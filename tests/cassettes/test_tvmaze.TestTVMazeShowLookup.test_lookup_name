@@ -4,17 +4,105 @@ interactions:
       headers:
         Connection: [close]
         Host: [api.tvmaze.com]
-        User-Agent: [Quicktime/7.7]
+        User-Agent: [Python-urllib/3.5]
       method: GET
-      uri: http://api.tvmaze.com/singlesearch/shows?q=House&embed=cast
+      uri: http://api.tvmaze.com/search/shows?q=House
     response:
-      body: {string: '{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":2,"network":{"id":4,"name":"FOX","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255,"imdb":"tt0412142"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/43/109527.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/43/109527.jpg"},"summary":"<p>Sink
+      body: {string: '[{"score":1.8527864,"show":{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":2,"network":{"id":4,"name":"FOX","country":{"name":"United
+          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255,"imdb":"tt0412142"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/43/109520.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/43/109520.jpg"},"summary":"<p>Sink
           your teeth into meaty drama and intrigue with <em><strong>\"House\"</strong></em>,
           FOX''s take on mystery, where the villain is a medical malady and the hero
           is an irreverent, controversial doctor who trusts no one, least of all his
-          patients.</p>","updated":1454899482,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}},"_embedded":{"cast":[{"person":{"id":25439,"url":"http://www.tvmaze.com/people/25439/hugh-laurie","name":"Hugh
-          Laurie","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7477.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7477.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/25439"}}},"character":{"id":32873,"url":"http://www.tvmaze.com/characters/32873/house-dr-gregory-house","name":"Dr.
+          patients.</p>","updated":1457120192,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}}}},{"score":1.5949285,"show":{"id":12544,"url":"http://www.tvmaze.com/shows/12544/horse-doctor","name":"Horse
+          Doctor","type":"Scripted","language":"Korean","genres":["Drama","Romance","Medical","History"],"status":"Ended","runtime":70,"premiered":"2012-10-01","schedule":{"time":"21:55","days":["Monday"]},"rating":{"average":null},"weight":0,"network":{"id":166,"name":"MBC","country":{"name":"Korea,
+          Republic of","code":"KR","timezone":"Asia/Seoul"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":262778,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/42/107212.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/42/107212.jpg"},"summary":"<p>Horse
+          Doctor follows the life of Baek Gwang-Hyun, a low-life veterinarian in the
+          Joseon period, struggles to become a royal physician.</p>","updated":1454481049,"_links":{"self":{"href":"http://api.tvmaze.com/shows/12544"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/597839"}}}},{"score":1.4437139,"show":{"id":175,"url":"http://www.tvmaze.com/shows/175/house-of-cards","name":"House
+          of Cards","type":"Scripted","language":"English","genres":["Drama","Thriller"],"status":"Running","runtime":60,"premiered":"2013-02-01","schedule":{"time":"","days":["Friday"]},"rating":{"average":8.8},"weight":100,"network":null,"webChannel":{"id":1,"name":"Netflix","country":{"name":"United
+          States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":27822,"thetvdb":262980,"imdb":"tt1856010"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2460.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2460.jpg"},"summary":"<p>A
+          Congressman works with his equally conniving wife to exact revenge on the
+          people who betrayed him.</p>","updated":1457202213,"_links":{"self":{"href":"http://api.tvmaze.com/shows/175"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/535325"}}}},{"score":1.3196723,"show":{"id":3081,"url":"http://www.tvmaze.com/shows/3081/fuller-house","name":"Fuller
+          House","type":"Scripted","language":"English","genres":["Comedy","Family"],"status":"Running","runtime":30,"premiered":"2016-02-26","schedule":{"time":"","days":["Friday"]},"rating":{"average":5.3},"weight":35,"network":null,"webChannel":{"id":1,"name":"Netflix","country":{"name":"United
+          States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":48701,"thetvdb":301236,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/47/118628.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/47/118628.jpg"},"summary":"<p>D.J.
+          Tanner-Fuller is a widow and mother of three. Things become too much to
+          handle, so she asks for help from her sister Stephanie and her best-friend
+          Kimmy.</p>","updated":1457119454,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3081"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/578058"}}}},{"score":1.2889916,"show":{"id":3819,"url":"http://www.tvmaze.com/shows/3819/house-vs-house","name":"House
+          vs. House","type":"Reality","language":"English","genres":[],"status":"Running","runtime":60,"premiered":"2014-07-22","schedule":{"time":"10:00","days":["Friday"]},"rating":{"average":null},"weight":0,"network":{"id":125,"name":"fyi,","country":{"name":"United
+          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":287378,"imdb":"tt4097428"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/19/48008.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/19/48008.jpg"},"summary":"<p><strong><em>\"House
+          vs. House\"</em></strong> is a new home makeover competition series where
+          amateur and experienced renovation teams compete for the chance to win $10,000
+          by proving they can create the better DIY projects in their home. From painting
+          and decorating, to one-of-a-kind, imaginative projects, each episode features
+          two teams will go head-to-head in grueling challenges. Tanya McQueen, a
+          DIY design expert, and David Brian Sanders, an architect and designer, will
+          determine which team completes the most impressive transformation and award
+          the cash prize.</p>","updated":1442545142,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3819"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/245354"}}}},{"score":1.2759428,"show":{"id":8725,"url":"http://www.tvmaze.com/shows/8725/disney-animated-shorts","name":"Disney
+          Animated Shorts","type":"Animation","language":"English","genres":["Comedy","Action","Children"],"status":"Running","runtime":5,"premiered":"1921-03-20","schedule":{"time":"20:55","days":["Friday"]},"rating":{"average":null},"weight":0,"network":{"id":78,"name":"Disney
+          Channel","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":78988,"imdb":"tt2768802"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/31/77690.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/77690.jpg"},"summary":"<p><strong><em>\"Disney
+          Animated Shorts</em></strong><strong><em>\"</em></strong> features all of
+          the animated short films produced by Walt Disney and Walt Disney Animation
+          Studios, from 1921 to the present. This includes films produced at the Laugh-O-Gram
+          Studio which Disney founded in 1921 as well as the animation studio now
+          owned by The Walt Disney Company, called the Disney Brothers Cartoon Studio
+          (1923), The Walt Disney Studio (1926), Walt Disney Productions (1929), Walt
+          Disney Feature Animation (1986), and Walt Disney Animation Studios (2007),
+          and includes all of the cartoons of Mickey Mouse, Donald Duck, Goofy, Pluto,
+          Humphrey the Bear and the Disney produced Oswald the Lucky Rabbit shorts.</p>","updated":1455346257,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8725"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/600609"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/583541"}}}},{"score":1.2581718,"show":{"id":10856,"url":"http://www.tvmaze.com/shows/10856/danger-mouse","name":"Danger
+          Mouse","type":"Animation","language":"English","genres":["Children"],"status":"Ended","runtime":10,"premiered":"1981-09-28","schedule":{"time":"","days":[]},"rating":{"average":10},"weight":0,"network":{"id":35,"name":"ITV","country":{"name":"United
+          Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":76308,"imdb":"tt0081848"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/36/91453.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/36/91453.jpg"},"summary":"<p><strong>\"</strong><strong><em>Danger
+          Mouse\"</em></strong> is a British children''s animated television series
+          produced by Cosgrove Hall Films for Thames Television. It featured the eponymous
+          Danger Mouse who worked as a secret agent. The show was a parody of British
+          spy fiction, particularly the <i>Danger Man</i> series and James Bond. The
+          show originally ran in the United Kingdom from 28 September 1981 to 19 March
+          1992.</p>","updated":1452661006,"_links":{"self":{"href":"http://api.tvmaze.com/shows/10856"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/548650"}}}},{"score":1.2581718,"show":{"id":5104,"url":"http://www.tvmaze.com/shows/5104/danger-mouse","name":"Danger
+          Mouse","type":"Animation","language":"English","genres":["Children","Family"],"status":"Running","runtime":12,"premiered":"2015-09-28","schedule":{"time":"18:00","days":["Monday","Tuesday","Wednesday","Thursday","Friday"]},"rating":{"average":10},"weight":2,"network":{"id":60,"name":"CBBC","country":{"name":"United
+          Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":300969,"imdb":"tt4196822"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/54509.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/54509.jpg"},"summary":"<p><strong><em>\"Danger
+          Mouse\"</em></strong> is back saving London, saving the World and, most
+          \nimportantly, saving Penfold in brand new and fantastically absurd, \nenergetic
+          adventures.</p>","updated":1456508259,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5104"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/620309"}}}},{"score":1.214111,"show":{"id":9649,"url":"http://www.tvmaze.com/shows/9649/four-houses","name":"Four
+          Houses","type":"Reality","language":"English","genres":[],"status":"Ended","runtime":60,"premiered":"2012-07-02","schedule":{"time":"22:00","days":["Monday"]},"rating":{"average":null},"weight":0,"network":{"id":80,"name":"TLC","country":{"name":"United
+          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":32044,"thetvdb":260169,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/33/83920.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/33/83920.jpg"},"summary":"<p>Modeled
+          after the TLC show \"Four Weddings,\" this competition series follows four
+          homeowners who are invited to preview, critique and score one another''s
+          homes for the chance to win $10,000 as well as be featured in Better Homes
+          and Gardens magazine. The hour-long episodes feature design-proud homeowners
+          hoping to impress the other three competitors with their decor and style
+          choices, which are graded -- often with frank and harsh opinions attached
+          -- using an overall impression score out of 10 and ranked for originality,
+          style and livability. The homeowner with the highest score wins the grand
+          prize.</p>","updated":1449506859,"_links":{"self":{"href":"http://api.tvmaze.com/shows/9649"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/518272"}}}},{"score":1.1757424,"show":{"id":1251,"url":"http://www.tvmaze.com/shows/1251/full-house","name":"Full
+          House","type":"Scripted","language":"English","genres":["Comedy","Family"],"status":"Ended","runtime":30,"premiered":"1987-09-18","schedule":{"time":"","days":[]},"rating":{"average":8},"weight":0,"network":{"id":3,"name":"ABC","country":{"name":"United
+          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3622,"thetvdb":70500,"imdb":"tt0092359"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/7/17933.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/7/17933.jpg"},"summary":"<p>Danny
+          Tanner, widowed father of three young and rambunctious girls recruits his
+          two buddies--his rock ''n'' roller brother-in-law, Jesse, and his best friend,
+          Joey, an infrequently employed stand-up comic--to move in and help him raise
+          the brood.</p>","updated":1454555069,"_links":{"self":{"href":"http://api.tvmaze.com/shows/1251"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/109208"}}}}]'}
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [close]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 06 Mar 2016 06:49:34 GMT']
+        Server: [nginx/1.4.6 (Ubuntu)]
+        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Connection: [close]
+        Host: [api.tvmaze.com]
+        User-Agent: [Python-urllib/3.5]
+      method: GET
+      uri: http://api.tvmaze.com/shows/118?embed=cast
+    response:
+      body: {string: '{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":2,"network":{"id":4,"name":"FOX","country":{"name":"United
+          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255,"imdb":"tt0412142"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/43/109520.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/43/109520.jpg"},"summary":"<p>Sink
+          your teeth into meaty drama and intrigue with <em><strong>\"House\"</strong></em>,
+          FOX''s take on mystery, where the villain is a medical malady and the hero
+          is an irreverent, controversial doctor who trusts no one, least of all his
+          patients.</p>","updated":1457120192,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}},"_embedded":{"cast":[{"person":{"id":25439,"url":"http://www.tvmaze.com/people/25439/hugh-laurie","name":"Hugh
+          Laurie","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/46/117107.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/46/117107.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/25439"}}},"character":{"id":32873,"url":"http://www.tvmaze.com/characters/32873/house-dr-gregory-house","name":"Dr.
           Gregory House","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1348.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1348.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32873"}}}},{"person":{"id":17012,"url":"http://www.tvmaze.com/people/17012/robert-sean-leonard","name":"Robert
           Sean Leonard","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7478.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7478.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/17012"}}},"character":{"id":32876,"url":"http://www.tvmaze.com/characters/32876/house-dr-james-wilson","name":"Dr.
           James Wilson","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1349.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1349.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32876"}}}},{"person":{"id":6320,"url":"http://www.tvmaze.com/people/6320/omar-epps","name":"Omar
@@ -31,18 +119,18 @@ interactions:
           Morrison","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/4212.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/4212.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/2911"}}},"character":{"id":32882,"url":"http://www.tvmaze.com/characters/32882/house-dr-allison-cameron","name":"Dr.
           Allison Cameron","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1351.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1351.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32882"}}}},{"person":{"id":23121,"url":"http://www.tvmaze.com/people/23121/kal-penn","name":"Kal
           Penn","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7482.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7482.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/23121"}}},"character":{"id":32883,"url":"http://www.tvmaze.com/characters/32883/house-dr-lawrence-kutner","name":"Dr.
-          Lawrence Kutner","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1356.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1356.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32883"}}}},{"person":{"id":8111,"url":"http://www.tvmaze.com/people/8111/odette-annable","name":"Odette
-          Annable","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7480.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7480.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8111"}}},"character":{"id":32880,"url":"http://www.tvmaze.com/characters/32880/house-dr-jessica-adams","name":"Dr.
-          Jessica Adams","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1354.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1354.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32880"}}}},{"person":{"id":25441,"url":"http://www.tvmaze.com/people/25441/charlyne-yi","name":"Charlyne
+          Lawrence Kutner","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1356.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1356.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32883"}}}},{"person":{"id":25441,"url":"http://www.tvmaze.com/people/25441/charlyne-yi","name":"Charlyne
           Yi","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7481.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7481.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/25441"}}},"character":{"id":32881,"url":"http://www.tvmaze.com/characters/32881/house-dr-chi-park","name":"Dr.
-          Chi Park","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1355.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1355.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32881"}}}}]}}'}
+          Chi Park","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1355.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1355.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32881"}}}},{"person":{"id":8111,"url":"http://www.tvmaze.com/people/8111/odette-annable","name":"Odette
+          Annable","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7480.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7480.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8111"}}},"character":{"id":32880,"url":"http://www.tvmaze.com/characters/32880/house-dr-jessica-adams","name":"Dr.
+          Jessica Adams","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1354.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1354.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32880"}}}}]}}'}
       headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Thu, 03 Mar 2016 09:33:04 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [close]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 06 Mar 2016 06:49:34 GMT']
+        Server: [nginx/1.4.6 (Ubuntu)]
+        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
 version: 1

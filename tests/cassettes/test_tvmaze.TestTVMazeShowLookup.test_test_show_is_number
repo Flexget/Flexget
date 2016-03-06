@@ -4,18 +4,24 @@ interactions:
       headers:
         Connection: [close]
         Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/2.7]
+        User-Agent: [Python-urllib/3.5]
       method: GET
       uri: http://api.tvmaze.com/search/shows?q=1992
     response:
-      body: {string: '[{"score":2.9334245,"show":{"id":4879,"url":"http://www.tvmaze.com/shows/4879/1992","name":"1992","type":"Scripted","language":"Italian","genres":["Drama","History"],"status":"Running","runtime":50,"premiered":"2015-03-24","schedule":{"time":"21:00","days":["Tuesday"]},"rating":{"average":8},"weight":1,"network":{"id":370,"name":"Sky
+      body: {string: '[{"score":2.9593544,"show":{"id":4879,"url":"http://www.tvmaze.com/shows/4879/1992","name":"1992","type":"Scripted","language":"Italian","genres":["Drama","History"],"status":"Running","runtime":50,"premiered":"2015-03-24","schedule":{"time":"21:00","days":["Tuesday"]},"rating":{"average":8},"weight":1,"network":{"id":370,"name":"Sky
           Cinema","country":{"name":"Italy","code":"IT","timezone":"Europe/Rome"}},"webChannel":null,"externals":{"tvrage":47669,"thetvdb":292192,"imdb":"tt2983290"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/53426.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/53426.jpg"},"summary":"<p>Set
           in early nineties Italy when there was a nationwide judicial investigation
           into corruption. This resulted in the break down of many political parties
           as well as the arrest and conviction of some high profile political figures.
           The story will follow six people whose lives are intertwined with the rapidly
           changing political landscape, exposing the far-reaching impact of the greed
-          and corruption.</p>","updated":1454187647,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4879"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/308495"}}}},{"score":0.9276519,"show":{"id":7260,"url":"http://www.tvmaze.com/shows/7260/answer-me-1994","name":"Answer
+          and corruption.</p>","updated":1454187647,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4879"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/308495"}}}},{"score":0.9210497,"show":{"id":5920,"url":"http://www.tvmaze.com/shows/5920/space-1999","name":"Space:
+          1999","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":60,"premiered":"1975-09-04","schedule":{"time":"","days":[]},"rating":{"average":8},"weight":0,"network":{"id":35,"name":"ITV","country":{"name":"United
+          Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":76366,"imdb":"tt0072564"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/23/58465.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/23/58465.jpg"},"summary":"<p>It''s
+          1999 and Moonbase Alpha has been built on the Moon to safeguard the\n nuclear
+          waste shipped from Earth. On September 13, 1999, disaster \nstrikes and
+          the nuclear waste explodes, causing a chain reaction that \nhurls the Moon
+          out of Earth''s orbit and into deep space.</p>","updated":1444601120,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5920"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/354641"}}}},{"score":0.8566607,"show":{"id":7260,"url":"http://www.tvmaze.com/shows/7260/answer-me-1994","name":"Answer
           Me 1994","type":"Scripted","language":"Korean","genres":["Comedy","Romance"],"status":"Ended","runtime":65,"premiered":"2013-10-18","schedule":{"time":"03:40","days":["Friday"]},"rating":{"average":null},"weight":0,"network":{"id":280,"name":"tvN","country":{"name":"Korea,
           Republic of","code":"KR","timezone":"Asia/Seoul"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":273209,"imdb":"tt3357586"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/27/67567.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/27/67567.jpg"},"summary":"<p>A
           drama about a group of college students who live in a boarding house located
@@ -24,7 +30,7 @@ interactions:
           of college freshmen in 1994 as they learn to live in a big city and what
           the students will go through as they experience Seoul, the basketball tournament
           obsession, Seo Taiji and Kids, and other social issues that occurred in
-          1994.</p>","updated":1446299861,"_links":{"self":{"href":"http://api.tvmaze.com/shows/7260"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/414745"}}}},{"score":0.9276519,"show":{"id":7266,"url":"http://www.tvmaze.com/shows/7266/answer-me-1997","name":"Answer
+          1994.</p>","updated":1446299861,"_links":{"self":{"href":"http://api.tvmaze.com/shows/7260"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/414745"}}}},{"score":0.8566607,"show":{"id":7266,"url":"http://www.tvmaze.com/shows/7266/answer-me-1997","name":"Answer
           Me 1997","type":"Scripted","language":"Korean","genres":["Comedy","Romance"],"status":"Ended","runtime":30,"premiered":"2012-07-24","schedule":{"time":"23:00","days":["Tuesday"]},"rating":{"average":10},"weight":0,"network":{"id":280,"name":"tvN","country":{"name":"Korea,
           Republic of","code":"KR","timezone":"Asia/Seoul"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":260977,"imdb":"tt2782216"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/27/67572.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/27/67572.jpg"},"summary":"<p>This
           drama will focus on the extreme fan culture that emerged in the 1990s when
@@ -33,15 +39,9 @@ interactions:
           in 2012 and brings back memories to 1997 when they were still high school
           students. Moving back and forth between the ''90s and today, the story centers
           on the life of Sung Shi Won (Jung Eun Ji), who idolizes boyband H.O.T.,
-          and her 5 high school friends.</p>","updated":1446299847,"_links":{"self":{"href":"http://api.tvmaze.com/shows/7266"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/414822"}}}},{"score":0.9129714,"show":{"id":5920,"url":"http://www.tvmaze.com/shows/5920/space-1999","name":"Space:
-          1999","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":60,"premiered":"1975-09-04","schedule":{"time":"","days":[]},"rating":{"average":8},"weight":0,"network":{"id":35,"name":"ITV","country":{"name":"United
-          Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":76366,"imdb":"tt0072564"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/23/58465.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/23/58465.jpg"},"summary":"<p>It''s
-          1999 and Moonbase Alpha has been built on the Moon to safeguard the\n nuclear
-          waste shipped from Earth. On September 13, 1999, disaster \nstrikes and
-          the nuclear waste explodes, causing a chain reaction that \nhurls the Moon
-          out of Earth''s orbit and into deep space.</p>","updated":1444601120,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5920"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/354641"}}}},{"score":0.792463,"show":{"id":4243,"url":"http://www.tvmaze.com/shows/4243/iron-man-1996","name":"Iron
+          and her 5 high school friends.</p>","updated":1446299847,"_links":{"self":{"href":"http://api.tvmaze.com/shows/7266"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/414822"}}}},{"score":0.7368398,"show":{"id":4243,"url":"http://www.tvmaze.com/shows/4243/iron-man-1996","name":"Iron
           Man 1996","type":"Animation","language":null,"genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":30,"premiered":"1994-09-24","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":{"id":72,"name":"Syndication","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":76278,"imdb":"tt0115218"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/20/50854.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/20/50854.jpg"},"summary":"","updated":1443128992,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4243"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/279853"}}}},{"score":0.5477828,"show":{"id":13445,"url":"http://www.tvmaze.com/shows/13445/salem-rogers-model-of-the-year-1998","name":"Salem
+          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":76278,"imdb":"tt0115218"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/20/50854.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/20/50854.jpg"},"summary":"","updated":1443128992,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4243"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/279853"}}}},{"score":0.5526298,"show":{"id":13445,"url":"http://www.tvmaze.com/shows/13445/salem-rogers-model-of-the-year-1998","name":"Salem
           Rogers: Model of the Year 1998","type":"Scripted","language":"English","genres":["Comedy"],"status":"Ended","runtime":30,"premiered":"2015-01-15","schedule":{"time":"00:01","days":["Thursday"]},"rating":{"average":null},"weight":0,"network":null,"webChannel":{"id":3,"name":"Amazon","country":{"name":"United
           States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/46/116274.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/46/116274.jpg"},"summary":"<p>After
           a decade in rehab, an abrasive former supermodel tries to recreate\n her
@@ -50,20 +50,20 @@ interactions:
           where people jump at her command or care about who she was. A \nhalf-hour
           comedy starring Leslie Bibb (About a Boy) and Rachel Dratch \n(SNL).</p>","updated":1456541819,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13445"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/630636"}}}}]'}
       headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Thu, 03 Mar 2016 09:33:07 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [close]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 06 Mar 2016 06:50:02 GMT']
+        Server: [nginx/1.4.6 (Ubuntu)]
+        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Connection: [close]
         Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/2.7]
+        User-Agent: [Python-urllib/3.5]
       method: GET
       uri: http://api.tvmaze.com/shows/4879?embed=cast
     response:
@@ -106,20 +106,20 @@ interactions:
           Ragno","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/people/88827"}}},"character":{"id":177292,"url":"http://www.tvmaze.com/characters/177292/1992-michele-mainaghi","name":"Michele
           Mainaghi","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/53436.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/53436.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/177292"}}}}]}}'}
       headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Thu, 03 Mar 2016 09:33:08 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [close]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 06 Mar 2016 06:50:03 GMT']
+        Server: [nginx/1.4.6 (Ubuntu)]
+        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Connection: [close]
         Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/2.7]
+        User-Agent: [Python-urllib/3.5]
       method: GET
       uri: http://api.tvmaze.com/shows/4879/episodebynumber?season=1&number=2
     response:
@@ -128,22 +128,197 @@ interactions:
           Notte attempts to hide his murky past as a radical left activist, while
           Luca Pastore takes care of some personal business. </p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/308487"}}}'}
       headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Thu, 03 Mar 2016 09:33:09 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [close]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 06 Mar 2016 06:50:04 GMT']
+        Server: [nginx/1.4.6 (Ubuntu)]
+        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Connection: [close]
         Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/2.7]
+        User-Agent: [Python-urllib/3.5]
       method: GET
-      uri: http://api.tvmaze.com/singlesearch/shows?q=24&embed=cast
+      uri: http://api.tvmaze.com/search/shows?q=24
+    response:
+      body: {string: "[{\"score\":2.3000493,\"show\":{\"id\":167,\"url\":\"http://www.tvmaze.com/shows/167/24\"\
+          ,\"name\":\"24\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\"\
+          :[\"Drama\",\"Action\",\"Crime\",\"Thriller\",\"Mystery\"],\"status\":\"\
+          Ended\",\"runtime\":60,\"premiered\":\"2001-11-06\",\"schedule\":{\"time\"\
+          :\"21:00\",\"days\":[\"Monday\"]},\"rating\":{\"average\":8.5},\"weight\"\
+          :2,\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United\
+          \ States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\"\
+          :null,\"externals\":{\"tvrage\":2445,\"thetvdb\":76290,\"imdb\":\"tt0285331\"\
+          },\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/2330.jpg\"\
+          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/2330.jpg\"\
+          },\"summary\":\"<p>Jack Bauer, agent of CTU (Counter Terrorist Unit) faces\
+          \ threats against his country and himself in this action packed show. Each\
+          \ season contains of one day, each episode shows one hour of Jack Bauer's\
+          \ day. <em><strong>24</strong></em> is the only action show in real time\
+          \ and gained alot of fans during the years with this concept.</p>\",\"updated\"\
+          :1456805383,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/167\"\
+          },\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/12094\"\
+          }}}},{\"score\":2.2657676,\"show\":{\"id\":6353,\"url\":\"http://www.tvmaze.com/shows/6353/24\"\
+          ,\"name\":\"24\",\"type\":\"Scripted\",\"language\":\"Hindi\",\"genres\"\
+          :[],\"status\":\"Ended\",\"runtime\":60,\"premiered\":\"2013-10-04\",\"\
+          schedule\":{\"time\":\"22:00\",\"days\":[\"Saturday\"]},\"rating\":{\"average\"\
+          :9},\"weight\":0,\"network\":{\"id\":438,\"name\":\"Colors\",\"country\"\
+          :{\"name\":\"India\",\"code\":\"IN\",\"timezone\":\"Asia/Kolkata\"}},\"\
+          webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":273614,\"imdb\"\
+          :\"tt2792284\"},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/24/60878.jpg\"\
+          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/24/60878.jpg\"\
+          },\"summary\":\"<p>24 is an Indian television drama that aired from 4 October\
+          \ 2013 \\nthrough 21 December 2013 and was based on the American series\
+          \ of the \\nsame name</p>\",\"updated\":1452610471,\"_links\":{\"self\"\
+          :{\"href\":\"http://api.tvmaze.com/shows/6353\"},\"previousepisode\":{\"\
+          href\":\"http://api.tvmaze.com/episodes/377269\"}}}},{\"score\":1.4321954,\"\
+          show\":{\"id\":11786,\"url\":\"http://www.tvmaze.com/shows/11786/24-legacy\"\
+          ,\"name\":\"24: Legacy\",\"type\":\"Scripted\",\"language\":\"English\"\
+          ,\"genres\":[\"Drama\",\"Action\",\"Adventure\",\"Crime\"],\"status\":\"\
+          In Development\",\"runtime\":60,\"premiered\":null,\"schedule\":{\"time\"\
+          :\"\",\"days\":[]},\"rating\":{\"average\":8.5},\"weight\":1,\"network\"\
+          :{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United States\",\"code\"\
+          :\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\"\
+          :{\"tvrage\":null,\"thetvdb\":null,\"imdb\":null},\"image\":{\"medium\"\
+          :\"http://tvmazecdn.com/uploads/images/medium_portrait/39/99144.jpg\",\"\
+          original\":\"http://tvmazecdn.com/uploads/images/original_untouched/39/99144.jpg\"\
+          },\"summary\":\"<p>A military hero returns to the U.S. and trouble follows\
+          \ him back, compelling him to ask CTU for help in saving his life, and stopping\
+          \ what potentially could be one of the largest-scale terror attacks on American\
+          \ soil.</p>\",\"updated\":1454009960,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/11786\"\
+          }}}},{\"score\":1.4161249,\"show\":{\"id\":6892,\"url\":\"http://www.tvmaze.com/shows/6892/247\"\
+          ,\"name\":\"24/7\",\"type\":\"Documentary\",\"language\":\"English\",\"\
+          genres\":[],\"status\":\"To Be Determined\",\"runtime\":60,\"premiered\"\
+          :\"2007-04-15\",\"schedule\":{\"time\":\"23:00\",\"days\":[\"Saturday\"\
+          ]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":8,\"name\"\
+          :\"HBO\",\"country\":{\"name\":\"United States\",\"code\":\"US\",\"timezone\"\
+          :\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":24555,\"\
+          thetvdb\":213021,\"imdb\":null},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/26/65144.jpg\"\
+          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/26/65144.jpg\"\
+          },\"summary\":\"<p><strong><em>24/7</em></strong> is HBO's reality series\
+          \ that goes behind-the-scenes with athletes as they prepare for future matchups.\
+          \ The series debuted in 2007 with a look at Oscar De La Hoya and Floyd Mayweather\
+          \ Jr. as they prepared to face each other for the junior-middleweight title.\
+          \ Later seasons focused on other boxing matchups, in addition to NASCAR\
+          \ driver Jimmie Johnson and multiple NHL teams.</p>\",\"updated\":1451690059,\"\
+          _links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/6892\"},\"previousepisode\"\
+          :{\"href\":\"http://api.tvmaze.com/episodes/436758\"}}}},{\"score\":1.4161048,\"\
+          show\":{\"id\":7591,\"url\":\"http://www.tvmaze.com/shows/7591/wwe-24\"\
+          ,\"name\":\"WWE 24\",\"type\":\"Documentary\",\"language\":\"English\",\"\
+          genres\":[],\"status\":\"Running\",\"runtime\":60,\"premiered\":\"2015-01-30\"\
+          ,\"schedule\":{\"time\":\"\",\"days\":[]},\"rating\":{\"average\":null},\"\
+          weight\":0,\"network\":null,\"webChannel\":{\"id\":15,\"name\":\"WWE Network\"\
+          ,\"country\":{\"name\":\"United States\",\"code\":\"US\",\"timezone\":\"\
+          America/New_York\"}},\"externals\":{\"tvrage\":null,\"thetvdb\":291489,\"\
+          imdb\":null},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/28/70049.jpg\"\
+          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/28/70049.jpg\"\
+          },\"summary\":\"\",\"updated\":1456389243,\"_links\":{\"self\":{\"href\"\
+          :\"http://api.tvmaze.com/shows/7591\"},\"previousepisode\":{\"href\":\"\
+          http://api.tvmaze.com/episodes/578349\"}}}},{\"score\":1.1414768,\"show\"\
+          :{\"id\":4439,\"url\":\"http://www.tvmaze.com/shows/4439/24-hours-in-ae\"\
+          ,\"name\":\"24 Hours in A&E\",\"type\":\"Documentary\",\"language\":\"English\"\
+          ,\"genres\":[\"Medical\"],\"status\":\"Running\",\"runtime\":60,\"premiered\"\
+          :\"2011-05-11\",\"schedule\":{\"time\":\"21:00\",\"days\":[\"Wednesday\"\
+          ]},\"rating\":{\"average\":null},\"weight\":1,\"network\":{\"id\":45,\"\
+          name\":\"Channel 4\",\"country\":{\"name\":\"United Kingdom\",\"code\":\"\
+          GB\",\"timezone\":\"Europe/London\"}},\"webChannel\":null,\"externals\"\
+          :{\"tvrage\":28202,\"thetvdb\":248699,\"imdb\":\"tt2674484\"},\"image\"\
+          :{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/26/65390.jpg\"\
+          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/26/65390.jpg\"\
+          },\"summary\":\"<p>Cameras film around the clock in some of Britain's busiest\
+          \ A&amp;E departments.</p>\",\"updated\":1457225834,\"_links\":{\"self\"\
+          :{\"href\":\"http://api.tvmaze.com/shows/4439\"},\"previousepisode\":{\"\
+          href\":\"http://api.tvmaze.com/episodes/621879\"},\"nextepisode\":{\"href\"\
+          :\"http://api.tvmaze.com/episodes/633206\"}}}},{\"score\":1.1343755,\"show\"\
+          :{\"id\":12856,\"url\":\"http://www.tvmaze.com/shows/12856/24\",\"name\"\
+          :\"\u0423\u0441\u043F\u0435\u0442\u044C \u0437\u0430 24 \u0447\u0430\u0441\
+          \u0430\",\"type\":\"Reality\",\"language\":\"Russian\",\"genres\":[],\"\
+          status\":\"Running\",\"runtime\":48,\"premiered\":\"2014-02-16\",\"schedule\"\
+          :{\"time\":\"10:00\",\"days\":[\"Sunday\"]},\"rating\":{\"average\":null},\"\
+          weight\":0,\"network\":{\"id\":304,\"name\":\"\u0421\u0422\u0421\",\"country\"\
+          :{\"name\":\"Russian Federation\",\"code\":\"RU\",\"timezone\":\"Asia/Magadan\"\
+          }},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":null,\"\
+          imdb\":null},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/43/109945.jpg\"\
+          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/43/109945.jpg\"\
+          },\"summary\":\"<p>Show the transformation of \\\"Catch 24 hours\\\" will\
+          \ make any girl a real beauty from the cover of a glossy magazine in just\
+          \ 24 hours!</p>\",\"updated\":1456614865,\"_links\":{\"self\":{\"href\"\
+          :\"http://api.tvmaze.com/shows/12856\"},\"previousepisode\":{\"href\":\"\
+          http://api.tvmaze.com/episodes/632003\"}}}},{\"score\":1.1336017,\"show\"\
+          :{\"id\":6817,\"url\":\"http://www.tvmaze.com/shows/6817/24-hour-rental\"\
+          ,\"name\":\"24 Hour Rental\",\"type\":\"Scripted\",\"language\":\"English\"\
+          ,\"genres\":[\"Comedy\",\"Crime\"],\"status\":\"Running\",\"runtime\":30,\"\
+          premiered\":\"2015-10-30\",\"schedule\":{\"time\":\"\",\"days\":[\"Friday\"\
+          ]},\"rating\":{\"average\":null},\"weight\":0,\"network\":null,\"webChannel\"\
+          :{\"id\":2,\"name\":\"Hulu\",\"country\":{\"name\":\"United States\",\"\
+          code\":\"US\",\"timezone\":\"America/New_York\"}},\"externals\":{\"tvrage\"\
+          :null,\"thetvdb\":null,\"imdb\":null},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/25/64502.jpg\"\
+          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/25/64502.jpg\"\
+          },\"summary\":\"<p>In a \\\"Clerks\\\" meets \\\"Sopranos\\\" gangster series,\
+          \ petty criminals operate a shady video rental store. Forget about gallows\
+          \ humor, 24 Hr. Rental is black comedy 2 weeks after the execution. <strong><em>\\\
+          \"24 HOUR RENTAL\\\"</em></strong> follows Tracker (Orzari), a former Mafia\
+          \ boss. Having barely avoided an early retirement in a shallow grave, he\
+          \ now operates a seedy video store. Struggling to stay afloat in the Internet\
+          \ age, Tracker runs his shop as a front for a host of petty crimes-from\
+          \ fencing jewelry to peddling dope cut with Drano and desperation-all in\
+          \ hopes of returning to power. </p>\",\"updated\":1456389243,\"_links\"\
+          :{\"self\":{\"href\":\"http://api.tvmaze.com/shows/6817\"},\"previousepisode\"\
+          :{\"href\":\"http://api.tvmaze.com/episodes/397230\"}}}},{\"score\":1.132894,\"\
+          show\":{\"id\":3961,\"url\":\"http://www.tvmaze.com/shows/3961/boarding-house-no-24\"\
+          ,\"name\":\"Boarding House No. 24\",\"type\":\"Scripted\",\"language\":\"\
+          Korean\",\"genres\":[\"Comedy\",\"Romance\"],\"status\":\"Ended\",\"runtime\"\
+          :60,\"premiered\":\"2014-09-23\",\"schedule\":{\"time\":\"18:00\",\"days\"\
+          :[\"Tuesday\"]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"\
+          id\":166,\"name\":\"MBC\",\"country\":{\"name\":\"Korea, Republic of\",\"\
+          code\":\"KR\",\"timezone\":\"Asia/Seoul\"}},\"webChannel\":null,\"externals\"\
+          :{\"tvrage\":null,\"thetvdb\":286314,\"imdb\":null},\"image\":{\"medium\"\
+          :\"http://tvmazecdn.com/uploads/images/medium_portrait/19/49094.jpg\",\"\
+          original\":\"http://tvmazecdn.com/uploads/images/original_untouched/19/49094.jpg\"\
+          },\"summary\":\"<p>A sitcom about seven boarders who have different personalities\
+          \ and situations. It is depicting dreams, careers, love and friendship of\
+          \ young people in their 20s who live under the same roof due to the plot\
+          \ of the house owner Kim Kwang Kyu.</p>\",\"updated\":1442776727,\"_links\"\
+          :{\"self\":{\"href\":\"http://api.tvmaze.com/shows/3961\"},\"previousepisode\"\
+          :{\"href\":\"http://api.tvmaze.com/episodes/253527\"}}}},{\"score\":1.1328838,\"\
+          show\":{\"id\":6813,\"url\":\"http://www.tvmaze.com/shows/6813/36-24-36\"\
+          ,\"name\":\"36-24-36\",\"type\":\"Scripted\",\"language\":\"English\",\"\
+          genres\":[\"Comedy\"],\"status\":\"In Development\",\"runtime\":30,\"premiered\"\
+          :null,\"schedule\":{\"time\":\"\",\"days\":[]},\"rating\":{\"average\":null},\"\
+          weight\":0,\"network\":{\"id\":9,\"name\":\"Showtime\",\"country\":{\"name\"\
+          :\"United States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"\
+          webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":null,\"imdb\"\
+          :null},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/25/64498.jpg\"\
+          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/25/64498.jpg\"\
+          },\"summary\":\"<p><strong><em>\\\"</em></strong><em><strong>36-24-36\\\"\
+          </strong>,</em> whose title refers to what had been considered \\\"ideal\\\
+          \" female model measurements, is about the first black TV model to be featured\
+          \ on a major game show in 1990. Celebrity and glamour collide with sexual\
+          \ harassment, racism, misogyny, homophobia, bulimia and job insecurity,\
+          \ for the four gorgeous models on the No. 1 game show of the \u201890's.</p>\"\
+          ,\"updated\":1445565602,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/6813\"\
+          }}}}]"}
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [close]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 06 Mar 2016 06:50:04 GMT']
+        Server: [nginx/1.4.6 (Ubuntu)]
+        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Connection: [close]
+        Host: [api.tvmaze.com]
+        User-Agent: [Python-urllib/3.5]
+      method: GET
+      uri: http://api.tvmaze.com/shows/167?embed=cast
     response:
       body: {string: '{"id":167,"url":"http://www.tvmaze.com/shows/167/24","name":"24","type":"Scripted","language":"English","genres":["Drama","Action","Crime","Thriller","Mystery"],"status":"Ended","runtime":60,"premiered":"2001-11-06","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":8.5},"weight":2,"network":{"id":4,"name":"FOX","country":{"name":"United
           States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":2445,"thetvdb":76290,"imdb":"tt0285331"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2330.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2330.jpg"},"summary":"<p>Jack
@@ -246,32 +421,32 @@ interactions:
           Matthey","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2375.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2375.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/9993"}}},"character":{"id":44063,"url":"http://www.tvmaze.com/characters/44063/24-jordan-reed","name":"Jordan
           Reed","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/44063"}}}}]}}'}
       headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Thu, 03 Mar 2016 09:33:09 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [close]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 06 Mar 2016 06:50:05 GMT']
+        Server: [nginx/1.4.6 (Ubuntu)]
+        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Connection: [close]
         Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/2.7]
+        User-Agent: [Python-urllib/3.5]
       method: GET
       uri: http://api.tvmaze.com/shows/167/episodebynumber?season=9&number=12
     response:
       body: {string: '{"id":12094,"url":"http://www.tvmaze.com/episodes/12094/24-9x12-day-9-1000-pm-1100-am","name":"Day
           9: 10:00 PM-11:00 AM","season":9,"number":12,"airdate":"2014-07-14","airtime":"21:00","airstamp":"2014-07-14T21:00:00-04:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/12094"}}}'}
       headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Thu, 03 Mar 2016 09:33:11 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [close]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Sun, 06 Mar 2016 06:50:06 GMT']
+        Server: [nginx/1.4.6 (Ubuntu)]
+        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
 version: 1
