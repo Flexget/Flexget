@@ -377,6 +377,9 @@ class Episode(Base):
         # Can't compare id type identifiers
         return NotImplemented
 
+    def __hash__(self):
+        return self.id
+
 
 Index('episode_series_identifier', Episode.series_id, Episode.identifier)
 
