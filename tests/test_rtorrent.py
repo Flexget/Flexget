@@ -1,7 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import mock
 import os
-import xmlrpclib
+import xmlrpc.client
 
 from flexget.plugins.plugin_rtorrent import RTorrent
 
@@ -62,7 +65,7 @@ class TestRTorrentClient(object):
         mocked_proxy.execute.throw.assert_called_with('', 'mkdir', '-p', '/data/downloads')
 
         # Ensure load was called
-        match_binary = Matcher(compare_binary, xmlrpclib.Binary(torrent_raw))
+        match_binary = Matcher(compare_binary, xmlrpc.client.Binary(torrent_raw))
         mocked_proxy.load.raw_start.assert_called_with(
             '',
             match_binary,

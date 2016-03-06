@@ -1,6 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 
-from StringIO import StringIO
+from io import StringIO
 
 import pytest
 from jinja2 import Template

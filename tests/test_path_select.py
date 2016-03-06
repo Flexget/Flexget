@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import range
+from builtins import object
 import os
 import mock
 from flexget.config_schema import parse_size

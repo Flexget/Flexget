@@ -1,3 +1,4 @@
+from builtins import object
 import json
 import os
 from mock import patch

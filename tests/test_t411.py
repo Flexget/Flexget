@@ -1,6 +1,9 @@
 # -*- coding: utf8 -*-
 from __future__ import unicode_literals, division, absolute_import
-from __builtin__ import object
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+from builtins import object
 import logging
 
 import mock

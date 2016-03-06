@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import next
+from builtins import object
 
 import mock
 import pytest

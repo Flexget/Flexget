@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from past.builtins import basestring
+from builtins import object
 
 from flexget import plugin
 from flexget.event import event
