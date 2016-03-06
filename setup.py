@@ -10,7 +10,8 @@ with io.open('README.rst', encoding='utf-8') as readme:
 
 # Populates __version__ without importing the package
 __version__ = None
-execfile('flexget/_version.py')
+with io.open('flexget/_version.py', encoding='utf-8')as ver_file:
+    exec(ver_file.read())
 if not __version__:
     print('Could not find __version__ from flexget/_version.py')
     sys.exit(1)
