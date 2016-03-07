@@ -33,6 +33,7 @@ PIN_URL = 'http://trakt.tv/pin/346'
 updated = SimplePersistence('api_trakt')
 sync_cache = TimedDict(cache_time='15 minutes')
 
+
 # Oauth account authentication
 class TraktUserAuth(Base):
     __tablename__ = 'trakt_user_auth'
@@ -832,13 +833,14 @@ def update_movie_collection(username=None, account=None, session=None):
                                                        account=account, updated_at=datetime.now())
                     session.add(collected)
         else:  # update local cache
-            sync_cache[username] = {}
+            if username not in sync_cache:
+                sync_cache[username] = {}
+                sync_cache[username]['collection'] = {}
             for movie in movies:
                 movie_id = movie['movie']['ids']['trakt']
-                sync_cache[username][movie_id] = movie['movie']
-                sync_cache[username][movie_id]['collected_at'] = dateutil_parse(movie['collected_at'],
-                                                                                      ignoretz=True)
-
+                sync_cache[username]['collection'][movie_id] = movie['movie']
+                sync_cache[username]['collection'][movie_id]['collected_at'] = dateutil_parse(movie['collected_at'],
+                                                                                              ignoretz=True)
     except requests.RequestException as e:
         raise plugin.PluginError('Unable to get movie collection data from trakt.tv: %s' % e)
 
@@ -961,7 +963,7 @@ class ApiTrakt(object):
                     update_movie_collection(username=username)
                 else:
                     update_episode_collection(account=account)
-            if trakt_data.id in sync_cache.get(username):
+            if trakt_data.id in sync_cache.get(username, {}).get('collection'):
                 in_collection = True
         log.info('The result for entry "%s" is: %s', title,
                  'Owned' if in_collection else 'Not owned')
@@ -994,8 +996,8 @@ class ApiTrakt(object):
                 if trakt_data.id == movie['movie']['ids']['trakt']:
                     watched = True
                     break
-        log.debug('The result for entry "%s" is: %s' % (title,
-                  'Watched' if watched else 'Not watched'))
+        log.debug('The result for entry "%s" is: %s', title,
+                  'Watched' if watched else 'Not watched')
         return watched
 
 
