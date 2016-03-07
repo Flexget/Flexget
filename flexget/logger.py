@@ -130,7 +130,13 @@ class FlexGetLogger(logging.Logger):
         # Replace newlines in log messages with \n
         if isinstance(msg, basestring):
             msg = msg.replace('\n', '\\n')
-        return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra, sinfo)
+
+        kwargs = {'func': func, 'extra': extra}
+        # sinfo introduced in py3, if it exists then send it..
+        if sinfo:
+            kwargs['sinfo'] = sinfo
+
+        return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, **kwargs)
 
     def trace(self, msg, *args, **kwargs):
         """Log at TRACE level (more detailed than DEBUG)."""
