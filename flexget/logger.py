@@ -122,7 +122,7 @@ class RollingBuffer(collections.deque):
 class FlexGetLogger(logging.Logger):
     """Custom logger that adds trace and verbose logging methods, and contextual information to log records."""
 
-    def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None, sinfo=None):
+    def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra, *exargs):
         extra = extra or {}
         extra.update(
             task=getattr(local_context, 'task', ''),
@@ -131,12 +131,7 @@ class FlexGetLogger(logging.Logger):
         if isinstance(msg, basestring):
             msg = msg.replace('\n', '\\n')
 
-        kwargs = {'func': func, 'extra': extra}
-        # sinfo introduced in py3, if it exists then send it..
-        if sinfo:
-            kwargs['sinfo'] = sinfo
-
-        return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, **kwargs)
+        return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra, *exargs)
 
     def trace(self, msg, *args, **kwargs):
         """Log at TRACE level (more detailed than DEBUG)."""
