@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from future import standard_library
 standard_library.install_aliases()
-from builtins import object
+from builtins import object, next
 import itertools
 import logging
 import threading
@@ -22,10 +22,10 @@ log = logging.getLogger('torrent_alive')
 
 
 class TorrentAliveThread(threading.Thread):
-    _counter = itertools.count().__next__
+    _counter = itertools.count()
 
     def __init__(self, tracker, info_hash):
-        threading.Thread.__init__(self, name='torrent_alive-%d' % self._counter())
+        threading.Thread.__init__(self, name='torrent_alive-%d' % next(self._counter))
         self.tracker = tracker
         self.info_hash = info_hash
         self.tracker_seeds = 0
