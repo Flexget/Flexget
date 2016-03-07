@@ -5,14 +5,15 @@ class TestListInterface(object):
     config = """
         tasks:
           list_get:
-            movie_list: test_list
+            entry_list: test_list
 
           test_list_add:
             mock:
-              - {title: 'title 1', url: "http://mock.url/file1.torrent", imdb_id: "tt133434"}
-              - {title: 'title 2', url: "http://mock.url/file2.torrent", imdb_id: "tt145434"}
+              - {title: 'title 1', url: "http://mock.url/file1.torrent"}
+              - {title: 'title 2', url: "http://mock.url/file2.torrent"}
+            accept_all: yes
             list_add:
-              - movie_list: test_list
+              - entry_list: test_list
     """
 
     def test_list_add(self, execute_task):
