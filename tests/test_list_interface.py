@@ -21,4 +21,4 @@ class TestListInterface(object):
         assert len(task.entries) == 2
 
         task = execute_task('list_get')
-        assert len(task.entries) == 2
+        assert len(task.all_entries) == 2
