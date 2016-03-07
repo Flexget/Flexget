@@ -572,10 +572,11 @@ class APITVMaze(object):
                 raise LookupError(e.value)
         # See if episode exists in DB
         episode = session.query(TVMazeEpisodes).filter(
-            and_(
-                TVMazeEpisodes.tvmaze_id == pytvmaze_episode.maze_id,
-                TVMazeEpisodes.number == pytvmaze_episode.episode_number,
-                TVMazeEpisodes.season_number == pytvmaze_episode.season_number)
+            or_(TVMazeEpisodes.tvmaze_id == pytvmaze_episode.maze_id,
+                and_(
+                    TVMazeEpisodes.number == pytvmaze_episode.episode_number,
+                    TVMazeEpisodes.season_number == pytvmaze_episode.season_number)
+                )
         ).first()
 
         if episode:
