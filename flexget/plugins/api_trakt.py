@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from dateutil.parser import parse as dateutil_parse
 from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, Date, DateTime, Time, or_, func, and_
 from sqlalchemy.orm import relation, object_session
-from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
@@ -33,41 +32,41 @@ PIN_URL = 'http://trakt.tv/pin/346'
 # Stores the last time we checked for updates for shows/movies
 updated = SimplePersistence('api_trakt')
 LAST_ACTIVITIES_MAP = {
-  'all': 'all',
-  'movies': {
-    'watched_at': 'movies_watched_at',
-    'collected_at': 'movies_collected_at',
-    'rated_at': 'movies_rated_at',
-    'watchlisted_at': 'movied_watchlisted_at',
-    'commented_at': 'movies_commented_at',
-    'paused_at': 'movies_paused_at'
-  },
-  'episodes': {
-    'watched_at': 'episodes_watched_at',
-    'collected_at': 'episodes_collected_at',
-    'rated_at': 'episodes_rated_at',
-    'watchlisted_at': 'episodes_watchlisted_at',
-    'commented_at': 'episodes_commented_at',
-    'paused_at': 'episodes_paused_at'
-  },
-  'shows': {
-    'rated_at': 'shows_rated_at',
-    'watchlisted_at': 'shows_watchlisted_at',
-    'commented_at': 'shows_commented_at'
-  },
-  'seasons': {
-    'rated_at': 'seasons_rated_at',
-    'watchlisted_at': 'seasons_watchlisted_at',
-    'commented_at': 'seasons_commented_at'
-  },
-  'comments': {
-    'liked_at': 'comments_liked_at'
-  },
-  'lists': {
-    'liked_at': 'lists_liked_at',
-    'updated_at': 'lists_updated_at',
-    'commented_at': 'lists_commented_at'
-  }
+    'all': 'all',
+    'movies': {
+        'watched_at': 'movies_watched_at',
+        'collected_at': 'movies_collected_at',
+        'rated_at': 'movies_rated_at',
+        'watchlisted_at': 'movied_watchlisted_at',
+        'commented_at': 'movies_commented_at',
+        'paused_at': 'movies_paused_at'
+    },
+    'episodes': {
+        'watched_at': 'episodes_watched_at',
+        'collected_at': 'episodes_collected_at',
+        'rated_at': 'episodes_rated_at',
+        'watchlisted_at': 'episodes_watchlisted_at',
+        'commented_at': 'episodes_commented_at',
+        'paused_at': 'episodes_paused_at'
+    },
+    'shows': {
+        'rated_at': 'shows_rated_at',
+        'watchlisted_at': 'shows_watchlisted_at',
+        'commented_at': 'shows_commented_at'
+    },
+    'seasons': {
+        'rated_at': 'seasons_rated_at',
+        'watchlisted_at': 'seasons_watchlisted_at',
+        'commented_at': 'seasons_commented_at'
+    },
+    'comments': {
+        'liked_at': 'comments_liked_at'
+    },
+    'lists': {
+        'liked_at': 'lists_liked_at',
+        'updated_at': 'lists_updated_at',
+        'commented_at': 'lists_commented_at'
+    }
 }
 
 
@@ -356,7 +355,7 @@ def get_db_actors(id, style):
                 actors.append(actor)
         return actors
     except requests.RequestException as e:
-        log.debug('Error searching for actors for trakt id %s' % e)
+        log.debug('Error searching for actors for trakt id %s', e)
         return
 
 
@@ -488,7 +487,7 @@ class TraktShow(Base):
             url = get_api_url('shows', self.id, 'seasons', season, 'episodes', number, '?extended=full')
             if only_cached:
                 raise LookupError('Episode %s %s not found in cache' % (season, number))
-            log.debug('Episode %s %s not found in cache, looking up from trakt.' % (season, number))
+            log.debug('Episode %s %s not found in cache, looking up from trakt.', season, number)
             try:
                 ses = get_session()
                 data = ses.get(url).json()
@@ -511,7 +510,7 @@ class TraktShow(Base):
         """
         # TODO stolen from imdb plugin, maybe there's a better way?
         if self.cached_at is None:
-            log.debug('cached_at is None: %s' % self)
+            log.debug('cached_at is None: %s', self)
             return True
         refresh_interval = 2
         # if show has been cancelled or ended, then it is unlikely to be updated often
@@ -519,7 +518,7 @@ class TraktShow(Base):
             # Make sure age is not negative
             age = max((datetime.now().year - self.year), 0)
             refresh_interval += age * 5
-            log.debug('show `%s` age %i expires in %i days' % (self.title, age, refresh_interval))
+            log.debug('show `%s` age %i expires in %i days', self.title, age, refresh_interval)
         return self.cached_at < datetime.now() - timedelta(days=refresh_interval)
 
     @property
@@ -581,14 +580,14 @@ class TraktMovie(Base):
         """
         # TODO stolen from imdb plugin, maybe there's a better way?
         if self.updated_at is None:
-            log.debug('updated_at is None: %s' % self)
+            log.debug('updated_at is None: %s', self)
             return True
         refresh_interval = 2
         if self.year:
             # Make sure age is not negative
             age = max((datetime.now().year - self.year), 0)
             refresh_interval += age * 5
-            log.debug('movie `%s` age %i expires in %i days' % (self.title, age, refresh_interval))
+            log.debug('movie `%s` age %i expires in %i days', self.title, age, refresh_interval)
         return self.cached_at < datetime.now() - timedelta(days=refresh_interval)
 
     @property
@@ -690,7 +689,7 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
                 last_search_type = id_type
                 results = req_session.get(get_api_url('search'), params={'id_type': id_type, 'id': identifier}).json()
             except requests.RequestException as e:
-                log.debug('Error searching for trakt id %s' % e)
+                log.debug('Error searching for trakt id %s', e)
                 continue
             for result in results:
                 if result['type'] != style:
@@ -783,7 +782,6 @@ def get_last_activities(account, session=None):
         activities = req_session.get(get_api_url('sync/last_activities')).json()
         # update last activities table
         for k, v in activities.iteritems():
-            log.error('plssss')
             if isinstance(v, dict):
                 for media_type, timestamp in v.iteritems():
                     name = LAST_ACTIVITIES_MAP.get(k, {}).get(media_type)
@@ -797,7 +795,7 @@ def get_last_activities(account, session=None):
                 name = LAST_ACTIVITIES_MAP.get(k)
                 r = session.query(TraktLastActivities).filter_by(name=name, account=account).first()
                 if r and r.last_activity != dateutil_parse(v, ignoretz=True):
-                        r.update(v)
+                    r.update(v)
                 elif not r:
                     session.add(TraktLastActivities(name, v, account))
                     session.commit()
@@ -840,7 +838,7 @@ def update_movie_collection(username=None, account=None, session=None):
             log.warning('No movie collection data returned from trakt.')
             return
         log.verbose('Received %d records from trakt.tv collection associated with account %s', len(movies),
-                    account)
+                    account or username)
         if account:  # update DB
             for movie in movies:
                 collected_at = dateutil_parse(movie['collected_at'], ignoretz=True)
@@ -850,7 +848,7 @@ def update_movie_collection(username=None, account=None, session=None):
                     r.collected_at = collected_at
                 else:
                     lookupargs = {'title': movie['movie']['title'],
-                                  'year':  movie['movie']['year'],
+                                  'year': movie['movie']['year'],
                                   'trakt_id': movie['movie']['ids']['trakt'],
                                   'trakt_slug': movie['movie']['ids']['slug'],
                                   'tmdb_id': movie['movie']['ids']['tmdb'],
@@ -891,7 +889,7 @@ class ApiTrakt(object):
             found = session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
                                                                 title.lower()).first()
             if found and found.series:
-                log.debug('Found %s in previous search results as %s' % (title, found.series.title))
+                log.debug('Found %s in previous search results as %s', title, found.series.title)
                 series = found.series
         if only_cached:
             if series:
@@ -903,7 +901,7 @@ class ApiTrakt(object):
             trakt_show = get_trakt('show', **lookup_params)
         except LookupError as e:
             if series:
-                log.debug('Error refreshing show data from trakt, using cached. %s' % e)
+                log.debug('Error refreshing show data from trakt, using cached. %s', e)
                 return series
             raise
         series = session.query(TraktShow).filter(TraktShow.id == trakt_show['ids']['trakt']).first()
@@ -934,7 +932,7 @@ class ApiTrakt(object):
             found = session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
                                                                  title.lower()).first()
             if found and found.movie:
-                log.debug('Found %s in previous search results as %s' % (title, found.movie.title))
+                log.debug('Found %s in previous search results as %s', title, found.movie.title)
                 movie = found.movie
         if only_cached:
             if movie:
@@ -946,7 +944,7 @@ class ApiTrakt(object):
             trakt_movie = get_trakt('movie', **lookup_params)
         except LookupError as e:
             if movie:
-                log.debug('Error refreshing movie data from trakt, using cached. %s' % e)
+                log.debug('Error refreshing movie data from trakt, using cached. %s', e)
                 return movie
             raise
         movie = session.query(TraktMovie).filter(TraktMovie.id == trakt_movie['ids']['trakt']).first()
@@ -972,6 +970,7 @@ class ApiTrakt(object):
     def collected(style, trakt_data, title, account=None, username=None, session=None):
         media_type = style + 's'
         in_collection = False
+        # FETCH FROM DB
         if account and not username:
             last_activities_name = LAST_ACTIVITIES_MAP[media_type]['collected_at']
             if not ApiTrakt.sync_cache.get('last_activities') and \
@@ -980,21 +979,24 @@ class ApiTrakt(object):
                     update_movie_collection(account=account, session=session)
                 if media_type == 'shows':
                     update_episode_collection(account=account, session=session)
-            # FETCH FROM DB
+
             if media_type == 'movies':
                 r = session.query(TraktMovieUserActivity).filter(TraktMovieUserActivity.movie_id ==
                                                                  trakt_data.id).first()
             else:
                 r = session.query(TraktEpisodeUserActivity).filter(TraktEpisodeUserActivity.episode_id ==
                                                                    trakt_data.id).first()
-            in_collection = True if r else False
+            in_collection = r is not None
         else:  # NO DB, JUST TIMEDDICT
-            if username not in ApiTrakt.sync_cache:
-                update_movie_collection(username=username)
+            if username not in ApiTrakt.sync_cache or 'collection' not in ApiTrakt.sync_cache[username]:
+                if media_type == 'movies':
+                    update_movie_collection(username=username)
+                else:
+                    update_episode_collection(account=account)
             if trakt_data.id in ApiTrakt.sync_cache.get(username):
                 in_collection = True
-        log.info('The result for entry "%s" is: %s' % (title,
-                 'Owned' if in_collection else 'Not owned'))
+        log.info('The result for entry "%s" is: %s', title,
+                 'Owned' if in_collection else 'Not owned')
         return in_collection
 
     @staticmethod
@@ -1002,7 +1004,7 @@ class ApiTrakt(object):
         url = get_api_url('users', username, 'history', style + 's', trakt_data.id)
         session = get_session(account=account)
         try:
-            log.debug('Opening %s' % url)
+            log.debug('Opening %s', url)
             data = session.get(url).json()
         except requests.RequestException as e:
             raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
@@ -1010,7 +1012,7 @@ class ApiTrakt(object):
         if not data:
             log.warning('No data returned from trakt.')
             return
-        log.verbose('Received %d records from trakt.tv %s\'s history' % (len(data), username))
+        log.verbose('Received %d records from trakt.tv %s\'s history', len(data), username)
         watched = False
         if style == 'episode':
             for ep in data:
@@ -1019,15 +1021,13 @@ class ApiTrakt(object):
                     if ep_data['season'] == trakt_data.season and ep_data['number'] == trakt_data.number:
                         watched = True
                         break
-                    log.debug('The result for entry "%s" is: %s' % (title,
-                              'Watched' if watched else 'Not watched'))
         else:
             for movie in data:
                 if trakt_data.id == movie['movie']['ids']['trakt']:
                     watched = True
                     break
-            log.debug('The result for entry "%s" is: %s' % (title,
-                      'Watched' if watched else 'Not watched'))
+        log.debug('The result for entry "%s" is: %s' % (title,
+                  'Watched' if watched else 'Not watched'))
         return watched
 
 
