@@ -141,7 +141,6 @@ class PluginTraktLookup(object):
                 'account': {'type': 'string'},
                 'username': {'type': 'string'},
             },
-            'required': ['username'],
             'additionalProperties': False
 
         },
@@ -240,8 +239,9 @@ class PluginTraktLookup(object):
                 item = lookup(**lookupargs)
                 if style == 'show':
                     item = item.get_episode(entry['series_season'], entry['series_episode'])
-                collected = ApiTrakt.collected(config['username'], style, item, entry.get('title'),
-                                               account=config.get('account'))
+                collected = ApiTrakt.collected(style, item, entry.get('title'),
+                                               account=config.get('account'), username=config.get('username'),
+                                               session=session)
             except LookupError as e:
                 log.debug(e.args[0])
             else:
@@ -289,7 +289,7 @@ class PluginTraktLookup(object):
 
                 if 'series_season' in entry and 'series_episode' in entry:
                     entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
-                    if config.get('username'):
+                    if config.get('username') or config.get('account'):
                         collected_lookup = functools.partial(self.lazy_collected_lookup, config, 'show')
                         watched_lookup = functools.partial(self.lazy_watched_lookup, config, 'episode')
                         entry.register_lazy_func(collected_lookup, ['trakt_collected'])
@@ -298,7 +298,7 @@ class PluginTraktLookup(object):
                 entry.register_lazy_func(self.lazy_movie_lookup, self.movie_map)
                 # TODO cleaner way to do this?
                 entry.register_lazy_func(self.lazy_movie_actor_lookup, self.movie_actor_map)
-                if config.get('username'):
+                if config.get('username') or config.get('account'):
                     collected_lookup = functools.partial(self.lazy_collected_lookup, config, 'movie')
                     watched_lookup = functools.partial(self.lazy_watched_lookup, config, 'movie')
                     entry.register_lazy_func(collected_lookup, ['trakt_collected'])

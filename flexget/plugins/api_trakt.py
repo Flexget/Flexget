@@ -5,8 +5,9 @@ import time
 from datetime import datetime, timedelta
 
 from dateutil.parser import parse as dateutil_parse
-from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, Date, DateTime, Time, or_, func
+from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, Date, DateTime, Time, or_, func, and_
 from sqlalchemy.orm import relation, object_session
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
@@ -18,6 +19,7 @@ from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import with_session
+from flexget.utils.tools import TimedDict
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.logger import console
 
@@ -30,6 +32,43 @@ API_URL = 'https://api-v2launch.trakt.tv/'
 PIN_URL = 'http://trakt.tv/pin/346'
 # Stores the last time we checked for updates for shows/movies
 updated = SimplePersistence('api_trakt')
+LAST_ACTIVITIES_MAP = {
+  'all': 'all',
+  'movies': {
+    'watched_at': 'movies_watched_at',
+    'collected_at': 'movies_collected_at',
+    'rated_at': 'movies_rated_at',
+    'watchlisted_at': 'movied_watchlisted_at',
+    'commented_at': 'movies_commented_at',
+    'paused_at': 'movies_paused_at'
+  },
+  'episodes': {
+    'watched_at': 'episodes_watched_at',
+    'collected_at': 'episodes_collected_at',
+    'rated_at': 'episodes_rated_at',
+    'watchlisted_at': 'episodes_watchlisted_at',
+    'commented_at': 'episodes_commented_at',
+    'paused_at': 'episodes_paused_at'
+  },
+  'shows': {
+    'rated_at': 'shows_rated_at',
+    'watchlisted_at': 'shows_watchlisted_at',
+    'commented_at': 'shows_commented_at'
+  },
+  'seasons': {
+    'rated_at': 'seasons_rated_at',
+    'watchlisted_at': 'seasons_watchlisted_at',
+    'commented_at': 'seasons_commented_at'
+  },
+  'comments': {
+    'liked_at': 'comments_liked_at'
+  },
+  'lists': {
+    'liked_at': 'lists_liked_at',
+    'updated_at': 'lists_updated_at',
+    'commented_at': 'lists_commented_at'
+  }
+}
 
 
 # Oauth account authentication
@@ -694,7 +733,153 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
         raise LookupError('Error getting trakt data for id %s: %s' % (trakt_id, e))
 
 
+class TraktMovieUserActivity(Base):
+    __tablename__ = 'trakt_movie_user_activity'
+    id = Column(Integer, primary_key=True)
+    movie = relation(TraktMovie, backref='user_activity')
+    movie_id = Column(Integer, ForeignKey('trakt_movies.id'), nullable=True)
+    collected_at = Column(DateTime, nullable=True)
+    watched_at = Column(DateTime, nullable=True)
+    account = Column(Unicode, nullable=False)
+
+
+class TraktEpisodeUserActivity(Base):
+    __tablename__ = 'trakt_episode_user_activity'
+    id = Column(Integer, primary_key=True)
+    episode = relation(TraktEpisode, backref='user_activity')
+    episode_id = Column(Integer, ForeignKey('trakt_episodes.id'), nullable=True)
+    collected_at = Column(DateTime, nullable=True)
+    watched_at = Column(DateTime, nullable=True)
+    account = Column(Unicode, nullable=False)
+
+
+class TraktLastActivities(Base):
+
+    __tablename__ = 'trakt_last_activities'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode)
+    last_activity = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=True)
+    account = Column(Unicode, nullable=False)
+
+    def __init__(self, name, last_activity, account, updated_at=None):
+        self.name = name
+        self.last_activity = dateutil_parse(last_activity, ignoretz=True)
+        if updated_at:
+            self.updated_at = dateutil_parse(updated_at, ignoretz=True)
+        self.account = account
+
+    def update(self, last_activity, updated_at=None):
+        self.last_activity = dateutil_parse(last_activity, ignoretz=True)
+        if updated_at:
+            self.updated_at = dateutil_parse(updated_at, ignoretz=True)
+
+
+@with_session
+def get_last_activities(account, session=None):
+    req_session = get_session(account=account)
+    try:
+        activities = req_session.get(get_api_url('sync/last_activities')).json()
+        # update last activities table
+        for k, v in activities.iteritems():
+            log.error('plssss')
+            if isinstance(v, dict):
+                for media_type, timestamp in v.iteritems():
+                    name = LAST_ACTIVITIES_MAP.get(k, {}).get(media_type)
+                    r = session.query(TraktLastActivities).filter_by(name=name, account=account).first()
+                    if r and r.last_activity != dateutil_parse(timestamp, ignoretz=True):
+                        r.update(timestamp)
+                    elif not r:
+                        session.add(TraktLastActivities(name, timestamp, account))
+                        session.commit()
+            else:
+                name = LAST_ACTIVITIES_MAP.get(k)
+                r = session.query(TraktLastActivities).filter_by(name=name, account=account).first()
+                if r and r.last_activity != dateutil_parse(v, ignoretz=True):
+                        r.update(v)
+                elif not r:
+                    session.add(TraktLastActivities(name, v, account))
+                    session.commit()
+        ApiTrakt.sync_cache['last_activities'] = True
+    except requests.RequestException as e:
+        raise plugin.PluginError('Getting latest user activity failed: %s', e.args[0])
+
+
+@with_session
+def is_sync_update_required(name, account, session=None):
+    # get and update last_activities
+    update_required = False
+    get_last_activities(account, session=session)
+    r = session.query(TraktLastActivities).filter(and_(TraktLastActivities.name == name,
+                                                       TraktLastActivities.account == account)).first()
+    if not r:
+        raise plugin.PluginError('Last Activity name %s does not exist' % name)
+    if r.updated_at and r.last_activity > r.updated_at:
+        update_required = True
+    elif not r.updated_at:
+        update_required = True
+    return update_required
+
+
+@with_session
+def update_episode_collection(username=None, account=None, session=None):
+    pass
+
+
+@with_session
+def update_movie_collection(username=None, account=None, session=None):
+    if account:
+        url = get_api_url('sync', 'collection', 'movies')
+    else:
+        url = get_api_url('users', username, 'collection', 'movies')
+    req_session = get_session(account=account)
+    try:
+        movies = req_session.get(url).json()
+        if not movies:
+            log.warning('No movie collection data returned from trakt.')
+            return
+        log.verbose('Received %d records from trakt.tv collection associated with account %s', len(movies),
+                    account)
+        if account:  # update DB
+            for movie in movies:
+                collected_at = dateutil_parse(movie['collected_at'], ignoretz=True)
+                r = session.query(TraktMovieUserActivity).filter(TraktMovieUserActivity.movie_id ==
+                                                                 movie['movie']['ids']['trakt']).first()
+                if r:
+                    r.collected_at = collected_at
+                else:
+                    lookupargs = {'title': movie['movie']['title'],
+                                  'year':  movie['movie']['year'],
+                                  'trakt_id': movie['movie']['ids']['trakt'],
+                                  'trakt_slug': movie['movie']['ids']['slug'],
+                                  'tmdb_id': movie['movie']['ids']['tmdb'],
+                                  'imdb_id': movie['movie']['ids']['imdb']}
+                    cached_movie = get_cached('movie', session=session, **lookupargs)
+                    if not cached_movie:
+                        log.debug('Collected movie with trakt id %s not found in lookup cache',
+                                  movie['movie']['ids']['trakt'])
+                        movie['movie']['updated_at'] = unicode(datetime.now())
+                        cached_movie = TraktMovie(movie['movie'], session=session)
+                        session.add(cached_movie)
+                    collected = TraktMovieUserActivity(movie=cached_movie, collected_at=collected_at,
+                                                       account=account)
+                    session.add(collected)
+        else:  # update local cache
+            ApiTrakt.sync_cache[username] = {}
+            for movie in movies:
+                movie_id = movie['movie']['ids']['trakt']
+                ApiTrakt.sync_cache[username][movie_id] = movie['movie']
+                ApiTrakt.sync_cache[username][movie_id]['collected_at'] = dateutil_parse(movie['collected_at'],
+                                                                                         ignoretz=True)
+
+    except requests.RequestException as e:
+        raise plugin.PluginError('Unable to get movie collection data from trakt.tv: %s' % e)
+
+
 class ApiTrakt(object):
+
+    sync_cache = TimedDict(cache_time='15 minutes')
 
     @staticmethod
     @with_session
@@ -783,38 +968,33 @@ class ApiTrakt(object):
         return movie
 
     @staticmethod
-    def collected(username, style, trakt_data, title, account=None):
-        url = get_api_url('users', username, 'collection', style + 's')
-        session = get_session(account=account)
-        try:
-            log.debug('Opening %s' % url)
-            data = session.get(url).json()
-        except requests.RequestException as e:
-            raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
-
-        if not data:
-            log.warning('No collection data returned from trakt.')
-            return
-        log.verbose('Received %d records from trakt.tv %s\'s collection' % (len(data), username))
+    @with_session
+    def collected(style, trakt_data, title, account=None, username=None, session=None):
+        media_type = style + 's'
         in_collection = False
-        if style == 'show':
-            for series in data:
-                if trakt_data.show.id == series['show']['ids']['trakt']:
-                    for s in series['seasons']:
-                        if s['number'] == trakt_data.season:
-                            # extract all episode numbers currently in collection for the season number
-                            episodes = [ep['number'] for ep in s['episodes']]
-                            in_collection = trakt_data.number in episodes
-                            break
-                    log.debug('The result for entry "%s" is: %s' % (title,
-                              'Owned' if in_collection else 'Not owned'))
-        else:
-            for movie in data:
-                if trakt_data.id == movie['movie']['ids']['trakt']:
-                    in_collection = True
-                    break
-            log.debug('The result for entry "%s" is: %s' % (title,
-                      'Owned' if in_collection else 'Not owned'))
+        if account and not username:
+            last_activities_name = LAST_ACTIVITIES_MAP[media_type]['collected_at']
+            if not ApiTrakt.sync_cache.get('last_activities') and \
+                    is_sync_update_required(last_activities_name, account, session=session):
+                if media_type == 'movies':
+                    update_movie_collection(account=account, session=session)
+                if media_type == 'shows':
+                    update_episode_collection(account=account, session=session)
+            # FETCH FROM DB
+            if media_type == 'movies':
+                r = session.query(TraktMovieUserActivity).filter(TraktMovieUserActivity.movie_id ==
+                                                                 trakt_data.id).first()
+            else:
+                r = session.query(TraktEpisodeUserActivity).filter(TraktEpisodeUserActivity.episode_id ==
+                                                                   trakt_data.id).first()
+            in_collection = True if r else False
+        else:  # NO DB, JUST TIMEDDICT
+            if username not in ApiTrakt.sync_cache:
+                update_movie_collection(username=username)
+            if trakt_data.id in ApiTrakt.sync_cache.get(username):
+                in_collection = True
+        log.info('The result for entry "%s" is: %s' % (title,
+                 'Owned' if in_collection else 'Not owned'))
         return in_collection
 
     @staticmethod
