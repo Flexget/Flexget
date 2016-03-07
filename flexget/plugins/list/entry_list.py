@@ -118,7 +118,6 @@ class DBEntrySet(MutableSet):
             stored_entry = EntryListEntry(entry=entry, entry_list_id=self._db_list(session).id)
         session.add(stored_entry)
 
-
     @with_session
     def __ior__(self, other, session=None):
         # Optimization to only open one session when adding multiple items
@@ -158,19 +157,19 @@ def get_entry_lists(name=None, session=None):
     if name:
         log.debug('searching for entry lists with name %s', name)
         query = query.filter(EntryListList.name.contains(name))
-    return query
+    return query.all()
 
 
 @with_session
 def get_list_by_exact_name(name, session=None):
     log.debug('returning entry list with name %s', name)
-    return session.query(EntryListList).filter(func.lower(EntryListList.name) == name.lower())
+    return session.query(EntryListList).filter(func.lower(EntryListList.name) == name.lower()).first()
 
 
 @with_session
 def get_list_by_id(list_id, session=None):
     log.debug('fetching entry list with id %d', list_id)
-    return session.query(EntryListList).filter(EntryListList.id == list_id)
+    return session.query(EntryListList).filter(EntryListList.id == list_id).one()
 
 
 @with_session
@@ -193,7 +192,7 @@ def get_entries_by_list_id(list_id, count=False, start=None, stop=None, order_by
         query = query.order_by(getattr(EntryListEntry, order_by).desc())
     else:
         query = query.order_by(getattr(EntryListEntry, order_by))
-    return query
+    return query.all()
 
 
 @with_session
@@ -204,4 +203,5 @@ def get_entry_by_title(title, session=None):
 @with_session
 def get_entry_by_id(list_id, entry_id, session=None):
     log.debug('fetching entry with id %d from list id %d', entry_id, list_id)
-    return session.query(EntryListEntry).filter(and_(EntryListEntry.id == entry_id, EntryListEntry.list_id == list_id))
+    return session.query(EntryListEntry).filter(
+        and_(EntryListEntry.id == entry_id, EntryListEntry.list_id == list_id)).one()

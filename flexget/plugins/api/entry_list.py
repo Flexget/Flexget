@@ -55,7 +55,7 @@ class EntryListListsAPI(APIResource):
         args = entry_list_parser.parse_args()
         name = args.get('name')
 
-        entry_lists = [entry_list.to_dict() for entry_list in el.get_entry_lists(name=name, session=session).all()]
+        entry_lists = [entry_list.to_dict() for entry_list in el.get_entry_lists(name=name, session=session)]
         return jsonify({'entry_lists': entry_lists})
 
     @api.validate(entry_list_input_object_schema)
@@ -65,7 +65,7 @@ class EntryListListsAPI(APIResource):
         """ Create a new entry list """
         data = request.json
         name = data.get('name')
-        entry_list = el.get_list_by_exact_name(name=name, session=session).first()
+        entry_list = el.get_list_by_exact_name(name=name, session=session)
         if entry_list:
             return {'status': 'error',
                     'message': "list with name '%s' already exists" % name}, 500
@@ -85,7 +85,7 @@ class EntryListListAPI(APIResource):
     def get(self, list_id, session=None):
         """ Get list by ID """
         try:
-            list = el.get_list_by_id(list_id=list_id, session=session).first()
+            list = el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
@@ -178,18 +178,21 @@ class EntryListEntriessAPI(APIResource):
         }
 
         try:
-            count = el.get_entries_by_list_id(count=True, **kwargs)
-            log.debug('entry lists entries count is %d', count)
+            list = el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
-        entries = [entry.to_dict() for entry in el.get_entries_by_list_id(**kwargs).all()]
+        count = el.get_entries_by_list_id(count=True, **kwargs)
+        log.debug('entry lists entries count is %d', count)
+        entries = [entry.to_dict() for entry in el.get_entries_by_list_id(**kwargs)]
         pages = int(ceil(count / float(page_size)))
+
+        number_of_entries = min(page_size, count)
 
         return jsonify({
             'entries': entries,
             'total_number_of_entries': count,
-            'number_of_entries': page_size,
+            'number_of_entries': number_of_entries,
             'page': page,
             'total_number_of_pages': pages
         })
@@ -227,7 +230,7 @@ class EntryListEntryAPI(APIResource):
     def get(self, list_id, entry_id, session=None):
         """ Get an entry by list ID and entry ID """
         try:
-            entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session).first()
+            entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'could not find entry with id %d in list %d' % (entry_id, list_id)}, 404
@@ -237,7 +240,7 @@ class EntryListEntryAPI(APIResource):
     def delete(self, list_id, entry_id, session=None):
         """ Delete an entry by list ID and entry ID """
         try:
-            entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session).first()
+            entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'could not find entry with id %d in list %d' % (entry_id, list_id)}, 404
@@ -251,7 +254,7 @@ class EntryListEntryAPI(APIResource):
     def put(self, list_id, entry_id, session=None):
         """ Sets entry object's entry data """
         try:
-            entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session).first()
+            entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'could not find entry with id %d in list %d' % (entry_id, list_id)}, 4044
