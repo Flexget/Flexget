@@ -56,14 +56,14 @@ class AppleTrailers(object):
                 'properties': {
                     'quality': {
                         'type': 'string',
-                        'enum': qualities.keys(),
+                        'enum': list(qualities.keys()),
                         'default': '720p'
                     },
                     'genres': {'type': 'array', 'items': {'type': 'string'}}
                 },
                 'additionalProperties': False
             },
-            {'title': 'justquality', 'type': 'string', 'enum': qualities.keys()}
+            {'title': 'justquality', 'type': 'string', 'enum': list(qualities.keys())}
         ]
 
     }
