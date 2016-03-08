@@ -14,7 +14,6 @@ jinja2
 requests>=1.0, !=2.4.0, <2.99
 python-dateutil!=2.0, !=2.2
 jsonschema>=2.0
-tmdbsimple
 path.py
 guessit>=2.0.3
 apscheduler
