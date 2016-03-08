@@ -79,10 +79,8 @@ class TestRTorrentClient(object):
         fields = [p for p in called_args[2:]]
         assert len(fields) == 3
         assert 'd.directory.set=\\/data\\/downloads' in fields
-        if PY2:
-            assert 'd.custom1.set=test\\_custom1' in fields
-        else:
-            assert 'd.custom1.set=test_custom1' in fields
+        # TODO TEST IF THIS MATTERS TO FLEXGET
+        assert 'd.custom1.set=test\\_custom1' in fields
         assert 'd.priority.set=3' in fields
 
     def test_torrent(self, mocked_proxy):
