@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
+from future.utils import PY2
 
 import mock
 import os
@@ -66,15 +67,23 @@ class TestRTorrentClient(object):
         mocked_proxy.execute.throw.assert_called_with('', 'mkdir', '-p', '/data/downloads')
 
         # Ensure load was called
-        match_binary = Matcher(compare_binary, xmlrpc.client.Binary(torrent_raw))
         assert mocked_proxy.load.raw_start.called
+
+        match_binary = Matcher(compare_binary, xmlrpc.client.Binary(torrent_raw))
+
         called_args = mocked_proxy.load.raw_start.call_args_list[0][0]
         assert len(called_args) == 5
-        assert '' in called_args
+        assert '' == called_args[0]
         assert match_binary in called_args
-        assert 'd.directory.set=\\/data\\/downloads' in called_args
-        assert 'd.custom1.set=test_custom1' in called_args
-        assert 'd.priority.set=3' in called_args
+
+        fields = [p for p in called_args[2:]]
+        assert len(fields) == 3
+        assert 'd.directory.set=\\/data\\/downloads' in fields
+        if PY2:
+            assert 'd.custom1.set=test\\_custom1' in fields
+        else:
+            assert 'd.custom1.set=test_custom1' in fields
+        assert 'd.priority.set=3' in fields
 
     def test_torrent(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
