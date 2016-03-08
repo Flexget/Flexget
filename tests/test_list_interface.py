@@ -19,23 +19,23 @@ class TestListInterface(object):
             list_add:
               - entry_list: test_list
 
-          test_list_match_with_remove:
+          test_list_accept_with_remove:
             mock:
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
               - {title: 'title 2', url: "http://mock.url/file2.torrent"}
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
-            list_match:
+            list_accept:
               - entry_list: test_list
 
-          test_list_match_without_remove:
+          test_list_accept_without_remove:
             mock:
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
               - {title: 'title 2', url: "http://mock.url/file2.torrent"}
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
-            list_match:
+            list_accept:
               lists:
                 - entry_list: test_list
-              remove_on_match: no
+              remove_on_accept: no
 
           test_list_remove:
             mock:
@@ -52,28 +52,28 @@ class TestListInterface(object):
         task = execute_task('list_get')
         assert len(task.entries) == 2
 
-    def test_list_match_with_remove(self, execute_task):
+    def test_list_accept_with_remove(self, execute_task):
         task = execute_task('test_list_add')
         assert len(task.entries) == 2
 
         task = execute_task('list_get')
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_match_with_remove')
+        task = execute_task('test_list_accept_with_remove')
         assert len(task.all_entries) == 3
         assert len(task.accepted) == 2
 
         task = execute_task('list_get')
         assert len(task.entries) == 0
 
-    def test_list_match_without_remove(self, execute_task):
+    def test_list_accept_without_remove(self, execute_task):
         task = execute_task('test_list_add')
         assert len(task.entries) == 2
 
         task = execute_task('list_get')
         assert len(task.entries) == 2
 
-        task = execute_task('test_list_match_without_remove')
+        task = execute_task('test_list_accept_without_remove')
         assert len(task.all_entries) == 3
         assert len(task.accepted) == 2
 

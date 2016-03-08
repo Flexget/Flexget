@@ -27,7 +27,10 @@ class ListAccept(object):
                     'properties': {
                         'lists': LISTS_SCHEMA,
                         'remove_on_accept': {'type': 'boolean'}
-                    }}
+                    },
+                    'additionalProperties': False,
+                    'required': ['lists']
+                    }
                    ]
               }
 
