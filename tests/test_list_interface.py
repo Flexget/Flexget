@@ -43,6 +43,13 @@ class TestListInterface(object):
             accept_all: yes
             list_remove:
               - entry_list: test_list
+
+          test_list_reject:
+            mock:
+              - {title: 'title 1', url: "http://mock.url/file1.torrent"}
+              - {title: 'title 3', url: "http://mock.url/file3.torrent"}
+            list_reject:
+              - entry_list: test_list
     """
 
     def test_list_add(self, execute_task):
@@ -92,3 +99,14 @@ class TestListInterface(object):
 
         task = execute_task('list_get')
         assert len(task.entries) == 1
+
+    def test_list_reject(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 2
+
+        task = execute_task('list_get')
+        assert len(task.entries) == 2
+
+        task = execute_task('test_list_reject')
+        assert len(task.rejected) == 1
+
