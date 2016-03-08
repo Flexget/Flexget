@@ -108,7 +108,7 @@ class PluginTraktLookup(object):
         'trakt_season': 'season',
         'trakt_episode': 'number',
         'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep.season, ep.number),
-        }
+    }
 
     # Movie info
     movie_map = {
@@ -230,12 +230,12 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         if style == 'show':
             lookup = lookup_series
-            id = entry.get('trakt_show_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_show_id', eval_lazy=True)
         else:
             lookup = lookup_movie
-            id = entry.get('trakt_movie_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_movie_id', eval_lazy=True)
         with Session() as session:
-            lookupargs = {'trakt_id': id,
+            lookupargs = {'trakt_id': trakt_id,
                           'session': session}
             try:
                 item = lookup(**lookupargs)
@@ -253,12 +253,12 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         if style == 'show':
             lookup = lookup_series
-            id = entry.get('trakt_show_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_show_id', eval_lazy=True)
         else:
             lookup = lookup_movie
-            id = entry.get('trakt_movie_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_movie_id', eval_lazy=True)
         with Session() as session:
-            lookupargs = {'trakt_id': id,
+            lookupargs = {'trakt_id': trakt_id,
                           'session': session}
             try:
                 item = lookup(**lookupargs)

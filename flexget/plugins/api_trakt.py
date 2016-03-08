@@ -5,8 +5,8 @@ import time
 from datetime import datetime, timedelta
 
 from dateutil.parser import parse as dateutil_parse
-from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, Date, DateTime, Time, or_, func
-from sqlalchemy.orm import relation, object_session
+from sqlalchemy import Table, Column, Integer, String, Unicode, Date, DateTime, Time, or_, func
+from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
@@ -299,9 +299,9 @@ movie_actors_table = Table('trakt_movie_actors', Base.metadata,
 Base.register_table(movie_actors_table)
 
 
-def get_db_actors(id, style):
+def get_db_actors(ident, style):
     actors = []
-    url = get_api_url(style + 's', id, 'people')
+    url = get_api_url(style + 's', ident, 'people')
     req_session = get_session()
     try:
         results = req_session.get(url).json()
