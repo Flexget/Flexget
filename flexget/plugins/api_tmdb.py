@@ -25,6 +25,16 @@ Base = db_schema.versioned_base('api_tmdb', 0)
 # This is a FlexGet API key
 tmdbsimple.API_KEY = 'bdfc018dbdb7c243dc7cb1454ff74b95'
 
+_tmdb_config = None
+
+
+def get_tmdb_config():
+    """Gets and caches tmdb config on first call."""
+    global _tmdb_config
+    if not _tmdb_config:
+        _tmdb_config = tmdbsimple.Configuration().info()
+    return _tmdb_config
+
 
 @db_schema.upgrade('api_tmdb')
 def upgrade(ver, session):
@@ -122,10 +132,10 @@ class TMDBPoster(Base):
     vote_count = Column(Integer)
     iso_639_1 = Column(Unicode)
 
-    def get_file(self, only_cached=False, size='w500'):
-        """Makes sure the poster is downloaded to the local cache (in userstatic folder) and
-        returns the path split into a list of directory and file components"""
-        # TODO: Is this used anywhere? make it work
+    @property
+    def url(self):
+        return get_tmdb_config()['images']['base_url'] + 'original' + self.file_path
+
 
 class TMDBSearchResult(Base):
 

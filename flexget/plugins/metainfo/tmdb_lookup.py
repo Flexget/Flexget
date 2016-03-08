@@ -37,13 +37,12 @@ class PluginTmdbLookup(object):
         'tmdb_released': 'released',
         'tmdb_votes': 'votes',
         'tmdb_certification': 'certification',
-        #'tmdb_posters': lambda movie: [poster.url for poster in sorted(movie.posters, key=lambda poster: poster.size)],
+        'tmdb_posters': lambda movie: [poster.url for poster in movie.posters],
         'tmdb_runtime': 'runtime',
         'tmdb_tagline': 'tagline',
         'tmdb_budget': 'budget',
         'tmdb_revenue': 'revenue',
         'tmdb_homepage': 'homepage',
-        #'tmdb_trailer': 'trailer',
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'name',
         'movie_year': 'year'}
