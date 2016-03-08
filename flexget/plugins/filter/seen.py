@@ -338,7 +338,7 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
 
 
 @with_session
-def search(value=None, status=None, start=None, stop=None, count=False, order_by=None, descending=False, session=None):
+def search(value=None, status=None, start=None, stop=None, count=False, order_by='added', descending=False, session=None):
     query = session.query(SeenEntry)
     if count:
         return query.count()
@@ -349,7 +349,7 @@ def search(value=None, status=None, start=None, stop=None, count=False, order_by
     query = query.slice(start, stop).from_self()
     query = query.join(SeenField)
     if value:
-        query = query.join(SeenField).filter(SeenField.value.like(value))
+        query = query.filter(SeenField.value.like(value))
     if status is not None:
         query = query.filter(SeenEntry.local == status)
     return query

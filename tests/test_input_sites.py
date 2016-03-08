@@ -27,10 +27,9 @@ class TestInputSites(object):
         task = execute_task('test_sceper')
         assert task.entries, 'no entries created / site may be down'
 
-    # Disabled due to plugin broken
-    # def test_apple_trailers(self, execute_task, use_vcr):
-    #    task = execute_task('test_apple_trailers')
-    #    assert task.entries, 'no entries created / site may be down'
+    def test_apple_trailers(self, execute_task, use_vcr):
+        task = execute_task('test_apple_trailers')
+        assert task.entries, 'no entries created / site may be down'
 
     def test_apple_trailers_simple(self, execute_task):
         task = execute_task('test_apple_trailers_simple')
