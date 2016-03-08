@@ -191,7 +191,7 @@ def get_movies_by_list_id(list_id, count=False, start=None, stop=None, order_by=
         query = query.order_by(getattr(MovieListMovie, order_by).desc())
     else:
         query = query.order_by(getattr(MovieListMovie, order_by))
-    return query
+    return query.all()
 
 
 @with_session
@@ -207,19 +207,20 @@ def get_movie_lists(name, session=None):
 @with_session
 def get_list_by_exact_name(name, session=None):
     log.debug('returning list with name %s', name)
-    return session.query(MovieListList).filter(func.lower(MovieListList.name) == name.lower())
+    return session.query(MovieListList).filter(func.lower(MovieListList.name) == name.lower()).first()
 
 
 @with_session
 def get_list_by_id(list_id, session=None):
     log.debug('fetching list with id %d', list_id)
-    return session.query(MovieListList).filter(MovieListList.id == list_id)
+    return session.query(MovieListList).filter(MovieListList.id == list_id).one()
 
 
 @with_session
 def get_movie_by_id(list_id, movie_id, session=None):
     log.debug('fetching movie with id %d from list id %d', movie_id, list_id)
-    return session.query(MovieListMovie).filter(and_(MovieListMovie.id == movie_id, MovieListMovie.list_id == list_id))
+    return session.query(MovieListMovie).filter(
+        and_(MovieListMovie.id == movie_id, MovieListMovie.list_id == list_id)).one()
 
 
 @with_session
@@ -235,7 +236,7 @@ def get_movie_by_title(list_id, title, session=None):
     movie_list = get_list_by_id(list_id=list_id, session=session)
     if movie_list:
         log.debug('searching for movie %s in list %d', title, list_id)
-        return session.query(MovieListMovie).filter(func.lower(MovieListMovie.title) == title.lower())
+        return session.query(MovieListMovie).filter(func.lower(MovieListMovie.title) == title.lower()).first()
 
 
 @with_session
