@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
-from future.utils import PY2
 
 import mock
 import os
@@ -56,7 +55,7 @@ class TestRTorrentClient(object):
 
         resp = client.load(
             torrent_raw,
-            fields={'priority': 3, 'directory': '/data/downloads', 'custom1': 'test_custom1'},
+            fields={'priority': 3, 'directory': '/data/downloads', 'custom1': 'testing'},
             start=True,
             mkdir=True,
         )
@@ -79,8 +78,7 @@ class TestRTorrentClient(object):
         fields = [p for p in called_args[2:]]
         assert len(fields) == 3
         assert 'd.directory.set=\\/data\\/downloads' in fields
-        # TODO TEST IF THIS MATTERS TO FLEXGET
-        assert 'd.custom1.set=test\\_custom1' in fields
+        assert 'd.custom1.set=testing' in fields
         assert 'd.priority.set=3' in fields
 
     def test_torrent(self, mocked_proxy):
