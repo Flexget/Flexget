@@ -9,10 +9,10 @@ from flexget.utils.qualities import Requirements
 movie_list_file = os.path.join(os.path.dirname(__file__), 'couchpotoato_movie_list_test_response.json')
 qualities_profiles_file = os.path.join(os.path.dirname(__file__), 'couchpotoato_quality_profile_test_response.json')
 
-with open(movie_list_file, "r", encoding="UTF-8") as data:
+with open(movie_list_file, "r") as data:
     movie_list_response = json.load(data)
 
-with open(qualities_profiles_file, "r", encoding="UTF-8") as data:
+with open(qualities_profiles_file, "r") as data:
     qualities_response = json.load(data)
 
 
