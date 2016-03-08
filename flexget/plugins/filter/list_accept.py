@@ -3,7 +3,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('list_match')
+log = logging.getLogger('list_accept')
 
 LISTS_SCHEMA = {'type': 'array',
                 'items':
@@ -20,13 +20,13 @@ LISTS_SCHEMA = {'type': 'array',
                 }
 
 
-class ListMatch(object):
+class ListAccept(object):
     schema = {'oneOf':
                   [LISTS_SCHEMA,
                    {'type': 'object',
                     'properties': {
                         'lists': LISTS_SCHEMA,
-                        'remove_on_match': {'type': 'boolean'}
+                        'remove_on_accept': {'type': 'boolean'}
                     }}
                    ]
               }
@@ -34,7 +34,7 @@ class ListMatch(object):
     def prepare_config(self, config):
         if isinstance(config, list):
             config = {'lists': config}
-        config.setdefault('remove_on_match', True)
+        config.setdefault('remove_on_accept', True)
         return config
 
     def on_task_filter(self, task, config):
@@ -48,7 +48,7 @@ class ListMatch(object):
 
     def on_task_learn(self, task, config):
         config = self.prepare_config(config)
-        if not config.get('remove_on_match'):
+        if not config.get('remove_on_accept'):
             return
         for item in config.get('lists'):
             for plugin_name, plugin_config in item.iteritems():
@@ -58,4 +58,4 @@ class ListMatch(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ListMatch, 'list_match', api_ver=2)
+    plugin.register(ListAccept, 'list_accept', api_ver=2)
