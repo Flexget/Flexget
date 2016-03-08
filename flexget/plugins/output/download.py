@@ -3,6 +3,7 @@ from future import standard_library
 standard_library.install_aliases()
 from past.builtins import basestring
 from builtins import object
+from builtins import str
 import hashlib
 import logging
 import mimetypes
@@ -297,9 +298,9 @@ class PluginDownload(object):
             log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
 
         if 'content-type' in response.headers:
-            entry['mime-type'] = parse_header(response.headers['content-type'])[0]
+            entry['mime-type'] = str(parse_header(response.headers['content-type'])[0])
         else:
-            entry['mime-type'] = "unknown/unknown"
+            entry['mime-type'] = str("unknown/unknown")
 
         content_encoding = response.headers.get('content-encoding', '')
         decompress = 'gzip' in content_encoding or 'deflate' in content_encoding
