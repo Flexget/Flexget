@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from past.builtins import basestring
 from builtins import object
+from builtins import str
 import logging
 
 import itertools
@@ -157,7 +157,7 @@ def filecopy(request):
     marker = request.node.get_marker('filecopy')
     if marker is not None:
         sources, dst = marker.args
-        if isinstance(sources, basestring):
+        if isinstance(sources, str):
             sources = [sources]
         if 'tmpdir' in request.fixturenames:
             dst = dst.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)

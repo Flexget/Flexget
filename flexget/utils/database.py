@@ -1,8 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import bytes
+from builtins import str
 from past.builtins import basestring
 import functools
 from collections import Mapping
-from datetime import datetime, date
+from datetime import datetime
 
 from sqlalchemy import extract, func
 from sqlalchemy.orm import synonym
@@ -51,7 +53,7 @@ def pipe_list_synonym(name):
             return attr.strip('|').split('|')
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             setattr(self, name, value)
         else:
             setattr(self, name, '|'.join(value))
@@ -66,7 +68,7 @@ def text_date_synonym(name):
         return getattr(self, name)
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             try:
                 setattr(self, name, datetime.strptime(value, '%Y-%m-%d'))
             except ValueError:
@@ -154,7 +156,7 @@ class CaseInsensitiveWord(Comparator):
             self.word = word
 
     def lower(self):
-        if isinstance(self.word, basestring):
+        if isinstance(self.word, str):
             return self.word.lower()
         else:
             return func.lower(self.word)
@@ -181,7 +183,7 @@ def quality_property(text_attr):
         return qualities.Quality(getattr(self, text_attr))
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             setattr(self, text_attr, value)
         else:
             setattr(self, text_attr, value.name)
@@ -206,7 +208,7 @@ def quality_requirement_property(text_attr):
         return qualities.Requirements(getattr(self, text_attr))
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             setattr(self, text_attr, value)
         else:
             setattr(self, text_attr, value.text)
