@@ -114,8 +114,8 @@ class TMDBGenre(Base):
 
     __tablename__ = 'tmdb_genres'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(Unicode, nullable=False, unique=True)
+    id = Column(Integer, primary_key=True, autoincrement=False)
+    name = Column(Unicode, nullable=False)
 
 
 class TMDBPoster(Base):
