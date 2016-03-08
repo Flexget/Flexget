@@ -13,17 +13,12 @@ from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, year_property, with_session
 
-try:
-    import tmdbsimple
-except ImportError:
-    raise plugin.DependencyError(issued_by='api_tmdb', missing='tmdb3',
-                                 message='TMDB requires https://github.com/wagnerrp/pytmdb3')
-
 log = logging.getLogger('api_tmdb')
 Base = db_schema.versioned_base('api_tmdb', 0)
 
 # This is a FlexGet API key
-tmdbsimple.API_KEY = 'bdfc018dbdb7c243dc7cb1454ff74b95'
+API_KEY = 'bdfc018dbdb7c243dc7cb1454ff74b95'
+BASE_URL = 'https://api.themoviedb.org/3/'
 
 _tmdb_config = None
 
@@ -32,8 +27,14 @@ def get_tmdb_config():
     """Gets and caches tmdb config on first call."""
     global _tmdb_config
     if not _tmdb_config:
-        _tmdb_config = tmdbsimple.Configuration().info()
+        _tmdb_config = tmdb_request('configuration')
     return _tmdb_config
+
+
+def tmdb_request(endpoint, **params):
+    params.setdefault('api_key', API_KEY)
+    full_url = BASE_URL + endpoint
+    return requests.get(full_url, params=params).json()
 
 
 @db_schema.upgrade('api_tmdb')
@@ -81,7 +82,7 @@ class TMDBMovie(Base):
 
     def update_from_tmdb(self):
         try:
-            movie = tmdbsimple.Movies(self.id).info(append_to_response='alternative_titles,images')
+            movie = tmdb_request('movie/{}'.format(self.id), append_to_response='alternative_titles,images')
         except requests.RequestException as e:
             raise LookupError('Error updating data from tmdb: %s' % e)
         self.imdb_id = movie['imdb_id']
@@ -225,7 +226,7 @@ class ApiTmdb(object):
             log.verbose('Searching from TMDb %s', id_str)
             if imdb_id and not tmdb_id:
                 try:
-                    result = tmdbsimple.Find(imdb_id).info(external_source='imdb_id')
+                    result = tmdb_request('find/{}'.format(imdb_id), external_source='imdb_id')
                 except requests.RequestException as e:
                     raise LookupError('Error searching imdb id on tmdb: {}'.format(e))
                 if result['movie_results']:
@@ -236,7 +237,7 @@ class ApiTmdb(object):
                 if year:
                     searchparams['year'] = year
                 try:
-                    results = tmdbsimple.Search().movie(**searchparams)
+                    results = tmdb_request('search/movie', **searchparams)
                 except requests.RequestException as e:
                     raise LookupError('Error searching for tmdb item {}: {}'.format(search_string, e))
                 if not results['results']:
