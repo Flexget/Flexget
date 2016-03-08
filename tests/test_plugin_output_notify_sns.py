@@ -1,6 +1,4 @@
-from builtins import object
-from mock import patch, Mock, sentinel
-from nose.tools import raises
+from mock import patch, Mock
 
 from flexget.task import Task
 from flexget.plugins.output import notify_sns

@@ -2,8 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import object
 from datetime import timedelta, datetime
 
-from nose.plugins.attrib import attr
-
 from flexget.manager import Session
 from flexget.plugins.filter.movie_queue import queue_add, QueuedMovie
 

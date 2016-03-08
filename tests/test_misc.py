@@ -5,8 +5,6 @@ import os
 import pytest
 import stat
 
-from nose.tools import raises
-
 from flexget.entry import EntryUnicodeError, Entry
 
 

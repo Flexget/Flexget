@@ -826,7 +826,7 @@ def show_episodes(series, start=None, stop=None, count=False, descending=False, 
     if series.identified_by == 'sequence':
         episodes = episodes.order_by(Episode.number.desc()) if descending else episodes.order_by(Episode.number)
     elif series.identified_by == 'ep':
-        episodes = episodes.order_by(Episode.season, Episode.number.desc()) if descending else episodes.order_by(
+        episodes = episodes.order_by(Episode.season.desc(), Episode.number.desc()) if descending else episodes.order_by(
             Episode.season, Episode.number)
     else:
         episodes = episodes.order_by(Episode.identifier.desc()) if descending else episodes.order_by(Episode.identifier)
