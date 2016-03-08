@@ -162,7 +162,7 @@ def setup_server(manager, session=None):
 
     user = get_user()
     if not user or not user.password:
-        log.warn('No password set for web server, create one by using'
+        log.warning('No password set for web server, create one by using'
                  ' `flexget web passwd <password>`')
 
     if web_server.is_alive():
