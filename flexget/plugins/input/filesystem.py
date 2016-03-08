@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
+from future.utils import PY2
 import logging
 import re
 import sys
@@ -111,7 +112,13 @@ class Filesystem(object):
         filepath = filepath.abspath()
         entry = Entry()
         entry['location'] = filepath
-        entry['url'] = urllib.parse.urljoin('file:', urllib.request.pathname2url(filepath))
+        if PY2:
+            # Python 2 urllib wants and returns native (byte) strings
+            urlpath = urllib.request.pathname2url(filepath.encode('utf-8'))
+            entry['url'] = urllib.parse.urljoin(b'file:', urlpath).decode('latin-1')
+        else:
+            import pathlib
+            entry['url'] = pathlib.Path(filepath).absolute().as_uri()
         entry['filename'] = filepath.name
         if filepath.isfile():
             entry['title'] = filepath.namebase
