@@ -3,6 +3,7 @@ from past.builtins import cmp
 # Commented out as ParsedEntry expects bytes in py2 and text in py3
 # from builtins import str
 from builtins import range
+from builtins import str as newstr
 
 import logging
 import re
@@ -529,7 +530,7 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
         if self.id_type == 'ep':
             return ['S%02dE%02d' % (self.season, self.episode + x) for x in range(self.episodes)]
         elif self.id_type == 'date':
-            return [self.id.strftime('%Y-%m-%d')]
+            return [newstr(self.id.strftime('%Y-%m-%d'))]
         if self.id is None:
             raise Exception('Series is missing identifier')
         else:

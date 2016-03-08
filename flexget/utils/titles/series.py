@@ -579,7 +579,7 @@ class SeriesParser(TitleParser):
         if self.id_type == 'ep':
             return ['S%02dE%02d' % (self.season, self.episode + x) for x in range(self.episodes)]
         elif self.id_type == 'date':
-            return [self.id.strftime('%Y-%m-%d')]
+            return [str(self.id.strftime('%Y-%m-%d'))]
         if self.id is None:
             raise Exception('Series is missing identifier')
         else:
