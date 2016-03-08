@@ -241,7 +241,7 @@ class PluginTraktLookup(object):
                 item = lookup(**lookupargs)
                 if style == 'show':
                     item = item.get_episode(entry['series_season'], entry['series_episode'])
-                collected = ApiTrakt.collected(config['username'], style, item, entry.get('title'),
+                collected = ApiTrakt.collected(style, item, entry.get('title'), username=config.get('username'),
                                                account=config.get('account'))
             except LookupError as e:
                 log.debug(e.args[0])
@@ -251,7 +251,7 @@ class PluginTraktLookup(object):
 
     def lazy_watched_lookup(self, config, style, entry):
         """Does the lookup for this entry and populates the entry fields."""
-        if style == 'episode':
+        if style == 'show':
             lookup = lookup_series
             id = entry.get('trakt_show_id', eval_lazy=True)
         else:
@@ -262,9 +262,9 @@ class PluginTraktLookup(object):
                           'session': session}
             try:
                 item = lookup(**lookupargs)
-                if style == 'episode':
+                if style == 'show':
                     item = item.get_episode(entry['series_season'], entry['series_episode'])
-                watched = ApiTrakt.watched(config['username'], style, item, entry.get('title'),
+                watched = ApiTrakt.watched(style, item, entry.get('title'), username=config.get('username'),
                                            account=config.get('account'))
             except LookupError as e:
                 log.debug(e.args[0])
@@ -291,7 +291,7 @@ class PluginTraktLookup(object):
                 if 'series_season' in entry and 'series_episode' in entry:
                     entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
                     collected_lookup = functools.partial(self.lazy_collected_lookup, config, 'show')
-                    watched_lookup = functools.partial(self.lazy_watched_lookup, config, 'episode')
+                    watched_lookup = functools.partial(self.lazy_watched_lookup, config, 'show')
                     entry.register_lazy_func(collected_lookup, ['trakt_collected'])
                     entry.register_lazy_func(watched_lookup, ['trakt_watched'])
             else:
