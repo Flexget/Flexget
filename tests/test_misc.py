@@ -3,8 +3,6 @@ import os
 import pytest
 import stat
 
-from nose.tools import raises
-
 from flexget.entry import EntryUnicodeError, Entry
 
 
@@ -199,7 +197,7 @@ class TestHtmlUtils(object):
 
         # why this does not encode < ?
         from flexget.utils.tools import encode_html
-        print encode_html('<3')
+        print(encode_html('<3'))
         assert encode_html('<3') == '&lt;3'
 
 
