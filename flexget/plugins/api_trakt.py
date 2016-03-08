@@ -854,7 +854,7 @@ class ApiTrakt(object):
 
     @staticmethod
     def collected(style, trakt_data, title, username=None, account=None):
-        ident = account + username if account and username else account or username
+        ident = str(account) + '|' + str(username)
         add_user_to_cache(ident)
         if not ApiTrakt.user_cache[ident]['collection'][style + 's']:
             update_collection_cache(style, ident, username=username, account=account)
@@ -881,7 +881,7 @@ class ApiTrakt(object):
 
     @staticmethod
     def watched(style, trakt_data, title, username=None, account=None):
-        ident = account + username if account and username else account or username
+        ident = str(account) + '|' + str(username)
         add_user_to_cache(ident)
         if not ApiTrakt.user_cache[ident]['watched'][style + 's']:
             update_watched_cache(style, ident, username=username, account=account)

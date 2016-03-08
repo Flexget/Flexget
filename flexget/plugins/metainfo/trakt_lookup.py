@@ -290,18 +290,20 @@ class PluginTraktLookup(object):
 
                 if 'series_season' in entry and 'series_episode' in entry:
                     entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
-                    collected_lookup = functools.partial(self.lazy_collected_lookup, config, 'show')
-                    watched_lookup = functools.partial(self.lazy_watched_lookup, config, 'show')
-                    entry.register_lazy_func(collected_lookup, ['trakt_collected'])
-                    entry.register_lazy_func(watched_lookup, ['trakt_watched'])
+                    if config.get('username') or config.get('account'):
+                        collected_lookup = functools.partial(self.lazy_collected_lookup, config, 'show')
+                        watched_lookup = functools.partial(self.lazy_watched_lookup, config, 'show')
+                        entry.register_lazy_func(collected_lookup, ['trakt_collected'])
+                        entry.register_lazy_func(watched_lookup, ['trakt_watched'])
             else:
                 entry.register_lazy_func(self.lazy_movie_lookup, self.movie_map)
                 # TODO cleaner way to do this?
                 entry.register_lazy_func(self.lazy_movie_actor_lookup, self.movie_actor_map)
-                collected_lookup = functools.partial(self.lazy_collected_lookup, config, 'movie')
-                watched_lookup = functools.partial(self.lazy_watched_lookup, config, 'movie')
-                entry.register_lazy_func(collected_lookup, ['trakt_collected'])
-                entry.register_lazy_func(watched_lookup, ['trakt_watched'])
+                if config.get('username') or config.get('account'):
+                    collected_lookup = functools.partial(self.lazy_collected_lookup, config, 'movie')
+                    watched_lookup = functools.partial(self.lazy_watched_lookup, config, 'movie')
+                    entry.register_lazy_func(collected_lookup, ['trakt_collected'])
+                    entry.register_lazy_func(watched_lookup, ['trakt_watched'])
 
 
 @event('plugin.register')
