@@ -4,6 +4,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import filter
 from past.builtins import basestring
 from builtins import object
+from builtins import str
 
 import pytest
 from flexget.plugins.parsers.parser_internal import ParserInternal
