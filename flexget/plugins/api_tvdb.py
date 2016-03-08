@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from future import standard_library
 standard_library.install_aliases()
-from builtins import range
+from builtins import range, str
 from past.builtins import basestring
 from builtins import object
 
@@ -116,8 +116,7 @@ class TVDBContainer(object):
                     elif isinstance(col.type, Float):
                         value = float(node.text)
                     else:
-                        # Make sure we always have unicode strings
-                        value = node.text
+                        value = str(node.text)
                         value = decode_html(value)
                     setattr(self, col.name, value)
         self.expired = False
