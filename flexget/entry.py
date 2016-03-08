@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, unicode_literals
 from builtins import str
-from past.builtins import str as oldstring
+from past.builtins import str as oldstr
 
 import copy
 import functools
@@ -185,9 +185,14 @@ class Entry(LazyDict):
         return self._state == 'undecided'
 
     def __setitem__(self, key, value):
-        # Enforce unicode compatibility. Check for all subclasses of basestring, so that NavigableStrings are also cast
-        if isinstance(value, oldstring):
-            raise EntryUnicodeError(key, value)
+        # Enforce unicode compatibility.
+        if isinstance(value, oldstr):
+            # Allow Python 2's implicit string decoding, but fail now instead of when entry fields are used.
+            # If encoding is anything but ascii, it should be decoded it to text before setting an entry field
+            try:
+                value = value.decode('ascii')
+            except UnicodeDecodeError:
+                raise EntryUnicodeError(key, value)
 
         # url and original_url handling
         if key == 'url':
