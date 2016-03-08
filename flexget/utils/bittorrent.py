@@ -7,6 +7,9 @@ import codecs
 from builtins import next
 from builtins import zip
 from builtins import object
+from builtins import str
+from past.builtins import unicode as oldunicode
+from past.builtins import str as oldstr
 import functools
 import re
 import logging
@@ -184,7 +187,10 @@ def bencode(data):
         str: encode_unicode,
         int: encode_integer,
         list: encode_list,
-        dict: encode_dictionary}
+        dict: encode_dictionary,
+        oldstr: encode_string,
+        oldunicode: encode_unicode
+    }
     return encode_func[type(data)](data)
 
 
@@ -288,7 +294,7 @@ class Torrent(object):
         hash = hashlib.sha1()
         info_data = encode_dictionary(self.content['info'])
         hash.update(info_data)
-        return hash.hexdigest().upper()
+        return str(hash.hexdigest().upper())
 
     @property
     def comment(self):
