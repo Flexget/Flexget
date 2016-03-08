@@ -33,7 +33,8 @@ class PluginTmdbLookup(object):
         'tmdb_year': 'year',
         'tmdb_popularity': 'popularity',
         'tmdb_rating': 'rating',
-        'tmdb_genres': 'genres',
+        # Make sure we don't stor the db association proxy directly on the entry
+        'tmdb_genres': lambda movie: list(movie.genres),
         'tmdb_released': 'released',
         'tmdb_votes': 'votes',
         'tmdb_certification': 'certification',
