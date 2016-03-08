@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, unicode_literals
 from builtins import str
-from past.builtins import basestring
+from past.builtins import str as oldstring
 
 import copy
 import functools
@@ -21,7 +21,7 @@ class EntryUnicodeError(Exception):
         self.value = value
 
     def __str__(self):
-        return 'Field %s is not unicode-compatible (%r)' % (self.key, self.value)
+        return 'Entry strings must be unicode: %s (%r)' % (self.key, self.value)
 
 
 class Entry(LazyDict):
@@ -186,21 +186,18 @@ class Entry(LazyDict):
 
     def __setitem__(self, key, value):
         # Enforce unicode compatibility. Check for all subclasses of basestring, so that NavigableStrings are also cast
-        if isinstance(value, basestring) and not type(value) == str:
-            try:
-                value = str(value)
-            except UnicodeDecodeError:
-                raise EntryUnicodeError(key, value)
+        if isinstance(value, oldstring):
+            raise EntryUnicodeError(key, value)
 
         # url and original_url handling
         if key == 'url':
-            if not isinstance(value, (basestring, LazyLookup)):
+            if not isinstance(value, (str, LazyLookup)):
                 raise PluginError('Tried to set %r url to %r' % (self.get('title'), value))
             self.setdefault('original_url', value)
 
         # title handling
         if key == 'title':
-            if not isinstance(value, (basestring, LazyLookup)):
+            if not isinstance(value, (str, LazyLookup)):
                 raise PluginError('Tried to set title to %r' % value)
 
         try:
@@ -224,9 +221,9 @@ class Entry(LazyDict):
             return False
         if 'url' not in self:
             return False
-        if not isinstance(self['url'], basestring):
+        if not isinstance(self['url'], str):
             return False
-        if not isinstance(self['title'], basestring):
+        if not isinstance(self['title'], str):
             return False
         return True
 
@@ -262,7 +259,7 @@ class Entry(LazyDict):
         """
         func = dict.get if isinstance(source_item, dict) else getattr
         for field, value in field_map.items():
-            if isinstance(value, basestring):
+            if isinstance(value, str):
                 v = functools.reduce(func, value.split('.'), source_item)
             else:
                 v = value(source_item)
@@ -279,7 +276,7 @@ class Entry(LazyDict):
         :rtype: string
         :raises RenderError: If there is a problem.
         """
-        if not isinstance(template, basestring):
+        if not isinstance(template, str):
             raise ValueError('Trying to render non string template, got %s' % repr(template))
         log.trace('rendering: %s' % template)
         return render_from_entry(template, self)
