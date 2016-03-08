@@ -713,13 +713,11 @@ def update_collection_cache(style, ident, username=None, account=None):
                 cache[series_id] = series['show']
                 cache[series_id]['seasons'] = series['seasons']
                 cache[series_id]['collected_at'] = dateutil_parse(series['last_collected_at'], ignoretz=True)
-                cache[series_id]['type'] = 'show'
         else:
             for movie in data:
                 movie_id = movie['movie']['ids']['trakt']
                 cache[movie_id] = movie['movie']
                 cache[movie_id]['collected_at'] = dateutil_parse(movie['collected_at'], ignoretz=True)
-                cache[movie_id]['type'] = 'movie'
     except requests.RequestException as e:
         raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
 
@@ -742,14 +740,12 @@ def update_watched_cache(style, ident, username=None, account=None):
                 cache[series_id] = series['show']
                 cache[series_id]['seasons'] = series['seasons']
                 cache[series_id]['watched_at'] = dateutil_parse(series['last_watched_at'], ignoretz=True)
-                cache[series_id]['type'] = 'show'
                 cache[series_id]['plays'] = series['plays']
         else:
             for movie in data:
                 movie_id = movie['movie']['ids']['trakt']
                 cache[movie_id] = movie['movie']
                 cache[movie_id]['watched_at'] = dateutil_parse(movie['last_watched_at'], ignoretz=True)
-                cache[movie_id]['type'] = 'movie'
                 cache[movie_id]['plays'] = movie['plays']
     except requests.RequestException as e:
         raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
