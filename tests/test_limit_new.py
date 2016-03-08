@@ -1,9 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
 
 
-class TestLimitNew(FlexGetBase):
-    __yaml__ = """
+class TestLimitNew(object):
+    config = """
         tasks:
           test:
             mock:
@@ -15,10 +14,10 @@ class TestLimitNew(FlexGetBase):
             limit_new: 1
     """
 
-    def test_limit_new(self):
-        self.execute_task('test')
-        assert len(self.task.entries) == 1, 'accepted too many'
-        assert self.task.find_entry('accepted', title='Item 1'), 'accepted wrong item'
-        self.execute_task('test')
-        assert len(self.task.entries) == 1, 'accepted too many on second run'
-        assert self.task.find_entry('accepted', title='Item 2'), 'accepted wrong item on second run'
+    def test_limit_new(self, execute_task):
+        task = execute_task('test')
+        assert len(task.entries) == 1, 'accepted too many'
+        assert task.find_entry('accepted', title='Item 1'), 'accepted wrong item'
+        task = execute_task('test')
+        assert len(task.entries) == 1, 'accepted too many on second run'
+        assert task.find_entry('accepted', title='Item 2'), 'accepted wrong item on second run'

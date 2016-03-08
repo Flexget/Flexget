@@ -5,73 +5,23 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+        User-Agent: [FlexGet/1.2.464.dev (www.flexget.com)]
       method: GET
       uri: http://download.flexget.com/
     response:
-      body: {string: "<html>\r\n<head><title>Index of /</title></head>\r\n<body bgcolor=\"\
-          white\">\r\n<h1>Index of /</h1><hr><pre><a href=\"../\">../</a>\r\n<a href=\"\
-          archive/\">archive/</a>                                           20-Oct-2014\
-          \ 08:01                   -\r\n<a href=\"ChangeLog\">ChangeLog</a>     \
-          \                                     20-Oct-2014 08:02              174905\r\
-          \n<a href=\"FlexGet-1.2.209.tar.gz\">FlexGet-1.2.209.tar.gz</a>        \
-          \                     20-Oct-2014 08:01              974402\r\n</pre><hr></body>\r\
-          \n</html>\r\n"}
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA41SS2rDMBDdF3oHob0lj/xJYxRtCimFlp5BjieWQbWCItKkp6/lpCVaNESLYf7v
+          jWakCZ9WPT5Ig7pTMgzBonodOzwStyVc8rNH8jk+5bWuO5G23zjr/Ip+mSEgneshKTOgpPFK7jwq
+          qYnxuF1RxjhVk5Bcx5Jf97PRY49vrqfqT40p5O4nqmyNbSZyqEm+aCaZPKhLgOUV4tri8QVDBkyw
+          YlGyDg8saM/6b6r+j93kJJbZxyZEChXJRVNByqCCUpRPVxSsDrgPB/T7wY1UJeZNoKRvXmTv2l8G
+          Fw2USfRsJKiud2w3Tj9tL9r9WHM3ARPgKQIWcUyRp4AAohYRkM+LjxfA48XEdfPLqf0AoW7AOXMC
+          AAA=
       headers:
         connection: [keep-alive]
+        content-encoding: [gzip]
         content-type: [text/html]
-        date: ['Wed, 22 Oct 2014 01:46:00 GMT']
-        server: [nginx/1.4.7]
-        transfer-encoding: [chunked]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://download.flexget.com/
-    response:
-      body: {string: "<html>\r\n<head><title>Index of /</title></head>\r\n<body bgcolor=\"\
-          white\">\r\n<h1>Index of /</h1><hr><pre><a href=\"../\">../</a>\r\n<a href=\"\
-          archive/\">archive/</a>                                           20-Oct-2014\
-          \ 08:01                   -\r\n<a href=\"ChangeLog\">ChangeLog</a>     \
-          \                                     20-Oct-2014 08:02              174905\r\
-          \n<a href=\"FlexGet-1.2.209.tar.gz\">FlexGet-1.2.209.tar.gz</a>        \
-          \                     20-Oct-2014 08:01              974402\r\n</pre><hr></body>\r\
-          \n</html>\r\n"}
-      headers:
-        connection: [keep-alive]
-        content-type: [text/html]
-        date: ['Wed, 22 Oct 2014 01:56:17 GMT']
-        server: [nginx/1.4.7]
-        transfer-encoding: [chunked]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://download.flexget.com/
-    response:
-      body: {string: "<html>\r\n<head><title>Index of /</title></head>\r\n<body bgcolor=\"\
-          white\">\r\n<h1>Index of /</h1><hr><pre><a href=\"../\">../</a>\r\n<a href=\"\
-          archive/\">archive/</a>                                           20-Oct-2014\
-          \ 08:01                   -\r\n<a href=\"ChangeLog\">ChangeLog</a>     \
-          \                                     20-Oct-2014 08:02              174905\r\
-          \n<a href=\"FlexGet-1.2.209.tar.gz\">FlexGet-1.2.209.tar.gz</a>        \
-          \                     20-Oct-2014 08:01              974402\r\n</pre><hr></body>\r\
-          \n</html>\r\n"}
-      headers:
-        connection: [keep-alive]
-        content-type: [text/html]
-        date: ['Wed, 22 Oct 2014 02:43:09 GMT']
-        server: [nginx/1.4.7]
-        transfer-encoding: [chunked]
+        date: ['Thu, 03 Mar 2016 09:32:47 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
       status: {code: 200, message: OK}
 version: 1

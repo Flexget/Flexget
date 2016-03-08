@@ -3,7 +3,11 @@
 
   angular
     .module('flexget.plugins.seen')
-    .controller('seenController', seenController);
+    .component('seenView', {
+      templateUrl: 'plugins/seen/seen.tmpl.html',
+      controllerAs: 'vm',
+      controller: seenController,
+    });
 
   function seenController($http) {
     var vm = this;

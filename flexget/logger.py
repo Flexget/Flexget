@@ -108,6 +108,7 @@ def console(text, *args, **kwargs):
         text = unicode(text).encode(io_encoding, 'replace')
     kwargs['file'] = getattr(local_context, 'output', sys.stdout)
     print(text, *args, **kwargs)
+    kwargs['file'].flush()  # flush to make sure the output is printed right away
 
 
 class RollingBuffer(collections.deque):
@@ -173,9 +174,8 @@ def initialize(unit_test=False):
     logging.addLevelName(VERBOSE, 'VERBOSE')
     _logging_configured = True
 
-    # with unit test we want a bit simpler setup
+    # with unit test we want pytest to add the handlers
     if unit_test:
-        logging.basicConfig()
         _logging_started = True
         return
 

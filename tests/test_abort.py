@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 
 from flexget import plugin
 from flexget.event import event
-from tests import FlexGetBase
 
 
 class AbortPlugin(object):
@@ -15,9 +14,9 @@ def register():
     plugin.register(AbortPlugin, 'abort', debug=True, api_ver=2)
 
 
-class TestAbort(FlexGetBase):
+class TestAbort(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             # causes on_task_abort to be called
@@ -31,6 +30,5 @@ class TestAbort(FlexGetBase):
               test: value
     """
 
-    def test_abort(self):
-        self.execute_task('test', abort_ok=True)
-        assert self.task.aborted, 'Task not aborted'
+    def test_abort(self, execute_task):
+        execute_task('test', abort=True)

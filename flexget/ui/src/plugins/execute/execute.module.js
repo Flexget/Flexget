@@ -6,7 +6,7 @@
     registerPlugin(executeModule);
 
     executeModule.run(function (route, sideNav) {
-        route.register('execute', '/execute', 'executeController', 'plugins/execute/execute.tmpl.html');
+        route.register('execute', '/execute', 'execute-view');
         sideNav.register('/execute', 'Execute', 'fa fa-cog', 128);
     });
 

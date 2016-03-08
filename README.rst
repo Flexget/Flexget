@@ -21,11 +21,14 @@ directory support or provide interface for external utilities like FlexGet.
     :target: https://pypi.python.org/pypi/Flexget
 
 .. image:: https://img.shields.io/pypi/dm/Flexget.svg
-        :target: https://pypi.python.org/pypi/Flexget
+    :target: https://pypi.python.org/pypi/Flexget
+
+.. image:: https://landscape.io/github/Flexget/Flexget/develop/landscape.png
+    :target: https://landscape.io/github/Flexget/Flexget/develop
 
 .. image:: https://badges.gitter.im/Flexget/Flexget.svg
-   :alt: Join the chat at https://gitter.im/Flexget/Flexget
-   :target: https://gitter.im/Flexget/Flexget?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+    :alt: Join the chat at https://gitter.im/Flexget/Flexget
+    :target: https://gitter.im/Flexget/Flexget?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
 
 
@@ -56,10 +59,10 @@ Docker can be used to install and run flexget::
 How to use GIT checkout
 -----------------------
 
-Check that you have Python 2.6 - 2.7 available with command ``python -V``.
+Check that you have Python 2.7 available with command ``python -V``.
 
 In some environments newer (or older, if your distro is on python 3,) python
-might be available under another name like 'python26' or 'python2.7' in which
+might be available under another name like 'python2.7' in which
 case you need to use that one instead of plain 'python'.
 
 To start using FlexGet from this directory:

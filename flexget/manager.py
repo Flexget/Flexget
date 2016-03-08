@@ -100,8 +100,11 @@ class Manager(object):
         """
         :param args: CLI args
         """
-        global manager
-        assert not manager, 'Only one instance of Manager should be created at a time!'
+        if not self.unit_test:
+            global manager
+            assert not manager, 'Only one instance of Manager should be created at a time!'
+        else:
+            log.info('last manager was not torn down correctly')
 
         if args is None:
             # Decode all arguments to unicode before parsing
@@ -588,7 +591,7 @@ class Manager(object):
             self.config = old_config
             raise
         log.debug('New config data loaded.')
-        self.user_config = new_user_config
+        self.user_config = copy.deepcopy(new_user_config)
         fire_event('manager.config_updated', self)
 
     def save_config(self):

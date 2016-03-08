@@ -35,8 +35,8 @@ setup(
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     zip_safe=False,
-    test_suite='nose.collector',
     install_requires=load_requirements('requirements.txt'),
+    tests_require=['pytest'],
     extras_require={
         ':python_version=="2.6"': ['argparse'],
         'dev_tools': load_requirements('dev-requirements.txt')
@@ -51,7 +51,6 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",

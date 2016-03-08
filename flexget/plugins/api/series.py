@@ -41,7 +41,7 @@ release_object = {
         'release_downloaded': {'type': 'string'},
         'release_quality': {'type': 'string'},
         'release_proper_count': {'type': 'integer'},
-        'release_first_seen': {'type': 'string'},
+        'release_first_seen': {'type': 'string', 'format': 'date-time'},
         'release_episode_id': {'type': 'integer'}
     }
 }
@@ -88,7 +88,7 @@ latest_object = {
 episode_object = {
     'type': 'object',
     'properties': {
-        "episode_first_seen": {'type': 'string'},
+        "episode_first_seen": {'type': 'string', 'format': 'date-time'},
         "episode_id": {'type': 'string'},
         "episode_identified_by": {'type': 'string'},
         "episode_identifier": {'type': 'string'},
@@ -248,7 +248,7 @@ series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behin
                                 default='show_name',
                                 help="Sort response by attribute.")
 series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
-series_list_parser.add_argument('lookup', choices=('tvdb',), action='append',
+series_list_parser.add_argument('lookup', choices=('tvdb', 'tvmaze'), action='append',
                                 help="Get lookup result for every show by sending another request to lookup API")
 
 
@@ -328,9 +328,10 @@ class SeriesListAPI(APIResource):
                 base_url = '/%s/series/' % endpoint
                 for show in response['shows']:
                     pos = response['shows'].index(show)
+                    response['shows'][pos].setdefault('lookup', {})
                     url = base_url + show['show_name'] + '/'
                     result = api_client.get_endpoint(url)
-                    response['shows'][pos]['lookup'] = {endpoint: result}
+                    response['shows'][pos]['lookup'].update({endpoint: result})
         return jsonify(response)
 
 
