@@ -33,17 +33,17 @@ class PluginTmdbLookup(object):
         'tmdb_year': 'year',
         'tmdb_popularity': 'popularity',
         'tmdb_rating': 'rating',
-        'tmdb_genres': lambda movie: [genre.name for genre in movie.genres],
+        # Make sure we don't stor the db association proxy directly on the entry
+        'tmdb_genres': lambda movie: list(movie.genres),
         'tmdb_released': 'released',
         'tmdb_votes': 'votes',
         'tmdb_certification': 'certification',
-        'tmdb_posters': lambda movie: [poster.url for poster in sorted(movie.posters, key=lambda poster: poster.size)],
+        'tmdb_posters': lambda movie: [poster.url for poster in movie.posters],
         'tmdb_runtime': 'runtime',
         'tmdb_tagline': 'tagline',
         'tmdb_budget': 'budget',
         'tmdb_revenue': 'revenue',
         'tmdb_homepage': 'homepage',
-        'tmdb_trailer': 'trailer',
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'name',
         'movie_year': 'year'}
@@ -55,7 +55,7 @@ class PluginTmdbLookup(object):
         imdb_id = (entry.get('imdb_id', eval_lazy=False) or
                    imdb.extract_id(entry.get('imdb_url', eval_lazy=False)))
         try:
-            with Session(expire_on_commit=False) as session:
+            with Session() as session:
                 movie = lookup(smart_match=entry['title'],
                                tmdb_id=entry.get('tmdb_id', eval_lazy=False),
                                imdb_id=imdb_id,
