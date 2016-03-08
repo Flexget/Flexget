@@ -4,6 +4,7 @@ from builtins import next
 from builtins import map
 from builtins import str
 from builtins import range
+from builtins import filter
 from past.builtins import basestring
 from builtins import object
 
