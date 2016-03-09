@@ -815,7 +815,6 @@ def show_episodes(series, start=None, stop=None, count=False, descending=False, 
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
     if count:
         return episodes.count()
-    episodes = episodes.slice(start, stop).from_self()
     # Query episodes in sane order instead of iterating from series.episodes
     if series.identified_by == 'sequence':
         episodes = episodes.order_by(Episode.number.desc()) if descending else episodes.order_by(Episode.number)
@@ -824,6 +823,7 @@ def show_episodes(series, start=None, stop=None, count=False, descending=False, 
             Episode.season, Episode.number)
     else:
         episodes = episodes.order_by(Episode.identifier.desc()) if descending else episodes.order_by(Episode.identifier)
+    episodes = episodes.slice(start, stop).from_self()
     return episodes.all()
 
 
