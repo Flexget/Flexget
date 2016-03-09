@@ -6,7 +6,7 @@
         </md-input-container>
     </div>
 	<md-list>
-        <series-show class="md-3-line" show="show" confirm-delete="vm.confirmDelete(show)" ng-repeat="show in vm.series"></series-show>
+        <series-show class="md-3-line" show="show" forget-show="vm.forgetShow(show)" ng-repeat="show in vm.series"></series-show>
         <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalShows" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
 	</md-list>
 </md-content>
