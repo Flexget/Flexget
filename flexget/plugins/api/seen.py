@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 
 import copy
 from math import ceil
-from operator import itemgetter
 from urllib import unquote
 
 from flask import jsonify, request
@@ -198,6 +197,7 @@ class SeenSearchAPI(APIResource):
 
     @api.response(500, 'Delete process failed', model=default_error_schema)
     @api.response(200, 'Successfully delete all entries', empty_response)
+    @api.response(404, 'No results to delete', default_error_schema)
     @api.doc(parser=seen_delete_parser, description='Delete seen entries')
     def delete(self, session):
         """ Delete seen entries """
@@ -209,6 +209,10 @@ class SeenSearchAPI(APIResource):
             value = unquote(value)
             value = '%' + value + '%'
         seen_entries_list = seen.search(value=value, status=is_seen_local, session=session)
+
+        if not seen_entries_list.all():
+            return {'status': 'error',
+                    'message': 'no results to delete'}, 404
 
         for entry in seen_entries_list:
             try:
