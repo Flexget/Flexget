@@ -151,6 +151,8 @@ class SeenSearchAPI(APIResource):
 
         pages = int(ceil(count / float(page_size)))
 
+        actual_size = min(count, page_size)
+
         # Invalid page request
         if page > pages and pages != 0:
             return {'status': 'error',
@@ -159,7 +161,7 @@ class SeenSearchAPI(APIResource):
         return jsonify({
             'seen_entries': converted_seen_entry_list,
             'total_number_of_seen_entries': count,
-            'number_of_seen_entries': page_size,
+            'page_size': actual_size,
             'page_number': page,
             'total_number_of_pages': pages
         })
