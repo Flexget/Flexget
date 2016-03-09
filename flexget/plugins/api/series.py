@@ -9,6 +9,7 @@ from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, ApiClient
+from flexget.event import fire_event
 from flexget.plugins.filter import series
 
 series_api = api.namespace('series', description='Flexget Series operations')
@@ -643,10 +644,8 @@ class SeriesEpisodeAPI(APIResource):
 
         args = delete_parser.parse_args()
         if args.get('delete_seen'):
-            api_client = ApiClient()
             for release in episode.releases:
-                seen_url = '/seen/?value=%s' % release.title
-                api_client.get_endpoint(seen_url, method='DELETE')
+                fire_event('forget', release.title)
 
         series.forget_episodes_by_id(show_id, ep_id)
         return {}
@@ -736,9 +735,7 @@ class SeriesReleasesAPI(APIResource):
                             downloaded == 'all':
                 release_items.append(release)
             if args.get('delete_seen'):
-                api_client = ApiClient()
-                seen_url = '/seen/?value=%s' % release.title
-                api_client.get_endpoint(seen_url, method='DELETE')
+                fire_event('forget', release.title)
 
         for release in release_items:
             series.delete_release_by_id(release.id)
@@ -847,9 +844,7 @@ class SeriesReleaseAPI(APIResource):
                     'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
         args = delete_parser.parse_args()
         if args.get('delete_seen'):
-            api_client = ApiClient()
-            seen_url = '/seen/?value=%s' % release.title
-            api_client.get_endpoint(seen_url, method='DELETE')
+            fire_event('forget', release.title)
 
         series.delete_release_by_id(rel_id)
         return {}
