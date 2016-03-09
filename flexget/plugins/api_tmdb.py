@@ -14,7 +14,7 @@ from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, year_property, with_session
 
 log = logging.getLogger('api_tmdb')
-Base = db_schema.versioned_base('api_tmdb', 0)
+Base = db_schema.versioned_base('api_tmdb', 1)
 
 # This is a FlexGet API key
 API_KEY = 'bdfc018dbdb7c243dc7cb1454ff74b95'
