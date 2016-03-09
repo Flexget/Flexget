@@ -582,6 +582,12 @@ class SeriesEpisodesAPI(APIResource):
         return {}
 
 
+delete_parser = api.parser()
+delete_parser.add_argument('delete_seen', type=inputs.boolean, default=False,
+                           help="Enabling this will delete all the related releases from seen entries list as well, "
+                                "enabling to re-download them")
+
+
 @api.response(404, 'Show ID not found', default_error_schema)
 @api.response(414, 'Episode ID not found', default_error_schema)
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id', default_error_schema)
@@ -615,7 +621,8 @@ class SeriesEpisodeAPI(APIResource):
 
     @api.response(200, 'Episode successfully forgotten for show', empty_response)
     @api.doc(description='Delete a specific episode via its ID and show ID. Deleting an episode will mark it as '
-                         'wanted again')
+                         'wanted again',
+             parser=delete_parser)
     def delete(self, show_id, ep_id, session):
         """ Forgets episode by show ID and episode ID """
         try:
@@ -633,6 +640,13 @@ class SeriesEpisodeAPI(APIResource):
         if not series.episode_in_show(show_id, ep_id):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
+
+        args = delete_parser.parse_args()
+        if args.get('delete_seen'):
+            api_client = ApiClient()
+            for release in episode.releases:
+                seen_url = '/seen/?value=%s' % release.title
+                api_client.get_endpoint(seen_url, method='DELETE')
 
         series.forget_episodes_by_id(show_id, ep_id)
         return {}
