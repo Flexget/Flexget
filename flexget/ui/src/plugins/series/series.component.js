@@ -9,7 +9,7 @@
       controller: seriesController,
     });
 
-  function seriesController($http, $state, $mdDialog) {
+  function seriesController($http, $mdDialog) {
     var vm = this;
 
     var options = {
@@ -33,22 +33,8 @@
       });
     }
 
-    //Call from the pagination to update the page to the selected page
-    vm.updateListPage = function(index) {
-      options.page = index;
-
-      getSeriesList();
-    }
-
-    vm.search = function() {
-      $http.get('/api/series/search/' + vm.searchTerm, { params: options })
-      .success(function(data) {
-        vm.series = data.shows;
-      });
-    }
-
-    vm.forgetSeries = function(show) {
-      var confirm = $mdDialog.confirm()
+    vm.forgetShow = function(show) {
+       var confirm = $mdDialog.confirm()
       .title('Confirm forgetting show.')
       .htmlContent("Are you sure you want to completely forget <b>" + show.show_name + "</b>?")
       .ok("Forget")
@@ -70,6 +56,22 @@
         })
       });
     }
+
+    //Call from the pagination to update the page to the selected page
+    vm.updateListPage = function(index) {
+      options.page = index;
+
+      getSeriesList();
+    }
+
+    vm.search = function() {
+      $http.get('/api/series/search/' + vm.searchTerm, { params: options })
+      .success(function(data) {
+        vm.series = data.shows;
+      });
+    }
+
+    
 
     //Load initial list of series
     getSeriesList();

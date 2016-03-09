@@ -9,16 +9,15 @@
       controller: seriesShowController,
       bindings: {
         show: '<',
-        forgetSeries: '<',
+        forgetShow: '&'
       },
     });
 
-    function seriesShowController($state) {
+    function seriesShowController($state, $mdDialog) {
       var vm = this;
 
       vm.gotoEpisodes = function() {
         $state.go('flexget.episodes', { id: vm.show.show_id });
       };
-
     }
 })();

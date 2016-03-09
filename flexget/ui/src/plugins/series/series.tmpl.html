@@ -1,16 +1,12 @@
 <md-content flex layout-margin>
-	<md-tabs md-dynamic-height md-border-bottom>
-		<md-tab label="All series" >
-            <div layout-gt-sm="row">
-                <md-input-container flex layout-align="end center">
-                    <label>Search</label>
-                    <input ng-model="vm.searchTerm" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }">
-                </md-input-container>
-            </div>
-			<md-list>
-   			<series-show class="md-3-line" show="show" ng-repeat="show in vm.series"></series-show>
-          <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalShows" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
-			</md-list>
-		</md-tab>
-	</md-tabs>
+    <div layout-gt-sm="row">
+        <md-input-container flex layout-align="end center">
+            <label>Search</label>
+            <input ng-model="vm.searchTerm" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }">
+        </md-input-container>
+    </div>
+	<md-list>
+        <series-show class="md-3-line" show="show" forget-show="vm.forgetShow(show)" ng-repeat="show in vm.series"></series-show>
+        <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalShows" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
+	</md-list>
 </md-content>
