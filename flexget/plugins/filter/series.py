@@ -464,9 +464,6 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
     elif configured not in ['configured', 'unconfigured', 'all']:
         raise LookupError('"configured" parameter must be either "configured", "unconfigured", or "all"')
     query = session.query(Series)
-    if count:
-        return query.count()
-    query = query.slice(start, stop).from_self()
     query = query.outerjoin(Series.episodes).outerjoin(Episode.releases).outerjoin(Series.in_tasks).group_by(Series.id)
     if configured == 'configured':
         query = query.having(func.count(SeriesTask.id) >= 1)
@@ -483,6 +480,9 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         if not days:
             days = 365
         query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
+    if count:
+        return query.count()
+    query = query.slice(start, stop).from_self()
     return query
 
 
@@ -821,7 +821,6 @@ def show_episodes(series, start=None, stop=None, count=False, descending=False, 
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
     if count:
         return episodes.count()
-    episodes = episodes.slice(start, stop).from_self()
     # Query episodes in sane order instead of iterating from series.episodes
     if series.identified_by == 'sequence':
         episodes = episodes.order_by(Episode.number.desc()) if descending else episodes.order_by(Episode.number)
@@ -830,6 +829,7 @@ def show_episodes(series, start=None, stop=None, count=False, descending=False, 
             Episode.season, Episode.number)
     else:
         episodes = episodes.order_by(Episode.identifier.desc()) if descending else episodes.order_by(Episode.identifier)
+    episodes = episodes.slice(start, stop).from_self()
     return episodes.all()
 
 

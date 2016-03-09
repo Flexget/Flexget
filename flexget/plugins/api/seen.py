@@ -153,6 +153,8 @@ class SeenSearchAPI(APIResource):
 
         pages = int(ceil(count / float(page_size)))
 
+        actual_size = min(count, page_size)
+
         # Invalid page request
         if page > pages and pages != 0:
             return {'status': 'error',
@@ -161,7 +163,7 @@ class SeenSearchAPI(APIResource):
         return jsonify({
             'seen_entries': converted_seen_entry_list,
             'total_number_of_seen_entries': count,
-            'number_of_seen_entries': page_size,
+            'page_size': actual_size,
             'page_number': page,
             'total_number_of_pages': pages
         })
@@ -198,6 +200,7 @@ class SeenSearchAPI(APIResource):
 
     @api.response(500, 'Delete process failed', model=default_error_schema)
     @api.response(200, 'Successfully delete all entries', empty_response)
+    @api.response(404, 'No results to delete', default_error_schema)
     @api.doc(parser=seen_delete_parser, description='Delete seen entries')
     def delete(self, session):
         """ Delete seen entries """
@@ -209,6 +212,10 @@ class SeenSearchAPI(APIResource):
             value = unquote(value)
             value = '%' + value + '%'
         seen_entries_list = seen.search(value=value, status=is_seen_local, session=session)
+
+        if not seen_entries_list.all():
+            return {'status': 'error',
+                    'message': 'no results to delete'}, 404
 
         for entry in seen_entries_list:
             try:

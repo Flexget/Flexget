@@ -106,6 +106,7 @@ class TestTraktShowLookup(object):
             assert series.tvdb_id == entry['tvdb_id'], 'tvdb id should be the same as the first entry'
             assert series.id == entry['trakt_show_id'], 'trakt id should be the same as the first entry'
             assert series.title.lower() == entry['trakt_series_name'].lower(), 'series name should match first entry'
+
     def test_search_fail(self, execute_task):
         task = execute_task('test_search_fail')
         entry = task.find_entry('accepted', title='Baking.Around.S01E01.HDTV.XViD-FlexGet')
@@ -245,6 +246,7 @@ class TestTraktWatchedAndCollected(object):
 
     def test_trakt_watched_movie_lookup(self, execute_task):
         task = execute_task('test_trakt_watched_movie')
+        print task.all_entries
         assert len(task.accepted) == 1, 'Movie should have been accepted as it is watched on Trakt profile'
         entry = task.accepted[0]
         assert entry['title'] == 'Inside.Out.2015.1080p.BDRip-FlexGet', 'title was not accepted?'

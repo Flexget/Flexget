@@ -48,7 +48,7 @@ gulp.task('html', ['inject', 'partials'], function () {
         .pipe(cssFilter)
         .pipe($.csso())
         .pipe(cssFilter.restore)
-        .pipe($.replace('url(\'ui-grid', 'url(\'../fonts/ui-grid'))
+        .pipe($.replace('url(ui-grid', 'url(../fonts/ui-grid'))
         .pipe($.replace('../bower_components/font-awesome/fonts', '../fonts'))
         .pipe($.replace('../bower_components/material-design-iconic-font/dist/fonts', '../fonts'))
         .pipe($.revReplace())
