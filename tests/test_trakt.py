@@ -246,7 +246,6 @@ class TestTraktWatchedAndCollected(object):
 
     def test_trakt_watched_movie_lookup(self, execute_task):
         task = execute_task('test_trakt_watched_movie')
-        print task.all_entries
         assert len(task.accepted) == 1, 'Movie should have been accepted as it is watched on Trakt profile'
         entry = task.accepted[0]
         assert entry['title'] == 'Inside.Out.2015.1080p.BDRip-FlexGet', 'title was not accepted?'
