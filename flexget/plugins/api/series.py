@@ -656,6 +656,11 @@ release_list_parser = api.parser()
 release_list_parser.add_argument('downloaded', choices=('downloaded', 'not_downloaded', 'all'), default='all',
                                  help='Filter between release status')
 
+release_delete_parser = release_list_parser.copy()
+release_delete_parser.add_argument('delete_seen', type=inputs.boolean, default=False,
+                                   help="Enabling this will delete all the related releases from seen entries list as well, "
+                                        "enabling to re-download them")
+
 
 @api.response(404, 'Show ID not found', default_error_schema)
 @api.response(414, 'Episode ID not found', default_error_schema)
@@ -703,7 +708,7 @@ class SeriesReleasesAPI(APIResource):
 
     @api.response(200, 'Successfully deleted all releases for episode', empty_response)
     @api.doc(description='Delete all releases for a specific episode of a specific show.',
-             parser=release_list_parser)
+             parser=release_delete_parser)
     def delete(self, show_id, ep_id, session):
         """ Deletes all episodes releases by show ID and episode ID """
         try:
@@ -722,7 +727,7 @@ class SeriesReleasesAPI(APIResource):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
 
-        args = release_list_parser.parse_args()
+        args = release_delete_parser.parse_args()
         downloaded = args['downloaded']
         release_items = []
         for release in episode.releases:
@@ -730,7 +735,11 @@ class SeriesReleasesAPI(APIResource):
                     (downloaded == 'not_downloaded' and not release.downloaded) or \
                             downloaded == 'all':
                 release_items.append(release)
-        number_of_releases = len(release_items)
+            if args.get('delete_seen'):
+                api_client = ApiClient()
+                seen_url = '/seen/?value=%s' % release.title
+                api_client.get_endpoint(seen_url, method='DELETE')
+
         for release in release_items:
             series.delete_release_by_id(release.id)
         return {}
@@ -808,7 +817,8 @@ class SeriesReleaseAPI(APIResource):
         })
 
     @api.response(200, 'Release successfully deleted', empty_response)
-    @api.doc(description='Delete a specific releases for a specific episode of a specific show.')
+    @api.doc(description='Delete a specific releases for a specific episode of a specific show.',
+             parser=delete_parser)
     def delete(self, show_id, ep_id, rel_id, session):
         ''' Delete episode release by show ID, episode ID and release ID '''
         try:
@@ -835,6 +845,11 @@ class SeriesReleaseAPI(APIResource):
         if not series.release_in_episode(ep_id, rel_id):
             return {'status': 'error',
                     'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
+        args = delete_parser.parse_args()
+        if args.get('delete_seen'):
+            api_client = ApiClient()
+            seen_url = '/seen/?value=%s' % release.title
+            api_client.get_endpoint(seen_url, method='DELETE')
 
         series.delete_release_by_id(rel_id)
         return {}
