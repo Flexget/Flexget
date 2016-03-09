@@ -225,6 +225,28 @@ class TestTraktWatchedAndCollected(object):
               - title: The.Matrix.1999.1080p.BDRip-FlexGet
             if:
               - trakt_collected: accept
+          test_trakt_show_collected_progress:
+            disable: builtins
+            trakt_lookup:
+              username: flexgettest
+            trakt_list:
+              username: flexgettest
+              list: test
+              type: shows
+              strip_dates: yes
+            if:
+              - trakt_collected: accept
+          test_trakt_show_watched_progress:
+            disable: builtins
+            trakt_lookup:
+              username: flexgettest
+            trakt_list:
+              username: flexgettest
+              list: test
+              type: shows
+              strip_dates: yes
+            if:
+              - trakt_watched: accept
     """
 
     def test_trakt_watched_lookup(self, execute_task):
@@ -259,6 +281,20 @@ class TestTraktWatchedAndCollected(object):
         assert entry['title'] == 'Inside.Out.2015.1080p.BDRip-FlexGet', 'title was not accepted?'
         assert entry['movie_name'] == 'Inside Out', 'wrong movie name'
         assert entry['trakt_collected'] == True, 'movie should be marked as collected'
+
+    def test_trakt_show_watched_progress(self, execute_task):
+        task = execute_task('test_trakt_show_watched_progress')
+        assert len(task.accepted) == 1, 'One show should have been accepted as it is watched on Trakt profile'
+        entry = task.accepted[0]
+        assert entry['trakt_series_name'] == 'Chuck', 'wrong series was accepted'
+        assert entry['trakt_watched'] == True, 'the whole series should be marked as watched'
+
+    def test_trakt_show_collected_progress(self, execute_task):
+        task = execute_task('test_trakt_show_collected_progress')
+        assert len(task.accepted) == 1, 'One show should have been accepted as it is collected on Trakt profile'
+        entry = task.accepted[0]
+        assert entry['trakt_series_name'] == 'White Collar', 'wrong series was accepted'
+        assert entry['trakt_collected'] == True, 'the whole series should be marked as collected'
 
 
 @pytest.mark.online
