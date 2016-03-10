@@ -9,7 +9,9 @@
       controller: seriesEpisodeController,
       bindings: {
         episode: '<',
-        forgetEpisode: '&'
+        deleteEpisode: '&',
+        deleteReleases: '&',
+        resetReleases: '&'
       },
     });
 
@@ -17,7 +19,7 @@
       var vm = this;
 
       loadReleases();
-    
+
       function loadReleases() {
         var params = {
           downloaded: 'downloaded'

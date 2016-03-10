@@ -1,7 +1,10 @@
 <md-content flex layout-margin>
     <md-button class="md-primary md-raised" ng-click="vm.goBack()">Back</md-button>
 	<md-list>
-        <series-episode class="md-3-line" episode="episode" forget-episode="vm.forgetEpisode(episode)" ng-repeat="episode in vm.episodes"></series-episode>
+        <series-episode class="md-3-line" episode="episode" 
+            delete-episode="vm.deleteEpisode(episode)"
+            delete-releases="vm.deleteReleases(episode)"
+            reset-releases="vm.resetReleases(episode)" ng-repeat="episode in vm.episodes"></series-episode>
         <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalEpisodes" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
 	</md-list>
 </md-content>
