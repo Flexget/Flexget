@@ -10,11 +10,28 @@
     			<md-list-item ng-repeat="release in ::vm.releases | orderBy : 'release_downloaded' : true" class="noright">
     		       	<h5><i ng-if="release.release_downloaded" class="fa fa-download"></i> {{ ::release.release_title }}</h5>
     				<h6 class="md-subheader">{{ ::release.release_quality }}</h6>
+                    <md-menu>
+                        <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
+                            <md-icon md-font-icon="fa fa-ellipsis-v"></md-icon>
+                        </md-button>
+                        <md-menu-content width="3">
+                            <md-menu-item ng-if="release.release_downloaded">
+                                <md-button ng-click="vm.resetRelease(release.release_id)">
+                                    Reset Release
+                                </md-button>
+                            </md-menu-item>
+                            <md-menu-item>
+                                <md-button>
+                                    Forget Release
+                                </md-button>
+                            </md-menu-item>
+                        </md-menu-content>
+                    </md-menu>
     			</md-list-item>
     		</md-list>
     	</md-card-content>
 	  	<md-card-actions layout="row" layout-align="end center">
-            <md-button class="md-primary md-raised" ng-click="vm.loadReleases()">
+            <md-button ng-if="!vm.releases" class="md-primary md-raised" ng-click="vm.loadReleases()">
             Load Releases</md-button>
            	<md-button class="md-warn md-raised" ng-click="vm.deleteEpisode()">Delete Episode</md-button>
             <md-button class="md-warn md-raised" ng-click="vm.deleteReleases()">Delete Releases</md-button>

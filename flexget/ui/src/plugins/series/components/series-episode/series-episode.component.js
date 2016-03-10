@@ -15,7 +15,7 @@
       },
     });
 
-    function seriesEpisodeController($mdDialog, $http, $stateParams){
+    function seriesEpisodeController($mdDialog, $http, $stateParams, $filter){
       var vm = this;
 
 
@@ -32,18 +32,13 @@
         });
       }
 
-      /*function loadReleases() {
-        var params = {
-          downloaded: 'downloaded'
-        }
-
-        $http.get('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases', { params: params, cache: true })
-        .success(function(data) {
-          vm.episode.releases = data.releases;
-        })
-        .error(function(error) {
-          console.log(error);
-        });
-      }*/
+      vm.resetRelease = function(id) {
+        $http.put('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases/' + id + '/')
+          .success(function(data) {
+            $filter('filter')(vm.releases, { release_id: id})[0].release_downloaded = false;
+          }).error(function(error) {
+            console.log(error);
+          });
+      }
     }
 })();
