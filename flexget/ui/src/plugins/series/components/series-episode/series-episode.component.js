@@ -40,5 +40,16 @@
             console.log(error);
           });
       }
+
+      vm.forgetRelease = function(release) {
+        $http.delete('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases/' + release.release_id + '/', { params: { delete_seen: true }})
+          .success(function(data) {
+            var index = vm.releases.indexOf(release);
+            vm.releases.splice(index, 1);
+            console.log(vm.releases);
+          }).error(function(error) {
+            console.log(error);
+          });
+      }
     }
 })();

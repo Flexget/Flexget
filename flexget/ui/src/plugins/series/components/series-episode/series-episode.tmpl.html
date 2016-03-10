@@ -7,12 +7,14 @@
         </md-card-title>
 		<md-card-content layout="row" layout-align="space-between">
     	   <md-list flex>
-    			<md-list-item ng-repeat="release in ::vm.releases | orderBy : 'release_downloaded' : true" class="noright">
-    		       	<h5><i ng-if="release.release_downloaded" class="fa fa-download"></i> {{ ::release.release_title }}</h5>
-    				<h6 class="md-subheader">{{ ::release.release_quality }}</h6>
+    			<md-list-item ng-repeat="release in vm.releases | orderBy : 'release_downloaded' : true" class="md-2-line" ng-click="$mdOpenMenu()">
+                    <div class="md-list-item-text">
+                        <h3><i ng-if="release.release_downloaded" class="fa fa-download"></i> {{ ::release.release_title }}</h3>
+    				    <p>{{ ::release.release_quality }}</p>
+                    </div>
                     <md-menu>
                         <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
-                            <md-icon md-font-icon="fa fa-ellipsis-v"></md-icon>
+                            <md-icon><i class="fa fa-ellipsis-v"></i></md-icon>
                         </md-button>
                         <md-menu-content width="3">
                             <md-menu-item ng-if="release.release_downloaded">
@@ -21,7 +23,7 @@
                                 </md-button>
                             </md-menu-item>
                             <md-menu-item>
-                                <md-button>
+                                <md-button ng-click="vm.forgetRelease(release)">
                                     Forget Release
                                 </md-button>
                             </md-menu-item>
