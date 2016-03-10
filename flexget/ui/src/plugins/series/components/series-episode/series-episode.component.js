@@ -18,9 +18,21 @@
     function seriesEpisodeController($mdDialog, $http, $stateParams){
       var vm = this;
 
-      loadReleases();
 
-      function loadReleases() {
+      vm.loadReleases = function() {
+        var params = {
+          downloaded: 'all'
+        }
+
+        $http.get('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases', { params: params, cache: true})
+        .success(function(data) {
+          vm.releases = data.releases;
+        }).error(function(error) {
+          console.log(error);
+        });
+      }
+
+      /*function loadReleases() {
         var params = {
           downloaded: 'downloaded'
         }
@@ -32,6 +44,6 @@
         .error(function(error) {
           console.log(error);
         });
-      }
+      }*/
     }
 })();
