@@ -2,8 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import str
 from builtins import object
 
-from future.utils import bytes_to_native_str
-
 import datetime
 import logging
 import re
@@ -294,7 +292,7 @@ class ParserGuessit(object):
         start = time.clock()
         guessit_options = self._guessit_options(kwargs)
         guessit_options['type'] = 'movie'
-        guess_result = guessit_api.guessit(bytes_to_native_str(data), options=guessit_options)
+        guess_result = guessit_api.guessit(data, options=guessit_options)
         parsed = GuessitParsedMovie(data, kwargs.pop('name', None), guess_result, **kwargs)
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
@@ -316,8 +314,7 @@ class ParserGuessit(object):
         parse_type = 'episode' if kwargs.get('name') else None
         if parse_type:
             guessit_options['type'] = parse_type
-
-        guess_result = guessit_api.guessit(bytes_to_native_str(data), options=guessit_options)
+        guess_result = guessit_api.guessit(data, options=guessit_options)
         parsed = GuessitParsedSerie(data, kwargs.pop('name', None), guess_result, **kwargs)
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
