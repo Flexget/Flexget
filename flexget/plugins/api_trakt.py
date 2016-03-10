@@ -860,10 +860,9 @@ class ApiTrakt(object):
             if trakt_data.id in cache:
                 log.error('work')
                 series = cache[trakt_data.id]
-                num = 0
-                for s in series['seasons']:
-                    num += len(s['episodes'])
-                in_collection = num == trakt_data.aired_episodes
+                # specials are not included
+                number_of_collected_episodes = sum(len(s['episodes']) for s in series['seasons'] if s['number'] > 0)
+                in_collection = number_of_collected_episodes >= trakt_data.aired_episodes
         elif style == 'episode':
             if trakt_data.show.id in cache:
                 series = cache[trakt_data.show.id]
@@ -895,10 +894,9 @@ class ApiTrakt(object):
         if style == 'show':
             if trakt_data.id in cache:
                 series = cache[trakt_data.id]
-                num = 0
-                for s in series['seasons']:
-                    num += len(s['episodes'])
-                watched = num == trakt_data.aired_episodes
+                # specials are not included
+                number_of_watched_episodes = sum(len(s['episodes']) for s in series['seasons'] if s['number'] > 0)
+                watched = number_of_watched_episodes == trakt_data.aired_episodes
         elif style == 'episode':
             if trakt_data.show.id in cache:
                 series = cache[trakt_data.show.id]
