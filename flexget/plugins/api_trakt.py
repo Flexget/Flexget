@@ -691,7 +691,7 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
         raise LookupError('Error getting trakt data for id %s: %s' % (trakt_id, e))
 
 
-def update_collection_cache(ident, style_ident, username=None, account=None):
+def update_collection_cache(style_ident, username=None, account=None):
     if account and not username:
         username = 'me'
     url = get_api_url('users', username, 'collection', style_ident)
@@ -701,7 +701,7 @@ def update_collection_cache(ident, style_ident, username=None, account=None):
         if not data:
             log.warning('No collection data returned from trakt.')
             return
-        cache = ApiTrakt.user_cache[ident]['collection'][style_ident]
+        cache = get_user_cache(username=username, account=account)['collection'][style_ident]
         log.verbose('Received %d records from trakt.tv %s\'s collection', len(data), username)
         if style_ident == 'movies':
             for movie in data:
@@ -718,7 +718,7 @@ def update_collection_cache(ident, style_ident, username=None, account=None):
         raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
 
 
-def update_watched_cache(ident, style_ident, username=None, account=None):
+def update_watched_cache(style_ident, username=None, account=None):
     if account and not username:
         username = 'me'
     url = get_api_url('users', username, 'watched', style_ident)
@@ -728,7 +728,7 @@ def update_watched_cache(ident, style_ident, username=None, account=None):
         if not data:
             log.warning('No watched data returned from trakt.')
             return
-        cache = ApiTrakt.user_cache[ident]['watched'][style_ident]
+        cache = get_user_cache(username=username, account=account)['watched'][style_ident]
         log.verbose('Received %d record(s) from trakt.tv %s\'s watched history', len(data), username)
         if style_ident == 'movies':
             for movie in data:
@@ -747,11 +747,14 @@ def update_watched_cache(ident, style_ident, username=None, account=None):
         raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
 
 
-def add_user_to_cache(ident):
-    ApiTrakt.user_cache.setdefault(ident, {}).setdefault('watched', {}).setdefault('shows', {})
-    ApiTrakt.user_cache.setdefault(ident, {}).setdefault('watched', {}).setdefault('movies', {})
-    ApiTrakt.user_cache.setdefault(ident, {}).setdefault('collection', {}).setdefault('shows', {})
-    ApiTrakt.user_cache.setdefault(ident, {}).setdefault('collection', {}).setdefault('movies', {})
+def get_user_cache(username=None, account=None):
+    identifier = str(account) + '|' + str(username)
+    ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('watched', {}).setdefault('shows', {})
+    ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('watched', {}).setdefault('movies', {})
+    ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('collection', {}).setdefault('shows', {})
+    ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('collection', {}).setdefault('movies', {})
+
+    return ApiTrakt.user_cache[identifier]
 
 
 class ApiTrakt(object):
@@ -846,16 +849,15 @@ class ApiTrakt(object):
 
     @staticmethod
     def collected(style, trakt_data, title, username=None, account=None):
-        ident = str(account) + '|' + str(username)
         style_ident = 'movies' if style == 'movie' else 'shows'
-        add_user_to_cache(ident)
-        if not ApiTrakt.user_cache[ident]['collection'][style_ident]:
-            update_collection_cache(ident, style_ident, username=username, account=account)
-        if not ApiTrakt.user_cache[ident]['collection'][style_ident]:
+        cache = get_user_cache(username=username, account=account)
+        if not cache['collection'][style_ident]:
+            update_collection_cache(style_ident, username=username, account=account)
+        if not cache['collection'][style_ident]:
             log.warning('No collection data returned from trakt.')
             return
         in_collection = False
-        cache = ApiTrakt.user_cache[ident]['collection'][style_ident]
+        cache = cache['collection'][style_ident]
         if style == 'show':
             if trakt_data.id in cache:
                 log.error('work')
@@ -881,16 +883,15 @@ class ApiTrakt(object):
 
     @staticmethod
     def watched(style, trakt_data, title, username=None, account=None):
-        ident = str(account) + '|' + str(username)
         style_ident = 'movies' if style == 'movie' else 'shows'
-        add_user_to_cache(ident)
-        if not ApiTrakt.user_cache[ident]['watched'][style_ident]:
-            update_watched_cache(ident, style_ident, username=username, account=account)
-        if not ApiTrakt.user_cache[ident]['watched'][style_ident]:
+        cache = get_user_cache(username=username, account=account)
+        if not cache['watched'][style_ident]:
+            update_watched_cache(style_ident, username=username, account=account)
+        if not cache['watched'][style_ident]:
             log.warning('No watched data returned from trakt.')
             return
         watched = False
-        cache = ApiTrakt.user_cache[ident]['watched'][style_ident]
+        cache = cache['watched'][style_ident]
         if style == 'show':
             if trakt_data.id in cache:
                 series = cache[trakt_data.id]
