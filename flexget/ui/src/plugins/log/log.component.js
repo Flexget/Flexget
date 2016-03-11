@@ -6,7 +6,7 @@
     .component('logView', {
       templateUrl: 'plugins/log/log.tmpl.html',
       controllerAs: 'vm',
-      controller: logController,
+      controller: logController
     });
 
   function logController($scope) {
