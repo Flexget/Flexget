@@ -401,7 +401,7 @@ class UrlRewriteTorrent411(object):
 #   urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        if re.match(r'^(https?://)?(www\.)?t411\.in/torrents/(?!download/)[-A-Za-z0-9+&@#/%|?=~_|!:,.;]+', url):
+        if re.match(r'^(https?://)?(www\.)?t411\.ch/torrents/(?!download/)[-A-Za-z0-9+&@#/%|?=~_|!:,.;]+', url):
             return True
         return False
 
@@ -461,11 +461,11 @@ class UrlRewriteTorrent411(object):
                                                           for c in sub_categories])
 
         if 'series_season' in entry and 'series_episode' in entry:
-            season = entry['series_season'] 
+            season = entry['series_season']
             if season in list(SEASONS):
                 filter_url = filter_url + '&term[%d][]' % SEASONS[season][0] + '=' + str(SEASONS[season][1])
 
-            episode = entry['series_episode'] 
+            episode = entry['series_episode']
             if episode in list(EPISODES):
                 filter_url = filter_url + '&term[%d][]' % EPISODES[episode][0] + '=' + str(EPISODES[episode][1])
 
