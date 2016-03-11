@@ -2,27 +2,29 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import object
 import pytest
 
+
+@pytest.mark.usefixtures('tmpdir')
 class TestContentFilter(object):
 
     config = """
         tasks:
           test_reject1:
             mock:
-              - {title: 'test', file: 'test_reject1.torrent'}
+              - {title: 'test', file: '__tmp__/test_reject1.torrent'}
             accept_all: yes
             content_filter:
               reject: '*.iso'
 
           test_reject2:
             mock:
-              - {title: 'test', file: 'test_reject2.torrent'}
+              - {title: 'test', file: '__tmp__/test_reject2.torrent'}
             accept_all: yes
             content_filter:
               reject: '*.avi'
 
           test_require1:
             mock:
-              - {title: 'test', file: 'test_require1.torrent'}
+              - {title: 'test', file: '__tmp__/test_require1.torrent'}
             accept_all: yes
             content_filter:
               require:
@@ -31,14 +33,14 @@ class TestContentFilter(object):
 
           test_require2:
             mock:
-              - {title: 'test', file: 'test_require2.torrent'}
+              - {title: 'test', file: '__tmp__/test_require2.torrent'}
             accept_all: yes
             content_filter:
               require: '*.avi'
 
           test_require_all1:
             mock:
-              - {title: 'test', file: 'test_require_all.torrent'}
+              - {title: 'test', file: '__tmp__/test_require_all.torrent'}
             accept_all: yes
             content_filter:
               require_all:
@@ -47,7 +49,7 @@ class TestContentFilter(object):
 
           test_require_all2:
             mock:
-              - {title: 'test', file: 'test_require_all.torrent'}
+              - {title: 'test', file: '__tmp__/test_require_all.torrent'}
             accept_all: yes
             content_filter:
               require_all:
@@ -64,7 +66,7 @@ class TestContentFilter(object):
 
           test_cache:
             mock:
-              - {title: 'test', url: 'http://localhost/', file: 'test.torrent'}
+              - {title: 'test', url: 'http://localhost/', file: '__tmp__/test.torrent'}
             accept_all: yes
             content_filter:
               reject: ['*.iso']
