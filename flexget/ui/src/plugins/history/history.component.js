@@ -12,7 +12,7 @@
     var vm = this;
 
     vm.title = 'History';
-    $http.get('/api/history')
+    $http.get('/api/history/')
       .success(function (data) {
         vm.entries = data['entries'];
       })

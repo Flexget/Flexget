@@ -278,7 +278,7 @@ class InputRSS(object):
 
         if not content:
             log.error('No data recieved for rss feed.')
-            return
+            return []
         try:
             rss = feedparser.parse(content)
         except LookupError as e:
