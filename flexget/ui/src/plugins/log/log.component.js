@@ -33,6 +33,10 @@
       }
     };
 
+    vm.clear = function() {
+      vm.gridOptions.data = [];
+    };
+
     vm.stop = function () {
       if (typeof vm.logStream !== 'undefined' && vm.logStream) {
         vm.logStream.abort();
