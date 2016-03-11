@@ -2,32 +2,60 @@
   'use strict';
 
   angular.module('flexget')
-  .provider('route', routeService)
-  .config(routeConfig);
+    .provider('route', routeService)
+    .config(routeConfig);
 
-  function routeService($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise(function ($injector) {
-      var $state = $injector.get('$state');
-      $state.go('flexget.home');
-    });
-
+  function routeService($stateProvider) {
     this.$get = function () {
       return {
         register: function (name, url, template) {
           $stateProvider.state('flexget.' + name, {
             url: url,
-            template: '<md-content><' + template + '></' + template + '></content>',
+            template: '<' + template + '>'
           });
-        },
+        }
       };
     };
   }
 
-  function routeConfig($stateProvider) {
+  function routeConfig($stateProvider, $urlRouterProvider) {
     $stateProvider
-    .state('flexget', {
-      abstract: true,
-      templateUrl: 'layout.tmpl.html',
-    });
+    // 404 & 500 pages
+      .state('404', {
+        url: '/404',
+        templateUrl: '404.tmpl.html',
+        controllerAs: 'vm',
+        controller: function ($state) {
+          var vm = this;
+          vm.goHome = function () {
+            $state.go('flexget.home');
+          };
+        }
+      })
+
+      .state('500', {
+        url: '/500',
+        templateUrl: '500.tmpl.html',
+        controllerAs: 'vm',
+        controller: function ($state) {
+          var vm = this;
+          vm.goHome = function () {
+            $state.go('flexget.home');
+          };
+        }
+      })
+
+      .state('flexget', {
+        abstract: true,
+        templateUrl: 'layout.tmpl.html'
+      });
+
+    // set default routes when no path specified
+    $urlRouterProvider.when('', '/home');
+    $urlRouterProvider.when('/', '/home');
+
+    // always goto 404 if route not found
+    $urlRouterProvider.otherwise('/404');
+
   }
 })();
