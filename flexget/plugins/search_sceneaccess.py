@@ -10,11 +10,9 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode, clean_title
-from flexget.utils.requests import Session, TimedLimiter
+from flexget.utils.requests import TimedLimiter
 
 log = logging.getLogger('search_sceneaccess')
-
-session = None
 
 CATEGORIES = {
     'browse':
