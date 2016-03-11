@@ -1,8 +1,8 @@
-<md-content layout="column" flex>
+<div layout="row" flex>
     <md-card class="log" flex>
-      <log-header status="vm.status" filter="vm.filter" refresh="vm.refresh" refresh-opts="vm.refreshOpts" toggle="vmtoggle" log-stream="vm.logSteam"></log-header>
-      <md-card-content layout="column" flex style="padding-top: 0px">
+        <log-header status="vm.status" filter="vm.filter" refresh="vm.refresh" refresh-opts="vm.refreshOpts" toggle="vmtoggle" log-stream="vm.logSteam"></log-header>
+        <md-card-content layout="column" flex style="padding-top: 0px">
             <div id="log-grid" ui-grid="vm.gridOptions" ui-grid-auto-resize flex ui-grid-auto-scroll></div>
         </md-card-content>
     </md-card>
-</md-content>
+</div>
