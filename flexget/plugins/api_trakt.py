@@ -748,7 +748,7 @@ def update_watched_cache(style_ident, username=None, account=None):
 
 
 def get_user_cache(username=None, account=None):
-    identifier = str(account) + '|' + str(username)
+    identifier = '{}|{}'.format(account, username or 'me')
     ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('watched', {}).setdefault('shows', {})
     ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('watched', {}).setdefault('movies', {})
     ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('collection', {}).setdefault('shows', {})
