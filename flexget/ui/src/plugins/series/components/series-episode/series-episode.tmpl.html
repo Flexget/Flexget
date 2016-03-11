@@ -1,4 +1,4 @@
-<md-list-item class="md-3-line">
+<md-list-item>
     <md-card flex>
     	<md-card-title>
         	<md-card-title-text>
@@ -35,9 +35,28 @@
 	  	<md-card-actions layout="row" layout-align="end center">
             <md-button ng-if="!vm.releases" class="md-primary md-raised" ng-click="vm.loadReleases()">
             Load Releases</md-button>
-           	<md-button class="md-warn md-raised" ng-click="vm.deleteEpisode()">Delete Episode</md-button>
-            <md-button class="md-warn md-raised" ng-click="vm.deleteReleases()">Delete Releases</md-button>
-            <md-button class="md-warn md-raised" ng-click="vm.resetReleases()">Reset Releases</md-button>
+            <md-menu>
+                <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
+                    <md-icon><i class="fa fa-ellipsis-v"></i></md-icon>
+                </md-button>
+                <md-menu-content width="3">
+                    <md-menu-item>
+                        <md-button ng-click="vm.deleteEpisode()">
+                            Delete Episode
+                        </md-button>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <md-button ng-click="vm.deleteReleases()">
+                            Delete Releases
+                        </md-button>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <md-button ng-click="vm.resetReleases()">
+                            Reset Releases
+                        </md-button>
+                    </md-menu-item>
+                </md-menu-content>
+            </md-menu>
     	</md-card-actions>
 	</md-card>
 </md-list-item>
