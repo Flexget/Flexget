@@ -14,7 +14,7 @@
 
     vm.title = 'Seen';
 
-    $http.get('/api/seen', {params: {max: 20}})
+    $http.get('/api/seen/', {params: {max: 20}})
       .success(function handleSeen(data) {
         vm.entries = data.seen_entries;
       })

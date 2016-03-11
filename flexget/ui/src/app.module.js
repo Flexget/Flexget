@@ -9,7 +9,7 @@
     'angular-loading-bar',
     'flexget.components',
     'flexget.directives',
-    'flexget.services',
+    'flexget.services'
   ]);
 
   function bootstrapApplication() {

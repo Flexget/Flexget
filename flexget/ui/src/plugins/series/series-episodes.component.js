@@ -49,11 +49,10 @@
 
     getEpisodesList();
 
-    vm.forgetEpisode = function(episode) {
-      console.log(episode)
+    vm.deleteEpisode = function(episode) {
       var confirm = $mdDialog.confirm()
         .title('Confirm forgetting episode.')
-        .htmlContent("Are you sure you want to forget episode <b>" + episode.episode_identifier + "</b> from show " + show + "?")
+        .htmlContent("Are you sure you want to forget episode <b>" + episode.episode_identifier + "</b> from show " + show + "?\n This also removes all seen entries for this episode!")
         .ok("Forget")
         .cancel("No");
 
@@ -67,6 +66,52 @@
             var errorDialog = $mdDialog.alert()
               .title("Something went wrong")
               .htmlContent("Oops, something went wrong when trying to forget <b>" + episode.episode_identifier + "</b> from show " + show + ":\n" + error.message)
+              .ok("Ok");
+
+            $mdDialog.show(errorDialog);
+          });
+      });
+    }
+
+    vm.deleteReleases = function(episode) {
+      var confirm = $mdDialog.confirm()
+        .title('Confirm deleting releases.')
+        .htmlContent("Are you sure you want to delete all releases for <b>" + episode.episode_identifier + "</b> from show " + show + "?\n This also removes all seen releases for this episode!")
+        .ok("Forget")
+        .cancel("No");
+
+      $mdDialog.show(confirm).then(function() {
+        $http.delete('/api/series/' + $stateParams.id + '/episodes/' + episode.episode_id + '/releases', { params: { delete_seen: true}})
+          .success(function(data) {
+            //TODO: Check what to do, prob remove all release if any loaded
+          })
+          .error(function(error) {
+            var errorDialog = $mdDialog.alert()
+              .title("Something went wrong")
+              .htmlContent("Oops, something went wrong when trying to forget <b>" + episode.episode_identifier + "</b> from show " + show + ":\n" + error.message)
+              .ok("Ok");
+
+            $mdDialog.show(errorDialog);
+          });
+      });
+    }
+
+    vm.resetReleases = function(episode) {
+      var confirm = $mdDialog.confirm()
+        .title('Confirm resetting releases.')
+        .htmlContent("Are you sure you want to reset downloaded releases for <b>" + episode.episode_identifier + "</b> from show " + show + "?\n This does not remove seen entries but will clear the quality to be downloaded again.")
+        .ok("Forget")
+        .cancel("No");
+
+      $mdDialog.show(confirm).then(function() {
+        $http.put('/api/series/' + $stateParams.id + '/episodes/' + episode.episode_id + '/releases')
+          .success(function(data) {
+            //TODO: Handle reset releases, remove them from view if they are showm
+          })
+          .error(function(error) {
+            var errorDialog = $mdDialog.alert()
+              .title("Something went wrong")
+              .htmlContent("Oops, something went wrong when trying to reset downloaded releases for <b>" + episode.episode_identifier + "</b> from show " + show + ":\n" + error.message)
               .ok("Ok");
 
             $mdDialog.show(errorDialog);

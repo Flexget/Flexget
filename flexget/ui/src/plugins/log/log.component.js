@@ -6,7 +6,7 @@
     .component('logView', {
       templateUrl: 'plugins/log/log.tmpl.html',
       controllerAs: 'vm',
-      controller: logController,
+      controller: logController
     });
 
   function logController($scope) {
@@ -31,6 +31,10 @@
       } else {
         vm.stop();
       }
+    };
+
+    vm.clear = function() {
+      vm.gridOptions.data = [];
     };
 
     vm.stop = function () {

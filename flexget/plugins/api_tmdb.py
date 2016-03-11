@@ -198,7 +198,7 @@ class ApiTmdb(object):
             if not movie:
                 search_string = title + ' ({})'.format(year) if year else ''
                 found = session.query(TMDBSearchResult). \
-                    filter(func.lower(TMDBSearchResult.search) == search_string).first()
+                    filter(func.lower(TMDBSearchResult.search) == search_string.lower()).first()
                 if found and found.movie:
                     movie = found.movie
         if movie:
