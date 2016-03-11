@@ -33,18 +33,6 @@
         }
       })
 
-      .state('500', {
-        url: '/500',
-        templateUrl: '500.tmpl.html',
-        controllerAs: 'vm',
-        controller: function ($state) {
-          var vm = this;
-          vm.goHome = function () {
-            $state.go('flexget.home');
-          };
-        }
-      })
-
       .state('flexget', {
         abstract: true,
         templateUrl: 'layout.tmpl.html'
