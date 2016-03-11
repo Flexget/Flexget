@@ -201,8 +201,7 @@ class SceneAccessSearch(object):
             else:                       # Will default to `browse` scope, because no scope was specified (only category)
                 category = [category]
                 toProcess[scope] = category
-        except KeyError:    # Category was not set, will default to all categories within `browse`
-                            # scope.
+        except KeyError:    # Category was not set, will default to all categories within `browse` scope.
             toProcess[scope] = []
 
         finally:    # Process the categories to use in search() method
