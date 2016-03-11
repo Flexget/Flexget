@@ -300,8 +300,23 @@ class Task(object):
     def is_rerun(self):
         return self._rerun_count
 
-    def __cmp__(self, other):
-        return cmp((self.priority, self._count), (other.priority, other._count))
+    def __lt__(self, other):
+        return (self.priority, self._count) < (other.priority, other._count)
+
+    def __le__(self, other):
+        return (self.priority, self._count) <= (other.priority, other._count)
+
+    def __eq__(self, other):
+        return (self.priority, self._count) == (other.priority, other._count)
+
+    def __ne__(self, other):
+        return (self.priority, self._count) != (other.priority, other._count)
+
+    def __gt__(self, other):
+        return (self.priority, self._count) > (other.priority, other._count)
+
+    def __ge__(self, other):
+        return (self.priority, self._count) >= (other.priority, other._count)
 
     def __str__(self):
         return '<Task(name=%s,aborted=%s)>' % (self.name, self.aborted)
