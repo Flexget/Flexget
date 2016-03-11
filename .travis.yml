@@ -11,6 +11,7 @@ addons:
       - libyaml-dev
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
+  - pip install --upgrade pip
   - pip install .
   - pip install -r dev-requirements.txt
 # command to run tests, e.g. python setup.py test
