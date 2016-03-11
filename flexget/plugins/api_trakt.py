@@ -646,6 +646,7 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
             try:
                 last_search_query = identifier
                 last_search_type = id_type
+                log.debug('Searching with params: %s=%s', id_type, identifier)
                 results = req_session.get(get_api_url('search'), params={'id_type': id_type, 'id': identifier}).json()
             except requests.RequestException as e:
                 log.debug('Error searching for trakt id %s', e)
@@ -669,8 +670,9 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
                 y = year or title_parser.year
                 parsed_title = title_parser.name
             try:
-                results = req_session.get(get_api_url('search'), params={'query': parsed_title, 'type': style,
-                                                                         'year': y}).json()
+                params = {'query': parsed_title, 'type': style, 'year': y}
+                log.debug('Searching with params: %s', ', '.join('{}={}'.format(k, v) for (k, v) in params.items()))
+                results = req_session.get(get_api_url('search'), params=params).json()
             except requests.RequestException as e:
                 raise LookupError('Searching trakt for %s failed with error: %s' % (title, e))
             for result in results:

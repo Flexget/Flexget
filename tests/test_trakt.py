@@ -47,11 +47,11 @@ class TestTraktShowLookup(object):
               - {title: 'Shameless.2011.S03E02.HDTV.XViD-FlexGet'}
             series:
               - Shameless (2011)
-          test_search_fail:
+          test_search_success:
             mock:
-              - {title: 'Baking.Around.S01E01.HDTV.XViD-FlexGet'}
+              - {title: '11-22-63.S01E01.HDTV.XViD-FlexGet'}
             series:
-              - Baking Around
+              - 11-22-63
     """
 
     def test_lookup_name(self, execute_task):
@@ -94,7 +94,7 @@ class TestTraktShowLookup(object):
 
             assert len(session.query(TraktShow).all()) == 1, 'should only have added one show to show table'
             assert session.query(TraktShow).first().title == 'Shameless', 'should have added Shameless and' \
-                                                                               'not Shameless (2011)'
+                                                                          'not Shameless (2011)'
             # change the search query
             session.query(TraktShowSearchResult).update({'search': "Shameless.S01E03.HDTV-FlexGet"})
             session.commit()
@@ -106,10 +106,10 @@ class TestTraktShowLookup(object):
             assert series.id == entry['trakt_show_id'], 'trakt id should be the same as the first entry'
             assert series.title.lower() == entry['trakt_series_name'].lower(), 'series name should match first entry'
 
-    def test_search_fail(self, execute_task):
-        task = execute_task('test_search_fail')
-        entry = task.find_entry('accepted', title='Baking.Around.S01E01.HDTV.XViD-FlexGet')
-        assert entry.get('trakt_show_id') is None, 'Should not have returned trakt id'
+    def test_search_success(self, execute_task):
+        task = execute_task('test_search_success')
+        entry = task.find_entry('accepted', title='11-22-63.S01E01.HDTV.XViD-FlexGet')
+        assert entry.get('trakt_show_id') == 102771, 'Should have returned the correct trakt id'
 
     def test_date(self, execute_task):
         task = execute_task('test_date')
