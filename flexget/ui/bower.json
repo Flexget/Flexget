@@ -14,7 +14,7 @@
     "oboe": "~2.1.2",
     "angular-spinkit": "~0.3.3",
     "angular-loading-bar": "~0.8.0",
-    "ui-grid-auto-scroll": "~1.0.0",
+    "ui-grid-auto-scroll": "~1.0.1",
     "animate.css-scss": "~3.1.0"
   },
   "resolutions": {
