@@ -15,7 +15,7 @@ from flexget.utils.requests import Session, TimedLimiter
 log = logging.getLogger('search_sceneaccess')
 
 session = None
-#session = Session()
+
 CATEGORIES = {
     'browse':
         {
@@ -153,8 +153,7 @@ class SceneAccessSearch(object):
         root.accept('number', key='gravity_multiplier')
 
         # Scope as in pages like `browse`, `mp3/0day`, `foreign`, etc.
-        # Will only accept categories from `browse` which will it default to,
-        # unless user specifies other scopes
+        # Will only accept categories from `browse` which will it default to, unless user specifies other scopes
         # via dict
         root.accept('choice', key='category').accept_choices(CATEGORIES['browse'])
         root.accept('number', key='category')
@@ -199,8 +198,7 @@ class SceneAccessSearch(object):
                     elif not isinstance(category[scope], list):     # or convert single category into list
                         category[scope] = [category[scope]]
                     toProcess[scope] = category[scope]
-            else:                       # Will default to `browse` scope, because no scope was
-                                        # specified (only category)
+            else:                       # Will default to `browse` scope, because no scope was specified (only category)
                 category = [category]
                 toProcess[scope] = category
         except KeyError:    # Category was not set, will default to all categories within `browse`
