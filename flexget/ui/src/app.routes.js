@@ -11,7 +11,7 @@
         register: function (name, url, template) {
           $stateProvider.state('flexget.' + name, {
             url: url,
-            template: '<' + template + ' flex layout="row">'
+            template: '<' + template + ' flex layout="row"></' + template + '/>'
           });
         }
       };

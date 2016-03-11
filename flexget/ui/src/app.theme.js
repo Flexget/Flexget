@@ -9,9 +9,11 @@
   function themesConfig($mdThemingProvider) {
     $mdThemingProvider.theme('default')
     .primaryPalette('orange', {
-      default: '800',
+      default: '800'
     })
-    .accentPalette('lime')
+    .accentPalette('deep-orange', {
+      default: '500'
+    })
     .warnPalette('amber');
   }
 
