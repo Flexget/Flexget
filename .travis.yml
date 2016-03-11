@@ -4,12 +4,11 @@ sudo: false
 python:
   - "2.7"
   - "3.5"
-# Install libyaml for vcr speedup
-# Disabled as not enough vcr tests to get any benefits (yet)
-#addons:
-#  apt:
-#    packages:
-#      - libyaml-dev
+# Install libyaml for vcr speedup?
+addons:
+  apt:
+    packages:
+      - libyaml-dev
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - pip install .
