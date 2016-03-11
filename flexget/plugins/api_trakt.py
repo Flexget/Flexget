@@ -852,6 +852,7 @@ class ApiTrakt(object):
         style_ident = 'movies' if style == 'movie' else 'shows'
         cache = get_user_cache(username=username, account=account)
         if not cache['collection'][style_ident]:
+            log.debug('No collection found in cache.')
             update_collection_cache(style_ident, username=username, account=account)
         if not cache['collection'][style_ident]:
             log.warning('No collection data returned from trakt.')
@@ -860,7 +861,6 @@ class ApiTrakt(object):
         cache = cache['collection'][style_ident]
         if style == 'show':
             if trakt_data.id in cache:
-                log.error('work')
                 series = cache[trakt_data.id]
                 # specials are not included
                 number_of_collected_episodes = sum(len(s['episodes']) for s in series['seasons'] if s['number'] > 0)
@@ -886,6 +886,7 @@ class ApiTrakt(object):
         style_ident = 'movies' if style == 'movie' else 'shows'
         cache = get_user_cache(username=username, account=account)
         if not cache['watched'][style_ident]:
+            log.debug('No watched history found in cache.')
             update_watched_cache(style_ident, username=username, account=account)
         if not cache['watched'][style_ident]:
             log.warning('No watched data returned from trakt.')
