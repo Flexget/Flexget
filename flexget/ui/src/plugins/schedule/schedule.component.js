@@ -34,7 +34,7 @@
       }
     };
 
-    $http.get('/api/schema/config/schedules').
+    $http.get('/api/schema/config/schedules/').
       success(function (data, status, headers, config) {
         // schema-form doesn't allow forms with an array at root level
         vm.schema = {type: 'object', 'properties': {'schedules': data}, required: ['schedules']};
@@ -42,7 +42,7 @@
         error(function (data, status, headers, config) {
           // log error
         });
-        $http.get('/api/schedules').
+        $http.get('/api/schedules/').
           success(function (data, status, headers, config) {
             vm.models = [data];
           }).
