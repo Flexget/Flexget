@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, unicode_literals
 from builtins import range
 from builtins import object
+from builtins import str
 
 import logging
 import random
@@ -20,8 +21,8 @@ rpyc.core.protocol.DEFAULT_CONFIG['safe_attrs'].update(['items'])
 rpyc.core.protocol.DEFAULT_CONFIG['allow_pickle'] = True
 
 IPC_VERSION = 3
-AUTH_ERROR = 'authentication error'
-AUTH_SUCCESS = 'authentication success'
+AUTH_ERROR = b'authentication error'
+AUTH_SUCCESS = b'authentication success'
 
 
 class RemoteStream(object):
@@ -42,7 +43,7 @@ class RemoteStream(object):
             self.buffer = data
         else:
             self.buffer += data
-        newline = b'\n' if isinstance(self.buffer, str) else '\n'
+        newline = '\n' if isinstance(self.buffer, str) else b'\n'
         if newline in self.buffer:
             self.flush()
 
@@ -117,7 +118,7 @@ class IPCServer(threading.Thread):
 
     def authenticator(self, sock):
         channel = rpyc.Channel(rpyc.SocketStream(sock))
-        password = channel.recv()
+        password = channel.recv().decode('utf-8')
         if password != self.password:
             channel.send(AUTH_ERROR)
             raise rpyc.utils.authenticators.AuthenticationError('Invalid password from client.')
@@ -146,7 +147,7 @@ class IPCServer(threading.Thread):
 class IPCClient(object):
     def __init__(self, port, password):
         channel = rpyc.Channel(rpyc.SocketStream.connect('127.0.0.1', port))
-        channel.send(password)
+        channel.send(password.encode('utf-8'))
         response = channel.recv()
         if response == AUTH_ERROR:
             # TODO: What to raise here. I guess we create a custom error
