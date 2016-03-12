@@ -2,16 +2,16 @@ interactions:
   - request:
       body: null
       headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d1a69aee013a0dffc4884290c9e0d00501457758857]
-        User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
-      method: GET
-      uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=naruto&language=en
+        !!python/unicode 'Accept': [!!python/unicode '*/*']
+        !!python/unicode 'Accept-Encoding': [!!python/unicode 'gzip, deflate']
+        !!python/unicode 'Connection': [!!python/unicode 'keep-alive']
+        !!python/unicode 'Cookie': [!!python/unicode '__cfduid=de5d3d1b54d91facc9ae2a7f691ef4c8d1457759084']
+        !!python/unicode 'User-Agent': [!!python/unicode 'FlexGet/1.3.0.dev (www.flexget.com)']
+      method: !!python/unicode 'GET'
+      uri: !!python/unicode 'http://www.thetvdb.com/api/GetSeries.php?seriesname=naruto&language=en'
     response:
-      body:
-        string: !!binary |
+      !!python/unicode 'body':
+        !!python/unicode 'string': !!binary |
           H4sIAAAAAAAAA51WwXLbNhC96yvW7kxzESlZtkdyyiiTjOvY08bxxE5yzKxIiEQEAhwAtCJP/qjf
           0f/qAyjKTsZp2lwkAljsvgXe7kP2/HOt6FZYJ41+tn+QjvdJ6NwUUpfP9t/dnCWzfXo+H2Sn7Bl/
           18JK4fDh4ocs5tPZ7HiajXbjQaZYly2XYi50NtoN+r2XXIv5JdvWm2z0YGqQLVhrYeel5aaSOatR
@@ -35,32 +35,32 @@ interactions:
           SH44KqFCd3gHanX9pTI+WShjiiCTrReRBNss8TTJw8vnVbuJvrukWBldogpFb1OHB5CjGwG91hH6
           pfgkU/rAPq9ikJeCWy/DvbyyAjYYQ353/I+XPqQy9qSeDl2XrPBaQkRFDom4+OIobhGoxcNgj77f
           rQ4myfjoZ1V7cjg+mI2n33Srvgt9065G8dn6D6D8oFDlCgAA
-      headers:
-        CF-RAY: [2824aff01de70b1a-SYD]
-        Cache-Control: [max-age=900]
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [text/xml; charset=utf-8]
-        Date: ['Sat, 12 Mar 2016 05:01:16 GMT']
-        Expires: ['Sat, 12 Mar 2016 05:15:17 GMT']
-        Server: [cloudflare-nginx]
-        Vary: [Accept-Encoding]
-        X-Cache: [EXPIRED]
-        X-Powered-By: [PHP/5.3.10-1ubuntu3.15]
-      status: {code: 200, message: OK}
+      !!python/unicode 'headers':
+        !!python/unicode 'CF-RAY': [!!python/unicode '2824b522d49104ce-SYD']
+        !!python/unicode 'Cache-Control': [!!python/unicode 'max-age=900']
+        !!python/unicode 'Connection': [!!python/unicode 'keep-alive']
+        !!python/unicode 'Content-Encoding': [!!python/unicode 'gzip']
+        !!python/unicode 'Content-Type': [!!python/unicode 'text/xml; charset=utf-8']
+        !!python/unicode 'Date': [!!python/unicode 'Sat, 12 Mar 2016 05:04:49 GMT']
+        !!python/unicode 'Expires': [!!python/unicode 'Sat, 12 Mar 2016 05:18:50 GMT']
+        !!python/unicode 'Server': [!!python/unicode 'cloudflare-nginx']
+        !!python/unicode 'Vary': [!!python/unicode 'Accept-Encoding']
+        !!python/unicode 'X-Cache': [!!python/unicode 'HIT']
+        !!python/unicode 'X-Powered-By': [!!python/unicode 'PHP/5.3.10-1ubuntu3.15']
+      !!python/unicode 'status': {!!python/unicode 'code': 200, !!python/unicode 'message': !!python/unicode 'OK'}
   - request:
       body: null
       headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d1a69aee013a0dffc4884290c9e0d00501457758857]
-        User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
-      method: GET
-      uri: http://thetvdb.com/api/4D297D8CFDE0E105/series/78857/en.xml
+        !!python/unicode 'Accept': [!!python/unicode '*/*']
+        !!python/unicode 'Accept-Encoding': [!!python/unicode 'gzip, deflate']
+        !!python/unicode 'Connection': [!!python/unicode 'keep-alive']
+        !!python/unicode 'Cookie': [!!python/unicode '__cfduid=de5d3d1b54d91facc9ae2a7f691ef4c8d1457759084']
+        !!python/unicode 'User-Agent': [!!python/unicode 'FlexGet/1.3.0.dev (www.flexget.com)']
+      method: !!python/unicode 'GET'
+      uri: !!python/unicode 'http://thetvdb.com/api/4D297D8CFDE0E105/series/78857/en.xml'
     response:
-      body:
-        string: !!binary |
+      !!python/unicode 'body':
+        !!python/unicode 'string': !!binary |
           H4sIAAAAAAAAA11VTXPbOAy991dwc9lLHDlpPE5mVHXSpGmzbpxO7bbTUwYOEYuVRHr4EVcZ/fh9
           FGVvsheJAB6ABxAk8/d/mlo8sXXK6HcHx0fjA8H6wUil1+8Ovi+vR2cH4n3xJr8iT8UbIfIFW8Uu
           LiEoWUzPzibTPMMqqS4evLGu6P4JujJiSRWHh1J1c2MVVUoswlq11FB3WSoWc6qoCZa6X6EiqwDv
@@ -80,32 +80,33 @@ interactions:
           6tghetWA8eSDKz5qyRLmJCUTYdAkpjn9X+g+tDstVkm/wsXOtlhb2pTqgeqsf25G65Oj35t1ng3m
           hH3EHWl9kX4ZZmut9N7j7Th5DKDkURP2ZyPRZlkcn06m07cn01NcEC/1Cbkx2GBbpJ8bYp6nkIMt
           AX3j7re4JVjem1oW4zz7nybBnmlzovw9Xs3F5+n09HyC/ftPF9/ZbPfQ5ll6e/8FQ0sPdqsHAAA=
-      headers:
-        CF-Cache-Status: [MISS]
-        CF-RAY: [2824aff2195719bc-SYD]
-        Cache-Control: ['public, max-age=1800']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [text/xml]
-        Date: ['Sat, 12 Mar 2016 05:01:16 GMT']
-        Expires: ['Sat, 12 Mar 2016 05:31:16 GMT']
-        Last-Modified: ['Fri, 11 Mar 2016 21:51:03 GMT']
-        Server: [cloudflare-nginx]
-        Vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
+      !!python/unicode 'headers':
+        !!python/unicode 'CF-Cache-Status': [!!python/unicode 'HIT']
+        !!python/unicode 'CF-RAY': [!!python/unicode '2824b524717b04c2-SYD']
+        !!python/unicode 'Cache-Control': [!!python/unicode 'public, max-age=1800']
+        !!python/unicode 'Connection': [!!python/unicode 'keep-alive']
+        !!python/unicode 'Content-Encoding': [!!python/unicode 'gzip']
+        !!python/unicode 'Content-Type': [!!python/unicode 'text/xml']
+        !!python/unicode 'Date': [!!python/unicode 'Sat, 12 Mar 2016 05:04:49 GMT']
+        !!python/unicode 'Expires': [!!python/unicode 'Sat, 12 Mar 2016 05:34:49 GMT']
+        !!python/unicode 'Last-Modified': [!!python/unicode 'Fri, 11 Mar 2016 21:51:03
+            GMT']
+        !!python/unicode 'Server': [!!python/unicode 'cloudflare-nginx']
+        !!python/unicode 'Vary': [!!python/unicode 'Accept-Encoding']
+      !!python/unicode 'status': {!!python/unicode 'code': 200, !!python/unicode 'message': !!python/unicode 'OK'}
   - request:
       body: null
       headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d1a69aee013a0dffc4884290c9e0d00501457758857]
-        User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
-      method: GET
-      uri: http://thetvdb.com/api/4D297D8CFDE0E105/series/78857/absolute/128/en.xml
+        !!python/unicode 'Accept': [!!python/unicode '*/*']
+        !!python/unicode 'Accept-Encoding': [!!python/unicode 'gzip, deflate']
+        !!python/unicode 'Connection': [!!python/unicode 'keep-alive']
+        !!python/unicode 'Cookie': [!!python/unicode '__cfduid=de5d3d1b54d91facc9ae2a7f691ef4c8d1457759084']
+        !!python/unicode 'User-Agent': [!!python/unicode 'FlexGet/1.3.0.dev (www.flexget.com)']
+      method: !!python/unicode 'GET'
+      uri: !!python/unicode 'http://thetvdb.com/api/4D297D8CFDE0E105/series/78857/absolute/128/en.xml'
     response:
-      body:
-        string: !!binary |
+      !!python/unicode 'body':
+        !!python/unicode 'string': !!binary |
           H4sIAAAAAAAAA11U21LbMBB911do8txEcpzUCbOYoYS0DAU6pZfHjLAVW8WWPJIc4O+7wnYuvGT2
           nD272ZsMF691RXfSOmX0+Sia8BGVOjO50sX56Pev9XgxohcpgZXwIoXrRjmTS8QqT6fLJOKfgaFJ
           wEnhjEYzmifJFNgekyHovq2fpE1nc2CnzEEhaple0iv7Ro2mKym29FpYd9AHP4G1ss5fKiuxBM7n
@@ -117,18 +118,48 @@ interactions:
           B22VdFj+uyocdI8J+BJzbkSey9DpMRp8Lyr3ZTrjfHB3xOAupSpKn8YHf8+goHYb+doY68NwjxCB
           WllrbLcEvPwoHvPlOOI04mez5IzjoztRELi5W33Z3KywxsEKT+2mLta4szQK72oABH4Kj0eYLifY
           a28TeHzfU/9O8QpOMIHvQhetKHCkGtgekP2DDasK3w3yHwdm2ORnBAAA
+      !!python/unicode 'headers':
+        !!python/unicode 'CF-Cache-Status': [!!python/unicode 'HIT']
+        !!python/unicode 'CF-RAY': [!!python/unicode '2824b524c18404c2-SYD']
+        !!python/unicode 'Cache-Control': [!!python/unicode 'public, max-age=1800']
+        !!python/unicode 'Connection': [!!python/unicode 'keep-alive']
+        !!python/unicode 'Content-Encoding': [!!python/unicode 'gzip']
+        !!python/unicode 'Content-Length': [!!python/unicode '612']
+        !!python/unicode 'Content-Type': [!!python/unicode 'text/xml; charset=utf-8']
+        !!python/unicode 'Date': [!!python/unicode 'Sat, 12 Mar 2016 05:04:49 GMT']
+        !!python/unicode 'Expires': [!!python/unicode 'Sat, 12 Mar 2016 05:34:49 GMT']
+        !!python/unicode 'Server': [!!python/unicode 'cloudflare-nginx']
+        !!python/unicode 'Vary': [!!python/unicode 'Accept-Encoding']
+        !!python/unicode 'X-Powered-By': [!!python/unicode 'PHP/5.3.10-1ubuntu3.15']
+      !!python/unicode 'status': {!!python/unicode 'code': 200, !!python/unicode 'message': !!python/unicode 'OK'}
+  - request:
+      body: null
       headers:
-        CF-Cache-Status: [MISS]
-        CF-RAY: [2824aff4b95d19bc-SYD]
-        Cache-Control: ['public, max-age=1800']
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Length: ['612']
-        Content-Type: [text/xml; charset=utf-8]
-        Date: ['Sat, 12 Mar 2016 05:01:17 GMT']
-        Expires: ['Sat, 12 Mar 2016 05:31:17 GMT']
-        Server: [cloudflare-nginx]
-        Vary: [Accept-Encoding]
-        X-Powered-By: [PHP/5.3.10-1ubuntu3.15]
+        User-Agent: [!!python/unicode 'FlexGet/1.3.0.dev (www.flexget.com)']
+      method: GET
+      uri: http://www.thetvdb.com/api/4D297D8CFDE0E105/mirrors.xml
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA7Oxr8jNUShLLSrOzM+zVTLUM1BSSM1Lzk/JzEu3VQoNcdO1UFKwt+Oy8c0sKsov
+          KrbjUlCAskFMICczxc7QRh9IQri5YLmCxJIMu4ySkgIrff2SjNSSspQkveT8XBt9JGmI+pLKgtTc
+          xOJsO3MbfTgbZIk+zBYYC2g3AI+ix/OuAAAA
+      headers:
+        cache-control: ['public, max-age=1800']
+        cf-cache-status: [EXPIRED]
+        cf-ray: [2824b5c149bc04c2-SYD]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [text/xml]
+        date: ['Sat, 12 Mar 2016 05:05:14 GMT']
+        expires: ['Sat, 12 Mar 2016 05:35:14 GMT']
+        last-modified: ['Sat, 12 Mar 2016 05:00:01 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=dcfb557e2329faff341aa3c4e439be06f1457759114; expires=Sun,
+            12-Mar-17 05:05:14 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+        vary: [Accept-Encoding]
       status: {code: 200, message: OK}
 version: 1
