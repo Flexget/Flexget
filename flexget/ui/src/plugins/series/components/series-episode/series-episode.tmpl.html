@@ -1,5 +1,4 @@
-<md-list-item>
-    <md-card flex>
+<md-card>
     	<md-card-title>
         	<md-card-title-text>
     			{{ ::vm.episode.episode_identifier }}
@@ -12,7 +11,7 @@
                         <h3><i ng-if="release.release_downloaded" class="fa fa-download"></i> {{ ::release.release_title }}</h3>
     				    <p>{{ ::release.release_quality }}</p>
                     </div>
-                    <md-menu>
+                    <md-menu class="md-secondary">
                         <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
                             <md-icon><i class="fa fa-ellipsis-v"></i></md-icon>
                         </md-button>
@@ -59,4 +58,3 @@
             </md-menu>
     	</md-card-actions>
 	</md-card>
-</md-list-item>

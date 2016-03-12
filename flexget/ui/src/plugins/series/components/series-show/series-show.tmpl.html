@@ -1,12 +1,11 @@
-<md-list-item class="md-3-line">
-  <md-card flex>
+<md-card>
     <md-card-title flex="initial">
       <md-card-title-text>
         <span class="md-headline">{{ ::vm.show.show_name }}</span>
         <span class="md-subhead">Latest: {{ ::(vm.show.latest_downloaded_episode.episode_identifier ? vm.show.latest_downloaded_episode.episode_identifier : 'No yet') }}</span>
       </md-card-title-text>
     </md-card-title>
-    <md-card-content layout-gt-xs="row" layout-sm="column" class="custom-card">
+    <md-card-content layout-gt-xs="row" layout-xs="column" class="custom-card">
       <div class="md-media-lg series-image">
         <img ng-src="{{ ::vm.show.lookup.tvmaze.medium_image }}">
       </div>
@@ -18,4 +17,3 @@
       <md-button class="md-warn md-raised" ng-click="vm.forgetShow()">Forget</md-button>
     </md-card-actions>
   </md-card>
-</md-list-item>
