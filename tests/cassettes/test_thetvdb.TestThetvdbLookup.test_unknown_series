@@ -5,7 +5,7 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: [__cfduid=d1a69aee013a0dffc4884290c9e0d00501457758857]
+        Cookie: [__cfduid=df2c14d47238c01b6d32267e9d19bebc41457783155]
         User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
       method: GET
       uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=Aoeu%20Htns&language=en
@@ -15,41 +15,13 @@ interactions:
           H4sIAAAAAAAAA7Oxr8jNUShLLSrOzM+zVTLUM1BSSM1Lzk/JzEu3VQoNcdO1UFKwt+OycUksSQRS
           +mAaAMwyaWc2AAAA
       headers:
-        CF-RAY: [2824af88000304c2-SYD]
+        CF-RAY: [282700bc31080b26-SYD]
         Cache-Control: [max-age=900]
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [text/xml; charset=utf-8]
-        Date: ['Sat, 12 Mar 2016 05:00:59 GMT']
-        Expires: ['Sat, 12 Mar 2016 05:14:55 GMT']
-        Server: [cloudflare-nginx]
-        Vary: [Accept-Encoding]
-        X-Cache: [MISS]
-        X-Powered-By: [PHP/5.3.10-1ubuntu3.15]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=de5d3d1b54d91facc9ae2a7f691ef4c8d1457759084]
-        User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
-      method: GET
-      uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=Aoeu%20Htns&language=en
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA7Oxr8jNUShLLSrOzM+zVTLUM1BSSM1Lzk/JzEu3VQoNcdO1UFKwt+OycUksSQRS
-          +mAaAMwyaWc2AAAA
-      headers:
-        CF-RAY: [2824b510e44604bc-SYD]
-        Cache-Control: [max-age=900]
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [text/xml; charset=utf-8]
-        Date: ['Sat, 12 Mar 2016 05:04:46 GMT']
-        Expires: ['Sat, 12 Mar 2016 05:18:42 GMT']
+        Date: ['Sat, 12 Mar 2016 11:45:57 GMT']
+        Expires: ['Sat, 12 Mar 2016 11:59:52 GMT']
         Server: [cloudflare-nginx]
         Vary: [Accept-Encoding]
         X-Cache: [HIT]

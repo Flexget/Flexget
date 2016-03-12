@@ -5,7 +5,7 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: [__cfduid=d1a69aee013a0dffc4884290c9e0d00501457758857]
+        Cookie: [__cfduid=df2c14d47238c01b6d32267e9d19bebc41457783155]
         User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
       method: GET
       uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=the%20daily%20show%20%28with%20jon%20stewart%29&language=en
@@ -23,13 +23,13 @@ interactions:
           EV90K0wewlAbeCBZlsh9el5+5uzgjPjj99mX18dZ4v0wjq/jqzFnByjib6IcSf9Kl/D1aTiKJ+Pb
           EbX5QCP+cTStyY43xdoj+wOurWU2kwMAAA==
       headers:
-        CF-RAY: [2824af9846640b1a-SYD]
+        CF-RAY: [282700c495a70b14-SYD]
         Cache-Control: [max-age=900]
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [text/xml; charset=utf-8]
-        Date: ['Sat, 12 Mar 2016 05:01:02 GMT']
-        Expires: ['Sat, 12 Mar 2016 05:15:03 GMT']
+        Date: ['Sat, 12 Mar 2016 11:45:58 GMT']
+        Expires: ['Sat, 12 Mar 2016 11:59:54 GMT']
         Server: [cloudflare-nginx]
         Vary: [Accept-Encoding]
         X-Cache: [MISS]
@@ -41,123 +41,7 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: [__cfduid=d1a69aee013a0dffc4884290c9e0d00501457758857]
-        User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
-      method: GET
-      uri: http://thetvdb.com/api/4D297D8CFDE0E105/series/71256/en.xml
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3VV227bOBB971cM8rQL1JblXL1QVcR20zSNnSJxN+hTMJbGEmuaFEjarhb6+B2K
-          itfZxb5I1Jkzl8PhUMnHXxsJOzJWaPXhJO4PToBUpnOhig8n3xc3vasT+Ji+S6boMH0HkDyREWT9
-          kj9Enl7Gw/OLJOJVgK4zp41Nm4WhnTYw11g2d1rBk6M9GtfckbUiQ3gWUgrcWDaaHBV8lVRVZJpr
-          tGIFM1T5TjTwqGt41jqHO9NvriXjuREFymZKVsB9nYusuUXL/jOhSvzJ0UoFtzovNqiar0ZYR5w7
-          K5F97mkvLIwlZuvmUStVw6QUpIrmCZntSoQxUXOPxtS+vI021HDZVckhJlouict/rtE5mJDCrLlD
-          y8JYHNmQ90EK3spmrJfe3600xx4bwdV9VwUbprgTOdwYbV3zKYdbkqz/xqBaw5QmaDTvjk8+Q0OK
-          C9nyC56Jci9m5hM/o7RlMxMcdAMLLRmfo8pYCbtI2TwiSyUJtyxCWFa55MpNnpualWBGNXzmmEZn
-          657fVtskUdewrnvC2Jcp1g8rTrtOpyhkzZS36BF1ITaUxvEfgwF8m3XEFguciVa8/+4RHZ+ndPFn
-          Lz5LordgIN6wo2NvytN4NLroDUa9QZxER3DgfebiKW0mekN53cxpb5sFyjU8lXrPWoI5UL/MpuOX
-          L9PUuUEcn8dnl0n0CgXCPapiiwWlpJLo8BFsc3J7bdZpSOT77QxK+O370+9J9Gp8Q+WwB8shxQMf
-          h52gfXqjTUEOnKlZMzgNa6IKKu4I7IUrYXgGpd4aUKyIH20U2wNXEizJOljhmoLRslIQqjUxS+Yc
-          QEqojOazRVDrbYiIDHpO6+TRjI9hyWMlqQ8LNrS9bTcOeCoQMi9VZODrBb0CQxmrDv4lYS4Fn3Pg
-          AFBpKRzPsISVKPiMWk5k9LbgpGDb68H7W+6vaVkbrbTUxda7S56JUKClYsMJLCxrzm04TKVV3iI+
-          yUoollCzVBf20AY3H8ZBRpKWhqv4v5L+o7F1PrqUvOgVDznlgA4uT08hjplxvSO1pfcAfLbgB3fh
-          Pcx/9JPo0MnQ2O7wjvqnSfTmIIePid4qx3NxsAago/DSj8jwnK3dOljC3cqnJx6O2PXweWydI9Pf
-          antltqaO69BtbepHTagtF8CcAAU75jnPVBKF9xE2rl9RXgV8iUqRSQuDVem3OGqv/F4x6v+sOG5n
-          DtwVKr7k0/CKNN/Vvo2dR3wVPDpS8JBo3bbK0fnRPzu/vDwdXMTDJDrGA7Pia5MThZftYp6FkJ0t
-          EN3Gvuz5Qqf8RUuOmkT/QgLtL6yGwr3wn+vTt8EwHl1eDZn6D+r/dtHr7y6Jwh/wb3EpdZsxBwAA
-      headers:
-        CF-Cache-Status: [REVALIDATED]
-        CF-RAY: [2824af9bc36e19bc-SYD]
-        Cache-Control: ['public, max-age=1800']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [text/xml]
-        Date: ['Sat, 12 Mar 2016 05:01:03 GMT']
-        Expires: ['Sat, 12 Mar 2016 05:31:03 GMT']
-        Last-Modified: ['Fri, 11 Mar 2016 21:10:27 GMT']
-        Server: [cloudflare-nginx]
-        Vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d1a69aee013a0dffc4884290c9e0d00501457758857]
-        User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
-      method: GET
-      uri: http://thetvdb.com/api/GetEpisodeByAirDate.php?apikey=4D297D8CFDE0E105&seriesid=71256&airdate=2012-06-06&language=en
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3VTXY/TMBB896+w+sLLXZ009Evay4m7UlSJA0SBPlZusk0NiR3ZToF/z6ZJ07SA
-          FCm7M7seez2Gx19Fzo9onTL6YRAOgwFHnZhU6exh8PXL8n424I8xg4X0kn5vS+VMihSpNH4dRZMo
-          iEBQzODZFDulMd1iU6OrYoc2DoM5iP9wvSaH0hkdh9NecYuR+LfFNjnI0lMPiH7WcKlyCe2hodqk
-          Ya71moLbPdRYK9UUXHSVxcSbU+M5rGewKrJlLrN4BOKSdMP5IAuMXxRtEXO+lM7tUKdo69oLf6nu
-          jekaYrBU1vk3pJzGoyAc3QcT+kD0YAbvKnR+7aV1/9Ts0QxWL4un7WpBxzlHDN5LnVUywxg1iC5h
-          8JFMcVT4M17LQmp/kPwJkVssjfWOG803NGejndKvHKc2tFxp7g/IC5U6z82erxPjPd/I/AdaKqIB
-          yjznmNMgyW13PLVGo+OJKbDuJZnffG9s4e5owZT/fRxa4ogyd3zwyVITiVVuwMvceF4apb0bguj2
-          zYCK0uqk9Vx7FsQNwOCz9GR0YtqAwfp09+dLITdeAQw2VjUubAMGcudMXnncdia7RRjsVY66vvbW
-          e05Mw9F4ItoXNPxeZiC6Iga5dL4qU+npisMomgfjeTAag+jjDBqf1g9xOp7N6B12QM1ZhY7Ck1BN
-          tTnrbFaHzbP+A1gWYTUGBAAA
-      headers:
-        CF-RAY: [2824af9f641019bc-SYD]
-        Cache-Control: [max-age=900]
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [text/xml; charset=utf-8]
-        Date: ['Sat, 12 Mar 2016 05:01:15 GMT']
-        Expires: ['Sat, 12 Mar 2016 05:15:11 GMT']
-        Server: [cloudflare-nginx]
-        Vary: [Accept-Encoding]
-        X-Cache: [MISS]
-        X-Powered-By: [PHP/5.3.10-1ubuntu3.15]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=de5d3d1b54d91facc9ae2a7f691ef4c8d1457759084]
-        User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
-      method: GET
-      uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=the%20daily%20show%20%28with%20jon%20stewart%29&language=en
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3VTTW/aQBC9+1eMOLVSYDH5IEgbRzQUKZVKI0EOOUWLPdhbll1rd43rqD++s3Yg
-          iLYXe+fN13szGn7/a6dgj9ZJo+968WDYA9SpyaTO73rPq3n/tgf3ScRnwgv6LdFKdPRw7UNmyTge
-          Xd9wdrQjroTOK5Fjgpqzo3HIXYgdJqsCYSakamBZmJqzE1fEp0qK9u3O4qCWvoBvRsPSYy2s//0v
-          /8ri3lhYGFFwdlIr4muhNdokt6IsZCoUa7n388ngZ5lz9u6O+A+ax15incyNzdGDtw2NA7yBLWIJ
-          pUixazW6gsJUFjTWjj6+Nnbr+uCJ1Rqdh43YYud0gZ7UrYuiVEYFlILSmr3MEBpTdRUFgSGmTQpo
-          KjQUQmcKB3CmVjoQkJodZjKFwBfMBiymqH2XX6DIlNRIcTqD0ijpg2zYyLyyhPrCmiqnptBtL+Q7
-          4aVto3ZGG2XyKqQrQ/pbgg7zHTVwsG6ot6UypdFZi4QmG6lJQkNSfTdD16WFMh5SVLi2xOJ/lP7S
-          eL7RIHojFWkG4WF8eQlxTBHTPeoKLwAWNIUX2sIFLF4GnB03GfG5tM5PpcUsiSeTm/5w0h/GnJ3A
-          EV90K0wewlAbeCBZlsh9el5+5uzgjPjj99mX18dZ4v0wjq/jqzFnByjib6IcSf9Kl/D1aTiKJ+Pb
-          EbX5QCP+cTStyY43xdoj+wOurWU2kwMAAA==
-      headers:
-        CF-RAY: [2824b51aabdc04ce-SYD]
-        Cache-Control: [max-age=900]
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [text/xml; charset=utf-8]
-        Date: ['Sat, 12 Mar 2016 05:04:48 GMT']
-        Expires: ['Sat, 12 Mar 2016 05:18:44 GMT']
-        Server: [cloudflare-nginx]
-        Vary: [Accept-Encoding]
-        X-Cache: [MISS]
-        X-Powered-By: [PHP/5.3.10-1ubuntu3.15]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=de5d3d1b54d91facc9ae2a7f691ef4c8d1457759084]
+        Cookie: [__cfduid=df2c14d47238c01b6d32267e9d19bebc41457783155]
         User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
       method: GET
       uri: http://thetvdb.com/api/4D297D8CFDE0E105/series/71256/en.xml
@@ -184,13 +68,13 @@ interactions:
           EN3Gvuz5Qqf8RUuOmkT/QgLtL6yGwr3wn+vTt8EwHl1eDZn6D+r/dtHr7y6Jwh/wb3EpdZsxBwAA
       headers:
         CF-Cache-Status: [HIT]
-        CF-RAY: [2824b51dbc2604bc-SYD]
+        CF-RAY: [282700c6235a0b1a-SYD]
         Cache-Control: ['public, max-age=1800']
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [text/xml]
-        Date: ['Sat, 12 Mar 2016 05:04:48 GMT']
-        Expires: ['Sat, 12 Mar 2016 05:34:48 GMT']
+        Date: ['Sat, 12 Mar 2016 11:45:58 GMT']
+        Expires: ['Sat, 12 Mar 2016 12:15:58 GMT']
         Last-Modified: ['Fri, 11 Mar 2016 21:10:27 GMT']
         Server: [cloudflare-nginx]
         Vary: [Accept-Encoding]
@@ -201,7 +85,7 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: [__cfduid=de5d3d1b54d91facc9ae2a7f691ef4c8d1457759084]
+        Cookie: [__cfduid=df2c14d47238c01b6d32267e9d19bebc41457783155]
         User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
       method: GET
       uri: http://thetvdb.com/api/GetEpisodeByAirDate.php?apikey=4D297D8CFDE0E105&seriesid=71256&airdate=2012-06-06&language=en
@@ -219,13 +103,13 @@ interactions:
           e05Mw9F4ItoXNPxeZiC6Iga5dL4qU+npisMomgfjeTAag+jjDBqf1g9xOp7N6B12QM1ZhY7Ck1BN
           tTnrbFaHzbP+A1gWYTUGBAAA
       headers:
-        CF-RAY: [2824b51e1c2a04bc-SYD]
+        CF-RAY: [282700c663660b1a-SYD]
         Cache-Control: [max-age=900]
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [text/xml; charset=utf-8]
-        Date: ['Sat, 12 Mar 2016 05:04:48 GMT']
-        Expires: ['Sat, 12 Mar 2016 05:18:44 GMT']
+        Date: ['Sat, 12 Mar 2016 11:45:58 GMT']
+        Expires: ['Sat, 12 Mar 2016 11:59:54 GMT']
         Server: [cloudflare-nginx]
         Vary: [Accept-Encoding]
         X-Cache: [HIT]
