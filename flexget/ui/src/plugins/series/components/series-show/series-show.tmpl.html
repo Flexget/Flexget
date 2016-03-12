@@ -3,6 +3,8 @@
       <md-card-title-text>
         <span class="md-headline">{{ ::vm.show.show_name }}</span>
         <span class="md-subhead">Latest: {{ ::(vm.show.latest_downloaded_episode.episode_identifier ? vm.show.latest_downloaded_episode.episode_identifier : 'No yet') }}</span>
+        <span class="md-subhead">Begin Episode: {{ ::(vm.show.begin_episode.episode_identifier ? vm.show.begin_episode.episode_identifier : 'No begin set')
+        }}
       </md-card-title-text>
     </md-card-title>
     <md-card-content layout-gt-xs="row" layout-xs="column" class="custom-card">
