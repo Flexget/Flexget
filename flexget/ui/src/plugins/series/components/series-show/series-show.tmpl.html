@@ -17,7 +17,12 @@
             {{ $chip }}
           </md-chip-template>
         </md-chips>
-        <div style="margin-top: 15px">Rating will come here</div>
+        <div class="rating">
+          <md-icon>
+            <i class="fa fa-star fa-lg"></i>
+          </md-icon>
+          {{ vm.show.lookup.tvmaze.rating }}
+        </div>
       </md-card-title-text>
     </md-card-title>
     <md-card-content flex layout-gt-xs="row" layout-xs="column" class="custom-card">
