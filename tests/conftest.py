@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import, print_functi
 from builtins import object
 from builtins import str
 import logging
+import shutil
 
 import itertools
 
@@ -156,23 +157,34 @@ def filecopy(request):
     out_files = []
     marker = request.node.get_marker('filecopy')
     if marker is not None:
-        sources, dst = marker.args
-        if isinstance(sources, str):
-            sources = [sources]
-        if 'tmpdir' in request.fixturenames:
-            dst = dst.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)
-        dst = Path(dst)
-        for f in itertools.chain(*(Path().glob(src) for src in sources)):
-            dest_path = dst
-            if dest_path.isdir():
-                dest_path = dest_path / f.basename()
-            f.copy(dest_path)
-            out_files.append(dest_path)
+        copy_list = marker.args[0] if len(marker.args) == 1 else [marker.args]
+
+        for sources, dst in copy_list:
+            if isinstance(sources, str):
+                sources = [sources]
+            if 'tmpdir' in request.fixturenames:
+                dst = dst.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)
+            dst = Path(dst)
+            for f in itertools.chain(*(Path().glob(src) for src in sources)):
+                dest_path = dst
+                if dest_path.isdir():
+                    dest_path = dest_path / f.basename()
+
+                if not os.path.isdir(os.path.dirname(dest_path)):
+                    os.makedirs(os.path.dirname(dest_path))
+                if os.path.isdir(f):
+                    shutil.copytree(f, dest_path)
+                else:
+                    shutil.copy(f, dest_path)
+                out_files.append(dest_path)
     yield
     if out_files:
         for f in out_files:
             try:
-                f.remove()
+                if os.path.isdir(f):
+                    shutil.rmtree(f)
+                else:
+                    f.remove()
             except OSError as e:
                 print("couldn't remove %s: %s" % (f, e))
 
