@@ -5,7 +5,7 @@ coverage
 flake8
 mock
 requests
-vcrpy>=1.5
+vcrpy>=1.7.4
 virtualenv
 boto3
 wheel
