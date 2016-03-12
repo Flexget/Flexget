@@ -30,8 +30,8 @@ class TestUoccinReader(object):
     """
 
     @pytest.mark.filecopy([
-        ('bah/uoccin.diff', '__tmp__/1431093328970.uoccin_test.diff'),
-        ('bah/uoccin.json', '__tmp__/uoccin/uoccin.json')
+        ('uoccin/uoccin.diff', '__tmp__/1431093328970.uoccin_test.diff'),
+        ('uoccin/uoccin.json', '__tmp__/uoccin/uoccin.json')
     ])
     def test_read(self, execute_task, tmpdir):
         execute_task('test_sync')
@@ -87,10 +87,10 @@ class TestUoccinWriters(object):
               uuid: flexget_test
               path: __tmp__
           test_chk:
-            uoccin_lookup: __tmp__
+            uoccin_lookup: __tmp__/uoccin
     """
 
-    @pytest.mark.filecopy('bah/uoccin.json', '__tmp__/uoccin/uoccin.json')
+    @pytest.mark.filecopy('uoccin/uoccin.json', '__tmp__/uoccin/uoccin.json')
     def test_write(self, execute_task):
         execute_task('test_del')
         task = execute_task('test_chk')
