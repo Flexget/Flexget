@@ -234,7 +234,7 @@ class SceneAccessSearch(object):
 
         session = task.requests
 
-        if not 'sceneaccess.eu' in session.domain_limiters:
+        if 'sceneaccess.eu' not in session.domain_limiters:
             session.add_domain_limiter(TimedLimiter('sceneaccess.eu', '7 seconds'))
 
         if not session.cookies:
