@@ -100,6 +100,19 @@ class TestListInterface(object):
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
             list_reject:
               - movie_list: test_list
+
+          test_allowed_identifiers:
+            mock:
+              - {title: 'title 1',
+                 url: "http://mock.url/file1.torrent",
+                 imdb_id: "tt1234567",
+                 trakt_movie_id: "12345",
+                 tmdb_id: "3456",
+                 fake_id_name: "123abc"
+                 }
+            accept_all: yes
+            list_add:
+              - movie_list: test_list
     """
 
     def test_list_add(self, execute_task):
@@ -108,6 +121,18 @@ class TestListInterface(object):
 
         task = execute_task('list_get')
         assert len(task.entries) == 2
+
+    def test_allowed_identifiers(self, execute_task):
+        task = execute_task('test_allowed_identifiers')
+        assert len(task.entries) == 1
+
+        task = execute_task('list_get')
+        assert len(task.entries) == 1
+
+        assert task.find_entry(imdb_id='tt1234567')
+        assert task.find_entry(trakt_movie_id='12345')
+        assert task.find_entry(tmdb_id='3456')
+        assert not task.find_entry(fake_id_name='123abc')
 
     def test_multiple_list_add(self, execute_task):
         task = execute_task('test_multiple_list_add')
