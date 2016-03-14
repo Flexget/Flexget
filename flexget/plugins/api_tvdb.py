@@ -219,11 +219,10 @@ class TVDBSeries(Base):
             'imdb_id': self.imdb_id,
             'zap2it_id': self.zap2it_id,
             'banner': self.banner,
-            'poster': self.poster,
-            'poster_file': self.poster_file,
+            'posters': self.posters,
             'genres': self.genres,
+            'actors': self.actors,
             'first_aired': self.firstaired,
-            'actors': self.get_actors()
         }
 
 
@@ -287,8 +286,8 @@ class TVDBEpisode(Base):
             'episode_name': self.episodename,
             'overview': self.overview,
             'director': self.director,
-            'guest_stars': self.gueststars,
             'rating': self.rating,
+            'image': self.image,
             'file_name': self.filename,
             'first_aired': self.firstaired,
             'series_id': self.series_id
