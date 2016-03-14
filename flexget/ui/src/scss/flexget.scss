@@ -54,6 +54,9 @@ md-input-container .hint {
 
 .series-image {
   margin-right: 10px;
+  .md-media-lg {
+    height: 100%;
+  }
 }
 
 .fg-material-paging .fg-pagination-button {
