@@ -21,11 +21,10 @@ default_error_schema = api.schema('default_error_schema', default_error_schema)
 tvdb_series_object = {
     'type': 'object',
     'properties': {
-        'TVDB_id': {'type': 'integer'},
+        'tvdb_id': {'type': 'integer'},
         'last_updated': {'type': 'string', 'format': 'date-time'},
         'expired': {'type': 'boolean'},
-        'series_name': {'type': 'string'},
-        'language': {'type': 'string'},
+        'name': {'type': 'string'},
         'rating': {'type': 'number'},
         'status': {'type': 'string'},
         'runtime': {'type': 'integer'},
@@ -37,12 +36,10 @@ tvdb_series_object = {
         'imdb_id': {'type': 'string'},
         'zap2it_id': {'type': 'string'},
         'banner': {'type': 'string'},
-        'fan_art': {'type': 'string'},
-        'poster': {'type': 'string'},
-        'poster_file': {'type': 'string'},
-        'genres': {'type': 'array', 'items': {'type': 'string'}},
         'first_aired': {'type': 'string'},
-        'actors': {'type': 'array', 'items': {'type': 'string'}}
+        'actors': {'type': 'array', 'items': {'type': 'string'}},
+        'posters': {'type': 'array', 'items': {'type': 'string'}},
+        'genres': {'type': 'array', 'items': {'type': 'string'}},
     }
 }
 
@@ -59,7 +56,6 @@ episode_object = {
         'overview': {'type': 'string'},
         'director': {'type': 'array', 'items': {'type': 'string'}},
         'writer': {'type': 'array', 'items': {'type': 'string'}},
-        'guest_stars': {'type': 'array', 'items': {'type': 'string'}},
         'rating': {'type': 'number'},
         'file_name': {'type': 'string'},
         'first_aired': {'type': 'string'},
@@ -111,24 +107,19 @@ class TVDBEpisodeSearchAPI(APIResource):
     @api.response(500, 'Not enough parameters for lookup', default_error_schema)
     def get(self, tvdb_id, session=None):
         args = episode_parser.parse_args()
-        air_date = args.get('air_date')
-        absolute_num = args.get('absolute_num')
-        season_num = args.get('season_num')
+        absolute_num = args.get('absolute_number')
+        season_num = args.get('season_number')
         ep_num = args.get('ep_num')
 
         kwargs = {'tvdb_id': tvdb_id,
                   'session': session}
 
-        if air_date:
-            kwargs['airdate'] = air_date
-        elif absolute_num:
+        if absolute_num:
             kwargs['absolutenum'] = absolute_num
-        elif season_num and ep_num:
+        if season_num and ep_num:
             kwargs['seasonnum'] = season_num
             kwargs['episodenum'] = ep_num
-        else:
-            return {'status': 'error',
-                    'message': 'not enough parameters sent for lookup'}, 500
+
         try:
             episode = lookup_episode(**kwargs)
         except LookupError as e:
