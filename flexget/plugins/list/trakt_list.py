@@ -14,6 +14,7 @@ from flexget.plugins.api_trakt import get_api_url, get_entry_ids, get_session, m
 
 
 log = logging.getLogger('trakt_list')
+IMMUTABLE_LISTS = []
 
 field_maps = {
     'movie': {
@@ -54,6 +55,11 @@ field_maps = {
 
 
 class TraktSet(MutableSet):
+    @property
+    def immutable(self):
+        if self.config['list'] in IMMUTABLE_LISTS:
+            return '%s list is not modifiable' % self.config['list']
+
     schema = {
         'type': 'object',
         'properties': {
