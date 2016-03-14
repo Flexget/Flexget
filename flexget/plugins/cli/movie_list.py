@@ -39,6 +39,10 @@ def do_cli(manager, options):
         movie_list_add(options)
         return
 
+    if options.list_action == 'del':
+        movie_list_del(options)
+        return
+
 
 def movie_list_lists(options):
     """ Show all movie lists """
@@ -91,6 +95,23 @@ def movie_list_add(options, session=None):
     console(output)
 
 
+@with_session
+def movie_list_del(options, session=None):
+    try:
+        list = get_list_by_exact_name(options.list_name)
+    except NoResultFound:
+        console('Could not find movie list with name {}'.format(options.list_name))
+        return
+    title, year = split_title_year(options.movie_title)
+    movie_exist = get_movie_by_title(list_id=list.id, title=title, session=session)
+    if movie_exist:
+        console('Removing movie %s from list %s' % (options.movie_title, options.list_name))
+        session.delete(movie_exist)
+    else:
+        console('Could not find movie with title %s in list %s' % (options.movie_title, options.list_name))
+        return
+
+
 @event('options.register')
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
@@ -110,4 +131,5 @@ def register_parser_arguments():
     list_parser = subparsers.add_parser('list', parents=[list_name_parser], help='list movies from the list')
     add_parser = subparsers.add_parser('add', parents=[identifiers_parser, list_name_parser],
                                        help='add a movie to the list')
-    subparsers.add_parser('del', parents=[identifiers_parser, list_name_parser], help='remove a movie from the list')
+    subparsers.add_parser('del', parents=[identifiers_parser, list_name_parser],
+                          help='remove a movie from the list using its title')
