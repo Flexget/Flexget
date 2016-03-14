@@ -4,6 +4,7 @@ import pytest
 
 from flexget.manager import Session
 from flexget.plugins.api_tvdb import lookup_episode
+from flexget.plugins.api_tvdb import persist
 
 
 @pytest.mark.online
@@ -50,6 +51,9 @@ class TestTVDBLookup(object):
 
     def test_lookup(self, execute_task):
         """thetvdb: Test Lookup (ONLINE)"""
+
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvdb_ep_name'] == 'Paternity', \
@@ -62,6 +66,8 @@ class TestTVDBLookup(object):
             'Failed imdb lookup Doctor Who 2005 S02E03'
 
     def test_unknown_series(self, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         # Test an unknown series does not cause any exceptions
         task = execute_task('test_unknown_series')
         # Make sure it didn't make a false match
@@ -69,6 +75,7 @@ class TestTVDBLookup(object):
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
     def test_mark_expired(self, execute_task):
+        persist['auth_tokens'] = {'default': None}
 
         def test_run():
             # Run the task and check tvdb data was populated.
@@ -92,6 +99,8 @@ class TestTVDBLookup(object):
         test_run()
 
     def test_absolute(self, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('test_absolute')
         entry = task.find_entry(title='naruto 128')
         assert entry
@@ -129,6 +138,8 @@ class TestTVDBFavorites(object):
     """
 
     def test_favorites(self, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('test')
         assert task.find_entry('accepted', title='House.S01E02.HDTV.XViD-FlexGet'), \
             'series House should have been accepted'
@@ -142,6 +153,8 @@ class TestTVDBFavorites(object):
             'series Lost should not have been accepted'
 
     def test_strip_date(self, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('test_strip_dates')
         assert task.find_entry(title='Hawaii Five-0'), \
             'series Hawaii Five-0 (2010) should have date stripped'
