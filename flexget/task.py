@@ -1,5 +1,4 @@
 from __future__ import absolute_import, division, unicode_literals
-from past.builtins import cmp
 from builtins import next
 from builtins import map
 from builtins import str
@@ -15,7 +14,7 @@ import logging
 import threading
 import random
 import string
-from functools import wraps
+from functools import wraps, total_ordering
 
 from sqlalchemy import Column, Integer, String, Unicode
 
@@ -153,6 +152,7 @@ class TaskAbort(Exception):
         return 'TaskAbort(reason=%s, silent=%s)' % (self.reason, self.silent)
 
 
+@total_ordering
 class Task(object):
 
     """
@@ -303,20 +303,8 @@ class Task(object):
     def __lt__(self, other):
         return (self.priority, self._count) < (other.priority, other._count)
 
-    def __le__(self, other):
-        return (self.priority, self._count) <= (other.priority, other._count)
-
     def __eq__(self, other):
         return (self.priority, self._count) == (other.priority, other._count)
-
-    def __ne__(self, other):
-        return (self.priority, self._count) != (other.priority, other._count)
-
-    def __gt__(self, other):
-        return (self.priority, self._count) > (other.priority, other._count)
-
-    def __ge__(self, other):
-        return (self.priority, self._count) >= (other.priority, other._count)
 
     def __str__(self):
         return '<Task(name=%s,aborted=%s)>' % (self.name, self.aborted)
