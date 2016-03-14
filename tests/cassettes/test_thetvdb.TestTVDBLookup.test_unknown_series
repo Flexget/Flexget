@@ -1,0 +1,51 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NTgwMzc2NjAsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDU3OTUxMjYwfQ.q1RzsOr2At9AnLA5laeH_osDwM0TmMHqTdcIGgZGlfgvT8qlXqSzvoSyP28Tk65W-Qhjh_VN7x3uOArfWkwI6ExwXtBoPjyDrcgnX6e9VB0aNV6Gx5FgR_JLDC8BlXaCzuHZyXb8Nv1DJ6FQ8wb78ftzTJ_0idZ5pQ1WHypD4w41LG0Z9h-_0bOMDaMrrvfEBfJzOMiXDIzmgOfFEUguNxtq6wJHLsrZt8G8wLBDbFsDcit1-yxgJaRveB5iEJ-BX3Pi7DHg5c6bd3YBQ19Jwc2K6YXOTCaT_oR-add5jsL1ZxvOkBDD4X4oOaptnSRMqYSn8Tm_HBmlKUnc46nHsw]
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/1.2.480.dev (www.flexget.com)]
+      method: GET
+      uri: https://api-beta.thetvdb.com//search/series?name=Aoeu+Htns
+    response:
+      body: {string: '<a href="/search/series?name=Aoeu+Htns">Moved Permanently</a>.
+
+
+          '}
+      headers:
+        cf-ray: [2837091d8efc0b1a-SYD]
+        connection: [keep-alive]
+        content-type: [text/html; charset=utf-8]
+        date: ['Mon, 14 Mar 2016 10:27:53 GMT']
+        location: ['/search/series?name=Aoeu+Htns']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d79b4705b2103e1a22ce689111e077c8b1457951272; expires=Tue,
+            14-Mar-17 10:27:52 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      status: {code: 301, message: Moved Permanently}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NTgwMzc2NjAsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDU3OTUxMjYwfQ.q1RzsOr2At9AnLA5laeH_osDwM0TmMHqTdcIGgZGlfgvT8qlXqSzvoSyP28Tk65W-Qhjh_VN7x3uOArfWkwI6ExwXtBoPjyDrcgnX6e9VB0aNV6Gx5FgR_JLDC8BlXaCzuHZyXb8Nv1DJ6FQ8wb78ftzTJ_0idZ5pQ1WHypD4w41LG0Z9h-_0bOMDaMrrvfEBfJzOMiXDIzmgOfFEUguNxtq6wJHLsrZt8G8wLBDbFsDcit1-yxgJaRveB5iEJ-BX3Pi7DHg5c6bd3YBQ19Jwc2K6YXOTCaT_oR-add5jsL1ZxvOkBDD4X4oOaptnSRMqYSn8Tm_HBmlKUnc46nHsw]
+        Connection: [keep-alive]
+        Cookie: [__cfduid=d79b4705b2103e1a22ce689111e077c8b1457951272]
+        User-Agent: [FlexGet/1.2.480.dev (www.flexget.com)]
+      method: GET
+      uri: https://api-beta.thetvdb.com/search/series?name=Aoeu+Htns
+    response:
+      body: {string: "{\n  \"Error\": \"Resource not found\"\n}"}
+      headers:
+        cache-control: ['private, max-age=300']
+        cf-ray: [283709226f1f0b1a-SYD]
+        connection: [keep-alive]
+        content-length: ['35']
+        content-type: [application/json]
+        date: ['Mon, 14 Mar 2016 10:27:54 GMT']
+        server: [cloudflare-nginx]
+        x-powered-by: [Thundar!]
+        x-thetvdb-api-version: [1.2.0]
+      status: {code: 404, message: Not Found}
+version: 1
