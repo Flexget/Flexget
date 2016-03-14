@@ -1,0 +1,85 @@
+interactions:
+  - request:
+      body: '{"apikey": "4D297D8CFDE0E105"}'
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Content-Length: ['30']
+        Content-Type: [application/json]
+        User-Agent: [FlexGet/1.2.480.dev (www.flexget.com)]
+      method: POST
+      uri: https://api-beta.thetvdb.com/login
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAAwTByZKiMAAA0Ht/heWdLhQRmRsQjEEFOoTNi4VsIktASEOcmn+f9/5+rVbridZ5
+          t/6zWufcej5gWjmV5fkftLErNKIOy6mB9qjuo8Cw1O+cW01+0irnZYo2Kefrp5TsjzmitqnRi1a4
+          XZrczJrMQCNqVZ6EWZGERxG96GIDX3KIz6+fdCl+vp2DchsSv485GQcWNJEZ7zzQGrSgU+GiiR1E
+          2c3eThUGO/RETsiwKnsMRkNENEpDRft9KXYJOme/1XvfRl4ZLzx9HFJ2wxA87cNBx6CsHzk26Ibu
+          sdSE5e8cyrrEfnBH3+Jkt0bS+1ES0Owua2xnC/37wkJNZUIaWBAN7eYcebCe8QnkBEjdVr8vI/Ey
+          KPhKIAaTC+k7PmKsQEa46WKdsP5KNQJaR4QWAwAnzzjvgD4bW7DMvE7AME3krkBtl+kCn2Ko9ySy
+          96fhLvi7lEb8ksn1Jd6+k/NDoRl0AliKl27k7vF8S/ri6gpNnBTSNjdHwQ1VfcrM8DRtmnwzvNRH
+          uf769x8AAP//AwBkdINh1wEAAA==
+      headers:
+        cf-ray: [283723ec637f19c8-SYD]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Mon, 14 Mar 2016 10:46:11 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d0e39c6c2e3ef7696d63dd90a727bb2fe1457952370; expires=Tue,
+            14-Mar-17 10:46:10 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+        x-powered-by: [Thundar!]
+        x-thetvdb-api-version: [1.2.0]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NTgwMzg3NzEsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDU3OTUyMzcxfQ.O87ZqaUpYyTsquVlXEY4SDmCofotfPItu805PdrOiWV4IhIOWuR95SuGXqXTAooW7Avj7NgDnO62BpUNISgYxycb8cuZRGDhN88BRDgkbeRCo1o6R3lWgvwW5B3uQRnor0tNmCapUXaVod_5Au4N-prLuWA9u-cVJGIqm1KXSGkwRHDeTD3n2B_xsTSdG-U7V0VtPGorYFRR7GuTyEPRBTupMoATDmO0GJuDDRahYenDBwC2DxwykaDqttT_7GA4dB-ytYGBpTXN6Hq_-U4coXyLd5kLY2raKb7odGOVGg0LnsyPFKZapfMP-lYaf32eEs-PW9BtdEWHt1le1qj9bg]
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/1.2.480.dev (www.flexget.com)]
+      method: GET
+      uri: https://api-beta.thetvdb.com//search/series?name=Aoeu+Htns
+    response:
+      body: {string: '<a href="/search/series?name=Aoeu+Htns">Moved Permanently</a>.
+
+
+          '}
+      headers:
+        cf-ray: [283723f229bf04ce-SYD]
+        connection: [keep-alive]
+        content-type: [text/html; charset=utf-8]
+        date: ['Mon, 14 Mar 2016 10:46:12 GMT']
+        location: ['/search/series?name=Aoeu+Htns']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d2ac1a5cfe49fb8887241d607f95532471457952371; expires=Tue,
+            14-Mar-17 10:46:11 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      status: {code: 301, message: Moved Permanently}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NTgwMzg3NzEsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDU3OTUyMzcxfQ.O87ZqaUpYyTsquVlXEY4SDmCofotfPItu805PdrOiWV4IhIOWuR95SuGXqXTAooW7Avj7NgDnO62BpUNISgYxycb8cuZRGDhN88BRDgkbeRCo1o6R3lWgvwW5B3uQRnor0tNmCapUXaVod_5Au4N-prLuWA9u-cVJGIqm1KXSGkwRHDeTD3n2B_xsTSdG-U7V0VtPGorYFRR7GuTyEPRBTupMoATDmO0GJuDDRahYenDBwC2DxwykaDqttT_7GA4dB-ytYGBpTXN6Hq_-U4coXyLd5kLY2raKb7odGOVGg0LnsyPFKZapfMP-lYaf32eEs-PW9BtdEWHt1le1qj9bg]
+        Connection: [keep-alive]
+        Cookie: [__cfduid=d2ac1a5cfe49fb8887241d607f95532471457952371]
+        User-Agent: [FlexGet/1.2.480.dev (www.flexget.com)]
+      method: GET
+      uri: https://api-beta.thetvdb.com/search/series?name=Aoeu+Htns
+    response:
+      body: {string: "{\n  \"Error\": \"Resource not found\"\n}"}
+      headers:
+        cache-control: ['private, max-age=300']
+        cf-ray: [283723f709dc04ce-SYD]
+        connection: [keep-alive]
+        content-length: ['35']
+        content-type: [application/json]
+        date: ['Mon, 14 Mar 2016 10:46:13 GMT']
+        server: [cloudflare-nginx]
+        x-powered-by: [Thundar!]
+        x-thetvdb-api-version: [1.2.0]
+      status: {code: 404, message: Not Found}
+version: 1

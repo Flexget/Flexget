@@ -5,10 +5,11 @@ import pytest
 
 from flexget.manager import Session
 from flexget.plugins.api_tvdb import lookup_episode
+from flexget.plugins.api_tvdb import persist
 
 
 @pytest.mark.online
-class TestThetvdbLookup(object):
+class TestTVDBLookup(object):
 
     config = """
         templates:
@@ -51,6 +52,9 @@ class TestThetvdbLookup(object):
 
     def test_lookup(self, execute_task):
         """thetvdb: Test Lookup (ONLINE)"""
+
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvdb_ep_name'] == 'Paternity', \
@@ -63,6 +67,8 @@ class TestThetvdbLookup(object):
             'Failed imdb lookup Doctor Who 2005 S02E03'
 
     def test_unknown_series(self, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         # Test an unknown series does not cause any exceptions
         task = execute_task('test_unknown_series')
         # Make sure it didn't make a false match
@@ -70,6 +76,7 @@ class TestThetvdbLookup(object):
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
     def test_mark_expired(self, execute_task):
+        persist['auth_tokens'] = {'default': None}
 
         def test_run():
             # Run the task and check tvdb data was populated.
@@ -79,24 +86,22 @@ class TestThetvdbLookup(object):
 
         # Run the task once, this populates data from tvdb
         test_run()
+
         # Run the task again, this should load the data from cache
         test_run()
+
         # Manually mark the data as expired, to test cache update
-        session = Session()
-        ep = lookup_episode(name='House', seasonnum=2, episodenum=2, session=session)
-        ep.expired = True
-        ep.series.expired = True
-        session.commit()
-        session.close()
+        with Session() as session:
+            ep = lookup_episode(name='House', season_number=2, episode_number=2, session=session)
+            ep.expired = True
+            ep.series.expired = True
+            session.commit()
+
         test_run()
 
-    def test_date(self, execute_task):
-        task = execute_task('test_date')
-        entry = task.find_entry(title='the daily show 2012-6-6')
-        assert entry
-        assert entry['tvdb_ep_name'] == 'Michael Fassbender'
-
     def test_absolute(self, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('test_absolute')
         entry = task.find_entry(title='naruto 128')
         assert entry
@@ -104,13 +109,12 @@ class TestThetvdbLookup(object):
 
 
 @pytest.mark.online
-class TestThetvdbFavorites(object):
+class TestTVDBFavorites(object):
     """
         Tests thetvdb favorites plugin with a test user at thetvdb.
         Test user info:
         username: flexget
         password: flexget
-        Account ID: 80FB8BD0720CA5EC
         Favorites: House, Doctor Who 2005, Penn & Teller: Bullshit, Hawaii Five-0 (2010)
     """
 
@@ -121,32 +125,37 @@ class TestThetvdbFavorites(object):
               - {title: 'House.S01E02.HDTV.XViD-FlexGet'}
               - {title: 'Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'}
               - {title: 'Lost.S03E02.720p-FlexGet'}
-              - {title: 'Penn.and.Teller.Bullshit.S02E02.720p.x264'}
+              - {title: 'Breaking.Bad.S02E02.720p.x264'}
             configure_series:
               from:
                 thetvdb_favorites:
-                  account_id: 80FB8BD0720CA5EC
+                  username: flexget
+                  password: flexget
           test_strip_dates:
             thetvdb_favorites:
-              account_id: 80FB8BD0720CA5EC
+              username: flexget
+              password: flexget
               strip_dates: yes
     """
 
     def test_favorites(self, execute_task):
-        """thetvdb: Test favorites (ONLINE)"""
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('test')
         assert task.find_entry('accepted', title='House.S01E02.HDTV.XViD-FlexGet'), \
             'series House should have been accepted'
         assert task.find_entry('accepted', title='Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'), \
             'series Doctor Who 2005 should have been accepted'
-        assert task.find_entry('accepted', title='Penn.and.Teller.Bullshit.S02E02.720p.x264'), \
-            'series Penn and Teller Bullshit should have been accepted'
+        assert task.find_entry('accepted', title='Breaking.Bad.S02E02.720p.x264'), \
+            'series Breaking Bad should have been accepted'
         entry = task.find_entry(title='Lost.S03E02.720p-FlexGet')
         assert entry, 'Entry not found?'
         assert entry not in task.accepted, \
             'series Lost should not have been accepted'
 
     def test_strip_date(self, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('test_strip_dates')
         assert task.find_entry(title='Hawaii Five-0'), \
             'series Hawaii Five-0 (2010) should have date stripped'
