@@ -135,7 +135,10 @@ class MovieListAPI(APIResource):
         """ Create a new list """
         data = request.json
         name = data.get('name')
-        movie_list = ml.get_list_by_exact_name(name=name, session=session)
+        try:
+            movie_list = ml.get_list_by_exact_name(name=name, session=session)
+        except NoResultFound:
+            movie_list = None
         if movie_list:
             return {'status': 'error',
                     'message': "list with name '%s' already exists" % name}, 500
