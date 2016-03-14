@@ -224,14 +224,6 @@ def get_movie_by_id(list_id, movie_id, session=None):
 
 
 @with_session
-def delete_list_by_id(list_id, session=None):
-    movie_list = get_list_by_id(list_id=list_id, session=session)
-    if movie_list:
-        log.debug('deleting list with id %d', list_id)
-        session.delete(movie_list)
-
-
-@with_session
 def get_movie_by_title(list_id, title, session=None):
     movie_list = get_list_by_id(list_id=list_id, session=session)
     if movie_list:

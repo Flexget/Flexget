@@ -155,21 +155,22 @@ class MovieListListAPI(APIResource):
     def get(self, list_id, session=None):
         """ Get list by ID """
         try:
-            list = ml.get_list_by_id(list_id=list_id, session=session)
+            movie_list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
-        return jsonify(list.to_dict())
+        return jsonify(movie_list.to_dict())
 
     @api.response(200, model=empty_response)
     @api.response(404, model=default_error_schema)
     def delete(self, list_id, session=None):
         """ Delete list by ID """
         try:
-            ml.delete_list_by_id(list_id=list_id, session=session)
+            movie_list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
+        session.delete(movie_list)
         return {}
 
 
@@ -212,7 +213,7 @@ class MovieListMoviesAPI(APIResource):
             'session': session
         }
         try:
-            list = ml.get_list_by_id(list_id=list_id, session=session)
+            movie_list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
@@ -228,14 +229,14 @@ class MovieListMoviesAPI(APIResource):
     def post(self, list_id, session=None):
         """ Add movies to list by ID """
         try:
-            list = ml.get_list_by_id(list_id=list_id, session=session)
+            movie_list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
         data = request.json
 
         # Validates ID type based on allowed ID
-        # TODO pass this to json shcema validation
+        # TODO pass this to json schema validation
         for id_name in data.get('movie_identifiers'):
             if set(id_name.keys()) & set(allowed_ids) == set([]):
                 return {'status': 'error',
