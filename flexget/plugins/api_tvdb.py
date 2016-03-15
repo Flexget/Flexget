@@ -10,7 +10,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from flexget import db_schema
 from flexget.utils import requests
-from flexget.utils.database import Session, with_session, text_date_synonym
+from flexget.utils.database import with_session, text_date_synonym, pipe_list_synonym
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('api_tvdb')
@@ -142,6 +142,8 @@ class TVDBSeries(Base):
 
     _first_aired = Column('first_aired', DateTime)
     first_aired = text_date_synonym('_first_aired')
+    _aliases = Column(Unicode)
+    aliases = pipe_list_synonym('_aliases')
 
     _genres = relation('TVDBGenre', secondary=genres_table)
     genres = association_proxy('_genres', 'name', creator=lambda g: TVDBGenre(name=g))
@@ -172,6 +174,7 @@ class TVDBSeries(Base):
         self.zap2it_id = series['zap2itId']
         self.first_aired = series['firstAired']
         self.expired = False
+        self.aliases = series['aliases']
         self._banner = series['banner']
 
         self._genres = get_db_genres(series['genre'], session=session)
@@ -357,7 +360,7 @@ class TVDBSearchResult(Base):
     __tablename__ = 'tvdb_search_results'
 
     id = Column(Integer, primary_key=True)
-    search = Column(Unicode, nullable=False)
+    search = Column(Unicode, nullable=False, unique=True)
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=True)
     series = relation(TVDBSeries, backref='search_strings')
 
@@ -442,8 +445,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         # There was no series found in the cache, do a lookup from tvdb
         log.debug('Series %s not found in cache, looking up from tvdb.', id_str())
         if tvdb_id:
-            series = TVDBSeries()
-            series.id = tvdb_id
+            series = TVDBSeries(id=tvdb_id)
             series.update(session)
             if series.name:
                 session.add(series)
@@ -456,13 +458,21 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
                     series.id = tvdb_id
                     series.update(session)
                     session.add(series)
-                if name.lower() != series.name.lower():
-                    session.add(TVDBSearchResult(search=name, series=series))
 
     if not series:
         raise LookupError('No results found from tvdb for %s' % id_str())
     if not series.name:
         raise LookupError('Tvdb result for series does not have a title.')
+
+    search_names = [a for a in series.aliases] + [series.name]
+    for search_name in search_names:
+        search_result = session.query(TVDBSearchResult).filter(TVDBSearchResult.search == search_name.lower()).first()
+        if not search_result:
+            search_result = TVDBSearchResult(search=search_name.lower())
+        search_result.series_id = tvdb_id
+        search_result.series = series
+        session.merge(search_result)
+
     session.commit()
     return series
 

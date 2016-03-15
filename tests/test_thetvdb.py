@@ -1,12 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import re
 from datetime import datetime
-
 import pytest
-
 from flexget.manager import Session
-from flexget.plugins.api_tvdb import lookup_episode
-from flexget.plugins.api_tvdb import persist
+from flexget.plugins.api_tvdb import persist, lookup_episode, TVDBSearchResult
 from flexget.plugins.input.thetvdb_favorites import TVDBUserFavorite
 
 
@@ -99,6 +96,13 @@ class TestTVDBLookup(object):
                                             'the paternity of the patient infuriates Dr. Cuddy and the teenager\'s ' \
                                             'parents, but may just pay off in spades.'
         assert entry['tvdb_ep_rating'] == 7.8
+
+        with Session() as session:
+            # Ensure search cache was added
+            search_names = [s.search for s in session.query(TVDBSearchResult).filter(TVDBSearchResult.series_id == 73255).all()]
+            assert 'house' in search_names
+            assert 'house m.d.' in search_names
+            assert 'house md' in search_names
 
     def test_unknown_series(self, execute_task):
         persist['auth_tokens'] = {'default': None}
@@ -197,7 +201,6 @@ class TestTVDBFavorites(object):
 
 @pytest.mark.online
 class TestTVDBSubmit(object):
-
     config = """
         tasks:
           add:
