@@ -14,7 +14,9 @@ from contextlib import contextmanager
 import mock
 import pytest
 from path import Path
+from future.backports.http import client as backport_client
 from vcr import VCR
+from vcr.stubs import VCRHTTPSConnection, VCRHTTPConnection
 
 import flexget.logger
 from flexget.manager import Manager
@@ -24,13 +26,20 @@ from flexget.webserver import User
 from flexget.manager import Session
 from flexget.api import app
 
-log = logging.getLogger('tests')
 
+log = logging.getLogger('tests')
 
 VCR_CASSETTE_DIR = os.path.join(os.path.dirname(__file__), 'cassettes')
 VCR_RECORD_MODE = os.environ.get('VCR_RECORD_MODE', 'once')
 
-vcr = VCR(cassette_library_dir=VCR_CASSETTE_DIR, record_mode=VCR_RECORD_MODE)
+vcr = VCR(
+    cassette_library_dir=VCR_CASSETTE_DIR,
+    record_mode=VCR_RECORD_MODE,
+    custom_patches=(
+        (backport_client, 'HTTPSConnection', VCRHTTPSConnection),
+        (backport_client, 'HTTPConnection', VCRHTTPConnection),
+    )
+)
 
 
 # --- These are the public fixtures tests can ask for ---
@@ -192,6 +201,12 @@ def filecopy(request):
 @pytest.fixture()
 def no_requests(monkeypatch):
     monkeypatch.setattr("requests.sessions.Session.request",
+                        mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online')))
+    # PY2
+    monkeypatch.setattr("future.backports.urllib.request.build_opener",
+                        mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online')))
+    # PY3
+    monkeypatch.setattr("urllib.request.build_opener",
                         mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online')))
 
 
