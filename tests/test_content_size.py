@@ -17,7 +17,7 @@ class TestTorrentSize(object):
 
           test_max:
             mock:
-              - {title: 'test', file: __tmp__/'test.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
             accept_all: yes
             content_size:
               max: 10
