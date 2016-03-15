@@ -464,7 +464,10 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     if not series.name:
         raise LookupError('Tvdb result for series does not have a title.')
 
-    search_names = [a for a in series.aliases] + [series.name]
+    search_names = [series.name]
+    if series.aliases:
+        search_names = [a for a in series.aliases] + search_names
+
     for search_name in search_names:
         search_result = session.query(TVDBSearchResult).filter(TVDBSearchResult.search == search_name.lower()).first()
         if not search_result:
