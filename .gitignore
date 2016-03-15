@@ -40,3 +40,4 @@ flexget/ui/app/
 cherrypy
 pip-selfcheck.json
 npm-debug.log
+.config-lock

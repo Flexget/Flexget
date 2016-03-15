@@ -1,5 +1,4 @@
-<md-list-item class="md-3-line">
-    <md-card flex>
+<md-card>
     	<md-card-title>
         	<md-card-title-text>
     			{{ ::vm.episode.episode_identifier }}
@@ -12,7 +11,7 @@
                         <h3><i ng-if="release.release_downloaded" class="fa fa-download"></i> {{ ::release.release_title }}</h3>
     				    <p>{{ ::release.release_quality }}</p>
                     </div>
-                    <md-menu>
+                    <md-menu class="md-secondary">
                         <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
                             <md-icon><i class="fa fa-ellipsis-v"></i></md-icon>
                         </md-button>
@@ -35,9 +34,27 @@
 	  	<md-card-actions layout="row" layout-align="end center">
             <md-button ng-if="!vm.releases" class="md-primary md-raised" ng-click="vm.loadReleases()">
             Load Releases</md-button>
-           	<md-button class="md-warn md-raised" ng-click="vm.deleteEpisode()">Delete Episode</md-button>
-            <md-button class="md-warn md-raised" ng-click="vm.deleteReleases()">Delete Releases</md-button>
-            <md-button class="md-warn md-raised" ng-click="vm.resetReleases()">Reset Releases</md-button>
+            <md-menu>
+                <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
+                    <md-icon><i class="fa fa-ellipsis-v"></i></md-icon>
+                </md-button>
+                <md-menu-content width="3">
+                    <md-menu-item>
+                        <md-button ng-click="vm.deleteEpisode()">
+                            Delete Episode
+                        </md-button>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <md-button ng-click="vm.deleteReleases()">
+                            Delete Releases
+                        </md-button>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <md-button ng-click="vm.resetReleases()">
+                            Reset Releases
+                        </md-button>
+                    </md-menu-item>
+                </md-menu-content>
+            </md-menu>
     	</md-card-actions>
 	</md-card>
-</md-list-item>

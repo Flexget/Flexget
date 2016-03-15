@@ -1,12 +1,10 @@
-<div flex layout-margin>
-    <div layout-gt-sm="row">
-        <md-input-container flex layout-align="end center">
+<div layout="column" flex>
+    <md-input-container>
             <label>Search</label>
             <input ng-model="vm.searchTerm" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }">
         </md-input-container>
-    </div>
-	<md-list>
-        <series-show class="md-3-line" show="show" forget-show="vm.forgetShow(show)" ng-repeat="show in vm.series"></series-show>
-        <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalShows" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
-	</md-list>
+    <md-content layout="row" layout-wrap>
+        <series-show layout="row" show="show" flex="100" flex-gt-md="50" forget-show="vm.forgetShow(show)" ng-repeat="show in vm.series"></series-show>
+    </md-content>
+    <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalShows" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
 </div>

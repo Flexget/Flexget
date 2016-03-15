@@ -110,11 +110,13 @@ class cached(object):
             cache_name = self.name + '_' + hash
             log.debug('cache name: %s (has: %s)' % (cache_name, ', '.join(list(self.cache.keys()))))
 
-            if not task.options.nocache and cache_name in self.cache:
+            cache_value = self.cache.get(cache_name, None)
+
+            if not task.options.nocache and cache_value:
                 # return from the cache
                 log.trace('cache hit')
                 entries = []
-                for entry in self.cache[cache_name]:
+                for entry in cache_value:
                     fresh = copy.deepcopy(entry)
                     entries.append(fresh)
                 if entries:

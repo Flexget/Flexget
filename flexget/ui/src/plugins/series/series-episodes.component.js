@@ -39,6 +39,8 @@
         vm.totalEpisodes = data.total_number_of_episodes;
         vm.pageSize = options.page_size;
 
+        vm.show = data.show;
+
         show = data.show;
         //loadReleases();
       })

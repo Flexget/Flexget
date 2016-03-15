@@ -14,11 +14,9 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode, clean_title
-from flexget.utils.requests import Session
+from flexget.utils.requests import TimedLimiter
 
 log = logging.getLogger('search_sceneaccess')
-
-session = Session()
 
 CATEGORIES = {
     'browse':
@@ -237,6 +235,11 @@ class SceneAccessSearch(object):
         """
             Search for entries on SceneAccess
         """
+
+        session = task.requests
+
+        if 'sceneaccess.eu' not in session.domain_limiters:
+            session.add_domain_limiter(TimedLimiter('sceneaccess.eu', '7 seconds'))
 
         if not session.cookies:
             log.debug('Logging in to %s...' % URL)

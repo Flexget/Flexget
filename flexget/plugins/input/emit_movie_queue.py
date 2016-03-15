@@ -86,8 +86,15 @@ class EmitMovieQueue(object):
                     log.info('quality option of emit_movie_queue is disabled while we figure out how to handle ranges')
                     # entry['title'] += ' %s' % queue_item.quality
                 entries.append(entry)
-                log.debug('Added title and IMDB id to new entry: %s - %s' %
-                          (entry['title'], entry['imdb_id']))
+                if entry.get('imdb_id'):
+                    log.debug('Added title and IMDB id to new entry: %s - %s',
+                              entry['title'], entry['imdb_id'])
+                elif entry.get('tmdb_id'):
+                    log.debug('Added title and TMDB id to new entry: %s - %s',
+                              entry['title'], entry['tmdb_id'])
+                else:
+                    # should this ever happen though?
+                    log.debug('Added title to new entry: %s', entry['title'])
 
         return entries
 

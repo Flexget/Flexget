@@ -141,19 +141,22 @@ class PluginCookies(object):
         config = self.prepare_config(config)
         cookie_type = config.get('type')
         cookie_file = os.path.expanduser(config.get('file'))
-        if cookie_file in self.cookiejars:
+        cj = self.cookiejars.get(cookie_file, None)
+        if cj is not None:
             log.debug('Loading cookiejar from cache.')
-            cj = self.cookiejars[cookie_file]
         elif cookie_type == 'firefox3':
             log.debug('Loading %s cookies' % cookie_type)
             cj = self.sqlite2cookie(cookie_file)
+            self.cookiejars[cookie_file] = cj
         else:
             if cookie_type == 'mozilla':
                 log.debug('Loading %s cookies' % cookie_type)
                 cj = http.cookiejar.MozillaCookieJar()
+                self.cookiejars[cookie_file] = cj
             elif cookie_type == 'lwp':
                 log.debug('Loading %s cookies' % cookie_type)
                 cj = http.cookiejar.LWPCookieJar()
+                self.cookiejars[cookie_file] = cj
             else:
                 raise plugin.PluginError('Unknown cookie type %s' % cookie_type, log)
 
@@ -163,9 +166,6 @@ class PluginCookies(object):
             except (http.cookiejar.LoadError, IOError):
                 import sys
                 raise plugin.PluginError('Cookies could not be loaded: %s' % sys.exc_info()[1], log)
-
-        if cookie_file not in self.cookiejars:
-            self.cookiejars[cookie_file] = cj
 
         # Add cookiejar to our requests session
         task.requests.add_cookiejar(cj)

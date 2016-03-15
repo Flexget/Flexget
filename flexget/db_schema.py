@@ -6,6 +6,7 @@ from past.builtins import basestring
 import logging
 
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.exc import OperationalError
 
 import flexget
 from flexget.event import event
@@ -151,8 +152,12 @@ def reset_schema(plugin, session=None):
     tables = [table_schema(name, session) for name in table_names]
     # Remove the plugin's tables
     for table in tables:
-        table.drop()
-    # Remove the plugin from schema table
+        try:
+            table.drop()
+        except OperationalError as e:
+            if 'no such table' in str(e):
+                continue
+            raise e    # Remove the plugin from schema table
     session.query(PluginSchema).filter(PluginSchema.plugin == plugin).delete()
     # We need to commit our current changes to close the session before calling create_all
     session.commit()
