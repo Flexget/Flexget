@@ -18,6 +18,19 @@
     function seriesEpisodeController($mdDialog, $http, $stateParams, $filter){
       var vm = this;
 
+      var releasesOpen = false;
+      vm.toggleReleases = function() {
+        releasesOpen = !releasesOpen;
+
+        if(releasesOpen && !vm.releases)
+        {
+          vm.loadReleases();
+        }
+      }
+
+      vm.isOpen = function() {
+        return releasesOpen;
+      }
 
       vm.loadReleases = function() {
         var params = {
