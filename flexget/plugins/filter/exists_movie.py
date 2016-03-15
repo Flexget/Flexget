@@ -82,9 +82,10 @@ class FilterExistsMovie(object):
         for folder in config['path']:
             folder = Path(folder).expanduser()
             # see if this path has already been scanned
-            if folder in self.cache:
+            cached_qualities = self.cache.get(folder, None)
+            if cached_qualities:
                 log.verbose('Using cached scan for %s ...' % folder)
-                qualities.update(self.cache[folder])
+                qualities.update(cached_qualities)
                 continue
 
             path_ids = {}
