@@ -1,10 +1,7 @@
 <div layout="column" flex layout-align="center">
     <h1 class="md-headline text-center">{{ vm.show }}</h1>
-    <div layout="row">
         <md-button class="md-primary md-raised" 
-            flex-gt-sm="20" flex-offset-gt-sm="40"
-            flex="40" flex-offset="30" ng-click="vm.goBack()">Back</md-button>
-    </div>
+            ng-click="vm.goBack()">Back</md-button>
 	<md-content layout="row" flex layout-wrap>
         <series-episode 
         	flex="100" flex-gt-md="50" 
