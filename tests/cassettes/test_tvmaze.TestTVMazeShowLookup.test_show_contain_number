@@ -2,37 +2,13 @@ interactions:
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/3.5]
-      method: GET
-      uri: http://api.tvmaze.com/search/shows?q=Detroit%201-8-7
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
+      uri: http://api.tvmaze.com/singlesearch/shows?q=Detroit%201-8-7&embed=cast
     response:
-      body: {string: '[{"score":2.4372447,"show":{"id":998,"url":"http://www.tvmaze.com/shows/998/detroit-1-8-7","name":"Detroit
-          1-8-7","type":"Scripted","language":"English","genres":[],"status":"Ended","runtime":60,"premiered":"2010-09-21","schedule":{"time":"22:00","days":[]},"rating":{"average":9.3},"weight":0,"network":{"id":3,"name":"ABC","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":25043,"thetvdb":164221,"imdb":"tt1578258"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/6/16547.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/6/16547.jpg"},"summary":"<p>Welcome
-          to Detroit Homicide. These are the detectives who dedicate their lives to
-          protecting a city they love. Get an inside<span>rs glimpse at what it means
-          to serve and protect. It''s their city, everything is personal.</span></p>","updated":1426070657,"_links":{"self":{"href":"http://api.tvmaze.com/shows/998"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/98767"}}}}]'}
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [close]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 06 Mar 2016 06:50:08 GMT']
-        Server: [nginx/1.4.6 (Ubuntu)]
-        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/3.5]
-      method: GET
-      uri: http://api.tvmaze.com/shows/998?embed=cast
-    response:
-      body: {string: '{"id":998,"url":"http://www.tvmaze.com/shows/998/detroit-1-8-7","name":"Detroit
+      body: {string: !!python/unicode '{"id":998,"url":"http://www.tvmaze.com/shows/998/detroit-1-8-7","name":"Detroit
           1-8-7","type":"Scripted","language":"English","genres":[],"status":"Ended","runtime":60,"premiered":"2010-09-21","schedule":{"time":"22:00","days":[]},"rating":{"average":9.3},"weight":0,"network":{"id":3,"name":"ABC","country":{"name":"United
           States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":25043,"thetvdb":164221,"imdb":"tt1578258"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/6/16547.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/6/16547.jpg"},"summary":"<p>Welcome
           to Detroit Homicide. These are the detectives who dedicate their lives to
@@ -55,104 +31,44 @@ interactions:
           McDaniel","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/5/13557.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/5/13557.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/6775"}}},"character":{"id":90007,"url":"http://www.tvmaze.com/characters/90007/detroit-1-8-7-sgt-jesse-longford","name":"Sgt.
           Jesse Longford","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/9/23446.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/9/23446.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/90007"}}}}]}}'}
       headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [close]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 06 Mar 2016 06:50:09 GMT']
-        Server: [nginx/1.4.6 (Ubuntu)]
-        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [close]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Tue, 15 Mar 2016 01:27:50 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/3.5]
-      method: GET
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
       uri: http://api.tvmaze.com/shows/998/episodebynumber?season=1&number=16
     response:
-      body: {string: '{"id":98765,"url":"http://www.tvmaze.com/episodes/98765/detroit-1-8-7-1x16-stone-cold","name":"Stone
+      body: {string: !!python/unicode '{"id":98765,"url":"http://www.tvmaze.com/episodes/98765/detroit-1-8-7-1x16-stone-cold","name":"Stone
           Cold","season":1,"number":16,"airdate":"2011-03-08","airtime":"22:00","airstamp":"2011-03-08T22:00:00-05:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/98765"}}}'}
       headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [close]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 06 Mar 2016 06:50:09 GMT']
-        Server: [nginx/1.4.6 (Ubuntu)]
-        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [close]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Tue, 15 Mar 2016 01:27:51 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/3.5]
-      method: GET
-      uri: http://api.tvmaze.com/search/shows?q=Tosh.0
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
+      uri: http://api.tvmaze.com/singlesearch/shows?q=Tosh.0&embed=cast
     response:
-      body: {string: "[{\"score\":3.0041304,\"show\":{\"id\":260,\"url\":\"http://www.tvmaze.com/shows/260/tosh0\"\
-          ,\"name\":\"Tosh.0\",\"type\":\"Variety\",\"language\":\"English\",\"genres\"\
-          :[\"Comedy\"],\"status\":\"Running\",\"runtime\":30,\"premiered\":\"2009-06-04\"\
-          ,\"schedule\":{\"time\":\"22:00\",\"days\":[\"Tuesday\"]},\"rating\":{\"\
-          average\":6.6},\"weight\":3,\"network\":{\"id\":23,\"name\":\"Comedy Central\"\
-          ,\"country\":{\"name\":\"United States\",\"code\":\"US\",\"timezone\":\"\
-          America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":22690,\"\
-          thetvdb\":97731,\"imdb\":\"tt1430587\"},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/1/4676.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/1/4676.jpg\"\
-          },\"summary\":\"<p>Tosh.0 is a weekly topical series that delves into all\
-          \ aspects of the Internet, featuring razor sharp humor and biting commentary\
-          \ from comedian Daniel Tosh. From the absolutely absurd to the incredibly\
-          \ ingenious, the series features viral clips, sketches, and \\\"Web Redemptions\\\
-          \" which give subjects of infamous viral videos a second chance to redeem\
-          \ themselves from the embarrassment with which they've become synonymous.\
-          \ Now in its third hit season, Tosh.0 continues to be cable TV's most trusted\
-          \ source for exhibitionist weirdos, injurious idiots and all things Web.\
-          \ </p>\",\"updated\":1456493709,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/260\"\
-          },\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/611611\"\
-          },\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/627634\"}}}},{\"\
-          score\":0.7859624,\"show\":{\"id\":5137,\"url\":\"http://www.tvmaze.com/shows/5137/gakusen-toshi-asterisk\"\
-          ,\"name\":\"Gakusen Toshi Asterisk\",\"type\":\"Animation\",\"language\"\
-          :\"Japanese\",\"genres\":[],\"status\":\"Running\",\"runtime\":25,\"premiered\"\
-          :\"2015-10-03\",\"schedule\":{\"time\":\"20:30\",\"days\":[\"Saturday\"\
-          ]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":157,\"\
-          name\":\"Animax\",\"country\":{\"name\":\"Japan\",\"code\":\"JP\",\"timezone\"\
-          :\"Asia/Tokyo\"}},\"webChannel\":null,\"externals\":{\"tvrage\":50512,\"\
-          thetvdb\":293996,\"imdb\":null},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/21/54576.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/21/54576.jpg\"\
-          },\"summary\":\"<p>The Academy City on the water, Rikka (otherwise known\
-          \ as Asterisk) is the world's largest stage for the integrated battle entertainment,\
-          \ \\\"Star Wars Festival.\\\" The young boys and girls of the \\\"Starpulse\
-          \ Generation\\\" belonging to the six academies made their wishes with Shining\
-          \ Armaments in their hands, vying for supremacy\u2014Amagiri Ayato is one\
-          \ of them.<br /><br />Ayato arrived at Rikka at the invitation of the Student\
-          \ Council President of the Seidoukan Academy, Claudia, and right after that\
-          \ he incurred the wrath of the \\\"Petalblaze Witch\\\" Julis, and ended\
-          \ up having to duel her.<br /><br />The greatest academy battle entertainment,\
-          \ begins here!</p>\",\"updated\":1451105594,\"_links\":{\"self\":{\"href\"\
-          :\"http://api.tvmaze.com/shows/5137\"},\"previousepisode\":{\"href\":\"\
-          http://api.tvmaze.com/episodes/334794\"},\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/544894\"\
-          }}}}]"}
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [close]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 06 Mar 2016 06:50:10 GMT']
-        Server: [nginx/1.4.6 (Ubuntu)]
-        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/3.5]
-      method: GET
-      uri: http://api.tvmaze.com/shows/260?embed=cast
-    response:
-      body: {string: '{"id":260,"url":"http://www.tvmaze.com/shows/260/tosh0","name":"Tosh.0","type":"Variety","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2009-06-04","schedule":{"time":"22:00","days":["Tuesday"]},"rating":{"average":6.6},"weight":3,"network":{"id":23,"name":"Comedy
+      body: {string: !!python/unicode '{"id":260,"url":"http://www.tvmaze.com/shows/260/tosh0","name":"Tosh.0","type":"Variety","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2009-06-04","schedule":{"time":"22:00","days":["Tuesday"]},"rating":{"average":6.9},"weight":1,"network":{"id":23,"name":"Comedy
           Central","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":22690,"thetvdb":97731,"imdb":"tt1430587"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/4676.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/4676.jpg"},"summary":"<p>Tosh.0
           is a weekly topical series that delves into all aspects of the Internet,
           featuring razor sharp humor and biting commentary from comedian Daniel Tosh.
@@ -161,75 +77,48 @@ interactions:
           viral videos a second chance to redeem themselves from the embarrassment
           with which they''ve become synonymous. Now in its third hit season, Tosh.0
           continues to be cable TV''s most trusted source for exhibitionist weirdos,
-          injurious idiots and all things Web. </p>","updated":1456493709,"_links":{"self":{"href":"http://api.tvmaze.com/shows/260"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/611611"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/627634"}},"_embedded":{"cast":[{"person":{"id":37366,"url":"http://www.tvmaze.com/people/37366/daniel-tosh","name":"Daniel
+          injurious idiots and all things Web. </p>","updated":1457449219,"_links":{"self":{"href":"http://api.tvmaze.com/shows/260"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/627634"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/644124"}},"_embedded":{"cast":[{"person":{"id":37366,"url":"http://www.tvmaze.com/people/37366/daniel-tosh","name":"Daniel
           Tosh","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/4788.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/4788.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/37366"}}},"character":{"id":133725,"url":"http://www.tvmaze.com/characters/133725/tosh0-daniel-tosh","name":"Daniel
           Tosh","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/133725"}}}}]}}'}
       headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [close]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 06 Mar 2016 06:50:11 GMT']
-        Server: [nginx/1.4.6 (Ubuntu)]
-        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [close]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Tue, 15 Mar 2016 01:27:52 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/3.5]
-      method: GET
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
       uri: http://api.tvmaze.com/shows/260/episodebynumber?season=7&number=30
     response:
-      body: {string: '{"id":457679,"url":"http://www.tvmaze.com/episodes/457679/tosh0-7x30-best-of-season-7","name":"Best
+      body: {string: !!python/unicode '{"id":457679,"url":"http://www.tvmaze.com/episodes/457679/tosh0-7x30-best-of-season-7","name":"Best
           of Season 7","season":7,"number":30,"airdate":"2015-12-01","airtime":"22:00","airstamp":"2015-12-01T22:00:00-05:00","runtime":30,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/33/83190.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/33/83190.jpg"},"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/457679"}}}'}
       headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [close]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 06 Mar 2016 06:50:12 GMT']
-        Server: [nginx/1.4.6 (Ubuntu)]
-        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [close]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Tue, 15 Mar 2016 01:27:53 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/3.5]
-      method: GET
-      uri: http://api.tvmaze.com/search/shows?q=Unwrapped%202.0
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
+      uri: http://api.tvmaze.com/singlesearch/shows?q=Unwrapped%202.0&embed=cast
     response:
-      body: {string: '[{"score":2.2980187,"show":{"id":5736,"url":"http://www.tvmaze.com/shows/5736/unwrapped-20","name":"Unwrapped
-          2.0","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"2015-02-02","schedule":{"time":"22:00","days":["Monday"]},"rating":{"average":null},"weight":0,"network":{"id":174,"name":"Cooking
-          Channel","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":47597,"thetvdb":291603,"imdb":"tt4491916"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/22/57200.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/22/57200.jpg"},"summary":"<p><strong><em>\"Unwrapped
-          2.0\"</em></strong> is a fun and fascinating look at the amazing processes,
-          great stories and interesting people behind the creation of America''s favorite
-          snacks. Hosted by Alfonso Ribeiro, Unwrapped 2.0 features everything from
-          classic childhood treats to the latest candy crazes. Whether you like your
-          snacks sweet or savory, crispy or gooey, Unwrapped 2.0 offers behind-the-scenes
-          access to get you a front row seat to see them made.</p>","updated":1453694075,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5736"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/583533"}}}}]'}
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [close]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 06 Mar 2016 06:50:13 GMT']
-        Server: [nginx/1.4.6 (Ubuntu)]
-        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/3.5]
-      method: GET
-      uri: http://api.tvmaze.com/shows/5736?embed=cast
-    response:
-      body: {string: '{"id":5736,"url":"http://www.tvmaze.com/shows/5736/unwrapped-20","name":"Unwrapped
+      body: {string: !!python/unicode '{"id":5736,"url":"http://www.tvmaze.com/shows/5736/unwrapped-20","name":"Unwrapped
           2.0","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"2015-02-02","schedule":{"time":"22:00","days":["Monday"]},"rating":{"average":null},"weight":0,"network":{"id":174,"name":"Cooking
           Channel","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":47597,"thetvdb":291603,"imdb":"tt4491916"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/22/57200.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/22/57200.jpg"},"summary":"<p><strong><em>\"Unwrapped
           2.0\"</em></strong> is a fun and fascinating look at the amazing processes,
@@ -240,73 +129,44 @@ interactions:
           access to get you a front row seat to see them made.</p>","updated":1453694075,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5736"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/583533"}},"_embedded":{"cast":[{"person":{"id":49365,"url":"http://www.tvmaze.com/people/49365/alfonso-ribeiro","name":"Alfonso
           Ribeiro","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/5/12529.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/5/12529.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/49365"}}},"character":{"id":182142,"url":"http://www.tvmaze.com/characters/182142/unwrapped-20-host","name":"Host","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/182142"}}}}]}}'}
       headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [close]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 06 Mar 2016 06:50:14 GMT']
-        Server: [nginx/1.4.6 (Ubuntu)]
-        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [close]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Tue, 15 Mar 2016 01:27:54 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/3.5]
-      method: GET
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
       uri: http://api.tvmaze.com/shows/5736/episodebynumber?season=2&number=6
     response:
-      body: {string: '{"id":387214,"url":"http://www.tvmaze.com/episodes/387214/unwrapped-20-2x06-savor-the-flavor","name":"Savor
+      body: {string: !!python/unicode '{"id":387214,"url":"http://www.tvmaze.com/episodes/387214/unwrapped-20-2x06-savor-the-flavor","name":"Savor
           the Flavor","season":2,"number":6,"airdate":"2015-11-07","airtime":"20:00","airstamp":"2015-11-07T20:00:00-05:00","runtime":30,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/387214"}}}'}
       headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [close]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 06 Mar 2016 06:50:14 GMT']
-        Server: [nginx/1.4.6 (Ubuntu)]
-        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [close]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Tue, 15 Mar 2016 01:27:55 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/3.5]
-      method: GET
-      uri: http://api.tvmaze.com/search/shows?q=Jake%202.0
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
+      uri: http://api.tvmaze.com/singlesearch/shows?q=Jake%202.0&embed=cast
     response:
-      body: {string: '[{"score":2.112077,"show":{"id":2381,"url":"http://www.tvmaze.com/shows/2381/jake-20","name":"Jake
-          2.0","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":60,"premiered":"2003-09-10","schedule":{"time":"21:00","days":["Wednesday"]},"rating":{"average":8.3},"weight":0,"network":{"id":70,"name":"UPN","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":4033,"thetvdb":78898,"imdb":"tt0367344"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/12/32302.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/12/32302.jpg"},"summary":"<p>NSA
-          computer technician Jake Foley is transformed into a secret agent after
-          he is accidentally infected with nanobots, based on nanotechnology that
-          reduce the size of a computer to the molecular level, which give him superhuman
-          powers. With his new abilities, he can hack into anything electronic and
-          control it. His medical and emotional state is carefully watched over by
-          Dr. Diane Hughes, who is far too human for her job with the NSA. Struggling
-          in his early tasks with the NSA, Jake must prove himself and yield results
-          or be locked up for \"research.\"</p>","updated":1452580253,"_links":{"self":{"href":"http://api.tvmaze.com/shows/2381"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/184267"}}}}]'}
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [close]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 06 Mar 2016 06:50:15 GMT']
-        Server: [nginx/1.4.6 (Ubuntu)]
-        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/3.5]
-      method: GET
-      uri: http://api.tvmaze.com/shows/2381?embed=cast
-    response:
-      body: {string: '{"id":2381,"url":"http://www.tvmaze.com/shows/2381/jake-20","name":"Jake
+      body: {string: !!python/unicode '{"id":2381,"url":"http://www.tvmaze.com/shows/2381/jake-20","name":"Jake
           2.0","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":60,"premiered":"2003-09-10","schedule":{"time":"21:00","days":["Wednesday"]},"rating":{"average":8.3},"weight":0,"network":{"id":70,"name":"UPN","country":{"name":"United
           States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":4033,"thetvdb":78898,"imdb":"tt0367344"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/12/32302.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/12/32302.jpg"},"summary":"<p>NSA
           computer technician Jake Foley is transformed into a secret agent after
@@ -328,32 +188,32 @@ interactions:
           Connor Tracy","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/54347.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/54347.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/2943"}}},"character":{"id":143896,"url":"http://www.tvmaze.com/characters/143896/jake-20-diane-hughes","name":"Diane
           Hughes","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/12/32304.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/12/32304.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/143896"}}}}]}}'}
       headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [close]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 06 Mar 2016 06:50:16 GMT']
-        Server: [nginx/1.4.6 (Ubuntu)]
-        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [close]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Tue, 15 Mar 2016 01:27:56 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/3.5]
-      method: GET
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
       uri: http://api.tvmaze.com/shows/2381/episodebynumber?season=1&number=10
     response:
-      body: {string: '{"id":184265,"url":"http://www.tvmaze.com/episodes/184265/jake-20-1x10-the-spy-who-really-liked-me","name":"The
+      body: {string: !!python/unicode '{"id":184265,"url":"http://www.tvmaze.com/episodes/184265/jake-20-1x10-the-spy-who-really-liked-me","name":"The
           Spy Who Really Liked Me","season":1,"number":10,"airdate":"2003-11-19","airtime":"21:00","airstamp":"2003-11-19T21:00:00-05:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/184265"}}}'}
       headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [close]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 06 Mar 2016 06:50:17 GMT']
-        Server: [nginx/1.4.6 (Ubuntu)]
-        X-Powered-By: [PHP/5.5.9-1ubuntu4.14]
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [close]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Tue, 15 Mar 2016 01:27:57 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
 version: 1
