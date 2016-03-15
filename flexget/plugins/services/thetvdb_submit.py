@@ -26,10 +26,10 @@ class TVDBBase(object):
 
     @with_session
     def get_favs(self, username, session=None):
-        favs = session.quert(TVDBUserFavorite).filter(TVDBUserFavorite.username == username).first()
+        favs = session.query(TVDBUserFavorite).filter(TVDBUserFavorite.username == username).first()
         if not favs:
             favs = TVDBUserFavorite(username=username)
-            session.save(favs)
+            session.add(favs)
         return favs
 
 
@@ -48,16 +48,20 @@ class TVDBAdd(TVDBBase):
                 tvdb_id = entry['tvdb_id']
                 series_name = entry.get('series_name', tvdb_id)
 
-                if tvdb_id in tvdb_favorites.series_id:
+                if tvdb_id in tvdb_favorites.series_ids:
                     self.log.verbose('Already a fav %s (%s), skipping...' % (series_name, tvdb_id))
                     continue
 
                 try:
                     req = TVDBRequest(username=config['username'], password=config['password'])
                     req.put('/user/favorites/%s' % tvdb_id)
-                    tvdb_favorites.series_ids.append(tvdb_id)
                 except RequestException as e:
-                    self.log.warning('Error adding %s to tvdb favorites: %s' % (tvdb_id, str(e)))
+                    # 409 is thrown if it was already in the favs
+                    if e.response.status_code != 409:
+                        entry.fail('Error adding %s to tvdb favorites: %s' % (tvdb_id, str(e)))
+                        continue
+
+                tvdb_favorites.series_ids.append(tvdb_id)
 
         task.session.merge(tvdb_favorites)
 
@@ -77,16 +81,20 @@ class TVDBRemove(TVDBBase):
                 tvdb_id = entry['tvdb_id']
                 series_name = entry.get('series_name', tvdb_id)
 
-                if tvdb_id not in tvdb_favorites.series_id:
+                if tvdb_id not in tvdb_favorites.series_ids:
                     self.log.verbose('Not a fav %s (%s), skipping...' % (series_name, tvdb_id))
                     continue
 
                 try:
                     req = TVDBRequest(username=config['username'], password=config['password'])
                     req.delete('/user/favorites/%s' % tvdb_id)
-                    tvdb_favorites.series_ids.remove(tvdb_id)
                 except RequestException as e:
-                    self.log.warning('Error deleting %s from tvdb favorites: %s' % (tvdb_id, str(e)))
+                    # 409 is thrown if it was not in the favs
+                    if e.response.status_code != 409:
+                        entry.fail('Error deleting %s from tvdb favorites: %s' % (tvdb_id, str(e)))
+                        continue
+
+                tvdb_favorites.series_ids.remove(tvdb_id)
 
         task.session.merge(tvdb_favorites)
 
