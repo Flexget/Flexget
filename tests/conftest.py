@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
+from future.utils import PY2
 from builtins import object
 from builtins import str
+
 import logging
 import shutil
 
@@ -200,14 +202,20 @@ def filecopy(request):
 
 @pytest.fixture()
 def no_requests(monkeypatch):
-    monkeypatch.setattr("requests.sessions.Session.request",
-                        mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online')))
-    # PY2
-    monkeypatch.setattr("future.backports.urllib.request.build_opener",
-                        mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online')))
-    # PY3
-    monkeypatch.setattr("urllib.request.build_opener",
-                        mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online')))
+    online_funcs = [
+        'requests.sessions.Session.request',
+        'future.backports.http.client.HTTPConnection.request',
+        'future.backports.http.client.HTTPSConnection.request',
+    ]
+    if PY2:
+        online_funcs.extend(['httplib.HTTPConnection.request',
+                             'httplib.HTTPSConnection.request'])
+    else:
+        online_funcs.extend(['http.client.HTTPConnection.request',
+                             'http.client.HTTPSConnection.request'])
+
+    for func in online_funcs:
+        monkeypatch.setattr(func, mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online')))
 
 
 @pytest.fixture(scope='session', autouse=True)
