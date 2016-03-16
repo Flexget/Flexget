@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
 from flask import jsonify
-from flask_restplus import inputs
 
 from flexget.api import api, APIResource
 from flexget.plugins.api_tvdb import lookup_series, lookup_episode
@@ -57,7 +56,7 @@ episode_object = {
         'director': {'type': 'array', 'items': {'type': 'string'}},
         'writer': {'type': 'array', 'items': {'type': 'string'}},
         'rating': {'type': 'number'},
-        'file_name': {'type': 'string'},
+        'image': {'type': 'string'},
         'first_aired': {'type': 'string'},
         'series_id': {'type': 'integer'}
     }
@@ -95,7 +94,6 @@ episode_parser = api.parser()
 episode_parser.add_argument('season_number', type=int, help='Season number')
 episode_parser.add_argument('ep_number', type=int, help='Episode number')
 episode_parser.add_argument('absolute_number', type=int, help='Absolute episode number')
-episode_parser.add_argument('air_date', type=inputs.date_from_iso8601, help="Air date in the format of '2012-01-01'")
 
 
 @tvdb_api.route('/episode/<int:tvdb_id>/')
