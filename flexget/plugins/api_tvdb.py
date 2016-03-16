@@ -223,14 +223,14 @@ class TVDBSeries(Base):
             'tvdb_id': self.id,
             'last_updated': datetime.fromtimestamp(self.last_updated).strftime('%Y-%m-%d %H:%M:%S'),
             'expired': self.expired,
-            'series_name': self.seriesname,
+            'series_name': self.series_name,
             'language': self.language,
             'rating': self.rating,
             'status': self.status,
             'runtime': self.runtime,
             'airs_time': self.airs_time,
             'airs_dayofweek': self.airs_dayofweek,
-            'content_rating': self.contentrating,
+            'content_rating': self.content_rating,
             'network': self.network,
             'overview': self.overview,
             'imdb_id': self.imdb_id,
@@ -239,7 +239,7 @@ class TVDBSeries(Base):
             'posters': self.posters,
             'genres': self.genres,
             'actors': self.actors,
-            'first_aired': self.firstaired,
+            'first_aired': self.first_aired,
         }
 
 
@@ -275,16 +275,15 @@ class TVDBEpisode(Base):
             'id': self.id,
             'expired': self.expired,
             'last_update': self.last_updated,
-            'season_number': self.seasonnumber,
-            'episode_number': self.episodenumber,
+            'season_number': self.season_number,
+            'episode_number': self.episode_number,
             'absolute_number': self.absolute_number,
-            'episode_name': self.episodename,
+            'episode_name': self.name,
             'overview': self.overview,
             'director': self.director,
             'rating': self.rating,
             'image': self.image,
-            'file_name': self.filename,
-            'first_aired': self.firstaired,
+            'first_aired': self.first_aired,
             'series_id': self.series_id
         }
 

@@ -57,7 +57,7 @@ episode_object = {
         'director': {'type': 'array', 'items': {'type': 'string'}},
         'writer': {'type': 'array', 'items': {'type': 'string'}},
         'rating': {'type': 'number'},
-        'file_name': {'type': 'string'},
+        'image': {'type': 'string'},
         'first_aired': {'type': 'string'},
         'series_id': {'type': 'integer'}
     }
