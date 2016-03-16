@@ -39,7 +39,7 @@ def upgrade(ver, session):
         table = table_schema('simple_persistence', session)
         for row in session.execute(select([table.c.id, table.c.plugin, table.c.key, table.c.value])):
             try:
-                p = pickle.loads(row['value'])
+                pickle.loads(row['value'])
             except Exception as e:
                 log.warning('Couldn\'t load %s:%s removing from db: %s' % (row['plugin'], row['key'], e))
                 session.execute(table.delete().where(table.c.id == row['id']))
@@ -88,6 +88,7 @@ class SimpleKeyValue(Base):
 
     def __repr__(self):
         return "<SimpleKeyValue('%s','%s','%s')>" % (self.task, self.key, self.value)
+
 
 Index('ix_simple_persistence_feed_plugin_key', SimpleKeyValue.task, SimpleKeyValue.plugin, SimpleKeyValue.key)
 
@@ -143,13 +144,16 @@ class SimplePersistence(MutableMapping):
             for pluginname in cls.class_store[task]:
                 for key, value in cls.class_store[task][pluginname].items():
                     query = (session.query(SimpleKeyValue).
-                        filter(SimpleKeyValue.task == task).
-                        filter(SimpleKeyValue.plugin == pluginname).
-                        filter(SimpleKeyValue.key == key))
+                             filter(SimpleKeyValue.task == task).
+                             filter(SimpleKeyValue.plugin == pluginname).
+                             filter(SimpleKeyValue.key == key))
                     if value == DELETE:
                         query.delete()
                     else:
-                        updated = query.update({'value': str(json.dumps(value))}, synchronize_session=False)
+                        updated = query.update(
+                            {'value': str(json.dumps(value, encode_datetime=True))},
+                            synchronize_session=False
+                        )
                         if not updated:
                             session.add(SimpleKeyValue(task, pluginname, key, value))
 
