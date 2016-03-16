@@ -205,7 +205,7 @@ class TVDBSeries(Base):
             except requests.RequestException as e:
                 raise LookupError('Error updating actors from tvdb: %s' % e)
 
-        return [a.name for a in self.actors_list]
+        return self.actors_list
 
     def get_posters(self):
         if not self._posters:
