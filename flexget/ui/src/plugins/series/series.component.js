@@ -16,13 +16,14 @@
       page: 1,
       page_size: 10,
       in_config: 'all',
-      lookup: 'tvmaze'
+      lookup: 'tvdb',
+      sort_by: 'show_name'
     }
 
     vm.searchTerm = "";
 
     function getSeriesList() {
-      $http.get('/api/series/', { params: options, cache: true })
+      $http.get('/api/series/', { params: options })
       .success(function(data) {
         vm.series = data.shows;
 
