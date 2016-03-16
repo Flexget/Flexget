@@ -96,15 +96,10 @@ class FilterTvdb(object):
             'reject_network': {'type': 'array', 'items': {'type': 'string'}},
             'reject_genres': {'type': 'array', 'items': {'type': 'string'}},
             'reject_status': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_languages': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_languages': {'type': 'array', 'items': {'type': 'string'}},
             'accept_actors': {'type': 'array', 'items': {'type': 'string'}},
             'reject_actors': {'type': 'array', 'items': {'type': 'string'}},
-            'accept_writers': {'type': 'array', 'items': {'type': 'string'}},
-            'reject_writers': {'type': 'array', 'items': {'type': 'string'}},
             'accept_directors': {'type': 'array', 'items': {'type': 'string'}},
             'reject_directors': {'type': 'array', 'items': {'type': 'string'}},
-
         },
         'additionalProperties': False
     }
@@ -178,25 +173,12 @@ class FilterTvdb(object):
             if self.is_in_set(config, 'reject_status', entry['tvdb_status']):
                 reasons.append('reject_status')
 
-            if self.is_in_set(config, 'reject_languages', entry['tvdb_language']):
-                reasons.append('reject_languages')
-
-            if not self.is_in_set(config, 'accept_languages', entry['tvdb_language']):
-                reasons.append('accept_languages')
-
             # Accept if actors contains an accepted actor, but don't reject otherwise
             if self.is_in_set(config, 'accept_actors', entry['tvdb_actors'] + entry['tvdb_ep_guest_stars']):
                 force_accept = True
 
             if self.is_in_set(config, 'reject_actors', entry['tvdb_actors'] + entry['tvdb_ep_guest_stars']):
                 reasons.append('reject_genres')
-
-            # Accept if writer is an accepted writer, but don't reject otherwise
-            if self.is_in_set(config, 'accept_writers', entry['tvdb_ep_writer']):
-                force_accept = True
-
-            if self.is_in_set(config, 'reject_writers', entry['tvdb_ep_writer']):
-                reasons.append('reject_writers')
 
             # Accept if director is an accepted director, but don't reject otherwise
             if self.is_in_set(config, 'accept_directors', entry['tvdb_ep_director']):
