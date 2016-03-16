@@ -141,7 +141,7 @@ def json_synonym(name):
         return json.loads(getattr(self, name), decode_datetime=True)
 
     def setter(self, entry):
-        setattr(self, name, unicode(json.dumps(entry, encode_datetime=True)))
+        setattr(self, name, str(json.dumps(entry, encode_datetime=True)))
 
     return synonym(name, descriptor=property(getter, setter))
 
