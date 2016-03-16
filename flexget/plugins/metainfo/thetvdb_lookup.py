@@ -4,6 +4,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
+from flexget.utils.database import with_session
 
 from flexget.plugins.api_tvdb import lookup_series, lookup_episode
 
@@ -33,9 +34,8 @@ class PluginThetvdbLookup(object):
       tvdb_genres
       tvdb_network
       tvdb_overview
-      tvdb_banner_url
-      tvdb_fanart_url
-      tvdb_poster_url
+      tvdb_banner
+      tvdb_posters
       tvdb_airs_day_of_week
       tvdb_actors
       tvdb_language (en, fr, etc.)
@@ -64,14 +64,20 @@ class PluginThetvdbLookup(object):
         'tvdb_genres': 'genres',
         'tvdb_network': 'network',
         'tvdb_overview': 'overview',
-        'tvdb_banner_url': 'banner',
-        'tvdb_posters': 'posters',
+        'tvdb_banner': 'banner',
         'tvdb_airs_day_of_week': 'airs_dayofweek',
-        'tvdb_actors': 'actors',
         'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
         'imdb_id': 'imdb_id',
         'zap2it_id': 'zap2it_id',
-        'tvdb_id': 'id'}
+        'tvdb_id': 'id'
+    }
+
+    series_actor_map = {
+        'tvdb_actors': 'actors',
+    }
+    series_poster_map = {
+        'tvdb_posters': 'posters',
+    }
 
     # Episode info
     episode_map = {
@@ -89,15 +95,24 @@ class PluginThetvdbLookup(object):
 
     schema = {'type': 'boolean'}
 
-    def lazy_series_lookup(self, entry):
-        """Does the lookup for this entry and populates the entry fields."""
+    @with_session(expire_on_commit=False)
+    def series_lookup(self, entry, field_map, session=None):
         try:
-            with Session(expire_on_commit=False) as session:
-                series = lookup_series(entry.get('series_name', eval_lazy=False),
-                                       tvdb_id=entry.get('tvdb_id', eval_lazy=False), session=session)
-                entry.update_using_map(self.series_map, series)
+            series = lookup_series(entry.get('series_name', eval_lazy=False),
+                                   tvdb_id=entry.get('tvdb_id', eval_lazy=False), session=session)
+            entry.update_using_map(field_map, series)
         except LookupError as e:
             log.debug('Error looking up tvdb series information for %s: %s' % (entry['title'], e.args[0]))
+        return entry
+
+    def lazy_series_lookup(self, entry):
+        return self.series_lookup(entry, self.series_map)
+
+    def lazy_series_actor_lookup(self, entry):
+        return self.series_lookup(entry, self.series_actor_map)
+
+    def lazy_series_poster_lookup(self, entry):
+        return self.series_lookup(entry, self.series_poster_map)
 
     def lazy_episode_lookup(self, entry):
         try:
@@ -137,6 +152,8 @@ class PluginThetvdbLookup(object):
             # If there is information for a series lookup, register our series lazy fields
             if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False):
                 entry.register_lazy_func(self.lazy_series_lookup, self.series_map)
+                entry.register_lazy_func(self.lazy_series_actor_lookup, self.series_actor_map)
+                entry.register_lazy_func(self.lazy_series_poster_lookup, self.series_poster_map)
 
                 # If there is season and ep info as well, register episode lazy fields
                 if entry.get('series_id_type') in ('ep', 'sequence', 'date'):
