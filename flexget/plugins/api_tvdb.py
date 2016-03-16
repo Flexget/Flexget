@@ -223,7 +223,7 @@ class TVDBSeries(Base):
             'tvdb_id': self.id,
             'last_updated': datetime.fromtimestamp(self.last_updated).strftime('%Y-%m-%d %H:%M:%S'),
             'expired': self.expired,
-            'series_name': self.series_name,
+            'series_name': self.name,
             'language': self.language,
             'rating': self.rating,
             'status': self.status,
@@ -237,7 +237,7 @@ class TVDBSeries(Base):
             'zap2it_id': self.zap2it_id,
             'banner': self.banner,
             'posters': self.posters,
-            'genres': self.genres,
+            'genres': [g for g in self.genres],
             'actors': self.actors,
             'first_aired': self.first_aired,
         }
