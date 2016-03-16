@@ -16,7 +16,8 @@
       page: 1,
       page_size: 10,
       in_config: 'all',
-      lookup: 'tvmaze'
+      lookup: 'tvdb',
+      sort_by: 'show_name'
     }
 
     vm.searchTerm = "";

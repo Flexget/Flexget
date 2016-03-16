@@ -20,6 +20,10 @@
         $state.go('flexget.episodes', { id: vm.show.show_id });
       };
 
+      vm.alternateName = function() {
+        alert("Not implemented yet, check back soon!");
+      }
+
       vm.setBegin = function(ev) {
         $mdDialog.show({
           controller: 'seriesBeginController',
