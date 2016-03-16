@@ -14,6 +14,7 @@
                 var vm = this;
                 vm.toggle = sideNav.toggle;
                 vm.navItems = sideNav.items;
+                vm.close = sideNav.close;
             }
         }
     }

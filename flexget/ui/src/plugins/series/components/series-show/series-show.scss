@@ -1,6 +1,6 @@
 .rating {
-  margin-top: 10px;
-  i {
+  float: right;
+  md-icon {
     color: gold;
   }
 }
@@ -10,4 +10,13 @@
   .md-media-lg {
     height: 100%;
   }
+}
+
+.second-subhead {
+	padding-top: 0 !important;
+	padding-bottom: 12px;
+}
+
+.card-menu {
+	padding: 0 0 0 6px;
 }
