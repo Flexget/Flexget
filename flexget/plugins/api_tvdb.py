@@ -221,7 +221,7 @@ class TVDBSeries(Base):
     def to_dict(self):
         return {
             'tvdb_id': self.id,
-            'last_updated': datetime.fromtimestamp(self.lastupdated).strftime('%Y-%m-%d %H:%M:%S'),
+            'last_updated': datetime.fromtimestamp(self.last_updated).strftime('%Y-%m-%d %H:%M:%S'),
             'expired': self.expired,
             'series_name': self.seriesname,
             'language': self.language,
@@ -274,7 +274,7 @@ class TVDBEpisode(Base):
         return {
             'id': self.id,
             'expired': self.expired,
-            'last_update': self.lastupdated,
+            'last_update': self.last_updated,
             'season_number': self.seasonnumber,
             'episode_number': self.episodenumber,
             'absolute_number': self.absolute_number,
