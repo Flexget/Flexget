@@ -10,6 +10,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, ApiClient
 from flexget.event import fire_event
+from flexget.plugin import PluginError
 from flexget.plugins.filter import series
 
 series_api = api.namespace('series', description='Flexget Series operations')
@@ -105,6 +106,7 @@ show_object = {
     'properties': {
         'show_id': {'type': 'integer'},
         'show_name': {'type': 'string'},
+        'alternate_names': {'type': 'array', 'items': {'type': 'string'}},
         'begin_episode': begin_object,
         'latest_downloaded_episode': latest_object,
         'in_tasks': {'type': 'array', 'items': {'type': 'string'}}
@@ -154,13 +156,19 @@ episode_schema = {
 }
 episode_schema = api.schema('episode_item', episode_schema)
 
-series_begin_input_schema = {
+series_input_schema = {
     'type': 'object',
     'properties': {
-        'episode_identifier': {'type': 'string'}
-    }
+        'episode_identifier': {'type': 'string'},
+        'alternate_names': {'type': 'array', 'items': {'type': 'string'}}
+    },
+    'anyOf': [
+        {'required': ['episode_identifier']},
+        {'required': ['alternate_names']}
+    ],
+    'additionalProperties:': False
 }
-series_begin_input_schema = api.schema('begin_item', series_begin_input_schema)
+series_input_schema = api.schema('begin_item', series_input_schema)
 
 
 def get_release_details(release):
@@ -227,6 +235,7 @@ def get_series_details(show):
     show_item = {
         'show_id': show.id,
         'show_name': show.name,
+        'alternate_names': [n.alt_name for n in show.alternate_names],
         'begin_episode': begin,
         'latest_downloaded_episode': latest,
         'in_tasks': [_show.name for _show in show.in_tasks]
@@ -447,7 +456,9 @@ class SeriesShowAPI(APIResource):
 
     @api.response(200, 'Episodes for series will be accepted starting with ep_id', show_details_schema)
     @api.response(404, 'Show ID not found', default_error_schema)
-    @api.validate(series_begin_input_schema)
+    @api.response(501, 'Episode Identifier format is incorrect', default_error_schema)
+    @api.response(502, 'Alternate name already exist for a different show', default_error_schema)
+    @api.validate(series_input_schema)
     @api.doc(description='Set a begin episode using a show ID')
     def put(self, show_id, session):
         """ Set the initial episode of an existing show """
@@ -459,12 +470,22 @@ class SeriesShowAPI(APIResource):
                     }, 404
         data = request.json
         ep_id = data.get('episode_identifier')
-        try:
-            series.set_series_begin(show, ep_id)
-        except ValueError as e:
-            return {'status': 'error',
-                    'message': e.args[0]
-                    }, 400
+        alt_names = data.get('alternate_names')
+        if ep_id:
+            try:
+                series.set_series_begin(show, ep_id)
+            except ValueError as e:
+                return {'status': 'error',
+                        'message': e.args[0]
+                        }, 501
+        if alt_names:
+            try:
+                series.set_alt_names(alt_names, show, session)
+            except PluginError as e:
+                return {'status': 'error',
+                        'message': e.value
+                        }, 502
+
         return jsonify(get_series_details(show))
 
 
@@ -475,7 +496,7 @@ class SeriesShowAPI(APIResource):
 class SeriesBeginByNameAPI(APIResource):
     @api.response(200, 'Adding series and setting first accepted episode to ep_id', show_details_schema)
     @api.response(500, 'Show already exists', default_error_schema)
-    @api.validate(series_begin_input_schema)
+    @api.validate(series_input_schema)
     def post(self, name, session):
         """ Create a new show and set its first accepted episode """
         normalized_name = series.normalize_series_name(name)
