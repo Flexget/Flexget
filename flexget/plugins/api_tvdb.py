@@ -10,7 +10,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from flexget import db_schema
 from flexget.utils import requests
-from flexget.utils.database import with_session, text_date_synonym, pipe_list_synonym
+from flexget.utils.database import with_session, text_date_synonym, json_synonym
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('api_tvdb')
@@ -98,11 +98,6 @@ genres_table = Table('tvdb_series_genres', Base.metadata,
                      Column('genre_id', Integer, ForeignKey('tvdb_genres.id')))
 Base.register_table(genres_table)
 
-actors_table = Table('tvdb_series_actors', Base.metadata,
-                     Column('series_id', Integer, ForeignKey('tvdb_series.id')),
-                     Column('actor_id', Integer, ForeignKey('tvdb_actors.id')))
-Base.register_table(genres_table)
-
 
 @with_session
 def get_db_genres(genre_names, session=None):
@@ -138,18 +133,20 @@ class TVDBSeries(Base):
     overview = Column(Unicode)
     imdb_id = Column(Unicode)
     zap2it_id = Column(Unicode)
-    _banner = Column(Unicode)
+    _banner = Column('banner', Unicode)
 
     _first_aired = Column('first_aired', DateTime)
     first_aired = text_date_synonym('_first_aired')
-    _aliases = Column(Unicode)
-    aliases = pipe_list_synonym('_aliases')
+    _aliases = Column('aliases', Unicode)
+    aliases = json_synonym('_aliases')
+    _actors = Column('actors', Unicode)
+    actors_list = json_synonym('_actors')
+    _posters = Column('posters', Unicode)
+    posters_list = json_synonym('_posters')
 
     _genres = relation('TVDBGenre', secondary=genres_table)
     genres = association_proxy('_genres', 'name', creator=lambda g: TVDBGenre(name=g))
 
-    _actors = relation('TVDBActor', secondary=actors_table)
-    _posters = relation('TVDBPoster', backref='series', cascade='all, delete, delete-orphan')
     episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
     def update(self, session):
@@ -180,8 +177,8 @@ class TVDBSeries(Base):
         self._genres = get_db_genres(series['genre'], session=session)
 
         # Reset Actors and Posters so they can be lazy populated
-        self._actors = []
-        self._posters = []
+        self._actors = None
+        self._posters = None
 
     def __repr__(self):
         return '<TVDBSeries name=%s,tvdb_id=%s>' % (self.name, self.id)
@@ -191,50 +188,35 @@ class TVDBSeries(Base):
         if self._banner:
             return TVDBRequest.BANNER_URL + self._banner
 
-    @with_session
-    def get_actors(self, session=None):
-        if not self._actors:
-            log.debug('Looking up actors for series %s' % self.name)
-            try:
-                actors_query = TVDBRequest().get('series/%s/actors' % self.id)
-                if actors_query:
-                    self._actors = [TVDBActor(name=a['name'], id=a['id']) for a in actors_query]
-                else:
-                    self._actors = [TVDBActor(name='No Actors', id=0)]
-            except requests.RequestException as e:
-                raise LookupError('Error updating actors from tvdb: %s' % e)
-
-        return [a.name for a in self._actors]
-
     @property
     def actors(self):
         return self.get_actors()
 
-    @with_session
-    def get_posters(self, session=None):
+    @property
+    def posters(self):
+        return self.get_posters()
+
+    def get_actors(self):
+        if not self._actors:
+            log.debug('Looking up actors for series %s' % self.name)
+            try:
+                actors_query = TVDBRequest().get('series/%s/actors' % self.id)
+                self.actors_list = [a['name'] for a in actors_query] if actors_query else []
+            except requests.RequestException as e:
+                raise LookupError('Error updating actors from tvdb: %s' % e)
+
+        return self.actors_list
+
+    def get_posters(self):
         if not self._posters:
             log.debug('Getting top 5 posters for series %s' % self.name)
             try:
                 poster_query = TVDBRequest().get('series/%s/images/query' % self.id, keyType='poster')
-
-                if poster_query:
-                    self._posters = [
-                        TVDBPoster(
-                            id=p['id'],
-                            file_path=p['fileName'],
-                            resolution=p['resolution'],
-                        ) for p in poster_query[:5]]
-                else:
-                    self._posters = ['undefined.jpg']
-
+                self.posters_list = [p['fileName'] for p in poster_query[:5]] if poster_query else []
             except requests.RequestException as e:
                 raise LookupError('Error updating posters from tvdb: %s' % e)
 
-        return self._posters
-
-    @property
-    def posters(self):
-        return [TVDBRequest.BANNER_URL + p.file_path for p in self.get_posters()]
+        return [TVDBRequest.BANNER_URL + p for p in self.posters_list]
 
     def to_dict(self):
         return {
@@ -261,34 +243,12 @@ class TVDBSeries(Base):
         }
 
 
-class TVDBActor(Base):
-
-    __tablename__ = 'tvdb_actors'
-
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    name = Column(Unicode, nullable=False)
-
-
 class TVDBGenre(Base):
 
     __tablename__ = 'tvdb_genres'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(Unicode, nullable=False, unique=True)
-
-
-class TVDBPoster(Base):
-
-    __tablename__ = 'tvdb_posters'
-
-    id = Column(Integer, primary_key=True)
-    tvdb_id = Column(Integer, ForeignKey('tvdb_series.id'))
-    file_path = Column(Unicode)
-    resolution = Column(Integer)
-
-    @property
-    def url(self):
-        return TVDBRequest.BANNER_URL + self.file_path
 
 
 class TVDBEpisode(Base):
@@ -463,6 +423,9 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         raise LookupError('No results found from tvdb for %s' % id_str())
     if not series.name:
         raise LookupError('Tvdb result for series does not have a title.')
+
+    # Save series to db before adding search results
+    session.commit()
 
     search_names = [series.name]
     if series.aliases:

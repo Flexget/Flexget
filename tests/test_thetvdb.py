@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import re
 from datetime import datetime
 import pytest
+
 from flexget.manager import Session
 from flexget.plugins.api_tvdb import persist, lookup_episode, TVDBSearchResult
 from flexget.plugins.input.thetvdb_favorites import TVDBUserFavorite
@@ -67,7 +68,7 @@ class TestTVDBLookup(object):
         assert entry['tvdb_status'] == 'Ended'
         assert entry['tvdb_air_time'] == ''
         assert entry['tvdb_airs_day_of_week'] == ''
-        assert re.match('http://thetvdb.com/banners/graphical/73255-g[0-9]+.jpg', entry['tvdb_banner_url'])
+        assert re.match('http://thetvdb.com/banners/graphical/73255-g[0-9]+.jpg', entry['tvdb_banner'])
         assert 'http://thetvdb.com/banners/posters/73255-1.jpg' in entry['tvdb_posters']
         assert entry['tvdb_content_rating'] == 'TV-14'
         assert entry['tvdb_episode'] == 2

@@ -92,9 +92,9 @@ class TVDBSeriesSearchApi(APIResource):
 
 
 episode_parser = api.parser()
-episode_parser.add_argument('season_num', type=int, help='Season number')
-episode_parser.add_argument('ep_num', type=int, help='Episode number')
-episode_parser.add_argument('absolute_num', type=int, help='Absolute episode number')
+episode_parser.add_argument('season_number', type=int, help='Season number')
+episode_parser.add_argument('ep_number', type=int, help='Episode number')
+episode_parser.add_argument('absolute_number', type=int, help='Absolute episode number')
 episode_parser.add_argument('air_date', type=inputs.date_from_iso8601, help="Air date in the format of '2012-01-01'")
 
 
@@ -107,18 +107,18 @@ class TVDBEpisodeSearchAPI(APIResource):
     @api.response(500, 'Not enough parameters for lookup', default_error_schema)
     def get(self, tvdb_id, session=None):
         args = episode_parser.parse_args()
-        absolute_num = args.get('absolute_number')
-        season_num = args.get('season_number')
-        ep_num = args.get('ep_num')
+        absolute_number = args.get('absolute_number')
+        season_number = args.get('season_number')
+        ep_number = args.get('ep_number')
 
         kwargs = {'tvdb_id': tvdb_id,
                   'session': session}
 
-        if absolute_num:
-            kwargs['absolutenum'] = absolute_num
-        if season_num and ep_num:
-            kwargs['seasonnum'] = season_num
-            kwargs['episodenum'] = ep_num
+        if absolute_number:
+            kwargs['absolute_number'] = absolute_number
+        if season_number and ep_number:
+            kwargs['season_number'] = season_number
+            kwargs['episode_number'] = ep_number
 
         try:
             episode = lookup_episode(**kwargs)
