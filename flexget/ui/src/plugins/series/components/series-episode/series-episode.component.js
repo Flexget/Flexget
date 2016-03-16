@@ -37,7 +37,7 @@
           downloaded: 'all'
         }
 
-        $http.get('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases', { params: params, cache: true})
+        $http.get('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases', { params: params })
         .success(function(data) {
           vm.releases = data.releases;
         }).error(function(error) {

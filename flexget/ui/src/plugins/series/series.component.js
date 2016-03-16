@@ -22,7 +22,7 @@
     vm.searchTerm = "";
 
     function getSeriesList() {
-      $http.get('/api/series/', { params: options, cache: true })
+      $http.get('/api/series/', { params: options })
       .success(function(data) {
         vm.series = data.shows;
 
