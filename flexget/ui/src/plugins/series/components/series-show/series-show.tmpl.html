@@ -9,7 +9,7 @@
         <h1 class="md-headline">{{ ::vm.show.show_name }}</h1>
         <md-divider></md-divider>
         <div class="md-subhead">Latest: {{ ::(vm.show.latest_downloaded_episode.episode_identifier ? vm.show.latest_downloaded_episode.episode_identifier : 'No yet') }}</div>
-        <div class="md-subhead">Begin Episode: {{ ::(vm.show.begin_episode.episode_identifier ? vm.show.begin_episode.episode_identifier : 'No begin set')
+        <div class="md-subhead">Begin Episode: {{ (vm.show.begin_episode.episode_identifier ? vm.show.begin_episode.episode_identifier : 'No begin set')
         }}</div>
         <md-divider></md-divider>
         <md-chips ng-model="vm.show.lookup.tvmaze.genres" readonly="true">
@@ -32,6 +32,7 @@
       <p>{{ ::vm.show.lookup.tvmaze.summary }}</p>
     </md-card-content>
     <md-card-actions layout="row" layout-align="end end">
+      <md-button class="md-warn md-raised" ng-click="vm.setBegin()">Set Begin</md-button>
       <md-button class="md-primary md-raised" ng-click="vm.gotoEpisodes()">Episodes</md-button>
       <!--<md-button class="md-primary md-raised">Configure</md-button>-->
       <md-button class="md-warn md-raised" ng-click="vm.forgetShow()">Forget</md-button>

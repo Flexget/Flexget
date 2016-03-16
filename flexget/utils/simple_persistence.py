@@ -12,17 +12,16 @@ from collections import MutableMapping, defaultdict
 from datetime import datetime
 import logging
 import pickle
-
-from sqlalchemy import Column, Integer, String, DateTime, PickleType, select, Index
-
+from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, Index
 from flexget import db_schema
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils.database import safe_pickle_synonym
-from flexget.utils.sqlalchemy_utils import table_schema, create_index
+from flexget.utils import json
+from flexget.utils.database import json_synonym
+from flexget.utils.sqlalchemy_utils import table_schema, create_index, table_add_column
 
 log = logging.getLogger('util.simple_persistence')
-Base = db_schema.versioned_base('simple_persistence', 2)
+Base = db_schema.versioned_base('simple_persistence', 4)
 
 # Used to signify that a given key should be deleted from simple persistence on flush
 DELETE = object()
@@ -38,7 +37,7 @@ def upgrade(ver, session):
         table = table_schema('simple_persistence', session)
         for row in session.execute(select([table.c.id, table.c.plugin, table.c.key, table.c.value])):
             try:
-                p = pickle.loads(row['value'])
+                pickle.loads(row['value'])
             except Exception as e:
                 log.warning('Couldn\'t load %s:%s removing from db: %s' % (row['plugin'], row['key'], e))
                 session.execute(table.delete().where(table.c.id == row['id']))
@@ -47,6 +46,16 @@ def upgrade(ver, session):
         log.info('Creating index on simple_persistence table.')
         create_index('simple_persistence', session, 'feed', 'plugin', 'key')
         ver = 2
+    if ver == 2 or ver == 3:
+        table = table_schema('simple_persistence', session)
+        table_add_column(table, 'json', Unicode, session)
+        # Make sure we get the new schema with the added column
+        table = table_schema('simple_persistence', session)
+        for row in session.execute(select([table.c.id, table.c.value])):
+            p = pickle.loads(row['value'])
+            session.execute(table.update().where(table.c.id == row['id']).values(
+                json=json.dumps(p, encode_datetime=True)))
+        ver = 4
     return ver
 
 
@@ -65,8 +74,8 @@ class SimpleKeyValue(Base):
     task = Column('feed', String)
     plugin = Column(String)
     key = Column(String)
-    _value = Column('value', PickleType)
-    value = safe_pickle_synonym('_value')
+    _json = Column('json', Unicode)
+    value = json_synonym('_json')
     added = Column(DateTime, default=datetime.now())
 
     def __init__(self, task, plugin, key, value):
@@ -77,6 +86,7 @@ class SimpleKeyValue(Base):
 
     def __repr__(self):
         return "<SimpleKeyValue('%s','%s','%s')>" % (self.task, self.key, self.value)
+
 
 Index('ix_simple_persistence_feed_plugin_key', SimpleKeyValue.task, SimpleKeyValue.plugin, SimpleKeyValue.key)
 
@@ -132,19 +142,21 @@ class SimplePersistence(MutableMapping):
             for pluginname in cls.class_store[task]:
                 for key, value in cls.class_store[task][pluginname].iteritems():
                     query = (session.query(SimpleKeyValue).
-                        filter(SimpleKeyValue.task == task).
-                        filter(SimpleKeyValue.plugin == pluginname).
-                        filter(SimpleKeyValue.key == key))
+                             filter(SimpleKeyValue.task == task).
+                             filter(SimpleKeyValue.plugin == pluginname).
+                             filter(SimpleKeyValue.key == key))
                     if value == DELETE:
                         query.delete()
                     else:
-                        updated = query.update({'value': value}, synchronize_session=False)
+                        updated = query.update(
+                            {'value': unicode(json.dumps(value, encode_datetime=True))},
+                            synchronize_session=False
+                        )
                         if not updated:
                             session.add(SimpleKeyValue(task, pluginname, key, value))
 
 
 class SimpleTaskPersistence(SimplePersistence):
-
     def __init__(self, task):
         self.task = task
         self.taskname = task.name

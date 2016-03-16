@@ -37,6 +37,7 @@ def main(args=None):
                 manager.start()
         except (IOError, ValueError) as e:
             print('Could not start manager: %s' % e, file=sys.stderr)
+            log.exception(e)
             sys.exit(1)
     except KeyboardInterrupt:
         print('Killed with keyboard interrupt.', file=sys.stderr)

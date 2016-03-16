@@ -123,7 +123,7 @@ class UoccinProcess(object):
                 # series name is unknown at this time
                 try:
                     series = lookup_series(tvdb_id=sid)
-                    ser['name'] = series.seriesname
+                    ser['name'] = series.name
                 except LookupError:
                     self.log.warning('Unable to lookup series %s from tvdb, using raw name.' % sid)
                 # setting
