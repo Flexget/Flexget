@@ -149,7 +149,7 @@ class SimplePersistence(MutableMapping):
                     if value == DELETE:
                         query.delete()
                     else:
-                        updated = query.update({'value': unicode(json.dumps(value))}, synchronize_session=False)
+                        updated = query.update({'value': unicode(json.dumps(value), encode_datetime=True)}, synchronize_session=False)
                         if not updated:
                             session.add(SimpleKeyValue(task, pluginname, key, value))
 
