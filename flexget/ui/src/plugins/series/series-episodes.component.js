@@ -30,7 +30,7 @@
     }
 
     function getEpisodesList() {
-      $http.get('/api/series/' + $stateParams.id + '/episodes', { params: options, cache: true})
+      $http.get('/api/series/' + $stateParams.id + '/episodes', { params: options })
       .success(function(data) {
         vm.episodes = data.episodes; // loadReleases(data.episodes);
         //vm.episodes = data.episodes;

@@ -26,6 +26,21 @@ DATE_FMT = '%Y-%m-%d'
 ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
+class DTDecoder(json.JSONDecoder):
+    def decode(self, obj, **kwargs):
+        if isinstance(obj, basestring):
+            dt_str = obj.lstrip('"').rstrip('"')
+            try:
+                return datetime.datetime.strptime(dt_str, ISO8601_FMT)
+            except (ValueError, TypeError):
+                try:
+                    return datetime.datetime.strptime(dt_str, DATE_FMT)
+                except (ValueError, TypeError):
+                    pass
+
+        return super(DTDecoder, self).decode(obj, **kwargs)
+
+
 def _datetime_encoder(obj):
     if isinstance(obj, datetime.datetime):
         return obj.strftime(ISO8601_FMT)
@@ -84,6 +99,7 @@ def loads(*args, **kwargs):
     """
     if kwargs.pop('decode_datetime', False):
         kwargs['object_hook'] = _datetime_decoder
+        kwargs['cls'] = DTDecoder
     else:
         kwargs['object_hook'] = _empty_unicode_decoder
     return json.loads(*args, **kwargs)
@@ -96,6 +112,7 @@ def load(*args, **kwargs):
     """
     if kwargs.pop('decode_datetime', False):
         kwargs['object_hook'] = _datetime_decoder
+        kwargs['cls'] = DTDecoder
     else:
         kwargs['object_hook'] = _empty_unicode_decoder
     return json.load(*args, **kwargs)
