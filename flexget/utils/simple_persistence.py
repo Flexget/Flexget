@@ -13,16 +13,17 @@ from datetime import datetime
 import logging
 import pickle
 
-from sqlalchemy import Column, Integer, String, DateTime, PickleType, select, Index
+from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, Index
 
 from flexget import db_schema
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils.database import safe_pickle_synonym
-from flexget.utils.sqlalchemy_utils import table_schema, create_index
+from flexget.utils import json
+from flexget.utils.database import json_synonym
+from flexget.utils.sqlalchemy_utils import table_schema, create_index, table_add_column
 
 log = logging.getLogger('util.simple_persistence')
-Base = db_schema.versioned_base('simple_persistence', 2)
+Base = db_schema.versioned_base('simple_persistence', 3)
 
 # Used to signify that a given key should be deleted from simple persistence on flush
 DELETE = object()
@@ -47,6 +48,16 @@ def upgrade(ver, session):
         log.info('Creating index on simple_persistence table.')
         create_index('simple_persistence', session, 'feed', 'plugin', 'key')
         ver = 2
+    if ver == 2:
+        table = table_schema('simple_persistence', session)
+        table_add_column(table, 'json', Unicode, session)
+        # Make sure we get the new schema with the added column
+        table = table_schema('simple_persistence', session)
+        for row in session.execute(select([table.c.id, table.c.value])):
+            p = pickle.loads(row['value'])
+            session.execute(table.update().where(table.c.id == row['id']).values(
+                json=json.dumps(p, encode_datetime=True)))
+        ver = 3
     return ver
 
 
@@ -65,8 +76,8 @@ class SimpleKeyValue(Base):
     task = Column('feed', String)
     plugin = Column(String)
     key = Column(String)
-    _value = Column('value', PickleType)
-    value = safe_pickle_synonym('_value')
+    _json = Column('json', Unicode)
+    value = json_synonym('_json')
     added = Column(DateTime, default=datetime.now())
 
     def __init__(self, task, plugin, key, value):
