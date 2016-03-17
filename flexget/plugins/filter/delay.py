@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType, Index
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, Index
 
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.entry import Entry
-from flexget.utils.database import safe_pickle_synonym
+from flexget.utils.database import json_synonym
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('delay')
@@ -21,8 +21,8 @@ class DelayedEntry(Base):
     task = Column('feed', String)
     title = Column(Unicode)
     expire = Column(DateTime)
-    _entry = Column('entry', PickleType)
-    entry = safe_pickle_synonym('_entry')
+    _entry = Column('entry', Unicode)
+    entry = json_synonym('_entry')
 
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % self.title

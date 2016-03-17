@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, PickleType, Integer, DateTime
+from sqlalchemy import Column, Unicode, Integer, DateTime
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -10,7 +10,7 @@ from flexget.db_schema import versioned_base
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils.database import safe_pickle_synonym
+from flexget.utils.database import json_synonym
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('digest')
@@ -22,8 +22,8 @@ class DigestEntry(Base):
     id = Column(Integer, primary_key=True)
     list = Column(Unicode, index=True)
     added = Column(DateTime, default=datetime.now)
-    _entry = Column('entry', PickleType)
-    entry = safe_pickle_synonym('_entry')
+    _entry = Column('entry', Unicode)
+    entry = json_synonym('_entry')
 
 
 class OutputDigest(object):

@@ -143,17 +143,6 @@ def json_synonym(name):
     return synonym(name, descriptor=property(getter, setter))
 
 
-def entry_synonym(name):
-    """Use json to serialize entry objects for db storage."""
-    def getter(self):
-        return json.loads(getattr(self, name), decode_datetime=True)
-
-    def setter(self, entry):
-        setattr(self, name, unicode(json.dumps(entry, encode_datetime=True)))
-
-    return synonym(name, descriptor=property(getter, setter))
-
-
 class CaseInsensitiveWord(Comparator):
     """Hybrid value representing a string that compares case insensitively."""
 
