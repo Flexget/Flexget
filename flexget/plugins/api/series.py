@@ -98,7 +98,8 @@ episode_object = {
         "episode_premiere_type": {'type': 'string'},
         "episode_number": {'type': 'string'},
         "episode_season": {'type': 'string'},
-        "episode_series_id": {'type': 'string'}
+        "episode_series_id": {'type': 'string'},
+        "episode_number_of_releases": {'type': 'integer'}
     }
 }
 
@@ -245,7 +246,8 @@ def get_episode_details(episode):
         'episode_number': episode.number,
         'episode_series_id': episode.series_id,
         'episode_first_seen': episode.first_seen,
-        'episode_premiere_type': episode.is_premiere
+        'episode_premiere_type': episode.is_premiere,
+        'episode_number_of_releases': len(episode.releases)
     }
     return episode_item
 
