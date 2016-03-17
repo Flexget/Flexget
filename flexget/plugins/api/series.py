@@ -319,6 +319,8 @@ series_list_parser.add_argument('lookup', choices=('tvdb', 'tvmaze'), action='ap
                                 help="Get lookup result for every show by sending another request to lookup API")
 
 
+ep_identifier_doc = "'episode_identifier' should be one of SxxExx, integer or date formatted such as 2012-12-12"
+
 @series_api.route('/')
 class SeriesListAPI(APIResource):
     @api.response(404, 'Page does not exist', default_error_schema)
@@ -405,7 +407,7 @@ class SeriesListAPI(APIResource):
     @api.response(500, 'Show already exists', default_error_schema)
     @api.response(501, 'Episode Identifier format is incorrect', default_error_schema)
     @api.response(502, 'Alternate name already exist for a different show', default_error_schema)
-    @api.validate(series_input_schema)
+    @api.validate(series_input_schema, description=ep_identifier_doc)
     def post(self, session):
         """ Create a new show and set its first accepted episode and/or alternate names """
         data = request.json
@@ -506,8 +508,9 @@ class SeriesShowAPI(APIResource):
     @api.response(404, 'Show ID not found', default_error_schema)
     @api.response(501, 'Episode Identifier format is incorrect', default_error_schema)
     @api.response(502, 'Alternate name already exist for a different show', default_error_schema)
-    @api.validate(series_edit_schema)
-    @api.doc(description='Set a begin episode using a show ID')
+    @api.validate(series_edit_schema, description=ep_identifier_doc)
+    @api.doc(description='Set a begin episode or alternate names using a show ID. Note that alternate names override '
+                         'the existing names (if name does not belong to a different show).')
     def put(self, show_id, session):
         """ Set the initial episode of an existing show """
         try:
