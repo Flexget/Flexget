@@ -80,7 +80,12 @@ class TMDBMovie(Base):
     genres = association_proxy('_genres', 'name')
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
-    def update_from_tmdb(self):
+    def __init__(self, id):
+        """
+        Looks up movie on tmdb and creates a new database model for it.
+        These instances should only be added to a session via `session.merge`.
+        """
+        self.id = id
         try:
             movie = tmdb_request('movie/{}'.format(self.id), append_to_response='alternative_titles,images')
         except requests.RequestException as e:
@@ -213,10 +218,8 @@ class ApiTmdb(object):
                     refresh_time += timedelta(days=age_in_years * 5)
             if movie.updated < datetime.now() - refresh_time and not only_cached:
                 log.debug('Cache has expired for %s, attempting to refresh from TMDb.', movie.name)
-                # Detach this instance from the session while we update it, then merge it back in after
-                updated_movie = TMDBMovie(id=movie.id)
                 try:
-                    updated_movie.update_from_tmdb()
+                    updated_movie = TMDBMovie(id=movie.id)
                 except LookupError:
                     log.error('Error refreshing movie details from TMDb, cached info being used.')
                 else:
@@ -250,7 +253,6 @@ class ApiTmdb(object):
                 session.add(TMDBSearchResult(search=search_string, movie_id=tmdb_id))
             if tmdb_id:
                 movie = TMDBMovie(id=tmdb_id)
-                movie.update_from_tmdb()
                 movie = session.merge(movie)
             else:
                 raise LookupError('Unable to find movie on tmdb: {}'.format(id_str))
