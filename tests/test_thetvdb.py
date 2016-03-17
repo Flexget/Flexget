@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import re
 from datetime import datetime
+import mock
 import pytest
 
 from flexget.manager import Session
@@ -8,6 +9,7 @@ from flexget.plugins.api_tvdb import persist, lookup_episode, TVDBSearchResult
 from flexget.plugins.input.thetvdb_favorites import TVDBUserFavorite
 
 
+@mock.patch('flexget.plugins.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestTVDBLookup(object):
     config = """
@@ -50,7 +52,7 @@ class TestTVDBLookup(object):
 
     """
 
-    def test_lookup(self, execute_task):
+    def test_lookup(self, mocked_expired, execute_task):
         """thetvdb: Test Lookup (ONLINE)"""
         persist['auth_tokens'] = {'default': None}
 
@@ -105,7 +107,7 @@ class TestTVDBLookup(object):
             assert 'house m.d.' in search_names
             assert 'house md' in search_names
 
-    def test_unknown_series(self, execute_task):
+    def test_unknown_series(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
 
         # Test an unknown series does not cause any exceptions
@@ -114,7 +116,7 @@ class TestTVDBLookup(object):
         entry = task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
-    def test_mark_expired(self, execute_task):
+    def test_mark_expired(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
 
         def test_run():
@@ -138,7 +140,7 @@ class TestTVDBLookup(object):
 
         test_run()
 
-    def test_absolute(self, execute_task):
+    def test_absolute(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
 
         task = execute_task('test_absolute')
@@ -147,6 +149,7 @@ class TestTVDBLookup(object):
         assert entry['tvdb_ep_name'] == 'A Cry on Deaf Ears'
 
 
+@mock.patch('flexget.plugins.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestTVDBFavorites(object):
     """
@@ -177,7 +180,7 @@ class TestTVDBFavorites(object):
               strip_dates: yes
     """
 
-    def test_favorites(self, execute_task):
+    def test_favorites(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
 
         task = execute_task('test')
@@ -192,7 +195,7 @@ class TestTVDBFavorites(object):
         assert entry not in task.accepted, \
             'series Lost should not have been accepted'
 
-    def test_strip_date(self, execute_task):
+    def test_strip_date(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
 
         task = execute_task('test_strip_dates')
@@ -200,6 +203,7 @@ class TestTVDBFavorites(object):
             'series Hawaii Five-0 (2010) should have date stripped'
 
 
+@mock.patch('flexget.plugins.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestTVDBSubmit(object):
     config = """
@@ -227,7 +231,7 @@ class TestTVDBSubmit(object):
 
     """
 
-    def test_add(self, execute_task):
+    def test_add(self, mocked_expired, execute_task):
         task = execute_task('add')
         task = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert task
@@ -238,7 +242,7 @@ class TestTVDBSubmit(object):
             assert user_favs
             assert 73255 in user_favs.series_ids
 
-    def test_delete(self, execute_task):
+    def test_delete(self, mocked_expired, execute_task):
         with Session() as session:
             user_favs = TVDBUserFavorite(username='flexget')
             user_favs.series_ids = ['80379']
