@@ -6,12 +6,12 @@
           <md-list>
             <md-list-item ng-repeat="name in vm.params.alternate_names">
               <span>{{ name }}</span>
-              <md-button class="md-icon-button md-raised md-secondary" ng-click="vm.removeName($index)">
+              <!--<md-button class="md-icon-button md-raised md-secondary" ng-click="vm.removeName($index)">
                 <md-icon md-font-set="fa" md-font-icon="fa-remove"></md-icon>
-              </md-button>
+              </md-button>-->
             </md-list-item>
           </md-list>
-          <div layout="row">
+          <!--<div layout="row">
             <md-input-container>
               <label>New name</label>
               <input type="text" required md-no-asterisk name="newName" ng-model="vm.newName" unique unique-array="vm.params.alternate_names">
@@ -24,7 +24,7 @@
                 <md-icon md-font-set="fa" md-font-icon="fa-check"></md-icon>
               </md-button>
             </div>
-          </div>
+          </div>-->
         </div>
       </form>
       <div class="md-dialog-content" ng-if="!vm.params.alternate_names">
@@ -39,7 +39,7 @@
       <md-button ng-click="vm.cancel()" class="md-primary">
         Cancel
       </md-button>
-      <md-button ng-click="vm.save()" class="md-warn">
+      <md-button ng-if="!vm.params.alternate_names" ng-click="vm.save()" class="md-warn">
         Save
       </md-button>
     </md-dialog-actions>
