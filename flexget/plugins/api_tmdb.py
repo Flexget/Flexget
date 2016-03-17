@@ -214,13 +214,13 @@ class ApiTmdb(object):
             if movie.updated < datetime.now() - refresh_time and not only_cached:
                 log.debug('Cache has expired for %s, attempting to refresh from TMDb.', movie.name)
                 # Detach this instance from the session while we update it, then merge it back in after
-                session.expunge(movie)
+                updated_movie = TMDBMovie(id=movie.id)
                 try:
-                    movie.update_from_tmdb()
+                    updated_movie.update_from_tmdb()
                 except LookupError:
                     log.error('Error refreshing movie details from TMDb, cached info being used.')
                 else:
-                    movie = session.merge(movie)
+                    movie = session.merge(updated_movie)
             else:
                 log.debug('Movie %s information restored from cache.', movie.name)
         else:
