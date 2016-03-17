@@ -4,9 +4,9 @@ import logging
 from datetime import datetime, timedelta
 
 from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, func
-from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import relation
+from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
 from flexget.utils import requests
@@ -21,7 +21,6 @@ persist = SimplePersistence('api_tvdb')
 
 
 class TVDBRequest(object):
-
     API_KEY = '4D297D8CFDE0E105'
     BASE_URL = 'https://api-beta.thetvdb.com/'
     BANNER_URL = 'http://thetvdb.com/banners/'
@@ -244,7 +243,6 @@ class TVDBSeries(Base):
 
 
 class TVDBGenre(Base):
-
     __tablename__ = 'tvdb_genres'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -535,8 +533,7 @@ def mark_expired(session=None):
     if not last_check:
         persist['last_check'] = datetime.now()
         return
-
-    if last_check + timedelta(hours=2) < datetime.now():
+    if datetime.now() - last_check <= timedelta(hours=2):
         # It has been less than 2 hour, don't check again
         return
 
@@ -544,7 +541,7 @@ def mark_expired(session=None):
 
     try:
         log.debug("Getting %s updates from thetvdb")
-        updates = TVDBRequest().get('updated/query', fromTime=last_check.strftime("%s"))
+        updates = TVDBRequest().get('updated/query', fromTime=last_check.strftime("%S"))
     except requests.RequestException as e:
         log.error('Could not get update information from tvdb: %s', e)
         return
