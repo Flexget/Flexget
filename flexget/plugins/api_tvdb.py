@@ -533,7 +533,7 @@ def mark_expired(session=None):
     last_check = persist.get('last_check')
 
     if not last_check:
-        persist['last_local'] = datetime.now()
+        persist['last_check'] = datetime.now()
         return
 
     if last_check + timedelta(hours=2) < datetime.now():
