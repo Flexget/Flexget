@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import copy
 import datetime
 from math import ceil
 
@@ -156,7 +157,7 @@ episode_schema = {
 }
 episode_schema = api.schema('episode_item', episode_schema)
 
-series_input_schema = {
+series_edit_object = {
     'type': 'object',
     'properties': {
         'episode_identifier': {'type': 'string'},
@@ -168,7 +169,58 @@ series_input_schema = {
     ],
     'additionalProperties:': False
 }
-series_input_schema = api.schema('begin_item', series_input_schema)
+series_edit_schema = api.schema('series_edit_schema', series_edit_object)
+
+series_input_object = copy.deepcopy(series_edit_object)
+series_input_object['properties']['series_name'] = {'type': 'string'}
+del series_input_object['anyOf']
+series_input_object['required'] = ['series_name']
+
+series_input_schema = api.schema('series_input_schema', series_input_object)
+
+release_object = {
+    'type': 'object',
+    'properties': {
+        'quality': {'type': 'string'},
+        'title': {'type': 'string'},
+        'proper_count': {'type': 'integer'},
+        'downloaded': {'type': 'boolean'}
+    }
+}
+
+episode_object = {
+    'type': 'object',
+    'properties': {
+        'identifier': {'type': 'string'},
+        'identifier_type': {'type': 'string'},
+        'download_age': {'type': 'string'},
+        'releases': {
+            'type': 'array',
+            'items': release_object}
+    }
+}
+
+show_details_schema = {
+    'type': 'object',
+    'properties': {
+        'episodes': {
+            'type': 'array',
+            'items': episode_object
+        },
+        'show': show_object
+    }
+}
+
+shows_schema = {
+    'type': 'object',
+    'properties': {
+        'shows': {
+            'type': 'array',
+            'items': show_object
+        },
+        'number_of_shows': {'type': 'integer'}
+    }
+}
 
 
 def get_release_details(release):
@@ -242,6 +294,9 @@ def get_series_details(show):
     }
     return show_item
 
+
+show_details_schema = api.schema('show_details', show_details_schema)
+shows_schema = api.schema('list_of_shows', shows_schema)
 
 series_list_parser = api.parser()
 series_list_parser.add_argument('in_config', choices=('configured', 'unconfigured', 'all'), default='configured',
@@ -344,53 +399,44 @@ class SeriesListAPI(APIResource):
                     response['shows'][pos]['lookup'].update({endpoint: result})
         return jsonify(response)
 
+    @api.response(200, 'Adding series and setting first accepted episode to ep_id', show_details_schema)
+    @api.response(500, 'Show already exists', default_error_schema)
+    @api.response(501, 'Episode Identifier format is incorrect', default_error_schema)
+    @api.response(502, 'Alternate name already exist for a different show', default_error_schema)
+    @api.validate(series_input_schema)
+    def post(self, session):
+        """ Create a new show and set its first accepted episode and/or alternate names """
+        data = request.json
+        series_name = data.get('series_name')
 
-release_object = {
-    'type': 'object',
-    'properties': {
-        'quality': {'type': 'string'},
-        'title': {'type': 'string'},
-        'proper_count': {'type': 'integer'},
-        'downloaded': {'type': 'boolean'}
-    }
-}
+        normalized_name = series.normalize_series_name(series_name)
+        matches = series.shows_by_exact_name(normalized_name, session=session)
+        if matches:
+            return {'status': 'error',
+                    'message': 'Show `%s` already exist in DB' % series_name
+                    }, 500
+        show = series.Series()
+        show.name = series_name
+        session.add(show)
 
-episode_object = {
-    'type': 'object',
-    'properties': {
-        'identifier': {'type': 'string'},
-        'identifier_type': {'type': 'string'},
-        'download_age': {'type': 'string'},
-        'releases': {
-            'type': 'array',
-            'items': release_object}
-    }
-}
+        ep_id = data.get('episode_identifier')
+        alt_names = data.get('alternate_names')
+        if ep_id:
+            try:
+                series.set_series_begin(show, ep_id)
+            except ValueError as e:
+                return {'status': 'error',
+                        'message': e.args[0]
+                        }, 501
+        if alt_names:
+            try:
+                series.set_alt_names(alt_names, show, session)
+            except PluginError as e:
+                return {'status': 'error',
+                        'message': e.value
+                        }, 502
 
-show_details_schema = {
-    'type': 'object',
-    'properties': {
-        'episodes': {
-            'type': 'array',
-            'items': episode_object
-        },
-        'show': show_object
-    }
-}
-
-shows_schema = {
-    'type': 'object',
-    'properties': {
-        'shows': {
-            'type': 'array',
-            'items': show_object
-        },
-        'number_of_shows': {'type': 'integer'}
-    }
-}
-
-show_details_schema = api.schema('show_details', show_details_schema)
-shows_schema = api.schema('list_of_shows', shows_schema)
+        return jsonify(get_series_details(show))
 
 
 @series_api.route('/search/<string:name>')
@@ -458,7 +504,7 @@ class SeriesShowAPI(APIResource):
     @api.response(404, 'Show ID not found', default_error_schema)
     @api.response(501, 'Episode Identifier format is incorrect', default_error_schema)
     @api.response(502, 'Alternate name already exist for a different show', default_error_schema)
-    @api.validate(series_input_schema)
+    @api.validate(series_edit_schema)
     @api.doc(description='Set a begin episode using a show ID')
     def put(self, show_id, session):
         """ Set the initial episode of an existing show """
@@ -486,36 +532,6 @@ class SeriesShowAPI(APIResource):
                         'message': e.value
                         }, 502
 
-        return jsonify(get_series_details(show))
-
-
-@series_api.route('/<name>')
-@api.doc(description="Add a new show to Flexget's DB and set the 1st initial episode via"
-                     " its body. 'episode_identifier' should be one of SxxExx, integer or date "
-                     "formatted such as 2012-12-12")
-class SeriesBeginByNameAPI(APIResource):
-    @api.response(200, 'Adding series and setting first accepted episode to ep_id', show_details_schema)
-    @api.response(500, 'Show already exists', default_error_schema)
-    @api.validate(series_input_schema)
-    def post(self, name, session):
-        """ Create a new show and set its first accepted episode """
-        normalized_name = series.normalize_series_name(name)
-        matches = series.shows_by_exact_name(normalized_name, session=session)
-        if matches:
-            return {'status': 'error',
-                    'message': 'Show `%s` already exist in DB' % name
-                    }, 500
-        show = series.Series()
-        show.name = name
-        session.add(show)
-        data = request.json
-        ep_id = data.get('episode_identifier')
-        try:
-            series.set_series_begin(show, ep_id)
-        except ValueError as e:
-            return {'status': 'error',
-                    'message': e.args[0]
-                    }, 400
         return jsonify(get_series_details(show))
 
 
