@@ -540,9 +540,10 @@ def mark_expired(session=None):
         # It has been less than 2 hour, don't check again
         return
 
+    last_check = datetime.now()
+
     try:
         log.debug("Getting %s updates from thetvdb")
-        last_check = datetime.now()
         updates = TVDBRequest().get('updated/query', fromTime=last_check.strftime("%s"))
     except requests.RequestException as e:
         log.error('Could not get update information from tvdb: %s', e)
@@ -553,7 +554,7 @@ def mark_expired(session=None):
         for i in range(0, len(seq), 900):
             yield seq[i:i + 900]
 
-    expired_series = [series['id'] for series in updates]
+    expired_series = [series['id'] for series in updates] if updates else []
 
     # Update our cache to mark the items that have expired
     for chunk in chunked(expired_series):
