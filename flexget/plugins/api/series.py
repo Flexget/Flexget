@@ -689,8 +689,7 @@ class SeriesEpisodeAPI(APIResource):
 
 
 release_list_parser = api.parser()
-release_list_parser.add_argument('downloaded', choices=('downloaded', 'not_downloaded', 'all'), default='all',
-                                 help='Filter between release status')
+release_list_parser.add_argument('downloaded', type=inputs.boolean, help='Filter between release status')
 
 release_delete_parser = release_list_parser.copy()
 release_delete_parser.add_argument('delete_seen', type=inputs.boolean, default=False,
@@ -726,12 +725,10 @@ class SeriesReleasesAPI(APIResource):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
         args = release_list_parser.parse_args()
-        downloaded = args['downloaded']
+        downloaded = args.get('downloaded') == True if args.get('downloaded') is not None else None
         release_items = []
         for release in episode.releases:
-            if (downloaded == 'downloaded' and release.downloaded) or \
-                    (downloaded == 'not_downloaded' and not release.downloaded) or \
-                            downloaded == 'all':
+            if downloaded and release.downloaded or downloaded is False and not release.downloaded or not downloaded:
                 release_items.append(get_release_details(release))
 
         return jsonify({
