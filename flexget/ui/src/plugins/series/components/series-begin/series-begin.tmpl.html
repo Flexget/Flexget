@@ -1,0 +1,19 @@
+<md-dialog aria-label="Series Begin" ng-cloak>
+    <md-dialog-content>
+      <div class="md-dialog-content">
+        <h1 class="md-headline">Series Begin</h1>
+        <md-input-container>
+          <label>Begin</label>
+          <input type="text" ng-model="vm.begin">
+        </md-input-container>
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions>
+      <md-button ng-click="vm.cancel()" class="md-primary">
+        Cancel
+      </md-button>
+      <md-button ng-click="vm.save()" class="md-warn">
+        Save
+      </md-button>
+    </md-dialog-actions>
+</md-dialog>
