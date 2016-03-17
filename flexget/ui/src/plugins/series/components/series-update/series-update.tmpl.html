@@ -1,27 +1,32 @@
 <md-dialog aria-label="Series Begin" ng-cloak>
-    <md-dialog-content layout layout-align="center" layout-padding>
-      <div class="md-dialog-content" ng-if="vm.params.alternate_names">
-        <h1 class="md-headline">Series Alternate names</h1>
-        <md-list>
-          <md-list-item ng-repeat="name in vm.params.alternate_names">
-            <span>{{ name }}</span>
-            <md-button class="md-icon-button md-secondary" ng-click="vm.removeName($index)">
-              <md-icon md-font-set="fa" md-font-icon="fa-remove"></md-icon>
-            </md-button>
-          </md-list-item>
-        </md-list>
-        <div layout="row" flex>
-          <md-input-container flex class="md-block md-title">
-            <label>New name</label>
-            <input type="text" ng-model="newName">
-          </md-input-container>
-          <div>
-            <md-button class="md-raised" ng-click="vm.addName(newName)">
-              <md-icon md-font-set="fa" md-font-icon="fa-check"></md-icon>
-            </md-button>
+    <md-dialog-content>
+      <form name="namesForm">
+        <div class="md-dialog-content" ng-if="vm.params.alternate_names" layout="column" layout-padding>
+          <h1 class="md-headline">Series Alternate Names</h1>
+          <md-list>
+            <md-list-item ng-repeat="name in vm.params.alternate_names">
+              <span>{{ name }}</span>
+              <md-button class="md-icon-button md-raised md-secondary" ng-click="vm.removeName($index)">
+                <md-icon md-font-set="fa" md-font-icon="fa-remove"></md-icon>
+              </md-button>
+            </md-list-item>
+          </md-list>
+          <div layout="row">
+            <md-input-container>
+              <label>New name</label>
+              <input type="text" required md-no-asterisk name="newName" ng-model="vm.newName" unique unique-array="vm.params.alternate_names">
+              <div ng-messages="namesForm.newName.$error">
+                <div ng-message="unique">This name is already in the list</div>
+              </div>
+            </md-input-container>
+            <div class="alternate-button">
+              <md-button ng-disabled="namesForm.newName.$invalid" class="md-raised md-icon-button" ng-click="vm.addName()">
+                <md-icon md-font-set="fa" md-font-icon="fa-check"></md-icon>
+              </md-button>
+            </div>
           </div>
         </div>
-      </div>
+      </form>
       <div class="md-dialog-content" ng-if="!vm.params.alternate_names">
         <h1 class="md-headline">Series Begin</h1>
         <md-input-container>

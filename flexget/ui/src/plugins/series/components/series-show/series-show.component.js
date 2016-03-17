@@ -38,7 +38,7 @@
         }
 
         showDialog(params).then(function(data) {
-          vm.show.alternate_names = data.alternate_names;
+          if(data) vm.show.alternate_names = data.alternate_names;
         }, function(err) {
           console.log(err);
         });
@@ -50,7 +50,7 @@
         }
 
         showDialog(params).then(function(data){
-          vm.show.begin_episode = data.begin_episode;
+          if (data) vm.show.begin_episode = data.begin_episode;
         }, function(err) {
           console.log(err);
         });
