@@ -119,9 +119,13 @@ class TestSeriesAPI(object):
 
     def test_new_series_begin(self, execute_task, api_client):
         show = 'Test Show'
-        ep_id = {"episode_identifier": "s01e01"}
+        new_show = {
+            "series_name": show,
+            "episode_identifier": "s01e01",
+            "alternate_names": ['show1', 'show2']
+        }
 
-        rsp = api_client.json_post(('/series/%s' % show), data=json.dumps(ep_id))
+        rsp = api_client.json_post(('/series/'), data=json.dumps(new_show))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
     @patch.object(series, 'show_by_id')
