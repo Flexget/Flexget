@@ -6,6 +6,7 @@ Also allows date and datetime objects to be encoded/decoded.
 """
 from __future__ import unicode_literals, division, absolute_import
 import datetime
+from builtins import str
 
 from flexget.plugin import DependencyError
 
@@ -28,7 +29,7 @@ ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 
 class DTDecoder(json.JSONDecoder):
     def decode(self, obj, **kwargs):
-        if isinstance(obj, basestring):
+        if isinstance(obj, str):
             dt_str = obj.strip('"')
             try:
                 return datetime.datetime.strptime(dt_str, ISO8601_FMT)
