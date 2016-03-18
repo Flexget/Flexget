@@ -83,6 +83,7 @@ class InputThetvdbFavorites(object):
 
         if not user_favorites:
             user_favorites = TVDBUserFavorite(username=config['username'])
+            task.session.add(user_favorites)
 
         if user_favorites.updated and user_favorites.updated > datetime.now() - timedelta(minutes=10):
             log.debug('Using cached thetvdb favorite series information for account %s' % config['username'])
