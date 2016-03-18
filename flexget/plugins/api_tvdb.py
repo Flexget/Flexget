@@ -529,7 +529,7 @@ def mark_expired(session=None):
         # It has been less than 2 hour, don't check again
         return
 
-    last_check = datetime.utcnow()
+    new_last_check = datetime.utcnow()
 
     try:
         # Calculate seconds since epoch minus a minute for buffer
@@ -553,4 +553,4 @@ def mark_expired(session=None):
         episodes_updated = session.query(TVDBEpisode).filter(TVDBEpisode.series_id.in_(chunk)).update({'expired': True}, 'fetch')
         log.debug('%s series and %s episodes marked as expired', series_updated, episodes_updated)
 
-    persist['last_check'] = last_check
+    persist['last_check'] = new_last_check
