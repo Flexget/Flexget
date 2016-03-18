@@ -1,11 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import mock
 import pytest
-
 from flexget.manager import Session
-from flexget.plugins.api_tvdb import persist, lookup_episode, TVDBSearchResult
+from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode
 from flexget.plugins.input.thetvdb_favorites import TVDBUserFavorite
 
 
@@ -28,17 +27,16 @@ class TestTVDBLookup(object):
             series:
               - House
               - Doctor Who 2005
+          test_search_cache:
+            mock:
+              - {title: 'House.S01E02.HDTV.XViD-FlexGet'}
+            series:
+              - House
           test_unknown_series:
             mock:
               - {title: 'Aoeu.Htns.S01E01.htvd'}
             series:
               - Aoeu Htns
-          test_mark_expired:
-            mock:
-              - {title: 'House.S02E02.hdtv'}
-            metainfo_series: yes
-            accept_all: yes
-            disable: [seen]
           test_date:
             mock:
               - title: the daily show 2012-6-6
@@ -100,12 +98,31 @@ class TestTVDBLookup(object):
                                             'parents, but may just pay off in spades.'
         assert entry['tvdb_ep_rating'] == 7.8
 
+    def test_cache(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
+        task = execute_task('test_search_cache')
+        entry = task.find_entry(tvdb_id=73255)
+
+        # Force tvdb lazy eval
+        assert entry['afield']
+
         with Session() as session:
             # Ensure search cache was added
-            search_names = [s.search for s in session.query(TVDBSearchResult).filter(TVDBSearchResult.series_id == 73255).all()]
-            assert 'house' in search_names
-            assert 'house m.d.' in search_names
-            assert 'house md' in search_names
+            search_results = session.query(TVDBSearchResult).all()
+
+            assert len(search_results) == 3
+
+            aliases = ['house', 'house m.d.', 'house md']
+
+            for search_result in search_results:
+                assert search_result.series
+                assert search_result.search in aliases
+
+            # No requests should be sent as we restore from cache
+            with mock.patch('requests.sessions.Session.request',
+                            side_effect=Exception('TVDB should restore from cache')) as _:
+                lookup_series('house m.d.', session=session)
 
     def test_unknown_series(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
@@ -116,7 +133,34 @@ class TestTVDBLookup(object):
         entry = task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
-    def test_mark_expired(self, mocked_expired, execute_task):
+    def test_absolute(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
+        task = execute_task('test_absolute')
+        entry = task.find_entry(title='naruto 128')
+        assert entry
+        assert entry['tvdb_ep_name'] == 'A Cry on Deaf Ears'
+
+
+@pytest.mark.online
+class TestTVDBExpire(object):
+    config = """
+        templates:
+          global:
+            thetvdb_lookup: yes
+            # Access a tvdb field to cause lazy loading to occur
+            set:
+              afield: "{{ tvdb_id }}{{ tvdb_ep_name }}"
+        tasks:
+          test_mark_expired:
+            mock:
+              - {title: 'House.S02E02.hdtv'}
+            metainfo_series: yes
+            accept_all: yes
+            disable: [seen]
+    """
+
+    def test_expire_no_check(self, execute_task):
         persist['auth_tokens'] = {'default': None}
 
         def test_run():
@@ -128,25 +172,58 @@ class TestTVDBLookup(object):
         # Run the task once, this populates data from tvdb
         test_run()
 
-        # Run the task again, this should load the data from cache
-        test_run()
+        # Should not expire as it was checked less then an hour ago
+        persist['last_check'] = datetime.utcnow() - timedelta(hours=1)
+        with mock.patch('requests.sessions.Session.request',
+                        side_effect=Exception('Tried to expire or lookup, less then an hour since last check')) as _:
+            # Ensure series is not marked as expired
+            mark_expired()
+            with Session() as session:
+                ep = session.query(TVDBEpisode)\
+                    .filter(TVDBEpisode.series_id == 73255)\
+                    .filter(TVDBEpisode.episode_number == 2)\
+                    .filter(TVDBEpisode.season_number == 2)\
+                    .first()
+                assert not ep.expired
+                assert not ep.series.expired
 
-        # Manually mark the data as expired, to test cache update
-        with Session() as session:
-            ep = lookup_episode(name='House', season_number=2, episode_number=2, session=session)
-            ep.expired = True
-            ep.series.expired = True
-            session.commit()
-
-        test_run()
-
-    def test_absolute(self, mocked_expired, execute_task):
+    def test_expire_check(self, execute_task):
         persist['auth_tokens'] = {'default': None}
 
-        task = execute_task('test_absolute')
-        entry = task.find_entry(title='naruto 128')
-        assert entry
-        assert entry['tvdb_ep_name'] == 'A Cry on Deaf Ears'
+        def test_run():
+            # Run the task and check tvdb data was populated.
+            task = execute_task('test_mark_expired')
+            entry = task.find_entry(title='House.S02E02.hdtv')
+            assert entry['tvdb_ep_name'] == 'Autopsy'
+
+        # Run the task once, this populates data from tvdb
+        test_run()
+
+        # Should expire
+        persist['last_check'] = datetime.utcnow() - timedelta(hours=3)
+
+        expired_data = [
+            {
+                "id": 73255,
+                "lastUpdated": 1458186055
+            },
+            {
+                "id": 295743,
+                "lastUpdated": 1458186088
+            }
+        ]
+
+        # Ensure series is marked as expired
+        with mock.patch.object(TVDBRequest, 'get', side_effect=[expired_data]) as _:
+            mark_expired()
+            with Session() as session:
+                ep = session.query(TVDBEpisode)\
+                    .filter(TVDBEpisode.series_id == 73255)\
+                    .filter(TVDBEpisode.episode_number == 2)\
+                    .filter(TVDBEpisode.season_number == 2)\
+                    .first()
+                assert ep.expired
+                assert ep.series.expired
 
 
 @mock.patch('flexget.plugins.api_tvdb.mark_expired')
@@ -195,6 +272,12 @@ class TestTVDBFavorites(object):
         assert entry not in task.accepted, \
             'series Lost should not have been accepted'
 
+        with Session() as session:
+            user = session.query(TVDBUserFavorite).filter(TVDBUserFavorite.username == 'flexget').first()
+            assert user
+            assert len(user.series_ids) > 0
+            assert user.series_ids == [78804, 84946, 164541, 73255, 81189]
+
     def test_strip_date(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
 
@@ -232,6 +315,8 @@ class TestTVDBSubmit(object):
     """
 
     def test_add(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('add')
         task = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert task
@@ -243,6 +328,8 @@ class TestTVDBSubmit(object):
             assert 73255 in user_favs.series_ids
 
     def test_delete(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         with Session() as session:
             user_favs = TVDBUserFavorite(username='flexget')
             user_favs.series_ids = ['80379']
