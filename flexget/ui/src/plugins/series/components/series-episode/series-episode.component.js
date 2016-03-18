@@ -80,7 +80,13 @@
           .success(function(data) {
             var index = vm.releases.indexOf(release);
             vm.releases.splice(index, 1);
-            console.log(vm.releases);
+
+            vm.episode.episode_number_of_releases -= 1;
+            if(vm.releases.length == 0) {
+              releasesOpen = false;
+              vm.releases = undefined;
+            }
+
           }).error(function(error) {
             console.log(error);
           });
