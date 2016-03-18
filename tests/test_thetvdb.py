@@ -99,6 +99,8 @@ class TestTVDBLookup(object):
         assert entry['tvdb_ep_rating'] == 7.8
 
     def test_cache(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('test_search_cache')
         entry = task.find_entry(tvdb_id=73255)
 
@@ -307,6 +309,8 @@ class TestTVDBSubmit(object):
     """
 
     def test_add(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('add')
         task = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert task
@@ -318,6 +322,8 @@ class TestTVDBSubmit(object):
             assert 73255 in user_favs.series_ids
 
     def test_delete(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         with Session() as session:
             user_favs = TVDBUserFavorite(username='flexget')
             user_favs.series_ids = ['80379']
