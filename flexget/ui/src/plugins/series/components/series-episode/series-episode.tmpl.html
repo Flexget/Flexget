@@ -5,7 +5,7 @@
     		</md-card-title-text>
         </md-card-title>
 		<md-card-content flex>
-            <md-button flex ng-click="vm.toggleReleases()">
+            <md-button ng-disabled="vm.episode.episode_number_of_releases == 0" flex ng-click="vm.toggleReleases()">
                 Releases
                 <md-icon md-font-set="fa fa-chevron-down" class="md-toggle-icon" ng-class="{ 'toggled' : vm.isOpen() }"></i></md-icon>
             </md-button>
