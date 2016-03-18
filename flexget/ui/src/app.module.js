@@ -6,6 +6,7 @@
     'ui.router',
     'ngMaterial',
     'ngCookies',
+    'ngMessages',
     'angular-loading-bar',
     'flexget.components',
     'flexget.directives',
