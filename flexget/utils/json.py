@@ -29,7 +29,7 @@ ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 class DTDecoder(json.JSONDecoder):
     def decode(self, obj, **kwargs):
         if isinstance(obj, basestring):
-            dt_str = obj.lstrip('"').rstrip('"')
+            dt_str = obj.strip('"')
             try:
                 return datetime.datetime.strptime(dt_str, ISO8601_FMT)
             except (ValueError, TypeError):

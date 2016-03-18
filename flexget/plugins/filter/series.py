@@ -1669,12 +1669,30 @@ def _add_alt_name(alt, db_series, series_name, session):
         else:
             # Alternate name already exists for another series. Not good.
             raise plugin.PluginError('Error adding alternate name for %s. %s is already associated with %s. '
-                                     'Check your config.' % (series_name, alt, db_series_alt.series.name))
+                                     'Check your settings.' % (series_name, alt, db_series_alt.series.name))
     else:
         log.debug('adding alternate name %s for %s into db' % (alt, series_name))
         db_series_alt = AlternateNames(alt)
         db_series.alternate_names.append(db_series_alt)
         log.debug('-> added %s' % db_series_alt)
+
+
+def set_alt_names(alt_names, db_series, session):
+    db_alt_names = []
+    for alt_name in alt_names:
+        db_series_alt = session.query(AlternateNames).filter(AlternateNames.alt_name == alt_name).first()
+        if db_series_alt:
+            if not db_series_alt.series_id == db_series.id:
+                raise plugin.PluginError('Error adding alternate name for %s. "%s" is already associated with %s. '
+                                         'Check your settings.' % (db_series.name, alt_name, db_series_alt.series.name))
+            else:
+                log.debug('alternate name %s already associated with series %s, no change needed', alt_name,
+                          db_series.name)
+                db_alt_names.append(db_series_alt)
+        else:
+            db_alt_names.append(AlternateNames(alt_name))
+            log.debug('adding alternate name %s to series %s', alt_name, db_series.name)
+    db_series.alternate_names[:] = db_alt_names
 
 
 @event('plugin.register')

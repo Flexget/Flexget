@@ -62,6 +62,7 @@ class TestUoccinReader(object):
                 'uoccin_subtitles')
 
 
+@mock.patch('flexget.plugins.api_tvdb.mark_expired')
 @pytest.mark.online
 @pytest.mark.usefixtures('tmpdir')
 class TestUoccinWriters(object):
@@ -91,7 +92,7 @@ class TestUoccinWriters(object):
     """
 
     @pytest.mark.filecopy('uoccin/uoccin.json', '__tmp__/uoccin/uoccin.json')
-    def test_write(self, execute_task):
+    def test_write(self, mock_expired, execute_task):
         execute_task('test_del')
         task = execute_task('test_chk')
         entry = task.find_entry(imdb_id='tt0047034')
