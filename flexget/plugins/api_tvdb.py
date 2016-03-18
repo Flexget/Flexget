@@ -172,8 +172,12 @@ class TVDBSeries(Base):
         self.expired = False
         self.aliases = series['aliases']
         self._banner = series['banner']
-
         self._genres = get_db_genres(series['genre'], session=session)
+
+        search_strings = self.search_strings
+        for name in [self.name.lower()] + ([a.lower() for a in self.aliases] if self.aliases else []):
+            if name not in search_strings:
+                self.search_strings.append(TVDBSearchResult(search=name, series_id=self.id))
 
         # Reset Actors and Posters so they can be lazy populated
         self._actors = None
@@ -378,11 +382,8 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     if tvdb_id:
         series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
     if not series and name:
-        series = session.query(TVDBSeries).filter(func.lower(TVDBSeries.name) == name.lower()).first()
-        if not series:
-            found = session.query(TVDBSearchResult).filter(
-                func.lower(TVDBSearchResult.search) == name.lower()).first()
-            if found and found.series:
+        found = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name.lower()).first()
+        if found and found.series:
                 series = found.series
     if series:
         # Series found in cache, update if cache has expired.
@@ -416,27 +417,18 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
                     series.update(session)
                     session.add(series)
 
+                # Add search result to cache
+                search_result = session.query(TVDBSearchResult).filter(TVDBSearchResult.search == name.lower()).first()
+                if not search_result:
+                    search_result = TVDBSearchResult(search=name.lower())
+                    search_result.series_id = tvdb_id
+                    session.add(search_result)
+
     if not series:
         raise LookupError('No results found from tvdb for %s' % id_str())
     if not series.name:
         raise LookupError('Tvdb result for series does not have a title.')
 
-    # Save series to db before adding search results
-    session.commit()
-
-    search_names = [series.name]
-    if series.aliases:
-        search_names = [a for a in series.aliases] + search_names
-
-    for search_name in search_names:
-        search_result = session.query(TVDBSearchResult).filter(TVDBSearchResult.search == search_name.lower()).first()
-        if not search_result:
-            search_result = TVDBSearchResult(search=search_name.lower())
-        search_result.series_id = tvdb_id
-        search_result.series = series
-        session.merge(search_result)
-
-    session.commit()
     return series
 
 
@@ -531,17 +523,19 @@ def mark_expired(session=None):
     last_check = persist.get('last_check')
 
     if not last_check:
-        persist['last_check'] = datetime.now()
+        persist['last_check'] = datetime.utcnow()
         return
-    if datetime.now() - last_check <= timedelta(hours=2):
+    if datetime.utcnow() - last_check <= timedelta(hours=2):
         # It has been less than 2 hour, don't check again
         return
 
-    last_check = datetime.now()
+    last_check = datetime.utcnow()
 
     try:
-        log.debug("Getting %s updates from thetvdb")
-        updates = TVDBRequest().get('updated/query', fromTime=last_check.strftime("%S"))
+        # Calculate seconds since epoch minus a minute for buffer
+        last_check_epoch = int((last_check - datetime(1970, 1, 1)).total_seconds()) - 60
+        log.debug("Getting updates from thetvdb (%s)" % last_check_epoch)
+        updates = TVDBRequest().get('updated/query', fromTime=last_check_epoch)
     except requests.RequestException as e:
         log.error('Could not get update information from tvdb: %s', e)
         return
@@ -555,9 +549,8 @@ def mark_expired(session=None):
 
     # Update our cache to mark the items that have expired
     for chunk in chunked(expired_series):
-        num = session.query(TVDBSeries).filter(TVDBSeries.id.in_(chunk)).update({'expired': True}, 'fetch')
-        log.debug('%s series marked as expired', num)
+        series_updated = session.query(TVDBSeries).filter(TVDBSeries.id.in_(chunk)).update({'expired': True}, 'fetch')
+        episodes_updated = session.query(TVDBEpisode).filter(TVDBEpisode.series_id.in_(chunk)).update({'expired': True}, 'fetch')
+        log.debug('%s series and %s episodes marked as expired', series_updated, episodes_updated)
 
-    # Save the time of this update
-    session.commit()
     persist['last_check'] = last_check
