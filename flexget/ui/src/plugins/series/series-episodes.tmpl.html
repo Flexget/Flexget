@@ -8,7 +8,7 @@
         	flex="100" flex-gt-md="50" 
         	episode="episode" 
         	delete-episode="vm.deleteEpisode(episode)"
-            delete-releases="vm.deleteReleases(episode)"
+        	show="vm.show"
             reset-releases="vm.resetReleases(episode)" ng-repeat="episode in vm.episodes"></series-episode>
     </md-content>
     <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalEpisodes" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
