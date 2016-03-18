@@ -175,9 +175,13 @@ class TVDBSeries(Base):
         self._genres = get_db_genres(series['genre'], session=session)
 
         search_strings = self.search_strings
-        for name in [self.name.lower()] + ([a.lower() for a in self.aliases] if self.aliases else []):
+        for name in set([self.name.lower()] + ([a.lower() for a in self.aliases] if self.aliases else [])):
             if name not in search_strings:
-                self.search_strings.append(TVDBSearchResult(search=name, series_id=self.id))
+                search_result = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name).first()
+                if not search_result:
+                    search_result = TVDBSearchResult(search=name)
+                search_result.series_id = self.id
+                self.search_strings.append(search_result)
 
         # Reset Actors and Posters so they can be lazy populated
         self._actors = None
