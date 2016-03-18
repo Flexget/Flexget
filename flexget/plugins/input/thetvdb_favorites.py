@@ -14,7 +14,9 @@ from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
+from flexget.utils.database import with_session
 from flexget.plugins.api_tvdb import lookup_series, TVDBRequest
+
 
 log = logging.getLogger('thetvdb_favorites')
 Base = db_schema.versioned_base('thetvdb_favorites', 0)
@@ -76,13 +78,15 @@ class InputThetvdbFavorites(object):
 
     @cached('thetvdb_favorites')
     @plugin.internet(log)
-    def on_task_input(self, task, config):
+    @with_session
+    def on_task_input(self, task, config, session=None):
 
         # Get the cache for this user
-        user_favorites = task.session.query(TVDBUserFavorite).filter(TVDBUserFavorite.username == config['username']).first()
+        user_favorites = session.query(TVDBUserFavorite).filter(TVDBUserFavorite.username == config['username']).first()
 
         if not user_favorites:
             user_favorites = TVDBUserFavorite(username=config['username'])
+            session.add(user_favorites)
 
         if user_favorites.updated and user_favorites.updated > datetime.now() - timedelta(minutes=10):
             log.debug('Using cached thetvdb favorite series information for account %s' % config['username'])
@@ -95,7 +99,6 @@ class InputThetvdbFavorites(object):
 
             # Successfully updated from tvdb, update the database
             user_favorites.updated = datetime.now()
-            task.session.merge(user_favorites)
 
         # Construct list of entries with our series names
         entries = []

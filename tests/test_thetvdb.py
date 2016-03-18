@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import mock
 import pytest
 from flexget.manager import Session
-from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, lookup_episode, TVDBRequest, TVDBEpisode
+from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode
 from flexget.plugins.input.thetvdb_favorites import TVDBUserFavorite
 
 
@@ -271,6 +271,12 @@ class TestTVDBFavorites(object):
         assert entry, 'Entry not found?'
         assert entry not in task.accepted, \
             'series Lost should not have been accepted'
+
+        with Session() as session:
+            user = session.query(TVDBUserFavorite).filter(TVDBUserFavorite.username == 'flexget').first()
+            assert user
+            assert len(user.series_ids) > 0
+            assert user.series_ids == [78804, 84946, 164541, 73255, 81189]
 
     def test_strip_date(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}

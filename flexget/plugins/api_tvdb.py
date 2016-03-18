@@ -175,9 +175,13 @@ class TVDBSeries(Base):
         self._genres = get_db_genres(series['genre'], session=session)
 
         search_strings = self.search_strings
-        for name in [self.name.lower()] + ([a.lower() for a in self.aliases] if self.aliases else []):
+        for name in set([self.name.lower()] + ([a.lower() for a in self.aliases] if self.aliases else [])):
             if name not in search_strings:
-                self.search_strings.append(TVDBSearchResult(search=name, series_id=self.id))
+                search_result = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name).first()
+                if not search_result:
+                    search_result = TVDBSearchResult(search=name)
+                search_result.series_id = self.id
+                self.search_strings.append(search_result)
 
         # Reset Actors and Posters so they can be lazy populated
         self._actors = None
@@ -418,7 +422,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
                     session.add(series)
 
                 # Add search result to cache
-                search_result = session.query(TVDBSearchResult).filter(TVDBSearchResult.search == name.lower()).first()
+                search_result = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name.lower()).first()
                 if not search_result:
                     search_result = TVDBSearchResult(search=name.lower())
                     search_result.series_id = tvdb_id
@@ -529,7 +533,7 @@ def mark_expired(session=None):
         # It has been less than 2 hour, don't check again
         return
 
-    last_check = datetime.utcnow()
+    new_last_check = datetime.utcnow()
 
     try:
         # Calculate seconds since epoch minus a minute for buffer
@@ -553,4 +557,4 @@ def mark_expired(session=None):
         episodes_updated = session.query(TVDBEpisode).filter(TVDBEpisode.series_id.in_(chunk)).update({'expired': True}, 'fetch')
         log.debug('%s series and %s episodes marked as expired', series_updated, episodes_updated)
 
-    persist['last_check'] = last_check
+    persist['last_check'] = new_last_check
