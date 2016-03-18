@@ -418,7 +418,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
                     session.add(series)
 
                 # Add search result to cache
-                search_result = session.query(TVDBSearchResult).filter(TVDBSearchResult.search == name.lower()).first()
+                search_result = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name.lower()).first()
                 if not search_result:
                     search_result = TVDBSearchResult(search=name.lower())
                     search_result.series_id = tvdb_id

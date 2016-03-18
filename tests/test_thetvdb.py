@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import mock
 import pytest
 from flexget.manager import Session
-from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, lookup_episode, TVDBRequest, TVDBEpisode
+from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode
 from flexget.plugins.input.thetvdb_favorites import TVDBUserFavorite
 
 
