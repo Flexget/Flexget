@@ -95,7 +95,6 @@ class InputThetvdbFavorites(object):
 
             # Successfully updated from tvdb, update the database
             user_favorites.updated = datetime.now()
-            task.session.merge(user_favorites)
 
         # Construct list of entries with our series names
         entries = []
