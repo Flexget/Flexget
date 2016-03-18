@@ -33,11 +33,7 @@
       }
 
       vm.loadReleases = function() {
-        var params = {
-          downloaded: 'all'
-        }
-
-        $http.get('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases', { params: params })
+        $http.get('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases')
         .success(function(data) {
           vm.releases = data.releases;
         }).error(function(error) {
