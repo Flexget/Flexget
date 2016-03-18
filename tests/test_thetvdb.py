@@ -272,6 +272,12 @@ class TestTVDBFavorites(object):
         assert entry not in task.accepted, \
             'series Lost should not have been accepted'
 
+        with Session() as session:
+            user = session.query(TVDBUserFavorite).filter(TVDBUserFavorite.username == 'flexget').first()
+            assert user
+            assert len(user.series_ids) > 0
+            assert user.series_ids == [78804, 84946, 164541, 73255, 81189]
+
     def test_strip_date(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
 
