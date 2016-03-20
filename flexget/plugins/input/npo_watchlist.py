@@ -48,10 +48,9 @@ class NPOWatchlist(object):
         'additionalProperties': False
     }
     
-    def _make_path_safe(self, s):
-        s = ''.join(c for c in unicodedata.normalize('NFKD', s)
-                  if unicodedata.category(c) != 'Mn').strip()
-        return re.sub(r'(?u)[^-_.()\w\s.]', '', s)
+    def _strip_accents(self, s):
+        return ''.join(c for c in unicodedata.normalize('NFD', s)
+                  if unicodedata.category(c) != 'Mn')
 
     def _get_profile(self, task, config):
         login_response = task.requests.get('https://mijn.npo.nl/inloggen')
@@ -102,7 +101,7 @@ class NPOWatchlist(object):
             e['url'] = 'http://www.npo.nl' + url
             
             e['series_name'] = title
-            e['series_name_path_safe'] = self._make_path_safe(title)
+            e['series_name_plain'] = self._strip_accents(title)
             e['description'] = listItem.find('p').text
             e['remove_url'] = remove_url
             
