@@ -102,13 +102,13 @@ class TraktSet(MutableSet):
 
     def __contains__(self, entry):
         for item in self.items:
-            if self.config['type'] in ['episodes', 'auto'] and self.episode_match(item, entry):
+            if self.config['type'] in ['episodes', 'auto'] and self.episode_match(entry, item):
                 return True
-            if self.config['type'] in ['seasons', 'auto'] and self.season_match(item, entry):
+            if self.config['type'] in ['seasons', 'auto'] and self.season_match(entry, item):
                 return True
-            if self.config['type'] in ['shows', 'auto'] and self.show_match(item, entry):
+            if self.config['type'] in ['shows', 'auto'] and self.show_match(entry, item):
                 return True
-            if self.config['type'] in ['movies', 'auto'] and self.movie_match(item, entry):
+            if self.config['type'] in ['movies', 'auto'] and self.movie_match(entry, item):
                 return True
 
     def clear(self):
