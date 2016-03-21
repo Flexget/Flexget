@@ -9,8 +9,8 @@
       controller: seriesEpisodeController,
       bindings: {
         episode: '<',
+        show: '<',
         deleteEpisode: '&',
-        deleteReleases: '&',
         resetReleases: '&'
       },
     });
@@ -24,7 +24,7 @@
 
         if(releasesOpen && !vm.releases)
         {
-          vm.loadReleases();
+          loadReleases();
         }
       }
 
@@ -32,12 +32,33 @@
         return releasesOpen;
       }
 
-      vm.loadReleases = function() {
-        var params = {
-          downloaded: 'all'
-        }
+      vm.deleteReleases = function() {
+        var confirm = $mdDialog.confirm()
+          .title('Confirm deleting releases.')
+          .htmlContent("Are you sure you want to delete all releases for <b>" + vm.episode.episode_identifier + "</b> from show " + vm.show + "?\n This also removes all seen releases for this episode!")
+          .ok("Forget")
+          .cancel("No");
 
-        $http.get('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases', { params: params })
+        $mdDialog.show(confirm).then(function() {
+          $http.delete('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases', { params: { delete_seen: true}})
+            .success(function(data) {
+              vm.releases = undefined;
+              vm.episode.episode_number_of_releases = 0;
+              releasesOpen = false;
+            })
+            .error(function(error) {
+              var errorDialog = $mdDialog.alert()
+                .title("Something went wrong")
+                .htmlContent("Oops, something went wrong when trying to forget <b>" + vm.episode.episode_identifier + "</b> from show " + vm.show + ":\n" + error.message)
+                .ok("Ok");
+
+              $mdDialog.show(errorDialog);
+            });
+        });
+      }
+
+      function loadReleases() {
+        $http.get('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases')
         .success(function(data) {
           vm.releases = data.releases;
         }).error(function(error) {
@@ -59,7 +80,13 @@
           .success(function(data) {
             var index = vm.releases.indexOf(release);
             vm.releases.splice(index, 1);
-            console.log(vm.releases);
+
+            vm.episode.episode_number_of_releases -= 1;
+            if(vm.releases.length == 0) {
+              releasesOpen = false;
+              vm.releases = undefined;
+            }
+
           }).error(function(error) {
             console.log(error);
           });

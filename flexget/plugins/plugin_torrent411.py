@@ -13,6 +13,22 @@ from flexget.event import event
 log = logging.getLogger('t411_plugin')
 
 
+def escape_query(query):
+    """
+    Escaping some expression Grey's -> Grey's + Greys + Grey, Marvel's ->Marvel's + Marvels + Marvel etc
+    :param query str:
+    :return:
+    """
+    queries = [query]
+    short_query = re.sub("'", "", query)
+    if query != short_query:
+        queries.append(short_query)
+        very_short_query = re.sub("'[a-z]", "", query)
+        if short_query != very_short_query:
+            queries.append(very_short_query)
+    return queries
+
+
 class T411InputPlugin(object):
     """T411 search/Input plugin.
     Before any usage, please add your credential with
@@ -64,29 +80,26 @@ class T411InputPlugin(object):
     def search(cls, task, entry, config=None):
         proxy = T411Proxy()
         proxy.set_credential()
+
         query = T411InputPlugin.build_request_from(config)
+        if entry.get('series_season'):
+            query.add_season_term(entry['series_season'])
+            query.add_episode_term(entry['series_episode'])
+            search_strings = escape_query(entry['series_name'])
+        else:
+            search_strings = entry.get('search_strings', [entry['title']])
+            search_strings = escape_query(search_strings)
 
-        entries = set()
-        search_strings = []
-        for search_string in entry.get('search_strings', [entry['title']]):
-            search_strings.append(search_string)
-            # Escaping some expression Grey's -> Grey, Marvel's -> Marvel etc
-            short_search_string = re.sub("'", "", search_string)
-            if search_string != short_search_string:
-                search_strings.append(short_search_string)
-                very_short_search_string = re.sub("'[a-z]", "", search_string)
-                if short_search_string != very_short_search_string:
-                    search_strings.append(very_short_search_string)
-
+        produced_entries = set()
         for search_string in search_strings:
             query.expression = search_string
             try:
                 search_result = proxy.search(query)
             except ApiError as e:
                 log.warning("Server send an error message : %d - %s", e.code, e.message)
-            entries.update(search_result)
+            produced_entries.update(search_result)
 
-        return entries
+        return produced_entries
 
 
 class T411LookupPlugin(object):

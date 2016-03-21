@@ -115,6 +115,12 @@ class FriendlySearchQuery(object):
         self.term_names = []
         self.max_results = 10
 
+    def add_season_term(self, season):
+        self.term_names.append("Saison %02d" % season)
+
+    def add_episode_term(self, episode):
+        self.term_names.append("Episode %02d" % episode)
+
 
 T411API_DOMAIN_URL = "api.t411.ch"
 T411API_CATEGORY_TREE_PATH = "/categories/tree/"
@@ -247,6 +253,7 @@ class T411RestClient(object):
         :return:
         """
         url = self.api_template_url % path
+
         request = self.web_session.get(url, params=params)
         try:
             result = request.json()
@@ -313,7 +320,6 @@ class T411RestClient(object):
                     url_params[term_type_key_param] = []
 
                 url_params[term_type_key_param].append(term_id)
-
         return self.get_json(url, params=url_params)
 
     @auth_required
@@ -627,6 +633,7 @@ class T411Proxy(object):
                 log.debug('Category named "%s" resolved by id %d', friendly_query.category_name, category_id)
 
                 if len(friendly_query.term_names) > 0:
+                    log.debug('Resolving terms : %s' % friendly_query.term_names)
                     or_like = (Term.name.like(friendly_query.term_names[0] + '%'))
                     for term_name in friendly_query.term_names[1:]:
                         or_like |= (Term.name.like(term_name + '%'))
