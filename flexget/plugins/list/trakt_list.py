@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
 import re
 from collections import MutableSet
@@ -8,10 +9,9 @@ from requests import RequestException
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.plugins.api_trakt import get_api_url, get_entry_ids, get_session, make_list_slug
 from flexget.utils import json
 from flexget.utils.cached_input import cached
-from flexget.plugins.api_trakt import get_api_url, get_entry_ids, get_session, make_list_slug
-
 
 log = logging.getLogger('trakt_list')
 IMMUTABLE_LISTS = []
@@ -111,6 +111,12 @@ class TraktSet(MutableSet):
             if self.config['type'] in ['movies', 'auto'] and self.movie_match(item, entry):
                 return True
 
+    def clear(self):
+        if self.items:
+            for item in self.items:
+                self.discard(item)
+            self._items = None
+
     # -- Public interface ends here -- #
 
     @property
@@ -118,7 +124,7 @@ class TraktSet(MutableSet):
         if self._items is None:
             session = get_session(account=self.config.get('account'))
             endpoint = self.get_list_endpoint()
-    
+
             log.verbose('Retrieving `%s` list `%s`' % (self.config['type'], self.config['list']))
             try:
                 result = session.get(get_api_url(endpoint))
@@ -129,11 +135,11 @@ class TraktSet(MutableSet):
                     raise plugin.PluginError('Error getting list from trakt.')
             except RequestException as e:
                 raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e.args[0])
-    
+
             if not data:
                 log.warning('No data returned from trakt for %s list %s.' % (self.config['type'], self.config['list']))
-                return
-    
+                return []
+
             entries = []
             list_type = (self.config['type']).rstrip('s')
             for item in data:
@@ -160,7 +166,7 @@ class TraktSet(MutableSet):
                     entries.append(entry)
                 else:
                     log.debug('Invalid entry created? %s' % entry)
-    
+
             self._items = entries
         return self._items
 
@@ -200,7 +206,7 @@ class TraktSet(MutableSet):
                ['trakt_movie_id', 'imdb_id', 'tmdb_id']):
             return True
         if entry1.get('movie_name') and ((entry1.get('movie_name'), entry1.get('movie_year')) ==
-                                         (entry2.get('movie_name'), entry2.get('movie_year'))):
+                                             (entry2.get('movie_name'), entry2.get('movie_year'))):
             return True
         return False
 
@@ -242,7 +248,7 @@ class TraktSet(MutableSet):
         else:
             args = ('users', self.config['username'], 'lists', make_list_slug(self.config['list']), 'items')
         if remove:
-            args += ('remove', )
+            args += ('remove',)
         url = get_api_url(args)
 
         session = get_session(account=self.config.get('account'))

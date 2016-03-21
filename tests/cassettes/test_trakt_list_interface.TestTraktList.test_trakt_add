@@ -9,71 +9,59 @@ interactions:
     method: GET
     uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
   response:
-    body: {string: !!python/unicode "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js
-        ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js
-        ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js
-        ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\"
-        lang=\"en-US\"> <!--<![endif]-->\n<head>\n<meta http-equiv=\"refresh\" content=\"0\">\n<meta
-        http-equiv=\"set-cookie\" content=\"cf_use_ob=443; expires=Mon, 21-Mar-16
-        08:09:31 GMT; path=/\">\n<meta http-equiv=\"set-cookie\" content=\"cf_ob_info=504:286fead38b612696:FRA;
-        expires=Mon, 21-Mar-16 08:09:31 GMT; path=/\">\n<title>api-v2launch.trakt.tv
-        | 504: Gateway time-out</title>\n<meta charset=\"UTF-8\"/>\n<meta http-equiv=\"Content-Type\"
-        content=\"text/html; charset=UTF-8\"/>\n<meta http-equiv=\"X-UA-Compatible\"
-        content=\"IE=Edge,chrome=1\"/>\n<meta name=\"robots\" content=\"noindex, nofollow\"/>\n<meta
-        name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1\"/>\n<link
-        rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/cf.errors.css\"
-        type=\"text/css\" media=\"screen,projection\"/>\n<!--[if lt IE 9]><link rel=\"stylesheet\"
-        id='cf_styles-ie-css' href=\"/cdn-cgi/styles/cf.errors.ie.css\" type=\"text/css\"
-        media=\"screen,projection\" /><![endif]-->\n<style type=\"text/css\">body{margin:0;padding:0}</style>\n<!--[if
-        lte IE 9]><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/jquery.min.js\"></script><![endif]-->\n<!--[if
-        gte IE 10]><!--><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/zepto.min.js\"></script><!--<![endif]-->\n<script
-        type=\"text/javascript\" src=\"/cdn-cgi/scripts/cf.common.js\"></script>\n</head>\n<body>\n<div
-        id=\"cf-wrapper\">\n<div id=\"cf-error-details\" class=\"cf-error-details-wrapper\">\n<div
-        class=\"cf-wrapper cf-error-overview\">\n<h1>\n<span class=\"cf-error-type\"
-        data-translate=\"error\">Error</span>\n<span class=\"cf-error-code\">504</span>\n<small
-        class=\"heading-ray-id\">Ray ID: 286fead38b612696 &bull; 2016-03-21 08:09:01
-        UTC</small>\n</h1>\n<h2 class=\"cf-subheadline\" data-translate=\"error_desc\">Gateway
-        time-out</h2>\n</div> \n<div class=\"cf-section cf-highlight cf-status-display\">\n<div
-        class=\"cf-wrapper\">\n<div class=\"cf-columns cols-3\">\n<div id=\"cf-browser-status\"
-        class=\"cf-column cf-status-item cf-browser-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-browser\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"browser_desc\">You</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"browser_label\">Browser</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"browser_status_label\">Working</span>\n</div>\n<div id=\"cf-cloudflare-status\"
-        class=\"cf-column cf-status-item cf-cloudflare-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-cloud\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"cloud_desc\">Frankfurt</span>\n<h3
-        class=\"cf-status-name\" data-translate=\"cloud_label\">CloudFlare</h3>\n<span
-        class=\"cf-status-label\" data-translate=\"cloud_status_label\">Working</span>\n</div>\n<div
-        id=\"cf-host-status\" class=\"cf-column cf-status-item cf-host-status cf-error-source\">\n<div
-        class=\"cf-icon-error-container\">\n<i class=\"cf-icon cf-icon-server\"></i>\n<i
-        class=\"cf-icon-status cf-icon-error\"></i>\n</div>\n<span class=\"cf-status-desc\"
-        data-translate=\"server_desc\">api-v2launch.trakt.tv</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"server_label\">Host</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"server_status_label\">Error</span>\n</div>\n</div>\n</div>\n</div>
-        \n<div class=\"cf-section cf-wrapper\">\n<div class=\"cf-columns two\">\n<div
-        class=\"cf-column\">\n<h2 data-translate=\"what_happened\">What happened?</h2>\n<p>The
-        web server reported a gateway time-out error.</p>\n</div>\n<div class=\"cf-column\">\n<h2
-        data-translate=\"what_can_i_do\">What can I do?</h2>\n<p data-translate=\"try_again_in_a_few\">Please
-        try again in a few minutes.</p>\n</div>\n</div>\n</div> \n<div class=\"cf-error-footer
-        cf-wrapper\">\n<p>\n<span class=\"cf-footer-item\">CloudFlare Ray ID: <strong>286fead38b612696</strong></span>\n<span
-        class=\"cf-footer-separator\">&bull;</span>\n<span class=\"cf-footer-item\"><span
-        data-translate=\"your_ip\">Your IP</span>: 195.110.40.7</span>\n<span class=\"cf-footer-separator\">&bull;</span>\n<span
-        class=\"cf-footer-item\"><span data-translate=\"performance_security_by\">Performance
-        &amp; security by</span> <a data-orig-proto=\"https\" data-orig-ref=\"www.cloudflare.com/5xx-error-landing?utm_source=error_footer\"
-        id=\"brand_link\" target=\"_blank\">CloudFlare</a></span>\n</p>\n</div> \n</div>
-        \n</div> \n"}
+    body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-03-21T13:11:43.000Z","type":"show","show":{"title":"White
+        Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
     headers:
-      cf-ray: [286fead38b612696-FRA]
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [2871b2828fcb2384-FRA]
       connection: [keep-alive]
-      content-type: [text/html; charset=UTF-8]
-      date: ['Mon, 21 Mar 2016 08:09:01 GMT']
-      pragma: [no-cache]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 21 Mar 2016 13:19:45 GMT']
+      etag: [W/"b894640cff1ab5b16592b60f5776b37c"]
+      last-modified: ['Mon, 21 Mar 2016 13:11:44 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d6d347df4add6a14987ca8f92c5ae52621458547720; expires=Tue,
-          21-Mar-17 08:08:40 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d6cbf60c6c54724ab36a13015c4fdfbf31458566385; expires=Tue,
+          21-Mar-17 13:19:45 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
-    status: {code: 504, message: Gateway Time-out}
+      x-private-user: ['true']
+      x-request-id: [874173d1-b1dd-4844-aba3-85a1c83ce4fd]
+      x-runtime: ['0.015694']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"shows": [{"ids": {"tvdb": 108611, "tmdb": 21510, "imdb": "tt1358522",
+      "tvrage": 20720, "trakt": 21410}, "title": "White Collar (2009)"}]}'
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Length: ['139']
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: POST
+    uri: https://api-v2launch.trakt.tv/sync/watchlist/remove
+  response:
+    body: {string: !!python/unicode '{"deleted":{"movies":0,"shows":1,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [2871b32bd955234e-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 21 Mar 2016 13:20:12 GMT']
+      etag: [W/"cfaa8cdc565941e1d32b738b1f7a7b93"]
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d00eda0d7552b413efd8a774dadf1c1461458566412; expires=Tue,
+          21-Mar-17 13:20:12 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [189b133c-6a28-42f2-9809-46679fc874e9]
+      x-runtime: ['0.134057']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
 - request:
     body: null
     headers:
@@ -84,71 +72,57 @@ interactions:
     method: GET
     uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
   response:
-    body: {string: !!python/unicode "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js
-        ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js
-        ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js
-        ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\"
-        lang=\"en-US\"> <!--<![endif]-->\n<head>\n<meta http-equiv=\"refresh\" content=\"0\">\n<meta
-        http-equiv=\"set-cookie\" content=\"cf_use_ob=443; expires=Mon, 21-Mar-16
-        08:09:40 GMT; path=/\">\n<meta http-equiv=\"set-cookie\" content=\"cf_ob_info=504:286feb5eac792756:FRA;
-        expires=Mon, 21-Mar-16 08:09:40 GMT; path=/\">\n<title>api-v2launch.trakt.tv
-        | 504: Gateway time-out</title>\n<meta charset=\"UTF-8\"/>\n<meta http-equiv=\"Content-Type\"
-        content=\"text/html; charset=UTF-8\"/>\n<meta http-equiv=\"X-UA-Compatible\"
-        content=\"IE=Edge,chrome=1\"/>\n<meta name=\"robots\" content=\"noindex, nofollow\"/>\n<meta
-        name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1\"/>\n<link
-        rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/cf.errors.css\"
-        type=\"text/css\" media=\"screen,projection\"/>\n<!--[if lt IE 9]><link rel=\"stylesheet\"
-        id='cf_styles-ie-css' href=\"/cdn-cgi/styles/cf.errors.ie.css\" type=\"text/css\"
-        media=\"screen,projection\" /><![endif]-->\n<style type=\"text/css\">body{margin:0;padding:0}</style>\n<!--[if
-        lte IE 9]><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/jquery.min.js\"></script><![endif]-->\n<!--[if
-        gte IE 10]><!--><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/zepto.min.js\"></script><!--<![endif]-->\n<script
-        type=\"text/javascript\" src=\"/cdn-cgi/scripts/cf.common.js\"></script>\n</head>\n<body>\n<div
-        id=\"cf-wrapper\">\n<div id=\"cf-error-details\" class=\"cf-error-details-wrapper\">\n<div
-        class=\"cf-wrapper cf-error-overview\">\n<h1>\n<span class=\"cf-error-type\"
-        data-translate=\"error\">Error</span>\n<span class=\"cf-error-code\">504</span>\n<small
-        class=\"heading-ray-id\">Ray ID: 286feb5eac792756 &bull; 2016-03-21 08:09:10
-        UTC</small>\n</h1>\n<h2 class=\"cf-subheadline\" data-translate=\"error_desc\">Gateway
-        time-out</h2>\n</div> \n<div class=\"cf-section cf-highlight cf-status-display\">\n<div
-        class=\"cf-wrapper\">\n<div class=\"cf-columns cols-3\">\n<div id=\"cf-browser-status\"
-        class=\"cf-column cf-status-item cf-browser-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-browser\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"browser_desc\">You</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"browser_label\">Browser</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"browser_status_label\">Working</span>\n</div>\n<div id=\"cf-cloudflare-status\"
-        class=\"cf-column cf-status-item cf-cloudflare-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-cloud\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"cloud_desc\">Frankfurt</span>\n<h3
-        class=\"cf-status-name\" data-translate=\"cloud_label\">CloudFlare</h3>\n<span
-        class=\"cf-status-label\" data-translate=\"cloud_status_label\">Working</span>\n</div>\n<div
-        id=\"cf-host-status\" class=\"cf-column cf-status-item cf-host-status cf-error-source\">\n<div
-        class=\"cf-icon-error-container\">\n<i class=\"cf-icon cf-icon-server\"></i>\n<i
-        class=\"cf-icon-status cf-icon-error\"></i>\n</div>\n<span class=\"cf-status-desc\"
-        data-translate=\"server_desc\">api-v2launch.trakt.tv</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"server_label\">Host</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"server_status_label\">Error</span>\n</div>\n</div>\n</div>\n</div>
-        \n<div class=\"cf-section cf-wrapper\">\n<div class=\"cf-columns two\">\n<div
-        class=\"cf-column\">\n<h2 data-translate=\"what_happened\">What happened?</h2>\n<p>The
-        web server reported a gateway time-out error.</p>\n</div>\n<div class=\"cf-column\">\n<h2
-        data-translate=\"what_can_i_do\">What can I do?</h2>\n<p data-translate=\"try_again_in_a_few\">Please
-        try again in a few minutes.</p>\n</div>\n</div>\n</div> \n<div class=\"cf-error-footer
-        cf-wrapper\">\n<p>\n<span class=\"cf-footer-item\">CloudFlare Ray ID: <strong>286feb5eac792756</strong></span>\n<span
-        class=\"cf-footer-separator\">&bull;</span>\n<span class=\"cf-footer-item\"><span
-        data-translate=\"your_ip\">Your IP</span>: 195.110.40.7</span>\n<span class=\"cf-footer-separator\">&bull;</span>\n<span
-        class=\"cf-footer-item\"><span data-translate=\"performance_security_by\">Performance
-        &amp; security by</span> <a data-orig-proto=\"https\" data-orig-ref=\"www.cloudflare.com/5xx-error-landing?utm_source=error_footer\"
-        id=\"brand_link\" target=\"_blank\">CloudFlare</a></span>\n</p>\n</div> \n</div>
-        \n</div> \n"}
+    body: {string: !!python/unicode '[]'}
     headers:
-      cf-ray: [286feb5eac792756-FRA]
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [2871b34887be269c-FRA]
       connection: [keep-alive]
-      content-type: [text/html; charset=UTF-8]
-      date: ['Mon, 21 Mar 2016 08:09:10 GMT']
-      pragma: [no-cache]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 21 Mar 2016 13:20:17 GMT']
+      etag: [W/"5d9fc8ff5750176f667d1b9a19b60b8d"]
+      last-modified: ['Mon, 21 Mar 2016 13:20:19 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d795d2f41331391f31d0c7101ba7f70ae1458547742; expires=Tue,
-          21-Mar-17 08:09:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d131d59021655b9e8b57ca29158f1215a1458566416; expires=Tue,
+          21-Mar-17 13:20:16 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
-    status: {code: 504, message: Gateway Time-out}
+      x-private-user: ['true']
+      x-request-id: [e5dccbc0-4071-4019-943f-dd32f86fde5f]
+      x-runtime: ['0.031715']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"shows": [{"ids": {}, "title": "White collar"}]}'
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Length: ['49']
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: POST
+    uri: https://api-v2launch.trakt.tv/sync/watchlist
+  response:
+    body: {string: !!python/unicode '{"added":{"movies":0,"shows":1,"seasons":0,"episodes":0},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [2871b3ae12962366-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 21 Mar 2016 13:20:33 GMT']
+      etag: [W/"db3caaa60d6c27d324e3b6b14e0abb51"]
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=dfdff6a9712623e72902eecfeee4f12e61458566432; expires=Tue,
+          21-Mar-17 13:20:32 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [cd64c775-6e3b-4464-a563-f634bbd6d6b9]
+      x-runtime: ['0.062457']
+      x-xss-protection: [1; mode=block]
+    status: {code: 201, message: Created}
 - request:
     body: null
     headers:
@@ -159,689 +133,27 @@ interactions:
     method: GET
     uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
   response:
-    body: {string: !!python/unicode "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js
-        ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js
-        ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js
-        ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\"
-        lang=\"en-US\"> <!--<![endif]-->\n<head>\n<meta http-equiv=\"refresh\" content=\"0\">\n<meta
-        http-equiv=\"set-cookie\" content=\"cf_use_ob=443; expires=Mon, 21-Mar-16
-        08:11:21 GMT; path=/\">\n<meta http-equiv=\"set-cookie\" content=\"cf_ob_info=504:286fee047daa2702:FRA;
-        expires=Mon, 21-Mar-16 08:11:21 GMT; path=/\">\n<title>api-v2launch.trakt.tv
-        | 504: Gateway time-out</title>\n<meta charset=\"UTF-8\"/>\n<meta http-equiv=\"Content-Type\"
-        content=\"text/html; charset=UTF-8\"/>\n<meta http-equiv=\"X-UA-Compatible\"
-        content=\"IE=Edge,chrome=1\"/>\n<meta name=\"robots\" content=\"noindex, nofollow\"/>\n<meta
-        name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1\"/>\n<link
-        rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/cf.errors.css\"
-        type=\"text/css\" media=\"screen,projection\"/>\n<!--[if lt IE 9]><link rel=\"stylesheet\"
-        id='cf_styles-ie-css' href=\"/cdn-cgi/styles/cf.errors.ie.css\" type=\"text/css\"
-        media=\"screen,projection\" /><![endif]-->\n<style type=\"text/css\">body{margin:0;padding:0}</style>\n<!--[if
-        lte IE 9]><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/jquery.min.js\"></script><![endif]-->\n<!--[if
-        gte IE 10]><!--><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/zepto.min.js\"></script><!--<![endif]-->\n<script
-        type=\"text/javascript\" src=\"/cdn-cgi/scripts/cf.common.js\"></script>\n</head>\n<body>\n<div
-        id=\"cf-wrapper\">\n<div id=\"cf-error-details\" class=\"cf-error-details-wrapper\">\n<div
-        class=\"cf-wrapper cf-error-overview\">\n<h1>\n<span class=\"cf-error-type\"
-        data-translate=\"error\">Error</span>\n<span class=\"cf-error-code\">504</span>\n<small
-        class=\"heading-ray-id\">Ray ID: 286fee047daa2702 &bull; 2016-03-21 08:10:51
-        UTC</small>\n</h1>\n<h2 class=\"cf-subheadline\" data-translate=\"error_desc\">Gateway
-        time-out</h2>\n</div> \n<div class=\"cf-section cf-highlight cf-status-display\">\n<div
-        class=\"cf-wrapper\">\n<div class=\"cf-columns cols-3\">\n<div id=\"cf-browser-status\"
-        class=\"cf-column cf-status-item cf-browser-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-browser\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"browser_desc\">You</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"browser_label\">Browser</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"browser_status_label\">Working</span>\n</div>\n<div id=\"cf-cloudflare-status\"
-        class=\"cf-column cf-status-item cf-cloudflare-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-cloud\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"cloud_desc\">Frankfurt</span>\n<h3
-        class=\"cf-status-name\" data-translate=\"cloud_label\">CloudFlare</h3>\n<span
-        class=\"cf-status-label\" data-translate=\"cloud_status_label\">Working</span>\n</div>\n<div
-        id=\"cf-host-status\" class=\"cf-column cf-status-item cf-host-status cf-error-source\">\n<div
-        class=\"cf-icon-error-container\">\n<i class=\"cf-icon cf-icon-server\"></i>\n<i
-        class=\"cf-icon-status cf-icon-error\"></i>\n</div>\n<span class=\"cf-status-desc\"
-        data-translate=\"server_desc\">api-v2launch.trakt.tv</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"server_label\">Host</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"server_status_label\">Error</span>\n</div>\n</div>\n</div>\n</div>
-        \n<div class=\"cf-section cf-wrapper\">\n<div class=\"cf-columns two\">\n<div
-        class=\"cf-column\">\n<h2 data-translate=\"what_happened\">What happened?</h2>\n<p>The
-        web server reported a gateway time-out error.</p>\n</div>\n<div class=\"cf-column\">\n<h2
-        data-translate=\"what_can_i_do\">What can I do?</h2>\n<p data-translate=\"try_again_in_a_few\">Please
-        try again in a few minutes.</p>\n</div>\n</div>\n</div> \n<div class=\"cf-error-footer
-        cf-wrapper\">\n<p>\n<span class=\"cf-footer-item\">CloudFlare Ray ID: <strong>286fee047daa2702</strong></span>\n<span
-        class=\"cf-footer-separator\">&bull;</span>\n<span class=\"cf-footer-item\"><span
-        data-translate=\"your_ip\">Your IP</span>: 195.110.40.7</span>\n<span class=\"cf-footer-separator\">&bull;</span>\n<span
-        class=\"cf-footer-item\"><span data-translate=\"performance_security_by\">Performance
-        &amp; security by</span> <a data-orig-proto=\"https\" data-orig-ref=\"www.cloudflare.com/5xx-error-landing?utm_source=error_footer\"
-        id=\"brand_link\" target=\"_blank\">CloudFlare</a></span>\n</p>\n</div> \n</div>
-        \n</div> \n"}
+    body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-03-21T13:20:33.000Z","type":"show","show":{"title":"White
+        Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
     headers:
-      cf-ray: [286fee047daa2702-FRA]
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [2871b3d13a452366-FRA]
       connection: [keep-alive]
-      content-type: [text/html; charset=UTF-8]
-      date: ['Mon, 21 Mar 2016 08:10:51 GMT']
-      pragma: [no-cache]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 21 Mar 2016 13:20:39 GMT']
+      etag: [W/"b36b5fd230faebc289d9dea1363dab41"]
+      last-modified: ['Mon, 21 Mar 2016 13:20:37 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d1c6b863e67e7a83e2cb3fef422f60f921458547850; expires=Tue,
-          21-Mar-17 08:10:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d0f792af393afbfdb7f07ac7d9db9d6241458566438; expires=Tue,
+          21-Mar-17 13:20:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
-    status: {code: 504, message: Gateway Time-out}
-- request:
-    body: null
-    headers:
-      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
-  response:
-    body: {string: !!python/unicode "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js
-        ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js
-        ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js
-        ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\"
-        lang=\"en-US\"> <!--<![endif]-->\n<head>\n<meta http-equiv=\"refresh\" content=\"0\">\n<meta
-        http-equiv=\"set-cookie\" content=\"cf_use_ob=443; expires=Mon, 21-Mar-16
-        08:11:24 GMT; path=/\">\n<meta http-equiv=\"set-cookie\" content=\"cf_ob_info=504:286fee15ac222720:FRA;
-        expires=Mon, 21-Mar-16 08:11:24 GMT; path=/\">\n<title>api-v2launch.trakt.tv
-        | 504: Gateway time-out</title>\n<meta charset=\"UTF-8\"/>\n<meta http-equiv=\"Content-Type\"
-        content=\"text/html; charset=UTF-8\"/>\n<meta http-equiv=\"X-UA-Compatible\"
-        content=\"IE=Edge,chrome=1\"/>\n<meta name=\"robots\" content=\"noindex, nofollow\"/>\n<meta
-        name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1\"/>\n<link
-        rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/cf.errors.css\"
-        type=\"text/css\" media=\"screen,projection\"/>\n<!--[if lt IE 9]><link rel=\"stylesheet\"
-        id='cf_styles-ie-css' href=\"/cdn-cgi/styles/cf.errors.ie.css\" type=\"text/css\"
-        media=\"screen,projection\" /><![endif]-->\n<style type=\"text/css\">body{margin:0;padding:0}</style>\n<!--[if
-        lte IE 9]><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/jquery.min.js\"></script><![endif]-->\n<!--[if
-        gte IE 10]><!--><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/zepto.min.js\"></script><!--<![endif]-->\n<script
-        type=\"text/javascript\" src=\"/cdn-cgi/scripts/cf.common.js\"></script>\n</head>\n<body>\n<div
-        id=\"cf-wrapper\">\n<div id=\"cf-error-details\" class=\"cf-error-details-wrapper\">\n<div
-        class=\"cf-wrapper cf-error-overview\">\n<h1>\n<span class=\"cf-error-type\"
-        data-translate=\"error\">Error</span>\n<span class=\"cf-error-code\">504</span>\n<small
-        class=\"heading-ray-id\">Ray ID: 286fee15ac222720 &bull; 2016-03-21 08:10:54
-        UTC</small>\n</h1>\n<h2 class=\"cf-subheadline\" data-translate=\"error_desc\">Gateway
-        time-out</h2>\n</div> \n<div class=\"cf-section cf-highlight cf-status-display\">\n<div
-        class=\"cf-wrapper\">\n<div class=\"cf-columns cols-3\">\n<div id=\"cf-browser-status\"
-        class=\"cf-column cf-status-item cf-browser-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-browser\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"browser_desc\">You</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"browser_label\">Browser</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"browser_status_label\">Working</span>\n</div>\n<div id=\"cf-cloudflare-status\"
-        class=\"cf-column cf-status-item cf-cloudflare-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-cloud\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"cloud_desc\">Frankfurt</span>\n<h3
-        class=\"cf-status-name\" data-translate=\"cloud_label\">CloudFlare</h3>\n<span
-        class=\"cf-status-label\" data-translate=\"cloud_status_label\">Working</span>\n</div>\n<div
-        id=\"cf-host-status\" class=\"cf-column cf-status-item cf-host-status cf-error-source\">\n<div
-        class=\"cf-icon-error-container\">\n<i class=\"cf-icon cf-icon-server\"></i>\n<i
-        class=\"cf-icon-status cf-icon-error\"></i>\n</div>\n<span class=\"cf-status-desc\"
-        data-translate=\"server_desc\">api-v2launch.trakt.tv</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"server_label\">Host</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"server_status_label\">Error</span>\n</div>\n</div>\n</div>\n</div>
-        \n<div class=\"cf-section cf-wrapper\">\n<div class=\"cf-columns two\">\n<div
-        class=\"cf-column\">\n<h2 data-translate=\"what_happened\">What happened?</h2>\n<p>The
-        web server reported a gateway time-out error.</p>\n</div>\n<div class=\"cf-column\">\n<h2
-        data-translate=\"what_can_i_do\">What can I do?</h2>\n<p data-translate=\"try_again_in_a_few\">Please
-        try again in a few minutes.</p>\n</div>\n</div>\n</div> \n<div class=\"cf-error-footer
-        cf-wrapper\">\n<p>\n<span class=\"cf-footer-item\">CloudFlare Ray ID: <strong>286fee15ac222720</strong></span>\n<span
-        class=\"cf-footer-separator\">&bull;</span>\n<span class=\"cf-footer-item\"><span
-        data-translate=\"your_ip\">Your IP</span>: 195.110.40.7</span>\n<span class=\"cf-footer-separator\">&bull;</span>\n<span
-        class=\"cf-footer-item\"><span data-translate=\"performance_security_by\">Performance
-        &amp; security by</span> <a data-orig-proto=\"https\" data-orig-ref=\"www.cloudflare.com/5xx-error-landing?utm_source=error_footer\"
-        id=\"brand_link\" target=\"_blank\">CloudFlare</a></span>\n</p>\n</div> \n</div>
-        \n</div> \n"}
-    headers:
-      cf-ray: [286fee15ac222720-FRA]
-      connection: [keep-alive]
-      content-type: [text/html; charset=UTF-8]
-      date: ['Mon, 21 Mar 2016 08:10:54 GMT']
-      pragma: [no-cache]
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=da8ff85da2c383dc02762c041c577835a1458547853; expires=Tue,
-          21-Mar-17 08:10:53 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      x-frame-options: [SAMEORIGIN]
-    status: {code: 504, message: Gateway Time-out}
-- request:
-    body: null
-    headers:
-      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
-  response:
-    body: {string: !!python/unicode "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js
-        ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js
-        ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js
-        ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\"
-        lang=\"en-US\"> <!--<![endif]-->\n<head>\n<meta http-equiv=\"refresh\" content=\"0\">\n<meta
-        http-equiv=\"set-cookie\" content=\"cf_use_ob=443; expires=Mon, 21-Mar-16
-        08:11:26 GMT; path=/\">\n<meta http-equiv=\"set-cookie\" content=\"cf_ob_info=504:286fee2577ca27aa:FRA;
-        expires=Mon, 21-Mar-16 08:11:26 GMT; path=/\">\n<title>api-v2launch.trakt.tv
-        | 504: Gateway time-out</title>\n<meta charset=\"UTF-8\"/>\n<meta http-equiv=\"Content-Type\"
-        content=\"text/html; charset=UTF-8\"/>\n<meta http-equiv=\"X-UA-Compatible\"
-        content=\"IE=Edge,chrome=1\"/>\n<meta name=\"robots\" content=\"noindex, nofollow\"/>\n<meta
-        name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1\"/>\n<link
-        rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/cf.errors.css\"
-        type=\"text/css\" media=\"screen,projection\"/>\n<!--[if lt IE 9]><link rel=\"stylesheet\"
-        id='cf_styles-ie-css' href=\"/cdn-cgi/styles/cf.errors.ie.css\" type=\"text/css\"
-        media=\"screen,projection\" /><![endif]-->\n<style type=\"text/css\">body{margin:0;padding:0}</style>\n<!--[if
-        lte IE 9]><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/jquery.min.js\"></script><![endif]-->\n<!--[if
-        gte IE 10]><!--><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/zepto.min.js\"></script><!--<![endif]-->\n<script
-        type=\"text/javascript\" src=\"/cdn-cgi/scripts/cf.common.js\"></script>\n</head>\n<body>\n<div
-        id=\"cf-wrapper\">\n<div id=\"cf-error-details\" class=\"cf-error-details-wrapper\">\n<div
-        class=\"cf-wrapper cf-error-overview\">\n<h1>\n<span class=\"cf-error-type\"
-        data-translate=\"error\">Error</span>\n<span class=\"cf-error-code\">504</span>\n<small
-        class=\"heading-ray-id\">Ray ID: 286fee2577ca27aa &bull; 2016-03-21 08:10:56
-        UTC</small>\n</h1>\n<h2 class=\"cf-subheadline\" data-translate=\"error_desc\">Gateway
-        time-out</h2>\n</div> \n<div class=\"cf-section cf-highlight cf-status-display\">\n<div
-        class=\"cf-wrapper\">\n<div class=\"cf-columns cols-3\">\n<div id=\"cf-browser-status\"
-        class=\"cf-column cf-status-item cf-browser-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-browser\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"browser_desc\">You</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"browser_label\">Browser</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"browser_status_label\">Working</span>\n</div>\n<div id=\"cf-cloudflare-status\"
-        class=\"cf-column cf-status-item cf-cloudflare-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-cloud\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"cloud_desc\">Frankfurt</span>\n<h3
-        class=\"cf-status-name\" data-translate=\"cloud_label\">CloudFlare</h3>\n<span
-        class=\"cf-status-label\" data-translate=\"cloud_status_label\">Working</span>\n</div>\n<div
-        id=\"cf-host-status\" class=\"cf-column cf-status-item cf-host-status cf-error-source\">\n<div
-        class=\"cf-icon-error-container\">\n<i class=\"cf-icon cf-icon-server\"></i>\n<i
-        class=\"cf-icon-status cf-icon-error\"></i>\n</div>\n<span class=\"cf-status-desc\"
-        data-translate=\"server_desc\">api-v2launch.trakt.tv</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"server_label\">Host</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"server_status_label\">Error</span>\n</div>\n</div>\n</div>\n</div>
-        \n<div class=\"cf-section cf-wrapper\">\n<div class=\"cf-columns two\">\n<div
-        class=\"cf-column\">\n<h2 data-translate=\"what_happened\">What happened?</h2>\n<p>The
-        web server reported a gateway time-out error.</p>\n</div>\n<div class=\"cf-column\">\n<h2
-        data-translate=\"what_can_i_do\">What can I do?</h2>\n<p data-translate=\"try_again_in_a_few\">Please
-        try again in a few minutes.</p>\n</div>\n</div>\n</div> \n<div class=\"cf-error-footer
-        cf-wrapper\">\n<p>\n<span class=\"cf-footer-item\">CloudFlare Ray ID: <strong>286fee2577ca27aa</strong></span>\n<span
-        class=\"cf-footer-separator\">&bull;</span>\n<span class=\"cf-footer-item\"><span
-        data-translate=\"your_ip\">Your IP</span>: 195.110.40.7</span>\n<span class=\"cf-footer-separator\">&bull;</span>\n<span
-        class=\"cf-footer-item\"><span data-translate=\"performance_security_by\">Performance
-        &amp; security by</span> <a data-orig-proto=\"https\" data-orig-ref=\"www.cloudflare.com/5xx-error-landing?utm_source=error_footer\"
-        id=\"brand_link\" target=\"_blank\">CloudFlare</a></span>\n</p>\n</div> \n</div>
-        \n</div> \n"}
-    headers:
-      cf-ray: [286fee2577ca27aa-FRA]
-      connection: [keep-alive]
-      content-type: [text/html; charset=UTF-8]
-      date: ['Mon, 21 Mar 2016 08:10:56 GMT']
-      pragma: [no-cache]
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d74e16d8168faf2440c7286388804e6911458547856; expires=Tue,
-          21-Mar-17 08:10:56 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      x-frame-options: [SAMEORIGIN]
-    status: {code: 504, message: Gateway Time-out}
-- request:
-    body: null
-    headers:
-      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
-  response:
-    body: {string: !!python/unicode "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js
-        ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js
-        ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js
-        ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\"
-        lang=\"en-US\"> <!--<![endif]-->\n<head>\n<meta http-equiv=\"refresh\" content=\"0\">\n<meta
-        http-equiv=\"set-cookie\" content=\"cf_use_ob=443; expires=Mon, 21-Mar-16
-        08:11:28 GMT; path=/\">\n<meta http-equiv=\"set-cookie\" content=\"cf_ob_info=504:286fee2f24b02720:FRA;
-        expires=Mon, 21-Mar-16 08:11:28 GMT; path=/\">\n<title>api-v2launch.trakt.tv
-        | 504: Gateway time-out</title>\n<meta charset=\"UTF-8\"/>\n<meta http-equiv=\"Content-Type\"
-        content=\"text/html; charset=UTF-8\"/>\n<meta http-equiv=\"X-UA-Compatible\"
-        content=\"IE=Edge,chrome=1\"/>\n<meta name=\"robots\" content=\"noindex, nofollow\"/>\n<meta
-        name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1\"/>\n<link
-        rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/cf.errors.css\"
-        type=\"text/css\" media=\"screen,projection\"/>\n<!--[if lt IE 9]><link rel=\"stylesheet\"
-        id='cf_styles-ie-css' href=\"/cdn-cgi/styles/cf.errors.ie.css\" type=\"text/css\"
-        media=\"screen,projection\" /><![endif]-->\n<style type=\"text/css\">body{margin:0;padding:0}</style>\n<!--[if
-        lte IE 9]><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/jquery.min.js\"></script><![endif]-->\n<!--[if
-        gte IE 10]><!--><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/zepto.min.js\"></script><!--<![endif]-->\n<script
-        type=\"text/javascript\" src=\"/cdn-cgi/scripts/cf.common.js\"></script>\n</head>\n<body>\n<div
-        id=\"cf-wrapper\">\n<div id=\"cf-error-details\" class=\"cf-error-details-wrapper\">\n<div
-        class=\"cf-wrapper cf-error-overview\">\n<h1>\n<span class=\"cf-error-type\"
-        data-translate=\"error\">Error</span>\n<span class=\"cf-error-code\">504</span>\n<small
-        class=\"heading-ray-id\">Ray ID: 286fee2f24b02720 &bull; 2016-03-21 08:10:58
-        UTC</small>\n</h1>\n<h2 class=\"cf-subheadline\" data-translate=\"error_desc\">Gateway
-        time-out</h2>\n</div> \n<div class=\"cf-section cf-highlight cf-status-display\">\n<div
-        class=\"cf-wrapper\">\n<div class=\"cf-columns cols-3\">\n<div id=\"cf-browser-status\"
-        class=\"cf-column cf-status-item cf-browser-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-browser\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"browser_desc\">You</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"browser_label\">Browser</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"browser_status_label\">Working</span>\n</div>\n<div id=\"cf-cloudflare-status\"
-        class=\"cf-column cf-status-item cf-cloudflare-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-cloud\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"cloud_desc\">Frankfurt</span>\n<h3
-        class=\"cf-status-name\" data-translate=\"cloud_label\">CloudFlare</h3>\n<span
-        class=\"cf-status-label\" data-translate=\"cloud_status_label\">Working</span>\n</div>\n<div
-        id=\"cf-host-status\" class=\"cf-column cf-status-item cf-host-status cf-error-source\">\n<div
-        class=\"cf-icon-error-container\">\n<i class=\"cf-icon cf-icon-server\"></i>\n<i
-        class=\"cf-icon-status cf-icon-error\"></i>\n</div>\n<span class=\"cf-status-desc\"
-        data-translate=\"server_desc\">api-v2launch.trakt.tv</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"server_label\">Host</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"server_status_label\">Error</span>\n</div>\n</div>\n</div>\n</div>
-        \n<div class=\"cf-section cf-wrapper\">\n<div class=\"cf-columns two\">\n<div
-        class=\"cf-column\">\n<h2 data-translate=\"what_happened\">What happened?</h2>\n<p>The
-        web server reported a gateway time-out error.</p>\n</div>\n<div class=\"cf-column\">\n<h2
-        data-translate=\"what_can_i_do\">What can I do?</h2>\n<p data-translate=\"try_again_in_a_few\">Please
-        try again in a few minutes.</p>\n</div>\n</div>\n</div> \n<div class=\"cf-error-footer
-        cf-wrapper\">\n<p>\n<span class=\"cf-footer-item\">CloudFlare Ray ID: <strong>286fee2f24b02720</strong></span>\n<span
-        class=\"cf-footer-separator\">&bull;</span>\n<span class=\"cf-footer-item\"><span
-        data-translate=\"your_ip\">Your IP</span>: 195.110.40.7</span>\n<span class=\"cf-footer-separator\">&bull;</span>\n<span
-        class=\"cf-footer-item\"><span data-translate=\"performance_security_by\">Performance
-        &amp; security by</span> <a data-orig-proto=\"https\" data-orig-ref=\"www.cloudflare.com/5xx-error-landing?utm_source=error_footer\"
-        id=\"brand_link\" target=\"_blank\">CloudFlare</a></span>\n</p>\n</div> \n</div>
-        \n</div> \n"}
-    headers:
-      cf-ray: [286fee2f24b02720-FRA]
-      connection: [keep-alive]
-      content-type: [text/html; charset=UTF-8]
-      date: ['Mon, 21 Mar 2016 08:10:58 GMT']
-      pragma: [no-cache]
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d4a081a48ebb88c3e6b929f90f91259c31458547857; expires=Tue,
-          21-Mar-17 08:10:57 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      x-frame-options: [SAMEORIGIN]
-    status: {code: 504, message: Gateway Time-out}
-- request:
-    body: null
-    headers:
-      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
-  response:
-    body: {string: !!python/unicode ''}
-    headers:
-      cf-ray: [286fee350b7d2702-FRA]
-      connection: [keep-alive]
-      content-length: ['0']
-      date: ['Mon, 21 Mar 2016 08:10:59 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d0573868c3a3812ad4d65ee656d8cb1781458547858; expires=Tue,
-          21-Mar-17 08:10:58 GMT; path=/; domain=.trakt.tv; HttpOnly']
-    status: {code: 503, message: 'Service Unavailable: Back-end server is at capacity'}
-- request:
-    body: null
-    headers:
-      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
-  response:
-    body: {string: !!python/unicode "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js
-        ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js
-        ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js
-        ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\"
-        lang=\"en-US\"> <!--<![endif]-->\n<head>\n<meta http-equiv=\"refresh\" content=\"0\">\n<meta
-        http-equiv=\"set-cookie\" content=\"cf_use_ob=443; expires=Mon, 21-Mar-16
-        08:11:32 GMT; path=/\">\n<meta http-equiv=\"set-cookie\" content=\"cf_ob_info=504:286fee4d57162666:FRA;
-        expires=Mon, 21-Mar-16 08:11:32 GMT; path=/\">\n<title>api-v2launch.trakt.tv
-        | 504: Gateway time-out</title>\n<meta charset=\"UTF-8\"/>\n<meta http-equiv=\"Content-Type\"
-        content=\"text/html; charset=UTF-8\"/>\n<meta http-equiv=\"X-UA-Compatible\"
-        content=\"IE=Edge,chrome=1\"/>\n<meta name=\"robots\" content=\"noindex, nofollow\"/>\n<meta
-        name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1\"/>\n<link
-        rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/cf.errors.css\"
-        type=\"text/css\" media=\"screen,projection\"/>\n<!--[if lt IE 9]><link rel=\"stylesheet\"
-        id='cf_styles-ie-css' href=\"/cdn-cgi/styles/cf.errors.ie.css\" type=\"text/css\"
-        media=\"screen,projection\" /><![endif]-->\n<style type=\"text/css\">body{margin:0;padding:0}</style>\n<!--[if
-        lte IE 9]><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/jquery.min.js\"></script><![endif]-->\n<!--[if
-        gte IE 10]><!--><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/zepto.min.js\"></script><!--<![endif]-->\n<script
-        type=\"text/javascript\" src=\"/cdn-cgi/scripts/cf.common.js\"></script>\n</head>\n<body>\n<div
-        id=\"cf-wrapper\">\n<div id=\"cf-error-details\" class=\"cf-error-details-wrapper\">\n<div
-        class=\"cf-wrapper cf-error-overview\">\n<h1>\n<span class=\"cf-error-type\"
-        data-translate=\"error\">Error</span>\n<span class=\"cf-error-code\">504</span>\n<small
-        class=\"heading-ray-id\">Ray ID: 286fee4d57162666 &bull; 2016-03-21 08:11:02
-        UTC</small>\n</h1>\n<h2 class=\"cf-subheadline\" data-translate=\"error_desc\">Gateway
-        time-out</h2>\n</div> \n<div class=\"cf-section cf-highlight cf-status-display\">\n<div
-        class=\"cf-wrapper\">\n<div class=\"cf-columns cols-3\">\n<div id=\"cf-browser-status\"
-        class=\"cf-column cf-status-item cf-browser-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-browser\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"browser_desc\">You</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"browser_label\">Browser</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"browser_status_label\">Working</span>\n</div>\n<div id=\"cf-cloudflare-status\"
-        class=\"cf-column cf-status-item cf-cloudflare-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-cloud\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"cloud_desc\">Frankfurt</span>\n<h3
-        class=\"cf-status-name\" data-translate=\"cloud_label\">CloudFlare</h3>\n<span
-        class=\"cf-status-label\" data-translate=\"cloud_status_label\">Working</span>\n</div>\n<div
-        id=\"cf-host-status\" class=\"cf-column cf-status-item cf-host-status cf-error-source\">\n<div
-        class=\"cf-icon-error-container\">\n<i class=\"cf-icon cf-icon-server\"></i>\n<i
-        class=\"cf-icon-status cf-icon-error\"></i>\n</div>\n<span class=\"cf-status-desc\"
-        data-translate=\"server_desc\">api-v2launch.trakt.tv</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"server_label\">Host</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"server_status_label\">Error</span>\n</div>\n</div>\n</div>\n</div>
-        \n<div class=\"cf-section cf-wrapper\">\n<div class=\"cf-columns two\">\n<div
-        class=\"cf-column\">\n<h2 data-translate=\"what_happened\">What happened?</h2>\n<p>The
-        web server reported a gateway time-out error.</p>\n</div>\n<div class=\"cf-column\">\n<h2
-        data-translate=\"what_can_i_do\">What can I do?</h2>\n<p data-translate=\"try_again_in_a_few\">Please
-        try again in a few minutes.</p>\n</div>\n</div>\n</div> \n<div class=\"cf-error-footer
-        cf-wrapper\">\n<p>\n<span class=\"cf-footer-item\">CloudFlare Ray ID: <strong>286fee4d57162666</strong></span>\n<span
-        class=\"cf-footer-separator\">&bull;</span>\n<span class=\"cf-footer-item\"><span
-        data-translate=\"your_ip\">Your IP</span>: 195.110.40.7</span>\n<span class=\"cf-footer-separator\">&bull;</span>\n<span
-        class=\"cf-footer-item\"><span data-translate=\"performance_security_by\">Performance
-        &amp; security by</span> <a data-orig-proto=\"https\" data-orig-ref=\"www.cloudflare.com/5xx-error-landing?utm_source=error_footer\"
-        id=\"brand_link\" target=\"_blank\">CloudFlare</a></span>\n</p>\n</div> \n</div>
-        \n</div> \n"}
-    headers:
-      cf-ray: [286fee4d57162666-FRA]
-      connection: [keep-alive]
-      content-type: [text/html; charset=UTF-8]
-      date: ['Mon, 21 Mar 2016 08:11:02 GMT']
-      pragma: [no-cache]
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d07cd30e1bab929b3515ecb0e9b27c78f1458547862; expires=Tue,
-          21-Mar-17 08:11:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      x-frame-options: [SAMEORIGIN]
-    status: {code: 504, message: Gateway Time-out}
-- request:
-    body: null
-    headers:
-      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
-  response:
-    body: {string: !!python/unicode "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js
-        ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js
-        ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js
-        ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\"
-        lang=\"en-US\"> <!--<![endif]-->\n<head>\n<meta http-equiv=\"refresh\" content=\"0\">\n<meta
-        http-equiv=\"set-cookie\" content=\"cf_use_ob=443; expires=Mon, 21-Mar-16
-        08:11:35 GMT; path=/\">\n<meta http-equiv=\"set-cookie\" content=\"cf_ob_info=504:286fee5c05e926b4:FRA;
-        expires=Mon, 21-Mar-16 08:11:35 GMT; path=/\">\n<title>api-v2launch.trakt.tv
-        | 504: Gateway time-out</title>\n<meta charset=\"UTF-8\"/>\n<meta http-equiv=\"Content-Type\"
-        content=\"text/html; charset=UTF-8\"/>\n<meta http-equiv=\"X-UA-Compatible\"
-        content=\"IE=Edge,chrome=1\"/>\n<meta name=\"robots\" content=\"noindex, nofollow\"/>\n<meta
-        name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1\"/>\n<link
-        rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/cf.errors.css\"
-        type=\"text/css\" media=\"screen,projection\"/>\n<!--[if lt IE 9]><link rel=\"stylesheet\"
-        id='cf_styles-ie-css' href=\"/cdn-cgi/styles/cf.errors.ie.css\" type=\"text/css\"
-        media=\"screen,projection\" /><![endif]-->\n<style type=\"text/css\">body{margin:0;padding:0}</style>\n<!--[if
-        lte IE 9]><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/jquery.min.js\"></script><![endif]-->\n<!--[if
-        gte IE 10]><!--><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/zepto.min.js\"></script><!--<![endif]-->\n<script
-        type=\"text/javascript\" src=\"/cdn-cgi/scripts/cf.common.js\"></script>\n</head>\n<body>\n<div
-        id=\"cf-wrapper\">\n<div id=\"cf-error-details\" class=\"cf-error-details-wrapper\">\n<div
-        class=\"cf-wrapper cf-error-overview\">\n<h1>\n<span class=\"cf-error-type\"
-        data-translate=\"error\">Error</span>\n<span class=\"cf-error-code\">504</span>\n<small
-        class=\"heading-ray-id\">Ray ID: 286fee5c05e926b4 &bull; 2016-03-21 08:11:05
-        UTC</small>\n</h1>\n<h2 class=\"cf-subheadline\" data-translate=\"error_desc\">Gateway
-        time-out</h2>\n</div> \n<div class=\"cf-section cf-highlight cf-status-display\">\n<div
-        class=\"cf-wrapper\">\n<div class=\"cf-columns cols-3\">\n<div id=\"cf-browser-status\"
-        class=\"cf-column cf-status-item cf-browser-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-browser\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"browser_desc\">You</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"browser_label\">Browser</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"browser_status_label\">Working</span>\n</div>\n<div id=\"cf-cloudflare-status\"
-        class=\"cf-column cf-status-item cf-cloudflare-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-cloud\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"cloud_desc\">Frankfurt</span>\n<h3
-        class=\"cf-status-name\" data-translate=\"cloud_label\">CloudFlare</h3>\n<span
-        class=\"cf-status-label\" data-translate=\"cloud_status_label\">Working</span>\n</div>\n<div
-        id=\"cf-host-status\" class=\"cf-column cf-status-item cf-host-status cf-error-source\">\n<div
-        class=\"cf-icon-error-container\">\n<i class=\"cf-icon cf-icon-server\"></i>\n<i
-        class=\"cf-icon-status cf-icon-error\"></i>\n</div>\n<span class=\"cf-status-desc\"
-        data-translate=\"server_desc\">api-v2launch.trakt.tv</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"server_label\">Host</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"server_status_label\">Error</span>\n</div>\n</div>\n</div>\n</div>
-        \n<div class=\"cf-section cf-wrapper\">\n<div class=\"cf-columns two\">\n<div
-        class=\"cf-column\">\n<h2 data-translate=\"what_happened\">What happened?</h2>\n<p>The
-        web server reported a gateway time-out error.</p>\n</div>\n<div class=\"cf-column\">\n<h2
-        data-translate=\"what_can_i_do\">What can I do?</h2>\n<p data-translate=\"try_again_in_a_few\">Please
-        try again in a few minutes.</p>\n</div>\n</div>\n</div> \n<div class=\"cf-error-footer
-        cf-wrapper\">\n<p>\n<span class=\"cf-footer-item\">CloudFlare Ray ID: <strong>286fee5c05e926b4</strong></span>\n<span
-        class=\"cf-footer-separator\">&bull;</span>\n<span class=\"cf-footer-item\"><span
-        data-translate=\"your_ip\">Your IP</span>: 195.110.40.7</span>\n<span class=\"cf-footer-separator\">&bull;</span>\n<span
-        class=\"cf-footer-item\"><span data-translate=\"performance_security_by\">Performance
-        &amp; security by</span> <a data-orig-proto=\"https\" data-orig-ref=\"www.cloudflare.com/5xx-error-landing?utm_source=error_footer\"
-        id=\"brand_link\" target=\"_blank\">CloudFlare</a></span>\n</p>\n</div> \n</div>
-        \n</div> \n"}
-    headers:
-      cf-ray: [286fee5c05e926b4-FRA]
-      connection: [keep-alive]
-      content-type: [text/html; charset=UTF-8]
-      date: ['Mon, 21 Mar 2016 08:11:05 GMT']
-      pragma: [no-cache]
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d6680ea36ff19b931529b1b0a5e8655241458547864; expires=Tue,
-          21-Mar-17 08:11:04 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      x-frame-options: [SAMEORIGIN]
-    status: {code: 504, message: Gateway Time-out}
-- request:
-    body: null
-    headers:
-      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
-  response:
-    body: {string: !!python/unicode "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js
-        ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js
-        ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js
-        ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\"
-        lang=\"en-US\"> <!--<![endif]-->\n<head>\n<meta http-equiv=\"refresh\" content=\"0\">\n<meta
-        http-equiv=\"set-cookie\" content=\"cf_use_ob=443; expires=Mon, 21-Mar-16
-        08:11:36 GMT; path=/\">\n<meta http-equiv=\"set-cookie\" content=\"cf_ob_info=504:286fee6261ca26b4:FRA;
-        expires=Mon, 21-Mar-16 08:11:36 GMT; path=/\">\n<title>api-v2launch.trakt.tv
-        | 504: Gateway time-out</title>\n<meta charset=\"UTF-8\"/>\n<meta http-equiv=\"Content-Type\"
-        content=\"text/html; charset=UTF-8\"/>\n<meta http-equiv=\"X-UA-Compatible\"
-        content=\"IE=Edge,chrome=1\"/>\n<meta name=\"robots\" content=\"noindex, nofollow\"/>\n<meta
-        name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1\"/>\n<link
-        rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/cf.errors.css\"
-        type=\"text/css\" media=\"screen,projection\"/>\n<!--[if lt IE 9]><link rel=\"stylesheet\"
-        id='cf_styles-ie-css' href=\"/cdn-cgi/styles/cf.errors.ie.css\" type=\"text/css\"
-        media=\"screen,projection\" /><![endif]-->\n<style type=\"text/css\">body{margin:0;padding:0}</style>\n<!--[if
-        lte IE 9]><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/jquery.min.js\"></script><![endif]-->\n<!--[if
-        gte IE 10]><!--><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/zepto.min.js\"></script><!--<![endif]-->\n<script
-        type=\"text/javascript\" src=\"/cdn-cgi/scripts/cf.common.js\"></script>\n</head>\n<body>\n<div
-        id=\"cf-wrapper\">\n<div id=\"cf-error-details\" class=\"cf-error-details-wrapper\">\n<div
-        class=\"cf-wrapper cf-error-overview\">\n<h1>\n<span class=\"cf-error-type\"
-        data-translate=\"error\">Error</span>\n<span class=\"cf-error-code\">504</span>\n<small
-        class=\"heading-ray-id\">Ray ID: 286fee6261ca26b4 &bull; 2016-03-21 08:11:06
-        UTC</small>\n</h1>\n<h2 class=\"cf-subheadline\" data-translate=\"error_desc\">Gateway
-        time-out</h2>\n</div> \n<div class=\"cf-section cf-highlight cf-status-display\">\n<div
-        class=\"cf-wrapper\">\n<div class=\"cf-columns cols-3\">\n<div id=\"cf-browser-status\"
-        class=\"cf-column cf-status-item cf-browser-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-browser\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"browser_desc\">You</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"browser_label\">Browser</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"browser_status_label\">Working</span>\n</div>\n<div id=\"cf-cloudflare-status\"
-        class=\"cf-column cf-status-item cf-cloudflare-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-cloud\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"cloud_desc\">Frankfurt</span>\n<h3
-        class=\"cf-status-name\" data-translate=\"cloud_label\">CloudFlare</h3>\n<span
-        class=\"cf-status-label\" data-translate=\"cloud_status_label\">Working</span>\n</div>\n<div
-        id=\"cf-host-status\" class=\"cf-column cf-status-item cf-host-status cf-error-source\">\n<div
-        class=\"cf-icon-error-container\">\n<i class=\"cf-icon cf-icon-server\"></i>\n<i
-        class=\"cf-icon-status cf-icon-error\"></i>\n</div>\n<span class=\"cf-status-desc\"
-        data-translate=\"server_desc\">api-v2launch.trakt.tv</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"server_label\">Host</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"server_status_label\">Error</span>\n</div>\n</div>\n</div>\n</div>
-        \n<div class=\"cf-section cf-wrapper\">\n<div class=\"cf-columns two\">\n<div
-        class=\"cf-column\">\n<h2 data-translate=\"what_happened\">What happened?</h2>\n<p>The
-        web server reported a gateway time-out error.</p>\n</div>\n<div class=\"cf-column\">\n<h2
-        data-translate=\"what_can_i_do\">What can I do?</h2>\n<p data-translate=\"try_again_in_a_few\">Please
-        try again in a few minutes.</p>\n</div>\n</div>\n</div> \n<div class=\"cf-error-footer
-        cf-wrapper\">\n<p>\n<span class=\"cf-footer-item\">CloudFlare Ray ID: <strong>286fee6261ca26b4</strong></span>\n<span
-        class=\"cf-footer-separator\">&bull;</span>\n<span class=\"cf-footer-item\"><span
-        data-translate=\"your_ip\">Your IP</span>: 195.110.40.7</span>\n<span class=\"cf-footer-separator\">&bull;</span>\n<span
-        class=\"cf-footer-item\"><span data-translate=\"performance_security_by\">Performance
-        &amp; security by</span> <a data-orig-proto=\"https\" data-orig-ref=\"www.cloudflare.com/5xx-error-landing?utm_source=error_footer\"
-        id=\"brand_link\" target=\"_blank\">CloudFlare</a></span>\n</p>\n</div> \n</div>
-        \n</div> \n"}
-    headers:
-      cf-ray: [286fee6261ca26b4-FRA]
-      connection: [keep-alive]
-      content-type: [text/html; charset=UTF-8]
-      date: ['Mon, 21 Mar 2016 08:11:06 GMT']
-      pragma: [no-cache]
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=dd303a3b2ba5f5ccb781f77fbcdb7d3101458547865; expires=Tue,
-          21-Mar-17 08:11:05 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      x-frame-options: [SAMEORIGIN]
-    status: {code: 504, message: Gateway Time-out}
-- request:
-    body: null
-    headers:
-      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
-  response:
-    body: {string: !!python/unicode "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js
-        ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js
-        ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js
-        ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\"
-        lang=\"en-US\"> <!--<![endif]-->\n<head>\n<meta http-equiv=\"refresh\" content=\"0\">\n<meta
-        http-equiv=\"set-cookie\" content=\"cf_use_ob=443; expires=Mon, 21-Mar-16
-        08:11:40 GMT; path=/\">\n<meta http-equiv=\"set-cookie\" content=\"cf_ob_info=504:286fee7dfce32720:FRA;
-        expires=Mon, 21-Mar-16 08:11:40 GMT; path=/\">\n<title>api-v2launch.trakt.tv
-        | 504: Gateway time-out</title>\n<meta charset=\"UTF-8\"/>\n<meta http-equiv=\"Content-Type\"
-        content=\"text/html; charset=UTF-8\"/>\n<meta http-equiv=\"X-UA-Compatible\"
-        content=\"IE=Edge,chrome=1\"/>\n<meta name=\"robots\" content=\"noindex, nofollow\"/>\n<meta
-        name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1\"/>\n<link
-        rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/cf.errors.css\"
-        type=\"text/css\" media=\"screen,projection\"/>\n<!--[if lt IE 9]><link rel=\"stylesheet\"
-        id='cf_styles-ie-css' href=\"/cdn-cgi/styles/cf.errors.ie.css\" type=\"text/css\"
-        media=\"screen,projection\" /><![endif]-->\n<style type=\"text/css\">body{margin:0;padding:0}</style>\n<!--[if
-        lte IE 9]><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/jquery.min.js\"></script><![endif]-->\n<!--[if
-        gte IE 10]><!--><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/zepto.min.js\"></script><!--<![endif]-->\n<script
-        type=\"text/javascript\" src=\"/cdn-cgi/scripts/cf.common.js\"></script>\n</head>\n<body>\n<div
-        id=\"cf-wrapper\">\n<div id=\"cf-error-details\" class=\"cf-error-details-wrapper\">\n<div
-        class=\"cf-wrapper cf-error-overview\">\n<h1>\n<span class=\"cf-error-type\"
-        data-translate=\"error\">Error</span>\n<span class=\"cf-error-code\">504</span>\n<small
-        class=\"heading-ray-id\">Ray ID: 286fee7dfce32720 &bull; 2016-03-21 08:11:10
-        UTC</small>\n</h1>\n<h2 class=\"cf-subheadline\" data-translate=\"error_desc\">Gateway
-        time-out</h2>\n</div> \n<div class=\"cf-section cf-highlight cf-status-display\">\n<div
-        class=\"cf-wrapper\">\n<div class=\"cf-columns cols-3\">\n<div id=\"cf-browser-status\"
-        class=\"cf-column cf-status-item cf-browser-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-browser\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"browser_desc\">You</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"browser_label\">Browser</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"browser_status_label\">Working</span>\n</div>\n<div id=\"cf-cloudflare-status\"
-        class=\"cf-column cf-status-item cf-cloudflare-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-cloud\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"cloud_desc\">Frankfurt</span>\n<h3
-        class=\"cf-status-name\" data-translate=\"cloud_label\">CloudFlare</h3>\n<span
-        class=\"cf-status-label\" data-translate=\"cloud_status_label\">Working</span>\n</div>\n<div
-        id=\"cf-host-status\" class=\"cf-column cf-status-item cf-host-status cf-error-source\">\n<div
-        class=\"cf-icon-error-container\">\n<i class=\"cf-icon cf-icon-server\"></i>\n<i
-        class=\"cf-icon-status cf-icon-error\"></i>\n</div>\n<span class=\"cf-status-desc\"
-        data-translate=\"server_desc\">api-v2launch.trakt.tv</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"server_label\">Host</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"server_status_label\">Error</span>\n</div>\n</div>\n</div>\n</div>
-        \n<div class=\"cf-section cf-wrapper\">\n<div class=\"cf-columns two\">\n<div
-        class=\"cf-column\">\n<h2 data-translate=\"what_happened\">What happened?</h2>\n<p>The
-        web server reported a gateway time-out error.</p>\n</div>\n<div class=\"cf-column\">\n<h2
-        data-translate=\"what_can_i_do\">What can I do?</h2>\n<p data-translate=\"try_again_in_a_few\">Please
-        try again in a few minutes.</p>\n</div>\n</div>\n</div> \n<div class=\"cf-error-footer
-        cf-wrapper\">\n<p>\n<span class=\"cf-footer-item\">CloudFlare Ray ID: <strong>286fee7dfce32720</strong></span>\n<span
-        class=\"cf-footer-separator\">&bull;</span>\n<span class=\"cf-footer-item\"><span
-        data-translate=\"your_ip\">Your IP</span>: 195.110.40.7</span>\n<span class=\"cf-footer-separator\">&bull;</span>\n<span
-        class=\"cf-footer-item\"><span data-translate=\"performance_security_by\">Performance
-        &amp; security by</span> <a data-orig-proto=\"https\" data-orig-ref=\"www.cloudflare.com/5xx-error-landing?utm_source=error_footer\"
-        id=\"brand_link\" target=\"_blank\">CloudFlare</a></span>\n</p>\n</div> \n</div>
-        \n</div> \n"}
-    headers:
-      cf-ray: [286fee7dfce32720-FRA]
-      connection: [keep-alive]
-      content-type: [text/html; charset=UTF-8]
-      date: ['Mon, 21 Mar 2016 08:11:10 GMT']
-      pragma: [no-cache]
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d9f7b31efbc993b4d86794fbeb5570eae1458547870; expires=Tue,
-          21-Mar-17 08:11:10 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      x-frame-options: [SAMEORIGIN]
-    status: {code: 504, message: Gateway Time-out}
-- request:
-    body: null
-    headers:
-      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
-  response:
-    body: {string: !!python/unicode "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js
-        ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js
-        ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-js
-        ie8 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if gt IE 8]><!--> <html class=\"no-js\"
-        lang=\"en-US\"> <!--<![endif]-->\n<head>\n<meta http-equiv=\"refresh\" content=\"0\">\n<meta
-        http-equiv=\"set-cookie\" content=\"cf_use_ob=443; expires=Mon, 21-Mar-16
-        08:11:43 GMT; path=/\">\n<meta http-equiv=\"set-cookie\" content=\"cf_ob_info=504:286fee8ec2872666:FRA;
-        expires=Mon, 21-Mar-16 08:11:43 GMT; path=/\">\n<title>api-v2launch.trakt.tv
-        | 504: Gateway time-out</title>\n<meta charset=\"UTF-8\"/>\n<meta http-equiv=\"Content-Type\"
-        content=\"text/html; charset=UTF-8\"/>\n<meta http-equiv=\"X-UA-Compatible\"
-        content=\"IE=Edge,chrome=1\"/>\n<meta name=\"robots\" content=\"noindex, nofollow\"/>\n<meta
-        name=\"viewport\" content=\"width=device-width,initial-scale=1,maximum-scale=1\"/>\n<link
-        rel=\"stylesheet\" id=\"cf_styles-css\" href=\"/cdn-cgi/styles/cf.errors.css\"
-        type=\"text/css\" media=\"screen,projection\"/>\n<!--[if lt IE 9]><link rel=\"stylesheet\"
-        id='cf_styles-ie-css' href=\"/cdn-cgi/styles/cf.errors.ie.css\" type=\"text/css\"
-        media=\"screen,projection\" /><![endif]-->\n<style type=\"text/css\">body{margin:0;padding:0}</style>\n<!--[if
-        lte IE 9]><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/jquery.min.js\"></script><![endif]-->\n<!--[if
-        gte IE 10]><!--><script type=\"text/javascript\" src=\"/cdn-cgi/scripts/zepto.min.js\"></script><!--<![endif]-->\n<script
-        type=\"text/javascript\" src=\"/cdn-cgi/scripts/cf.common.js\"></script>\n</head>\n<body>\n<div
-        id=\"cf-wrapper\">\n<div id=\"cf-error-details\" class=\"cf-error-details-wrapper\">\n<div
-        class=\"cf-wrapper cf-error-overview\">\n<h1>\n<span class=\"cf-error-type\"
-        data-translate=\"error\">Error</span>\n<span class=\"cf-error-code\">504</span>\n<small
-        class=\"heading-ray-id\">Ray ID: 286fee8ec2872666 &bull; 2016-03-21 08:11:13
-        UTC</small>\n</h1>\n<h2 class=\"cf-subheadline\" data-translate=\"error_desc\">Gateway
-        time-out</h2>\n</div> \n<div class=\"cf-section cf-highlight cf-status-display\">\n<div
-        class=\"cf-wrapper\">\n<div class=\"cf-columns cols-3\">\n<div id=\"cf-browser-status\"
-        class=\"cf-column cf-status-item cf-browser-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-browser\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"browser_desc\">You</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"browser_label\">Browser</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"browser_status_label\">Working</span>\n</div>\n<div id=\"cf-cloudflare-status\"
-        class=\"cf-column cf-status-item cf-cloudflare-status \">\n<div class=\"cf-icon-error-container\">\n<i
-        class=\"cf-icon cf-icon-cloud\"></i>\n<i class=\"cf-icon-status cf-icon-ok\"></i>\n</div>\n<span
-        class=\"cf-status-desc\" data-translate=\"cloud_desc\">Frankfurt</span>\n<h3
-        class=\"cf-status-name\" data-translate=\"cloud_label\">CloudFlare</h3>\n<span
-        class=\"cf-status-label\" data-translate=\"cloud_status_label\">Working</span>\n</div>\n<div
-        id=\"cf-host-status\" class=\"cf-column cf-status-item cf-host-status cf-error-source\">\n<div
-        class=\"cf-icon-error-container\">\n<i class=\"cf-icon cf-icon-server\"></i>\n<i
-        class=\"cf-icon-status cf-icon-error\"></i>\n</div>\n<span class=\"cf-status-desc\"
-        data-translate=\"server_desc\">api-v2launch.trakt.tv</span>\n<h3 class=\"cf-status-name\"
-        data-translate=\"server_label\">Host</h3>\n<span class=\"cf-status-label\"
-        data-translate=\"server_status_label\">Error</span>\n</div>\n</div>\n</div>\n</div>
-        \n<div class=\"cf-section cf-wrapper\">\n<div class=\"cf-columns two\">\n<div
-        class=\"cf-column\">\n<h2 data-translate=\"what_happened\">What happened?</h2>\n<p>The
-        web server reported a gateway time-out error.</p>\n</div>\n<div class=\"cf-column\">\n<h2
-        data-translate=\"what_can_i_do\">What can I do?</h2>\n<p data-translate=\"try_again_in_a_few\">Please
-        try again in a few minutes.</p>\n</div>\n</div>\n</div> \n<div class=\"cf-error-footer
-        cf-wrapper\">\n<p>\n<span class=\"cf-footer-item\">CloudFlare Ray ID: <strong>286fee8ec2872666</strong></span>\n<span
-        class=\"cf-footer-separator\">&bull;</span>\n<span class=\"cf-footer-item\"><span
-        data-translate=\"your_ip\">Your IP</span>: 195.110.40.7</span>\n<span class=\"cf-footer-separator\">&bull;</span>\n<span
-        class=\"cf-footer-item\"><span data-translate=\"performance_security_by\">Performance
-        &amp; security by</span> <a data-orig-proto=\"https\" data-orig-ref=\"www.cloudflare.com/5xx-error-landing?utm_source=error_footer\"
-        id=\"brand_link\" target=\"_blank\">CloudFlare</a></span>\n</p>\n</div> \n</div>
-        \n</div> \n"}
-    headers:
-      cf-ray: [286fee8ec2872666-FRA]
-      connection: [keep-alive]
-      content-type: [text/html; charset=UTF-8]
-      date: ['Mon, 21 Mar 2016 08:11:13 GMT']
-      pragma: [no-cache]
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d14664485d0fce30bd04ef2c51f3523f81458547873; expires=Tue,
-          21-Mar-17 08:11:13 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      x-frame-options: [SAMEORIGIN]
-    status: {code: 504, message: Gateway Time-out}
+      x-private-user: ['true']
+      x-request-id: [82f27707-0976-4a4f-978a-24e16941d31e]
+      x-runtime: ['0.055526']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
 version: 1

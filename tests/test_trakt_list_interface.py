@@ -41,8 +41,10 @@ class TestTraktList(object):
     def test_trakt_add(self):
         self.get_auth()
         trakt_set = TraktSet(self.trakt_config)
+        # Initialize trakt set
+        trakt_set.clear()
 
-        entry = Entry(title='White collar (2009)', series_name='White collar (2009)')
+        entry = Entry(title='White collar', series_name='White collar')
 
         assert entry not in trakt_set
 
