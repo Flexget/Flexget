@@ -44,7 +44,7 @@ class TestTraktList(object):
         # Initialize trakt set
         trakt_set.clear()
 
-        entry = Entry(title='White collar', series_name='White collar')
+        entry = Entry(title='White collar', series_name='White Collar (2009)')
 
         assert entry not in trakt_set
 
