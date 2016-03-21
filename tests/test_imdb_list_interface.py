@@ -20,6 +20,8 @@ class TestIMDBList(object):
     def test_imdb_list_add(self):
         imdb_set = ImdbEntrySet(self.imdb_config)
         # Clearing existing list
+        imdb_set.clear()
+
         entry = Entry(title='the matrix', imdb_id='tt0133093')
 
         assert entry not in imdb_set

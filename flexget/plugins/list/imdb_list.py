@@ -184,6 +184,11 @@ class ImdbEntrySet(MutableSet):
     def __len__(self):
         return len(self.items)
 
+    def clear(self):
+        for item in self.items:
+            self.discard(item)
+        self._items = None
+
 
 class ImdbList(object):
     schema = ImdbEntrySet.schema
