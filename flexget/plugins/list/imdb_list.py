@@ -9,6 +9,7 @@ from datetime import datetime
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.plugin import PluginError
 from flexget.utils.requests import Session
 from flexget.utils.soup import get_soup
 
@@ -56,8 +57,8 @@ class ImdbEntrySet(MutableSet):
         data = dict((i['name'], i.get('value')) for i in inputs if i.get('name'))
         data['email'] = self.config['login']
         data['password'] = self.config['password']
-        self._session.post('https://www.imdb.com/ap/signin', data=data)
-        # Get user id by exctracting from redirect url
+        d = self._session.post('https://www.imdb.com/ap/signin', data=data)
+        # Get user id by extracting from redirect url
         r = self._session.head('http://www.imdb.com/profile', allow_redirects=False)
         if not r.headers.get('location') or 'login' in r.headers['location']:
             raise plugin.PluginError('Login to imdb failed. Check your credentials.')
@@ -66,7 +67,11 @@ class ImdbEntrySet(MutableSet):
         if self.config['list'] == 'watchlist':
             data = {'consts[]': 'tt0133093', 'tracking_tag': 'watchlistRibbon'}
             wl_data = self._session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data).json()
-            self.list_id = wl_data['list_id']
+            try:
+                self.list_id = wl_data['list_id']
+            except KeyError:
+                raise PluginError('No list ID could be received. Please initialize list by '
+                                  'manually adding an item to it and try again')
         elif self.config['list'] in IMMUTABLE_LISTS or self.config['list'].startswith('ls'):
             self.list_id = self.config['list']
         else:
@@ -83,7 +88,7 @@ class ImdbEntrySet(MutableSet):
 
     @property
     def items(self):
-        if self._items is None:
+        if self._items is None or not self._items:
             r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
                                  (self.list_id, self.user_id))
             lines = r.iter_lines()
@@ -93,7 +98,7 @@ class ImdbEntrySet(MutableSet):
             for row in csv.reader(lines):
                 row = [unicode(cell, 'utf-8') for cell in row]
                 entry = Entry({
-                    'title': '%s (%s)' % (row[5], row[11]),
+                    'title': '%s (%s)' % (row[5], row[11]) if (row[11]) != '????' else '%s' % row[5],
                     'url': row[15],
                     'imdb_id': row[1],
                     'imdb_url': row[15],
@@ -166,6 +171,9 @@ class ImdbEntrySet(MutableSet):
         if 'imdb_id' not in entry:
             log.warning('Cannot add %s to imdb_list because it does not have an imdb_id', entry['title'])
             return
+        # TODO is this the right way? this basically doubles request per each item added
+        # Reset items list so that new item will show
+        self._items = None
         data = {
             'const': entry['imdb_id'],
             'list_id': self.list_id,
