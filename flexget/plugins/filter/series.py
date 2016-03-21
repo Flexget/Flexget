@@ -458,9 +458,6 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
     elif configured not in ['configured', 'unconfigured', 'all']:
         raise LookupError('"configured" parameter must be either "configured", "unconfigured", or "all"')
     query = session.query(Series)
-    if count:
-        return query.count()
-    query = query.slice(start, stop).from_self()
     query = query.outerjoin(Series.episodes).outerjoin(Episode.releases).outerjoin(Series.in_tasks).group_by(Series.id)
     if configured == 'configured':
         query = query.having(func.count(SeriesTask.id) >= 1)
@@ -477,6 +474,9 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         if not days:
             days = 365
         query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
+    if count:
+        return query.count()
+    query = query.slice(start, stop).from_self()
     return query
 
 
@@ -815,7 +815,6 @@ def show_episodes(series, start=None, stop=None, count=False, descending=False, 
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
     if count:
         return episodes.count()
-    episodes = episodes.slice(start, stop).from_self()
     # Query episodes in sane order instead of iterating from series.episodes
     if series.identified_by == 'sequence':
         episodes = episodes.order_by(Episode.number.desc()) if descending else episodes.order_by(Episode.number)
@@ -824,6 +823,7 @@ def show_episodes(series, start=None, stop=None, count=False, descending=False, 
             Episode.season, Episode.number)
     else:
         episodes = episodes.order_by(Episode.identifier.desc()) if descending else episodes.order_by(Episode.identifier)
+    episodes = episodes.slice(start, stop).from_self()
     return episodes.all()
 
 
@@ -1663,12 +1663,30 @@ def _add_alt_name(alt, db_series, series_name, session):
         else:
             # Alternate name already exists for another series. Not good.
             raise plugin.PluginError('Error adding alternate name for %s. %s is already associated with %s. '
-                                     'Check your config.' % (series_name, alt, db_series_alt.series.name))
+                                     'Check your settings.' % (series_name, alt, db_series_alt.series.name))
     else:
         log.debug('adding alternate name %s for %s into db' % (alt, series_name))
         db_series_alt = AlternateNames(alt)
         db_series.alternate_names.append(db_series_alt)
         log.debug('-> added %s' % db_series_alt)
+
+
+def set_alt_names(alt_names, db_series, session):
+    db_alt_names = []
+    for alt_name in alt_names:
+        db_series_alt = session.query(AlternateNames).filter(AlternateNames.alt_name == alt_name).first()
+        if db_series_alt:
+            if not db_series_alt.series_id == db_series.id:
+                raise plugin.PluginError('Error adding alternate name for %s. "%s" is already associated with %s. '
+                                         'Check your settings.' % (db_series.name, alt_name, db_series_alt.series.name))
+            else:
+                log.debug('alternate name %s already associated with series %s, no change needed', alt_name,
+                          db_series.name)
+                db_alt_names.append(db_series_alt)
+        else:
+            db_alt_names.append(AlternateNames(alt_name))
+            log.debug('adding alternate name %s to series %s', alt_name, db_series.name)
+    db_series.alternate_names[:] = db_alt_names
 
 
 @event('plugin.register')

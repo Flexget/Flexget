@@ -60,10 +60,10 @@ class EmitMovieQueue(object):
                 if queue_item.tmdb_id:
                     entry['tmdb_id'] = queue_item.tmdb_id
 
-                plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
                 # check if title is a imdb url (leftovers from old database?)
                 # TODO: maybe this should be fixed at the queue_get ...
                 if 'http://' in queue_item.title:
+                    plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
                     log.debug('queue contains url instead of title')
                     if entry.get('movie_name'):
                         entry['title'] = entry['movie_name']
@@ -77,14 +77,22 @@ class EmitMovieQueue(object):
                 # Add the year and quality if configured to (make sure not to double it up)
                 if config.get('year') and entry.get('movie_year') \
                         and unicode(entry['movie_year']) not in entry['title']:
+                    plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
                     entry['title'] += ' %s' % entry['movie_year']
                 # TODO: qualities can now be ranges.. how should we handle this?
                 if config.get('quality') and queue_item.quality != 'ANY':
                     log.info('quality option of emit_movie_queue is disabled while we figure out how to handle ranges')
                     # entry['title'] += ' %s' % queue_item.quality
                 entries.append(entry)
-                log.debug('Added title and IMDB id to new entry: %s - %s' %
-                          (entry['title'], entry['imdb_id']))
+                if entry.get('imdb_id'):
+                    log.debug('Added title and IMDB id to new entry: %s - %s',
+                              entry['title'], entry['imdb_id'])
+                elif entry.get('tmdb_id'):
+                    log.debug('Added title and TMDB id to new entry: %s - %s',
+                              entry['title'], entry['tmdb_id'])
+                else:
+                    # should this ever happen though?
+                    log.debug('Added title to new entry: %s', entry['title'])
 
         return entries
 

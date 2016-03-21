@@ -23,7 +23,6 @@ share/
 dist/
 build/
 *.sqlite
-*.yml
 paver-minilib.zip
 man/
 distribute-*.tar.gz
@@ -40,3 +39,5 @@ flexget/ui/.tmp/
 flexget/ui/app/
 cherrypy
 pip-selfcheck.json
+npm-debug.log
+.config-lock

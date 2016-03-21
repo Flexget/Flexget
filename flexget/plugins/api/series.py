@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import copy
 import datetime
 from math import ceil
 
@@ -9,6 +10,8 @@ from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, ApiClient
+from flexget.event import fire_event
+from flexget.plugin import PluginError
 from flexget.plugins.filter import series
 
 series_api = api.namespace('series', description='Flexget Series operations')
@@ -95,7 +98,8 @@ episode_object = {
         "episode_premiere_type": {'type': 'string'},
         "episode_number": {'type': 'string'},
         "episode_season": {'type': 'string'},
-        "episode_series_id": {'type': 'string'}
+        "episode_series_id": {'type': 'string'},
+        "episode_number_of_releases": {'type': 'integer'}
     }
 }
 
@@ -104,6 +108,7 @@ show_object = {
     'properties': {
         'show_id': {'type': 'integer'},
         'show_name': {'type': 'string'},
+        'alternate_names': {'type': 'array', 'items': {'type': 'string'}},
         'begin_episode': begin_object,
         'latest_downloaded_episode': latest_object,
         'in_tasks': {'type': 'array', 'items': {'type': 'string'}}
@@ -153,13 +158,70 @@ episode_schema = {
 }
 episode_schema = api.schema('episode_item', episode_schema)
 
-series_begin_input_schema = {
+series_edit_object = {
     'type': 'object',
     'properties': {
-        'episode_identifier': {'type': 'string'}
+        'episode_identifier': {'type': 'string'},
+        'alternate_names': {'type': 'array', 'items': {'type': 'string'}}
+    },
+    'anyOf': [
+        {'required': ['episode_identifier']},
+        {'required': ['alternate_names']}
+    ],
+    'additionalProperties:': False
+}
+series_edit_schema = api.schema('series_edit_schema', series_edit_object)
+
+series_input_object = copy.deepcopy(series_edit_object)
+series_input_object['properties']['series_name'] = {'type': 'string'}
+del series_input_object['anyOf']
+series_input_object['required'] = ['series_name']
+
+series_input_schema = api.schema('series_input_schema', series_input_object)
+
+release_object = {
+    'type': 'object',
+    'properties': {
+        'quality': {'type': 'string'},
+        'title': {'type': 'string'},
+        'proper_count': {'type': 'integer'},
+        'downloaded': {'type': 'boolean'}
     }
 }
-series_begin_input_schema = api.schema('begin_item', series_begin_input_schema)
+
+episode_object = {
+    'type': 'object',
+    'properties': {
+        'identifier': {'type': 'string'},
+        'identifier_type': {'type': 'string'},
+        'download_age': {'type': 'string'},
+        'releases': {
+            'type': 'array',
+            'items': release_object}
+    }
+}
+
+show_details_schema = {
+    'type': 'object',
+    'properties': {
+        'episodes': {
+            'type': 'array',
+            'items': episode_object
+        },
+        'show': show_object
+    }
+}
+
+shows_schema = {
+    'type': 'object',
+    'properties': {
+        'shows': {
+            'type': 'array',
+            'items': show_object
+        },
+        'number_of_shows': {'type': 'integer'}
+    }
+}
 
 
 def get_release_details(release):
@@ -184,7 +246,8 @@ def get_episode_details(episode):
         'episode_number': episode.number,
         'episode_series_id': episode.series_id,
         'episode_first_seen': episode.first_seen,
-        'episode_premiere_type': episode.is_premiere
+        'episode_premiere_type': episode.is_premiere,
+        'episode_number_of_releases': len(episode.releases)
     }
     return episode_item
 
@@ -226,12 +289,16 @@ def get_series_details(show):
     show_item = {
         'show_id': show.id,
         'show_name': show.name,
+        'alternate_names': [n.alt_name for n in show.alternate_names],
         'begin_episode': begin,
         'latest_downloaded_episode': latest,
         'in_tasks': [_show.name for _show in show.in_tasks]
     }
     return show_item
 
+
+show_details_schema = api.schema('show_details', show_details_schema)
+shows_schema = api.schema('list_of_shows', shows_schema)
 
 series_list_parser = api.parser()
 series_list_parser.add_argument('in_config', choices=('configured', 'unconfigured', 'all'), default='configured',
@@ -251,6 +318,8 @@ series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc'
 series_list_parser.add_argument('lookup', choices=('tvdb', 'tvmaze'), action='append',
                                 help="Get lookup result for every show by sending another request to lookup API")
 
+
+ep_identifier_doc = "'episode_identifier' should be one of SxxExx, integer or date formatted such as 2012-12-12"
 
 @series_api.route('/')
 class SeriesListAPI(APIResource):
@@ -334,53 +403,44 @@ class SeriesListAPI(APIResource):
                     response['shows'][pos]['lookup'].update({endpoint: result})
         return jsonify(response)
 
+    @api.response(200, 'Adding series and setting first accepted episode to ep_id', show_details_schema)
+    @api.response(500, 'Show already exists', default_error_schema)
+    @api.response(501, 'Episode Identifier format is incorrect', default_error_schema)
+    @api.response(502, 'Alternate name already exist for a different show', default_error_schema)
+    @api.validate(series_input_schema, description=ep_identifier_doc)
+    def post(self, session):
+        """ Create a new show and set its first accepted episode and/or alternate names """
+        data = request.json
+        series_name = data.get('series_name')
 
-release_object = {
-    'type': 'object',
-    'properties': {
-        'quality': {'type': 'string'},
-        'title': {'type': 'string'},
-        'proper_count': {'type': 'integer'},
-        'downloaded': {'type': 'boolean'}
-    }
-}
+        normalized_name = series.normalize_series_name(series_name)
+        matches = series.shows_by_exact_name(normalized_name, session=session)
+        if matches:
+            return {'status': 'error',
+                    'message': 'Show `%s` already exist in DB' % series_name
+                    }, 500
+        show = series.Series()
+        show.name = series_name
+        session.add(show)
 
-episode_object = {
-    'type': 'object',
-    'properties': {
-        'identifier': {'type': 'string'},
-        'identifier_type': {'type': 'string'},
-        'download_age': {'type': 'string'},
-        'releases': {
-            'type': 'array',
-            'items': release_object}
-    }
-}
+        ep_id = data.get('episode_identifier')
+        alt_names = data.get('alternate_names')
+        if ep_id:
+            try:
+                series.set_series_begin(show, ep_id)
+            except ValueError as e:
+                return {'status': 'error',
+                        'message': e.args[0]
+                        }, 501
+        if alt_names:
+            try:
+                series.set_alt_names(alt_names, show, session)
+            except PluginError as e:
+                return {'status': 'error',
+                        'message': e.value
+                        }, 502
 
-show_details_schema = {
-    'type': 'object',
-    'properties': {
-        'episodes': {
-            'type': 'array',
-            'items': episode_object
-        },
-        'show': show_object
-    }
-}
-
-shows_schema = {
-    'type': 'object',
-    'properties': {
-        'shows': {
-            'type': 'array',
-            'items': show_object
-        },
-        'number_of_shows': {'type': 'integer'}
-    }
-}
-
-show_details_schema = api.schema('show_details', show_details_schema)
-shows_schema = api.schema('list_of_shows', shows_schema)
+        return jsonify(get_series_details(show))
 
 
 @series_api.route('/search/<string:name>')
@@ -446,8 +506,11 @@ class SeriesShowAPI(APIResource):
 
     @api.response(200, 'Episodes for series will be accepted starting with ep_id', show_details_schema)
     @api.response(404, 'Show ID not found', default_error_schema)
-    @api.validate(series_begin_input_schema)
-    @api.doc(description='Set a begin episode using a show ID')
+    @api.response(501, 'Episode Identifier format is incorrect', default_error_schema)
+    @api.response(502, 'Alternate name already exist for a different show', default_error_schema)
+    @api.validate(series_edit_schema, description=ep_identifier_doc)
+    @api.doc(description='Set a begin episode or alternate names using a show ID. Note that alternate names override '
+                         'the existing names (if name does not belong to a different show).')
     def put(self, show_id, session):
         """ Set the initial episode of an existing show """
         try:
@@ -458,42 +521,22 @@ class SeriesShowAPI(APIResource):
                     }, 404
         data = request.json
         ep_id = data.get('episode_identifier')
-        try:
-            series.set_series_begin(show, ep_id)
-        except ValueError as e:
-            return {'status': 'error',
-                    'message': e.args[0]
-                    }, 400
-        return jsonify(get_series_details(show))
+        alt_names = data.get('alternate_names')
+        if ep_id:
+            try:
+                series.set_series_begin(show, ep_id)
+            except ValueError as e:
+                return {'status': 'error',
+                        'message': e.args[0]
+                        }, 501
+        if alt_names:
+            try:
+                series.set_alt_names(alt_names, show, session)
+            except PluginError as e:
+                return {'status': 'error',
+                        'message': e.value
+                        }, 502
 
-
-@series_api.route('/<name>')
-@api.doc(description="Add a new show to Flexget's DB and set the 1st initial episode via"
-                     " its body. 'episode_identifier' should be one of SxxExx, integer or date "
-                     "formatted such as 2012-12-12")
-class SeriesBeginByNameAPI(APIResource):
-    @api.response(200, 'Adding series and setting first accepted episode to ep_id', show_details_schema)
-    @api.response(500, 'Show already exists', default_error_schema)
-    @api.validate(series_begin_input_schema)
-    def post(self, name, session):
-        """ Create a new show and set its first accepted episode """
-        normalized_name = series.normalize_series_name(name)
-        matches = series.shows_by_exact_name(normalized_name, session=session)
-        if matches:
-            return {'status': 'error',
-                    'message': 'Show `%s` already exist in DB' % name
-                    }, 500
-        show = series.Series()
-        show.name = name
-        session.add(show)
-        data = request.json
-        ep_id = data.get('episode_identifier')
-        try:
-            series.set_series_begin(show, ep_id)
-        except ValueError as e:
-            return {'status': 'error',
-                    'message': e.args[0]
-                    }, 400
         return jsonify(get_series_details(show))
 
 
@@ -582,6 +625,12 @@ class SeriesEpisodesAPI(APIResource):
         return {}
 
 
+delete_parser = api.parser()
+delete_parser.add_argument('delete_seen', type=inputs.boolean, default=False,
+                           help="Enabling this will delete all the related releases from seen entries list as well, "
+                                "enabling to re-download them")
+
+
 @api.response(404, 'Show ID not found', default_error_schema)
 @api.response(414, 'Episode ID not found', default_error_schema)
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id', default_error_schema)
@@ -615,7 +664,8 @@ class SeriesEpisodeAPI(APIResource):
 
     @api.response(200, 'Episode successfully forgotten for show', empty_response)
     @api.doc(description='Delete a specific episode via its ID and show ID. Deleting an episode will mark it as '
-                         'wanted again')
+                         'wanted again',
+             parser=delete_parser)
     def delete(self, show_id, ep_id, session):
         """ Forgets episode by show ID and episode ID """
         try:
@@ -634,13 +684,22 @@ class SeriesEpisodeAPI(APIResource):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
 
+        args = delete_parser.parse_args()
+        if args.get('delete_seen'):
+            for release in episode.releases:
+                fire_event('forget', release.title)
+
         series.forget_episodes_by_id(show_id, ep_id)
         return {}
 
 
 release_list_parser = api.parser()
-release_list_parser.add_argument('downloaded', choices=('downloaded', 'not_downloaded', 'all'), default='all',
-                                 help='Filter between release status')
+release_list_parser.add_argument('downloaded', type=inputs.boolean, help='Filter between release status')
+
+release_delete_parser = release_list_parser.copy()
+release_delete_parser.add_argument('delete_seen', type=inputs.boolean, default=False,
+                                   help="Enabling this will delete all the related releases from seen entries list as well, "
+                                        "enabling to re-download them")
 
 
 @api.response(404, 'Show ID not found', default_error_schema)
@@ -671,12 +730,10 @@ class SeriesReleasesAPI(APIResource):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
         args = release_list_parser.parse_args()
-        downloaded = args['downloaded']
+        downloaded = args.get('downloaded') == True if args.get('downloaded') is not None else None
         release_items = []
         for release in episode.releases:
-            if (downloaded == 'downloaded' and release.downloaded) or \
-                    (downloaded == 'not_downloaded' and not release.downloaded) or \
-                            downloaded == 'all':
+            if downloaded and release.downloaded or downloaded is False and not release.downloaded or not downloaded:
                 release_items.append(get_release_details(release))
 
         return jsonify({
@@ -689,7 +746,7 @@ class SeriesReleasesAPI(APIResource):
 
     @api.response(200, 'Successfully deleted all releases for episode', empty_response)
     @api.doc(description='Delete all releases for a specific episode of a specific show.',
-             parser=release_list_parser)
+             parser=release_delete_parser)
     def delete(self, show_id, ep_id, session):
         """ Deletes all episodes releases by show ID and episode ID """
         try:
@@ -708,15 +765,15 @@ class SeriesReleasesAPI(APIResource):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
 
-        args = release_list_parser.parse_args()
-        downloaded = args['downloaded']
+        args = release_delete_parser.parse_args()
+        downloaded = args.get('downloaded') == True if args.get('downloaded') is not None else None
         release_items = []
         for release in episode.releases:
-            if (downloaded == 'downloaded' and release.downloaded) or \
-                    (downloaded == 'not_downloaded' and not release.downloaded) or \
-                            downloaded == 'all':
+            if downloaded and release.downloaded or downloaded is False and not release.downloaded or not downloaded:
                 release_items.append(release)
-        number_of_releases = len(release_items)
+            if args.get('delete_seen'):
+                fire_event('forget', release.title)
+
         for release in release_items:
             series.delete_release_by_id(release.id)
         return {}
@@ -794,7 +851,8 @@ class SeriesReleaseAPI(APIResource):
         })
 
     @api.response(200, 'Release successfully deleted', empty_response)
-    @api.doc(description='Delete a specific releases for a specific episode of a specific show.')
+    @api.doc(description='Delete a specific releases for a specific episode of a specific show.',
+             parser=delete_parser)
     def delete(self, show_id, ep_id, rel_id, session):
         ''' Delete episode release by show ID, episode ID and release ID '''
         try:
@@ -821,6 +879,9 @@ class SeriesReleaseAPI(APIResource):
         if not series.release_in_episode(ep_id, rel_id):
             return {'status': 'error',
                     'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
+        args = delete_parser.parse_args()
+        if args.get('delete_seen'):
+            fire_event('forget', release.title)
 
         series.delete_release_by_id(rel_id)
         return {}

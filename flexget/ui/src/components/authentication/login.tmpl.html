@@ -1,24 +1,24 @@
-<div class="login" layout="column" layout-padding>
+<div class="login" layout="column" flex layout-align="start stretch">
     <div class="header"></div>
-    <div>
-        <form>
-            <div layout="column" flex-gt-sm="40" flex-offset-gt-sm="30" flex-gt-md="30" flex-offset-gt-md="35">
+    <form name="loginForm">
+        <div layout="row" layout-align="center stretch">
+            <md-card flex-xs="100" flex-sm="70" flex-md="50" flex-gt-md="30" layout-padding>
                 <p style="color: orange" class="text-success text-center" ng-if="vm.timeout == 'true'">Your session timed out</p>
 
-                <p style="color: red">{{ vm.error }}</p>
-                <md-input-container flex>
+                <p style="color: red" class="text-center">{{ vm.error }}</p>
+                <md-input-container class="md-block">
                     <label>Username</label>
                     <input id="username" ng-model="vm.credentials.username">
                 </md-input-container>
-                <md-input-container>
+                <md-input-container class="md-block">
                     <label>Password</label>
-                    <input ng-model="vm.credentials.password" type="password">
+                    <input id="password" ng-model="vm.credentials.password" type="password">
                 </md-input-container>
                 <div layout="column" layout-align="center center">
                     <md-checkbox md-no-ink aria-label="Remember Me" ng-model="vm.remember" class="md-primary">Remember Me</md-checkbox>
                 </div>
                 <md-button type="submit" class="md-raised md-primary" data-ng-click="vm.login()">Login</md-button>
-            </div>
-        </form>
-    </div>
+            </md-card>
+        </div>
+    </form>
 </div>

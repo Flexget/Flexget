@@ -1,5 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import
-from nose.tools import assert_true
 from flexget.plugin import get_plugin_by_name
 
 
@@ -33,12 +32,12 @@ class TestURLRewriters(object):
         # test with piratebay entry
         urlrewriter = self.get_urlrewriter('piratebay')
         entry = task.find_entry(title='tpb page')
-        assert_true(urlrewriter.url_rewritable(task, entry))
+        assert urlrewriter.url_rewritable(task, entry)
         entry = task.find_entry(title='tbp torrent')
         assert not urlrewriter.url_rewritable(task, entry), \
             'TPB direct torrent link should not be url_rewritable'
         entry = task.find_entry(title='tbp torrent subdomain')
-        assert_true(urlrewriter.url_rewritable(task, entry))
+        assert urlrewriter.url_rewritable(task, entry)
         entry = task.find_entry(title='tbp torrent bad subdomain')
         assert not urlrewriter.url_rewritable(task, entry), \
             'TPB link with invalid subdomain should not be url_rewritable'
@@ -48,14 +47,14 @@ class TestURLRewriters(object):
         # test with piratebay entry
         urlrewriter = self.get_urlrewriter('piratebay')
         entry = task.find_entry(title='tbp search')
-        assert_true(urlrewriter.url_rewritable(task, entry))
+        assert urlrewriter.url_rewritable(task, entry)
 
     def test_nyaa_torrents(self, execute_task):
         task = execute_task('test')
         entry = task.find_entry(title='nyaa')
         urlrewriter = self.get_urlrewriter('nyaa')
         assert entry['url'] == 'http://www.nyaa.eu/?page=torrentinfo&tid=12345'
-        assert_true(urlrewriter.url_rewritable(task, entry))
+        assert urlrewriter.url_rewritable(task, entry)
         urlrewriter.url_rewrite(task, entry)
         assert entry['url'] == 'http://www.nyaa.eu/?page=download&tid=12345'
 

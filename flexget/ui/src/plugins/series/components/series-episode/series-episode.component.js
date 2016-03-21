@@ -1,0 +1,95 @@
+(function () {
+  'use strict';
+
+  angular
+    .module('flexget.plugins.series')
+    .component('seriesEpisode', {
+      templateUrl: 'plugins/series/components/series-episode/series-episode.tmpl.html',
+      controllerAs: 'vm',
+      controller: seriesEpisodeController,
+      bindings: {
+        episode: '<',
+        show: '<',
+        deleteEpisode: '&',
+        resetReleases: '&'
+      },
+    });
+
+    function seriesEpisodeController($mdDialog, $http, $stateParams, $filter){
+      var vm = this;
+
+      var releasesOpen = false;
+      vm.toggleReleases = function() {
+        releasesOpen = !releasesOpen;
+
+        if(releasesOpen && !vm.releases)
+        {
+          loadReleases();
+        }
+      }
+
+      vm.isOpen = function() {
+        return releasesOpen;
+      }
+
+      vm.deleteReleases = function() {
+        var confirm = $mdDialog.confirm()
+          .title('Confirm deleting releases.')
+          .htmlContent("Are you sure you want to delete all releases for <b>" + vm.episode.episode_identifier + "</b> from show " + vm.show + "?\n This also removes all seen releases for this episode!")
+          .ok("Forget")
+          .cancel("No");
+
+        $mdDialog.show(confirm).then(function() {
+          $http.delete('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases', { params: { delete_seen: true}})
+            .success(function(data) {
+              vm.releases = undefined;
+              vm.episode.episode_number_of_releases = 0;
+              releasesOpen = false;
+            })
+            .error(function(error) {
+              var errorDialog = $mdDialog.alert()
+                .title("Something went wrong")
+                .htmlContent("Oops, something went wrong when trying to forget <b>" + vm.episode.episode_identifier + "</b> from show " + vm.show + ":\n" + error.message)
+                .ok("Ok");
+
+              $mdDialog.show(errorDialog);
+            });
+        });
+      }
+
+      function loadReleases() {
+        $http.get('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases')
+        .success(function(data) {
+          vm.releases = data.releases;
+        }).error(function(error) {
+          console.log(error);
+        });
+      }
+
+      vm.resetRelease = function(id) {
+        $http.put('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases/' + id + '/')
+          .success(function(data) {
+            $filter('filter')(vm.releases, { release_id: id})[0].release_downloaded = false;
+          }).error(function(error) {
+            console.log(error);
+          });
+      }
+
+      vm.forgetRelease = function(release) {
+        $http.delete('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases/' + release.release_id + '/', { params: { delete_seen: true }})
+          .success(function(data) {
+            var index = vm.releases.indexOf(release);
+            vm.releases.splice(index, 1);
+
+            vm.episode.episode_number_of_releases -= 1;
+            if(vm.releases.length == 0) {
+              releasesOpen = false;
+              vm.releases = undefined;
+            }
+
+          }).error(function(error) {
+            console.log(error);
+          });
+      }
+    }
+})();

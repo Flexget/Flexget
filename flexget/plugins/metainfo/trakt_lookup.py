@@ -61,7 +61,7 @@ class PluginTraktLookup(object):
     trakt_ep_id
     trakt_ep_tvdb_id
 
-  """
+    """
 
     # Series info
     series_map = {
@@ -108,7 +108,7 @@ class PluginTraktLookup(object):
         'trakt_season': 'season',
         'trakt_episode': 'number',
         'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep.season, ep.number),
-        }
+    }
 
     # Movie info
     movie_map = {
@@ -141,7 +141,8 @@ class PluginTraktLookup(object):
                 'account': {'type': 'string'},
                 'username': {'type': 'string'},
             },
-            'required': ['username'],
+            'anyOf': [{'required': ['username']}, {'required': ['account']}],
+            'error_anyOf': 'At least one of `username` or `account` options are needed.',
             'additionalProperties': False
 
         },
@@ -189,7 +190,7 @@ class PluginTraktLookup(object):
                 series = lookup_series(**lookupargs)
                 episode = series.get_episode(entry['series_season'], entry['series_episode'])
             except LookupError as e:
-                log.debug('Error looking up trakt episode information for %s: %s' % (entry['title'], e.args[0]))
+                log.debug('Error looking up trakt episode information for %s: %s', entry['title'], e.args[0])
             else:
                 entry.update_using_map(self.episode_map, episode)
         return entry
@@ -227,20 +228,20 @@ class PluginTraktLookup(object):
 
     def lazy_collected_lookup(self, config, style, entry):
         """Does the lookup for this entry and populates the entry fields."""
-        if style == 'show':
+        if style == 'show' or style == 'episode':
             lookup = lookup_series
-            id = entry.get('trakt_show_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_show_id', eval_lazy=True)
         else:
             lookup = lookup_movie
-            id = entry.get('trakt_movie_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_movie_id', eval_lazy=True)
         with Session() as session:
-            lookupargs = {'trakt_id': id,
+            lookupargs = {'trakt_id': trakt_id,
                           'session': session}
             try:
                 item = lookup(**lookupargs)
-                if style == 'show':
+                if style == 'episode':
                     item = item.get_episode(entry['series_season'], entry['series_episode'])
-                collected = ApiTrakt.collected(config['username'], style, item, entry.get('title'),
+                collected = ApiTrakt.collected(style, item, entry.get('title'), username=config.get('username'),
                                                account=config.get('account'))
             except LookupError as e:
                 log.debug(e.args[0])
@@ -250,20 +251,20 @@ class PluginTraktLookup(object):
 
     def lazy_watched_lookup(self, config, style, entry):
         """Does the lookup for this entry and populates the entry fields."""
-        if style == 'episode':
+        if style == 'show' or style == 'episode':
             lookup = lookup_series
-            id = entry.get('trakt_show_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_show_id', eval_lazy=True)
         else:
             lookup = lookup_movie
-            id = entry.get('trakt_movie_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_movie_id', eval_lazy=True)
         with Session() as session:
-            lookupargs = {'trakt_id': id,
+            lookupargs = {'trakt_id': trakt_id,
                           'session': session}
             try:
                 item = lookup(**lookupargs)
                 if style == 'episode':
                     item = item.get_episode(entry['series_season'], entry['series_episode'])
-                watched = ApiTrakt.watched(config['username'], style, item, entry.get('title'),
+                watched = ApiTrakt.watched(style, item, entry.get('title'), username=config.get('username'),
                                            account=config.get('account'))
             except LookupError as e:
                 log.debug(e.args[0])
@@ -283,22 +284,24 @@ class PluginTraktLookup(object):
         for entry in task.entries:
 
             if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False):
+                style = 'show'
                 entry.register_lazy_func(self.lazy_series_lookup, self.series_map)
                 # TODO cleaner way to do this?
                 entry.register_lazy_func(self.lazy_series_actor_lookup, self.series_actor_map)
 
                 if 'series_season' in entry and 'series_episode' in entry:
                     entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
-                    if config.get('username'):
-                        collected_lookup = functools.partial(self.lazy_collected_lookup, config, 'show')
-                        watched_lookup = functools.partial(self.lazy_watched_lookup, config, 'episode')
-                        entry.register_lazy_func(collected_lookup, ['trakt_collected'])
-                        entry.register_lazy_func(watched_lookup, ['trakt_watched'])
+                    style = 'episode'
+                if config.get('username') or config.get('account'):
+                    collected_lookup = functools.partial(self.lazy_collected_lookup, config, style)
+                    watched_lookup = functools.partial(self.lazy_watched_lookup, config, style)
+                    entry.register_lazy_func(collected_lookup, ['trakt_collected'])
+                    entry.register_lazy_func(watched_lookup, ['trakt_watched'])
             else:
                 entry.register_lazy_func(self.lazy_movie_lookup, self.movie_map)
                 # TODO cleaner way to do this?
                 entry.register_lazy_func(self.lazy_movie_actor_lookup, self.movie_actor_map)
-                if config.get('username'):
+                if config.get('username') or config.get('account'):
                     collected_lookup = functools.partial(self.lazy_collected_lookup, config, 'movie')
                     watched_lookup = functools.partial(self.lazy_watched_lookup, config, 'movie')
                     entry.register_lazy_func(collected_lookup, ['trakt_collected'])

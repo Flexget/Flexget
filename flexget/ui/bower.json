@@ -1,24 +1,25 @@
 {
   "name": "FlexgetUI",
   "dependencies": {
-    "angular": "angularjs#~1.4.6",
-    "angular-material": "~1.0.5",
+    "angular": "angularjs#~1.5.1",
+    "angular-material": "~1.1.0-RC1",
     "angular-ui-router": "ui-router#~0.2.15",
     "angular-filter": "~0.5.8",
     "angular-schema-form": "~0.8.12",
     "font-awesome": "~4.5.0",
-    "angular-ui-grid": "~3.1.0",
+    "angular-ui-grid": "~3.1.1",
     "bootstrap-sass": "bootstrap-sass-official#~3.3.5",
     "angular-cookies": "~1.4.8",
     "please-wait": "~0.0.5",
     "oboe": "~2.1.2",
     "angular-spinkit": "~0.3.3",
     "angular-loading-bar": "~0.8.0",
-    "ui-grid-auto-scroll": "~1.0.0",
-    "animate.css-scss": "~3.1.0"
+    "ui-grid-auto-scroll": "~1.0.1",
+    "animate.css-scss": "~3.1.0",
+    "angular-messages": "^1.5.1"
   },
   "resolutions": {
-    "angular": "1.5.0"
+    "angular": "1.5.2"
   },
   "devDependencies": {},
   "overrides": {

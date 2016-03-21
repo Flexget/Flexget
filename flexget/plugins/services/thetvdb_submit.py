@@ -1,86 +1,97 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import xml.etree.ElementTree as ElementTree
 
 from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
-
-try:
-    from flexget.plugins.api_tvdb import get_mirror, api_key
-except ImportError:
-    raise plugin.DependencyError(issued_by='thetvdb_submit', missing='api_tvdb',
-                                 message='thetvdb_add/remove requires the `api_tvdb` plugin')
+from flexget.utils.database import with_session
+from flexget.plugins.input.thetvdb_favorites import TVDBUserFavorite
+from flexget.plugins.api_tvdb import TVDBRequest
 
 
-class TVDBSubmit(object):
+class TVDBBase(object):
     
     schema = {
         'type': 'object',
         'properties': {
-            'account_id': {'type': 'string'}
+            'username': {'type': 'string'},
+            'password': {'type': 'string'}
         },
-        'required': ['account_id'],
+        'required': ['username', 'password'],
         'additionalProperties': False
     }
-    
-    # Defined by subclasses
-    remove = None
-    log = None
-    
-    def exists(self, favs, tvdb_id):
-        if favs is not None:
-            for series in favs.findall('Series'):
-                if series.text == tvdb_id:
-                    return True
-        return False
-    
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
-        mirror = None
-        favs = None
-        for entry in task.accepted:
-            if entry.get('tvdb_id'):
-                tvdb_id = str(entry['tvdb_id'])
-                ser_info = entry.get('series_name', tvdb_id)
-                if favs is not None:
-                    isin = self.exists(favs, tvdb_id)
-                    if (self.remove and not isin) or (isin and not self.remove):
-                        self.log.verbose('Nothing to do for series %s, skipping...' % ser_info)
-                        continue
-                if not mirror:
-                    mirror = get_mirror()
-                url = mirror + 'User_Favorites.php?accountid=%s&type=%s&seriesid=%s' % \
-                    (config['account_id'], 'remove' if self.remove else 'add', tvdb_id)
-                try:
-                    page = task.requests.get(url).content
-                except RequestException as e:
-                    self.log.error('Error submitting series %s to tvdb: %s' % (tvdb_id, e))
-                    continue
-                if not page:
-                    self.log.error('Null response from tvdb, aborting task.')
-                    return
-                favs = ElementTree.fromstring(page)
-                isin = self.exists(favs, tvdb_id)
-                if (isin and not self.remove):
-                    self.log.verbose('Series %s added to tvdb favorites.' % ser_info)
-                elif (self.remove and not isin):
-                    self.log.verbose('Series %s removed from tvdb favorites.' % ser_info)
-                else:
-                    self.log.info("Operation failed for series %s (don't know why)." % ser_info)
+
+    def get_favs(self, username, session):
+        favs = session.query(TVDBUserFavorite).filter(TVDBUserFavorite.username == username).first()
+        if not favs:
+            favs = TVDBUserFavorite(username=username)
+            session.add(favs)
+        return favs
 
 
-class TVDBAdd(TVDBSubmit):
+class TVDBAdd(TVDBBase):
     """Add all accepted shows to your tvdb favorites."""
     remove = False
     log = logging.getLogger('thetvdb_add')
 
+    @plugin.priority(-255)
+    @with_session
+    def on_task_output(self, task, config, session=None):
 
-class TVDBRemove(TVDBSubmit):
+        tvdb_favorites = self.get_favs(config['username'], session)
+
+        for entry in task.accepted:
+            if entry.get('tvdb_id'):
+                tvdb_id = entry['tvdb_id']
+                series_name = entry.get('series_name', tvdb_id)
+
+                if tvdb_id in tvdb_favorites.series_ids:
+                    self.log.verbose('Already a fav %s (%s), skipping...' % (series_name, tvdb_id))
+                    continue
+
+                try:
+                    req = TVDBRequest(username=config['username'], password=config['password'])
+                    req.put('/user/favorites/%s' % tvdb_id)
+                except RequestException as e:
+                    # 409 is thrown if it was already in the favs
+                    if e.response.status_code != 409:
+                        entry.fail('Error adding %s to tvdb favorites: %s' % (tvdb_id, str(e)))
+                        continue
+
+                tvdb_favorites.series_ids.append(tvdb_id)
+
+
+class TVDBRemove(TVDBBase):
     """Remove all accepted shows from your tvdb favorites."""
     remove = True
     log = logging.getLogger('thetvdb_remove')
+
+    @plugin.priority(-255)
+    @with_session
+    def on_task_output(self, task, config, session=None):
+
+        tvdb_favorites = self.get_favs(config['username'], session=session)
+
+        for entry in task.accepted:
+            if entry.get('tvdb_id'):
+                tvdb_id = entry['tvdb_id']
+                series_name = entry.get('series_name', tvdb_id)
+
+                if tvdb_id not in tvdb_favorites.series_ids:
+                    self.log.verbose('Not a fav %s (%s), skipping...' % (series_name, tvdb_id))
+                    continue
+
+                try:
+                    req = TVDBRequest(username=config['username'], password=config['password'])
+                    req.delete('/user/favorites/%s' % tvdb_id)
+                except RequestException as e:
+                    # 409 is thrown if it was not in the favs
+                    if e.response.status_code != 409:
+                        entry.fail('Error deleting %s from tvdb favorites: %s' % (tvdb_id, str(e)))
+                        continue
+
+                tvdb_favorites.series_ids.remove(tvdb_id)
 
 
 @event('plugin.register')

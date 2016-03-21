@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
 from flask import jsonify
+from flask_restplus import inputs
 
 from flexget.api import api, APIResource
 from flexget.plugins.api_tvmaze import APITVMaze as tvm
@@ -66,7 +67,27 @@ tvmaze_series_object = {
     }
 }
 
+tvmaze_episode_object = {
+    'type': 'object',
+    'properties': {
+        'tvmaze_id': {'type': 'integer'},
+        'series_id': {'type': 'integer'},
+        'number': {'type': 'integer'},
+        'season_number': {'type': 'integer'},
+        'title': {'type': 'string'},
+        'airdate': {'type': 'string', 'format': 'date-time'},
+        'url': {'type': 'string'},
+        'original_image': {'type': 'string'},
+        'medium_image': {'type': 'string'},
+        'airstamp': {'type': 'string', 'format': 'date-time'},
+        'runtime': {'type': 'string'},
+        'summary': {'type': 'string'},
+        'last_update': {'type': 'string', 'format': 'date-time'}
+    }
+}
+
 tvmaze_series_schema = api.schema('tvmaze_series_schema', tvmaze_series_object)
+tvmaze_episode_schema = api.schema('tvmaze_episode_schema', tvmaze_episode_object)
 
 
 @tvmaze_api.route('/series/<string:search>/')
@@ -91,3 +112,44 @@ class TVDBSeriesSearchApi(APIResource):
                     }, 404
 
         return jsonify(result.to_dict())
+
+
+episode_parser = api.parser()
+episode_parser.add_argument('season_num', type=int, help='Season number')
+episode_parser.add_argument('ep_num', type=int, help='Episode number')
+episode_parser.add_argument('air_date', type=inputs.date_from_iso8601, help="Air date in the format of '2012-01-01'")
+
+
+@tvmaze_api.route('/episode/<int:tvmaze_id>/')
+@api.doc(params={'tvmaze_id': 'TVMaze ID of show'})
+@api.doc(parser=episode_parser)
+class TVDBEpisodeSearchAPI(APIResource):
+    @api.response(200, 'Successfully found episode', tvmaze_episode_schema)
+    @api.response(404, 'No show found', default_error_schema)
+    @api.response(500, 'Not enough parameters for lookup', default_error_schema)
+    def get(self, tvmaze_id, session=None):
+        args = episode_parser.parse_args()
+        air_date = args.get('air_date')
+        season_num = args.get('season_num')
+        ep_num = args.get('ep_num')
+
+        kwargs = {'tvmaze_id': tvmaze_id,
+                  'session': session}
+        if air_date:
+            kwargs['series_id_type'] = 'date'
+            kwargs['series_date'] = air_date
+        elif season_num and ep_num:
+            kwargs['series_id_type'] = 'ep'
+            kwargs['series_season'] = season_num
+            kwargs['series_episode'] = ep_num
+        else:
+            return {'status': 'error',
+                    'message': 'not enough parameters sent for lookup'}, 500
+
+        try:
+            episode = tvm.episode_lookup(**kwargs)
+        except LookupError as e:
+            return {'status': 'error',
+                    'message': e.args[0]
+                    }, 404
+        return jsonify(episode.to_dict())

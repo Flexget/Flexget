@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "airbnb/legacy",
+    "angular"
+  ],
+
+  "rules": {
+    "wrap-iife": [2, "inside"],
+    "angular/window-service": 0,
+    "func-names": 0,
+    "comma-dangle": [2, "always-multiline"],
+    "consistent-return": 0,
+    "no-extend-native": 0
+  }
+}

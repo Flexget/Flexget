@@ -1,16 +1,14 @@
 <md-content flex layout-margin>
-    <div>
-        <section ng-repeat="(key, value) in vm.entries | groupBy: 'time | limitTo : 10'">
-            <md-subheader class="md-primary">{{ key }}</md-subheader>
-            <md-list layout-padding>
-                <md-list-item class="md-2-line" ng-repeat="entry in value">
-                    <div class="md-list-item-text">
-                        <h3>{{ entry.title }}</h3>
+    <section ng-repeat="(key, value) in vm.entries | groupBy: 'time | limitTo : 10'">
+        <md-subheader class="md-primary">{{ key }}</md-subheader>
+        <md-list layout-padding>
+            <md-list-item class="md-2-line" ng-repeat="entry in value">
+                <div class="md-list-item-text">
+                    <h3>{{ entry.title }}</h3>
 
-                        <p>{{ entry.task }}</p>
-                    </div>
-                </md-list-item>
-            </md-list>
-        </section>
-    </div>
+                    <p>{{ entry.task }}</p>
+                </div>
+            </md-list-item>
+        </md-list>
+    </section>
 </md-content>

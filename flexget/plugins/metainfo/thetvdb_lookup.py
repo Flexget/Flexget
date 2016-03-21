@@ -4,12 +4,9 @@ import logging
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
+from flexget.utils.database import with_session
 
-try:
-    from flexget.plugins.api_tvdb import lookup_series, lookup_episode, get_mirror
-except ImportError:
-    raise plugin.DependencyError(issued_by='thetvdb_lookup', missing='api_tvdb',
-                                 message='thetvdb_lookup requires the `api_tvdb` plugin')
+from flexget.plugins.api_tvdb import lookup_series, lookup_episode
 
 log = logging.getLogger('thetvdb_lookup')
 
@@ -37,9 +34,8 @@ class PluginThetvdbLookup(object):
       tvdb_genres
       tvdb_network
       tvdb_overview
-      tvdb_banner_url
-      tvdb_fanart_url
-      tvdb_poster_url
+      tvdb_banner
+      tvdb_posters
       tvdb_airs_day_of_week
       tvdb_actors
       tvdb_language (en, fr, etc.)
@@ -58,52 +54,65 @@ class PluginThetvdbLookup(object):
 
     # Series info
     series_map = {
-        'tvdb_series_name': 'seriesname',
+        'tvdb_series_name': 'name',
         'tvdb_rating': 'rating',
         'tvdb_status': 'status',
         'tvdb_runtime': 'runtime',
-        'tvdb_first_air_date': 'firstaired',
+        'tvdb_first_air_date': 'first_aired',
         'tvdb_air_time': 'airs_time',
-        'tvdb_content_rating': 'contentrating',
-        'tvdb_genres': 'genre',
+        'tvdb_content_rating': 'content_rating',
+        'tvdb_genres': lambda series: [g for g in series.genres],
         'tvdb_network': 'network',
         'tvdb_overview': 'overview',
-        'tvdb_banner_url': lambda series: series.banner and get_mirror('banner') + series.banner,
-        'tvdb_fanart_url': lambda series: series.fanart and get_mirror('banner') + series.fanart,
-        'tvdb_poster_url': lambda series: series.poster and get_mirror('banner') + series.poster,
+        'tvdb_banner': 'banner',
         'tvdb_airs_day_of_week': 'airs_dayofweek',
-        'tvdb_actors': 'actors',
-        'tvdb_language': 'language',
         'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
         'imdb_id': 'imdb_id',
         'zap2it_id': 'zap2it_id',
-        'tvdb_id': 'id'}
+        'tvdb_id': 'id'
+    }
+
+    series_actor_map = {
+        'tvdb_actors': 'actors',
+    }
+    series_poster_map = {
+        'tvdb_posters': 'posters',
+    }
+
     # Episode info
     episode_map = {
-        'tvdb_ep_name': 'episodename',
-        'tvdb_ep_air_date': 'firstaired',
+        'tvdb_ep_name': 'name',
+        'tvdb_ep_air_date': 'first_aired',
         'tvdb_ep_rating': 'rating',
-        'tvdb_ep_image_url': lambda ep: ep.filename and get_mirror('banner') + ep.filename,
+        'tvdb_ep_image': 'image',
         'tvdb_ep_overview': 'overview',
-        'tvdb_ep_writers': 'writer',
         'tvdb_ep_directors': 'director',
-        'tvdb_ep_guest_stars': 'gueststars',
         'tvdb_absolute_number': 'absolute_number',
-        'tvdb_season': 'seasonnumber',
-        'tvdb_episode': 'episodenumber',
-        'tvdb_ep_id': lambda ep: 'S%02dE%02d' % (ep.seasonnumber, ep.episodenumber)}
+        'tvdb_season': 'season_number',
+        'tvdb_episode': 'episode_number',
+        'tvdb_ep_id': lambda ep: 'S%02dE%02d' % (ep.season_number, ep.episode_number)
+    }
 
     schema = {'type': 'boolean'}
 
-    def lazy_series_lookup(self, entry):
-        """Does the lookup for this entry and populates the entry fields."""
+    @with_session(expire_on_commit=False)
+    def series_lookup(self, entry, field_map, session=None):
         try:
-            with Session(expire_on_commit=False) as session:
-                series = lookup_series(entry.get('series_name', eval_lazy=False),
-                                       tvdb_id=entry.get('tvdb_id', eval_lazy=False), session=session)
-                entry.update_using_map(self.series_map, series)
+            series = lookup_series(entry.get('series_name', eval_lazy=False),
+                                   tvdb_id=entry.get('tvdb_id', eval_lazy=False), session=session)
+            entry.update_using_map(field_map, series)
         except LookupError as e:
             log.debug('Error looking up tvdb series information for %s: %s' % (entry['title'], e.args[0]))
+        return entry
+
+    def lazy_series_lookup(self, entry):
+        return self.series_lookup(entry, self.series_map)
+
+    def lazy_series_actor_lookup(self, entry):
+        return self.series_lookup(entry, self.series_actor_map)
+
+    def lazy_series_poster_lookup(self, entry):
+        return self.series_lookup(entry, self.series_poster_map)
 
     def lazy_episode_lookup(self, entry):
         try:
@@ -121,12 +130,11 @@ class PluginThetvdbLookup(object):
             lookupargs = {'name': entry.get('series_name', eval_lazy=False),
                           'tvdb_id': entry.get('tvdb_id', eval_lazy=False)}
             if entry['series_id_type'] == 'ep':
-                lookupargs['seasonnum'] = entry['series_season'] + season_offset
-                lookupargs['episodenum'] = entry['series_episode'] + episode_offset
+                lookupargs['season_number'] = entry['series_season'] + season_offset
+                lookupargs['episode_number'] = entry['series_episode'] + episode_offset
             elif entry['series_id_type'] == 'sequence':
-                lookupargs['absolutenum'] = entry['series_id'] + episode_offset
-            elif entry['series_id_type'] == 'date':
-                lookupargs['airdate'] = entry['series_date']
+                lookupargs['absolute_number'] = entry['series_id'] + episode_offset
+
             with Session(expire_on_commit=False) as session:
                 lookupargs['session'] = session
                 episode = lookup_episode(**lookupargs)
@@ -144,6 +152,8 @@ class PluginThetvdbLookup(object):
             # If there is information for a series lookup, register our series lazy fields
             if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False):
                 entry.register_lazy_func(self.lazy_series_lookup, self.series_map)
+                entry.register_lazy_func(self.lazy_series_actor_lookup, self.series_actor_map)
+                entry.register_lazy_func(self.lazy_series_poster_lookup, self.series_poster_map)
 
                 # If there is season and ep info as well, register episode lazy fields
                 if entry.get('series_id_type') in ('ep', 'sequence', 'date'):

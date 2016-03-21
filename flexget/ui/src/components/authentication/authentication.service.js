@@ -39,7 +39,7 @@
                         if (prevState) {
                             $state.go(prevState, prevParams);
                         } else {
-                            $state.go('home');
+                            $state.go('flexget.home');
                         }
 
                     })

@@ -2,13 +2,15 @@
 @import "variables";
 @import "header";
 @import "loading-bar";
-
 // Components
 @import "../components/sidenav/sidenav";
 @import "../components/authentication/authentication";
 
-// Directives
+body {
+  background: $flexget-background-color;
+}
 
+// Directives
 md-input-container .hint {
   left: 2px;
   right: auto;
@@ -34,9 +36,10 @@ md-input-container .hint {
 }
 
 #content {
-  background: #E6E6E6;
+  padding: 0px;
+  background: $flexget-background-color;
   md-content.md-default-theme, md-content {
-    background: #E6E6E6;
+    background: $flexget-background-color;
   }
 }
 
@@ -49,17 +52,12 @@ md-input-container .hint {
 
 }
 
-.custom-card .series-image {
-  margin-right: 15px;
-}
-
-.series-image img {
-  max-width: 150px;
-  max-height: 300px;
-}
-
 .fg-material-paging .fg-pagination-button {
   width: 50px;
   min-width: 50px;
   margin: 3px;
+}
+
+.text-center {
+  text-align: center;
 }

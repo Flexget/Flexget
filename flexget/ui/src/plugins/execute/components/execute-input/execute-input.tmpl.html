@@ -1,0 +1,42 @@
+<div layout="row" layout-align="center center">
+  <md-card flex flex-gt-sm="50" flex-gt-md="40" class="task-search">
+      <md-card-header>
+          <md-card-header-text flex>
+              <span class="md-title">{{ vm.running.length }} Tasks in Queue</span>
+              <span class="md-subhead" ng-if="vm.running[0]">{{ vm.running[0].name }} ({{ vm.running[0].current_phase }})</span>
+          </md-card-header-text>
+          <md-menu>
+              <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
+                  <md-icon md-font-icon="fa fa-ellipsis-v"></md-icon>
+              </md-button>
+              <md-menu-content width="3">
+                  <md-menu-item ng-repeat="option in vm.options.optional">
+                      <md-button ng-click="vm.options.toggle(option)">
+                          <md-tooltip>{{ option.help }}</md-tooltip>
+                          <md-icon ng-class="option.value ? 'fa fa-ban' : 'fa fa-check'"></md-icon>
+                          {{ option.display }}
+                      </md-button>
+                  </md-menu-item>
+              </md-menu-content>
+          </md-menu>
+      </md-card-header>
+      <md-card-content>
+          <md-chips ng-model="vm.tasksInput.tasks" md-autocomplete-snap md-require-match="false" md-transform-chip="vm.addTask($chip)">
+              <md-autocomplete
+                      md-items="task in vm.tasksInput.query(vm.tasksInput.search)"
+                      md-item-text="task"
+                      placeholder="Enter task(s) to execute"
+                      md-selected-item="selectedItem"
+                      md-search-text="vm.tasksInput.search">
+                  <span md-highlight-text="vm.tasksInput.search">{{ task }}</span>
+              </md-autocomplete>
+          </md-chips>
+          <div flex></div>
+          <div layout="row" layout-align="center center">
+              <div flex="100" flex-gt-md="50" layout="column">
+                  <md-button class="md-raised md-primary" ng-click="vm.execute()">Execute</md-button>
+              </div>
+          </div>
+      </md-card-content>
+  </md-card>
+</div>

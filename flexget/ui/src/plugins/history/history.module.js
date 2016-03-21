@@ -6,7 +6,7 @@
     registerPlugin(historyModule);
 
     historyModule.run(function (route, sideNav) {
-        route.register('history', '/history', 'historyController', 'plugins/history/history.tmpl.html');
+        route.register('history', '/history', 'history-view');
         sideNav.register('/history', 'History', 'fa fa-history', 128);
     });
 

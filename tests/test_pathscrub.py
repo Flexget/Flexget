@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from nose.tools import assert_raises
-
+import pytest
 from flexget.utils.pathscrub import pathscrub
 
 
@@ -38,7 +37,8 @@ class TestPathscrub(object):
 
     def test_degenerate(self):
         # If path is reduced to nothing, make sure it complains
-        assert_raises(ValueError, pathscrub, '<<<<:>>>>', os='windows', filename=True)
+        with pytest.raises(ValueError):
+            pathscrub('<<<<:>>>>', os='windows', filename=True)
 
     def test_space_around(self):
         # We don't want folder or file names to end or start with spaces on any platform

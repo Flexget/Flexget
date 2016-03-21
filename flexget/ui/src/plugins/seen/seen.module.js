@@ -9,7 +9,7 @@
   registerPlugin(seenModule);
 
   seenModule.run(function run(route, sideNav) {
-    route.register('seen', '/seen', 'seenController', 'plugins/seen/seen.tmpl.html');
+    route.register('seen', '/seen', 'seen-view');
     sideNav.register('/seen', 'Seen', 'fa fa-eye', 228);
   });
 })();

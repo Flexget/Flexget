@@ -47,11 +47,11 @@ class TestTraktShowLookup(object):
               - {title: 'Shameless.2011.S03E02.HDTV.XViD-FlexGet'}
             series:
               - Shameless (2011)
-          test_search_fail:
+          test_search_success:
             mock:
-              - {title: 'Baking.Around.S01E01.HDTV.XViD-FlexGet'}
+              - {title: '11-22-63.S01E01.HDTV.XViD-FlexGet'}
             series:
-              - Baking Around
+              - 11-22-63
     """
 
     def test_lookup_name(self, execute_task):
@@ -94,7 +94,7 @@ class TestTraktShowLookup(object):
 
             assert len(session.query(TraktShow).all()) == 1, 'should only have added one show to show table'
             assert session.query(TraktShow).first().title == 'Shameless', 'should have added Shameless and' \
-                                                                               'not Shameless (2011)'
+                                                                          'not Shameless (2011)'
             # change the search query
             session.query(TraktShowSearchResult).update({'search': "Shameless.S01E03.HDTV-FlexGet"})
             session.commit()
@@ -105,10 +105,11 @@ class TestTraktShowLookup(object):
             assert series.tvdb_id == entry['tvdb_id'], 'tvdb id should be the same as the first entry'
             assert series.id == entry['trakt_show_id'], 'trakt id should be the same as the first entry'
             assert series.title.lower() == entry['trakt_series_name'].lower(), 'series name should match first entry'
-    def test_search_fail(self, execute_task):
-        task = execute_task('test_search_fail')
-        entry = task.find_entry('accepted', title='Baking.Around.S01E01.HDTV.XViD-FlexGet')
-        assert entry.get('trakt_show_id') is None, 'Should not have returned trakt id'
+
+    def test_search_success(self, execute_task):
+        task = execute_task('test_search_success')
+        entry = task.find_entry('accepted', title='11-22-63.S01E01.HDTV.XViD-FlexGet')
+        assert entry.get('trakt_show_id') == 102771, 'Should have returned the correct trakt id'
 
     def test_date(self, execute_task):
         task = execute_task('test_date')
@@ -224,6 +225,28 @@ class TestTraktWatchedAndCollected(object):
               - title: The.Matrix.1999.1080p.BDRip-FlexGet
             if:
               - trakt_collected: accept
+          test_trakt_show_collected_progress:
+            disable: builtins
+            trakt_lookup:
+              username: flexgettest
+            trakt_list:
+              username: flexgettest
+              list: test
+              type: shows
+              strip_dates: yes
+            if:
+              - trakt_collected: accept
+          test_trakt_show_watched_progress:
+            disable: builtins
+            trakt_lookup:
+              username: flexgettest
+            trakt_list:
+              username: flexgettest
+              list: test
+              type: shows
+              strip_dates: yes
+            if:
+              - trakt_watched: accept
     """
 
     def test_trakt_watched_lookup(self, execute_task):
@@ -244,6 +267,7 @@ class TestTraktWatchedAndCollected(object):
 
     def test_trakt_watched_movie_lookup(self, execute_task):
         task = execute_task('test_trakt_watched_movie')
+        print task.all_entries
         assert len(task.accepted) == 1, 'Movie should have been accepted as it is watched on Trakt profile'
         entry = task.accepted[0]
         assert entry['title'] == 'Inside.Out.2015.1080p.BDRip-FlexGet', 'title was not accepted?'
@@ -257,6 +281,20 @@ class TestTraktWatchedAndCollected(object):
         assert entry['title'] == 'Inside.Out.2015.1080p.BDRip-FlexGet', 'title was not accepted?'
         assert entry['movie_name'] == 'Inside Out', 'wrong movie name'
         assert entry['trakt_collected'] == True, 'movie should be marked as collected'
+
+    def test_trakt_show_watched_progress(self, execute_task):
+        task = execute_task('test_trakt_show_watched_progress')
+        assert len(task.accepted) == 1, 'One show should have been accepted as it is watched on Trakt profile'
+        entry = task.accepted[0]
+        assert entry['trakt_series_name'] == 'Chuck', 'wrong series was accepted'
+        assert entry['trakt_watched'] == True, 'the whole series should be marked as watched'
+
+    def test_trakt_show_collected_progress(self, execute_task):
+        task = execute_task('test_trakt_show_collected_progress')
+        assert len(task.accepted) == 1, 'One show should have been accepted as it is collected on Trakt profile'
+        entry = task.accepted[0]
+        assert entry['trakt_series_name'] == 'White Collar', 'wrong series was accepted'
+        assert entry['trakt_collected'] == True, 'the whole series should be marked as collected'
 
 
 @pytest.mark.online

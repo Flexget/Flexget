@@ -1,244 +1,278 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
-import os
-import posixpath
-import random
-import urllib
-import xml.etree.ElementTree as ElementTree
 from datetime import datetime, timedelta
 
-try:
-    from xml.etree.ElementTree import ParseError
-except ImportError:
-    # Python 2.6 throws this instead when there is invalid xml
-    from xml.parsers.expat import ExpatError as ParseError
-
-from sqlalchemy import Column, Integer, Float, String, Unicode, Boolean, DateTime, func
-from sqlalchemy.schema import ForeignKey
+from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, func
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
-from requests import RequestException
+from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
-from flexget.utils.tools import decode_html
-from flexget.utils.requests import Session as ReqSession
-from flexget.utils.database import with_session, pipe_list_synonym, text_date_synonym
-from flexget.utils.sqlalchemy_utils import table_add_column
-from flexget.manager import Session
+from flexget.utils import requests
+from flexget.utils.database import with_session, text_date_synonym, json_synonym
 from flexget.utils.simple_persistence import SimplePersistence
 
-SCHEMA_VER = 4
-
 log = logging.getLogger('api_tvdb')
-Base = db_schema.versioned_base('api_tvdb', SCHEMA_VER)
-requests = ReqSession(timeout=25)
+Base = db_schema.versioned_base('api_tvdb', 5)
 
 # This is a FlexGet API key
-api_key = '4D297D8CFDE0E105'
-language = 'en'
-server = 'http://www.thetvdb.com/api/'
 persist = SimplePersistence('api_tvdb')
-_mirrors = {}
+
+
+class TVDBRequest(object):
+    API_KEY = '4D297D8CFDE0E105'
+    BASE_URL = 'https://api-beta.thetvdb.com/'
+    BANNER_URL = 'http://thetvdb.com/banners/'
+
+    def __init__(self, username=None, password=None):
+        self.username = username
+        self.password = password
+        self.auth_key = self.username if self.username else 'default'
+
+    def get_auth_token(self, refresh=False):
+        tokens = persist.get('auth_tokens')
+        if not tokens:
+            tokens = {'default': None}
+
+        auth_token = tokens.get(self.auth_key)
+
+        if not auth_token or refresh:
+            data = {'apikey': TVDBRequest.API_KEY}
+            if self.username:
+                data['username'] = self.username
+            if self.password:
+                data['userpass'] = self.password
+
+            log.debug('Authenticating to TheTVDB with %s' % (self.username if self.username else 'api_key'))
+
+            tokens[self.auth_key] = requests.post(TVDBRequest.BASE_URL + 'login', json=data).json().get('token')
+        persist['auth_tokens'] = tokens
+        return tokens[self.auth_key]
+
+    def _request(self, method, endpoint, **params):
+        url = TVDBRequest.BASE_URL + endpoint
+        headers = {'Authorization': 'Bearer %s' % self.get_auth_token()}
+        data = params.pop('data', None)
+
+        result = requests.request(method, url, params=params, headers=headers, raise_status=False, json=data)
+        if result.status_code == 401:
+            log.debug('Auth token expired, refreshing')
+            headers['Authorization'] = 'Bearer %s' % self.get_auth_token(refresh=True)
+            result = requests.request(method, url, params=params, headers=headers, raise_status=False, json=data)
+        result.raise_for_status()
+        result = result.json()
+
+        if result.get('errors'):
+            raise LookupError('Error processing request on tvdb: %s' % result.get('errors'))
+
+        return result
+
+    def get(self, endpoint, **params):
+        result = self._request('get', endpoint, **params)
+        return result.get('data')
+
+    def post(self, endpoint, **params):
+        result = self._request('post', endpoint, **params)
+        return result.get('data')
+
+    def put(self, endpoint, **params):
+        result = self._request('put', endpoint, **params)
+        return result.get('data')
+
+    def delete(self, endpoint, **params):
+        return self._request('delete', endpoint, **params)
 
 
 @db_schema.upgrade('api_tvdb')
 def upgrade(ver, session):
-    if ver is None:
-        if 'last_updated' in persist:
-            del persist['last_updated']
-        ver = 0
-    if ver == 0:
-        table_add_column('tvdb_episodes', 'gueststars', Unicode, session)
-        ver = 1
-    if ver == 1:
-        table_add_column('tvdb_episodes', 'absolute_number', Integer, session)
-        ver = 2
-    if ver == 2:
-        table_add_column('tvdb_series', 'overview', Unicode, session)
-        ver = 3
-    if ver == 3:
-        table_add_column('tvdb_series', 'actors', Unicode, session)
-        ver = 4
-
+    if ver is None or ver <= 4:
+        raise db_schema.UpgradeImpossible
     return ver
 
 
-def get_mirror(type='xml'):
-    """Returns a random mirror for a given type 'xml', 'zip', or 'banner'"""
-    if not _mirrors.get(type):
-        # Get the list of mirrors from tvdb
-        page = None
-        try:
-            page = requests.get(server + api_key + '/mirrors.xml').content
-        except RequestException:
-            pass
-        # If there were problems getting the mirror list we'll just fall back to the main site.
-        if page:
-            data = ElementTree.fromstring(page)
-            for mirror in data.findall('Mirror'):
-                type_mask = int(mirror.find("typemask").text)
-                mirrorpath = mirror.find("mirrorpath").text
-                for t in [(1, 'xml'), (2, 'banner'), (4, 'zip')]:
-                    if type_mask & t[0]:
-                        _mirrors.setdefault(t[1], set()).add(mirrorpath)
-        else:
-            log.debug('Unable to get the mirrors list from thetvdb.')
-    if _mirrors.get(type):
-        return random.sample(_mirrors[type], 1)[0] + ('/banners/' if type == 'banner' else '/api/')
-    else:
-        # If nothing was populated from the server's mirror list, return the main site as fallback
-        return 'http://thetvdb.com' + ('/banners/' if type == 'banner' else '/api/')
+# association tables
+genres_table = Table('tvdb_series_genres', Base.metadata,
+                     Column('series_id', Integer, ForeignKey('tvdb_series.id')),
+                     Column('genre_id', Integer, ForeignKey('tvdb_genres.id')))
+Base.register_table(genres_table)
 
 
-class TVDBContainer(object):
-    """Base class for TVDb objects"""
+@with_session
+def get_db_genres(genre_names, session=None):
+    if not genre_names:
+        return []
 
-    def __init__(self, init_xml=None):
-        if init_xml is not None:
-            self.update_from_xml(init_xml)
+    genres = []
+    for genre_name in genre_names:
+        genre = session.query(TVDBGenre).filter(TVDBGenre.name == genre_name).first()
+        if not genre:
+            genre = TVDBGenre(name=genre_name)
+            session.add(genre)
+        genres.append(genre)
 
-    def update_from_xml(self, update_xml):
-        """Populates any simple (string or number) attributes from a dict"""
-        for node in update_xml:
-            if not node.text or not node.tag:
-                continue
-
-            # Have to iterate to get around the inability to do a case-insensitive find
-            for col in self.__table__.columns:
-                if node.tag.lower() == col.name.lower():
-                    if isinstance(col.type, Integer):
-                        value = int(node.text)
-                    elif isinstance(col.type, Float):
-                        value = float(node.text)
-                    else:
-                        # Make sure we always have unicode strings
-                        value = node.text.decode('utf-8') if isinstance(node.text, str) else node.text
-                        value = decode_html(value)
-                    setattr(self, col.name, value)
-        self.expired = False
+    return genres
 
 
-class TVDBSeries(TVDBContainer, Base):
+class TVDBSeries(Base):
     __tablename__ = "tvdb_series"
 
     id = Column(Integer, primary_key=True, autoincrement=False)
-    lastupdated = Column(Integer)
+    last_updated = Column(Integer)
     expired = Column(Boolean)
-    seriesname = Column(Unicode)
+    name = Column(Unicode)
     language = Column(Unicode)
     rating = Column(Float)
     status = Column(Unicode)
     runtime = Column(Integer)
     airs_time = Column(Unicode)
     airs_dayofweek = Column(Unicode)
-    contentrating = Column(Unicode)
+    content_rating = Column(Unicode)
     network = Column(Unicode)
     overview = Column(Unicode)
-    imdb_id = Column(String)
-    zap2it_id = Column(String)
-    banner = Column(String)
-    fanart = Column(String)
-    poster = Column(String)
-    poster_file = Column(Unicode)
-    _genre = Column('genre', Unicode)
-    genre = pipe_list_synonym('_genre')
-    _firstaired = Column('firstaired', DateTime)
-    firstaired = text_date_synonym('_firstaired')
+    imdb_id = Column(Unicode)
+    zap2it_id = Column(Unicode)
+    _banner = Column('banner', Unicode)
+
+    _first_aired = Column('first_aired', DateTime)
+    first_aired = text_date_synonym('_first_aired')
+    _aliases = Column('aliases', Unicode)
+    aliases = json_synonym('_aliases')
     _actors = Column('actors', Unicode)
-    actors = pipe_list_synonym('_actors')
+    actors_list = json_synonym('_actors')
+    _posters = Column('posters', Unicode)
+    posters_list = json_synonym('_posters')
+
+    _genres = relation('TVDBGenre', secondary=genres_table)
+    genres = association_proxy('_genres', 'name', creator=lambda g: TVDBGenre(name=g))
 
     episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
-    def update(self, tvdb_id=None):
-        tvdb_id = tvdb_id or self.id
-        url = get_mirror() + api_key + '/series/%s/%s.xml' % (tvdb_id, language)
+    def update(self, session):
         try:
-            data = requests.get(url).content
-        except RequestException as e:
-            raise LookupError('Request failed %s' % url)
-        result = ElementTree.fromstring(data).find('Series')
-        if result is not None:
-            self.update_from_xml(result)
-        else:
-            raise LookupError('Could not retrieve information from thetvdb')
+            series = TVDBRequest().get('series/%s' % self.id)
+        except requests.RequestException as e:
+            raise LookupError('Error updating data from tvdb: %s' % e)
 
-    def get_poster(self, only_cached=False):
-        """Downloads this poster to a local cache and returns the path"""
-        from flexget.manager import manager
-        base_dir = os.path.join(manager.config_base, 'userstatic')
-        if os.path.isfile(os.path.join(base_dir, self.poster_file or '')):
-            return self.poster_file
-        elif only_cached:
-            return
-        # If we don't already have a local copy, download one.
-        url = get_mirror('banner') + self.poster
-        log.debug('Downloading poster %s', url)
-        dirname = os.path.join('tvdb', 'posters')
-        # Create folders if the don't exist
-        fullpath = os.path.join(base_dir, dirname)
-        if not os.path.isdir(fullpath):
-            os.makedirs(fullpath)
-        filename = os.path.join(dirname, posixpath.basename(self.poster))
-        thefile = file(os.path.join(base_dir, filename), 'wb')
-        thefile.write(requests.get(url).content)
-        self.poster_file = filename
-        # If we are detached from a session, update the db
-        if not Session.object_session(self):
-            with Session() as session:
-                session.query(TVDBSeries).filter(TVDBSeries.id == self.id).update(values={'poster_file': filename})
-        return filename
+        self.id = series['id']
+        self.language = 'en'
+        self.last_updated = series['lastUpdated']
+        self.name = series['seriesName']
+        self.rating = float(series['siteRating']) if series['siteRating'] else 0.0
+        self.status = series['status']
+        self.runtime = int(series['runtime']) if series['runtime'] else 0
+        self.airs_time = series['airsTime']
+        self.airs_dayofweek = series['airsDayOfWeek']
+        self.content_rating = series['rating']
+        self.network = series['network']
+        self.overview = series['overview']
+        self.imdb_id = series['imdbId']
+        self.zap2it_id = series['zap2itId']
+        self.first_aired = series['firstAired']
+        self.expired = False
+        self.aliases = series['aliases']
+        self._banner = series['banner']
+        self._genres = get_db_genres(series['genre'], session=session)
+
+        search_strings = self.search_strings
+        for name in set([self.name.lower()] + ([a.lower() for a in self.aliases] if self.aliases else [])):
+            if name not in search_strings:
+                search_result = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name).first()
+                if not search_result:
+                    search_result = TVDBSearchResult(search=name)
+                search_result.series_id = self.id
+                self.search_strings.append(search_result)
+
+        # Reset Actors and Posters so they can be lazy populated
+        self._actors = None
+        self._posters = None
 
     def __repr__(self):
-        return '<TVDBSeries name=%s,tvdb_id=%s>' % (self.seriesname, self.id)
+        return '<TVDBSeries name=%s,tvdb_id=%s>' % (self.name, self.id)
+
+    @property
+    def banner(self):
+        if self._banner:
+            return TVDBRequest.BANNER_URL + self._banner
+
+    @property
+    def actors(self):
+        return self.get_actors()
+
+    @property
+    def posters(self):
+        return self.get_posters()
+
+    def get_actors(self):
+        if not self._actors:
+            log.debug('Looking up actors for series %s' % self.name)
+            try:
+                actors_query = TVDBRequest().get('series/%s/actors' % self.id)
+                self.actors_list = [a['name'] for a in actors_query] if actors_query else []
+            except requests.RequestException as e:
+                raise LookupError('Error updating actors from tvdb: %s' % e)
+
+        return self.actors_list
+
+    def get_posters(self):
+        if not self._posters:
+            log.debug('Getting top 5 posters for series %s' % self.name)
+            try:
+                poster_query = TVDBRequest().get('series/%s/images/query' % self.id, keyType='poster')
+                self.posters_list = [p['fileName'] for p in poster_query[:5]] if poster_query else []
+            except requests.RequestException as e:
+                raise LookupError('Error updating posters from tvdb: %s' % e)
+
+        return [TVDBRequest.BANNER_URL + p for p in self.posters_list]
 
     def to_dict(self):
         return {
-            'TVDB_id': self.id,
-            'last_updated': datetime.fromtimestamp(self.lastupdated).strftime('%Y-%m-%d %H:%M:%S'),
+            'tvdb_id': self.id,
+            'last_updated': datetime.fromtimestamp(self.last_updated).strftime('%Y-%m-%d %H:%M:%S'),
             'expired': self.expired,
-            'series_name': self.seriesname,
+            'series_name': self.name,
             'language': self.language,
             'rating': self.rating,
             'status': self.status,
             'runtime': self.runtime,
             'airs_time': self.airs_time,
             'airs_dayofweek': self.airs_dayofweek,
-            'content_rating': self.contentrating,
+            'content_rating': self.content_rating,
             'network': self.network,
             'overview': self.overview,
             'imdb_id': self.imdb_id,
             'zap2it_id': self.zap2it_id,
             'banner': self.banner,
-            'fan_art': self.fanart,
-            'poster': self.poster,
-            'poster_file': self.poster_file,
-            'genres': self.genre,
-            'first_aired': self.firstaired,
-            'actors': self.actors
+            'posters': self.posters,
+            'genres': [g for g in self.genres],
+            'actors': self.actors,
+            'first_aired': self.first_aired,
         }
 
 
-class TVDBEpisode(TVDBContainer, Base):
+class TVDBGenre(Base):
+    __tablename__ = 'tvdb_genres'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(Unicode, nullable=False, unique=True)
+
+
+class TVDBEpisode(Base):
     __tablename__ = 'tvdb_episodes'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
     expired = Column(Boolean)
-    lastupdated = Column(Integer)
-    seasonnumber = Column(Integer)
-    episodenumber = Column(Integer)
+    last_updated = Column(Integer)
+    season_number = Column(Integer)
+    episode_number = Column(Integer)
     absolute_number = Column(Integer)
-    episodename = Column(Unicode)
+    name = Column(Unicode)
     overview = Column(Unicode)
-    _director = Column('director', Unicode)
-    director = pipe_list_synonym('_director')
-    _writer = Column('writer', Unicode)
-    writer = pipe_list_synonym('_writer')
-    _gueststars = Column('gueststars', Unicode)
-    gueststars = pipe_list_synonym('_gueststars')
     rating = Column(Float)
-    filename = Column(Unicode)
-    _firstaired = Column('firstaired', DateTime)
-    firstaired = text_date_synonym('_firstaired')
+    director = Column(Unicode)
+    _image = Column(Unicode)
+    _first_aired = Column('firstaired', DateTime)
+    first_aired = text_date_synonym('_first_aired')
 
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=False)
 
@@ -246,80 +280,78 @@ class TVDBEpisode(TVDBContainer, Base):
         return {
             'id': self.id,
             'expired': self.expired,
-            'last_update': self.lastupdated,
-            'season_number': self.seasonnumber,
-            'episode_number': self.episodenumber,
+            'last_update': self.last_updated,
+            'season_number': self.season_number,
+            'episode_number': self.episode_number,
             'absolute_number': self.absolute_number,
-            'episode_name': self.episodename,
+            'episode_name': self.name,
             'overview': self.overview,
             'director': self.director,
-            'writer': self.writer,
-            'guest_stars': self.gueststars,
             'rating': self.rating,
-            'file_name': self.filename,
-            'first_aired': self.firstaired,
+            'image': self.image,
+            'first_aired': self.first_aired,
             'series_id': self.series_id
         }
 
+    @property
+    def image(self):
+        if self._image:
+            return TVDBRequest.BANNER_URL + self._image
+
     def update(self):
-        if not self.id:
-            raise LookupError('Cannot update an episode without an episode id.')
-        url = get_mirror() + api_key + '/episodes/%s/%s.xml' % (self.id, language)
         try:
-            data = requests.get(url).content
-        except RequestException as e:
-            raise LookupError('Request failed %s' % url)
-        result = ElementTree.fromstring(data).find('Episode')
-        if result is not None:
-            self.update_from_xml(result)
-        else:
-            raise LookupError('Could not retrieve information from thetvdb')
+            episode = TVDBRequest().get('episodes/%s' % self.id)
+        except requests.RequestException as e:
+            raise LookupError('Error updating data from tvdb: %s' % e)
+
+        self.id = episode['id']
+        self.last_updated = episode['lastUpdated']
+        self.season_number = episode['airedSeason']
+        self.episode_number = episode['airedEpisodeNumber']
+        self.absolute_number = episode['absoluteNumber']
+        self.name = episode['episodeName']
+        self.overview = episode['overview']
+        self.director = episode['director']
+        self._image = episode['filename']
+        self.rating = episode['siteRating']
+        self.first_aired = episode['firstAired']
 
     def __repr__(self):
         return '<TVDBEpisode series=%s,season=%s,episode=%s>' % \
-               (self.series.seriesname, self.seasonnumber, self.episodenumber)
+               (self.series.name, self.season_number, self.episode_number)
 
 
 class TVDBSearchResult(Base):
     __tablename__ = 'tvdb_search_results'
 
     id = Column(Integer, primary_key=True)
-    search = Column(Unicode, nullable=False)
+    search = Column(Unicode, nullable=False, unique=True)
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=True)
     series = relation(TVDBSeries, backref='search_strings')
 
 
 def find_series_id(name):
     """Looks up the tvdb id for a series"""
-    url = server + 'GetSeries.php?seriesname=%s&language=%s' % (urllib.quote(name), language)
     try:
-        page = requests.get(url).content
-    except RequestException as e:
+        series = TVDBRequest().get('search/series', name=name)
+    except requests.RequestException as e:
         raise LookupError('Unable to get search results for %s: %s' % (name, e))
-    try:
-        xmldata = ElementTree.fromstring(page)
-    except ParseError as e:
-        log.error('error parsing tvdb result for %s: %s', name, e)
-        return
-    if xmldata is None:
-        log.error("Didn't get a return from tvdb on the series search for %s", name)
-        return
-    # See if there is an exact match
-    # TODO: Check if there are multiple exact matches
-    firstmatch = xmldata.find('Series')
-    if firstmatch is not None and firstmatch.find("SeriesName").text.lower() == name.lower():
-        return int(firstmatch.find("seriesid").text)
-    # If there is no exact match, sort by airing date and pick the latest
-    # TODO: Is there a better way to do this? Maybe weight name similarity and air date
-    series_list = []
-    for s in xmldata.findall('Series'):
-        fa = s.find("FirstAired")
-        if fa is not None and fa.text:
-            series_list.append((fa.text, s.find("seriesid").text))
 
+    series_list = []
+
+    name = name.lower()
+
+    for s in series:
+        # Exact match
+        if s['seriesName'].lower() == name:
+            return s['id']
+        if s['firstAired']:
+            series_list.append((s['firstAired'], s['id']))
+
+    # If there is no exact match, sort by airing date and pick the latest
     if series_list:
         series_list.sort(key=lambda s: s[0], reverse=True)
-        return int(series_list[0][1])
+        return series_list[0][1]
     else:
         raise LookupError('No results for `%s`' % name)
 
@@ -354,20 +386,17 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     if tvdb_id:
         series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
     if not series and name:
-        series = session.query(TVDBSeries).filter(func.lower(TVDBSeries.seriesname) == name.lower()).first()
-        if not series:
-            found = session.query(TVDBSearchResult).filter(
-                func.lower(TVDBSearchResult.search) == name.lower()).first()
-            if found and found.series:
+        found = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name.lower()).first()
+        if found and found.series:
                 series = found.series
     if series:
         # Series found in cache, update if cache has expired.
         if not only_cached:
             mark_expired(session=session)
         if not only_cached and series.expired:
-            log.verbose('Data for %s has expired, refreshing from tvdb', series.seriesname)
+            log.verbose('Data for %s has expired, refreshing from tvdb', series.name)
             try:
-                series.update()
+                series.update(session)
             except LookupError as e:
                 log.warning('Error while updating from tvdb (%s), using cached data.', e.args[0])
         else:
@@ -378,9 +407,9 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         # There was no series found in the cache, do a lookup from tvdb
         log.debug('Series %s not found in cache, looking up from tvdb.', id_str())
         if tvdb_id:
-            series = TVDBSeries()
-            series.update(tvdb_id)
-            if series.seriesname:
+            series = TVDBSeries(id=tvdb_id)
+            series.update(session)
+            if series.name:
                 session.add(series)
         elif name:
             tvdb_id = find_series_id(name)
@@ -388,21 +417,27 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
                 series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
                 if not series:
                     series = TVDBSeries()
-                    series.update(tvdb_id)
+                    series.id = tvdb_id
+                    series.update(session)
                     session.add(series)
-                if name.lower() != series.seriesname.lower():
-                    session.add(TVDBSearchResult(search=name, series=series))
+
+                # Add search result to cache
+                search_result = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name.lower()).first()
+                if not search_result:
+                    search_result = TVDBSearchResult(search=name.lower())
+                    search_result.series_id = tvdb_id
+                    session.add(search_result)
 
     if not series:
         raise LookupError('No results found from tvdb for %s' % id_str())
-    if not series.seriesname:
+    if not series.name:
         raise LookupError('Tvdb result for series does not have a title.')
-    session.commit()
+
     return series
 
 
 @with_session(expire_on_commit=False)
-def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None, airdate=None,
+def lookup_episode(name=None, season_number=None, episode_number=None, absolute_number=None,
                    tvdb_id=None, only_cached=False, session=None):
     """
     Look up information on an episode. Will be returned from cache if available, and looked up online and cached if not.
@@ -411,10 +446,9 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
     Either `seasonnum` and `episodedum`, `absolutenum`, or `airdate` are required to specify episode number.
     :param unicode name: Name of series episode belongs to.
     :param int tvdb_id: TVDb ID of series episode belongs to.
-    :param int seasonnum: Season number of episode.
-    :param int episodenum: Episode number of episode.
-    :param int absolutenum: Absolute number of episode.
-    :param int airdate: Air date of episode.
+    :param int season_number: Season number of episode.
+    :param int episode_number: Episode number of episode.
+    :param int absolute_number: Absolute number of episode.
     :param bool only_cached: If True, will not cause an online lookup. LookupError will be raised if not available
         in the cache.
     :param session: An sqlalchemy session to be used to lookup and store to cache. Commit(s) may occur when passing in
@@ -426,35 +460,38 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
     """
     # First make sure we have the series data
     series = lookup_series(name=name, tvdb_id=tvdb_id, only_cached=only_cached, session=session)
-    # Set variables depending on what type of identifier we are looking up
-    if airdate is not None:
-        airdatestring = airdate.strftime('%Y-%m-%d')
-        ep_description = '%s.%s' % (series.seriesname, airdatestring)
-        episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id). \
-            filter(TVDBEpisode.firstaired == airdate).first()
-        url = get_mirror() + ('GetEpisodeByAirDate.php?apikey=%s&seriesid=%d&airdate=%s&language=%s' %
-                              (api_key, series.id, airdatestring, language))
-    elif absolutenum is not None:
-        ep_description = '%s.%d' % (series.seriesname, absolutenum)
-        episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id). \
-            filter(TVDBEpisode.absolute_number == absolutenum).first()
-        url = get_mirror() + api_key + '/series/%d/absolute/%s/%s.xml' % (series.id, absolutenum, language)
-    elif seasonnum is not None and episodenum is not None:
-        ep_description = '%s.S%sE%s' % (series.seriesname, seasonnum, episodenum)
-        # See if we have this episode cached
-        episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id). \
-            filter(TVDBEpisode.seasonnumber == seasonnum). \
-            filter(TVDBEpisode.episodenumber == episodenum).first()
-        url = get_mirror() + api_key + '/series/%d/default/%d/%d/%s.xml' % (series.id, seasonnum, episodenum, language)
-    else:
-        raise LookupError('No episode identifier specified.')
+
+    if not series:
+        LookupError('Series %s (%s) not found from' % (name, tvdb_id))
+
+    ep_description = series.name
+    query_params = {}
+    episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id)
+
+    if absolute_number:
+        episode = episode.filter(TVDBEpisode.absolute_number == absolute_number)
+        query_params['absoluteNumber'] = absolute_number
+        ep_description = '%s absNo: %s' % (ep_description, absolute_number)
+
+    if season_number:
+        episode = episode.filter(TVDBEpisode.season_number == season_number)
+        query_params['airedSeason'] = season_number
+        ep_description = '%s s%s' % (ep_description, season_number)
+
+    if episode_number:
+        episode = episode.filter(TVDBEpisode.episode_number == episode_number)
+        query_params['airedEpisode'] = episode_number
+        ep_description = '%s e%s' % (ep_description, episode_number)
+
+    episode = episode.first()
+
     if episode:
         if episode.expired and not only_cached:
             log.info('Data for %r has expired, refreshing from tvdb', episode)
             try:
                 episode.update()
             except LookupError as e:
-                log.warning('Error while updating from tvdb (%s), using cached data.', e.args[0])
+                log.warning('Error while updating from tvdb (%s), using cached data.' % str(e))
         else:
             log.debug('Using episode info for %s from cache.', ep_description)
     else:
@@ -463,104 +500,61 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
         # There was no episode found in the cache, do a lookup from tvdb
         log.debug('Episode %s not found in cache, looking up from tvdb.', ep_description)
         try:
-            raw_data = requests.get(url).content
-            data = ElementTree.fromstring(raw_data)
-            if data is not None:
-                error = data.find('Error')  # TODO: lowercase????
-                if error is not None:
-                    raise LookupError('Error looking up episode from TVDb (%s)' % error.text)
-                ep_data = data.find('Episode')
-                if ep_data is not None:
-                    # Check if this episode id is already in our db
-                    episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == ep_data.find("id").text).first()
-                    if episode is not None:
-                        episode.update_from_xml(ep_data)
-                    else:
-                        episode = TVDBEpisode(ep_data)
-                    series.episodes.append(episode)
-                    session.merge(series)
-        except RequestException as e:
+            results = TVDBRequest().get('series/%s/episodes/query' % series.id, **query_params)
+            if results:
+                # Check if this episode id is already in our db
+                episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == results[0]['id']).first()
+                if not episode:
+                    episode = TVDBEpisode(id=results[0]['id'])
+                if episode.expired is not False:
+                    episode.update()
+
+                series.episodes.append(episode)
+                session.merge(series)
+        except requests.RequestException as e:
             raise LookupError('Error looking up episode from TVDb (%s)' % e)
     if episode:
         session.commit()
         return episode
     else:
-        raise LookupError('No results found for ')
+        raise LookupError('No results found for %s' % ep_description)
 
 
 @with_session
 def mark_expired(session=None):
     """Marks series and episodes that have expired since we cached them"""
     # Only get the expired list every hour
-    last_server = persist.get('last_server')
-    last_local = persist.get('last_local')
+    last_check = persist.get('last_check')
 
-    if not last_local:
-        # Never run before? Lets reset ALL series
-        log.info('Setting all series to expire')
-        session.query(TVDBSeries).update({'expired': True}, synchronize_session='fetch')
-        persist['last_local'] = datetime.now()
+    if not last_check:
+        persist['last_check'] = datetime.utcnow()
         return
-    elif last_local + timedelta(hours=6) > datetime.now():
-        # It has been less than an hour, don't check again yet
+    if datetime.utcnow() - last_check <= timedelta(hours=2):
+        # It has been less than 2 hour, don't check again
         return
 
-    if not last_server:
-        last_server = 0
-
-    # Need to figure out what type of update file to use
-    # Default of day
-    get_update = 'day'
-    last_update_days = (datetime.now() - last_local).days
-
-    if 1 < last_update_days < 7:
-        get_update = 'week'
-    elif last_update_days > 7:
-        get_update = 'month'
+    new_last_check = datetime.utcnow()
 
     try:
-        # Get items that have changed since our last update
-        log.debug("Getting %s worth of updates from thetvdb", get_update)
-        content = requests.get(server + api_key + '/updates/updates_%s.xml' % get_update).content
-        if not isinstance(content, basestring):
-            raise Exception('expected string, got %s' % type(content))
-        updates = ElementTree.fromstring(content)
-    except RequestException as e:
+        # Calculate seconds since epoch minus a minute for buffer
+        last_check_epoch = int((last_check - datetime(1970, 1, 1)).total_seconds()) - 60
+        log.debug("Getting updates from thetvdb (%s)" % last_check_epoch)
+        updates = TVDBRequest().get('updated/query', fromTime=last_check_epoch)
+    except requests.RequestException as e:
         log.error('Could not get update information from tvdb: %s', e)
         return
 
-    if updates is not None:
-        new_server = int(updates.attrib['time'])
+    def chunked(seq):
+        """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
+        for i in range(0, len(seq), 900):
+            yield seq[i:i + 900]
 
-        if new_server <= last_server:
-            # nothing changed on the server, ignoring
-            log.debug("Not checking for expired as nothing has changed on server")
-            return
+    expired_series = [series['id'] for series in updates] if updates else []
 
-        # Make lists of expired series and episode ids
-        expired_series = []
-        expired_episodes = []
+    # Update our cache to mark the items that have expired
+    for chunk in chunked(expired_series):
+        series_updated = session.query(TVDBSeries).filter(TVDBSeries.id.in_(chunk)).update({'expired': True}, 'fetch')
+        episodes_updated = session.query(TVDBEpisode).filter(TVDBEpisode.series_id.in_(chunk)).update({'expired': True}, 'fetch')
+        log.debug('%s series and %s episodes marked as expired', series_updated, episodes_updated)
 
-        for series in updates.findall('Series'):
-            expired_series.append(int(series.find("id").text))
-
-        for episode in updates.findall('Episode'):
-            expired_series.append(int(episode.find("id").text))
-
-        def chunked(seq):
-            """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
-            for i in xrange(0, len(seq), 900):
-                yield seq[i:i + 900]
-
-        # Update our cache to mark the items that have expired
-        for chunk in chunked(expired_series):
-            num = session.query(TVDBSeries).filter(TVDBSeries.id.in_(chunk)).update({'expired': True}, 'fetch')
-            log.debug('%s series marked as expired', num)
-        for chunk in chunked(expired_episodes):
-            num = session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(chunk)).update({'expired': True}, 'fetch')
-            log.debug('%s episodes marked as expired', num)
-
-        # Save the time of this update
-        session.commit()
-        persist['last_local'] = datetime.now()
-        persist['last_server'] = new_server
+    persist['last_check'] = new_last_check
