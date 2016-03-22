@@ -4,14 +4,14 @@ import logging
 import re
 from collections import MutableSet
 
-from requests import RequestException
-
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.api_trakt import get_api_url, get_entry_ids, get_session, make_list_slug
 from flexget.utils import json
 from flexget.utils.cached_input import cached
+from flexget.utils.requests import RequestException, TimedLimiter
+from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('trakt_list')
 IMMUTABLE_LISTS = []
@@ -78,6 +78,9 @@ class TraktSet(MutableSet):
         self.config = config
         if self.config.get('account') and not self.config.get('username'):
             self.config['username'] = 'me'
+        self.session = get_session(self.config.get('account'))
+        # Lists may not have modified results if modified then accessed in quick succession.
+        self.session.add_domain_limiter(TimedLimiter('trakt.tv', '2 seconds'))
         self._items = None
 
     def __iter__(self):
@@ -122,12 +125,11 @@ class TraktSet(MutableSet):
     @property
     def items(self):
         if self._items is None:
-            session = get_session(account=self.config.get('account'))
             endpoint = self.get_list_endpoint()
 
             log.verbose('Retrieving `%s` list `%s`' % (self.config['type'], self.config['list']))
             try:
-                result = session.get(get_api_url(endpoint))
+                result = self.session.get(get_api_url(endpoint))
                 try:
                     data = result.json()
                 except ValueError:
@@ -215,7 +217,10 @@ class TraktSet(MutableSet):
         found = {}
         for entry in entries:
             if self.config['type'] in ['auto', 'shows', 'seasons', 'episodes'] and entry.get('series_name') is not None:
-                show = {'title': entry['series_name'], 'ids': get_entry_ids(entry)}
+                show_name, show_year = split_title_year(entry['series_name'])
+                show = {'title': show_name, 'ids': get_entry_ids(entry)}
+                if show_year:
+                    show['year'] = show_year
                 if self.config['type'] in ['auto', 'seasons', 'episodes'] and entry.get('series_season') is not None:
                     season = {'number': entry['series_season']}
                     if self.config['type'] in ['auto', 'episodes'] and entry.get('series_episode') is not None:
@@ -251,10 +256,9 @@ class TraktSet(MutableSet):
             args += ('remove',)
         url = get_api_url(args)
 
-        session = get_session(account=self.config.get('account'))
         log.debug('Submitting data to trakt.tv (%s): %s' % (url, found))
         try:
-            result = session.post(url, data=json.dumps(found), raise_status=False)
+            result = self.session.post(url, data=json.dumps(found), raise_status=False)
         except RequestException as e:
             log.error('Error submitting data to trakt.tv: %s' % e)
             return
