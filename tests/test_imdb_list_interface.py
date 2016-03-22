@@ -9,9 +9,8 @@ from flexget.plugins.list.imdb_list import ImdbEntrySet
 @pytest.mark.online
 class TestIMDBList(object):
     config = """
-      'tasks': {}
+      tasks: {}
     """
-    VCR_RECORD_MODE = 'all'
 
     imdb_config = {'login': 'siysbijz@sharklasers.com',
                    'password': 'flexget16',

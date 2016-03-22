@@ -33,7 +33,7 @@ class ImdbEntrySet(MutableSet):
     def __init__(self, config):
         self.config = config
         self._session = Session()
-        self._session.add_domain_limiter(TimedLimiter('imdb.com', '3 seconds'))
+        self._session.add_domain_limiter(TimedLimiter('imdb.com', '5 seconds'))
         self._session.headers = {'Accept-Language': config.get('force_language', 'en-us')}
         self.user_id = None
         self.list_id = None
