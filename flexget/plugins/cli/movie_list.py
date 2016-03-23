@@ -53,21 +53,21 @@ def movie_list_lists(options):
     lists = get_movie_lists()
     console('Existing movie lists:')
     console('-' * 20)
-    for list in lists:
-        console(list.name)
+    for movie_list in lists:
+        console(movie_list.name)
 
 
 @with_session
 def movie_list_list(options, session=None):
     """List movie list"""
     try:
-        list = get_list_by_exact_name(options.list_name)
+        movie_list = get_list_by_exact_name(options.list_name)
     except NoResultFound:
         console('Could not find movie list with name {}'.format(options.list_name))
         return
     console('Movies for list {}:'.format(options.list_name))
     console('-' * 79)
-    for movie in get_movies_by_list_id(list.id, order_by='added', descending=True, session=session):
+    for movie in get_movies_by_list_id(movie_list.id, order_by='added', descending=True, session=session):
         _str = '{} ({}) '.format(movie.title, movie.year) if movie.year else '{} '.format(movie.title)
         _ids = '[' + ', '.join(
             '{}={}'.format(identifier.id_name, identifier.id_value) for identifier in movie.ids) + ']'
@@ -77,23 +77,23 @@ def movie_list_list(options, session=None):
 @with_session
 def movie_list_add(options, session=None):
     try:
-        list = get_list_by_exact_name(options.list_name)
+        movie_list = get_list_by_exact_name(options.list_name)
     except NoResultFound:
         console('Could not find movie list with name {}, creating'.format(options.list_name))
-        list = MovieListList(name=options.list_name)
-        session.add(list)
+        movie_list = MovieListList(name=options.list_name)
+        session.add(movie_list)
         session.commit()
     title, year = split_title_year(options.movie_title)
-    movie_exist = get_movie_by_title(list_id=list.id, title=title, session=session)
+    movie_exist = get_movie_by_title(list_id=movie_list.id, title=title, session=session)
     if movie_exist:
         console("Movie with the title {} already exist with list {}. Will replace identifiers if given".format(
-            title, list.name))
-        output = 'Successfully updated movie {} to movie list {} '.format(title, list.name)
+            title, movie_list.name))
+        output = 'Successfully updated movie {} to movie list {} '.format(title, movie_list.name)
     else:
-        console("Adding movie with title {} to list {}".format(title, list.name))
-        movie_exist = MovieListMovie(title=title, year=year, list_id=list.id)
+        console("Adding movie with title {} to list {}".format(title, movie_list.name))
+        movie_exist = MovieListMovie(title=title, year=year, list_id=movie_list.id)
         session.add(movie_exist)
-        output = 'Successfully added movie {} to movie list {} '.format(title, list.name)
+        output = 'Successfully added movie {} to movie list {} '.format(title, movie_list.name)
     if options.identifiers:
         identifiers = [parse_identifier(identifier) for identifier in options.identifiers if options.identifiers]
         console('Adding identifiers {} to movie {}'.format(identifiers, title))
@@ -104,12 +104,12 @@ def movie_list_add(options, session=None):
 @with_session
 def movie_list_del(options, session=None):
     try:
-        list = get_list_by_exact_name(options.list_name)
+        movie_list = get_list_by_exact_name(options.list_name)
     except NoResultFound:
         console('Could not find movie list with name {}'.format(options.list_name))
         return
     title, year = split_title_year(options.movie_title)
-    movie_exist = get_movie_by_title(list_id=list.id, title=title, session=session)
+    movie_exist = get_movie_by_title(list_id=movie_list.id, title=title, session=session)
     if movie_exist:
         console('Removing movie %s from list %s' % (options.movie_title, options.list_name))
         session.delete(movie_exist)
@@ -121,12 +121,12 @@ def movie_list_del(options, session=None):
 @with_session
 def movie_list_purge(options, session=None):
     try:
-        list = get_list_by_exact_name(options.list_name)
+        movie_list = get_list_by_exact_name(options.list_name)
     except NoResultFound:
         console('Could not find movie list with name {}'.format(options.list_name))
         return
     console('Deleting list %s' % options.list_name)
-    session.delete(list)
+    session.delete(movie_list)
 
 
 @event('options.register')
