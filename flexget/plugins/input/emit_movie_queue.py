@@ -29,7 +29,8 @@ class EmitMovieQueue(object):
                     'quality': {'type': 'boolean'},
                     'queue_name': {'type': 'string'}
                 },
-                'additionalProperties': False
+                'additionalProperties': False,
+                'deprecated': 'movie_queue plugin is deprecated. Please switch to using movie_list'
             }
         ]
     }
