@@ -2,6 +2,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+from flexget.plugin import PluginError
 
 log = logging.getLogger('list_remove')
 
@@ -28,7 +29,10 @@ class ListRemove(object):
                 if task.manager.options.test:
                     log.info('Would remove accepted items from `%s` outside of --test mode.' % plugin_name)
                     continue
-                thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+                try:
+                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+                except AttributeError:
+                    raise PluginError('Plugin %s does not support list interface' % plugin_name)
                 thelist -= task.accepted
 
 
