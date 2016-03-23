@@ -13,7 +13,7 @@ from flexget.utils.tools import split_title_year
 
 try:
     from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
-        get_movie_by_title, MovieListMovie, get_db_movie_identifiers
+        get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList
 except ImportError:
     raise DependencyError(issued_by='cli_movie_list', missing='movie_list')
 
@@ -79,8 +79,10 @@ def movie_list_add(options, session=None):
     try:
         list = get_list_by_exact_name(options.list_name)
     except NoResultFound:
-        console('Could not find movie list with name {}'.format(options.list_name))
-        return
+        console('Could not find movie list with name {}, creating'.format(options.list_name))
+        list = MovieListList(name=options.list_name)
+        session.add(list)
+        session.commit()
     title, year = split_title_year(options.movie_title)
     movie_exist = get_movie_by_title(list_id=list.id, title=title, session=session)
     if movie_exist:
@@ -130,8 +132,10 @@ def movie_list_purge(options, session=None):
 @event('options.register')
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
+    movie_parser = ArgumentParser(add_help=False)
+    movie_parser.add_argument('-t', '--movie_title', required=True, help="Title of the movie")
+
     identifiers_parser = ArgumentParser(add_help=False)
-    identifiers_parser.add_argument('-t', '--movie_title', required=True, help="Title of the movie")
     identifiers_parser.add_argument('-i', '--identifiers', metavar='<identifiers>', nargs='+',
                                     help='Can be a string or a list of string with the format imdb_id=XXX,'
                                          ' tmdb_id=XXX, etc')
@@ -142,11 +146,11 @@ def register_parser_arguments():
     parser = options.register_command('movie-list', do_cli, help='view and manage movie lists')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='list_action')
-    list_parser = subparsers.add_parser('all', help='shows all existing movie lists')
+    all_parser = subparsers.add_parser('all', help='shows all existing movie lists')
     list_parser = subparsers.add_parser('list', parents=[list_name_parser], help='list movies from a list')
-    add_parser = subparsers.add_parser('add', parents=[identifiers_parser, list_name_parser],
+    add_parser = subparsers.add_parser('add', parents=[identifiers_parser, list_name_parser, movie_parser],
                                        help='add a movie to a list')
-    subparsers.add_parser('del', parents=[identifiers_parser, list_name_parser],
+    subparsers.add_parser('del', parents=[movie_parser, list_name_parser],
                           help='remove a movie from a list using its title')
     subparsers.add_parser('purge', parents=[list_name_parser],
                           help='removes an entire list with all of its movies. Use this with caution')
