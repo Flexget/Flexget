@@ -20,8 +20,10 @@
       sort_by: 'show_name'
     }
 
+
     vm.searchTerm = "";
 
+    //Call to get the series, based on the options
     function getSeriesList() {
       $http.get('/api/series/', { params: options })
       .success(function(data) {
@@ -35,12 +37,14 @@
     }
 
     vm.forgetShow = function(show) {
+      //Construct the confirmation dialog
        var confirm = $mdDialog.confirm()
       .title('Confirm forgetting show.')
       .htmlContent("Are you sure you want to completely forget <b>" + show.show_name + "</b>?")
       .ok("Forget")
       .cancel("No");
 
+      //Actually show the confirmation dialog and place a call to DELETE when confirmed
       $mdDialog.show(confirm).then(function() {
         $http.delete('/api/series/' + show.show_id)
         .success(function(data) {
@@ -48,6 +52,8 @@
           vm.series.splice(index, 1);
         })
         .error(function(error) {
+
+          //Show a dialog when something went wrong, this will change in the future to more generic error handling
           var errorDialog = $mdDialog.alert()
           .title("Something went wrong")
           .htmlContent("Oops, something went wrong when trying to forget <b>" + show.show_name + "</b>:\n" + error.message)
