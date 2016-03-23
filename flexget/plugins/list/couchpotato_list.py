@@ -215,6 +215,10 @@ class CouchPotatoSet(MutableSet):
                 CouchPotatoBase.remove_movie(self.config, movie_id)
                 self._movies = None
 
+    @property
+    def immutable(self):
+        return False
+
 
 class CouchPotatoList(object):
     schema = CouchPotatoSet.schema

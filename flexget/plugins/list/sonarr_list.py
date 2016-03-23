@@ -253,6 +253,10 @@ class SonarrSet(MutableSet):
         self.remove_show(show)
         log.verbose('removed show %s from Sonarr', show['title'])
 
+    @property
+    def immutable(self):
+        return False
+
 
 class SonarrList(object):
     schema = SonarrSet.schema
