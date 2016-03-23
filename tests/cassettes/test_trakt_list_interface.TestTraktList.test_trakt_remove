@@ -1,0 +1,530 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: !!python/unicode '[]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [28788efa76850bed-AMS]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Tue, 22 Mar 2016 09:18:50 GMT']
+      etag: [W/"4b73ced71f8bb51cd6e9d3e9ee8f7945"]
+      last-modified: ['Tue, 22 Mar 2016 08:58:56 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d46e39721ad00732ade7f6bc01a891b8f1458638329; expires=Wed,
+          22-Mar-17 09:18:49 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-private-user: ['true']
+      x-request-id: [88ff70b0-8d7e-413c-8f34-88e134372ea1]
+      x-runtime: ['0.013701']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: !!python/unicode '[]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [28788f0099860c6b-AMS]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Tue, 22 Mar 2016 09:18:51 GMT']
+      etag: [W/"4b73ced71f8bb51cd6e9d3e9ee8f7945"]
+      last-modified: ['Tue, 22 Mar 2016 08:58:56 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=df024d85baecde3af996c889569c77aa71458638330; expires=Wed,
+          22-Mar-17 09:18:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-private-user: ['true']
+      x-request-id: [06fed890-754b-4ace-8b30-b7c412247837]
+      x-runtime: ['0.016283']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"shows": [{"ids": {}, "title": "White Collar (2009)"}]}'
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Length: ['56']
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: POST
+    uri: https://api-v2launch.trakt.tv/sync/watchlist
+  response:
+    body: {string: !!python/unicode '{"added":{"movies":0,"shows":0,"seasons":0,"episodes":0},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[{"ids":{},"title":"White
+        Collar (2009)"}],"seasons":[],"episodes":[],"people":[]}}'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [28788f0a0c7d0c9b-AMS]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Tue, 22 Mar 2016 09:18:52 GMT']
+      etag: [W/"7e1510dfc1bab085cfed0106ee6f4ae1"]
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=da0ad539f2a4caa4022f84ba72c541a5a1458638332; expires=Wed,
+          22-Mar-17 09:18:52 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [9c34b38d-efa2-4f3a-b4c0-864a4fa71485]
+      x-runtime: ['0.416834']
+      x-xss-protection: [1; mode=block]
+    status: {code: 201, message: Created}
+- request:
+    body: null
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: !!python/unicode '[]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [287890a3d37f2c54-AMS]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Tue, 22 Mar 2016 09:19:58 GMT']
+      etag: [W/"4b73ced71f8bb51cd6e9d3e9ee8f7945"]
+      last-modified: ['Tue, 22 Mar 2016 08:58:56 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d88562247f47793ade877aeef7ee908161458638398; expires=Wed,
+          22-Mar-17 09:19:58 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-private-user: ['true']
+      x-request-id: [c1dbfe37-187b-465c-830b-ac4b1a513018]
+      x-runtime: ['0.022532']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: !!python/unicode '[]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [28789186a60714a9-AMS]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Tue, 22 Mar 2016 09:20:34 GMT']
+      etag: [W/"4b73ced71f8bb51cd6e9d3e9ee8f7945"]
+      last-modified: ['Tue, 22 Mar 2016 08:58:56 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=df87daa31a2958097d87ee4a07c6b9ff21458638434; expires=Wed,
+          22-Mar-17 09:20:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-private-user: ['true']
+      x-request-id: [ab2f5e9a-c0fd-4c7b-8dcb-b8c6934e14c4]
+      x-runtime: ['0.060980']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: !!python/unicode '[]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [287892003c932bfa-AMS]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Tue, 22 Mar 2016 09:20:54 GMT']
+      etag: [W/"4b73ced71f8bb51cd6e9d3e9ee8f7945"]
+      last-modified: ['Tue, 22 Mar 2016 08:58:56 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=dc8c0e346e33a21aba55a08ffbc0b43341458638453; expires=Wed,
+          22-Mar-17 09:20:53 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-private-user: ['true']
+      x-request-id: [08d27854-ffa6-4aa7-a520-533ebc64dc19]
+      x-runtime: ['0.010725']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: !!python/unicode '[]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [2878a637cccb15b9-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Tue, 22 Mar 2016 09:34:42 GMT']
+      etag: [W/"4b73ced71f8bb51cd6e9d3e9ee8f7945"]
+      last-modified: ['Tue, 22 Mar 2016 08:58:56 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d7140fb7df06d2ebd80311aee013f634f1458639281; expires=Wed,
+          22-Mar-17 09:34:41 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-private-user: ['true']
+      x-request-id: [1db4a1af-ef5e-4c81-b7c7-9993e52da6cc]
+      x-runtime: ['0.045206']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: !!python/unicode '[]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [2878a63ba27d2372-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Tue, 22 Mar 2016 09:34:42 GMT']
+      etag: [W/"4b73ced71f8bb51cd6e9d3e9ee8f7945"]
+      last-modified: ['Tue, 22 Mar 2016 08:58:56 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d62eb6a5ff40d053f779a6e212a9be43c1458639282; expires=Wed,
+          22-Mar-17 09:34:42 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-private-user: ['true']
+      x-request-id: [cc8c440f-5266-42cf-ad7f-0f3b84d4c354]
+      x-runtime: ['0.017807']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"shows": [{"ids": {}, "title": "White Collar (2009)"}]}'
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Length: ['56']
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: POST
+    uri: https://api-v2launch.trakt.tv/sync/watchlist
+  response:
+    body: {string: !!python/unicode '{"added":{"movies":0,"shows":0,"seasons":0,"episodes":0},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[{"ids":{},"title":"White
+        Collar (2009)"}],"seasons":[],"episodes":[],"people":[]}}'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [2878a64142c52756-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Tue, 22 Mar 2016 09:34:43 GMT']
+      etag: [W/"8b182c327de37fe7733d557479e6c6b5"]
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=dd0d4fb6fe2b3b44b9bd6d1833938b56b1458639283; expires=Wed,
+          22-Mar-17 09:34:43 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [01691811-e1ec-4ed0-9709-12290bc4e304]
+      x-runtime: ['0.046476']
+      x-xss-protection: [1; mode=block]
+    status: {code: 201, message: Created}
+- request:
+    body: null
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: !!python/unicode '[]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [2878a64539a52372-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Tue, 22 Mar 2016 09:34:44 GMT']
+      etag: [W/"4b73ced71f8bb51cd6e9d3e9ee8f7945"]
+      last-modified: ['Tue, 22 Mar 2016 08:58:56 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d38ca923f69e83cfea9aeb82f27168c201458639284; expires=Wed,
+          22-Mar-17 09:34:44 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-private-user: ['true']
+      x-request-id: [2ec28ff5-685a-491e-8825-ca3ed4987679]
+      x-runtime: ['0.031339']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-03-22T23:43:10.000Z","type":"show","show":{"title":"White
+        Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [288112b08cb326d2-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 23 Mar 2016 10:06:51 GMT']
+      etag: [W/"7fb45744dbed3e6e48305c3a22084eeb"]
+      last-modified: ['Tue, 22 Mar 2016 23:43:20 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=dcd4ce956cc4014e23d2d2813e81358761458727610; expires=Thu,
+          23-Mar-17 10:06:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-private-user: ['true']
+      x-request-id: [5d4ef15d-5532-4a11-b5a5-57c802a40669]
+      x-runtime: ['0.090634']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"shows": [{"year": 2009, "ids": {"tvdb": 108611, "tmdb": 21510, "imdb":
+      "tt1358522", "tvrage": 20720, "trakt": 21410}, "title": "White Collar"}]}'
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Length: ['146']
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=dcd4ce956cc4014e23d2d2813e81358761458727610]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: POST
+    uri: https://api-v2launch.trakt.tv/sync/watchlist/remove
+  response:
+    body: {string: !!python/unicode '{"deleted":{"movies":0,"shows":1,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [288112b9edd226d2-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 23 Mar 2016 10:06:52 GMT']
+      etag: [W/"8d52ac8ccf8c526c4c230875c8c4db0f"]
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [7b733c0e-936b-453e-8d21-a18764243e93]
+      x-runtime: ['0.114329']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=dcd4ce956cc4014e23d2d2813e81358761458727610]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: !!python/unicode '[]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [288112c67f3426d2-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 23 Mar 2016 10:06:54 GMT']
+      etag: [W/"63f7d4c009f56023f3b115470a6aad24"]
+      last-modified: ['Wed, 23 Mar 2016 10:07:01 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-private-user: ['true']
+      x-request-id: [ec76d9db-ba43-43a8-8cc6-3212dee14e02]
+      x-runtime: ['0.024304']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"shows": [{"year": 2009, "ids": {}, "title": "White Collar"}]}'
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Length: ['63']
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=dcd4ce956cc4014e23d2d2813e81358761458727610]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: POST
+    uri: https://api-v2launch.trakt.tv/sync/watchlist
+  response:
+    body: {string: !!python/unicode '{"added":{"movies":0,"shows":1,"seasons":0,"episodes":0},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [288112d3214c26d2-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 23 Mar 2016 10:06:57 GMT']
+      etag: [W/"281c7f1f61404456f282fe53d0532f09"]
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [79fdf408-e893-4c3f-81d8-35fef441949f]
+      x-runtime: ['0.409109']
+      x-xss-protection: [1; mode=block]
+    status: {code: 201, message: Created}
+- request:
+    body: null
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=dcd4ce956cc4014e23d2d2813e81358761458727610]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-03-23T10:06:59.000Z","type":"show","show":{"title":"White
+        Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [288112df534126d2-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 23 Mar 2016 10:06:58 GMT']
+      etag: [W/"5917867b1186fb825aff4dd9aaf61818"]
+      last-modified: ['Wed, 23 Mar 2016 10:07:04 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-private-user: ['true']
+      x-request-id: [fe1ba05f-5397-4d9e-ac88-6acc8c3fb494]
+      x-runtime: ['0.030255']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"shows": [{"year": 2009, "ids": {}, "title": "White Collar"}]}'
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Length: ['63']
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=dcd4ce956cc4014e23d2d2813e81358761458727610]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: POST
+    uri: https://api-v2launch.trakt.tv/sync/watchlist/remove
+  response:
+    body: {string: !!python/unicode '{"deleted":{"movies":0,"shows":1,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [288112ebd4ad26d2-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 23 Mar 2016 10:07:00 GMT']
+      etag: [W/"84cf624e64a2be516d32ac79729cef8a"]
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [9509e0d9-1962-456f-acd6-059096de1c79]
+      x-runtime: ['0.323172']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Authorization: [!!python/unicode Bearer 895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d]
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=dcd4ce956cc4014e23d2d2813e81358761458727610]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+  response:
+    body: {string: !!python/unicode '[]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [288112f8569726d2-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 23 Mar 2016 10:07:02 GMT']
+      etag: [W/"63f7d4c009f56023f3b115470a6aad24"]
+      last-modified: ['Wed, 23 Mar 2016 10:07:01 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-private-user: ['true']
+      x-request-id: [b18b9e62-9e61-4023-b960-973b10118f18]
+      x-runtime: ['0.015354']
+      x-sort-by: [rank]
+      x-sort-how: [asc]
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1
