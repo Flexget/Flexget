@@ -290,7 +290,7 @@ class SendTelegram(object):
         if self._parse_mode == 'markdown':
             kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
         elif self._parse_mode == 'html':
-            kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
+            kwargs['parse_mode'] = telegram.ParseMode.HTML
         for entry in task.accepted:
             msg = self._render_msg(entry, self._tmpl)
             for chat_id in (x.id for x in chat_ids):
