@@ -5,12 +5,12 @@ from datetime import datetime
 from json import JSONEncoder
 
 import cherrypy
-import flask_restplus
 from flask import jsonify, Response
 from flask import request
 
 from flexget.api import api, APIResource, ApiError, NotFoundError
 from flexget.config_schema import process_config
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.options import get_parser
 from flexget.task import task_phases
@@ -226,13 +226,31 @@ task_execution_results_schema = {
     }
 }
 
+inject_input = {
+    'type': 'object',
+    'properties': {
+        'title': {'type': 'string'},
+        'url': {'type': 'string'},
+        'force': {'type': 'string'},
+        'accept': {'type': 'string'},
+        'fields': {'type': 'array',
+                   'items': {
+                       'type': 'object',
+                       'minProperties': 1,
+                       'maxProperties': 1}
+                   }
+    },
+    'required': ['title', 'url']
+}
+
 task_execution_input = {
     'type': 'object',
     'properties': {
         'progress': {'type': 'boolean', 'default': True},
         'summary': {'type': 'boolean', 'default': True},
         'log': {'type': 'boolean', 'default': False},
-        'entry_dump': {'type': 'boolean', 'default': True}
+        'entry_dump': {'type': 'boolean', 'default': True},
+        'inject': {'type': 'array', 'items': inject_input}
     }
 }
 
@@ -262,15 +280,6 @@ class ExecuteLog(Queue):
         self.put(json.dumps({'log': s}))
 
 
-execute_parser = api.parser()
-
-execute_parser.add_argument('progress', type=flask_restplus.inputs.boolean, default=True,
-                            help='Include task progress updates')
-execute_parser.add_argument('summary', type=flask_restplus.inputs.boolean, default=True, help='Include task summary')
-execute_parser.add_argument('log', type=flask_restplus.inputs.boolean, default=False, help='Include execution log')
-execute_parser.add_argument('entry_dump', type=flask_restplus.inputs.boolean, default=False,
-                            help='Include dump of entries including fields')
-
 _streams = {}
 
 
@@ -291,8 +300,25 @@ class TaskExecutionAPI(APIResource):
         output = queue if args.get('log') else None
         stream = True if any(
             arg[0] in ['progress', 'summary', 'log', 'entry_dump'] for arg in args.items() if arg[1]) else False
+        options = {'tasks': [task]}
 
-        task_id, __, task_event = self.manager.execute(options={'tasks': [task]}, output=output)[0]
+        if args.get('inject'):
+            entries = []
+            for item in args.get('inject'):
+                entry = Entry()
+                entry['title'] = item['title']
+                entry['url'] = item['url']
+                if item.get('force'):
+                    entry['immortal'] = True
+                if item.get('accept'):
+                    entry.accept(reason='accepted by API inject')
+                if item.get('fields'):
+                    for field in item.get('fields'):
+                        entry[field.keys()[0]] = field.values()[0]
+                entries.append(entry)
+            options['inject'] = entries
+
+        task_id, __, task_event = self.manager.execute(options=options, output=output)[0]
 
         if not stream:
             return {'task': {'id': task_id, 'name': task}}
