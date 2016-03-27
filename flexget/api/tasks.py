@@ -1,4 +1,5 @@
 import argparse
+import cgi
 import copy
 from Queue import Queue, Empty
 from datetime import datetime
@@ -15,6 +16,7 @@ from flexget.event import event
 from flexget.options import get_parser
 from flexget.task import task_phases
 from flexget.utils import json
+from flexget.utils import requests
 from flexget.utils.lazy_dict import LazyLookup
 
 # Tasks API
@@ -230,7 +232,7 @@ inject_input = {
     'type': 'object',
     'properties': {
         'title': {'type': 'string'},
-        'url': {'type': 'string'},
+        'url': {'type': 'string', 'format': 'url'},
         'force': {'type': 'string'},
         'accept': {'type': 'string'},
         'fields': {'type': 'array',
@@ -240,7 +242,7 @@ inject_input = {
                        'maxProperties': 1}
                    }
     },
-    'required': ['title', 'url']
+    'required': ['url']
 }
 
 task_execution_input = {
@@ -286,7 +288,8 @@ _streams = {}
 @tasks_api.route('/<task>/execute/')
 @api.doc(params={'task': 'task name'})
 class TaskExecutionAPI(APIResource):
-    @api.response(404, description='task not found')
+    @api.response(404, description='Task not found')
+    @api.response(500, description='Could not resolve title from URL')
     @api.response(200, model=task_api_execute_schema)
     @api.validate(task_execution_schema)
     def post(self, task, session=None):
@@ -306,8 +309,14 @@ class TaskExecutionAPI(APIResource):
             entries = []
             for item in args.get('inject'):
                 entry = Entry()
-                entry['title'] = item['title']
                 entry['url'] = item['url']
+                if not item.get('title'):
+                    try:
+                        value, params = cgi.parse_header(requests.head(item['url']).headers['Content-Disposition'])
+                        entry['title'] = params['filename']
+                    except KeyError:
+                        return {'status': 'error',
+                                'message': 'No title given, and couldn\'t get one from the URL\'s HTTP response'}, 500
                 if item.get('force'):
                     entry['immortal'] = True
                 if item.get('accept'):
