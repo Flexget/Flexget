@@ -56,7 +56,7 @@ def upgrade(ver, session):
             p = pickle.loads(row['entry'])
             session.execute(table.update().where(table.c.id == row['id']).values(
                 json=json.dumps(p, encode_datetime=True)))
-        ver = 1
+        ver = 2
 
     return ver
 
