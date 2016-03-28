@@ -125,7 +125,7 @@ _resolutions = [
     QualityComponent('resolution', 50, '720i'),
     QualityComponent('resolution', 60, '720p', '(1280x)?720(p|hd)?x?(50)?'),
     QualityComponent('resolution', 70, '1080i'),
-    QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?')
+    QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?x?(50)?')
 ]
 _sources = [
     QualityComponent('source', 10, 'workprint', modifier=-8),

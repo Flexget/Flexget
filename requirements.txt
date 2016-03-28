@@ -12,7 +12,7 @@ rpyc
 jinja2
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
 requests>=2.8.0, <3.0
-python-dateutil!=2.0, !=2.2
+python-dateutil!=2.0, !=2.2, <2.5.2
 jsonschema>=2.0
 path.py
 guessit>=2.0.3
