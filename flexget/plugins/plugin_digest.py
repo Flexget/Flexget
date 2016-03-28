@@ -20,17 +20,17 @@ from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 
 log = logging.getLogger('digest')
-Base = versioned_base('digest', 0)
+Base = versioned_base('digest', 1)
 
 
 @db_schema.upgrade('digest')
 def upgrade(ver, session):
     if ver == 0:
-        table = table_schema('digest', session)
+        table = table_schema('digest_entries', session)
         table_add_column(table, 'json', Unicode, session)
         # Make sure we get the new schema with the added column
-        table = table_schema('digest', session)
-        for row in session.execute(select([table.c.id, table.c.value])):
+        table = table_schema('digest_entries', session)
+        for row in session.execute(select([table.c.id, table.c.entry])):
             p = pickle.loads(row['entry'])
             session.execute(table.update().where(table.c.id == row['id']).values(
                 json=json.dumps(p, encode_datetime=True)))

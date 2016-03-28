@@ -27,11 +27,11 @@ Base = db_schema.versioned_base('input_cache', 1)
 @db_schema.upgrade('input_cache')
 def upgrade(ver, session):
     if ver == 0:
-        table = table_schema('input_cache', session)
+        table = table_schema('input_cache_entry', session)
         table_add_column(table, 'json', Unicode, session)
         # Make sure we get the new schema with the added column
-        table = table_schema('input_cache', session)
-        for row in session.execute(select([table.c.id, table.c.value])):
+        table = table_schema('input_cache_entry', session)
+        for row in session.execute(select([table.c.id, table.c.entry])):
             p = pickle.loads(row['entry'])
             session.execute(table.update().where(table.c.id == row['id']).values(
                 json=json.dumps(p, encode_datetime=True)))

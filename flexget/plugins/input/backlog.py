@@ -43,7 +43,7 @@ def upgrade(ver, session):
         table_add_column(table, 'json', Unicode, session)
         # Make sure we get the new schema with the added column
         table = table_schema('backlog', session)
-        for row in session.execute(select([table.c.id, table.c.value])):
+        for row in session.execute(select([table.c.id, table.c.entry])):
             p = pickle.loads(row['entry'])
             session.execute(table.update().where(table.c.id == row['id']).values(
                 json=json.dumps(p, encode_datetime=True)))
