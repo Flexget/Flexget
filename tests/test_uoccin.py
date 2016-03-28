@@ -1,11 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
-
+import mock
 
 import pytest
 
 
 # TODO: Is this test supposed to be going online?
+@mock.patch('flexget.plugins.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestUoccinReader(object):
 
@@ -42,7 +43,7 @@ class TestUoccinReader(object):
 1431198108565|series|272135.2.5|subtitles|eng,ita
     """
 
-    def test_read(self, execute_task, tmpdir):
+    def test_read(self, mock_expired, execute_task, tmpdir):
         with open(os.path.join(tmpdir.strpath, '1431093328970.uoccin_test.diff'), 'w') as txt:
             txt.write(TestUoccinReader.__diff__.strip())
         execute_task('test_sync')
@@ -67,6 +68,7 @@ class TestUoccinReader(object):
             'Expected "ita" in uoccin_subtitles for episode "TURN S02E05", found %s instead.' % entry.get('uoccin_subtitles')
 
 
+@mock.patch('flexget.plugins.api_tvdb.mark_expired')
 @pytest.mark.online
 class TestUoccinWriters(object):
 
@@ -95,7 +97,7 @@ class TestUoccinWriters(object):
             uoccin_lookup: uoccin
     """
 
-    def test_write(self, execute_task):
+    def test_write(self, mock_expired, execute_task):
         execute_task('test_del')
         task = execute_task('test_chk')
         entry = task.find_entry(imdb_id='tt0047034')

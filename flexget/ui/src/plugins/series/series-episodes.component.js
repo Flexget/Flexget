@@ -32,9 +32,7 @@
     function getEpisodesList() {
       $http.get('/api/series/' + $stateParams.id + '/episodes', { params: options })
       .success(function(data) {
-        vm.episodes = data.episodes; // loadReleases(data.episodes);
-        //vm.episodes = data.episodes;
-
+        vm.episodes = data.episodes;
         vm.currentPage = data.page;
         vm.totalEpisodes = data.total_number_of_episodes;
         vm.pageSize = options.page_size;
@@ -42,7 +40,6 @@
         vm.show = data.show;
 
         show = data.show;
-        //loadReleases();
       })
       .error(function(error) {
         console.log(error);

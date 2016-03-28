@@ -11,13 +11,13 @@ progressbar
 rpyc
 jinja2
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
-requests>=1.0, !=2.4.0, <2.99
+requests>=2.8.0, <3.0
 python-dateutil!=2.0, !=2.2
 jsonschema>=2.0
 path.py
 guessit>=2.0.3
 apscheduler
-pytvmaze>=1.4.5
+pytvmaze>=1.4.8
 ordereddict>=1.1
 # WebUI Requirements
 cherrypy>=3.7.0
