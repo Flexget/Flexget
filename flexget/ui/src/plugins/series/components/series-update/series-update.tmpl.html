@@ -1,0 +1,46 @@
+<md-dialog aria-label="Series Begin" ng-cloak>
+    <md-dialog-content>
+      <form name="namesForm">
+        <div class="md-dialog-content" ng-if="vm.params.alternate_names" layout="column" layout-padding>
+          <h1 class="md-headline">Series Alternate Names</h1>
+          <md-list>
+            <md-list-item ng-repeat="name in vm.params.alternate_names">
+              <span>{{ name }}</span>
+              <!--<md-button class="md-icon-button md-raised md-secondary" ng-click="vm.removeName($index)">
+                <md-icon md-font-set="fa" md-font-icon="fa-remove"></md-icon>
+              </md-button>-->
+            </md-list-item>
+          </md-list>
+          <!--<div layout="row">
+            <md-input-container>
+              <label>New name</label>
+              <input type="text" required md-no-asterisk name="newName" ng-model="vm.newName" unique unique-array="vm.params.alternate_names">
+              <div ng-messages="namesForm.newName.$error">
+                <div ng-message="unique">This name is already in the list</div>
+              </div>
+            </md-input-container>
+            <div class="alternate-button">
+              <md-button ng-disabled="namesForm.newName.$invalid" class="md-raised md-icon-button" ng-click="vm.addName()">
+                <md-icon md-font-set="fa" md-font-icon="fa-check"></md-icon>
+              </md-button>
+            </div>
+          </div>-->
+        </div>
+      </form>
+      <div class="md-dialog-content" ng-if="!vm.params.alternate_names">
+        <h1 class="md-headline">Series Begin</h1>
+        <md-input-container>
+          <label>Begin</label>
+          <input type="text" ng-model="vm.params.episode_identifier">
+        </md-input-container>
+      </div>
+    </md-dialog-content>
+    <md-dialog-actions>
+      <md-button ng-click="vm.cancel()" class="md-primary">
+        Cancel
+      </md-button>
+      <md-button ng-if="!vm.params.alternate_names" ng-click="vm.save()" class="md-warn">
+        Save
+      </md-button>
+    </md-dialog-actions>
+</md-dialog>

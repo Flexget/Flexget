@@ -22,8 +22,7 @@ class TVDBBase(object):
         'additionalProperties': False
     }
 
-    @with_session
-    def get_favs(self, username, session=None):
+    def get_favs(self, username, session):
         favs = session.query(TVDBUserFavorite).filter(TVDBUserFavorite.username == username).first()
         if not favs:
             favs = TVDBUserFavorite(username=username)
@@ -37,9 +36,10 @@ class TVDBAdd(TVDBBase):
     log = logging.getLogger('thetvdb_add')
 
     @plugin.priority(-255)
-    def on_task_output(self, task, config):
+    @with_session
+    def on_task_output(self, task, config, session=None):
 
-        tvdb_favorites = self.get_favs(config['username'], session=task.session)
+        tvdb_favorites = self.get_favs(config['username'], session)
 
         for entry in task.accepted:
             if entry.get('tvdb_id'):
@@ -61,8 +61,6 @@ class TVDBAdd(TVDBBase):
 
                 tvdb_favorites.series_ids.append(tvdb_id)
 
-        task.session.merge(tvdb_favorites)
-
 
 class TVDBRemove(TVDBBase):
     """Remove all accepted shows from your tvdb favorites."""
@@ -70,9 +68,10 @@ class TVDBRemove(TVDBBase):
     log = logging.getLogger('thetvdb_remove')
 
     @plugin.priority(-255)
-    def on_task_output(self, task, config):
+    @with_session
+    def on_task_output(self, task, config, session=None):
 
-        tvdb_favorites = self.get_favs(config['username'], session=task.session)
+        tvdb_favorites = self.get_favs(config['username'], session=session)
 
         for entry in task.accepted:
             if entry.get('tvdb_id'):
@@ -93,8 +92,6 @@ class TVDBRemove(TVDBBase):
                         continue
 
                 tvdb_favorites.series_ids.remove(tvdb_id)
-
-        task.session.merge(tvdb_favorites)
 
 
 @event('plugin.register')

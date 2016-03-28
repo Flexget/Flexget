@@ -290,14 +290,14 @@ class SendTelegram(object):
         if self._parse_mode == 'markdown':
             kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
         elif self._parse_mode == 'html':
-            kwargs['parse_mode'] = 'HTML'  # TODO: Change this to use ParseMode when it's implemented
+            kwargs['parse_mode'] = telegram.ParseMode.HTML
         for entry in task.accepted:
             msg = self._render_msg(entry, self._tmpl)
             for chat_id in (x.id for x in chat_ids):
                 try:
                     self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
                 except TelegramError as e:
-                    if kwargs['parse_mode']:
+                    if kwargs['parse_mode'] and "can't parse message text" in e.message:
                         self.log.warning(
                                 'Failed to render message using parse mode %s. Falling back to basic parsing: %s' % (
                                     kwargs['parse_mode'], e.message))
