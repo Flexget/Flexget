@@ -34,7 +34,7 @@ class DTDecoder(json.JSONDecoder):
         if obj == b'':
             return ''
 
-        if isinstance(obj, basestring):
+        if isinstance(obj, str):
             dt_str = obj.strip('"')
             try:
                 return datetime.datetime.strptime(dt_str, ISO8601_FMT)
