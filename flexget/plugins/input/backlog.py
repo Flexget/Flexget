@@ -4,18 +4,20 @@ import logging
 import pickle
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, PickleType, Index
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, Index, select
 
 from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import json
 from flexget.manager import Session
-from flexget.utils.database import safe_pickle_synonym, with_session
-from flexget.utils.sqlalchemy_utils import table_schema
+from flexget.utils.database import json_synonym, with_session
 from flexget.utils.tools import parse_timedelta
+from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+
 
 log = logging.getLogger('backlog')
-Base = db_schema.versioned_base('backlog', 1)
+Base = db_schema.versioned_base('backlog', 2)
 
 
 @db_schema.upgrade('backlog')
@@ -36,6 +38,16 @@ def upgrade(ver, session):
         log.info('Creating index on backlog table.')
         Index('ix_backlog_feed_expire', backlog_table.c.feed, backlog_table.c.expire).create(bind=session.bind)
         ver = 1
+    elif ver == 1:
+        table = table_schema('backlog', session)
+        table_add_column(table, 'json', Unicode, session)
+        # Make sure we get the new schema with the added column
+        table = table_schema('backlog', session)
+        for row in session.execute(select([table.c.id, table.c.value])):
+            p = pickle.loads(row['entry'])
+            session.execute(table.update().where(table.c.id == row['id']).values(
+                json=json.dumps(p, encode_datetime=True)))
+        ver = 2
     return ver
 
 
@@ -47,8 +59,8 @@ class BacklogEntry(Base):
     task = Column('feed', String)
     title = Column(String)
     expire = Column(DateTime)
-    _entry = Column('entry', PickleType)
-    entry = safe_pickle_synonym('_entry')
+    _json = Column('json', Unicode)
+    entry = json_synonym('_json')
 
     def __repr__(self):
         return '<BacklogEntry(title=%s)>' % (self.title)

@@ -2,17 +2,20 @@ from __future__ import unicode_literals, division, absolute_import
 from past.builtins import basestring
 from builtins import object
 import logging
+import pickle
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType, Index
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, Index, select
 
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.entry import Entry
-from flexget.utils.database import safe_pickle_synonym
+from flexget.utils import json
+from flexget.utils.database import json_synonym
 from flexget.utils.tools import parse_timedelta
+from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('delay')
-Base = db_schema.versioned_base('delay', 1)
+Base = db_schema.versioned_base('delay', 2)
 
 
 class DelayedEntry(Base):
@@ -23,8 +26,8 @@ class DelayedEntry(Base):
     task = Column('feed', String)
     title = Column(Unicode)
     expire = Column(DateTime)
-    _entry = Column('entry', PickleType)
-    entry = safe_pickle_synonym('_entry')
+    _json = Column('json', Unicode)
+    entry = json_synonym('_json')
 
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % self.title
@@ -46,6 +49,17 @@ def upgrade(ver, session):
                     session.delete(de)
                     break
         ver = 1
+    elif ver == 1:
+        table = table_schema('delay', session)
+        table_add_column(table, 'json', Unicode, session)
+        # Make sure we get the new schema with the added column
+        table = table_schema('delay', session)
+        for row in session.execute(select([table.c.id, table.c.value])):
+            p = pickle.loads(row['entry'])
+            session.execute(table.update().where(table.c.id == row['id']).values(
+                json=json.dumps(p, encode_datetime=True)))
+        ver = 2
+
     return ver
 
 
@@ -86,7 +100,7 @@ class FilterDelay(object):
                     filter(DelayedEntry.task == task.name).first():
                 delay_entry = DelayedEntry()
                 delay_entry.title = entry['title']
-                delay_entry.entry = entry
+                delay_entry.entry = dict(entry)
                 delay_entry.task = task.name
                 delay_entry.expire = expire_time
                 task.session.add(delay_entry)

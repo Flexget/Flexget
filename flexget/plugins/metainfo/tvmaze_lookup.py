@@ -83,7 +83,7 @@ class PluginTVMazeLookup(object):
         'tvmaze_series_tvrage': 'tvrage_id',
         'tvmaze_series_runtime': 'runtime',
         'tvmaze_series_premiered': 'premiered',
-        'tvmaze_series_airdays': lambda show: show.schedule.get('days') if show.schedule else None,
+        'tvmaze_series_airdays': 'schedule',
         'tvmaze_series_weight': 'weight',
         'tvmaze_series_update_date': 'updated',
         'tvmaze_series_language': 'language',
