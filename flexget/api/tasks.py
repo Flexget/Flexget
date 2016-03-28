@@ -57,7 +57,7 @@ class TasksAPI(APIResource):
     def get(self, session=None):
         """ List all tasks """
         tasks = []
-        for name, config in self.manager.user_config.get('tasks', {}).iteritems():
+        for name, config in self.manager.user_config.get('tasks', {}).items():
             tasks.append({'name': name, 'config': config})
         return {'tasks': tasks}
 
@@ -284,9 +284,17 @@ class ExecuteLog(Queue):
 
 _streams = {}
 
+execution_doc = "'progress': Include task progress updates<br>" \
+                "'summary': Include task summary<br>" \
+                "'log': Include execution log<br>" \
+                "'entry_dump': Include dump of entries including fields<br>"
 
+inject_api = api.namespace('inject', description='Entry injection API')
+
+
+@inject_api.route('/<task>/')
 @tasks_api.route('/<task>/execute/')
-@api.doc(params={'task': 'task name'})
+@api.doc(params={'task': 'task name'}, description=execution_doc)
 class TaskExecutionAPI(APIResource):
     @api.response(404, description='Task not found')
     @api.response(500, description='Could not resolve title from URL')
@@ -370,7 +378,9 @@ def setup_params(mgr):
         if name in ignore:
             continue
         if isinstance(action, argparse._StoreConstAction) and action.help != '==SUPPRESS==':
+            global execution_doc
             task_execution_input['properties'][name] = {'type': 'boolean'}
+            TaskExecutionAPI.__apidoc__['description'] += "'{0}': {1}<br>".format(name, action.help)
 
 
 class EntryDecoder(JSONEncoder):
