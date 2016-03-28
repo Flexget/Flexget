@@ -282,10 +282,7 @@ class InputPlex(object):
                         key = node.getAttribute(thumbtag)
                     # key = part.getAttribute('key')
                     duration = part.getAttribute('duration')
-                    if viewgroup == "show":
-                        e['plex_title'] = episodetitle
-                    elif viewgroup == "movie":
-                        e['plex_title'] = title
+                    e['plex_title'] = title
                     if config['original_filename']:
                         filename, fileext = os.path.splitext(basename(part.getAttribute('file')))
                         if config['fetch'] != 'file':
