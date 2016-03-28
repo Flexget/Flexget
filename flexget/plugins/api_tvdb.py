@@ -210,7 +210,10 @@ class TVDBSeries(Base):
                 actors_query = TVDBRequest().get('series/%s/actors' % self.id)
                 self.actors_list = [a['name'] for a in actors_query] if actors_query else []
             except requests.RequestException as e:
-                raise LookupError('Error updating actors from tvdb: %s' % e)
+                if None is not e.response and e.response.status_code == 404:
+                    self.actors_list = []
+                else:
+                    raise LookupError('Error updating actors from tvdb: %s' % e)
 
         return self.actors_list
 
@@ -221,7 +224,10 @@ class TVDBSeries(Base):
                 poster_query = TVDBRequest().get('series/%s/images/query' % self.id, keyType='poster')
                 self.posters_list = [p['fileName'] for p in poster_query[:5]] if poster_query else []
             except requests.RequestException as e:
-                raise LookupError('Error updating posters from tvdb: %s' % e)
+                if None is not e.response and e.response.status_code == 404:
+                    self.posters_list = []
+                else:
+                    raise LookupError('Error updating posters from tvdb: %s' % e)
 
         return [TVDBRequest.BANNER_URL + p for p in self.posters_list]
 
