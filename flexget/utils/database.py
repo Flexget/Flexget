@@ -91,7 +91,7 @@ def entry_synonym(name):
             return item
         elif isinstance(item, Mapping):
             result = {}
-            for key, value in item.iteritems():
+            for key, value in item.items():
                 try:
                     result[key] = only_builtins(value)
                 except TypeError:
