@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from future import standard_library
 standard_library.install_aliases()
+from future.utils import native_str
 from builtins import str
 from builtins import object
 
@@ -286,7 +287,7 @@ class SendTelegram(object):
             raise plugin.PluginWarning('missing python-telegram-bot pkg')
         elif not hasattr(telegram, str('__version__')):
             raise plugin.PluginWarning('invalid or old python-telegram-bot pkg')
-        elif LooseVersion(telegram.__version__) < str(_MIN_TELEGRAM_VER):
+        elif LooseVersion(telegram.__version__) < native_str(_MIN_TELEGRAM_VER):
             raise plugin.PluginWarning('old python-telegram-bot ({0})'.format(telegram.__version__))
 
     def _send_msgs(self, task, chat_ids):
