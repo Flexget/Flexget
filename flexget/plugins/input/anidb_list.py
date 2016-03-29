@@ -61,7 +61,7 @@ class AnidbList(object):
             entry_type = 'Type: TV Series'
         for tr in trs:
             if tr.find('span', title=entry_type):
-                a = tr.find('label').find('a')
+                a = tr.find('td', class_='name').find('a')
                 if not a:
                     log.debug('No title link found for the row, skipping')
                     continue
