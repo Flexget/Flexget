@@ -36,7 +36,7 @@ def upgrade(ver, session):
         log.info('Creating index on backlog table.')
         Index('ix_backlog_feed_expire', backlog_table.c.feed, backlog_table.c.expire).create(bind=session.bind)
         ver = 1
-    elif ver == 1:
+    if ver == 1:
         table = table_schema('backlog', session)
         table_add_column(table, 'json', Unicode, session)
         # Make sure we get the new schema with the added column
