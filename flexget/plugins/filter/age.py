@@ -11,13 +11,14 @@ log = logging.getLogger('age')
 
 class Age(object):
     """
-        Rejects/accepts files based on file metadata
+        Rejects/accepts entries based on date in specified entry field
 
-        Example::
+        Example:
 
-          file_age:
-            stat: 'access'
-            age: '7 days'
+          age:
+            field: 'access'  # 'access' is a field set from filesystem plugin
+            amount: '7 days'
+            action: 'accept'
     """
 
     schema = {
