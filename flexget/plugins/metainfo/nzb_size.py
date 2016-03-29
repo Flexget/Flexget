@@ -41,7 +41,7 @@ class NzbSize(object):
 
                 filename = entry['file']
                 log.debug('reading %s' % filename)
-                xmldata = file(filename).read()
+                xmldata = open(filename).read()
 
                 try:
                     nzbfiles = nzb_parser.parse(xmldata)

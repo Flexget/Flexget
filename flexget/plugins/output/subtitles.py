@@ -159,7 +159,7 @@ class Subtitles(object):
                 f = urlopener(sub['ZipDownloadLink'], log)
                 subfilename = re.match('^attachment; filename="(.*)"$', f.info()['content-disposition']).group(1)
                 outfile = os.path.join(config['output'], subfilename)
-                fp = file(outfile, 'w')
+                fp = open(outfile, 'w')
                 fp.write(f.read())
                 fp.close()
                 f.close()
