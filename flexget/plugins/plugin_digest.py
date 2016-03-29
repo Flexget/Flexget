@@ -10,11 +10,10 @@ from sqlalchemy import Column, Unicode, Integer, DateTime, select
 from flexget import plugin, db_schema
 from flexget.config_schema import one_or_more
 from flexget.db_schema import versioned_base
-from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import json
-from flexget.utils.database import json_synonym
+from flexget.utils.database import entry_synonym
 from flexget.utils.tools import parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
@@ -44,7 +43,7 @@ class DigestEntry(Base):
     list = Column(Unicode, index=True)
     added = Column(DateTime, default=datetime.now)
     _json = Column('json', Unicode)
-    entry = json_synonym('_json')
+    entry = entry_synonym('_json')
 
 
 class OutputDigest(object):
@@ -79,7 +78,7 @@ class OutputDigest(object):
                     continue
                 entry['digest_task'] = task.name
                 entry['digest_state'] = entry.state
-                session.add(DigestEntry(list=config['list'], entry=dict(entry)))
+                session.add(DigestEntry(list=config['list'], entry=entry))
 
 
 class EmitDigest(object):
@@ -113,7 +112,7 @@ class EmitDigest(object):
                 if 0 < config.get('limit', -1) <= index:
                     session.delete(digest_entry)
                     continue
-                entry = Entry(digest_entry.entry)
+                entry = digest_entry.entry
                 if config.get('restore_state') and entry.get('digest_state'):
                     # Not sure this is the best way, but we don't want hooks running on this task
                     # (like backlog hooking entry.fail)

@@ -11,6 +11,7 @@ from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 
 from flexget.manager import Session
 from flexget.utils import qualities, json
+from flexget.entry import Entry
 
 
 def with_session(*args, **kwargs):
@@ -79,58 +80,52 @@ def text_date_synonym(name):
     return synonym(name, descriptor=property(getter, setter))
 
 
-def _only_builtins(item):
-    """Casts all subclasses of builtin types to their builtin python type. Works recursively on iterables.
+def entry_synonym(name):
+    """Use json to serialize python objects for db storage."""
 
-    Raises ValueError if passed an object that doesn't subclass a builtin type.
-    """
+    def only_builtins(item):
+        supported_types = [str, unicode, int, float, long, bool, datetime]
+        # dict, list, tuple and set are also supported, but handled separately
 
-    supported_types = [str, int, float, long, bool, datetime]
-    # dict, list, tuple and set are also supported, but handled separately
-
-    if type(item) in supported_types:
-        return item
-    elif isinstance(item, Mapping):
-        result = {}
-        for key, value in item.iteritems():
-            try:
-                result[key] = _only_builtins(value)
-            except TypeError:
-                continue
-        return result
-    elif isinstance(item, (list, tuple, set)):
-        result = []
-        for value in item:
-            try:
-                result.append(_only_builtins(value))
-            except ValueError:
-                continue
-        if isinstance(item, list):
+        if type(item) in supported_types:
+            return item
+        elif isinstance(item, Mapping):
+            result = {}
+            for key, value in item.iteritems():
+                try:
+                    result[key] = only_builtins(value)
+                except TypeError:
+                    continue
             return result
-        elif isinstance(item, tuple):
-            return tuple(result)
+        elif isinstance(item, (list, tuple, set)):
+            result = []
+            for value in item:
+                try:
+                    result.append(only_builtins(value))
+                except ValueError:
+                    continue
+            if isinstance(item, list):
+                return result
+            elif isinstance(item, tuple):
+                return tuple(result)
+            else:
+                return set(result)
         else:
-            return set(result)
-    else:
-        for s_type in supported_types:
-            if isinstance(item, s_type):
-                return s_type(item)
+            for s_type in supported_types:
+                if isinstance(item, s_type):
+                    return s_type(item)
 
-    # If item isn't a subclass of a builtin python type, raise ValueError.
-    raise TypeError('%r is not a subclass of a builtin python type.' % type(item))
-
-
-def safe_pickle_synonym(name):
-    """Used to store Entry instances into a PickleType column in the database.
-
-    In order to ensure everything can be loaded after code changes, makes sure no custom python classes are pickled.
-    """
+        # If item isn't a subclass of a builtin python type, raise ValueError.
+        raise TypeError('%r is not of type Entry.' % type(item))
 
     def getter(self):
-        return getattr(self, name)
+        return Entry(json.loads(getattr(self, name), decode_datetime=True))
 
     def setter(self, entry):
-        setattr(self, name, _only_builtins(entry))
+        if isinstance(entry, Entry) or isinstance(entry, dict):
+            setattr(self, name, unicode(json.dumps(only_builtins(dict(entry)), encode_datetime=True)))
+        else:
+            raise TypeError('%r is not of type Entry or dict.' % type(entry))
 
     return synonym(name, descriptor=property(getter, setter))
 
@@ -141,13 +136,13 @@ def json_synonym(name):
         return json.loads(getattr(self, name), decode_datetime=True)
 
     def setter(self, entry):
-        setattr(self, name, str(json.dumps(_only_builtins(entry), encode_datetime=True)))
+        setattr(self, name, unicode(json.dumps(entry, encode_datetime=True)))
 
     return synonym(name, descriptor=property(getter, setter))
 
 
 class CaseInsensitiveWord(Comparator):
-    """Hybr id value representing a string that compares case insensitively."""
+    """Hybrid value representing a string that compares case insensitively."""
 
     def __init__(self, word):
         if isinstance(word, CaseInsensitiveWord):

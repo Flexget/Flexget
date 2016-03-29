@@ -7,11 +7,10 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Index, select
 
 from flexget import db_schema, plugin
-from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import json
 from flexget.manager import Session
-from flexget.utils.database import json_synonym, with_session
+from flexget.utils.database import entry_synonym, with_session
 from flexget.utils.tools import parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
@@ -60,7 +59,7 @@ class BacklogEntry(Base):
     title = Column(String)
     expire = Column(DateTime)
     _json = Column('json', Unicode)
-    entry = json_synonym('_json')
+    entry = entry_synonym('_json')
 
     def __repr__(self):
         return '<BacklogEntry(title=%s)>' % (self.title)
@@ -164,7 +163,7 @@ class InputBacklog(object):
         """Insert missing entries from backlog."""
         entries = []
         for backlog_entry in get_entries(task=task.name, session=session):
-            entry = Entry(backlog_entry.entry)
+            entry = backlog_entry.entry
 
             # this is already in the task
             if task.find_entry(title=entry['title'], url=entry['url']):
