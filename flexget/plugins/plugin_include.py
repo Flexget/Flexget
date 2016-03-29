@@ -39,7 +39,7 @@ class PluginInclude(object):
             name = os.path.expanduser(name)
             if not os.path.isabs(name):
                 name = os.path.join(task.manager.config_base, name)
-            include = yaml.load(file(name))
+            include = yaml.load(open(name))
             errors = process_config(include, plugin.plugin_schemas(context='task'))
             if errors:
                 log.error('Included file %s has invalid config:' % name)
