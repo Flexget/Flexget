@@ -120,10 +120,10 @@ def entry_synonym(name):
         return Entry(json.loads(getattr(self, name), decode_datetime=True))
 
     def setter(self, entry):
-        if not isinstance(entry, Entry):
-            raise TypeError('%r is not of type Entry.' % type(entry))
-
-        setattr(self, name, unicode(json.dumps(only_builtins(dict(entry)), encode_datetime=True)))
+        if isinstance(entry, Entry) or isinstance(entry, dict):
+            setattr(self, name, unicode(json.dumps(only_builtins(dict(entry)), encode_datetime=True)))
+        else:
+            raise TypeError('%r is not of type Entry or dict.' % type(entry))
 
     return synonym(name, descriptor=property(getter, setter))
 
