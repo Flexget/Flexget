@@ -22,6 +22,8 @@ Base = versioned_base('digest', 1)
 
 @db_schema.upgrade('digest')
 def upgrade(ver, session):
+    if None is ver:
+        ver = 0
     if ver == 0:
         table = table_schema('digest_entries', session)
         table_add_column(table, 'json', Unicode, session)
