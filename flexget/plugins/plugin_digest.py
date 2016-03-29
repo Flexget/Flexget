@@ -76,7 +76,7 @@ class OutputDigest(object):
                     continue
                 entry['digest_task'] = task.name
                 entry['digest_state'] = entry.state
-                session.add(DigestEntry(list=config['list'], entry=dict(entry)))
+                session.add(DigestEntry(list=config['list'], entry=entry))
 
 
 class EmitDigest(object):
