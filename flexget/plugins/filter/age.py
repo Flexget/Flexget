@@ -6,6 +6,8 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils.tools import parse_timedelta
 
+from dateutil.parser import parse as dateutil_parse
+
 log = logging.getLogger('age')
 
 
@@ -17,7 +19,7 @@ class Age(object):
 
           age:
             field: 'access'  # 'access' is a field set from filesystem plugin
-            amount: '7 days'
+            age: '7 days'
             action: 'accept'
     """
 
@@ -26,9 +28,9 @@ class Age(object):
         'properties': {
             'field': {'type': 'string'},
             'action': {'type': 'string', 'enum': ['accept', 'reject']},
-            'amount': {'type': 'string', 'format': 'interval'}
+            'age': {'type': 'string', 'format': 'interval'}
         },
-        'required': ['field', 'action', 'amount'],
+        'required': ['field', 'action', 'age'],
         'additionalProperties': False
     }
 
@@ -39,16 +41,18 @@ class Age(object):
                 entry.fail('Field {0} does not exist'.format(field))
                 continue
 
-            age_cutoff = datetime.now() - parse_timedelta(config['amount'])
+            val = entry[field]
+            age_cutoff = datetime.now() - parse_timedelta(config['age'])
 
-            if entry[field] < age_cutoff:
-                info_string = 'Date in field {0} is older than {1}'.format(field, config['amount'])
+            field_date = datetime.fromtimestamp(val) if isinstance(val, float) else dateutil_parse(val)
+            if field_date < age_cutoff:
+                info_string = 'Date in field {0} is older than {1}'.format(field, config['age'])
                 if config['action'] == 'accept':
                     entry.accept(info_string)
                 else:
                     entry.reject(info_string)
                 log.debug('Entry %s was %sed because date in field %s is older than %s', entry['title'],
-                          config['action'], field, config['amount'])
+                          config['action'], field, config['age'])
 
 
 @event('plugin.register')
