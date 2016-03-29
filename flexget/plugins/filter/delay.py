@@ -37,6 +37,9 @@ Index('delay_feed_title', DelayedEntry.task, DelayedEntry.title)
 
 @db_schema.upgrade('delay')
 def upgrade(ver, session):
+    if ver is None:
+        # Upgrade to version 0 was a failed attempt at cleaning bad entries from our table, better attempt in ver 1
+        ver = 1
     if ver == 1:
         table = table_schema('delay', session)
         table_add_column(table, 'json', Unicode, session)
