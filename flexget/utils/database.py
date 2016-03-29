@@ -82,11 +82,6 @@ def entry_synonym(name):
     """Use json to serialize python objects for db storage."""
 
     def only_builtins(item):
-        """Casts all subclasses of builtin types to their builtin python type. Works recursively on iterables.
-
-        Raises ValueError if passed an object that doesn't subclass a builtin type.
-        """
-
         supported_types = [str, unicode, int, float, long, bool, datetime]
         # dict, list, tuple and set are also supported, but handled separately
 
@@ -119,13 +114,16 @@ def entry_synonym(name):
                     return s_type(item)
 
         # If item isn't a subclass of a builtin python type, raise ValueError.
-        raise TypeError('%r is not a subclass of a builtin python type.' % type(item))
+        raise TypeError('%r is not of type Entry.' % type(item))
 
     def getter(self):
         return Entry(json.loads(getattr(self, name), decode_datetime=True))
 
     def setter(self, entry):
-        setattr(self, name, unicode(json.dumps(only_builtins(entry), encode_datetime=True)))
+        if not isinstance(entry, Entry):
+            raise TypeError('%r is not of type Entry.' % type(entry))
+
+        setattr(self, name, unicode(json.dumps(only_builtins(dict(entry)), encode_datetime=True)))
 
     return synonym(name, descriptor=property(getter, setter))
 
