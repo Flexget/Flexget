@@ -808,10 +808,13 @@ class Manager(object):
         # redirect standard file descriptors
         sys.stdout.flush()
         sys.stderr.flush()
-        null = open(os.devnull, 'w')
-        sys.stdout = null
-        sys.stdin = null
-        sys.stderr = null
+        si = open(os.devnull, 'r')
+        so = open(os.devnull, 'ab+')
+        se = open(os.devnull, 'ab+', 0)
+        os.dup2(si.fileno(), sys.stdin.fileno())
+        os.dup2(so.fileno(), sys.stdout.fileno())
+        os.dup2(se.fileno(), sys.stderr.fileno())
+
         # If we have a lock, update the lock file with our new pid
         if self._has_lock:
             self.write_lock()
