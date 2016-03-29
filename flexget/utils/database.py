@@ -118,21 +118,6 @@ def _only_builtins(item):
     raise TypeError('%r is not a subclass of a builtin python type.' % type(item))
 
 
-def safe_pickle_synonym(name):
-    """Used to store Entry instances into a PickleType column in the database.
-
-    In order to ensure everything can be loaded after code changes, makes sure no custom python classes are pickled.
-    """
-
-    def getter(self):
-        return getattr(self, name)
-
-    def setter(self, entry):
-        setattr(self, name, _only_builtins(entry))
-
-    return synonym(name, descriptor=property(getter, setter))
-
-
 def json_synonym(name):
     """Use json to serialize python objects for db storage."""
     def getter(self):
