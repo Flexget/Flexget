@@ -11,7 +11,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, Forei
 from flexget import db_schema
 from flexget.manager import Session
 from flexget.utils import json
-from flexget.utils.database import json_synonym
+from flexget.utils.database import entry_synonym
 from flexget.utils.tools import parse_timedelta, TimedDict
 from flexget.entry import Entry
 from flexget.event import event
@@ -55,7 +55,7 @@ class InputCacheEntry(Base):
 
     id = Column(Integer, primary_key=True)
     _json = Column('json', Unicode)
-    entry = json_synonym('_json')
+    entry = entry_synonym('_json')
 
     cache_id = Column(Integer, ForeignKey('input_cache.id'), nullable=False)
 
@@ -147,7 +147,7 @@ class cached(object):
                             filter(InputCache.added > datetime.now() - self.persist).\
                             first()
                         if db_cache:
-                            entries = [Entry(e.entry) for e in db_cache.entries]
+                            entries = [e.entry for e in db_cache.entries]
                             log.verbose('Restored %s entries from db cache' % len(entries))
                             # Store to in memory cache
                             self.cache[cache_name] = copy.deepcopy(entries)
@@ -167,7 +167,7 @@ class cached(object):
                             if db_cache and db_cache.entries:
                                 log.error('There was an error during %s input (%s), using cache instead.' %
                                         (self.name, e))
-                                entries = [Entry(e.entry) for e in db_cache.entries]
+                                entries = [e.entry for e in db_cache.entries]
                                 log.verbose('Restored %s entries from db cache' % len(entries))
                                 # Store to in memory cache
                                 self.cache[cache_name] = copy.deepcopy(entries)
@@ -195,7 +195,7 @@ class cached(object):
                             filter(InputCache.hash == hash).first()
                         if not db_cache:
                             db_cache = InputCache(name=self.name, hash=hash)
-                        db_cache.entries = [InputCacheEntry(entry=dict(e)) for e in response]
+                        db_cache.entries = [InputCacheEntry(entry=e) for e in response]
                         db_cache.added = datetime.now()
                         session.merge(db_cache)
                 return response

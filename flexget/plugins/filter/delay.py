@@ -6,9 +6,8 @@ from sqlalchemy import Column, Integer, String, Unicode, DateTime, Index, select
 
 from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.entry import Entry
 from flexget.utils import json
-from flexget.utils.database import json_synonym
+from flexget.utils.database import entry_synonym
 from flexget.utils.tools import parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
@@ -25,7 +24,7 @@ class DelayedEntry(Base):
     title = Column(Unicode)
     expire = Column(DateTime)
     _json = Column('json', Unicode)
-    entry = json_synonym('_json')
+    entry = entry_synonym('_json')
 
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % self.title
@@ -98,7 +97,7 @@ class FilterDelay(object):
                     filter(DelayedEntry.task == task.name).first():
                 delay_entry = DelayedEntry()
                 delay_entry.title = entry['title']
-                delay_entry.entry = dict(entry)
+                delay_entry.entry = entry
                 delay_entry.task = task.name
                 delay_entry.expire = expire_time
                 task.session.add(delay_entry)
@@ -110,7 +109,7 @@ class FilterDelay(object):
         passed_delay = task.session.query(DelayedEntry).\
             filter(datetime.now() > DelayedEntry.expire).\
             filter(DelayedEntry.task == task.name)
-        delayed_entries = [Entry(item.entry) for item in passed_delay.all()]
+        delayed_entries = [item.entry for item in passed_delay.all()]
         for entry in delayed_entries:
             entry['passed_delay'] = True
             log.debug('Releasing %s' % entry['title'])
