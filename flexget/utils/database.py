@@ -1,5 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import bytes
 from builtins import str
 from past.builtins import basestring
 import functools
@@ -86,7 +85,7 @@ def _only_builtins(item):
     Raises ValueError if passed an object that doesn't subclass a builtin type.
     """
 
-    supported_types = [str, unicode, int, float, long, bool, datetime]
+    supported_types = [str, int, float, long, bool, datetime]
     # dict, list, tuple and set are also supported, but handled separately
 
     if type(item) in supported_types:
@@ -148,7 +147,7 @@ def json_synonym(name):
 
 
 class CaseInsensitiveWord(Comparator):
-    """Hybrid value representing a string that compares case insensitively."""
+    """Hybr id value representing a string that compares case insensitively."""
 
     def __init__(self, word):
         if isinstance(word, CaseInsensitiveWord):
