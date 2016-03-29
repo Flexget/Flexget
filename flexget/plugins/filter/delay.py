@@ -37,18 +37,7 @@ Index('delay_feed_title', DelayedEntry.task, DelayedEntry.title)
 
 @db_schema.upgrade('delay')
 def upgrade(ver, session):
-    if ver is None:
-        log.info('Fixing delay table from erroneous data ...')
-        # TODO: Using the DelayedEntry object here is no good.
-        all = session.query(DelayedEntry).all()
-        for de in all:
-            for key, value in de.entry.items():
-                if not isinstance(value, (basestring, bool, int, float, list, dict)):
-                    log.warning('Removing `%s` with erroneous data' % de.title)
-                    session.delete(de)
-                    break
-        ver = 1
-    elif ver == 1:
+    if ver == 1:
         table = table_schema('delay', session)
         table_add_column(table, 'json', Unicode, session)
         # Make sure we get the new schema with the added column
