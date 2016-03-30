@@ -100,7 +100,7 @@ Base.register_table(genres_table)
 
 
 @with_session
-def get_db_genres(genre_names, session=None):
+def _get_db_genres(genre_names, session=None):
     if not genre_names:
         return []
 
@@ -112,7 +112,10 @@ def get_db_genres(genre_names, session=None):
             session.add(genre)
         genres.append(genre)
 
-    return genres
+    if len(genres) > 0:
+        session.flush()
+
+    return [{'id': genre.id, 'name': genre.name} for genre in genres]
 
 
 class TVDBSeries(Base):
@@ -173,7 +176,6 @@ class TVDBSeries(Base):
         self.expired = False
         self.aliases = series['aliases']
         self._banner = series['banner']
-        self._genres = get_db_genres(series['genre'])
 
         with Session() as session:
             search_strings = self.search_strings
@@ -184,6 +186,9 @@ class TVDBSeries(Base):
                         search_result = TVDBSearchResult(search=name)
                     search_result.series_id = self.id
                     session.add(search_result)
+
+        genres = _get_db_genres(series['genre'])
+        self._genres = [TVDBGenre(**g) for g in genres]
 
         # Reset Actors and Posters so they can be lazy populated
         self._actors = None
@@ -364,7 +369,7 @@ def find_series_id(name):
         raise LookupError('No results for `%s`' % name)
 
 
-@with_session(expire_on_commit=False)
+@with_session
 def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     """
     Look up information on a series. Will be returned from cache if available, and looked up online and cached if not.
@@ -418,7 +423,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
             series = TVDBSeries(id=tvdb_id)
             series.update()
             if series.name:
-                session.add(series)
+                session.merge(series)
         elif name:
             tvdb_id = find_series_id(name)
             if tvdb_id:
@@ -427,7 +432,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
                     series = TVDBSeries()
                     series.id = tvdb_id
                     series.update()
-                    session.add(series)
+                    session.merge(series)
 
                 # Add search result to cache
                 search_result = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name.lower()).first()
@@ -444,7 +449,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     return series
 
 
-@with_session(expire_on_commit=False)
+@with_session
 def lookup_episode(name=None, season_number=None, episode_number=None, absolute_number=None,
                    tvdb_id=None, only_cached=False, session=None):
     """
