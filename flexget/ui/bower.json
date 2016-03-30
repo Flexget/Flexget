@@ -1,7 +1,7 @@
 {
   "name": "FlexgetUI",
   "dependencies": {
-    "angular": "angularjs#~1.5.1",
+    "angular": "angularjs#~1.5.2",
     "angular-material": "~1.1.0-RC1",
     "angular-ui-router": "ui-router#~0.2.15",
     "angular-filter": "~0.5.8",
@@ -19,7 +19,7 @@
     "angular-messages": "^1.5.1"
   },
   "resolutions": {
-    "angular": "1.5.2"
+    "angular": "~1.5.2"
   },
   "devDependencies": {},
   "overrides": {
