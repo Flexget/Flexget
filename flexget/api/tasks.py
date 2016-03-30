@@ -233,8 +233,8 @@ inject_input = {
     'properties': {
         'title': {'type': 'string'},
         'url': {'type': 'string', 'format': 'url'},
-        'force': {'type': 'string'},
-        'accept': {'type': 'string'},
+        'force': {'type': 'boolean'},
+        'accept': {'type': 'boolean'},
         'fields': {'type': 'array',
                    'items': {
                        'type': 'object',
@@ -287,7 +287,15 @@ _streams = {}
 execution_doc = "'progress': Include task progress updates<br>" \
                 "'summary': Include task summary<br>" \
                 "'log': Include execution log<br>" \
-                "'entry_dump': Include dump of entries including fields<br>"
+                "'entry_dump': Include dump of entries including fields<br>"\
+                "'inject': A List of entry objects. See payload description for additional information<br>"
+
+entry_doc = "Entry object:<br>" \
+            "'title': Title of the entry. If not supplied it will be attempted to retrieve it from URL headers<br>" \
+            "'url': URL of the entry, mandatory" \
+            "'accept': Accept this entry immediately upon injection<br>" \
+            "'force': Prevent any plugins from rejecting this entry<br>" \
+            "'fields': A list of objects that can contain any other value for the entry"
 
 inject_api = api.namespace('inject', description='Entry injection API')
 
@@ -299,7 +307,7 @@ class TaskExecutionAPI(APIResource):
     @api.response(404, description='Task not found')
     @api.response(500, description='Could not resolve title from URL')
     @api.response(200, model=task_api_execute_schema)
-    @api.validate(task_execution_schema)
+    @api.validate(task_execution_schema, description=entry_doc)
     def post(self, task, session=None):
         """ Execute task and stream results """
         args = request.json
@@ -325,6 +333,8 @@ class TaskExecutionAPI(APIResource):
                     except KeyError:
                         return {'status': 'error',
                                 'message': 'No title given, and couldn\'t get one from the URL\'s HTTP response'}, 500
+                else:
+                    entry['title'] = item.get('title')
                 if item.get('force'):
                     entry['immortal'] = True
                 if item.get('accept'):
