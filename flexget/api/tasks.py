@@ -310,20 +310,20 @@ class TaskExecutionAPI(APIResource):
     @api.validate(task_execution_schema, description=entry_doc)
     def post(self, task, session=None):
         """ Execute task and stream results """
-        args = request.json
+        data = request.json
 
         if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {}).keys()]:
             return {'error': 'task does not exist'}, 404
 
         queue = ExecuteLog()
-        output = queue if args.get('log') else None
+        output = queue if data.get('log') else None
         stream = True if any(
-            arg[0] in ['progress', 'summary', 'log', 'entry_dump'] for arg in args.items() if arg[1]) else False
+            arg[0] in ['progress', 'summary', 'log', 'entry_dump'] for arg in data.items() if arg[1]) else False
         options = {'tasks': [task]}
 
-        if args.get('inject'):
+        if data.get('inject'):
             entries = []
-            for item in args.get('inject'):
+            for item in data.get('inject'):
                 entry = Entry()
                 entry['url'] = item['url']
                 if not item.get('title'):
@@ -353,7 +353,7 @@ class TaskExecutionAPI(APIResource):
         _streams[task_id] = {
             'queue': queue,
             'last_update': datetime.now(),
-            'args': args
+            'args': data
         }
 
         def stream_response():
