@@ -1,9 +1,12 @@
 import json
 import os
+
 from mock import patch
+
 from flexget import __version__
 from flexget.api import __version__ as __api_version__
-from flexget.manager import Manager
+from flexget.manager import Manager, Session
+from flexget.plugins.filter.seen import SeenEntry
 from tests.conftest import MockManager
 
 
@@ -204,5 +207,25 @@ class TestTaskAPI(object):
         assert mocked_save_config.called
         assert 'test' not in manager.user_config['tasks']
         assert 'test' not in manager.config['tasks']
+
+
+class TestExecuteAPI(object):
+    config = """
+        tasks:
+          test_task:
+            mock:
+              - title: accept_me
+              - title: reject_me
+            accept_all: yes
+        """
+
+    def test_execute(self, api_client):
+        # No parameters
+        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps({'log': True}))
+        assert rsp.status_code == 200
+
+        with Session() as session:
+            query = session.query(SeenEntry).all()
+            assert len(query) == 1
 
 # TODO: Finish tests
