@@ -119,7 +119,7 @@ class Filesystem(object):
         except Exception as e:
             log.warning('Error setting timestamp for %s: %s' % (filepath, e))
             entry['timestamp'] = None
-        entry['accessed'] = 10 #datetime.fromtimestamp(filepath.getatime())
+        entry['accessed'] = datetime.fromtimestamp(filepath.getatime())
         entry['modified'] = datetime.fromtimestamp(filepath.getmtime())
         entry['created'] = datetime.fromtimestamp(filepath.getctime())
         if entry.isvalid():
