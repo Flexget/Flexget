@@ -216,13 +216,23 @@ class TestExecuteAPI(object):
             mock:
               - title: accept_me
               - title: reject_me
-            accept_all: yes
+            regexp:
+              accept:
+                - accept
+              reject:
+                - reject
         """
 
-    def test_execute(self, api_client):
-        # No parameters
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps({'log': True}))
+    def test_execute(self, api_client, manager):
+        # Empty payload
+        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps({}))
         assert rsp.status_code == 200
+
+        assert len(manager.task_queue) == 1
+        task = manager.task_queue.run_queue.get(timeout=0.5)
+        assert task
+
+        task.execute()
 
         with Session() as session:
             query = session.query(SeenEntry).all()
