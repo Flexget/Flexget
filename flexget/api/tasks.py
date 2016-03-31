@@ -1,21 +1,23 @@
-import copy
-import cherrypy
-from datetime import datetime
-from Queue import Queue, Empty
-from json import JSONEncoder
 import argparse
+import cgi
+import copy
+from Queue import Queue, Empty
+from datetime import datetime
+from json import JSONEncoder
 
-from flask import request
+import cherrypy
 from flask import jsonify, Response
-import flask_restplus
+from flask import request
 
-from flexget.config_schema import process_config
 from flexget.api import api, APIResource, ApiError, NotFoundError
+from flexget.config_schema import process_config
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.options import get_parser
 from flexget.task import task_phases
 from flexget.utils import json
-from flexget.event import event
+from flexget.utils import requests
 from flexget.utils.lazy_dict import LazyLookup
-from flexget.options import get_parser
 
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
@@ -31,7 +33,6 @@ tasks_list_api_schema = api.schema('tasks.list', {
     'additionalProperties': False
 })
 
-
 task_schema_validate = {
     'type': 'object',
     'properties': {
@@ -40,7 +41,6 @@ task_schema_validate = {
     },
     'additionalProperties': False
 }
-
 
 task_schema = copy.deepcopy(task_schema_validate)
 task_schema['properties']['config'] = {'type': 'object'}
@@ -57,7 +57,7 @@ class TasksAPI(APIResource):
     def get(self, session=None):
         """ List all tasks """
         tasks = []
-        for name, config in self.manager.user_config.get('tasks', {}).iteritems():
+        for name, config in self.manager.user_config.get('tasks', {}).items():
             tasks.append({'name': name, 'config': config})
         return {'tasks': tasks}
 
@@ -228,8 +228,33 @@ task_execution_results_schema = {
     }
 }
 
+inject_input = {
+    'type': 'object',
+    'properties': {
+        'title': {'type': 'string'},
+        'url': {'type': 'string', 'format': 'url'},
+        'force': {'type': 'boolean'},
+        'accept': {'type': 'boolean'},
+        'fields': {'type': 'object'}
+    },
+    'required': ['url']
+}
+
+task_execution_input = {
+    'type': 'object',
+    'properties': {
+        'progress': {'type': 'boolean', 'default': True},
+        'summary': {'type': 'boolean', 'default': True},
+        'log': {'type': 'boolean', 'default': False},
+        'entry_dump': {'type': 'boolean', 'default': True},
+        'inject': {'type': 'array', 'items': inject_input}
+    }
+}
+
 task_api_queue_schema = api.schema('task.queue', task_queue_schema)
 task_api_execute_schema = api.schema('task.execution', task_execution_results_schema)
+
+task_execution_schema = api.schema('task_execution_input', task_execution_input)
 
 
 @tasks_api.route('/queue/')
@@ -252,38 +277,70 @@ class ExecuteLog(Queue):
         self.put(json.dumps({'log': s}))
 
 
-execute_parser = api.parser()
-
-execute_parser.add_argument('progress', type=flask_restplus.inputs.boolean, required=False, default=True,
-                            help='Include task progress updates')
-execute_parser.add_argument('summary', type=flask_restplus.inputs.boolean, required=False, default=True,
-                            help='Include task summary')
-execute_parser.add_argument('log', type=flask_restplus.inputs.boolean, required=False, default=False,
-                            help='Include execution log')
-execute_parser.add_argument('entry_dump', type=flask_restplus.inputs.boolean, required=False, default=False,
-                            help='Include dump of entries including fields')
-
 _streams = {}
 
+execution_doc = "'progress': Include task progress updates<br>" \
+                "'summary': Include task summary<br>" \
+                "'log': Include execution log<br>" \
+                "'entry_dump': Include dump of entries including fields<br>" \
+                "'inject': A List of entry objects. See payload description for additional information<br>"
 
+entry_doc = "Entry object:<br>" \
+            "'title': Title of the entry. If not supplied it will be attempted to retrieve it from URL headers<br>" \
+            "'url': URL of the entry, mandatory<br>" \
+            "'accept': Accept this entry immediately upon injection<br>" \
+            "'force': Prevent any plugins from rejecting this entry<br>" \
+            "'fields': A list of objects that can contain any other value for the entry"
+
+inject_api = api.namespace('inject', description='Entry injection API')
+
+
+@inject_api.route('/<task>/')
 @tasks_api.route('/<task>/execute/')
-@api.doc(params={'task': 'task name'})
+@api.doc(params={'task': 'task name'}, description=execution_doc)
 class TaskExecutionAPI(APIResource):
-    @api.response(404, description='task not found')
+    @api.response(404, description='Task not found')
+    @api.response(500, description='Could not resolve title from URL')
     @api.response(200, model=task_api_execute_schema)
-    def get(self, task, session=None):
+    @api.validate(task_execution_schema, description=entry_doc)
+    def post(self, task, session=None):
         """ Execute task and stream results """
-        args = execute_parser.parse_args()
+        data = request.json
 
-        if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {}).iterkeys()]:
+        if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {}).keys()]:
             return {'error': 'task does not exist'}, 404
 
         queue = ExecuteLog()
-        output = queue if args['log'] else None
+        output = queue if data.get('log') else None
         stream = True if any(
-            arg[0] in ['progress', 'summary', 'log', 'entry_dump'] for arg in args.iteritems() if arg[1]) else False
+            arg[0] in ['progress', 'summary', 'log', 'entry_dump'] for arg in data.items() if arg[1]) else False
+        options = {'tasks': [task]}
 
-        task_id, __, task_event = self.manager.execute(options={'tasks': [task]}, output=output)[0]
+        if data.get('inject'):
+            entries = []
+            for item in data.get('inject'):
+                entry = Entry()
+                entry['url'] = item['url']
+                if not item.get('title'):
+                    try:
+                        value, params = cgi.parse_header(requests.head(item['url']).headers['Content-Disposition'])
+                        entry['title'] = params['filename']
+                    except KeyError:
+                        return {'status': 'error',
+                                'message': 'No title given, and couldn\'t get one from the URL\'s HTTP response'}, 500
+                else:
+                    entry['title'] = item.get('title')
+                if item.get('force'):
+                    entry['immortal'] = True
+                if item.get('accept'):
+                    entry.accept(reason='accepted by API inject')
+                if item.get('fields'):
+                    for key, value in item.get('fields').items():
+                        entry[key] = value
+                entries.append(entry)
+            options['inject'] = entries
+
+        task_id, __, task_event = self.manager.execute(options=options, output=output)[0]
 
         if not stream:
             return {'task': {'id': task_id, 'name': task}}
@@ -291,7 +348,7 @@ class TaskExecutionAPI(APIResource):
         _streams[task_id] = {
             'queue': queue,
             'last_update': datetime.now(),
-            'args': args
+            'args': data
         }
 
         def stream_response():
@@ -326,11 +383,9 @@ def setup_params(mgr):
         if name in ignore:
             continue
         if isinstance(action, argparse._StoreConstAction) and action.help != '==SUPPRESS==':
-            execute_parser.add_argument(name,
-                                        type=flask_restplus.inputs.boolean,
-                                        required=False,
-                                        help=action.help)
-    api.doc(parser=execute_parser)(TaskExecutionAPI)
+            global execution_doc
+            task_execution_input['properties'][name] = {'type': 'boolean'}
+            TaskExecutionAPI.__apidoc__['description'] += "'{0}': {1}<br>".format(name, action.help)
 
 
 class EntryDecoder(JSONEncoder):
@@ -373,21 +428,21 @@ def update_stream(task, status='pending'):
 def start_task(task):
     task.stream = _streams.get(task.id)
 
-    if task.stream and task.stream['args']['progress']:
+    if task.stream and task.stream['args'].get('progress'):
         update_stream(task, status='running')
 
 
 @event('task.execute.completed')
 def finish_task(task):
     if task.stream:
-        if task.stream['args']['progress']:
+        if task.stream['args'].get('progress'):
             update_stream(task, status='complete')
 
-        if task.stream['args']['entry_dump']:
+        if task.stream['args'].get('entry_dump'):
             entries = [entry.store for entry in task.entries]
             task.stream['queue'].put(EntryDecoder().encode({'entry_dump': entries}))
 
-        if task.stream['args']['summary']:
+        if task.stream['args'].get('summary'):
             task.stream['queue'].put(json.dumps({
                 'summary': {
                     'accepted': len(task.accepted),
@@ -402,5 +457,5 @@ def finish_task(task):
 
 @event('task.execute.before_plugin')
 def track_progress(task, plugin_name):
-    if task.stream and task.stream['args']['progress']:
+    if task.stream and task.stream['args'].get('progress'):
         update_stream(task, status='running')
