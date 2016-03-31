@@ -318,12 +318,12 @@ class TestExecuteAPI(object):
         assert len(task.accepted) == 1
 
     def test_inject_with_fields(self, api_client, manager):
-        field1 = {'imdb_id': "tt1234567"}
-        field2 = {'tmdb_id': "1234567"}
+        fields = {'imdb_id': "tt1234567",
+                  'tmdb_id': "1234567"}
         entry = {
             'title': "injected",
             'url': 'http://test.com',
-            'fields': [field1, field2],
+            'fields': fields,
             'accept': True
         }
 

@@ -235,12 +235,7 @@ inject_input = {
         'url': {'type': 'string', 'format': 'url'},
         'force': {'type': 'boolean'},
         'accept': {'type': 'boolean'},
-        'fields': {'type': 'array',
-                   'items': {
-                       'type': 'object',
-                       'minProperties': 1,
-                       'maxProperties': 1}
-                   }
+        'fields': {'type': 'object', 'minProperties': 1}
     },
     'required': ['url']
 }
@@ -287,7 +282,7 @@ _streams = {}
 execution_doc = "'progress': Include task progress updates<br>" \
                 "'summary': Include task summary<br>" \
                 "'log': Include execution log<br>" \
-                "'entry_dump': Include dump of entries including fields<br>"\
+                "'entry_dump': Include dump of entries including fields<br>" \
                 "'inject': A List of entry objects. See payload description for additional information<br>"
 
 entry_doc = "Entry object:<br>" \
@@ -340,8 +335,8 @@ class TaskExecutionAPI(APIResource):
                 if item.get('accept'):
                     entry.accept(reason='accepted by API inject')
                 if item.get('fields'):
-                    for field in item.get('fields'):
-                        entry[field.keys()[0]] = field.values()[0]
+                    for key, value in item.get('fields').items():
+                        entry[key] = value
                 entries.append(entry)
             options['inject'] = entries
 
