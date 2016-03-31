@@ -5,8 +5,7 @@ from mock import patch
 
 from flexget import __version__
 from flexget.api import __version__ as __api_version__
-from flexget.manager import Manager, Session
-from flexget.plugins.filter.seen import SeenEntry
+from flexget.manager import Manager
 from tests.conftest import MockManager
 
 
@@ -210,6 +209,14 @@ class TestTaskAPI(object):
 
 
 class TestExecuteAPI(object):
+    @staticmethod
+    def get_task_queue(manager):
+        """ Used to execute task queue"""
+        assert len(manager.task_queue) == 1
+        task = manager.task_queue.run_queue.get(timeout=0.5)
+        assert task
+        return task
+
     config = """
         tasks:
           test_task:
@@ -228,14 +235,154 @@ class TestExecuteAPI(object):
         rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps({}))
         assert rsp.status_code == 200
 
-        assert len(manager.task_queue) == 1
-        task = manager.task_queue.run_queue.get(timeout=0.5)
-        assert task
-
+        task = self.get_task_queue(manager)
         task.execute()
 
-        with Session() as session:
-            query = session.query(SeenEntry).all()
-            assert len(query) == 1
+        assert len(task.accepted) == 1
 
-# TODO: Finish tests
+    def test_inject_plain(self, api_client, manager):
+        entry = {
+            'title': "injected",
+            'url': 'http://test.com'
+        }
+
+        payload = {
+            "inject": [entry]
+        }
+        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        assert rsp.status_code == 200
+
+        task = self.get_task_queue(manager)
+        task.execute()
+
+        assert len(task.all_entries) == 1
+        assert len(task.accepted) == 0
+
+    def test_inject_accept(self, api_client, manager):
+        entry = {
+            'title': "injected",
+            'url': 'http://test.com',
+            'accept': True
+        }
+
+        payload = {
+            "inject": [entry]
+        }
+        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        assert rsp.status_code == 200
+
+        task = self.get_task_queue(manager)
+        task.execute()
+
+        assert len(task.all_entries) == 1
+        assert len(task.accepted) == 1
+
+    def test_inject_force(self, api_client, manager):
+        entry = {
+            'title': "accept",
+            'url': 'http://test.com',
+        }
+
+        payload = {
+            "inject": [entry]
+        }
+        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        assert rsp.status_code == 200
+
+        task = self.get_task_queue(manager)
+        task.execute()
+
+        assert len(task.all_entries) == 1
+        assert len(task.accepted) == 1
+
+        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        assert rsp.status_code == 200
+
+        task = self.get_task_queue(manager)
+        task.execute()
+
+        assert len(task.all_entries) == 1
+        # Rejected due to Seen
+        assert len(task.accepted) == 0
+
+        # Forcing the entry not to be disabled
+        entry['force'] = True
+
+        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        assert rsp.status_code == 200
+
+        task = self.get_task_queue(manager)
+        task.execute()
+
+        assert len(task.all_entries) == 1
+        assert len(task.accepted) == 1
+
+    def test_inject_with_fields(self, api_client, manager):
+        field1 = {'imdb_id': "tt1234567"}
+        field2 = {'tmdb_id': "1234567"}
+        entry = {
+            'title': "injected",
+            'url': 'http://test.com',
+            'fields': [field1, field2],
+            'accept': True
+        }
+
+        payload = {
+            "inject": [entry]
+        }
+
+        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        assert rsp.status_code == 200
+
+        task = self.get_task_queue(manager)
+        task.execute()
+
+        assert len(task.all_entries) == 1
+        assert len(task.accepted) == 1
+
+        entry = task.find_entry(title='injected')
+        assert entry['imdb_id'] == "tt1234567"
+        assert entry['tmdb_id'] == "1234567"
+
+    def test_multiple_entries(self, api_client, manager):
+        entry1 = {
+            'title': "entry1",
+            'url': 'http://test.com',
+            'accept': True
+        }
+        entry2 = {
+            'title': "entry2",
+            'url': 'http://test.com',
+            'accept': True
+        }
+
+        payload = {
+            "inject": [entry1, entry2]
+        }
+        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        assert rsp.status_code == 200
+
+        task = self.get_task_queue(manager)
+        task.execute()
+
+        assert len(task.all_entries) == 2
+        assert len(task.accepted) == 2
+
+    def test_2nd_endpoint(self, api_client, manager):
+        entry = {
+            'title': "injected",
+            'url': 'http://test.com',
+            'accept': True
+        }
+
+        payload = {
+            "inject": [entry]
+        }
+        rsp = api_client.json_post('/inject/test_task/', data=json.dumps(payload))
+        assert rsp.status_code == 200
+
+        task = self.get_task_queue(manager)
+        task.execute()
+
+        assert len(task.all_entries) == 1
+        assert len(task.accepted) == 1

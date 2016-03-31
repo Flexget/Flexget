@@ -292,7 +292,7 @@ execution_doc = "'progress': Include task progress updates<br>" \
 
 entry_doc = "Entry object:<br>" \
             "'title': Title of the entry. If not supplied it will be attempted to retrieve it from URL headers<br>" \
-            "'url': URL of the entry, mandatory" \
+            "'url': URL of the entry, mandatory<br>" \
             "'accept': Accept this entry immediately upon injection<br>" \
             "'force': Prevent any plugins from rejecting this entry<br>" \
             "'fields': A list of objects that can contain any other value for the entry"
