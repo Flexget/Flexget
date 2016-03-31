@@ -235,7 +235,7 @@ inject_input = {
         'url': {'type': 'string', 'format': 'url'},
         'force': {'type': 'boolean'},
         'accept': {'type': 'boolean'},
-        'fields': {'type': 'object', 'minProperties': 1}
+        'fields': {'type': 'object'}
     },
     'required': ['url']
 }
