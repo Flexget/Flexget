@@ -20,7 +20,7 @@ from flexget.utils.database import with_session
 from flexget.webserver import User
 from flexget.webserver import register_app, get_secret
 
-__version__ = '0.4.5-beta'
+__version__ = '0.4.5.1-beta'
 
 log = logging.getLogger('api')
 

@@ -247,7 +247,9 @@ task_execution_input = {
         'summary': {'type': 'boolean', 'default': True},
         'log': {'type': 'boolean', 'default': False},
         'entry_dump': {'type': 'boolean', 'default': True},
-        'inject': {'type': 'array', 'items': inject_input}
+        'inject': {'type': 'array', 'items': inject_input},
+        'log_level': {'type': "string",
+                      "enum": ['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace']}
     }
 }
 
@@ -283,7 +285,9 @@ execution_doc = "'progress': Include task progress updates<br>" \
                 "'summary': Include task summary<br>" \
                 "'log': Include execution log<br>" \
                 "'entry_dump': Include dump of entries including fields<br>" \
-                "'inject': A List of entry objects. See payload description for additional information<br>"
+                "'inject': A List of entry objects. See payload description for additional information<br>" \
+                "'loglevel': Specify log level. One of 'none', 'critical', 'error', 'warning', 'info', 'verbose', " \
+                "'debug', 'trace'<br>"
 
 entry_doc = "Entry object:<br>" \
             "'title': Title of the entry. If not supplied it will be attempted to retrieve it from URL headers<br>" \
@@ -314,6 +318,7 @@ class TaskExecutionAPI(APIResource):
         output = queue if data.get('log') else None
         stream = True if any(
             arg[0] in ['progress', 'summary', 'log', 'entry_dump'] for arg in data.items() if arg[1]) else False
+        loglevel = data.get('loglevel')
         options = {'tasks': [task]}
 
         if data.get('inject'):
@@ -340,7 +345,7 @@ class TaskExecutionAPI(APIResource):
                 entries.append(entry)
             options['inject'] = entries
 
-        task_id, __, task_event = self.manager.execute(options=options, output=output)[0]
+        task_id, __, task_event = self.manager.execute(options=options, output=output, loglevel=loglevel)[0]
 
         if not stream:
             return {'task': {'id': task_id, 'name': task}}
