@@ -164,7 +164,7 @@ class MovieQueue(queue_base.FilterQueueBase):
             if conditions:
                 break
         if not conditions:
-            log_once('IMDB and TMDB lookups failed for %s.' % entry['title'], log, logging.WARN)
+            log_once('IMDB and TMDB lookups failed for %s.' % entry['title'], log, logging.VERBOSE)
             return
 
         quality = entry.get('quality', qualities.Quality())
