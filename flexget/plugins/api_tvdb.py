@@ -101,21 +101,16 @@ Base.register_table(genres_table)
 
 @with_session
 def _get_db_genres(genre_names, session=None):
-    if not genre_names:
-        return []
-
     genres = []
-    for genre_name in genre_names:
-        genre = session.query(TVDBGenre).filter(TVDBGenre.name == genre_name).first()
-        if not genre:
-            genre = TVDBGenre(name=genre_name)
-            session.add(genre)
-        genres.append(genre)
+    if genre_names:
+        for genre_name in genre_names:
+            genre = session.query(TVDBGenre).filter(TVDBGenre.name == genre_name).first()
+            if not genre:
+                genre = TVDBGenre(name=genre_name)
+                session.add(genre)
+            genres.append({'id': genre.id, 'name': genre.name})
 
-    if len(genres) > 0:
-        session.flush()
-
-    return [{'id': genre.id, 'name': genre.name} for genre in genres]
+    return genres
 
 
 class TVDBSeries(Base):
