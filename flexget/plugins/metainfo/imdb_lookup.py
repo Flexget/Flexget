@@ -340,7 +340,7 @@ class ImdbLookup(object):
                 session.commit()
                 log.verbose('Found %s' % (entry['imdb_url']))
             else:
-                log_once('IMDB lookup failed for %s' % entry['title'], log, logging.VERBOSE, session=session)
+                log_once('IMDB lookup failed for %s' % entry['title'], log, logging.WARN, session=session)
                 # store FAIL for this title
                 result = SearchResult(entry['title'])
                 result.fails = True
