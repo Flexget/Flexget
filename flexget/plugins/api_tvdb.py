@@ -7,6 +7,7 @@ from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
+from sqlalchemy import func
 
 from flexget import db_schema
 from flexget.manager import Session
@@ -99,16 +100,17 @@ genres_table = Table('tvdb_series_genres', Base.metadata,
 Base.register_table(genres_table)
 
 
-@with_session
-def _get_db_genres(genre_names, session=None):
+def _get_db_genres(genre_names):
     genres = []
     if genre_names:
-        for genre_name in genre_names:
-            genre = session.query(TVDBGenre).filter(TVDBGenre.name == genre_name).first()
-            if not genre:
-                genre = TVDBGenre(name=genre_name)
-                session.add(genre)
-            genres.append({'id': genre.id, 'name': genre.name})
+        with Session() as session:
+            for genre_name in genre_names:
+                genre = session.query(TVDBGenre).filter(func.lower(TVDBGenre.name) == genre_name.lower()).first()
+                if not genre:
+                    genre = TVDBGenre(name=genre_name)
+                    session.add(genre)
+                    session.commit()
+                genres.append({'id': genre.id, 'name': genre.name})
 
     return genres
 
@@ -143,7 +145,7 @@ class TVDBSeries(Base):
     posters_list = json_synonym('_posters')
 
     _genres = relation('TVDBGenre', secondary=genres_table)
-    genres = association_proxy('_genres', 'name', creator=lambda g: TVDBGenre(name=g))
+    genres = association_proxy('_genres', 'name')
 
     episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
@@ -351,7 +353,7 @@ def find_series_id(name):
 
     for s in series:
         # Exact match
-        if s['seriesName'].lower() == name:
+        if s.get('seriesName').lower() == name:
             return s['id']
         if s['firstAired']:
             series_list.append((s['firstAired'], s['id']))
