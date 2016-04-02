@@ -346,6 +346,7 @@ class ImdbLookup(object):
                 result.fails = True
                 session.add(result)
                 session.commit()
+                # Todo: FIX this, it is logged as Info, should be Verbose
                 raise plugin.PluginError('Title `%s` lookup failed' % entry['title'])
 
         # check if this imdb page has been parsed & cached
