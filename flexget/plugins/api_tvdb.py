@@ -353,7 +353,8 @@ def find_series_id(name):
 
     for s in series:
         # Exact match
-        if s.get('seriesName').lower() == name:
+        series_name = s.get('seriesName')
+        if series_name and series_name.lower() == name:
             return s['id']
         if s['firstAired']:
             series_list.append((s['firstAired'], s['id']))
