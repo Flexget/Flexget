@@ -73,7 +73,7 @@ class NPOWatchlist(object):
 
         if profile_response.url == 'https://mijn.npo.nl/sessions':
             raise plugin.PluginError('Failed to login. Check username and password.')
-        elif profile_response.url != 'http://www.npo.nl/profiel':
+        elif profile_response.url != 'https://mijn.npo.nl/profiel':
             raise plugin.PluginError('Unexpected profile page: {}'.format(profile_response.url))
         
         return profile_response
@@ -98,7 +98,7 @@ class NPOWatchlist(object):
 
             e = Entry()
             e['title'] = '{} ({})'.format(title, subtitle)
-            e['url'] = 'http://www.npo.nl' + url
+            e['url'] = url
             
             e['series_name'] = title
             e['series_name_plain'] = self._strip_accents(title)
