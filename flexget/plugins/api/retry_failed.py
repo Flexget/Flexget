@@ -12,6 +12,8 @@ log = logging.getLogger('retry_failed_api')
 
 retry_failed_api = api.namespace('retry_failed', description='View and manage failed entries')
 
+empty_response = api.schema('empty', {'type': 'object'})
+
 retry_failed_entry_object = {
     'type': 'object',
     'properties': {
@@ -47,7 +49,7 @@ class RetryFailed(APIResource):
             'number_of_failed_entries': len(failed_entries)
         })
 
-    @api.response(200, 'success', model=api.schema('empty', {}))
+    @api.response(200, 'success', model=empty_response)
     def delete(self, session=None):
         """ Clear all failed entries """
         session.query(FailedEntry).delete()
@@ -57,7 +59,7 @@ class RetryFailed(APIResource):
 @retry_failed_api.route('/<int:failed_entry_id>/')
 @api.response(404, 'No failed entry found')
 class RetryFailed(APIResource):
-    @api.doc(params={'id': 'ID of the failed entry'})
+    @api.doc(params={'failed_entry_id': 'ID of the failed entry'})
     @api.response(200, model=retry_failed_entry_schema)
     def get(self, failed_entry_id, session=None):
         """ Get failed entry by ID """
@@ -68,7 +70,7 @@ class RetryFailed(APIResource):
                     'message': 'could not find entry with ID %i' % failed_entry_id}, 404
         return jsonify(failed_entry.to_dict())
 
-    @api.response(200, 'success', model=api.schema('empty', {}))
+    @api.response(200, 'success', model=empty_response)
     def delete(self, failed_entry_id, session=None):
         """ Delete failed entry by ID """
         try:
