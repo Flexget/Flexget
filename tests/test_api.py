@@ -394,3 +394,29 @@ class TestExecuteAPI(object):
 
         assert len(task.all_entries) == 1
         assert len(task.accepted) == 1
+
+
+class TestExecuteMultipleTasks(object):
+    config = """
+        tasks:
+          test_task1:
+            mock:
+              - title: accept_me1
+            accept_all: yes
+          test_task2:
+            mock:
+              - title: accept_me2
+            accept_all: yes
+        """
+
+    def test_execute_multiple_tasks(self, api_client, manager):
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps({}))
+        assert rsp.status_code == 400
+
+        payload = {'tasks': ['non_existing_test_task']}
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
+        assert rsp.status_code == 404
+
+        payload = {'tasks': ['test_task1', 'test_task2']}
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
+        assert rsp.status_code == 200
