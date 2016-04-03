@@ -231,8 +231,9 @@ class TestExecuteAPI(object):
         """
 
     def test_execute(self, api_client, manager):
-        # Empty payload
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps({}))
+        # Minimal payload
+        payload = {'tasks': ['test_task']}
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -247,9 +248,10 @@ class TestExecuteAPI(object):
         }
 
         payload = {
-            "inject": [entry]
+            "inject": [entry],
+            'tasks': ['test_task']
         }
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -262,13 +264,15 @@ class TestExecuteAPI(object):
         entry = {
             'title': "injected",
             'url': 'http://test.com',
-            'accept': True
+            'accept': True,
+            'tasks': ['test_task']
         }
 
         payload = {
-            "inject": [entry]
+            "inject": [entry],
+            'tasks': ['test_task']
         }
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -284,9 +288,10 @@ class TestExecuteAPI(object):
         }
 
         payload = {
-            "inject": [entry]
+            "inject": [entry],
+            'tasks': ['test_task']
         }
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -295,7 +300,7 @@ class TestExecuteAPI(object):
         assert len(task.all_entries) == 1
         assert len(task.accepted) == 1
 
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -308,7 +313,7 @@ class TestExecuteAPI(object):
         # Forcing the entry not to be disabled
         entry['force'] = True
 
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -328,10 +333,11 @@ class TestExecuteAPI(object):
         }
 
         payload = {
-            "inject": [entry]
+            "inject": [entry],
+            'tasks': ['test_task']
         }
 
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -357,9 +363,10 @@ class TestExecuteAPI(object):
         }
 
         payload = {
-            "inject": [entry1, entry2]
+            "inject": [entry1, entry2],
+            'tasks': ['test_task']
         }
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -376,9 +383,10 @@ class TestExecuteAPI(object):
         }
 
         payload = {
-            "inject": [entry]
+            "inject": [entry],
+            'tasks': ['test_task']
         }
-        rsp = api_client.json_post('/inject/test_task/', data=json.dumps(payload))
+        rsp = api_client.json_post('/inject/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
