@@ -48,6 +48,8 @@ class NPOWatchlist(object):
         'additionalProperties': False
     }
     
+    csrf_token = None
+    
     def _strip_accents(self, s):
         return ''.join(c for c in unicodedata.normalize('NFD', s)
                   if unicodedata.category(c) != 'Mn')
@@ -84,6 +86,8 @@ class NPOWatchlist(object):
 
         profile_response = self._get_profile(task, config)
         profile_page = BeautifulSoup(profile_response.content, 'html5lib')
+        
+        self.csrf_token = profile_page.find('meta', attrs={'name': 'csrf-token'})['content']
         
         entries = list()
         for listItem in profile_page.findAll('div', class_='list-item'):
@@ -122,10 +126,17 @@ class NPOWatchlist(object):
         else:
             log.info('Removing from watchlist: %s', e['title'])
             
+            headers = {
+                'Origin': 'https://mijn.npo.nl/',
+                'Referer': 'https://mijn.npo.nl/profiel',
+                'X-CSRF-Token': self.csrf_token,
+                'X-Requested-With': 'XMLHTTPRequests'
+            }
+            
             try:
-                delete_response = task.requests.delete(e['remove_url'])
-            except requests.HTTPError:
-                log.warning('Failed to remove %s, already removed (404)', e['title'])
+                delete_response = task.requests.delete(e['remove_url'], headers=headers)
+            except requests.HTTPError as error:
+                log.error('Failed to remove %s, got status %s', e['title'], error.response.status_code)
             else:
                 if delete_response.status_code != requests.codes.ok:
                     log.warning('Failed to remove %s, got status %s', e['title'], delete_response.status_code)
