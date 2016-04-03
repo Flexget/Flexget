@@ -52,6 +52,7 @@ class RetryFailed(APIResource):
     @api.response(200, 'success', model=empty_response)
     def delete(self, session=None):
         """ Clear all failed entries """
+        log.debug('deleting all failed entries')
         session.query(FailedEntry).delete()
         return {}
 
@@ -78,5 +79,6 @@ class RetryFailed(APIResource):
         except NoResultFound:
             return {'status': 'error',
                     'message': 'could not find entry with ID %i' % failed_entry_id}, 404
+        log.debug('deleting failed entry: "%s"' % failed_entry.title)
         session.delete(failed_entry)
         return {}
