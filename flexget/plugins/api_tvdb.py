@@ -7,8 +7,10 @@ from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
+from sqlalchemy import func
 
 from flexget import db_schema
+from flexget.manager import Session
 from flexget.utils import requests
 from flexget.utils.database import with_session, text_date_synonym, json_synonym
 from flexget.utils.simple_persistence import SimplePersistence
@@ -98,18 +100,17 @@ genres_table = Table('tvdb_series_genres', Base.metadata,
 Base.register_table(genres_table)
 
 
-@with_session
-def get_db_genres(genre_names, session=None):
-    if not genre_names:
-        return []
-
+def _get_db_genres(genre_names):
     genres = []
-    for genre_name in genre_names:
-        genre = session.query(TVDBGenre).filter(TVDBGenre.name == genre_name).first()
-        if not genre:
-            genre = TVDBGenre(name=genre_name)
-            session.add(genre)
-        genres.append(genre)
+    if genre_names:
+        with Session() as session:
+            for genre_name in genre_names:
+                genre = session.query(TVDBGenre).filter(func.lower(TVDBGenre.name) == genre_name.lower()).first()
+                if not genre:
+                    genre = TVDBGenre(name=genre_name)
+                    session.add(genre)
+                    session.commit()
+                genres.append({'id': genre.id, 'name': genre.name})
 
     return genres
 
@@ -144,11 +145,11 @@ class TVDBSeries(Base):
     posters_list = json_synonym('_posters')
 
     _genres = relation('TVDBGenre', secondary=genres_table)
-    genres = association_proxy('_genres', 'name', creator=lambda g: TVDBGenre(name=g))
+    genres = association_proxy('_genres', 'name')
 
     episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
-    def update(self, session):
+    def update(self):
         try:
             series = TVDBRequest().get('series/%s' % self.id)
         except requests.RequestException as e:
@@ -172,16 +173,19 @@ class TVDBSeries(Base):
         self.expired = False
         self.aliases = series['aliases']
         self._banner = series['banner']
-        self._genres = get_db_genres(series['genre'], session=session)
 
-        search_strings = self.search_strings
-        for name in set([self.name.lower()] + ([a.lower() for a in self.aliases] if self.aliases else [])):
-            if name not in search_strings:
-                search_result = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name).first()
-                if not search_result:
-                    search_result = TVDBSearchResult(search=name)
-                search_result.series_id = self.id
-                self.search_strings.append(search_result)
+        with Session() as session:
+            search_strings = self.search_strings
+            for name in set([self.name.lower()] + ([a.lower() for a in self.aliases] if self.aliases else [])):
+                if name not in search_strings:
+                    search_result = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name).first()
+                    if not search_result:
+                        search_result = TVDBSearchResult(search=name)
+                    search_result.series_id = self.id
+                    session.add(search_result)
+
+        genres = _get_db_genres(series['genre'])
+        self._genres = [TVDBGenre(**g) for g in genres]
 
         # Reset Actors and Posters so they can be lazy populated
         self._actors = None
@@ -210,7 +214,10 @@ class TVDBSeries(Base):
                 actors_query = TVDBRequest().get('series/%s/actors' % self.id)
                 self.actors_list = [a['name'] for a in actors_query] if actors_query else []
             except requests.RequestException as e:
-                raise LookupError('Error updating actors from tvdb: %s' % e)
+                if None is not e.response and e.response.status_code == 404:
+                    self.actors_list = []
+                else:
+                    raise LookupError('Error updating actors from tvdb: %s' % e)
 
         return self.actors_list
 
@@ -221,7 +228,10 @@ class TVDBSeries(Base):
                 poster_query = TVDBRequest().get('series/%s/images/query' % self.id, keyType='poster')
                 self.posters_list = [p['fileName'] for p in poster_query[:5]] if poster_query else []
             except requests.RequestException as e:
-                raise LookupError('Error updating posters from tvdb: %s' % e)
+                if None is not e.response and e.response.status_code == 404:
+                    self.posters_list = []
+                else:
+                    raise LookupError('Error updating posters from tvdb: %s' % e)
 
         return [TVDBRequest.BANNER_URL + p for p in self.posters_list]
 
@@ -343,7 +353,8 @@ def find_series_id(name):
 
     for s in series:
         # Exact match
-        if s['seriesName'].lower() == name:
+        series_name = s.get('seriesName')
+        if series_name and series_name.lower() == name:
             return s['id']
         if s['firstAired']:
             series_list.append((s['firstAired'], s['id']))
@@ -356,7 +367,7 @@ def find_series_id(name):
         raise LookupError('No results for `%s`' % name)
 
 
-@with_session(expire_on_commit=False)
+@with_session
 def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     """
     Look up information on a series. Will be returned from cache if available, and looked up online and cached if not.
@@ -396,7 +407,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         if not only_cached and series.expired:
             log.verbose('Data for %s has expired, refreshing from tvdb', series.name)
             try:
-                series.update(session)
+                series.update()
             except LookupError as e:
                 log.warning('Error while updating from tvdb (%s), using cached data.', e.args[0])
         else:
@@ -408,9 +419,9 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         log.debug('Series %s not found in cache, looking up from tvdb.', id_str())
         if tvdb_id:
             series = TVDBSeries(id=tvdb_id)
-            series.update(session)
+            series.update()
             if series.name:
-                session.add(series)
+                session.merge(series)
         elif name:
             tvdb_id = find_series_id(name)
             if tvdb_id:
@@ -418,8 +429,8 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
                 if not series:
                     series = TVDBSeries()
                     series.id = tvdb_id
-                    series.update(session)
-                    session.add(series)
+                    series.update()
+                    session.merge(series)
 
                 # Add search result to cache
                 search_result = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name.lower()).first()
@@ -436,7 +447,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     return series
 
 
-@with_session(expire_on_commit=False)
+@with_session
 def lookup_episode(name=None, season_number=None, episode_number=None, absolute_number=None,
                    tvdb_id=None, only_cached=False, session=None):
     """
@@ -514,7 +525,6 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
         except requests.RequestException as e:
             raise LookupError('Error looking up episode from TVDb (%s)' % e)
     if episode:
-        session.commit()
         return episode
     else:
         raise LookupError('No results found for %s' % ep_description)

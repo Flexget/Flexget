@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
 from datetime import datetime, timedelta
 
@@ -9,8 +10,8 @@ from flexget import db_schema, options, plugin
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
+from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.tools import parse_timedelta
-from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 SCHEMA_VER = 3
 
@@ -50,6 +51,18 @@ class FailedEntry(Base):
 
     def __str__(self):
         return '<Failed(title=%s)>' % self.title
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'url': self.url,
+            'added_at': self.tof,
+            'reason': self.reason,
+            'count': self.count,
+            'retry_time': self.retry_time
+        }
+
 
 # create indexes, used when creating tables
 columns = Base.metadata.tables['failed'].c
