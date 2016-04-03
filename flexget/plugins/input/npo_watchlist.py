@@ -130,7 +130,7 @@ class NPOWatchlist(object):
                 'Origin': 'https://mijn.npo.nl/',
                 'Referer': 'https://mijn.npo.nl/profiel',
                 'X-CSRF-Token': self.csrf_token,
-                'X-Requested-With': 'XMLHTTPRequests'
+                'X-Requested-With': 'XMLHttpRequest'
             }
             
             try:
