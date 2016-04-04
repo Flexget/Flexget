@@ -18,9 +18,9 @@ class TVDBBase(object):
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
-            'password': {'type': 'string'}
+            'account_id': {'type': 'string'}
         },
-        'required': ['username', 'password'],
+        'required': ['username', 'account_id'],
         'additionalProperties': False
     }
 
@@ -53,7 +53,7 @@ class TVDBAdd(TVDBBase):
                     continue
 
                 try:
-                    req = TVDBRequest(username=config['username'], password=config['password'])
+                    req = TVDBRequest(username=config['username'], account_id=config['account_id'])
                     req.put('/user/favorites/%s' % tvdb_id)
                 except RequestException as e:
                     # 409 is thrown if it was already in the favs
@@ -85,7 +85,7 @@ class TVDBRemove(TVDBBase):
                     continue
 
                 try:
-                    req = TVDBRequest(username=config['username'], password=config['password'])
+                    req = TVDBRequest(username=config['username'], account_id=config['account_id'])
                     req.delete('/user/favorites/%s' % tvdb_id)
                 except RequestException as e:
                     # 409 is thrown if it was not in the favs
