@@ -13,20 +13,22 @@ from flexget.event import event
 log = logging.getLogger('t411_plugin')
 
 
-def escape_query(query):
+def escape_query(search_strings):
     """
     Escaping some expression Grey's -> Grey's + Greys + Grey, Marvel's ->Marvel's + Marvels + Marvel etc
-    :param query str:
+    :param query str[]:
     :return:
     """
-    queries = [query]
-    short_query = re.sub("'", "", query)
-    if query != short_query:
-        queries.append(short_query)
-        very_short_query = re.sub("'[a-z]", "", query)
-        if short_query != very_short_query:
-            queries.append(very_short_query)
-    return queries
+    result = []
+    for search_string in search_strings:
+        result.append(search_string)
+        short_query = re.sub("'", "", search_string)
+        if search_string != short_query:
+            result.append(short_query)
+            very_short_query = re.sub("'[a-z]", "", search_string)
+            if short_query != very_short_query:
+                result.append(very_short_query)
+    return result
 
 
 class T411InputPlugin(object):
@@ -77,7 +79,7 @@ class T411InputPlugin(object):
 
     @classmethod
     @plugin.internet(log)
-    def search(cls, task, entry, config=None):
+    def search(cls, entry=None, config=None, task=None):
         proxy = T411Proxy()
         proxy.set_credential()
 
@@ -85,7 +87,7 @@ class T411InputPlugin(object):
         if entry.get('series_season'):
             query.add_season_term(entry['series_season'])
             query.add_episode_term(entry['series_episode'])
-            search_strings = escape_query(entry['series_name'])
+            search_strings = escape_query([entry['series_name']])
         else:
             search_strings = entry.get('search_strings', [entry['title']])
             search_strings = escape_query(search_strings)
@@ -95,9 +97,9 @@ class T411InputPlugin(object):
             query.expression = search_string
             try:
                 search_result = proxy.search(query)
+                produced_entries.update(search_result)
             except ApiError as e:
                 log.warning("Server send an error message : %d - %s", e.code, e.message)
-            produced_entries.update(search_result)
 
         return produced_entries
 

@@ -7,6 +7,7 @@ from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
+from sqlalchemy import func
 
 from flexget import db_schema
 from flexget.manager import Session
@@ -99,23 +100,18 @@ genres_table = Table('tvdb_series_genres', Base.metadata,
 Base.register_table(genres_table)
 
 
-@with_session
-def _get_db_genres(genre_names, session=None):
-    if not genre_names:
-        return []
-
+def _get_db_genres(genre_names):
     genres = []
-    for genre_name in genre_names:
-        genre = session.query(TVDBGenre).filter(TVDBGenre.name == genre_name).first()
-        if not genre:
-            genre = TVDBGenre(name=genre_name)
-            session.add(genre)
-        genres.append(genre)
-
-    if len(genres) > 0:
-        session.flush()
-
-    return [{'id': genre.id, 'name': genre.name} for genre in genres]
+    if genre_names:
+        with Session() as session:
+            for genre_name in genre_names:
+                genre = session.query(TVDBGenre).filter(func.lower(TVDBGenre.name) == genre_name.lower()).first()
+                if not genre:
+                    genre = TVDBGenre(name=genre_name)
+                    session.add(genre)
+                    session.commit()
+                genres.append({'id': genre.id, 'name': genre.name})
+    return genres
 
 
 class TVDBSeries(Base):
@@ -148,11 +144,17 @@ class TVDBSeries(Base):
     posters_list = json_synonym('_posters')
 
     _genres = relation('TVDBGenre', secondary=genres_table)
-    genres = association_proxy('_genres', 'name', creator=lambda g: TVDBGenre(name=g))
+    genres = association_proxy('_genres', 'name')
 
     episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
-    def update(self):
+    def __init__(self, id):
+        """
+        Looks up movie on tmdb and creates a new database model for it.
+        These instances should only be added to a session via `session.merge`.
+        """
+        self.id = id
+
         try:
             series = TVDBRequest().get('series/%s' % self.id)
         except requests.RequestException as e:
@@ -177,20 +179,10 @@ class TVDBSeries(Base):
         self.aliases = series['aliases']
         self._banner = series['banner']
 
-        with Session() as session:
-            search_strings = self.search_strings
-            for name in set([self.name.lower()] + ([a.lower() for a in self.aliases] if self.aliases else [])):
-                if name not in search_strings:
-                    search_result = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name).first()
-                    if not search_result:
-                        search_result = TVDBSearchResult(search=name)
-                    search_result.series_id = self.id
-                    session.add(search_result)
-
         genres = _get_db_genres(series['genre'])
         self._genres = [TVDBGenre(**g) for g in genres]
 
-        # Reset Actors and Posters so they can be lazy populated
+        # Actors and Posters are lazy populated
         self._actors = None
         self._posters = None
 
@@ -289,6 +281,33 @@ class TVDBEpisode(Base):
 
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=False)
 
+    def __init__(self, id):
+        """
+        Looks up movie on tmdb and creates a new database model for it.
+        These instances should only be added to a session via `session.merge`.
+        """
+        self.id = id
+        try:
+            episode = TVDBRequest().get('episodes/%s' % self.id)
+        except requests.RequestException as e:
+            raise LookupError('Error updating data from tvdb: %s' % e)
+
+        self.id = episode['id']
+        self.last_updated = episode['lastUpdated']
+        self.season_number = episode['airedSeason']
+        self.episode_number = episode['airedEpisodeNumber']
+        self.absolute_number = episode['absoluteNumber']
+        self.name = episode['episodeName']
+        self.overview = episode['overview']
+        self.director = episode['director']
+        self._image = episode['filename']
+        self.rating = episode['siteRating']
+        self.first_aired = episode['firstAired']
+
+    def __repr__(self):
+        return '<TVDBEpisode series=%s,season=%s,episode=%s>' % \
+               (self.series.name, self.season_number, self.episode_number)
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -310,28 +329,6 @@ class TVDBEpisode(Base):
     def image(self):
         if self._image:
             return TVDBRequest.BANNER_URL + self._image
-
-    def update(self):
-        try:
-            episode = TVDBRequest().get('episodes/%s' % self.id)
-        except requests.RequestException as e:
-            raise LookupError('Error updating data from tvdb: %s' % e)
-
-        self.id = episode['id']
-        self.last_updated = episode['lastUpdated']
-        self.season_number = episode['airedSeason']
-        self.episode_number = episode['airedEpisodeNumber']
-        self.absolute_number = episode['absoluteNumber']
-        self.name = episode['episodeName']
-        self.overview = episode['overview']
-        self.director = episode['director']
-        self._image = episode['filename']
-        self.rating = episode['siteRating']
-        self.first_aired = episode['firstAired']
-
-    def __repr__(self):
-        return '<TVDBEpisode series=%s,season=%s,episode=%s>' % \
-               (self.series.name, self.season_number, self.episode_number)
 
 
 class TVDBSearchResult(Base):
@@ -356,7 +353,8 @@ def find_series_id(name):
 
     for s in series:
         # Exact match
-        if s['seriesName'].lower() == name:
+        series_name = s.get('seriesName')
+        if series_name and series_name.lower() == name:
             return s['id']
         if s['firstAired']:
             series_list.append((s['firstAired'], s['id']))
@@ -367,6 +365,20 @@ def find_series_id(name):
         return series_list[0][1]
     else:
         raise LookupError('No results for `%s`' % name)
+
+
+@with_session
+def _update_search_strings(series, search=None, session=None):
+    search_strings = series.search_strings
+    add = [series.name.lower()] + ([a.lower() for a in series.aliases] if series.aliases else []) + [search.lower()] if search else []
+    for name in set(add):
+        if name not in search_strings:
+            search_result = session.query(TVDBSearchResult).filter(
+                func.lower(TVDBSearchResult.search) == name).first()
+            if not search_result:
+                search_result = TVDBSearchResult(search=name)
+            search_result.series_id = series.id
+            session.add(search_result)
 
 
 @with_session
@@ -409,7 +421,9 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         if not only_cached and series.expired:
             log.verbose('Data for %s has expired, refreshing from tvdb', series.name)
             try:
-                series.update()
+                updated_series = TVDBSeries(id=series.id)
+                series = session.merge(updated_series)
+                _update_search_strings(series, search=name)
             except LookupError as e:
                 log.warning('Error while updating from tvdb (%s), using cached data.', e.args[0])
         else:
@@ -420,26 +434,15 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         # There was no series found in the cache, do a lookup from tvdb
         log.debug('Series %s not found in cache, looking up from tvdb.', id_str())
         if tvdb_id:
-            series = TVDBSeries(id=tvdb_id)
-            series.update()
-            if series.name:
-                session.merge(series)
+            series = session.merge(TVDBSeries(id=tvdb_id))
+            _update_search_strings(series, search=name)
         elif name:
             tvdb_id = find_series_id(name)
             if tvdb_id:
                 series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
                 if not series:
-                    series = TVDBSeries()
-                    series.id = tvdb_id
-                    series.update()
-                    session.merge(series)
-
-                # Add search result to cache
-                search_result = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name.lower()).first()
-                if not search_result:
-                    search_result = TVDBSearchResult(search=name.lower())
-                    search_result.series_id = tvdb_id
-                    session.add(search_result)
+                    series = session.merge(TVDBSeries(tvdb_id))
+                    _update_search_strings(series, search=name)
 
     if not series:
         raise LookupError('No results found from tvdb for %s' % id_str())
@@ -502,7 +505,8 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
         if episode.expired and not only_cached:
             log.info('Data for %r has expired, refreshing from tvdb', episode)
             try:
-                episode.update()
+                updated_episode = TVDBEpisode(id=series.id)
+                episode = session.merge(updated_episode)
             except LookupError as e:
                 log.warning('Error while updating from tvdb (%s), using cached data.' % str(e))
         else:
@@ -517,13 +521,10 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
             if results:
                 # Check if this episode id is already in our db
                 episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == results[0]['id']).first()
-                if not episode:
-                    episode = TVDBEpisode(id=results[0]['id'])
-                if episode.expired is not False:
-                    episode.update()
+                if not episode or (episode and episode.expired is not False):
+                    episode = session.merge(TVDBEpisode(id=results[0]['id']))
 
-                series.episodes.append(episode)
-                session.merge(series)
+                episode.series = series
         except requests.RequestException as e:
             raise LookupError('Error looking up episode from TVDb (%s)' % e)
     if episode:
