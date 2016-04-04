@@ -1,11 +1,7 @@
 from future import standard_library
 standard_library.install_aliases()
-from builtins import bytes
-from builtins import zip
-from builtins import str
-from builtins import map
-from builtins import range
-from builtins import object
+from builtins import bytes, zip, map, range, object
+from future.utils import native_str
 import logging
 import sys
 import os
@@ -26,6 +22,20 @@ from flexget.utils.bittorrent import Torrent, is_torrent_file
 
 
 log = logging.getLogger('rtorrent')
+
+
+class _Method:
+    # some magic to bind an XML-RPC method to an RPC server.
+    # supports "nested" methods (e.g. examples.getStateName)
+    def __init__(self, send, name):
+        self.__send = send
+        self.__name = name
+
+    def __getattr__(self, name):
+        return _Method(self.__send, "%s.%s" % (self.__name, name))
+
+    def __call__(self, *args):
+        return self.__send(self.__name, args)
 
 
 class TimeoutHTTPConnection(http.client.HTTPConnection):
@@ -71,7 +81,7 @@ class SCGITransport(xmlrpc.client.Transport):
 
     def single_request(self, host, handler, request_body, verbose=0):
         # Add SCGI headers to the request.
-        headers = [('CONTENT_LENGTH', str(len(request_body))), ('SCGI', '1')]
+        headers = [('CONTENT_LENGTH', native_str(len(request_body))), ('SCGI', '1')]
         header = '\x00'.join(['%s\x00%s' % (key, value) for key, value in headers]) + '\x00'
         header = '%d:%s' % (len(header), header)
         request_body = '%s,%s' % (header, request_body)
@@ -162,8 +172,7 @@ class SCGIServerProxy(xmlrpc.client.ServerProxy):
         return '<SCGIServerProxy for %s%s>' % (self.__host, self.__handler)
 
     def __getattr__(self, name):
-        # magic method dispatcher
-        return xmlrpc.client._Method(self.__request, name)
+        return _Method(self.__request, name)
 
     # note: to call a remote object with an non-standard name, use
     # result getattr(server, "strange-python-name")(args)
@@ -251,7 +260,7 @@ class RTorrent(object):
         if reverse:
             for field in ['up.total', 'down.total', 'down.rate']:
                 if field in fields:
-                    fields[fields.index(field)] = field.replace('.', '_')
+                    fields[fields.index(field)] = native_str(field.replace('.', '_'))
             return fields
 
         for required_field in self.required_fields:
@@ -260,7 +269,7 @@ class RTorrent(object):
 
         for field in ['up_total', 'down_total', 'down_rate']:
             if field in fields:
-                fields[fields.index(field)] = field.replace('_', '.')
+                fields[fields.index(field)] = native_str(field.replace('_', '.'))
 
         return fields
 
@@ -278,7 +287,7 @@ class RTorrent(object):
         # Additional fields to set
         for key, val in fields.items():
             # Values must be escaped if within params
-            params.append('d.%s.set=%s' % (key, re.escape(str(val))))
+            params.append('d.%s.set=%s' % (key, re.escape(native_str(val))))
 
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])
@@ -304,6 +313,7 @@ class RTorrent(object):
 
     def torrent(self, info_hash, fields=None):
         """ Get the details of a torrent """
+        info_hash = native_str(info_hash)
         if not fields:
             fields = list(self.default_fields)
 
@@ -337,21 +347,22 @@ class RTorrent(object):
 
         for key, val in fields.items():
             method_name = 'd.%s.set' % key
-            getattr(multi_call, method_name)(info_hash, str(val))
+            getattr(multi_call, method_name)(native_str(info_hash), native_str(val))
 
         return multi_call()[0]
 
     def delete(self, info_hash):
-        return self._server.d.erase(info_hash)
+        return self._server.d.erase(native_str(info_hash))
 
     def stop(self, info_hash):
         self._server.d.stop(info_hash)
-        return self._server.d.close(info_hash)
+        return self._server.d.close(native_str(info_hash))
 
     def start(self, info_hash):
-        return self._server.d.start(info_hash)
+        return self._server.d.start(native_str(info_hash))
 
     def move(self, info_hash, dst_path):
+        info_hash = native_str(info_hash)
         self.stop(info_hash)
 
         torrent = self.torrent(info_hash, fields=['base_path'])
