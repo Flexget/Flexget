@@ -92,7 +92,7 @@ class InputThetvdbFavorites(object):
             log.debug('Using cached thetvdb favorite series information for account %s' % config['username'])
         else:
             try:
-                req = TVDBRequest(username=config['username'], acount_id=config['account_id']).get('user/favorites')
+                req = TVDBRequest(username=config['username'], account_id=config['account_id']).get('user/favorites')
                 user_favorites.series_ids = [int(f_id) for f_id in req['favorites']]
             except RequestException as e:
                 log.error('Error retrieving favorites from thetvdb: %s' % str(e))
