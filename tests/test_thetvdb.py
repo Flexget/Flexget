@@ -261,11 +261,11 @@ class TestTVDBFavorites(object):
               from:
                 thetvdb_favorites:
                   username: flexget
-                  password: flexget
+                  account_id: 80FB8BD0720CA5EC
           test_strip_dates:
             thetvdb_favorites:
               username: flexget
-              password: flexget
+              account_id: 80FB8BD0720CA5EC
               strip_dates: yes
     """
 
@@ -310,7 +310,7 @@ class TestTVDBSubmit(object):
             thetvdb_lookup: yes
             thetvdb_add:
               username: flexget
-              password: flexget
+              account_id: 80FB8BD0720CA5EC
             series:
               - House
           delete:
@@ -320,7 +320,7 @@ class TestTVDBSubmit(object):
             thetvdb_lookup: yes
             thetvdb_remove:
               username: flexget
-              password: flexget
+              account_id: 80FB8BD0720CA5EC
             series:
               - The Big Bang Theory
 
