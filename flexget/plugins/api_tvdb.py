@@ -150,7 +150,7 @@ class TVDBSeries(Base):
 
     def __init__(self, id):
         """
-        Looks up movie on tmdb and creates a new database model for it.
+        Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
         """
         self.id = id
@@ -283,7 +283,7 @@ class TVDBEpisode(Base):
 
     def __init__(self, id):
         """
-        Looks up movie on tmdb and creates a new database model for it.
+        Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
         """
         self.id = id
