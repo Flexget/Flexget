@@ -17,7 +17,8 @@ python-dateutil!=2.0, !=2.2, !=2.5.2
 jsonschema>=2.0
 path.py
 guessit>=2.0.3
-apscheduler
+# Bug in apscheduler 3.1.0 https://github.com/agronholm/apscheduler/issues/121
+apscheduler>=3.0.3, !=3.1.0
 pytvmaze>=1.4.8
 ordereddict>=1.1
 # WebUI Requirements
