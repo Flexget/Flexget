@@ -29,7 +29,7 @@ class TVDBRequest(object):
 
     def __init__(self, username=None, account_id=None):
         self.username = username
-        self.account_id = account_id
+        self.account_id = acount_id
         self.auth_key = self.username if self.username else 'default'
 
     def get_auth_token(self, refresh=False):
@@ -150,7 +150,7 @@ class TVDBSeries(Base):
 
     def __init__(self, id):
         """
-        Looks up movie on tmdb and creates a new database model for it.
+        Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
         """
         self.id = id
@@ -283,7 +283,7 @@ class TVDBEpisode(Base):
 
     def __init__(self, id):
         """
-        Looks up movie on tmdb and creates a new database model for it.
+        Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
         """
         self.id = id

@@ -7,29 +7,29 @@ interactions:
         Connection: [keep-alive]
         Content-Length: ['30']
         Content-Type: [application/json]
-        User-Agent: [!!python/unicode 'FlexGet/1.3.0.dev (www.flexget.com)']
+        User-Agent: [FlexGet/1.2.501.dev (www.flexget.com)]
       method: POST
       uri: https://api-beta.thetvdb.com/login
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAAwTBSbKiMAAA0P0/heWeXzKH3imDBDASBEE3FkNQCAYVZOrqu/d7f39Wq3XfUsLW
-          f1ZrMjuPbJ9Xx8o5RQvkUQU7yAI516EC6Ss56472S2anIfa2OtbmBoVUOtQX+RgeOvhsKKzbKnhO
-          DTGLptBhB5/anMZFmcbWBtbthIxIRgseUUiXEv/G9oMzQTU+ZLRngUBiEF4mshBNkV25mSNCsKpx
-          yVu1b9xw0q+pIJai96KZi7I7I1A1q7C89zvrjHniTsYw6tJyjV+VfQW9d+ZUXrrWaLjvvs+rhzUW
-          sk5HEj52b6XnJw7PYBCjsscgzTdufGoU11VxnySB4ennz75DGPRHA4GDSANBu8cCiat3bW/CbpCT
-          hc5+nSWcFT0N3s/r7vaINMf7+B0LSlnBQcuD2Gc6EiJ2iEuYWTQBF2aA+TagVCxUL+N8vbIG1O56
-          4Tw4Hv3qkx185vSicFSE2U4rNvkXvROc3NrFdoG17UfuxayR20onUXb42UD0tU8wyD+MmVCSjTEc
-          1z///gMAAP//AwCAeR7C1wEAAA==
+          H4sIAAAAAAAAAwTByZKiMAAA0Ht/heXdLpCgMrewiEFJWkQQLhQQkC2ABptlav593vv7tVqth67O
+          2vWf1TqbrSIx05KU1u2+IBGXiKPWkVMN7VDdPzzNUr6z2WqyEyxJZQjYrQHW0dbWDY5YU6OqKx02
+          NZlBG6ohjpgyxz7NY/8ooKqbsH6X8XLf2hWc8uv3myZMmQZPlbFvtT47jN3nJJueVD5iFkTjORpS
+          pO6NpRKBE6dwkYZOcWl5jydlvokZH/T0spy0j7/9GT7X7BEoakgi0E524AJyoRyRLiaIKvaNmEvC
+          9sYFkgdcVPy8FI8fLuyR2gHk100u85Pbt7rdCaHVRzsJOUOQROKzD9UpjnnfLqN70LFI8tduA4MD
+          1MZXU/DrJlTSXn9zNmfKeXQbcFzCACDN3Bw7u/sAcIQy94INDp32zcH+iQVFby+FcZDDIoKqVCWf
+          Ib3SMTXz/Clx2C9Jz3CuPakneKSbOBDgJjJeixvfqU7OtJBr0R8KTZopS3/t1Gwb1ymYkI2/IReu
+          cP317z8AAAD//wMAjqUozdcBAAA=
       headers:
-        cf-ray: [28e1adaf439004bc-SYD]
+        cf-ray: [28e32abd5e5c19ce-SYD]
         connection: [keep-alive]
         content-encoding: [gzip]
         content-type: [application/json]
-        date: ['Mon, 04 Apr 2016 03:29:53 GMT']
+        date: ['Mon, 04 Apr 2016 07:50:01 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dca4a61b4295a40d696c53822c4716f4f1459740592; expires=Tue,
-            04-Apr-17 03:29:52 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+        set-cookie: ['__cfduid=da7e0efe425f12fdbd756e4aeb3ae44f31459756200; expires=Tue,
+            04-Apr-17 07:50:00 GMT; path=/; domain=.thetvdb.com; HttpOnly']
         x-powered-by: [Thundar!]
         x-thetvdb-api-version: [2.0.0]
       status: {code: 200, message: OK}
@@ -38,23 +38,23 @@ interactions:
       headers:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
-        Authorization: [!!python/unicode 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NTk4MjY5OTMsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDU5NzQwNTkzfQ.WHh-E8iwh5NGnR2eW8TYxeze965K5lyUeeQ79-Xq7H_-vSCZa23f3LpkbKNbgneI7EiTfgtBFVQ1eKxDvwC4zZWpiHZ8tLV-714ZjNvgBumZLQ9nTnsCN4QOsq6t1x-Qy8v3UftQ8ac0KWSl6KK7QtXXRDLCVrGsNQ8tODN8M3kR29gW2eWiqjH0Tsv5XzkyPjbX-FUmD1Pcjs_hU9JLrPsnRf56QRo18WPnCN2UnMWfIbFkX8YnD8y_vNa3d7Lb-PCiFvNoBt2VvJLkuCxHRryaY6-k3IbB9d0cuNqXQX_ozHK8FAtw-pnFw-A4S35J1yDNkpGXQ8crnnEI45DwTw']
+        Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NTk4NDI2MDEsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDU5NzU2MjAxfQ.rdbm9xtVB5NWJnWm8wouH5GV3iXamY_wK_tcIB7Ezj14RacAz3to9TdiUax9yS1estDcLzHCuW2PtuQeXY9BZO_4nxMYT4OLdsIOoaOId9MSOGzbm7ELAOXAzBNgLhXPs07IBo4IWklf5sHTpnDMo0ZJp_63IRtYb_1gpZBxaaspnzwT8DN1Ofq6-AY8ACwqlhsQ-Z9cpDrsmye9KwTl4FzZY4ICG-FoMou44FA5sVY-NZRnrs47gN09DnLhE85Zh_AB3jbutcQdwcGffg3sApzbpmNfCgdV0VOoxs40A-_EqzTaUdDOKdh5k1WthC3ydmcvMcGnlTRhm0ewvZs0QA]
         Connection: [keep-alive]
-        User-Agent: [!!python/unicode 'FlexGet/1.3.0.dev (www.flexget.com)']
+        User-Agent: [FlexGet/1.2.501.dev (www.flexget.com)]
       method: GET
       uri: https://api-beta.thetvdb.com/search/series?name=Aoeu+Htns
     response:
-      body: {string: !!python/unicode "{\n  \"Error\": \"Resource not found\"\n}"}
+      body: {string: "{\n  \"Error\": \"Resource not found\"\n}"}
       headers:
         cache-control: ['private, max-age=300']
-        cf-ray: [28e1adb6ec510b08-SYD]
+        cf-ray: [28e32ac2813f19aa-SYD]
         connection: [keep-alive]
         content-length: ['35']
         content-type: [application/json]
-        date: ['Mon, 04 Apr 2016 03:29:54 GMT']
+        date: ['Mon, 04 Apr 2016 07:50:02 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=de2d764fe52e14d445e45ae220f39b0a11459740593; expires=Tue,
-            04-Apr-17 03:29:53 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+        set-cookie: ['__cfduid=d2a17a7936ee93f00c14d7ec018aa48e11459756201; expires=Tue,
+            04-Apr-17 07:50:01 GMT; path=/; domain=.thetvdb.com; HttpOnly']
         x-powered-by: [Thundar!]
         x-thetvdb-api-version: [2.0.0]
       status: {code: 404, message: Not Found}
