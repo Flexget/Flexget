@@ -10,13 +10,12 @@ from sqlalchemy.schema import ForeignKey
 from sqlalchemy import func
 
 from flexget import db_schema
-from flexget.manager import Session
 from flexget.utils import requests
 from flexget.utils.database import with_session, text_date_synonym, json_synonym
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('api_tvdb')
-Base = db_schema.versioned_base('api_tvdb', 5)
+Base = db_schema.versioned_base('api_tvdb', 6)
 
 # This is a FlexGet API key
 persist = SimplePersistence('api_tvdb')
@@ -88,7 +87,7 @@ class TVDBRequest(object):
 
 @db_schema.upgrade('api_tvdb')
 def upgrade(ver, session):
-    if ver is None or ver <= 4:
+    if ver is None or ver <= 5:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -98,20 +97,6 @@ genres_table = Table('tvdb_series_genres', Base.metadata,
                      Column('series_id', Integer, ForeignKey('tvdb_series.id')),
                      Column('genre_id', Integer, ForeignKey('tvdb_genres.id')))
 Base.register_table(genres_table)
-
-
-def _get_db_genres(genre_names):
-    genres = []
-    if genre_names:
-        with Session() as session:
-            for genre_name in genre_names:
-                genre = session.query(TVDBGenre).filter(func.lower(TVDBGenre.name) == genre_name.lower()).first()
-                if not genre:
-                    genre = TVDBGenre(name=genre_name)
-                    session.add(genre)
-                    session.commit()
-                genres.append({'id': genre.id, 'name': genre.name})
-    return genres
 
 
 class TVDBSeries(Base):
@@ -148,12 +133,12 @@ class TVDBSeries(Base):
 
     episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
-    def __init__(self, id):
+    def __init__(self, tvdb_id):
         """
         Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
         """
-        self.id = id
+        self.id = tvdb_id
 
         try:
             series = TVDBRequest().get('series/%s' % self.id)
@@ -178,9 +163,7 @@ class TVDBSeries(Base):
         self.expired = False
         self.aliases = series['aliases']
         self._banner = series['banner']
-
-        genres = _get_db_genres(series['genre'])
-        self._genres = [TVDBGenre(**g) for g in genres]
+        self._genres = [TVDBGenre(id=name) for name in series['genre']] if series['genre'] else []
 
         # Actors and Posters are lazy populated
         self._actors = None
@@ -257,9 +240,11 @@ class TVDBSeries(Base):
 
 class TVDBGenre(Base):
     __tablename__ = 'tvdb_genres'
+    id = Column(Unicode, primary_key=True)
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(Unicode, nullable=False, unique=True)
+    @property
+    def name(self):
+        return self.id
 
 
 class TVDBEpisode(Base):
@@ -421,7 +406,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         if not only_cached and series.expired:
             log.verbose('Data for %s has expired, refreshing from tvdb', series.name)
             try:
-                updated_series = TVDBSeries(id=series.id)
+                updated_series = TVDBSeries(series.id)
                 series = session.merge(updated_series)
                 _update_search_strings(series, search=name)
             except LookupError as e:
@@ -434,7 +419,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         # There was no series found in the cache, do a lookup from tvdb
         log.debug('Series %s not found in cache, looking up from tvdb.', id_str())
         if tvdb_id:
-            series = session.merge(TVDBSeries(id=tvdb_id))
+            series = session.merge(TVDBSeries(tvdb_id))
             _update_search_strings(series, search=name)
         elif name:
             tvdb_id = find_series_id(name)
