@@ -15,7 +15,7 @@ from sqlalchemy.orm import relation, backref, object_session
 
 from flexget import db_schema, options, plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import event, fire_event
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.plugins.parsers import SERIES_ID_TYPES
@@ -716,24 +716,25 @@ def set_series_begin(series, ep_id):
     series.begin = episode
 
 
-def forget_series(name):
+@with_session
+def forget_series(name, session=None, global_forget=False):
     """Remove a whole series `name` from database."""
-    session = Session()
-    try:
-        series = session.query(Series).filter(Series.name == name).all()
-        if series:
-            for s in series:
-                session.delete(s)
-            session.commit()
-            log.debug('Removed series %s from database.', name)
-        else:
-            raise ValueError('Unknown series %s' % name)
-    finally:
-        session.close()
+    series = session.query(Series).filter(Series.name == name).all()
+    if series:
+        for s in series:
+            if global_forget:
+                for episode in series.episodes:
+                    for release in episode.downloaded_releases:
+                        fire_event('forget', release.title)
+            session.delete(s)
+        session.commit()
+        log.debug('Removed series %s from database.', name)
+    else:
+        raise ValueError('Unknown series %s' % name)
 
 
 @with_session
-def forget_series_episode(name, identifier, session=None):
+def forget_series_episode(name, identifier, session=None, global_forget=False):
     """Remove all episodes by `identifier` from series `name` from database."""
     series = session.query(Series).filter(Series.name == name).first()
     if series:
@@ -742,6 +743,9 @@ def forget_series_episode(name, identifier, session=None):
         if episode:
             if not series.begin:
                 series.identified_by = ''  # reset identified_by flag so that it will be recalculated
+            if global_forget:
+                for release in episode.downloaded_releases:
+                    fire_event('forget', release.title)
             session.delete(episode)
             session.commit()
             log.debug('Episode %s from series %s removed from database.', identifier, name)

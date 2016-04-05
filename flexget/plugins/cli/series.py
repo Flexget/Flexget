@@ -25,7 +25,7 @@ def do_cli(manager, options):
     elif options.series_action == 'delete':
         forget(manager, options)
     elif options.series_action == 'forget':
-        forget(manager, options, remove_from_seen=True)
+        forget(manager, options, global_forget=True)
     elif options.series_action == 'begin':
         begin(manager, options)
 
@@ -121,35 +121,30 @@ def begin(manager, options):
         manager.config_changed()
 
 
-def forget(manager, options, remove_from_seen=False):
+def forget(manager, options, global_forget=False):
     name = options.series_name
 
     if options.episode_id:
         # remove by id
         identifier = options.episode_id
         try:
-            forget_series_episode(name, identifier)
+            forget_series_episode(name, identifier, global_forget)
             console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
         except ValueError:
             # Try upper casing identifier if we fail at first
             try:
-                forget_series_episode(name, identifier.upper())
+                forget_series_episode(name, identifier.upper(), global_forget)
                 console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
             except ValueError as e:
                 console(e.message)
-        finally:
-            if remove_from_seen:
-                fire_event('forget', name + identifier)
+
     else:
         # remove whole series
         try:
-            forget_series(name)
+            forget_series(name, global_forget)
             console('Removed series `%s` from database.' % name.capitalize())
         except ValueError as e:
             console(e.message)
-        finally:
-            if remove_from_seen:
-                fire_event('forget', name)
 
     manager.config_changed()
 
