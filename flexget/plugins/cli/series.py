@@ -22,7 +22,7 @@ def do_cli(manager, options):
         display_summary(options)
     elif options.series_action == 'show':
         display_details(options.series_name)
-    elif options.series_action == 'del':
+    elif options.series_action == 'delete':
         forget(manager, options)
     elif options.series_action == 'forget':
         forget(manager, options, remove_from_seen=True)
