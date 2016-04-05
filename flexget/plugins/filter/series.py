@@ -754,24 +754,6 @@ def remove_series_episode(name, identifier, forget=False, session=None):
         raise ValueError('Unknown series %s' % name)
 
 
-def forget_episodes_by_id(series_id, episode_id):
-    """ Removes a specific episode using `series_id` and `episode_id`."""
-    with Session() as session:
-        series = session.query(Series).filter(Series.id == series_id).first()
-        if series:
-            episode = session.query(Episode).filter(Episode.id == episode_id).first()
-            if episode:
-                if not series.begin:
-                    series.identified_by = ''  # reset identified_by flag so that it will be recalculated
-                session.delete(episode)
-                session.commit()
-                log.debug('Episode %s from series %s removed from database.', episode_id, series_id)
-            else:
-                raise ValueError('Unknown identifier %s for series %s' % (episode_id, series_id))
-        else:
-            raise ValueError('Unknown series %s' % series_id)
-
-
 def delete_release_by_id(release_id):
     with Session() as session:
         release = session.query(Release).filter(Release.id == release_id).first()

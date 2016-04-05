@@ -22,10 +22,10 @@ def do_cli(manager, options):
         display_summary(options)
     elif options.series_action == 'show':
         display_details(options.series_name)
-    elif options.series_action == 'delete':
-        forget(manager, options)
+    elif options.series_action == 'remove':
+        remove(manager, options)
     elif options.series_action == 'forget':
-        forget(manager, options, forget=True)
+        remove(manager, options, forget=True)
     elif options.series_action == 'begin':
         begin(manager, options)
 
@@ -121,7 +121,7 @@ def begin(manager, options):
         manager.config_changed()
 
 
-def forget(manager, options, forget=False):
+def remove(manager, options, forget=False):
     name = options.series_name
 
     if options.episode_id:
