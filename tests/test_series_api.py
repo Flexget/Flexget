@@ -83,7 +83,7 @@ class TestSeriesAPI(object):
         assert mock_new_eps_after.called
         assert mock_show_by_id.called
 
-    @patch.object(series, 'forget_series')
+    @patch.object(series, 'remove_series')
     @patch.object(series, 'show_by_id')
     def test_series_delete(self, mock_show_by_id, mock_forget_series, api_client):
         show = series.Series()

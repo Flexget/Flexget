@@ -717,13 +717,13 @@ def set_series_begin(series, ep_id):
 
 
 @with_session
-def forget_series(name, session=None, global_forget=False):
+def remove_series(name, forget=False, session=None):
     """Remove a whole series `name` from database."""
     series = session.query(Series).filter(Series.name == name).all()
     if series:
         for s in series:
-            if global_forget:
-                for episode in series.episodes:
+            if forget:
+                for episode in s.episodes:
                     for release in episode.downloaded_releases:
                         fire_event('forget', release.title)
             session.delete(s)
@@ -734,7 +734,7 @@ def forget_series(name, session=None, global_forget=False):
 
 
 @with_session
-def forget_series_episode(name, identifier, session=None, global_forget=False):
+def remove_series_episode(name, identifier, forget=False, session=None):
     """Remove all episodes by `identifier` from series `name` from database."""
     series = session.query(Series).filter(Series.name == name).first()
     if series:
@@ -743,7 +743,7 @@ def forget_series_episode(name, identifier, session=None, global_forget=False):
         if episode:
             if not series.begin:
                 series.identified_by = ''  # reset identified_by flag so that it will be recalculated
-            if global_forget:
+            if forget:
                 for release in episode.downloaded_releases:
                     fire_event('forget', release.title)
             session.delete(episode)

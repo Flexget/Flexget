@@ -497,7 +497,7 @@ class SeriesShowAPI(APIResource):
         name = show.name
 
         try:
-            series.forget_series(name)
+            series.remove_series(name)
         except ValueError as e:
             return {'status': 'error',
                     'message': e.args[0]

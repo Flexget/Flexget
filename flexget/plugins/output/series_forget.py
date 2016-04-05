@@ -6,7 +6,7 @@ from flexget import plugin
 from flexget.event import event
 
 try:
-    from flexget.plugins.filter.series import forget_series_episode
+    from flexget.plugins.filter.series import remove_series_episode
 except ImportError:
     raise plugin.DependencyError(issued_by='series_forget', missing='series',
                                  message='series_forget plugin need series plugin to work')
@@ -23,7 +23,7 @@ class OutputSeriesForget(object):
         for entry in task.accepted:
             if 'series_name' in entry and 'series_id' in entry:
                 try:
-                    forget_series_episode(entry['series_name'], entry['series_id'])
+                    remove_series_episode(entry['series_name'], entry['series_id'])
                     log.info('Removed episode `%s` from series `%s` download history.' %
                              (entry['series_id'], entry['series_name']))
                 except ValueError:
