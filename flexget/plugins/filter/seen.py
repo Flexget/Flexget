@@ -126,29 +126,29 @@ class SeenField(Base):
 
 
 @event('forget')
-def forget(value):
+@with_session
+def forget(value, session=None):
     """
     See module docstring
     :param string value: Can be task name, entry title or field value
     :return: count, field_count where count is number of entries removed and field_count number of fields
     """
     log.debug('forget called with %s' % value)
-    with Session() as session:
-        count = 0
-        field_count = 0
-        for se in session.query(SeenEntry).filter(or_(SeenEntry.title == value, SeenEntry.task == value)).all():
-            field_count += len(se.fields)
-            count += 1
-            log.debug('forgetting %s' % se)
-            session.delete(se)
+    count = 0
+    field_count = 0
+    for se in session.query(SeenEntry).filter(or_(SeenEntry.title == value, SeenEntry.task == value)).all():
+        field_count += len(se.fields)
+        count += 1
+        log.debug('forgetting %s' % se)
+        session.delete(se)
 
-        for sf in session.query(SeenField).filter(SeenField.value == value).all():
-            se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
-            field_count += len(se.fields)
-            count += 1
-            log.debug('forgetting %s' % se)
-            session.delete(se)
-        return count, field_count
+    for sf in session.query(SeenField).filter(SeenField.value == value).all():
+        se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
+        field_count += len(se.fields)
+        count += 1
+        log.debug('forgetting %s' % se)
+        session.delete(se)
+    return count, field_count
 
 
 @with_session

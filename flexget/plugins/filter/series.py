@@ -747,7 +747,6 @@ def remove_series_episode(name, identifier, forget=False, session=None):
                 for release in episode.downloaded_releases:
                     fire_event('forget', release.title)
             session.delete(episode)
-            session.commit()
             log.debug('Episode %s from series %s removed from database.', identifier, name)
         else:
             raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
