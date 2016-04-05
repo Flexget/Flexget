@@ -732,26 +732,23 @@ def forget_series(name):
         session.close()
 
 
-def forget_series_episode(name, identifier):
+@with_session
+def forget_series_episode(name, identifier, session=None):
     """Remove all episodes by `identifier` from series `name` from database."""
-    session = Session()
-    try:
-        series = session.query(Series).filter(Series.name == name).first()
-        if series:
-            episode = session.query(Episode).filter(Episode.identifier == identifier). \
-                filter(Episode.series_id == series.id).first()
-            if episode:
-                if not series.begin:
-                    series.identified_by = ''  # reset identified_by flag so that it will be recalculated
-                session.delete(episode)
-                session.commit()
-                log.debug('Episode %s from series %s removed from database.', identifier, name)
-            else:
-                raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
+    series = session.query(Series).filter(Series.name == name).first()
+    if series:
+        episode = session.query(Episode).filter(Episode.identifier == identifier). \
+            filter(Episode.series_id == series.id).first()
+        if episode:
+            if not series.begin:
+                series.identified_by = ''  # reset identified_by flag so that it will be recalculated
+            session.delete(episode)
+            session.commit()
+            log.debug('Episode %s from series %s removed from database.', identifier, name)
         else:
-            raise ValueError('Unknown series %s' % name)
-    finally:
-        session.close()
+            raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
+    else:
+        raise ValueError('Unknown series %s' % name)
 
 
 def forget_episodes_by_id(series_id, episode_id):

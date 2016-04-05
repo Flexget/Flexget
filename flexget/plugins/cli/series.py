@@ -4,7 +4,7 @@ import argparse
 from datetime import datetime, timedelta
 
 from flexget import options, plugin
-from flexget.event import event
+from flexget.event import event, fire_event
 from flexget.logger import console
 from flexget.manager import Session
 
@@ -22,8 +22,10 @@ def do_cli(manager, options):
         display_summary(options)
     elif options.series_action == 'show':
         display_details(options.series_name)
-    elif options.series_action == 'forget':
+    elif options.series_action == 'del':
         forget(manager, options)
+    elif options.series_action == 'forget':
+        forget(manager, options, remove_from_seen=True)
     elif options.series_action == 'begin':
         begin(manager, options)
 
@@ -119,7 +121,7 @@ def begin(manager, options):
         manager.config_changed()
 
 
-def forget(manager, options):
+def forget(manager, options, remove_from_seen=False):
     name = options.series_name
 
     if options.episode_id:
@@ -135,6 +137,9 @@ def forget(manager, options):
                 console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
             except ValueError as e:
                 console(e.message)
+        finally:
+            if remove_from_seen:
+                fire_event('forget', name + identifier)
     else:
         # remove whole series
         try:
@@ -142,6 +147,9 @@ def forget(manager, options):
             console('Removed series `%s` from database.' % name.capitalize())
         except ValueError as e:
             console(e.message)
+        finally:
+            if remove_from_seen:
+                fire_event('forget', name)
 
     manager.config_changed()
 
@@ -254,5 +262,9 @@ def register_parser_arguments():
                               help='episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
                                    'depending on how the series is numbered)')
     forget_parser = subparsers.add_parser('forget', parents=[series_parser],
-                                          help='removes episodes or whole series from the series database')
+                                          help='removes episodes or whole series from the entire database '
+                                               '(including seen plugin)')
     forget_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
+    delete_parser = subparsers.add_parser('delete', parents=[series_parser],
+                                          help='removes episodes or whole series from the series database only')
+    delete_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
