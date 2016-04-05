@@ -8,13 +8,13 @@ from flexget.event import event
 try:
     from flexget.plugins.filter.series import remove_series_episode
 except ImportError:
-    raise plugin.DependencyError(issued_by='series_forget', missing='series',
+    raise plugin.DependencyError(issued_by='series_remove', missing='series',
                                  message='series_forget plugin need series plugin to work')
 
 log = logging.getLogger('series_forget')
 
 
-class OutputSeriesForget(object):
+class OutputSeriesRemove(object):
     schema = {'type': 'boolean'}
 
     def on_task_output(self, task, config):
@@ -32,4 +32,4 @@ class OutputSeriesForget(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OutputSeriesForget, 'series_forget', api_ver=2)
+    plugin.register(OutputSeriesRemove, 'series_remove', api_ver=2)
