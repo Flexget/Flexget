@@ -33,12 +33,12 @@ class TestSeriesAPI(object):
 
         # Changed params
         rsp = api_client.get('/series/?status=new&max=10&days=4&sort_by=last_download_date&in_config=all'
-                       '&premieres=true&order=asc&page=2')
+                             '&premieres=true&order=asc&page=2')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         # Negative test, invalid parameter
         rsp = api_client.get('/series/?status=bla&max=10&days=4&sort_by=last_download_date&in_config=all'
-                       '&premieres=true&order=asc&page=2')
+                             '&premieres=true&order=asc&page=2')
         assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
         assert mock_series_list.call_count == 6, 'Should have 3 calls, is actually %s' % mock_series_list.call_count
 
@@ -143,22 +143,19 @@ class TestSeriesAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         assert mock_show_by_id.called
 
-    @patch.object(series, 'forget_episodes_by_id')
-    @patch.object(series, 'show_by_id')
-    def test_series_delete_episodes(self, mock_show_by_id, mock_forget_episodes_by_id, api_client):
-        show = series.Series()
-        episode = series.Episode()
-        release = series.Release()
-        release.downloaded = True
-        episode.releases.append(release)
-        show.episodes.append(episode)
+    def test_series_delete_episodes(self, api_client):
+        show = 'Test Show'
+        new_show = {
+            "series_name": show,
+            "episode_identifier": "s01e01",
+            "alternate_names": ['show1', 'show2']
+        }
 
-        mock_show_by_id.return_value = show
+        rsp = api_client.json_post(('/series/'), data=json.dumps(new_show))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         rsp = api_client.delete('/series/1/episodes')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_show_by_id.called
-        assert mock_forget_episodes_by_id.called
 
     @patch.object(series, 'episode_in_show')
     @patch.object(series, 'episode_by_id')
@@ -176,12 +173,12 @@ class TestSeriesAPI(object):
         assert mock_episode_by_id.called
         assert mock_episode_in_show.called
 
-    @patch.object(series, 'forget_episodes_by_id')
+    @patch.object(series, 'remove_series_episode')
     @patch.object(series, 'episode_in_show')
     @patch.object(series, 'episode_by_id')
     @patch.object(series, 'show_by_id')
     def test_series_delete_episode(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show,
-                                   mock_forget_episodes_by_id, api_client):
+                                   mock_remove_series_episode, api_client):
         show = series.Series()
         episode = series.Episode()
 
@@ -193,7 +190,7 @@ class TestSeriesAPI(object):
         assert mock_show_by_id.called
         assert mock_episode_by_id.called
         assert mock_episode_in_show.called
-        assert mock_forget_episodes_by_id.called
+        assert mock_remove_series_episode.called
 
     @patch.object(series, 'episode_in_show')
     @patch.object(series, 'episode_by_id')
