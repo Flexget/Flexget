@@ -38,6 +38,52 @@ class TestTraktList(object):
             auth = TraktUserAuth(**kwargs)
             session.add(auth)
 
+    def test_get_list(self):
+        config = {'account': 'flexget_list_test', 'list': 'testlist', 'type': 'auto'}
+        trakt_set = TraktSet(config)
+        entries = sorted(dict(e) for e in trakt_set)
+        assert entries == sorted([
+            {
+                'trakt_show_slug': 'castle',
+                'original_url': 'http://trakt.tv/shows/castle/seasons/8/episodes/15',
+                'url': 'http://trakt.tv/shows/castle/seasons/8/episodes/15',
+                'series_season': 8,
+                'tvdb_id': 83462,
+                'series_name': 'Castle (2009)',
+                'imdb_id': 'tt1219024',
+                'series_id': 'S08E15',
+                'series_episode': 15,
+                'trakt_episode_id': 2125119,
+                'title': 'Castle (2009) S08E15 Fidelis Ad Mortem',
+                'trakt_show_id': 1410,
+                'trakt_ep_name': 'Fidelis Ad Mortem',
+                'tvrage_id': 19267
+            },
+            {
+                'movie_name': 'Deadpool',
+                'original_url': 'http://trakt.tv/movie/deadpool-2016',
+                'tmdb_id': 293660,
+                'title': 'Deadpool (2016)',
+                'url': 'http://trakt.tv/movie/deadpool-2016',
+                'trakt_movie_id': 190430,
+                'imdb_id': 'tt1431045',
+                'movie_year': 2016,
+                'trakt_movie_slug': 'deadpool-2016'
+            },
+            {
+                'trakt_show_slug': 'the-walking-dead',
+                'tmdb_id': 1402,
+                'title': 'The Walking Dead (2010)',
+                'url': 'http://trakt.tv/show/the-walking-dead',
+                'original_url': 'http://trakt.tv/show/the-walking-dead',
+                'series_name': 'The Walking Dead (2010)',
+                'trakt_show_id': 1393,
+                'tvdb_id': 153021,
+                'imdb_id': 'tt1520211',
+                'tvrage_id': 25056
+            }
+        ])
+
     def test_strip_dates(self):
         config = {'account': 'flexget_list_test', 'list': 'testlist', 'strip_dates': True, 'type': 'auto'}
         trakt_set = TraktSet(config)
