@@ -19,7 +19,7 @@ try:
 except ImportError:
     telegram = None
 
-_MIN_TELEGRAM_VER = '3.2.0'
+_MIN_TELEGRAM_VER = '3.4.0'
 
 _PLUGIN_NAME = 'send_telegram'
 
