@@ -610,8 +610,7 @@ class Manager(object):
         """Makes sure that all tasks will have the config_modified flag come out true on the next run.
         Useful when changing the db and all tasks need to be completely reprocessed."""
         from flexget.task import config_changed
-        for task in self.tasks:
-            config_changed(task)
+        config_changed()
         fire_event('manager.config_updated', self)
 
     def validate_config(self, config=None):
@@ -833,12 +832,8 @@ class Manager(object):
         expired = self.persist.get('last_cleanup', datetime(1900, 1, 1)) < datetime.now() - DB_CLEANUP_INTERVAL
         if force or expired:
             log.info('Running database cleanup.')
-            session = Session()
-            try:
+            with Session() as session:
                 fire_event('manager.db_cleanup', self, session)
-                session.commit()
-            finally:
-                session.close()
             # Just in case some plugin was overzealous in its cleaning, mark the config changed
             self.config_changed()
             self.persist['last_cleanup'] = datetime.now()
