@@ -66,7 +66,8 @@ class TraktSet(MutableSet):
             'username': {'type': 'string'},
             'account': {'type': 'string'},
             'list': {'type': 'string'},
-            'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies', 'auto'], 'default': 'auto'}
+            'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies', 'auto'], 'default': 'auto'},
+            'strip_dates': {'type': 'boolean', 'default': False}
         },
         'required': ['list'],
         'anyOf': [{'required': ['username']}, {'required': ['account']}],
@@ -145,8 +146,10 @@ class TraktSet(MutableSet):
             entries = []
             list_type = (self.config['type']).rstrip('s')
             for item in data:
+                if self.config['type'] == 'auto':
+                    list_type = item['type']
                 # Collection and watched lists don't return 'type' along with the items (right now)
-                if list_type != 'auto' and 'type' in item and item['type'] != list_type:
+                if 'type' in item and item['type'] != list_type:
                     log.debug('Skipping %s because it is not a %s' % (item[item['type']].get('title', 'unknown'),
                                                                       list_type))
                     continue
@@ -161,6 +164,14 @@ class TraktSet(MutableSet):
                 else:
                     entry['url'] = 'http://trakt.tv/%s/%s' % (list_type, item[list_type]['ids'].get('slug'))
                 entry.update_using_map(field_maps[list_type], item)
+                # Override the title if strip_dates is on. TODO: a better way?
+                if self.config.get('strip_dates'):
+                    if list_type in ['show', 'movie']:
+                        entry['title'] = item[list_type]['title']
+                    elif list_type == 'episode':
+                        entry['title'] = '{show[title]} S{episode[season]:02}E{episode[number]:02}'.format(**item)
+                        if item['episode']['title']:
+                            entry['title'] += ' {episode[title]}'.format(**item)
                 if entry.isvalid():
                     if self.config.get('strip_dates'):
                         # Remove year from end of name if present

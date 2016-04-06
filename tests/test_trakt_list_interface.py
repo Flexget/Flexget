@@ -24,11 +24,12 @@ class TestTraktList(object):
                     'list': 'watchlist',
                     'type': 'shows'}
 
-    def get_auth(self):
+    @pytest.fixture(autouse=True)
+    def db_auth(self, manager):
         kwargs = {
             'account': 'flexget_list_test',
-            'access_token': '895b5417b640ed0d40b5fbda56a3ad2158fc36f313c825f638e61b65586df32d',
-            'refresh_token': '3708a9f1057c10c0a9b59f544e6c758000d02b7d1cc66b9404e8d70210d15cba',
+            'access_token': '60a093e80b670a254ec40b7a0d2d7535119b3bcc61859b052ae641c3009dd75b',
+            'refresh_token': '006c4813fc0bd8e02219c2ce4b0295228f2ce651419adea1bfb0aded352b59d2',
             'created': 1458488839.44,
             'expires': 7776000
         }
@@ -36,10 +37,14 @@ class TestTraktList(object):
         with Session() as session:
             auth = TraktUserAuth(**kwargs)
             session.add(auth)
-            session.commit()
+
+    def test_strip_dates(self):
+        config = {'account': 'flexget_list_test', 'list': 'testlist', 'strip_dates': True, 'type': 'auto'}
+        trakt_set = TraktSet(config)
+        titles = [e['title'] for e in trakt_set]
+        assert set(titles) == set(('The Walking Dead', 'Deadpool', 'Castle S08E15 Fidelis Ad Mortem'))
 
     def test_trakt_add(self):
-        self.get_auth()
         trakt_set = TraktSet(self.trakt_config)
         # Initialize trakt set
         trakt_set.clear()
@@ -52,7 +57,6 @@ class TestTraktList(object):
         assert entry in trakt_set
 
     def test_trakt_remove(self):
-        self.get_auth()
         trakt_set = TraktSet(self.trakt_config)
         # Initialize trakt set
         trakt_set.clear()
