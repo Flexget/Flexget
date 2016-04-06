@@ -465,7 +465,7 @@ class SeriesGetShowsAPI(APIResource):
 
 delete_parser = api.parser()
 delete_parser.add_argument('forget', type=inputs.boolean, default=False,
-                           help="Enabling this will for 'forget' event that will delete the downloaded releases "
+                           help="Enabling this will fire a 'forget' event that will delete the downloaded releases "
                                 "from the entire DB, enabling to re-download them")
 
 

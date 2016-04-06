@@ -133,20 +133,20 @@ def forget(value):
     :return: count, field_count where count is number of entries removed and field_count number of fields
     """
     with Session() as session:
-        log.debug('forget called with %s' % value)
+        log.debug('forget called with %s', value)
         count = 0
         field_count = 0
         for se in session.query(SeenEntry).filter(or_(SeenEntry.title == value, SeenEntry.task == value)).all():
             field_count += len(se.fields)
             count += 1
-            log.debug('forgetting %s' % se)
+            log.debug('forgetting %s', se)
             session.delete(se)
 
         for sf in session.query(SeenField).filter(SeenField.value == value).all():
             se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
             field_count += len(se.fields)
             count += 1
-            log.debug('forgetting %s' % se)
+            log.debug('forgetting %s', se)
             session.delete(se)
     return count, field_count
 
@@ -338,7 +338,8 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
 
 
 @with_session
-def search(value=None, status=None, start=None, stop=None, count=False, order_by='added', descending=False, session=None):
+def search(value=None, status=None, start=None, stop=None, count=False, order_by='added', descending=False,
+           session=None):
     query = session.query(SeenEntry)
     if descending:
         query = query.order_by(getattr(SeenEntry, order_by).desc())

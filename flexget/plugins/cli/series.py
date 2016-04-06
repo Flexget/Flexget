@@ -4,7 +4,7 @@ import argparse
 from datetime import datetime, timedelta
 
 from flexget import options, plugin
-from flexget.event import event, fire_event
+from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
 
