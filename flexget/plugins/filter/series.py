@@ -733,25 +733,25 @@ def remove_series(name, forget=False, session=None):
         raise ValueError('Unknown series %s' % name)
 
 
-@with_session
 def remove_series_episode(name, identifier, forget=False, session=None):
     """Remove all episodes by `identifier` from series `name` from database."""
-    series = session.query(Series).filter(Series.name == name).first()
-    if series:
-        episode = session.query(Episode).filter(Episode.identifier == identifier). \
-            filter(Episode.series_id == series.id).first()
-        if episode:
-            if not series.begin:
-                series.identified_by = ''  # reset identified_by flag so that it will be recalculated
-            if forget:
-                for release in episode.downloaded_releases:
-                    fire_event('forget', release.title)
-            session.delete(episode)
-            log.debug('Episode %s from series %s removed from database.', identifier, name)
+    with Session() as session:
+        series = session.query(Series).filter(Series.name == name).first()
+        if series:
+            episode = session.query(Episode).filter(Episode.identifier == identifier). \
+                filter(Episode.series_id == series.id).first()
+            if episode:
+                if not series.begin:
+                    series.identified_by = ''  # reset identified_by flag so that it will be recalculated
+                if forget:
+                    for release in episode.downloaded_releases:
+                        fire_event('forget', release.title)
+                session.delete(episode)
+                log.debug('Episode %s from series %s removed from database.', identifier, name)
+            else:
+                raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
         else:
-            raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
-    else:
-        raise ValueError('Unknown series %s' % name)
+            raise ValueError('Unknown series %s' % name)
 
 
 def delete_release_by_id(release_id):
