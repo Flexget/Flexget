@@ -59,12 +59,12 @@
     vm.deleteEpisode = function(episode) {
       var confirm = $mdDialog.confirm()
         .title('Confirm forgetting episode.')
-        .htmlContent("Are you sure you want to forget episode <b>" + episode.episode_identifier + "</b> from show " + show + "?\n This also removes all seen entries for this episode!")
+        .htmlContent("Are you sure you want to forget episode <b>" + episode.episode_identifier + "</b> from show " + show + "?<br /> This also removes all downloaded releases for this episode!")
         .ok("Forget")
         .cancel("No");
 
       $mdDialog.show(confirm).then(function() {
-        $http.delete('/api/series/' + $stateParams.id + '/episodes/' + episode.episode_id)
+        $http.delete('/api/series/' + $stateParams.id + '/episodes/' + episode.episode_id, { params: { forget: true} })
           .success(function(data) {
             //Find the index of the episode in the data
             var index = vm.episodes.indexOf(episode);
@@ -86,7 +86,7 @@
     vm.resetReleases = function(episode) {
       var confirm = $mdDialog.confirm()
         .title('Confirm resetting releases.')
-        .htmlContent("Are you sure you want to reset downloaded releases for <b>" + episode.episode_identifier + "</b> from show " + show + "?\n This does not remove seen entries but will clear the quality to be downloaded again.")
+        .htmlContent("Are you sure you want to reset downloaded releases for <b>" + episode.episode_identifier + "</b> from show " + show + "?<br /> This does not remove seen entries but will clear the quality to be downloaded again.")
         .ok("Forget")
         .cancel("No");
 
@@ -98,7 +98,7 @@
           .error(function(error) {
             var errorDialog = $mdDialog.alert()
               .title("Something went wrong")
-              .htmlContent("Oops, something went wrong when trying to reset downloaded releases for <b>" + episode.episode_identifier + "</b> from show " + show + ":\n" + error.message)
+              .htmlContent("Oops, something went wrong when trying to reset downloaded releases for <b>" + episode.episode_identifier + "</b> from show " + show + ":<br />" + error.message)
               .ok("Ok");
 
             $mdDialog.show(errorDialog);

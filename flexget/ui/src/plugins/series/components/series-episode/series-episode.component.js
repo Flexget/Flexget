@@ -38,12 +38,12 @@
       vm.deleteReleases = function() {
         var confirm = $mdDialog.confirm()
           .title('Confirm deleting releases.')
-          .htmlContent("Are you sure you want to delete all releases for <b>" + vm.episode.episode_identifier + "</b> from show " + vm.show + "?\n This also removes all seen releases for this episode!")
+          .htmlContent("Are you sure you want to delete all releases for <b>" + vm.episode.episode_identifier + "</b> from show " + vm.show + "?<br /> This also removes all seen releases for this episode!")
           .ok("Forget")
           .cancel("No");
 
         $mdDialog.show(confirm).then(function() {
-          $http.delete('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases', { params: { delete_seen: true}})
+          $http.delete('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases', { params: { forget: true}})
             .success(function(data) {
               //Remove all loaded releases from the page and set variables for the accordion
               vm.releases = undefined;
@@ -53,7 +53,7 @@
             .error(function(error) {
               var errorDialog = $mdDialog.alert()
                 .title("Something went wrong")
-                .htmlContent("Oops, something went wrong when trying to forget <b>" + vm.episode.episode_identifier + "</b> from show " + vm.show + ":\n" + error.message)
+                .htmlContent("Oops, something went wrong when trying to forget <b>" + vm.episode.episode_identifier + "</b> from show " + vm.show + ":<br />" + error.message)
                 .ok("Ok");
 
               $mdDialog.show(errorDialog);
@@ -84,7 +84,7 @@
 
       //Call from a release item, to forget the release
       vm.forgetRelease = function(release) {
-        $http.delete('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases/' + release.release_id + '/', { params: { delete_seen: true }})
+        $http.delete('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases/' + release.release_id + '/', { params: { forget: true }})
           .success(function(data) {
             //Find index of the release and remove it from the list
             var index = vm.releases.indexOf(release);

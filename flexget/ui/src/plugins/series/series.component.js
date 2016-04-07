@@ -48,13 +48,9 @@
       .ok("Forget")
       .cancel("No");
 
-      var params = {
-        forget: true
-      };
-
       //Actually show the confirmation dialog and place a call to DELETE when confirmed
       $mdDialog.show(confirm).then(function() {
-        $http.delete('/api/series/' + show.show_id, { params: params })
+        $http.delete('/api/series/' + show.show_id, { params: { forget: true } })
         .success(function(data) {
           var index = vm.series.indexOf(show);
           vm.series.splice(index, 1);
