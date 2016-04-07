@@ -1,12 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
-import re
+
 import logging
+import re
 
 from path import Path
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 from flexget.plugin import get_plugin_by_name
 from flexget.utils.tools import TimedDict
 
@@ -106,11 +107,13 @@ class FilterExistsMovie(object):
                 for d in folder.walkdirs(errors='ignore'):
                     if self.dir_pattern.search(d.name):
                         continue
+                    log.debug('detected dir with name %s, adding to check list' % d.name)
                     items.append(d.name)
             elif config.get('type') == 'files':
                 for f in folder.walkfiles(errors='ignore'):
                     if not self.file_pattern.search(f.name):
                         continue
+                    log.debug('detected file with name %s, adding to check list' % f.name)
                     items.append(f.name)
 
             if not items:
@@ -125,8 +128,8 @@ class FilterExistsMovie(object):
                 if config.get('lookup') == 'imdb':
                     try:
                         imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
-                                                            raw_title=item,
-                                                            session=task.session)
+                                                             raw_title=item,
+                                                             session=task.session)
                         if imdb_id in path_ids:
                             log.trace('duplicate %s' % item)
                             continue
@@ -149,6 +152,7 @@ class FilterExistsMovie(object):
         # do actual filtering
         for entry in task.accepted:
             count_entries += 1
+            log.debug('trying to parse entry %s' % entry['title'])
             if config.get('lookup') == 'imdb':
                 key = 'imdb_id'
                 if not entry.get('imdb_id', eval_lazy=False):
@@ -180,7 +184,7 @@ class FilterExistsMovie(object):
         if incompatible_files or incompatible_entries:
             log.verbose('There were some incompatible items. %s of %s entries '
                         'and %s of %s directories could not be verified.' %
-                (incompatible_entries, count_entries, incompatible_files, count_files))
+                        (incompatible_entries, count_entries, incompatible_files, count_files))
 
         log.debug('-- Finished filtering entries -------------------------------')
 

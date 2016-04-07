@@ -12,11 +12,13 @@ rpyc
 jinja2
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
 requests>=2.8.0, <3.0
-python-dateutil!=2.0, !=2.2
+# Bug in dateutil 2.5.2 https://github.com/dateutil/dateutil/issues/233
+python-dateutil!=2.0, !=2.2, !=2.5.2
 jsonschema>=2.0
 path.py
 guessit>=2.0.3
-apscheduler
+# Bug in apscheduler 3.1.0 https://github.com/agronholm/apscheduler/issues/121
+apscheduler>=3.0.3, !=3.1.0
 pytvmaze>=1.4.8
 ordereddict>=1.1
 # WebUI Requirements

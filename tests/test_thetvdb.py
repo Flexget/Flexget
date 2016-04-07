@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import mock
 import pytest
 from flexget.manager import Session
-from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode
+from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode, TVDBSeries
 from flexget.plugins.input.thetvdb_favorites import TVDBUserFavorite
 
 
@@ -47,6 +47,12 @@ class TestTVDBLookup(object):
               - title: naruto 128
             series:
               - naruto
+          test_no_poster_actors:
+            mock:
+              - {title: 'Sex.House.S01E02.HDTV.XViD-FlexGet'}
+            series:
+              - Sex House
+              - The Blacklist
 
     """
 
@@ -97,6 +103,12 @@ class TestTVDBLookup(object):
                                             'the paternity of the patient infuriates Dr. Cuddy and the teenager\'s ' \
                                             'parents, but may just pay off in spades.'
         assert entry['tvdb_ep_rating'] == 7.8
+
+    def test_no_posters_actors(self, mocked_expired, execute_task):
+        task = execute_task('test_no_poster_actors')
+        entry = task.find_entry(tvdb_series_name='Sex House')
+        assert entry['tvdb_posters'] == []
+        assert entry['tvdb_actors'] == []
 
     def test_cache(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
@@ -249,11 +261,11 @@ class TestTVDBFavorites(object):
               from:
                 thetvdb_favorites:
                   username: flexget
-                  password: flexget
+                  account_id: 80FB8BD0720CA5EC
           test_strip_dates:
             thetvdb_favorites:
               username: flexget
-              password: flexget
+              account_id: 80FB8BD0720CA5EC
               strip_dates: yes
     """
 
@@ -298,7 +310,7 @@ class TestTVDBSubmit(object):
             thetvdb_lookup: yes
             thetvdb_add:
               username: flexget
-              password: flexget
+              account_id: 80FB8BD0720CA5EC
             series:
               - House
           delete:
@@ -308,7 +320,7 @@ class TestTVDBSubmit(object):
             thetvdb_lookup: yes
             thetvdb_remove:
               username: flexget
-              password: flexget
+              account_id: 80FB8BD0720CA5EC
             series:
               - The Big Bang Theory
 

@@ -28,6 +28,11 @@ ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 
 class DTDecoder(json.JSONDecoder):
     def decode(self, obj, **kwargs):
+        # The built-in `json` library will `unicode` strings, except for empty strings. patch this for
+        # consistency so that `unicode` is always returned.
+        if obj == b'':
+            return ''
+
         if isinstance(obj, basestring):
             dt_str = obj.strip('"')
             try:
