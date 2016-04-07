@@ -1,4 +1,9 @@
 <div layout="column" flex>
+	<md-toolbar class="md-accent">
+		<span class="md-toolbar-tools" flex>
+			Please note that performed operations on this page might not be persistent. Depending on your config, settings might get overriden and data might be recreated.
+		</span>
+	</md-toolbar>
     <md-input-container>
             <label>Search</label>
             <input ng-model="vm.searchTerm" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }">

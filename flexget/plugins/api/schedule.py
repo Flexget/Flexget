@@ -64,8 +64,8 @@ class SchedulesAPI(APIResource):
             # Schedules not defined or are disabled, enable as one is being created
             manager.config['schedules'] = []
 
-        manager.config['schedules'].append(data['schedule'])
-        new_schedule = _schedule_by_id(id(data['schedule']))
+        manager.config['schedules'].append(data)
+        new_schedule = _schedule_by_id(id(data))
 
         if not new_schedule:
             return {'error': 'schedule went missing after add'}, 500
