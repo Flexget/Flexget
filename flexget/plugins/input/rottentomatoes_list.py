@@ -76,4 +76,4 @@ class RottenTomatoesList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(RottenTomatoesList, 'rottentomatoes_list', api_ver=2)
+    plugin.register(RottenTomatoesList, 'rottentomatoes_list', api_ver=2, groups=['list'])
