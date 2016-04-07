@@ -12,6 +12,10 @@
   function seriesController($http, $mdDialog) {
     var vm = this;
 
+    vm.currentPage = 1;
+    vm.totalShows = 0;
+    vm.pageSize = 10;
+
     var options = {
       page: 1,
       page_size: 10,
@@ -40,13 +44,17 @@
       //Construct the confirmation dialog
        var confirm = $mdDialog.confirm()
       .title('Confirm forgetting show.')
-      .htmlContent("Are you sure you want to completely forget <b>" + show.show_name + "</b>?")
+      .htmlContent("Are you sure you want to completely forget <b>" + show.show_name + "</b>?<br /> This will also forget all downloaded releases.")
       .ok("Forget")
       .cancel("No");
 
+      var params = {
+        forget: true
+      };
+
       //Actually show the confirmation dialog and place a call to DELETE when confirmed
       $mdDialog.show(confirm).then(function() {
-        $http.delete('/api/series/' + show.show_id)
+        $http.delete('/api/series/' + show.show_id, { params: params })
         .success(function(data) {
           var index = vm.series.indexOf(show);
           vm.series.splice(index, 1);
@@ -77,8 +85,6 @@
         vm.series = data.shows;
       });
     }
-
-    
 
     //Load initial list of series
     getSeriesList();
