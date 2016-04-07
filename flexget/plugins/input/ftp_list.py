@@ -207,4 +207,4 @@ class InputFtpList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(InputFtpList, 'ftp_list', api_ver=2)
+    plugin.register(InputFtpList, 'ftp_list', api_ver=2, groups=['list'])

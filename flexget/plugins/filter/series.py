@@ -15,7 +15,7 @@ from sqlalchemy.orm import relation, backref, object_session
 
 from flexget import db_schema, options, plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import event, fire_event
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.plugins.parsers import SERIES_ID_TYPES
@@ -716,26 +716,38 @@ def set_series_begin(series, ep_id):
     series.begin = episode
 
 
-def forget_series(name):
-    """Remove a whole series `name` from database."""
-    session = Session()
-    try:
+def remove_series(name, forget=False):
+    """
+    Remove a whole series `name` from database.
+    :param name: Name of series to be removed
+    :param forget: Indication whether or not to fire a 'forget' event
+    """
+    downloaded_releases = []
+    with Session() as session:
         series = session.query(Series).filter(Series.name == name).all()
         if series:
             for s in series:
+                if forget:
+                    for episode in s.episodes:
+                        downloaded_releases = [release.title for release in episode.downloaded_releases]
                 session.delete(s)
             session.commit()
             log.debug('Removed series %s from database.', name)
         else:
             raise ValueError('Unknown series %s' % name)
-    finally:
-        session.close()
+    for downloaded_release in downloaded_releases:
+        fire_event('forget', downloaded_release)
 
 
-def forget_series_episode(name, identifier):
-    """Remove all episodes by `identifier` from series `name` from database."""
-    session = Session()
-    try:
+def remove_series_episode(name, identifier, forget=False):
+    """
+    Remove all episodes by `identifier` from series `name` from database.
+    :param name: Name of series to be removed
+    :param identifier: Series identifier to be deleted
+    :param forget: Indication whether or not to fire a 'forget' event
+    """
+    downloaded_releases = []
+    with Session() as session:
         series = session.query(Series).filter(Series.name == name).first()
         if series:
             episode = session.query(Episode).filter(Episode.identifier == identifier). \
@@ -743,33 +755,16 @@ def forget_series_episode(name, identifier):
             if episode:
                 if not series.begin:
                     series.identified_by = ''  # reset identified_by flag so that it will be recalculated
+                if forget:
+                    downloaded_releases = [release.title for release in episode.downloaded_releases]
                 session.delete(episode)
-                session.commit()
                 log.debug('Episode %s from series %s removed from database.', identifier, name)
             else:
                 raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
         else:
             raise ValueError('Unknown series %s' % name)
-    finally:
-        session.close()
-
-
-def forget_episodes_by_id(series_id, episode_id):
-    """ Removes a specific episode using `series_id` and `episode_id`."""
-    with Session() as session:
-        series = session.query(Series).filter(Series.id == series_id).first()
-        if series:
-            episode = session.query(Episode).filter(Episode.id == episode_id).first()
-            if episode:
-                if not series.begin:
-                    series.identified_by = ''  # reset identified_by flag so that it will be recalculated
-                session.delete(episode)
-                session.commit()
-                log.debug('Episode %s from series %s removed from database.', episode_id, series_id)
-            else:
-                raise ValueError('Unknown identifier %s for series %s' % (episode_id, series_id))
-        else:
-            raise ValueError('Unknown series %s' % series_id)
+    for downloaded_release in downloaded_releases:
+        fire_event('forget', downloaded_release)
 
 
 def delete_release_by_id(release_id):
