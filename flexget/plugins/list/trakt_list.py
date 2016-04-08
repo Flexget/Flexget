@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import logging
 import re
-from collections import MutableSet
+from collections import MutableSet, defaultdict
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -276,6 +276,9 @@ class TraktSet(MutableSet):
         if 200 <= result.status_code < 300:
             action = 'deleted' if remove else 'added'
             res = result.json()
+            # Default to 0 for all categories, even if trakt response didn't include them
+            for cat in ('movies', 'shows', 'episodes', 'seasons'):
+                res[action].setdefault(cat, 0)
             log.info('Successfully {0} to/from list {1}: {movies} movie(s), {shows} show(s), {episodes} episode(s), '
                      '{seasons} season(s).'.format(action, self.config['list'], **res[action]))
             for k, r in res['not_found'].iteritems():
