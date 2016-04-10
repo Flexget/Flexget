@@ -18,8 +18,7 @@ jsonschema>=2.0
 path.py>=8.1.1
 pathlib>=1.0
 guessit<=2.0.4
-# Bug in apscheduler 3.1.0 https://github.com/agronholm/apscheduler/issues/121
-apscheduler>=3.0.3, !=3.1.0
+apscheduler>=3.2.0
 # WebUI Requirements
 cherrypy>=3.7.0
 flask>=0.7
