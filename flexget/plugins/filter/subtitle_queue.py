@@ -192,10 +192,10 @@ class SubtitleQueue(object):
                     entry['subtitle_languages'] = primary
 
                     try:
-                        import subliminal
+                        from subliminal.core import search_external_subtitles
                         try:
-                            video = subliminal.scan_video(normalize_path(file))
-                            if primary and not primary - video.subtitle_languages:
+                            existing_subtitles = set(search_external_subtitles(normalize_path(file)).values())
+                            if primary and not primary - existing_subtitles:
                                 log.debug('All subtitles already fetched for %s.' % entry['title'])
                                 sub_item.downloaded = True
                                 continue
