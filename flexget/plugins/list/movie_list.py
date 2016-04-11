@@ -96,7 +96,7 @@ class MovieListID(Base):
 
 class MovieList(MutableSet):
     def _db_list(self, session):
-        return session.query(MovieListList).filter(MovieListList.name == self.config).first()
+        return session.query(MovieListList).filter(MovieListList.name == self.config)
 
     def _from_iterable(self, it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
@@ -105,22 +105,22 @@ class MovieList(MutableSet):
     @with_session
     def __init__(self, config, session=None):
         self.config = config
-        db_list = self._db_list(session)
+        db_list = self._db_list(session).first()
         if not db_list:
             session.add(MovieListList(name=self.config))
 
     @with_session
     def __iter__(self, session=None):
-        return iter([movie.to_entry() for movie in self._db_list(session).movies])
+        return iter([movie.to_entry() for movie in self._db_list(session).first().movies])
 
     @with_session
     def __len__(self, session=None):
-        return len(self._db_list(session).movies)
+        return len(self._db_list(session).first().movies)
 
     @with_session
     def add(self, entry, session=None):
         # Check if this is already in the list, refresh info if so
-        db_list = self._db_list(session=session)
+        db_list = self._db_list(session=session).first()
         db_movie = self._find_entry(entry, session=session)
         # Just delete and re-create to refresh
         if db_movie:
