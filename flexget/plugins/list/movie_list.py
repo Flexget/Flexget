@@ -27,6 +27,9 @@ class MovieListList(Base):
     added = Column(DateTime, default=datetime.now)
     movies = relationship('MovieListMovie', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
 
+    def __repr__(self):
+        return '<MovieListList name=%d>' % (self.id)
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -43,6 +46,9 @@ class MovieListMovie(Base):
     year = Column(Integer)
     list_id = Column(Integer, ForeignKey(MovieListList.id), nullable=False)
     ids = relationship('MovieListID', backref='movie', cascade='all, delete, delete-orphan')
+
+    def __repr__(self):
+        return '<MovieListMovie title=%s,year=%s,list_id=%d>' % (self.title, self.year, self.list_id)
 
     def to_entry(self):
         entry = Entry()
@@ -74,6 +80,9 @@ class MovieListID(Base):
     id_name = Column(Unicode)
     id_value = Column(Unicode)
     movie_id = Column(Integer, ForeignKey(MovieListMovie.id))
+
+    def __repr__(self):
+        return '<MovieListID id_name=%s,id_value=%s,movie_id=%d>' % (self.id_name, self.id_value, self.movie_id)
 
     def to_dict(self):
         return {
@@ -133,7 +142,7 @@ class MovieList(MutableSet):
     def discard(self, entry, session=None):
         db_movie = self._find_entry(entry, session=session)
         if db_movie:
-            log.debug('deleting entry %s', entry)
+            log.debug('deleting movie %s', db_movie)
             session.delete(db_movie)
 
     def __contains__(self, entry):
@@ -144,10 +153,14 @@ class MovieList(MutableSet):
         """Finds `MovieListMovie` corresponding to this entry, if it exists."""
         for id_name in SUPPORTED_IDS:
             if id_name in entry:
-                # TODO: Make this real
-                res = (self._db_list(session).movies.filter(MovieListID.id_name == id_name)
-                       .filter(MovieListID.id_value == entry[id_name]).first())
+                log.debug('finding movie based off id %s:%s', id_name, entry[id_name])
+                res = (self._db_list(session).movies.filter(
+                    and_(
+                        MovieListID.id_name == id_name,
+                        MovieListID.id_value == entry[id_name]))
+                       .first())
                 if res:
+                    log.debug('found movie %s', res)
                     return res
         # Fall back to title/year match
         if 'movie_name' in entry and 'movie_year' in entry:

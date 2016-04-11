@@ -119,6 +119,9 @@ class TestListInterface(object):
               - {title: 'Drumline 2002 DVDRip x264-FuzerHD', url: "http://mock.url/Drumline 2002 DVDRip x264-FuzerHD.torrent", imdb_id: "tt0303933"}
             list_queue:
               - movie_list: test_list_queue
+
+          get_for_list_queue:
+             movie_list: test_list_queue
     """
 
     def test_list_add(self, execute_task):
@@ -241,3 +244,9 @@ class TestListInterface(object):
 
         task = execute_task('test_list_queue')
         assert len(task.accepted) == 2
+
+        assert task.find_entry(title="The 5th Wave 2016 720p BluRay DTS x264-FuzerHD")
+        assert task.find_entry(title="Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD")
+
+        task = execute_task('get_for_list_queue')
+        assert len(task.entries) == 0
