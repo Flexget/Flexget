@@ -111,9 +111,6 @@ class TestListInterface(object):
 
           test_list_queue:
             mock:
-              - {title: 'The 5th Wave 2016 720p BluRay DTS x264-FuzerHD', url: "http://mock.url/The 5th Wave 2016 720p BluRay DTS x264-FuzerHD.torrent", imdb_id: "tt2304933"}
-              - {title: 'The 5th Wave 2016 1080p BluRay DTS x264-FuzerHD', url: "http://mock.url/The 5th Wave 2016 1080p BluRay DTS x264-FuzerHD.torrent", imdb_id: "tt2304933"}
-              - {title: 'The 5th Wave 2016 DVDRip x264-FuzerHD', url: "http://mock.url/The 5th Wave 2016 DVDRip x264-FuzerHD.torrent", imdb_id: "tt2304933"}
               - {title: 'Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD', url: "http://mock.url/Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent", imdb_id: "tt0303933"}
               - {title: 'Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD', url: "http://mock.url/Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent", imdb_id: "tt0303933"}
               - {title: 'Drumline 2002 DVDRip x264-FuzerHD', url: "http://mock.url/Drumline 2002 DVDRip x264-FuzerHD.torrent", imdb_id: "tt0303933"}
@@ -243,10 +240,9 @@ class TestListInterface(object):
         assert len(task.entries) == 2
 
         task = execute_task('test_list_queue')
-        assert len(task.accepted) == 2
+        assert len(task.accepted) == 1
 
-        assert task.find_entry(title="The 5th Wave 2016 720p BluRay DTS x264-FuzerHD")
         assert task.find_entry(title="Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD")
 
         task = execute_task('get_for_list_queue')
-        assert len(task.entries) == 0
+        assert len(task.entries) == 2
