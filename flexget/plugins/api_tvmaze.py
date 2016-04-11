@@ -293,11 +293,13 @@ class TVMazeEpisodes(Base):
     @property
     def expired(self):
         if not self.last_update:
-            log.debug('no last update attribute, series set for update')
+            log.debug('no last update attribute, episode set for update')
             return True
         time_dif = datetime.now() - self.last_update
         expiration = time_dif.days > UPDATE_INTERVAL
-        log.debug('episode %s, season %s for series %s is expired.', self.number, self.season_number, self.series_id)
+        if expiration:
+            log.debug('episode %s, season %s for series %s is expired.', self.number, self.season_number,
+                      self.series_id)
         return expiration
 
 
@@ -389,7 +391,7 @@ def from_lookup(session=None, title=None):
 
 @with_session
 def add_to_lookup(session=None, title=None, series=None):
-    log.debug('trying to add lookup title {0} to series {1} in lookup table'.format(title, series.name))
+    log.debug('trying to add search title {0} to series {1} in lookup table'.format(title, series.name))
     exist = session.query(TVMazeLookup).filter(TVMazeLookup.search_name == title).first()
     if exist:
         log.debug('title {0} already exist for series {1}, no need to save lookup'.format(title, series.name))
@@ -485,7 +487,7 @@ class APITVMaze(object):
             if series and title.lower() == series.name.lower():
                 return series
             elif series and not search:
-                log.debug('mismatch between series title {0} and search title {1}. '
+                log.debug('mismatch between search title {0} and series title {1}. '
                           'saving in lookup table'.format(title, series.name))
                 add_to_lookup(session=session, title=title, series=series)
             elif series and search:
@@ -516,7 +518,7 @@ class APITVMaze(object):
         # Get series
         series = APITVMaze.series_lookup(session=session, only_cached=only_cached, **lookup_params)
         if not series:
-            raise LookupError('Could not find series with the following parameters: {0}'.format(**lookup_params))
+            raise LookupError('Could not find series with the following parameters: {0}'.format(lookup_params))
 
         # See if episode already exists in cache
         log.debug('searching for episode of show {0} in cache'.format(series.name))
@@ -533,14 +535,18 @@ class APITVMaze(object):
         # Logic for cache only mode
         if only_cached:
             if episode:
-                log.debug('forcing cache for episode {0}, season {1} for show {2}'.format(episode.number,
-                                                                                          episode.season_number,
-                                                                                          series.name))
+                log.debug('forcing cache for episode id {3}, number{0}, season {1} for show {2}'
+                          .format(episode.number,
+                                  episode.season_number,
+                                  series.name,
+                                  episode.tvmaze_id))
                 return episode
         if episode and not episode.expired:
-            log.debug('found episode {0}, season {1} for show {2} in cache'.format(episode.number,
-                                                                                   episode.season_number,
-                                                                                   series.name))
+            log.debug('found episode id {3}, number {0}, season {1} for show {2} in cache'
+                      .format(episode.number,
+                              episode.season_number,
+                              series.name,
+                              episode.tvmaze_id))
 
             return episode
 
