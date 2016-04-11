@@ -174,7 +174,7 @@ class CouchPotatoSet(MutableSet):
 
     @property
     def movies(self):
-        if self._movies == None:
+        if not self._movies:
             self._movies = CouchPotatoBase.list_entries(self.config)
         return self._movies
 
