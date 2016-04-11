@@ -245,4 +245,4 @@ class TestListInterface(object):
         assert task.find_entry(title="Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD")
 
         task = execute_task('get_for_list_queue')
-        assert len(task.entries) == 2
+        assert len(task.entries) == 1

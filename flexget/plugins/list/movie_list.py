@@ -154,7 +154,7 @@ class MovieList(MutableSet):
         for id_name in SUPPORTED_IDS:
             if id_name in entry:
                 log.debug('finding movie based off id %s:%s', id_name, entry[id_name])
-                res = (self._db_list(session).movies.filter(
+                res = (self._db_list(session).movies.join(MovieListMovie.ids).filter(
                     and_(
                         MovieListID.id_name == id_name,
                         MovieListID.id_value == entry[id_name]))
