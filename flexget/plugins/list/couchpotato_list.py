@@ -109,17 +109,17 @@ class CouchPotatoBase(object):
 
         entries = []
         for movie in active_movies_json['movies']:
-            quality_req = ''
+            quality = ''
             if movie['status'] == 'active':
                 if config.get('include_data') and profile_json:
                     for profile in profile_json['list']:
                         if profile['_id'] == movie['profile_id']:  # Matches movie profile with profile JSON
-                            quality_req = CouchPotatoBase.quality_requirement_builder(profile)
+                            quality = CouchPotatoBase.quality_requirement_builder(profile)
                 entry = Entry(title=movie["title"],
                               url='',
                               imdb_id=movie['info'].get('imdb'),
                               tmdb_id=movie['info'].get('tmdb_id'),
-                              quality_req=quality_req,
+                              quality=quality,
                               couchpotato_id=movie.get('_id'))
                 if entry.isvalid():
                     log.debug('returning entry %s', entry)
