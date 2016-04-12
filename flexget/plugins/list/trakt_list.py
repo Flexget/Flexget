@@ -306,7 +306,7 @@ class TraktList(object):
     # TODO: we should somehow invalidate this cache when the list is modified
     @cached('trakt_list', persist='2 hours')
     def on_task_input(self, task, config):
-        return TraktSet(config)
+        return list(TraktSet(config))
 
 
 class TraktAdd(object):
