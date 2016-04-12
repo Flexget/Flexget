@@ -100,6 +100,25 @@ class TestListInterface(object):
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
             list_reject:
               - entry_list: test_list
+
+          add_for_list_queue:
+            mock:
+              - {title: 'The 5th Wave', url: "", imdb_id: "tt2304933"}
+              - {title: 'Drumline', url: "", imdb_id: "tt0303933"}
+            accept_all: yes
+            list_add:
+              - movie_list: test_list_queue
+
+          test_list_queue:
+            mock:
+              - {title: 'Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD', url: "http://mock.url/Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent", imdb_id: "tt0303933"}
+              - {title: 'Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD', url: "http://mock.url/Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent", imdb_id: "tt0303933"}
+              - {title: 'Drumline 2002 DVDRip x264-FuzerHD', url: "http://mock.url/Drumline 2002 DVDRip x264-FuzerHD.torrent", imdb_id: "tt0303933"}
+            list_queue:
+              - movie_list: test_list_queue
+
+          get_for_list_queue:
+             movie_list: test_list_queue
     """
 
     def test_list_add(self, execute_task):
@@ -213,3 +232,17 @@ class TestListInterface(object):
 
         task = execute_task('test_list_reject')
         assert len(task.rejected) == 1
+
+    def test_list_queue(self, execute_task):
+        # List queue test is based off movie_list and not entry_list since it entry_list matching is a
+        # lot more strict so it doesn't make sense to use it with it
+        task = execute_task('add_for_list_queue')
+        assert len(task.entries) == 2
+
+        task = execute_task('test_list_queue')
+        assert len(task.accepted) == 1
+
+        assert task.find_entry(title="Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD")
+
+        task = execute_task('get_for_list_queue')
+        assert len(task.entries) == 1

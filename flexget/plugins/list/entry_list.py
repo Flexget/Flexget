@@ -13,6 +13,7 @@ from flexget import plugin
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.manager import Session
 from flexget.utils.database import safe_pickle_synonym, with_session
 
 log = logging.getLogger('entry_list')
@@ -68,12 +69,11 @@ class DBEntrySet(MutableSet):
     def _db_list(self, session):
         return session.query(EntryListList).filter(EntryListList.name == self.config).first()
 
-    @with_session
-    def __init__(self, config, session=None):
+    def __init__(self, config):
         self.config = config
-        db_list = self._db_list(session)
-        if not db_list:
-            session.add(EntryListList(name=self.config))
+        with Session() as session:
+            if not self._db_list(session):
+                session.add(EntryListList(name=self.config))
 
     def _entry_query(self, session, entry):
         db_entry = session.query(EntryListEntry).filter(and_(
@@ -108,6 +108,8 @@ class DBEntrySet(MutableSet):
 
     @with_session
     def add(self, entry, session=None):
+        # Evaluate all lazy fields so that no db access occurs during our db session
+        entry.values()
         stored_entry = self._entry_query(session, entry)
         if stored_entry:
             # Refresh all the fields if we already have this entry
@@ -118,11 +120,14 @@ class DBEntrySet(MutableSet):
             stored_entry = EntryListEntry(entry=entry, entry_list_id=self._db_list(session).id)
         session.add(stored_entry)
 
-    @with_session
-    def __ior__(self, other, session=None):
+    def __ior__(self, other):
         # Optimization to only open one session when adding multiple items
+        # Make sure lazy lookups are done before opening our session to prevent db locks
         for value in other:
-            self.add(value, session=session)
+            value.values()
+        with Session() as session:
+            for value in other:
+                self.add(value, session=session)
         return self
 
     @property
