@@ -6,7 +6,7 @@
 
   logModule.run(function ($state, route, sideNav, toolBar) {
     route.register('log', '/log', 'log-view');
-    sideNav.register('/log', 'Log', 'fa fa-file-text-o', 128);
+    sideNav.register('/log', 'Log', 'fa fa-file-text-o', 10);
     toolBar.registerButton('Log', 'fa fa-file-text-o', function () {
       $state.go('flexget.log')
     });
