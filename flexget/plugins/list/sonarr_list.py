@@ -12,7 +12,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 
-log = logging.getLogger('sonarr')
+log = logging.getLogger('sonarr_list')
 
 
 class SonarrSet(MutableSet):
@@ -58,9 +58,6 @@ class SonarrSet(MutableSet):
         url = '%s://%s:%s%s/api/Rootfolder' % (parsedurl.scheme, parsedurl.netloc, port, parsedurl.path)
         headers = {'X-Api-Key': api_key}
         return url, headers
-
-    def series_add_request(self, base_url, port, api_key):
-        pass
 
     def get_json(self, url, headers):
         try:
