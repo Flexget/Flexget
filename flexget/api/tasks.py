@@ -252,9 +252,7 @@ task_execution_input = {
         'inject': {'type': 'array',
                    'items': inject_input},
         'loglevel': {'type': "string",
-                     "enum":
-                         ['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
-                     'default': 'none'}
+                     "enum": ['critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace']}
     },
     'required': ['tasks']
 
