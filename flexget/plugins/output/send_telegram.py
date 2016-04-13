@@ -19,7 +19,7 @@ try:
 except ImportError:
     telegram = None
 
-_MIN_TELEGRAM_VER = '3.2.0'
+_MIN_TELEGRAM_VER = '3.4'
 
 _PLUGIN_NAME = 'send_telegram'
 
@@ -297,7 +297,7 @@ class SendTelegram(object):
                 try:
                     self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
                 except TelegramError as e:
-                    if kwargs['parse_mode'] and "can't parse message text" in e.message:
+                    if kwargs.get('parse_mode') and "can't parse message text" in e.message:
                         self.log.warning(
                                 'Failed to render message using parse mode %s. Falling back to basic parsing: %s' % (
                                     kwargs['parse_mode'], e.message))

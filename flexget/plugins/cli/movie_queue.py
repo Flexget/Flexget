@@ -19,6 +19,7 @@ except ImportError:
 
 def do_cli(manager, options):
     """Handle movie-queue subcommand"""
+    console('WARNING!: movie_queue plugin is deprecated. Please switch to using movie_list\n')
 
     if options.queue_action == 'list':
         queue_list(options)

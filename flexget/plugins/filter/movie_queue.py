@@ -128,7 +128,8 @@ class MovieQueue(queue_base.FilterQueueBase):
                     'queue_name': {'type': 'string'}
                 },
                 'required': ['action'],
-                'additionalProperties': False
+                'additionalProperties': False,
+                'deprecated': 'movie_queue plugin is deprecated. Please switch to using movie_list'
             }
         ]
     }

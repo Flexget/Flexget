@@ -1,8 +1,8 @@
 {
   "name": "FlexgetUI",
   "dependencies": {
-    "angular": "angularjs#~1.5.1",
-    "angular-material": "~1.1.0-RC1",
+    "angular": "angularjs#~1.5.3",
+    "angular-material": "1.1.0-rc1",
     "angular-ui-router": "ui-router#~0.2.15",
     "angular-filter": "~0.5.8",
     "angular-schema-form": "~0.8.12",
