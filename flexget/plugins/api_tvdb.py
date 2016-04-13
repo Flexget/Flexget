@@ -402,7 +402,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     if series:
         # Series found in cache, update if cache has expired.
         if not only_cached:
-            mark_expired(session=session)
+            mark_expired(session)
         if not only_cached and series.expired:
             log.verbose('Data for %s has expired, refreshing from tvdb', series.name)
             try:
@@ -518,8 +518,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
         raise LookupError('No results found for %s' % ep_description)
 
 
-@with_session
-def mark_expired(session=None):
+def mark_expired(session):
     """Marks series and episodes that have expired since we cached them"""
     # Only get the expired list every hour
     last_check = persist.get('last_check')
