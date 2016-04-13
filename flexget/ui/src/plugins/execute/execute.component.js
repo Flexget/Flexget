@@ -122,7 +122,7 @@
                 }
             };
 
-            var streamTask = function (name) {
+            /*var streamTask = function (name) {
                 var task = getTask(name);
 
                 var options = {};
@@ -146,9 +146,9 @@
                     .entry_dump(function (entries) {
                         task.entries = entries;
                     });
-            };
+            };*/
 
-            var done = vm.tasksInput.tasks.reduce(function (previous, taskName) {
+            /*var done = vm.tasksInput.tasks.reduce(function (previous, taskName) {
                 return previous.then(function () {
                     if (vm.stream.running) {
                         return streamTask(taskName);
@@ -159,9 +159,11 @@
             done.then(function () {
                 vm.stream.running = false;
                 vm.stream.percent = 100;
-            });
+            });*/
 
-
+            var options = {};
+            angular.copy(vm.options.settings, options);
+            tasks.execute(vm.tasksInput.tasks, options);
         };
 
         var getRunning = function () {
