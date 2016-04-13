@@ -145,7 +145,6 @@ class TVDBSeries(Base):
         except requests.RequestException as e:
             raise LookupError('Error updating data from tvdb: %s' % e)
 
-        self.id = series['id']
         self.language = 'en'
         self.last_updated = series['lastUpdated']
         self.name = series['seriesName']
@@ -273,6 +272,7 @@ class TVDBEpisode(Base):
         """
         self.series_id = series_id
         self.id = ep_id
+        self.expired = False
         try:
             episode = TVDBRequest().get('episodes/%s' % self.id)
         except requests.RequestException as e:
