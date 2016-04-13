@@ -290,7 +290,7 @@ class LogParser(object):
         else:
             self._query_parser = False
 
-        time_cmpnt = Word(nums).setParseAction(lambda t: int(t[0]) if 0 > int(t[0]) < 10 else t[0].zfill(2))
+        time_cmpnt = Word(nums).setParseAction(lambda t: t[0].zfill(2))
         date = Combine((time_cmpnt + '-' + time_cmpnt + '-' + time_cmpnt) + ' ' + time_cmpnt + ':' + time_cmpnt)
         word = Word(printables)
 
