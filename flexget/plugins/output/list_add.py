@@ -36,10 +36,10 @@ class ListAdd(object):
     def on_task_output(self, task, config):
         for item in config:
             for plugin_name, plugin_config in item.items():
-                if task.manager.options.test:
-                    log.info('Would add accepted items to `%s` outside of --test mode.' % plugin_name)
-                    continue
                 thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+                if task.manager.options.test and thelist.online:
+                    log.info('`%s` is marked as online, would add accepted items outside of --test mode.', plugin_name)
+                    continue
                 log.verbose('adding accepted entries into %s - %s', plugin_config, plugin_config)
                 thelist |= task.accepted
 

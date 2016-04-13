@@ -25,14 +25,15 @@ class ListRemove(object):
 
     def on_task_output(self, task, config):
         for item in config:
-            for plugin_name, plugin_config in item.iteritems():
-                if task.manager.options.test:
-                    log.info('Would remove accepted items from `%s` outside of --test mode.' % plugin_name)
-                    continue
+            for plugin_name, plugin_config in item.items():
                 try:
                     thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
                 except AttributeError:
                     raise PluginError('Plugin %s does not support list interface' % plugin_name)
+                if task.manager.options.test and thelist.online:
+                    log.info('`%s` is marked as online, would remove accepted items outside of --test mode.',
+                             plugin_name)
+                    continue
                 thelist -= task.accepted
 
 

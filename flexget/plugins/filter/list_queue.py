@@ -29,6 +29,10 @@ class ListQueue(object):
                     thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
                 except AttributeError:
                     raise PluginError('Plugin %s does not support list interface' % plugin_name)
+                if task.manager.options.test and thelist.online:
+                    log.info('`%s` is marked as online, would accept and remove items outside of --test mode.',
+                             plugin_name)
+                    continue
                 for entry in task.entries:
                     if entry in thelist:
                         entry.accept()
