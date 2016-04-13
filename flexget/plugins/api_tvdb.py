@@ -352,8 +352,7 @@ def find_series_id(name):
         raise LookupError('No results for `%s`' % name)
 
 
-@with_session
-def _update_search_strings(series, search=None, session=None):
+def _update_search_strings(series, session, search=None):
     search_strings = series.search_strings
     add = [series.name.lower()] + ([a.lower() for a in series.aliases] if series.aliases else []) + [search.lower()] if search else []
     for name in set(add):
@@ -408,7 +407,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
             try:
                 updated_series = TVDBSeries(series.id)
                 series = session.merge(updated_series)
-                _update_search_strings(series, search=name)
+                _update_search_strings(series, session, search=name)
             except LookupError as e:
                 log.warning('Error while updating from tvdb (%s), using cached data.', e.args[0])
         else:
@@ -420,14 +419,14 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         log.debug('Series %s not found in cache, looking up from tvdb.', id_str())
         if tvdb_id:
             series = session.merge(TVDBSeries(tvdb_id))
-            _update_search_strings(series, search=name)
+            _update_search_strings(series, session, search=name)
         elif name:
             tvdb_id = find_series_id(name)
             if tvdb_id:
                 series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
                 if not series:
                     series = session.merge(TVDBSeries(tvdb_id))
-                    _update_search_strings(series, search=name)
+                    _update_search_strings(series, session, search=name)
 
     if not series:
         raise LookupError('No results found from tvdb for %s' % id_str())
