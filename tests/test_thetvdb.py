@@ -237,6 +237,18 @@ class TestTVDBExpire(object):
                 assert ep.expired
                 assert ep.series.expired
 
+        # Run the task again, should be re-populated from tvdb
+        test_run()
+
+        with Session() as session:
+            ep = session.query(TVDBEpisode)\
+                .filter(TVDBEpisode.series_id == 73255)\
+                .filter(TVDBEpisode.episode_number == 2)\
+                .filter(TVDBEpisode.season_number == 2)\
+                .first()
+            assert not ep.expired
+            assert not ep.series.expired
+
 
 @mock.patch('flexget.plugins.api_tvdb.mark_expired')
 @pytest.mark.online
