@@ -266,12 +266,13 @@ class TVDBEpisode(Base):
 
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=False)
 
-    def __init__(self, id):
+    def __init__(self, series_id, ep_id):
         """
         Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
         """
-        self.id = id
+        self.series_id = series_id
+        self.id = ep_id
         try:
             episode = TVDBRequest().get('episodes/%s' % self.id)
         except requests.RequestException as e:
@@ -489,7 +490,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
         if episode.expired and not only_cached:
             log.info('Data for %r has expired, refreshing from tvdb', episode)
             try:
-                updated_episode = TVDBEpisode(id=series.id)
+                updated_episode = TVDBEpisode(series.id, episode.id)
                 episode = session.merge(updated_episode)
             except LookupError as e:
                 log.warning('Error while updating from tvdb (%s), using cached data.' % str(e))
@@ -506,9 +507,9 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
                 # Check if this episode id is already in our db
                 episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == results[0]['id']).first()
                 if not episode or (episode and episode.expired is not False):
-                    episode = session.merge(TVDBEpisode(id=results[0]['id']))
+                    updated_episode = TVDBEpisode(series.id, results[0]['id'])
+                    episode = session.merge(updated_episode)
 
-                episode.series = series
         except requests.RequestException as e:
             raise LookupError('Error looking up episode from TVDb (%s)' % e)
     if episode:
