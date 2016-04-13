@@ -189,8 +189,8 @@ class TestTVDBExpire(object):
         with mock.patch('requests.sessions.Session.request',
                         side_effect=Exception('Tried to expire or lookup, less then an hour since last check')) as _:
             # Ensure series is not marked as expired
-            mark_expired()
             with Session() as session:
+                mark_expired(session)
                 ep = session.query(TVDBEpisode)\
                     .filter(TVDBEpisode.series_id == 73255)\
                     .filter(TVDBEpisode.episode_number == 2)\
@@ -227,8 +227,8 @@ class TestTVDBExpire(object):
 
         # Ensure series is marked as expired
         with mock.patch.object(TVDBRequest, 'get', side_effect=[expired_data]) as _:
-            mark_expired()
             with Session() as session:
+                mark_expired(session)
                 ep = session.query(TVDBEpisode)\
                     .filter(TVDBEpisode.series_id == 73255)\
                     .filter(TVDBEpisode.episode_number == 2)\
@@ -236,6 +236,18 @@ class TestTVDBExpire(object):
                     .first()
                 assert ep.expired
                 assert ep.series.expired
+
+        # Run the task again, should be re-populated from tvdb
+        test_run()
+
+        with Session() as session:
+            ep = session.query(TVDBEpisode)\
+                .filter(TVDBEpisode.series_id == 73255)\
+                .filter(TVDBEpisode.episode_number == 2)\
+                .filter(TVDBEpisode.season_number == 2)\
+                .first()
+            assert not ep.expired
+            assert not ep.series.expired
 
 
 @mock.patch('flexget.plugins.api_tvdb.mark_expired')

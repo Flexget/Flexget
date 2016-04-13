@@ -1,4 +1,9 @@
 <div layout="column" flex layout-align="center">
+    <md-toolbar class="md-accent">
+        <span class="md-toolbar-tools" flex>
+            Please note that performed operations on this page might not be persistent. Depending on your config, settings might get overriden and data might be recreated.
+        </span>
+    </md-toolbar>
     <h1 class="md-headline text-center">{{ vm.show }}</h1>
         <md-button class="md-primary md-raised" 
             ng-click="vm.goBack()">Back</md-button>

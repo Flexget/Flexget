@@ -1,13 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
 from builtins import object
 import json
 import mock
 import os
 
-from flexget.utils.qualities import Requirements
-
-movie_list_file = os.path.join(os.path.dirname(__file__), 'couchpotoato_movie_list_test_response.json')
-qualities_profiles_file = os.path.join(os.path.dirname(__file__), 'couchpotoato_quality_profile_test_response.json')
+movie_list_file = os.path.join(os.path.dirname(__file__), 'couchpotato_movie_list_test_response.json')
+qualities_profiles_file = os.path.join(os.path.dirname(__file__), 'couchpotato_quality_profile_test_response.json')
 
 with open(movie_list_file, "r") as data:
     movie_list_response = json.load(data)
@@ -20,13 +17,13 @@ class TestCouchpotato(object):
     config = """
         tasks:
           couch:
-            couchpotato:
+            couchpotato_list:
               base_url: 'http://test.url.com'
               port: 5050
               api_key: '123abc'
         """
 
-    @mock.patch('flexget.plugins.input.couchpotato.CouchPotato.get_json')
+    @mock.patch('flexget.plugins.list.couchpotato_list.CouchPotatoBase.get_json')
     def test_couchpotato_no_data(self, mock_get, execute_task):
         mock_get.return_value = movie_list_response
 
@@ -52,7 +49,7 @@ class TestCouchpotatoWithQuality(object):
                           'Deadpool': '1080p',
                           'Doug Benson: Doug Dynasty': '720p',
                           'Ghostbusters': '720p',
-                          'The Gift': '720p|1080p bluray|dvdrip',
+                          'The Gift': '720p|1080p dvdrip|bluray',
                           'Hail, Caesar!': '720p',
                           'I Am Chris Farley': '720p|1080p',
                           'Inside Out': '720p',
@@ -75,7 +72,7 @@ class TestCouchpotatoWithQuality(object):
     config = """
         tasks:
           couch:
-            couchpotato:
+            couchpotato_list:
               base_url: 'http://test.url.com'
               port: 5050
               api_key: '123abc'
@@ -87,11 +84,11 @@ class TestCouchpotatoWithQuality(object):
         assert entry['title'] in self.expected_qualities , 'Could not find entry {} in qualities list.'.format(entry)
         expected_quality = self.expected_qualities[entry['title']]
 
-        assert Requirements(expected_quality) == entry['quality_req'], \
+        assert entry['quality_req'] == expected_quality, \
             'Expected Quality for entry {} should be {}, instead its {}'.format(entry['title'], expected_quality,
                                                                                 entry.store['quality_req'])
 
-    @mock.patch('flexget.plugins.input.couchpotato.CouchPotato.get_json')
+    @mock.patch('flexget.plugins.list.couchpotato_list.CouchPotatoBase.get_json')
     def test_couchpotato_with_quality(self, mock_get, execute_task):
         mock_get.side_effect = [movie_list_response, qualities_response]
         task = execute_task('couch')

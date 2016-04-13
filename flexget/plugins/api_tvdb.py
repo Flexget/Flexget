@@ -145,7 +145,6 @@ class TVDBSeries(Base):
         except requests.RequestException as e:
             raise LookupError('Error updating data from tvdb: %s' % e)
 
-        self.id = series['id']
         self.language = 'en'
         self.last_updated = series['lastUpdated']
         self.name = series['seriesName']
@@ -266,12 +265,14 @@ class TVDBEpisode(Base):
 
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=False)
 
-    def __init__(self, id):
+    def __init__(self, series_id, ep_id):
         """
         Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
         """
-        self.id = id
+        self.series_id = series_id
+        self.id = ep_id
+        self.expired = False
         try:
             episode = TVDBRequest().get('episodes/%s' % self.id)
         except requests.RequestException as e:
@@ -352,8 +353,7 @@ def find_series_id(name):
         raise LookupError('No results for `%s`' % name)
 
 
-@with_session
-def _update_search_strings(series, search=None, session=None):
+def _update_search_strings(series, session, search=None):
     search_strings = series.search_strings
     add = [series.name.lower()] + ([a.lower() for a in series.aliases] if series.aliases else []) + [search.lower()] if search else []
     for name in set(add):
@@ -402,13 +402,13 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     if series:
         # Series found in cache, update if cache has expired.
         if not only_cached:
-            mark_expired(session=session)
+            mark_expired(session)
         if not only_cached and series.expired:
             log.verbose('Data for %s has expired, refreshing from tvdb', series.name)
             try:
                 updated_series = TVDBSeries(series.id)
                 series = session.merge(updated_series)
-                _update_search_strings(series, search=name)
+                _update_search_strings(series, session, search=name)
             except LookupError as e:
                 log.warning('Error while updating from tvdb (%s), using cached data.', e.args[0])
         else:
@@ -420,14 +420,14 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         log.debug('Series %s not found in cache, looking up from tvdb.', id_str())
         if tvdb_id:
             series = session.merge(TVDBSeries(tvdb_id))
-            _update_search_strings(series, search=name)
+            _update_search_strings(series, session, search=name)
         elif name:
             tvdb_id = find_series_id(name)
             if tvdb_id:
                 series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
                 if not series:
                     series = session.merge(TVDBSeries(tvdb_id))
-                    _update_search_strings(series, search=name)
+                    _update_search_strings(series, session, search=name)
 
     if not series:
         raise LookupError('No results found from tvdb for %s' % id_str())
@@ -490,7 +490,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
         if episode.expired and not only_cached:
             log.info('Data for %r has expired, refreshing from tvdb', episode)
             try:
-                updated_episode = TVDBEpisode(id=series.id)
+                updated_episode = TVDBEpisode(series.id, episode.id)
                 episode = session.merge(updated_episode)
             except LookupError as e:
                 log.warning('Error while updating from tvdb (%s), using cached data.' % str(e))
@@ -507,9 +507,9 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
                 # Check if this episode id is already in our db
                 episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == results[0]['id']).first()
                 if not episode or (episode and episode.expired is not False):
-                    episode = session.merge(TVDBEpisode(id=results[0]['id']))
+                    updated_episode = TVDBEpisode(series.id, results[0]['id'])
+                    episode = session.merge(updated_episode)
 
-                episode.series = series
         except requests.RequestException as e:
             raise LookupError('Error looking up episode from TVDb (%s)' % e)
     if episode:
@@ -518,8 +518,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
         raise LookupError('No results found for %s' % ep_description)
 
 
-@with_session
-def mark_expired(session=None):
+def mark_expired(session):
     """Marks series and episodes that have expired since we cached them"""
     # Only get the expired list every hour
     last_check = persist.get('last_check')

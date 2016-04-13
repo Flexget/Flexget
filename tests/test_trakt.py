@@ -234,7 +234,6 @@ class TestTraktWatchedAndCollected(object):
               username: flexgettest
               list: test
               type: shows
-              strip_dates: yes
             if:
               - trakt_collected: accept
           test_trakt_show_watched_progress:
@@ -245,7 +244,6 @@ class TestTraktWatchedAndCollected(object):
               username: flexgettest
               list: test
               type: shows
-              strip_dates: yes
             if:
               - trakt_watched: accept
     """

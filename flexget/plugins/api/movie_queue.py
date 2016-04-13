@@ -12,7 +12,7 @@ from flexget.plugins.api.series import NoResultFound
 from flexget.plugins.filter import movie_queue as mq
 from flexget.utils import qualities
 
-movie_queue_api = api.namespace('movie_queue', description='Movie Queue operations')
+movie_queue_api = api.namespace('movie_queue', description='Movie Queue operations (DEPRECATED)')
 
 default_error_schema = {
     'type': 'object',
@@ -102,7 +102,7 @@ movie_edit_input_schema = {
 
 movie_edit_input_schema = api.schema('movie_edit_input_schema', movie_edit_input_schema)
 
-
+@api.deprecated
 @movie_queue_api.route('/')
 class MovieQueueAPI(APIResource):
     @api.response(404, 'Page does not exist', model=default_error_schema)
@@ -174,7 +174,7 @@ class MovieQueueAPI(APIResource):
         reply.status_code = 201
         return reply
 
-
+@api.deprecated
 @api.response(404, 'ID not found', model=default_error_schema)
 @movie_queue_api.route('/<id>/')
 @api.doc(params={'id': 'ID of Queued Movie'})

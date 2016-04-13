@@ -14,42 +14,6 @@ from flexget.plugins.api_trakt import get_api_url, get_session, make_list_slug
 log = logging.getLogger('trakt_list')
 
 
-field_maps = {
-    'movie': {
-        'title': lambda i: '%s (%s)' % (i['movie']['title'], i['movie']['year']),
-        'movie_name': 'movie.title',
-        'movie_year': 'movie.year',
-        'imdb_id': 'movie.ids.imdb',
-        'tmdb_id': 'movie.ids.tmdb',
-        'trakt_movie_id': 'movie.ids.trakt',
-        'trakt_movie_slug': 'movie.ids.slug'
-    },
-    'show': {
-        'title': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
-        'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
-        'imdb_id': 'show.ids.imdb',
-        'tvdb_id': 'show.ids.tvdb',
-        'tvrage_id': 'show.ids.tvrage',
-        'tmdb_id': 'show.ids.tmdb',
-        'trakt_show_id': 'show.ids.trakt',
-        'trakt_slug': 'show.ids.slug'
-    },
-    'episode': {
-        'title': lambda i: ('%s (%s) S%02dE%02d %s' % (i['show']['title'], i['show']['year'], i['episode']['season'],
-                                                       i['episode']['number'], i['episode']['title'] or '')).strip(),
-        'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
-        'series_season': 'episode.season',
-        'series_episode': 'episode.number',
-        'series_id': lambda i: 'S%02dE%02d' % (i['episode']['season'], i['episode']['number']),
-        'imdb_id': 'show.ids.imdb',
-        'tvdb_id': 'show.ids.tvdb',
-        'tvrage_id': 'show.ids.tvrage',
-        'trakt_episode_id': 'episode.ids.trakt',
-        'trakt_show_id': 'show.ids.trakt',
-        'trakt_show_slug': 'show.ids.slug',
-        'trakt_ep_name': 'episode.title'
-    }
-}
 
 
 class TraktList(object):

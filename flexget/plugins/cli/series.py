@@ -10,7 +10,7 @@ from flexget.logger import console
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.filter.series import (Series, forget_series, forget_series_episode, set_series_begin,
+    from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
                                                normalize_series_name, new_eps_after, get_latest_release,
                                                get_series_summary, shows_by_name, show_episodes, shows_by_exact_name)
 except ImportError:
@@ -23,8 +23,10 @@ def do_cli(manager, options):
         display_summary(options)
     elif options.series_action == 'show':
         display_details(options.series_name)
+    elif options.series_action == 'remove':
+        remove(manager, options)
     elif options.series_action == 'forget':
-        forget(manager, options)
+        remove(manager, options, forget=True)
     elif options.series_action == 'begin':
         begin(manager, options)
 
@@ -120,29 +122,30 @@ def begin(manager, options):
         manager.config_changed()
 
 
-def forget(manager, options):
+def remove(manager, options, forget=False):
     name = options.series_name
 
     if options.episode_id:
         # remove by id
         identifier = options.episode_id
         try:
-            forget_series_episode(name, identifier)
+            remove_series_episode(name, identifier, forget)
             console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
         except ValueError:
             # Try upper casing identifier if we fail at first
             try:
-                forget_series_episode(name, identifier.upper())
+                remove_series_episode(name, identifier.upper(), forget)
                 console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
             except ValueError as e:
-                console(e.message)
+                console(e.args[0])
+
     else:
         # remove whole series
         try:
-            forget_series(name)
+            remove_series(name, forget)
             console('Removed series `%s` from database.' % name.capitalize())
         except ValueError as e:
-            console(e.message)
+            console(e.args[0])
 
     manager.config_changed()
 
@@ -255,5 +258,9 @@ def register_parser_arguments():
                               help='episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
                                    'depending on how the series is numbered)')
     forget_parser = subparsers.add_parser('forget', parents=[series_parser],
-                                          help='removes episodes or whole series from the series database')
+                                          help='removes episodes or whole series from the entire database '
+                                               '(including seen plugin)')
     forget_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
+    delete_parser = subparsers.add_parser('remove', parents=[series_parser],
+                                          help='removes episodes or whole series from the series database only')
+    delete_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
