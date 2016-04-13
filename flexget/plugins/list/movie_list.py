@@ -175,6 +175,12 @@ class MovieList(MutableSet):
     def immutable(self):
         return False
 
+    @property
+    def online(self):
+        """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
+        like test mode"""
+        return False
+
 
 class PluginMovieList(object):
     """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""

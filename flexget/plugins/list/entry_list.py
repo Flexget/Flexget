@@ -138,6 +138,12 @@ class DBEntrySet(MutableSet):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
         return set(it)
 
+    @property
+    def online(self):
+        """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
+        like test mode"""
+        return False
+
 
 class EntryList(object):
     schema = {'type': 'string'}

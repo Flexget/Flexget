@@ -296,6 +296,12 @@ class TraktSet(MutableSet):
         else:
             log.error('Unknown error submitting data to trakt.tv: %s' % result.text)
 
+    @property
+    def online(self):
+        """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
+        like test mode"""
+        return True
+
 
 class TraktList(object):
     schema = TraktSet.schema

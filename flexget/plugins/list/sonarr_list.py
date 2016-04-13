@@ -257,6 +257,12 @@ class SonarrSet(MutableSet):
     def immutable(self):
         return False
 
+    @property
+    def online(self):
+        """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
+        like test mode"""
+        return True
+
 
 class SonarrList(object):
     schema = SonarrSet.schema
