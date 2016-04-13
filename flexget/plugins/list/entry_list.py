@@ -62,7 +62,7 @@ class EntryListEntry(Base):
     added = Column(DateTime, default=datetime.now)
     title = Column(Unicode)
     original_url = Column(Unicode)
-    _entry = Column('json', Unicode)
+    _json = Column('json', Unicode)
     entry = entry_synonym('_json')
 
     def __init__(self, entry, entry_list_id):
