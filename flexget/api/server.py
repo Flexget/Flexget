@@ -1,21 +1,20 @@
-from builtins import range
-from builtins import object
+from builtins import range, object
+
 import os
-import logging
 import json
+import logging
+import os
 from time import sleep
 
 import cherrypy
-
 from flask import Response
-
-from pyparsing import Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, Combine
+from flask_restplus import inputs
+from pyparsing import Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, \
+    Combine
 from pyparsing import nums, alphanums, printables
 
-from flask_restplus import inputs
-
-from flexget.api import api, APIResource, ApiError, __version__ as __api_version__
 from flexget._version import __version__
+from flexget.api import api, APIResource, ApiError, __version__ as __api_version__
 
 log = logging.getLogger('api.server')
 
@@ -53,11 +52,12 @@ class ServerPIDAPI(APIResource):
     @api.response(200, description='Reloaded config', model=pid_schema)
     def get(self, session=None):
         """ Get server PID """
-        return{'pid': os.getpid()}
+        return {'pid': os.getpid()}
 
 
 shutdown_parser = api.parser()
-shutdown_parser.add_argument('force', type=inputs.boolean, required=False, default=False, help='Ignore tasks in the queue')
+shutdown_parser.add_argument('force', type=inputs.boolean, required=False, default=False,
+                             help='Ignore tasks in the queue')
 
 
 @server_api.route('/shutdown/')
@@ -151,7 +151,6 @@ def file_inode(filename):
 
 @server_api.route('/log/')
 class ServerLogAPI(APIResource):
-
     @api.doc(parser=server_log_parser)
     @api.response(200, description='Streams as line delimited JSON')
     def get(self, session=None):
@@ -294,8 +293,8 @@ class LogParser(object):
         else:
             self._query_parser = False
 
-        integer = Word(nums).setParseAction(lambda t: int(t[0]))
-        date = Combine((integer + '-' + integer + '-' + integer) + ' ' + integer + ':' + integer)
+        time_cmpnt = Word(nums).setParseAction(lambda t: t[0].zfill(2))
+        date = Combine((time_cmpnt + '-' + time_cmpnt + '-' + time_cmpnt) + ' ' + time_cmpnt + ':' + time_cmpnt)
         word = Word(printables)
 
         self._log_parser = (

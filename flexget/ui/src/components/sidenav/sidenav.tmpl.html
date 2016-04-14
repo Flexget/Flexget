@@ -1,7 +1,7 @@
 <md-sidenav layout="column" class="nav-menu md-sidenav-left md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')">
     <md-content layout="column" flex>
         <md-list>
-            <md-list-item ng-repeat="item in ::vm.navItems">
+            <md-list-item ng-repeat="item in ::vm.navItems | orderBy : 'order'">
                 <md-button href="{{ ::item.href }}" ng-click="vm.close()" flex>
                     <md-icon class="{{ ::item.icon }}"></md-icon>
                     {{ ::item.caption }}

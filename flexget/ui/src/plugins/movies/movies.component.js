@@ -16,6 +16,7 @@
     $http.get('/api/movie_list/').success(function(data) {
       console.log(data);
       vm.lists = data.movie_lists;
+      vm.loadMovies(vm.lists[0].id);
     }).error(function(err) {
       console.log(err);
     });
