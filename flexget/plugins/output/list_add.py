@@ -41,7 +41,7 @@ class ListAdd(object):
                     log.info('`%s` is marked as an online plugin, would add accepted items outside of --test mode. '
                              'Skipping', plugin_name)
                     continue
-                log.verbose('adding accepted entries into %s - %s', plugin_config, plugin_config)
+                log.verbose('adding accepted entries into %s - %s', plugin_name, plugin_config)
                 thelist |= task.accepted
 
 
