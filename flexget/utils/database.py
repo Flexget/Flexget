@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import str
-from past.builtins import basestring, unicode, long
+from past.builtins import basestring, long, unicode
+
 import functools
 from collections import Mapping
 from datetime import datetime

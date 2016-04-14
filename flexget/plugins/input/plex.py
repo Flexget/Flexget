@@ -1,11 +1,12 @@
 """Plugin for plex media server (www.plexapp.com)."""
 from builtins import object
-from xml.dom.minidom import parseString
+
 import re
 import logging
 import os
 from os.path import basename
 from socket import gethostbyname
+from xml.dom.minidom import parseString
 
 from flexget import plugin
 from flexget.entry import Entry

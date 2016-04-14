@@ -1,6 +1,5 @@
 from __future__ import absolute_import, division, unicode_literals
 from past.builtins import basestring
-from builtins import str
 
 import copy
 import random

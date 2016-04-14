@@ -1,12 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
-import re
-import urllib.request, urllib.parse, urllib.error
-import logging
+from builtins import str, object
+from future.moves.urllib.parse import quote_plus
 
+import re
+import logging
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -130,7 +127,7 @@ class UrlRewriteIPTorrents(object):
 
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
-            query = urllib.parse.quote_plus(query.encode('utf8'))
+            query = quote_plus(query.encode('utf8'))
 
             url = "{base_url}/t?{filter}&q={query}&qf=".format(base_url=BASE_URL, filter=filter_url, query=query)
             log.debug('searching with url: %s' % url)

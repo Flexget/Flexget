@@ -1,17 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object, next
+from future.moves.urllib.parse import urlparse, SplitResult, urlsplit, urlunsplit, quote
+from future.moves.urllib.error import URLError
+
+
 import itertools
 import logging
 import threading
 import socket
-from urllib.parse import urlparse, SplitResult, urlsplit, urlunsplit
 import struct
 from random import randrange
 from http.client import BadStatusLine
-from urllib.parse import quote
-from urllib.error import URLError
 
 from flexget import plugin
 from flexget.event import event

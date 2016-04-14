@@ -1,15 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
-from urllib.parse import urljoin, urlparse
-from collections import namedtuple
-from itertools import groupby
+from future.moves.urllib.parse import urljoin, urlparse
+
 import logging
 import os
 import posixpath
-from functools import partial
 import time
+from functools import partial
+from collections import namedtuple
+from itertools import groupby
+
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry

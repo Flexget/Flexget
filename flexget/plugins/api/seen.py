@@ -1,11 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
+from future.moves.urllib.parse import unquote
 
 import copy
 from math import ceil
-from operator import itemgetter
-from urllib.parse import unquote
 
 from flask import jsonify, request
 from flask_restplus import inputs

@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import object
-from difflib import SequenceMatcher
+
 import logging
+from difflib import SequenceMatcher
 
 from flexget import plugin
 from flexget.event import event

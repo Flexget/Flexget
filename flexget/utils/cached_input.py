@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str
-from builtins import object
+from builtins import str, object
+
 import copy
 import logging
 import hashlib
@@ -15,7 +15,6 @@ from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.database import entry_synonym
 from flexget.utils.tools import parse_timedelta, TimedDict
-from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column

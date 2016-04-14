@@ -1,4 +1,5 @@
 from builtins import object
+
 import logging
 
 from flexget import plugin

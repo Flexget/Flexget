@@ -1,11 +1,6 @@
 from __future__ import absolute_import, division, unicode_literals
-from builtins import next
-from builtins import map
-from builtins import str
-from builtins import range
-from builtins import filter
+from builtins import next, map, str, range, filter, object
 from past.builtins import basestring
-from builtins import object
 
 import copy
 import hashlib

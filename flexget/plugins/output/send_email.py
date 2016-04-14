@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str
-from builtins import object
+from builtins import object, str
+
 import logging
 import smtplib
 import socket
@@ -14,7 +14,6 @@ from flexget import config_schema, manager, plugin
 from flexget.event import event
 from flexget.utils.template import render_from_task, get_template, RenderError
 from flexget.utils.tools import merge_dict_from_to, MergeException
-from flexget import validator
 from flexget.config_schema import one_or_more
 
 log = logging.getLogger('email')

@@ -1,14 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
+from builtins import str, object
 from past.builtins import basestring
-from builtins import object
+from future.moves.urllib.parse import urljoin
+from future.moves.urllib import request
+
 import glob
 import logging
 import os
-import urllib.request, urllib.parse, urllib.error
-import urllib.parse
 import os.path
 
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, DateTime, Boolean
@@ -191,7 +189,7 @@ class SubtitleQueue(object):
                     if not file.lower().endswith(VIDEO_EXTENSIONS):
                         continue
                     file = normalize_path(os.path.join(path_dir, file))
-                    entry['url'] = urllib.parse.urljoin('file:', urllib.request.pathname2url(file))
+                    entry['url'] = urljoin('file:', request.pathname2url(file))
                     entry['location'] = file
                     entry['title'] = os.path.splitext(os.path.basename(file))[0]  # filename without ext
                     entry['subtitle_languages'] = primary

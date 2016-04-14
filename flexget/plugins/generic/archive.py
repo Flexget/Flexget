@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str
-from builtins import object
+from builtins import str, object
+
 from collections import defaultdict
 import logging
 import re

@@ -1,20 +1,14 @@
-""" Plugin Loading & Management.
-"""
-
 from __future__ import absolute_import, division, unicode_literals
-from future import standard_library
-standard_library.install_aliases()
-from builtins import map
-from builtins import str
+from builtins import map, str
 from past.builtins import basestring
-from builtins import object
+from future.moves.urllib.error import HTTPError, URLError
 
 import logging
 import os
 import re
 import time
 import warnings
-
+from http.client import BadStatusLine
 
 from path import Path
 from requests import RequestException
@@ -124,16 +118,14 @@ class internet(object):
     def __call__(self, func):
 
         def wrapped_func(*args, **kwargs):
-            from http.client import BadStatusLine
-            import urllib.request, urllib.error, urllib.parse
             try:
                 return func(*args, **kwargs)
             except RequestException as e:
                 log.debug('decorator caught RequestException. handled traceback:', exc_info=True)
                 raise PluginError('RequestException: %s' % e)
-            except urllib.error.HTTPError as e:
+            except HTTPError as e:
                 raise PluginError('HTTPError %s' % e.code, self.log)
-            except urllib.error.URLError as e:
+            except URLError as e:
                 log.debug('decorator caught urlerror. handled traceback:', exc_info=True)
                 raise PluginError('URLError %s' % e.reason, self.log)
             except BadStatusLine:

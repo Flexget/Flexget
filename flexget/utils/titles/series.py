@@ -1,15 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import map, range, str
 from past.builtins import cmp
-from builtins import map
-from builtins import str
-from builtins import range
+
 import logging
+import re
 from datetime import datetime, timedelta
 from string import capwords
 
 from dateutil.parser import parse as parsedate
 
-import re
 from flexget.utils.titles.parser import TitleParser
 from flexget.plugins.parsers import ParseWarning
 from flexget.plugins.parsers.parser_common import default_ignore_prefixes, name_to_re

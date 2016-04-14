@@ -1,16 +1,16 @@
-from future import standard_library
-standard_library.install_aliases()
+from __future__ import unicode_literals, division, absolute_import
 from builtins import bytes, zip, map, range, object
+from future.moves.urllib.parse import urlparse
+from future.moves import xmlrpc
 from future.utils import native_str
+
 import logging
 import sys
 import os
 import socket
 import re
-import xmlrpc.client
 import http.client
 from time import sleep
-from urllib.parse import urlparse
 
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub

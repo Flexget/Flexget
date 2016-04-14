@@ -1,9 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
+from future.moves.urllib.parse import quote
+
 import logging
-import urllib.request, urllib.parse, urllib.error
 
 from flexget import plugin
 from flexget.event import event
@@ -19,7 +18,7 @@ class UrlRewriteCinemageddon(object):
 
     def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('details.php?id=', 'download.php?id=')
-        entry['url'] += '&name=%s.torrent' % (urllib.parse.quote(entry['title'], safe=''))
+        entry['url'] += '&name=%s.torrent' % (quote(entry['title'], safe=''))
 
 
 @event('plugin.register')

@@ -1,13 +1,11 @@
 from __future__ import absolute_import, division, unicode_literals
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import map
+from builtins import str, map
 from past.builtins import basestring
+
+from future.moves.urllib.parse import urlparse, parse_qsl
 
 import os
 import re
-import urllib.parse
 import logging
 from collections import defaultdict
 from datetime import datetime
@@ -85,11 +83,11 @@ def resolve_ref(uri):
     """
     Finds and returns a schema pointed to by `uri` that has been registered in the register_schema function.
     """
-    parsed = urllib.parse.urlparse(uri)
+    parsed = urlparse(uri)
     if parsed.path in schema_paths:
         schema = schema_paths[parsed.path]
         if callable(schema):
-            return schema(**dict(urllib.parse.parse_qsl(parsed.query)))
+            return schema(**dict(parse_qsl(parsed.query)))
         return schema
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 

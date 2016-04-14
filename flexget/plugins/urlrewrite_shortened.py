@@ -1,12 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
+from future.moves.urllib.parse import urlparse
+
 import logging
-from urllib.parse import urlparse
 
 from flexget import plugin
-from flexget.utils import requests
 from flexget.event import event
 
 log = logging.getLogger('shortened')

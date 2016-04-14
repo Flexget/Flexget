@@ -1,8 +1,12 @@
+from __future__ import absolute_import, division, unicode_literals
+
 import base64
+
 from flask import request, jsonify, session as flask_session
 from flask.ext.login import login_user, LoginManager, current_user, current_app
 from flask_restplus import inputs
 from werkzeug.security import check_password_hash
+
 from flexget.api import api, APIResource, app
 from flexget.utils.database import with_session
 from flexget.webserver import User

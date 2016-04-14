@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
+
 import logging
 
 from flexget import options

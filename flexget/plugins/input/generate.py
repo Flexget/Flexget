@@ -1,12 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import range
-from builtins import object
+from builtins import object, range
+
 import logging
 
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
-from flexget import validator
 
 log = logging.getLogger(__name__.rsplit('.')[-1])
 

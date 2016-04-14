@@ -1,9 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
+from future.moves.urllib.parse import quote
+
 import re
-import urllib.request, urllib.parse, urllib.error
 import logging
 
 from flexget import plugin
@@ -129,7 +128,7 @@ class UrlRewritePirateBay(object):
             # TPB search doesn't like dashes
             query = query.replace('-', ' ')
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = 'http://thepiratebay.%s/search/%s%s' % (CUR_TLD, urllib.parse.quote(query.encode('utf-8')), filter_url)
+            url = 'http://thepiratebay.%s/search/%s%s' % (CUR_TLD, quote(query.encode('utf-8')), filter_url)
             log.debug('Using %s as piratebay search url' % url)
             page = requests.get(url).content
             soup = get_soup(page)

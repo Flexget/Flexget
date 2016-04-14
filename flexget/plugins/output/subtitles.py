@@ -1,8 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
-from xmlrpc.client import ServerProxy
+from future.moves.xmlrpc.client import ServerProxy
+
 import re
 import difflib
 import os.path

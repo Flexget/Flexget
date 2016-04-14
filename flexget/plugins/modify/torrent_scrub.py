@@ -1,11 +1,8 @@
-""" Torrent Scrubber Plugin.
-"""
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str
-from builtins import object
+from builtins import str, object
 import logging
 
-from flexget import plugin, validator
+from flexget import plugin
 from flexget.event import event
 from flexget.plugins.modify.torrent import TorrentFilename
 from flexget.utils import bittorrent

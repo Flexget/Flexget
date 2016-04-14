@@ -1,8 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import zip
-from builtins import str
+from builtins import zip, str, object
 from past.builtins import basestring
-from builtins import object
+
 import re
 import copy
 import logging

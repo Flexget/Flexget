@@ -1,17 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
-import os
+from builtins import str, object
+
 import logging
 import re
-import urllib.parse
 import xmlrpc.client
 
 from flexget import plugin
 from flexget.event import event
-from flexget.entry import Entry
 from flexget.utils.template import RenderError
 from flexget.plugin import get_plugin_by_name
 

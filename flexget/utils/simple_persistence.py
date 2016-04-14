@@ -6,12 +6,12 @@ Avoid using this module on your own or in plugins, this was originally made for 
 You can safely use task.simple_persistence and manager.persist, if we implement something better we
 can replace underlying mechanism in single point (and provide transparent switch).
 """
-
 from __future__ import unicode_literals, division, absolute_import
-from collections import MutableMapping, defaultdict
-from datetime import datetime
+
 import logging
 import pickle
+from collections import MutableMapping, defaultdict
+from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, Index
 

@@ -1,14 +1,12 @@
 from __future__ import division
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
+from builtins import str, object
 from past.utils import old_div
+from future.moves.urllib.parse import quote
+
 import logging
 import ftplib
 import os
 import re
-import urllib.request, urllib.parse, urllib.error
 
 from flexget import plugin
 from flexget.event import event
@@ -154,7 +152,7 @@ class InputFtpList(object):
                                   recursive, get_size, encoding)
 
             if not files_only or mlst.get('type') == 'file':
-                url = baseurl + urllib.parse.quote(path) + '/' + urllib.parse.quote(p)
+                url = baseurl + quote(path) + '/' + quote(p)
                 log.debug("Encoded URL: " + url)
                 title = os.path.basename(p)
                 log.info('Accepting entry "%s" [%s]' % (path + '/' + p, mlst.get('type') or "unknown",))

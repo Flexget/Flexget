@@ -1,12 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import next
-from builtins import hex
+from builtins import next, hex, object
 from past.builtins import basestring
-from builtins import object
+from future.moves.urllib import request
+
 import logging
-import urllib.request, urllib.error, urllib.parse
 import http.cookiejar
 
 from flexget import plugin
@@ -170,18 +167,18 @@ class PluginCookies(object):
         # Add cookiejar to our requests session
         task.requests.add_cookiejar(cj)
         # Add handler to urllib2 default opener for backwards compatibility
-        handler = urllib.request.HTTPCookieProcessor(cj)
-        if urllib.request._opener:
+        handler = request.HTTPCookieProcessor(cj)
+        if request._opener:
             log.debug('Adding HTTPCookieProcessor to default opener')
-            urllib.request._opener.add_handler(handler)
+            request._opener.add_handler(handler)
         else:
             log.debug('Creating new opener and installing it')
-            urllib.request.install_opener(urllib.request.build_opener(handler))
+            request.install_opener(request.build_opener(handler))
 
     def on_task_exit(self, task, config):
         """Task exiting, remove cookiejar"""
         log.debug('Removing urllib2 opener')
-        urllib.request.install_opener(None)
+        request.install_opener(None)
 
     # Task aborted, unhook the cookiejar
     on_task_abort = on_task_exit

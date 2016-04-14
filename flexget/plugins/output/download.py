@@ -1,9 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from past.builtins import basestring
-from builtins import object
-from builtins import str
+from builtins import object, str
+from future.moves.urllib.parse import unquote
+
 import hashlib
 import logging
 import mimetypes
@@ -14,7 +13,6 @@ import sys
 import tempfile
 from cgi import parse_header
 from http.client import BadStatusLine
-from urllib.parse import unquote
 
 from requests import RequestException
 

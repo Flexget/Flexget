@@ -1,11 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import object
+
 import logging
 
 from flexget import plugin
 from flexget.event import event
 from flexget.config_schema import one_or_more
-import flexget.utils.qualities as quals
+from flexget.utils import qualities
 
 log = logging.getLogger('quality')
 
@@ -27,7 +28,7 @@ class FilterQuality(object):
     def on_task_filter(self, task, config):
         if not isinstance(config, list):
             config = [config]
-        reqs = [quals.Requirements(req) for req in config]
+        reqs = [qualities.Requirements(req) for req in config]
         for entry in task.entries:
             if not entry.get('quality'):
                 entry.reject('Entry doesn\'t have a quality')

@@ -7,11 +7,9 @@ forget (string)
     task name then everything in that task will be forgotten. With title all learned fields from it and the
     title will be forgotten. With field value only that particular field is forgotten.
 """
-
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str
+from builtins import str, object
 from past.builtins import basestring
-from builtins import object
 
 import logging
 from datetime import datetime, timedelta

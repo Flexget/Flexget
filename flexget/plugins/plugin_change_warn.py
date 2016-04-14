@@ -1,8 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import object
+
 import logging
 import sys
-import os
 
 from flexget import plugin
 from flexget.event import event

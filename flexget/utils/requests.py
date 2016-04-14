@@ -1,12 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
-import urllib.request, urllib.error, urllib.parse
+from future.moves.urllib.request import urlopen
+from future.moves.urllib.parse import urlparse
+
 import time
 import logging
 from datetime import timedelta, datetime
-from urllib.parse import urlparse
 
 import requests
 # Allow some request objects to be imported from here instead of requests
@@ -134,7 +133,7 @@ def _wrap_urlopen(url, timeout=None):
 
     """
     try:
-        raw = urllib.request.urlopen(url, timeout=timeout)
+        raw = urlopen(url, timeout=timeout)
     except IOError as e:
         msg = 'Error getting %s: %s' % (url, e)
         log.error(msg)

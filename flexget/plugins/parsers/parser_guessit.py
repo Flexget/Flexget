@@ -1,7 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str
-from builtins import object
-
+from builtins import str, object
 from future.utils import native
 
 import datetime
@@ -11,14 +9,13 @@ import time
 
 from guessit.rules import rebulk_builder
 from guessit.api import GuessItApi
-
 from rebulk import Rebulk
 from rebulk.pattern import RePattern
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
-from .parser_common import clean_value, old_assume_quality
+from .parser_common import old_assume_quality
 from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie
 
 

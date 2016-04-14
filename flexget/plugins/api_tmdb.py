@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from datetime import datetime, timedelta
+
 import logging
+from datetime import datetime, timedelta
 
 from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, func, or_
 from sqlalchemy.ext.associationproxy import association_proxy

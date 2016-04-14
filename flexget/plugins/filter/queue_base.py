@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import object
-from datetime import datetime
-import logging
 
-from sqlalchemy import Column, Integer, Boolean, String, Unicode, DateTime
+import logging
+from datetime import datetime
+
+from sqlalchemy import Column, Integer, String, Unicode, DateTime
 
 from flexget import db_schema
 from flexget.plugin import priority

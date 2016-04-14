@@ -1,10 +1,9 @@
-from __future__ import division
-from future import standard_library
-standard_library.install_aliases()
+from __future__ import unicode_literals, division, absolute_import
 from builtins import object
 from past.utils import old_div
+from future.moves.urllib.parse import urlencode
+
 import logging
-import urllib.request, urllib.parse, urllib.error
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -57,7 +56,7 @@ class Newznab(object):
                     'apikey': config['apikey'],
                     'extended': 1
                 }
-                config['url'] = config['website'] + '/api?' + urllib.parse.urlencode(params)
+                config['url'] = config['website'] + '/api?' + urlencode(params)
 
         return config
 

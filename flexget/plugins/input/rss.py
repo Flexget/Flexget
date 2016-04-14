@@ -1,13 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import map
+from builtins import str, object, map
 from past.builtins import basestring
-from builtins import object
+from future.moves.urllib.parse import urlparse, urlsplit
+
 import os
 import logging
-import urllib.parse
 import xml.sax
 import posixpath
 import http.client
@@ -174,7 +171,7 @@ class InputRSS(object):
         if not os.path.isdir(received):
             os.mkdir(received)
         filename = task.name
-        sourcename = urllib.parse.urlparse(url).netloc
+        sourcename = urlparse(url).netloc
         if sourcename:
             filename += '-' + sourcename
         filename = pathscrub(filename, filename=True)
@@ -196,7 +193,7 @@ class InputRSS(object):
             entry['type'] = enclosure['type']
         # TODO: better and perhaps join/in download plugin?
         # Parse filename from enclosure url
-        basename = posixpath.basename(urllib.parse.urlsplit(entry['url']).path)
+        basename = posixpath.basename(urlsplit(entry['url']).path)
         # If enclosure has size OR there are multiple enclosures use filename from url
         if (entry.get('size') or multiple and basename) and filename:
             entry['filename'] = basename

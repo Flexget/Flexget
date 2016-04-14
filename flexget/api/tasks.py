@@ -1,10 +1,9 @@
-from future import standard_library
-standard_library.install_aliases()
+from __future__ import absolute_import, division, unicode_literals
 from builtins import str
+
 import argparse
 import cgi
 import copy
-import cherrypy
 from datetime import datetime
 from queue import Queue, Empty
 from json import JSONEncoder

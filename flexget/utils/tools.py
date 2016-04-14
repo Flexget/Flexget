@@ -1,13 +1,10 @@
 """Contains miscellaneous helpers"""
-
 from __future__ import unicode_literals, division, absolute_import, print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import chr
-from builtins import str
-from builtins import zip
-from builtins import range
+from builtins import chr, str, zip, range
 from past.builtins import basestring
+from future.moves.urllib.parse import urlparse
+from future.moves.urllib import request
+from future.moves.urllib.error import URLError, HTTPError
 
 import queue
 import ast
@@ -20,11 +17,9 @@ import re
 import socket
 import sys
 import time
-import urllib.request, urllib.error, urllib.parse
 from collections import MutableMapping
 from datetime import timedelta, datetime
 from html.entities import name2codepoint
-from urllib.parse import urlparse
 
 import requests
 
@@ -171,14 +166,14 @@ def merge_dict_from_to(d1, d2):
             d2[k] = copy.deepcopy(v)
 
 
-class SmartRedirectHandler(urllib.request.HTTPRedirectHandler):
+class SmartRedirectHandler(request.HTTPRedirectHandler):
     def http_error_301(self, req, fp, code, msg, headers):
-        result = urllib.request.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
+        result = request.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
         result.status = code
         return result
 
     def http_error_302(self, req, fp, code, msg, headers):
-        result = urllib.request.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
+        result = request.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
         result.status = code
         return result
 
@@ -198,14 +193,14 @@ def urlopener(url_or_request, log, **kwargs):
     """
     from flexget.utils.requests import is_unresponsive, set_unresponsive
 
-    if isinstance(url_or_request, urllib.request.Request):
+    if isinstance(url_or_request, request.Request):
         url = url_or_request.get_host()
     else:
         url = url_or_request
     if is_unresponsive(url):
         msg = '%s is known to be unresponsive, not trying again.' % urlparse(url).hostname
         log.warning(msg)
-        raise urllib.error.URLError(msg)
+        raise URLError(msg)
 
     retries = kwargs.get('retries', 3)
     timeout = kwargs.get('timeout', 15.0)
@@ -218,26 +213,26 @@ def urlopener(url_or_request, log, **kwargs):
         socket.setdefaulttimeout(timeout)
 
         handlers = [SmartRedirectHandler()]
-        if urllib.request._opener:
-            handlers.extend(urllib.request._opener.handlers)
+        if request._opener:
+            handlers.extend(request._opener.handlers)
         if kwargs.get('handlers'):
             handlers.extend(kwargs['handlers'])
         if len(handlers) > 1:
             handler_names = [h.__class__.__name__ for h in handlers]
             log.debug('Additional handlers have been specified for this urlopen: %s' % ', '.join(handler_names))
-        opener = urllib.request.build_opener(*handlers).open
+        opener = request.build_opener(*handlers).open
         for i in range(retries):  # retry getting the url up to 3 times.
             if i > 0:
                 time.sleep(3)
             try:
                 retrieved = opener(url_or_request, kwargs.get('data'))
-            except urllib.error.HTTPError as e:
+            except HTTPError as e:
                 if e.code < 500:
                     # If it was not a server error, don't keep retrying.
                     log.warning('Could not retrieve url (HTTP %s error): %s' % (e.code, e.url))
                     raise
                 log.debug('HTTP error (try %i/%i): %s' % (i + 1, retries, e.code))
-            except (urllib.error.URLError, socket.timeout) as e:
+            except (URLError, socket.timeout) as e:
                 if hasattr(e, 'reason'):
                     reason = str(e.reason)
                 else:
@@ -262,7 +257,7 @@ def urlopener(url_or_request, log, **kwargs):
                 return retrieved
 
         log.warning('Could not retrieve url: %s' % url_or_request)
-        raise urllib.error.URLError('Could not retrieve url after %s tries.' % retries)
+        raise URLError('Could not retrieve url after %s tries.' % retries)
     finally:
         socket.setdefaulttimeout(oldtimeout)
 

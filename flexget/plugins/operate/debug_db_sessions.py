@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import next
+
 import inspect
 import logging
-from threading import Lock
 import time
+from threading import Lock
 
 import sqlalchemy
 

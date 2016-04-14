@@ -1,16 +1,16 @@
 """Logging utilities"""
-
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
 import hashlib
 from datetime import datetime, timedelta
-from flexget.utils.database import with_session
 
 from sqlalchemy import Column, Integer, String, DateTime, Index
+
+from flexget.utils.database import with_session
 from flexget import db_schema
 from flexget import logger as f_logger
 from flexget.utils.sqlalchemy_utils import table_schema
-from flexget.manager import Session
 from flexget.event import event
 
 log = logging.getLogger('util.log')

@@ -1,12 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import str
 from past.builtins import basestring
+
 import logging
 import os
 import re
+import locale
 from copy import copy
 from datetime import datetime, date, time
-import locale
 from email.utils import parsedate
 from time import mktime
 

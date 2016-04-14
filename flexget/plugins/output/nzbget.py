@@ -1,6 +1,6 @@
-from future import standard_library
-standard_library.install_aliases()
+from __future__ import unicode_literals, division, absolute_import
 from builtins import object
+
 import logging
 
 from flexget import plugin

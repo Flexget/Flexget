@@ -1,12 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
+from builtins import str, object
+from future.moves.urllib.parse import quote
+
 import logging
 import re
-
-from urllib.parse import quote
 
 from flexget import plugin
 from flexget import validator

@@ -1,15 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
+from builtins import str, object
 from past.builtins import basestring
-from builtins import object
+from future.moves.urllib.parse import quote_plus
+from future.moves.urllib.error import URLError
+
 import time
 import logging
 import difflib
-import urllib.request, urllib.parse, urllib.error
 from datetime import datetime, timedelta
-from urllib.error import URLError
 
 from sqlalchemy import Table, Column, Integer, String, DateTime, func, sql
 from sqlalchemy.schema import ForeignKey, Index
@@ -517,7 +515,7 @@ def lists(list_type, list_name, limit=20, page_limit=20, page=None, api_key=None
 
 def movies_search(q, page_limit=None, page=None, api_key=None):
     if isinstance(q, basestring):
-        q = urllib.parse.quote_plus(q.encode('latin-1', errors='ignore'))
+        q = quote_plus(q.encode('latin-1', errors='ignore'))
 
     if not api_key:
         api_key = API_KEY

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import range
-from builtins import object
+from builtins import object, range
+
 import logging
 import random
 import string

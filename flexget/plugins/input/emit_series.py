@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import range
-from builtins import object
+from builtins import range, object
+
 import logging
 import re
 
@@ -10,14 +10,9 @@ from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.manager import Session
+from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release
 
 log = logging.getLogger('emit_series')
-
-try:
-    from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release, AlternateNames
-except ImportError as e:
-    log.error(e.message)
-    raise plugin.DependencyError(issued_by='emit_series', missing='series')
 
 
 class EmitSeries(object):

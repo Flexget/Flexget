@@ -1,7 +1,5 @@
 from __future__ import absolute_import, division, unicode_literals
-from builtins import range
-from builtins import object
-from builtins import str
+from builtins import range, object, str
 
 import logging
 import random
@@ -12,7 +10,7 @@ import rpyc
 from rpyc.utils.server import ThreadedServer
 
 from flexget.logger import console, capture_output
-from flexget.options import get_parser, ParserError
+from flexget.options import get_parser
 
 log = logging.getLogger('ipc')
 

@@ -1,14 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
+from builtins import str, object
+from future.moves.urllib import request
+from future.moves.urllib import parse
+from future.moves.urllib.error import URLError
+
 import logging
-import urllib.request, urllib.parse, urllib.error
-import urllib.request, urllib.error, urllib.parse
 import re
-import http.cookiejar
 from datetime import datetime
+import http.cookiejar
 
 from sqlalchemy import Column, Integer, String, DateTime
 
@@ -101,15 +100,15 @@ class MyEpisodes(object):
         password = config['password']
 
         cookiejar = http.cookiejar.CookieJar()
-        opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookiejar))
-        baseurl = urllib.request.Request('http://www.myepisodes.com/login.php?')
-        loginparams = urllib.parse.urlencode({'username': username,
+        opener = request.build_opener(request.HTTPCookieProcessor(cookiejar))
+        baseurl = request.Request('http://www.myepisodes.com/login.php?')
+        loginparams = parse.urlencode({'username': username,
                                         'password': password,
                                         'action': 'Login'})
         try:
             logincon = opener.open(baseurl, loginparams)
             loginsrc = logincon.read()
-        except urllib.error.URLError as e:
+        except URLError as e:
             log.error('Error logging in to myepisodes: %s' % e)
             return
 
@@ -161,12 +160,12 @@ class MyEpisodes(object):
                 log.warning('Unable to lookup series `%s` from tvdb, using raw name.' % series_name)
                 query_name = series_name
 
-        baseurl = urllib.request.Request('http://www.myepisodes.com/search.php?')
-        params = urllib.parse.urlencode({'tvshow': query_name, 'action': 'Search myepisodes.com'})
+        baseurl = request.Request('http://www.myepisodes.com/search.php?')
+        params = parse.urlencode({'tvshow': query_name, 'action': 'Search myepisodes.com'})
         try:
             con = opener.open(baseurl, params)
             txt = con.read()
-        except urllib.error.URLError as e:
+        except URLError as e:
             log.error('Error searching for myepisodes id: %s' % e)
 
         matchObj = re.search(r'&showid=([0-9]*)">' + query_name + '</a>', txt, re.MULTILINE | re.IGNORECASE)
@@ -209,7 +208,7 @@ class MyEpisodes(object):
         if task.options.test:
             log.info('Would mark %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
         else:
-            baseurl2 = urllib.request.Request(
+            baseurl2 = request.Request(
                 'http://www.myepisodes.com/myshows.php?action=Update&showid=%s&season=%s&episode=%s&seen=0' %
                 (myepisodes_id, season, episode))
             opener.open(baseurl2)

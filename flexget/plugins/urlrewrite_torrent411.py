@@ -1,10 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
-import urllib.request, urllib.parse, urllib.error
-import urllib.request, urllib.error, urllib.parse
+from builtins import str, object
+from future.moves import urllib
+
 import logging
 import json
 import re
@@ -15,7 +12,6 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.utils import requests
 from flexget.utils.tools import arithmeticEval
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode

@@ -1,11 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from past.builtins import basestring
 from builtins import object
-import urllib.parse
+from past.builtins import basestring
+from future.moves.urllib import parse
+
 import logging
-import urllib.request, urllib.parse, urllib.error
 import zlib
 import re
 from jinja2 import Template
@@ -58,7 +56,7 @@ class InputHtml(object):
 
         def get_auth_from_url():
             """Moves basic authentication from url to username and password fields"""
-            parts = list(urllib.parse.urlsplit(config['url']))
+            parts = list(parse.urlsplit(config['url']))
             split = parts[1].split('@')
             if len(split) > 1:
                 auth = split[0].split(':')
@@ -67,7 +65,7 @@ class InputHtml(object):
                 else:
                     log.warning('Invalid basic authentication in url: %s' % config['url'])
                 parts[1] = split[1]
-                config['url'] = urllib.parse.urlunsplit(parts)
+                config['url'] = parse.urlunsplit(parts)
 
         if isinstance(config, basestring):
             config = {'url': config}
@@ -151,8 +149,8 @@ class InputHtml(object):
         return title or None
 
     def _title_from_url(self, url):
-        parts = urllib.parse.splitquery(url[url.rfind('/') + 1:])
-        title = urllib.parse.unquote_plus(parts[0])
+        parts = parse.splitquery(url[url.rfind('/') + 1:])
+        title = parse.unquote_plus(parts[0])
         return title
 
     def create_entries(self, page_url, soup, config):
@@ -180,7 +178,7 @@ class InputHtml(object):
             if url.startswith('//'):
                 url = 'http:' + url
             elif not url.startswith('http://') or not url.startswith('https://'):
-                url = urllib.parse.urljoin(page_url, url)
+                url = parse.urljoin(page_url, url)
 
             log_link = url
             log_link = log_link.replace('\n', '')

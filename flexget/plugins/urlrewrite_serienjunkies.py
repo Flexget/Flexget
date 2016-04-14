@@ -1,9 +1,7 @@
 # coding=utf-8
-
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str
-from builtins import range
-from builtins import object
+from builtins import str, range, object
+
 import re
 import logging
 

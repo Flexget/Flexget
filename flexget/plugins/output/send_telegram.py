@@ -1,14 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
+from builtins import str, object
 from future.utils import native_str
-from builtins import str
-from builtins import object
 
 import sys
 from distutils.version import LooseVersion
 from ssl import SSLError
-from urllib.error import URLError
 
 from sqlalchemy import Column, Integer, String
 

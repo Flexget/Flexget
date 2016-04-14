@@ -1,10 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
+from builtins import str, object
 from past.builtins import basestring
-from builtins import object
-import urllib.request, urllib.parse, urllib.error
+
 import logging
 import re
 
@@ -187,7 +184,7 @@ class FilterRegexp(object):
                 if not isinstance(value, basestring):
                     continue
                 if field in unquote:
-                    value = urllib.parse.unquote(value)
+                    value = unquote(value)
                     # If none of the not_regexps match
                 if regexp.search(value):
                     # Make sure the not_regexps do not match for this field

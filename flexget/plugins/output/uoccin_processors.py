@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import next
-from builtins import str
-from builtins import object
+from builtins import next, str, object
+
 import logging
 import os
 import re

@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from past.builtins import basestring
 from builtins import object
+
 import logging
 import pickle
 from datetime import datetime
+
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, Index, select
 
 from flexget import db_schema, plugin

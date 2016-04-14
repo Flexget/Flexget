@@ -1,8 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from argparse import SUPPRESS
+
 import logging
 import os
-
+from argparse import SUPPRESS
 
 from flexget import options
 from flexget.event import event

@@ -1,9 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
+from future.moves.urllib.parse import urlencode
+
 import logging
-import urllib.request, urllib.parse, urllib.error
 
 from flexget import plugin
 from flexget.event import event
@@ -83,7 +82,7 @@ class OutputSabnzbd(object):
             # add cleaner nzb name (undocumented api feature)
             params['nzbname'] = ''.join([x for x in entry['title'] if ord(x) < 128])
 
-            request_url = config['url'] + urllib.parse.urlencode(params)
+            request_url = config['url'] + urlencode(params)
             log.debug('request_url: %s' % request_url)
             try:
                 response = urlopener(request_url, log).read()

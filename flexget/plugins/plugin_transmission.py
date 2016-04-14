@@ -1,17 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from past.builtins import basestring
 from builtins import object
+from past.builtins import basestring
+from future.moves.urllib.parse import urlparse
+
 import os
-from datetime import datetime
-from datetime import timedelta
-from netrc import netrc, NetrcParseError
 import logging
 import base64
 import re
 import time
-from urllib.parse import urlparse
+from datetime import datetime
+from datetime import timedelta
+from netrc import netrc, NetrcParseError
 
 from flexget import plugin, validator
 from flexget.entry import Entry

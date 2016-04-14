@@ -1,7 +1,5 @@
 from __future__ import absolute_import, division, unicode_literals
 from past.builtins import basestring
-# Commented out as meta expects bytes in py2 and text in py3
-# from builtins import str
 
 import logging
 

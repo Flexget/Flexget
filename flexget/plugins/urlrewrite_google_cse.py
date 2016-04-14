@@ -1,11 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
+from future.moves import urllib
+
 import re
-import urllib.request, urllib.error, urllib.parse
 import logging
-import urllib.parse
 
 from flexget import plugin
 from flexget.event import event

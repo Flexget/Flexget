@@ -1,8 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from past.builtins import cmp
-# Commented out as ParsedEntry expects bytes in py2 and text in py3
-# from builtins import str
-from builtins import range
+from builtins import range, cmp  # ParsedEntry expects bytes in py2 and text in py3
 
 import logging
 import re

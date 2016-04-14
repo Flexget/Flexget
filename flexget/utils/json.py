@@ -5,8 +5,9 @@ Plugins can just import the methods from this module.
 Also allows date and datetime objects to be encoded/decoded.
 """
 from __future__ import unicode_literals, division, absolute_import
-import datetime
 from builtins import str
+
+import datetime
 
 from flexget.plugin import DependencyError
 

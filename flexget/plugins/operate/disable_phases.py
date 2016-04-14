@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import map
-from builtins import object
+from builtins import object, map
+
 import logging
 
 from flexget import plugin

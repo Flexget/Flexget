@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals, division, absolute_import
-from builtins import range
-from builtins import object
+from builtins import range, object
+
 import json
 import logging
 from time import sleep
@@ -16,10 +16,8 @@ from flexget.event import event
 from flexget.db_schema import versioned_base
 from flexget.plugin import PluginError
 from flexget.manager import Session
-from requests import post
 from requests import Session as RSession
 from requests.auth import AuthBase
-from requests.cookies import cookiejar_from_dict
 from requests.utils import dict_from_cookiejar
 
 

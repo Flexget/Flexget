@@ -1,9 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from flexget.utils.log import log_once
 
 import logging
 import sys
 
+from flexget.utils.log import log_once
 from flexget.event import event
 from flexget.utils.simple_persistence import SimplePersistence
 

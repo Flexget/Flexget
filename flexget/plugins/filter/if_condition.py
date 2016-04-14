@@ -1,9 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from past.builtins import basestring
+from future import builtins
 from builtins import object
-import builtins
+from past.builtins import basestring
+
 import logging
 import re
 import datetime

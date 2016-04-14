@@ -1,16 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
+from future.moves.urllib.parse import urlparse, urlunparse
+
 import re
 import logging
-from urllib.parse import urlparse, urlunparse
+
 from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.utils import requests
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('eztv')

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import object
+
 import logging
 import re
 
@@ -10,7 +11,7 @@ from flexget.utils import requests
 from flexget.utils.soup import get_soup
 
 from flexget.entry import Entry
-from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.search import normalize_unicode
 
 from bs4.element import Tag
 

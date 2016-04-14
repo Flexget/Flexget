@@ -2,15 +2,11 @@
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
 from __future__ import unicode_literals, division, absolute_import
+from builtins import next, zip, object, str
+from past.builtins import unicode as oldunicode  # For py2 support
+from past.builtins import str as oldstr  # For py2 support
 
 import codecs
-from builtins import next
-from builtins import zip
-from builtins import object
-from builtins import str
-# For py2 support
-from past.builtins import unicode as oldunicode
-from past.builtins import str as oldstr
 import functools
 import re
 import logging

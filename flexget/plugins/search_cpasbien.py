@@ -1,18 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
+from builtins import str, object
+from future.moves.urllib.parse import quote_plus
+
 import logging
 import re
-import urllib.request, urllib.parse, urllib.error 
 
-from flexget import plugin, validator
+from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.search import normalize_unicode
 
 log = logging.getLogger('search_cpasbien')
 
@@ -76,7 +74,7 @@ class SearchCPASBIEN(object):
             search_string = search_string.replace('(', '')
             search_string = search_string.replace(')', '')
             query = normalize_unicode(search_string)
-            query_url_fragment = urllib.parse.quote_plus(query.encode('utf-8'))
+            query_url_fragment = quote_plus(query.encode('utf-8'))
 # http://www.cpasbien.pe/recherche/ncis.html
             if config['category'] == 'all':
                 str_url = (base_url, 'recherche', query_url_fragment)
