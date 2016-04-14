@@ -6,14 +6,7 @@
             </md-tab-label>
             <md-tab-body>
                 <md-list flex>
-                    <md-list-item class="md-2-line md-long-text" ng-repeat="movie in vm.movies">
-                        <div class="md-list-item-text">
-                        <h3>{{ movie.title }} ({{ movie.year }})</h3>
-                            <p ng-repeat="id in ::movie.movies_list_ids">
-                                {{ ::id.id_name | moviesListIdsFilter }}: {{ ::id.id_value }}
-                            </p>
-                        </div>
-                    </md-list-item>
+                    <movie-entry movie="movie" ng-repeat="movie in vm.movies"></movie-entry>                        
                 </md-list>
             </md-tab-body>
         </md-tab>
