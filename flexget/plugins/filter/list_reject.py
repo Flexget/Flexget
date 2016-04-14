@@ -24,7 +24,7 @@ class ListReject(object):
 
     def on_task_filter(self, task, config):
         for item in config:
-            for plugin_name, plugin_config in item.iteritems():
+            for plugin_name, plugin_config in item.items():
                 try:
                     thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
                 except AttributeError:

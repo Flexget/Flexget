@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import logging
 import re
-from collections import MutableSet, defaultdict
+from collections import MutableSet
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -281,7 +281,7 @@ class TraktSet(MutableSet):
                 res[action].setdefault(cat, 0)
             log.info('Successfully {0} to/from list {1}: {movies} movie(s), {shows} show(s), {episodes} episode(s), '
                      '{seasons} season(s).'.format(action, self.config['list'], **res[action]))
-            for k, r in res['not_found'].iteritems():
+            for k, r in res['not_found'].items():
                 if r:
                     log.debug('not found %s: %s' % (k, r))
             # TODO: Improve messages about existing and unknown results
@@ -295,6 +295,12 @@ class TraktSet(MutableSet):
             log.debug('trakt response: ' + result.text)
         else:
             log.error('Unknown error submitting data to trakt.tv: %s' % result.text)
+
+    @property
+    def online(self):
+        """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
+        like test mode"""
+        return True
 
 
 class TraktList(object):

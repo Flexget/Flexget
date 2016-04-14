@@ -1,16 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import pickle
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType, Index
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, Index, select
 
 from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.entry import Entry
-from flexget.utils.database import safe_pickle_synonym
+from flexget.utils import json
+from flexget.utils.database import entry_synonym
 from flexget.utils.tools import parse_timedelta
+from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('delay')
-Base = db_schema.versioned_base('delay', 1)
+Base = db_schema.versioned_base('delay', 2)
 
 
 class DelayedEntry(Base):
@@ -21,8 +23,8 @@ class DelayedEntry(Base):
     task = Column('feed', String)
     title = Column(Unicode)
     expire = Column(DateTime)
-    _entry = Column('entry', PickleType)
-    entry = safe_pickle_synonym('_entry')
+    _json = Column('json', Unicode)
+    entry = entry_synonym('_json')
 
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % self.title
@@ -34,16 +36,19 @@ Index('delay_feed_title', DelayedEntry.task, DelayedEntry.title)
 @db_schema.upgrade('delay')
 def upgrade(ver, session):
     if ver is None:
-        log.info('Fixing delay table from erroneous data ...')
-        # TODO: Using the DelayedEntry object here is no good.
-        all = session.query(DelayedEntry).all()
-        for de in all:
-            for key, value in de.entry.iteritems():
-                if not isinstance(value, (basestring, bool, int, float, list, dict)):
-                    log.warning('Removing `%s` with erroneous data' % de.title)
-                    session.delete(de)
-                    break
+        # Upgrade to version 0 was a failed attempt at cleaning bad entries from our table, better attempt in ver 1
         ver = 1
+    if ver == 1:
+        table = table_schema('delay', session)
+        table_add_column(table, 'json', Unicode, session)
+        # Make sure we get the new schema with the added column
+        table = table_schema('delay', session)
+        for row in session.execute(select([table.c.id, table.c.entry])):
+            p = pickle.loads(row['entry'])
+            session.execute(table.update().where(table.c.id == row['id']).values(
+                json=json.dumps(p, encode_datetime=True)))
+        ver = 2
+
     return ver
 
 
@@ -96,7 +101,7 @@ class FilterDelay(object):
         passed_delay = task.session.query(DelayedEntry).\
             filter(datetime.now() > DelayedEntry.expire).\
             filter(DelayedEntry.task == task.name)
-        delayed_entries = [Entry(item.entry) for item in passed_delay.all()]
+        delayed_entries = [item.entry for item in passed_delay.all()]
         for entry in delayed_entries:
             entry['passed_delay'] = True
             log.debug('Releasing %s' % entry['title'])

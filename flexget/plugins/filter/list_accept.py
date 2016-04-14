@@ -60,6 +60,11 @@ class ListAccept(object):
         for item in config.get('lists'):
             for plugin_name, plugin_config in item.items():
                 thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+                if task.manager.options.test and thelist.online:
+                    log.info('`%s` is marked as online, would remove accepted items outside of --test mode.',
+                             plugin_name)
+                    continue
+                log.verbose('removing accepted entries from %s - %s', plugin_name, plugin_config)
                 thelist -= task.accepted
 
 

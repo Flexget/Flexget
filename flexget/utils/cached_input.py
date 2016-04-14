@@ -2,21 +2,39 @@ from __future__ import unicode_literals, division, absolute_import
 import copy
 import logging
 import hashlib
+import pickle
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, Integer, String, DateTime, PickleType, Unicode, ForeignKey
 from sqlalchemy.orm import relation
+from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, ForeignKey
 
 from flexget import db_schema
 from flexget.manager import Session
-from flexget.utils.database import safe_pickle_synonym
+from flexget.utils import json
+from flexget.utils.database import entry_synonym
 from flexget.utils.tools import parse_timedelta, TimedDict
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
+from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('input_cache')
-Base = db_schema.versioned_base('input_cache', 0)
+Base = db_schema.versioned_base('input_cache', 1)
+
+
+@db_schema.upgrade('input_cache')
+def upgrade(ver, session):
+    if ver == 0:
+        table = table_schema('input_cache_entry', session)
+        table_add_column(table, 'json', Unicode, session)
+        # Make sure we get the new schema with the added column
+        table = table_schema('input_cache_entry', session)
+        for row in session.execute(select([table.c.id, table.c.entry])):
+            p = pickle.loads(row['entry'])
+            session.execute(table.update().where(table.c.id == row['id']).values(
+                json=json.dumps(p, encode_datetime=True)))
+        ver = 1
+    return ver
 
 
 class InputCache(Base):
@@ -36,8 +54,8 @@ class InputCacheEntry(Base):
     __tablename__ = 'input_cache_entry'
 
     id = Column(Integer, primary_key=True)
-    _entry = Column('entry', PickleType)
-    entry = safe_pickle_synonym('_entry')
+    _json = Column('json', Unicode)
+    entry = entry_synonym('_json')
 
     cache_id = Column(Integer, ForeignKey('input_cache.id'), nullable=False)
 
@@ -129,7 +147,7 @@ class cached(object):
                             filter(InputCache.added > datetime.now() - self.persist).\
                             first()
                         if db_cache:
-                            entries = [Entry(e.entry) for e in db_cache.entries]
+                            entries = [e.entry for e in db_cache.entries]
                             log.verbose('Restored %s entries from db cache' % len(entries))
                             # Store to in memory cache
                             self.cache[cache_name] = copy.deepcopy(entries)
@@ -149,7 +167,7 @@ class cached(object):
                             if db_cache and db_cache.entries:
                                 log.error('There was an error during %s input (%s), using cache instead.' %
                                         (self.name, e))
-                                entries = [Entry(e.entry) for e in db_cache.entries]
+                                entries = [e.entry for e in db_cache.entries]
                                 log.verbose('Restored %s entries from db cache' % len(entries))
                                 # Store to in memory cache
                                 self.cache[cache_name] = copy.deepcopy(entries)

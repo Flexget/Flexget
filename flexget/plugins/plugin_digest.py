@@ -1,20 +1,40 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import pickle
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, PickleType, Integer, DateTime
+from sqlalchemy import Column, Unicode, Integer, DateTime, select
 
-from flexget import plugin
+from flexget import plugin, db_schema
 from flexget.config_schema import one_or_more
 from flexget.db_schema import versioned_base
-from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils.database import safe_pickle_synonym
+from flexget.utils import json
+from flexget.utils.database import entry_synonym
 from flexget.utils.tools import parse_timedelta
+from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+
 
 log = logging.getLogger('digest')
-Base = versioned_base('digest', 0)
+Base = versioned_base('digest', 1)
+
+
+@db_schema.upgrade('digest')
+def upgrade(ver, session):
+    if None is ver:
+        ver = 0
+    if ver == 0:
+        table = table_schema('digest_entries', session)
+        table_add_column(table, 'json', Unicode, session)
+        # Make sure we get the new schema with the added column
+        table = table_schema('digest_entries', session)
+        for row in session.execute(select([table.c.id, table.c.entry])):
+            p = pickle.loads(row['entry'])
+            session.execute(table.update().where(table.c.id == row['id']).values(
+                json=json.dumps(p, encode_datetime=True)))
+        ver = 1
+    return ver
 
 
 class DigestEntry(Base):
@@ -22,8 +42,8 @@ class DigestEntry(Base):
     id = Column(Integer, primary_key=True)
     list = Column(Unicode, index=True)
     added = Column(DateTime, default=datetime.now)
-    _entry = Column('entry', PickleType)
-    entry = safe_pickle_synonym('_entry')
+    _json = Column('json', Unicode)
+    entry = entry_synonym('_json')
 
 
 class OutputDigest(object):
@@ -92,7 +112,7 @@ class EmitDigest(object):
                 if 0 < config.get('limit', -1) <= index:
                     session.delete(digest_entry)
                     continue
-                entry = Entry(digest_entry.entry)
+                entry = digest_entry.entry
                 if config.get('restore_state') and entry.get('digest_state'):
                     # Not sure this is the best way, but we don't want hooks running on this task
                     # (like backlog hooking entry.fail)
