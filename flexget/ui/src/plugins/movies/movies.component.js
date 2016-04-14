@@ -31,6 +31,16 @@
         console.log(err);
       })
     }
+
+    vm.deleteMovie = function(listid, movie) {
+      $http.delete('/api/movie_list/' + listid + '/movies/' + movie.id + '/')
+        .success(function(data) {
+          var index = vm.movies.indexOf(movie);
+          vm.movies.splice(index, 1);
+        }).error(function(err) {
+          console.log(err);
+        });
+    }
     
   }
 

@@ -6,7 +6,7 @@
             </md-tab-label>
             <md-tab-body>
                 <md-list flex>
-                    <movie-entry movie="movie" ng-repeat="movie in vm.movies"></movie-entry>                        
+                    <movie-entry movie="movie" delete-movie="vm.deleteMovie(list.id, movie)" ng-repeat="movie in vm.movies"></movie-entry>
                 </md-list>
             </md-tab-body>
         </md-tab>
