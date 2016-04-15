@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
+
 from flexget.plugin import get_plugin_by_name
 
 

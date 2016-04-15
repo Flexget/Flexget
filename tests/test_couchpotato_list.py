@@ -1,7 +1,9 @@
 from builtins import object
+
 import json
-import mock
 import os
+
+import mock
 
 movie_list_file = os.path.join(os.path.dirname(__file__), 'couchpotato_movie_list_test_response.json')
 qualities_profiles_file = os.path.join(os.path.dirname(__file__), 'couchpotato_quality_profile_test_response.json')

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import range
-from builtins import object
+from builtins import range, object
+
 from datetime import datetime, timedelta
 
 from flexget.entry import Entry

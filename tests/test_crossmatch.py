@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import object
 
+
 class TestCrossmatch(object):
     config = """
         tasks:

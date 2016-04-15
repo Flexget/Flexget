@@ -5,6 +5,7 @@ import pytest
 
 from .conftest import MockManager
 
+
 class TestMigrate(object):
 
     config = """

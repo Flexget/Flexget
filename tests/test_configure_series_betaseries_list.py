@@ -1,9 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import next
-from builtins import object
+from builtins import next, object
 
 import mock
 import pytest
+
 
 def assert_mock_calls(expected_calls, mock_object):
     assert expected_calls == mock_object.mock_calls, "expecting calls %r, got %r instead" % \
@@ -19,7 +19,7 @@ def assert_series_count_in_db(expected_count):
                                                   (expected_count, actual_series_count)
 
 
-class Test_configure_series_betaseries_list(object):
+class TestConfigureSeriesBetaSeriesList(object):
     config = """
         tasks:
           test_no_members:
@@ -54,48 +54,45 @@ class Test_configure_series_betaseries_list(object):
 
     @pytest.fixture()
     def create_token_mock(self, monkeypatch):
-        ## mock create_token
-        themock = mock.Mock(return_value='token_foo')
-        monkeypatch.setattr('flexget.plugins.input.betaseries_list.create_token', themock)
-        return themock
+        # mock create_token
+        the_mock = mock.Mock(return_value='token_foo')
+        monkeypatch.setattr('flexget.plugins.input.betaseries_list.create_token', the_mock)
+        return the_mock
 
     @pytest.fixture()
     def query_series_mock(self, monkeypatch):
-        ## mock query_series
-        themock = mock.Mock(return_value=[])
-        monkeypatch.setattr('flexget.plugins.input.betaseries_list.query_series', themock)
-        return themock
+        # mock query_series
+        the_mock = mock.Mock(return_value=[])
+        monkeypatch.setattr('flexget.plugins.input.betaseries_list.query_series', the_mock)
+        return the_mock
 
     def test_no_members(self, execute_task, create_token_mock, query_series_mock):
-        # GIVEN
         query_series_mock.return_value = ["Breaking Bad", "Dexter"]
-        # WHEN
-        task = execute_task('test_no_members')
-        # THEN
+
+        execute_task('test_no_members')
+
         assert_series_count_in_db(2)
         assert_mock_calls([mock.call('api_key_foo', 'user_foo', 'passwd_foo')], create_token_mock)
         assert_mock_calls([mock.call('api_key_foo', 'token_foo', 'user_foo')], query_series_mock)
 
     def test_with_one_members(self, execute_task, create_token_mock, query_series_mock):
-        # GIVEN
         query_series_mock.return_value = ["Breaking Bad", "Dexter", "The Simpsons"]
-        # WHEN
-        task = execute_task('test_with_one_members')
-        # THEN
+
+        execute_task('test_with_one_members')
+
         assert_series_count_in_db(3)
         assert_mock_calls([mock.call('api_key_foo', 'user_foo', 'passwd_foo')],  create_token_mock)
         assert_mock_calls([mock.call('api_key_foo', 'token_foo', 'other_member_1')], query_series_mock)
 
     def test_with_two_members(self, execute_task, create_token_mock, query_series_mock):
-        # GIVEN
         return_values_generator = (val for val in [
             ["Family guy", "The Simpsons"],
             ["Breaking Bad", "Dexter", "The Simpsons"],
         ])
         query_series_mock.side_effect = lambda *args: next(return_values_generator)
-        # WHEN
-        task = execute_task('test_with_two_members')
-        # THEN
+
+        execute_task('test_with_two_members')
+
         assert_series_count_in_db(4)
         assert_mock_calls([mock.call('api_key_foo', 'user_foo', 'passwd_foo')], create_token_mock)
         assert_mock_calls(

@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import oct
 from builtins import object
+
 import os
-import pytest
 import stat
+
+import pytest
 
 from flexget.entry import EntryUnicodeError, Entry
 
