@@ -96,12 +96,12 @@ class ImdbEntrySet(MutableSet):
         if self._items is None:
             r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
                                  (self.list_id, self.user_id))
-            lines = r.iter_lines()
+            lines = r.iter_lines(decode_unicode=True)
             # Throw away first line with headers
             next(lines)
             self._items = []
             for row in csv.reader(lines):
-                row = [cell.decode('utf-8') for cell in row]
+                row = [cell for cell in row]
                 log.debug('parsing line from csv: %s', ', '.join(row))
                 entry = Entry({
                     'title': '%s (%s)' % (row[5], row[11]) if row[11] != '????' else '%s' % row[5],
