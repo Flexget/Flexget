@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import object
+from future.moves.urllib.parse import urlparse
 
 import json
 import logging
 from collections import MutableSet
-from urlparse import urlparse
 
 import requests
 from requests import RequestException
