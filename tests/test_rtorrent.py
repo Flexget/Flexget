@@ -34,7 +34,7 @@ class Matcher(object):
         return self.compare(self.some_obj, other)
 
 
-@mock.patch('flexget.plugins.plugin_rtorrent.HTTPServerProxy')
+@mock.patch('flexget.plugins.plugin_rtorrent.xmlrpc_client.ServerProxy')
 class TestRTorrentClient(object):
 
     def test_version(self, mocked_proxy):
