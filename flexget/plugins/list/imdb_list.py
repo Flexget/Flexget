@@ -101,7 +101,7 @@ class ImdbEntrySet(MutableSet):
             next(lines)
             self._items = []
             for row in csv.reader(lines):
-                row = [unicode(cell, 'utf-8') for cell in row]
+                row = [cell.decode('utf-8') for cell in row]
                 log.debug('parsing line from csv: %s', ', '.join(row))
                 entry = Entry({
                     'title': '%s (%s)' % (row[5], row[11]) if row[11] != '????' else '%s' % row[5],
