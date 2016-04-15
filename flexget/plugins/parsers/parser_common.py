@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
+from future.utils import native_str
 from past.builtins import cmp
 
 import logging
@@ -110,7 +111,7 @@ def normalize_name(name):
     return name
 
 
-class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
+class ParsedEntry(ABCMeta(native_str('ParsedEntryABCMeta'), (object,), {})):
     """
     A parsed entry, containing parsed data like name, year, episodeNumber and season.
     """
@@ -256,7 +257,7 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
         return "<%s(name=%s)>" % (self.__class__.__name__, self.name)
 
 
-class ParsedVideo(ABCMeta(str('ParsedVideoABCMeta'), (ParsedEntry,), {})):
+class ParsedVideo(ABCMeta(native_str('ParsedVideoABCMeta'), (ParsedEntry,), {})):
     _old_quality = None
     _assumed_quality = None
 
@@ -308,7 +309,7 @@ class ParsedVideo(ABCMeta(str('ParsedVideoABCMeta'), (ParsedEntry,), {})):
         return self is other
 
 
-class ParsedVideoQuality(ABCMeta(str('ParsedVideoQualityABCMeta'), (object,), {})):
+class ParsedVideoQuality(ABCMeta(native_str('ParsedVideoQualityABCMeta'), (object,), {})):
     @abstractproperty
     def screen_size(self):
         raise NotImplementedError
@@ -350,7 +351,7 @@ class ParsedVideoQuality(ABCMeta(str('ParsedVideoQualityABCMeta'), (object,), {}
             self.__class__.__name__, self.screen_size, self.source, self.video_codec, self.audio_channels)
 
 
-class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
+class ParsedMovie(ABCMeta(native_str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
     @property
     def parsed_name(self):
         return self.title
@@ -368,7 +369,7 @@ class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
         return True
 
 
-class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
+class ParsedSerie(ABCMeta(native_str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     _valid_strict = None
 
     @property
