@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import next, hex, object
 from past.builtins import basestring
-from future.moves.urllib import request
 
 import logging
 import http.cookiejar
@@ -166,22 +165,6 @@ class PluginCookies(object):
 
         # Add cookiejar to our requests session
         task.requests.add_cookiejar(cj)
-        # Add handler to urllib2 default opener for backwards compatibility
-        handler = request.HTTPCookieProcessor(cj)
-        if request._opener:
-            log.debug('Adding HTTPCookieProcessor to default opener')
-            request._opener.add_handler(handler)
-        else:
-            log.debug('Creating new opener and installing it')
-            request.install_opener(request.build_opener(handler))
-
-    def on_task_exit(self, task, config):
-        """Task exiting, remove cookiejar"""
-        log.debug('Removing urllib2 opener')
-        request.install_opener(None)
-
-    # Task aborted, unhook the cookiejar
-    on_task_abort = on_task_exit
 
 
 @event('plugin.register')
