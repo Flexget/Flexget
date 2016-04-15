@@ -274,7 +274,7 @@ class TestMovieQueueAPI(object):
 
         rsp = api_client.json_put('/movie_queue/1/', data=json.dumps(payload))
 
-        assert json.loads(rsp.get_data(as_text=True).decode('utf-8')) == valid_response
+        assert json.loads(rsp.get_data(as_text=True)) == valid_response
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
 
         assert mocked_get_movie_by_id.called
