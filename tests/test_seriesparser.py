@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
-from builtins import filter, str, object
 from past.builtins import basestring
 
 import pytest

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import next, object
+from builtins import next
 
 import mock
 import pytest

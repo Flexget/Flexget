@@ -1,4 +1,4 @@
-from builtins import object
+from __future__ import unicode_literals, division, absolute_import
 
 import json
 import os

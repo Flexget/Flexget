@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import object
+
 
 import os
 import stat

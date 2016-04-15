@@ -3,7 +3,6 @@ These validate methods are never run by FlexGet anymore, but these tests serve a
 old validators will get converted to new schemas properly for plugins still using the `validator` method.
 """
 from __future__ import unicode_literals, division, absolute_import
-from builtins import object
 
 from flexget import validator
 

@@ -1,22 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
 from future.utils import PY2
-from builtins import object
-from builtins import str
+from future.backports.http import client as backport_client
 
+import os
+import sys
+import yaml
 import logging
 import shutil
 
 import itertools
 
-import os
-import sys
-import yaml
 from contextlib import contextmanager
 
 import mock
 import pytest
 from path import Path
-from future.backports.http import client as backport_client
 from vcr import VCR
 from vcr.stubs import VCRHTTPSConnection, VCRHTTPConnection
 
