@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import object
-from future.moves import urllib
+from future.moves.urllib.parse import quote
 
 import logging
 import re
@@ -11,8 +11,9 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.utils.soup import get_soup
-from flexget.utils.tools import urlopener
 from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils import requests
+
 
 timeout = 10
 socket.setdefaulttimeout(timeout)
@@ -62,9 +63,9 @@ class NewTorrents(object):
     def url_from_page(self, url):
         """Parses torrent url from newtorrents download page"""
         try:
-            page = urlopener(url, log)
-            data = page.read()
-        except urllib.error.URLError:
+            page = requests.get(url)
+            data = page.text
+        except Exception as e:
             raise UrlRewritingError('URLerror when retrieving page')
         p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)
         f = p.search(data)
@@ -79,11 +80,11 @@ class NewTorrents(object):
         """Parses torrent download url from search results"""
         name = normalize_unicode(name)
         if not url:
-            url = 'http://www.newtorrents.info/search/%s' % urllib.parse.quote(name.encode('utf-8'), safe=b':/~?=&%')
+            url = 'http://www.newtorrents.info/search/%s' % quote(name.encode('utf-8'), safe=b':/~?=&%')
 
         log.debug('search url: %s' % url)
 
-        html = urlopener(url, log).read()
+        html = requests.get(url).text
         # fix </SCR'+'IPT> so that BS does not crash
         # TODO: should use beautifulsoup massage
         html = re.sub(r'(</SCR.*?)...(.*?IPT>)', r'\1\2', html)

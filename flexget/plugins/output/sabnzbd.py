@@ -6,7 +6,6 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.tools import urlopener
 
 log = logging.getLogger('sabnzbd')
 
@@ -85,7 +84,7 @@ class OutputSabnzbd(object):
             request_url = config['url'] + urlencode(params)
             log.debug('request_url: %s' % request_url)
             try:
-                response = urlopener(request_url, log).read()
+                response = task.get(request_url)
             except Exception as e:
                 log.critical('Failed to use sabnzbd. Requested %s' % request_url)
                 log.critical('Result was: %s' % e)
@@ -94,8 +93,8 @@ class OutputSabnzbd(object):
                     log.exception(e)
                 continue
 
-            if 'error' in response.lower():
-                entry.fail(response.replace('\n', ''))
+            if 'error' in response.text.lower():
+                entry.fail(response.text.replace('\n', ''))
             else:
                 log.info('Added `%s` to SABnzbd' % (entry['title']))
 

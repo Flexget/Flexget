@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import object
-from future.moves import urllib
+from future.moves.urllib.parse import parse_qs, urlparse
 
 import re
 import logging
@@ -10,7 +10,6 @@ from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.soup import get_soup
-from flexget.utils.tools import urlopener
 
 log = logging.getLogger('google')
 
@@ -35,9 +34,8 @@ class UrlRewriteGoogleCse(object):
         try:
             # need to fake user agent
             txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
-            req = urllib.request.Request(entry['url'], None, txheaders)
-            page = urlopener(req, log)
-            soup = get_soup(page)
+            page = task.requests.get(entry['url'], headers=txheaders)
+            soup = get_soup(page.text)
             results = soup.find_all('a', attrs={'class': 'l'})
             if not results:
                 raise UrlRewritingError('No results')
@@ -72,7 +70,7 @@ class UrlRewriteGoogle(object):
         for link in soup.findAll('a', attrs={'href': re.compile(r'^/url')}):
             # Extract correct url from google internal link
             href = 'http://google.com' + link['href']
-            args = urllib.parse.parse_qs(urllib.parse.urlparse(href).query)
+            args = parse_qs(urlparse(href).query)
             href = args['q'][0]
 
             # import IPython; IPython.embed()

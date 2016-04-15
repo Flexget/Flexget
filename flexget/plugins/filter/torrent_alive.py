@@ -11,10 +11,11 @@ import socket
 import struct
 from random import randrange
 from http.client import BadStatusLine
+from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.tools import urlopener
+from flexget.utils import requests
 from flexget.utils.bittorrent import bdecode
 
 log = logging.getLogger('torrent_alive')
@@ -134,9 +135,10 @@ def get_http_seeds(url, info_hash):
         return 0
     log.debug('Checking for seeds from %s' % url)
     data = None
+
     try:
-        data = bdecode(urlopener(url, log, retries=1, timeout=10).read()).get('files')
-    except URLError as e:
+        data = bdecode(requests.get(url).json().get('files'))
+    except RequestException as e:
         log.debug('Error scraping: %s' % e)
         return 0
     except SyntaxError as e:

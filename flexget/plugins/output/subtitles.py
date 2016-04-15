@@ -9,7 +9,6 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.tools import urlopener
 
 """
 
@@ -155,11 +154,11 @@ class Subtitles(object):
                 log.debug('SUBS FOUND: %s %s %s' %
                           (sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID']))
 
-                f = urlopener(sub['ZipDownloadLink'], log)
-                subfilename = re.match('^attachment; filename="(.*)"$', f.info()['content-disposition']).group(1)
+                f = task.requests.get(sub['ZipDownloadLink'])
+                subfilename = re.match('^attachment; filename="(.*)"$', f.headers['content-disposition']).group(1)
                 outfile = os.path.join(config['output'], subfilename)
                 fp = open(outfile, 'w')
-                fp.write(f.read())
+                fp.write(f.raw)
                 fp.close()
                 f.close()
 

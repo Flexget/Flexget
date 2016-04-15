@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import str, object
-from future.moves import urllib
+from future.moves.urllib.parse import urlencode
 
 import logging
 import re
@@ -9,7 +9,6 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.soup import get_soup
-from flexget.utils.tools import urlopener
 
 log = logging.getLogger("newzleech")
 
@@ -35,15 +34,14 @@ class UrlRewriteNewzleech(object):
         nzbs = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = entry['title']
-            url = u'http://newzleech.com/?%s' % str(urllib.parse.urlencode({'q': query.encode('latin1'),
+            url = u'http://newzleech.com/?%s' % str(urlencode({'q': query.encode('latin1'),
                                                                       'm': 'search', 'group': '', 'min': 'min',
                                                                       'max': 'max', 'age': '', 'minage': '',
                                                                       'adv': ''}))
             # log.debug('Search url: %s' % url)
 
-            req = urllib.request.Request(url, headers=txheaders)
-            page = urlopener(req, log)
-            soup = get_soup(page)
+            page = task.requests.get(url, headers=txheaders)
+            soup = get_soup(page.text)
 
             for item in soup.find_all('table', attrs={'class': 'contentt'}):
                 subject_tag = item.find('td', attrs={'class': 'subject'}).__next__

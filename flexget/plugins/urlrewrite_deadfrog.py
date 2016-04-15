@@ -8,7 +8,6 @@ import re
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('deadfrog')
@@ -28,15 +27,14 @@ class UrlRewriteDeadFrog(object):
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        entry['url'] = self.parse_download_page(entry['url'])
+        entry['url'] = self.parse_download_page(entry['url'], task.requests)
 
     @plugin.internet(log)
-    def parse_download_page(self, url):
+    def parse_download_page(self, url, requests):
         txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
-        req = urllib.request.Request(url, None, txheaders)
-        page = urlopener(req, log)
+        page = requests.get(url, headers=txheaders)
         try:
-            soup = get_soup(page)
+            soup = get_soup(page.text)
         except Exception as e:
             raise UrlRewritingError(e)
         down_link = soup.find('a', attrs={'href': re.compile("download/\d+/.*\.torrent")})
