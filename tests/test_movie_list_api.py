@@ -60,7 +60,7 @@ class TestMovieListAPI(object):
         rsp = api_client.get('/movie_list/1/movies/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        returned_identifier = json.loads(rsp.data)['movies'][0]['movies_list_ids'][0]
+        returned_identifier = json.loads(rsp.get_data(as_text=True))['movies'][0]['movies_list_ids'][0]
         assert returned_identifier['id_name'], returned_identifier['id_value'] == identifier.items()[0]
 
     def test_movie_list_movie(self, api_client):
@@ -82,13 +82,13 @@ class TestMovieListAPI(object):
         # Get movies from list
         rsp = api_client.get('/movie_list/1/movies/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        returned_identifier = json.loads(rsp.data)['movies'][0]['movies_list_ids'][0]
+        returned_identifier = json.loads(rsp.get_data(as_text=True))['movies'][0]['movies_list_ids'][0]
         assert returned_identifier['id_name'], returned_identifier['id_value'] == identifier.items()[0]
 
         # Get specific movie from list
         rsp = api_client.get('/movie_list/1/movies/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        returned_identifier = json.loads(rsp.data)['movies_list_ids'][0]
+        returned_identifier = json.loads(rsp.get_data(as_text=True))['movies_list_ids'][0]
         assert returned_identifier['id_name'], returned_identifier['id_value'] == identifier.items()[0]
 
         identifiers = [{'trakt_movie_id': '12345'}]
@@ -96,7 +96,7 @@ class TestMovieListAPI(object):
         # Change specific movie from list
         rsp = api_client.json_put('/movie_list/1/movies/1/', data=json.dumps(identifiers))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        returned_identifier = json.loads(rsp.data)['movies_list_ids'][0]
+        returned_identifier = json.loads(rsp.get_data(as_text=True))['movies_list_ids'][0]
         assert returned_identifier['id_name'], returned_identifier['id_value'] == identifiers[0].items()
 
         # Delete specific movie from list

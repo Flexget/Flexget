@@ -25,7 +25,7 @@ class TestValidator(object):
         rsp = api_client.json_post('/tasks/', data=json.dumps(new_task))
 
         assert rsp.status_code == 400
-        data = json.loads(rsp.data.decode('utf8'))
+        data = json.loads(rsp.get_data(as_text=True))
         assert data.get('code') == 400
         assert data.get('message') == 'validation error'
         assert data.get('validation_errors')
@@ -47,7 +47,7 @@ class TestServerAPI(object):
     def test_pid(self, api_client):
         rsp = api_client.get('/server/pid/', headers={})
         assert rsp.status_code == 200
-        assert json.loads(rsp.data.decode('utf8')) == {'pid': os.getpid()}
+        assert json.loads(rsp.get_data(as_text=True)) == {'pid': os.getpid()}
 
     @patch.object(MockManager, 'load_config')
     def test_reload(self, mocked_load_config, api_client):
@@ -63,7 +63,7 @@ class TestServerAPI(object):
     def test_get_config(self, api_client):
         rsp = api_client.get('/server/config/')
         assert rsp.status_code == 200
-        assert json.loads(rsp.data.decode('utf8')) == {
+        assert json.loads(rsp.get_data(as_text=True)) == {
             'tasks': {
                 'test': {
                     'mock': [{'title': 'entry 1'}],
@@ -81,7 +81,7 @@ class TestServerAPI(object):
     def test_version(self, api_client):
         rsp = api_client.get('/server/version/')
         assert rsp.status_code == 200
-        assert json.loads(rsp.data.decode('utf8')) == {'flexget_version': __version__, 'api_version': __api_version__}
+        assert json.loads(rsp.get_data(as_text=True)) == {'flexget_version': __version__, 'api_version': __api_version__}
 
 
 class TestTaskAPI(object):
@@ -96,7 +96,7 @@ class TestTaskAPI(object):
 
     def test_list_tasks(self, api_client):
         rsp = api_client.get('/tasks/')
-        data = json.loads(rsp.data.decode('utf8'))
+        data = json.loads(rsp.get_data(as_text=True))
         assert data == {
             'tasks': [
                 {
@@ -129,7 +129,7 @@ class TestTaskAPI(object):
 
         assert rsp.status_code == 201
         assert mocked_save_config.called
-        assert json.loads(rsp.data.decode('utf8')) == new_task
+        assert json.loads(rsp.get_data(as_text=True)) == new_task
         assert manager.user_config['tasks']['new_task'] == new_task['config']
         assert manager.config['tasks']['new_task'] == new_task['config']
 
@@ -146,7 +146,7 @@ class TestTaskAPI(object):
 
     def test_get_task(self, api_client):
         rsp = api_client.get('/tasks/test/')
-        data = json.loads(rsp.data.decode('utf8'))
+        data = json.loads(rsp.get_data(as_text=True))
         assert data == {
             'name': 'test',
             'config': {
@@ -175,7 +175,7 @@ class TestTaskAPI(object):
 
         assert rsp.status_code == 200
         assert mocked_save_config.called
-        assert json.loads(rsp.data.decode('utf8')) == updated_task
+        assert json.loads(rsp.get_data(as_text=True)) == updated_task
         assert manager.user_config['tasks']['test'] == updated_task['config']
         assert manager.config['tasks']['test'] == updated_task['config']
 
@@ -193,7 +193,7 @@ class TestTaskAPI(object):
 
         assert rsp.status_code == 201
         assert mocked_save_config.called
-        assert json.loads(rsp.data.decode('utf8')) == updated_task
+        assert json.loads(rsp.get_data(as_text=True)) == updated_task
         assert 'test' not in manager.user_config['tasks']
         assert 'test' not in manager.config['tasks']
         assert manager.user_config['tasks']['new_test'] == updated_task['config']
