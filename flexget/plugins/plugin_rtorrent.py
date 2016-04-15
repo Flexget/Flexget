@@ -1,15 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import bytes, zip, map, range, object, list
+from builtins import dict, int, range, str, map, zip
+from future.moves.xmlrpc import client as xmlrpc_client
 from future.moves.urllib.parse import urlparse
-from future.backports.xmlrpc import client as xmlrpc_client
 from future.utils import native_str
+from future.utils import PY3
 
 import logging
-import sys
 import os
 import socket
 import re
-import http.client
 from time import sleep
 
 from flexget.utils.template import RenderError
@@ -20,11 +19,10 @@ from flexget.entry import Entry
 from flexget.config_schema import one_or_more
 from flexget.utils.bittorrent import Torrent, is_torrent_file
 
-
 log = logging.getLogger('rtorrent')
 
 
-class _Method:
+class _Method(object):
     # some magic to bind an XML-RPC method to an RPC server.
     # supports "nested" methods (e.g. examples.getStateName)
     def __init__(self, send, name):
@@ -38,43 +36,13 @@ class _Method:
         return self.__send(self.__name, args)
 
 
-class TimeoutHTTPConnection(http.client.HTTPConnection):
-    def __init__(self, host, timeout=30):
-        super(TimeoutHTTPConnection, self).__init__(host, timeout=timeout)
-
-
-class HTTPTransport(xmlrpc_client.Transport):
-    def __init__(self, timeout=30, *args, **kwargs):
-        super(HTTPTransport, self).__init__(*args, **kwargs)
-        self.timeout = timeout
-
-    def make_connection(self, host):
-        # return an existing connection if possible.  This allows HTTP/1.1 keep-alive.
-        if self._connection and host == self._connection[0]:
-            return self._connection[1]
-
-        # create a HTTP connection object from a host descriptor
-        chost, self._extra_headers, x509 = self.get_host_info(host)
-        self._connection = host, TimeoutHTTPConnection(chost, timeout=self.timeout)
-        return self._connection[1]
-
-
-class HTTPServerProxy(xmlrpc_client.ServerProxy):
-    """
-    Supports http with timeout
-    """
-    def __init__(self, uri, timeout=30, *args, **kwargs):
-        kwargs['transport'] = HTTPTransport(timeout=timeout, use_datetime=kwargs.get('use_datetime', 0))
-        super(HTTPServerProxy, self).__init__(uri, *args, **kwargs)
-
-
 class SCGITransport(xmlrpc_client.Transport):
     """ Used to override the default xmlrpclib transport to support SCGI """
 
     def __init__(self, timeout=30, *args, **kwargs):
         self.verbose = 0
-        super(SCGITransport, self).__init__(*args, **kwargs)
-        self.timeout = timeout
+        xmlrpc_client.Transport.__init__(self, *args, **kwargs)
+        self._timeout = timeout
 
     def request(self, host, handler, request_body, verbose=False):
         return self.single_request(host, handler, request_body, verbose)
@@ -96,17 +64,17 @@ class SCGITransport(xmlrpc_client.Transport):
 
                 addr_info = socket.getaddrinfo(host, int(port), socket.AF_INET, socket.SOCK_STREAM)
                 sock = socket.socket(*addr_info[0][:3])
-                sock.settimeout(self.timeout)
+                sock.settimeout(self._timeout)
                 sock.connect(addr_info[0][4])
             else:
                 sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-                sock.settimeout(self.timeout)
+                sock.settimeout(self._timeout)
                 sock.connect(handler)
 
             self.verbose = verbose
 
-            if sys.version_info[0] > 2:
-                sock.send(bytes(request_body, 'utf-8'))
+            if PY3:
+                sock.send(request_body.encode('utf-8'))
             else:
                 sock.send(request_body)
             return self.parse_response(sock.makefile())
@@ -136,12 +104,12 @@ class SCGITransport(xmlrpc_client.Transport):
         return u.close()
 
 
-class SCGIServerProxy(xmlrpc_client.ServerProxy):
+class SCGIServerProxy(object):
     """ Enable connection to SCGI proxy """
 
     def __init__(self, uri, transport=None, encoding=None,
                  verbose=False, allow_none=False, use_datetime=False, timeout=30):
-        self.timeout = timeout
+        self._timeout = timeout
         parsed_url = urlparse(uri)
         self.__host = uri if parsed_url.scheme else None
         self.__handler = urlparse(uri).path
@@ -149,9 +117,9 @@ class SCGIServerProxy(xmlrpc_client.ServerProxy):
             self.__handler = '/'
 
         if not transport:
-            transport = SCGITransport(use_datetime=use_datetime, timeout=self.timeout)
+            transport = SCGITransport(use_datetime=use_datetime, timeout=self._timeout)
         self.__transport = transport
-        self.__encoding = encoding
+        self.__encoding = encoding or 'utf-8'
         self.__verbose = verbose
         self.__allow_none = allow_none
 
@@ -160,8 +128,16 @@ class SCGIServerProxy(xmlrpc_client.ServerProxy):
 
     def __request(self, method_name, params):
         # call a method on the remote server
-        request = xmlrpc_client.dumps(params, method_name, encoding=self.__encoding, allow_none=self.__allow_none)
-        response = self.__transport.request(self.__host, self.__handler, request, verbose=self.__verbose)
+
+        request = xmlrpc_client.dumps(params, method_name, encoding=self.__encoding,
+                                      allow_none=self.__allow_none).encode(self.__encoding)
+
+        response = self.__transport.request(
+            self.__host,
+            self.__handler,
+            request,
+            verbose=self.__verbose
+        )
 
         if len(response) == 1:
             response = response[0]
@@ -169,23 +145,29 @@ class SCGIServerProxy(xmlrpc_client.ServerProxy):
         return response
 
     def __repr__(self):
-        return '<SCGIServerProxy for %s%s>' % (self.__host, self.__handler)
+        return (
+            "<ServerProxy for %s%s>" %
+            (self.__host, self.__handler)
+        )
+
+    __str__ = __repr__
 
     def __getattr__(self, name):
+        # magic method dispatcher
         return _Method(self.__request, name)
 
     # note: to call a remote object with an non-standard name, use
     # result getattr(server, "strange-python-name")(args)
+
     def __call__(self, attr):
+        """A workaround to get special attributes on the ServerProxy
+           without interfering with the magic __getattr__
         """
-        A workaround to get special attributes on the ServerProxy
-        without interfering with the magic __getattr__
-        """
-        if attr == 'close':
+        if attr == "close":
             return self.__close
-        elif attr == 'transport':
+        elif attr == "transport":
             return self.__transport
-        raise AttributeError('Attribute %r not found' % (attr,))
+        raise AttributeError("Attribute %r not found" % (attr,))
 
 
 class RTorrent(object):
@@ -242,7 +224,7 @@ class RTorrent(object):
 
         # Determine the proxy server
         if parsed_uri.scheme in ['http', 'https']:
-            sp = HTTPServerProxy
+            sp = xmlrpc_client.ServerProxy
         elif parsed_uri.scheme == 'scgi':
             sp = SCGIServerProxy
         elif parsed_uri.scheme == '' and parsed_uri.path:
@@ -251,7 +233,7 @@ class RTorrent(object):
         else:
             raise IOError('Unsupported scheme %s for uri %s' % (parsed_uri.scheme, self.uri))
 
-        self._server = sp(self.uri, timeout=timeout)
+        self._server = sp(self.uri)
 
     def _clean_fields(self, fields, reverse=False):
         if not fields:
@@ -379,7 +361,6 @@ class RTorrent(object):
 
 
 class RTorrentPluginBase(object):
-
     priority_map = {
         'high': 3,
         'medium': 2,
@@ -435,7 +416,6 @@ class RTorrentPluginBase(object):
 
 
 class RTorrentOutputPlugin(RTorrentPluginBase):
-
     schema = {
         'type': 'object',
         'properties': {
@@ -535,7 +515,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
         if existing and 'directory' in options:
             # Check if changing to another directory which requires a move
-            if options['directory'] != existing['base_path']\
+            if options['directory'] != existing['base_path'] \
                     and options['directory'] != os.path.dirname(existing['base_path']):
                 try:
                     log.verbose("Path is changing, moving files from '%s' to '%s'"
@@ -631,7 +611,6 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
 
 class RTorrentInputPlugin(RTorrentPluginBase):
-
     schema = {
         'type': 'object',
         'properties': {
