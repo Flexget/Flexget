@@ -40,37 +40,37 @@ class TestCouchpotato(object):
 
 
 class TestCouchpotatoWithQuality(object):
-    expected_qualities = {'American Ultra': '720p|1080p',
-                          'Anomalisa': '720p|1080p',
-                          'Ant-Man': '720p',
-                          'Austin Powers 4': '720p',
-                          'Black Mass': '720p',
-                          'Bridge of Spies': '720p',
-                          'Chronic-Con, Episode 420: A New Dope': '720p',
-                          'Citizenfour': '720p',
-                          'Crimson Peak': '720p',
-                          'Deadpool': '1080p',
-                          'Doug Benson: Doug Dynasty': '720p',
-                          'Ghostbusters': '720p',
-                          'The Gift': '720p|1080p dvdrip|bluray',
-                          'Hail, Caesar!': '720p',
-                          'I Am Chris Farley': '720p|1080p',
-                          'Inside Out': '720p',
-                          'The Last Witch Hunter': '720p',
-                          'Legend': '720p',
-                          'The Martian': '1080p',
-                          'Minions': '720p',
-                          'A Most Violent Year': '720p',
-                          'Mr. Holmes': '720p',
-                          "Pee-wee's Big Holiday": '720p',
-                          'Sicario': '720p',
-                          'SPECTRE': '1080p',
-                          'Straight Outta Compton': '720p',
-                          'Ted 2': '720p',
-                          'Tomorrowland': '720p',
-                          'Trainwreck': '720p',
-                          'True Story': '720p',
-                          'Untitled Next Bourne Chapter': '720p',
+    expected_qualities = {'American Ultra': ['720p', '1080p'],
+                          'Anomalisa': ['720p', '1080p'],
+                          'Ant-Man': ['720p'],
+                          'Austin Powers 4': ['720p'],
+                          'Black Mass': ['720p'],
+                          'Bridge of Spies': ['720p'],
+                          'Chronic-Con, Episode 420: A New Dope': ['720p'],
+                          'Citizenfour': ['720p'],
+                          'Crimson Peak': ['720p'],
+                          'Deadpool': ['1080p'],
+                          'Doug Benson: Doug Dynasty': ['720p'],
+                          'Ghostbusters': ['720p'],
+                          'The Gift': ['720p', '1080p', 'dvdrip', 'bluray'],
+                          'Hail, Caesar!': ['720p'],
+                          'I Am Chris Farley': ['720p', '1080p'],
+                          'Inside Out': ['720p'],
+                          'The Last Witch Hunter': ['720p'],
+                          'Legend': ['720p'],
+                          'The Martian': ['1080p'],
+                          'Minions': ['720p'],
+                          'A Most Violent Year': ['720p'],
+                          'Mr. Holmes': ['720p'],
+                          "Pee-wee's Big Holiday": ['720p'],
+                          'Sicario': ['720p'],
+                          'SPECTRE': ['1080p'],
+                          'Straight Outta Compton': ['720p'],
+                          'Ted 2': ['720p'],
+                          'Tomorrowland': ['720p'],
+                          'Trainwreck': ['720p'],
+                          'True Story': ['720p'],
+                          'Untitled Next Bourne Chapter': ['720p'],
                           }
     config = """
         tasks:
@@ -82,12 +82,16 @@ class TestCouchpotatoWithQuality(object):
               include_data: yes
         """
 
-
     def quality_assertion(self, entry):
-        assert entry['title'] in self.expected_qualities , 'Could not find entry {} in qualities list.'.format(entry)
+        assert entry['title'] in self.expected_qualities, 'Could not find entry {} in qualities list.'.format(entry)
         expected_quality = self.expected_qualities[entry['title']]
 
-        assert entry['quality_req'] == expected_quality, \
+        # Must do this as the order is not guaranteed
+        entry_quality = entry['quality_req'].replace(' ', '|').split('|')
+
+        assert len(expected_quality) == len(entry_quality)
+
+        assert all(q in expected_quality for q in entry_quality), \
             'Expected Quality for entry {} should be {}, instead its {}'.format(entry['title'], expected_quality,
                                                                                 entry.store['quality_req'])
 
