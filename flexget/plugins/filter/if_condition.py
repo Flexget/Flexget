@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from future import builtins
 from builtins import object
+from future.moves import builtins
 from past.builtins import basestring
 
 import logging
