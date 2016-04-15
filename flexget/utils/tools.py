@@ -1,6 +1,6 @@
 """Contains miscellaneous helpers"""
-from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import chr, str, zip, range
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 from past.builtins import basestring
 from future.moves.urllib.parse import urlparse
 from future.moves.urllib import request

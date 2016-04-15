@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str
+from builtins import *
 
 import argparse
 from datetime import datetime, timedelta

@@ -1,5 +1,5 @@
-from __future__ import division
-from builtins import str, object
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 from past.utils import old_div
 from future.moves.urllib.parse import quote
 

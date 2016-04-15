@@ -2,7 +2,8 @@
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
 from __future__ import unicode_literals, division, absolute_import
-from builtins import next, zip, object, str
+from builtins import *
+from future.types.newbytes import newbytes
 from past.builtins import unicode as oldunicode  # For py2 support
 from past.builtins import str as oldstr  # For py2 support
 
@@ -231,7 +232,7 @@ class Torrent(object):
         else:
             # multifile torrent
             for item in self.content['info']['files']:
-                t = {'path': b'/'.join(item['path'][:-1]),
+                t = {'path': b'/'.join([newbytes(p, 'utf-8') for p in item['path'][:-1]]),
                      'name': item['path'][-1],
                      'size': item['length']}
                 files.append(t)

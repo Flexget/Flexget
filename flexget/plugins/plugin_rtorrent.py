@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import dict, int, range, str, map, zip
+from builtins import *
 from future.moves.xmlrpc import client as xmlrpc_client
 from future.moves.urllib.parse import urlparse
 from future.utils import native_str

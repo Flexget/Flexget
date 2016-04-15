@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str, object
+from builtins import *
 import logging
 
 from flexget import plugin

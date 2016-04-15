@@ -1,5 +1,5 @@
-from __future__ import absolute_import, division, unicode_literals, print_function
-from builtins import str
+from __future__ import unicode_literals, division, absolute_import, print_function
+from builtins import *
 from past.builtins import basestring
 
 import collections

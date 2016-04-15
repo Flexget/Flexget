@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import next, str, range, object
+from builtins import *
 
 import base64
 import glob

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import next
+from builtins import *
 
 import inspect
 import logging

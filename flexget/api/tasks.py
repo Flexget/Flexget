@@ -1,5 +1,5 @@
-from __future__ import absolute_import, division, unicode_literals
-from builtins import str
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 import argparse
 import cgi

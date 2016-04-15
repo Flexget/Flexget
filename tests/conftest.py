@@ -1,4 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 from future.utils import PY2
 from future.backports.http import client as backport_client
 

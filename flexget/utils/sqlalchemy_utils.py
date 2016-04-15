@@ -2,6 +2,7 @@
 Miscellaneous SQLAlchemy helpers.
 """
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 from past.builtins import basestring
 
 import logging

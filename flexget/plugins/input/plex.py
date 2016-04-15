@@ -1,5 +1,4 @@
 """Plugin for plex media server (www.plexapp.com)."""
-from builtins import object
 
 import re
 import logging

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import zip, str, object
+from builtins import *
 from past.builtins import basestring
 
 import re

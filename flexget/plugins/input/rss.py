@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str, object, map
+from builtins import *
 from past.builtins import basestring
 from future.moves.urllib.parse import urlparse, urlsplit
 

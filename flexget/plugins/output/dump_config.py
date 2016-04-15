@@ -1,5 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import object
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 import logging
 

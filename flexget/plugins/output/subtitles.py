@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import object
+from builtins import *
 from future.moves.xmlrpc.client import ServerProxy
 
 import re

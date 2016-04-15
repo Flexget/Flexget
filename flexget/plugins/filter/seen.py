@@ -8,7 +8,7 @@ forget (string)
     title will be forgotten. With field value only that particular field is forgotten.
 """
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str, object
+from builtins import *
 from past.builtins import basestring
 
 import logging

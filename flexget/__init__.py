@@ -1,5 +1,6 @@
 #!/usr/bin/python
-from __future__ import unicode_literals, division, absolute_import, print_function
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 from ._version import __version__
 

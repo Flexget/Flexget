@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str
+from builtins import *
 
 import logging
 from time import time

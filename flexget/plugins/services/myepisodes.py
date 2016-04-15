@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str, object
+from builtins import *
 from future.moves.urllib import request
 from future.moves.urllib import parse
 from future.moves.urllib.error import URLError

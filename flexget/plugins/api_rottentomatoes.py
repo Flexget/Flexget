@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import str, object
+from builtins import *
 from past.builtins import basestring
 from future.moves.urllib.parse import quote_plus
 from future.moves.urllib.error import URLError

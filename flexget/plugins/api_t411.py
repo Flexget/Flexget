@@ -1,8 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import next
-from builtins import map
-from builtins import str
-from builtins import object
+from builtins import *
 from datetime import datetime
 from functools import partial
 import json
