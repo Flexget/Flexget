@@ -7,6 +7,7 @@ You can safely use task.simple_persistence and manager.persist, if we implement 
 can replace underlying mechanism in single point (and provide transparent switch).
 """
 from __future__ import unicode_literals, division, absolute_import
+from future.types.newstr import newstr
 
 import logging
 import pickle
@@ -155,7 +156,7 @@ class SimplePersistence(MutableMapping):
                         query.delete()
                     else:
                         updated = query.update(
-                            {'value': str(json.dumps(value, encode_datetime=True))},
+                            {'value': newstr(json.dumps(value, encode_datetime=True))},
                             synchronize_session=False
                         )
                         if not updated:
