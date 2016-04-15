@@ -54,9 +54,13 @@ def upgrade(ver, session):
         # Make sure we get the new schema with the added column
         table = table_schema('simple_persistence', session)
         for row in session.execute(select([table.c.id, table.c.value])):
-            p = pickle.loads(row['value'])
-            session.execute(table.update().where(table.c.id == row['id']).values(
-                json=json.dumps(p, encode_datetime=True)))
+            try:
+                p = pickle.loads(row['value'])
+                session.execute(table.update().where(table.c.id == row['id']).values(
+                    json=json.dumps(p, encode_datetime=True)))
+            except KeyError as e:
+                log.error('Unable error upgrading simple_persistence pickle object due to %s' % str(e))
+
         ver = 4
     return ver
 

@@ -47,9 +47,13 @@ def upgrade(ver, session):
         # Make sure we get the new schema with the added column
         table = table_schema('delay', session)
         for row in session.execute(select([table.c.id, table.c.entry])):
-            p = pickle.loads(row['entry'])
-            session.execute(table.update().where(table.c.id == row['id']).values(
-                json=json.dumps(p, encode_datetime=True)))
+            try:
+                p = pickle.loads(row['entry'])
+                session.execute(table.update().where(table.c.id == row['id']).values(
+                    json=json.dumps(p, encode_datetime=True)))
+            except KeyError as e:
+                log.error('Unable error upgrading delay pickle object due to %s' % str(e))
+
         ver = 2
 
     return ver
