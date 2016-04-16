@@ -69,9 +69,9 @@ def register_web_ui(mgr):
     if debug:
         app_base = os.path.join(ui_base, '.tmp', 'serve')
         if not os.path.exists(app_base):
-            log.warn('Unable to start web ui in debug mode. To enable debug mode please run the debug build, '
+            log.warning('Unable to start web ui in debug mode. To enable debug mode please run the debug build, '
                      'see http://flexget.com/wiki/Web-UI for instructions')
-            log.warn('Attempting to serve web ui from complied directory')
+            log.warning('Attempting to serve web ui from complied directory')
             app_base = None
 
     if not app_base:

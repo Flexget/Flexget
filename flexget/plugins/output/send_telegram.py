@@ -488,7 +488,7 @@ class SendTelegram(object):
             elif chat.type in ('group', 'supergroup' or 'channel'):
                 groups[chat.title] = chat
             else:
-                self.log.warn('unknown chat type: {0}'.format(type(chat)))
+                self.log.warning('unknown chat type: {0}'.format(type(chat)))
 
         return usernames, fullnames, groups
 

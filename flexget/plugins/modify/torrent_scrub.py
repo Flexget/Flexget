@@ -99,7 +99,7 @@ class TorrentScrub(object):
                           " scrubbed from torrent '%s'!") % (", ".join(sorted(modified)), entry['title']))
                 new_infohash = entry["torrent"].info_hash
                 if infohash != new_infohash:
-                    log.warn("Info hash changed from #%s to #%s in '%s'" %
+                    log.warning("Info hash changed from #%s to #%s in '%s'" %
                              (infohash, new_infohash, entry['filename']))
 
 

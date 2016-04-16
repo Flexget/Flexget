@@ -249,7 +249,7 @@ class t411Auth(AuthBase):
                 raise UrlRewritingError("Connection Error for %s : %s" % (url_auth, e))
 
             if b'confirmer le captcha' in login_output:
-                log.warn("Captcha requested for login.")
+                log.warning("Captcha requested for login.")
                 login_output = self._solveCaptcha(login_output, url_auth, params, opener)
 
             if b'logout' in login_output:

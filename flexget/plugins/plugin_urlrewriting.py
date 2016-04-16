@@ -33,7 +33,7 @@ class PluginUrlRewriting(object):
             try:
                 self.url_rewrite(task, entry)
             except UrlRewritingError as e:
-                log.warn(e.value)
+                log.warning(e.value)
                 entry.fail()
 
     # API method
