@@ -204,8 +204,16 @@ def no_requests(monkeypatch):
     online_funcs = [
         'requests.sessions.Session.request',
         'future.backports.http.client.HTTPConnection.request',
-        'future.backports.http.client.HTTPSConnection.request',
     ]
+
+    # Don't monkey patch HTTPSConnection if ssl not installed as it won't exist in backports
+    try:
+        import ssl
+        from ssl import SSLContext
+        online_funcs.extend('future.backports.http.client.HTTPSConnection.request')
+    except ImportError:
+        pass
+
     if PY2:
         online_funcs.extend(['httplib.HTTPConnection.request',
                              'httplib.HTTPSConnection.request'])
