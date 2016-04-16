@@ -22,20 +22,12 @@
         };
 
         // Execute task(s), return stream log etc
-        this.execute = function (task_name, options) {
+        this.execute = function (task_names, options) {
             var deferred = $q.defer();
 
-            var params = '';
+            console.log(options);
 
-            angular.forEach(options, function (value, key) {
-                var option = key + '=' + value;
-                if (params) {
-                    params = params + '&' + option
-                } else {
-                    params = '?' + option
-                }
-            });
-
+            options.tasks = task_names;
             var on = function (event, pattern, callback) {
                 var wrappedCallback = function () {
                     var args = arguments;
@@ -53,8 +45,9 @@
             };
 
             var stream = oboe({
-                url: '/api/tasks/' + task_name + '/execute/' + params,
-                method: 'GET'
+                url: '/api/tasks/execute/',
+                body: options,
+                method: 'POST'
             }).done(function () {
                 deferred.resolve("finished stream");
             }).fail(function (error) {
