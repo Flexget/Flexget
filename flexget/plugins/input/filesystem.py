@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
-from future.utils import PY2
 
 import logging
 import re
@@ -8,6 +7,7 @@ import sys
 from datetime import datetime
 
 from path import Path
+import pathlib
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -109,15 +109,7 @@ class Filesystem(object):
         filepath = filepath.abspath()
         entry = Entry()
         entry['location'] = filepath
-        if PY2:
-            # Python 2 urllib wants and returns native (byte) strings
-            import urllib
-            import urlparse
-            urlpath = urllib.pathname2url(filepath.encode('utf-8'))
-            entry['url'] = urlparse.urljoin(b'file:', urlpath).decode('latin-1')
-        else:
-            import pathlib
-            entry['url'] = pathlib.Path(filepath).absolute().as_uri()
+        entry['url'] = pathlib.Path(filepath).absolute().as_uri()
         entry['filename'] = filepath.name
         if filepath.isfile():
             entry['title'] = filepath.namebase

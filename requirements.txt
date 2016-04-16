@@ -16,6 +16,7 @@ requests>=2.8.0, <3.0
 python-dateutil!=2.0, !=2.2, !=2.5.2
 jsonschema>=2.0
 path.py
+pathlib
 guessit>=2.0.3
 # Bug in apscheduler 3.1.0 https://github.com/agronholm/apscheduler/issues/121
 apscheduler>=3.0.3, !=3.1.0
