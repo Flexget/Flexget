@@ -5,24 +5,9 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
+        User-Agent: [FlexGet/2.0.0b0 (www.flexget.com)]
       method: GET
       uri: http://torrent.ubuntu.com:6969/scrape?info_hash=%14%FF%E5%DD%23%18%8F%D5%CBS%A1%D4%7F%12%89%DBp%AB%F3%1E
-    response:
-      body: {string: 'd5:filesdee'}
-      headers:
-        Content-Length: ['11']
-        Content-Type: [text/plain]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/1.3.0.dev (www.flexget.com)]
-      method: GET
-      uri: http://ipv6.torrent.ubuntu.com:6969/scrape?info_hash=%14%FF%E5%DD%23%18%8F%D5%CBS%A1%D4%7F%12%89%DBp%AB%F3%1E
     response:
       body: {string: 'd5:filesdee'}
       headers:
