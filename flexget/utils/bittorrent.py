@@ -90,7 +90,7 @@ def is_torrent_file(metafilepath):
     return bool(magic_marker)
 
 
-def tokenize(text, match=re.compile(bytes('([idel])|(\d+):|(-?\d+)', 'utf-8')).match):
+def tokenize(text, match=re.compile(b'([idel])|(\d+):|(-?\d+)').match):
     i = 0
     while i < len(text):
         m = match(text, i)
