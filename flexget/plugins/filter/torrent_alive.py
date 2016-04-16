@@ -1,8 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
-from future.moves.urllib.parse import urlparse, SplitResult, urlsplit, urlunsplit, quote
+from future.moves.urllib.parse import urlparse, urlsplit, urlunsplit, quote
 from future.moves.urllib.error import URLError
-
 
 import itertools
 import logging
@@ -55,10 +54,9 @@ def max_seeds_from_threads(threads):
 
 def get_scrape_url(tracker_url, info_hash):
     if 'announce' in tracker_url:
-        v = urlsplit(tracker_url)
-        sr = SplitResult(v.scheme, v.netloc, v.path.replace('announce', 'scrape'),
-                         v.query, v.fragment)
-        result = urlunsplit(sr)
+        v = urlsplit(tracker_url).replace('an')
+        result = urlunsplit([v.scheme, v.netloc, v.path.replace('announce', 'scrape'),
+                             v.query, v.fragment])
     else:
         log.debug('`announce` not contained in tracker url, guessing scrape address.')
         result = tracker_url + '/scrape'
@@ -201,7 +199,7 @@ class TorrentAlive(object):
         for entry in task.entries:
             if 'torrent_seeds' in entry and entry['torrent_seeds'] < config['min_seeds']:
                 entry.reject(reason='Had < %d required seeds. (%s)' %
-                            (config['min_seeds'], entry['torrent_seeds']))
+                                    (config['min_seeds'], entry['torrent_seeds']))
 
     # Run on output phase so that we let torrent plugin output modified torrent file first
     @plugin.priority(250)
