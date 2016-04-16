@@ -3,9 +3,8 @@
 # Test scripts and other short code fragments can be considered as being in the public domain.
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
+from future.utils import native
 from future.types.newbytes import newbytes
-from past.builtins import unicode as oldunicode  # For py2 support
-from past.builtins import str as oldstr  # For py2 support
 
 import codecs
 import functools
@@ -180,17 +179,18 @@ def encode_dictionary(data):
 
 
 def bencode(data):
-    encode_func = {
-        bytes: encode_string,
-        str: encode_unicode,
-        int: encode_integer,
-        list: encode_list,
-        dict: encode_dictionary,
-        # Added for py2 support
-        oldstr: encode_string,
-        oldunicode: encode_unicode
-    }
-    return encode_func[type(data)](data)
+    if isinstance(data, bytes):
+        return encode_string(data)
+    if isinstance(data, str):
+        return encode_unicode(data)
+    if isinstance(data, int):
+        return encode_integer(data)
+    if isinstance(data, list):
+        return encode_list(data)
+    if isinstance(data, dict):
+        return encode_dictionary(data)
+
+    raise TypeError
 
 
 class Torrent(object):
