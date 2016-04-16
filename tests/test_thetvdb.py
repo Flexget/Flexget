@@ -109,6 +109,8 @@ class TestTVDBLookup(object):
         assert entry['tvdb_ep_rating'] == 7.8
 
     def test_no_posters_actors(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('test_no_poster_actors')
         entry = task.find_entry(tvdb_series_name='Sex House')
         assert entry['tvdb_posters'] == []
