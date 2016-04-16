@@ -7,7 +7,7 @@ interactions:
         Connection: [keep-alive]
         User-Agent: [FlexGet/2.0.0b0 (www.flexget.com)]
       method: GET
-      uri: http://torrent.ubuntu.com:6969/scrape?info_hash=%24P2%17%A6%06%DA%AC%EA%A1%B85i%BDH%1C%B8%07%8F%9C
+      uri: http://torrent.ubuntu.com:6969/scrape?info_hash=31344646453544443233313838464435434235334131443437463132383944423730414246333145
     response:
       body: {string: 'd5:filesdee'}
       headers:

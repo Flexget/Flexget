@@ -61,7 +61,7 @@ def get_scrape_url(tracker_url, info_hash):
         result = tracker_url + '/scrape'
 
     result += '&' if '?' in result else '?'
-    result += 'info_hash=%s' % quote(binascii.hexlify(info_hash))
+    result += 'info_hash=%s' % quote(binascii.hexlify(bytes(info_hash, 'utf-8')))
     return result
 
 
@@ -102,7 +102,7 @@ def get_udp_seeds(url, info_hash):
         action, transaction_id, connection_id = struct.unpack(b">LLQ", res)
 
         # build packet hash out of decoded info_hash
-        packet_hash = binascii.hexlify(info_hash)
+        packet_hash = binascii.hexlify(bytes(info_hash, 'utf-8'))
 
         # construct packet for scrape with decoded info_hash setting action byte to 2 for scape
         packet = struct.pack(b">QLL", connection_id, 2, transaction_id) + packet_hash
