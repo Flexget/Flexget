@@ -9,12 +9,13 @@ import click
 
 
 def _get_version():
-    __version__ = None
     with open('flexget/_version.py') as f:
-        exec(f.read())
-    if not __version__:
+        g = globals()
+        l = {}
+        exec(f.read(), g, l)
+    if not l['__version__']:
         raise click.ClickException('Could not find __version__ from flexget/_version.py')
-    return __version__
+    return l['__version__']
 
 
 @click.group()
