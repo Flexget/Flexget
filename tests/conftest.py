@@ -210,7 +210,7 @@ def no_requests(monkeypatch):
     try:
         import ssl
         from ssl import SSLContext
-        online_funcs.extend('future.backports.http.client.HTTPSConnection.request')
+        online_funcs.append('future.backports.http.client.HTTPSConnection.request')
     except ImportError:
         pass
 
