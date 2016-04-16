@@ -39,10 +39,9 @@ class _Method(object):
 class SCGITransport(xmlrpc_client.Transport):
     """ Used to override the default xmlrpclib transport to support SCGI """
 
-    def __init__(self, timeout=30, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.verbose = 0
         xmlrpc_client.Transport.__init__(self, *args, **kwargs)
-        self._timeout = timeout
 
     def request(self, host, handler, request_body, verbose=False):
         return self.single_request(host, handler, request_body, verbose)
@@ -64,19 +63,15 @@ class SCGITransport(xmlrpc_client.Transport):
 
                 addr_info = socket.getaddrinfo(host, int(port), socket.AF_INET, socket.SOCK_STREAM)
                 sock = socket.socket(*addr_info[0][:3])
-                sock.settimeout(self._timeout)
                 sock.connect(addr_info[0][4])
             else:
                 sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-                sock.settimeout(self._timeout)
                 sock.connect(handler)
 
             self.verbose = verbose
 
-            if PY3:
-                sock.send(request_body.encode('utf-8'))
-            else:
-                sock.send(request_body)
+            sock.send(request_body.encode())
+
             return self.parse_response(sock.makefile())
         finally:
             if sock:
@@ -108,8 +103,7 @@ class SCGIServerProxy(object):
     """ Enable connection to SCGI proxy """
 
     def __init__(self, uri, transport=None, encoding=None,
-                 verbose=False, allow_none=False, use_datetime=False, timeout=30):
-        self._timeout = timeout
+                 verbose=False, allow_none=False, use_datetime=False):
         parsed_url = urlparse(uri)
         self.__host = uri if parsed_url.scheme else None
         self.__handler = urlparse(uri).path
@@ -117,7 +111,7 @@ class SCGIServerProxy(object):
             self.__handler = '/'
 
         if not transport:
-            transport = SCGITransport(use_datetime=use_datetime, timeout=self._timeout)
+            transport = SCGITransport(use_datetime=use_datetime)
         self.__transport = transport
         self.__encoding = encoding or 'utf-8'
         self.__verbose = verbose
@@ -135,7 +129,7 @@ class SCGIServerProxy(object):
         response = self.__transport.request(
             self.__host,
             self.__handler,
-            request,
+            request.decode('utf-8'),
             verbose=self.__verbose
         )
 
@@ -191,7 +185,7 @@ class RTorrent(object):
         'base_path'
     )
 
-    def __init__(self, uri, username=None, password=None, timeout=30):
+    def __init__(self, uri, username=None, password=None):
         """
         New connection to rTorrent
 
@@ -407,7 +401,7 @@ class RTorrentPluginBase(object):
     def on_task_start(self, task, config):
         try:
             client = RTorrent(config['uri'], username=config.get('username'),
-                              password=config.get('password'), timeout=config.get('timeout'))
+                              password=config.get('password'))
             if client.version < [0, 9, 2]:
                 log.error('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
                 task.abort('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
@@ -426,7 +420,6 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             'start': {'type': 'boolean', 'default': True},
             'mkdir': {'type': 'boolean', 'default': True},
             'action': {'type': 'string', 'emun': ['update', 'delete', 'add'], 'default': 'add'},
-            'timeout': {'type': 'integer', 'default': 30},
             # properties to set on rtorrent download object
             'message': {'type': 'string'},
             'priority': {'type': 'string'},
@@ -458,7 +451,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
     def on_task_output(self, task, config):
         client = RTorrent(config['uri'], username=config.get('username'),
-                          password=config.get('password'), timeout=config.get('timeout'))
+                          password=config.get('password'))
 
         for entry in task.accepted:
             if task.options.test:
@@ -617,7 +610,6 @@ class RTorrentInputPlugin(RTorrentPluginBase):
             'uri': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'timeout': {'type': 'integer', 'default': 30},
             'view': {'type': 'string', 'default': 'main'},
             'fields': one_or_more({'type': 'string', 'enum': list(RTorrent.default_fields)}),
         },
@@ -627,7 +619,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
 
     def on_task_input(self, task, config):
         client = RTorrent(config['uri'], username=config.get('username'),
-                          password=config.get('password'), timeout=config.get('timeout'))
+                          password=config.get('password'))
 
         fields = config.get('fields')
 
