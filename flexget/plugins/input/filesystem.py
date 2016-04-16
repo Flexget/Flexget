@@ -109,7 +109,7 @@ class Filesystem(object):
         filepath = filepath.abspath()
         entry = Entry()
         entry['location'] = filepath
-        entry['url'] = pathlib.Path(filepath).absolute().as_uri()
+        entry['url'] = pathlib.Path(filepath.encode('utf8')).absolute().as_uri()
         entry['filename'] = filepath.name
         if filepath.isfile():
             entry['title'] = filepath.namebase
