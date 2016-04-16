@@ -3,6 +3,7 @@ from builtins import *
 
 import os
 
+import mock
 import pytest
 
 from flexget.utils.bittorrent import Torrent
@@ -268,7 +269,6 @@ class TestTorrentScrub(object):
                 filename, osize, self.__tmp__ + filename, msize)
 
 
-@pytest.mark.online
 @pytest.mark.usefixtures('tmpdir')
 class TestTorrentAlive(object):
     config = """
@@ -287,7 +287,8 @@ class TestTorrentAlive(object):
     """
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
-    def test_torrent_alive_fail(self, execute_task):
+    @mock.patch('flexget.utils.requests.get')
+    def test_torrent_alive_fail(self, mocked_request, execute_task):
         task = execute_task('test_torrent_alive_fail')
         assert not task.accepted, 'Torrent should not have met seed requirement.'
         assert task._rerun_count == 1, ('Task should have been rerun 1 time. Was rerun %s times.' %
