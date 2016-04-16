@@ -148,7 +148,7 @@ def bdecode(text):
 
 # encoding implementation by d0b
 def encode_string(data):
-    return b"%d:%s" % (len(data), data)
+    return bytes("%d:%s" % (len(data), data), 'utf-8')
 
 
 def encode_unicode(data):
@@ -156,7 +156,7 @@ def encode_unicode(data):
 
 
 def encode_integer(data):
-    return b"i%de" % data
+    return bytes("i%de" % data, 'utf-8')
 
 
 def encode_list(data):
