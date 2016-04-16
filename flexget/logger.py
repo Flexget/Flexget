@@ -58,6 +58,7 @@ class SessionFilter(logging.Filter):
 @contextlib.contextmanager
 def capture_output(stream, loglevel=None):
     """Context manager which captures all log and console output to given `stream` while in scope."""
+    print("DEBUG: loglevel is equal to %s" % loglevel)
     root_logger = logging.getLogger()
     old_level = root_logger.getEffectiveLevel()
     old_id = getattr(local_context, 'session_id', None)
@@ -70,6 +71,7 @@ def capture_output(stream, loglevel=None):
     streamhandler.addFilter(SessionFilter(local_context.session_id))
     if loglevel is not None:
         loglevel = get_level_no(loglevel)
+        print("DEBUG: loglevel after get_level_no equal to %s" % loglevel)
         streamhandler.setLevel(loglevel)
         # If requested loglevel is lower than the root logger is filtering for, we need to turn it down.
         # All existing handlers should have their desired level set and not be affected.
