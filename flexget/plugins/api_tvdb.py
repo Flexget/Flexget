@@ -24,7 +24,7 @@ persist = SimplePersistence('api_tvdb')
 
 class TVDBRequest(object):
     API_KEY = '4D297D8CFDE0E105'
-    BASE_URL = 'https://api-beta.thetvdb.com/'
+    BASE_URL = 'https://api.thetvdb.com/'
     BANNER_URL = 'http://thetvdb.com/banners/'
 
     def __init__(self, username=None, account_id=None):
