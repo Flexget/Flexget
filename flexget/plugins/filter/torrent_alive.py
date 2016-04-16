@@ -54,7 +54,7 @@ def max_seeds_from_threads(threads):
 
 def get_scrape_url(tracker_url, info_hash):
     if 'announce' in tracker_url:
-        v = urlsplit(tracker_url).replace('an')
+        v = urlsplit(tracker_url)
         result = urlunsplit([v.scheme, v.netloc, v.path.replace('announce', 'scrape'),
                              v.query, v.fragment])
     else:
