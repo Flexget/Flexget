@@ -146,11 +146,12 @@ def bdecode(text):
 
 # encoding implementation by d0b
 def encode_string(data):
-    return '{0}:{1}'.format(len(data), data).encode('utf-8')
+    return encode_bytes(data.encode())
 
 
-def encode_unicode(data):
-    return encode_string(data)
+def encode_bytes(data):
+    length = str(len(data)).encode()
+    return bytes('', 'utf-8').join([length, str(':').encode(), data])
 
 
 def encode_integer(data):
@@ -178,9 +179,9 @@ def encode_dictionary(data):
 
 def bencode(data):
     if isinstance(data, bytes):
-        return encode_string(data)
+        return encode_bytes(data)
     if isinstance(data, str):
-        return encode_unicode(data)
+        return encode_string(data)
     if isinstance(data, int):
         return encode_integer(data)
     if isinstance(data, list):
