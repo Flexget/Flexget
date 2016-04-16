@@ -9,6 +9,7 @@ import logging
 import threading
 import socket
 import struct
+import codecs
 from random import randrange
 from http.client import BadStatusLine
 from requests import RequestException
@@ -19,6 +20,7 @@ from flexget.utils import requests
 from flexget.utils.bittorrent import bdecode
 
 log = logging.getLogger('torrent_alive')
+decode_hex = codecs.getdecoder("hex_codec")
 
 
 class TorrentAliveThread(threading.Thread):
@@ -62,7 +64,7 @@ def get_scrape_url(tracker_url, info_hash):
         result = tracker_url + '/scrape'
 
     result += '&' if '?' in result else '?'
-    result += 'info_hash=%s' % quote(info_hash.decode('hex'))
+    result += 'info_hash=%s' % quote(decode_hex(info_hash)[0])
     return result
 
 
@@ -134,10 +136,9 @@ def get_http_seeds(url, info_hash):
         log.debug('if not url is true returning 0')
         return 0
     log.debug('Checking for seeds from %s' % url)
-    data = None
 
     try:
-        data = bdecode(requests.get(url).json().get('files'))
+        data = bdecode(requests.get(url).text.encode('utf-8')).get('files')
     except RequestException as e:
         log.debug('Error scraping: %s' % e)
         return 0

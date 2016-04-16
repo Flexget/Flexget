@@ -138,7 +138,7 @@ def decode_item(next, token):
 def bdecode(text):
     try:
         src = tokenize(text)
-        data = decode_item(functools.partial(next, src), next(src)) # pylint:disable=E1101
+        data = decode_item(functools.partial(next, src), next(src))  # pylint:disable=E1101
         for token in src: # look for more tokens
             raise SyntaxError("trailing junk")
     except (AttributeError, ValueError, StopIteration) as e:
