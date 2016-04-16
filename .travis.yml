@@ -3,6 +3,7 @@ cache: pip
 sudo: false
 python:
   - "2.7"
+  - "3.3"
   - "3.5"
 # Install libyaml for vcr speedup?
 addons:
