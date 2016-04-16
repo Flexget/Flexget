@@ -2,21 +2,16 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
 from past.builtins import basestring
-from future.moves.urllib.parse import urlparse
 from future.moves.urllib import request
-from future.moves.urllib.error import URLError, HTTPError
 
 import queue
 import ast
 import copy
-import http.client
 import locale
 import operator
 import os
 import re
-import socket
 import sys
-import time
 from collections import MutableMapping
 from datetime import timedelta, datetime
 from html.entities import name2codepoint
