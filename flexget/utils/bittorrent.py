@@ -3,7 +3,6 @@
 # Test scripts and other short code fragments can be considered as being in the public domain.
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
-from future.types.newbytes import newbytes
 
 import binascii
 import functools
@@ -91,14 +90,14 @@ def is_torrent_file(metafilepath):
     return bool(magic_marker)
 
 
-def tokenize(text, match=re.compile(b"([idel])|(\d+):|(-?\d+)").match):
+def tokenize(text, match=re.compile(bytes('([idel])|(\d+):|(-?\d+)', 'utf-8')).match):
     i = 0
     while i < len(text):
         m = match(text, i)
         s = m.group(m.lastindex)
         i = m.end()
         if m.lastindex == 2:
-            yield b"s"
+            yield bytes('s', 'utf-8')
             yield text[i:i + int(s)]
             i += int(s)
         else:
@@ -106,12 +105,12 @@ def tokenize(text, match=re.compile(b"([idel])|(\d+):|(-?\d+)").match):
 
 
 def decode_item(next, token):
-    if token == b"i":
+    if token == bytes('i', 'utf-8'):
         # integer: "i" value "e"
         data = int(next())
-        if next() != b"e":
+        if next() != bytes('e', 'utf-8'):
             raise ValueError
-    elif token == b"s":
+    elif token == bytes('s', 'utf-8'):
         # string: "s" value (virtual tokens)
         data = next()
         # Strings in torrent file are defined as utf-8 encoded
@@ -120,14 +119,14 @@ def decode_item(next, token):
         except UnicodeDecodeError as e:
             # The pieces field is a byte string, and should be left as such.
             pass
-    elif token == b"l" or token == b"d":
+    elif token == bytes('l', 'utf-8') or token == bytes('d', 'utf-8'):
         # container: "l" (or "d") values "e"
         data = []
         tok = next()
-        while tok != b"e":
+        while tok != bytes('e', 'utf-8'):
             data.append(decode_item(next, tok))
             tok = next()
-        if token == b"d":
+        if token == bytes('d', 'utf-8'):
             data = dict(list(zip(data[0::2], data[1::2])))
     else:
         raise ValueError
@@ -147,11 +146,11 @@ def bdecode(text):
 
 # encoding implementation by d0b
 def encode_string(data):
-    return bytes("%d:%s" % (len(data), data), 'utf-8')
+    return '{0}:{1}'.format(len(data), data).encode('utf-8')
 
 
 def encode_unicode(data):
-    return encode_string(data.encode('utf8'))
+    return encode_string(data)
 
 
 def encode_integer(data):
@@ -159,21 +158,21 @@ def encode_integer(data):
 
 
 def encode_list(data):
-    encoded = b"l"
+    encoded = bytes('l', 'utf-8')
     for item in data:
         encoded += bencode(item)
-    encoded += b"e"
+    encoded += bytes('e', 'utf-8')
     return encoded
 
 
 def encode_dictionary(data):
-    encoded = b"d"
+    encoded = bytes('d', 'utf-8')
     items = list(data.items())
     items.sort()
     for (key, value) in items:
         encoded += bencode(key)
         encoded += bencode(value)
-    encoded += b"e"
+    encoded += bytes('e', 'utf-8')
     return encoded
 
 
@@ -231,7 +230,7 @@ class Torrent(object):
         else:
             # multifile torrent
             for item in self.content['info']['files']:
-                t = {'path': b'/'.join([newbytes(p, 'utf-8') for p in item['path'][:-1]]),
+                t = {'path': bytes('/', 'utf-8').join([bytes(p, 'utf-8') for p in item['path'][:-1]]),
                      'name': item['path'][-1],
                      'size': item['length']}
                 files.append(t)
