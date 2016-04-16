@@ -1,0 +1,10 @@
+<md-list-item class="md-2-line md-long-text" >
+  <div class="md-list-item-text">
+    <h3>{{ vm.movie.title }} ({{ vm.movie.year }})</h3>
+    <p ng-repeat="id in ::vm.movie.movies_list_ids">
+      {{ ::id.id_name | moviesListIdsFilter }}: {{ ::id.id_value }}
+    </p>
+    <md-button class="md-raised md-warn" ng-click="vm.deleteMovie()">Delete</md-button>
+  </div>
+
+</md-list-item>
