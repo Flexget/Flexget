@@ -3,10 +3,9 @@
 # Test scripts and other short code fragments can be considered as being in the public domain.
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
-from future.utils import native
 from future.types.newbytes import newbytes
 
-import codecs
+import binascii
 import functools
 import re
 import logging
@@ -87,7 +86,7 @@ def is_torrent_file(metafilepath):
 
     magic_marker = bool(TORRENT_RE.match(data))
     if not magic_marker:
-        log.trace('%s doesn\'t seem to be a torrent, got `%s` (hex)' % (metafilepath, codecs.encode(data, 'hex')))
+        log.trace('%s doesn\'t seem to be a torrent, got `%s` (hex)' % (metafilepath, binascii.hexlify(data)))
 
     return bool(magic_marker)
 

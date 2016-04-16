@@ -8,7 +8,7 @@ import logging
 import threading
 import socket
 import struct
-import codecs
+import binascii
 from random import randrange
 from http.client import BadStatusLine
 from requests import RequestException
@@ -19,7 +19,6 @@ from flexget.utils import requests
 from flexget.utils.bittorrent import bdecode
 
 log = logging.getLogger('torrent_alive')
-decode_hex = codecs.getdecoder("hex_codec")
 
 
 class TorrentAliveThread(threading.Thread):
@@ -62,7 +61,7 @@ def get_scrape_url(tracker_url, info_hash):
         result = tracker_url + '/scrape'
 
     result += '&' if '?' in result else '?'
-    result += 'info_hash=%s' % quote(decode_hex(info_hash)[0])
+    result += 'info_hash=%s' % quote(binascii.hexlify(info_hash))
     return result
 
 
@@ -103,7 +102,7 @@ def get_udp_seeds(url, info_hash):
         action, transaction_id, connection_id = struct.unpack(b">LLQ", res)
 
         # build packet hash out of decoded info_hash
-        packet_hash = info_hash.decode('hex')
+        packet_hash = binascii.hexlify(info_hash)
 
         # construct packet for scrape with decoded info_hash setting action byte to 2 for scape
         packet = struct.pack(b">QLL", connection_id, 2, transaction_id) + packet_hash
