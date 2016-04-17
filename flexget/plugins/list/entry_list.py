@@ -14,8 +14,8 @@ from flexget import plugin, db_schema
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils import json
 from flexget.manager import Session
+from flexget.utils import json
 from flexget.utils.database import entry_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
@@ -227,8 +227,11 @@ def get_entries_by_list_id(list_id, count=False, start=None, stop=None, order_by
 
 
 @with_session
-def get_entry_by_title(title, session=None):
-    return session.query(EntryListEntry).filter(EntryListEntry.title == title).first()
+def get_entry_by_title(list_id, title, session=None):
+    entry_list = get_list_by_id(list_id=list_id, session=session)
+    if entry_list:
+        return session.query(EntryListEntry).filter(and_(
+            EntryListEntry.title == title, EntryListEntry.list_id == list_id)).first()
 
 
 @with_session
