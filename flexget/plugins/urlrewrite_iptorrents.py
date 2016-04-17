@@ -151,8 +151,8 @@ class UrlRewriteIPTorrents(object):
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
                                                             entry['torrent_leeches'])
 
-                size = torrent.findNext("td", text=re.compile('([\.\d]+) ([GMK]?)B')).text
-                size = re.search('([\.\d]+) ([GMK]?)B', size)
+                size = torrent.findNext(text=re.compile('^([\.\d]+) ([GMK]?)B$'))
+                size = re.search('^([\.\d]+) ([GMK]?)B$', size)
                 if size:
                     if size.group(2) == 'G':
                         entry['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)
