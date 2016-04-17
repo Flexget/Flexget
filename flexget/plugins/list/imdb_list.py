@@ -134,6 +134,7 @@ class ImdbEntrySet(MutableSet):
 
     def __contains__(self, entry):
         if not entry.get('imdb_id'):
+            log.debug('entry %s does not have imdb_id, skipping', entry)
             return False
         return any(e['imdb_id'] == entry['imdb_id'] for e in self.items)
 
