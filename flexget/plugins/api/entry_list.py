@@ -65,8 +65,12 @@ class EntryListListsAPI(APIResource):
         """ Create a new entry list """
         data = request.json
         name = data.get('name')
-        entry_list = el.get_list_by_exact_name(name=name, session=session)
-        if entry_list:
+        new_list = False
+        try:
+            entry_list = el.get_list_by_exact_name(name=name, session=session)
+        except NoResultFound:
+            new_list = True
+        if not new_list:
             return {'status': 'error',
                     'message': "list with name '%s' already exists" % name}, 500
         entry_list = el.EntryListList(name=name)
@@ -150,7 +154,7 @@ entry_list_parser.add_argument('page_size', type=int, default=10, help='Number o
 
 
 @entry_list_api.route('/<int:list_id>/entries/')
-class EntryListEntriessAPI(APIResource):
+class EntryListEntriesAPI(APIResource):
     @api.response(404, 'List does not exist', model=default_error_schema)
     @api.response(200, model=entry_lists_entries_return_schema)
     @api.doc(params={'list_id': 'ID of the list'}, parser=entry_list_parser)
@@ -210,7 +214,7 @@ class EntryListEntriessAPI(APIResource):
                     'message': 'list_id %d does not exist' % list_id}, 404
         data = request.json
         title = data.get('title')
-        entry_object = el.get_entry_by_title(title=title, session=session)
+        entry_object = el.get_entry_by_title(list_id=list_id, title=title, session=session)
         if entry_object:
             return {'status': 'error',
                     'message': "entry with title '%s' already exists" % title}, 500
