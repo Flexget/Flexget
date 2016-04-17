@@ -103,7 +103,7 @@ def entry_list_add(options):
         try:
             entry_list = get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
-            console('Could not find entry list with name {}, creating'.format(options.list_name))
+            console('Could not find entry list with name `{}`, creating'.format(options.list_name))
             entry_list = EntryListList(name=options.list_name)
             session.add(entry_list)
         session.merge(entry_list)
@@ -112,17 +112,18 @@ def entry_list_add(options):
         entry = {'title': options.entry_title, 'original_url': options.original_url}
         db_entry = get_entry_by_title(list_id=entry_list.id, title=title, session=session)
         if db_entry:
-            console("Entry with the title {} already exist with list {}. Will replace identifiers if given".format(
+            console("Entry with the title `{}` already exist with list `{}`. Will replace identifiers if given".format(
                 title, entry_list.name))
-            output = 'Successfully updated entry {} to entry list {} '.format(title, entry_list.name)
+            output = 'Successfully updated entry `{}` to entry list `{}` '.format(title, entry_list.name)
         else:
-            console("Adding entry with title {} to list {}".format(title, entry_list.name))
+            console("Adding entry with title `{}` to list `{}`".format(title, entry_list.name))
             db_entry = EntryListEntry(entry=entry, entry_list_id=entry_list.id)
             session.add(db_entry)
-            output = 'Successfully added entry {} to entry list {} '.format(title, entry_list.name)
+            output = 'Successfully added entry `{}` to entry list `{}` '.format(title, entry_list.name)
         if options.identifiers:
+            output = 'Successfully updated entry `{}` to entry list `{}` '.format(title, entry_list.name)
             identifiers = [parse_identifier(identifier) for identifier in options.identifiers if options.identifiers]
-            console('Adding identifiers {} to entry {}'.format(identifiers, title))
+            console('Adding identifiers to entry `{}`'.format(identifiers, title))
             for identifier in identifiers:
                 for k, v in identifier.items():
                     entry[k] = v
@@ -131,32 +132,39 @@ def entry_list_add(options):
 
 
 def movie_list_del(options):
-    pass
-    # with Session() as session:
-    #     try:
-    #         movie_list = get_list_by_exact_name(options.list_name)
-    #     except NoResultFound:
-    #         console('Could not find movie list with name {}'.format(options.list_name))
-    #         return
-    #     title, year = split_title_year(options.movie_title)
-    #     movie_exist = get_movie_by_title(list_id=movie_list.id, title=title, session=session)
-    #     if movie_exist:
-    #         console('Removing movie %s from list %s' % (options.movie_title, options.list_name))
-    #         session.delete(movie_exist)
-    #     else:
-    #         console('Could not find movie with title %s in list %s' % (options.movie_title, options.list_name))
-    #         return
+    with Session() as session:
+        try:
+            entry_list = get_list_by_exact_name(options.list_name)
+        except NoResultFound:
+            console('Could not find entry list with name `{}`'.format(options.list_name))
+            return
+        try:
+            db_entry = get_entry_by_id(entry_list.id, int(options.entry), session=session)
+        except NoResultFound:
+            console(
+                'Could not find matching entry with ID {} in list `{}`'.format(int(options.entry), options.list_name))
+            return
+        except ValueError:
+            db_entry = get_entry_by_title(entry_list.id, options.entry, session=session)
+            if not db_entry:
+                console(
+                    'Could not find matching entry with title `{}` in list `{}`'.format(options.entry,
+                                                                                        options.list_name))
+                return
+        console('Removing entry `%s` from list %s' % (db_entry.title, options.list_name))
+        session.delete(db_entry)
+
 
 
 def movie_list_purge(options):
     with Session() as session:
         try:
-            movie_list = get_list_by_exact_name(options.list_name)
+            entry_list = get_list_by_exact_name(options.list_name)
         except NoResultFound:
-            console('Could not find movie list with name {}'.format(options.list_name))
+            console('Could not find entry list with name `{}`'.format(options.list_name))
             return
         console('Deleting list %s' % options.list_name)
-        session.delete(movie_list)
+        session.delete(entry_list)
 
 
 @event('options.register')
@@ -166,25 +174,28 @@ def register_parser_arguments():
     entry_parser.add_argument('-t', '--entry_title', required=True, help="Title of the entry")
     entry_parser.add_argument('-u', '--original_url', required=True, help="URL of the entry")
 
+    global_entry_parser = ArgumentParser(add_help=False)
+    global_entry_parser.add_argument('entry', nargs='?', help='can be entry title or ID')
+
     identifiers_parser = ArgumentParser(add_help=False)
     identifiers_parser.add_argument('-i', '--identifiers', metavar='<identifiers>', nargs='+',
                                     help='Can be a string or a list of string with the format imdb_id=XXX,'
                                          ' tmdb_id=XXX, etc')
     list_name_parser = ArgumentParser(add_help=False)
     list_name_parser.add_argument('-l', '--list_name', metavar='<list_name>', required=True,
-                                  help='name of movie list to operate on')
+                                  help='name of entry list to operate on')
     # Register subcommand
     parser = options.register_command('entry-list', do_cli, help='view and manage entry lists')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='list_action')
     all_parser = subparsers.add_parser('all', help='shows all existing entry lists')
     list_parser = subparsers.add_parser('list', parents=[list_name_parser], help='list entries from a list')
-    show_parser = subparsers.add_parser('show', parents=[list_name_parser], help='show entry fields.')
-    show_parser.add_argument('entry', nargs='?', help='can be entry title or ID')
+    show_parser = subparsers.add_parser('show', parents=[list_name_parser, global_entry_parser],
+                                        help='show entry fields.')
 
     add_parser = subparsers.add_parser('add', parents=[identifiers_parser, list_name_parser, entry_parser],
                                        help='add an entry to a list')
-    subparsers.add_parser('del', parents=[entry_parser, list_name_parser],
+    subparsers.add_parser('del', parents=[global_entry_parser, list_name_parser],
                           help='remove an entry from a list using its title')
     subparsers.add_parser('purge', parents=[list_name_parser],
                           help='removes an entire list with all of its entries. Use this with caution')

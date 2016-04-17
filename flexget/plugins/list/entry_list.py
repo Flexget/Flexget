@@ -194,7 +194,7 @@ def get_entry_lists(name=None, session=None):
 @with_session
 def get_list_by_exact_name(name, session=None):
     log.debug('returning entry list with name %s', name)
-    return session.query(EntryListList).filter(func.lower(EntryListList.name) == name.lower()).first()
+    return session.query(EntryListList).filter(func.lower(EntryListList.name) == name.lower()).one()
 
 
 @with_session
@@ -215,7 +215,7 @@ def delete_list_by_id(list_id, session=None):
 def get_entries_by_list_id(list_id, count=False, start=None, stop=None, order_by='title', descending=False,
                            session=None):
     log.debug('querying entries from entry list with id %d', list_id)
-    query = session.query(EntryListEntry).filter(EntryListList.id == list_id)
+    query = session.query(EntryListEntry).join(EntryListList).filter(EntryListList.id == list_id)
     if count:
         return query.count()
     query = query.slice(start, stop).from_self()
