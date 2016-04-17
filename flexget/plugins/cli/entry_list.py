@@ -22,7 +22,7 @@ def parse_identifier(identifier_string):
 def do_cli(manager, options):
     """Handle entry-list subcommand"""
     if options.list_action == 'all':
-        entry_list_lists(options)
+        entry_list_lists()
         return
 
     if options.list_action == 'list':
@@ -46,7 +46,7 @@ def do_cli(manager, options):
         return
 
 
-def entry_list_lists(options):
+def entry_list_lists():
     """ Show all entry lists """
     with Session() as session:
         lists = get_entry_lists(session=session)
@@ -123,7 +123,7 @@ def entry_list_add(options):
         if options.identifiers:
             output = 'Successfully updated entry `{}` to entry list `{}` '.format(title, entry_list.name)
             identifiers = [parse_identifier(identifier) for identifier in options.identifiers if options.identifiers]
-            console('Adding identifiers to entry `{}`'.format(identifiers, title))
+            console('Adding identifiers to entry `{}`'.format(title))
             for identifier in identifiers:
                 for k, v in identifier.items():
                     entry[k] = v
@@ -153,7 +153,6 @@ def movie_list_del(options):
                 return
         console('Removing entry `%s` from list %s' % (db_entry.title, options.list_name))
         session.delete(db_entry)
-
 
 
 def movie_list_purge(options):
