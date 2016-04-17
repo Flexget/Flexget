@@ -65,8 +65,12 @@ class EntryListListsAPI(APIResource):
         """ Create a new entry list """
         data = request.json
         name = data.get('name')
-        entry_list = el.get_list_by_exact_name(name=name, session=session)
-        if entry_list:
+        new_list = False
+        try:
+            entry_list = el.get_list_by_exact_name(name=name, session=session)
+        except NoResultFound:
+            new_list = True
+        if not new_list:
             return {'status': 'error',
                     'message': "list with name '%s' already exists" % name}, 500
         entry_list = el.EntryListList(name=name)
