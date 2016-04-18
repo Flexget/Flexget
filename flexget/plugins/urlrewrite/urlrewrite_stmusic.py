@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
+from future.moves.urllib.parse import quote
 
-import logging
+import loggingc
 
 from flexget import plugin
 from flexget.event import event
@@ -16,9 +17,8 @@ class UrlRewriteSTMusic(object):
         return entry['url'].startswith('http://www.stmusic.org/details.php?id=')
 
     def url_rewrite(self, task, entry):
-        import urllib.request, urllib.parse, urllib.error
         entry['url'] = entry['url'].replace('details.php?id=', 'download.php/')
-        entry['url'] += '/%s.torrent' % (urllib.parse.quote(entry['title'], safe=''))
+        entry['url'] += '/%s.torrent' % (quote(entry['title'], safe=''))
 
 
 @event('plugin.register')
