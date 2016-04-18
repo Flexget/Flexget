@@ -19,7 +19,7 @@
     "angular-messages": "^1.5.1"
   },
   "resolutions": {
-    "angular": "1.5.3"
+    "angular": "1.5.5"
   },
   "devDependencies": {},
   "overrides": {
