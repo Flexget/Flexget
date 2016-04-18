@@ -297,7 +297,7 @@ class ApiClient(object):
             method = 'POST' if data is not None else 'GET'
         auth_header = dict(Authorization='Token %s' % api_key())
         response = self.app.open(url, data=data, follow_redirects=True, method=method, headers=auth_header)
-        result = json.loads(response.data)
+        result = json.loads(response.get_data(as_text=True))
         # TODO: Proper exceptions
         if 200 > response.status_code >= 300:
             raise Exception(result['error'])
