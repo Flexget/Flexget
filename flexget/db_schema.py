@@ -22,7 +22,7 @@ class FlexgetVersion(Base):
     __tablename__ = 'flexget_version'
 
     version = Column(String, primary_key=True)
-    create = Column(DateTime, default=datetime.now)
+    created_at = Column(DateTime, default=datetime.now)
 
     def __init__(self):
         self.version = get_current_flexget_version()
