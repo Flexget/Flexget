@@ -4,8 +4,9 @@ from future.utils import native_str
 from past.builtins import basestring
 
 import logging
+from datetime import datetime
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.exc import OperationalError
 
 import flexget
@@ -13,6 +14,7 @@ from flexget.event import event
 from flexget.manager import Base, Session
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_schema
+from flexget.utils.tools import get_current_flexget_version
 
 log = logging.getLogger('schema')
 
@@ -20,8 +22,29 @@ log = logging.getLogger('schema')
 plugin_schemas = {}
 
 
-class PluginSchema(Base):
+class FlexgetVersion(Base):
+    __tablename__ = 'flexget_version'
 
+    version = Column(String, primary_key=True)
+    created = Column(DateTime, default=datetime.now)
+
+    def __init__(self):
+        self.version = get_current_flexget_version()
+
+
+@event('manager.initialize')
+def flexget_db_version(manager=None):
+    with Session() as session:
+        version = session.query(FlexgetVersion).first()
+        if not version:
+            log.debug('no flexget version info detected in db, writing')
+            version = FlexgetVersion()
+            session.add(version)
+            session.commit()
+        return version.version
+
+
+class PluginSchema(Base):
     __tablename__ = 'plugin_schema'
 
     id = Column(Integer, primary_key=True)
@@ -136,6 +159,7 @@ def upgrade(plugin):
                         manager.shutdown(finish_queue=False)
 
         return upgrade_wrapper
+
     return upgrade_decorator
 
 
@@ -157,7 +181,7 @@ def reset_schema(plugin, session=None):
         except OperationalError as e:
             if 'no such table' in str(e):
                 continue
-            raise e    # Remove the plugin from schema table
+            raise e  # Remove the plugin from schema table
     session.query(PluginSchema).filter(PluginSchema.plugin == plugin).delete()
     # We need to commit our current changes to close the session before calling create_all
     session.commit()
@@ -187,6 +211,7 @@ class Meta(type):
                 if not any(isinstance(base, type(Base)) for base in bases):
                     # We are not already subclassing Base, add it in to the list of bases instead of VersionedBase
                     new_bases.append(Base)
+
                     # Since Base and VersionedBase have 2 different metaclasses, a class that subclasses both of them
                     # must have a metaclass that subclasses both of their metaclasses.
 
@@ -229,6 +254,7 @@ def after_table_create(event, target, bind, tables=None, **kw):
                 # Only set the version if all tables for a given plugin are being created
                 if all(table in tables for table in info['tables']):
                     set_version(plugin, info['version'])
+
 
 # Register a listener to call our method after tables are created
 Base.metadata.append_ddl_listener('after-create', after_table_create)

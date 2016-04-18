@@ -15,8 +15,8 @@ from flexget import plugin, db_schema
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils import json
 from flexget.manager import Session
+from flexget.utils import json
 from flexget.utils.database import entry_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
@@ -199,7 +199,7 @@ def get_entry_lists(name=None, session=None):
 @with_session
 def get_list_by_exact_name(name, session=None):
     log.debug('returning entry list with name %s', name)
-    return session.query(EntryListList).filter(func.lower(EntryListList.name) == name.lower()).first()
+    return session.query(EntryListList).filter(func.lower(EntryListList.name) == name.lower()).one()
 
 
 @with_session
@@ -220,7 +220,7 @@ def delete_list_by_id(list_id, session=None):
 def get_entries_by_list_id(list_id, count=False, start=None, stop=None, order_by='title', descending=False,
                            session=None):
     log.debug('querying entries from entry list with id %d', list_id)
-    query = session.query(EntryListEntry).filter(EntryListList.id == list_id)
+    query = session.query(EntryListEntry).join(EntryListList).filter(EntryListList.id == list_id)
     if count:
         return query.count()
     query = query.slice(start, stop).from_self()
@@ -232,8 +232,11 @@ def get_entries_by_list_id(list_id, count=False, start=None, stop=None, order_by
 
 
 @with_session
-def get_entry_by_title(title, session=None):
-    return session.query(EntryListEntry).filter(EntryListEntry.title == title).first()
+def get_entry_by_title(list_id, title, session=None):
+    entry_list = get_list_by_id(list_id=list_id, session=session)
+    if entry_list:
+        return session.query(EntryListEntry).filter(and_(
+            EntryListEntry.title == title, EntryListEntry.list_id == list_id)).first()
 
 
 @with_session
