@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *
 from future.moves.urllib.parse import quote
 
-import loggingc
+import logging
 
 from flexget import plugin
 from flexget.event import event
