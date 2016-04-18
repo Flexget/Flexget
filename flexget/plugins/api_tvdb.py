@@ -11,6 +11,7 @@ from sqlalchemy import func
 
 from flexget import db_schema
 from flexget.utils import requests
+from flexget.utils.tools import split_title_year
 from flexget.utils.database import with_session, text_date_synonym, json_synonym
 from flexget.utils.simple_persistence import SimplePersistence
 
@@ -333,24 +334,39 @@ def find_series_id(name):
     except requests.RequestException as e:
         raise LookupError('Unable to get search results for %s: %s' % (name, e))
 
-    series_list = []
-
     name = name.lower()
+
+    if not series:
+        raise LookupError('No results found for %s' % name)
+
+    # Cleanup results for sorting
+    for s in series:
+        if s['firstAired']:
+            s['firstAired'] = datetime.strptime(s['firstAired'], "%Y-%m-%d")
+        else:
+            s['firstAired'] = datetime(1970, 1, 1)
+
+        s['names'] = [a.lower() for a in s.get('aliases')] if s.get('aliases') else []
+        if s.get('seriesName'):
+            s['names'].append(s.get('seriesName').lower())
+        s['running'] = True if s['status'] == 'Continuing' else False
+
+        for n in s['names']:
+            # Exact matching by stripping our the year
+            title, year = split_title_year(n)
+            if title not in s['names']:
+                s['names'].append(title)
+
+    # Sort by status, aired_date
+    series = sorted(series, key=lambda x: (x['running'], x['firstAired']), reverse=True)
 
     for s in series:
         # Exact match
-        series_name = s.get('seriesName')
-        if series_name and series_name.lower() == name:
+        if name in s['names']:
             return s['id']
-        if s['firstAired']:
-            series_list.append((s['firstAired'], s['id']))
 
-    # If there is no exact match, sort by airing date and pick the latest
-    if series_list:
-        series_list.sort(key=lambda s: s[0], reverse=True)
-        return series_list[0][1]
-    else:
-        raise LookupError('No results for `%s`' % name)
+    # If there is no exact match, pick the first result
+    return series[0]['id']
 
 
 def _update_search_strings(series, session, search=None):
