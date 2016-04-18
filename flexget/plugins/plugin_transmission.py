@@ -22,25 +22,16 @@ from flexget.utils.tools import parse_timedelta
 from flexget.config_schema import one_or_more
 from fnmatch import fnmatch
 
+try:
+    import transmissionrpc
+    from transmissionrpc import TransmissionError
+    from transmissionrpc import HTTPHandlerError
+except ImportError:
+    # If transmissionrpc is not found, errors will be shown later
+    pass
+
+
 log = logging.getLogger('transmission')
-
-
-def save_opener(f):
-    """
-        Transmissionrpc sets a new default opener for urllib2
-        We use this as a decorator to capture and restore it when needed
-    """
-
-    def new_f(self, *args, **kwargs):
-        import urllib.request, urllib.error, urllib.parse
-        prev_opener = urllib2._opener
-        urllib.request.install_opener(self.opener)
-        try:
-            f(self, *args, **kwargs)
-            self.opener = urllib2._opener
-        finally:
-            urllib.request.install_opener(prev_opener)
-    return new_f
 
 
 class TransmissionBase(object):
@@ -78,10 +69,6 @@ class TransmissionBase(object):
         return config
 
     def create_rpc_client(self, config):
-        import transmissionrpc
-        from transmissionrpc import TransmissionError
-        from transmissionrpc import HTTPHandlerError
-
         user, password = config.get('username'), config.get('password')
 
         try:
@@ -134,7 +121,6 @@ class TransmissionBase(object):
 
         return seed_limit_ok, idle_limit_ok
 
-    @save_opener
     def on_task_start(self, task, config):
         try:
             import transmissionrpc
@@ -292,9 +278,7 @@ class PluginTransmission(TransmissionBase):
             download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
     @plugin.priority(135)
-    @save_opener
     def on_task_output(self, task, config):
-        from transmissionrpc import TransmissionError
         config = self.prepare_config(config)
         # don't add when learning
         if task.options.learn:
@@ -391,7 +375,6 @@ class PluginTransmission(TransmissionBase):
 
     def add_to_transmission(self, cli, task, config):
         """Adds accepted entries to transmission """
-        from transmissionrpc import TransmissionError
         for entry in task.accepted:
             if task.options.test:
                 log.info('Would add %s to transmission' % entry['url'])
