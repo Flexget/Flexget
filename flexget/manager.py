@@ -196,7 +196,7 @@ class Manager(object):
 
         if db_schema.upgrade_required():
             log.info('Database upgrade is required. Attempting now.')
-            if self.options.backup_db_on_upgrade:
+            if self.options.backup_db:
                 log.verbose('backup db on upgrade flag detected, trying to backup DB')
                 fire_event('manager.backup_db', self)
             else:
