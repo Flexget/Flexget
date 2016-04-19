@@ -470,7 +470,7 @@ class Manager(object):
             # for virtualenv / dev sandbox
             if hasattr(sys, 'real_prefix'):
                 log.debug('Adding virtualenv path')
-                possible.append(bytes(sys.prefix).decode(sys.getfilesystemencoding()))
+                possible.append(sys.prefix)
             # normal lookup locations
             possible.append(home_path)
             if sys.platform.startswith('win'):
