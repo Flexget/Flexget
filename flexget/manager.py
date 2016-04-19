@@ -175,6 +175,8 @@ class Manager(object):
         plugin.load_plugins(extra_dirs=[os.path.join(self.config_base, 'plugins')])
 
         # Reparse CLI options now that plugins are loaded
+        if not self.args:
+            self.args = ['--help']
         self.options = get_parser().parse_args(self.args)
 
         self.task_queue = TaskQueue()
