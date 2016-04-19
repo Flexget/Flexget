@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 from flexget import options
 from flexget.db_schema import reset_schema, plugin_schemas
-from flexget.event import event
+from flexget.event import event, fire_event
 from flexget.logger import console
 from flexget.manager import Base, Session
 
@@ -15,6 +15,8 @@ def do_cli(manager, options):
             vacuum()
         elif options.db_action == 'reset':
             reset(manager)
+        elif options.db_action == 'backup':
+            backup(manager)
         elif options.db_action == 'reset-plugin':
             reset_plugin(options)
 
@@ -77,16 +79,21 @@ def reset_plugin(options):
             console('Unable to reset %s: %s' % (plugin, e.message))
 
 
+def backup(manager):
+    fire_event('manager.backup_db', manager)
+
+
 @event('options.register')
 def register_parser_arguments():
     parser = options.register_command('database', do_cli, help='utilities to manage the FlexGet database')
     subparsers = parser.add_subparsers(title='Actions', metavar='<action>', dest='db_action')
     subparsers.add_parser('cleanup', help='make all plugins clean un-needed data from the database')
     subparsers.add_parser('vacuum', help='running vacuum can increase performance and decrease database size')
+    subparsers.add_parser('backup', help='create a backup DB')
     reset_parser = subparsers.add_parser('reset', add_help=False, help='reset the entire database (DANGEROUS!)')
     reset_parser.add_argument('--sure', action='store_true', required=True,
                               help='you must use this flag to indicate you REALLY want to do this')
     reset_plugin_parser = subparsers.add_parser('reset-plugin', help='reset the database for a specific plugin')
     reset_plugin_parser.add_argument('reset_plugin', metavar='<plugin>', nargs='?',
-                                 help='name of plugin to reset (if omitted, known plugins will be listed)')
+                                     help='name of plugin to reset (if omitted, known plugins will be listed)')
     reset_plugin_parser.add_argument('--porcelain', action='store_true', help='make the output parseable')
