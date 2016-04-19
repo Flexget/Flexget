@@ -200,7 +200,7 @@ class Manager(object):
                 log.verbose('backup db on upgrade flag detected, trying to backup DB')
                 fire_event('manager.backup_db', self)
             else:
-                log.info('Consider using the `--backup-db-on-upgrade` flag')
+                log.info('DB is upgrading without a backup, consider using the `--backup-db-on-upgrade` flag')
             fire_event('manager.upgrade', self)
             if manager.db_upgraded:
                 fire_event('manager.db_upgraded', self)

@@ -17,14 +17,14 @@ from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')
 
-DB_VERSION = 4
+DB_VERSION = 5
 Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 
 
 @db_schema.upgrade('tvmaze')
 def upgrade(ver, session):
-    if ver is None or ver < 4:
+    if ver is None or ver < 5:
         raise db_schema.UpgradeImpossible
     return ver
 
