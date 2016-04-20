@@ -8,6 +8,7 @@ import ftplib
 import os
 import re
 
+from flexget.utils.tools import native_str_to_text
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
@@ -128,7 +129,7 @@ class InputFtpList(object):
 
         for p in dirs:
             if encoding:
-                p = p.decode(encoding)
+                p = native_str_to_text(p, encoding=encoding)
 
             # Clean file list when subdirectories are used
             p = p.replace(path + '/', '')

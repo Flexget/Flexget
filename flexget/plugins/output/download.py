@@ -18,7 +18,7 @@ from requests import RequestException
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.utils.tools import decode_html
+from flexget.utils.tools import decode_html, native_str_to_text
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
 
@@ -329,11 +329,11 @@ class PluginDownload(object):
         if filename:
             # try to decode to unicode, specs allow latin1, some may do utf-8 anyway
             try:
-                filename = filename.decode('latin1')
+                filename = native_str_to_text(filename, encoding='latin1')
                 log.debug('filename header latin1 decoded')
             except UnicodeError:
                 try:
-                    filename = filename.decode('utf-8')
+                    filename = native_str_to_text(filename, encoding='utf-8')
                     log.debug('filename header UTF-8 decoded')
                 except UnicodeError:
                     pass

@@ -11,7 +11,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.template import render_from_entry, render_from_task, RenderError
-from flexget.utils.tools import io_encoding
+from flexget.utils.tools import io_encoding, native_str_to_text
 
 log = logging.getLogger('exec')
 
@@ -110,7 +110,7 @@ class PluginExec(object):
                              stderr=subprocess.STDOUT, close_fds=False)
         if not allow_background:
             (r, w) = (p.stdout, p.stdin)
-            response = r.read().decode(encoding, 'replace')
+            response = native_str_to_text(r.read(), encoding=encoding, errors='replace')
             r.close()
             w.close()
             if response:

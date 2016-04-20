@@ -12,7 +12,7 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.utils.tools import arithmeticEval
+from flexget.utils.tools import arithmeticEval, native_str_to_text
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 
@@ -495,7 +495,7 @@ class UrlRewriteTorrent411(object):
                     '<a href=\"//www.t411.ch/torrents/([-A-Za-z0-9+&@#/%|?=~_|!:,.;]+)\" title="([^"]*)">',
                     str(tr))
                 if title_res is not None:
-                    entry['title'] = title_res.group(2).decode('utf-8')
+                    entry['title'] = native_str_to_text(title_res.group(2), encoding='utf-8')
                 size = tr('td')[5].contents[0]
                 entry['url'] = 'http://www.t411.ch/torrents/download/?id=%s' % tid
                 entry['torrent_seeds'] = tr('td')[7].contents[0]

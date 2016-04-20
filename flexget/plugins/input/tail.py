@@ -8,6 +8,7 @@ import logging
 from sqlalchemy import Column, Integer, Unicode
 
 from flexget import options, plugin
+from flexget.utils.tools import native_str_to_text
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry
 from flexget.event import event
@@ -124,7 +125,7 @@ class InputTail(object):
                     line = file.readline()
                     if encoding:
                         try:
-                            line = line.decode(encoding)
+                            line = native_str_to_text(line, encoding=encoding)
                         except UnicodeError:
                             raise plugin.PluginError('Failed to decode file using %s. Check encoding.' % encoding)
 
