@@ -13,7 +13,7 @@
       },
     });
 
-    function seriesShowController($state, $mdDialog) {
+    function seriesShowController($state, $mdDialog, $http) {
       var vm = this;
 
       vm.gotoEpisodes = function() {
@@ -32,6 +32,15 @@
           }
         });
       }
+
+      function loadMetadata() {
+        $http.get('/api/tvdb/series/' + vm.show.show_name)
+          .success(function(data) {
+            vm.metadata = data;
+          })
+      }
+
+      loadMetadata();
 
       //Call from the page, to open a dialog with alternate names
       vm.alternateName = function(ev) {
