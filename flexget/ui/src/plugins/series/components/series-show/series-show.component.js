@@ -34,7 +34,7 @@
       }
 
       function loadMetadata() {
-        $http.get('/api/tvdb/series/' + vm.show.show_name)
+        $http.get('/api/tvdb/series/' + vm.show.show_name, { cache: true })
           .success(function(data) {
             vm.metadata = data;
           })
