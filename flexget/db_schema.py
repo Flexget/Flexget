@@ -28,7 +28,7 @@ class FlexgetVersion(Base):
         self.version = get_current_flexget_version()
 
 
-@event('manager.initialize')
+@event('manager.startup')
 def flexget_db_version(manager=None):
     with Session() as session:
         version = session.query(FlexgetVersion).first()
