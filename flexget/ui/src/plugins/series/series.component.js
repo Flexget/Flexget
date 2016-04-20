@@ -12,10 +12,6 @@
   function seriesController($http, $mdDialog, seriesService) {
     var vm = this;
 
-    vm.currentPage = 1;
-    vm.totalShows = 0;
-    vm.pageSize = 10;
-
     var options = {
       page: 1,
       page_size: 10,
@@ -24,26 +20,17 @@
       sort_by: 'show_name'
     }
 
-
     vm.searchTerm = "";
 
-    seriesService.getSeries().then(function(data) {
-      console.log(data);
-    });
-
-    //Call to get the series, based on the options
-    /*function getSeriesList() {
-      $http.get('/api/series/', { params: options })
-      .success(function(data) {
+    function getSeriesList() {
+      seriesService.getSeries(options).then(function(data) {
         vm.series = data.shows;
 
-        //Set vars for pagination
         vm.currentPage = data.page;
         vm.totalShows = data.total_number_of_shows;
         vm.pageSize = data.page_size;
       });
     }
-*/
     vm.forgetShow = function(show) {
       //Construct the confirmation dialog
        var confirm = $mdDialog.confirm()
