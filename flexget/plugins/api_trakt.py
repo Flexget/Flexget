@@ -214,6 +214,7 @@ def upgrade_database(ver, session):
         raise db_schema.UpgradeImpossible
     if ver <= 3:
         table_add_column('trakt_movies', 'poster', Unicode, session)
+        ver = 4
     return ver
 
 
