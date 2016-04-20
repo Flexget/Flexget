@@ -51,11 +51,12 @@ class ImdbEntrySet(MutableSet):
     def authenticate(self):
         """Authenticates a session with imdb, and grabs any IDs needed for getting/modifying list."""
         try:
-            r = self._session.get('https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
-                              'handler&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&'
-                              'openid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%'
-                              '2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.ope'
-                              'nid.net%2Fauth%2F2.0')
+            r = self._session.get(
+                'https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
+                'handler&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&'
+                'openid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%'
+                '2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.ope'
+                'nid.net%2Fauth%2F2.0')
         except ConnectionError as e:
             raise PluginError(e.args[0])
         soup = get_soup(r.content)
@@ -107,6 +108,9 @@ class ImdbEntrySet(MutableSet):
             for row in csv.reader(lines):
                 row = [unicode(cell, 'utf-8') for cell in row]
                 log.debug('parsing line from csv: %s', ', '.join(row))
+                if not len(row) == 15:
+                    log.debug('no movie row detected, skipping. %s', ', '.join(row))
+                    continue
                 entry = Entry({
                     'title': '%s (%s)' % (row[5], row[11]) if row[11] != '????' else '%s' % row[5],
                     'url': row[15],
