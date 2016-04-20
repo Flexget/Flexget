@@ -108,7 +108,7 @@ class ImdbEntrySet(MutableSet):
             for row in csv.reader(lines):
                 row = [unicode(cell, 'utf-8') for cell in row]
                 log.debug('parsing line from csv: %s', ', '.join(row))
-                if not len(row) == 15:
+                if not len(row) == 16:
                     log.debug('no movie row detected, skipping. %s', ', '.join(row))
                     continue
                 entry = Entry({
