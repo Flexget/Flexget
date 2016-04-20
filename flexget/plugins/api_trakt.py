@@ -19,10 +19,11 @@ from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.tools import TimedDict
 from flexget.utils.database import with_session
+from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.logger import console
 
-Base = db_schema.versioned_base('api_trakt', 3)
+Base = db_schema.versioned_base('api_trakt', 4)
 log = logging.getLogger('api_trakt')
 # Production Site
 CLIENT_ID = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
@@ -211,6 +212,8 @@ def get_api_url(*endpoint):
 def upgrade_database(ver, session):
     if ver <= 2:
         raise db_schema.UpgradeImpossible
+    if ver <= 3:
+        table_add_column('trakt_movies', 'poster', Unicode, session)
     return ver
 
 
@@ -502,6 +505,7 @@ class TraktMovie(Base):
     tmdb_id = Column(Integer)
     tagline = Column(Unicode)
     overview = Column(Unicode)
+    poster = Column(Unicode)
     released = Column(Date)
     runtime = Column(Integer)
     rating = Column(Integer)
@@ -525,6 +529,7 @@ class TraktMovie(Base):
         self.slug = trakt_movie['ids']['slug']
         self.imdb_id = trakt_movie['ids']['imdb']
         self.tmdb_id = trakt_movie['ids']['tmdb']
+        self.poster = trakt_movie['images']['poster']['full']
         for col in ['title', 'overview', 'runtime', 'rating', 'votes', 'language', 'tagline', 'year']:
             setattr(self, col, trakt_movie.get(col))
         if self.released:
@@ -688,7 +693,7 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
         raise LookupError('Unable to find %s="%s" on trakt.' % (last_search_type, last_search_query))
     # Get actual data from trakt
     try:
-        return req_session.get(get_api_url(style + 's', trakt_id), params={'extended': 'full'}).json()
+        return req_session.get(get_api_url(style + 's', trakt_id), params={'extended': 'full,images'}).json()
     except requests.RequestException as e:
         raise LookupError('Error getting trakt data for id %s: %s' % (trakt_id, e))
 

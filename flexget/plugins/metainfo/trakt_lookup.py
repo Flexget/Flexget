@@ -122,6 +122,7 @@ class PluginTraktLookup(object):
         'tmdb_id': 'tmdb_id',
         'trakt_tagline': 'tagline',
         'trakt_overview': 'overview',
+        'trakt_movie_poster': 'poster',
         'trakt_released': 'released',
         'trakt_runtime': 'runtime',
         'trakt_rating': 'rating',
