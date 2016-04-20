@@ -94,11 +94,11 @@ class ImdbEntrySet(MutableSet):
         self._authenticated = True
 
     def invalidate_cache(self):
-        self._items = []
+        self._items = None
 
     @property
     def items(self):
-        if not self._items:
+        if self._items is None:
             r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
                                  (self.list_id, self.user_id))
             lines = r.iter_lines()
