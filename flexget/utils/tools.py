@@ -39,7 +39,7 @@ if PY2:
     def native_str_to_text(string, **kwargs):
         if 'encoding' not in kwargs:
             kwargs['encoding'] = 'ascii'
-        return string.decode(kwargs)
+        return string.decode(**kwargs)
 else:
     def native_str_to_text(string, **kwargs):
         return string
