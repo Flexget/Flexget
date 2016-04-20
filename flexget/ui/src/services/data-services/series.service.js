@@ -4,29 +4,54 @@
     angular.module('flexget.services')
         .factory('seriesService', seriesService);
 
-    function seriesService($http, CacheFactory) {
-        //CacheFactory('series');
-
-        return {
-            getSeries: getSeries
+    function seriesService($http, CacheFactory, $mdDialog) {
+        // If cache doesn't exist, create it
+        if (!CacheFactory.get('seriesCache')) {
+            CacheFactory.createCache('seriesCache');
         }
 
-        function getSeries(options) {
+        var seriesCache = CacheFactory.get('seriesCache');
+
+        return {
+            getShows: getShows,
+            deleteShow: deleteShow
+        }
+
+        function getShows(options) {
             return $http.get('/api/series/', 
                 {
-                    cache: CacheFactory.get('series'), 
+                    cache: seriesCache, 
                     params: options
                 })
-                .then(getSeriesComplete)
-                .catch(getSeriesFailed);
+                .then(getShowsComplete)
+                .catch(callFailed);
 
-            function getSeriesComplete(response) {
+            function getShowsComplete(response) {
                 return response.data;
             }
+        }
 
-            function getSeriesFailed(error) {
-                //TODO: Log error
+        function deleteShow(show) {
+            //TODO: Prob add warning messages again
+
+            return $http.delete('/api/series/' + show.show_id, 
+                { 
+                    params: { forget: true } 
+                })
+                .then(deleteShowComplete)
+                .catch(callFailed)
+
+            function deleteShowComplete() {
+                // remove all shows from cache, since order might have changed
+                seriesCache.removeAll();
+                return;
             }
+        }
+
+        function callFailed(error) {
+            //TODO: handle error
+
+            console.log(error);
         }
     }
 })();

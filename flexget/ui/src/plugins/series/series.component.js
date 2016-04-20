@@ -16,14 +16,14 @@
       page: 1,
       page_size: 10,
       in_config: 'all',
-      lookup: 'tvdb',
+      //lookup: 'tvdb',
       sort_by: 'show_name'
     }
 
     vm.searchTerm = "";
 
     function getSeriesList() {
-      seriesService.getSeries(options).then(function(data) {
+      seriesService.getShows(options).then(function(data) {
         vm.series = data.shows;
 
         vm.currentPage = data.page;
@@ -31,7 +31,17 @@
         vm.pageSize = data.page_size;
       });
     }
+
     vm.forgetShow = function(show) {
+      seriesService.deleteShow(show).then(function(data) {
+          getSeriesList();
+
+        /*var index = vm.series.indexOf(show);
+        vm.series.splice(index, 1);*/
+      });
+    }
+
+    /*vm.forgetShow = function(show) {
       //Construct the confirmation dialog
        var confirm = $mdDialog.confirm()
       .title('Confirm forgetting show.')
@@ -57,7 +67,7 @@
           $mdDialog.show(errorDialog);
         })
       });
-    }
+    }*/       
 
     //Call from the pagination to update the page to the selected page
     vm.updateListPage = function(index) {
