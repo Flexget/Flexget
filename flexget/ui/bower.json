@@ -16,7 +16,8 @@
     "angular-loading-bar": "~0.8.0",
     "ui-grid-auto-scroll": "~1.0.1",
     "animate.css-scss": "~3.1.0",
-    "angular-messages": "^1.5.1"
+    "angular-messages": "^1.5.1",
+    "angular-cache": "^4.5.0"
   },
   "resolutions": {
     "angular": "1.5.3"

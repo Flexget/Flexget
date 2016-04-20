@@ -9,7 +9,7 @@
       controller: seriesController,
     });
 
-  function seriesController($http, $mdDialog) {
+  function seriesController($http, $mdDialog, seriesService) {
     var vm = this;
 
     vm.currentPage = 1;
@@ -27,8 +27,12 @@
 
     vm.searchTerm = "";
 
+    seriesService.getSeries().then(function(data) {
+      console.log(data);
+    });
+
     //Call to get the series, based on the options
-    function getSeriesList() {
+    /*function getSeriesList() {
       $http.get('/api/series/', { params: options })
       .success(function(data) {
         vm.series = data.shows;
@@ -39,7 +43,7 @@
         vm.pageSize = data.page_size;
       });
     }
-
+*/
     vm.forgetShow = function(show) {
       //Construct the confirmation dialog
        var confirm = $mdDialog.confirm()
