@@ -8,22 +8,27 @@ interactions:
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=11-22-63&type=show
     response:
-      body: {string: '[{"type":"show","score":15.22699,"show":{"title":"11.22.63","overview":"An
-          English teacher travels back in time to prevent the Kennedy assassination,
-          but discovers he is attached to the life he has made in a bygone era.","year":2016,"status":"returning
-          series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/102/771/posters/original/e9cfb8f315.jpg","medium":"https://walter.trakt.us/images/shows/000/102/771/posters/medium/e9cfb8f315.jpg","thumb":"https://walter.trakt.us/images/shows/000/102/771/posters/thumb/e9cfb8f315.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/102/771/fanarts/original/3c06324bd8.jpg","medium":"https://walter.trakt.us/images/shows/000/102/771/fanarts/medium/3c06324bd8.jpg","thumb":"https://walter.trakt.us/images/shows/000/102/771/fanarts/thumb/3c06324bd8.jpg"}},"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210}}}]'}
+      body: {string: '[{"type":"show","score":17.726036,"show":{"title":"11.22.63","overview":"Imagine
+          having the power to change history. Would you journey down the \"rabbit
+          hole\"? This event series follows Jake Epping, an ordinary high school teacher,
+          presented with the unthinkable mission of traveling back in time to prevent
+          the assassination of John F. Kennedy on November 22, 1963. Jake travels
+          to the past in order to solve the most enduring mystery of the 20th century:
+          who killed JFK, and could it have been stopped? But as Jake will learn,
+          the past does not want to be changed. And trying to divert the course of
+          history may prove fatal.","year":2016,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/102/771/posters/original/e9cfb8f315.jpg","medium":"https://walter.trakt.us/images/shows/000/102/771/posters/medium/e9cfb8f315.jpg","thumb":"https://walter.trakt.us/images/shows/000/102/771/posters/thumb/e9cfb8f315.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/102/771/fanarts/original/3c06324bd8.jpg","medium":"https://walter.trakt.us/images/shows/000/102/771/fanarts/medium/3c06324bd8.jpg","thumb":"https://walter.trakt.us/images/shows/000/102/771/fanarts/thumb/3c06324bd8.jpg"}},"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210}}}]'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [EXPIRED]
-        cf-ray: [281d98c475203d25-CPH]
+        cf-cache-status: [STALE]
+        cf-ray: [296c6025197b2018-DFW]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Fri, 11 Mar 2016 08:22:07 GMT']
-        etag: [W/"09305b104e32cba95fc920537647427e"]
-        expires: ['Fri, 11 Mar 2016 12:22:07 GMT']
+        date: ['Wed, 20 Apr 2016 23:29:03 GMT']
+        etag: [W/"4184a2e8b5a481552613ed1f708a0626"]
+        expires: ['Thu, 21 Apr 2016 03:29:03 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d83b378694324ce94e197b56f0fbc26431457684526; expires=Sat,
-            11-Mar-17 08:22:06 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d0a216396cb53cea3c08ef79ca6e37cf01461194937; expires=Thu,
+            20-Apr-17 23:28:57 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -31,40 +36,45 @@ interactions:
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
         x-pagination-page-count: ['1']
-        x-request-id: [b6fa9e19-c5c1-4e85-a905-802e6cb64040]
-        x-runtime: ['0.014133']
+        x-request-id: [83253a7f-a71e-46b3-8b0c-904279536dd6]
+        x-runtime: ['0.026689']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=d83b378694324ce94e197b56f0fbc26431457684526]
+        Cookie: [__cfduid=d0a216396cb53cea3c08ef79ca6e37cf01461194937]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/102771?extended=full
+      uri: https://api-v2launch.trakt.tv/shows/102771?extended=full%2Cimages
     response:
-      body: {string: '{"title":"11.22.63","year":2016,"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210},"overview":"An
-          English teacher travels back in time to prevent the Kennedy assassination,
-          but discovers he is attached to the life he has made in a bygone era.","first_aired":"2016-02-15T08:00:00.000Z","airs":{"day":"Monday","time":"00:01","timezone":"America/New_York"},"runtime":60,"certification":"TV-MA","network":"Hulu","country":"us","trailer":null,"homepage":"http://www.hulu.com/112263","status":"returning
-          series","rating":8.41053,"votes":285,"updated_at":"2016-03-10T10:59:22.000Z","language":"en","available_translations":["en","fr","bs","he","pl","el","ru","pt","bg","cs"],"genres":["science-fiction","drama","fantasy"],"aired_episodes":4}'}
+      body: {string: '{"title":"11.22.63","year":2016,"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210},"overview":"Imagine
+          having the power to change history. Would you journey down the \"rabbit
+          hole\"? This event series follows Jake Epping, an ordinary high school teacher,
+          presented with the unthinkable mission of traveling back in time to prevent
+          the assassination of John F. Kennedy on November 22, 1963. Jake travels
+          to the past in order to solve the most enduring mystery of the 20th century:
+          who killed JFK, and could it have been stopped? But as Jake will learn,
+          the past does not want to be changed. And trying to divert the course of
+          history may prove fatal.","first_aired":"2016-02-15T08:00:00.000Z","airs":{"day":"Monday","time":"00:01","timezone":"America/New_York"},"runtime":60,"certification":"TV-MA","network":"Hulu","country":"us","trailer":"http://youtube.com/watch?v=NXUx__qQGew","homepage":"http://www.hulu.com/112263","status":"ended","rating":8.25596,"votes":797,"updated_at":"2016-04-18T12:30:19.000Z","language":"en","available_translations":["en","fr","bs","he","pl","el","ru","pt","bg","cs","nl","de","es","hu"],"genres":["science-fiction","drama","fantasy"],"aired_episodes":8,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/102/771/fanarts/original/3c06324bd8.jpg","medium":"https://walter.trakt.us/images/shows/000/102/771/fanarts/medium/3c06324bd8.jpg","thumb":"https://walter.trakt.us/images/shows/000/102/771/fanarts/thumb/3c06324bd8.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/102/771/posters/original/e9cfb8f315.jpg","medium":"https://walter.trakt.us/images/shows/000/102/771/posters/medium/e9cfb8f315.jpg","thumb":"https://walter.trakt.us/images/shows/000/102/771/posters/thumb/e9cfb8f315.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/102/771/logos/original/47016c0f0c.png"},"clearart":{"full":null},"banner":{"full":"https://walter.trakt.us/images/shows/000/102/771/banners/original/97f4c7160f.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/102/771/thumbs/original/a8234a4ad9.jpg"}}}'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [281d98c765233d25-CPH]
+        cf-cache-status: [STALE]
+        cf-ray: [296c60505d4f2018-DFW]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Fri, 11 Mar 2016 08:22:07 GMT']
-        etag: [W/"b2658a48c443f956003a42259183aa2e"]
-        expires: ['Fri, 11 Mar 2016 12:22:07 GMT']
-        last-modified: ['Thu, 10 Mar 2016 10:59:22 GMT']
+        date: ['Wed, 20 Apr 2016 23:29:04 GMT']
+        etag: [W/"030b34407ffa70cfb4f542f8afabc898"]
+        expires: ['Thu, 21 Apr 2016 03:29:04 GMT']
+        last-modified: ['Mon, 18 Apr 2016 12:30:19 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [0237d90d-6845-4723-92e1-30318abd62b3]
-        x-runtime: ['0.013742']
+        x-request-id: [22c2ceb5-6cd1-4e1b-b665-c21d8198580a]
+        x-runtime: ['0.015137']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1
