@@ -180,7 +180,7 @@ class ImdbEntrySet(MutableSet):
         for item_id in item_ids:
             self.session.post('http://www.imdb.com/list/_ajax/edit', data=dict(data, list_item_id=item_id))
         # We don't need to invalidate our cache if we remove the item
-        self._items = [i for i in self._items if self._items and i['imdb_id'] != entry['imdb_id']]
+        self._items = [i for i in self._items if i['imdb_id'] != entry['imdb_id']] if self._items else None
 
     def add(self, entry):
         if self.config['list'] in IMMUTABLE_LISTS:
