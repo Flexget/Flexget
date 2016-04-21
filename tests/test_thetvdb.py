@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import mock
 import pytest
 from flexget.manager import Session
-from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode, TVDBSeries
+from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode, find_series_id
 from flexget.plugins.input.thetvdb_favorites import TVDBUserFavorite
 
 
@@ -154,6 +154,13 @@ class TestTVDBLookup(object):
         entry = task.find_entry(title='naruto 128')
         assert entry
         assert entry['tvdb_ep_name'] == 'A Cry on Deaf Ears'
+
+    def test_find_series_id(self, mocked_expired, execute_task):
+        # Test the best match logic
+        assert find_series_id('Once Upon A Time') == 248835
+        assert find_series_id('Once Upon A Time 2011') == 248835
+        assert find_series_id('House M.D.') == 73255
+        assert find_series_id('House') == 73255
 
 
 @pytest.mark.online

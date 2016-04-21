@@ -24,7 +24,7 @@ Init
             self.config.config
 
 The init method should pass the config to a class variable, that will be used by other class methods. Also, any other
-global data that is need for the class operation to work should be retreived. For example, from ``trakt_list``:
+global data that is need for the class operation to work should be retrieved. For example, from ``trakt_list``:
 
 .. code-block:: python
 
@@ -38,7 +38,7 @@ global data that is need for the class operation to work should be retreived. Fo
         self._items = None
 
 Note the usage of ``self._items``. In case of an online list, the data should be fetch as little as possible, so a local
-cache that can be invalidated should be created. Then a property method that call on that data should be used throught
+cache that can be invalidated should be created. Then a property method that call on that data should be used throughout
 the class:
 
 .. code-block:: python

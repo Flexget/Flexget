@@ -174,7 +174,7 @@ def register_parser_arguments():
     entry_parser.add_argument('-u', '--original_url', required=True, help="URL of the entry")
 
     global_entry_parser = ArgumentParser(add_help=False)
-    global_entry_parser.add_argument('entry', nargs='?', help='can be entry title or ID')
+    global_entry_parser.add_argument('entry', help='can be entry title or ID')
 
     identifiers_parser = ArgumentParser(add_help=False)
     identifiers_parser.add_argument('-i', '--identifiers', metavar='<identifiers>', nargs='+',

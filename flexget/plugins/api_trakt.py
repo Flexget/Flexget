@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
 import re
 import time
@@ -10,19 +11,20 @@ from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
-from flexget import plugin
 from flexget import options
+from flexget import plugin
 from flexget.db_schema import upgrade
 from flexget.event import event
+from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
-from flexget.utils.tools import TimedDict
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimplePersistence
-from flexget.logger import console
+from flexget.utils.sqlalchemy_utils import table_add_column
+from flexget.utils.tools import TimedDict
 
-Base = db_schema.versioned_base('api_trakt', 3)
+Base = db_schema.versioned_base('api_trakt', 4)
 log = logging.getLogger('api_trakt')
 # Production Site
 CLIENT_ID = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
@@ -211,6 +213,11 @@ def get_api_url(*endpoint):
 def upgrade_database(ver, session):
     if ver <= 2:
         raise db_schema.UpgradeImpossible
+    if ver <= 3:
+        table_add_column('trakt_movies', 'poster', Unicode, session)
+        table_add_column('trakt_shows', 'poster', Unicode, session)
+        table_add_column('trakt_episodes', 'poster', Unicode, session)
+        ver = 4
     return ver
 
 
@@ -238,11 +245,11 @@ def get_entry_ids(entry):
 
 
 class TraktGenre(Base):
-
     __tablename__ = 'trakt_genres'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(Unicode)
+
 
 show_genres_table = Table('trakt_show_genres', Base.metadata,
                           Column('show_id', Integer, ForeignKey('trakt_shows.id')),
@@ -269,7 +276,6 @@ def get_db_genres(genres, session):
 
 
 class TraktActor(Base):
-
     __tablename__ = 'trakt_actors'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -283,6 +289,14 @@ class TraktActor(Base):
         self.trakt_id = trakt_id
         self.imdb_id = imdb_id
         self.tmdb_id = tmdb_id
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'trakt_id': self.trakt_id,
+            'imdb_id': self.imdb_id,
+            'tmdb_id': self.tmdb_id
+        }
 
 
 show_actors_table = Table('trakt_show_actors', Base.metadata,
@@ -343,6 +357,7 @@ class TraktEpisode(Base):
     number = Column(Integer)
     number_abs = Column(Integer)
     overview = Column(Unicode)
+    poster = Column(Unicode)
     first_aired = Column(DateTime)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
@@ -362,6 +377,10 @@ class TraktEpisode(Base):
         self.imdb_id = trakt_episode['ids']['imdb']
         self.tmdb_id = trakt_episode['ids']['tmdb']
         self.tvrage_id = trakt_episode['ids']['tvrage']
+        if trakt_episode['images']['screenshot']['full']:
+            self.poster = trakt_episode['images']['screenshot']['full']
+        else:
+            self.poster = None
         self.tvdb_id = trakt_episode['ids']['tvdb']
         self.first_aired = None
         if trakt_episode.get('first_aired'):
@@ -396,6 +415,7 @@ class TraktShow(Base):
     runtime = Column(Integer)
     certification = Column(Unicode)
     network = Column(Unicode)
+    poster = Column(Unicode)
     country = Column(Unicode)
     status = Column(String)
     rating = Column(Integer)
@@ -407,6 +427,36 @@ class TraktShow(Base):
     _actors = relation(TraktActor, secondary=show_actors_table)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "year": self.year,
+            "slug": self.slug,
+            "tvdb_id": self.tvdb_id,
+            "imdb_id": self.imdb_id,
+            "tmdb_id": self.tmdb_id,
+            "tvrage_id": self.tvrage_id,
+            "overview": self.overview,
+            "first_aired": self.first_aired,
+            "air_day": self.air_day,
+            "air_time": self.air_time,
+            "runtime": self.runtime,
+            "certification": self.certification,
+            "network": self.network,
+            "poster": self.poster,
+            "country": self.country,
+            "status": self.status,
+            "rating": self.rating,
+            "votes": self.votes,
+            "language": self.language,
+            "number_of_aired_episodes": self.aired_episodes,
+            "genres": [g.name for g in self.genres],
+            "actors": [a.to_dict() for a in self.actors],
+            "updated_at": self.updated_at,
+            "cached_at": self.cached_at
+        }
 
     def __init__(self, trakt_show, session):
         super(TraktShow, self).__init__()
@@ -423,6 +473,10 @@ class TraktShow(Base):
         self.tmdb_id = trakt_show['ids']['tmdb']
         self.tvrage_id = trakt_show['ids']['tvrage']
         self.tvdb_id = trakt_show['ids']['tvdb']
+        if trakt_show['images']['poster']['full']:
+            self.poster = trakt_show['images']['poster']['full']
+        else:
+            self.poster = None
         if trakt_show.get('air_time'):
             self.air_time = dateutil_parse(trakt_show.get('air_time'), ignoretz=True)
         else:
@@ -444,7 +498,7 @@ class TraktShow(Base):
         # TODO: Does series data being expired mean all episode data should be refreshed?
         episode = self.episodes.filter(TraktEpisode.season == season).filter(TraktEpisode.number == number).first()
         if not episode or self.expired:
-            url = get_api_url('shows', self.id, 'seasons', season, 'episodes', number, '?extended=full')
+            url = get_api_url('shows', self.id, 'seasons', season, 'episodes', number, '?extended=full,images')
             if only_cached:
                 raise LookupError('Episode %s %s not found in cache' % (season, number))
             log.debug('Episode %s %s not found in cache, looking up from trakt.', season, number)
@@ -502,6 +556,7 @@ class TraktMovie(Base):
     tmdb_id = Column(Integer)
     tagline = Column(Unicode)
     overview = Column(Unicode)
+    poster = Column(Unicode)
     released = Column(Date)
     runtime = Column(Integer)
     rating = Column(Integer)
@@ -516,6 +571,28 @@ class TraktMovie(Base):
         super(TraktMovie, self).__init__()
         self.update(trakt_movie, session)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "year": self.year,
+            "slug": self.slug,
+            "imdb_id": self.imdb_id,
+            "tmdb_id": self.tmdb_id,
+            "tagline": self.tagline,
+            "overview": self.overview,
+            "poster": self.poster,
+            "released": self.released,
+            "runtime": self.runtime,
+            "rating": self.rating,
+            "votes": self.votes,
+            "language": self.language,
+            "genres": [g.name for g in self.genres],
+            "actors": [a.to_dict() for a in self.actors],
+            "updated_at": self.updated_at,
+            "cached_at": self.cached_at
+        }
+
     def update(self, trakt_movie, session):
         """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
         if self.id and self.id != trakt_movie['ids']['trakt']:
@@ -525,6 +602,10 @@ class TraktMovie(Base):
         self.slug = trakt_movie['ids']['slug']
         self.imdb_id = trakt_movie['ids']['imdb']
         self.tmdb_id = trakt_movie['ids']['tmdb']
+        if trakt_movie['images']['poster']['full']:
+            self.poster = trakt_movie['images']['poster']['full']
+        else:
+            self.poster = None
         for col in ['title', 'overview', 'runtime', 'rating', 'votes', 'language', 'tagline', 'year']:
             setattr(self, col, trakt_movie.get(col))
         if self.released:
@@ -558,7 +639,6 @@ class TraktMovie(Base):
 
 
 class TraktShowSearchResult(Base):
-
     __tablename__ = 'trakt_show_search_results'
 
     id = Column(Integer, primary_key=True)
@@ -568,7 +648,6 @@ class TraktShowSearchResult(Base):
 
 
 class TraktMovieSearchResult(Base):
-
     __tablename__ = 'trakt_movie_search_results'
 
     id = Column(Integer, primary_key=True)
@@ -688,7 +767,7 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
         raise LookupError('Unable to find %s="%s" on trakt.' % (last_search_type, last_search_query))
     # Get actual data from trakt
     try:
-        return req_session.get(get_api_url(style + 's', trakt_id), params={'extended': 'full'}).json()
+        return req_session.get(get_api_url(style + 's', trakt_id), params={'extended': 'full,images'}).json()
     except requests.RequestException as e:
         raise LookupError('Error getting trakt data for id %s: %s' % (trakt_id, e))
 
@@ -760,7 +839,6 @@ def get_user_cache(username=None, account=None):
 
 
 class ApiTrakt(object):
-
     user_cache = TimedDict(cache_time='15 minutes')
 
     @staticmethod
@@ -798,7 +876,7 @@ class ApiTrakt(object):
             return series
         elif series and not found:
             if not session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
-                                                               title.lower()).first():
+                                                                       title.lower()).first():
                 log.debug('Adding search result to db')
                 session.add(TraktShowSearchResult(search=title, series=series))
         elif series and found:
@@ -841,7 +919,7 @@ class ApiTrakt(object):
             return movie
         if movie and not found:
             if not session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
-                                                                title.lower()).first():
+                                                                        title.lower()).first():
                 log.debug('Adding search result to db')
                 session.add(TraktMovieSearchResult(search=title, movie=movie))
         elif movie and found:
