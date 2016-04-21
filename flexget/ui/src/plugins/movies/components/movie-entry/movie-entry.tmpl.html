@@ -1,14 +1,14 @@
 
 <md-card class="movie-entry">
   <div class="movie-poster">
-    <img ng-src="{{ vm.metadata.poster }}"/>
+    <img ng-src="{{ ::vm.metadata.poster }}"/>
   </div>
   <div class="movie-info">
-    <h3>{{ vm.metadata.title }} ({{ vm.metadata.year }})
+    <h3>{{ ::vm.metadata.title }} ({{ ::vm.metadata.year }})
       <span class="rating">
         <md-icon md-font-set="fa" md-font-icon="fa-star"></md-icon>
         <span class="md-suhead">
-        {{ vm.metadata.rating | number:2 }}
+        {{ ::vm.metadata.rating | number:2 }}
         </span>
       </span>
     </h3>
@@ -22,7 +22,7 @@
     </md-chips>
 
     <p class="movie-plot">
-      {{ vm.metadata.overview }}
+      {{ ::vm.metadata.overview }}
     </p>
   </div>
 
@@ -38,7 +38,7 @@
       </md-button>
 
       <md-button aria-label="More info" class="md-fab md-raised md-mini">
-        <a ng-href="http://www.imdb.com/title/{{ vm.metadata.imdb_id }}"><i class="fa fa-film" aria-hidden="true"></i></a>
+        <a ng-href="http://www.imdb.com/title/{{ ::vm.metadata.imdb_id }}"><i class="fa fa-film" aria-hidden="true"></i></a>
       </md-button>
     </md-fab-actions>
   </md-fab-speed-dial>

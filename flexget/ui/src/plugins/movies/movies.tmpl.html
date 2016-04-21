@@ -2,11 +2,11 @@
     <md-tabs md-dynamic-height md-border-bottom>
         <md-tab ng-repeat="list in vm.lists" md-on-select="vm.loadMovies(list.id)">
             <md-tab-label>
-                {{ list.name }}
+                {{ ::list.name }}
             </md-tab-label>
             <md-tab-body>
                 <md-content layout="row" layout-wrap layout-padding>
-                    <movie-entry flex="33" metadata="movie.metadata" delete-movie="vm.deleteMovie(list.id, movie)" ng-repeat="movie in vm.movies"></movie-entry>
+                    <movie-entry flex="33" metadata="::movie.metadata" delete-movie="vm.deleteMovie(list.id, movie)" ng-repeat="movie in vm.movies"></movie-entry>
                 </md-content>
             </md-tab-body>
         </md-tab>
