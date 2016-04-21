@@ -369,7 +369,10 @@ class TraktEpisode(Base):
         self.imdb_id = trakt_episode['ids']['imdb']
         self.tmdb_id = trakt_episode['ids']['tmdb']
         self.tvrage_id = trakt_episode['ids']['tvrage']
-        self.poster = trakt_episode['images']['screenshot']['full']
+        if trakt_episode['images']['screenshot']['full']:
+            self.poster = trakt_episode['images']['screenshot']['full']
+        else:
+            self.poster = None
         self.tvdb_id = trakt_episode['ids']['tvdb']
         self.first_aired = None
         if trakt_episode.get('first_aired'):
@@ -432,7 +435,10 @@ class TraktShow(Base):
         self.tmdb_id = trakt_show['ids']['tmdb']
         self.tvrage_id = trakt_show['ids']['tvrage']
         self.tvdb_id = trakt_show['ids']['tvdb']
-        self.poster = trakt_show['images']['poster']['full']
+        if trakt_show['images']['poster']['full']:
+            self.poster = trakt_show['images']['poster']['full']
+        else:
+            self.poster = None
         if trakt_show.get('air_time'):
             self.air_time = dateutil_parse(trakt_show.get('air_time'), ignoretz=True)
         else:
@@ -536,7 +542,10 @@ class TraktMovie(Base):
         self.slug = trakt_movie['ids']['slug']
         self.imdb_id = trakt_movie['ids']['imdb']
         self.tmdb_id = trakt_movie['ids']['tmdb']
-        self.poster = trakt_movie['images']['poster']['full']
+        if trakt_movie['images']['poster']['full']:
+            self.poster = trakt_movie['images']['poster']['full']
+        else:
+            self.poster = None
         for col in ['title', 'overview', 'runtime', 'rating', 'votes', 'language', 'tagline', 'year']:
             setattr(self, col, trakt_movie.get(col))
         if self.released:
