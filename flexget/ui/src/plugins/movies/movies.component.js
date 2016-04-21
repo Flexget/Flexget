@@ -26,25 +26,9 @@
     vm.loadMovies = function(id) {
       $http.get('/api/movie_list/' + id + '/movies/')
       .success(function(data) {
-        console.log(data);
+
         vm.movies = data.movies;
-
-        vm.movies.forEach(function (movie) {
-
-          $http.get('/api/trakt/movie/', {
-            params : {
-              title: movie.title,
-              year : movie.year
-            }
-          })
-          .success(function (data) {
-            console.log(data);
-            movie.metadata = data;
-
-          }).error(function (err) {
-            console.error(err);
-          })
-        })
+        
       }).error(function(err) {
         console.log(err);
       })
