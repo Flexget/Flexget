@@ -6,7 +6,7 @@ import re
 from collections import MutableSet
 from datetime import datetime
 
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, HTTPError
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -99,8 +99,11 @@ class ImdbEntrySet(MutableSet):
     @property
     def items(self):
         if self._items is None:
-            r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
+            try:
+                r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
                                  (self.list_id, self.user_id))
+            except HTTPError as e:
+                raise PluginError(e.args[0])
             lines = r.iter_lines()
             # Throw away first line with headers
             next(lines)
