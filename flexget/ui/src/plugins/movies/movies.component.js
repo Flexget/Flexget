@@ -26,11 +26,25 @@
     vm.loadMovies = function(id) {
       $http.get('/api/movie_list/' + id + '/movies/')
       .success(function(data) {
+        console.log(data);
         vm.movies = data.movies;
+
+        vm.movies.forEach(function (movie) {
+
+          $http.get('http://www.omdbapi.com/?i='+ movie.movies_list_ids[0].id_value +'&plot=short&r=json')
+          .success(function (data) {
+
+            movie.metadata = data;
+
+          }).error(function (err) {
+            console.error(err);
+          })
+        })
       }).error(function(err) {
         console.log(err);
       })
     }
+
 
     vm.deleteMovie = function(listid, movie) {
       $http.delete('/api/movie_list/' + listid + '/movies/' + movie.id + '/')
@@ -41,7 +55,7 @@
           console.log(err);
         });
     }
-    
+
   }
 
 })();
