@@ -395,9 +395,6 @@ manager_parser.add_argument('--ipc-port', type=int, help=SUPPRESS)
 manager_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
                             help='use when executing FlexGet non-interactively: allows background '
                                  'maintenance to run, disables stdout and stderr output, reduces logging level')
-manager_parser.add_argument('--backup-db', action='store_true', default=False,
-                            help='in case a DB upgrade is required, a db backup will be created')
-
 
 
 class CoreArgumentParser(ArgumentParser):

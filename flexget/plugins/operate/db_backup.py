@@ -5,6 +5,7 @@ import logging
 import os
 import shutil
 
+from flexget import options
 from flexget.db_schema import flexget_db_version
 from flexget.event import event
 
@@ -32,3 +33,9 @@ def create_db_backup(manager):
 def no_backup_warning(manager):
     if not manager.options.backup_db:
         log.info('DB is upgrading without a backup, consider using the `--backup-db-on-upgrade` flag')
+
+
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser().add_argument('--backup-db', action='store_true', default=False,
+                                      help='in case a DB upgrade is required, a db backup will be created')
