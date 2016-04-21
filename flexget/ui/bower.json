@@ -20,7 +20,7 @@
     "angular-cache": "^4.5.0"
   },
   "resolutions": {
-    "angular": "1.5.3"
+    "angular": "1.5.5"
   },
   "devDependencies": {},
   "overrides": {

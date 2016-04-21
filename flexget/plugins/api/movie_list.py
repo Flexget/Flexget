@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import copy
 import logging
+from math import ceil
 
 from flask import jsonify
 from flask import request
@@ -97,7 +98,9 @@ return_movies = {
             'type': 'array',
             'items': movie_list_object
         },
-        'number_of_movies': {'type': 'integer'}
+        'number_of_movies': {'type': 'integer'},
+        'total_number_of_movies': {'type': 'integer'},
+        'page_number': {'type': 'integer'}
     }
 }
 return_lists = {'type': 'array', 'items': list_object}
@@ -189,10 +192,10 @@ movies_parser.add_argument('page_size', type=int, default=10, help='Number of mo
 
 
 @movie_list_api.route('/<int:list_id>/movies/')
-@api.doc(params={'list_id': 'ID of the list'}, parser=movies_parser)
 class MovieListMoviesAPI(APIResource):
     @api.response(404, model=default_error_schema)
     @api.response(200, model=return_movies_schema)
+    @api.doc(params={'list_id': 'ID of the list'}, parser=movies_parser)
     def get(self, list_id, session=None):
         """ Get movies by list ID """
 
@@ -220,9 +223,17 @@ class MovieListMoviesAPI(APIResource):
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
+        count = ml.get_movies_by_list_id(count=True, **kwargs)
         movies = [movie.to_dict() for movie in ml.get_movies_by_list_id(**kwargs)]
+        pages = int(ceil(count / float(page_size)))
 
-        return jsonify({'movies': movies})
+        number_of_movies = min(page_size, count)
+
+        return jsonify({'movies': movies,
+                        'number_of_movies': number_of_movies,
+                        'total_number_of_movies': count,
+                        'page': page,
+                        'total_number_of_pages': pages})
 
     @api.validate(model=input_movie_entry_schema, description=movie_identifiers_doc)
     @api.response(201, model=movie_list_object_schema)
