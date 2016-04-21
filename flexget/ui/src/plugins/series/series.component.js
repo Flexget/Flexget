@@ -16,7 +16,6 @@
       page: 1,
       page_size: 10,
       in_config: 'all',
-      //lookup: 'tvdb',
       sort_by: 'show_name'
     }
 
@@ -35,9 +34,6 @@
     vm.forgetShow = function(show) {
       seriesService.deleteShow(show).then(function(data) {
           getSeriesList();
-
-        /*var index = vm.series.indexOf(show);
-        vm.series.splice(index, 1);*/
       });
     }
 
@@ -67,7 +63,7 @@
           $mdDialog.show(errorDialog);
         })
       });
-    }*/       
+    }*/
 
     //Call from the pagination to update the page to the selected page
     vm.updateListPage = function(index) {
@@ -77,10 +73,14 @@
     }
 
     vm.search = function() {
-      $http.get('/api/series/search/' + vm.searchTerm, { params: options })
-      .success(function(data) {
-        vm.series = data.shows;
-      });
+      if(vm.searchTerm) {
+        seriesService.seriesShows(vm.searchTerm).then(function(data) {
+          vm.series = data.shows;
+        });
+      } else {
+        options.page = 1;
+        getSeriesList();
+      }
     }
 
     //Load initial list of series
