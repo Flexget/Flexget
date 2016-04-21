@@ -31,9 +31,14 @@
 
         vm.movies.forEach(function (movie) {
 
-          $http.get('http://www.omdbapi.com/?i='+ movie.movies_list_ids[0].id_value +'&plot=short&r=json')
+          $http.get('/api/trakt/movie/', {
+            params : {
+              title: movie.title,
+              year : movie.year
+            }
+          })
           .success(function (data) {
-
+            console.log(data);
             movie.metadata = data;
 
           }).error(function (err) {

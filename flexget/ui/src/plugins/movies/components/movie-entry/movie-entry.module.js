@@ -10,7 +10,7 @@
       },
       controllerAs: 'vm',
       bindings: {
-        movie: '<',
+        metadata: '<',
         deleteMovie: '&'
       },
     });

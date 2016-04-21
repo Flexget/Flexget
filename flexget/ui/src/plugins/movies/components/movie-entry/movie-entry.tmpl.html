@@ -1,30 +1,28 @@
 
 <md-card class="movie-entry">
   <div class="movie-poster">
-    <img ng-src="{{ vm.movie.metadata.Poster }}"/>
+    <img ng-src="{{ vm.metadata.poster }}"/>
   </div>
   <div class="movie-info">
-    <h3>{{ vm.movie.title }} ({{ vm.movie.metadata.Year }})
+    <h3>{{ vm.metadata.title }} ({{ vm.metadata.year }})
       <span class="rating">
         <md-icon md-font-set="fa" md-font-icon="fa-star"></md-icon>
         <span class="md-suhead">
-        {{ vm.movie.metadata.imdbRating }}
+        {{ vm.metadata.rating | number:2 }}
         </span>
       </span>
     </h3>
 
     <md-divider></md-divider>
 
-    <md-chips>
-      <md-chip>{{ vm.movie.metadata.Genre }}</md-chip>
+    <md-chips ng-model="vm.metadata.genres" readonly="true">
+      <md-chip-template>
+        {{ $chip }}
+      </md-chip-template>
     </md-chips>
 
-    <p>
-      <strong>Directed by:</strong> {{ vm.movie.metadata.Director }}
-    </p>
-
     <p class="movie-plot">
-      {{ vm.movie.metadata.Plot }}
+      {{ vm.metadata.overview }}
     </p>
   </div>
 
@@ -40,7 +38,7 @@
       </md-button>
 
       <md-button aria-label="More info" class="md-fab md-raised md-mini">
-        <a ng-href="http://www.imdb.com/title/{{ vm.movie.metadata.imdbID }}"><i class="fa fa-film" aria-hidden="true"></i></a>
+        <a ng-href="http://www.imdb.com/title/{{ vm.metadata.imdb_id }}"><i class="fa fa-film" aria-hidden="true"></i></a>
       </md-button>
     </md-fab-actions>
   </md-fab-speed-dial>
