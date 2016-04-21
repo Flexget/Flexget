@@ -4,7 +4,7 @@
     angular.module('flexget.services')
         .factory('seriesService', seriesService);
 
-    function seriesService($http, CacheFactory, $mdDialog) {
+    function seriesService($http, CacheFactory, $mdDialog, errorService) {
         // If cache doesn't exist, create it
         if (!CacheFactory.get('seriesCache')) {
             CacheFactory.createCache('seriesCache');
@@ -14,7 +14,8 @@
 
         return {
             getShows: getShows,
-            deleteShow: deleteShow
+            deleteShow: deleteShow,
+            searchShows: searchShows
         }
 
         function getShows(options) {
@@ -48,10 +49,22 @@
             }
         }
 
+        function searchShows(searchTerm) {
+            return $http.get('/api/series/search/' + searchTerm)
+                .then(searchShowsComplete)
+                .catch(callFailed);
+
+            function searchShowsComplete(response) {
+                return response.data;
+            }
+        }
+
         function callFailed(error) {
             //TODO: handle error
 
             console.log(error);
+
+            errorService.showToast(error);
         }
     }
 })();
