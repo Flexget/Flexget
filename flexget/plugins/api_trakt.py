@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
 import re
 import time
@@ -10,18 +11,18 @@ from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
-from flexget import plugin
 from flexget import options
+from flexget import plugin
 from flexget.db_schema import upgrade
 from flexget.event import event
+from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
-from flexget.utils.tools import TimedDict
 from flexget.utils.database import with_session
-from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.simple_persistence import SimplePersistence
-from flexget.logger import console
+from flexget.utils.sqlalchemy_utils import table_add_column
+from flexget.utils.tools import TimedDict
 
 Base = db_schema.versioned_base('api_trakt', 4)
 log = logging.getLogger('api_trakt')
@@ -244,11 +245,11 @@ def get_entry_ids(entry):
 
 
 class TraktGenre(Base):
-
     __tablename__ = 'trakt_genres'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(Unicode)
+
 
 show_genres_table = Table('trakt_show_genres', Base.metadata,
                           Column('show_id', Integer, ForeignKey('trakt_shows.id')),
@@ -275,7 +276,6 @@ def get_db_genres(genres, session):
 
 
 class TraktActor(Base):
-
     __tablename__ = 'trakt_actors'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -289,6 +289,14 @@ class TraktActor(Base):
         self.trakt_id = trakt_id
         self.imdb_id = imdb_id
         self.tmdb_id = tmdb_id
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'trakt_id': self.trakt_id,
+            'imdb_id': self.imdb_id,
+            'tmdb_id': self.tmdb_id
+        }
 
 
 show_actors_table = Table('trakt_show_actors', Base.metadata,
@@ -420,6 +428,36 @@ class TraktShow(Base):
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "year": self.year,
+            "slug": self.slug,
+            "tvdb_id": self.tvdb_id,
+            "imdb_id": self.imdb_id,
+            "tmdb_id": self.tmdb_id,
+            "tvrage_id": self.tvrage_id,
+            "overview": self.overview,
+            "first_aired": self.first_aired,
+            "air_day": self.air_day,
+            "air_time": self.air_time,
+            "runtime": self.runtime,
+            "certification": self.certification,
+            "network": self.network,
+            "poster": self.poster,
+            "country": self.country,
+            "status": self.status,
+            "rating": self.rating,
+            "votes": self.votes,
+            "language": self.language,
+            "number_of_aired_episodes": self.aired_episodes,
+            "genres": [g.name for g in self.genres],
+            "actors": [a.to_dict() for a in self.actors],
+            "updated_at": self.updated_at,
+            "cached_at": self.cached_at
+        }
+
     def __init__(self, trakt_show, session):
         super(TraktShow, self).__init__()
         self.update(trakt_show, session)
@@ -533,6 +571,28 @@ class TraktMovie(Base):
         super(TraktMovie, self).__init__()
         self.update(trakt_movie, session)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "year": self.year,
+            "slug": self.slug,
+            "imdb_id": self.imdb_id,
+            "tmdb_id": self.tmdb_id,
+            "tagline": self.tagline,
+            "overview": self.overview,
+            "poster": self.poster,
+            "released": self.released,
+            "runtime": self.runtime,
+            "rating": self.rating,
+            "votes": self.votes,
+            "language": self.language,
+            "genres": [g.name for g in self.genres],
+            "actors": [a.to_dict() for a in self.actors],
+            "updated_at": self.updated_at,
+            "cached_at": self.cached_at
+        }
+
     def update(self, trakt_movie, session):
         """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
         if self.id and self.id != trakt_movie['ids']['trakt']:
@@ -579,7 +639,6 @@ class TraktMovie(Base):
 
 
 class TraktShowSearchResult(Base):
-
     __tablename__ = 'trakt_show_search_results'
 
     id = Column(Integer, primary_key=True)
@@ -589,7 +648,6 @@ class TraktShowSearchResult(Base):
 
 
 class TraktMovieSearchResult(Base):
-
     __tablename__ = 'trakt_movie_search_results'
 
     id = Column(Integer, primary_key=True)
@@ -781,7 +839,6 @@ def get_user_cache(username=None, account=None):
 
 
 class ApiTrakt(object):
-
     user_cache = TimedDict(cache_time='15 minutes')
 
     @staticmethod
@@ -819,7 +876,7 @@ class ApiTrakt(object):
             return series
         elif series and not found:
             if not session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
-                                                               title.lower()).first():
+                                                                       title.lower()).first():
                 log.debug('Adding search result to db')
                 session.add(TraktShowSearchResult(search=title, series=series))
         elif series and found:
@@ -862,7 +919,7 @@ class ApiTrakt(object):
             return movie
         if movie and not found:
             if not session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
-                                                                title.lower()).first():
+                                                                        title.lower()).first():
                 log.debug('Adding search result to db')
                 session.add(TraktMovieSearchResult(search=title, movie=movie))
         elif movie and found:
