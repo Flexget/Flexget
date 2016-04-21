@@ -25,6 +25,7 @@
     function getSeriesList() {
       seriesService.getShows(options).then(function(data) {
         vm.series = data.shows;
+        console.log(vm);
 
         vm.currentPage = data.page;
         vm.totalShows = data.total_number_of_shows;
@@ -67,7 +68,7 @@
           $mdDialog.show(errorDialog);
         })
       });
-    }*/       
+    }*/
 
     //Call from the pagination to update the page to the selected page
     vm.updateListPage = function(index) {

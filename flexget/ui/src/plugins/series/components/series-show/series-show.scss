@@ -1,3 +1,14 @@
+.series-entry {
+  display: flex;
+  position: relative;
+  align-self: stretch;
+}
+
+.divider {
+  width: 100%;
+}
+
+
 .rating {
   float: right;
   md-icon {

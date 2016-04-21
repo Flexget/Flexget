@@ -1,62 +1,62 @@
 <md-card flex>
-    	<md-card-title flex="initial">
-        	<md-card-title-text>
-    			{{ ::vm.episode.episode_identifier }}
-    		</md-card-title-text>
-        </md-card-title>
-		<md-card-content flex>
-            <md-button ng-disabled="vm.episode.episode_number_of_releases == 0" flex ng-click="vm.toggleReleases()">
-                Releases
-                <md-icon md-font-set="fa fa-chevron-down" class="md-toggle-icon" ng-class="{ 'toggled' : vm.isOpen() }"></i></md-icon>
-            </md-button>
-            <md-list flex ng-show="vm.isOpen()" class="releases-toggle-list">
-    			<md-list-item ng-repeat="release in vm.releases | orderBy : 'release_downloaded' : true" class="md-2-line" ng-click="$mdOpenMenu()">
-                    <div class="md-list-item-text">
-                        <h3 class="release-title"><i ng-if="release.release_downloaded" class="fa fa-download"></i> {{ ::release.release_title }}</h3>
-    				    <p>{{ ::release.release_quality }}</p>
-                    </div>
-                    <md-menu class="md-secondary">
-                        <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
-                            <md-icon><i class="fa fa-ellipsis-v"></i></md-icon>
-                        </md-button>
-                        <md-menu-content width="3">
-                            <md-menu-item ng-if="release.release_downloaded">
-                                <md-button ng-click="vm.resetRelease(release.release_id)">
-                                    Reset Release
-                                </md-button>
-                            </md-menu-item>
-                            <md-menu-item>
-                                <md-button ng-click="vm.forgetRelease(release)">
-                                    Forget Release
-                                </md-button>
-                            </md-menu-item>
-                        </md-menu-content>
-                    </md-menu>
-    			</md-list-item>
-    		</md-list>
-    	</md-card-content>
-	  	<md-card-actions layout="row" layout-align="end end">
-            <md-menu class="card-menu">
-                <md-button class="md-warn md-raised" ng-click="$mdOpenMenu()" aria-label="open menu">
-                    <md-icon md-font-set="fa" md-font-icon="fa-cog"></md-icon> Settings
-                </md-button>
-                <md-menu-content width="3">
-                    <md-menu-item>
-                        <md-button ng-click="vm.deleteEpisode()">
-                            Delete Episode
-                        </md-button>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <md-button ng-click="vm.deleteReleases()">
-                            Delete Releases
-                        </md-button>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <md-button ng-click="vm.resetReleases()">
-                            Reset Releases
-                        </md-button>
-                    </md-menu-item>
-                </md-menu-content>
-            </md-menu>
-    	</md-card-actions>
-	</md-card>
+  <md-card-title flex="initial">
+    <md-card-title-text>
+      {{ ::vm.episode.episode_identifier }}
+    </md-card-title-text>
+  </md-card-title>
+  <md-card-content flex>
+    <md-button ng-disabled="vm.episode.episode_number_of_releases == 0" flex ng-click="vm.toggleReleases()">
+      Releases
+      <md-icon md-font-set="fa fa-chevron-down" class="md-toggle-icon" ng-class="{ 'toggled' : vm.isOpen() }"></i></md-icon>
+    </md-button>
+    <md-list flex ng-show="vm.isOpen()" class="releases-toggle-list">
+      <md-list-item ng-repeat="release in vm.releases | orderBy : 'release_downloaded' : true" class="md-2-line" ng-click="$mdOpenMenu()">
+        <div class="md-list-item-text">
+          <h3 class="release-title"><i ng-if="release.release_downloaded" class="fa fa-download"></i> {{ ::release.release_title }}</h3>
+          <p>{{ ::release.release_quality }}</p>
+        </div>
+        <md-menu class="md-secondary">
+          <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
+            <md-icon><i class="fa fa-ellipsis-v"></i></md-icon>
+          </md-button>
+          <md-menu-content width="3">
+            <md-menu-item ng-if="release.release_downloaded">
+              <md-button ng-click="vm.resetRelease(release.release_id)">
+                Reset Release
+              </md-button>
+            </md-menu-item>
+            <md-menu-item>
+              <md-button ng-click="vm.forgetRelease(release)">
+                Forget Release
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+      </md-list-item>
+    </md-list>
+  </md-card-content>
+  <md-card-actions layout="row" layout-align="end end">
+    <md-menu class="card-menu">
+      <md-button class="md-warn md-raised" ng-click="$mdOpenMenu()" aria-label="open menu">
+        <md-icon md-font-set="fa" md-font-icon="fa-cog"></md-icon> Settings
+      </md-button>
+      <md-menu-content width="3">
+        <md-menu-item>
+          <md-button ng-click="vm.deleteEpisode()">
+            Delete Episode
+          </md-button>
+        </md-menu-item>
+        <md-menu-item>
+          <md-button ng-click="vm.deleteReleases()">
+            Delete Releases
+          </md-button>
+        </md-menu-item>
+        <md-menu-item>
+          <md-button ng-click="vm.resetReleases()">
+            Reset Releases
+          </md-button>
+        </md-menu-item>
+      </md-menu-content>
+    </md-menu>
+  </md-card-actions>
+</md-card>
