@@ -26,11 +26,14 @@
     vm.loadMovies = function(id) {
       $http.get('/api/movie_list/' + id + '/movies/')
       .success(function(data) {
+
         vm.movies = data.movies;
+        
       }).error(function(err) {
         console.log(err);
       })
     }
+
 
     vm.deleteMovie = function(listid, movie) {
       $http.delete('/api/movie_list/' + listid + '/movies/' + movie.id + '/')
@@ -41,7 +44,7 @@
           console.log(err);
         });
     }
-    
+
   }
 
 })();

@@ -9,31 +9,22 @@
       controller: seriesController,
     });
 
-  function seriesController($http, $mdDialog) {
+  function seriesController($http, $mdDialog, seriesService) {
     var vm = this;
-
-    vm.currentPage = 1;
-    vm.totalShows = 0;
-    vm.pageSize = 10;
 
     var options = {
       page: 1,
       page_size: 10,
       in_config: 'all',
-      lookup: 'tvdb',
       sort_by: 'show_name'
     }
 
-
     vm.searchTerm = "";
 
-    //Call to get the series, based on the options
     function getSeriesList() {
-      $http.get('/api/series/', { params: options })
-      .success(function(data) {
+      seriesService.getShows(options).then(function(data) {
         vm.series = data.shows;
 
-        //Set vars for pagination
         vm.currentPage = data.page;
         vm.totalShows = data.total_number_of_shows;
         vm.pageSize = data.page_size;
@@ -41,6 +32,12 @@
     }
 
     vm.forgetShow = function(show) {
+      seriesService.deleteShow(show).then(function(data) {
+          getSeriesList();
+      });
+    }
+
+    /*vm.forgetShow = function(show) {
       //Construct the confirmation dialog
        var confirm = $mdDialog.confirm()
       .title('Confirm forgetting show.')
@@ -66,7 +63,7 @@
           $mdDialog.show(errorDialog);
         })
       });
-    }
+    }*/
 
     //Call from the pagination to update the page to the selected page
     vm.updateListPage = function(index) {
@@ -76,10 +73,14 @@
     }
 
     vm.search = function() {
-      $http.get('/api/series/search/' + vm.searchTerm, { params: options })
-      .success(function(data) {
-        vm.series = data.shows;
-      });
+      if(vm.searchTerm) {
+        seriesService.seriesShows(vm.searchTerm).then(function(data) {
+          vm.series = data.shows;
+        });
+      } else {
+        options.page = 1;
+        getSeriesList();
+      }
     }
 
     //Load initial list of series
