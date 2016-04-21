@@ -214,6 +214,8 @@ def upgrade_database(ver, session):
         raise db_schema.UpgradeImpossible
     if ver <= 3:
         table_add_column('trakt_movies', 'poster', Unicode, session)
+        table_add_column('trakt_shows', 'poster', Unicode, session)
+        table_add_column('trakt_episodes', 'poster', Unicode, session)
         ver = 4
     return ver
 
@@ -347,6 +349,7 @@ class TraktEpisode(Base):
     number = Column(Integer)
     number_abs = Column(Integer)
     overview = Column(Unicode)
+    poster = Column(Unicode)
     first_aired = Column(DateTime)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
@@ -366,6 +369,7 @@ class TraktEpisode(Base):
         self.imdb_id = trakt_episode['ids']['imdb']
         self.tmdb_id = trakt_episode['ids']['tmdb']
         self.tvrage_id = trakt_episode['ids']['tvrage']
+        self.poster = trakt_episode['images']['screenshot']['full']
         self.tvdb_id = trakt_episode['ids']['tvdb']
         self.first_aired = None
         if trakt_episode.get('first_aired'):
@@ -400,6 +404,7 @@ class TraktShow(Base):
     runtime = Column(Integer)
     certification = Column(Unicode)
     network = Column(Unicode)
+    poster = Column(Unicode)
     country = Column(Unicode)
     status = Column(String)
     rating = Column(Integer)
@@ -427,6 +432,7 @@ class TraktShow(Base):
         self.tmdb_id = trakt_show['ids']['tmdb']
         self.tvrage_id = trakt_show['ids']['tvrage']
         self.tvdb_id = trakt_show['ids']['tvdb']
+        self.poster = trakt_show['images']['poster']['full']
         if trakt_show.get('air_time'):
             self.air_time = dateutil_parse(trakt_show.get('air_time'), ignoretz=True)
         else:
@@ -448,7 +454,7 @@ class TraktShow(Base):
         # TODO: Does series data being expired mean all episode data should be refreshed?
         episode = self.episodes.filter(TraktEpisode.season == season).filter(TraktEpisode.number == number).first()
         if not episode or self.expired:
-            url = get_api_url('shows', self.id, 'seasons', season, 'episodes', number, '?extended=full')
+            url = get_api_url('shows', self.id, 'seasons', season, 'episodes', number, '?extended=full,images')
             if only_cached:
                 raise LookupError('Episode %s %s not found in cache' % (season, number))
             log.debug('Episode %s %s not found in cache, looking up from trakt.', season, number)
