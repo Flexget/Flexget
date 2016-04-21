@@ -12,7 +12,7 @@
       }
     });
 
-  function episodesController($http, $stateParams, $mdDialog, $state) {
+  function episodesController($http, $mdDialog) {
     var vm = this;
 
 
@@ -26,10 +26,6 @@
       options.page = index;
 
       getEpisodesList();
-    }
-
-    vm.goBack = function() {
-      $state.go('flexget.series');
     }
 
     //Cal the episodes based on the options, id is loaded from the route

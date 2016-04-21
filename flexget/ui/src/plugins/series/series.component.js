@@ -9,7 +9,7 @@
       controller: seriesController,
     });
 
-  function seriesController($http, $mdDialog, seriesService) {
+  function seriesController($http, $mdDialog, seriesService, $timeout) {
     var vm = this;
 
     var options = {

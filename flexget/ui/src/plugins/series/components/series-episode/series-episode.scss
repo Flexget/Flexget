@@ -17,7 +17,8 @@
 .releases-toggle-list {
   max-height: 1300px;
   overflow: hidden;
-  position: relative;
+  position: relative;;
+  background-color: $flexget-background-color;
   z-index: 1;
   -webkit-transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
   -webkit-transition-property: max-height;

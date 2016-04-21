@@ -1,16 +1,20 @@
-<div layout="column" flex layout-align="center">
+<md-card layout="column" flex>
 
-    <h1 class="md-headline text-center">{{ vm.show.show_name }}</h1>
-        <md-button class="md-primary md-raised"
-            ng-click="vm.goBack()">Back</md-button>
-	<md-content layout="row" flex layout-wrap>
-        <series-episode
-            layout="row"
-        	flex="100" flex-gt-md="50"
-        	episode="episode"
-        	delete-episode="vm.deleteEpisode(episode)"
-        	show="vm.show"
-            reset-releases="vm.resetReleases(episode)" ng-repeat="episode in vm.episodes"></series-episode>
-    </md-content>
-    <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalEpisodes" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
-</md-content>
+  <md-card-header>
+    <md-card-header-text layout-align="center">
+      <span class="md-title">{{ ::vm.show.show_name }}</span>
+    </md-card-header-text>
+  </md-card-header>
+
+  <md-content layout="column" flex layout-wrap>
+    <series-episode
+    layout="row"
+    flex="100" flex-gt-md="50" flex-gt-lg="33"
+    episode="episode"
+    delete-episode="vm.deleteEpisode(episode)"
+    show="vm.show"
+    reset-releases="vm.resetReleases(episode)" ng-repeat="episode in vm.show.episodes"></series-episode>
+  </md-content>
+  <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.show.totalEpisodes" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
+
+</md-card>
