@@ -32,16 +32,27 @@ class FlexgetVersion(Base):
         self.version = get_current_flexget_version()
 
 
-@event('manager.initialize')
-def flexget_db_version(manager=None):
+@event('manager.startup')
+def set_flexget_db_version(manager=None):
+    with Session() as session:
+        db_version = session.query(FlexgetVersion).first()
+        if not db_version:
+            log.debug('entering flexget version %s to db', get_current_flexget_version())
+            session.add(FlexgetVersion())
+        elif db_version.version != get_current_flexget_version():
+            log.debug('updating flexget version %s in db', get_current_flexget_version())
+            db_version.version = get_current_flexget_version()
+            db_version.created = datetime.now()
+            session.commit()
+        else:
+            log.debug('current flexget version already exist in db %s', db_version.version)
+
+
+def get_flexget_db_version():
     with Session() as session:
         version = session.query(FlexgetVersion).first()
-        if not version:
-            log.debug('no flexget version info detected in db, writing')
-            version = FlexgetVersion()
-            session.add(version)
-            session.commit()
-        return version.version
+        if version:
+            return version.version
 
 
 class PluginSchema(Base):

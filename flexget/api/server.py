@@ -97,6 +97,50 @@ class ServerVersionAPI(APIResource):
         return {'flexget_version': __version__, 'api_version': __api_version__}
 
 
+dump_threads_schema = api.schema('server.dump_threads', {
+    'type': 'object',
+    'properties': {
+        'threads': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'name': {'type': 'string'},
+                    'id': {'type': 'string'},
+                    'dump': {
+                        'type': 'array',
+                        'items': {'type': 'string'}
+                    }
+                },
+            },
+        }
+    }
+})
+
+
+@server_api.route('/dump_threads/')
+class ServerDumpThreads(APIResource):
+    @api.response(200, description='Flexget threads dump', model=dump_threads_schema)
+    def get(self, session=None):
+        """ Dump Server threads for debugging """
+        import threading, traceback, sys
+        id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
+        threads = []
+        for threadId, stack in sys._current_frames().items():
+            dump = []
+            for filename, lineno, name, line in traceback.extract_stack(stack):
+                dump.append('File: "%s", line %d, in %s' % (filename, lineno, name))
+                if line:
+                    dump.append(line.strip())
+            threads.append({
+                'name': id2name.get(threadId),
+                'id': threadId,
+                'dump': dump
+            })
+
+        return {'threads': threads}
+
+
 server_log_parser = api.parser()
 server_log_parser.add_argument(
     'lines', type=int, required=False, default=200,

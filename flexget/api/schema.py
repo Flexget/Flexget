@@ -7,10 +7,8 @@ from jsonschema import RefResolutionError
 from flexget.api import api, APIResource
 from flexget.config_schema import schema_paths, resolve_ref
 
-
 schema_api = api.namespace('schema', description='Config and plugin schemas')
 _plugins_cache = None
-
 
 schema_api_list = api.schema('schema.list', {
     'type': 'object',
@@ -21,6 +19,7 @@ schema_api_list = api.schema('schema.list', {
         }
     }
 })
+
 
 @schema_api.route('/')
 class SchemaAllAPI(APIResource):

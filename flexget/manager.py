@@ -139,8 +139,13 @@ class Manager(object):
             try:
                 self.options, extra = CoreArgumentParser().parse_known_args(args)
             except ParserError:
-                # If a non-built-in command was used, we need to parse with a parser that doesn't define the subparsers
-                self.options, extra = manager_parser.parse_known_args(args)
+                try:
+                    # If a non-built-in command was used, we need to parse with a parser that doesn't define the subparsers
+                    self.options, extra = manager_parser.parse_known_args(args)
+                except ParserError as e:
+                    manager_parser.print_help()
+                    print('\nError: %s' % e.message)
+                    sys.exit(1)
         try:
             self.find_config(create=False)
         except:
