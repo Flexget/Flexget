@@ -291,19 +291,13 @@ class TraktImages(Base):
     style = Column(Unicode)
     url = Column(Unicode)
 
-    def __init__(self, images):
+    def __init__(self, images, session):
         super(TraktImages, self).__init__()
-        self.update(images)
+        self.update(images, session)
 
-    def update(self, images):
-        flat = []
-        for i, s in images.items():
-            for ss,u in s.items():
-                a = {'ident': i, 'style': ss, 'url': u}
-                flat.append(a)
-        for i in flat:
-            for col in i.keys():
-                setattr(self, col, images.get(col))
+    def update(self, images, session):
+        for col in images.keys():
+            setattr(self, col, images.get(col))
 
 
 trakt_image_actors = Table('trakt_image_actor', Base.metadata,
@@ -337,11 +331,11 @@ class TraktActors(Base):
     homepage = Column(Unicode)
     images = relation(TraktImages, secondary=trakt_image_actors)
 
-    def __init__(self, actor):
+    def __init__(self, actor, session):
         super(TraktActors, self).__init__()
-        self.update(actor)
+        self.update(actor, session)
 
-    def update(self, actor):
+    def update(self, actor, session):
         if self.id and self.id != actor.get('ids').get('trakt'):
             raise Exception('Tried to update db actors with different actor data')
         elif not self.id:
@@ -355,7 +349,31 @@ class TraktActors(Base):
         self.birthday = actor.get('birthday')
         self.death    = actor.get('death')
         self.homepage = actor.get('homepage')
-        self.images = TraktImages(actor.get('images'))
+        if actor.get('images'):
+            img = actor.get('images')
+            self.images = get_db_images(img, session)
+
+def get_db_images(image, session):
+    try:
+        flat = []
+        images = []
+        if image:
+            for i, s in image.items():
+                for ss, u in s.items():
+                    a = {'ident': i, 'style': ss, 'url': u}
+                    flat.append(a)
+        for i in flat:
+            url = i.get('url')
+            image = session.query(TraktImages).filter(TraktImages.url == url).first()
+            if not image:
+                image = TraktImages(i, session)
+                session.add(image)
+            images.append(image)
+        return images
+    except:
+        log.debug('Something went wrong with images')
+        return
+
 
 def get_db_actors(ident, style):
     actors = []
@@ -366,10 +384,11 @@ def get_db_actors(ident, style):
         with Session() as session:
             for result in results.get('cast'):
                 ids = result.get('person').get('ids')
-                trakt_id = ids.get('trakt')
-                actor = session.query(TraktActors).filter(TraktActors.id == trakt_id).first()
+                character = result.get('character')
+                actor = session.query(TraktCharacters).filter(TraktCharacters.name == character).first()
                 if not actor:
-                    actor = TraktCharacters(ident, result)
+                    actor = TraktCharacters(ident, result, session)
+                    session.add(actor)
                 actors.append(actor)
         return actors
     except requests.RequestException as e:
@@ -384,17 +403,17 @@ class TraktCharacters(Base):
     name = Column(Unicode)
     actor = relation(TraktActors, secondary=trakt_character_map)
 
-    def __init__(self, id, trakt_characters):
+    def __init__(self, id, trakt_characters, session):
         super(TraktCharacters, self).__init__()
-        self.update(id, trakt_characters)
+        self.update(id, trakt_characters, session)
 
-    def update(self, id, characters):
+    def update(self, id, characters, session):
         if self.name and self.trakt_id and self.name != characters.get('character') and self.trakt_id != id:
             raise Exception('Tried to update character with wrong information')
         elif not self.name and self.trakt_id:
             self.name = characters.get('character')
             self.trakt_id = id
-        self.actor = TraktActors(characters.get('person'))
+        self.actor = TraktActors(characters.get('person'), session)
 
 def list_actors(characters):
     res = {}
@@ -568,7 +587,7 @@ class TraktShow(Base):
     @property
     def actors(self):
         if not self._characters:
-            self._characters[:] = get_db_actors(self.id, 'show')
+            self._characters = get_db_actors(self.id, 'show')
         return self._characters
 
     def __repr__(self):
