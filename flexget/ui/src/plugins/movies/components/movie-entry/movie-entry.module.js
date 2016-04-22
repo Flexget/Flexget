@@ -18,20 +18,37 @@
 
     var vm = this;
 
+    getMetadata();
 
 
-    $http.get('/api/trakt/movie/', {
-      params : {
+    function getMetadata() {
+
+      var params = {
         title: vm.movie.title,
         year : vm.movie.year
       }
-    })
-    .success(function (data) {
-      vm.metadata = data;
 
-    }).error(function (err) {
-      console.error(err);
-    })
+      vm.movie.movies_list_ids.forEach(function (id) {
+        var newid = {};
+        newid[id.id_name] = id.id_value;
+        params = $.extend(params, newid);
+      })
+
+
+      $http.get('/api/trakt/movie/', {
+        params: params
+      })
+      .success(function (data) {
+
+        vm.metadata = data;
+
+
+      }).error(function (err) {
+        console.error(err);
+      })
+    }
   }
+
+
 
 })();

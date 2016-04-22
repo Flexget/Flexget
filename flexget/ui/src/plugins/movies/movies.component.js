@@ -1,14 +1,14 @@
 (function () {
   'use strict';
   angular
-    .module("flexget.plugins.movies")
-    .component('moviesView', {
-      templateUrl: 'plugins/movies/movies.tmpl.html',
-      controllerAs: 'vm',
-      controller: moviesController,
-    });
+  .module("flexget.plugins.movies")
+  .component('moviesView', {
+    templateUrl: 'plugins/movies/movies.tmpl.html',
+    controllerAs: 'vm',
+    controller: moviesController,
+  });
 
-  function moviesController($http) {
+  function moviesController($http, $mdDialog) {
     var vm = this;
 
     vm.title = 'Movies';
@@ -28,7 +28,7 @@
       .success(function(data) {
 
         vm.movies = data.movies;
-        
+
       }).error(function(err) {
         console.log(err);
       })
@@ -36,13 +36,29 @@
 
 
     vm.deleteMovie = function(listid, movie) {
-      $http.delete('/api/movie_list/' + listid + '/movies/' + movie.id + '/')
+
+      var confirm = $mdDialog.confirm()
+      .title('Confirm deleting movie')
+      .htmlContent("Are you sure you want to forget this movie ?")
+      .ok("Delete")
+      .cancel("No");
+
+      $mdDialog.show(confirm).then(function() {
+        $http.delete('/api/movie_list/' + listid + '/movies/' + movie.id + '/')
         .success(function(data) {
           var index = vm.movies.indexOf(movie);
           vm.movies.splice(index, 1);
-        }).error(function(err) {
+        }).error(function(error) {
           console.log(err);
+
+          var errorDialog = $mdDialog.alert()
+            .title("Something went wrong")
+            .htmlContent("Oops, something went wrong when trying to forget <b>" + movie.title + "</b>:<br />" + error.message)
+            .ok("Ok");
+
+          $mdDialog.show(errorDialog);
         });
+      });
     }
 
   }

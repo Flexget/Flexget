@@ -1,4 +1,3 @@
-
 <md-card class="movie-entry">
   <div class="movie-poster">
     <img ng-src="{{ ::vm.metadata.poster }}"/>
@@ -13,8 +12,6 @@
       </span>
     </h3>
 
-    <md-divider></md-divider>
-
     <md-chips ng-model="::vm.metadata.genres" readonly="true">
       <md-chip-template>
         {{ $chip }}
@@ -26,7 +23,7 @@
     </p>
   </div>
 
-  <md-fab-speed-dial md-direction="left" class="md-fling movie-more-btn">
+  <md-fab-speed-dial md-direction="left" class="md-scale movie-more-btn">
     <md-fab-trigger>
       <md-button aria-label="More" class="md-fab md-mini">
         <i class="fa fa-bars" aria-hidden="true"></i>
@@ -38,7 +35,7 @@
       </md-button>
 
       <md-button aria-label="More info" class="md-fab md-raised md-mini">
-        <a ng-href="http://www.imdb.com/title/{{ ::vm.metadata.imdb_id }}"><i class="fa fa-film" aria-hidden="true"></i></a>
+        <a target="_blank" ng-href="http://www.imdb.com/title/{{ ::vm.metadata.imdb_id }}"><i class="fa fa-film" aria-hidden="true"></i></a>
       </md-button>
     </md-fab-actions>
   </md-fab-speed-dial>
