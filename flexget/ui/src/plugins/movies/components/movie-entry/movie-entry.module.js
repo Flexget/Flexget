@@ -36,7 +36,8 @@
 
 
       $http.get('/api/trakt/movie/', {
-        params: params
+        params: params,
+        cache: true
       })
       .success(function (data) {
 
