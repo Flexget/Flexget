@@ -291,15 +291,15 @@ class TraktImages(Base):
     style = Column(Unicode)
     url = Column(Unicode)
 
-    def __init__(self, images, session):
+    def __init__(self, images):
         super(TraktImages, self).__init__()
-        self.update(images, session)
+        self.update(images)
 
-    def update(self, images, session):
+    def update(self, images):
         flat = []
         for i, s in images.items():
             for ss,u in s.items():
-                a = [{'ident': i, 'style': ss, 'url': u}]
+                a = {'ident': i, 'style': ss, 'url': u}
                 flat.append(a)
         for i in flat:
             for col in i.keys():
@@ -337,12 +337,11 @@ class TraktActors(Base):
     homepage = Column(Unicode)
     images = relation(TraktImages, secondary=trakt_image_actors)
 
-
-    def __init__(self, actor, session):
+    def __init__(self, actor):
         super(TraktActors, self).__init__()
-        self.update(actor, session)
+        self.update(actor)
 
-    def update(self, actor, session):
+    def update(self, actor):
         if self.id and self.id != actor.get('ids').get('trakt'):
             raise Exception('Tried to update db actors with different actor data')
         elif not self.id:
@@ -356,47 +355,46 @@ class TraktActors(Base):
         self.birthday = actor.get('birthday')
         self.death    = actor.get('death')
         self.homepage = actor.get('homepage')
-        self.images = TraktImages.update(actor.get('images'), session)
+        self.images = TraktImages(actor.get('images'))
 
-    def get_db_actors(ident, style):
-        actors = []
-        url = get_api_url(style + 's', ident, 'people', '?extend=full,images')
-        req_session = get_session()
-        try:
-            results = req_session.get(url).json()
-            with Session() as session:
-                for result in results.get('cast'):
-                    ids = result.get('person').get('ids')
-                    trakt_id = ids.get('trakt')
-                    actor = session.query(TraktActors).filter(TraktActors.trakt_id == trakt_id).first()
-                    if not actor:
-                        actor = TraktCharacters.update(ident, result, session)
-                    actors.append(actor)
-            return actors
-        except requests.RequestException as e:
-            log.debug('Error searching for actors for trakt id %s', e)
-            return
+def get_db_actors(ident, style):
+    actors = []
+    url = get_api_url(style + 's', ident, 'people')
+    req_session = get_session()
+    try:
+        results = req_session.get(url+'?extended=full,images').json()
+        with Session() as session:
+            for result in results.get('cast'):
+                ids = result.get('person').get('ids')
+                trakt_id = ids.get('trakt')
+                actor = session.query(TraktActors).filter(TraktActors.id == trakt_id).first()
+                if not actor:
+                    actor = TraktCharacters(ident, result)
+                actors.append(actor)
+        return actors
+    except requests.RequestException as e:
+        log.debug('Error searching for actors for trakt id %s', e)
+        return
 
 class TraktCharacters(Base):
     __tablename__ = 'trakt_characters'
 
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     trakt_id = Column(Integer)
+    name = Column(Unicode)
     actor = relation(TraktActors, secondary=trakt_character_map)
 
-    def __init__(self, id, trakt_characters, session):
+    def __init__(self, id, trakt_characters):
         super(TraktCharacters, self).__init__()
-        self.update(id, trakt_characters, session)
+        self.update(id, trakt_characters)
 
-    def update(self, id, characters, session):
-
-        for c in characters.get('cast'):
-            if self.name and self.trakt_id and self.name != c.get('character') and self.trakt_id != id:
-                raise Exception('Tried to update character with wrong information')
-            elif not self.name and self.trakt_id:
-                self.name = c.get('character')
-                self.trakt_id = id
-            self.actor = TraktActors.update(self, c.get('person'), session)
+    def update(self, id, characters):
+        if self.name and self.trakt_id and self.name != characters.get('character') and self.trakt_id != id:
+            raise Exception('Tried to update character with wrong information')
+        elif not self.name and self.trakt_id:
+            self.name = characters.get('character')
+            self.trakt_id = id
+        self.actor = TraktActors(characters.get('person'))
 
 def list_actors(characters):
     res = {}
@@ -570,7 +568,7 @@ class TraktShow(Base):
     @property
     def actors(self):
         if not self._characters:
-            self._characters[:] = TraktActors.get_db_actors(self.id, 'show')
+            self._characters[:] = get_db_actors(self.id, 'show')
         return self._characters
 
     def __repr__(self):
@@ -666,7 +664,7 @@ class TraktMovie(Base):
     @property
     def actors(self):
         if not self._characters:
-            self._characters[:] = TraktActors.get_db_actors(self.id, 'movie')
+            self._characters[:] = get_db_actors(self.id, 'movie')
         return self._characters
 
 
@@ -799,7 +797,8 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
         raise LookupError('Unable to find %s="%s" on trakt.' % (last_search_type, last_search_query))
     # Get actual data from trakt
     try:
-        return req_session.get(get_api_url(style + 's', trakt_id), params={'extended': 'full,images'}).json()
+        data = req_session.get(get_api_url(style + 's', trakt_id), params={'extended':'full,images'}).json()
+        return data
     except requests.RequestException as e:
         raise LookupError('Error getting trakt data for id %s: %s' % (trakt_id, e))
 
