@@ -13,7 +13,7 @@ jinja2
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
 requests>=2.8.0, <3.0
 # Bug in dateutil 2.5.2 https://github.com/dateutil/dateutil/issues/233
-python-dateutil!=2.0, !=2.2, !=2.5.2
+python-dateutil!=2.0, !=2.2, !=2.5.2, !=2.5.3
 jsonschema>=2.0
 path.py>=8.1.1
 pathlib>=1.0
