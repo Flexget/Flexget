@@ -399,7 +399,7 @@ class PluginTransmission(TransmissionBase):
             try:
                 if downloaded:
                     with open(entry['file'], 'rb') as f:
-                        filedump = base64.b64encode(f.read())
+                        filedump = base64.b64encode(f.read()).decode('utf-8')
                     r = cli.add_torrent(filedump, 30, **options['add'])
                 else:
                     # we need to set paused to false so the magnetization begins immediately
