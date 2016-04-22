@@ -317,7 +317,7 @@ class PluginTransmission(TransmissionBase):
         if opt_dic.get('path'):
             try:
                 path = os.path.expanduser(entry.render(opt_dic['path']))
-                add['download_dir'] = pathscrub(path)
+                add['download_dir'] = pathscrub(path).encode('utf-8')
             except RenderError as e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
         if 'bandwidthpriority' in opt_dic:
@@ -540,7 +540,7 @@ class PluginTransmission(TransmissionBase):
                                 try:
                                     cli.rename_torrent_path(r.id, fl[r.id][index]['name'],
                                                             os.path.basename(
-                                                                pathscrub(filename + file_ext))
+                                                                pathscrub(filename + file_ext)).encode('utf-8')
                                                             )
                                 except TransmissionError:
                                     log.error('content_filename only supported with transmission 2.8+')
