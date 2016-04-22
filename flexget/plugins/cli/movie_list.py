@@ -8,14 +8,9 @@ from flexget import options
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
-from flexget.plugin import DependencyError
+from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
+    get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList
 from flexget.utils.tools import split_title_year
-
-try:
-    from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
-        get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList
-except ImportError:
-    raise DependencyError(issued_by='cli_movie_list', missing='movie_list')
 
 
 def parse_identifier(identifier_string):
