@@ -317,7 +317,7 @@ class PluginTransmission(TransmissionBase):
         if opt_dic.get('path'):
             try:
                 path = os.path.expanduser(entry.render(opt_dic['path']))
-                add['download_dir'] = pathscrub(path).encode('utf-8')
+                add['download_dir'] = pathscrub(path)
             except RenderError as e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
         if 'bandwidthpriority' in opt_dic:
@@ -399,7 +399,7 @@ class PluginTransmission(TransmissionBase):
             try:
                 if downloaded:
                     with open(entry['file'], 'rb') as f:
-                        filedump = base64.b64encode(f.read()).encode('utf-8')
+                        filedump = base64.b64encode(f.read())
                     r = cli.add_torrent(filedump, 30, **options['add'])
                 else:
                     # we need to set paused to false so the magnetization begins immediately
@@ -540,7 +540,7 @@ class PluginTransmission(TransmissionBase):
                                 try:
                                     cli.rename_torrent_path(r.id, fl[r.id][index]['name'],
                                                             os.path.basename(
-                                                                pathscrub(filename + file_ext).encode('utf-8'))
+                                                                pathscrub(filename + file_ext))
                                                             )
                                 except TransmissionError:
                                     log.error('content_filename only supported with transmission 2.8+')
