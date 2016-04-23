@@ -209,7 +209,7 @@ def get_api_url(*endpoint):
     return url
 
 
-@db_schema.upgrade('api_tvdb')
+@upgrade('api_trakt')
 def upgrade(ver, session):
     if ver is None or ver <= 4:
         raise db_schema.UpgradeImpossible
