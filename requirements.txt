@@ -14,7 +14,7 @@ jinja2
 requests>=2.8.0, <3.0
 # Bug in dateutil 2.5.2 https://github.com/dateutil/dateutil/issues/233
 # Bug in dateutil 2.5.3 https://github.com/dateutil/dateutil/issues/258
-python-dateutil<2.5.2
+python-dateutil>=2.5.2
 jsonschema>=2.0
 path.py
 guessit>=2.0.3
