@@ -480,7 +480,7 @@ class TestSeriesParser(object):
 
         # If we specify yearfirst yes it should force another interpretation
         s = parse(name='Something', data='Something 01-02-03', date_yearfirst=True)
-        assert (s.identifier == '2001-02-03'), 'failed to parse %s' % s.data
+        assert (s.identifier == '2001-03-02'), 'failed to parse %s' % s.data
 
         # If we specify dayfirst no it should force the third interpretation
         s = parse(name='Something', data='Something 01-02-03', date_dayfirst=False)
