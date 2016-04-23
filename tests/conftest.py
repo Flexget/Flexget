@@ -1,17 +1,23 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
-
-import itertools
+from builtins import *
+from future.utils import PY2
+from future.backports.http import client as backport_client
 
 import os
 import sys
 import yaml
+import logging
+import shutil
+
+import itertools
+
 from contextlib import contextmanager
 
 import mock
 import pytest
 from path import Path
 from vcr import VCR
+from vcr.stubs import VCRHTTPSConnection, VCRHTTPConnection
 
 import flexget.logger
 from flexget.manager import Manager
@@ -21,13 +27,20 @@ from flexget.webserver import User
 from flexget.manager import Session
 from flexget.api import app
 
-log = logging.getLogger('tests')
 
+log = logging.getLogger('tests')
 
 VCR_CASSETTE_DIR = os.path.join(os.path.dirname(__file__), 'cassettes')
 VCR_RECORD_MODE = os.environ.get('VCR_RECORD_MODE', 'once')
 
-vcr = VCR(cassette_library_dir=VCR_CASSETTE_DIR, record_mode=VCR_RECORD_MODE)
+vcr = VCR(
+    cassette_library_dir=VCR_CASSETTE_DIR,
+    record_mode=VCR_RECORD_MODE,
+    custom_patches=(
+        (backport_client, 'HTTPSConnection', VCRHTTPSConnection),
+        (backport_client, 'HTTPConnection', VCRHTTPConnection),
+    )
+)
 
 
 # --- These are the public fixtures tests can ask for ---
@@ -56,7 +69,6 @@ def manager(request, config, caplog, monkeypatch, filecopy):  # enforce filecopy
         raise
     yield mockmanager
     mockmanager.shutdown()
-    mockmanager.__del__()
 
 
 @pytest.fixture()
@@ -155,31 +167,62 @@ def filecopy(request):
     out_files = []
     marker = request.node.get_marker('filecopy')
     if marker is not None:
-        sources, dst = marker.args
-        if isinstance(sources, basestring):
-            sources = [sources]
-        if 'tmpdir' in request.fixturenames:
-            dst = dst.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)
-        dst = Path(dst)
-        for f in itertools.chain(*(Path().glob(src) for src in sources)):
-            dest_path = dst
-            if dest_path.isdir():
-                dest_path = dest_path / f.basename()
-            f.copy(dest_path)
-            out_files.append(dest_path)
+        copy_list = marker.args[0] if len(marker.args) == 1 else [marker.args]
+
+        for sources, dst in copy_list:
+            if isinstance(sources, str):
+                sources = [sources]
+            if 'tmpdir' in request.fixturenames:
+                dst = dst.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)
+            dst = Path(dst)
+            for f in itertools.chain(*(Path().glob(src) for src in sources)):
+                dest_path = dst
+                if dest_path.isdir():
+                    dest_path = dest_path / f.basename()
+
+                if not os.path.isdir(os.path.dirname(dest_path)):
+                    os.makedirs(os.path.dirname(dest_path))
+                if os.path.isdir(f):
+                    shutil.copytree(f, dest_path)
+                else:
+                    shutil.copy(f, dest_path)
+                out_files.append(dest_path)
     yield
     if out_files:
         for f in out_files:
             try:
-                f.remove()
+                if os.path.isdir(f):
+                    shutil.rmtree(f)
+                else:
+                    f.remove()
             except OSError as e:
                 print("couldn't remove %s: %s" % (f, e))
 
 
 @pytest.fixture()
 def no_requests(monkeypatch):
-    monkeypatch.setattr("requests.sessions.Session.request",
-                        mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online')))
+    online_funcs = [
+        'requests.sessions.Session.request',
+        'future.backports.http.client.HTTPConnection.request',
+    ]
+
+    # Don't monkey patch HTTPSConnection if ssl not installed as it won't exist in backports
+    try:
+        import ssl
+        from ssl import SSLContext
+        online_funcs.append('future.backports.http.client.HTTPSConnection.request')
+    except ImportError:
+        pass
+
+    if PY2:
+        online_funcs.extend(['httplib.HTTPConnection.request',
+                             'httplib.HTTPSConnection.request'])
+    else:
+        online_funcs.extend(['http.client.HTTPConnection.request',
+                             'http.client.HTTPSConnection.request'])
+
+    for func in online_funcs:
+        monkeypatch.setattr(func, mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online')))
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -187,7 +230,7 @@ def setup_once(pytestconfig, request):
     os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'tests'))
     flexget.logger.initialize(True)
     m = MockManager('tasks: {}', 'init')  # This makes sure our template environment is set up before any tests are run
-    m.__del__()
+    m.shutdown()
     logging.getLogger().setLevel(logging.DEBUG)
     load_plugins()
 

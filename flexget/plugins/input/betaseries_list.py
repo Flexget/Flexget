@@ -1,5 +1,7 @@
 """Input plugin for www.betaseries.com"""
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 from hashlib import md5
 import logging
 

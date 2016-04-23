@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from future.moves.urllib.parse import quote
+
 import logging
-import urllib
 
 import feedparser
 from requests import RequestException
@@ -49,7 +51,7 @@ class SearchKAT(object):
             params = {'rss': 1}
             if config.get('verified'):
                 search_string_url_fragment += ' verified:1'
-            url = 'https://kat.cr/usearch/%s/' % urllib.quote(search_string_url_fragment.encode('utf-8'))
+            url = 'https://kat.cr/usearch/%s/' % quote(search_string_url_fragment.encode('utf-8'))
             if config.get('category', 'all') != 'all':
                 params['category'] = config['category']
 

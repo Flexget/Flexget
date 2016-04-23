@@ -2,19 +2,19 @@ interactions:
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/2.7]
-      method: GET
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
       uri: http://api.tvmaze.com/singlesearch/shows?q=Aoeu%20Htns&embed=cast
     response:
-      body: {string: ''}
+      body: {string: !!python/unicode ''}
       headers:
         access-control-allow-origin: ['*']
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Thu, 03 Mar 2016 09:33:06 GMT']
+        date: ['Tue, 15 Mar 2016 01:27:39 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 404, message: Not Found}

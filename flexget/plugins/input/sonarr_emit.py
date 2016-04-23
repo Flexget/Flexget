@@ -1,7 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from urlparse import urlparse
+from builtins import *
+from future.moves.urllib.parse import urlparse
+
 import logging
 import math
+
 from requests import RequestException
 
 from flexget import plugin
@@ -116,7 +119,7 @@ class SonarrEmit(object):
                     # Test mode logging
                     if entry and task.options.test:
                         log.verbose("Test mode. Entry includes:")
-                        for key, value in entry.items():
+                        for key, value in list(entry.items()):
                             log.verbose('     %s: %s' % (key.capitalize(), value))
             json = self.get_page(task, config, page)
         return entries

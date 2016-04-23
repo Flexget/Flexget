@@ -1,8 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from datetime import datetime
-import logging
+from builtins import *
 
-from sqlalchemy import Column, Integer, Boolean, String, Unicode, DateTime
+import logging
+from datetime import datetime
+
+from sqlalchemy import Column, Integer, String, Unicode, DateTime
 
 from flexget import db_schema
 from flexget.plugin import priority
@@ -72,7 +74,7 @@ class FilterQueueBase(object):
         if config is False:
             return
 
-        for id, entry in self.accepted_entries.iteritems():
+        for id, entry in self.accepted_entries.items():
             if entry in task.accepted and entry not in task.failed:
                 # If entry was not rejected or failed, mark it as downloaded
                 update_values = {'downloaded': datetime.now(),

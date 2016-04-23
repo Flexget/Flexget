@@ -1,6 +1,10 @@
-import json
-import logging
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import os
+import json
+import sys
+import logging
 from time import sleep
 
 import cherrypy
@@ -159,7 +163,7 @@ def reverse_readline(fh, start_byte=0, buf_size=8192):
         fh.seek(-offset, os.SEEK_END)
         buf = fh.read(min(remaining_size, buf_size))
         remaining_size -= buf_size
-        lines = buf.split('\n')
+        lines = buf.decode(sys.getfilesystemencoding()).split('\n')
         # the first line of the buffer is probably not a complete line so
         # we'll save it and append it to the last line of the next buffer
         # we read
@@ -254,10 +258,11 @@ class ServerLogAPI(APIResource):
                 try:
                     with open(base_log_file, 'rb') as fh:
                         fh.seek(stream_from_byte)
-                        line = fh.readline()
+                        line = fh.readline().decode(sys.getfilesystemencoding())
                         stream_from_byte = fh.tell()
                 except IOError:
                     yield '{}'
+                    continue
 
                 # If a valid line is found and does not pass the filter then set it to none
                 line = log_parser.json_string(line) if log_parser.matches(line) else '{}'

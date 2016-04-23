@@ -1,4 +1,7 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
+from future.utils import with_metaclass
 
 import re
 
@@ -22,7 +25,7 @@ class Errors(object):
 
     def add(self, msg):
         """Add new error message to current path."""
-        path = [unicode(p) for p in self.path]
+        path = [str(p) for p in self.path]
         msg = '[/%s] %s' % ('/'.join(path), msg)
         self.messages.append(msg)
 
@@ -73,17 +76,18 @@ def any_schema(schemas):
         return {'anyOf': schemas}
 
 
-class Validator(object):
+class ValidatorType(type):
+    """Automatically adds subclasses to the registry."""
+
+    def __init__(cls, name, bases, dict):
+        type.__init__(cls, name, bases, dict)
+        if 'name' not in dict:
+            raise Exception('Validator %s is missing class-attribute name' % name)
+        registry[dict['name']] = cls
+
+
+class Validator(with_metaclass(ValidatorType)):
     name = 'validator'
-
-    class __metaclass__(type):
-        """Automatically adds subclasses to the registry."""
-
-        def __init__(cls, name, bases, dict):
-            type.__init__(cls, name, bases, dict)
-            if 'name' not in dict:
-                raise Exception('Validator %s is missing class-attribute name' % name)
-            registry[dict['name']] = cls
 
     def __init__(self, parent=None, message=None, **kwargs):
         self.valid = []
@@ -199,7 +203,7 @@ class ChoiceValidator(Validator):
         if self.valid_ic:
             schemas.append(any_schema({"type": "string", "pattern": "(?i)^%s$" % p} for p in self.valid_ic))
         s = any_schema(schemas)
-        s['error'] = 'Must be one of the following: %s' % ', '.join(map(unicode, self.valid + self.valid_ic))
+        s['error'] = 'Must be one of the following: %s' % ', '.join(map(str, self.valid + self.valid_ic))
         return s
 
 
@@ -457,7 +461,7 @@ class DictValidator(Validator):
     def _schema(self):
         schema = {'type': 'object'}
         properties = schema['properties'] = {}
-        for key, validators in self.valid.iteritems():
+        for key, validators in self.valid.items():
             if not validators:
                 continue
             properties[key] = any_schema(v.schema() for v in validators)

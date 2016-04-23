@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring, long, unicode
+
 import functools
 from collections import Mapping
 from datetime import datetime
@@ -51,7 +54,7 @@ def pipe_list_synonym(name):
             return attr.strip('|').split('|')
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             setattr(self, name, value)
         else:
             setattr(self, name, '|'.join(value))
@@ -89,7 +92,7 @@ def entry_synonym(name):
             return item
         elif isinstance(item, Mapping):
             result = {}
-            for key, value in item.iteritems():
+            for key, value in item.items():
                 try:
                     result[key] = only_builtins(value)
                 except TypeError:
@@ -149,7 +152,7 @@ class CaseInsensitiveWord(Comparator):
             self.word = word
 
     def lower(self):
-        if isinstance(self.word, basestring):
+        if isinstance(self.word, str):
             return self.word.lower()
         else:
             return func.lower(self.word)
@@ -176,7 +179,7 @@ def quality_property(text_attr):
         return qualities.Quality(getattr(self, text_attr))
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             setattr(self, text_attr, value)
         else:
             setattr(self, text_attr, value.name)
@@ -201,7 +204,7 @@ def quality_requirement_property(text_attr):
         return qualities.Requirements(getattr(self, text_attr))
 
     def setter(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             setattr(self, text_attr, value)
         else:
             setattr(self, text_attr, value.text)

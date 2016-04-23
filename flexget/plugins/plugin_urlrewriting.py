@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 
 from flexget import plugin
@@ -31,7 +33,7 @@ class PluginUrlRewriting(object):
             try:
                 self.url_rewrite(task, entry)
             except UrlRewritingError as e:
-                log.warn(e.value)
+                log.warning(e.value)
                 entry.fail()
 
     # API method

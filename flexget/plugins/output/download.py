@@ -1,4 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
+from future.moves.urllib.parse import unquote
+
 import hashlib
 import logging
 import mimetypes
@@ -8,14 +12,13 @@ import socket
 import sys
 import tempfile
 from cgi import parse_header
-from httplib import BadStatusLine
-from urllib import unquote
+from http.client import BadStatusLine
 
 from requests import RequestException
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.utils.tools import decode_html
+from flexget.utils.tools import decode_html, native_str_to_text
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
 
@@ -293,7 +296,7 @@ class PluginDownload(object):
             log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
 
         if 'content-type' in response.headers:
-            entry['mime-type'] = parse_header(response.headers['content-type'])[0]
+            entry['mime-type'] = str(parse_header(response.headers['content-type'])[0])
         else:
             entry['mime-type'] = "unknown/unknown"
 
@@ -326,11 +329,11 @@ class PluginDownload(object):
         if filename:
             # try to decode to unicode, specs allow latin1, some may do utf-8 anyway
             try:
-                filename = filename.decode('latin1')
+                filename = native_str_to_text(filename, encoding='latin1')
                 log.debug('filename header latin1 decoded')
             except UnicodeError:
                 try:
-                    filename = filename.decode('utf-8')
+                    filename = native_str_to_text(filename, encoding='utf-8')
                     log.debug('filename header UTF-8 decoded')
                 except UnicodeError:
                     pass

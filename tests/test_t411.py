@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from __future__ import unicode_literals, division, absolute_import
-from __builtin__ import object
+from builtins import *
+
 import logging
 
 import mock
@@ -238,16 +239,18 @@ class TestObjectMapper(object):
         category_to_term_type, term_types = T411ObjectMapper().map_term_type_tree(tree)
         assert (234, 11) in category_to_term_type
         assert (234, 43) in category_to_term_type
-        assert term_types.has_key(11)
-        assert term_types.has_key(43)
+        assert 11 in term_types
+        assert 43 in term_types
         assert term_types.get(11).mode == 'single'
         assert term_types.get(11).name == 'Application - Genre', \
             'Expected "Application - Genre", found "%s"' % term_types.get(11).name
         assert len(term_types.get(11).terms) == 7
-        assert term_types.get(11).terms[0].name == "Edition multimédia"
+        term_names = [term.name for term in term_types.get(11).terms]
+        assert "Edition multimédia" in term_names
 
 
 class TestProxy(object):
+
     def test_offline_proxy(self):
         proxy = T411Proxy()
         proxy.rest_client = MockRestClient()
@@ -268,9 +271,10 @@ class TestProxy(object):
         proxy = T411Proxy()
         proxy.rest_client = MockRestClient()
         details = proxy.details(123123)
-        assert proxy.rest_client.details_called == True
+        assert proxy.rest_client.details_called
         assert details.name == "Mock Title 720p"
-        assert details.terms[0].id == 12
+        term_ids = [term.id for term in details.terms]
+        assert 12 in term_ids
         # Session not still bound! assert details.terms[0].type.id == 7
 
         proxy.rest_client.details_called = False

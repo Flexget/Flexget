@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
-from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
 
 

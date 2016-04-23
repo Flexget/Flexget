@@ -1,6 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from urlparse import urlparse
+from builtins import *
+from future.moves.urllib.parse import urlparse
+
 import logging
+
 from requests import RequestException
 
 from flexget import plugin
@@ -90,7 +93,7 @@ class Sickbeard(object):
             raise plugin.PluginError('Unable to connect to Sickbeard at %s://%s:%s%s. Error: %s'
                                      % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e))
         entries = []
-        for id, show in json['data'].items():
+        for id, show in list(json['data'].items()):
             fg_qualities = ''  # Initializes the quality parameter
             if show['paused'] and config.get('only_monitored'):
                 continue
@@ -120,7 +123,7 @@ class Sickbeard(object):
             # Test mode logging
             if task.options.test:
                 log.info("Test mode. Entry includes:")
-                for key, value in entry.items():
+                for key, value in list(entry.items()):
                     log.info('     {}: {}'.format(key.capitalize(), value))
 
         return entries

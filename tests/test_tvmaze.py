@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 from datetime import timedelta, datetime
 
@@ -155,7 +156,7 @@ class TestTVMazeShowLookup(object):
     def test_search_results(self, execute_task):
         task = execute_task('test_search_result')
         entry = task.entries[0]
-        print entry['tvmaze_series_name'].lower()
+        print(entry['tvmaze_series_name'].lower())
         assert entry['tvmaze_series_name'].lower() == 'Shameless'.lower(), 'lookup failed'
         with Session() as session:
             assert task.entries[1]['tvmaze_series_name'].lower() == 'Shameless'.lower(), 'second lookup failed'
@@ -250,7 +251,7 @@ class TestTVMazeShowLookup(object):
 
             # Verify series data has been refreshed with actual values upon 2nd call, and series expiration flag
             # is set to False
-            assert series.weight == 15, \
+            assert series.weight == 20, \
                 'weight should have been updated back to 15 from 99, instead its %s' % series.weight
             assert session.query(TVMazeSeries).first().expired == False, 'expired status should be False'
 

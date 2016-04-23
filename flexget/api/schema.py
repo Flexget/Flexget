@@ -1,3 +1,6 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 from flask import jsonify, request
 from jsonschema import RefResolutionError
 

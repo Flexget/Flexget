@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 
 import logging
 
@@ -44,7 +46,7 @@ class EstimatesSeriesTVMaze(object):
 
         log.debug(
             'Searching TVMaze for airdate of {0} season {1} episode {2}'.format(series_name, season, episode_number))
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             if v:
                 log.debug('{0}: {1}'.format(k, v))
         try:

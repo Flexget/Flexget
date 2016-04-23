@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-
-
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import os
 from logging import getLogger
 

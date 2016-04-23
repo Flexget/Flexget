@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 import re
 
@@ -80,7 +82,7 @@ class TraktEmit(object):
         if context == 'collected':
             context = 'collection'
         entries = []
-        for trakt_id, fields in listed_series.iteritems():
+        for trakt_id, fields in listed_series.items():
             url = get_api_url('shows', trakt_id, 'progress', context)
             try:
                 data = session.get(url).json()

@@ -5,11 +5,9 @@ coverage
 flake8
 mock
 requests
-vcrpy>=1.5
+vcrpy>=1.7.4
 virtualenv
 boto3
-# vcrpy requires this, and 0.5 drops python 2.6 support
-contextlib2<0.5
 wheel
 pytest >= 2.7
 pytest-capturelog

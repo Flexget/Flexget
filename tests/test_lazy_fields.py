@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 from flexget.entry import Entry
 from flexget.plugin import PluginError
+
 
 class TestLazyFields(object):
 
@@ -30,7 +32,7 @@ class TestLazyFields(object):
         # Now cause 'a' lookup to occur
         assert entry['a_field'] == 'a'
         # TODO: What is the desired result when a lookup has information that is already populated?
-        #assert entry['ab_field'] == 'b'
+        # assert entry['ab_field'] == 'b'
 
         # Test fallback when first lookup fails
         entry = setup_entry()

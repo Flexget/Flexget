@@ -1,12 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from future.moves.urllib.parse import quote
+
 import logging
-import urllib
 
 from jinja2 import TemplateSyntaxError
 
 from flexget import plugin
 from flexget.event import event
-from flexget.task import Task
 from flexget.utils.search import normalize_unicode
 
 log = logging.getLogger('search_rss')
@@ -20,7 +21,7 @@ class SearchRSS(object):
 
     def search(self, task, entry, config=None):
         from flexget.utils.template import environment
-        search_strings = [urllib.quote(normalize_unicode(s).encode('utf-8'))
+        search_strings = [quote(normalize_unicode(s).encode('utf-8'))
                           for s in entry.get('search_strings', [entry['title']])]
         rss_plugin = plugin.get_plugin_by_name('rss')
         entries = set()

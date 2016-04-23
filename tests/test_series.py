@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
-from StringIO import StringIO
+from io import StringIO
 
 import pytest
 from jinja2 import Template

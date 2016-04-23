@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 
 import re
@@ -66,7 +68,7 @@ class SearchBTN(object):
                         log.error('Error searching btn: %s' % content['error'].get('message', content['error']))
                 continue
             if 'torrents' in content['result']:
-                for item in content['result']['torrents'].itervalues():
+                for item in content['result']['torrents'].values():
                     entry = Entry()
                     entry['title'] = item['ReleaseName']
                     entry['title'] += ' '.join(['', item['Resolution'], item['Source'], item['Codec']])

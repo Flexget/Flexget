@@ -1,3 +1,6 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import json
 import logging
 import os
@@ -42,7 +45,7 @@ def register_config():
     register_config_key('api', api_config_schema)
 
 
-class ApiSchemaModel(Model, object):
+class ApiSchemaModel(Model):
     """A flask restplus :class:`flask_restplus.models.ApiModel` which can take a json schema directly."""
 
     def __init__(self, name, schema, *args, **kwargs):
@@ -61,14 +64,14 @@ class ApiSchemaModel(Model, object):
         else:
             return self._schema
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self._schema)
 
     def __repr__(self):
         return '<ApiSchemaModel(%r)>' % self._schema
 
 
-class Api(RestPlusAPI, object):
+class Api(RestPlusAPI):
     """
     Extends a flask restplus :class:`flask_restplus.Api` with:
       - methods to make using json schemas easier
@@ -81,7 +84,7 @@ class Api(RestPlusAPI, object):
                 self._rewrite_refs(value)
 
         if isinstance(schema, dict):
-            for key, value in schema.iteritems():
+            for key, value in schema.items():
                 if isinstance(value, (list, dict)):
                     self._rewrite_refs(value)
 
@@ -156,7 +159,7 @@ class Api(RestPlusAPI, object):
         return super(Api, self).response(code_or_apierror, description, model=model)
 
 
-class APIResource(Resource, object):
+class APIResource(Resource):
     """All api resources should subclass this class."""
     method_decorators = [with_session]
 
@@ -294,7 +297,7 @@ class ApiClient(object):
             method = 'POST' if data is not None else 'GET'
         auth_header = dict(Authorization='Token %s' % api_key())
         response = self.app.open(url, data=data, follow_redirects=True, method=method, headers=auth_header)
-        result = json.loads(response.data)
+        result = json.loads(response.get_data(as_text=True))
         # TODO: Proper exceptions
         if 200 > response.status_code >= 300:
             raise Exception(result['error'])

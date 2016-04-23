@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 from flexget import options
 from flexget.db_schema import reset_schema, plugin_schemas
@@ -50,7 +51,7 @@ def reset_plugin(options):
             console('-' * 79)
             console('%-20s Ver  Tables' % 'Name')
             console('-' * 79)
-        for k, v in sorted(plugin_schemas.iteritems()):
+        for k, v in sorted(plugin_schemas.items()):
             tables = ''
             line_len = 0
             for name in v['tables']:

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 import logging
 
 from flexget import options, plugin
@@ -49,7 +50,7 @@ def on_manager_shutdown(manager):
         return
 
     import resource
-    print 'Resource Module memory usage: %s (kb)' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    console('Resource Module memory usage: %s (kb)' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     global heapy
     console('Heapy module calculating memory usage:')
     console(heapy.heap())

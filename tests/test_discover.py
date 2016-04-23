@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 from datetime import datetime, timedelta
 
 from flexget.entry import Entry
@@ -135,7 +137,7 @@ class TestDiscover(object):
 
     def test_emit_series_with_bad_search(self, execute_task):
         task = execute_task('test_emit_series_with_bad_search')
-        for epnum in xrange(1, 5):
+        for epnum in range(1, 5):
             title = 'My Show S01E0%d' % epnum
             assert any(e['title'] == title for e in task.mock_output), '%s not accepted' % title
         assert len(task.mock_output) == 4, \

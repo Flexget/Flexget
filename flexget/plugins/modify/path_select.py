@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
+
 import logging
 import os
 import random
@@ -108,7 +111,7 @@ class PluginPathSelect(object):
     schema = {
         'type': 'object',
         'properties': {
-            'select': {'type': 'string', 'enum': selector_map.keys()},
+            'select': {'type': 'string', 'enum': list(selector_map.keys())},
             'to_field': {'type': 'string', 'default': 'path'},
             'paths': one_or_more({'type': 'string', 'format': 'path'}),
             'within': {

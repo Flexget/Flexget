@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 from flexget import plugin
 from flexget.event import event
@@ -47,7 +48,7 @@ class FilterAllSeries(FilterSeriesBase):
             if guess_entry(entry, config=group_settings):
                 guessed_series.setdefault(normalize_series_name(entry['series_name']), entry['series_name'])
         # Combine settings and series into series plugin config format
-        allseries = {'settings': {'all_series': group_settings}, 'all_series': guessed_series.values()}
+        allseries = {'settings': {'all_series': group_settings}, 'all_series': list(guessed_series.values())}
         # Merge our config in to the main series config
         self.merge_config(task, allseries)
 

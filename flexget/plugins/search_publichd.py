@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from future.moves import urllib
+
 import logging
-import urllib
 import re
 
 from flexget import plugin
@@ -75,14 +77,14 @@ class SearchPublicHD(object):
             categories = [categories]
         # Convert named category to its respective category id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-        category_url_fragment = '&category=%s' % urllib.quote(';'.join(str(c) for c in categories))
+        category_url_fragment = '&category=%s' % urllib.parse.quote(';'.join(str(c) for c in categories))
 
         base_url = 'http://publichd.se/index.php?page=torrents&active=0'
 
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
-            query_url_fragment = '&search=' + urllib.quote(query.encode('utf8'))
+            query_url_fragment = '&search=' + urllib.parse.quote(query.encode('utf8'))
 
             # http://publichd.se/index.php?page=torrents&active=0&category=5;15&search=QUERY
             url = (base_url + category_url_fragment + query_url_fragment)

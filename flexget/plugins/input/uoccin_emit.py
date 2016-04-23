@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import os
 
 from flexget import plugin
@@ -64,7 +66,7 @@ class UoccinEmit(object):
         udata = load_uoccin_data(config['path'])
         section = udata['movies'] if config['type'] == 'movies' else udata['series']
         entries = []
-        for eid, itm in section.items():
+        for eid, itm in list(section.items()):
             if not itm['watchlist']:
                 continue
             if 'tags' in config:
@@ -114,7 +116,7 @@ class UoccinEmit(object):
                         self.log.debug('Invalid entry created? %s' % entry)
                 elif config['ep_flags'] == 'collected':
                     slist = itm.get('collected', {})
-                    for sno in slist.keys():
+                    for sno in list(slist.keys()):
                         for eno in slist[sno]:
                             entry = Entry()
                             entry['url'] = surl
@@ -126,7 +128,7 @@ class UoccinEmit(object):
                                 self.log.debug('Invalid entry created? %s' % entry)
                 else:
                     slist = itm.get('watched', {})
-                    for sno in slist.keys():
+                    for sno in list(slist.keys()):
                         for eno in slist[sno]:
                             entry = Entry()
                             entry['url'] = surl

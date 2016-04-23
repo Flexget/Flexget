@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 import re
 
@@ -55,7 +57,7 @@ class Manipulate(object):
         """
         self.phase_jobs = {'filter': [], 'metainfo': []}
         for item in config:
-            for item_config in item.itervalues():
+            for item_config in item.values():
                 # Get the phase specified for this item, or use default of metainfo
                 phase = item_config.get('phase', 'metainfo')
                 self.phase_jobs[phase].append(item)
@@ -86,7 +88,7 @@ class Manipulate(object):
 
         modified = False
         for item in jobs:
-            for field, config in item.iteritems():
+            for field, config in item.items():
                 from_field = field
                 if 'from' in config:
                     from_field = config['from']

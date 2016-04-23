@@ -2,19 +2,19 @@ interactions:
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/2.7]
-      method: GET
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
       uri: http://api.tvmaze.com/singlesearch/shows?q=House&embed=cast
     response:
-      body: {string: '{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":2,"network":{"id":4,"name":"FOX","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255,"imdb":"tt0412142"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/43/109527.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/43/109527.jpg"},"summary":"<p>Sink
+      body: {string: !!python/unicode '{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
+          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255,"imdb":"tt0412142"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/43/109520.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/43/109520.jpg"},"summary":"<p>Sink
           your teeth into meaty drama and intrigue with <em><strong>\"House\"</strong></em>,
           FOX''s take on mystery, where the villain is a medical malady and the hero
           is an irreverent, controversial doctor who trusts no one, least of all his
-          patients.</p>","updated":1454899482,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}},"_embedded":{"cast":[{"person":{"id":25439,"url":"http://www.tvmaze.com/people/25439/hugh-laurie","name":"Hugh
-          Laurie","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7477.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7477.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/25439"}}},"character":{"id":32873,"url":"http://www.tvmaze.com/characters/32873/house-dr-gregory-house","name":"Dr.
+          patients.</p>","updated":1457120192,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}},"_embedded":{"cast":[{"person":{"id":25439,"url":"http://www.tvmaze.com/people/25439/hugh-laurie","name":"Hugh
+          Laurie","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/46/117107.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/46/117107.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/25439"}}},"character":{"id":32873,"url":"http://www.tvmaze.com/characters/32873/house-dr-gregory-house","name":"Dr.
           Gregory House","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1348.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1348.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32873"}}}},{"person":{"id":17012,"url":"http://www.tvmaze.com/people/17012/robert-sean-leonard","name":"Robert
           Sean Leonard","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7478.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7478.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/17012"}}},"character":{"id":32876,"url":"http://www.tvmaze.com/characters/32876/house-dr-james-wilson","name":"Dr.
           James Wilson","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1349.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1349.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32876"}}}},{"person":{"id":6320,"url":"http://www.tvmaze.com/people/6320/omar-epps","name":"Omar
@@ -41,64 +41,65 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Thu, 03 Mar 2016 09:33:08 GMT']
+        date: ['Tue, 15 Mar 2016 01:27:39 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/2.7]
-      method: GET
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
       uri: http://api.tvmaze.com/shows/118/episodebynumber?season=1&number=2
     response:
-      body: {string: '{"id":9032,"url":"http://www.tvmaze.com/episodes/9032/house-1x02-paternity","name":"Paternity","season":1,"number":2,"airdate":"2004-11-23","airtime":"21:00","airstamp":"2004-11-23T21:00:00-05:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/9032"}}}'}
+      body: {string: !!python/unicode '{"id":9032,"url":"http://www.tvmaze.com/episodes/9032/house-1x02-paternity","name":"Paternity","season":1,"number":2,"airdate":"2004-11-23","airtime":"21:00","airstamp":"2004-11-23T21:00:00-05:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/9032"}}}'}
       headers:
         access-control-allow-origin: ['*']
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Thu, 03 Mar 2016 09:33:09 GMT']
+        date: ['Tue, 15 Mar 2016 01:27:40 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/2.7]
-      method: GET
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
       uri: http://api.tvmaze.com/search/shows?q=Doctor%20Who
     response:
-      body: {string: '[{"score":2.0227363,"show":{"id":210,"url":"http://www.tvmaze.com/shows/210/doctor-who","name":"Doctor
-          Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Running","runtime":45,"premiered":"2005-03-26","schedule":{"time":"21:00","days":["Saturday"]},"rating":{"average":9.2},"weight":3,"network":{"id":12,"name":"BBC
+      body: {string: !!python/unicode '[{"score":2.0301228,"show":{"id":210,"url":"http://www.tvmaze.com/shows/210/doctor-who","name":"Doctor
+          Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Running","runtime":45,"premiered":"2005-03-26","schedule":{"time":"21:00","days":["Saturday"]},"rating":{"average":9.2},"weight":5,"network":{"id":12,"name":"BBC
           One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":3332,"thetvdb":78804,"imdb":"tt0436992"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3179.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3179.jpg"},"summary":"<p>Adventures
-          across time and space with the time travelling alien and his companions.</p>","updated":1456718071,"_links":{"self":{"href":"http://api.tvmaze.com/shows/210"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228572"}}}},{"score":1.9657573,"show":{"id":766,"url":"http://www.tvmaze.com/shows/766/doctor-who","name":"Doctor
-          Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":25,"premiered":"1963-11-23","schedule":{"time":"17:15","days":[]},"rating":{"average":8.6},"weight":1,"network":{"id":12,"name":"BBC
+          across time and space with the time travelling alien and his companions.</p>","updated":1457809872,"_links":{"self":{"href":"http://api.tvmaze.com/shows/210"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228572"}}}},{"score":1.9701192,"show":{"id":766,"url":"http://www.tvmaze.com/shows/766/doctor-who","name":"Doctor
+          Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":25,"premiered":"1963-11-23","schedule":{"time":"17:15","days":[]},"rating":{"average":8.6},"weight":0,"network":{"id":12,"name":"BBC
           One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":3331,"thetvdb":76107,"imdb":"tt0056751"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/6/15291.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/6/15291.jpg"},"summary":"<p><em>Doctor
           Who</em> is the longest-running science fiction TV series in history, airing
           initially from 1963 to 1989. <em>Doctor Who</em> is about ideas. It pioneered
           sophisticated mixed-level storytelling. Its format was the key to its longevity:
           the Doctor, a mysterious traveller in space and time, travels in his ship,
           the TARDIS. The TARDIS can take him and his companions anywhere in time
-          and space. Inevitably he finds evil at work wherever he goes..</p>","updated":1456967958,"_links":{"self":{"href":"http://api.tvmaze.com/shows/766"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/325662"}}}},{"score":1.5655355,"show":{"id":8430,"url":"http://www.tvmaze.com/shows/8430/doctor-who-confidential","name":"Doctor
+          and space. Inevitably he finds evil at work wherever he goes..</p>","updated":1457767174,"_links":{"self":{"href":"http://api.tvmaze.com/shows/766"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/325662"}}}},{"score":1.5848992,"show":{"id":8433,"url":"http://www.tvmaze.com/shows/8433/doctor-who-extra","name":"Doctor
+          Who Extra","type":"Documentary","language":"English","genres":[],"status":"Running","runtime":11,"premiered":"2014-08-23","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":1,"network":{"id":590,"name":"BBC
+          Red Button 1","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":{"id":26,"name":"BBC
+          iPlayer","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":null,"summary":"","updated":1457712058,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8433"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/648813"}}}},{"score":1.571025,"show":{"id":8430,"url":"http://www.tvmaze.com/shows/8430/doctor-who-confidential","name":"Doctor
           Who Confidential","type":"Documentary","language":"English","genres":["Science-Fiction"],"status":"Ended","runtime":45,"premiered":"2005-03-26","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":{"id":49,"name":"BBC
           Three","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":79298,"imdb":"tt0453422"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/30/75328.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/30/75328.jpg"},"summary":"<p>Specially
           filmed for BBC Three as a companion piece to Doctor Who, \nDoctor Who Confidential
           aims to give a taste of the excitement and the \nenergy that surrounds the
           show. The programme includes behind-the-scenes\n filming and interviews
           with the cast, writers and production team as \nthey bring our favourite
-          Time Lord back to our screens.</p>","updated":1447538892,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/463156"}}}},{"score":1.5631689,"show":{"id":8433,"url":"http://www.tvmaze.com/shows/8433/doctor-who-extra","name":"Doctor
-          Who Extra","type":"Scripted","language":"English","genres":[],"status":"Ended","runtime":11,"premiered":"2014-08-23","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":{"id":12,"name":"BBC
-          One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":null,"summary":"","updated":1447605495,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8433"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/466781"}}}},{"score":1.3675528,"show":{"id":9272,"url":"http://www.tvmaze.com/shows/9272/doctor-who-the-fan-show","name":"Doctor
+          Time Lord back to our screens.</p>","updated":1447538892,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/463156"}}}},{"score":1.3748279,"show":{"id":9272,"url":"http://www.tvmaze.com/shows/9272/doctor-who-the-fan-show","name":"Doctor
           Who: The Fan Show","type":"Talk Show","language":"English","genres":[],"status":"Running","runtime":20,"premiered":"2015-05-08","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":null,"webChannel":{"id":21,"name":"YouTube","country":{"name":"United
           States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":null,"thetvdb":300845,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/32/81575.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/32/81575.jpg"},"summary":"<p>The
           weekly show from the Official Doctor Who YouTube channel. Friends of The
           Doctor and curators of Doctor Who news, here you will see all of our un-seen
-          bonus videos and lots of extra stuff from our presenter Christel Dee.</p>","updated":1456389243,"_links":{"self":{"href":"http://api.tvmaze.com/shows/9272"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/501799"}}}},{"score":1.1726838,"show":{"id":8432,"url":"http://www.tvmaze.com/shows/8432/doctor-who-scream-of-the-shalka","name":"Doctor
+          bonus videos and lots of extra stuff from our presenter Christel Dee.</p>","updated":1456389243,"_links":{"self":{"href":"http://api.tvmaze.com/shows/9272"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/501799"}}}},{"score":1.1783887,"show":{"id":8432,"url":"http://www.tvmaze.com/shows/8432/doctor-who-scream-of-the-shalka","name":"Doctor
           Who: Scream of the Shalka","type":"Animation","language":"English","genres":[],"status":"Ended","runtime":15,"premiered":"2003-11-13","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":null,"webChannel":{"id":70,"name":"BBC
           Doctor Who Webcast","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":null,"summary":"","updated":1456389243,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8432"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/466769"}}}}]'}
       headers:
@@ -106,23 +107,23 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Thu, 03 Mar 2016 09:33:10 GMT']
+        date: ['Tue, 15 Mar 2016 01:27:41 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/2.7]
-      method: GET
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
       uri: http://api.tvmaze.com/shows/210?embed=cast
     response:
-      body: {string: '{"id":210,"url":"http://www.tvmaze.com/shows/210/doctor-who","name":"Doctor
-          Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Running","runtime":45,"premiered":"2005-03-26","schedule":{"time":"21:00","days":["Saturday"]},"rating":{"average":9.2},"weight":3,"network":{"id":12,"name":"BBC
+      body: {string: !!python/unicode '{"id":210,"url":"http://www.tvmaze.com/shows/210/doctor-who","name":"Doctor
+          Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Running","runtime":45,"premiered":"2005-03-26","schedule":{"time":"21:00","days":["Saturday"]},"rating":{"average":9.2},"weight":5,"network":{"id":12,"name":"BBC
           One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":3332,"thetvdb":78804,"imdb":"tt0436992"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3179.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3179.jpg"},"summary":"<p>Adventures
-          across time and space with the time travelling alien and his companions.</p>","updated":1456718071,"_links":{"self":{"href":"http://api.tvmaze.com/shows/210"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228572"}},"_embedded":{"cast":[{"person":{"id":34550,"url":"http://www.tvmaze.com/people/34550/matt-smith","name":"Matt
+          across time and space with the time travelling alien and his companions.</p>","updated":1457809872,"_links":{"self":{"href":"http://api.tvmaze.com/shows/210"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228572"}},"_embedded":{"cast":[{"person":{"id":34550,"url":"http://www.tvmaze.com/people/34550/matt-smith","name":"Matt
           Smith","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10540.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10540.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/34550"}}},"character":{"id":161649,"url":"http://www.tvmaze.com/characters/161649/doctor-who-the-eleventh-doctor","name":"The
           Eleventh Doctor","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/14/36499.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/14/36499.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/161649"}}}},{"person":{"id":23485,"url":"http://www.tvmaze.com/people/23485/david-tennant","name":"David
           Tennant","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/6595.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/6595.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/23485"}}},"character":{"id":53338,"url":"http://www.tvmaze.com/characters/53338/doctor-who-the-tenth-doctor","name":"The
@@ -130,19 +131,21 @@ interactions:
           Coleman","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/42/107172.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/42/107172.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/34549"}}},"character":{"id":53334,"url":"http://www.tvmaze.com/characters/53334/doctor-who-clara-oswald","name":"Clara
           Oswald","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3185.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3185.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53334"}}}},{"person":{"id":26905,"url":"http://www.tvmaze.com/people/26905/karen-gillan","name":"Karen
           Gillan","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/20/51020.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/20/51020.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/26905"}}},"character":{"id":53336,"url":"http://www.tvmaze.com/characters/53336/doctor-who-amy-pond","name":"Amy
-          Pond","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3186.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3186.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53336"}}}},{"person":{"id":2829,"url":"http://www.tvmaze.com/people/2829/billie-piper","name":"Billie
+          Pond","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3186.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3186.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53336"}}}},{"person":{"id":34548,"url":"http://www.tvmaze.com/people/34548/peter-capaldi","name":"Peter
+          Capaldi","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/4974.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/4974.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/34548"}}},"character":{"id":161648,"url":"http://www.tvmaze.com/characters/161648/doctor-who-the-twelfth-doctor","name":"The
+          Twelfth Doctor","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/14/36498.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/14/36498.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/161648"}}}},{"person":{"id":2829,"url":"http://www.tvmaze.com/people/2829/billie-piper","name":"Billie
           Piper","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/8174.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/8174.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/2829"}}},"character":{"id":53340,"url":"http://www.tvmaze.com/characters/53340/doctor-who-rose-tyler","name":"Rose
           Tyler","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3190.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3190.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53340"}}}},{"person":{"id":34551,"url":"http://www.tvmaze.com/people/34551/arthur-darvill","name":"Arthur
           Darvill","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/8189.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/8189.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/34551"}}},"character":{"id":53337,"url":"http://www.tvmaze.com/characters/53337/doctor-who-rory-williams","name":"Rory
-          Williams","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3191.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3191.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53337"}}}},{"person":{"id":34548,"url":"http://www.tvmaze.com/people/34548/peter-capaldi","name":"Peter
-          Capaldi","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/4974.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/4974.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/34548"}}},"character":{"id":161648,"url":"http://www.tvmaze.com/characters/161648/doctor-who-the-twelfth-doctor","name":"The
-          Twelfth Doctor","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/14/36498.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/14/36498.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/161648"}}}},{"person":{"id":33972,"url":"http://www.tvmaze.com/people/33972/freema-agyeman","name":"Freema
+          Williams","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3191.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3191.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53337"}}}},{"person":{"id":444,"url":"http://www.tvmaze.com/people/444/alex-kingston","name":"Alex
+          Kingston","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/7656.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/7656.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/444"}}},"character":{"id":161375,"url":"http://www.tvmaze.com/characters/161375/doctor-who-professor-river-song","name":"Professor
+          River Song","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/25/62552.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/25/62552.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/161375"}}}},{"person":{"id":33972,"url":"http://www.tvmaze.com/people/33972/freema-agyeman","name":"Freema
           Agyeman","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10113.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10113.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/33972"}}},"character":{"id":53341,"url":"http://www.tvmaze.com/characters/53341/doctor-who-martha-jones","name":"Martha
-          Jones","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3189.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3189.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53341"}}}},{"person":{"id":34552,"url":"http://www.tvmaze.com/people/34552/catherine-tate","name":"Catherine
-          Tate","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10533.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10533.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/34552"}}},"character":{"id":53342,"url":"http://www.tvmaze.com/characters/53342/doctor-who-donna-noble","name":"Donna
-          Noble","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3187.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3187.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53342"}}}},{"person":{"id":27330,"url":"http://www.tvmaze.com/people/27330/christopher-eccleston","name":"Christopher
+          Jones","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3189.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3189.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53341"}}}},{"person":{"id":27330,"url":"http://www.tvmaze.com/people/27330/christopher-eccleston","name":"Christopher
           Eccleston","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10259.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10259.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/27330"}}},"character":{"id":53339,"url":"http://www.tvmaze.com/characters/53339/doctor-who-the-ninth-doctor","name":"The
-          Ninth Doctor","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3184.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3184.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53339"}}}},{"person":{"id":281,"url":"http://www.tvmaze.com/people/281/john-barrowman","name":"John
+          Ninth Doctor","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3184.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3184.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53339"}}}},{"person":{"id":34552,"url":"http://www.tvmaze.com/people/34552/catherine-tate","name":"Catherine
+          Tate","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10533.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10533.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/34552"}}},"character":{"id":53342,"url":"http://www.tvmaze.com/characters/53342/doctor-who-donna-noble","name":"Donna
+          Noble","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3187.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3187.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53342"}}}},{"person":{"id":281,"url":"http://www.tvmaze.com/people/281/john-barrowman","name":"John
           Barrowman","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7051.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7051.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/281"}}},"character":{"id":53343,"url":"http://www.tvmaze.com/characters/53343/doctor-who-captain-jack-harkness","name":"Captain
           Jack Harkness","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3188.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3188.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53343"}}}}]}}'}
       headers:
@@ -150,20 +153,20 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Thu, 03 Mar 2016 09:33:10 GMT']
+        date: ['Tue, 15 Mar 2016 01:27:41 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/2.7]
-      method: GET
+        !!python/unicode 'Connection': [!!python/unicode 'close']
+        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
+        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
+      method: !!python/unicode 'GET'
       uri: http://api.tvmaze.com/shows/210/episodebynumber?season=2&number=3
     response:
-      body: {string: '{"id":13872,"url":"http://www.tvmaze.com/episodes/13872/doctor-who-2x03-school-reunion","name":"School
+      body: {string: !!python/unicode '{"id":13872,"url":"http://www.tvmaze.com/episodes/13872/doctor-who-2x03-school-reunion","name":"School
           Reunion","season":2,"number":3,"airdate":"2006-04-29","airtime":"19:35","airstamp":"2006-04-29T19:35:00+01:00","runtime":45,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/14/36848.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/14/36848.jpg"},"summary":"<p>The
           return of Sarah Jane and K-9! The Doctor plus companions old and new fight
           the bat-like Krillitanes!</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/13872"}}}'}
@@ -172,7 +175,7 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Thu, 03 Mar 2016 09:33:11 GMT']
+        date: ['Tue, 15 Mar 2016 01:27:42 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}

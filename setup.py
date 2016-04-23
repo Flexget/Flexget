@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import unicode_literals, division, absolute_import
 import io
 import sys
 
@@ -10,7 +10,8 @@ with io.open('README.rst', encoding='utf-8') as readme:
 
 # Populates __version__ without importing the package
 __version__ = None
-execfile('flexget/_version.py')
+with io.open('flexget/_version.py', encoding='utf-8')as ver_file:
+    exec(ver_file.read())
 if not __version__:
     print('Could not find __version__ from flexget/_version.py')
     sys.exit(1)
@@ -38,8 +39,7 @@ setup(
     install_requires=load_requirements('requirements.txt'),
     tests_require=['pytest'],
     extras_require={
-        ':python_version=="2.6"': ['argparse'],
-        'dev_tools': load_requirements('dev-requirements.txt')
+        'dev': load_requirements('dev-requirements.txt')
     },
     entry_points={
         'console_scripts': ['flexget = flexget:main'],
@@ -52,6 +52,8 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ]

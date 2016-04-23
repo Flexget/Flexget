@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-import urllib
+from builtins import *
+from past.builtins import basestring
+
 import logging
 import re
 
@@ -101,14 +103,14 @@ class FilterRegexp(object):
         if 'rest' in config:
             out_config['rest'] = config['rest']
         # Turn all our regexps into advanced form dicts and compile them
-        for operation, regexps in config.iteritems():
+        for operation, regexps in config.items():
             if operation in ['rest', 'from']:
                 continue
             for regexp_item in regexps:
                 if not isinstance(regexp_item, dict):
                     regexp = regexp_item
                     regexp_item = {regexp: {}}
-                regexp, opts = regexp_item.items()[0]
+                regexp, opts = list(regexp_item.items())[0]
                 # Parse custom settings for this regexp
                 if not isinstance(opts, dict):
                     opts = {'path': opts}
@@ -130,7 +132,7 @@ class FilterRegexp(object):
 
                 # compile regexp and make sure regexp is a string for series like '24'
                 try:
-                    regexp = re.compile(unicode(regexp), re.IGNORECASE | re.UNICODE)
+                    regexp = re.compile(str(regexp), re.IGNORECASE | re.UNICODE)
                 except re.error as e:
                     # Since validator can't validate dict keys (when an option is defined for the pattern) make sure we
                     # raise a proper error here.
@@ -143,7 +145,7 @@ class FilterRegexp(object):
         # TODO: what if accept and accept_excluding configured? Should raise error ...
         config = self.prepare_config(config)
         rest = []
-        for operation, regexps in config.iteritems():
+        for operation, regexps in config.items():
             if operation == 'rest':
                 continue
             leftovers = self.filter(task, operation, regexps)
@@ -182,7 +184,7 @@ class FilterRegexp(object):
                 if not isinstance(value, basestring):
                     continue
                 if field in unquote:
-                    value = urllib.unquote(value)
+                    value = unquote(value)
                     # If none of the not_regexps match
                 if regexp.search(value):
                     # Make sure the not_regexps do not match for this field
@@ -208,7 +210,7 @@ class FilterRegexp(object):
         for entry in task.entries:
             log.trace('testing %i regexps to %s' % (len(regexps), entry['title']))
             for regexp_opts in regexps:
-                regexp, opts = regexp_opts.items()[0]
+                regexp, opts = list(regexp_opts.items())[0]
 
                 # check if entry matches given regexp configuration
                 field = self.matches(entry, regexp, opts.get('from'), opts.get('not'))

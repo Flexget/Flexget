@@ -7,16 +7,15 @@ beautifulsoup4>=4.1, !=4.2.0, <4.5
 html5lib>=0.11
 PyRSS2Gen
 pynzb
-progressbar
+#PY3 progressbar
 rpyc
 jinja2
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
 requests>=2.8.0, <3.0
-# Bug in dateutil 2.5.2 https://github.com/dateutil/dateutil/issues/233
-# Bug in dateutil 2.5.3 https://github.com/dateutil/dateutil/issues/258
 python-dateutil>=2.5.2
 jsonschema>=2.0
-path.py
+path.py>=8.1.1
+pathlib>=1.0
 guessit>=2.0.3
 # Bug in apscheduler 3.1.0 https://github.com/agronholm/apscheduler/issues/121
 apscheduler>=3.0.3, !=3.1.0
@@ -31,4 +30,5 @@ flask-compress>=1.2.1
 flask-login>=0.3.2
 flask-cors>=2.1.2
 pyparsing>=2.0.3
-Safe
+Safe>=0.4
+future>=0.15.2

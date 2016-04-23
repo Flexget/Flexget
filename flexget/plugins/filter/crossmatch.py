@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 
 from flexget import plugin
@@ -44,7 +46,7 @@ class CrossMatch(object):
         # few places already (discover, inputs, ...)
         # code written so that this can be done easily ...
         for item in config['from']:
-            for input_name, input_config in item.iteritems():
+            for input_name, input_config in item.items():
                 input = plugin.get_plugin_by_name(input_name)
                 if input.api_ver == 1:
                     raise plugin.PluginError('Plugin %s does not support API v2' % input_name)

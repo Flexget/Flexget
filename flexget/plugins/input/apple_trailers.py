@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 import re
 
@@ -56,14 +58,14 @@ class AppleTrailers(object):
                 'properties': {
                     'quality': {
                         'type': 'string',
-                        'enum': qualities.keys(),
+                        'enum': list(qualities.keys()),
                         'default': '720p'
                     },
                     'genres': {'type': 'array', 'items': {'type': 'string'}}
                 },
                 'additionalProperties': False
             },
-            {'title': 'justquality', 'type': 'string', 'enum': qualities.keys()}
+            {'title': 'justquality', 'type': 'string', 'enum': list(qualities.keys())}
         ]
 
     }
@@ -75,7 +77,7 @@ class AppleTrailers(object):
     @cached('apple_trailers')
     def on_task_input(self, task, config):
         # Turn simple config into full config
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'quality': config}
 
         try:
@@ -101,7 +103,7 @@ class AppleTrailers(object):
             entry['movie_name'], entry['apple_trailers_name'] = entry['title'].split(' - ')
             if not trailers.get(movie_url):
                 try:
-                    movie_page = task.requests.get(movie_url).content
+                    movie_page = task.requests.get(movie_url).text
                     match = filmid_regex.search(movie_page)
                     if match:
                         json_url = self.movie_data_url + match.group(2) + '.json'

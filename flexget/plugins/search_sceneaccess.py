@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from future.moves.urllib.parse import quote
+
 import logging
 import re
-
-from urllib import quote
 
 from flexget import plugin
 from flexget import validator
@@ -205,7 +206,7 @@ class SceneAccessSearch(object):
         finally:    # Process the categories to use in search() method
             ret = list()
 
-            for scope, categories in toProcess.iteritems():
+            for scope, categories in toProcess.items():
                 cat_id = list()
 
                 for category in categories:
@@ -277,7 +278,7 @@ class SceneAccessSearch(object):
                     entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
                                                                 entry['torrent_leeches']) * multip
 
-                    size = result.find('td', attrs={'class': 'ttr_size'}).next
+                    size = result.find('td', attrs={'class': 'ttr_size'}).__next__
                     size = re.search('(\d+(?:[.,]\d+)*)\s?([KMG]B)', size)
 
                     if size:

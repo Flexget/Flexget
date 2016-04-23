@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 import json
 import logging
 
-from flexget import options, plugin
+from flexget import plugin
 from flexget.event import event
 
 log = logging.getLogger('output.sns')

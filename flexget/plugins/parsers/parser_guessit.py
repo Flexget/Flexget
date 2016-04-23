@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from future.utils import native
 
 import datetime
 import logging
@@ -7,14 +9,13 @@ import time
 
 from guessit.rules import rebulk_builder
 from guessit.api import GuessItApi
-
 from rebulk import Rebulk
 from rebulk.pattern import RePattern
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
-from .parser_common import clean_value, old_assume_quality
+from .parser_common import old_assume_quality
 from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie
 
 
@@ -134,7 +135,7 @@ class GuessitParsedVideoQuality(ParsedVideoQuality):
         codec = self.old_codec
         audio = self.old_audio
 
-        old_quality = qualities.Quality(' '.join(filter(None, [resolution, source, codec, audio])))
+        old_quality = qualities.Quality(' '.join([_f for _f in [resolution, source, codec, audio] if _f]))
         old_quality = old_assume_quality(old_quality, assumed_quality)
 
         return old_quality
@@ -291,7 +292,8 @@ class ParserGuessit(object):
         guessit_options = self._guessit_options(kwargs)
         guessit_options['type'] = 'movie'
         guess_result = guessit_api.guessit(data, options=guessit_options)
-        parsed = GuessitParsedMovie(data, kwargs.pop('name', None), guess_result, **kwargs)
+        # NOTE: Guessit expects str on PY3 and unicode on PY2 hence the use of future.utils.native
+        parsed = GuessitParsedMovie(native(data), kwargs.pop('name', None), guess_result, **kwargs)
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed
@@ -312,7 +314,9 @@ class ParserGuessit(object):
         parse_type = 'episode' if kwargs.get('name') else None
         if parse_type:
             guessit_options['type'] = parse_type
-        guess_result = guessit_api.guessit(data, options=guessit_options)
+
+        # NOTE: Guessit expects str on PY3 and unicode on PY2 hence the use of future.utils.native
+        guess_result = guessit_api.guessit(native(data), options=guessit_options)
         parsed = GuessitParsedSerie(data, kwargs.pop('name', None), guess_result, **kwargs)
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)

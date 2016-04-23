@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
+
 import logging
 import re
 
@@ -52,7 +55,7 @@ class RegexExtract(object):
         try:
             for rx in self.regex_list:
                 pass
-        except re.error, e:
+        except re.error as e:
             raise plugin.PluginError('Error compiling regex: %s' % str(e))
 
     def on_task_modify(self, task, config):
@@ -66,13 +69,13 @@ class RegexExtract(object):
                 log.debug('Matching %s with regex: %s' % (entry_field, rx))
                 try:
                     match = rx.match(entry_field)
-                except re.error, e:
+                except re.error as e:
                     raise plugin.PluginError('Error encountered processing regex: %s' % str(e))
                 if match:
                     log.debug('Successfully matched %s' % entry_field)
                     data = match.groupdict()
                     if prefix:
-                        for key in data.keys():
+                        for key in list(data.keys()):
                             data[prefix + key] = data[key]
                             del data[key]
                     log.debug('Values added to entry: %s' % data)

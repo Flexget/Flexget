@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import codecs
 import logging
 import yaml
@@ -105,7 +107,7 @@ def pre_check_config(config_path):
             log.warning('Config line %s is indented incorrectly (previous line ends with \':\')' % line_num)
 
         # notify if user is trying to set same key multiple times in a task (a common mistake)
-        for level in duplicates.iterkeys():
+        for level in duplicates.keys():
             # when indentation goes down, delete everything indented more than that
             if indentation < level:
                 duplicates[level] = {}

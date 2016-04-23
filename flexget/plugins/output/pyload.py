@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from future.moves.urllib.parse import quote
+
 from logging import getLogger
-from urllib import quote
 
 from requests.exceptions import RequestException
 
@@ -161,7 +161,7 @@ class PluginPyLoad(object):
 
             # no preferred hoster and not preferred hoster only - add all recognized plugins
             if not urls and not config.get('preferred_hoster_only', self.DEFAULT_PREFERRED_HOSTER_ONLY):
-                for name, purls in parsed.iteritems():
+                for name, purls in parsed.items():
                     if name != "BasePlugin":
                         urls.extend(purls)
 

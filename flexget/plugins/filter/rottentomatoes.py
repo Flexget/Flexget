@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 
 from flexget import plugin
@@ -72,8 +74,8 @@ class FilterRottenTomatoes(object):
         rt.accept('number', key='min_critics_score')
         rt.accept('number', key='min_audience_score')
         rt.accept('number', key='min_average_score')
-        rt.accept('choice', key='min_critics_rating').accept_choices(self.critics_ratings.keys())
-        rt.accept('choice', key='min_audience_rating').accept_choices(self.audience_ratings.keys())
+        rt.accept('choice', key='min_critics_rating').accept_choices(list(self.critics_ratings.keys()))
+        rt.accept('choice', key='min_audience_rating').accept_choices(list(self.audience_ratings.keys()))
         rt.accept('list', key='reject_genres').accept('text')
         rt.accept('list', key='reject_actors').accept('text')
         rt.accept('list', key='accept_actors').accept('text')

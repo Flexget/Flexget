@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 import pytest
 
@@ -41,7 +42,8 @@ class TestTraktList(object):
     def test_get_list(self):
         config = {'account': 'flexget_list_test', 'list': 'testlist', 'type': 'auto'}
         trakt_set = TraktSet(config)
-        entries = sorted(dict(e) for e in trakt_set)
+        entries = sorted([dict(e) for e in trakt_set], key=lambda x: sorted(x.keys()))
+
         assert entries == sorted([
             {
                 'trakt_show_slug': 'castle',
@@ -82,7 +84,7 @@ class TestTraktList(object):
                 'imdb_id': 'tt1520211',
                 'tvrage_id': 25056
             }
-        ])
+        ], key=lambda x: sorted(x.keys()))
 
     def test_strip_dates(self):
         config = {'account': 'flexget_list_test', 'list': 'testlist', 'strip_dates': True, 'type': 'auto'}

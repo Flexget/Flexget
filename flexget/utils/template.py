@@ -1,10 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
+
 import logging
 import os
 import re
+import locale
 from copy import copy
 from datetime import datetime, date, time
-import locale
 from email.utils import parsedate
 from time import mktime
 
@@ -54,7 +57,7 @@ def filter_pathscrub(val, os_mode=None):
 
 def filter_re_replace(val, pattern, repl):
     """Perform a regexp replacement on the given string."""
-    return re.sub(pattern, repl, unicode(val))
+    return re.sub(pattern, repl, str(val))
 
 
 def filter_re_search(val, pattern):
@@ -91,11 +94,11 @@ def filter_date_suffix(date):
 
 def filter_format_number(val, places=None, grouping=True):
     """Formats a number according to the user's locale."""
-    if not isinstance(val, (int, float, long)):
+    if not isinstance(val, (int, float, int)):
         return val
     if places is not None:
         format = '%.' + str(places) + 'f'
-    elif isinstance(val, (int, long)):
+    elif isinstance(val, (int, int)):
         format = '%d'
     else:
         format = '%.02f'
@@ -106,7 +109,7 @@ def filter_format_number(val, places=None, grouping=True):
 
 def filter_pad(val, width, fillchar='0'):
     """Pads a number or string with fillchar to the specified width."""
-    return unicode(val).rjust(width, fillchar)
+    return str(val).rjust(width, fillchar)
 
 
 def filter_to_date(date_time_val):
@@ -144,7 +147,7 @@ def make_environment(manager):
                              FileSystemLoader(os.path.join(manager.config_base, 'templates'))]),
         extensions=['jinja2.ext.loopcontrols'])
     environment.template_class = FlexGetTemplate
-    for name, filt in globals().items():
+    for name, filt in list(globals().items()):
         if name.startswith('filter_'):
             environment.filters[name.split('_', 1)[1]] = filt
         elif name == 'now':

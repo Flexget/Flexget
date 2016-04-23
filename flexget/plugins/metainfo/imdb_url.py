@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import re
 import logging
 
@@ -30,7 +32,7 @@ class MetainfoImdbUrl(object):
                 continue
             urls = re.findall(r'\bimdb.com/title/tt\d+\b', entry['description'])
             # Find unique imdb ids
-            imdb_ids = filter(None, set(extract_id(url) for url in urls))
+            imdb_ids = [_f for _f in set(extract_id(url) for url in urls) if _f]
             if not imdb_ids:
                 continue
 

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 import csv
 import logging
@@ -104,12 +105,12 @@ class ImdbEntrySet(MutableSet):
                                  (self.list_id, self.user_id))
             except RequestException as e:
                 raise PluginError(e.args[0])
-            lines = r.iter_lines()
+            lines = r.iter_lines(decode_unicode=True)
             # Throw away first line with headers
             next(lines)
             self._items = []
             for row in csv.reader(lines):
-                row = [unicode(cell, 'utf-8') for cell in row]
+                row = [cell for cell in row]
                 log.debug('parsing line from csv: %s', ', '.join(row))
                 if not len(row) == 16:
                     log.debug('no movie row detected, skipping. %s', ', '.join(row))

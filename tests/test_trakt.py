@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 import pytest
 
@@ -85,7 +86,7 @@ class TestTraktShowLookup(object):
     def test_search_results(self, execute_task):
         task = execute_task('test_search_result')
         entry = task.entries[0]
-        print entry['trakt_series_name'].lower()
+        print(entry['trakt_series_name'].lower())
         assert entry['trakt_series_name'].lower() == 'Shameless'.lower(), 'lookup failed'
         with Session() as session:
             assert task.entries[1]['trakt_series_name'].lower() == 'Shameless'.lower(), 'second lookup failed'
@@ -151,7 +152,7 @@ class TestTraktShowLookup(object):
                   'Jennifer Crystal Foley',
                   'Bobbin Bergstrom']
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
-        trakt_actors = entry['trakt_series_actors'].values()
+        trakt_actors = list(entry['trakt_series_actors'].values())
         trakt_actors = [trakt_actor['name'] for trakt_actor in trakt_actors]
         assert entry['series_name'] == 'House', 'series lookup failed'
         assert set(trakt_actors) == set(actors), 'looking up actors for %s failed' % entry.get('title')
@@ -265,7 +266,6 @@ class TestTraktWatchedAndCollected(object):
 
     def test_trakt_watched_movie_lookup(self, execute_task):
         task = execute_task('test_trakt_watched_movie')
-        print task.all_entries
         assert len(task.accepted) == 1, 'Movie should have been accepted as it is watched on Trakt profile'
         entry = task.accepted[0]
         assert entry['title'] == 'Inside.Out.2015.1080p.BDRip-FlexGet', 'title was not accepted?'
@@ -390,7 +390,7 @@ class TestTraktMovieLookup(object):
                   'Chris Pattinson',
                   'Nigel Harbach',
                   'Rana Morrison']
-        trakt_actors = entry['trakt_movie_actors'].values()
+        trakt_actors = list(entry['trakt_movie_actors'].values())
         trakt_actors = [trakt_actor['name'] for trakt_actor in trakt_actors]
         assert entry['movie_name'] == 'The Matrix', 'movie lookup failed'
         assert set(trakt_actors) == set(actors), 'looking up actors for %s failed' % entry.get('title')

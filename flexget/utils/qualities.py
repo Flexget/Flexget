@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
+
 import re
 import copy
 import logging
@@ -49,8 +52,8 @@ class QualityComponent(object):
     def __hash__(self):
         return hash(self.type + str(self.value))
 
-    def __nonzero__(self):
-        return self.value
+    def __bool__(self):
+        return bool(self.value)
 
     def __eq__(self, other):
         if isinstance(other, basestring):
@@ -188,7 +191,7 @@ for items in (_resolutions, _sources, _codecs, _audios):
 
 
 def all_components():
-    return _registry.itervalues()
+    return iter(_registry.values())
 
 
 class Quality(object):
@@ -269,7 +272,7 @@ class Quality(object):
                 return False
         return True
 
-    def __nonzero__(self):
+    def __bool__(self):
         return any(self._comparator)
 
     def __eq__(self, other):
@@ -330,7 +333,7 @@ def get(quality_name):
     if not found_components:
         raise ValueError('No quality specified')
     result = Quality()
-    for type, component in found_components.iteritems():
+    for type, component in found_components.items():
         setattr(result, type, component)
     return result
 
@@ -346,8 +349,8 @@ class RequirementComponent(object):
     def reset(self):
         self.min = None
         self.max = None
-        self.acceptable = []
-        self.none_of = []
+        self.acceptable = set()
+        self.none_of = set()
 
     def allows(self, comp, loose=False):
         if comp.type != self.type:
@@ -377,16 +380,16 @@ class RequirementComponent(object):
             self.min, self.max = min, max
         elif '|' in text:
             quals = text.split('|')
-            quals = [_registry[qual] for qual in quals]
+            quals = {_registry[qual] for qual in quals}
             if any(qual.type != self.type for qual in quals):
                 raise ValueError('Component type mismatch: %s' % text)
-            self.acceptable.extend(quals)
+            self.acceptable |= quals
         else:
             qual = _registry[text.strip('!<>=+')]
             if qual.type != self.type:
                 raise ValueError('Component type mismatch!')
             if text in _registry:
-                self.acceptable.append(qual)
+                self.acceptable.add(qual)
             else:
                 if text[0] == '<':
                     if text[1] != '=':
@@ -397,7 +400,14 @@ class RequirementComponent(object):
                         qual += 1
                     self.min = qual
                 elif text[0] == '!':
-                    self.none_of.append(qual)
+                    self.none_of.add(qual)
+
+    def __eq__(self, other):
+        return ((self.max, self.max, self.acceptable, self.none_of) ==
+                (other.max, other.max, other.acceptable, other.none_of))
+
+    def __hash__(self):
+        return hash(tuple([self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of))]))
 
 
 class Requirements(object):
@@ -462,6 +472,14 @@ class Requirements(object):
             if not r_component.allows(q_component, loose=loose):
                 return False
         return True
+
+    def __eq__(self, other):
+        if isinstance(other, str):
+            other = Requirements(other)
+        return self.components == other.components
+
+    def __hash__(self):
+        return hash(tuple(self.components))
 
     def __str__(self):
         return self.text or 'any'

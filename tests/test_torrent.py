@@ -1,5 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import os
+
+import mock
 import pytest
 
 from flexget.utils.bittorrent import Torrent
@@ -35,17 +39,18 @@ class TestInfoHash(object):
         assert task.all_entries[1]['torrent_info_hash'] == '2B3959BED2BE445BB0E3EA96F497D873D5FAED05'
 
 
+@pytest.mark.usefixtures('tmpdir')
 class TestSeenInfoHash(object):
 
     config = """
         tasks:
           test:
             mock:
-              - {title: test, file: test.torrent}
+              - {title: test, file: '__tmp__/test.torrent'}
             accept_all: yes
           test2:
             mock:
-              - {title: test2, file: test2.torrent}
+              - {title: test2, file: '__tmp__/test.torrent'}
             accept_all: yes
           test_same_run:
             mock:
@@ -54,7 +59,7 @@ class TestSeenInfoHash(object):
             accept_all: yes
     """
 
-    @pytest.mark.filecopy('test.torrent', 'test2.torrent')
+    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_seen_info_hash(self, execute_task):
         task = execute_task('test')
         assert task.find_entry('accepted', title='test'), 'torrent should have been accepted on first run'
@@ -68,6 +73,7 @@ class TestSeenInfoHash(object):
         assert len(task.accepted) == 1, 'Should not have accepted both entries with the same info hash'
 
 
+@pytest.mark.usefixtures('tmpdir')
 class TestModifyTrackers(object):
 
     config = """
@@ -77,7 +83,7 @@ class TestModifyTrackers(object):
         tasks:
           test_add_trackers:
             mock:
-              - {title: 'test', file: 'test_add_trackers.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
               - {title: 'test_magnet'}
             set:
               url: 'magnet:?xt=urn:btih:HASH&dn=title'
@@ -86,7 +92,7 @@ class TestModifyTrackers(object):
 
           test_remove_trackers:
             mock:
-              - {title: 'test', file: 'test_remove_trackers.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
               - title: 'test_magnet'
             set:
               url: 'magnet:?xt=urn:btih:HASH&dn=title&tr=http://ipv6.torrent.ubuntu.com:6969/announce'
@@ -95,7 +101,7 @@ class TestModifyTrackers(object):
 
           test_modify_trackers:
             mock:
-              - {title: 'test', file: 'test_modify_trackers.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
             modify_trackers:
               - test:
                   from: ubuntu
@@ -107,29 +113,29 @@ class TestModifyTrackers(object):
             data = f.read()
         return Torrent(data)
 
-    @pytest.mark.filecopy('test.torrent', 'test_add_trackers.torrent')
-    def test_add_trackers(self, execute_task):
+    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
+    def test_add_trackers(self, execute_task, tmpdir):
         task = execute_task('test_add_trackers')
-        torrent = self.load_torrent('test_add_trackers.torrent')
+        torrent = self.load_torrent(os.path.join(tmpdir.strpath, 'test.torrent'))
         assert 'udp://thetracker.com/announce' in torrent.trackers, \
             'udp://thetracker.com/announce should have been added to trackers'
         # Check magnet url
         assert 'tr=udp://thetracker.com/announce' in task.find_entry(title='test_magnet')['url']
 
-    @pytest.mark.filecopy('test.torrent', 'test_remove_trackers.torrent')
-    def test_remove_trackers(self, execute_task):
+    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
+    def test_remove_trackers(self, execute_task, tmpdir):
         task = execute_task('test_remove_trackers')
-        torrent = self.load_torrent('test_remove_trackers.torrent')
+        torrent = self.load_torrent(os.path.join(tmpdir.strpath, 'test.torrent'))
         assert 'http://ipv6.torrent.ubuntu.com:6969/announce' not in torrent.trackers, \
             'ipv6 tracker should have been removed'
 
         # Check magnet url
         assert 'tr=http://ipv6.torrent.ubuntu.com:6969/announce' not in task.find_entry(title='test_magnet')['url']
 
-    @pytest.mark.filecopy('test.torrent', 'test_modify_trackers.torrent')
-    def test_modify_trackers(self, execute_task):
+    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
+    def test_modify_trackers(self, execute_task, tmpdir):
         task = execute_task('test_modify_trackers')
-        torrent = self.load_torrent('test_modify_trackers.torrent')
+        torrent = self.load_torrent(os.path.join(tmpdir.strpath, 'test.torrent'))
         assert 'http://torrent.replaced.com:6969/announce' in torrent.trackers, \
             'ubuntu tracker should have been added'
 
@@ -212,8 +218,8 @@ class TestTorrentScrub(object):
 
             # Dump small torrents on demand
             if 0 and not clean:
-                print "original=%r" % original.content
-                print "modified=%r" % modified.content
+                print("original=%r" % original.content)
+                print("modified=%r" % modified.content)
 
             # Make sure essentials survived
             assert 'announce' in modified.content
@@ -263,7 +269,7 @@ class TestTorrentScrub(object):
                 filename, osize, self.__tmp__ + filename, msize)
 
 
-@pytest.mark.online
+@pytest.mark.usefixtures('tmpdir')
 class TestTorrentAlive(object):
     config = """
         templates:
@@ -272,16 +278,17 @@ class TestTorrentAlive(object):
         tasks:
           test_torrent_alive_fail:
             mock:
-              - {title: 'test', file: 'test_torrent_alive.torrent', url: fake}
+              - {title: 'test', file: '__tmp__/test.torrent', url: fake}
             torrent_alive: 100000
           test_torrent_alive_pass:
             mock:
-              - {title: 'test', file: 'test_torrent_alive.torrent', url: fake}
+              - {title: 'test', file: '__tmp__/test.torrent', url: fake}
             torrent_alive: 0
     """
 
-    @pytest.mark.filecopy('test.torrent', 'test_torrent_alive.torrent')
-    def test_torrent_alive_fail(self, execute_task):
+    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
+    @mock.patch('flexget.utils.requests.get')
+    def test_torrent_alive_fail(self, mocked_request, execute_task):
         task = execute_task('test_torrent_alive_fail')
         assert not task.accepted, 'Torrent should not have met seed requirement.'
         assert task._rerun_count == 1, ('Task should have been rerun 1 time. Was rerun %s times.' %
@@ -292,7 +299,7 @@ class TestTorrentAlive(object):
         assert not task.accepted, 'Torrent should have been rejected by remember_rejected.'
         assert task._rerun_count == 0, 'Task should not have been rerun.'
 
-    @pytest.mark.filecopy('test.torrent', 'test_torrent_alive.torrent')
+    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_torrent_alive_pass(self, execute_task):
         task = execute_task('test_torrent_alive_pass')
         assert task.accepted

@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 
 from flexget import plugin
@@ -23,7 +25,7 @@ class PluginSequence(object):
 
     def __getattr__(self, item):
         """Returns a function for all on_task_* events, that runs all the configured plugins."""
-        for phase, method in plugin.phase_methods.iteritems():
+        for phase, method in plugin.phase_methods.items():
             if item == method and phase not in ['accept', 'reject', 'fail']:
                 break
         else:
@@ -34,7 +36,7 @@ class PluginSequence(object):
             # Keep a list of all results, for input plugin combining
             results = []
             for item in config:
-                for plugin_name, plugin_config in item.iteritems():
+                for plugin_name, plugin_config in item.items():
                     if phase in plugin.get_phases_by_plugin(plugin_name):
                         method = plugin.get_plugin_by_name(plugin_name).phase_handlers[phase]
                         log.debug('Running plugin %s' % plugin_name)

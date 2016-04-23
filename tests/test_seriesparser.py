@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
 
 import pytest
+
 from flexget.plugins.parsers.parser_internal import ParserInternal
 from flexget.plugins.parsers.parser_guessit import ParserGuessit
 
@@ -354,12 +356,12 @@ class TestSeriesParser(object):
 
         for quality1 in qualities.all_components():
             # Attempt to create an episode number out of quality
-            mock_ep1 = filter(unicode.isdigit, quality1.name)
+            mock_ep1 = ''.join(list(filter(str.isdigit, quality1.name)))
             if not mock_ep1:
                 continue
 
             for quality2 in qualities.all_components():
-                mock_ep2 = filter(unicode.isdigit, quality2.name)
+                mock_ep2 = ''.join(list(filter(str.isdigit, quality2.name)))
                 if not mock_ep2:
                     continue
 

@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import copy
 import logging
 import hashlib
@@ -13,7 +15,6 @@ from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.database import entry_synonym
 from flexget.utils.tools import parse_timedelta, TimedDict
-from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
@@ -78,9 +79,9 @@ def config_hash(config):
     """
     if isinstance(config, dict):
         # this does in fact support nested dicts, they're sorted too!
-        return hashlib.md5(str(sorted(config.items()))).hexdigest()
+        return hashlib.md5(str(sorted(config.items())).encode('utf-8')).hexdigest()
     else:
-        return hashlib.md5(str(config)).hexdigest()
+        return hashlib.md5(str(config).encode('utf-8')).hexdigest()
 
 
 class cached(object):
@@ -100,7 +101,7 @@ class cached(object):
 
     def __init__(self, name, persist=None):
         # Cast name to unicode to prevent sqlalchemy warnings when filtering
-        self.name = unicode(name)
+        self.name = str(name)
         # Parse persist time
         self.persist = persist and parse_timedelta(persist)
 
@@ -127,7 +128,7 @@ class cached(object):
             log.trace('hash: %s' % hash)
 
             cache_name = self.name + '_' + hash
-            log.debug('cache name: %s (has: %s)' % (cache_name, ', '.join(self.cache.keys())))
+            log.debug('cache name: %s (has: %s)' % (cache_name, ', '.join(list(self.cache.keys()))))
 
             cache_value = self.cache.get(cache_name, None)
 

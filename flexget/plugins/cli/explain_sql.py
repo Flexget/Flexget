@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 from time import time
 from argparse import SUPPRESS
@@ -28,7 +30,7 @@ def explain(element, compiler, **kw):
 class ExplainQuery(Query):
 
     def __iter__(self):
-        log.info('Query:\n\t%s' % unicode(self).replace('\n', '\n\t'))
+        log.info('Query:\n\t%s' % str(self).replace('\n', '\n\t'))
         explain = self.session.execute(Explain(self)).fetchall()
         text = '\n\t'.join('|'.join(str(x) for x in line) for line in explain)
         before = time()

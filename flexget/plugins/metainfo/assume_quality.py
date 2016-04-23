@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
+
 import logging
 from collections import namedtuple
 
@@ -75,7 +78,7 @@ class AssumeQuality(object):
             config = {'any': config}
         assume = namedtuple('assume', ['target', 'quality'])
         self.assumptions = []
-        for target, quality in config.items():
+        for target, quality in list(config.items()):
             log.verbose('New assumption: %s is %s' % (target, quality))
             try:
                 target = qualities.Requirements(target)

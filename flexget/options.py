@@ -1,15 +1,15 @@
-from __future__ import absolute_import, division, unicode_literals
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
 
 import copy
 import random
-import socket
 import string
 import sys
 from argparse import ArgumentParser as ArgParser
-from argparse import (_VersionAction, Action, ArgumentError, ArgumentTypeError, Namespace, PARSER, REMAINDER, SUPPRESS,
+from argparse import (_VersionAction, Action, ArgumentError, Namespace, PARSER, REMAINDER, SUPPRESS,
                       _SubParsersAction)
 
-import pkg_resources
 
 import flexget
 from flexget.entry import Entry
@@ -24,7 +24,12 @@ core_parser = None
 
 def unicode_argv():
     """Like sys.argv, but decodes all arguments."""
-    return [arg.decode(sys.getfilesystemencoding()) for arg in sys.argv]
+    args = []
+    for arg in sys.argv:
+        if isinstance(arg, bytes):
+            arg = arg.decode(sys.getfilesystemencoding())
+        args.append(arg)
+    return args
 
 
 def get_parser(command=None):
@@ -162,7 +167,7 @@ class ScopedNamespace(Namespace):
         return object.__setattr__(self, key, value)
 
     def __iter__(self):
-        return (i for i in self.__dict__.iteritems() if i[0] != '__parent__')
+        return (i for i in self.__dict__.items() if i[0] != '__parent__')
 
     def __copy__(self):
         new = self.__class__()

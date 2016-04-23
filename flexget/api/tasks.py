@@ -1,8 +1,11 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import argparse
 import cgi
 import copy
-from Queue import Queue, Empty
 from datetime import datetime
+from queue import Queue, Empty
 from json import JSONEncoder
 
 from flask import jsonify, Response
