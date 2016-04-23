@@ -8,27 +8,48 @@
     controller: moviesController,
   });
 
-  function moviesController($http, $mdDialog) {
+  function moviesController($http, $mdDialog, $scope) {
     var vm = this;
+
+    var options = {
+      page: 1,
+      page_size: 10
+    }
 
     vm.title = 'Movies';
 
     $http.get('/api/movie_list/').success(function(data) {
       vm.lists = data.movie_lists;
-
-      //Hack to load movies from first list, because md-on-select does not fire on initial selection
-      vm.loadMovies(vm.lists[0].id);
     }).error(function(err) {
       console.log(err);
     });
 
+    //Call from the pagination to update the page to the selected page
+    vm.updateListPage = function(index) {
+      options.page = index;
 
-    vm.loadMovies = function(id) {
-      $http.get('/api/movie_list/' + id + '/movies/')
+      loadMovies();
+    }
+
+    $scope.$watch(function() {
+      return vm.selectedList;
+    }, function(newValue, oldValue) {
+      if(newValue != oldValue) {
+        loadMovies();
+      }
+    });
+
+    function loadMovies() {
+      var listId = vm.lists[vm.selectedList].id;
+
+      $http.get('/api/movie_list/' + listId + '/movies/', { params: options })
       .success(function(data) {
 
         vm.movies = data.movies;
 
+        vm.currentPage = data.page;
+        vm.totalMovies = data.total_number_of_movies;
+        vm.pageSize = data.number_of_movies;
       }).error(function(err) {
         console.log(err);
       })
