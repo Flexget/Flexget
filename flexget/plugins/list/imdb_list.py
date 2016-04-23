@@ -104,6 +104,8 @@ class ImdbEntrySet(MutableSet):
                                  (self.list_id, self.user_id))
             except HTTPError as e:
                 raise PluginError(e.args[0])
+            except ConnectionError as e:
+                raise PluginError(e.args[0])
             lines = r.iter_lines()
             # Throw away first line with headers
             next(lines)
