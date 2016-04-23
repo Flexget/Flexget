@@ -102,7 +102,7 @@ class ImdbEntrySet(MutableSet):
             try:
                 r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
                                  (self.list_id, self.user_id))
-            except HTTPError as e:
+            except [HTTPError, ConnectionError] as e:
                 raise PluginError(e.args[0])
             lines = r.iter_lines()
             # Throw away first line with headers
