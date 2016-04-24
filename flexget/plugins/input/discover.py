@@ -152,7 +152,7 @@ class Discover(object):
                     log.debug('Discovered %s entries from %s' % (len(search_results), plugin_name))
                     if config.get('limit'):
                         search_results = sorted(search_results, reverse=True,
-                                                key=lambda x: x.get('search_sort'))[:config['limit']]
+                                                key=lambda x: x.get('search_sort', ''))[:config['limit']]
                     for e in search_results:
                         e['discovered_from'] = entry['title']
                         e['discovered_with'] = plugin_name
