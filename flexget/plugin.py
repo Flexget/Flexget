@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *
 from past.builtins import basestring
 from future.moves.urllib.error import HTTPError, URLError
+from functools import total_ordering
 
 import logging
 import os
@@ -210,6 +211,7 @@ def register_task_phase(name, before=None, after=None):
             del _new_phase_queue[phase_name]
 
 
+@total_ordering
 class PluginInfo(dict):
     """
     Allows accessing key/value pairs of this dictionary subclass via
@@ -333,6 +335,15 @@ class PluginInfo(dict):
 
     def __str__(self):
         return '<PluginInfo(name=%s)>' % self.name
+        
+    def _is_valid_operand(self, other):
+        return hasattr(other, 'name')
+
+    def __eq__(self, other):
+        return self.name == other.name
+    
+    def __lt__(self, other):
+        return self.name < other.name
 
     __repr__ = __str__
 
