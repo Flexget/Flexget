@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 from flexget.utils import json
 
@@ -57,7 +58,7 @@ class TestEntryListAPI(object):
         rsp = api_client.get('/entry_list/1/entries/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        serialized_entry = json.loads(rsp.data)['entries'][0]['entry']
+        serialized_entry = json.loads(rsp.get_data(as_text=True))['entries'][0]['entry']
         assert serialized_entry == entry_data
 
     def test_entry_list_entry(self, api_client):
@@ -76,19 +77,19 @@ class TestEntryListAPI(object):
         # Get entries from list
         rsp = api_client.get('/entry_list/1/entries/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert json.loads(rsp.data)['entries'][0]['entry'] == entry_data
+        assert json.loads(rsp.get_data(as_text=True))['entries'][0]['entry'] == entry_data
 
         # Get specific entry from list
         rsp = api_client.get('/entry_list/1/entries/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert json.loads(rsp.data)['entry'] == entry_data
+        assert json.loads(rsp.get_data(as_text=True))['entry'] == entry_data
 
         new_entry_data = {'title': 'title2', 'original_url': 'http://test2.com'}
 
         # Change specific entry from list
         rsp = api_client.json_put('/entry_list/1/entries/1/', data=json.dumps(new_entry_data))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert json.loads(rsp.data)['entry'] == new_entry_data
+        assert json.loads(rsp.get_data(as_text=True))['entry'] == new_entry_data
 
         # Delete specific entry from list
         rsp = api_client.delete('/entry_list/1/entries/1/')

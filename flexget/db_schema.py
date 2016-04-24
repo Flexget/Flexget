@@ -1,4 +1,7 @@
-from __future__ import absolute_import, division, unicode_literals
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from future.utils import native_str
+from past.builtins import basestring
 
 import logging
 from datetime import datetime
@@ -6,6 +9,7 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.exc import OperationalError
 
+import flexget
 from flexget.event import event
 from flexget.manager import Base, Session
 from flexget.utils.database import with_session
@@ -154,6 +158,7 @@ def upgrade(plugin):
                     session.rollback()
                     manager.shutdown(finish_queue=False)
                 else:
+                    current_ver = -1 if current_ver is None else current_ver
                     if new_ver > current_ver:
                         log.info('Plugin `%s` schema upgraded successfully' % plugin)
                         set_version(plugin, new_ver, session=session)
@@ -226,7 +231,7 @@ class Meta(type):
             else:
                 new_bases.append(base)
 
-        return type.__new__(mcs, str(metaname), tuple(new_bases), dict_)
+        return type.__new__(mcs, native_str(metaname), tuple(new_bases), dict_)
 
     def register_table(cls, table):
         """
@@ -252,12 +257,11 @@ def versioned_base(plugin, version):
 
 def after_table_create(event, target, bind, tables=None, **kw):
     """Sets the schema version to most recent for a plugin when it's tables are freshly created."""
-    from flexget.manager import manager
     if tables:
         # TODO: Detect if any database upgrading is needed and acquire the lock only in one place
-        with manager.acquire_lock(event=False):
+        with flexget.manager.manager.acquire_lock(event=False):
             tables = [table.name for table in tables]
-            for plugin, info in plugin_schemas.iteritems():
+            for plugin, info in plugin_schemas.items():
                 # Only set the version if all tables for a given plugin are being created
                 if all(table in tables for table in info['tables']):
                     set_version(plugin, info['version'])

@@ -1,27 +1,32 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import pytest
 
+
+@pytest.mark.usefixtures('tmpdir')
+@pytest.mark.filecopy('test.torrent', '__tmp__/')
 class TestContentFilter(object):
 
     config = """
         tasks:
           test_reject1:
             mock:
-              - {title: 'test', file: 'test_reject1.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
             accept_all: yes
             content_filter:
               reject: '*.iso'
 
           test_reject2:
             mock:
-              - {title: 'test', file: 'test_reject2.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
             accept_all: yes
             content_filter:
               reject: '*.avi'
 
           test_require1:
             mock:
-              - {title: 'test', file: 'test_require1.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
             accept_all: yes
             content_filter:
               require:
@@ -30,14 +35,14 @@ class TestContentFilter(object):
 
           test_require2:
             mock:
-              - {title: 'test', file: 'test_require2.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
             accept_all: yes
             content_filter:
               require: '*.avi'
 
           test_require_all1:
             mock:
-              - {title: 'test', file: 'test_require_all.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
             accept_all: yes
             content_filter:
               require_all:
@@ -46,7 +51,7 @@ class TestContentFilter(object):
 
           test_require_all2:
             mock:
-              - {title: 'test', file: 'test_require_all.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
             accept_all: yes
             content_filter:
               require_all:
@@ -63,49 +68,42 @@ class TestContentFilter(object):
 
           test_cache:
             mock:
-              - {title: 'test', url: 'http://localhost/', file: 'test.torrent'}
+              - {title: 'test', url: 'http://localhost/', file: '__tmp__/test.torrent'}
             accept_all: yes
             content_filter:
               reject: ['*.iso']
     """
 
-    @pytest.mark.filecopy('test.torrent', 'test_reject1.torrent')
     def test_reject1(self, execute_task):
         task = execute_task('test_reject1')
         assert task.find_entry('rejected', title='test'), \
             'should have rejected, contains *.iso'
 
-    @pytest.mark.filecopy('test.torrent', 'test_reject2.torrent')
     def test_reject2(self, execute_task):
         task = execute_task('test_reject2')
         assert task.find_entry('accepted', title='test'), \
             'should have accepted, doesn\t contain *.avi'
 
-    @pytest.mark.filecopy('test.torrent', 'test_require1.torrent')
     def test_require1(self, execute_task):
         task = execute_task('test_require1')
         assert task.find_entry('accepted', title='test'), \
             'should have accepted, contains *.iso'
 
-    @pytest.mark.filecopy('test.torrent', 'test_require2.torrent')
     def test_require2(self, execute_task):
         task = execute_task('test_require2')
         assert task.find_entry('rejected', title='test'), \
             'should have rejected, doesn\t contain *.avi'
 
-    @pytest.mark.filecopy('test.torrent', 'test_require_all.torrent')
     def test_require_all1(self, execute_task):
         task = execute_task('test_require_all1')
         assert task.find_entry('accepted', title='test'), \
             'should have accepted, both masks are satisfied'
 
-    @pytest.mark.filecopy('test.torrent', 'test_require_all.torrent')
     def test_require_all2(self, execute_task):
         task = execute_task('test_require_all2')
         assert task.find_entry('rejected', title='test'), \
             'should have rejected, one mask isn\'t satisfied'
 
-    @pytest.mark.filecopy('test.torrent', 'test_strict.torrent')
     def test_strict(self, execute_task):
         """Content Filter: strict enabled"""
         task = execute_task('test_strict')

@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 import re
 
@@ -8,14 +10,9 @@ from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.manager import Session
+from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release
 
 log = logging.getLogger('emit_series')
-
-try:
-    from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release, AlternateNames
-except ImportError as e:
-    log.error(e.message)
-    raise plugin.DependencyError(issued_by='emit_series', missing='series')
 
 
 class EmitSeries(object):
@@ -120,7 +117,7 @@ class EmitSeries(object):
                 else:
                     latest_season = low_season + 1
 
-                for season in xrange(latest_season, low_season, -1):
+                for season in range(latest_season, low_season, -1):
                     log.debug('Adding episodes for season %d' % season)
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
                     if series.begin and (not latest or latest < series.begin):
@@ -142,7 +139,7 @@ class EmitSeries(object):
                         # Calculate the episodes we still need to get from this season
                         if series.begin and series.begin.season == season:
                             start_at_ep = max(start_at_ep, series.begin.number)
-                        eps_to_get = range(start_at_ep, latest_ep_this_season.number + 1)
+                        eps_to_get = list(range(start_at_ep, latest_ep_this_season.number + 1))
                         for ep in downloaded_this_season:
                             try:
                                 eps_to_get.remove(ep.number)

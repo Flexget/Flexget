@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 
 from flexget import plugin
@@ -51,7 +53,7 @@ class RottenTomatoesList(object):
     def on_task_input(self, task, config):
         entries = []
         api_key = config.get('api_key', None)
-        for l_type, l_names in config.items():
+        for l_type, l_names in list(config.items()):
             if type(l_names) is not list: 
                 continue
             

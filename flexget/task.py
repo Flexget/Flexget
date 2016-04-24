@@ -1,4 +1,6 @@
-from __future__ import absolute_import, division, unicode_literals
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
 
 import copy
 import hashlib
@@ -7,7 +9,7 @@ import logging
 import threading
 import random
 import string
-from functools import wraps
+from functools import wraps, total_ordering
 
 from sqlalchemy import Column, Integer, String, Unicode
 
@@ -81,7 +83,7 @@ class EntryIterator(object):
         self.filter = lambda e: e._state in states
 
     def __iter__(self):
-        return itertools.ifilter(self.filter, self.all_entries)
+        return filter(self.filter, self.all_entries)
 
     def __bool__(self):
         return any(e for e in self)
@@ -96,6 +98,8 @@ class EntryIterator(object):
         return itertools.chain(other, self)
 
     def __getitem__(self, item):
+        if isinstance(item, slice):
+            return list(itertools.islice(self, item.start, item.stop))
         if not isinstance(item, int):
             raise ValueError('Index must be integer.')
         for index, entry in enumerate(self):
@@ -103,9 +107,6 @@ class EntryIterator(object):
                 return entry
         else:
             raise IndexError('%d is out of bounds' % item)
-
-    def __getslice__(self, a, b):
-        return list(itertools.islice(self, a, b))
 
     def reverse(self):
         self.all_entries.sort(reverse=True)
@@ -146,6 +147,7 @@ class TaskAbort(Exception):
         return 'TaskAbort(reason=%s, silent=%s)' % (self.reason, self.silent)
 
 
+@total_ordering
 class Task(object):
 
     """
@@ -194,7 +196,7 @@ class Task(object):
             The default is 0, if the cron option is set though, the default is lowered to 10.
 
         """
-        self.name = unicode(name)
+        self.name = str(name)
         self.id = ''.join(random.choice(string.digits) for _ in range(6))
         self.manager = manager
         if config is None:
@@ -293,8 +295,11 @@ class Task(object):
     def is_rerun(self):
         return self._rerun_count
 
-    def __cmp__(self, other):
-        return cmp((self.priority, self._count), (other.priority, other._count))
+    def __lt__(self, other):
+        return (self.priority, self._count) < (other.priority, other._count)
+
+    def __eq__(self, other):
+        return (self.priority, self._count) == (other.priority, other._count)
 
     def __str__(self):
         return '<Task(name=%s,aborted=%s)>' % (self.name, self.aborted)
@@ -337,7 +342,7 @@ class Task(object):
         if not isinstance(cat, EntryIterator):
             raise TypeError('category must be a EntryIterator')
         for entry in cat:
-            for k, v in values.iteritems():
+            for k, v in values.items():
                 if not (k in entry and entry[k] == v):
                     break
             else:
@@ -355,7 +360,7 @@ class Task(object):
         if phase:
             plugins = sorted(get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True)
         else:
-            plugins = all_plugins.itervalues()
+            plugins = iter(all_plugins.values())
         return (p for p in plugins if p.name in self.config or p.builtin)
 
     def __run_task_phase(self, phase):
@@ -499,7 +504,7 @@ class Task(object):
             self.disable_phase('download')
             self.disable_phase('output')
         if self.options.disable_phases:
-            map(self.disable_phase, self.options.disable_phases)
+            list(map(self.disable_phase, self.options.disable_phases))
         if self.options.inject:
             # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')
@@ -507,7 +512,7 @@ class Task(object):
 
         # Save current config hash and set config_modidied flag
         with Session() as session:
-            config_hash = hashlib.md5(str(sorted(self.config.items()))).hexdigest()
+            config_hash = hashlib.md5(str(sorted(self.config.items())).encode('utf-8')).hexdigest()
             last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
             if self.is_rerun:
                 # Restore the config to state right after start phase

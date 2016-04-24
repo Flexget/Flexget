@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 import os
 import re
@@ -6,7 +8,6 @@ import shutil
 import zipfile
 
 from flexget import plugin
-from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.template import render_from_entry, RenderError
 
@@ -106,7 +107,7 @@ class Decompress(object):
                 entry.fail(error_message)
         else:
             if not rarfile:
-                log.warn('Rarfile module not installed; unable to extract RAR archives.')
+                log.warning('Rarfile module not installed; unable to extract RAR archives.')
             log.error('Can\'t open file: %s', archive_path)
 
         return archive
@@ -155,13 +156,13 @@ class Decompress(object):
         match = re.compile(config['regexp'], re.IGNORECASE).match
         archive_path = entry.get('location')
         if not archive_path:
-            log.warn('Entry does not appear to represent a local file, decompress plugin only supports local files')
+            log.warning('Entry does not appear to represent a local file, decompress plugin only supports local files')
             return
         archive_dir = os.path.dirname(archive_path)
         archive_file = os.path.basename(archive_path)
 
         if not os.path.exists(archive_path):
-            log.warn('File no longer exists: %s', archive_path)
+            log.warning('File no longer exists: %s', archive_path)
             return
 
         archive = self.open_archive(entry)
@@ -269,7 +270,7 @@ class Decompress(object):
 
         if unrar_tool:
             if not rarfile:
-                raise log.warn('rarfile Python module is not installed.')
+                raise log.warning('rarfile Python module is not installed.')
             else:
                 rarfile.UNRAR_TOOL = unrar_tool
                 log.debug('Set RarFile.unrar_tool to: %s', unrar_tool)

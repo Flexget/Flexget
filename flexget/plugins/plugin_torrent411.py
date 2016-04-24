@@ -1,11 +1,12 @@
-# coding=utf-8
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 import re
+
 from flexget.config_schema import one_or_more
 from flexget.manager import Session
 from flexget.plugins.api_t411 import T411Proxy, FriendlySearchQuery, ApiError
-
 from flexget import plugin
 from flexget.event import event
 

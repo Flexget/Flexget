@@ -6,13 +6,17 @@ Avoid using this module on your own or in plugins, this was originally made for 
 You can safely use task.simple_persistence and manager.persist, if we implement something better we
 can replace underlying mechanism in single point (and provide transparent switch).
 """
-
 from __future__ import unicode_literals, division, absolute_import
-from collections import MutableMapping, defaultdict
-from datetime import datetime
+from builtins import *
+from future.types.newstr import newstr
+
 import logging
 import pickle
+from collections import MutableMapping, defaultdict
+from datetime import datetime
+
 from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, Index
+
 from flexget import db_schema
 from flexget.event import event
 from flexget.manager import Session
@@ -144,7 +148,7 @@ class SimplePersistence(MutableMapping):
         log.debug('Flushing simple persistence for task %s to db.' % task)
         with Session() as session:
             for pluginname in cls.class_store[task]:
-                for key, value in cls.class_store[task][pluginname].iteritems():
+                for key, value in cls.class_store[task][pluginname].items():
                     query = (session.query(SimpleKeyValue).
                              filter(SimpleKeyValue.task == task).
                              filter(SimpleKeyValue.plugin == pluginname).
@@ -153,7 +157,7 @@ class SimplePersistence(MutableMapping):
                         query.delete()
                     else:
                         updated = query.update(
-                            {'value': unicode(json.dumps(value, encode_datetime=True))},
+                            {'value': newstr(json.dumps(value, encode_datetime=True))},
                             synchronize_session=False
                         )
                         if not updated:
@@ -161,6 +165,7 @@ class SimplePersistence(MutableMapping):
 
 
 class SimpleTaskPersistence(SimplePersistence):
+
     def __init__(self, task):
         self.task = task
         self.taskname = task.name

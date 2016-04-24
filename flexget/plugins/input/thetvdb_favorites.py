@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 import re
 from datetime import datetime, timedelta
@@ -8,7 +10,6 @@ from sqlalchemy import Column, Integer, Unicode, DateTime
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relationship
-
 
 from flexget import db_schema, plugin
 from flexget.entry import Entry

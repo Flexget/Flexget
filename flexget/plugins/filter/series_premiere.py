@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 from flexget import plugin
 from flexget.event import event
@@ -68,7 +69,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
                     guessed_series.setdefault(normalized_name, entry['series_name'])
         # Reject any further episodes in those series
         for entry in task.entries:
-            for series in guessed_series.itervalues():
+            for series in guessed_series.values():
                 if entry.get('series_name') == series and not (
                         entry.get('series_season') == 1 and
                         entry.get('series_episode') in desired_eps):
@@ -76,7 +77,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
         # Since we are running after task start phase, make sure not to merge into the config multiple times on reruns
         if not task.is_rerun:
             # Combine settings and series into series plugin config format
-            allseries = {'settings': {'series_premiere': group_settings}, 'series_premiere': guessed_series.values()}
+            allseries = {'settings': {'series_premiere': group_settings}, 'series_premiere': list(guessed_series.values())}
             # Merge the our config in to the main series config
             self.merge_config(task, allseries)
 

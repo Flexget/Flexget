@@ -1,4 +1,5 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import unicode_literals, division, absolute_import, print_function
+from builtins import *
 
 import atexit
 import codecs
@@ -13,6 +14,8 @@ import threading
 import traceback
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+
+import io
 
 import sqlalchemy
 import yaml
@@ -100,10 +103,10 @@ class Manager(object):
         """
         :param args: CLI args
         """
+        global manager
         if not self.unit_test:
-            global manager
             assert not manager, 'Only one instance of Manager should be created at a time!'
-        else:
+        elif manager:
             log.info('last manager was not torn down correctly')
 
         if args is None:
@@ -166,10 +169,6 @@ class Manager(object):
                         'disk will not work properly for filenames containing non-ascii characters. Make sure your '
                         'locale env variables are set up correctly for the environment which is launching FlexGet.')
 
-    def __del__(self):
-        global manager
-        manager = None
-
     def initialize(self):
         """
         Load plugins, database, and config. Also initializes (but does not start) the task queue and ipc server.
@@ -181,6 +180,8 @@ class Manager(object):
         plugin.load_plugins(extra_dirs=[os.path.join(self.config_base, 'plugins')])
 
         # Reparse CLI options now that plugins are loaded
+        if not self.args:
+            self.args = ['--help']
         self.options = get_parser().parse_args(self.args)
 
         self.task_queue = TaskQueue()
@@ -212,7 +213,7 @@ class Manager(object):
         """A list of tasks in the config"""
         if not self.config:
             return []
-        return self.config.get('tasks', {}).keys()
+        return list(self.config.get('tasks', {}).keys())
 
     @property
     def has_lock(self):
@@ -246,7 +247,7 @@ class Manager(object):
                 # Create list of tasks to run, preserving order
                 task_names = []
                 for arg in options.tasks:
-                    matches = [t for t in self.tasks if fnmatch.fnmatchcase(unicode(t).lower(), arg.lower())]
+                    matches = [t for t in self.tasks if fnmatch.fnmatchcase(str(t).lower(), arg.lower())]
                     if not matches:
                         msg = '`%s` does not match any tasks' % arg
                         log.error(msg)
@@ -439,7 +440,7 @@ class Manager(object):
             node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
             return node
 
-        yaml.add_representer(unicode, unicode_representer)
+        yaml.add_representer(str, unicode_representer)
 
         # Set up the dumper to increase the indent for lists
         def increase_indent_wrapper(func):
@@ -470,13 +471,13 @@ class Manager(object):
         else:
             log.debug('Figuring out config load paths')
             try:
-                possible.append(os.getcwdu())
+                possible.append(os.getcwd())
             except OSError:
                 log.debug('current directory invalid, not searching for config there')
             # for virtualenv / dev sandbox
             if hasattr(sys, 'real_prefix'):
                 log.debug('Adding virtualenv path')
-                possible.append(sys.prefix.decode(sys.getfilesystemencoding()))
+                possible.append(sys.prefix)
             # normal lookup locations
             possible.append(home_path)
             if sys.platform.startswith('win'):
@@ -523,7 +524,7 @@ class Manager(object):
         :raises: `ValueError` if there is a problem loading the config file
         """
         fire_event('manager.before_config_load', self)
-        with codecs.open(self.config_path, 'rb', 'utf-8') as f:
+        with io.open(self.config_path, 'r', encoding='utf-8') as f:
             try:
                 raw_config = f.read()
             except UnicodeDecodeError:
@@ -688,11 +689,11 @@ class Manager(object):
         """
         if self.lockfile and os.path.exists(self.lockfile):
             result = {}
-            with open(self.lockfile) as f:
+            with io.open(self.lockfile, encoding='utf-8') as f:
                 lines = [l for l in f.readlines() if l]
             for line in lines:
                 try:
-                    key, value = line.split(b':', 1)
+                    key, value = line.split(':', 1)
                 except ValueError:
                     log.debug('Invalid line in lock file: %s' % line)
                     continue
@@ -736,7 +737,7 @@ class Manager(object):
             if not self._has_lock:
                 # Exit if there is an existing lock.
                 if self.check_lock():
-                    with open(self.lockfile) as f:
+                    with io.open(self.lockfile, encoding='utf-8') as f:
                         pid = f.read()
                     print('Another process (%s) is running, will exit.' % pid.split('\n')[0], file=sys.stderr)
                     print('If you\'re sure there is no other instance running, delete %s' % self.lockfile,
@@ -756,11 +757,11 @@ class Manager(object):
 
     def write_lock(self, ipc_info=None):
         assert self._has_lock
-        with open(self.lockfile, 'w') as f:
-            f.write(b'PID: %s\n' % os.getpid())
+        with io.open(self.lockfile, 'w', encoding='utf-8') as f:
+            f.write('PID: %s\n' % os.getpid())
             if ipc_info:
                 for key in sorted(ipc_info):
-                    f.write(b'%s: %s\n' % (key, ipc_info[key]))
+                    f.write('%s: %s\n' % (key, ipc_info[key]))
 
     def release_lock(self):
         if os.path.exists(self.lockfile):
@@ -812,12 +813,13 @@ class Manager(object):
         # redirect standard file descriptors
         sys.stdout.flush()
         sys.stderr.flush()
-        si = file('/dev/null', 'r')
-        so = file('/dev/null', 'a+')
-        se = file('/dev/null', 'a+', 0)
+        si = open(os.devnull, 'r')
+        so = open(os.devnull, 'ab+')
+        se = open(os.devnull, 'ab+', 0)
         os.dup2(si.fileno(), sys.stdin.fileno())
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
+
         # If we have a lock, update the lock file with our new pid
         if self._has_lock:
             self.write_lock()
@@ -871,6 +873,8 @@ class Manager(object):
             if self._has_lock:
                 os.remove(self.db_filename)
                 log.info('Removed test database')
+        global manager
+        manager = None
 
     def crash_report(self):
         """

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 from flexget import options, plugin
 from flexget.event import event

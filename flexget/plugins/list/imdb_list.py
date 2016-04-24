@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 import csv
 import logging
@@ -6,7 +7,7 @@ import re
 from collections import MutableSet
 from datetime import datetime
 
-from requests.exceptions import ConnectionError, HTTPError
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -57,7 +58,7 @@ class ImdbEntrySet(MutableSet):
                 'openid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%'
                 '2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.ope'
                 'nid.net%2Fauth%2F2.0')
-        except ConnectionError as e:
+        except RequestException as e:
             raise PluginError(e.args[0])
         soup = get_soup(r.content)
         inputs = soup.select('form#ap_signin_form input')
@@ -102,14 +103,14 @@ class ImdbEntrySet(MutableSet):
             try:
                 r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
                                  (self.list_id, self.user_id))
-            except HTTPError as e:
+            except RequestException as e:
                 raise PluginError(e.args[0])
-            lines = r.iter_lines()
+            lines = r.iter_lines(decode_unicode=True)
             # Throw away first line with headers
             next(lines)
             self._items = []
             for row in csv.reader(lines):
-                row = [unicode(cell, 'utf-8') for cell in row]
+                row = [cell for cell in row]
                 log.debug('parsing line from csv: %s', ', '.join(row))
                 if not len(row) == 16:
                     log.debug('no movie row detected, skipping. %s', ', '.join(row))

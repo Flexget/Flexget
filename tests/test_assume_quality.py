@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 import pytest
 from jinja2 import Template

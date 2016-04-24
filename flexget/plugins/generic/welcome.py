@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-import os
+from builtins import *
 
+import os
 import logging
 import sys
 

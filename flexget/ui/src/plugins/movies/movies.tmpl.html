@@ -1,14 +1,17 @@
-<md-content flex layout-margin>
-    <md-tabs md-dynamic-height md-border-bottom>
-        <md-tab ng-repeat="list in vm.lists" md-on-select="vm.loadMovies(list.id)">
+<div layout="column" flex>
+<md-content flex layout-margin ng-if="vm.lists">
+    <md-tabs md-dynamic-height md-border-bottom md-selected="vm.selectedList">
+        <md-tab ng-repeat="list in vm.lists">
             <md-tab-label>
-                {{ list.name }}
+                {{ ::list.name }}
             </md-tab-label>
             <md-tab-body>
-                <md-list flex>
-                    <movie-entry movie="movie" delete-movie="vm.deleteMovie(list.id, movie)" ng-repeat="movie in vm.movies"></movie-entry>
-                </md-list>
+                <md-content layout="row" layout-wrap layout-padding>
+                    <movie-entry flex="100" flex-gt-md="50" flex-gt-lg="33" movie="::movie" delete-movie="vm.deleteMovie(list.id, movie)" ng-repeat="movie in vm.movies"></movie-entry>
+                </md-content>
             </md-tab-body>
         </md-tab>
     </md-tabs>
 </md-content>
+<fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalMovies" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
+</div>

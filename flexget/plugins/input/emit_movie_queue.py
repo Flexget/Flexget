@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 import logging
 
@@ -77,7 +78,7 @@ class EmitMovieQueue(object):
 
                 # Add the year and quality if configured to (make sure not to double it up)
                 if config.get('year') and entry.get('movie_year') \
-                        and unicode(entry['movie_year']) not in entry['title']:
+                        and str(entry['movie_year']) not in entry['title']:
                     plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
                     entry['title'] += ' %s' % entry['movie_year']
                 # TODO: qualities can now be ranges.. how should we handle this?

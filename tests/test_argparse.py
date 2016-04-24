@@ -1,4 +1,5 @@
-"""Test the custom behaviors we have added to argparse."""
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 from argparse import Action
 

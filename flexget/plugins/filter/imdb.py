@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 
 from flexget import plugin
@@ -161,7 +163,7 @@ class FilterImdb(object):
 
             if 'reject_actors' in config:
                 rejected = config['reject_actors']
-                for actor_id, actor_name in entry.get('imdb_actors', {}).iteritems():
+                for actor_id, actor_name in entry.get('imdb_actors', {}).items():
                     if actor_id in rejected or actor_name in rejected:
                         reasons.append('reject_actors %s' % actor_name or actor_id)
                         break
@@ -169,7 +171,7 @@ class FilterImdb(object):
             # Accept if actors contains an accepted actor, but don't reject otherwise
             if 'accept_actors' in config:
                 accepted = config['accept_actors']
-                for actor_id, actor_name in entry.get('imdb_actors', {}).iteritems():
+                for actor_id, actor_name in entry.get('imdb_actors', {}).items():
                     if actor_id in accepted or actor_name in accepted:
                         log.debug('Accepting because of accept_actors %s' % actor_name or actor_id)
                         force_accept = True
@@ -177,7 +179,7 @@ class FilterImdb(object):
 
             if 'reject_directors' in config:
                 rejected = config['reject_directors']
-                for director_id, director_name in entry.get('imdb_directors', {}).iteritems():
+                for director_id, director_name in entry.get('imdb_directors', {}).items():
                     if director_id in rejected or director_name in rejected:
                         reasons.append('reject_directors %s' % director_name or director_id)
                         break
@@ -185,7 +187,7 @@ class FilterImdb(object):
             # Accept if the director is in the accept list, but do not reject if the director is unknown
             if 'accept_directors' in config:
                 accepted = config['accept_directors']
-                for director_id, director_name in entry.get('imdb_directors', {}).iteritems():
+                for director_id, director_name in entry.get('imdb_directors', {}).items():
                     if director_id in accepted or director_name in accepted:
                         log.debug('Accepting because of accept_directors %s' % director_name or director_id)
                         force_accept = True

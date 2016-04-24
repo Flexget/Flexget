@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 from datetime import datetime, timedelta
 
@@ -234,7 +236,7 @@ class ImdbLookup(object):
         try:
             self.lookup(entry)
         except plugin.PluginError as e:
-            log_once(unicode(e.value).capitalize(), logger=log)
+            log_once(str(e.value).capitalize(), logger=log)
 
     @with_session
     def imdb_id_lookup(self, movie_title=None, raw_title=None, session=None):
@@ -424,12 +426,12 @@ class ImdbLookup(object):
             if not language:
                 language = Language(name)
             movie.languages.append(MovieLanguage(language, prominence=index))
-        for imdb_id, name in parser.actors.iteritems():
+        for imdb_id, name in parser.actors.items():
             actor = session.query(Actor).filter(Actor.imdb_id == imdb_id).first()
             if not actor:
                 actor = Actor(imdb_id, name)
             movie.actors.append(actor)  # pylint:disable=E1101
-        for imdb_id, name in parser.directors.iteritems():
+        for imdb_id, name in parser.directors.items():
             director = session.query(Director).filter(Director.imdb_id == imdb_id).first()
             if not director:
                 director = Director(imdb_id, name)

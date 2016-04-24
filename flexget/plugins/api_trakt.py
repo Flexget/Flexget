@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
 
 import logging
 import re
@@ -205,7 +207,7 @@ def get_api_url(*endpoint):
     if len(endpoint) == 1 and not isinstance(endpoint[0], basestring):
         endpoint = endpoint[0]
     # Make sure integer portions are turned into strings first too
-    url = API_URL + '/'.join(map(unicode, endpoint))
+    url = API_URL + '/'.join(map(str, endpoint))
     return url
 
 

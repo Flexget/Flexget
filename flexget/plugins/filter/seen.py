@@ -7,12 +7,12 @@ forget (string)
     task name then everything in that task will be forgotten. With title all learned fields from it and the
     title will be forgotten. With field value only that particular field is forgotten.
 """
-
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
 
 import logging
 from datetime import datetime, timedelta
-from types import NoneType
 
 from sqlalchemy import Column, Integer, DateTime, Unicode, Boolean, or_, select, update, Index
 from sqlalchemy.orm import relation
@@ -214,7 +214,7 @@ class FilterSeen(object):
         self.keyword = 'seen'
 
     def prepare_config(self, config):
-        if isinstance(config, NoneType):
+        if config is None:
             config = {}
         elif isinstance(config, bool):
             if config is False:
@@ -246,7 +246,7 @@ class FilterSeen(object):
                 if field not in entry:
                     continue
                 if entry[field] not in values and entry[field]:
-                    values.append(unicode(entry[field]))
+                    values.append(str(entry[field]))
             if values:
                 log.trace('querying for: %s' % ', '.join(values))
                 # check if SeenField.value is any of the values
@@ -283,7 +283,7 @@ class FilterSeen(object):
         # no explicit fields given, use default
         if not fields:
             fields = self.fields
-        se = SeenEntry(entry['title'], unicode(task.name), reason, local)
+        se = SeenEntry(entry['title'], str(task.name), reason, local)
         remembered = []
         for field in fields:
             if field not in entry:
@@ -292,7 +292,7 @@ class FilterSeen(object):
             if entry[field] in remembered:
                 continue
             remembered.append(entry[field])
-            sf = SeenField(unicode(field), unicode(entry[field]))
+            sf = SeenField(str(field), str(entry[field]))
             se.fields.append(sf)
             log.debug("Learned '%s' (field: %s)" % (entry[field], field))
         # Only add the entry to the session if it has one of the required fields
@@ -329,7 +329,7 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
     :return: Seen Entry object as committed to DB
     """
     se = SeenEntry(title, task_name, reason, local)
-    for field, value in fields.items():
+    for field, value in list(fields.items()):
         sf = SeenField(field, value)
         se.fields.append(sf)
     session.add(se)

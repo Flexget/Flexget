@@ -1,5 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-import __builtin__
+from builtins import *
+from future.moves import builtins
+from past.builtins import basestring
+
 import logging
 import re
 import datetime
@@ -15,9 +18,9 @@ log = logging.getLogger('if')
 
 def safer_eval(statement, locals):
     """A safer eval function. Does not allow __ or try statements, only includes certain 'safe' builtins."""
-    allowed_builtins = ['True', 'False', 'str', 'unicode', 'int', 'float', 'len', 'any', 'all', 'sorted']
+    allowed_builtins = ['True', 'False', 'str', 'bytes', 'int', 'float', 'len', 'any', 'all', 'sorted']
     for name in allowed_builtins:
-        locals[name] = getattr(__builtin__, name)
+        locals[name] = getattr(builtins, name)
     if re.search(r'__|try\s*:|lambda', statement):
         raise ValueError('`__`, lambda or try blocks not allowed in if statements.')
     return eval(statement, {'__builtins__': None}, locals)
@@ -64,7 +67,7 @@ class FilterIf(object):
 
     def __getattr__(self, item):
         """Provides handlers for all phases."""
-        for phase, method in plugin.phase_methods.iteritems():
+        for phase, method in plugin.phase_methods.items():
             if item == method and phase not in ['accept', 'reject', 'fail', 'input']:
                 break
         else:
@@ -76,7 +79,7 @@ class FilterIf(object):
                 'reject': Entry.reject,
                 'fail': Entry.fail}
             for item in config:
-                requirement, action = item.items()[0]
+                requirement, action = list(item.items())[0]
                 passed_entries = [e for e in task.entries if self.check_condition(requirement, e)]
                 if isinstance(action, basestring):
                     if not phase == 'filter':
@@ -92,7 +95,7 @@ class FilterIf(object):
                     fake_task.all_entries[:] = passed_entries
 
                     methods = {}
-                    for plugin_name, plugin_config in action.iteritems():
+                    for plugin_name, plugin_config in action.items():
                         p = plugin.get_plugin_by_name(plugin_name)
                         method = p.phase_handlers.get(phase)
                         if method:

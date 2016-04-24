@@ -1,4 +1,7 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
+
 import logging
 
 from flexget import options, plugin
@@ -19,7 +22,7 @@ class PluginTryRegexp(object):
     def matches(self, entry, regexp):
         """Return True if any of the entry string fields match given regexp"""
         import re
-        for field, value in entry.iteritems():
+        for field, value in entry.items():
             if not isinstance(value, basestring):
                 continue
             if re.search(regexp, value, re.IGNORECASE | re.UNICODE):
@@ -38,7 +41,7 @@ class PluginTryRegexp(object):
         console('Task \'%s\' has %s entries, enter regexp to see what matches it.' % (task.name, len(task.entries)))
         while (True):
             try:
-                s = raw_input('--> ')
+                s = input('--> ')
                 if s == 'exit':
                     break
                 if s == 'abort' or s == 'continue':

@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import base64
 import glob
 import logging
@@ -88,7 +90,7 @@ def install_pausing_reactor():
                 self.startRunning(installSignalHandlers)
                 self._mainLoopGen = self._mainLoopGenerator()
             try:
-                return self._mainLoopGen.next()
+                return next(self._mainLoopGen)
             except StopIteration:
                 pass
 
@@ -290,7 +292,7 @@ class InputDeluge(DelugePlugin):
 
         def on_get_torrents_status(torrents):
             config_path = os.path.expanduser(config.get('config_path', ''))
-            for hash, torrent_dict in torrents.iteritems():
+            for hash, torrent_dict in torrents.items():
                 # Make sure it has a url so no plugins crash
                 entry = Entry(deluge_id=hash, url='')
                 if config_path:
@@ -302,7 +304,7 @@ class InputDeluge(DelugePlugin):
                         entry['url'] = 'file://' + torrent_path
                     else:
                         log.warning('Did not find torrent file at %s' % torrent_path)
-                for key, value in torrent_dict.iteritems():
+                for key, value in torrent_dict.items():
                     flexget_key = self.settings_map[key]
                     if isinstance(flexget_key, tuple):
                         flexget_key, format_func = flexget_key
@@ -311,7 +313,7 @@ class InputDeluge(DelugePlugin):
                 self.entries.append(entry)
             client.disconnect()
         filter = config.get('filter', {})
-        client.core.get_torrents_status(filter, self.settings_map.keys()).addCallback(on_get_torrents_status)
+        client.core.get_torrents_status(filter, list(self.settings_map.keys())).addCallback(on_get_torrents_status)
 
 
 class OutputDeluge(DelugePlugin):
@@ -676,7 +678,7 @@ class OutputDeluge(DelugePlugin):
                 @defer.inlineCallbacks
                 def _wait_for_metadata(torrent_id, timeout):
                     log.verbose('Waiting %d seconds for "%s" to magnetize' % (timeout, entry['title']))
-                    for i in xrange(timeout):
+                    for i in range(timeout):
                         time.sleep(1)
                         try:
                             status = yield client.core.get_torrent_status(torrent_id, ['files'])
@@ -722,7 +724,7 @@ class OutputDeluge(DelugePlugin):
                         add_opts['download_location'] = pathscrub(os.path.expanduser(path))
                 except RenderError as e:
                     log.error('Could not set path for %s: %s' % (entry['title'], e))
-                for fopt, dopt in self.options.iteritems():
+                for fopt, dopt in self.options.items():
                     value = entry.get(fopt, config.get(fopt))
                     if value is not None:
                         add_opts[dopt] = value

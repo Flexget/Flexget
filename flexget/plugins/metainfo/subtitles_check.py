@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
+from builtins import *
+
 import os
+import logging
 import tempfile
 
 from flexget import plugin

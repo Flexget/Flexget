@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 import os
 import socket
-import urllib2
 
 from flexget import plugin
 from flexget.event import event
@@ -83,22 +84,6 @@ class FormLogin(object):
 
         # Add cookiejar to our requests session
         task.requests.add_cookiejar(cookiejar)
-        # Add handler to urllib2 default opener for backwards compatibility
-        handler = urllib2.HTTPCookieProcessor(cookiejar)
-        if urllib2._opener:
-            log.debug('Adding HTTPCookieProcessor to default opener')
-            urllib2._opener.add_handler(handler)
-        else:
-            log.debug('Creating new opener and installing it')
-            urllib2.install_opener(urllib2.build_opener(handler))
-
-    def on_task_exit(self, task, config):
-        """Task exiting, remove cookiejar"""
-        log.debug('Removing urllib2 opener')
-        urllib2.install_opener(None)
-
-    # Task aborted, unhook the cookiejar
-    on_task_abort = on_task_exit
 
 
 @event('plugin.register')

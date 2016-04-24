@@ -1,8 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 
 import pytest
 
 from .conftest import MockManager
+
 
 class TestMigrate(object):
 
@@ -22,8 +25,5 @@ class TestMigrate(object):
         database_uri = 'sqlite:///%s' % filename
         # This will raise an error if the upgrade wasn't successful
         mockmanager = MockManager(self.config, request.cls.__name__, db_uri=database_uri)
-        try:
-            mockmanager.shutdown()
-        finally:
-            mockmanager.__del__()
+        mockmanager.shutdown()
         # TODO: verify we actually loaded the old config, and didn't just create a new one or something

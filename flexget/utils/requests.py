@@ -1,9 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-import urllib2
+from builtins import *
+from future.moves.urllib.request import urlopen
+from future.moves.urllib.parse import urlparse
+
 import time
 import logging
 from datetime import timedelta, datetime
-from urlparse import urlparse
 
 import requests
 # Allow some request objects to be imported from here instead of requests
@@ -131,7 +133,7 @@ def _wrap_urlopen(url, timeout=None):
 
     """
     try:
-        raw = urllib2.urlopen(url, timeout=timeout)
+        raw = urlopen(url, timeout=timeout)
     except IOError as e:
         msg = 'Error getting %s: %s' % (url, e)
         log.error(msg)
@@ -152,7 +154,7 @@ def limit_domains(url, limit_dict):
 
     This is separated in to its own function so that limits can be disabled during unit tests with VCR.
     """
-    for domain, limiter in limit_dict.iteritems():
+    for domain, limiter in limit_dict.items():
         if domain in url:
             limiter()
             break

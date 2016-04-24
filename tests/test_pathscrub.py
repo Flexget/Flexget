@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 import pytest
+
 from flexget.utils.pathscrub import pathscrub
 
 

@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import hashlib
 import logging
 
@@ -100,7 +102,7 @@ scheduler_job_map = {}
 
 def job_id(conf):
     """Create a unique id for a schedule item in config."""
-    return hashlib.sha1(json.dumps(conf, sort_keys=True)).hexdigest()
+    return hashlib.sha1(json.dumps(conf, sort_keys=True).encode('utf-8')).hexdigest()
 
 
 def run_job(tasks):

@@ -1,5 +1,7 @@
 """Plugin for text file or URL feeds via regex."""
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import re
 import logging
 
@@ -67,7 +69,7 @@ class Text(object):
     }
 
     def format_entry(self, entry, d):
-        for k, v in d.iteritems():
+        for k, v in d.items():
             entry[k] = v % entry
 
     @cached('text')
@@ -75,7 +77,7 @@ class Text(object):
     def on_task_input(self, task, config):
         url = config['url']
         if '://' in url:
-            lines = task.requests.get(url).iter_lines(decode_unicode=True)
+            lines = task.requests.get(url).text.split('\n')
         else:
             lines = path.Path(url).lines(encoding=config.get('encoding', 'utf-8'))
 
@@ -89,7 +91,7 @@ class Text(object):
 
         # now parse text
         for line in lines:
-            for field, regexp in entry_config.iteritems():
+            for field, regexp in entry_config.items():
                 # log.debug('search field: %s regexp: %s' % (field, regexp))
                 match = re.search(regexp, line)
                 if match:

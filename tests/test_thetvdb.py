@@ -1,8 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import re
 from datetime import datetime, timedelta
+
 import mock
 import pytest
+
 from flexget.manager import Session
 from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode, find_series_id
 from flexget.plugins.input.thetvdb_favorites import TVDBUserFavorite

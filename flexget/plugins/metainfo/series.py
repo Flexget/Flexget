@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 
 from flexget.plugins.parsers.parser_common import normalize_name, remove_dirt

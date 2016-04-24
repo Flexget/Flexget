@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
 
 import pytest
 
@@ -45,6 +46,7 @@ class TestDownload(object):
         assert not task.aborted, 'Task should not have aborted'
 
 
+@pytest.mark.usefixtures('tmpdir')
 class TestDownloadTemp(object):
     config = """
         tasks:
@@ -53,23 +55,23 @@ class TestDownloadTemp(object):
               - {title: 'entry 1', url: 'http://www.speedtest.qsc.de/1kB.qsc'}
             accept_all: yes
             download:
-              path: ~/
+              path: __tmp__
               temp: /root
           temp_non_existent:
             download:
-              path: ~/
+              path: __tmp__
               temp: /a/b/c/non/existent/
           temp_wrong_config_1:
             download:
-              path: ~/
+              path: __tmp__
               temp: no
           temp_wrong_config_2:
             download:
-              path: ~/
+              path: __tmp__
               temp: 3
           temp_empty:
             download:
-              path: ~/
+              path: __tmp__
               temp:
         """
 # TODO: These are really just config validation tests, and I have config validation turned off at the moment for unit

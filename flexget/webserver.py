@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
 
 import hashlib
 import logging
@@ -44,7 +46,7 @@ web_config_schema = {
 
 def generate_key():
     """ Generate key for use to authentication """
-    return unicode(hashlib.sha224(str(random.getrandbits(128))).hexdigest())
+    return str(hashlib.sha224(str(random.getrandbits(128)).encode('utf-8')).hexdigest())
 
 
 def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
@@ -77,16 +79,16 @@ class WeakPassword(Exception):
         super(WeakPassword, self).__init__()
         # Value is expected to be a string
         if not isinstance(value, basestring):
-            value = unicode(value)
+            value = str(value)
         self.value = value
         self.log = logger
         self.kwargs = kwargs
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return str(self).encode('utf-8')
 
     def __unicode__(self):
-        return unicode(self.value)
+        return str(self.value)
 
 
 class User(Base, UserMixin):
@@ -159,7 +161,7 @@ def setup_server(manager, session=None):
 
     user = get_user()
     if not user or not user.password:
-        log.warn('No password set for web server, create one by using'
+        log.warning('No password set for web server, create one by using'
                  ' `flexget web passwd <password>`')
 
     if web_server.is_alive():
@@ -198,7 +200,7 @@ class WebServer(threading.Thread):
     def _start_server(self):
         # Mount the WSGI callable object (app) on the root directory
         cherrypy.tree.graft(_default_app, '/')
-        for path, registered_app in _app_register.iteritems():
+        for path, registered_app in _app_register.items():
             cherrypy.tree.graft(registered_app, path)
 
         cherrypy.log.error_log.propagate = False
@@ -248,7 +250,7 @@ def change_password(username='flexget', password='', session=None):
         raise WeakPassword('Password {0} is not strong enough'.format(password))
 
     user = get_user(username=username, session=session)
-    user.password = unicode(generate_password_hash(password))
+    user.password = str(generate_password_hash(password))
     session.commit()
 
 

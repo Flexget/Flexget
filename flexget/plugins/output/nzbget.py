@@ -1,3 +1,6 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import logging
 
 from flexget import plugin
@@ -30,7 +33,7 @@ class OutputNzbget(object):
     }
 
     def on_task_output(self, task, config):
-        from xmlrpclib import ServerProxy
+        from xmlrpc.client import ServerProxy
 
         params = dict(config)
 

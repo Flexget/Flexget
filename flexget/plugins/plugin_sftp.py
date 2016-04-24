@@ -1,12 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
-from urlparse import urljoin, urlparse
-from collections import namedtuple
-from itertools import groupby
+from builtins import *
+from future.moves.urllib.parse import urljoin, urlparse
+
 import logging
 import os
 import posixpath
-from functools import partial
 import time
+from functools import partial
+from collections import namedtuple
+from itertools import groupby
+
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
@@ -56,7 +59,7 @@ def sftp_connect(conf):
                 raise e
             else:
                 log.debug('Caught exception: %s' % e)
-                log.warn('Failed to connect to %s; waiting %d seconds before retrying.' %
+                log.warning('Failed to connect to %s; waiting %d seconds before retrying.' %
                          (conf.host, retry_interval))
                 time.sleep(retry_interval)
                 tries -= 1
@@ -256,7 +259,7 @@ class SftpList(object):
             """
             Skip unknown files
             """
-            log.warn('Skipping unknown file: %s' % path)
+            log.warning('Skipping unknown file: %s' % path)
 
         # the business end
         for dir in dirs:
@@ -320,7 +323,7 @@ class SftpDownload(object):
         if parsed.scheme == 'sftp':
             config = ConnectionConfig(host, port, username, password, private_key, private_key_pass)
         else:
-            log.warn('Scheme does not match SFTP: %s' % entry['url'])
+            log.warning('Scheme does not match SFTP: %s' % entry['url'])
             config = None
 
         return config
@@ -372,7 +375,7 @@ class SftpDownload(object):
         """
         Dummy unknown file handler. Warns about unknown files.
         """
-        log.warn('Skipping unknown file %s' % path)
+        log.warning('Skipping unknown file %s' % path)
 
     def remove_dir(self, sftp, path):
         """
@@ -435,7 +438,7 @@ class SftpDownload(object):
             if delete_origin:
                 self.remove_dir(sftp, path)
         else:
-            log.warn('Skipping unknown file %s' % path)
+            log.warning('Skipping unknown file %s' % path)
 
     def on_task_download(self, task, config):
         """
@@ -537,7 +540,7 @@ class SftpUpload(object):
         destination_url = urljoin(url_prefix, destination)
 
         if not os.path.exists(location):
-            log.warn('File no longer exists: %s', location)
+            log.warning('File no longer exists: %s', location)
             return
 
         if not sftp.lexists(to):
@@ -557,7 +560,7 @@ class SftpUpload(object):
             sftp.put(localpath=location, remotepath=destination)
             log.verbose('Successfully uploaded %s to %s' % (location, destination_url))
         except OSError as e:
-            log.warn('File no longer exists: %s', location)
+            log.warning('File no longer exists: %s', location)
             return
         except IOError as e:
             log.error('Remote directory does not exist: %s (%s)' % to)

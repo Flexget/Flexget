@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from future.moves.urllib.parse import unquote
 
 import copy
 from math import ceil
-from urllib import unquote
 
 from flask import jsonify, request
 from flask_restplus import inputs
@@ -184,7 +185,7 @@ class SeenSearchAPI(APIResource):
             'local': data.get('local', False),
             'session': session
         }
-        values = [value for value in kwargs['fields'].values()]
+        values = [value for value in list(kwargs['fields'].values())]
         exist = seen.search_by_field_values(field_value_list=values, task_name=PLUGIN_TASK_NAME, local=kwargs['local'],
                                             session=session)
         if exist:

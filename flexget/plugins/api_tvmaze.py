@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from future.utils import native_str
 
 import logging
 from datetime import datetime
@@ -378,9 +380,9 @@ def from_cache(session=None, search_params=None, cache_type=None):
     if not any(search_params.values()):
         raise LookupError('No parameters sent for cache lookup')
     else:
-        log.debug('searching db {0} for the values {1}'.format(cache_type.__tablename__, search_params.items()))
+        log.debug('searching db {0} for the values {1}'.format(cache_type.__tablename__, list(search_params.items())))
         result = session.query(cache_type).filter(
-            or_(getattr(cache_type, col) == val for col, val in search_params.iteritems() if val)).first()
+            or_(getattr(cache_type, col) == val for col, val in search_params.items() if val)).first()
     return result
 
 
@@ -416,16 +418,21 @@ def prepare_lookup_for_pytvmaze(**lookup_params):
     if not title:
         title = series_name
 
+    network = lookup_params.get('network') or lookup_params.get('trakt_series_network')
+    country = lookup_params.get('country') or lookup_params.get('trakt_series_country')
+    language = lookup_params.get('language')
+
     prepared_params['maze_id'] = lookup_params.get('tvmaze_id')
     prepared_params['tvdb_id'] = lookup_params.get('tvdb_id') or lookup_params.get('trakt_series_tvdb_id')
     prepared_params['tvrage_id'] = lookup_params.get('tvrage_id') or lookup_params.get('trakt_series_tvrage_id')
     prepared_params['imdb_id'] = lookup_params.get('imdb_id')
-    prepared_params['show_name'] = title or None
+    prepared_params['show_name'] = native_str(title) if title else None
     prepared_params['show_year'] = lookup_params.get('trakt_series_year') or lookup_params.get(
         'year') or lookup_params.get('imdb_year') or year_match
-    prepared_params['show_network'] = lookup_params.get('network') or lookup_params.get('trakt_series_network')
-    prepared_params['show_country'] = lookup_params.get('country') or lookup_params.get('trakt_series_country')
-    prepared_params['show_language'] = lookup_params.get('language')
+
+    prepared_params['show_network'] = native_str(network) if network else None
+    prepared_params['show_country'] = native_str(country) if country else None
+    prepared_params['show_language'] = native_str(language) if language else None
 
     # Include cast information by default
     prepared_params['embed'] = 'cast'

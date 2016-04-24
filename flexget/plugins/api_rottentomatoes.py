@@ -1,10 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from past.builtins import basestring
+from future.moves.urllib.parse import quote_plus
+from future.moves.urllib.error import URLError
+
 import time
 import logging
 import difflib
-import urllib
 from datetime import datetime, timedelta
-from urllib2 import URLError
 
 from sqlalchemy import Table, Column, Integer, String, DateTime, func, sql
 from sqlalchemy.schema import ForeignKey, Index
@@ -442,11 +445,11 @@ def _set_movie_details(movie, session, movie_data=None, api_key=None):
                 movie.genres.append(genre)
         release_dates = movie_data.get('release_dates')
         if release_dates:
-            for name, date in release_dates.items():
+            for name, date in list(release_dates.items()):
                 movie.release_dates.append(ReleaseDate(name, date))
         posters = movie_data.get('posters')
         if posters:
-            for name, url in posters.items():
+            for name, url in list(posters.items()):
                 movie.posters.append(RottenTomatoesPoster(name, url))
         cast = movie_data.get('abridged_cast')
         if cast:
@@ -466,11 +469,11 @@ def _set_movie_details(movie, session, movie_data=None, api_key=None):
                 movie.directors.append(director)
         alternate_ids = movie_data.get('alternate_ids')
         if alternate_ids:
-            for name, id in alternate_ids.items():
+            for name, id in list(alternate_ids.items()):
                 movie.alternate_ids.append(RottenTomatoesAlternateId(name, id))
         links = movie_data.get('links')
         if links:
-            for name, url in links.items():
+            for name, url in list(links.items()):
                 movie.links.append(RottenTomatoesLink(name, url))
         movie.updated = datetime.now()
     else:
@@ -512,7 +515,7 @@ def lists(list_type, list_name, limit=20, page_limit=20, page=None, api_key=None
 
 def movies_search(q, page_limit=None, page=None, api_key=None):
     if isinstance(q, basestring):
-        q = urllib.quote_plus(q.encode('latin-1', errors='ignore'))
+        q = quote_plus(q.encode('latin-1', errors='ignore'))
 
     if not api_key:
         api_key = API_KEY

@@ -1,12 +1,15 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+from future.moves.xmlrpc import client as xmlrpc_client
+from future.moves.urllib.parse import urlparse
+from future.utils import native_str
+from future.utils import PY3
+
 import logging
-import sys
 import os
 import socket
 import re
-import xmlrpclib
-import httplib
 from time import sleep
-from urlparse import urlparse
 
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
@@ -16,54 +19,36 @@ from flexget.entry import Entry
 from flexget.config_schema import one_or_more
 from flexget.utils.bittorrent import Torrent, is_torrent_file
 
-
 log = logging.getLogger('rtorrent')
 
 
-class TimeoutHTTPConnection(httplib.HTTPConnection):
-    def __init__(self, host, timeout=30):
-        httplib.HTTPConnection.__init__(self, host, timeout=timeout)
+class _Method(object):
+    # some magic to bind an XML-RPC method to an RPC server.
+    # supports "nested" methods (e.g. examples.getStateName)
+    def __init__(self, send, name):
+        self.__send = send
+        self.__name = name
+
+    def __getattr__(self, name):
+        return _Method(self.__send, "%s.%s" % (self.__name, name))
+
+    def __call__(self, *args):
+        return self.__send(self.__name, args)
 
 
-class HTTPTransport(xmlrpclib.Transport):
-    def __init__(self, timeout=30, *args, **kwargs):
-        xmlrpclib.Transport.__init__(self, *args, **kwargs)
-        self.timeout = timeout
-
-    def make_connection(self, host):
-        # return an existing connection if possible.  This allows HTTP/1.1 keep-alive.
-        if self._connection and host == self._connection[0]:
-            return self._connection[1]
-
-        # create a HTTP connection object from a host descriptor
-        chost, self._extra_headers, x509 = self.get_host_info(host)
-        self._connection = host, TimeoutHTTPConnection(chost, timeout=self.timeout)
-        return self._connection[1]
-
-
-class HTTPServerProxy(xmlrpclib.ServerProxy):
-    """
-    Supports http with timeout
-    """
-    def __init__(self, uri, timeout=30, *args, **kwargs):
-        kwargs['transport'] = HTTPTransport(timeout=timeout, use_datetime=kwargs.get('use_datetime', 0))
-        xmlrpclib.ServerProxy.__init__(self, uri, *args, **kwargs)
-
-
-class SCGITransport(xmlrpclib.Transport):
+class SCGITransport(xmlrpc_client.Transport):
     """ Used to override the default xmlrpclib transport to support SCGI """
 
-    def __init__(self, timeout=30, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.verbose = 0
-        xmlrpclib.Transport.__init__(self, *args, **kwargs)
-        self.timeout = timeout
+        xmlrpc_client.Transport.__init__(self, *args, **kwargs)
 
     def request(self, host, handler, request_body, verbose=False):
         return self.single_request(host, handler, request_body, verbose)
 
     def single_request(self, host, handler, request_body, verbose=0):
         # Add SCGI headers to the request.
-        headers = [('CONTENT_LENGTH', str(len(request_body))), ('SCGI', '1')]
+        headers = [('CONTENT_LENGTH', native_str(len(request_body))), ('SCGI', '1')]
         header = '\x00'.join(['%s\x00%s' % (key, value) for key, value in headers]) + '\x00'
         header = '%d:%s' % (len(header), header)
         request_body = '%s,%s' % (header, request_body)
@@ -78,19 +63,15 @@ class SCGITransport(xmlrpclib.Transport):
 
                 addr_info = socket.getaddrinfo(host, int(port), socket.AF_INET, socket.SOCK_STREAM)
                 sock = socket.socket(*addr_info[0][:3])
-                sock.settimeout(self.timeout)
                 sock.connect(addr_info[0][4])
             else:
                 sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-                sock.settimeout(self.timeout)
                 sock.connect(handler)
 
             self.verbose = verbose
 
-            if sys.version_info[0] > 2:
-                sock.send(bytes(request_body, 'utf-8'))
-            else:
-                sock.send(request_body)
+            sock.send(request_body.encode())
+
             return self.parse_response(sock.makefile())
         finally:
             if sock:
@@ -118,22 +99,21 @@ class SCGITransport(xmlrpclib.Transport):
         return u.close()
 
 
-class SCGIServerProxy(xmlrpclib.ServerProxy):
+class SCGIServerProxy(object):
     """ Enable connection to SCGI proxy """
 
     def __init__(self, uri, transport=None, encoding=None,
-                 verbose=False, allow_none=False, use_datetime=False, timeout=30):
-        self.timeout = timeout
+                 verbose=False, allow_none=False, use_datetime=False):
         parsed_url = urlparse(uri)
-        self.__host = uri if  parsed_url.scheme else None
+        self.__host = uri if parsed_url.scheme else None
         self.__handler = urlparse(uri).path
         if not self.__handler:
             self.__handler = '/'
 
         if not transport:
-            transport = SCGITransport(use_datetime=use_datetime, timeout=self.timeout)
+            transport = SCGITransport(use_datetime=use_datetime)
         self.__transport = transport
-        self.__encoding = encoding
+        self.__encoding = encoding or 'utf-8'
         self.__verbose = verbose
         self.__allow_none = allow_none
 
@@ -142,8 +122,16 @@ class SCGIServerProxy(xmlrpclib.ServerProxy):
 
     def __request(self, method_name, params):
         # call a method on the remote server
-        request = xmlrpclib.dumps(params, method_name, encoding=self.__encoding, allow_none=self.__allow_none)
-        response = self.__transport.request(self.__host, self.__handler, request, verbose=self.__verbose)
+
+        request = xmlrpc_client.dumps(params, method_name, encoding=self.__encoding,
+                                      allow_none=self.__allow_none).encode(self.__encoding)
+
+        response = self.__transport.request(
+            self.__host,
+            self.__handler,
+            request.decode('utf-8'),
+            verbose=self.__verbose
+        )
 
         if len(response) == 1:
             response = response[0]
@@ -151,24 +139,29 @@ class SCGIServerProxy(xmlrpclib.ServerProxy):
         return response
 
     def __repr__(self):
-        return '<SCGIServerProxy for %s%s>' % (self.__host, self.__handler)
+        return (
+            "<ServerProxy for %s%s>" %
+            (self.__host, self.__handler)
+        )
+
+    __str__ = __repr__
 
     def __getattr__(self, name):
         # magic method dispatcher
-        return xmlrpclib._Method(self.__request, name)
+        return _Method(self.__request, name)
 
     # note: to call a remote object with an non-standard name, use
     # result getattr(server, "strange-python-name")(args)
+
     def __call__(self, attr):
+        """A workaround to get special attributes on the ServerProxy
+           without interfering with the magic __getattr__
         """
-        A workaround to get special attributes on the ServerProxy
-        without interfering with the magic __getattr__
-        """
-        if attr == 'close':
+        if attr == "close":
             return self.__close
-        elif attr == 'transport':
+        elif attr == "transport":
             return self.__transport
-        raise AttributeError('Attribute %r not found' % (attr,))
+        raise AttributeError("Attribute %r not found" % (attr,))
 
 
 class RTorrent(object):
@@ -192,7 +185,7 @@ class RTorrent(object):
         'base_path'
     )
 
-    def __init__(self, uri, username=None, password=None, timeout=30):
+    def __init__(self, uri, username=None, password=None):
         """
         New connection to rTorrent
 
@@ -225,7 +218,7 @@ class RTorrent(object):
 
         # Determine the proxy server
         if parsed_uri.scheme in ['http', 'https']:
-            sp = HTTPServerProxy
+            sp = xmlrpc_client.ServerProxy
         elif parsed_uri.scheme == 'scgi':
             sp = SCGIServerProxy
         elif parsed_uri.scheme == '' and parsed_uri.path:
@@ -234,7 +227,7 @@ class RTorrent(object):
         else:
             raise IOError('Unsupported scheme %s for uri %s' % (parsed_uri.scheme, self.uri))
 
-        self._server = sp(self.uri, timeout=timeout)
+        self._server = sp(self.uri)
 
     def _clean_fields(self, fields, reverse=False):
         if not fields:
@@ -243,7 +236,7 @@ class RTorrent(object):
         if reverse:
             for field in ['up.total', 'down.total', 'down.rate']:
                 if field in fields:
-                    fields[fields.index(field)] = field.replace('.', '_')
+                    fields[fields.index(field)] = native_str(field.replace('.', '_'))
             return fields
 
         for required_field in self.required_fields:
@@ -252,7 +245,7 @@ class RTorrent(object):
 
         for field in ['up_total', 'down_total', 'down_rate']:
             if field in fields:
-                fields[fields.index(field)] = field.replace('_', '.')
+                fields[fields.index(field)] = native_str(field.replace('_', '.'))
 
         return fields
 
@@ -265,20 +258,20 @@ class RTorrent(object):
         if fields is None:
             fields = {}
         # First param is empty 'target'
-        params = ['', xmlrpclib.Binary(raw_torrent)]
+        params = ['', xmlrpc_client.Binary(raw_torrent)]
 
         # Additional fields to set
-        for key, val in fields.iteritems():
+        for key, val in fields.items():
             # Values must be escaped if within params
-            params.append('d.%s.set=%s' % (key, re.escape(str(val))))
+            params.append('d.%s.set=%s' % (key, re.escape(native_str(val))))
 
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])
             if result != 0:
-                raise xmlrpclib.Error('Failed creating directory %s' % fields['directory'])
+                raise xmlrpc_client.Error('Failed creating directory %s' % fields['directory'])
 
         # by default rtorrent won't allow calls over 512kb in size.
-        xmlrpc_size = len(xmlrpclib.dumps(tuple(params), 'raw_start')) + 71680  # Add 70kb for buffer
+        xmlrpc_size = len(xmlrpc_client.dumps(tuple(params), 'raw_start')) + 71680  # Add 70kb for buffer
         if xmlrpc_size > 524288:
             prev_size = self._server.network.xmlrpc.size_limit()
             self._server.network.xmlrpc.size_limit.set('', xmlrpc_size)
@@ -296,12 +289,13 @@ class RTorrent(object):
 
     def torrent(self, info_hash, fields=None):
         """ Get the details of a torrent """
+        info_hash = native_str(info_hash)
         if not fields:
             fields = list(self.default_fields)
 
         fields = self._clean_fields(fields)
 
-        multi_call = xmlrpclib.MultiCall(self._server)
+        multi_call = xmlrpc_client.MultiCall(self._server)
 
         for field in fields:
             method_name = 'd.%s' % field
@@ -309,7 +303,7 @@ class RTorrent(object):
 
         resp = multi_call()
         # TODO: Maybe we should return a named tuple or a Torrent class?
-        return dict(zip(self._clean_fields(fields, reverse=True), [val for val in resp]))
+        return dict(list(zip(self._clean_fields(fields, reverse=True), [val for val in resp])))
 
     def torrents(self, view='main', fields=None):
         if not fields:
@@ -322,28 +316,29 @@ class RTorrent(object):
         resp = self._server.d.multicall(params)
 
         # Response is formatted as a list of lists, with just the values
-        return [dict(zip(self._clean_fields(fields, reverse=True), val)) for val in resp]
+        return [dict(list(zip(self._clean_fields(fields, reverse=True), val))) for val in resp]
 
     def update(self, info_hash, fields):
-        multi_call = xmlrpclib.MultiCall(self._server)
+        multi_call = xmlrpc_client.MultiCall(self._server)
 
-        for key, val in fields.iteritems():
+        for key, val in fields.items():
             method_name = 'd.%s.set' % key
-            getattr(multi_call, method_name)(info_hash, str(val))
+            getattr(multi_call, method_name)(native_str(info_hash), native_str(val))
 
         return multi_call()[0]
 
     def delete(self, info_hash):
-        return self._server.d.erase(info_hash)
+        return self._server.d.erase(native_str(info_hash))
 
     def stop(self, info_hash):
         self._server.d.stop(info_hash)
-        return self._server.d.close(info_hash)
+        return self._server.d.close(native_str(info_hash))
 
     def start(self, info_hash):
-        return self._server.d.start(info_hash)
+        return self._server.d.start(native_str(info_hash))
 
     def move(self, info_hash, dst_path):
+        info_hash = native_str(info_hash)
         self.stop(info_hash)
 
         torrent = self.torrent(info_hash, fields=['base_path'])
@@ -351,8 +346,8 @@ class RTorrent(object):
         try:
             log.verbose('Creating destination directory `%s`' % dst_path)
             self._server.execute.throw('', 'mkdir', '-p', dst_path)
-        except xmlrpclib.Error:
-            raise xmlrpclib.Error("unable to create folder %s" % dst_path)
+        except xmlrpc_client.Error:
+            raise xmlrpc_client.Error("unable to create folder %s" % dst_path)
 
         self._server.execute.throw('', 'mv', '-u', torrent['base_path'], dst_path)
         self._server.d.set_directory(info_hash, dst_path)
@@ -360,7 +355,6 @@ class RTorrent(object):
 
 
 class RTorrentPluginBase(object):
-
     priority_map = {
         'high': 3,
         'medium': 2,
@@ -407,16 +401,15 @@ class RTorrentPluginBase(object):
     def on_task_start(self, task, config):
         try:
             client = RTorrent(config['uri'], username=config.get('username'),
-                              password=config.get('password'), timeout=config.get('timeout'))
+                              password=config.get('password'))
             if client.version < [0, 9, 2]:
                 log.error('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
                 task.abort('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
-        except (IOError, xmlrpclib.Error) as e:
+        except (IOError, xmlrpc_client.Error) as e:
             raise plugin.PluginError("Couldn't connect to rTorrent: %s" % str(e))
 
 
 class RTorrentOutputPlugin(RTorrentPluginBase):
-
     schema = {
         'type': 'object',
         'properties': {
@@ -427,7 +420,6 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             'start': {'type': 'boolean', 'default': True},
             'mkdir': {'type': 'boolean', 'default': True},
             'action': {'type': 'string', 'emun': ['update', 'delete', 'add'], 'default': 'add'},
-            'timeout': {'type': 'integer', 'default': 30},
             # properties to set on rtorrent download object
             'message': {'type': 'string'},
             'priority': {'type': 'string'},
@@ -446,7 +438,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         for i in range(0, 5):
             try:
                 return client.torrent(info_hash, fields=['hash'])
-            except (IOError, xmlrpclib.Error):
+            except (IOError, xmlrpc_client.Error):
                 sleep(0.5)
         raise
 
@@ -459,7 +451,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
     def on_task_output(self, task, config):
         client = RTorrent(config['uri'], username=config.get('username'),
-                          password=config.get('password'), timeout=config.get('timeout'))
+                          password=config.get('password'))
 
         for entry in task.accepted:
             if task.options.test:
@@ -491,7 +483,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         try:
             client.delete(entry['torrent_info_hash'])
             log.verbose('Deleted %s (%s) in rtorrent ' % (entry['title'], entry['torrent_info_hash']))
-        except (IOError, xmlrpclib.Error) as e:
+        except (IOError, xmlrpc_client.Error) as e:
             entry.fail('Failed to delete: %s' % str(e))
             return
 
@@ -504,7 +496,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         except IOError as e:
             entry.fail("Error updating torrent %s" % str(e))
             return
-        except xmlrpclib.Error as e:
+        except xmlrpc_client.Error as e:
             existing = False
 
         # Build options but make config values override entry values
@@ -516,13 +508,13 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
         if existing and 'directory' in options:
             # Check if changing to another directory which requires a move
-            if options['directory'] != existing['base_path']\
+            if options['directory'] != existing['base_path'] \
                     and options['directory'] != os.path.dirname(existing['base_path']):
                 try:
                     log.verbose("Path is changing, moving files from '%s' to '%s'"
                                 % (existing['base_path'], options['directory']))
                     client.move(info_hash, options['directory'])
-                except (IOError, xmlrpclib.Error) as e:
+                except (IOError, xmlrpc_client.Error) as e:
                     entry.fail('Failed moving torrent: %s' % str(e))
                     return
 
@@ -533,7 +525,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         try:
             client.update(info_hash, options)
             log.verbose('Updated %s (%s) in rtorrent ' % (entry['title'], info_hash))
-        except (IOError, xmlrpclib.Error) as e:
+        except (IOError, xmlrpc_client.Error) as e:
             entry.fail('Failed to update: %s' % str(e))
             return
 
@@ -581,7 +573,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 return
         except IOError as e:
             entry.fail("Error checking if torrent already exists %s" % str(e))
-        except xmlrpclib.Error:
+        except xmlrpc_client.Error:
             # No existing found
             pass
 
@@ -589,7 +581,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             resp = client.load(torrent_raw, fields=options, start=start, mkdir=mkdir)
             if resp != 0:
                 entry.fail('Failed to add to rTorrent invalid return value %s' % resp)
-        except (IOError, xmlrpclib.Error) as e:
+        except (IOError, xmlrpc_client.Error) as e:
             log.exception(e)
             entry.fail('Failed to add to rTorrent %s' % str(e))
             return
@@ -598,7 +590,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         try:
             self._verify_load(client, entry['torrent_info_hash'])
             log.info('%s added to rtorrent' % entry['title'])
-        except (IOError, xmlrpclib.Error) as e:
+        except (IOError, xmlrpc_client.Error) as e:
             entry.fail('Failed to verify torrent loaded: %s' % str(e))
 
     def on_task_exit(self, task, config):
@@ -612,14 +604,12 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
 
 class RTorrentInputPlugin(RTorrentPluginBase):
-
     schema = {
         'type': 'object',
         'properties': {
             'uri': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'timeout': {'type': 'integer', 'default': 30},
             'view': {'type': 'string', 'default': 'main'},
             'fields': one_or_more({'type': 'string', 'enum': list(RTorrent.default_fields)}),
         },
@@ -629,13 +619,13 @@ class RTorrentInputPlugin(RTorrentPluginBase):
 
     def on_task_input(self, task, config):
         client = RTorrent(config['uri'], username=config.get('username'),
-                          password=config.get('password'), timeout=config.get('timeout'))
+                          password=config.get('password'))
 
         fields = config.get('fields')
 
         try:
             torrents = client.torrents(config['view'], fields=fields)
-        except (IOError, xmlrpclib.Error) as e:
+        except (IOError, xmlrpc_client.Error) as e:
             task.abort('Could not get torrents (%s): %s' % (config['view'], e))
             return
 
@@ -649,7 +639,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
                 torrent_info_hash=torrent['hash'],
             )
 
-            for attr, value in torrent.iteritems():
+            for attr, value in torrent.items():
                 entry[attr] = value
 
             entries.append(entry)

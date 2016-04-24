@@ -1,5 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 from datetime import timedelta
+
 from flexget.manager import Session
 from flexget.plugins.filter.delay import DelayedEntry
 

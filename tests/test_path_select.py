@@ -1,8 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *
+
 import os
+
 import mock
-from flexget.config_schema import parse_size
 import pytest
+
+from flexget.config_schema import parse_size
 
 
 def mock_os_disk_stats(folder):

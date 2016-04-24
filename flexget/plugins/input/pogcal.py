@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
+from builtins import *
 
+import logging
 
 from flexget import plugin
 from flexget.entry import Entry
