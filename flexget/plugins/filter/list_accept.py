@@ -67,10 +67,7 @@ class ListAccept(object):
                     log.info('`%s` is marked as online, would remove accepted items outside of --test mode.',
                              plugin_name)
                     continue
-
-                for entry in task.accepted:
-                    log.verbose('Removing %s from list %s', entry.get('title', 'entry'), plugin_name)
-
+                log.verbose('removing accepted entries from %s - %s', plugin_name, plugin_config)
                 thelist -= task.accepted
 
 
