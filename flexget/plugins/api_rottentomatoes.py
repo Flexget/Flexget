@@ -493,9 +493,9 @@ def movies_info(id, api_key=None):
 
 def lists(list_type, list_name, limit=20, page_limit=20, page=None, api_key=None):
     if isinstance(list_type, basestring):
-        list_type = list_type.replace(' ', '_').encode('utf-8')
+        list_type = list_type.replace(' ', '_')
     if isinstance(list_name, basestring):
-        list_name = list_name.replace(' ', '_').encode('utf-8')
+        list_name = list_name.replace(' ', '_')
 
     if not api_key:
         api_key = API_KEY
