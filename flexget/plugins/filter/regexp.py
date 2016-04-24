@@ -10,6 +10,11 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 
+try:
+    from urllib.parse import unquote
+except ImportError:
+    from urllib import unquote
+
 log = logging.getLogger('regexp')
 
 
@@ -171,7 +176,7 @@ class FilterRegexp(object):
         :param not_regexps: None or list of regexps that can NOT match
         :return: Field matching
         """
-        unquote = ['url']
+        unquote_fields = ['url']
         for field in find_from or ['title', 'description']:
             # Only evaluate lazy fields if find_from has been explicitly specified
             if not entry.get(field, eval_lazy=find_from):
@@ -183,7 +188,7 @@ class FilterRegexp(object):
             for value in values:
                 if not isinstance(value, basestring):
                     continue
-                if field in unquote:
+                if field in unquote_fields:
                     value = unquote(value)
                     # If none of the not_regexps match
                 if regexp.search(value):
