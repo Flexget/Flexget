@@ -10,10 +10,7 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 
-try:
-    from urllib.parse import unquote
-except ImportError:
-    from urllib import unquote
+from future.moves.urllib.parse import unquote
 
 log = logging.getLogger('regexp')
 
