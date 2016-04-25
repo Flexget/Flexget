@@ -181,7 +181,7 @@ class InputRSS(object):
         filename = pathscrub(filename, filename=True)
         filepath = os.path.join(received, '%s.%s' % (filename, ext))
         with open(filepath, 'wb') as f:
-            f.write(data.encode())
+            f.write(data)
         log.critical('I have saved the invalid content to %s for you to view', filepath)
 
     def add_enclosure_info(self, entry, enclosure, filename=True, multiple=False):
