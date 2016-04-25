@@ -132,7 +132,7 @@ class CouchPotatoBase(object):
                 if entry and test_mode:
                     log.info("Test mode. Entry includes:")
                     for key, value in entry.items():
-                        log.info('     %s: %s', (key.capitalize(), value))
+                        log.info('     %s: %s', key.capitalize(), value)
 
         return entries
 
