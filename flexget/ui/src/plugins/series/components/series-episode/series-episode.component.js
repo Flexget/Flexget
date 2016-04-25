@@ -43,7 +43,7 @@
           .cancel("No");
 
         $mdDialog.show(confirm).then(function() {
-          $http.delete('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases', { params: { forget: true}})
+          $http.delete('/api/series/' + vm.show.show_id + '/episodes/' + vm.episode.episode_id + '/releases', { params: { forget: true}})
             .success(function(data) {
               //Remove all loaded releases from the page and set variables for the accordion
               vm.releases = undefined;
@@ -53,7 +53,7 @@
             .error(function(error) {
               var errorDialog = $mdDialog.alert()
                 .title("Something went wrong")
-                .htmlContent("Oops, something went wrong when trying to forget <b>" + vm.episode.episode_identifier + "</b> from show " + vm.show + ":<br />" + error.message)
+                .htmlContent("Oops, something went wrong when trying to forget <b>" + vm.episode.episode_identifier + "</b> from show " + vm.show.show_name + ":<br />" + error.message)
                 .ok("Ok");
 
               $mdDialog.show(errorDialog);
@@ -63,7 +63,7 @@
 
       //Load the releases upon opening the accordion
       function loadReleases() {
-        $http.get('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases')
+        $http.get('/api/series/' + vm.show.show_id + '/episodes/' + vm.episode.episode_id + '/releases')
         .success(function(data) {
           vm.releases = data.releases;
         }).error(function(error) {
@@ -73,7 +73,7 @@
 
       //Call from a release item, to reset the release
       vm.resetRelease = function(id) {
-        $http.put('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases/' + id + '/')
+        $http.put('/api/series/' + vm.show.show_id + '/episodes/' + vm.episode.episode_id + '/releases/' + id + '/')
           .success(function(data) {
             //Find all downloaded releases, and set their download status to false, which will make the downloaded icon disappear
             $filter('filter')(vm.releases, { release_id: id})[0].release_downloaded = false;
@@ -84,7 +84,7 @@
 
       //Call from a release item, to forget the release
       vm.forgetRelease = function(release) {
-        $http.delete('/api/series/' + $stateParams.id + '/episodes/' + vm.episode.episode_id + '/releases/' + release.release_id + '/', { params: { forget: true }})
+        $http.delete('/api/series/' + vm.show.show_id + '/episodes/' + vm.episode.episode_id + '/releases/' + release.release_id + '/', { params: { forget: true }})
           .success(function(data) {
             //Find index of the release and remove it from the list
             var index = vm.releases.indexOf(release);

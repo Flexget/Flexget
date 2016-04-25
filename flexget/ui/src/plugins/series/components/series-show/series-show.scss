@@ -1,3 +1,10 @@
+.series-entry {
+  display: flex;
+  position: relative;
+  align-self: stretch;
+}
+
+
 .rating {
   float: right;
   md-icon {
