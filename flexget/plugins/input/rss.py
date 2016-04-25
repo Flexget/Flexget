@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
+from future.utils import tobytes
 from past.builtins import basestring
 from future.moves.urllib.parse import urlparse, urlsplit
 
@@ -159,6 +160,9 @@ class InputRSS(object):
         if data is None:
             log.critical('Received empty page - no content')
             return
+        else:
+            data = tobytes(data)
+
         ext = 'xml'
         if b'<html>' in data.lower():
             log.critical('Received content is HTML page, not an RSS feed')
@@ -176,8 +180,8 @@ class InputRSS(object):
             filename += '-' + sourcename
         filename = pathscrub(filename, filename=True)
         filepath = os.path.join(received, '%s.%s' % (filename, ext))
-        with open(filepath, 'w') as f:
-            f.write(data)
+        with open(filepath, 'wb') as f:
+            f.write(data.encode())
         log.critical('I have saved the invalid content to %s for you to view', filepath)
 
     def add_enclosure_info(self, entry, enclosure, filename=True, multiple=False):
