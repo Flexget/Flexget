@@ -1,0 +1,65 @@
+$episodes-list-backdrop-overlay-color: rgba(0, 0, 0, .65);
+
+.series-episodes {
+  position: relative;
+  width: 100%;
+  padding: 0;
+}
+
+.episodes-backdrop-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  &-shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0px -20px 50px 10px #555;
+  }
+}
+
+.episodes-backdrop-filler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #555;
+}
+
+#content .episodes-backdrop-overlay {
+
+  display: flex;
+  justify-content: space-between;;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  align-content: stretch;;
+
+  position: relative;
+  min-height: 100%;
+  width: 100%;
+
+
+  background-color: $episodes-list-backdrop-overlay-color;
+
+  > md-content.episodes-list {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-content: flex-start;
+
+    margin: 0 20em;
+    background-color: transparent;
+    color: #FFF;
+  }
+
+  series-episodes {
+    background-color: transparent;
+    color: #FFF;
+  }
+}

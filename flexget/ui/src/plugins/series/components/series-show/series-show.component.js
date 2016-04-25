@@ -10,7 +10,8 @@
     bindings: {
       show: '<',
       forgetShow: '&'
-    }
+    },
+    transclude: true
   });
 
   function seriesShowController($state, $mdDialog, $http) {
@@ -32,7 +33,7 @@
     function loadMetadata() {
       $http.get('/api/tvdb/series/' + vm.show.show_name, { cache: true })
       .success(function(data) {
-        vm.metadata = data;
+        vm.show.metadata = data;
       })
       .error(function (error) {
         console.error(error);
@@ -40,25 +41,6 @@
     }
 
     loadMetadata();
-
-    vm.showEpisodes = function () {
-      $mdDialog.show({
-        clickOutsideToClose: true,
-        locals: {
-          show: vm.show
-        },
-        template: '<series-episodes-view show="show"></series-episodes-view>',
-        controller: function($scope, $mdDialog, show) {
-          $scope.show = show;
-
-          console.log(this);
-
-          $scope.closeDialog = function() {
-            $mdDialog.hide();
-          }
-        }
-      })
-    }
 
     //Call from the page, to open a dialog with alternate names
     vm.alternateName = function(ev) {

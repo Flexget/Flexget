@@ -8,7 +8,7 @@
       controllerAs: 'vm',
       controller: episodesController,
       bindings: {
-        show : '<'
+        show : '<',
       }
     });
 
@@ -40,8 +40,6 @@
         vm.currentPage = data.page;
         vm.show.totalEpisodes = data.total_number_of_episodes;
         vm.pageSize = options.page_size;
-
-        console.log(vm, data);
 
       })
       .error(function(error) {

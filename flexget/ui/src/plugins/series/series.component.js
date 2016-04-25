@@ -24,7 +24,6 @@
     function getSeriesList() {
       seriesService.getShows(options).then(function(data) {
         vm.series = data.shows;
-        console.log(vm);
 
         vm.currentPage = data.page;
         vm.totalShows = data.total_number_of_shows;
@@ -82,6 +81,36 @@
         options.page = 1;
         getSeriesList();
       }
+    }
+
+    vm.showEpisodes = function (show) {
+      vm.selectedShow = null;
+
+      $timeout(function () {
+        vm.selectedShow = show;
+      }, 10);
+
+    }
+
+    vm.areEpisodesOnShowRow = function (show, index) {
+      var numberOfColumns = 3;
+      if (!show) return false;
+
+      var isOnRightRow = true;
+
+      var column = index % numberOfColumns;
+      var row = (index - column) / numberOfColumns;
+
+
+      var showIndex = vm.series.indexOf(show);
+      var showColumn = showIndex % numberOfColumns;
+      var showRow = (showIndex - showColumn) / numberOfColumns;
+
+      if (row !== showRow) isOnRightRow = false;
+      if (column !== 2) isOnRightRow = false;
+      if (showIndex === index && index === (vm.series.length - 1)) isOnRightRow = true;
+
+      return isOnRightRow;
     }
 
     //Load initial list of series

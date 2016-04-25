@@ -1,12 +1,12 @@
 <md-card flex class="series-entry">
-  <img ng-src="{{ ::vm.metadata.banner }}" class="md-card-image">
+  <img ng-src="{{ ::vm.show.metadata.banner }}" class="md-card-image">
     <md-card-title flex="initial">
       <md-card-title-text>
         <span class="md-headline">{{ ::vm.show.show_name }}
         <span class="rating">
           <md-icon md-font-set="fa" md-font-icon="fa-star"></md-icon>
           <span class="md-suhead">
-          {{ vm.metadata.rating }}
+          {{ ::vm.show.metadata.rating }}
           </span>
         </span>
         </span>
@@ -46,6 +46,5 @@
       </md-fab-actions>
     </md-fab-speed-dial>
 
-
-    <md-button class="md-primary md-raised" ng-click="vm.showEpisodes()">Episodes</md-button>
+    <ng-transclude></ng-transclude>
   </md-card>

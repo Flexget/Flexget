@@ -1,33 +1,5 @@
-.md-toggle-icon.toggled {
-  transform: rotateZ(180deg);
-  -webkit-transform: rotateZ(180deg);
-}
 
-.md-toggle-icon {
-  margin: auto 0 auto auto;
-  padding-top: 10px;
-  transition: transform 0.5s ease-in-out;
-  -webkit-transition: -webkit-transform 0.5s ease-in-out;
-}
 
-.releases-toggle-list.ng-hide {
-  max-height: 0;
-}
-
-.releases-toggle-list {
-  max-height: 1300px;
-  overflow: hidden;
-  position: relative;;
-  background-color: $flexget-background-color;
-  z-index: 1;
-  -webkit-transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
-  -webkit-transition-property: max-height;
-  -moz-transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
-  -moz-transition-property: max-height;
-  transition: 0.75s cubic-bezier(0.35, 0, 0.25, 1);
-  transition-property: max-height;
-}
-
-.release-title {
-  padding-right: 100px;
+.series-episode {
+  border-bottom: 1px solid #FFF;
 }
