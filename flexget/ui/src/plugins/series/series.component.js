@@ -2,12 +2,12 @@
     'use strict';
 
     angular
-    .module('flexget.plugins.series')
-    .component('seriesView', {
-        templateUrl: 'plugins/series/series.tmpl.html',
-        controllerAs: 'vm',
-        controller: seriesController,
-    });
+        .module('flexget.plugins.series')
+        .component('seriesView', {
+            templateUrl: 'plugins/series/series.tmpl.html',
+            controllerAs: 'vm',
+            controller: seriesController,
+        });
 
     function seriesController($http, $mdDialog, seriesService, $timeout) {
         var vm = this;
@@ -22,7 +22,7 @@
         vm.searchTerm = "";
 
         function getSeriesList() {
-            seriesService.getShows(options).then(function(data) {
+            seriesService.getShows(options).then(function (data) {
                 vm.series = data.shows;
 
                 vm.currentPage = data.page;
@@ -31,92 +31,98 @@
             });
         }
 
-        vm.forgetShow = function(show) {
-            seriesService.deleteShow(show).then(function(data) {
+        vm.forgetShow = function (show) {
+            seriesService.deleteShow(show).then(function (data) {
                 getSeriesList();
             });
         }
 
-        /*vm.forgetShow = function(show) {
-        //Construct the confirmation dialog
-        var confirm = $mdDialog.confirm()
-        .title('Confirm forgetting show.')
-        .htmlContent("Are you sure you want to completely forget <b>" + show.show_name + "</b>?<br /> This will also forget all downloaded releases.")
-        .ok("Forget")
-        .cancel("No");
 
-        //Actually show the confirmation dialog and place a call to DELETE when confirmed
-        $mdDialog.show(confirm).then(function() {
-        $http.delete('/api/series/' + show.show_id, { params: { forget: true } })
-        .success(function(data) {
-        var index = vm.series.indexOf(show);
-        vm.series.splice(index, 1);
-    })
-    .error(function(error) {
+        /*vm.forgetShow = function (show) {
+            //Construct the confirmation dialog
+            var confirm = $mdDialog.confirm()
+                .title('Confirm forgetting show.')
+                .htmlContent("Are you sure you want to completely forget <b>" + show.show_name + "</b>?<br /> This will also forget all downloaded releases.")
+                .ok("Forget")
+                .cancel("No");
 
-    //Show a dialog when something went wrong, this will change in the future to more generic error handling
-    var errorDialog = $mdDialog.alert()
-    .title("Something went wrong")
-    .htmlContent("Oops, something went wrong when trying to forget <b>" + show.show_name + "</b>:\n" + error.message)
-    .ok("Ok");
+            //Actually show the confirmation dialog and place a call to DELETE when confirmed
+            $mdDialog.show(confirm).then(function () {
+                $http.delete('/api/series/' + show.show_id, { params: { forget: true } })
+                    .success(function (data) {
+                        var index = vm.series.indexOf(show);
+                        vm.series.splice(index, 1);
+                    })
+                    .error(function (error) {
 
-    $mdDialog.show(errorDialog);
-})
-});
-}*/
+                        //Show a dialog when something went wrong, this will change in the future to more generic error handling
+                        var errorDialog = $mdDialog.alert()
+                            .title("Something went wrong")
+                            .htmlContent("Oops, something went wrong when trying to forget <b>" + show.show_name + "</b>:\n" + error.message)
+                            .ok("Ok");
 
-//Call from the pagination to update the page to the selected page
-vm.updateListPage = function(index) {
-    options.page = index;
+                        $mdDialog.show(errorDialog);
+                    })
+            });
+        }*/
 
-    getSeriesList();
-}
 
-vm.search = function() {
-    if(vm.searchTerm) {
-        seriesService.seriesShows(vm.searchTerm).then(function(data) {
-            vm.series = data.shows;
-        });
-    } else {
-        options.page = 1;
+        //Call from the pagination to update the page to the selected page
+        vm.updateListPage = function (index) {
+            options.page = index;
+
+            getSeriesList();
+        }
+
+
+        vm.search = function () {
+            if (vm.searchTerm) {
+                seriesService.seriesShows(vm.searchTerm).then(function (data) {
+                    vm.series = data.shows;
+                });
+            } else {
+                options.page = 1;
+                getSeriesList();
+            }
+        }
+
+        vm.showEpisodes = function (show) {
+            if (show !== vm.selectedShow) {
+                vm.selectedShow = null;
+
+                $timeout(function () {
+                    vm.selectedShow = show;
+                }, 10);
+            }
+        }
+
+        vm.hideEpisodes = function () {
+            vm.selectedShow = null;
+        }
+
+        vm.areEpisodesOnShowRow = function (show, index) {
+            var numberOfColumns = 3;
+            if (!show) return false;
+
+            var isOnRightRow = true;
+
+            var column = index % numberOfColumns;
+            var row = (index - column) / numberOfColumns;
+
+
+            var showIndex = vm.series.indexOf(show);
+            var showColumn = showIndex % numberOfColumns;
+            var showRow = (showIndex - showColumn) / numberOfColumns;
+
+            if (row !== showRow) isOnRightRow = false;
+            if (column !== 2) isOnRightRow = false;
+            if (showIndex === index && index === (vm.series.length - 1)) isOnRightRow = true;
+
+            return isOnRightRow;
+        }
+
+        //Load initial list of series
         getSeriesList();
     }
-}
-
-vm.showEpisodes = function (show) {
-    if (show !== vm.selectedShow) {
-        vm.selectedShow = null;
-
-        $timeout(function () {
-            vm.selectedShow = show;
-        }, 10);
-    }
-
-}
-
-vm.areEpisodesOnShowRow = function (show, index) {
-    var numberOfColumns = 3;
-    if (!show) return false;
-
-    var isOnRightRow = true;
-
-    var column = index % numberOfColumns;
-    var row = (index - column) / numberOfColumns;
-
-
-    var showIndex = vm.series.indexOf(show);
-    var showColumn = showIndex % numberOfColumns;
-    var showRow = (showIndex - showColumn) / numberOfColumns;
-
-    if (row !== showRow) isOnRightRow = false;
-    if (column !== 2) isOnRightRow = false;
-    if (showIndex === index && index === (vm.series.length - 1)) isOnRightRow = true;
-
-    return isOnRightRow;
-}
-
-//Load initial list of series
-getSeriesList();
-}
 
 })();

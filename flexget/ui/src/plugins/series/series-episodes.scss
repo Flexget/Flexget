@@ -1,65 +1,85 @@
 $episodes-list-backdrop-overlay-color: rgba(0, 0, 0, .65);
 
 .series-episodes {
-  position: relative;
-  width: 100%;
-  padding: 0;
+    position: relative;
+
+    width: 100%;
+    height: auto;
+    padding: 0;
 }
 
 .episodes-backdrop-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-
-  &-shadow {
     position: absolute;
     top: 0;
     left: 0;
+
     width: 100%;
-    height: 100%;
-    box-shadow: inset 0px -20px 50px 10px #555;
-  }
+
+    &-shadow {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 100%;
+
+        box-shadow: inset 0 -20px 50px 10px #555;
+    }
 }
 
 .episodes-backdrop-filler {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #555;
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    min-height: 100%;
+
+    background-color: #555;
 }
 
 #content .episodes-backdrop-overlay {
+    position: relative;
 
-  display: flex;
-  justify-content: space-between;;
-  flex-wrap: nowrap;
-  flex-direction: column;
-  align-content: stretch;;
-
-  position: relative;
-  min-height: 100%;
-  width: 100%;
+    width: 100%;
+    height: 100%;
 
 
-  background-color: $episodes-list-backdrop-overlay-color;
+    background-color: $episodes-list-backdrop-overlay-color;
 
-  > md-content.episodes-list {
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    flex-direction: column;
-    align-content: flex-start;
+    justify-content: space-between;
+    flex-flow: column nowrap;
+    align-content: stretch;;
 
-    margin: 0 20em;
-    background-color: transparent;
-    color: #FFF;
-  }
+    > md-content.episodes-list {
+        display: flex;
+        flex-direction: column;
 
-  series-episodes {
-    background-color: transparent;
-    color: #FFF;
-  }
+        min-height: 100%;
+        margin: 0 20em;
+
+        color: #fff;
+        background-color: transparent;
+
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        align-content: flex-start;
+    }
+
+    series-episodes {
+        color: #fff;
+        background-color: transparent;
+    }
+
+    .hide-episodes-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: #FFF;
+    }
+
+    fg-material-pagination {
+
+    }
 }

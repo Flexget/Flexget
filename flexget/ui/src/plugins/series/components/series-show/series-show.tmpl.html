@@ -1,50 +1,50 @@
 <md-card flex class="series-entry">
-  <img ng-src="{{ ::vm.show.metadata.banner }}" class="md-card-image">
+    <img ng-src="{{ ::vm.show.metadata.banner }}" class="md-card-image">
     <md-card-title flex="initial">
-      <md-card-title-text>
-        <span class="md-headline">{{ ::vm.show.show_name }}
-        <span class="rating">
-          <md-icon md-font-set="fa" md-font-icon="fa-star"></md-icon>
-          <span class="md-suhead">
-          {{ ::vm.show.metadata.rating }}
-          </span>
-        </span>
-        </span>
-        <md-divider></md-divider>
-        <span class="md-subhead">Latest: {{ ::(vm.show.latest_downloaded_episode.episode_identifier ? vm.show.latest_downloaded_episode.episode_identifier : 'No episode downloaded') }}</span>
-        <span class="md-subhead second-subhead">Begin Episode: {{ (vm.show.begin_episode.episode_identifier ? vm.show.begin_episode.episode_identifier : 'No begin set')
-        }}</span>
-        <md-divider></md-divider>
-        <md-chips ng-model="vm.metadata.genres" readonly="true">
-          <md-chip-template>
-            {{ $chip }}
-          </md-chip-template>
-        </md-chips>
-      </md-card-title-text>
+        <md-card-title-text>
+            <span class="md-headline">{{ ::vm.show.show_name }}
+                <span class="rating">
+                    <md-icon md-font-set="fa" md-font-icon="fa-star"></md-icon>
+                    <span class="md-suhead">
+                        {{ ::vm.show.metadata.rating }}
+                    </span>
+                </span>
+            </span>
+            <md-divider></md-divider>
+            <span class="md-subhead">Latest: {{ ::(vm.show.latest_downloaded_episode.episode_identifier ? vm.show.latest_downloaded_episode.episode_identifier : 'No episode downloaded') }}</span>
+            <span class="md-subhead second-subhead">Begin Episode: {{ (vm.show.begin_episode.episode_identifier ? vm.show.begin_episode.episode_identifier : 'No begin set')
+            }}</span>
+            <md-divider></md-divider>
+            <md-chips ng-model="vm.metadata.genres" readonly="true">
+                <md-chip-template>
+                    {{ $chip }}
+                </md-chip-template>
+            </md-chips>
+        </md-card-title-text>
     </md-card-title>
     <md-card-content flex layout-gt-xs="row" layout-xs="column" class="custom-card">
-      <p>{{ ::vm.metadata.overview }}</p>
+        <p>{{ ::vm.metadata.overview }}</p>
     </md-card-content>
 
 
     <md-fab-speed-dial md-direction="left" class="md-scale more-btn">
-      <md-fab-trigger>
-        <md-button aria-label="More" class="md-fab md-mini">
-          <i class="fa fa-bars" aria-hidden="true"></i>
-        </md-button>
-      </md-fab-trigger>
-      <md-fab-actions>
-        <md-button ng-click="vm.setBegin()" aria-label="Set Series begin" class="md-fab md-raised md-mini">
-          <i class="fa fa-play" aria-hidden="true"></i>
-        </md-button>
-        <md-button ng-click="vm.forgetShow()" aria-label="forget show" class="md-fab md-raised md-mini">
-          <i class="fa fa-trash-o" aria-hidden="true"></i>
-        </md-button>
-        <md-button ng-click="vm.alternateName()" aria-label="alternate names" class="md-fab md-raised md-mini">
-          <i class="fa fa-share-alt" aria-hidden="true"></i>
-        </md-button>
-      </md-fab-actions>
+        <md-fab-trigger>
+            <md-button aria-label="More" class="md-fab md-mini">
+                <i class="fa fa-bars" aria-hidden="true"></i>
+            </md-button>
+        </md-fab-trigger>
+        <md-fab-actions>
+            <md-button ng-click="vm.setBegin()" aria-label="Set Series begin" class="md-fab md-raised md-mini">
+                <i class="fa fa-play" aria-hidden="true"></i>
+            </md-button>
+            <md-button ng-click="vm.forgetShow()" aria-label="forget show" class="md-fab md-raised md-mini">
+                <i class="fa fa-trash-o" aria-hidden="true"></i>
+            </md-button>
+            <md-button ng-click="vm.alternateName()" aria-label="alternate names" class="md-fab md-raised md-mini">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </md-button>
+        </md-fab-actions>
     </md-fab-speed-dial>
 
     <ng-transclude></ng-transclude>
-  </md-card>
+</md-card>
