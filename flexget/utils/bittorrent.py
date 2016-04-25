@@ -146,12 +146,11 @@ def bdecode(text):
 
 # encoding implementation by d0b
 def encode_string(data):
-    return encode_bytes(data.encode())
+    return encode_bytes(data.encode('utf-8'))
 
 
 def encode_bytes(data):
-    length = str(len(data)).encode()
-    return bytes('', 'utf-8').join([length, str(':').encode(), data])
+    return b'{0}:{1}'.format(len(data), data)
 
 
 def encode_integer(data):
