@@ -84,11 +84,13 @@ vm.search = function() {
 }
 
 vm.showEpisodes = function (show) {
-    vm.selectedShow = null;
+    if (show !== vm.selectedShow) {
+        vm.selectedShow = null;
 
-    $timeout(function () {
-        vm.selectedShow = show;
-    }, 10);
+        $timeout(function () {
+            vm.selectedShow = show;
+        }, 10);
+    }
 
 }
 
