@@ -12,7 +12,7 @@
       }
     });
 
-  function episodesController($http, $mdDialog) {
+  function episodesController($http, $mdDialog, seriesService) {
     var vm = this;
 
 
@@ -28,10 +28,10 @@
       getEpisodesList();
     }
 
-    //Cal the episodes based on the options, id is loaded from the route
+    //Cal the episodes based on the options
     function getEpisodesList() {
-      $http.get('/api/series/' + vm.show.show_id + '/episodes', { params: options })
-      .success(function(data) {
+      seriesService.getEpisodes(vm.show, options)
+      .then(function(data) {
         //Set the episodes in the vm scope to the loaded episodes
         vm.show.episodes = data.episodes;
 
@@ -42,7 +42,7 @@
         vm.pageSize = options.page_size;
 
       })
-      .error(function(error) {
+      .catch(function(error) {
         //TODO: Error handling
         console.log(error);
       });
@@ -60,7 +60,7 @@
         .cancel("No");
 
       $mdDialog.show(confirm).then(function() {
-        $http.delete('/api/series/' + vm.show.show_id + '/episodes/' + episode.episode_id, { params: { forget: true} })
+        seriesService.deleteEpisode(vm.show, episode)
           .success(function(data) {
             //Find the index of the episode in the data
             var index = vm.show.episodes.indexOf(episode);
@@ -87,7 +87,7 @@
         .cancel("No");
 
       $mdDialog.show(confirm).then(function() {
-        $http.put('/api/series/' + vm.show.show_id + '/episodes/' + episode.episode_id + '/releases')
+        seriesService.resetReleases(vm.show, episode)
           .success(function(data) {
             //TODO: Handle reset releases, remove them from view if they are showm
           })
