@@ -155,7 +155,7 @@ class PluginDownload(object):
         received = os.path.join(task.manager.config_base, 'received', task.name)
         if not os.path.isdir(received):
             os.makedirs(received)
-        filename = os.path.join(received, '%s.error' % entry['title'].encode(sys.getfilesystemencoding(), 'replace').decode(sys.getfilesystemencoding()))
+        filename = os.path.join(received, pathscrub('%s.error' % entry['title'], filename=True))
         log.error('Error retrieving %s, the error page has been saved to %s' % (entry['title'], filename))
         with open(filename, 'wb') as outfile:
             outfile.write(page)
