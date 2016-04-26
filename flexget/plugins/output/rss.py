@@ -3,6 +3,7 @@ from builtins import *
 
 import base64
 import hashlib
+import io
 import logging
 import datetime
 import os
@@ -256,7 +257,7 @@ class OutputRSS(object):
 
         # write rss
         fn = os.path.expanduser(config['file'])
-        with open(fn, 'w') as file:
+        with io.open(fn, 'wb') as file:
             try:
                 log.verbose('Writing output rss to %s' % fn)
                 rss.write_xml(file, encoding=config['encoding'])
