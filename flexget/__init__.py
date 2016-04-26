@@ -8,7 +8,7 @@ import logging
 import os
 import sys
 
-from flexget import logger, plugin
+from flexget import logger
 from flexget.manager import Manager
 
 log = logging.getLogger('main')

@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
-from past.builtins import basestring
 from future.utils import with_metaclass
 
 import re
@@ -184,9 +183,9 @@ class ChoiceValidator(Validator):
         :param value: accepted text, int or boolean
         :param bool ignore_case: Whether case matters for text values
         """
-        if not isinstance(value, (basestring, int, float)):
+        if not isinstance(value, (str, int, float)):
             raise Exception('Choice validator only accepts strings and numbers')
-        if isinstance(value, basestring) and ignore_case:
+        if isinstance(value, str) and ignore_case:
             self.valid_ic.append(value.lower())
         else:
             self.valid.append(value)
@@ -447,7 +446,7 @@ class DictValidator(Validator):
             # Make sure errors show up in our list
             key_validator.add_parent(self)
         elif key_type:
-            if isinstance(key_type, basestring):
+            if isinstance(key_type, str):
                 key_type = [key_type]
             key_validator = self.get_validator('root')
             for key_type in key_type:
