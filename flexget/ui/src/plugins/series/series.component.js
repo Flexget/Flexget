@@ -74,7 +74,7 @@
 
     vm.search = function() {
       if(vm.searchTerm) {
-        seriesService.seriesShows(vm.searchTerm).then(function(data) {
+        seriesService.searchShows(vm.searchTerm).then(function(data) {
           vm.series = data.shows;
         });
       } else {
