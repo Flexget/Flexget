@@ -193,6 +193,8 @@ class Entry(LazyDict):
                 value = value.decode('ascii')
             except UnicodeDecodeError:
                 raise EntryUnicodeError(key, value)
+        elif isinstance(value, bytes):
+            raise EntryUnicodeError(key, value)
 
         # url and original_url handling
         if key == 'url':
