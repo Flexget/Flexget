@@ -399,7 +399,6 @@ def setup_params(mgr):
         if name in ignore:
             continue
         if isinstance(action, argparse._StoreConstAction) and action.help != '==SUPPRESS==':
-            global execution_doc
             task_execution_input['properties'][name] = {'type': 'boolean'}
             TaskExecutionAPI.__apidoc__['description'] += "'{0}': {1}<br>".format(name, action.help)
 

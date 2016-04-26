@@ -5,6 +5,8 @@ import os
 import json
 import sys
 import logging
+import threading
+import traceback
 from time import sleep
 
 import cherrypy
@@ -123,7 +125,6 @@ class ServerDumpThreads(APIResource):
     @api.response(200, description='Flexget threads dump', model=dump_threads_schema)
     def get(self, session=None):
         """ Dump Server threads for debugging """
-        import threading, traceback, sys
         id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
         threads = []
         for threadId, stack in sys._current_frames().items():

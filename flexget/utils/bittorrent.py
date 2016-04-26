@@ -97,7 +97,7 @@ def tokenize(text, match=re.compile(b'([idel])|(\d+):|(-?\d+)').match):
         s = m.group(m.lastindex)
         i = m.end()
         if m.lastindex == 2:
-            yield bytes('s', 'utf-8')
+            yield b's'
             yield text[i:i + int(s)]
             i += int(s)
         else:
@@ -105,12 +105,12 @@ def tokenize(text, match=re.compile(b'([idel])|(\d+):|(-?\d+)').match):
 
 
 def decode_item(next, token):
-    if token == bytes('i', 'utf-8'):
+    if token == b'i':
         # integer: "i" value "e"
         data = int(next())
-        if next() != bytes('e', 'utf-8'):
+        if next() != b'e':
             raise ValueError
-    elif token == bytes('s', 'utf-8'):
+    elif token == b's':
         # string: "s" value (virtual tokens)
         data = next()
         # Strings in torrent file are defined as utf-8 encoded
@@ -119,14 +119,14 @@ def decode_item(next, token):
         except UnicodeDecodeError as e:
             # The pieces field is a byte string, and should be left as such.
             pass
-    elif token == bytes('l', 'utf-8') or token == bytes('d', 'utf-8'):
+    elif token == b'l' or token == b'd':
         # container: "l" (or "d") values "e"
         data = []
         tok = next()
-        while tok != bytes('e', 'utf-8'):
+        while tok != b'e':
             data.append(decode_item(next, tok))
             tok = next()
-        if token == bytes('d', 'utf-8'):
+        if token == b'd':
             data = dict(list(zip(data[0::2], data[1::2])))
     else:
         raise ValueError
@@ -146,34 +146,33 @@ def bdecode(text):
 
 # encoding implementation by d0b
 def encode_string(data):
-    return encode_bytes(data.encode())
+    return encode_bytes(data.encode('utf-8'))
 
 
 def encode_bytes(data):
-    length = str(len(data)).encode()
-    return bytes('', 'utf-8').join([length, str(':').encode(), data])
+    return str(len(data)).encode() + b':' + data
 
 
 def encode_integer(data):
-    return bytes("i%de" % data, 'utf-8')
+    return b'i' + str(data).encode() + b'e'
 
 
 def encode_list(data):
-    encoded = bytes('l', 'utf-8')
+    encoded = b'l'
     for item in data:
         encoded += bencode(item)
-    encoded += bytes('e', 'utf-8')
+    encoded += b'e'
     return encoded
 
 
 def encode_dictionary(data):
-    encoded = bytes('d', 'utf-8')
+    encoded = b'd'
     items = list(data.items())
     items.sort()
     for (key, value) in items:
         encoded += bencode(key)
         encoded += bencode(value)
-    encoded += bytes('e', 'utf-8')
+    encoded += b'e'
     return encoded
 
 
@@ -231,7 +230,7 @@ class Torrent(object):
         else:
             # multifile torrent
             for item in self.content['info']['files']:
-                t = {'path': bytes('/', 'utf-8').join([bytes(p, 'utf-8') for p in item['path'][:-1]]),
+                t = {'path': '/'.join(item['path'][:-1]),
                      'name': item['path'][-1],
                      'size': item['length']}
                 files.append(t)
