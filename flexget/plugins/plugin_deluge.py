@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
+from future.utils import native
 
 import base64
 import glob
@@ -313,7 +314,9 @@ class InputDeluge(DelugePlugin):
                 self.entries.append(entry)
             client.disconnect()
         filter = config.get('filter', {})
-        client.core.get_torrents_status(filter, list(self.settings_map.keys())).addCallback(on_get_torrents_status)
+        # deluge client lib chokes on future's newlist, make sure we have a native python list here
+        client.core.get_torrents_status(filter, native(list(self.settings_map.keys()))).addCallback(
+            on_get_torrents_status)
 
 
 class OutputDeluge(DelugePlugin):

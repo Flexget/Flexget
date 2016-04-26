@@ -4,7 +4,6 @@ from future.utils import native_str
 
 import sys
 from distutils.version import LooseVersion
-from ssl import SSLError
 
 from sqlalchemy import Column, Integer, String
 
@@ -17,6 +16,7 @@ from flexget.utils.template import RenderError
 try:
     import telegram
     from telegram.error import TelegramError
+    from telegram.utils.request import URLError, SSLError
 except ImportError:
     telegram = None
 

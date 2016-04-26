@@ -8,7 +8,6 @@ from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
-from sqlalchemy import func
 
 from flexget import db_schema
 from flexget.utils import requests

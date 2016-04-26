@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
+from future.utils import PY3
 
 import csv
 import logging
@@ -18,6 +19,19 @@ from flexget.utils.soup import get_soup
 
 log = logging.getLogger('imdb_list')
 IMMUTABLE_LISTS = ['ratings', 'checkins']
+
+
+if PY3:
+    csv_reader = csv.reader
+else:
+    def csv_reader(iterable, dialect='excel', *args, **kwargs):
+        """
+        Compatibilty function to make python 2 act like python 3
+        Always takes and returns text (no bytes).
+        """
+        iterable = (l.encode('utf-8') for l in iterable)
+        for row in csv.reader(iterable):
+            yield [cell.decode('utf-8') for cell in row]
 
 
 class ImdbEntrySet(MutableSet):
@@ -109,8 +123,7 @@ class ImdbEntrySet(MutableSet):
             # Throw away first line with headers
             next(lines)
             self._items = []
-            for row in csv.reader(lines):
-                row = [cell for cell in row]
+            for row in csv_reader(lines):
                 log.debug('parsing line from csv: %s', ', '.join(row))
                 if not len(row) == 16:
                     log.debug('no movie row detected, skipping. %s', ', '.join(row))

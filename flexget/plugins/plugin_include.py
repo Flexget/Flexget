@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *
 from past.builtins import basestring
 
+import io
 import logging
 import os
 import yaml
@@ -40,7 +41,7 @@ class PluginInclude(object):
             name = os.path.expanduser(name)
             if not os.path.isabs(name):
                 name = os.path.join(task.manager.config_base, name)
-            include = yaml.load(open(name))
+            include = yaml.load(io.open(name, encoding='utf-8'))
             errors = process_config(include, plugin.plugin_schemas(context='task'))
             if errors:
                 log.error('Included file %s has invalid config:' % name)

@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
-from past.builtins import basestring
 
 import copy
 import random
@@ -264,7 +263,7 @@ class ArgumentParser(ArgParser):
                     self.set_post_defaults(**parent.post_defaults)
 
     def add_argument(self, *args, **kwargs):
-        if isinstance(kwargs.get('nargs'), basestring) and '-' in kwargs['nargs']:
+        if isinstance(kwargs.get('nargs'), str) and '-' in kwargs['nargs']:
             # Handle a custom range of arguments
             min, max = kwargs['nargs'].split('-')
             min, max = int(min), int(max)

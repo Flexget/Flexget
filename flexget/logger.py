@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
 from builtins import *
-from past.builtins import basestring
 
 import collections
 import contextlib
@@ -136,7 +135,7 @@ class FlexGetLogger(logging.Logger):
             task=getattr(local_context, 'task', ''),
             session_id=getattr(local_context, 'session_id', ''))
         # Replace newlines in log messages with \n
-        if isinstance(msg, basestring):
+        if isinstance(msg, str):
             msg = msg.replace('\n', '\\n')
 
         return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra, *exargs)

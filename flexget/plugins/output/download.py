@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *
-from past.builtins import basestring
 from future.moves.urllib.parse import unquote
 
 import hashlib
+import io
 import logging
 import mimetypes
 import os
@@ -74,7 +75,7 @@ class PluginDownload(object):
 
     def process_config(self, config):
         """Return plugin configuration in advanced form"""
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'path': config}
         if not isinstance(config, dict):
             config = {}
@@ -157,7 +158,7 @@ class PluginDownload(object):
             os.makedirs(received)
         filename = os.path.join(received, '%s.error' % entry['title'].encode(sys.getfilesystemencoding(), 'replace'))
         log.error('Error retrieving %s, the error page has been saved to %s' % (entry['title'], filename))
-        with open(filename, 'w') as outfile:
+        with io.open(filename, 'wb') as outfile:
             outfile.write(page)
 
     def get_temp_files(self, task, require_path=False, handle_magnets=False, fail_html=True,
@@ -269,7 +270,7 @@ class PluginDownload(object):
         tmp_dir = tempfile.mkdtemp(dir=tmp_path)
         fname = hashlib.md5(url.encode('utf-8', 'replace')).hexdigest()
         datafile = os.path.join(tmp_dir, fname)
-        outfile = open(datafile, 'wb')
+        outfile = io.open(datafile, 'wb')
         try:
             for chunk in response.iter_content(chunk_size=150 * 1024, decode_unicode=False):
                 outfile.write(chunk)
@@ -387,7 +388,7 @@ class PluginDownload(object):
         try:
             # use path from entry if has one, otherwise use from download definition parameter
             path = entry.get('path', config.get('path'))
-            if not isinstance(path, basestring):
+            if not isinstance(path, str):
                 raise plugin.PluginError('Invalid `path` in entry `%s`' % entry['title'])
 
             # override path from command line parameter
