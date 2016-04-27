@@ -6,6 +6,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+from requests import RequestException
 
 log = logging.getLogger('sabnzbd')
 
@@ -85,9 +86,9 @@ class OutputSabnzbd(object):
             log.debug('request_url: %s' % request_url)
             try:
                 response = task.get(request_url)
-            except Exception as e:
+            except RequestException as e:
                 log.critical('Failed to use sabnzbd. Requested %s' % request_url)
-                log.critical('Result was: %s' % e)
+                log.critical('Result was: %s' % e.args[0])
                 entry.fail('sabnzbd unreachable')
                 if task.options.debug:
                     log.exception(e)
