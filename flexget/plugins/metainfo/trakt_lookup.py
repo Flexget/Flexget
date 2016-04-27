@@ -44,6 +44,7 @@ class PluginTraktLookup(object):
     trakt_series_fanart_url
     trakt_series_imdb_url
     trakt_series_trakt_url
+    trakt_series_images
     imdb_id
     tvdb_id
     trakt_series_actors
@@ -62,6 +63,8 @@ class PluginTraktLookup(object):
     trakt_ep_image_url
     trakt_ep_id
     trakt_ep_tvdb_id
+    trakt_ep_images
+
 
     """
 
@@ -79,7 +82,6 @@ class PluginTraktLookup(object):
         'trakt_series_first_aired': 'first_aired',
         'trakt_series_air_time': 'air_time',
         'trakt_series_air_day': 'air_day',
-        'trakt_series_poster': 'poster',
         'trakt_series_content_rating': 'certification',
         'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
         'trakt_series_network': 'network',
@@ -90,7 +92,8 @@ class PluginTraktLookup(object):
         'trakt_series_overview': 'overview',
         'trakt_series_rating': 'rating',
         'trakt_series_aired_episodes': 'aired_episodes',
-        'trakt_series_episodes': lambda show: [episodes.title for episodes in show.episodes]
+        'trakt_series_episodes': lambda show: [episodes.title for episodes in show.episodes],
+        'trakt_series_images': lambda im: list_images(im.images)
     }
 
     series_actor_map = {
@@ -105,13 +108,13 @@ class PluginTraktLookup(object):
         'trakt_ep_tmdb_id': 'tmdb_id',
         'trakt_ep_tvrage': 'tvrage_id',
         'trakt_episode_id': 'id',
-        'trakt_ep_poster': 'poster',
         'trakt_ep_first_aired': 'first_aired',
         'trakt_ep_overview': 'overview',
         'trakt_ep_abs_number': 'number_abs',
         'trakt_season': 'season',
         'trakt_episode': 'number',
         'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep.season, ep.number),
+        'trakt_ep_images': lambda im: list_images(im.images)
     }
 
     # Movie info
@@ -126,7 +129,6 @@ class PluginTraktLookup(object):
         'tmdb_id': 'tmdb_id',
         'trakt_tagline': 'tagline',
         'trakt_overview': 'overview',
-        'trakt_movie_poster': 'poster',
         'trakt_released': 'released',
         'trakt_runtime': 'runtime',
         'trakt_rating': 'rating',
