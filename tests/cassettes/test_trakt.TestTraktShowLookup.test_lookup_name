@@ -2,15 +2,15 @@ interactions:
   - request:
       body: null
       headers:
-        Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        Content-Type: [!!python/unicode 'application/json']
+        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=House&type=show
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":50.486725,\"show\":{\"title\"\
-          :\"House\",\"overview\":\"Go deeper into the medical mysteries of House,\
-          \ TV's most compelling drama. Hugh Laurie stars as the brilliant but sarcastic\
+      body: {string: "[{\"type\":\"show\",\"score\":50.98358,\"show\":{\"title\":\"\
+          House\",\"overview\":\"Go deeper into the medical mysteries of House, TV's\
+          \ most compelling drama. Hugh Laurie stars as the brilliant but sarcastic\
           \ Dr. Gregory House, a maverick physician who is devoid of bedside manner.\
           \ While his behavior can border on antisocial, Dr. House thrives on the\
           \ challenge of solving the medical puzzles that other doctors give up on.\
@@ -24,25 +24,25 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg\"\
           }},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"\
           tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\"\
-          :40.799435,\"show\":{\"title\":\"House vs. House\",\"overview\":\"House\
-          \ vs. House is a new home makeover competition series where amateur and\
-          \ experienced renovation teams compete for the chance to win $10,000 by\
-          \ proving they can create the better DIY projects in their home. From painting\
-          \ and decorating, to one-of-a-kind, imaginative projects, each episode features\
-          \ two teams will go head-to-head in grueling challenges. Tanya McQueen,\
-          \ a DIY design expert, and David Brian Sanders, an architect and designer,\
-          \ will determine which team completes the most impressive transformation\
-          \ and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"\
-          poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\"\
-          :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\"\
-          :\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"\
-          tvrage\":null}}},{\"type\":\"show\",\"score\":36.061947,\"show\":{\"title\"\
-          :\"Full House\",\"overview\":\"Full House is an American sitcom created\
-          \ by Jeff Franklin for ABC. The show chronicles a widowed father, who enlists\
-          \ his best friend and his brother-in-law to help raise his three daughters.\
-          \ It aired from September 22, 1987, to May 23, 1995, broadcasting eight\
-          \ seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\"\
-          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/posters/original/17202e7ebc.jpg\"\
+          :41.20096,\"show\":{\"title\":\"House vs. House\",\"overview\":\"House vs.\
+          \ House is a new home makeover competition series where amateur and experienced\
+          \ renovation teams compete for the chance to win $10,000 by proving they\
+          \ can create the better DIY projects in their home. From painting and decorating,\
+          \ to one-of-a-kind, imaginative projects, each episode features two teams\
+          \ will go head-to-head in grueling challenges. Tanya McQueen, a DIY design\
+          \ expert, and David Brian Sanders, an architect and designer, will determine\
+          \ which team completes the most impressive transformation and award the\
+          \ cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"\
+          full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\"\
+          ,\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"\
+          type\":\"show\",\"score\":36.416847,\"show\":{\"title\":\"Full House\",\"\
+          overview\":\"Full House is an American sitcom created by Jeff Franklin for\
+          \ ABC. The show chronicles a widowed father, who enlists his best friend\
+          \ and his brother-in-law to help raise his three daughters. It aired from\
+          \ September 22, 1987, to May 23, 1995, broadcasting eight seasons and 192\
+          \ episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\"\
+          :{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/posters/original/17202e7ebc.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/004/289/posters/medium/17202e7ebc.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/posters/thumb/17202e7ebc.jpg\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/original/98635a003a.jpg\"\
@@ -50,7 +50,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/thumb/98635a003a.jpg\"\
           }},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"\
           imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\"\
-          ,\"score\":36.061947,\"show\":{\"title\":\"House Hunters\",\"overview\"\
+          ,\"score\":36.416847,\"show\":{\"title\":\"House Hunters\",\"overview\"\
           :\"House Hunters takes viewers behind the scenes as individuals, couples\
           \ and families learn what to look for and decide whether or not a home is\
           \ meant for them. Focusing on the emotional experience of finding and purchasing\
@@ -64,7 +64,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/thumb/36bdbe2817.jpg\"\
           }},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"\
           imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":36.061947,\"show\":{\"title\":\"Fuller House\",\"overview\":\"\
+          ,\"score\":36.416847,\"show\":{\"title\":\"Fuller House\",\"overview\":\"\
           Recently widowed D.J. Tanner-Fuller gets help from her sister Stephanie\
           \ and best friend Kimmy when the women move in with their families to help\
           \ D.J. raise her children in this spin-off series.\",\"year\":2016,\"status\"\
@@ -76,7 +76,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/thumb/37bbde27f6.jpg\"\
           }},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"\
           imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\"\
-          ,\"score\":36.061947,\"show\":{\"title\":\"Alpha House\",\"overview\":\"\
+          ,\"score\":36.416847,\"show\":{\"title\":\"Alpha House\",\"overview\":\"\
           Alpha House follows four senators who live together in a rented house in\
           \ Washington DC.Re-election battles, looming indictments, parties, their\
           \ Party... these senators need a drink. And a new housemate.\",\"year\"\
@@ -89,7 +89,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/thumb/e477e76c44.jpg\"\
           }},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"\
           imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\"\
-          ,\"score\":36.061947,\"show\":{\"title\":\"Playing House\",\"overview\"\
+          ,\"score\":36.416847,\"show\":{\"title\":\"Playing House\",\"overview\"\
           :\"A single-camera buddy comedy about what happens when two best friends\
           \ come back together, just when they need each other most.Inspired by the\
           \ ultra-close friendship between the series' creators and stars, \\\"Playing\
@@ -104,7 +104,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/thumb/49c78c5d22.jpg\"\
           }},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"\
           imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":36.061947,\"show\":{\"title\":\"House Husbands\",\"overview\"\
+          ,\"score\":36.416847,\"show\":{\"title\":\"House Husbands\",\"overview\"\
           :\"House Husbands centres around four families with one thing in common,\
           \ the husbands stay home to raise the children.\",\"year\":2012,\"status\"\
           :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/posters/original/8d6ef762b1.jpg\"\
@@ -115,7 +115,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/thumb/632ffeb8be.jpg\"\
           }},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"\
           imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":36.061947,\"show\":{\"title\":\"Bleak House\",\"overview\":\"\
+          ,\"score\":36.416847,\"show\":{\"title\":\"Bleak House\",\"overview\":\"\
           In this star-studded adaptation of a literary classic, acclaimed writer\
           \ Andrew Davies turns his talents to one of Charles Dickens' most brilliant\
           \ novels \u2014 arguably the greatest-ever depiction of Victorian London.\
@@ -138,7 +138,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/002/474/fanarts/thumb/4d61afbe9b.jpg\"\
           }},\"ids\":{\"trakt\":2474,\"slug\":\"bleak-house\",\"tvdb\":73558,\"imdb\"\
           :\"tt0442632\",\"tmdb\":2489,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :36.061947,\"show\":{\"title\":\"Full House\",\"overview\":\"Han Ji Eun\
+          :36.416847,\"show\":{\"title\":\"Full House\",\"overview\":\"Han Ji Eun\
           \ is a naive writer who got swindled out of everything she owned including\
           \ her house by her best friends. Stranded in China, She managed to borrow\
           \ money from an actor Lee Young Jae to return to Korea. On her return, she\
@@ -158,37 +158,37 @@ interactions:
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [296c5fbaecea1fe2-DFW]
+        cf-ray: [29a027e88c26116b-DFW]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:28:40 GMT']
-        etag: [W/"014b54a7d22d36e404a1d0289f9bb3bd"]
-        expires: ['Thu, 21 Apr 2016 03:28:40 GMT']
+        date: ['Wed, 27 Apr 2016 06:18:13 GMT']
+        etag: [W/"b96d231ef0a6f44efd7eb24d5ccf50b3"]
+        expires: ['Wed, 27 Apr 2016 10:18:13 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d2d129ceaeaf460244a82e0d35932d8c71461194920; expires=Thu,
-            20-Apr-17 23:28:40 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=def5bb8470357e771921f1a4df93a02b31461737893; expires=Thu,
+            27-Apr-17 06:18:13 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['1561']
+        x-pagination-item-count: ['1564']
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
         x-pagination-page-count: ['157']
-        x-request-id: [97b0c63c-6e45-4706-bda2-a5ab8448daab]
-        x-runtime: ['0.680600']
+        x-request-id: [d7969d32-8373-4b8a-8e61-57b4099ad4ba]
+        x-runtime: ['0.037867']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Content-Type: [application/json]
-        Cookie: [__cfduid=d2d129ceaeaf460244a82e0d35932d8c71461194920]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        Content-Type: [!!python/unicode 'application/json']
+        Cookie: [__cfduid=def5bb8470357e771921f1a4df93a02b31461737893]
+        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/shows/1399?extended=full%2Cimages
     response:
-      body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
+      body: {string: !!python/unicode '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
           deeper into the medical mysteries of House, TV''s most compelling drama.
           Hugh Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
           physician who is devoid of bedside manner. While his behavior can border
@@ -200,12 +200,12 @@ interactions:
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [296c5fbcad1b1fe2-DFW]
+        cf-ray: [29a027e8cc2f116b-DFW]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:28:40 GMT']
+        date: ['Wed, 27 Apr 2016 06:18:13 GMT']
         etag: [W/"728305d1b1b390d23cdca9343a14bc71"]
-        expires: ['Thu, 21 Apr 2016 03:28:40 GMT']
+        expires: ['Wed, 27 Apr 2016 10:18:13 GMT']
         last-modified: ['Fri, 15 Apr 2016 09:37:30 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]

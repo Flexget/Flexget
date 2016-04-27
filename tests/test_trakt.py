@@ -162,9 +162,9 @@ class TestTraktShowLookup(object):
         with Session() as session:
             actor = session.query(TraktActor).filter(TraktActor.name == 'Hugh Laurie').first()
             assert actor is not None, 'adding actor to actors table failed'
-            assert actor.imdb_id == 'nm0491402', 'saving imdb_id for actors in table failed'
-            assert actor.trakt_id == '297390', 'saving trakt_id for actors in table failed'
-            assert actor.tmdb_id == '41419', 'saving tmdb_id for actors table failed'
+            assert actor.imdb == 'nm0491402', 'saving imdb_id for actors in table failed'
+            assert str(actor.id) == '297390', 'saving trakt_id for actors in table failed'
+            assert str(actor.tmdb) == '41419', 'saving tmdb_id for actors table failed'
 
 
 @pytest.mark.online
@@ -400,6 +400,6 @@ class TestTraktMovieLookup(object):
         with Session() as session:
             actor = session.query(TraktActor).filter(TraktActor.name == 'Keanu Reeves').first()
             assert actor is not None, 'adding actor to actors table failed'
-            assert actor.imdb_id == 'nm0000206', 'saving imdb_id for actors in table failed'
-            assert actor.trakt_id == '7134', 'saving trakt_id for actors in table failed'
-            assert actor.tmdb_id == '6384', 'saving tmdb_id for actors table failed'
+            assert actor.imdb == 'nm0000206', 'saving imdb_id for actors in table failed'
+            assert str(actor.id) == '7134', 'saving trakt_id for actors in table failed'
+            assert str(actor.tmdb) == '6384', 'saving tmdb_id for actors table failed'

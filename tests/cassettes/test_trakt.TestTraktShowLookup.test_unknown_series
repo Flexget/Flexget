@@ -2,25 +2,25 @@ interactions:
   - request:
       body: null
       headers:
-        Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        Content-Type: [!!python/unicode 'application/json']
+        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=Aoeu+Htns&type=show
     response:
-      body: {string: '[]'}
+      body: {string: !!python/unicode '[]'}
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [EXPIRED]
-        cf-ray: [296c5fec50bc0932-DFW]
+        cf-ray: [29a027f2ef811fc4-DFW]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:28:49 GMT']
-        etag: [W/"787ee7db93e1314c53818c5980d6a52f"]
-        expires: ['Thu, 21 Apr 2016 03:28:49 GMT']
+        date: ['Wed, 27 Apr 2016 06:18:15 GMT']
+        etag: [W/"9e749deb1f783c6c150e8cd62410fe19"]
+        expires: ['Wed, 27 Apr 2016 10:18:15 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d73cd7e50c7e1253218bdc6fe899d00291461194928; expires=Thu,
-            20-Apr-17 23:28:48 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=db43fe334b20cdcdb6333e9f34776773a1461737894; expires=Thu,
+            27-Apr-17 06:18:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -28,8 +28,8 @@ interactions:
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
         x-pagination-page-count: ['0']
-        x-request-id: [61fcc198-96fe-419e-a9f8-4805d8bdcf0f]
-        x-runtime: ['0.191007']
+        x-request-id: [04ec18e8-22cd-4f6c-b00c-a5e52ba6ec4b]
+        x-runtime: ['0.020640']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

@@ -26,7 +26,7 @@ from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.tools import TimedDict
 
-Base = db_schema.versioned_base('api_trakt', 4)
+Base = db_schema.versioned_base('api_trakt', 5)
 log = logging.getLogger('api_trakt')
 # Production Site
 CLIENT_ID = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
@@ -212,14 +212,9 @@ def get_api_url(*endpoint):
 
 
 @upgrade('api_trakt')
-def upgrade_database(ver, session):
-    if ver <= 2:
+def upgrade(ver, session):
+    if ver is None or ver <= 4:
         raise db_schema.UpgradeImpossible
-    if ver <= 3:
-        table_add_column('trakt_movies', 'poster', Unicode, session)
-        table_add_column('trakt_shows', 'poster', Unicode, session)
-        table_add_column('trakt_episodes', 'poster', Unicode, session)
-        ver = 4
     return ver
 
 
@@ -343,9 +338,9 @@ class TraktActor(Base):
         self.tmdb = ids.get('tmdb')
         self.biography = actor.get('biography')
         if actor.get('birthday'):
-            self.birthday = datetime.date(actor.get('birthday'))
+            self.birthday = dateutil_parse(actor.get('birthday'))
         if actor.get('death'):
-            self.death    = datetime.date(actor.get('death'))
+            self.death = dateutil_parse(actor.get('death'))
         self.homepage = actor.get('homepage')
         if actor.get('images'):
             img = actor.get('images')
@@ -412,6 +407,7 @@ def get_db_actors(ident, style):
         return
 
 def list_images(images):
+
     res = []
     for image in images:
         info = {
