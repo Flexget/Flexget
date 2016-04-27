@@ -85,7 +85,7 @@ class OutputSabnzbd(object):
             request_url = config['url'] + urlencode(params)
             log.debug('request_url: %s' % request_url)
             try:
-                response = task.get(request_url)
+                response = task.requests.get(request_url)
             except RequestException as e:
                 log.critical('Failed to use sabnzbd. Requested %s' % request_url)
                 log.critical('Result was: %s' % e.args[0])
