@@ -2,36 +2,36 @@ interactions:
   - request:
       body: null
       headers:
-        Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        Content-Type: [!!python/unicode 'application/json']
+        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
     response:
-      body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
+      body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
           to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
           By day he is an average computer programmer and by night a malevolent hacker
           known as Neo, who finds himself targeted by the police when he is contacted
           by Morpheus, a legendary computer hacker, who reveals the shocking truth
-          about our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.92411,"votes":19752,"updated_at":"2016-04-18T12:57:57.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id","fa","bs"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
+          about our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.92311,"votes":19807,"updated_at":"2016-04-21T08:53:50.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id","fa","bs"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [STALE]
-        cf-ray: [296c59127553202a-DFW]
+        cf-cache-status: [HIT]
+        cf-ray: [29a027f356ea1fdc-DFW]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:24:07 GMT']
-        etag: [W/"86831be49892c4a96b2ba405a7b93463"]
-        expires: ['Thu, 21 Apr 2016 03:24:07 GMT']
-        last-modified: ['Mon, 18 Apr 2016 12:57:57 GMT']
+        date: ['Wed, 27 Apr 2016 06:18:14 GMT']
+        etag: [W/"57a188607cedd99f883252a4a8ddef05"]
+        expires: ['Wed, 27 Apr 2016 10:18:14 GMT']
+        last-modified: ['Thu, 21 Apr 2016 08:53:50 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d7b33c9964353a36a22d635953b89b0611461194647; expires=Thu,
-            20-Apr-17 23:24:07 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d325bdbd15b6b1127e315f321b4f58d921461737894; expires=Thu,
+            27-Apr-17 06:18:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [3eb8c609-60db-4fbd-9282-0b0165a93b67]
-        x-runtime: ['0.019031']
+        x-request-id: [c4c27aa0-9f35-47e0-88ce-54987cbdb63f]
+        x-runtime: ['0.031590']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

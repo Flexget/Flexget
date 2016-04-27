@@ -2,13 +2,13 @@ interactions:
   - request:
       body: null
       headers:
-        Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        Content-Type: [!!python/unicode 'application/json']
+        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=The+Matrix&type=movie&year=1999
     response:
-      body: {string: "[{\"type\":\"movie\",\"score\":70.25974,\"movie\":{\"title\"\
+      body: {string: "[{\"type\":\"movie\",\"score\":69.50237,\"movie\":{\"title\"\
           :\"The Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives.\
           \ By day he is an average computer programmer and by night a malevolent\
           \ hacker known as Neo, who finds himself targeted by the police when he\
@@ -21,7 +21,7 @@ interactions:
           ,\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg\"\
           }},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\"\
-          ,\"tmdb\":603}}},{\"type\":\"movie\",\"score\":56.207794,\"movie\":{\"title\"\
+          ,\"tmdb\":603}}},{\"type\":\"movie\",\"score\":55.6019,\"movie\":{\"title\"\
           :\"Making The Matrix\",\"overview\":\"A promotional making-of documentary\
           \ for the film Matrix, The (1999) that devotes its time to explaining the\
           \ digital and practical effects contained in the film. This is very interesting,\
@@ -33,7 +33,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\"\
-          ,\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":52.085907,\"movie\":{\"\
+          ,\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":51.505898,\"movie\":{\"\
           title\":\"V-World Matrix\",\"overview\":\"Two friends take a cyber vacation\
           \ to experience a world where they can act out their virtual fantasies!\
           \ They soon realize they've entered a virtual free-for-all. Forbidden fantasies\
@@ -46,7 +46,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/movies/000/158/764/posters/thumb/b5bd19302a.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":158764,\"slug\":\"v-world-matrix-1969\",\"imdb\":\"tt0211096\",\"\
-          tmdb\":259464}}},{\"type\":\"movie\",\"score\":4.79523,\"movie\":{\"title\"\
+          tmdb\":259464}}},{\"type\":\"movie\",\"score\":4.767971,\"movie\":{\"title\"\
           :\"The Tricky Master\",\"overview\":\"Undercover cop Leung Foon (Nick Cheung)\
           \ is having trouble taking down the illegal trading operation headed by\
           \ crime boss Ferrari (Wong Jing). So to accomplish his mission, he asks\
@@ -61,7 +61,7 @@ interactions:
           ,\"medium\":\"https://walter.trakt.us/images/movies/000/037/624/fanarts/medium/de31c092f7.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/movies/000/037/624/fanarts/thumb/de31c092f7.jpg\"\
           }},\"ids\":{\"trakt\":37624,\"slug\":\"the-tricky-master-1999\",\"imdb\"\
-          :\"tt0212864\",\"tmdb\":53281}}},{\"type\":\"movie\",\"score\":0.68568826,\"\
+          :\"tt0212864\",\"tmdb\":53281}}},{\"type\":\"movie\",\"score\":0.6841915,\"\
           movie\":{\"title\":\"Superstar\",\"overview\":\"Inspired by Yves Klein\u2019\
           s Leap into the Void (1960), Superstar was commissioned by Creative Time\
           \ to be presented on the Jumbotron screen in Times Square, New York City.\
@@ -74,16 +74,16 @@ interactions:
           :\"superstar-1999-03-03\",\"imdb\":\"\",\"tmdb\":385552}}}]"}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [296c8a27c7a9092c-DFW]
+        cf-cache-status: [EXPIRED]
+        cf-ray: [29a027f6d4f20932-DFW]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:57:37 GMT']
-        etag: [W/"35175f7ee0c4e223b3b91f59ac1565c3"]
-        expires: ['Thu, 21 Apr 2016 03:57:37 GMT']
+        date: ['Wed, 27 Apr 2016 06:18:15 GMT']
+        etag: [W/"7185a5a4bd1208f8c31851655673d8ba"]
+        expires: ['Wed, 27 Apr 2016 10:18:15 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d66490c3da2bfeb7a156c666cead16e851461196657; expires=Thu,
-            20-Apr-17 23:57:37 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d57da42a26d4acf0d7dc17a32cff5b6231461737895; expires=Thu,
+            27-Apr-17 06:18:15 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -91,129 +91,590 @@ interactions:
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
         x-pagination-page-count: ['1']
-        x-request-id: [29c09ef5-15ad-4b06-b151-392a081c7b0b]
-        x-runtime: ['0.094281']
+        x-request-id: [e65cb9ba-e9da-4d4e-bd45-cf7f1fad259a]
+        x-runtime: ['0.031389']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Content-Type: [application/json]
-        Cookie: [__cfduid=d66490c3da2bfeb7a156c666cead16e851461196657]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        Content-Type: [!!python/unicode 'application/json']
+        Cookie: [__cfduid=d57da42a26d4acf0d7dc17a32cff5b6231461737895]
+        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
     response:
-      body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
+      body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
           to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
           By day he is an average computer programmer and by night a malevolent hacker
           known as Neo, who finds himself targeted by the police when he is contacted
           by Morpheus, a legendary computer hacker, who reveals the shocking truth
-          about our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.92313,"votes":19787,"updated_at":"2016-04-18T12:57:57.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id","fa","bs"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
+          about our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.92311,"votes":19807,"updated_at":"2016-04-21T08:53:50.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id","fa","bs"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [296c8a2837b7092c-DFW]
+        cf-ray: [29a027f815010932-DFW]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:57:37 GMT']
-        etag: [W/"86831be49892c4a96b2ba405a7b93463"]
-        expires: ['Thu, 21 Apr 2016 03:57:37 GMT']
-        last-modified: ['Mon, 18 Apr 2016 12:57:57 GMT']
+        date: ['Wed, 27 Apr 2016 06:18:15 GMT']
+        etag: [W/"57a188607cedd99f883252a4a8ddef05"]
+        expires: ['Wed, 27 Apr 2016 10:18:15 GMT']
+        last-modified: ['Thu, 21 Apr 2016 08:53:50 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [bb2746a4-49bc-4f88-a9c8-a5f22805f1fa]
-        x-runtime: ['0.024743']
+        x-request-id: [c4c27aa0-9f35-47e0-88ce-54987cbdb63f]
+        x-runtime: ['0.031590']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        Content-Type: [!!python/unicode 'application/json']
+        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/movies/481/people
+      uri: https://api-v2launch.trakt.tv/movies/481/people?extended=full%2Cimages
     response:
-      body: {string: '{"cast":[{"character":"Neo","person":{"name":"Keanu Reeves","ids":{"trakt":7134,"slug":"keanu-reeves","imdb":"nm0000206","tmdb":6384,"tvrage":19449}}},{"character":"Morpheus","person":{"name":"Laurence
-          Fishburne","ids":{"trakt":551,"slug":"laurence-fishburne","imdb":"nm0000401","tmdb":2975,"tvrage":58899}}},{"character":"Trinity","person":{"name":"Carrie-Anne
-          Moss","ids":{"trakt":5274,"slug":"carrie-anne-moss","imdb":"nm0005251","tmdb":530,"tvrage":30031}}},{"character":"Agent
-          Smith","person":{"name":"Hugo Weaving","ids":{"trakt":16499,"slug":"hugo-weaving","imdb":"nm0915989","tmdb":1331,"tvrage":165660}}},{"character":"Oracle","person":{"name":"Gloria
-          Foster","ids":{"trakt":413616,"slug":"gloria-foster","imdb":"nm0287825","tmdb":9364,"tvrage":33201}}},{"character":"Cypher","person":{"name":"Joe
-          Pantoliano","ids":{"trakt":294554,"slug":"joe-pantoliano","imdb":"nm0001592","tmdb":532,"tvrage":10693}}},{"character":"Tank","person":{"name":"Marcus
-          Chong","ids":{"trakt":413619,"slug":"marcus-chong","imdb":"nm0159059","tmdb":9372,"tvrage":33610}}},{"character":"Apoc","person":{"name":"Julian
-          Arahanga","ids":{"trakt":413207,"slug":"julian-arahanga","imdb":"nm0032810","tmdb":7244,"tvrage":null}}},{"character":"Mouse","person":{"name":"Matt
-          Doran","ids":{"trakt":413621,"slug":"matt-doran","imdb":"nm0233391","tmdb":9374,"tvrage":30260}}},{"character":"Switch","person":{"name":"Belinda
-          McClory","ids":{"trakt":413623,"slug":"belinda-mcclory","imdb":"nm0565883","tmdb":9376,"tvrage":9741}}},{"character":"Dozer","person":{"name":"Anthony
-          Ray Parker","ids":{"trakt":413625,"slug":"anthony-ray-parker","imdb":"nm0662562","tmdb":9378,"tvrage":null}}},{"character":"Agent
-          Brown","person":{"name":"Paul Goddard","ids":{"trakt":413628,"slug":"paul-goddard-12bfb257-984b-4e2d-a582-578481a07a9d","imdb":"nm0323822","tmdb":9380,"tvrage":null}}},{"character":"Agent
-          Jones","person":{"name":"Robert Taylor","ids":{"trakt":413633,"slug":"robert-taylor-dd49859a-edc3-4e88-8dc1-551d8053242d","imdb":"nm0853079","tmdb":39545,"tvrage":null}}},{"character":"Rhineheart","person":{"name":"David
-          Aston","ids":{"trakt":413636,"slug":"david-aston","imdb":"nm0040058","tmdb":9383,"tvrage":null}}},{"character":"Choi","person":{"name":"Marc
-          Aden","ids":{"trakt":413639,"slug":"marc-aden","imdb":"nm0336802","tmdb":9384,"tvrage":null}}},{"character":"White
-          Rabbit Girl","person":{"name":"Ada Nicodemou","ids":{"trakt":413643,"slug":"ada-nicodemou","imdb":"nm0630124","tmdb":181214,"tvrage":24685}}},{"character":"Priestess","person":{"name":"Deni
-          Gordon","ids":{"trakt":413646,"slug":"deni-gordon","imdb":"nm0330139","tmdb":1090466,"tvrage":null}}},{"character":"Spoon
-          Boy","person":{"name":"Rowan Witt","ids":{"trakt":413649,"slug":"rowan-witt","imdb":"nm0936894","tmdb":218366,"tvrage":null}}},{"character":"Lieutenant","person":{"name":"Bill
-          Young","ids":{"trakt":413652,"slug":"bill-young","imdb":"nm0949303","tmdb":57799,"tvrage":null}}},{"character":"Potential","person":{"name":"Eleanor
-          Witt","ids":{"trakt":413655,"slug":"eleanor-witt","imdb":"nm0936860","tmdb":1209244,"tvrage":null}}},{"character":"Potential","person":{"name":"Tamara
-          Brown","ids":{"trakt":413659,"slug":"tamara-brown","imdb":"nm0114756","tmdb":1209245,"tvrage":null}}},{"character":"Potential","person":{"name":"Janaya
-          Pender","ids":{"trakt":6816,"slug":"janaya-pender","imdb":"nm0671665","tmdb":1209246,"tvrage":null}}},{"character":"Potential","person":{"name":"Adryn
-          White","ids":{"trakt":6817,"slug":"adryn-white","imdb":"nm0924423","tmdb":1209247,"tvrage":null}}},{"character":"Potential","person":{"name":"Natalie
-          Tjen","ids":{"trakt":6819,"slug":"natalie-tjen","imdb":"nm0864666","tmdb":1209248,"tvrage":null}}},{"character":"FedEx
-          Man","person":{"name":"David O''Connor","ids":{"trakt":6821,"slug":"david-o-connor","imdb":"nm0640292","tmdb":1209249,"tvrage":null}}},{"character":"Businessman","person":{"name":"Jeremy
-          Ball","ids":{"trakt":413664,"slug":"jeremy-ball-7545f463-cee6-4be7-83f6-5a029d7ff1a2","imdb":"nm0050390","tmdb":1209250,"tvrage":null}}},{"character":"Woman
-          in Red","person":{"name":"Fiona Johnson","ids":{"trakt":413668,"slug":"fiona-johnson","imdb":"nm0425087","tmdb":1209251,"tvrage":null}}},{"character":"Old
-          Man","person":{"name":"Harry Lawrence","ids":{"trakt":6826,"slug":"harry-lawrence","imdb":"nm0492790","tmdb":110411,"tvrage":null}}},{"character":"Blind
-          Man","person":{"name":"Steve Dodd","ids":{"trakt":413670,"slug":"steve-dodd","imdb":"nm0230117","tmdb":212562,"tvrage":null}}},{"character":"Security
-          Guard","person":{"name":"Luke Quinton","ids":{"trakt":413673,"slug":"luke-quinton","imdb":"nm0704280","tmdb":1209252,"tvrage":null}}},{"character":"Guard","person":{"name":"Lawrence
-          Woodward","ids":{"trakt":413675,"slug":"lawrence-woodward","imdb":"nm0940959","tmdb":75715,"tvrage":null}}},{"character":"Cop
-          Who Captures Neo","person":{"name":"Michael Butcher","ids":{"trakt":6833,"slug":"michael-butcher","imdb":"nm0124697","tmdb":1209253,"tvrage":null}}},{"character":"Big
-          Cop","person":{"name":"Bernard Ledger","ids":{"trakt":6835,"slug":"bernard-ledger","imdb":"nm0496567","tmdb":1209254,"tvrage":null}}},{"character":"Cop","person":{"name":"Robert
-          Simper","ids":{"trakt":413679,"slug":"robert-simper","imdb":"nm0800854","tmdb":26753,"tvrage":null}}},{"character":"Cop","person":{"name":"Chris
-          Pattinson","ids":{"trakt":413683,"slug":"chris-pattinson","imdb":"nm0778966","tmdb":1209255,"tvrage":null}}},{"character":"Parking
-          Cop","person":{"name":"Nigel Harbach","ids":{"trakt":413685,"slug":"nigel-harbach","imdb":"nm0361876","tmdb":1209256,"tvrage":null}}},{"character":"Shaylae
-          - Woman in Office (uncredited)","person":{"name":"Rana Morrison","ids":{"trakt":413688,"slug":"rana-morrison","imdb":"nm3269395","tmdb":1209257,"tvrage":null}}}],"crew":{"production":[{"job":"Casting","person":{"name":"Mali
-          Finn","ids":{"trakt":1363,"slug":"mali-finn","imdb":"nm0278139","tmdb":1262,"tvrage":null}}},{"job":"Casting","person":{"name":"Shauna
-          Wolifson","ids":{"trakt":6865,"slug":"shauna-wolifson","imdb":"nm0938441","tmdb":9342,"tvrage":null}}},{"job":"Producer","person":{"name":"Joel
-          Silver","ids":{"trakt":11366,"slug":"joel-silver","imdb":"nm0005428","tmdb":1091,"tvrage":92573}}}],"editing":[{"job":"Editor","person":{"name":"Zach
-          Staenberg","ids":{"trakt":3454,"slug":"zach-staenberg","imdb":"nm0821205","tmdb":4671,"tvrage":null}}}],"sound":[{"job":"Original
-          Music Composer","person":{"name":"Don Davis","ids":{"trakt":3615,"slug":"don-davis","imdb":"nm0204485","tmdb":4949,"tvrage":null}}},{"job":"Supervising
-          Sound Effects Editor","person":{"name":"Dane A. Davis","ids":{"trakt":6873,"slug":"dane-a-davis","imdb":"nm0204424","tmdb":9349,"tvrage":null}}},{"job":"Sound
-          Editor","person":{"name":"Zigmund Gron","ids":{"trakt":6876,"slug":"zigmund-gron","imdb":"nm0343065","tmdb":9351,"tvrage":null}}}],"costume
-          & make-up":[{"job":"Costume Design","person":{"name":"Kym Barrett","ids":{"trakt":4764,"slug":"kym-barrett","imdb":"nm0057199","tmdb":6209,"tvrage":null}}}],"camera":[{"job":"Director
-          of Photography","person":{"name":"Bill Pope","ids":{"trakt":5936,"slug":"bill-pope","imdb":"nm0691084","tmdb":9341,"tvrage":null}}}],"art":[{"job":"Production
-          Design","person":{"name":"Owen Paterson","ids":{"trakt":6866,"slug":"owen-paterson","imdb":"nm0665517","tmdb":9343,"tvrage":null}}},{"job":"Art
-          Direction","person":{"name":"Hugh Bateup","ids":{"trakt":6867,"slug":"hugh-bateup","imdb":"nm0061064","tmdb":9344,"tvrage":null}}},{"job":"Art
-          Direction","person":{"name":"Michelle McGahey","ids":{"trakt":6870,"slug":"michelle-mcgahey","imdb":"nm0568894","tmdb":9345,"tvrage":null}}},{"job":"Set
-          Decoration","person":{"name":"Lisa Brennan","ids":{"trakt":6872,"slug":"lisa-brennan","imdb":"nm0107345","tmdb":9346,"tvrage":null}}}],"crew":[{"job":"Special
-          Effects","person":{"name":"Richard Alexander","ids":{"trakt":6877,"slug":"richard-alexander","imdb":"nm0018689","tmdb":9354,"tvrage":null}}},{"job":"Special
-          Effects","person":{"name":"Brian Belcher","ids":{"trakt":6878,"slug":"brian-belcher","imdb":"nm0067633","tmdb":9355,"tvrage":null}}},{"job":"Stunts","person":{"name":"Glenn
-          Boswell","ids":{"trakt":6879,"slug":"glenn-boswell","imdb":"nm0098342","tmdb":9357,"tvrage":null}}},{"job":"Special
-          Effects Coordinator","person":{"name":"Steve Courtley","ids":{"trakt":6880,"slug":"steve-courtley","imdb":"nm0183871","tmdb":9593,"tvrage":null}}}],"directing":[{"job":"Director","person":{"name":"Lilly
-          Wachowski","ids":{"trakt":413676,"slug":"lilly-wachowski","imdb":"nm0905152","tmdb":9339,"tvrage":null}}},{"job":"Director","person":{"name":"Lana
-          Wachowski","ids":{"trakt":413681,"slug":"lana-wachowski","imdb":"nm0905154","tmdb":9340,"tvrage":null}}},{"job":"Assistant
-          Director","person":{"name":"James McTeigue","ids":{"trakt":414381,"slug":"james-mcteigue","imdb":"nm0574625","tmdb":11266,"tvrage":null}}}],"writing":[{"job":"Screenplay","person":{"name":"Lilly
-          Wachowski","ids":{"trakt":413676,"slug":"lilly-wachowski","imdb":"nm0905152","tmdb":9339,"tvrage":null}}},{"job":"Screenplay","person":{"name":"Lana
-          Wachowski","ids":{"trakt":413681,"slug":"lana-wachowski","imdb":"nm0905154","tmdb":9340,"tvrage":null}}}]}}'}
+      body: {string: "{\"cast\":[{\"character\":\"Neo\",\"person\":{\"name\":\"Keanu\
+          \ Reeves\",\"ids\":{\"trakt\":7134,\"slug\":\"keanu-reeves\",\"imdb\":\"\
+          nm0000206\",\"tmdb\":6384,\"tvrage\":19449},\"images\":{\"headshot\":{\"\
+          full\":\"https://walter.trakt.us/images/people/000/007/134/headshots/original/88d0ee35f6.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/88d0ee35f6.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/headshots/thumb/88d0ee35f6.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/original/6a31c3ef56.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/medium/6a31c3ef56.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/thumb/6a31c3ef56.jpg\"\
+          }},\"biography\":\"Keanu Charles Reeves is a Canadian actor. Reeves is known\
+          \ for his roles in Bill &amp; Ted's Excellent Adventure, Speed, Point Break,\
+          \ and The Matrix trilogy as Neo. He has collaborated with major directors\
+          \ such as Stephen Frears (in the 1988 period drama Dangerous Liaisons);\
+          \ Gus Van Sant (in the 1991 independent film My Own Private Idaho); and\
+          \ Bernardo Bertolucci (in the 1993 film Little Buddha). Referring to his\
+          \ 1991 film releases, The New York Times' critic, Janet Maslin, praised\
+          \ Reeves' versatility, saying that he \\\"displays considerable discipline\
+          \ and range. He moves easily between the buttoned-down demeanor that suits\
+          \ a police procedural story and the loose-jointed manner of his comic roles.\\\
+          \" A repeated theme in roles he has portrayed is that of saving the world,\
+          \ including the characters of Ted Logan, Buddha, Neo, Johnny Mnemonic, John\
+          \ Constantine and Klaatu.\",\"birthday\":\"1964-09-02\",\"death\":null,\"\
+          birthplace\":\"Beirut, Lebanon\",\"homepage\":\"\"}},{\"character\":\"Morpheus\"\
+          ,\"person\":{\"name\":\"Laurence Fishburne\",\"ids\":{\"trakt\":551,\"slug\"\
+          :\"laurence-fishburne\",\"imdb\":\"nm0000401\",\"tmdb\":2975,\"tvrage\"\
+          :58899},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/000/551/headshots/original/d807b72a19.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/000/551/headshots/medium/d807b72a19.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/000/551/headshots/thumb/d807b72a19.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/000/551/fanarts/original/3911e0f422.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/000/551/fanarts/medium/3911e0f422.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/000/551/fanarts/thumb/3911e0f422.jpg\"\
+          }},\"biography\":\"Laurence John Fishburne III (born July 30, 1961) is an\
+          \ American actor of screen and stage, as well as a playwright, director,\
+          \ and producer. He is perhaps best known for his roles as Morpheus in the\
+          \ Matrix science fiction film trilogy and as singer-musician Ike Turner\
+          \ in the Tina Turner biopic What's Love Got to Do With It. He became the\
+          \ first African-American to portray Othello in a motion picture by a major\
+          \ studio when he appeared in Oliver Parker's 1995 film adaption of the Shakespeare\
+          \ play. Fishburne has won a Tony Award for Best Featured Actor in a Play\
+          \ for his performance in Two Trains Running (1992) and an Emmy Award for\
+          \ Drama Series Guest Actor for his performance in TriBeCa (1993).\\n\\nFishburne\u2019\
+          s first marriage was to actress to Hajna O. Moss. They had two children\
+          \ together: a son, Langston and a daughter, Montana. Fishburne is now married\
+          \ to actress Gina Torres. They live in Hollywood with their daughter Delilah.\"\
+          ,\"birthday\":\"1961-07-30\",\"death\":null,\"birthplace\":\"Augusta, Georgia,\
+          \ United States\",\"homepage\":\"http://www.laurence-fishburne.com/\"}},{\"\
+          character\":\"Trinity\",\"person\":{\"name\":\"Carrie-Anne Moss\",\"ids\"\
+          :{\"trakt\":5274,\"slug\":\"carrie-anne-moss\",\"imdb\":\"nm0005251\",\"\
+          tmdb\":530,\"tvrage\":30031},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/005/274/headshots/original/5622ad45c5.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/005/274/headshots/medium/5622ad45c5.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/005/274/headshots/thumb/5622ad45c5.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/005/274/fanarts/original/242c858fcc.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/005/274/fanarts/medium/242c858fcc.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/005/274/fanarts/thumb/242c858fcc.jpg\"\
+          }},\"biography\":\"Carrie-Anne Moss (born August 21, 1967) is a Canadian\
+          \ actress,\\n\\nbest known for her role of Trinity in The Matrix trilogy\
+          \ of films beginning with The Matrix (1999), her breakthrough film. She\
+          \ has starred in the films Memento and Chocolat (both 2000), Snow Cake (2006),\
+          \ Disturbia (2007) and Unthinkable (2010).\\n\\nDescription above from the\
+          \ Wikipedia article Carrie-Anne Moss, licensed under CC-BY-SA, full list\
+          \ of contributors on Wikipedia.\",\"birthday\":\"1967-08-21\",\"death\"\
+          :null,\"birthplace\":\"Burnaby, British Columbia, Canada\",\"homepage\"\
+          :\"\"}},{\"character\":\"Agent Smith\",\"person\":{\"name\":\"Hugo Weaving\"\
+          ,\"ids\":{\"trakt\":16499,\"slug\":\"hugo-weaving\",\"imdb\":\"nm0915989\"\
+          ,\"tmdb\":1331,\"tvrage\":165660},\"images\":{\"headshot\":{\"full\":\"\
+          https://walter.trakt.us/images/people/000/016/499/headshots/original/8bf03df29c.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/016/499/headshots/medium/8bf03df29c.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/016/499/headshots/thumb/8bf03df29c.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/016/499/fanarts/original/c0ad7ea552.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/016/499/fanarts/medium/c0ad7ea552.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/016/499/fanarts/thumb/c0ad7ea552.jpg\"\
+          }},\"biography\":\"From Wikipedia, the free encyclopedia\\n\\nHugo Wallace\
+          \ Weaving (born 4 April 1960) is a British-Australian film and stage actor.\
+          \ He is best known for his roles as Agent Smith in the Matrix trilogy, Elrond\
+          \ in the Lord of the Rings trilogy, \\\"V\\\" in V for Vendetta, and performances\
+          \ in numerous Australian character dramas.\\n\\nDescription above from the\
+          \ Wikipedia article Hugo Weaving, licensed under CC-BY-SA, full list of\
+          \ contributors on Wikipedia.\",\"birthday\":\"1960-04-04\",\"death\":null,\"\
+          birthplace\":\"Ibadan, Nigeria\",\"homepage\":\"\"}},{\"character\":\"Oracle\"\
+          ,\"person\":{\"name\":\"Gloria Foster\",\"ids\":{\"trakt\":413616,\"slug\"\
+          :\"gloria-foster\",\"imdb\":\"nm0287825\",\"tmdb\":9364,\"tvrage\":33201},\"\
+          images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/616/headshots/original/e06c731406.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/616/headshots/medium/e06c731406.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/616/headshots/thumb/e06c731406.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":\"1933-11-15\",\"death\":\"2001-09-29\",\"birthplace\"\
+          :null,\"homepage\":null}},{\"character\":\"Cypher\",\"person\":{\"name\"\
+          :\"Joe Pantoliano\",\"ids\":{\"trakt\":294554,\"slug\":\"joe-pantoliano\"\
+          ,\"imdb\":\"nm0001592\",\"tmdb\":532,\"tvrage\":10693},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/people/000/294/554/headshots/original/a36bea230a.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/294/554/headshots/medium/a36bea230a.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/294/554/headshots/thumb/a36bea230a.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/294/554/fanarts/original/6c353577dd.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/294/554/fanarts/medium/6c353577dd.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/294/554/fanarts/thumb/6c353577dd.jpg\"\
+          }},\"biography\":\"Joseph Peter \\\"Joe\\\" Pantoliano (born September 12,\
+          \ 1951) is an American film and television actor. He played the character\
+          \ of Ralph Cifaretto on The Sopranos, Bob Keane in La Bamba, Cypher in The\
+          \ Matrix, Teddy in Memento, Francis Fratelli in The Goonies, Guido \\\"\
+          the Killer Pimp\\\" in Risky Business, and Jennifer Tilly's violent mobster\
+          \ boyfriend, Caesar, in Bound. He also played US Marshall Renfro in both\
+          \ The Fugitive and U.S. Marshals. He is often referred to as \\\"Joey Pants\\\
+          \", due to the difficulty some have pronouncing his Italian surname.\\n\\\
+          nDescription above from the Wikipedia article Joe Pantoliano, licensed under\
+          \ CC-BY-SA, full list of contributors on Wikipedia.\",\"birthday\":\"1951-09-12\"\
+          ,\"death\":null,\"birthplace\":\"Hoboken - New Jersey - USA\",\"homepage\"\
+          :\"\"}},{\"character\":\"Tank\",\"person\":{\"name\":\"Marcus Chong\",\"\
+          ids\":{\"trakt\":413619,\"slug\":\"marcus-chong\",\"imdb\":\"nm0159059\"\
+          ,\"tmdb\":9372,\"tvrage\":33610},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/619/headshots/original/9873d052ea.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/619/headshots/medium/9873d052ea.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/619/headshots/thumb/9873d052ea.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":\"1967-07-08\",\"death\":null,\"birthplace\":null,\"\
+          homepage\":null}},{\"character\":\"Apoc\",\"person\":{\"name\":\"Julian\
+          \ Arahanga\",\"ids\":{\"trakt\":413207,\"slug\":\"julian-arahanga\",\"imdb\"\
+          :\"nm0032810\",\"tmdb\":7244,\"tvrage\":null},\"images\":{\"headshot\":{\"\
+          full\":\"https://walter.trakt.us/images/people/000/413/207/headshots/original/df212c6beb.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/207/headshots/medium/df212c6beb.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/207/headshots/thumb/df212c6beb.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :null}},{\"character\":\"Mouse\",\"person\":{\"name\":\"Matt Doran\",\"\
+          ids\":{\"trakt\":413621,\"slug\":\"matt-doran\",\"imdb\":\"nm0233391\",\"\
+          tmdb\":9374,\"tvrage\":30260},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/621/headshots/original/35a0e76ef6.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/621/headshots/medium/35a0e76ef6.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/621/headshots/thumb/35a0e76ef6.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"Matt Doran was born on March 30, 1976 in Sydney, New South Wales, Australia\
+          \ as Matthew J. Doran. He is an actor and cinematographer.\",\"birthday\"\
+          :\"1976-03-30\",\"death\":null,\"birthplace\":\"Sydney - New South Wales\
+          \ - Australia\",\"homepage\":\"\"}},{\"character\":\"Switch\",\"person\"\
+          :{\"name\":\"Belinda McClory\",\"ids\":{\"trakt\":413623,\"slug\":\"belinda-mcclory\"\
+          ,\"imdb\":\"nm0565883\",\"tmdb\":9376,\"tvrage\":9741},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/people/000/413/623/headshots/original/b6832e0449.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/623/headshots/medium/b6832e0449.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/623/headshots/thumb/b6832e0449.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"\",\"birthday\":\"1968-11-01\",\"death\":null,\"birthplace\":null,\"\
+          homepage\":\"\"}},{\"character\":\"Dozer\",\"person\":{\"name\":\"Anthony\
+          \ Ray Parker\",\"ids\":{\"trakt\":413625,\"slug\":\"anthony-ray-parker\"\
+          ,\"imdb\":\"nm0662562\",\"tmdb\":9378,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/people/000/413/625/headshots/original/348181202a.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/625/headshots/medium/348181202a.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/625/headshots/thumb/348181202a.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":\"1958-05-13\",\"death\":null,\"birthplace\":null,\"\
+          homepage\":null}},{\"character\":\"Agent Brown\",\"person\":{\"name\":\"\
+          Paul Goddard\",\"ids\":{\"trakt\":413628,\"slug\":\"paul-goddard-12bfb257-984b-4e2d-a582-578481a07a9d\"\
+          ,\"imdb\":\"nm0323822\",\"tmdb\":9380,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/people/000/413/628/headshots/original/af130585c7.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/628/headshots/medium/af130585c7.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/628/headshots/thumb/af130585c7.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/413/628/fanarts/original/31363e594d.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/628/fanarts/medium/31363e594d.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/628/fanarts/thumb/31363e594d.jpg\"\
+          }},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"\
+          homepage\":null}},{\"character\":\"Agent Jones\",\"person\":{\"name\":\"\
+          Robert Taylor\",\"ids\":{\"trakt\":413633,\"slug\":\"robert-taylor-dd49859a-edc3-4e88-8dc1-551d8053242d\"\
+          ,\"imdb\":\"nm0853079\",\"tmdb\":39545,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/people/000/413/633/headshots/original/bfa70cee08.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/633/headshots/medium/bfa70cee08.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/633/headshots/thumb/bfa70cee08.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/413/633/fanarts/original/7d1cc8b570.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/633/fanarts/medium/7d1cc8b570.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/633/fanarts/thumb/7d1cc8b570.jpg\"\
+          }},\"biography\":\"From Wikipedia, the free encyclopedia\\n\\nRobert Taylor\
+          \ (born 1963) is an Australian actor who has appeared in many films and\
+          \ television series in Australia, United Kingdom and the United States.\
+          \ On television he is best known for his lead role in the A&amp;E television\
+          \ series Longmire. On film he is best known for playing Agent Jones on The\
+          \ Matrix.\",\"birthday\":null,\"death\":null,\"birthplace\":\"Sydney Australia\"\
+          ,\"homepage\":\"\"}},{\"character\":\"Rhineheart\",\"person\":{\"name\"\
+          :\"David Aston\",\"ids\":{\"trakt\":413636,\"slug\":\"david-aston\",\"imdb\"\
+          :\"nm0040058\",\"tmdb\":9383,\"tvrage\":null},\"images\":{\"headshot\":{\"\
+          full\":\"https://walter.trakt.us/images/people/000/413/636/headshots/original/d02f54b8b3.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/636/headshots/medium/d02f54b8b3.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/636/headshots/thumb/d02f54b8b3.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :null}},{\"character\":\"Choi\",\"person\":{\"name\":\"Marc Aden\",\"ids\"\
+          :{\"trakt\":413639,\"slug\":\"marc-aden\",\"imdb\":\"nm0336802\",\"tmdb\"\
+          :9384,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/639/headshots/original/d2d47152fa.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/639/headshots/medium/d2d47152fa.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/639/headshots/thumb/d2d47152fa.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"Marc Aden Gray is an actor and writer.\",\"birthday\":null,\"death\"\
+          :null,\"birthplace\":\"\",\"homepage\":\"\"}},{\"character\":\"White Rabbit\
+          \ Girl\",\"person\":{\"name\":\"Ada Nicodemou\",\"ids\":{\"trakt\":413643,\"\
+          slug\":\"ada-nicodemou\",\"imdb\":\"nm0630124\",\"tmdb\":181214,\"tvrage\"\
+          :24685},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/643/headshots/original/c2443a53dc.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/643/headshots/medium/c2443a53dc.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/643/headshots/thumb/c2443a53dc.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"\",\"birthday\":\"1977-05-14\",\"death\":null,\"birthplace\":\"Auburn,\
+          \ Sydney, Australia\",\"homepage\":\"\"}},{\"character\":\"Priestess\",\"\
+          person\":{\"name\":\"Deni Gordon\",\"ids\":{\"trakt\":413646,\"slug\":\"\
+          deni-gordon\",\"imdb\":\"nm0330139\",\"tmdb\":1090466,\"tvrage\":null},\"\
+          images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/646/headshots/original/6c5d83af47.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/646/headshots/medium/6c5d83af47.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/646/headshots/thumb/6c5d83af47.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :\"\"}},{\"character\":\"Spoon Boy\",\"person\":{\"name\":\"Rowan Witt\"\
+          ,\"ids\":{\"trakt\":413649,\"slug\":\"rowan-witt\",\"imdb\":\"nm0936894\"\
+          ,\"tmdb\":218366,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"\
+          https://walter.trakt.us/images/people/000/413/649/headshots/original/7a352ccabf.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/649/headshots/medium/7a352ccabf.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/649/headshots/thumb/7a352ccabf.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"\",\"birthday\":\"1988-11-05\",\"death\":null,\"birthplace\":null,\"\
+          homepage\":\"\"}},{\"character\":\"Lieutenant\",\"person\":{\"name\":\"\
+          Bill Young\",\"ids\":{\"trakt\":413652,\"slug\":\"bill-young\",\"imdb\"\
+          :\"nm0949303\",\"tmdb\":57799,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/people/000/413/652/headshots/original/a5ec47f2d1.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/652/headshots/medium/a5ec47f2d1.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/652/headshots/thumb/a5ec47f2d1.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":\"1950-06-01\",\"death\":null,\"birthplace\":\"\",\"\
+          homepage\":null}},{\"character\":\"Potential\",\"person\":{\"name\":\"Eleanor\
+          \ Witt\",\"ids\":{\"trakt\":413655,\"slug\":\"eleanor-witt\",\"imdb\":\"\
+          nm0936860\",\"tmdb\":1209244,\"tvrage\":null},\"images\":{\"headshot\":{\"\
+          full\":\"https://walter.trakt.us/images/people/000/413/655/headshots/original/b5a84ebd00.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/655/headshots/medium/b5a84ebd00.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/655/headshots/thumb/b5a84ebd00.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :null}},{\"character\":\"Potential\",\"person\":{\"name\":\"Tamara Brown\"\
+          ,\"ids\":{\"trakt\":413659,\"slug\":\"tamara-brown\",\"imdb\":\"nm0114756\"\
+          ,\"tmdb\":1209245,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"\
+          https://walter.trakt.us/images/people/000/413/659/headshots/original/5811c11ff4.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/659/headshots/medium/5811c11ff4.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/659/headshots/thumb/5811c11ff4.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :null}},{\"character\":\"Potential\",\"person\":{\"name\":\"Janaya Pender\"\
+          ,\"ids\":{\"trakt\":6816,\"slug\":\"janaya-pender\",\"imdb\":\"nm0671665\"\
+          ,\"tmdb\":1209246,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
+          :null,\"homepage\":null}},{\"character\":\"Potential\",\"person\":{\"name\"\
+          :\"Adryn White\",\"ids\":{\"trakt\":6817,\"slug\":\"adryn-white\",\"imdb\"\
+          :\"nm0924423\",\"tmdb\":1209247,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
+          :null,\"birthplace\":null,\"homepage\":null}},{\"character\":\"Potential\"\
+          ,\"person\":{\"name\":\"Natalie Tjen\",\"ids\":{\"trakt\":6819,\"slug\"\
+          :\"natalie-tjen\",\"imdb\":\"nm0864666\",\"tmdb\":1209248,\"tvrage\":null},\"\
+          images\":{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"\
+          fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"\
+          birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"\
+          character\":\"FedEx Man\",\"person\":{\"name\":\"David O'Connor\",\"ids\"\
+          :{\"trakt\":6821,\"slug\":\"david-o-connor\",\"imdb\":\"nm0640292\",\"tmdb\"\
+          :1209249,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"medium\"\
+          :null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\"\
+          :null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
+          :null,\"homepage\":null}},{\"character\":\"Businessman\",\"person\":{\"\
+          name\":\"Jeremy Ball\",\"ids\":{\"trakt\":413664,\"slug\":\"jeremy-ball-7545f463-cee6-4be7-83f6-5a029d7ff1a2\"\
+          ,\"imdb\":\"nm0050390\",\"tmdb\":1209250,\"tvrage\":null},\"images\":{\"\
+          headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/664/headshots/original/22a53f3ff0.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/664/headshots/medium/22a53f3ff0.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/664/headshots/thumb/22a53f3ff0.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :null}},{\"character\":\"Woman in Red\",\"person\":{\"name\":\"Fiona Johnson\"\
+          ,\"ids\":{\"trakt\":413668,\"slug\":\"fiona-johnson\",\"imdb\":\"nm0425087\"\
+          ,\"tmdb\":1209251,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"\
+          https://walter.trakt.us/images/people/000/413/668/headshots/original/44eaa943a0.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/668/headshots/medium/44eaa943a0.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/668/headshots/thumb/44eaa943a0.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :null}},{\"character\":\"Old Man\",\"person\":{\"name\":\"Harry Lawrence\"\
+          ,\"ids\":{\"trakt\":6826,\"slug\":\"harry-lawrence\",\"imdb\":\"nm0492790\"\
+          ,\"tmdb\":110411,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
+          :null,\"homepage\":null}},{\"character\":\"Blind Man\",\"person\":{\"name\"\
+          :\"Steve Dodd\",\"ids\":{\"trakt\":413670,\"slug\":\"steve-dodd\",\"imdb\"\
+          :\"nm0230117\",\"tmdb\":212562,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/people/000/413/670/headshots/original/a7a9a83251.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/670/headshots/medium/a7a9a83251.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/670/headshots/thumb/a7a9a83251.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :null}},{\"character\":\"Security Guard\",\"person\":{\"name\":\"Luke Quinton\"\
+          ,\"ids\":{\"trakt\":413673,\"slug\":\"luke-quinton\",\"imdb\":\"nm0704280\"\
+          ,\"tmdb\":1209252,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"\
+          https://walter.trakt.us/images/people/000/413/673/headshots/original/c11ff73279.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/673/headshots/medium/c11ff73279.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/673/headshots/thumb/c11ff73279.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :null}},{\"character\":\"Guard\",\"person\":{\"name\":\"Lawrence Woodward\"\
+          ,\"ids\":{\"trakt\":413675,\"slug\":\"lawrence-woodward\",\"imdb\":\"nm0940959\"\
+          ,\"tmdb\":75715,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/675/headshots/original/912ae34d45.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/675/headshots/medium/912ae34d45.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/675/headshots/thumb/912ae34d45.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":\"\",\"homepage\"\
+          :null}},{\"character\":\"Cop Who Captures Neo\",\"person\":{\"name\":\"\
+          Michael Butcher\",\"ids\":{\"trakt\":6833,\"slug\":\"michael-butcher\",\"\
+          imdb\":\"nm0124697\",\"tmdb\":1209253,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
+          :null,\"birthplace\":null,\"homepage\":null}},{\"character\":\"Big Cop\"\
+          ,\"person\":{\"name\":\"Bernard Ledger\",\"ids\":{\"trakt\":6835,\"slug\"\
+          :\"bernard-ledger\",\"imdb\":\"nm0496567\",\"tmdb\":1209254,\"tvrage\":null},\"\
+          images\":{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"\
+          fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"\
+          birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"\
+          character\":\"Cop\",\"person\":{\"name\":\"Robert Simper\",\"ids\":{\"trakt\"\
+          :413679,\"slug\":\"robert-simper\",\"imdb\":\"nm0800854\",\"tmdb\":26753,\"\
+          tvrage\":null},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/679/headshots/original/c86afaaf10.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/679/headshots/medium/c86afaaf10.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/679/headshots/thumb/c86afaaf10.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":\"\",\"homepage\"\
+          :null}},{\"character\":\"Cop\",\"person\":{\"name\":\"Chris Pattinson\"\
+          ,\"ids\":{\"trakt\":413683,\"slug\":\"chris-pattinson\",\"imdb\":\"nm0778966\"\
+          ,\"tmdb\":1209255,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"\
+          https://walter.trakt.us/images/people/000/413/683/headshots/original/82bccbfb57.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/683/headshots/medium/82bccbfb57.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/683/headshots/thumb/82bccbfb57.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :null}},{\"character\":\"Parking Cop\",\"person\":{\"name\":\"Nigel Harbach\"\
+          ,\"ids\":{\"trakt\":413685,\"slug\":\"nigel-harbach\",\"imdb\":\"nm0361876\"\
+          ,\"tmdb\":1209256,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"\
+          https://walter.trakt.us/images/people/000/413/685/headshots/original/e86a380a59.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/685/headshots/medium/e86a380a59.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/685/headshots/thumb/e86a380a59.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :null}},{\"character\":\"Shaylae - Woman in Office (uncredited)\",\"person\"\
+          :{\"name\":\"Rana Morrison\",\"ids\":{\"trakt\":413688,\"slug\":\"rana-morrison\"\
+          ,\"imdb\":\"nm3269395\",\"tmdb\":1209257,\"tvrage\":null},\"images\":{\"\
+          headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/688/headshots/original/36466146c0.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/688/headshots/medium/36466146c0.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/688/headshots/thumb/36466146c0.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :\"\"}}],\"crew\":{\"production\":[{\"job\":\"Casting\",\"person\":{\"name\"\
+          :\"Mali Finn\",\"ids\":{\"trakt\":1363,\"slug\":\"mali-finn\",\"imdb\":\"\
+          nm0278139\",\"tmdb\":1262,\"tvrage\":null},\"images\":{\"headshot\":{\"\
+          full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":\"1938-03-08\"\
+          ,\"death\":\"2007-11-28\",\"birthplace\":null,\"homepage\":null}},{\"job\"\
+          :\"Casting\",\"person\":{\"name\":\"Shauna Wolifson\",\"ids\":{\"trakt\"\
+          :6865,\"slug\":\"shauna-wolifson\",\"imdb\":\"nm0938441\",\"tmdb\":9342,\"\
+          tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"\
+          biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"\
+          homepage\":null}},{\"job\":\"Producer\",\"person\":{\"name\":\"Joel Silver\"\
+          ,\"ids\":{\"trakt\":11366,\"slug\":\"joel-silver\",\"imdb\":\"nm0005428\"\
+          ,\"tmdb\":1091,\"tvrage\":92573},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/011/366/headshots/original/e0ef66bbc5.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/011/366/headshots/medium/e0ef66bbc5.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/011/366/headshots/thumb/e0ef66bbc5.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"From Wikipedia, the free encyclopedia.\\n\\nJoel Silver\_(born July 14,\
+          \ 1952) is an American\_film producer, known for\_action films\_like\_Lethal\
+          \ Weapon\_and\_Die Hard. He is owner of\_Silver Pictures\_and co-founder\
+          \ of\_Dark Castle Entertainment.\\n\\nSilver grew up in\_South Orange, New\
+          \ Jersey, the son of a writer and a public relations executive.\_He attended\_\
+          Columbia High School\_in\_Maplewood, New Jersey, where he is credited with\
+          \ inventing the sport of\_Ultimate\_(then known as \\\"Ultimate Frisbee\\\
+          \").\_In 1970, he entered\_Lafayette College, where he formed the first\
+          \ collegiate Ultimate team. He finished his undergraduate studies at the\_\
+          New York University's\_Tisch School of the Arts. Silver began his career\
+          \ at\_Lawrence Gordon Productions, where he eventually became president\
+          \ of motion pictures for the company. He earned his first screen credit\
+          \ as the associate producer on\_The Warriors\_and, with Gordon, produced\_\
+          48 Hrs.,Streets of Fire\_and\_Brewster's Millions. In 1985, he formed\_\
+          Silver Pictures\_and produced successful action films such as\_Commando\_\
+          (1985), the\_Lethal Weapon\_franchise, the first two films of the\_Die Hard\_\
+          series and the\_The Matrix\_franchise of action films. Silver appears on-screen\
+          \ at the beginning of\_Who Framed Roger Rabbit\_as Raoul J. Raoul, the director\
+          \ of the animated short\_Something's Cookin. Silver directed \\\"Split Personality\\\
+          \", (1992), an episode of the\_HBO\_horror anthology,\_Tales from the Crypt.\
+          \ He currently runs two production companies,\_Silver Pictures\_and\_Dark\
+          \ Castle Entertainment\_co-owned by\_Robert Zemeckis. Along with Jared Kass,\
+          \ Silver was co-creator of the sport of\_Ultimate. On July 10, 1999, Silver\
+          \ married his production assistant Karyn Fields.\\n\\nDescription above\
+          \ from the Wikipedia article Joel Silver, licensed under CC-BY-SA, full\
+          \ list of contributors on Wikipedia.\",\"birthday\":\"1952-07-14\",\"death\"\
+          :null,\"birthplace\":\"South Orange, New Jersey, USA\",\"homepage\":\"\"\
+          }}],\"editing\":[{\"job\":\"Editor\",\"person\":{\"name\":\"Zach Staenberg\"\
+          ,\"ids\":{\"trakt\":3454,\"slug\":\"zach-staenberg\",\"imdb\":\"nm0821205\"\
+          ,\"tmdb\":4671,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
+          :null,\"homepage\":null}}],\"sound\":[{\"job\":\"Original Music Composer\"\
+          ,\"person\":{\"name\":\"Don Davis\",\"ids\":{\"trakt\":3615,\"slug\":\"\
+          don-davis\",\"imdb\":\"nm0204485\",\"tmdb\":4949,\"tvrage\":null},\"images\"\
+          :{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\":\"\",\"birthday\"\
+          :\"1957-02-04\",\"death\":null,\"birthplace\":\"Anaheim, California, USA\"\
+          ,\"homepage\":\"\"}},{\"job\":\"Supervising Sound Effects Editor\",\"person\"\
+          :{\"name\":\"Dane A. Davis\",\"ids\":{\"trakt\":6873,\"slug\":\"dane-a-davis\"\
+          ,\"imdb\":\"nm0204424\",\"tmdb\":9349,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
+          :null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Sound Editor\"\
+          ,\"person\":{\"name\":\"Zigmund Gron\",\"ids\":{\"trakt\":6876,\"slug\"\
+          :\"zigmund-gron\",\"imdb\":\"nm0343065\",\"tmdb\":9351,\"tvrage\":null},\"\
+          images\":{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"\
+          fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"\
+          birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"\
+          costume & make-up\":[{\"job\":\"Costume Design\",\"person\":{\"name\":\"\
+          Kym Barrett\",\"ids\":{\"trakt\":4764,\"slug\":\"kym-barrett\",\"imdb\"\
+          :\"nm0057199\",\"tmdb\":6209,\"tvrage\":null},\"images\":{\"headshot\":{\"\
+          full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":\"1977-01-11\"\
+          ,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"camera\":[{\"\
+          job\":\"Director of Photography\",\"person\":{\"name\":\"Bill Pope\",\"\
+          ids\":{\"trakt\":5936,\"slug\":\"bill-pope\",\"imdb\":\"nm0691084\",\"tmdb\"\
+          :9341,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/005/936/headshots/original/4e3a38da47.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/005/936/headshots/medium/4e3a38da47.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/005/936/headshots/thumb/4e3a38da47.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":\"1952-06-19\",\"death\":null,\"birthplace\":null,\"\
+          homepage\":null}}],\"art\":[{\"job\":\"Production Design\",\"person\":{\"\
+          name\":\"Owen Paterson\",\"ids\":{\"trakt\":6866,\"slug\":\"owen-paterson\"\
+          ,\"imdb\":\"nm0665517\",\"tmdb\":9343,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
+          :null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Art Direction\"\
+          ,\"person\":{\"name\":\"Hugh Bateup\",\"ids\":{\"trakt\":6867,\"slug\":\"\
+          hugh-bateup\",\"imdb\":\"nm0061064\",\"tmdb\":9344,\"tvrage\":null},\"images\"\
+          :{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\"\
+          :null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"\
+          Art Direction\",\"person\":{\"name\":\"Michelle McGahey\",\"ids\":{\"trakt\"\
+          :6870,\"slug\":\"michelle-mcgahey\",\"imdb\":\"nm0568894\",\"tmdb\":9345,\"\
+          tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"\
+          biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"\
+          homepage\":null}},{\"job\":\"Set Decoration\",\"person\":{\"name\":\"Lisa\
+          \ Brennan\",\"ids\":{\"trakt\":6872,\"slug\":\"lisa-brennan\",\"imdb\":\"\
+          nm0107345\",\"tmdb\":9346,\"tvrage\":null},\"images\":{\"headshot\":{\"\
+          full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
+          :null,\"birthplace\":null,\"homepage\":null}}],\"crew\":[{\"job\":\"Special\
+          \ Effects\",\"person\":{\"name\":\"Richard Alexander\",\"ids\":{\"trakt\"\
+          :6877,\"slug\":\"richard-alexander\",\"imdb\":\"nm0018689\",\"tmdb\":9354,\"\
+          tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"\
+          biography\":\"\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"\
+          homepage\":\"\"}},{\"job\":\"Special Effects\",\"person\":{\"name\":\"Brian\
+          \ Belcher\",\"ids\":{\"trakt\":6878,\"slug\":\"brian-belcher\",\"imdb\"\
+          :\"nm0067633\",\"tmdb\":9355,\"tvrage\":null},\"images\":{\"headshot\":{\"\
+          full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
+          :null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Stunts\",\"person\"\
+          :{\"name\":\"Glenn Boswell\",\"ids\":{\"trakt\":6879,\"slug\":\"glenn-boswell\"\
+          ,\"imdb\":\"nm0098342\",\"tmdb\":9357,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
+          :null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Special Effects\
+          \ Coordinator\",\"person\":{\"name\":\"Steve Courtley\",\"ids\":{\"trakt\"\
+          :6880,\"slug\":\"steve-courtley\",\"imdb\":\"nm0183871\",\"tmdb\":9593,\"\
+          tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"\
+          biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"\
+          homepage\":null}}],\"writing\":[{\"job\":\"Screenplay\",\"person\":{\"name\"\
+          :\"Lilly Wachowski\",\"ids\":{\"trakt\":413676,\"slug\":\"lilly-wachowski\"\
+          ,\"imdb\":\"nm0905152\",\"tmdb\":9339,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/people/000/413/676/headshots/original/cecbe9b237.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/676/headshots/medium/cecbe9b237.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/676/headshots/thumb/cecbe9b237.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"Lana Wachowski (born June 21, 1965) and Lilly Wachowski (born December\
+          \ 29, 1967), siblings collectively known as The Wachowskis (formerly The\
+          \ Wachowski Brothers), are American film directors, writers and producers,\
+          \ most famous for creating The Matrix series. Their most recent project\
+          \ was producing Ninja Assassin.\\n\\nDescription above from the Wikipedia\
+          \ article Andy Wachowski, licensed under CC-BY-SA, full list of contributors\
+          \ on Wikipedia.\",\"birthday\":\"1967-12-29\",\"death\":null,\"birthplace\"\
+          :\"Chicago, Illinois, United States\",\"homepage\":\"\"}},{\"job\":\"Screenplay\"\
+          ,\"person\":{\"name\":\"Lana Wachowski\",\"ids\":{\"trakt\":413681,\"slug\"\
+          :\"lana-wachowski\",\"imdb\":\"nm0905154\",\"tmdb\":9340,\"tvrage\":null},\"\
+          images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/681/headshots/original/2e09778274.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/681/headshots/medium/2e09778274.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/681/headshots/thumb/2e09778274.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"Lana Wachowski (born June 21, 1965) and Lilly Wachowski (born December\
+          \ 29, 1967), siblings collectively known as The Wachowskis (formerly The\
+          \ Wachowski Brothers), are American film directors, writers and producers,\
+          \ most famous for creating The Matrix series. Their most recent project\
+          \ was producing Ninja Assassin.\\n\\nDescription above from the Wikipedia\
+          \ article Lana Wachowski, licensed under CC-BY-SA, full list of contributors\
+          \ on Wikipedia.\",\"birthday\":\"1965-06-21\",\"death\":null,\"birthplace\"\
+          :\"Chicago, Illinois, USA \",\"homepage\":\"\"}}],\"directing\":[{\"job\"\
+          :\"Director\",\"person\":{\"name\":\"Lilly Wachowski\",\"ids\":{\"trakt\"\
+          :413676,\"slug\":\"lilly-wachowski\",\"imdb\":\"nm0905152\",\"tmdb\":9339,\"\
+          tvrage\":null},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/676/headshots/original/cecbe9b237.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/676/headshots/medium/cecbe9b237.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/676/headshots/thumb/cecbe9b237.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"Lana Wachowski (born June 21, 1965) and Lilly Wachowski (born December\
+          \ 29, 1967), siblings collectively known as The Wachowskis (formerly The\
+          \ Wachowski Brothers), are American film directors, writers and producers,\
+          \ most famous for creating The Matrix series. Their most recent project\
+          \ was producing Ninja Assassin.\\n\\nDescription above from the Wikipedia\
+          \ article Andy Wachowski, licensed under CC-BY-SA, full list of contributors\
+          \ on Wikipedia.\",\"birthday\":\"1967-12-29\",\"death\":null,\"birthplace\"\
+          :\"Chicago, Illinois, United States\",\"homepage\":\"\"}},{\"job\":\"Director\"\
+          ,\"person\":{\"name\":\"Lana Wachowski\",\"ids\":{\"trakt\":413681,\"slug\"\
+          :\"lana-wachowski\",\"imdb\":\"nm0905154\",\"tmdb\":9340,\"tvrage\":null},\"\
+          images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/681/headshots/original/2e09778274.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/681/headshots/medium/2e09778274.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/681/headshots/thumb/2e09778274.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"Lana Wachowski (born June 21, 1965) and Lilly Wachowski (born December\
+          \ 29, 1967), siblings collectively known as The Wachowskis (formerly The\
+          \ Wachowski Brothers), are American film directors, writers and producers,\
+          \ most famous for creating The Matrix series. Their most recent project\
+          \ was producing Ninja Assassin.\\n\\nDescription above from the Wikipedia\
+          \ article Lana Wachowski, licensed under CC-BY-SA, full list of contributors\
+          \ on Wikipedia.\",\"birthday\":\"1965-06-21\",\"death\":null,\"birthplace\"\
+          :\"Chicago, Illinois, USA \",\"homepage\":\"\"}}]}}"}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [296c8a295bcf202a-DFW]
+        cf-cache-status: [MISS]
+        cf-ray: [29a027f8d36a03dc-DFW]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:57:38 GMT']
-        etag: [W/"47a63498278113571c8431c5d693a392"]
-        expires: ['Thu, 21 Apr 2016 03:57:38 GMT']
+        date: ['Wed, 27 Apr 2016 06:18:16 GMT']
+        etag: [W/"8b3844425461740439b060a2011aa912"]
+        expires: ['Wed, 27 Apr 2016 10:18:16 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=df28cae33881da99ff0237f487def08671461196658; expires=Thu,
-            20-Apr-17 23:57:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d75418d1f41312b7b705f0c6822b7d3b71461737895; expires=Thu,
+            27-Apr-17 06:18:15 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [501f0d49-f02d-45bd-83b0-9a08301d35c4]
-        x-runtime: ['0.132757']
+        x-request-id: [cd014a6c-c544-4177-8223-53c3aebe9b29]
+        x-runtime: ['0.111388']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

@@ -9,7 +9,7 @@ from flexget.event import event
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.api_trakt import ApiTrakt, list_actors
+    from flexget.plugins.api_trakt import ApiTrakt, list_actors, list_images
     lookup_series = ApiTrakt.lookup_series
     lookup_movie = ApiTrakt.lookup_movie
 except ImportError:
@@ -133,6 +133,7 @@ class PluginTraktLookup(object):
         'trakt_votes': 'votes',
         'trakt_language': 'language',
         'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
+        'trakt_images': lambda im: list_images(im.images)
     }
 
     movie_actor_map = {
