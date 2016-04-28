@@ -1,14 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
-from past.builtins import basestring
 from future.moves.urllib.error import HTTPError, URLError
-from functools import total_ordering
+from future.utils import python_2_unicode_compatible
 
 import logging
 import os
 import re
 import time
 import warnings
+from functools import total_ordering
 from http.client import BadStatusLine
 
 from path import Path
@@ -22,6 +22,7 @@ from flexget.event import fire_event, remove_event_handlers
 log = logging.getLogger('plugin')
 
 
+@python_2_unicode_compatible
 class DependencyError(Exception):
     """Plugin depends on other plugin, but it cannot be loaded.
 
@@ -69,6 +70,7 @@ class RegisterException(Exception):
         return repr(self.value)
 
 
+@python_2_unicode_compatible
 class PluginWarning(Warning):
 
     def __init__(self, value, logger=log, **kwargs):
@@ -77,29 +79,24 @@ class PluginWarning(Warning):
         self.log = logger
         self.kwargs = kwargs
 
-    def __bytes__(self):
-        return str(self).encode('utf-8')
-
     def __str__(self):
         return self.value
 
 
+@python_2_unicode_compatible
 class PluginError(Exception):
 
     def __init__(self, value, logger=log, **kwargs):
         super(PluginError, self).__init__()
         # Value is expected to be a string
-        if not isinstance(value, basestring):
+        if not isinstance(value, str):
             value = str(value)
         self.value = value
         self.log = logger
         self.kwargs = kwargs
 
-    def __bytes__(self):
-        return str(self).encode('utf-8')
-
     def __str__(self):
-        return str(self.value)
+        return self.value
 
 
 # TODO: move to utils or somewhere more appropriate
@@ -245,7 +242,7 @@ class PluginInfo(dict):
             name = re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
         if contexts is None:
             contexts = ['task']
-        elif isinstance(contexts, basestring):
+        elif isinstance(contexts, str):
             contexts = [contexts]
         if category is None and plugin_class.__module__.startswith('flexget.plugins'):
             # By default look at the containing package of the plugin.

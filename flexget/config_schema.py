@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
-from past.builtins import basestring
 
 from future.moves.urllib.parse import urlparse, parse_qsl
 
@@ -263,7 +262,7 @@ def set_error_message(error):
     """
     # First, replace default error messages with our custom ones
     if error.validator == 'type':
-        if isinstance(error.validator_value, basestring):
+        if isinstance(error.validator_value, str):
             valid_types = [error.validator_value]
         else:
             valid_types = list(error.validator_value)

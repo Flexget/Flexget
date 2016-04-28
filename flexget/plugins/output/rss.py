@@ -3,6 +3,7 @@ from builtins import *
 
 import base64
 import hashlib
+import io
 import logging
 import datetime
 import os
@@ -228,7 +229,7 @@ class OutputRSS(object):
                 hasher.update(db_item.title.encode('utf8'))
                 hasher.update(db_item.description.encode('utf8'))
                 hasher.update(db_item.link.encode('utf8'))
-                guid = base64.urlsafe_b64encode(hasher.digest())
+                guid = base64.urlsafe_b64encode(hasher.digest()).decode('ascii')
                 guid = PyRSS2Gen.Guid(guid, isPermaLink=False)
 
                 gen = {'title': db_item.title,
@@ -256,7 +257,7 @@ class OutputRSS(object):
 
         # write rss
         fn = os.path.expanduser(config['file'])
-        with open(fn, 'w') as file:
+        with io.open(fn, 'wb') as file:
             try:
                 log.verbose('Writing output rss to %s' % fn)
                 rss.write_xml(file, encoding=config['encoding'])

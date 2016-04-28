@@ -3,6 +3,7 @@ from builtins import *
 
 import logging
 import queue
+import sys
 import threading
 import time
 
@@ -92,6 +93,12 @@ class TaskQueue(object):
         Waits for the thread to exit.
         Allows abortion of task queue with ctrl-c
         """
+        if sys.version_info >= (3, 4):
+            # Due to python bug, Thread.is_alive doesn't seem to work properly under our conditions on python 3.4+
+            # http://bugs.python.org/issue26793
+            # TODO: Is it important to have the clean abortion? Do we need to find a better way?
+            self._thread.join()
+            return
         try:
             while self._thread.is_alive():
                 time.sleep(0.5)

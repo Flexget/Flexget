@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
-from past.builtins import basestring
 
 import copy
 import hashlib
@@ -78,7 +77,7 @@ class EntryIterator(object):
 
     def __init__(self, entries, states):
         self.all_entries = entries
-        if isinstance(states, basestring):
+        if isinstance(states, str):
             states = [states]
         self.filter = lambda e: e._state in states
 
