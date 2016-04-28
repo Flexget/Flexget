@@ -535,7 +535,6 @@ class TraktShow(Base):
             "runtime": self.runtime,
             "certification": self.certification,
             "network": self.network,
-            "poster": self.poster,
             "country": self.country,
             "status": self.status,
             "rating": self.rating,
