@@ -349,9 +349,9 @@ class TraktActor(Base):
     def to_dict(self):
         return {
             'name': self.name,
-            'trakt_id': self.trakt_id,
-            'imdb_id': self.imdb_id,
-            'tmdb_id': self.tmdb_id
+            'trakt_id': self.id,
+            'imdb_id': self.imdb,
+            'tmdb_id': self.tmdb
         }
 
 
@@ -366,11 +366,10 @@ def get_db_images(image, session):
                     flat.append(a)
         for i in flat:
             url = i.get('url')
-            image = session.query(TraktImages).filter(TraktImages.url == url).first()
-            if not image:
-                image = TraktImages(i, session)
-                session.add(image)
-            images.append(image)
+            im = session.query(TraktImages).filter(TraktImages.url == url).first()
+            if not im:
+                im = TraktImages(i, session)
+            images.append(im)
         return images
     except:
         log.debug('Something went wrong with images')
