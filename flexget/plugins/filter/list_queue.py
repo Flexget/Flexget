@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
 
 import logging
+
+from builtins import *
 
 from flexget import plugin
 from flexget.event import event
@@ -36,10 +37,23 @@ class ListQueue(object):
                     log.info('`%s` is marked as online, would accept and remove items outside of --test mode.',
                              plugin_name)
                     continue
+                cached_items = []
                 for entry in task.entries:
-                    if entry in thelist:
+                    result = thelist.get(entry, task.session)
+                    if result and result not in cached_items:
                         entry.accept()
-                        thelist.discard(entry)
+                        cached_items.append(result)
+
+    def on_task_learn(self, task, config):
+        for item in config:
+            for plugin_name, plugin_config in item.items():
+                thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+                if task.manager.options.test and thelist.online:
+                    log.info('`%s` is marked as online, would remove accepted items outside of --test mode.',
+                             plugin_name)
+                    continue
+                log.verbose('removing accepted entries from %s - %s', plugin_name, plugin_config)
+                thelist -= task.accepted
 
 
 @event('plugin.register')

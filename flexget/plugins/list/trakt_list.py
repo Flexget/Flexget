@@ -208,7 +208,7 @@ class TraktSet(MutableSet):
         return False
 
     def season_match(self, entry1, entry2):
-        return (self.series_match(entry1, entry2) and entry1.get('series_season') is not None and
+        return (self.show_match(entry1, entry2) and entry1.get('series_season') is not None and
                 entry1['series_season'] == entry2.get('series_season'))
 
     def episode_match(self, entry1, entry2):

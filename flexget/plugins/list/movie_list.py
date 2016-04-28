@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
 
 import logging
 from collections import MutableSet
 from datetime import datetime
 
+from builtins import *
 from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
@@ -181,6 +181,9 @@ class MovieList(MutableSet):
         """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
         like test mode"""
         return False
+
+    def get(self, entry, session):
+        return self._find_entry(entry, session=session)
 
 
 class PluginMovieList(object):
