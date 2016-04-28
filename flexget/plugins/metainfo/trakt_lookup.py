@@ -196,7 +196,7 @@ class PluginTraktLookup(object):
                           'session': session}
             try:
                 series = lookup_series(**lookupargs)
-                episode = series.get_episode(entry['series_season'], entry['series_episode'])
+                episode = series.get_episode(entry['series_season'], entry['series_episode'], session)
             except LookupError as e:
                 log.debug('Error looking up trakt episode information for %s: %s', entry['title'], e.args[0])
             else:
@@ -248,7 +248,7 @@ class PluginTraktLookup(object):
             try:
                 item = lookup(**lookupargs)
                 if style == 'episode':
-                    item = item.get_episode(entry['series_season'], entry['series_episode'])
+                    item = item.get_episode(entry['series_season'], entry['series_episode'], session)
                 collected = ApiTrakt.collected(style, item, entry.get('title'), username=config.get('username'),
                                                account=config.get('account'))
             except LookupError as e:
@@ -271,7 +271,7 @@ class PluginTraktLookup(object):
             try:
                 item = lookup(**lookupargs)
                 if style == 'episode':
-                    item = item.get_episode(entry['series_season'], entry['series_episode'])
+                    item = item.get_episode(entry['series_season'], entry['series_episode'], session)
                 watched = ApiTrakt.watched(style, item, entry.get('title'), username=config.get('username'),
                                            account=config.get('account'))
             except LookupError as e:

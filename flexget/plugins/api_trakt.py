@@ -450,18 +450,18 @@ class TraktEpisode(Base):
     number = Column(Integer)
     number_abs = Column(Integer)
     overview = Column(Unicode)
-    poster = Column(Unicode)
+    images = relation(TraktImages, secondary=trakt_image_episodes)
     first_aired = Column(DateTime)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
 
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=False)
 
-    def __init__(self, trakt_episode):
+    def __init__(self, trakt_episode, session):
         super(TraktEpisode, self).__init__()
-        self.update(trakt_episode)
+        self.update(trakt_episode, session)
 
-    def update(self, trakt_episode):
+    def update(self, trakt_episode, session):
         """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
         if self.id and self.id != trakt_episode['ids']['trakt']:
             raise Exception('Tried to update db ep with different ep data')
@@ -470,10 +470,8 @@ class TraktEpisode(Base):
         self.imdb_id = trakt_episode['ids']['imdb']
         self.tmdb_id = trakt_episode['ids']['tmdb']
         self.tvrage_id = trakt_episode['ids']['tvrage']
-        if trakt_episode['images']['screenshot']['full']:
-            self.poster = trakt_episode['images']['screenshot']['full']
-        else:
-            self.poster = None
+        if trakt_episode.get('images'):
+            self.images = get_db_images(trakt_episode.get('images'), session)
         self.tvdb_id = trakt_episode['ids']['tvdb']
         self.first_aired = None
         if trakt_episode.get('first_aired'):
@@ -508,7 +506,7 @@ class TraktShow(Base):
     runtime = Column(Integer)
     certification = Column(Unicode)
     network = Column(Unicode)
-    poster = Column(Unicode)
+    images = relation(TraktImages, secondary=trakt_image_shows)
     country = Column(Unicode)
     status = Column(String)
     rating = Column(Integer)
@@ -566,10 +564,8 @@ class TraktShow(Base):
         self.tmdb_id = trakt_show['ids']['tmdb']
         self.tvrage_id = trakt_show['ids']['tvrage']
         self.tvdb_id = trakt_show['ids']['tvdb']
-        if trakt_show['images']['poster']['full']:
-            self.poster = trakt_show['images']['poster']['full']
-        else:
-            self.poster = None
+        if trakt_show.get('images'):
+            self.images = get_db_images(trakt_show.get('images'), session)
         if trakt_show.get('air_time'):
             self.air_time = dateutil_parse(trakt_show.get('air_time'), ignoretz=True)
         else:
@@ -587,7 +583,7 @@ class TraktShow(Base):
         self.genres[:] = get_db_genres(trakt_show.get('genres', []), session)
         self.cached_at = datetime.now()
 
-    def get_episode(self, season, number, only_cached=False):
+    def get_episode(self, season, number, session, only_cached=False):
         # TODO: Does series data being expired mean all episode data should be refreshed?
         episode = self.episodes.filter(TraktEpisode.season == season).filter(TraktEpisode.number == number).first()
         if not episode or self.expired:
@@ -604,9 +600,9 @@ class TraktShow(Base):
                 raise LookupError('No data in response from trakt %s' % url)
             episode = self.episodes.filter(TraktEpisode.id == data['ids']['trakt']).first()
             if episode:
-                episode.update(data)
+                episode.update(data, session)
             else:
-                episode = TraktEpisode(data)
+                episode = TraktEpisode(data, session)
                 self.episodes.append(episode)
         return episode
 
