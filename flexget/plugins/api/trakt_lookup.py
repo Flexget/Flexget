@@ -29,12 +29,12 @@ class objects_container(object):
             'genres': {'type': 'array', 'items': 'string'},
             'id': {'type': 'integer'},
             "overview": {'type': 'string'},
-            "poster": {'type': 'string'},
             "runtime": {'type': 'integer'},
             "rating": {'type': 'number'},
             "votes": {'type': 'integer'},
             "language": {'type': 'string'},
             "updated_at": {'type': 'string', 'format': 'date-time'},
+            "images": {'type': 'array', 'items': 'string'}
 
         }
     }
@@ -54,6 +54,7 @@ class objects_container(object):
     movie_return_object = copy.deepcopy(base_return_object)
     movie_return_object['properties']['tagline'] = {'type': 'string'}
     movie_return_object['properties']['released'] = {'type': 'string'}
+    movie_return_object['properties']['poster'] = {'type': 'string'}
 
     default_error_object = {
         'type': 'object',
