@@ -644,7 +644,6 @@ class TraktMovie(Base):
     tmdb_id = Column(Integer)
     tagline = Column(Unicode)
     overview = Column(Unicode)
-    poster = Column(Unicode)
     released = Column(Date)
     runtime = Column(Integer)
     rating = Column(Integer)
@@ -670,7 +669,6 @@ class TraktMovie(Base):
             "tmdb_id": self.tmdb_id,
             "tagline": self.tagline,
             "overview": self.overview,
-            "poster": self.poster,
             "released": self.released,
             "runtime": self.runtime,
             "rating": self.rating,
@@ -692,10 +690,6 @@ class TraktMovie(Base):
         self.slug = trakt_movie['ids']['slug']
         self.imdb_id = trakt_movie['ids']['imdb']
         self.tmdb_id = trakt_movie['ids']['tmdb']
-        if trakt_movie['images']['poster']['full']:
-            self.poster = trakt_movie['images']['poster']['full']
-        else:
-            self.poster = None
         for col in ['title', 'overview', 'runtime', 'rating', 'votes', 'language', 'tagline', 'year']:
             setattr(self, col, trakt_movie.get(col))
         if self.released:

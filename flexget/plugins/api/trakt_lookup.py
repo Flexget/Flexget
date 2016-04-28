@@ -54,7 +54,6 @@ class objects_container(object):
     movie_return_object = copy.deepcopy(base_return_object)
     movie_return_object['properties']['tagline'] = {'type': 'string'}
     movie_return_object['properties']['released'] = {'type': 'string'}
-    movie_return_object['properties']['poster'] = {'type': 'string'}
 
     default_error_object = {
         'type': 'object',
