@@ -167,7 +167,10 @@ class PluginSubliminal(object):
             # save subtitles to disk
             for video, subtitle in downloaded_subtitles.items():
                 if subtitle:
-                    subliminal.save_subtitles(video, subtitle, single=single_mode, directory=config.get('directory', None))
+                    _directory = config.get('directory', None)
+                    if _directory:
+                        _directory = os.path.expanduser(_directory)
+                    subliminal.save_subtitles(video, subtitle, single=single_mode, directory=_directory)
 
 
 @event('plugin.register')
