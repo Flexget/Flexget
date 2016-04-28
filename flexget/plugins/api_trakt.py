@@ -1,13 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
-from past.builtins import basestring
 
 import logging
 import re
 import time
 from datetime import datetime, timedelta
 
+from builtins import *
 from dateutil.parser import parse as dateutil_parse
+from past.builtins import basestring
 from sqlalchemy import Table, Column, Integer, String, Unicode, Date, DateTime, Time, or_, func
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
@@ -23,7 +23,6 @@ from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimplePersistence
-from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.tools import TimedDict
 
 Base = db_schema.versioned_base('api_trakt', 5)
@@ -273,7 +272,6 @@ def get_db_genres(genres, session):
 
 
 class TraktImages(Base):
-
     __tablename__ = 'trakt_images'
 
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
@@ -376,6 +374,7 @@ def get_db_images(image, session):
         log.debug('Something went wrong with images')
         return
 
+
 show_actors_table = Table('trakt_show_actors', Base.metadata,
                           Column('show_id', Integer, ForeignKey('trakt_shows.id')),
                           Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
@@ -392,7 +391,7 @@ def get_db_actors(ident, style):
     url = get_api_url(style + 's', ident, 'people')
     req_session = get_session()
     try:
-        results = req_session.get(url, params={'extended':'full,images'}).json()
+        results = req_session.get(url, params={'extended': 'full,images'}).json()
         with Session() as session:
             for result in results.get('cast'):
 
@@ -406,8 +405,8 @@ def get_db_actors(ident, style):
         log.debug('Error searching for actors for trakt id %s', e)
         return
 
-def list_images(images):
 
+def list_images(images):
     res = []
     for image in images:
         info = {
@@ -418,11 +417,12 @@ def list_images(images):
         res.append(info)
     return res
 
+
 def list_actors(actors):
     res = {}
     for actor in actors:
         info = {
-            'trakt_id':actor.id,
+            'trakt_id': actor.id,
             'name': actor.name,
             'imdb_id': str(actor.imdb),
             'trakt_slug': actor.slug,
@@ -546,7 +546,8 @@ class TraktShow(Base):
             "genres": [g.name for g in self.genres],
             "actors": [a.to_dict() for a in self.actors],
             "updated_at": self.updated_at,
-            "cached_at": self.cached_at
+            "cached_at": self.cached_at,
+            "images": [i.url for i in self.images]
         }
 
     def __init__(self, trakt_show, session):
@@ -680,7 +681,8 @@ class TraktMovie(Base):
             "genres": [g.name for g in self.genres],
             "actors": [a.to_dict() for a in self.actors],
             "updated_at": self.updated_at,
-            "cached_at": self.cached_at
+            "cached_at": self.cached_at,
+            "images": [i.url for i in self.images]
         }
 
     def update(self, trakt_movie, session):
@@ -727,7 +729,6 @@ class TraktMovie(Base):
         if not self._actors:
             self._actors[:] = get_db_actors(self.id, 'movie')
         return self._actors
-
 
 
 class TraktShowSearchResult(Base):
