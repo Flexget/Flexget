@@ -97,7 +97,7 @@ class TraktSeriesSearchApi(APIResource):
 
 
 @trakt_api.route('/movie/')
-class TraktSeriesSearchApi(APIResource):
+class TraktMovieSearchApi(APIResource):
     @api.response(200, 'Successfully found show', movie_return_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.doc(parser=lookup_parser)
