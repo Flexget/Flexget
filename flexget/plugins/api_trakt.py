@@ -15,7 +15,6 @@ from sqlalchemy.schema import ForeignKey
 from flexget import db_schema
 from flexget import options
 from flexget import plugin
-from flexget.db_schema import upgrade
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
@@ -210,7 +209,7 @@ def get_api_url(*endpoint):
     return url
 
 
-@upgrade('api_trakt')
+@db_schema.upgrade('api_trakt')
 def upgrade(ver, session):
     if ver is None or ver <= 4:
         raise db_schema.UpgradeImpossible
@@ -369,8 +368,8 @@ def get_db_images(image, session):
                 im = TraktImages(i, session)
             images.append(im)
         return images
-    except:
-        log.debug('Something went wrong with images')
+    except TypeError as e:
+        log.debug('Error has Occured during images: %s' % e.args[0])
         return
 
 
