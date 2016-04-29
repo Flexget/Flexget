@@ -18,6 +18,7 @@ class objects_container(object):
             "name": {'type': 'string'},
             "tmdb_id": {'type': 'integer'},
             "trakt_id": {'type': 'integer'},
+            "images": {'type': 'object'}
         }
     }
 
@@ -34,7 +35,7 @@ class objects_container(object):
             "votes": {'type': 'integer'},
             "language": {'type': 'string'},
             "updated_at": {'type': 'string', 'format': 'date-time'},
-            "images": {'type': 'array', 'items': 'string'}
+            "images": {'type': 'object'}
 
         }
     }

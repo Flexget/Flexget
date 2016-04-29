@@ -348,7 +348,8 @@ class TraktActor(Base):
             'name': self.name,
             'trakt_id': self.id,
             'imdb_id': self.imdb,
-            'tmdb_id': self.tmdb
+            'tmdb_id': self.tmdb,
+            'images': self.images
         }
 
 
@@ -405,14 +406,9 @@ def get_db_actors(ident, style):
 
 
 def list_images(images):
-    res = []
+    res = {}
     for image in images:
-        info = {
-            'ident': image.ident,
-            'style': image.style,
-            'url': image.url
-        }
-        res.append(info)
+        res.setdefault(image.ident, {})[image.style]=image.url
     return res
 
 
@@ -544,7 +540,7 @@ class TraktShow(Base):
             "actors": [a.to_dict() for a in self.actors],
             "updated_at": self.updated_at,
             "cached_at": self.cached_at,
-            "images": [i.url for i in self.images]
+            "images": list_images(self.images)
         }
 
     def __init__(self, trakt_show, session):
@@ -677,7 +673,7 @@ class TraktMovie(Base):
             "actors": [a.to_dict() for a in self.actors],
             "updated_at": self.updated_at,
             "cached_at": self.cached_at,
-            "images": [i.url for i in self.images]
+            "images": list_images(self.images)
         }
 
     def update(self, trakt_movie, session):
