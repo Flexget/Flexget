@@ -15,7 +15,7 @@ def clean_symbols(text):
         result = normalize('NFKD', result)
     result = re.sub('[ \(\)\-_\[\]\.]+', ' ', result).lower()
 
-	# Leftovers
+    # Leftovers
     result = re.sub(r"[^a-zA-Z0-9 ]", "", result)
 
     return result
