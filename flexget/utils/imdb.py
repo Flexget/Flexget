@@ -127,8 +127,8 @@ class ImdbSearch(object):
         """Return array of movie details (dict)"""
         log.debug('Searching: %s' % name)
         url = u'http://www.imdb.com/find'
-        # This will only include movies searched by title in the results
-        params = {'q': name, 's': 'tt', 'ttype': 'ft'}
+        # This may include Shorts and TV series in the results
+        params = {'q': name, 's': 'tt'}
 
         log.debug('Search query: %s' % repr(url))
         page = requests.get(url, params=params)
@@ -168,7 +168,17 @@ class ImdbSearch(object):
             movie = {}
             additional = re.findall(r'\((.*?)\)', row.text)
             if len(additional) > 0:
-                movie['year'] = additional[-1]
+                try:
+                    int(additional[-1])
+                    movie['year'] = additional[-1]
+                except ValueError:
+                    if len(additional) > 1:
+                        movie['year'] = additional[-2]
+                        #FIXME: Allow any other result type (Short, Video) ??
+                        if additional[-1] not in ['TV Movie']:
+                            log.debug('skipping %s - %s' % (
+                                link.text, additional[-1]))
+                            break
 
             link = row.find_next('a')
             movie['name'] = link.text
