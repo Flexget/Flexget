@@ -69,7 +69,7 @@ class PluginUrlRewriting(object):
                         log.debug('Url rewriting %s' % entry['url'])
                         urlrewriter.instance.url_rewrite(task, entry)
                         if entry['url'] != old_url:
-                            if old_url in entry['urls']:
+                            if entry.get('urls') and old_url in entry.get('urls'):
                                 entry['urls'][entry['urls'].index(old_url)] = entry['url']
                             log.info('Entry \'%s\' URL rewritten to %s (with %s)' % (
                                 entry['title'],
