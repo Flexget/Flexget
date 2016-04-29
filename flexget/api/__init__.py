@@ -64,7 +64,7 @@ class ApiSchemaModel(Model):
         else:
             return self._schema
 
-    def __bool__(self):
+    def __nonzero__(self):
         return bool(self._schema)
 
     def __repr__(self):
