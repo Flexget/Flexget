@@ -1,4 +1,45 @@
 {
-    "movies": {},
-    "series": {}
+    "movies": {
+        "tt0047034": {
+            "collected": false,
+            "name": "Godzilla",
+            "watched": false,
+            "watchlist": true
+        },
+        "tt0057012": {
+            "collected": true,
+            "name": "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb",
+            "watched": false,
+            "watchlist": false
+        }
+    },
+    "series": {
+        "272135": {
+            "collected": {
+                "2": {
+                    "5": [
+                        "eng",
+                        "ita"
+                    ]
+                }
+            },
+            "name": "TURN: Washington's Spies",
+            "watched": {},
+            "watchlist": false
+        },
+        "80379": {
+            "collected": {},
+            "name": "The Big Bang Theory",
+            "tags": [
+                "pippo",
+                "pluto"
+            ],
+            "watched": {
+                "8": [
+                    24
+                ]
+            },
+            "watchlist": true
+        }
+    }
 }
