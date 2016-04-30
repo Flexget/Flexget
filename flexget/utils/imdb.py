@@ -176,8 +176,7 @@ class ImdbSearch(object):
                         movie['year'] = additional[-2]
                         #FIXME: Allow any other result type (Short, Video) ??
                         if additional[-1] not in ['TV Movie']:
-                            log.debug('skipping %s - %s' % (
-                                link.text, additional[-1]))
+                            log.debug('skipping %s' % row.text)
                             break
 
             link = row.find_next('a')
