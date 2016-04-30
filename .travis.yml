@@ -17,7 +17,7 @@ install:
   - pip install .
   - pip install -r dev-requirements.txt
 # command to run tests, e.g. python setup.py test
-script: py.test --cov coveralls -n 3
+script: py.test --cov coveralls --cov-report term-missing -n 3
 after_success:
   - coveralls
 env: VCR_RECORD_MODE=none
