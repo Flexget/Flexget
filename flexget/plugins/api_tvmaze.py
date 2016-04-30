@@ -425,13 +425,13 @@ def prepare_lookup_for_pytvmaze(**lookup_params):
     prepared_params['tvdb_id'] = lookup_params.get('tvdb_id') or lookup_params.get('trakt_series_tvdb_id')
     prepared_params['tvrage_id'] = lookup_params.get('tvrage_id') or lookup_params.get('trakt_series_tvrage_id')
     prepared_params['imdb_id'] = lookup_params.get('imdb_id')
-    prepared_params['show_name'] = native_str_to_text(title, 'utf-8') if title else None
+    prepared_params['show_name'] = native_str_to_text(title, encoding='utf-8') if title else None
     prepared_params['show_year'] = lookup_params.get('trakt_series_year') or lookup_params.get(
         'year') or lookup_params.get('imdb_year') or year_match
 
-    prepared_params['show_network'] = native_str_to_text(network, 'utf8') if network else None
-    prepared_params['show_country'] = native_str_to_text(country, 'utf8') if country else None
-    prepared_params['show_language'] = native_str_to_text(language, 'utf8') if language else None
+    prepared_params['show_network'] = native_str_to_text(network, encoding='utf8') if network else None
+    prepared_params['show_country'] = native_str_to_text(country, encoding='utf8') if country else None
+    prepared_params['show_language'] = native_str_to_text(language, encoding='utf8') if language else None
 
     # Include cast information by default
     prepared_params['embed'] = 'cast'
