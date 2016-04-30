@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from future.utils import native_str
 
 import logging
 from datetime import datetime
@@ -15,7 +14,7 @@ from sqlalchemy.orm import relation
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.utils.database import with_session, json_synonym
-from flexget.utils.tools import split_title_year
+from flexget.utils.tools import split_title_year, native_str_to_text
 
 log = logging.getLogger('api_tvmaze')
 
@@ -426,13 +425,13 @@ def prepare_lookup_for_pytvmaze(**lookup_params):
     prepared_params['tvdb_id'] = lookup_params.get('tvdb_id') or lookup_params.get('trakt_series_tvdb_id')
     prepared_params['tvrage_id'] = lookup_params.get('tvrage_id') or lookup_params.get('trakt_series_tvrage_id')
     prepared_params['imdb_id'] = lookup_params.get('imdb_id')
-    prepared_params['show_name'] = native_str(title) if title else None
+    prepared_params['show_name'] = native_str_to_text(title, 'utf-8') if title else None
     prepared_params['show_year'] = lookup_params.get('trakt_series_year') or lookup_params.get(
         'year') or lookup_params.get('imdb_year') or year_match
 
-    prepared_params['show_network'] = native_str(network) if network else None
-    prepared_params['show_country'] = native_str(country) if country else None
-    prepared_params['show_language'] = native_str(language) if language else None
+    prepared_params['show_network'] = native_str_to_text(network, 'utf8') if network else None
+    prepared_params['show_country'] = native_str_to_text(country, 'utf8') if country else None
+    prepared_params['show_language'] = native_str_to_text(language, 'utf8') if language else None
 
     # Include cast information by default
     prepared_params['embed'] = 'cast'
