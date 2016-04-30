@@ -174,8 +174,7 @@ class ImdbSearch(object):
                 except ValueError:
                     if len(additional) > 1:
                         movie['year'] = additional[-2]
-                        #FIXME: Allow any other result type (Short, Video) ??
-                        if additional[-1] not in ['TV Movie']:
+                        if additional[-1] not in ['TV Movie', 'Video']:
                             log.debug('skipping %s' % row.text)
                             break
 
