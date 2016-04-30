@@ -102,7 +102,7 @@ def send_email(subject, content, config):
         except socket.error as e:
             log.warning('Socket error: %s' % e)
             return
-        except SMTPException as e:
+        except OSError as e:
             # Ticket #1133
             log.warning('Unable to send email: %s' % e)
             return
@@ -116,9 +116,6 @@ def send_email(subject, content, config):
         except IOError as e:
             # Ticket #686
             log.warning('Unable to send email! IOError: %s' % e)
-            return
-        except SMTPException as e:
-            log.warning('Unable to send email! SMTPException: %s' % e)
             return
 
         mailServer.quit()
