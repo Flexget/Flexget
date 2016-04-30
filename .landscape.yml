@@ -4,3 +4,6 @@ python-targets:
 max-line-length: 120
 dodgy:
   run: no
+pylint:
+  disable:
+    - redefined-builtin
