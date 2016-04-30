@@ -26,7 +26,7 @@ directory support or provide interface for external utilities like FlexGet.
 .. image:: https://landscape.io/github/Flexget/Flexget/develop/landscape.png
     :target: https://landscape.io/github/Flexget/Flexget/develop
 
-.. image:: https://coveralls.io/repos/github/Flexget/Flexget/badge.png?branch=develop
+.. image:: https://coveralls.io/repos/github/Flexget/Flexget/badge.svg?branch=develop
     :target: https://coveralls.io/github/Flexget/Flexget?branch=develop
 
 .. image:: https://badges.gitter.im/Flexget/Flexget.svg
