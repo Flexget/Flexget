@@ -123,6 +123,11 @@ class TestTVMazeShowLookup(object):
               - {title: 'The.Flash.2014.S02E04.HDTV.x264-LOL', imdb_id: 'tt3107288'}
             series:
               - The Flash
+          test_alternate_language:
+            mock:
+              - {'title': 'Игра престолов (2011).s01e01.hdtv'}
+            series:
+              - Игра престолов
     """
 
     def test_lookup_name(self, execute_task):
@@ -152,6 +157,12 @@ class TestTVMazeShowLookup(object):
         # Make sure it didn't make a false match
         entry = task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
+
+    def test_alternate_language(self, execute_task):
+        # Test Non-English lookups
+        task = execute_task('test_alternate_language')
+        entry = task.find_entry(title='Игра престолов (2011).s01e01.hdtv')
+        assert entry['tvmaze_series_name'] == 'Game of Thrones', 'Should of returned GoT'
 
     def test_search_results(self, execute_task):
         task = execute_task('test_search_result')
