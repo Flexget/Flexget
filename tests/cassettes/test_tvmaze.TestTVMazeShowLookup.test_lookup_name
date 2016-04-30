@@ -2,18 +2,18 @@ interactions:
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [!!python/unicode 'api.tvmaze.com']
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/singlesearch/shows?q=House&embed=cast
     response:
-      body: {string: !!python/unicode '{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
+      body: {string: !!python/unicode '{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":2,"network":{"id":4,"name":"FOX","country":{"name":"United
           States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255,"imdb":"tt0412142"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/43/109520.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/43/109520.jpg"},"summary":"<p>Sink
           your teeth into meaty drama and intrigue with <em><strong>\"House\"</strong></em>,
           FOX''s take on mystery, where the villain is a medical malady and the hero
           is an irreverent, controversial doctor who trusts no one, least of all his
-          patients.</p>","updated":1457120192,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}},"_embedded":{"cast":[{"person":{"id":25439,"url":"http://www.tvmaze.com/people/25439/hugh-laurie","name":"Hugh
+          patients.</p>","updated":1459815657,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}},"_embedded":{"cast":[{"person":{"id":25439,"url":"http://www.tvmaze.com/people/25439/hugh-laurie","name":"Hugh
           Laurie","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/46/117107.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/46/117107.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/25439"}}},"character":{"id":32873,"url":"http://www.tvmaze.com/characters/32873/house-dr-gregory-house","name":"Dr.
           Gregory House","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1348.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1348.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32873"}}}},{"person":{"id":17012,"url":"http://www.tvmaze.com/people/17012/robert-sean-leonard","name":"Robert
           Sean Leonard","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7478.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7478.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/17012"}}},"character":{"id":32876,"url":"http://www.tvmaze.com/characters/32876/house-dr-james-wilson","name":"Dr.
@@ -41,7 +41,7 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:39 GMT']
+        date: ['Sat, 30 Apr 2016 06:40:39 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}

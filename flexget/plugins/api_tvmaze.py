@@ -15,6 +15,7 @@ from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.utils.database import with_session, json_synonym
 from flexget.utils.tools import split_title_year
+from future.utils import native_str
 
 log = logging.getLogger('api_tvmaze')
 
@@ -425,7 +426,7 @@ def prepare_lookup_for_pytvmaze(**lookup_params):
     prepared_params['tvdb_id'] = lookup_params.get('tvdb_id') or lookup_params.get('trakt_series_tvdb_id')
     prepared_params['tvrage_id'] = lookup_params.get('tvrage_id') or lookup_params.get('trakt_series_tvrage_id')
     prepared_params['imdb_id'] = lookup_params.get('imdb_id')
-    prepared_params['show_name'] = title if title else None
+    prepared_params['show_name'] = native_str(title) if title else None
     prepared_params['show_year'] = lookup_params.get('trakt_series_year') or lookup_params.get(
         'year') or lookup_params.get('imdb_year') or year_match
 
