@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.utils import native
 
 import logging
 from datetime import datetime
@@ -422,17 +423,18 @@ def prepare_lookup_for_pytvmaze(**lookup_params):
     country = lookup_params.get('country') or lookup_params.get('trakt_series_country')
     language = lookup_params.get('language')
 
+    # Ensure we send native types to tvmaze lib as it does not handle new types very well
     prepared_params['maze_id'] = lookup_params.get('tvmaze_id')
     prepared_params['tvdb_id'] = lookup_params.get('tvdb_id') or lookup_params.get('trakt_series_tvdb_id')
     prepared_params['tvrage_id'] = lookup_params.get('tvrage_id') or lookup_params.get('trakt_series_tvrage_id')
     prepared_params['imdb_id'] = lookup_params.get('imdb_id')
-    prepared_params['show_name'] = native_str(title) if title else None
+    prepared_params['show_name'] = native(title) if title else None
     prepared_params['show_year'] = lookup_params.get('trakt_series_year') or lookup_params.get(
         'year') or lookup_params.get('imdb_year') or year_match
 
-    prepared_params['show_network'] = network if network else None
-    prepared_params['show_country'] = country if country else None
-    prepared_params['show_language'] = language if language else None
+    prepared_params['show_network'] = native(network) if network else None
+    prepared_params['show_country'] = native(country) if country else None
+    prepared_params['show_language'] = native(language) if language else None
 
     # Include cast information by default
     prepared_params['embed'] = 'cast'

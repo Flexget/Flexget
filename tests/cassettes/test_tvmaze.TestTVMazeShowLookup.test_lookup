@@ -41,7 +41,7 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Sat, 30 Apr 2016 06:40:39 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:06 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
@@ -60,7 +60,7 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Sat, 30 Apr 2016 06:40:40 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:06 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
@@ -73,10 +73,10 @@ interactions:
       method: GET
       uri: http://api.tvmaze.com/search/shows?q=Doctor%20Who
     response:
-      body: {string: !!python/unicode '[{"score":1.9821479,"show":{"id":210,"url":"http://www.tvmaze.com/shows/210/doctor-who","name":"Doctor
+      body: {string: !!python/unicode '[{"score":1.9821984,"show":{"id":210,"url":"http://www.tvmaze.com/shows/210/doctor-who","name":"Doctor
           Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Running","runtime":45,"premiered":"2005-03-26","schedule":{"time":"21:00","days":["Saturday"]},"rating":{"average":9.2},"weight":3,"network":{"id":12,"name":"BBC
           One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":3332,"thetvdb":78804,"imdb":"tt0436992"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3179.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3179.jpg"},"summary":"<p>Adventures
-          across time and space with the time travelling alien and his companions.</p>","updated":1461602220,"_links":{"self":{"href":"http://api.tvmaze.com/shows/210"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228572"}}}},{"score":1.9451976,"show":{"id":766,"url":"http://www.tvmaze.com/shows/766/doctor-who","name":"Doctor
+          across time and space with the time travelling alien and his companions.</p>","updated":1461602220,"_links":{"self":{"href":"http://api.tvmaze.com/shows/210"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228572"}}}},{"score":1.9452469,"show":{"id":766,"url":"http://www.tvmaze.com/shows/766/doctor-who","name":"Doctor
           Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":25,"premiered":"1963-11-23","schedule":{"time":"17:15","days":[]},"rating":{"average":8.8},"weight":0,"network":{"id":12,"name":"BBC
           One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":3331,"thetvdb":76107,"imdb":"tt0056751"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/6/15291.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/6/15291.jpg"},"summary":"<p><em>Doctor
           Who</em> is the longest-running science fiction TV series in history, airing
@@ -84,22 +84,22 @@ interactions:
           sophisticated mixed-level storytelling. Its format was the key to its longevity:
           the Doctor, a mysterious traveller in space and time, travels in his ship,
           the TARDIS. The TARDIS can take him and his companions anywhere in time
-          and space. Inevitably he finds evil at work wherever he goes..</p>","updated":1460871497,"_links":{"self":{"href":"http://api.tvmaze.com/shows/766"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/325662"}}}},{"score":1.5552014,"show":{"id":8430,"url":"http://www.tvmaze.com/shows/8430/doctor-who-confidential","name":"Doctor
+          and space. Inevitably he finds evil at work wherever he goes..</p>","updated":1460871497,"_links":{"self":{"href":"http://api.tvmaze.com/shows/766"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/325662"}}}},{"score":1.5552409,"show":{"id":8430,"url":"http://www.tvmaze.com/shows/8430/doctor-who-confidential","name":"Doctor
           Who Confidential","type":"Documentary","language":"English","genres":["Science-Fiction"],"status":"Ended","runtime":45,"premiered":"2005-03-26","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":{"id":49,"name":"BBC
           Three","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":79298,"imdb":"tt0453422"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/30/75328.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/30/75328.jpg"},"summary":"<p>Specially
           filmed for BBC Three as a companion piece to Doctor Who, \nDoctor Who Confidential
           aims to give a taste of the excitement and the \nenergy that surrounds the
           show. The programme includes behind-the-scenes\n filming and interviews
           with the cast, writers and production team as \nthey bring our favourite
-          Time Lord back to our screens.</p>","updated":1447538892,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/463156"}}}},{"score":1.5551981,"show":{"id":8433,"url":"http://www.tvmaze.com/shows/8433/doctor-who-extra","name":"Doctor
+          Time Lord back to our screens.</p>","updated":1447538892,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/463156"}}}},{"score":1.5552375,"show":{"id":8433,"url":"http://www.tvmaze.com/shows/8433/doctor-who-extra","name":"Doctor
           Who Extra","type":"Documentary","language":"English","genres":[],"status":"Running","runtime":11,"premiered":"2014-08-23","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":{"id":590,"name":"BBC
           Red Button 1","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":{"id":26,"name":"BBC
-          iPlayer","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":null,"summary":"","updated":1458047523,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8433"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/648813"}}}},{"score":1.3607509,"show":{"id":9272,"url":"http://www.tvmaze.com/shows/9272/doctor-who-the-fan-show","name":"Doctor
+          iPlayer","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":null,"summary":"","updated":1458047523,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8433"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/648813"}}}},{"score":1.3607855,"show":{"id":9272,"url":"http://www.tvmaze.com/shows/9272/doctor-who-the-fan-show","name":"Doctor
           Who: The Fan Show","type":"Talk Show","language":"English","genres":[],"status":"Running","runtime":20,"premiered":"2015-05-08","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":null,"webChannel":{"id":21,"name":"YouTube","country":{"name":"United
           States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":null,"thetvdb":300845,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/32/81575.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/32/81575.jpg"},"summary":"<p>The
           weekly show from the Official Doctor Who YouTube channel. Friends of The
           Doctor and curators of Doctor Who news, here you will see all of our un-seen
-          bonus videos and lots of extra stuff from our presenter Christel Dee.</p>","updated":1456389243,"_links":{"self":{"href":"http://api.tvmaze.com/shows/9272"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/501799"}}}},{"score":1.1668786,"show":{"id":8432,"url":"http://www.tvmaze.com/shows/8432/doctor-who-scream-of-the-shalka","name":"Doctor
+          bonus videos and lots of extra stuff from our presenter Christel Dee.</p>","updated":1456389243,"_links":{"self":{"href":"http://api.tvmaze.com/shows/9272"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/501799"}}}},{"score":1.1669083,"show":{"id":8432,"url":"http://www.tvmaze.com/shows/8432/doctor-who-scream-of-the-shalka","name":"Doctor
           Who: Scream of the Shalka","type":"Animation","language":"English","genres":[],"status":"Ended","runtime":15,"premiered":"2003-11-13","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":null,"webChannel":{"id":70,"name":"BBC
           Doctor Who Webcast","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":null,"summary":"","updated":1456389243,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8432"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/466769"}}}}]'}
       headers:
@@ -107,7 +107,7 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Sat, 30 Apr 2016 06:40:40 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:07 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
@@ -154,7 +154,7 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Sat, 30 Apr 2016 06:40:40 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:08 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
@@ -176,7 +176,7 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Sat, 30 Apr 2016 06:40:40 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:09 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
