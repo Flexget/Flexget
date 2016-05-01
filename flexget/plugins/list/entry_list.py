@@ -169,8 +169,9 @@ class DBEntrySet(MutableSet):
         like test mode"""
         return False
 
-    def get(self, entry, session):
-        return self._entry_query(session, entry)
+    @with_session
+    def get(self, entry, session=None):
+        return self._entry_query(session=session, entry=entry)
 
 
 class EntryList(object):

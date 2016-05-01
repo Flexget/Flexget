@@ -39,7 +39,7 @@ class ListQueue(object):
                     continue
                 cached_items = []
                 for entry in task.entries:
-                    result = thelist.get(entry, task.session)
+                    result = thelist.get(entry)
                     if result and result not in cached_items:
                         entry.accept()
                         cached_items.append(result)
