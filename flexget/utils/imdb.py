@@ -168,15 +168,13 @@ class ImdbSearch(object):
             movie = {}
             additional = re.findall(r'\((.*?)\)', row.text)
             if len(additional) > 0:
-                try:
-                    int(additional[-1])
+                if re.match('^\d{4}$', additional[-1]):
                     movie['year'] = additional[-1]
-                except ValueError:
-                    if len(additional) > 1:
-                        movie['year'] = additional[-2]
-                        if additional[-1] not in ['TV Movie', 'Video']:
-                            log.debug('skipping %s' % row.text)
-                            break
+                elif len(additional) > 1:
+                    movie['year'] = additional[-2]
+                    if additional[-1] not in ['TV Movie', 'Video']:
+                        log.debug('skipping %s' % row.text)
+                        break
 
             link = row.find_next('a')
             movie['name'] = link.text
