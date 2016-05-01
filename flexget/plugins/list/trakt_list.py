@@ -117,7 +117,7 @@ class TraktSet(MutableSet):
                 return item
 
     def __contains__(self, entry):
-        self._find_entry(entry) is not None
+        return self._find_entry(entry) is not None
 
     def clear(self):
         if self.items:
