@@ -171,7 +171,7 @@ class DBEntrySet(MutableSet):
 
     @with_session
     def get(self, entry, session=None):
-        return self._entry_query(session=session, entry=entry)
+        return Entry(self._entry_query(session=session, entry=entry).entry)
 
 
 class EntryList(object):

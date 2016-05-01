@@ -35,9 +35,9 @@ class ListQueue(object):
                 cached_items = []
                 for entry in task.entries:
                     result = thelist.get(entry)
-                    if result and result['title'] not in cached_items:
+                    if result and result not in cached_items:
                         entry.accept()
-                        cached_items.append(result['title'])
+                        cached_items.append(result)
 
     def on_task_learn(self, task, config):
         for item in config:
