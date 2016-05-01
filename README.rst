@@ -26,6 +26,9 @@ directory support or provide interface for external utilities like FlexGet.
 .. image:: https://api.codacy.com/project/badge/Grade/3f7fe87d2dcb4f2d9b8a729a45e5e948
     :target: https://www.codacy.com/app/stevezau/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
 
+.. image:: https://api.codacy.com/project/badge/Coverage/3f7fe87d2dcb4f2d9b8a729a45e5e948
+    :target: https://www.codacy.com/app/stevezau/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Coverage
+
 .. image:: https://badges.gitter.im/Flexget/Flexget.svg
     :alt: Join the chat at https://gitter.im/Flexget/Flexget
     :target: https://gitter.im/Flexget/Flexget?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
