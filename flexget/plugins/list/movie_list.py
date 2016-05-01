@@ -184,7 +184,7 @@ class MovieList(MutableSet):
 
     @with_session
     def get(self, entry, session):
-        return self._find_entry(entry, session)
+        return self._find_entry(entry=entry, session=session)
 
 
 class PluginMovieList(object):
