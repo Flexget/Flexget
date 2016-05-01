@@ -278,7 +278,7 @@ class SceneAccessSearch(object):
                     entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
                                                                 entry['torrent_leeches']) * multip
 
-                    size = result.find('td', attrs={'class': 'ttr_size'}).__next__
+                    size = result.find('td', attrs={'class': 'ttr_size'}).text
                     size = re.search('(\d+(?:[.,]\d+)*)\s?([KMG]B)', size)
 
                     if size:
