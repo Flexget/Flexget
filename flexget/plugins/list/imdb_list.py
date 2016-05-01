@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.utils import PY3
 
 import csv
 import logging
@@ -6,8 +8,6 @@ import re
 from collections import MutableSet
 from datetime import datetime
 
-from builtins import *
-from future.utils import PY3
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -19,6 +19,7 @@ from flexget.utils.soup import get_soup
 
 log = logging.getLogger('imdb_list')
 IMMUTABLE_LISTS = ['ratings', 'checkins']
+
 
 if PY3:
     csv_reader = csv.reader

@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.moves.urllib.parse import urlparse
 
 import json
 import logging
 from collections import MutableSet
 
 import requests
-from builtins import *
-from future.moves.urllib.parse import urlparse
 from requests import RequestException
 
 from flexget import plugin

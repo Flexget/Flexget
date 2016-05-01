@@ -2,10 +2,10 @@ interactions:
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [!!python/unicode 'api.tvmaze.com']
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/singlesearch/shows?q=Unite%209&embed=cast
     response:
       body: {string: "{\"id\":8652,\"url\":\"http://www.tvmaze.com/shows/8652/unite-9\"\
@@ -20,36 +20,36 @@ interactions:
           },\"summary\":\"\",\"updated\":1452815788,\"_links\":{\"self\":{\"href\"\
           :\"http://api.tvmaze.com/shows/8652\"},\"previousepisode\":{\"href\":\"\
           http://api.tvmaze.com/episodes/485612\"}},\"_embedded\":{\"cast\":[{\"person\"\
-          :{\"id\":112530,\"url\":\"http://www.tvmaze.com/people/112530/celine-bonnier\"\
-          ,\"name\":\"C\xE9line Bonnier\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/42/106484.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/42/106484.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/112530\"\
-          }}},\"character\":{\"id\":230262,\"url\":\"http://www.tvmaze.com/characters/230262/unite-9-suzanne-beauchemin\"\
-          ,\"name\":\"Suzanne Beauchemin\",\"image\":null,\"_links\":{\"self\":{\"\
-          href\":\"http://api.tvmaze.com/characters/230262\"}}}},{\"person\":{\"id\"\
-          :109492,\"url\":\"http://www.tvmaze.com/people/109492/guylaine-tremblay\"\
+          :{\"id\":109492,\"url\":\"http://www.tvmaze.com/people/109492/guylaine-tremblay\"\
           ,\"name\":\"Guylaine Tremblay\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/39/98646.jpg\"\
           ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/39/98646.jpg\"\
           },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/109492\"\
           }}},\"character\":{\"id\":230261,\"url\":\"http://www.tvmaze.com/characters/230261/unite-9-marie-lamontagne\"\
           ,\"name\":\"Marie Lamontagne\",\"image\":null,\"_links\":{\"self\":{\"href\"\
-          :\"http://api.tvmaze.com/characters/230261\"}}}}]}}"}
+          :\"http://api.tvmaze.com/characters/230261\"}}}},{\"person\":{\"id\":112530,\"\
+          url\":\"http://www.tvmaze.com/people/112530/celine-bonnier\",\"name\":\"\
+          C\xE9line Bonnier\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/42/106484.jpg\"\
+          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/42/106484.jpg\"\
+          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/112530\"\
+          }}},\"character\":{\"id\":230262,\"url\":\"http://www.tvmaze.com/characters/230262/unite-9-suzanne-beauchemin\"\
+          ,\"name\":\"Suzanne Beauchemin\",\"image\":null,\"_links\":{\"self\":{\"\
+          href\":\"http://api.tvmaze.com/characters/230262\"}}}}]}}"}
       headers:
         access-control-allow-origin: ['*']
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:51 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:11 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [api.tvmaze.com]
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/shows/8652/episodebynumber?season=1&number=16
     response:
       body: {string: !!python/unicode '{"id":476294,"url":"http://www.tvmaze.com/episodes/476294/unite-9-1x16-episode-16","name":"Episode
@@ -59,7 +59,7 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:52 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:12 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}

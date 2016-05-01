@@ -2,10 +2,10 @@ interactions:
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [!!python/unicode 'api.tvmaze.com']
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/singlesearch/shows?q=Firefly&embed=cast
     response:
       body: {string: !!python/unicode '{"id":180,"url":"http://www.tvmaze.com/shows/180/firefly","name":"Firefly","type":"Scripted","language":"English","genres":["Adventure","Science-Fiction","Western"],"status":"Ended","runtime":60,"premiered":"2002-09-20","schedule":{"time":"20:00","days":["Friday"]},"rating":{"average":9.4},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
@@ -33,17 +33,17 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:58 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:12 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [api.tvmaze.com]
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/shows/180/episodebynumber?season=1&number=13
     response:
       body: {string: !!python/unicode '{"id":13007,"url":"http://www.tvmaze.com/episodes/13007/firefly-1x13-heart-of-gold","name":"Heart
@@ -56,7 +56,7 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:59 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:12 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}

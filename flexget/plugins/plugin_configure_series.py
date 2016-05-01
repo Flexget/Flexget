@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import hashlib
 import logging
@@ -91,7 +91,7 @@ class ConfigureSeries(FilterSeriesBase):
                             s[key] = entry['configure_series_' + key]
 
         # Set the config_modified flag if the list of shows changed since last time
-        new_hash = hashlib.md5(str(sorted(series)).encode('utf-8')).hexdigest()
+        new_hash = str(hashlib.md5(str(sorted(series)).encode('utf-8')).hexdigest())
         with Session() as session:
             last_hash = session.query(LastHash).filter(LastHash.task == task.name).first()
             if not last_hash:

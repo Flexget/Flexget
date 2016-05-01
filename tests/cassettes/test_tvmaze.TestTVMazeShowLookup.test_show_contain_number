@@ -2,10 +2,10 @@ interactions:
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [!!python/unicode 'api.tvmaze.com']
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/singlesearch/shows?q=Detroit%201-8-7&embed=cast
     response:
       body: {string: !!python/unicode '{"id":998,"url":"http://www.tvmaze.com/shows/998/detroit-1-8-7","name":"Detroit
@@ -35,17 +35,17 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:50 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:16 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [api.tvmaze.com]
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/shows/998/episodebynumber?season=1&number=16
     response:
       body: {string: !!python/unicode '{"id":98765,"url":"http://www.tvmaze.com/episodes/98765/detroit-1-8-7-1x16-stone-cold","name":"Stone
@@ -55,17 +55,17 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:51 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:16 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [!!python/unicode 'api.tvmaze.com']
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/singlesearch/shows?q=Tosh.0&embed=cast
     response:
       body: {string: !!python/unicode '{"id":260,"url":"http://www.tvmaze.com/shows/260/tosh0","name":"Tosh.0","type":"Variety","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2009-06-04","schedule":{"time":"22:00","days":["Tuesday"]},"rating":{"average":6.9},"weight":1,"network":{"id":23,"name":"Comedy
@@ -77,7 +77,7 @@ interactions:
           viral videos a second chance to redeem themselves from the embarrassment
           with which they''ve become synonymous. Now in its third hit season, Tosh.0
           continues to be cable TV''s most trusted source for exhibitionist weirdos,
-          injurious idiots and all things Web. </p>","updated":1457449219,"_links":{"self":{"href":"http://api.tvmaze.com/shows/260"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/627634"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/644124"}},"_embedded":{"cast":[{"person":{"id":37366,"url":"http://www.tvmaze.com/people/37366/daniel-tosh","name":"Daniel
+          injurious idiots and all things Web. </p>","updated":1460569360,"_links":{"self":{"href":"http://api.tvmaze.com/shows/260"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/644512"}},"_embedded":{"cast":[{"person":{"id":37366,"url":"http://www.tvmaze.com/people/37366/daniel-tosh","name":"Daniel
           Tosh","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/4788.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/4788.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/37366"}}},"character":{"id":133725,"url":"http://www.tvmaze.com/characters/133725/tosh0-daniel-tosh","name":"Daniel
           Tosh","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/133725"}}}}]}}'}
       headers:
@@ -85,17 +85,17 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:52 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:17 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [api.tvmaze.com]
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/shows/260/episodebynumber?season=7&number=30
     response:
       body: {string: !!python/unicode '{"id":457679,"url":"http://www.tvmaze.com/episodes/457679/tosh0-7x30-best-of-season-7","name":"Best
@@ -105,17 +105,17 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:53 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:18 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [!!python/unicode 'api.tvmaze.com']
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/singlesearch/shows?q=Unwrapped%202.0&embed=cast
     response:
       body: {string: !!python/unicode '{"id":5736,"url":"http://www.tvmaze.com/shows/5736/unwrapped-20","name":"Unwrapped
@@ -126,24 +126,24 @@ interactions:
           snacks. Hosted by Alfonso Ribeiro, Unwrapped 2.0 features everything from
           classic childhood treats to the latest candy crazes. Whether you like your
           snacks sweet or savory, crispy or gooey, Unwrapped 2.0 offers behind-the-scenes
-          access to get you a front row seat to see them made.</p>","updated":1453694075,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5736"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/583533"}},"_embedded":{"cast":[{"person":{"id":49365,"url":"http://www.tvmaze.com/people/49365/alfonso-ribeiro","name":"Alfonso
+          access to get you a front row seat to see them made.</p>","updated":1460287286,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5736"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/702485"}},"_embedded":{"cast":[{"person":{"id":49365,"url":"http://www.tvmaze.com/people/49365/alfonso-ribeiro","name":"Alfonso
           Ribeiro","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/5/12529.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/5/12529.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/49365"}}},"character":{"id":182142,"url":"http://www.tvmaze.com/characters/182142/unwrapped-20-host","name":"Host","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/182142"}}}}]}}'}
       headers:
         access-control-allow-origin: ['*']
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:54 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:18 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [api.tvmaze.com]
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/shows/5736/episodebynumber?season=2&number=6
     response:
       body: {string: !!python/unicode '{"id":387214,"url":"http://www.tvmaze.com/episodes/387214/unwrapped-20-2x06-savor-the-flavor","name":"Savor
@@ -153,17 +153,17 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:55 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:19 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [!!python/unicode 'api.tvmaze.com']
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/singlesearch/shows?q=Jake%202.0&embed=cast
     response:
       body: {string: !!python/unicode '{"id":2381,"url":"http://www.tvmaze.com/shows/2381/jake-20","name":"Jake
@@ -176,7 +176,9 @@ interactions:
           control it. His medical and emotional state is carefully watched over by
           Dr. Diane Hughes, who is far too human for her job with the NSA. Struggling
           in his early tasks with the NSA, Jake must prove himself and yield results
-          or be locked up for \"research.\"</p>","updated":1452580253,"_links":{"self":{"href":"http://api.tvmaze.com/shows/2381"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/184267"}},"_embedded":{"cast":[{"person":{"id":3316,"url":"http://www.tvmaze.com/people/3316/christopher-gorham","name":"Christopher
+          or be locked up for \"research.\"</p>","updated":1452580253,"_links":{"self":{"href":"http://api.tvmaze.com/shows/2381"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/184267"}},"_embedded":{"cast":[{"person":{"id":2943,"url":"http://www.tvmaze.com/people/2943/keegan-connor-tracy","name":"Keegan
+          Connor Tracy","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/54347.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/54347.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/2943"}}},"character":{"id":143896,"url":"http://www.tvmaze.com/characters/143896/jake-20-diane-hughes","name":"Diane
+          Hughes","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/12/32304.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/12/32304.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/143896"}}}},{"person":{"id":3316,"url":"http://www.tvmaze.com/people/3316/christopher-gorham","name":"Christopher
           Gorham","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/8361.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/8361.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/3316"}}},"character":{"id":143892,"url":"http://www.tvmaze.com/characters/143892/jake-20-jake-foley","name":"Jake
           Foley","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/12/32303.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/12/32303.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/143892"}}}},{"person":{"id":2140,"url":"http://www.tvmaze.com/people/2140/philip-anthony-rodriguez","name":"Philip
           Anthony-Rodriguez","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/4454.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/4454.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/2140"}}},"character":{"id":143893,"url":"http://www.tvmaze.com/characters/143893/jake-20-kyle-duarte","name":"Kyle
@@ -184,25 +186,23 @@ interactions:
           Black","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/35/89734.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/35/89734.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/22112"}}},"character":{"id":143894,"url":"http://www.tvmaze.com/characters/143894/jake-20-sarah-carter","name":"Sarah
           Carter","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/12/32307.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/12/32307.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/143894"}}}},{"person":{"id":12338,"url":"http://www.tvmaze.com/people/12338/judith-scott","name":"Judith
           Scott","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3418.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3418.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/12338"}}},"character":{"id":143895,"url":"http://www.tvmaze.com/characters/143895/jake-20-deputy-director-louise-lou-beckett","name":"Deputy
-          Director Louise \"Lou\" Beckett","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/12/32306.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/12/32306.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/143895"}}}},{"person":{"id":2943,"url":"http://www.tvmaze.com/people/2943/keegan-connor-tracy","name":"Keegan
-          Connor Tracy","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/54347.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/54347.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/2943"}}},"character":{"id":143896,"url":"http://www.tvmaze.com/characters/143896/jake-20-diane-hughes","name":"Diane
-          Hughes","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/12/32304.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/12/32304.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/143896"}}}}]}}'}
+          Director Louise \"Lou\" Beckett","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/12/32306.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/12/32306.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/143895"}}}}]}}'}
       headers:
         access-control-allow-origin: ['*']
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:56 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:20 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [api.tvmaze.com]
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/shows/2381/episodebynumber?season=1&number=10
     response:
       body: {string: !!python/unicode '{"id":184265,"url":"http://www.tvmaze.com/episodes/184265/jake-20-1x10-the-spy-who-really-liked-me","name":"The
@@ -212,7 +212,7 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:57 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:21 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}

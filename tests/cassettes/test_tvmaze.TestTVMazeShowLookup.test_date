@@ -2,10 +2,10 @@ interactions:
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [!!python/unicode 'api.tvmaze.com']
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/singlesearch/shows?q=the%20daily%20show%20%28with%20jon%20stewart&embed=cast
     response:
       body: {string: !!python/unicode '{"id":249,"url":"http://www.tvmaze.com/shows/249/the-daily-show-with-jon-stewart","name":"The
@@ -25,17 +25,17 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:43 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:10 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
+        Connection: [close]
+        Host: [api.tvmaze.com]
+        User-Agent: [Python-urllib/2.7]
+      method: GET
       uri: http://api.tvmaze.com/shows/249/episodesbydate?date=2012-06-06
     response:
       body: {string: !!python/unicode '[{"id":20471,"url":"http://www.tvmaze.com/episodes/20471/the-daily-show-with-jon-stewart-2012-06-06-michael-fassbender","name":"Michael
@@ -45,7 +45,7 @@ interactions:
         cache-control: ['public, max-age=3600']
         connection: [close]
         content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:44 GMT']
+        date: ['Sat, 30 Apr 2016 08:47:10 GMT']
         server: [nginx/1.4.6 (Ubuntu)]
         x-powered-by: [PHP/5.5.9-1ubuntu4.14]
       status: {code: 200, message: OK}

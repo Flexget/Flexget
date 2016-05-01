@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import quote
 
 import logging
@@ -186,45 +186,45 @@ class SceneAccessSearch(object):
         }
         """
 
-        toProcess = dict()
-        scope = 'browse' # Default scope to search in
-        try:
-            category = config['category']
+        to_process = dict()
+        scope = 'browse'  # Default scope to search in
+        category = config.get('category')
+
+        if category:
             if isinstance(category, dict):                          # Categories have search scope specified.
                 for scope in category:
                     if isinstance(category[scope], bool):           # If provided boolean, search all categories within
                         category[scope] = []                        # the scope.
                     elif not isinstance(category[scope], list):     # or convert single category into list
                         category[scope] = [category[scope]]
-                    toProcess[scope] = category[scope]
+                    to_process[scope] = category[scope]
             else:                       # Will default to `browse` scope, because no scope was specified (only category)
                 category = [category]
-                toProcess[scope] = category
-        except KeyError:    # Category was not set, will default to all categories within `browse` scope.
-            toProcess[scope] = []
+                to_process[scope] = category
+        else:    # Category was not set, will default to all categories within `browse` scope.
+            to_process[scope] = []
 
-        finally:    # Process the categories to use in search() method
-            ret = list()
+        ret = list()
 
-            for scope, categories in toProcess.items():
-                cat_id = list()
+        for scope, categories in to_process.items():
+            cat_id = list()
 
-                for category in categories:
-                    try:
-                        id = CATEGORIES[scope][category]
-                    except KeyError:            # User provided category id directly
-                        id = category
-                    finally:
-                        if isinstance(id, list):      #
-                            [cat_id.append(l) for l in id]
-                        else:
-                            cat_id.append(id)
+            for category in categories:
+                try:
+                    cat_id = CATEGORIES[scope][category]
+                except KeyError:            # User provided category id directly
+                    cat_id = category
+                finally:
+                    if isinstance(cat_id, list):
+                        [cat_id.append(l) for l in id]
+                    else:
+                        cat_id.append(cat_id)
 
-                if scope == 'mp3/0day':     # mp3/0day is actually /spam?search= in URL, can safely change it now
-                    scope = 'spam'
+            if scope == 'mp3/0day':     # mp3/0day is actually /spam?search= in URL, can safely change it now
+                scope = 'spam'
 
-                category_url_string = ''.join(['&c' + str(id) + '=' + str(id) for id in cat_id])  # &c<id>=<id>&...
-                ret.append({'url_path': scope, 'category_url_string': category_url_string})
+            category_url_string = ''.join(['&c' + str(x) + '=' + str(x) for x in cat_id])  # &c<id>=<id>&...
+            ret.append({'url_path': scope, 'category_url_string': category_url_string})
             return ret
 
     @plugin.internet(log)

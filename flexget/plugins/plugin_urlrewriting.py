@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -69,6 +69,8 @@ class PluginUrlRewriting(object):
                         log.debug('Url rewriting %s' % entry['url'])
                         urlrewriter.instance.url_rewrite(task, entry)
                         if entry['url'] != old_url:
+                            if entry.get('urls') and old_url in entry.get('urls'):
+                                entry['urls'][entry['urls'].index(old_url)] = entry['url']
                             log.info('Entry \'%s\' URL rewritten to %s (with %s)' % (
                                 entry['title'],
                                 entry['url'],
