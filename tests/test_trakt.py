@@ -90,6 +90,7 @@ class TestTraktShowLookup(object):
         entry = task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
+    @pytest.mark.skip(reason="no way of currently testing this. VCR crash's test")
     def test_alternate_language(self, execute_task):
         # Test Non-English lookups
         task = execute_task('test_alternate_language')
