@@ -32,14 +32,23 @@ class ListQueue(object):
                     thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
                 except AttributeError:
                     raise PluginError('Plugin %s does not support list interface' % plugin_name)
+                cached_items = []
+                for entry in task.entries:
+                    result = thelist.get(entry)
+                    if result and result not in cached_items:
+                        entry.accept()
+                        cached_items.append(result)
+
+    def on_task_learn(self, task, config):
+        for item in config:
+            for plugin_name, plugin_config in item.items():
+                thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
                 if task.manager.options.test and thelist.online:
-                    log.info('`%s` is marked as online, would accept and remove items outside of --test mode.',
+                    log.info('`%s` is marked as online, would remove accepted items outside of --test mode.',
                              plugin_name)
                     continue
-                for entry in task.entries:
-                    if entry in thelist:
-                        entry.accept()
-                        thelist.discard(entry)
+                log.verbose('removing accepted entries from %s - %s', plugin_name, plugin_config)
+                thelist -= task.accepted
 
 
 @event('plugin.register')

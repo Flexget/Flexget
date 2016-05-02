@@ -162,6 +162,21 @@ like test mode.
         like test mode"""
         return True
 
+
+``get``
+-------
+
+Used to return entry match from internal used. `list_queue` plugin calls it in order to create a cached list of entries
+and avoid acceptance duplication during filter phase.
+
+.. code-block:: python
+
+    @with_session
+    def get(self, entry, session):
+        match = self._find_entry(entry=entry, session=session)
+        return match.to_entry() if match else None
+
+
 Plugin format
 -------------
 
