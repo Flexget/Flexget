@@ -6,6 +6,7 @@ import pytest
 
 from flexget.manager import Session
 from flexget.plugins.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow
+from future.utils import native
 
 
 lookup_series = ApiTrakt.lookup_series
@@ -92,7 +93,7 @@ class TestTraktShowLookup(object):
     def test_alternate_language(self, execute_task):
         # Test Non-English lookups
         task = execute_task('test_alternate_language')
-        entry = task.find_entry(title='Игра престолов (2011).s01e01.hdtv')
+        entry = task.find_entry(title=native('Игра престолов (2011).s01e01.hdtv'))
         assert entry['trakt_series_name'] == 'Game of Thrones', 'Should of returned GoT'
 
     def test_search_results(self, execute_task):

@@ -18,15 +18,15 @@ interactions:
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [29ca31a8d41503d6-DFW]
+        cf-ray: [29ca5ac14d6a2012-DFW]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Mon, 02 May 2016 08:44:54 GMT']
+        date: ['Mon, 02 May 2016 09:12:57 GMT']
         etag: [W/"f4c5bdb69c1825542076e92b12b3aba3"]
-        expires: ['Mon, 02 May 2016 12:44:54 GMT']
+        expires: ['Mon, 02 May 2016 13:12:57 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d8f11ee192349abf60bfa90b6ed152b631462178694; expires=Tue,
-            02-May-17 08:44:54 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=dce415149fa66544d0dae6620fbe0df361462180377; expires=Tue,
+            02-May-17 09:12:57 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -42,7 +42,7 @@ interactions:
       body: null
       headers:
         Content-Type: [!!python/unicode 'application/json']
-        Cookie: [__cfduid=d8f11ee192349abf60bfa90b6ed152b631462178694]
+        Cookie: [__cfduid=dce415149fa66544d0dae6620fbe0df361462180377]
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [2]
       method: GET
@@ -58,12 +58,12 @@ interactions:
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [29ca31a8f41703d6-DFW]
+        cf-ray: [29ca5ac17d702012-DFW]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Mon, 02 May 2016 08:44:54 GMT']
+        date: ['Mon, 02 May 2016 09:12:57 GMT']
         etag: [W/"423cbfab2425ee2610e36bbdc2a799d5"]
-        expires: ['Mon, 02 May 2016 12:44:54 GMT']
+        expires: ['Mon, 02 May 2016 13:12:57 GMT']
         last-modified: ['Sun, 01 May 2016 11:02:56 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]
