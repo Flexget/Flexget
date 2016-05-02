@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import pickle
 from collections import MutableSet
 from datetime import datetime
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from sqlalchemy import Column, Unicode, select, Integer, DateTime, or_, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
@@ -171,7 +171,8 @@ class DBEntrySet(MutableSet):
 
     @with_session
     def get(self, entry, session=None):
-        return Entry(self._entry_query(session=session, entry=entry).entry)
+        match = self._entry_query(session=session, entry=entry)
+        return Entry(match.entry) if match else None
 
 
 class EntryList(object):
