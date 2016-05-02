@@ -181,8 +181,8 @@ class CouchPotatoSet(MutableSet):
 
     def _find_entry(self, entry):
         for cp_entry in self.movies:
-            for id in self.supported_ids:
-                if entry.get(id) is not None and entry[id] == cp_entry[id] or entry.get(
+            for sup_id in self.supported_ids:
+                if entry.get(sup_id) is not None and entry[sup_id] == cp_entry[sup_id] or entry.get(
                         'title').lower() == cp_entry.get('title').lower():
                     return cp_entry
 
