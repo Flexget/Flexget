@@ -295,9 +295,9 @@ def add_to_lookup(session=None, title=None, series=None):
 
 def prepare_lookup_for_tvmaze(**lookup_params):
     """
-    Return a dict of params which is valid with pytvmaze get_show method
+    Return a dict of params which is valid with tvmaze API lookups
     :param lookup_params: Search parameters
-    :return: Dict of pytvmaze recognizable key words
+    :return: Dict of tvmaze recognizable key words
     """
     prepared_params = {}
     title = None
