@@ -5,7 +5,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.9.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=Firefly
   response:
@@ -19,7 +19,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 12:25:48 GMT']
+      date: ['Tue, 03 May 2016 13:06:29 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.14]
     status: {code: 200, message: OK}
@@ -29,7 +29,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.9.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/180/episodebynumber?season=1&number=13
   response:
@@ -43,7 +43,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 12:25:49 GMT']
+      date: ['Tue, 03 May 2016 13:06:29 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.14]
     status: {code: 200, message: OK}

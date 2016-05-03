@@ -25,7 +25,7 @@ UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 BASE_URL = 'http://api.tvmaze.com'
 
 TVMAZE_ENDPOINTS = {
-    'tvmaze_id': '/shows/{}/',
+    'tvmaze_id': '/shows/{}',
     'imdb_id': '/lookup/shows?imdb={}',
     'tvrage_id': '/lookup/shows?tvrage={}',
     'thetvdb_id': '/lookup/shows?thetvdb={}',
@@ -492,7 +492,7 @@ def tvmaze_lookup(lookup_type, lookup_values):
     :return: A JSON reply from the API
     """
     lookup_url = BASE_URL + TVMAZE_ENDPOINTS[lookup_type].format(*lookup_values)
-    log.debug('querying tvmaze API with the following URL:{}', lookup_url)
+    log.debug('querying tvmaze API with the following URL: %s', lookup_url)
     try:
         result = requests.get(lookup_url).json()
     except HTTPError as e:

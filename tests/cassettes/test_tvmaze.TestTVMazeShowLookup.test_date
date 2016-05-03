@@ -5,7 +5,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.9.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=the%20daily%20show%20(with%20jon%20stewart
   response:
@@ -16,13 +16,13 @@ interactions:
         of the stodginess of the evening newscasts and you can''t bear to sit through
         the spinmeisters and shills on the 24-hour cable news network, don''t miss
         The Daily Show with Jon Stewart, the nightly half-hour series unburdened by
-        objectivity, journalistic integrity or even accuracy.</p>","updated":1462274851,"_links":{"self":{"href":"http://api.tvmaze.com/shows/249"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/201574"}}}'}
+        objectivity, journalistic integrity or even accuracy.</p>","updated":1462280756,"_links":{"self":{"href":"http://api.tvmaze.com/shows/249"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/201574"}}}'}
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 12:25:34 GMT']
+      date: ['Tue, 03 May 2016 13:06:16 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.14]
     status: {code: 200, message: OK}
@@ -32,7 +32,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.9.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/249/episodesbydate?date=2012-06-06
   response:
@@ -43,7 +43,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 12:25:34 GMT']
+      date: ['Tue, 03 May 2016 13:06:17 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.14]
     status: {code: 200, message: OK}
