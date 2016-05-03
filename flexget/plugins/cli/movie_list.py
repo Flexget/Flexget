@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -10,14 +9,18 @@ from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
-    get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList
+    get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, SUPPORTED_IDS
 from flexget.utils.tools import split_title_year
 
 
-def parse_identifier(identifier_string):
-    if identifier_string.count('=') != 1:
-        return
-    name, value = identifier_string.split('=', 2)
+def movie_list_keyword_type(identifier):
+    if identifier.count('=') != 1:
+        raise ArgumentTypeError('Received identifier in wrong format: %s, '
+                                ' should be in keyword format like `imdb_id=tt1234567`' % identifier)
+    name, value = identifier.split('=', 2)
+    if name not in SUPPORTED_IDS:
+        raise ArgumentTypeError(
+            'Received unsupported identifier ID %s. Should be one of %s' % (identifier, ' ,'.join(SUPPORTED_IDS)))
     return {name: value}
 
 
@@ -91,9 +94,8 @@ def movie_list_add(options):
             session.add(movie_exist)
             output = 'Successfully added movie {} to movie list {} '.format(title, movie_list.name)
         if options.identifiers:
-            identifiers = [parse_identifier(identifier) for identifier in options.identifiers if options.identifiers]
-            console('Adding identifiers {} to movie {}'.format(identifiers, title))
-            movie_exist.ids = get_db_movie_identifiers(identifier_list=identifiers, session=session)
+            console('Adding identifiers {} to movie {}'.format(options.identifiers, title))
+            movie_exist.ids = get_db_movie_identifiers(identifier_list=options.identifiers, session=session)
         console(output)
 
 
@@ -133,6 +135,7 @@ def register_parser_arguments():
 
     identifiers_parser = ArgumentParser(add_help=False)
     identifiers_parser.add_argument('-i', '--identifiers', metavar='<identifiers>', nargs='+',
+                                    type=movie_list_keyword_type,
                                     help='Can be a string or a list of string with the format imdb_id=XXX,'
                                          ' tmdb_id=XXX, etc')
     list_name_parser = ArgumentParser(add_help=False)

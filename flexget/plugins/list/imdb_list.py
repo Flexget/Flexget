@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.utils import PY3
 
 import csv
@@ -116,7 +116,7 @@ class ImdbEntrySet(MutableSet):
         if self._items is None:
             try:
                 r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
-                                 (self.list_id, self.user_id))
+                                     (self.list_id, self.user_id))
             except RequestException as e:
                 raise PluginError(e.args[0])
             lines = r.iter_lines(decode_unicode=True)
@@ -158,11 +158,16 @@ class ImdbEntrySet(MutableSet):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
         return set(it)
 
+    def _find_movie(self, entry):
+        for e in self.items:
+            if e['imdb_id'] == entry['imdb_id']:
+                return e
+
     def __contains__(self, entry):
         if not entry.get('imdb_id'):
             log.debug('entry %s does not have imdb_id, skipping', entry)
             return False
-        return any(e['imdb_id'] == entry['imdb_id'] for e in self.items)
+        return self._find_movie(entry) is not None
 
     def __iter__(self):
         return iter(self.items)
@@ -222,6 +227,9 @@ class ImdbEntrySet(MutableSet):
         """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
         like test mode"""
         return True
+
+    def get(self, entry):
+        return self._find_movie(entry)
 
 
 class ImdbList(object):

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
 
 import logging
@@ -181,10 +181,10 @@ class CouchPotatoSet(MutableSet):
 
     def _find_entry(self, entry):
         for cp_entry in self.movies:
-            if any(entry.get(id) is not None and entry[id] == cp_entry[id] for id in self.supported_ids):
-                return True
-            if entry.get('title').lower() == cp_entry.get('title').lower():
-                return True
+            for sup_id in self.supported_ids:
+                if entry.get(sup_id) is not None and entry[sup_id] == cp_entry[sup_id] or entry.get(
+                        'title').lower() == cp_entry.get('title').lower():
+                    return cp_entry
 
     def __init__(self, config):
         self.config = config
@@ -225,6 +225,9 @@ class CouchPotatoSet(MutableSet):
         """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
         like test mode"""
         return True
+
+    def get(self, entry):
+        return self._find_entry(entry)
 
 
 class CouchPotatoList(object):
