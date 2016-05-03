@@ -8,6 +8,10 @@ $episodes-list-backdrop-overlay-color: rgba(0, 0, 0, .65);
     padding: 0;
 }
 
+.episodes-list-card {
+    flex: 1 1 0;
+}
+
 #content md-card-content.episodes-backdrop-image {
     position: absolute;
     top: 0;
@@ -34,6 +38,8 @@ $episodes-list-backdrop-overlay-color: rgba(0, 0, 0, .65);
 
 .episodes-backdrop-filler {
     position: absolute;
+
+    flex: 1 1 auto;
 
     top: 0;
     left: 0;
@@ -63,7 +69,7 @@ $episodes-list-backdrop-overlay-color: rgba(0, 0, 0, .65);
         flex-direction: column;
 
         min-height: 100%;
-        margin: 0 20em;
+        margin: 0 10px;
 
         color: #fff;
         background-color: transparent;
@@ -81,8 +87,10 @@ $episodes-list-backdrop-overlay-color: rgba(0, 0, 0, .65);
     .hide-episodes-button {
         position: absolute;
         top: 0;
-        right: 0;
+        left: 0;
         color: #FFF;
+
+        transform: translate(-50%, -50%);
     }
 
     fg-material-pagination {

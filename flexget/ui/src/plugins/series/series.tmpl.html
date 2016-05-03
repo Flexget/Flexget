@@ -14,7 +14,7 @@
             <md-button class="md-primary md-raised" ng-click="vm.showEpisodes(show)">Episodes</md-button>
         </series-show>
         <series-episodes-view ng-repeat-end ng-if="vm.areEpisodesOnShowRow(vm.selectedShow, $index)" show="vm.selectedShow" class="series-episodes">
-            <md-button class="md-icon-button hide-episodes-button" ng-click="vm.hideEpisodes()" aria-label="hide the episodes"><i class="fa fa-times" aria-hidden="true"></i></md-button>
+            <md-button class="md-fab md-mini hide-episodes-button" ng-click="vm.hideEpisodes()" aria-label="hide the episodes"><i class="fa fa-times" aria-hidden="true"></i></md-button>
         </series-episodes-view>
     </md-content>
     <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalShows" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
