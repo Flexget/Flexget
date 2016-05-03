@@ -1,143 +1,60 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        Connection: [close]
-        Host: [!!python/unicode 'api.tvmaze.com']
-        User-Agent: [Python-urllib/2.7]
-      method: GET
-      uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Flash&embed=cast
-    response:
-      body: {string: "{\"id\":13,\"url\":\"http://www.tvmaze.com/shows/13/the-flash\"\
-          ,\"name\":\"The Flash\",\"type\":\"Scripted\",\"language\":\"English\",\"\
-          genres\":[\"Drama\",\"Action\",\"Adventure\",\"Science-Fiction\"],\"status\"\
-          :\"Running\",\"runtime\":60,\"premiered\":\"2014-10-07\",\"schedule\":{\"\
-          time\":\"20:00\",\"days\":[\"Tuesday\"]},\"rating\":{\"average\":8.3},\"\
-          weight\":23,\"network\":{\"id\":5,\"name\":\"The CW\",\"country\":{\"name\"\
-          :\"United States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"\
-          webChannel\":null,\"externals\":{\"tvrage\":36939,\"thetvdb\":279121,\"\
-          imdb\":\"tt3107288\"},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/49/124187.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/49/124187.jpg\"\
-          },\"summary\":\"<p>After a particle accelerator causes a freak storm, CSI\
-          \ Investigator Barry Allen is struck by lightning and falls into a coma.\
-          \ Months later he awakens with the power of super speed, granting him the\
-          \ ability to move through Central City like an unseen guardian angel. Though\
-          \ initially excited by his newfound powers, Barry is shocked to discover\
-          \ he is not the only \\\"meta-human\\\" who was created in the wake of the\
-          \ accelerator explosion -- and not everyone is using their new powers for\
-          \ good. Barry partners with S.T.A.R. Labs and dedicates his life to protect\
-          \ the innocent. For now, only a few close friends and associates know that\
-          \ Barry is literally the fastest man alive, but it won't be long before\
-          \ the world learns what Barry Allen has become...The Flash.</p>\",\"updated\"\
-          :1461962321,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/13\"\
-          },\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/670723\"\
-          },\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/647394\"}},\"\
-          _embedded\":{\"cast\":[{\"person\":{\"id\":578,\"url\":\"http://www.tvmaze.com/people/578/grant-gustin\"\
-          ,\"name\":\"Grant Gustin\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5936.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5936.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/578\"}}},\"\
-          character\":{\"id\":2293,\"url\":\"http://www.tvmaze.com/characters/2293/the-flash-barry-allen-the-flash\"\
-          ,\"name\":\"Barry Allen / The Flash\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/1172.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/1172.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2293\"\
-          }}}},{\"person\":{\"id\":2565,\"url\":\"http://www.tvmaze.com/people/2565/candice-patton\"\
-          ,\"name\":\"Candice Patton\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5942.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5942.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2565\"}}},\"\
-          character\":{\"id\":2294,\"url\":\"http://www.tvmaze.com/characters/2294/the-flash-iris-west\"\
-          ,\"name\":\"Iris West\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/152.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/152.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2294\"\
-          }}}},{\"person\":{\"id\":633,\"url\":\"http://www.tvmaze.com/people/633/carlos-valdes\"\
-          ,\"name\":\"Carlos Vald\xE9s\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6034.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6034.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/633\"}}},\"\
-          character\":{\"id\":2297,\"url\":\"http://www.tvmaze.com/characters/2297/the-flash-cisco-ramon\"\
-          ,\"name\":\"Cisco Ramon\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/153.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/153.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2297\"\
-          }}}},{\"person\":{\"id\":2568,\"url\":\"http://www.tvmaze.com/people/2568/jesse-l-martin\"\
-          ,\"name\":\"Jesse L. Martin\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6036.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6036.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2568\"}}},\"\
-          character\":{\"id\":2299,\"url\":\"http://www.tvmaze.com/characters/2299/the-flash-detective-joe-west\"\
-          ,\"name\":\"Detective Joe West\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/1174.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/1174.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2299\"\
-          }}}},{\"person\":{\"id\":634,\"url\":\"http://www.tvmaze.com/people/634/danielle-panabaker\"\
-          ,\"name\":\"Danielle Panabaker\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6033.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6033.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/634\"}}},\"\
-          character\":{\"id\":2296,\"url\":\"http://www.tvmaze.com/characters/2296/the-flash-caitlin-snow\"\
-          ,\"name\":\"Caitlin Snow\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/150.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/150.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2296\"\
-          }}}},{\"person\":{\"id\":2567,\"url\":\"http://www.tvmaze.com/people/2567/tom-cavanagh\"\
-          ,\"name\":\"Tom Cavanagh\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6035.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6035.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2567\"}}},\"\
-          character\":{\"id\":175145,\"url\":\"http://www.tvmaze.com/characters/175145/the-flash-dr-harrison-wells-reverse-flash\"\
-          ,\"name\":\"Dr. Harrison Wells / Reverse-Flash\",\"image\":{\"medium\":\"\
-          http://tvmazecdn.com/uploads/images/medium_portrait/21/54930.jpg\",\"original\"\
-          :\"http://tvmazecdn.com/uploads/images/original_untouched/21/54930.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/175145\"\
-          }}}},{\"person\":{\"id\":2566,\"url\":\"http://www.tvmaze.com/people/2566/rick-cosnett\"\
-          ,\"name\":\"Rick Cosnett\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6032.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6032.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2566\"}}},\"\
-          character\":{\"id\":175143,\"url\":\"http://www.tvmaze.com/characters/175143/the-flash-detective-eddie-thawne\"\
-          ,\"name\":\"Detective Eddie Thawne\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/21/54931.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/21/54931.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/175143\"\
-          }}}},{\"person\":{\"id\":2567,\"url\":\"http://www.tvmaze.com/people/2567/tom-cavanagh\"\
-          ,\"name\":\"Tom Cavanagh\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6035.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6035.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2567\"}}},\"\
-          character\":{\"id\":199969,\"url\":\"http://www.tvmaze.com/characters/199969/the-flash-dr-harrison-wells-earth-2\"\
-          ,\"name\":\"Dr. Harrison Wells / Earth-2\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/29/73609.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/29/73609.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/199969\"\
-          }}}},{\"person\":{\"id\":86920,\"url\":\"http://www.tvmaze.com/people/86920/keiynan-lonsdale\"\
-          ,\"name\":\"Keiynan Lonsdale\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/20/50008.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/20/50008.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/86920\"\
-          }}},\"character\":{\"id\":213769,\"url\":\"http://www.tvmaze.com/characters/213769/the-flash-wally-west\"\
-          ,\"name\":\"Wally West\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/37/93263.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/37/93263.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/213769\"\
-          }}}}]}}"}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Sat, 30 Apr 2016 08:47:13 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Connection: [close]
-        Host: [api.tvmaze.com]
-        User-Agent: [Python-urllib/2.7]
-      method: GET
-      uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=2
-    response:
-      body: {string: !!python/unicode '{"id":211206,"url":"http://www.tvmaze.com/episodes/211206/the-flash-2x02-flash-of-two-worlds","name":"Flash
-          of Two Worlds","season":2,"number":2,"airdate":"2015-10-13","airtime":"20:00","airstamp":"2015-10-13T20:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/23/59298.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/23/59298.jpg"},"summary":"<p>The
-          team''s visitor, Jay Garrick, explains that he comes from a parallel world
-          and was a speedster there, but lost his powers transitioning over. Now he
-          insists that Barry needs his help fighting a new metahuman, Sand Demon,
-          who came from Jay''s world. Meanwhile, Officer Patty Spivot tries to join
-          Joe''s Metahuman Taskforce.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/211206"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Sat, 30 Apr 2016 08:47:14 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.9.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Flash
+  response:
+    body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
+        Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":22,"network":{"id":5,"name":"The
+        CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/49/124187.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/49/124187.jpg"},"summary":"<p>After
+        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
+        is struck by lightning and falls into a coma. Months later he awakens with
+        the power of super speed, granting him the ability to move through Central
+        City like an unseen guardian angel. Though initially excited by his newfound
+        powers, Barry is shocked to discover he is not the only \"meta-human\" who
+        was created in the wake of the accelerator explosion -- and not everyone is
+        using their new powers for good. Barry partners with S.T.A.R. Labs and dedicates
+        his life to protect the innocent. For now, only a few close friends and associates
+        know that Barry is literally the fastest man alive, but it won''t be long
+        before the world learns what Barry Allen has become...The Flash.</p>","updated":1462013745,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/670723"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/647394"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 12:25:50 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.9.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=2
+  response:
+    body: {string: !!python/unicode '{"id":211206,"url":"http://www.tvmaze.com/episodes/211206/the-flash-2x02-flash-of-two-worlds","name":"Flash
+        of Two Worlds","season":2,"number":2,"airdate":"2015-10-13","airtime":"20:00","airstamp":"2015-10-13T20:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/23/59298.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/23/59298.jpg"},"summary":"<p>The
+        team''s visitor, Jay Garrick, explains that he comes from a parallel world
+        and was a speedster there, but lost his powers transitioning over. Now he
+        insists that Barry needs his help fighting a new metahuman, Sand Demon, who
+        came from Jay''s world. Meanwhile, Officer Patty Spivot tries to join Joe''s
+        Metahuman Taskforce.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/211206"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 12:25:50 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
 version: 1

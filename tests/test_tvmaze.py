@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from datetime import timedelta, datetime
 
 import pytest
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget.manager import Session
 from flexget.plugins.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries
@@ -252,7 +252,7 @@ class TestTVMazeShowLookup(object):
 
             # Verify series data has been refreshed with actual values upon 2nd call, and series expiration flag
             # is set to False
-            assert series.weight == 34, \
+            assert series.weight == 3, \
                 'weight should have been updated back to 15 from 99, instead its %s' % series.weight
             assert not session.query(TVMazeSeries).first().expired, 'expired status should be False'
 
@@ -316,10 +316,10 @@ class TestTVMazeShowLookup(object):
             'Expected airdate to be None, got %s' % entry['tvmaze_episode_airstamp']
 
     def test_episode_summary(self, execute_task):
-        expected_summary = u"The team's visitor, Jay Garrick, explains that he comes from a parallel world and " \
-                           u"was a speedster there, but lost his powers transitioning over. Now he insists that" \
-                           u" Barry needs his help fighting a new metahuman, Sand Demon, who came from Jay's world." \
-                           u" Meanwhile, Officer Patty Spivot tries to join Joe's Metahuman Taskforce."
+        expected_summary = "<p>The team's visitor, Jay Garrick, explains that he comes from a parallel world and " \
+                           "was a speedster there, but lost his powers transitioning over. Now he insists that Barry" \
+                           " needs his help fighting a new metahuman, Sand Demon, who came from Jay's world." \
+                           " Meanwhile, Officer Patty Spivot tries to join Joe's Metahuman Taskforce.</p>"
 
         task = execute_task('test_episode_summary')
         entry = task.entries[0]
@@ -339,17 +339,6 @@ class TestTVMazeShowLookup(object):
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 476294, 'episode id should be 476294, instead its %s' % entry[
             'tvmaze_episode_id']
-
-    def test_show_cast(self, execute_task):
-        task = execute_task('test_show_cast')
-        entry = task.entries[0]
-        assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[
-            'tvmaze_series_id']
-        assert entry['tvmaze_episode_id'] == 211206, 'episode id should be 211206, instead its %s' % entry[
-            'tvmaze_episode_id']
-        assert len(entry['tvmaze_series_actors']) == 9, \
-            'expected actors list for series to contain 9 members,' \
-            ' instead it contains %s' % len(entry['tvmaze_series_actors'])
 
     def test_episode_air_date(self, execute_task):
         task = execute_task('test_episode_air_date')
