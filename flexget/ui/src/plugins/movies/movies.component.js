@@ -49,12 +49,20 @@
     }
 
 
-    vm.deleteMovie = function(listId, movie) {
-        moviesService.deleteMovie(listId, movie)
+    vm.deleteMovie = function(list, movie) {
+      var confirm = $mdDialog.confirm()
+      .title('Confirm deleting movie from list.')
+      .htmlContent("Are you sure you want to delete the movie <b>" + movie.title + "</b> from list <b>" + list.name + "?")
+      .ok("Forget")
+      .cancel("No");
+
+      $mdDialog.show(confirm).then(function() {
+        moviesService.deleteMovie(list.id, movie.id)
           .then(function() {
             var index = vm.movies.indexOf(movie);
             vm.movies.splice(index, 1);
           });
+      });
     }
 
     vm.deleteList = function(list) {
@@ -72,10 +80,6 @@
             vm.lists.splice(index, 1);
           });
       });
-
-
-
-      console.log(list);
     }
   }
 })();

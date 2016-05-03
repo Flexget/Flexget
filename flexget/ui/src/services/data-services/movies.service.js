@@ -49,8 +49,8 @@
             }
         }
 
-        function deleteMovie(listId, movie) {
-            return $http.delete('/api/movie_list/' + listId + '/movies/' + movie.id + '/')
+        function deleteMovie(listId, movieId) {
+            return $http.delete('/api/movie_list/' + listId + '/movies/' + movieId + '/')
                 .then(deleteMovieComplete)
                 .catch(callFailed);
 
