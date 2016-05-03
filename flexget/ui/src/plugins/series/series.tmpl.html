@@ -12,6 +12,7 @@
 
         <series-show show="show" forget-show="vm.forgetShow(show)" layout="row" flex="100" flex-gt-md="50" flex-gt-lg="33" ng-repeat-start="show in vm.series">
             <md-button class="md-primary md-raised" ng-click="vm.showEpisodes(show)">Episodes</md-button>
+            <span class="show-indicator" ng-if="show == vm.selectedShow"></span>
         </series-show>
         <series-episodes-view ng-repeat-end ng-if="vm.areEpisodesOnShowRow(vm.selectedShow, $index)" show="vm.selectedShow" class="series-episodes">
             <md-button class="md-fab md-mini hide-episodes-button" ng-click="vm.hideEpisodes()" aria-label="hide the episodes"><i class="fa fa-times" aria-hidden="true"></i></md-button>

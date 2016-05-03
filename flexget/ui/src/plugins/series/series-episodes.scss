@@ -1,5 +1,16 @@
 $episodes-list-backdrop-overlay-color: rgba(0, 0, 0, .65);
 
+.show-indicator {
+    content: '';
+    width: 30px;
+    height: 30px;
+    background-color: #000;
+    transform: rotate(45deg);
+    position: absolute;
+    left: 50%;
+    bottom: -40px;
+}
+
 .series-episodes {
     position: relative;
 
@@ -69,7 +80,7 @@ $episodes-list-backdrop-overlay-color: rgba(0, 0, 0, .65);
         flex-direction: column;
 
         min-height: 100%;
-        margin: 0 10px;
+        margin: 0 30px;
 
         color: #fff;
         background-color: transparent;
