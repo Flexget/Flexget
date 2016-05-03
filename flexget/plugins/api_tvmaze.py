@@ -389,6 +389,8 @@ class APITVMaze(object):
         # Verify we have enough parameters for search
         if not any([series_name, show_id]):
             raise LookupError('Not enough parameters to lookup episode')
+        if lookup_type == 'sequence':
+            raise LookupError('TVMaze does not support sequence type searches')
         if lookup_type == 'ep' and not all([season_number, episode_number]):
             raise LookupError('Not enough parameters to lookup episode')
         elif lookup_type == 'date' and not episode_date:
