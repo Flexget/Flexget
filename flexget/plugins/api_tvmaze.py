@@ -24,6 +24,16 @@ Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 BASE_URL = 'http://api.tvmaze.com'
 
+TVMAZE_ENDPOINTS = {
+    'tvmaze_id': '/shows/{}/',
+    'imdb_id': '/lookup/shows?imdb={}',
+    'tvrage_id': '/lookup/shows?tvrage={}',
+    'thetvdb_id': '/lookup/shows?thetvdb={}',
+    'show_name': '/singlesearch/shows?q={}',
+    'date': '/shows/{}/episodesbydate?date={}',
+    'number': '/shows/{}/episodebynumber?season={}&number={}'
+}
+
 
 @db_schema.upgrade('tvmaze')
 def upgrade(ver, session):
@@ -453,51 +463,27 @@ class APITVMaze(object):
 def get_show(show_name=None, tvmaze_id=None, imdb_id=None, tvrage_id=None, thetvdb_id=None):
     if not any(show_name or tvmaze_id or imdb_id or tvrage_id or thetvdb_id):
         raise LookupError('Not enough parameters sent for series lookup')
-    if show_name:
-        return tvmaze_lookup('show_name', show_name)
-    if tvmaze_id:
-        return tvmaze_lookup('tvmaze_id', tvmaze_id)
-    if imdb_id:
-        return tvmaze_lookup('imdb_id', imdb_id)
-    if tvrage_id:
-        return tvmaze_lookup('tvrage_id', tvrage_id)
-    if thetvdb_id:
-        return tvmaze_lookup('thetvdb_id', thetvdb_id)
+    for k, v in locals().items():
+        if v:
+            return tvmaze_lookup(k, [v])
 
 
 def get_episode(series_id, date=None, number=None, season=None):
     if not (date or (number and season)):
         raise LookupError('Not enough parameters sent for episode lookup')
     if date:
-        return tvmaze_lookup('date', date, series_id=series_id)
+        return tvmaze_lookup('date', [series_id, date])
     elif number and season:
-        return tvmaze_lookup('number', number, series_id=series_id, season=season)
+        return tvmaze_lookup('number', [series_id, season, number])
 
 
-def tvmaze_lookup(lookup_type, lookup_value, **kwargs):
-    if lookup_type == 'tvmaze_id':
-        lookup_url = BASE_URL + '/shows/{}/'.format(lookup_value)
-    elif lookup_type == 'imdb_id':
-        lookup_url = BASE_URL + '/lookup/shows?imdb={}'.format(lookup_value)
-    elif lookup_type == 'tvrage_id':
-        lookup_url = BASE_URL + '/lookup/shows?tvrage={}'.format(lookup_value)
-    elif lookup_type == 'thetvdb_id':
-        lookup_url = BASE_URL + '/lookup/shows?thetvdb={}'.format(lookup_value)
-    elif lookup_type == 'show_name':
-        lookup_url = BASE_URL + '/singlesearch/shows?q={}'.format(lookup_value)
-    elif lookup_type == 'date':
-        lookup_url = BASE_URL + '/shows/{}/episodesbydate?date={}'.format(kwargs.get('series_id'), lookup_value)
-    elif lookup_type == 'number':
-        lookup_url = BASE_URL + '/shows/{}/episodebynumber?season={}&number={}'.format(kwargs.get('series_id'),
-                                                                                       kwargs.get('season'),
-                                                                                       lookup_value)
-    else:
-        raise LookupError('Wrong lookup type sent: {}'.format(lookup_type))
+def tvmaze_lookup(lookup_type, lookup_values):
+    lookup_url = BASE_URL + TVMAZE_ENDPOINTS[lookup_type].format(*lookup_values)
+    log.debug('querying tvmaze API with the following URL:{}', lookup_url)
     try:
         result = requests.get(lookup_url).json()
     except HTTPError as e:
         raise LookupError(e)
-
     return result
 
 
