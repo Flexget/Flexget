@@ -49,12 +49,37 @@
     }
 
 
-    vm.deleteMovie = function(listid, movie) {
-        moviesService.deleteMovie(listId, movie)
+    vm.deleteMovie = function(list, movie) {
+      var confirm = $mdDialog.confirm()
+      .title('Confirm deleting movie from list.')
+      .htmlContent("Are you sure you want to delete the movie <b>" + movie.title + "</b> from list <b>" + list.name + "?")
+      .ok("Forget")
+      .cancel("No");
+
+      $mdDialog.show(confirm).then(function() {
+        moviesService.deleteMovie(list.id, movie.id)
           .then(function() {
             var index = vm.movies.indexOf(movie);
             vm.movies.splice(index, 1);
           });
+      });
+    }
+
+    vm.deleteList = function(list) {
+      var confirm = $mdDialog.confirm()
+      .title('Confirm deleting movie list.')
+      .htmlContent("Are you sure you want to delete the movie list <b>" + list.name + "</b>?")
+      .ok("Forget")
+      .cancel("No");
+
+      //Actually show the confirmation dialog and place a call to DELETE when confirmed
+      $mdDialog.show(confirm).then(function() {
+       moviesService.deleteList(list.id)
+          .then(function() {
+            var index = vm.lists.indexOf(list);
+            vm.lists.splice(index, 1);
+          });
+      });
     }
   }
 })();

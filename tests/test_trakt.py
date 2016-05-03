@@ -1,10 +1,12 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
 from flexget.manager import Session
 from flexget.plugins.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow
+from future.utils import native
 
 
 lookup_series = ApiTrakt.lookup_series
@@ -16,7 +18,7 @@ class TestTraktShowLookup(object):
         templates:
           global:
             trakt_lookup: yes
-            # Access a tvdb field to cause lazy loading to occur
+            # Access a trakt field to cause lazy loading to occur
             set:
               afield: "{{tvdb_id}}{{trakt_ep_name}}"
         tasks:
@@ -53,6 +55,11 @@ class TestTraktShowLookup(object):
               - {title: '11-22-63.S01E01.HDTV.XViD-FlexGet'}
             series:
               - 11-22-63
+          test_alternate_language:
+            mock:
+              - {'title': 'Игра престолов (2011).s01e01.hdtv'}
+            series:
+              - Игра престолов
     """
 
     def test_lookup_name(self, execute_task):
@@ -82,6 +89,13 @@ class TestTraktShowLookup(object):
         # Make sure it didn't make a false match
         entry = task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
+
+    @pytest.mark.skip(reason="no way of currently testing this. VCR crash's test")
+    def test_alternate_language(self, execute_task):
+        # Test Non-English lookups
+        task = execute_task('test_alternate_language')
+        entry = task.find_entry(title=native('Игра престолов (2011).s01e01.hdtv'))
+        assert entry['trakt_series_name'] == 'Game of Thrones', 'Should of returned GoT'
 
     def test_search_results(self, execute_task):
         task = execute_task('test_search_result')

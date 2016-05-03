@@ -1,7 +1,11 @@
-<div class="row">
-    <div ng-repeat="model in vm.models">
-        <div class="col-xs-3">
-            <form name="myForm" sf-schema="schema" sf-form="form" sf-model="model" ng-submit="onSubmit(myForm)"></form>
-        </div>
-    </div>
+<div layout="column" flex>
+	<ng-include src="'../../construction.tmpl.html'" layout="row"></ng-include>
+	<div layout="row">
+		<pre>{{ vm.models | json }}</pre>
+	    <div ng-repeat="model in vm.models">
+	        <div class="col-xs-3">
+	            <form name="myForm" sf-schema="vm.schema" sf-form="vm.form" sf-model="vm.model" ng-submit="onSubmit(myForm)"></form>
+	        </div>
+	    </div>
+	</div>
 </div>

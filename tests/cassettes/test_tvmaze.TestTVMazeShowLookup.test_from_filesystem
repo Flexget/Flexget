@@ -1,701 +1,250 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/singlesearch/shows?q=Marvels%20Jessica%20Jones&embed=cast
-    response:
-      body: {string: !!python/unicode '{"id":1370,"url":"http://www.tvmaze.com/shows/1370/marvels-jessica-jones","name":"Marvel''s
-          Jessica Jones","type":"Scripted","language":"English","genres":["Action","Crime","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2015-11-20","schedule":{"time":"","days":["Friday"]},"rating":{"average":8},"weight":6,"network":null,"webChannel":{"id":1,"name":"Netflix","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":38797,"thetvdb":284190,"imdb":"tt2357547"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/31/77884.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/77884.jpg"},"summary":"<p>Haunted
-          by a traumatic past, Jessica Jones uses her gifts as a private eye to find
-          her tormentor before he can harm anyone else in Hell''s Kitchen.</p>","updated":1457735325,"_links":{"self":{"href":"http://api.tvmaze.com/shows/1370"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/206167"}},"_embedded":{"cast":[{"person":{"id":31094,"url":"http://www.tvmaze.com/people/31094/krysten-ritter","name":"Krysten
-          Ritter","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/11247.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/11247.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/31094"}}},"character":{"id":93859,"url":"http://www.tvmaze.com/characters/93859/marvels-jessica-jones-jessica-jones","name":"Jessica
-          Jones","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/25/64061.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/25/64061.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/93859"}}}},{"person":{"id":33335,"url":"http://www.tvmaze.com/people/33335/rachael-taylor","name":"Rachael
-          Taylor","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/8005.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/8005.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/33335"}}},"character":{"id":135015,"url":"http://www.tvmaze.com/characters/135015/marvels-jessica-jones-patricia-trish-walker-patsy","name":"Patricia
-          \"Trish\" Walker / Patsy","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/25/64065.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/25/64065.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/135015"}}}},{"person":{"id":23276,"url":"http://www.tvmaze.com/people/23276/eka-darville","name":"Eka
-          Darville","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/12/30286.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/12/30286.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/23276"}}},"character":{"id":206937,"url":"http://www.tvmaze.com/characters/206937/marvels-jessica-jones-malcolm-ducasse","name":"Malcolm
-          Ducasse","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/32/81283.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/32/81283.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/206937"}}}},{"person":{"id":23485,"url":"http://www.tvmaze.com/people/23485/david-tennant","name":"David
-          Tennant","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/6595.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/6595.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/23485"}}},"character":{"id":135016,"url":"http://www.tvmaze.com/characters/135016/marvels-jessica-jones-kilgrave-kevin-thompson","name":"Kilgrave
-          / Kevin Thompson","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/25/64062.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/25/64062.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/135016"}}}},{"person":{"id":31007,"url":"http://www.tvmaze.com/people/31007/carrie-anne-moss","name":"Carrie-Anne
-          Moss","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/4504.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/4504.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/31007"}}},"character":{"id":135013,"url":"http://www.tvmaze.com/characters/135013/marvels-jessica-jones-jeri-hogarth","name":"Jeri
-          Hogarth","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/25/64064.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/25/64064.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/135013"}}}},{"person":{"id":3268,"url":"http://www.tvmaze.com/people/3268/wil-traval","name":"Wil
-          Traval","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/8/20429.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/8/20429.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/3268"}}},"character":{"id":206573,"url":"http://www.tvmaze.com/characters/206573/marvels-jessica-jones-will-simpson","name":"Will
-          Simpson","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/31/78404.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/78404.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/206573"}}}},{"person":{"id":9691,"url":"http://www.tvmaze.com/people/9691/mike-colter","name":"Mike
-          Colter","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/6965.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/6965.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/9691"}}},"character":{"id":175107,"url":"http://www.tvmaze.com/characters/175107/marvels-jessica-jones-luke-cage","name":"Luke
-          Cage","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/25/64063.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/25/64063.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/175107"}}}},{"person":{"id":746,"url":"http://www.tvmaze.com/people/746/erin-moriarty","name":"Erin
-          Moriarty","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/8/20420.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/8/20420.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/746"}}},"character":{"id":135014,"url":"http://www.tvmaze.com/characters/135014/marvels-jessica-jones-hope-shlottmann","name":"Hope
-          Shlottmann","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/32/81285.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/32/81285.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/135014"}}}}]}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:46 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/shows/1370/episodebynumber?season=1&number=2
-    response:
-      body: {string: !!python/unicode '{"id":206178,"url":"http://www.tvmaze.com/episodes/206178/marvels-jessica-jones-1x02-aka-crush-syndrome","name":"AKA
-          Crush Syndrome","season":1,"number":2,"airdate":"2015-11-20","airtime":"","airstamp":"2015-11-20T12:00:00+00:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/31/77821.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/77821.jpg"},"summary":"<p>Jessica
-          tracks down Kilgrave to provide Jeri with enough evidence to convince her
-          that a mind-controller exists so that the lawyer will represent Hope. Meanwhile,
-          Jessica and Luke draw closer after a barfight after they both realize the
-          other is more than they seem.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/206178"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:47 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/shows/1370/episodebynumber?season=1&number=3
-    response:
-      body: {string: !!python/unicode '{"id":206177,"url":"http://www.tvmaze.com/episodes/206177/marvels-jessica-jones-1x03-aka-its-called-whiskey","name":"AKA
-          It''s Called Whiskey","season":1,"number":3,"airdate":"2015-11-20","airtime":"","airstamp":"2015-11-20T12:00:00+00:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/31/78410.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/78410.jpg"},"summary":"<p>While
-          Jessica tries to get the anesthesia she needs to negate Kilgrave''s mind
-          control powers, Trish interviews Hope on her radio show and makes herself
-          Kilgrave''s next target.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/206177"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:47 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Big%20Bang%20Theory&embed=cast
-    response:
-      body: {string: !!python/unicode '{"id":66,"url":"http://www.tvmaze.com/shows/66/the-big-bang-theory","name":"The
-          Big Bang Theory","type":"Scripted","language":"English","genres":["Drama","Comedy"],"status":"Running","runtime":30,"premiered":"2007-09-24","schedule":{"time":"20:00","days":["Thursday"]},"rating":{"average":8.4},"weight":45,"network":{"id":2,"name":"CBS","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":8511,"thetvdb":80379,"imdb":"tt0898266"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/486.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/486.jpg"},"summary":"<p><strong><em>\"The
-          Big Bang Theory\"</em></strong> is a comedy about brilliant physicists,
-          Leonard and Sheldon, who are the kind of \"beautiful minds\" that understand
-          how the universe works. But none of that genius helps them interact with
-          people, especially women. All this begins to change when a free-spirited
-          beauty named Penny moves in next door. Sheldon, Leonard''s roommate, is
-          quite content spending his nights playing Klingon Boggle with their socially
-          dysfunctional friends, fellow Cal Tech scientists Wolowitz and Koothrappali.
-          However, Leonard sees in Penny a whole new universe of possibilities...
-          including love.</p>","updated":1457778368,"_links":{"self":{"href":"http://api.tvmaze.com/shows/66"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/621664"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/642013"}},"_embedded":{"cast":[{"person":{"id":8680,"url":"http://www.tvmaze.com/people/8680/jim-parsons","name":"Jim
-          Parsons","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1080.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1080.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8680"}}},"character":{"id":8868,"url":"http://www.tvmaze.com/characters/8868/the-big-bang-theory-sheldon-lee-cooper","name":"Sheldon
-          Lee Cooper","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1591.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1591.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/8868"}}}},{"person":{"id":8682,"url":"http://www.tvmaze.com/people/8682/simon-helberg","name":"Simon
-          Helberg","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1081.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1081.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8682"}}},"character":{"id":8870,"url":"http://www.tvmaze.com/characters/8870/the-big-bang-theory-howard-joel-wolowitz","name":"Howard
-          Joel Wolowitz","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1593.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1593.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/8870"}}}},{"person":{"id":8683,"url":"http://www.tvmaze.com/people/8683/kunal-nayyar","name":"Kunal
-          Nayyar","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1082.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1082.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8683"}}},"character":{"id":8871,"url":"http://www.tvmaze.com/characters/8871/the-big-bang-theory-rajesh-ramayan-koothrappali","name":"Rajesh
-          Ramayan Koothrappali","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1594.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1594.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/8871"}}}},{"person":{"id":8679,"url":"http://www.tvmaze.com/people/8679/johnny-galecki","name":"Johnny
-          Galecki","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1078.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1078.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8679"}}},"character":{"id":8867,"url":"http://www.tvmaze.com/characters/8867/the-big-bang-theory-leonard-leakey-hofstadter","name":"Leonard
-          Leakey Hofstadter","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1592.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1592.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/8867"}}}},{"person":{"id":8681,"url":"http://www.tvmaze.com/people/8681/kaley-cuoco","name":"Kaley
-          Cuoco","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1790.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1790.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8681"}}},"character":{"id":8869,"url":"http://www.tvmaze.com/characters/8869/the-big-bang-theory-penny","name":"Penny","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/487.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/487.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/8869"}}}},{"person":{"id":8685,"url":"http://www.tvmaze.com/people/8685/melissa-rauch","name":"Melissa
-          Rauch","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/45/114860.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/45/114860.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8685"}}},"character":{"id":8873,"url":"http://www.tvmaze.com/characters/8873/the-big-bang-theory-bernadette-marianne-rostenkowski","name":"Bernadette
-          Marianne Rostenkowski","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1595.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1595.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/8873"}}}},{"person":{"id":8684,"url":"http://www.tvmaze.com/people/8684/mayim-bialik","name":"Mayim
-          Bialik","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1784.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1784.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8684"}}},"character":{"id":8872,"url":"http://www.tvmaze.com/characters/8872/the-big-bang-theory-amy-farrah-fowler","name":"Amy
-          Farrah Fowler","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/488.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/488.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/8872"}}}},{"person":{"id":8686,"url":"http://www.tvmaze.com/people/8686/kevin-sussman","name":"Kevin
-          Sussman","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1084.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1084.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8686"}}},"character":{"id":8874,"url":"http://www.tvmaze.com/characters/8874/the-big-bang-theory-stuart-bloom","name":"Stuart
-          Bloom","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/8231.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/8231.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/8874"}}}},{"person":{"id":6656,"url":"http://www.tvmaze.com/people/6656/laura-spencer","name":"Laura
-          Spencer","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/12252.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/12252.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/6656"}}},"character":{"id":53928,"url":"http://www.tvmaze.com/characters/53928/the-big-bang-theory-emily-sweeney","name":"Emily
-          Sweeney","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/45/114666.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/45/114666.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/53928"}}}},{"person":{"id":8687,"url":"http://www.tvmaze.com/people/8687/sara-gilbert","name":"Sara
-          Gilbert","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1079.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1079.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8687"}}},"character":{"id":8875,"url":"http://www.tvmaze.com/characters/8875/the-big-bang-theory-leslie-winkle","name":"Leslie
-          Winkle","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/8230.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/8230.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/8875"}}}}]}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:48 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/shows/66/episodebynumber?season=9&number=9
-    response:
-      body: {string: !!python/unicode '{"id":409180,"url":"http://www.tvmaze.com/episodes/409180/the-big-bang-theory-9x09-the-platonic-permutation","name":"The
-          Platonic Permutation","season":9,"number":9,"airdate":"2015-11-19","airtime":"20:00","airstamp":"2015-11-19T20:00:00-05:00","runtime":30,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/31/77852.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/77852.jpg"},"summary":"<p>Sheldon
-          and Amy try hanging out as friends when they spend Thanksgiving together
-          at the aquarium. Also, Wolowitz reluctantly agrees to volunteer at the soup
-          kitchen with Bernadette, Raj and Emily, and Penny discovers that Leonard
-          knows more about her than she thought.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/409180"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:49 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/search/shows?q=The%20Flash
-    response:
-      body: {string: !!python/unicode '[{"score":3.2371752,"show":{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
-          Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":34,"network":{"id":5,"name":"The
-          CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/148.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/148.jpg"},"summary":"<p>After
-          a particle accelerator causes a freak storm, CSI Investigator Barry Allen
-          is struck by lightning and falls into a coma. Months later he awakens with
-          the power of super speed, granting him the ability to move through Central
-          City like an unseen guardian angel. Though initially excited by his newfound
-          powers, Barry is shocked to discover he is not the only \"meta-human\" who
-          was created in the wake of the accelerator explosion -- and not everyone
-          is using their new powers for good. Barry partners with S.T.A.R. Labs and
-          dedicates his life to protect the innocent. For now, only a few close friends
-          and associates know that Barry is literally the fastest man alive, but it
-          won''t be long before the world learns what Barry Allen has become...The
-          Flash.</p>","updated":1457624504,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/600637"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/622447"}}}},{"score":2.6524968,"show":{"id":528,"url":"http://www.tvmaze.com/shows/528/the-flash","name":"The
-          Flash","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":60,"premiered":"1990-09-20","schedule":{"time":"20:30","days":[]},"rating":{"average":8.6},"weight":1,"network":{"id":2,"name":"CBS","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":5781,"thetvdb":78650,"imdb":"tt0098798"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/11360.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/11360.jpg"},"summary":"<p>Barry
-          Allen, a police scientist, is working one night during a terrible thunder
-          storm when a bolt of lightning crashes through the lab window, electrocuting
-          him. Barry survives and soon learns that he is now able to move at almost
-          incomprehensible speed.</p>","updated":1444404348,"_links":{"self":{"href":"http://api.tvmaze.com/shows/528"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/47947"}}}},{"score":2.637723,"show":{"id":7079,"url":"http://www.tvmaze.com/shows/7079/the-flash","name":"The
-          Flash","type":"Animation","language":"English","genres":["Action","Adventure","Children"],"status":"Ended","runtime":7,"premiered":"1967-11-11","schedule":{"time":"","days":["Saturday"]},"rating":{"average":null},"weight":0,"network":{"id":2,"name":"CBS","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":272094,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/29/73727.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/29/73727.jpg"},"summary":"<p>The
-          Flash is--of course!--the fastest man alive. Barry Allen, otherwise known
-          as the Flash, and his sidekick Wally West, otherwise known as Kid Flash,
-          battle evil villains and aliens who try to cause mayhem on Earth. They can
-          outrun a bullet, vibrate through solid walls, and do all sorts of other
-          things with their incredible speed. When there is trouble, Barry and Wally
-          open up their rings which shoot out their costumes.</p>","updated":1447263873,"_links":{"self":{"href":"http://api.tvmaze.com/shows/7079"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/406494"}}}},{"score":1.7750616,"show":{"id":7719,"url":"http://www.tvmaze.com/shows/7719/the-flush","name":"The
-          Flush","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"2012-06-27","schedule":{"time":"17:30","days":["Saturday"]},"rating":{"average":null},"weight":0,"network":{"id":207,"name":"Outdoor
-          Channel","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/33/83404.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/33/83404.jpg"},"summary":"<p><strong><em>\"The\n
-          Flush\"</em></strong> will make your heart thump! \"The Flush\" takes upland
-          hunting \nand the work of Pheasants Forever to new heights on Outdoor Channel.
-          \nEmmy award-winning hosts Bill Sherck and Ron Schara team up to guide \nviewers
-          on some of North America''s most profound and most exciting \nhunts. Each
-          trip highlights the work and dedication of Pheasants Forever\n supporters
-          and promotes the mission of the nation''s most efficient \nconservation
-          organization. Be prepared to be surprised! \"The Flush\" \ndocuments bird
-          hunts like you''ve never seen before! </p>","updated":1449344898,"_links":{"self":{"href":"http://api.tvmaze.com/shows/7719"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/433116"}}}},{"score":1.6641545,"show":{"id":999,"url":"http://www.tvmaze.com/shows/999/flash-gordon","name":"Flash
-          Gordon","type":"Scripted","language":"English","genres":["Science-Fiction"],"status":"Ended","runtime":60,"premiered":"2007-08-10","schedule":{"time":"21:00","days":[]},"rating":{"average":5.7},"weight":1,"network":{"id":16,"name":"SyFy","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":15536,"thetvdb":80441,"imdb":"tt0959086"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/6/16548.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/6/16548.jpg"},"summary":"<p>Placing
-          a 21st century spin on a science fiction classic, SCI FI''s contemporized
-          version of Flash Gordon follows the all-new adventures of Flash (Eric Johnson)
-          and his companions, Dale Arden and Dr. Hans Zarkov. Ordinary people thrust
-          into extraordinary circumstances, they find themselves as Earth''s last
-          line of defense against the forces of the merciless dictator Ming.<br /></p>","updated":1442953579,"_links":{"self":{"href":"http://api.tvmaze.com/shows/999"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/98788"}}}},{"score":1.6578106,"show":{"id":14017,"url":"http://www.tvmaze.com/shows/14017/flash-forward","name":"Flash
-          Forward","type":"Scripted","language":null,"genres":[],"status":"Ended","runtime":30,"premiered":null,"schedule":{"time":"21:10","days":[]},"rating":{"average":null},"weight":1,"network":{"id":78,"name":"Disney
-          Channel","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":77954,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/48/120029.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/48/120029.jpg"},"summary":"<p>Aa
-          look at the lives of two best friends and neighbors \nsince birth, Tucker
-          and Rebecca, and their respective adventures as they\n travel through the
-          world of eighth grade.</p>","updated":1457543064,"_links":{"self":{"href":"http://api.tvmaze.com/shows/14017"}}}},{"score":0.9588815,"show":{"id":2760,"url":"http://www.tvmaze.com/shows/2760/flesh-and-bone","name":"Flesh
-          and Bone","type":"Scripted","language":"English","genres":["Drama"],"status":"Ended","runtime":60,"premiered":"2015-11-08","schedule":{"time":"20:00","days":["Sunday"]},"rating":{"average":7.8},"weight":1,"network":{"id":17,"name":"starz","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":{"id":46,"name":"Starz
-          Play","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":39079,"thetvdb":282400,"imdb":"tt3507484"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/14/37166.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/14/37166.jpg"},"summary":"<p>Described
-          as a dark and gritty exploration of the dysfunction and glamour of the ballet
-          world, <strong><em>\"Flesh and Bone\"</em></strong> follows a young ballet
-          dancer, Claire, who has a distinctly troubled past, as she joins a prestigious
-          ballet company in New York.</p>","updated":1455464346,"_links":{"self":{"href":"http://api.tvmaze.com/shows/2760"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228275"}}}},{"score":0.87971795,"show":{"id":5035,"url":"http://www.tvmaze.com/shows/5035/hank-parkers-flesh-blood","name":"Hank
-          Parker''s Flesh & Blood","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"2013-07-02","schedule":{"time":"19:30","days":["Tuesday"]},"rating":{"average":null},"weight":0,"network":{"id":207,"name":"Outdoor
-          Channel","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/54294.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/54294.jpg"},"summary":"<p><strong><em>\"Hank\n
-          Parker''s Flesh &amp; Blood\"</em></strong> is a family hunting show that
-          features Hank\n Parker, two-time Bassmaster Classic Champion. Hank and his
-          two sons \nHank Parker Jr. and Billy \"Catfish\" Parker, who started their
-          careers in\n NASCAR as drivers, hunt big game, share a few laughs, and giving
-          back \nto organizations such as Outdoor Dream Foundation, Outdoor Without
-          \nLimits, and more. Follow these hunters as the Parker family dynamic is
-          \nrevealed while in pursuit of big game.</p>","updated":1449528645,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5035"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/519698"}}}},{"score":0.7671052,"show":{"id":669,"url":"http://www.tvmaze.com/shows/669/in-the-flesh","name":"In
-          the Flesh","type":"Scripted","language":"English","genres":["Drama","Fantasy","Horror"],"status":"Ended","runtime":60,"premiered":"2013-03-17","schedule":{"time":"22:00","days":["Sunday"]},"rating":{"average":6.7},"weight":0,"network":{"id":49,"name":"BBC
-          Three","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":34747,"thetvdb":261742,"imdb":"tt2480514"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/32/80591.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/32/80591.jpg"},"summary":"<p>Set
-          after a zombie uprising, treated zombies are rehabilitated back into society.</p>","updated":1451841753,"_links":{"self":{"href":"http://api.tvmaze.com/shows/669"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/59013"}}}},{"score":0.73020434,"show":{"id":4975,"url":"http://www.tvmaze.com/shows/4975/clash-of-the-dinosaurs","name":"Clash
-          of the Dinosaurs","type":"Documentary","language":"English","genres":[],"status":"Ended","runtime":45,"premiered":"2009-12-06","schedule":{"time":"20:00","days":["Sunday"]},"rating":{"average":null},"weight":0,"network":{"id":66,"name":"Discovery
-          Channel","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":24446,"thetvdb":128551,"imdb":"tt1266003"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/54113.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/54113.jpg"},"summary":"<p>For
-          the first time in 65 million years, innovative imaging technology enables
-          viewers to see deep inside the body of a dinosaur to reveal the secrets
-          of these ultimate prehistoric survival machines. Combining cinematic photo-real
-          3d graphics and leading-edge anatomy and paleontology, \"Clash of the Dinosaurs\"
-          is a four-part special that peels back the skin, muscles and bones to show
-          how they survived in such a violent world.</p>","updated":1448781557,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4975"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/312862"}}}}]'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:50 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/shows/13?embed=cast
-    response:
-      body: {string: "{\"id\":13,\"url\":\"http://www.tvmaze.com/shows/13/the-flash\"\
-          ,\"name\":\"The Flash\",\"type\":\"Scripted\",\"language\":\"English\",\"\
-          genres\":[\"Drama\",\"Action\",\"Adventure\",\"Science-Fiction\"],\"status\"\
-          :\"Running\",\"runtime\":60,\"premiered\":\"2014-10-07\",\"schedule\":{\"\
-          time\":\"20:00\",\"days\":[\"Tuesday\"]},\"rating\":{\"average\":8.3},\"\
-          weight\":34,\"network\":{\"id\":5,\"name\":\"The CW\",\"country\":{\"name\"\
-          :\"United States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"\
-          webChannel\":null,\"externals\":{\"tvrage\":36939,\"thetvdb\":279121,\"\
-          imdb\":\"tt3107288\"},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/148.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/148.jpg\"\
-          },\"summary\":\"<p>After a particle accelerator causes a freak storm, CSI\
-          \ Investigator Barry Allen is struck by lightning and falls into a coma.\
-          \ Months later he awakens with the power of super speed, granting him the\
-          \ ability to move through Central City like an unseen guardian angel. Though\
-          \ initially excited by his newfound powers, Barry is shocked to discover\
-          \ he is not the only \\\"meta-human\\\" who was created in the wake of the\
-          \ accelerator explosion -- and not everyone is using their new powers for\
-          \ good. Barry partners with S.T.A.R. Labs and dedicates his life to protect\
-          \ the innocent. For now, only a few close friends and associates know that\
-          \ Barry is literally the fastest man alive, but it won't be long before\
-          \ the world learns what Barry Allen has become...The Flash.</p>\",\"updated\"\
-          :1457624504,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/13\"\
-          },\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/600637\"\
-          },\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/622447\"}},\"\
-          _embedded\":{\"cast\":[{\"person\":{\"id\":578,\"url\":\"http://www.tvmaze.com/people/578/grant-gustin\"\
-          ,\"name\":\"Grant Gustin\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5936.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5936.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/578\"}}},\"\
-          character\":{\"id\":2293,\"url\":\"http://www.tvmaze.com/characters/2293/the-flash-barry-allen-the-flash\"\
-          ,\"name\":\"Barry Allen / The Flash\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/1172.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/1172.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2293\"\
-          }}}},{\"person\":{\"id\":2565,\"url\":\"http://www.tvmaze.com/people/2565/candice-patton\"\
-          ,\"name\":\"Candice Patton\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5942.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5942.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2565\"}}},\"\
-          character\":{\"id\":2294,\"url\":\"http://www.tvmaze.com/characters/2294/the-flash-iris-west\"\
-          ,\"name\":\"Iris West\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/152.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/152.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2294\"\
-          }}}},{\"person\":{\"id\":634,\"url\":\"http://www.tvmaze.com/people/634/danielle-panabaker\"\
-          ,\"name\":\"Danielle Panabaker\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6033.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6033.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/634\"}}},\"\
-          character\":{\"id\":2296,\"url\":\"http://www.tvmaze.com/characters/2296/the-flash-caitlin-snow\"\
-          ,\"name\":\"Caitlin Snow\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/150.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/150.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2296\"\
-          }}}},{\"person\":{\"id\":2568,\"url\":\"http://www.tvmaze.com/people/2568/jesse-l-martin\"\
-          ,\"name\":\"Jesse L. Martin\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6036.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6036.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2568\"}}},\"\
-          character\":{\"id\":2299,\"url\":\"http://www.tvmaze.com/characters/2299/the-flash-detective-joe-west\"\
-          ,\"name\":\"Detective Joe West\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/1174.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/1174.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2299\"\
-          }}}},{\"person\":{\"id\":633,\"url\":\"http://www.tvmaze.com/people/633/carlos-valdes\"\
-          ,\"name\":\"Carlos Vald\xE9s\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6034.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6034.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/633\"}}},\"\
-          character\":{\"id\":2297,\"url\":\"http://www.tvmaze.com/characters/2297/the-flash-cisco-ramon\"\
-          ,\"name\":\"Cisco Ramon\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/153.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/153.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2297\"\
-          }}}},{\"person\":{\"id\":2567,\"url\":\"http://www.tvmaze.com/people/2567/tom-cavanagh\"\
-          ,\"name\":\"Tom Cavanagh\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6035.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6035.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2567\"}}},\"\
-          character\":{\"id\":175145,\"url\":\"http://www.tvmaze.com/characters/175145/the-flash-dr-harrison-wells-reverse-flash\"\
-          ,\"name\":\"Dr. Harrison Wells / Reverse-Flash\",\"image\":{\"medium\":\"\
-          http://tvmazecdn.com/uploads/images/medium_portrait/21/54930.jpg\",\"original\"\
-          :\"http://tvmazecdn.com/uploads/images/original_untouched/21/54930.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/175145\"\
-          }}}},{\"person\":{\"id\":2566,\"url\":\"http://www.tvmaze.com/people/2566/rick-cosnett\"\
-          ,\"name\":\"Rick Cosnett\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6032.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6032.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2566\"}}},\"\
-          character\":{\"id\":175143,\"url\":\"http://www.tvmaze.com/characters/175143/the-flash-detective-eddie-thawne\"\
-          ,\"name\":\"Detective Eddie Thawne\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/21/54931.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/21/54931.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/175143\"\
-          }}}},{\"person\":{\"id\":2567,\"url\":\"http://www.tvmaze.com/people/2567/tom-cavanagh\"\
-          ,\"name\":\"Tom Cavanagh\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6035.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6035.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2567\"}}},\"\
-          character\":{\"id\":199969,\"url\":\"http://www.tvmaze.com/characters/199969/the-flash-dr-harrison-wells-earth-2\"\
-          ,\"name\":\"Dr. Harrison Wells / Earth-2\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/29/73609.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/29/73609.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/199969\"\
-          }}}},{\"person\":{\"id\":86920,\"url\":\"http://www.tvmaze.com/people/86920/keiynan-lonsdale\"\
-          ,\"name\":\"Keiynan Lonsdale\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/20/50008.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/20/50008.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/86920\"\
-          }}},\"character\":{\"id\":213769,\"url\":\"http://www.tvmaze.com/characters/213769/the-flash-wally-west\"\
-          ,\"name\":\"Wally West\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/37/93263.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/37/93263.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/213769\"\
-          }}}}]}}"}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:51 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=4
-    response:
-      body: {string: !!python/unicode '{"id":284974,"url":"http://www.tvmaze.com/episodes/284974/the-flash-2x04-the-fury-of-firestorm","name":"The
-          Fury of Firestorm","season":2,"number":4,"airdate":"2015-10-27","airtime":"20:00","airstamp":"2015-10-27T20:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/26/66222.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/26/66222.jpg"},"summary":"<p>Martin
-          begins to destabilize without Ronnie to merge with him, and the team desperately
-          seek out another metahuman with similar abilities. They find two men: Henry
-          Hewitt and Jefferson \"Jax\" Jackson. Meanwhile, Iris does some digging
-          into Francine''s past, and Barry is hesitate to become involved with Patty
-          after what happened between him and Iris.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/284974"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:52 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Walking%20Dead&embed=cast
-    response:
-      body: {string: "{\"id\":73,\"url\":\"http://www.tvmaze.com/shows/73/the-walking-dead\"\
-          ,\"name\":\"The Walking Dead\",\"type\":\"Scripted\",\"language\":\"English\"\
-          ,\"genres\":[\"Drama\",\"Action\",\"Horror\",\"Thriller\"],\"status\":\"\
-          Running\",\"runtime\":60,\"premiered\":\"2010-10-31\",\"schedule\":{\"time\"\
-          :\"21:00\",\"days\":[\"Sunday\"]},\"rating\":{\"average\":8.7},\"weight\"\
-          :59,\"network\":{\"id\":20,\"name\":\"AMC\",\"country\":{\"name\":\"United\
-          \ States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\"\
-          :null,\"externals\":{\"tvrage\":25056,\"thetvdb\":153021,\"imdb\":\"tt1520211\"\
-          },\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/509.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/509.jpg\"\
-          },\"summary\":\"<p><i><strong>\\\"The Walking Dead\\\"</strong></i> is an\
-          \ American horror drama television series developed by Frank Darabont, based\
-          \ on the comic book series of the same name by Robert Kirkman, Tony Moore,\
-          \ and Charlie Adlard. Andrew Lincoln plays the show's lead character, sheriff's\
-          \ deputy Rick Grimes, who awakens from a months-long coma to confront a\
-          \ post-apocalyptic world overrun by zombies. Grimes reunites with his family\
-          \ and becomes the leader of a group he forms with other survivors. Together\
-          \ they struggle to survive in and adapt to a world filled with zombies and\
-          \ some humans who are even more dangerous than the zombies themselves.</p><p><i>The\
-          \ Walking Dead</i> premiered in the U.S. on October 31, 2010, on the cable\
-          \ television channel AMC and internationally in November 2010 on Fox International\
-          \ Channels.AMC has renewed the series each year because of its consistently\
-          \ increasing Nielsen ratings, which have been unprecedentedly high for a\
-          \ cable series, including averaging the most 18- to 49-year-old adult viewers\
-          \ of any cable or broadcast television series during its fourth and fifth\
-          \ seasons.</p><p>The series has been well received by critics and nominated\
-          \ for several awards, including the Writers Guild of America Award for Television:\
-          \ New Series and the Golden Globe Award for Best Television Series \u2013\
-          \ Drama.</p>\",\"updated\":1457994024,\"_links\":{\"self\":{\"href\":\"\
-          http://api.tvmaze.com/shows/73\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/638714\"\
-          },\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/639987\"}},\"\
-          _embedded\":{\"cast\":[{\"person\":{\"id\":10257,\"url\":\"http://www.tvmaze.com/people/10257/andrew-lincoln\"\
-          ,\"name\":\"Andrew Lincoln\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5794.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5794.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10257\"\
-          }}},\"character\":{\"id\":10763,\"url\":\"http://www.tvmaze.com/characters/10763/the-walking-dead-rick-grimes\"\
-          ,\"name\":\"Rick Grimes\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/111989.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/111989.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10763\"\
-          }}}},{\"person\":{\"id\":5068,\"url\":\"http://www.tvmaze.com/people/5068/norman-reedus\"\
-          ,\"name\":\"Norman Reedus\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5795.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5795.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/5068\"}}},\"\
-          character\":{\"id\":10764,\"url\":\"http://www.tvmaze.com/characters/10764/the-walking-dead-daryl-dixon\"\
-          ,\"name\":\"Daryl Dixon\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/111992.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/111992.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10764\"\
-          }}}},{\"person\":{\"id\":10258,\"url\":\"http://www.tvmaze.com/people/10258/steven-yeun\"\
-          ,\"name\":\"Steven Yeun\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/1/3284.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/1/3284.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10258\"\
-          }}},\"character\":{\"id\":10765,\"url\":\"http://www.tvmaze.com/characters/10765/the-walking-dead-glenn-rhee\"\
-          ,\"name\":\"Glenn Rhee\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/111991.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/111991.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10765\"\
-          }}}},{\"person\":{\"id\":10259,\"url\":\"http://www.tvmaze.com/people/10259/chandler-riggs\"\
-          ,\"name\":\"Chandler Riggs\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5797.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5797.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10259\"\
-          }}},\"character\":{\"id\":10767,\"url\":\"http://www.tvmaze.com/characters/10767/the-walking-dead-carl-grimes\"\
-          ,\"name\":\"Carl Grimes\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/111990.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/111990.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10767\"\
-          }}}},{\"person\":{\"id\":3358,\"url\":\"http://www.tvmaze.com/people/3358/lauren-cohan\"\
-          ,\"name\":\"Lauren Cohan\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5796.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5796.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/3358\"}}},\"\
-          character\":{\"id\":10766,\"url\":\"http://www.tvmaze.com/characters/10766/the-walking-dead-maggie-greene\"\
-          ,\"name\":\"Maggie Greene\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/111994.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/111994.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10766\"\
-          }}}},{\"person\":{\"id\":10260,\"url\":\"http://www.tvmaze.com/people/10260/danai-gurira\"\
-          ,\"name\":\"Danai Gurira\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5798.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5798.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10260\"\
-          }}},\"character\":{\"id\":10768,\"url\":\"http://www.tvmaze.com/characters/10768/the-walking-dead-michonne\"\
-          ,\"name\":\"Michonne\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/111996.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/111996.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10768\"\
-          }}}},{\"person\":{\"id\":10261,\"url\":\"http://www.tvmaze.com/people/10261/melissa-mcbride\"\
-          ,\"name\":\"Melissa McBride\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5799.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5799.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10261\"\
-          }}},\"character\":{\"id\":10769,\"url\":\"http://www.tvmaze.com/characters/10769/the-walking-dead-carol-peletier\"\
-          ,\"name\":\"Carol Peletier\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/111998.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/111998.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10769\"\
-          }}}},{\"person\":{\"id\":10266,\"url\":\"http://www.tvmaze.com/people/10266/laurie-holden\"\
-          ,\"name\":\"Laurie Holden\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5804.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5804.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10266\"\
-          }}},\"character\":{\"id\":10775,\"url\":\"http://www.tvmaze.com/characters/10775/the-walking-dead-andrea\"\
-          ,\"name\":\"Andrea\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/523.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/523.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10775\"\
-          }}}},{\"person\":{\"id\":10339,\"url\":\"http://www.tvmaze.com/people/10339/emily-kinney\"\
-          ,\"name\":\"Emily Kinney\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/1/2889.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/1/2889.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10339\"\
-          }}},\"character\":{\"id\":10843,\"url\":\"http://www.tvmaze.com/characters/10843/the-walking-dead-beth-greene\"\
-          ,\"name\":\"Beth Greene\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/517.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/517.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10843\"\
-          }}}},{\"person\":{\"id\":10267,\"url\":\"http://www.tvmaze.com/people/10267/sarah-wayne-callies\"\
-          ,\"name\":\"Sarah Wayne Callies\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5805.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5805.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10267\"\
-          }}},\"character\":{\"id\":10776,\"url\":\"http://www.tvmaze.com/characters/10776/the-walking-dead-lori-grimes\"\
-          ,\"name\":\"Lori Grimes\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/525.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/525.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10776\"\
-          }}}},{\"person\":{\"id\":3257,\"url\":\"http://www.tvmaze.com/people/3257/sonequa-martin-green\"\
-          ,\"name\":\"Sonequa Martin-Green\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/1/4578.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/1/4578.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/3257\"}}},\"\
-          character\":{\"id\":58932,\"url\":\"http://www.tvmaze.com/characters/58932/the-walking-dead-sasha-williams\"\
-          ,\"name\":\"Sasha Williams\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/112000.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/112000.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/58932\"\
-          }}}},{\"person\":{\"id\":10437,\"url\":\"http://www.tvmaze.com/people/10437/alanna-masterson\"\
-          ,\"name\":\"Alanna Masterson\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/24/61695.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/24/61695.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10437\"\
-          }}},\"character\":{\"id\":10963,\"url\":\"http://www.tvmaze.com/characters/10963/the-walking-dead-tara-chambler\"\
-          ,\"name\":\"Tara Chambler\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/112002.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/112002.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10963\"\
-          }}}},{\"person\":{\"id\":9475,\"url\":\"http://www.tvmaze.com/people/9475/christian-serratos\"\
-          ,\"name\":\"Christian Serratos\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/12/31744.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/12/31744.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/9475\"}}},\"\
-          character\":{\"id\":10981,\"url\":\"http://www.tvmaze.com/characters/10981/the-walking-dead-rosita-espinosa\"\
-          ,\"name\":\"Rosita Espinosa\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/112005.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/112005.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10981\"\
-          }}}},{\"person\":{\"id\":10447,\"url\":\"http://www.tvmaze.com/people/10447/michael-cudlitz\"\
-          ,\"name\":\"Michael Cudlitz\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5806.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5806.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10447\"\
-          }}},\"character\":{\"id\":102304,\"url\":\"http://www.tvmaze.com/characters/102304/the-walking-dead-sgt-abraham-ford\"\
-          ,\"name\":\"Sgt. Abraham Ford\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/112007.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/112007.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/102304\"\
-          }}}},{\"person\":{\"id\":10446,\"url\":\"http://www.tvmaze.com/people/10446/josh-mcdermitt\"\
-          ,\"name\":\"Josh McDermitt\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5811.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5811.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10446\"\
-          }}},\"character\":{\"id\":53369,\"url\":\"http://www.tvmaze.com/characters/53369/the-walking-dead-eugene-porter\"\
-          ,\"name\":\"Eugene Porter\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/112009.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/112009.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/53369\"\
-          }}}},{\"person\":{\"id\":10262,\"url\":\"http://www.tvmaze.com/people/10262/scott-wilson\"\
-          ,\"name\":\"Scott Wilson\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5800.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5800.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10262\"\
-          }}},\"character\":{\"id\":10770,\"url\":\"http://www.tvmaze.com/characters/10770/the-walking-dead-hershel-greene\"\
-          ,\"name\":\"Hershel Greene\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/518.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/518.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10770\"\
-          }}}},{\"person\":{\"id\":10265,\"url\":\"http://www.tvmaze.com/people/10265/jon-bernthal\"\
-          ,\"name\":\"Jon Bernthal\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5803.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5803.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10265\"\
-          }}},\"character\":{\"id\":10774,\"url\":\"http://www.tvmaze.com/characters/10774/the-walking-dead-shane-walsh\"\
-          ,\"name\":\"Shane Walsh\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/524.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/524.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10774\"\
-          }}}},{\"person\":{\"id\":1087,\"url\":\"http://www.tvmaze.com/people/1087/seth-gilliam\"\
-          ,\"name\":\"Seth Gilliam\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6021.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6021.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/1087\"}}},\"\
-          character\":{\"id\":53373,\"url\":\"http://www.tvmaze.com/characters/53373/the-walking-dead-father-gabriel-stokes\"\
-          ,\"name\":\"Father Gabriel Stokes\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/112011.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/112011.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/53373\"\
-          }}}},{\"person\":{\"id\":10264,\"url\":\"http://www.tvmaze.com/people/10264/david-morrissey\"\
-          ,\"name\":\"David Morrissey\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5801.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5801.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10264\"\
-          }}},\"character\":{\"id\":73211,\"url\":\"http://www.tvmaze.com/characters/73211/the-walking-dead-governor-phillip-blake\"\
-          ,\"name\":\"Governor Phillip Blake\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/1116.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/1116.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/73211\"\
-          }}}},{\"person\":{\"id\":7956,\"url\":\"http://www.tvmaze.com/people/7956/jeffrey-demunn\"\
-          ,\"name\":\"Jeffrey DeMunn\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5802.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5802.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/7956\"}}},\"\
-          character\":{\"id\":10773,\"url\":\"http://www.tvmaze.com/characters/10773/the-walking-dead-dale-horvath\"\
-          ,\"name\":\"Dale Horvath\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/1117.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/1117.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10773\"\
-          }}}},{\"person\":{\"id\":10263,\"url\":\"http://www.tvmaze.com/people/10263/michael-rooker\"\
-          ,\"name\":\"Michael Rooker\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/30/76150.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/30/76150.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10263\"\
-          }}},\"character\":{\"id\":10771,\"url\":\"http://www.tvmaze.com/characters/10771/the-walking-dead-merle-dixon\"\
-          ,\"name\":\"Merle Dixon\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/516.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/516.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10771\"\
-          }}}},{\"person\":{\"id\":10390,\"url\":\"http://www.tvmaze.com/people/10390/chad-coleman\"\
-          ,\"name\":\"Chad Coleman\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/1/3710.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/1/3710.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10390\"\
-          }}},\"character\":{\"id\":58931,\"url\":\"http://www.tvmaze.com/characters/58931/the-walking-dead-tyreese-williams\"\
-          ,\"name\":\"Tyreese Williams\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/7124.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/7124.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/58931\"\
-          }}}},{\"person\":{\"id\":2482,\"url\":\"http://www.tvmaze.com/people/2482/alexandra-breckenridge\"\
-          ,\"name\":\"Alexandra Breckenridge\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6693.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6693.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2482\"}}},\"\
-          character\":{\"id\":100988,\"url\":\"http://www.tvmaze.com/characters/100988/the-walking-dead-jessie-anderson\"\
-          ,\"name\":\"Jessie Anderson\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/112013.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/112013.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/100988\"\
-          }}}},{\"person\":{\"id\":10303,\"url\":\"http://www.tvmaze.com/people/10303/lennie-james\"\
-          ,\"name\":\"Lennie James\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5813.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5813.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10303\"\
-          }}},\"character\":{\"id\":10793,\"url\":\"http://www.tvmaze.com/characters/10793/the-walking-dead-morgan-jones\"\
-          ,\"name\":\"Morgan Jones\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/112018.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/112018.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/10793\"\
-          }}}},{\"person\":{\"id\":20106,\"url\":\"http://www.tvmaze.com/people/20106/tovah-feldshuh\"\
-          ,\"name\":\"Tovah Feldshuh\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/32/81835.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/32/81835.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/20106\"\
-          }}},\"character\":{\"id\":100991,\"url\":\"http://www.tvmaze.com/characters/100991/the-walking-dead-deanna-monroe\"\
-          ,\"name\":\"Deanna Monroe\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/112015.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/112015.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/100991\"\
-          }}}},{\"person\":{\"id\":42668,\"url\":\"http://www.tvmaze.com/people/42668/ross-marquand\"\
-          ,\"name\":\"Ross Marquand\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/8/22181.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/8/22181.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/42668\"\
-          }}},\"character\":{\"id\":100420,\"url\":\"http://www.tvmaze.com/characters/100420/the-walking-dead-aaron\"\
-          ,\"name\":\"Aaron\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/112020.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/112020.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/100420\"\
-          }}}},{\"person\":{\"id\":6129,\"url\":\"http://www.tvmaze.com/people/6129/austin-nichols\"\
-          ,\"name\":\"Austin Nichols\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6429.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6429.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/6129\"}}},\"\
-          character\":{\"id\":102658,\"url\":\"http://www.tvmaze.com/characters/102658/the-walking-dead-spencer-monroe\"\
-          ,\"name\":\"Spencer Monroe\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/44/112022.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/44/112022.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/102658\"\
-          }}}},{\"person\":{\"id\":61603,\"url\":\"http://www.tvmaze.com/people/61603/lawrence-gilliard-jr\"\
-          ,\"name\":\"Lawrence Gilliard Jr\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5812.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5812.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/61603\"\
-          }}},\"character\":{\"id\":11016,\"url\":\"http://www.tvmaze.com/characters/11016/the-walking-dead-bob-stookey\"\
-          ,\"name\":\"Bob Stookey\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/7122.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/7122.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/11016\"\
-          }}}},{\"person\":{\"id\":10498,\"url\":\"http://www.tvmaze.com/people/10498/andrew-j-west\"\
-          ,\"name\":\"Andrew J. West\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5809.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5809.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/10498\"\
-          }}},\"character\":{\"id\":11047,\"url\":\"http://www.tvmaze.com/characters/11047/the-walking-dead-gareth\"\
-          ,\"name\":\"Gareth\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/7118.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/7118.jpg\"\
-          },\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/11047\"\
-          }}}}]}}"}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:53 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/shows/73/episodebynumber?season=6&number=8
-    response:
-      body: {string: !!python/unicode '{"id":185073,"url":"http://www.tvmaze.com/episodes/185073/the-walking-dead-6x08-start-to-finish","name":"Start
-          to Finish","season":6,"number":8,"airdate":"2015-11-29","airtime":"21:00","airstamp":"2015-11-29T21:00:00-05:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/32/82293.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/32/82293.jpg"},"summary":"<p>After
-          having a few moments of peace, trouble finds its way to Alexandria yet again.
-          Only this time, the threat might be too big to defeat.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/185073"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:54 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=Marvels%20Jessica%20Jones
+  response:
+    body: {string: !!python/unicode '{"id":1370,"url":"http://www.tvmaze.com/shows/1370/marvels-jessica-jones","name":"Marvel''s
+        Jessica Jones","type":"Scripted","language":"English","genres":["Action","Crime","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2015-11-20","schedule":{"time":"","days":["Friday"]},"rating":{"average":7.9},"weight":5,"network":null,"webChannel":{"id":1,"name":"Netflix","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":38797,"thetvdb":284190,"imdb":"tt2357547"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/31/77884.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/77884.jpg"},"summary":"<p>Haunted
+        by a traumatic past, Jessica Jones uses her gifts as a private eye to find
+        her tormentor before he can harm anyone else in Hell''s Kitchen.</p>","updated":1457735325,"_links":{"self":{"href":"http://api.tvmaze.com/shows/1370"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/206167"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 13:06:19 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/1370/episodebynumber?season=1&number=2
+  response:
+    body: {string: !!python/unicode '{"id":206178,"url":"http://www.tvmaze.com/episodes/206178/marvels-jessica-jones-1x02-aka-crush-syndrome","name":"AKA
+        Crush Syndrome","season":1,"number":2,"airdate":"2015-11-20","airtime":"","airstamp":"2015-11-20T12:00:00+00:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/31/77821.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/77821.jpg"},"summary":"<p>Jessica
+        tracks down Kilgrave to provide Jeri with enough evidence to convince her
+        that a mind-controller exists so that the lawyer will represent Hope. Meanwhile,
+        Jessica and Luke draw closer after a barfight after they both realize the
+        other is more than they seem.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/206178"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 13:06:19 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/1370/episodebynumber?season=1&number=3
+  response:
+    body: {string: !!python/unicode '{"id":206177,"url":"http://www.tvmaze.com/episodes/206177/marvels-jessica-jones-1x03-aka-its-called-whiskey","name":"AKA
+        It''s Called Whiskey","season":1,"number":3,"airdate":"2015-11-20","airtime":"","airstamp":"2015-11-20T12:00:00+00:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/31/78410.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/78410.jpg"},"summary":"<p>While
+        Jessica tries to get the anesthesia she needs to negate Kilgrave''s mind control
+        powers, Trish interviews Hope on her radio show and makes herself Kilgrave''s
+        next target.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/206177"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 13:06:19 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Big%20Bang%20Theory
+  response:
+    body: {string: !!python/unicode '{"id":66,"url":"http://www.tvmaze.com/shows/66/the-big-bang-theory","name":"The
+        Big Bang Theory","type":"Scripted","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2007-09-24","schedule":{"time":"20:00","days":["Thursday"]},"rating":{"average":8.4},"weight":20,"network":{"id":2,"name":"CBS","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":8511,"thetvdb":80379,"imdb":"tt0898266"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/55/139111.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/55/139111.jpg"},"summary":"<p><strong><em>\"The
+        Big Bang Theory\"</em></strong> is a comedy about brilliant physicists, Leonard
+        and Sheldon, who are the kind of \"beautiful minds\" that understand how the
+        universe works. But none of that genius helps them interact with people, especially
+        women. All this begins to change when a free-spirited beauty named Penny moves
+        in next door. Sheldon, Leonard''s roommate, is quite content spending his
+        nights playing Klingon Boggle with their socially dysfunctional friends, fellow
+        Cal Tech scientists Wolowitz and Koothrappali. However, Leonard sees in Penny
+        a whole new universe of possibilities... including love.</p>","updated":1462235634,"_links":{"self":{"href":"http://api.tvmaze.com/shows/66"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/663423"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/663424"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 13:06:20 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/66/episodebynumber?season=9&number=9
+  response:
+    body: {string: !!python/unicode '{"id":409180,"url":"http://www.tvmaze.com/episodes/409180/the-big-bang-theory-9x09-the-platonic-permutation","name":"The
+        Platonic Permutation","season":9,"number":9,"airdate":"2015-11-19","airtime":"20:00","airstamp":"2015-11-19T20:00:00-05:00","runtime":30,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/31/77852.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/77852.jpg"},"summary":"<p>Sheldon
+        and Amy try hanging out as friends when they spend Thanksgiving together at
+        the aquarium. Also, Wolowitz reluctantly agrees to volunteer at the soup kitchen
+        with Bernadette, Raj and Emily, and Penny discovers that Leonard knows more
+        about her than she thought.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/409180"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 13:06:20 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Flash
+  response:
+    body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
+        Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":22,"network":{"id":5,"name":"The
+        CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/49/124187.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/49/124187.jpg"},"summary":"<p>After
+        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
+        is struck by lightning and falls into a coma. Months later he awakens with
+        the power of super speed, granting him the ability to move through Central
+        City like an unseen guardian angel. Though initially excited by his newfound
+        powers, Barry is shocked to discover he is not the only \"meta-human\" who
+        was created in the wake of the accelerator explosion -- and not everyone is
+        using their new powers for good. Barry partners with S.T.A.R. Labs and dedicates
+        his life to protect the innocent. For now, only a few close friends and associates
+        know that Barry is literally the fastest man alive, but it won''t be long
+        before the world learns what Barry Allen has become...The Flash.</p>","updated":1462013745,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/670723"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/647394"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 13:06:20 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=4
+  response:
+    body: {string: !!python/unicode '{"id":284974,"url":"http://www.tvmaze.com/episodes/284974/the-flash-2x04-the-fury-of-firestorm","name":"The
+        Fury of Firestorm","season":2,"number":4,"airdate":"2015-10-27","airtime":"20:00","airstamp":"2015-10-27T20:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/26/66222.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/26/66222.jpg"},"summary":"<p>Martin
+        begins to destabilize without Ronnie to merge with him, and the team desperately
+        seek out another metahuman with similar abilities. They find two men: Henry
+        Hewitt and Jefferson \"Jax\" Jackson. Meanwhile, Iris does some digging into
+        Francine''s past, and Barry is hesitate to become involved with Patty after
+        what happened between him and Iris.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/284974"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 13:06:20 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Walking%20Dead
+  response:
+    body: {string: "{\"id\":73,\"url\":\"http://www.tvmaze.com/shows/73/the-walking-dead\",\"name\":\"The
+        Walking Dead\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Drama\",\"Action\",\"Horror\",\"Thriller\"],\"status\":\"Running\",\"runtime\":60,\"premiered\":\"2010-10-31\",\"schedule\":{\"time\":\"21:00\",\"days\":[\"Sunday\"]},\"rating\":{\"average\":8.7},\"weight\":20,\"network\":{\"id\":20,\"name\":\"AMC\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":25056,\"thetvdb\":153021,\"imdb\":\"tt1520211\"},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/509.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/509.jpg\"},\"summary\":\"<p><em>The
+        Walking Dead</em> is an American horror drama television series developed
+        by Frank Darabont, based on the comic book series of the same name by Robert
+        Kirkman, Tony Moore, and Charlie Adlard. Andrew Lincoln plays the show's lead
+        character, sheriff's deputy Rick Grimes, who awakens from a months-long coma
+        to confront a post-apocalyptic world overrun by zombies. Grimes reunites with
+        his family and becomes the leader of a group he forms with other survivors.
+        Together they struggle to survive in and adapt to a world filled with zombies
+        and some humans who are even more dangerous than the zombies themselves.</p><p><i>The
+        Walking Dead</i> premiered in the U.S. on October 31, 2010, on the cable television
+        channel AMC and internationally in November 2010 on Fox International Channels.AMC
+        has renewed the series each year because of its consistently increasing Nielsen
+        ratings, which have been unprecedentedly high for a cable series, including
+        averaging the most 18- to 49-year-old adult viewers of any cable or broadcast
+        television series during its fourth and fifth seasons.</p><p>The series has
+        been well received by critics and nominated for several awards, including
+        the Writers Guild of America Award for Television: New Series and the Golden
+        Globe Award for Best Television Series \u2013 Drama.</p>\",\"updated\":1461550359,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/73\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/639999\"},\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/707345\"}}}"}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 13:06:21 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/73/episodebynumber?season=6&number=8
+  response:
+    body: {string: !!python/unicode '{"id":185073,"url":"http://www.tvmaze.com/episodes/185073/the-walking-dead-6x08-start-to-finish","name":"Start
+        to Finish","season":6,"number":8,"airdate":"2015-11-29","airtime":"21:00","airstamp":"2015-11-29T21:00:00-05:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/32/82293.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/32/82293.jpg"},"summary":"<p>After
+        having a few moments of peace, trouble finds its way to Alexandria yet again.
+        Only this time, the threat might be too big to defeat.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/185073"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 13:06:21 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
 version: 1

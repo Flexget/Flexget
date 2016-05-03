@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import json
 import logging
@@ -64,7 +64,7 @@ class ApiSchemaModel(Model):
         else:
             return self._schema
 
-    def __bool__(self):
+    def __nonzero__(self):
         return bool(self._schema)
 
     def __repr__(self):

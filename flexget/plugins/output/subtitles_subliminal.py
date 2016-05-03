@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import collections
 import logging
@@ -65,12 +65,12 @@ class PluginSubliminal(object):
             import babelfish
         except ImportError as e:
             log.debug('Error importing Babelfish: %s', e)
-            raise plugin.DependencyError('subliminal', 'babelfish', 'Babelfish module required. ImportError: %s', e)
+            raise plugin.DependencyError('subliminal', 'babelfish', 'Babelfish module required. ImportError: %s' % e)
         try:
             import subliminal
         except ImportError as e:
             log.debug('Error importing Subliminal: %s', e)
-            raise plugin.DependencyError('subliminal', 'subliminal', 'Subliminal module required. ImportError: %s', e)
+            raise plugin.DependencyError('subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e)
     
     def on_task_output(self, task, config):
         """

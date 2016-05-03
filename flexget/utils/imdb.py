@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import difflib
@@ -128,7 +128,7 @@ class ImdbSearch(object):
         # This will only include movies searched by title in the results
         params = {'q': name, 's': 'tt', 'ttype': 'ft'}
 
-        log.debug('Serch query: %s' % repr(url))
+        log.debug('Search query: %s' % repr(url))
         page = requests.get(url, params=params)
         actual_url = page.url
 

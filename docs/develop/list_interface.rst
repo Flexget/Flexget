@@ -1,8 +1,10 @@
 List Interface
 ==============
 
-List interface is a unique type of plugin that enables its usage in multiple operational phases following their
-functional meaning, as opposed to a regular style plugin which is set to be used only in one phase.
+List interface is a unique type of plugin that enables manipulation of its content using flexget normal task operation.
+Different phases and interaction with the plugin enable using it as an input, filter or removing entries from it.
+It's especially useful for watchlist type list, but not limited to those. Any list that can return entries can be used
+as a list interface plugin.
 
 The class of the plugin is based on python's `MutableSet`_ with overrides of its methods where needed.
 
@@ -15,7 +17,7 @@ As various plugins have different meaning, the specific of the implementation ca
 methods will always be needed, in addition to a few custom ones required by flexget.
 
 Init
-====
+~~~~
 
 .. code-block:: python
 
@@ -57,12 +59,12 @@ The cache could be invalidated when need by simply resetting the local cache:
     self._items = None
 
 Overridden methods
-==================
+------------------
 
 Below are code examples of overridden method taken from ``trakt_list`` and ``entry_list``.
 
 ``__iter__``
-------------
+~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -70,7 +72,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
         return iter(self.items)
 
 ``__len__``
------------
+~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -79,7 +81,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
 
 
 ``__discard__``
----------------
+~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -90,7 +92,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
             session.delete(db_entry)
 
 ``__ior__``
------------
+~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -105,7 +107,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
         return self
 
 ``__contains__``
-----------------
+~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -114,7 +116,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
         return self._entry_query(session, entry) is not None
 
 ``__add__``
------------
+~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -122,7 +124,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
         self.submit([entry])
 
 ``___from_iterable__``
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -130,12 +132,12 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
         return set(it)
 
 Custom methods
-==============
+--------------
 
 These are custom methods that all list type plugin need to implement to work with flexget.
 
 ``immutable``
--------------
+~~~~~~~~~~~~~
 
 Used to specify if some elements of the list plugins are immutable.
 
@@ -149,7 +151,7 @@ Used to specify if some elements of the list plugins are immutable.
             return '%s list is not modifiable' % self.config['list']
 
 ``online``
-----------
+~~~~~~~~~~
 
 Used to determine whether this plugin is an online one and change functionality accordingly in certain situations,
 like test mode.
@@ -161,6 +163,21 @@ like test mode.
         """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
         like test mode"""
         return True
+
+
+``get``
+~~~~~~~
+
+Used to return entry match from internal used. ``list_queue`` plugin calls it in order to create a cached list of entries
+and avoid acceptance duplication during filter phase.
+
+.. code-block:: python
+
+    @with_session
+    def get(self, entry, session):
+        match = self._find_entry(entry=entry, session=session)
+        return match.to_entry() if match else None
+
 
 Plugin format
 -------------
@@ -187,7 +204,7 @@ After creating the base class, the plugin class itself need to be created.
 Note the ``get_list(config)`` method which is mandatory, and the ``on_task_input`` method which enable to use the plugin
 as an input plugin.
 
-Also note to register the plugin under the `list` group.
+Also note to register the plugin under the ``list`` group.
 
 
 
