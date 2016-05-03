@@ -14,6 +14,7 @@
 
         return {
             getLists: getLists,
+            deleteList: deleteList,
             getListMovies: getListMovies,
             deleteMovie: deleteMovie
         }
@@ -28,6 +29,16 @@
             }
         }
 
+        function deleteList(listId) {
+            return $http.delete('/api/movie_list/' + listId + '/')
+                .then(deleteListComplete)
+                .catch(callFailed);
+
+            function deleteListComplete(response) {
+                return;
+            }
+        }
+
         function getListMovies(listId, options) {
             return $http.get('/api/movie_list/' + listId + '/movies/', { params: options })
                 .then(getListMoviesComplete)
@@ -39,7 +50,7 @@
         }
 
         function deleteMovie(listId, movie) {
-            return $http.delete('/api/movie_list/' + listid + '/movies/' + movie.id + '/')
+            return $http.delete('/api/movie_list/' + listId + '/movies/' + movie.id + '/')
                 .then(deleteMovieComplete)
                 .catch(callFailed);
 

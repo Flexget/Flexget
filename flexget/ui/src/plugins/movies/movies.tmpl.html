@@ -2,8 +2,11 @@
 <md-content flex layout-margin ng-if="vm.lists">
     <md-tabs md-dynamic-height md-border-bottom md-selected="vm.selectedList">
         <md-tab ng-repeat="list in vm.lists">
-            <md-tab-label>
-                {{ ::list.name }}
+            <md-tab-label layout-fill>
+                <section layout="row" layout-align="center center" layout-fill>
+                    <span>{{ ::list.name }}</span>
+                    <a href><md-icon md-font-icon="fa-trash-o" class="fa tab-icon fa-lg" ng-click="vm.deleteList(list)"></md-icon></a>
+                </section>
             </md-tab-label>
             <md-tab-body>
                 <md-content layout="row" layout-wrap layout-padding>

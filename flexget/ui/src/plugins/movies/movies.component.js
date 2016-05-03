@@ -49,12 +49,33 @@
     }
 
 
-    vm.deleteMovie = function(listid, movie) {
+    vm.deleteMovie = function(listId, movie) {
         moviesService.deleteMovie(listId, movie)
           .then(function() {
             var index = vm.movies.indexOf(movie);
             vm.movies.splice(index, 1);
           });
+    }
+
+    vm.deleteList = function(list) {
+      var confirm = $mdDialog.confirm()
+      .title('Confirm deleting movie list.')
+      .htmlContent("Are you sure you want to delete the movie list <b>" + list.name + "</b>?")
+      .ok("Forget")
+      .cancel("No");
+
+      //Actually show the confirmation dialog and place a call to DELETE when confirmed
+      $mdDialog.show(confirm).then(function() {
+       moviesService.deleteList(list.id)
+          .then(function() {
+            var index = vm.lists.indexOf(list);
+            vm.lists.splice(index, 1);
+          });
+      });
+
+
+
+      console.log(list);
     }
   }
 })();
