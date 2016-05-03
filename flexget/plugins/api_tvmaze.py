@@ -465,9 +465,16 @@ class APITVMaze(object):
 def get_show(show_name=None, tvmaze_id=None, imdb_id=None, tvrage_id=None, thetvdb_id=None):
     if not any(show_name or tvmaze_id or imdb_id or tvrage_id or thetvdb_id):
         raise LookupError('Not enough parameters sent for series lookup')
-    for k, v in locals().items():
-        if v:
-            return tvmaze_lookup(k, [v])
+    if show_name:
+        return tvmaze_lookup('show_name', [show_name])
+    if tvmaze_id:
+        return tvmaze_lookup('tvmaze_id', [tvmaze_id])
+    if imdb_id:
+        return tvmaze_lookup('imdb_id', [imdb_id])
+    if tvrage_id:
+        return tvmaze_lookup('tvrage_id', [tvrage_id])
+    if thetvdb_id:
+        return tvmaze_lookup('thetvdb_id', [thetvdb_id])
 
 
 def get_episode(series_id, date=None, number=None, season=None):
@@ -480,6 +487,12 @@ def get_episode(series_id, date=None, number=None, season=None):
 
 
 def tvmaze_lookup(lookup_type, lookup_values):
+    """
+    Build the URL and return the reply from TVMaze API
+    :param lookup_type: Selects the endpoint that will be used
+    :param lookup_values: A list of values to be used in the URL
+    :return: A JSON reply from the API
+    """
     lookup_url = BASE_URL + TVMAZE_ENDPOINTS[lookup_type].format(*lookup_values)
     log.debug('querying tvmaze API with the following URL:{}', lookup_url)
     try:
