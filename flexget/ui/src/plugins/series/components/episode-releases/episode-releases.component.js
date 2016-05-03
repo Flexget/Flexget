@@ -15,37 +15,47 @@
     });
 
 
-    function episodesReleasesController($http, $filter) {
+    function episodesReleasesController($http, $filter, $mdDialog, seriesService) {
         var vm = this;
         //Call from a release item, to reset the release
-        vm.resetRelease = function(id) {
-            $http.put('/api/series/' + vm.show.show_id + '/episodes/' + vm.episode.episode_id + '/releases/' + id + '/')
-            .success(function(data) {
-                //Find all downloaded releases, and set their download status to false, which will make the downloaded icon disappear
-                $filter('filter')(vm.releases, { release_id: id})[0].release_downloaded = false;
-            }).error(function(error) {
-                console.log(error);
-            });
+        vm.resetRelease = function(release) {
+
+            var confirm = $mdDialog.confirm()
+            .title('Confirm resetting a release')
+            .htmlContent("Are you sure you want to reset the release <b>" + release.release_title + "</b>?")
+            .ok("reset")
+            .cancel("No");
+
+            $mdDialog.show(confirm).then(function () {
+                seriesService.resetRelease(vm.show, vm.episode, release).then(function (data) {
+                    //Find all downloaded releases, and set their download status to false, which will make the downloaded icon disappear
+                    $filter('filter')(vm.releases, { release_id: id})[0].release_downloaded = false;
+                })
+            })
+
         }
 
         //Call from a release item, to forget the release
         vm.forgetRelease = function(release) {
-            $http.delete('/api/series/' + vm.show.show_id + '/episodes/' + vm.episode.episode_id + '/releases/' + release.release_id + '/', { params: { forget: true }})
-            .success(function(data) {
-                //Find index of the release and remove it from the list
-                var index = vm.releases.indexOf(release);
-                vm.releases.splice(index, 1);
+            var confirm = $mdDialog.confirm()
+            .title('Confirm forgetting a release')
+            .htmlContent("Are you sure you want to delete the release <b>" + release.release_title + "</b>?")
+            .ok("Forget")
+            .cancel("No");
 
-                //Set vars for the accordion
-                vm.episode.episode_number_of_releases -= 1;
-                if(vm.releases.length == 0) {
-                    releasesOpen = false;
-                    vm.releases = undefined;
-                }
+            $mdDialog.show(confirm).then(function () {
+                seriesService.forgetRelease(vm.show, vm.episode, release).then(function (data) {
+                    //Find index of the release and remove it from the list
+                    var index = vm.releases.indexOf(release);
+                    vm.releases.splice(index, 1);
 
-            }).error(function(error) {
-                console.log(error);
-            });
+                    vm.episode.episode_number_of_releases -= 1;
+                    if(vm.releases.length == 0) {
+                        vm.releases = undefined;
+                    }
+                })
+            })
+
         }
     }
 })();

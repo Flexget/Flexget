@@ -23,7 +23,6 @@
         vm.showReleases = function () {
 
             var dialog = {
-                clickOutsideToClose: true,
                 template: '<episode-releases show="vm.show" episode="vm.episode" releases="vm.releases"></episode-releases>',
                 locals: {
                     show: vm.show,

@@ -20,6 +20,8 @@
             getEpisodes: getEpisodes,
             deleteEpisode: deleteEpisode,
             resetReleases: resetReleases,
+            forgetRelease: forgetRelease,
+            resetRelease: resetRelease,
         }
 
         function getShows(options) {
@@ -97,10 +99,30 @@
         function resetReleases(show, episode) {
             return $http.put('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/releases')
             .then(resetReleasesComplete)
-            .then(callFailed)
+            .catch(callFailed)
 
             function resetReleasesComplete(res) {
                 return res.data;
+            }
+        }
+
+        function forgetRelease(show, episode, release) {
+            return $http.delete('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/releases/' + release.release_id + '/', { params: { forget: true }})
+            .then(forgetReleaseComplete)
+            .catch(callFailed);
+
+            function forgetReleaseComplete(res) {
+                return res.data;
+            }
+        }
+
+        function resetRelease(show, episode, release) {
+            return $http.put('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/releases/' + release.release_id + '/')
+            .then(resetReleaseComplete)
+            .catch(callFailed);
+
+            function resetReleaseComplete(data) {
+                return datal
             }
         }
 

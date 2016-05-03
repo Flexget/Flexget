@@ -7,7 +7,7 @@
                 </h3>
                 <p>{{ ::release.release_quality }}</p>
             </div>
-            <md-button ng-click="vm.resetRelease(release.release_id)" ng-if="release.release_downloaded" class="md-icon-button" aria-label="reset the release">
+            <md-button ng-click="vm.resetRelease(release)" ng-if="release.release_downloaded" class="md-icon-button" aria-label="reset the release">
                 <i class="fa fa-refresh" aria-hidden="true"></i>
             </md-button>
             <md-button ng-click="vm.forgetRelease(release)" class="md-icon-button" aria-label="forget the release">
