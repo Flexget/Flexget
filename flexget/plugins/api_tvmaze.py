@@ -463,10 +463,6 @@ class APITVMaze(object):
 
 
 def get_show(show_name=None, tvmaze_id=None, imdb_id=None, tvrage_id=None, thetvdb_id=None):
-    if not any(show_name or tvmaze_id or imdb_id or tvrage_id or thetvdb_id):
-        raise LookupError('Not enough parameters sent for series lookup')
-    if show_name:
-        return tvmaze_lookup('show_name', [show_name])
     if tvmaze_id:
         return tvmaze_lookup('tvmaze_id', [tvmaze_id])
     if imdb_id:
@@ -475,15 +471,17 @@ def get_show(show_name=None, tvmaze_id=None, imdb_id=None, tvrage_id=None, thetv
         return tvmaze_lookup('tvrage_id', [tvrage_id])
     if thetvdb_id:
         return tvmaze_lookup('thetvdb_id', [thetvdb_id])
+    if show_name:
+        return tvmaze_lookup('show_name', [show_name])
+    raise LookupError('Not enough parameters sent for series lookup')
 
 
 def get_episode(series_id, date=None, number=None, season=None):
-    if not (date or (number and season)):
-        raise LookupError('Not enough parameters sent for episode lookup')
     if date:
         return tvmaze_lookup('date', [series_id, date])
     elif number and season:
         return tvmaze_lookup('number', [series_id, season, number])
+    raise LookupError('Not enough parameters sent for episode lookup')
 
 
 def tvmaze_lookup(lookup_type, lookup_values):
