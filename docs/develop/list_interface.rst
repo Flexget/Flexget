@@ -1,8 +1,10 @@
 List Interface
 ==============
 
-List interface is a unique type of plugin that enables its usage in multiple operational phases following their
-functional meaning, as opposed to a regular style plugin which is set to be used only in one phase.
+List interface is a unique type of plugin that enables manipulation of its content using flexget normal task operation.
+Different phases and interaction with the plugin enable using it as an input, filter or removing entries from it.
+It's especially useful for watchlist type list, but not limited to those. Any list that can return entries can be used
+as a list interface plugin.
 
 The class of the plugin is based on python's `MutableSet`_ with overrides of its methods where needed.
 
