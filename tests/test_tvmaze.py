@@ -252,7 +252,7 @@ class TestTVMazeShowLookup(object):
 
             # Verify series data has been refreshed with actual values upon 2nd call, and series expiration flag
             # is set to False
-            assert series.weight == 34, \
+            assert series.weight == 3, \
                 'weight should have been updated back to 15 from 99, instead its %s' % series.weight
             assert not session.query(TVMazeSeries).first().expired, 'expired status should be False'
 
@@ -316,10 +316,10 @@ class TestTVMazeShowLookup(object):
             'Expected airdate to be None, got %s' % entry['tvmaze_episode_airstamp']
 
     def test_episode_summary(self, execute_task):
-        expected_summary = u"The team's visitor, Jay Garrick, explains that he comes from a parallel world and " \
-                           u"was a speedster there, but lost his powers transitioning over. Now he insists that" \
-                           u" Barry needs his help fighting a new metahuman, Sand Demon, who came from Jay's world." \
-                           u" Meanwhile, Officer Patty Spivot tries to join Joe's Metahuman Taskforce."
+        expected_summary = "<p>The team's visitor, Jay Garrick, explains that he comes from a parallel world and " \
+                           "was a speedster there, but lost his powers transitioning over. Now he insists that Barry" \
+                           " needs his help fighting a new metahuman, Sand Demon, who came from Jay's world." \
+                           " Meanwhile, Officer Patty Spivot tries to join Joe's Metahuman Taskforce.</p>"
 
         task = execute_task('test_episode_summary')
         entry = task.entries[0]

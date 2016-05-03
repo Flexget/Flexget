@@ -130,7 +130,7 @@ class PluginTVMazeLookup(object):
             try:
                 series = series_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e.args[0])
+                log.debug(e)
             else:
                 entry.update_using_map(self.series_map, series)
         return entry
@@ -150,7 +150,7 @@ class PluginTVMazeLookup(object):
             try:
                 episode = episode_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e.args[0])
+                log.debug(e)
             else:
                 entry.update_using_map(self.episode_map, episode)
         return entry
