@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from datetime import timedelta, datetime
 
 import pytest
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget.manager import Session
 from flexget.plugins.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries
@@ -339,7 +339,6 @@ class TestTVMazeShowLookup(object):
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 476294, 'episode id should be 476294, instead its %s' % entry[
             'tvmaze_episode_id']
-
 
     def test_episode_air_date(self, execute_task):
         task = execute_task('test_episode_air_date')

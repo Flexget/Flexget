@@ -240,7 +240,7 @@ def get_db_genres(genres, session):
 
 def search_params_for_series(**lookup_params):
     search_params = {
-        'tvmaze_id': lookup_params.get('maze_id') or lookup_params.get('tvmaze_id'),
+        'tvmaze_id': lookup_params.get('tvmaze_id'),
         'tvdb_id': lookup_params.get('tvdb_id'),
         'tvrage_id': lookup_params.get('tvrage_id'),
         'name': lookup_params.get('title') or lookup_params.get('series_name')
