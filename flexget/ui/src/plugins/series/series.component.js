@@ -10,7 +10,7 @@
             controller: seriesController,
         });
 
-    function seriesController($http, $mdDialog, seriesService, $timeout) {
+    function seriesController($http, $mdDialog, seriesService, $timeout, $mdMedia) {
         var vm = this;
 
         var options = {
@@ -102,8 +102,12 @@
         }
 
         vm.areEpisodesOnShowRow = function (show, index) {
-            var numberOfColumns = 3;
             if (!show) return false;
+
+            var numberOfColumns = 1;
+
+            if ($mdMedia('gt-md')) numberOfColumns = 2;
+            if ($mdMedia('gt-lg')) numberOfColumns = 3;
 
             var isOnRightRow = true;
 
@@ -116,7 +120,7 @@
             var showRow = (showIndex - showColumn) / numberOfColumns;
 
             if (row !== showRow) isOnRightRow = false;
-            if (column !== 2) isOnRightRow = false;
+            if (column !== numberOfColumns - 1) isOnRightRow = false;
             if (showIndex === index && index === (vm.series.length - 1)) isOnRightRow = true;
 
             return isOnRightRow;
