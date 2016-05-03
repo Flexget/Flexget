@@ -16,13 +16,13 @@ interactions:
         of the stodginess of the evening newscasts and you can''t bear to sit through
         the spinmeisters and shills on the 24-hour cable news network, don''t miss
         The Daily Show with Jon Stewart, the nightly half-hour series unburdened by
-        objectivity, journalistic integrity or even accuracy.</p>","updated":1462271107,"_links":{"self":{"href":"http://api.tvmaze.com/shows/249"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/201574"}}}'}
+        objectivity, journalistic integrity or even accuracy.</p>","updated":1462274851,"_links":{"self":{"href":"http://api.tvmaze.com/shows/249"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/201574"}}}'}
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 11:07:44 GMT']
+      date: ['Tue, 03 May 2016 11:30:12 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.14]
     status: {code: 200, message: OK}
@@ -43,7 +43,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 11:07:44 GMT']
+      date: ['Tue, 03 May 2016 11:30:12 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.14]
     status: {code: 200, message: OK}

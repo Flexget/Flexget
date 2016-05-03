@@ -32,60 +32,6 @@ def upgrade(ver, session):
     return ver
 
 
-actors_to_shows_table = Table('tvmaze_actors_to_shows', Base.metadata,
-                              Column('series_id', Integer, ForeignKey('tvmaze_series.tvmaze_id')),
-                              Column('actor_id', Integer, ForeignKey('tvmaze_actors.tvmaze_id')))
-Base.register_table(actors_to_shows_table)
-
-
-class TVMazeActor(Base):
-    __tablename__ = 'tvmaze_actors'
-
-    tvmaze_id = Column(Integer, primary_key=True)
-    name = Column(Unicode, nullable=False)
-    original_image = Column(String)
-    medium_image = Column(String)
-    url = Column(String)
-    last_update = Column(DateTime)
-
-    def to_dict(self):
-        return {
-            'tvmaze_id': self.tvmaze_id,
-            'name': self.name,
-            'original_image': self.original_image,
-            'medium_image': self.medium_image,
-            'url': self.url,
-            'last_update': self.last_update
-        }
-
-    def __init__(self, actor):
-        self.tvmaze_id = actor.id
-        self.name = actor.name
-        self.url = actor.url
-        self.update(actor)
-
-    def __repr__(self):
-        return '<TVMazeActor,name={0},id={1}'.format(self.name, self.tvmaze_id)
-
-    def update(self, actor):
-        if actor.image:
-            self.original_image = actor.image.get('original')
-            self.medium_image = actor.image.get('medium')
-        else:
-            self.original_image = None
-            self.medium_image = None
-        self.last_update = datetime.now()
-
-    @property
-    def expired(self):
-        if not self.last_update:
-            log.debug('no last update attribute, actor set for update')
-            return True
-        time_dif = datetime.now() - self.last_update
-        expiration = time_dif.days > UPDATE_INTERVAL
-        return expiration
-
-
 class TVMazeGenre(Base):
     __tablename__ = 'tvmaze_genres'
 
@@ -139,7 +85,6 @@ class TVMazeSeries(Base):
     network = Column(Unicode)
     episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season_number', cascade='all, delete, delete-orphan',
                         backref='series')
-    actors = relation(TVMazeActor, secondary=actors_to_shows_table)
     last_update = Column(DateTime)  # last time we updated the db for the show
 
     def __init__(self, series, session):
@@ -279,34 +224,6 @@ class TVMazeEpisodes(Base):
         return expiration
 
 
-def get_db_actors(actors, session):
-    """
-    Return a tuple of db actors list and db characters list generated from show cast.
-    :param actors: List of actors retrieved by API
-    :param session: DB Session
-    :return: tuple of db actors list and db characters list
-    """
-    db_actors = []
-    for actor in actors:
-        db_actor = get_db_actor(actor, session)
-        db_actors.append(db_actor)
-    return db_actors
-
-
-def get_db_actor(actor, session):
-    db_actor = session.query(TVMazeActor).filter(TVMazeActor.tvmaze_id == actor.id).first()
-    if not db_actor:
-        db_actor = TVMazeActor(actor=actor)
-        log.debug('adding actor %s to db', db_actor.name)
-        session.add(db_actor)
-    elif db_actor.expired:
-        log.debug('found expired actor in db, refreshing')
-        db_actor.update(actor)
-    else:
-        log.debug('actor %s found in db, returning', db_actor.name)
-    return db_actor
-
-
 def get_db_genres(genres, session):
     db_genres = []
     for genre in genres:
@@ -319,15 +236,6 @@ def get_db_genres(genres, session):
             log.debug('genre %s found in db, returning', db_genre.name)
         db_genres.append(db_genre)
     return db_genres
-
-
-def get_actor_details(actor):
-    return {'name': actor.name,
-            'original_image': actor.original_image,
-            'medium_image': actor.medium_image,
-            'url': actor.url,
-            'id': actor.tvmaze_id
-            }
 
 
 def search_params_for_series(**lookup_params):
@@ -383,7 +291,6 @@ def prepare_lookup_for_tvmaze(**lookup_params):
     """
     prepared_params = {}
     title = None
-    year_match = None
     series_name = lookup_params.get('series_name') or lookup_params.get('show_name') or lookup_params.get('title')
     if series_name:
         title, year_match = split_title_year(series_name)

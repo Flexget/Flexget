@@ -340,16 +340,6 @@ class TestTVMazeShowLookup(object):
         assert entry['tvmaze_episode_id'] == 476294, 'episode id should be 476294, instead its %s' % entry[
             'tvmaze_episode_id']
 
-    def test_show_cast(self, execute_task):
-        task = execute_task('test_show_cast')
-        entry = task.entries[0]
-        assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[
-            'tvmaze_series_id']
-        assert entry['tvmaze_episode_id'] == 211206, 'episode id should be 211206, instead its %s' % entry[
-            'tvmaze_episode_id']
-        assert len(entry['tvmaze_series_actors']) == 9, \
-            'expected actors list for series to contain 9 members,' \
-            ' instead it contains %s' % len(entry['tvmaze_series_actors'])
 
     def test_episode_air_date(self, execute_task):
         task = execute_task('test_episode_air_date')
