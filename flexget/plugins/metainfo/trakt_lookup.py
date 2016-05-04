@@ -103,7 +103,7 @@ class PluginTraktLookup(object):
     }
 
     series_actor_map = {
-        'trakt_series_actors': lambda show: list_actors(show.actors),
+        'trakt_actors': lambda show: list_actors(show.actors),
     }
     show_translate_map = {
         'trakt_translations': lambda show: get_translations(show.translate),
@@ -155,7 +155,7 @@ class PluginTraktLookup(object):
     }
 
     movie_actor_map = {
-        'trakt_movie_actors': lambda movie: list_actors(movie.actors),
+        'trakt_actors': lambda movie: list_actors(movie.actors),
     }
 
     schema = {'oneOf': [
