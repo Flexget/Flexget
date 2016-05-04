@@ -102,8 +102,10 @@ class MovieParser(TitleParser):
                 cut = True
             # check for propers
             if part.lower() in self.propers:
-                self.proper_count += 1
-                cut = True
+                # 'real' and 'final' are too common in movie titles, only cut if it comes after year
+                if part.lower() not in ['real', 'final'] or self.year:
+                    self.proper_count += 1
+                    cut = True
             # update cut position
             if cut and parts.index(part) < cut_part:
                 cut_part = part_pos
