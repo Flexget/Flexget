@@ -8,7 +8,6 @@ import logging
 import base64
 import re
 import time
-import sys
 from datetime import datetime
 from datetime import timedelta
 from netrc import netrc, NetrcParseError
@@ -298,6 +297,13 @@ class PluginTransmission(TransmissionBase):
         if task.accepted:
             self.add_to_transmission(self.client, task, config)
 
+    def _decode_if_bytes(self, data):
+        """Transmission doesn't like encoded byte strings (Py3) so decode"""
+        if type(data) == bytes:
+            return data.decode('UTF-8')
+        else:
+            return data
+
     def _make_torrent_options_dict(self, config, entry):
 
         opt_dic = {}
@@ -318,11 +324,7 @@ class PluginTransmission(TransmissionBase):
         if opt_dic.get('path'):
             try:
                 path = os.path.expanduser(entry.render(opt_dic['path']))
-                # return unicode in 2.7, str in 3.5
-                if sys.version_info[0] == 3:
-                    add['download_dir'] = pathscrub(path)
-                else:
-                    add['download_dir'] = pathscrub(path).encode('UTF-8')
+                add['download_dir'] = self._decode_if_bytes((pathscrub(path).encode('UTF-8')))
             except RenderError as e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
         if 'bandwidthpriority' in opt_dic:
@@ -521,10 +523,10 @@ class PluginTransmission(TransmissionBase):
                             if 'download_dir' not in options['add']:
                                 download_dir = cli.get_session().download_dir
                             else:
-                                if sys.version_info[0] == 3:
-                                    download_dir = options['add']['download_dir']
-                                else:
-                                    download_dir = options['add']['download_dir'].decode('UTF-8')                                
+                                download_dir = options['add']['download_dir']
+                                """If this isn't a Py3 str it needs to be decoded"""
+                                if not isinstance(download_dir, str):
+                                    download_dir = download_dir.decode('UTF-8')
 
                             # Get new filename without ext
                             file_ext = os.path.splitext(fl[r.id][main_id]['name'])[1]
@@ -546,10 +548,7 @@ class PluginTransmission(TransmissionBase):
                         # change to below when set_files will allow setting name, more efficient to have one call
                         # fl[r.id][index]['name'] = os.path.basename(pathscrub(filename + file_ext).encode('utf-8'))
                                 try:
-                                    if sys.version_info[0] == 3:
-                                        dl_dir = os.path.basename(pathscrub(filename + file_ext))
-                                    else:
-                                        dl_dir = os.path.basename(pathscrub(filename + file_ext)).encode('utf-8')
+                                    dl_dir = self._decode_if_bytes((os.path.basename(pathscrub(filename + file_ext)).encode('utf-8')))
                                     cli.rename_torrent_path(r.id, fl[r.id][index]['name'], dl_dir)
                                 except TransmissionError:
                                     log.error('content_filename only supported with transmission 2.8+')
