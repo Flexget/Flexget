@@ -153,8 +153,8 @@ class MovieList(MutableSet):
     def _find_entry(self, entry, session=None):
         """Finds `MovieListMovie` corresponding to this entry, if it exists."""
         for id_name in SUPPORTED_IDS:
-            if id_name in entry:
-                log.debug('finding movie based off id %s:%s', id_name, entry[id_name])
+            if entry.get(id_name):
+                log.debug('finding movie based off id %s: %s', id_name, entry[id_name])
                 res = (self._db_list(session).movies.join(MovieListMovie.ids).filter(
                     and_(
                         MovieListID.id_name == id_name,
@@ -164,7 +164,7 @@ class MovieList(MutableSet):
                     log.debug('found movie %s', res)
                     return res
         # Fall back to title/year match
-        if 'movie_name' in entry and 'movie_year' in entry:
+        if entry.get('movie_name') and entry.get('movie_year'):
             name, year = entry['movie_name'], entry['movie_year']
         else:
             name, year = split_title_year(entry['title'])
