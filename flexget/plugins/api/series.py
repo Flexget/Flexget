@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import copy
-import datetime
 from math import ceil
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
 from flask import request
 from flask_restplus import inputs
@@ -312,7 +311,7 @@ series_list_parser.add_argument('days', type=int,
 series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
 series_list_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Max is 100.')
 
-series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behind_latest', 'last_download_date'),
+series_list_parser.add_argument('sort_by', choices=('show_name', 'last_download_date'),
                                 default='show_name',
                                 help="Sort response by attribute.")
 series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
@@ -338,13 +337,12 @@ class SeriesListAPI(APIResource):
         if page_size > 100:
             page_size = 100
 
-        sort_by = args['sort_by']
         order = args['order']
         # In case the default 'desc' order was received
         if order == 'desc':
-            order = True
+            descending = True
         else:
-            order = False
+            descending = False
 
         start = page_size * (page - 1)
         stop = start + page_size
@@ -356,6 +354,8 @@ class SeriesListAPI(APIResource):
             'days': args.get('days'),
             'start': start,
             'stop': stop,
+            'sort_by': args.get('sort_by'),
+            'descending': descending,
             'session': session
 
         }
@@ -363,19 +363,6 @@ class SeriesListAPI(APIResource):
 
         raw_series_list = series.get_series_summary(**kwargs)
         converted_series_list = [get_series_details(show) for show in raw_series_list]
-        sorted_show_list = []
-        if sort_by == 'show_name':
-            sorted_show_list = sorted(converted_series_list, key=lambda show: show['show_name'], reverse=order)
-        elif sort_by == 'episodes_behind_latest':
-            sorted_show_list = sorted(converted_series_list,
-                                      key=lambda show: show['latest_downloaded_episode']['number_of_episodes_behind'],
-                                      reverse=order)
-        elif sort_by == 'last_download_date':
-            sorted_show_list = sorted(converted_series_list,
-                                      key=lambda show: show['latest_downloaded_episode']['last_downloaded_release'][
-                                          'release_first_seen'] if show['latest_downloaded_episode'][
-                                          'last_downloaded_release'] else datetime.datetime(1970, 1, 1),
-                                      reverse=order)
 
         pages = int(ceil(num_of_shows / float(page_size)))
 
@@ -385,7 +372,7 @@ class SeriesListAPI(APIResource):
         number_of_shows = min(page_size, num_of_shows)
 
         response = {
-            'shows': sorted_show_list,
+            'shows': converted_series_list,
             'page_size': number_of_shows,
             'total_number_of_shows': num_of_shows,
             'page': page,
