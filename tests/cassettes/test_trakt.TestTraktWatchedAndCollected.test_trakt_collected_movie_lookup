@@ -8,7 +8,7 @@ interactions:
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=Inside+Out&type=movie&year=2015
     response:
-      body: {string: '[{"type":"movie","score":52.515827,"movie":{"title":"Inside
+      body: {string: '[{"type":"movie","score":52.100258,"movie":{"title":"Inside
           Out","overview":"Growing up can be a bumpy road, and it''s no exception
           for Riley, who is uprooted from her Midwest life when her father starts
           a new job in San Francisco. Like all of us, Riley is guided by her emotions
@@ -17,30 +17,30 @@ interactions:
           everyday life. As Riley and her emotions struggle to adjust to a new life
           in San Francisco, turmoil ensues in Headquarters. Although Joy, Riley''s
           main and most important emotion, tries to keep things positive, the emotions
-          conflict on how best to navigate a new city, house and school.","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/098/998/posters/original/09e0ae33aa.jpg","medium":"https://walter.trakt.us/images/movies/000/098/998/posters/medium/09e0ae33aa.jpg","thumb":"https://walter.trakt.us/images/movies/000/098/998/posters/thumb/09e0ae33aa.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/098/998/fanarts/original/dd51480cb4.jpg","medium":"https://walter.trakt.us/images/movies/000/098/998/fanarts/medium/dd51480cb4.jpg","thumb":"https://walter.trakt.us/images/movies/000/098/998/fanarts/thumb/dd51480cb4.jpg"}},"ids":{"trakt":98998,"slug":"inside-out-2015","imdb":"tt2096673","tmdb":150540}}},{"type":"movie","score":21.806652,"movie":{"title":"Locked
+          conflict on how best to navigate a new city, house and school.","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/098/998/posters/original/09e0ae33aa.jpg","medium":"https://walter.trakt.us/images/movies/000/098/998/posters/medium/09e0ae33aa.jpg","thumb":"https://walter.trakt.us/images/movies/000/098/998/posters/thumb/09e0ae33aa.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/098/998/fanarts/original/dd51480cb4.jpg","medium":"https://walter.trakt.us/images/movies/000/098/998/fanarts/medium/dd51480cb4.jpg","thumb":"https://walter.trakt.us/images/movies/000/098/998/fanarts/thumb/dd51480cb4.jpg"}},"ids":{"trakt":98998,"slug":"inside-out-2015","imdb":"tt2096673","tmdb":150540}}},{"type":"movie","score":21.891073,"movie":{"title":"Locked
           Out","overview":"Spoiled rich kid Greg Mardukas gets home from a long day
           to find out that he has been locked out of his own house. Realizing he won''t
           be able to get inside until his father gets home in a few days, Greg must
-          learn to live in the outdoors for the weekend. Will he survive?","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/220/954/posters/original/6a4c4e5bbb.jpg","medium":"https://walter.trakt.us/images/movies/000/220/954/posters/medium/6a4c4e5bbb.jpg","thumb":"https://walter.trakt.us/images/movies/000/220/954/posters/thumb/6a4c4e5bbb.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":220954,"slug":"locked-out-2015","imdb":"","tmdb":340509}}},{"type":"movie","score":2.10207,"movie":{"title":"Mind
+          learn to live in the outdoors for the weekend. Will he survive?","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/220/954/posters/original/6a4c4e5bbb.jpg","medium":"https://walter.trakt.us/images/movies/000/220/954/posters/medium/6a4c4e5bbb.jpg","thumb":"https://walter.trakt.us/images/movies/000/220/954/posters/thumb/6a4c4e5bbb.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":220954,"slug":"locked-out-2015","imdb":"","tmdb":340509}}},{"type":"movie","score":2.070005,"movie":{"title":"Mind
           Candy","overview":"This short was released as an extra in the Blu-ray release
           of Disney Pixar''s \"Inside Out.\"  It''s a zany collection clips of the
-          emotions and how they interact.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":235484,"slug":"mind-candy-2015","imdb":"","tmdb":370082}}},{"type":"movie","score":0.38075614,"movie":{"title":"Containment","overview":"Neighbours
+          emotions and how they interact.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":235484,"slug":"mind-candy-2015","imdb":"","tmdb":370082}}},{"type":"movie","score":0.38057113,"movie":{"title":"Containment","overview":"Neighbours
           in a block wake one morning to find they have been sealed inside their apartments.
           Can they work together to find out why? Or will they destroy each other
-          in their fight to escape?","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/223/348/posters/original/22f821f30c.jpg","medium":"https://walter.trakt.us/images/movies/000/223/348/posters/medium/22f821f30c.jpg","thumb":"https://walter.trakt.us/images/movies/000/223/348/posters/thumb/22f821f30c.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/223/348/fanarts/original/fce4925aef.jpg","medium":"https://walter.trakt.us/images/movies/000/223/348/fanarts/medium/fce4925aef.jpg","thumb":"https://walter.trakt.us/images/movies/000/223/348/fanarts/thumb/fce4925aef.jpg"}},"ids":{"trakt":223348,"slug":"containment-2015","imdb":"tt3561236","tmdb":347548}}},{"type":"movie","score":0.38075614,"movie":{"title":"Necroland","overview":"In
+          in their fight to escape?","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/223/348/posters/original/22f821f30c.jpg","medium":"https://walter.trakt.us/images/movies/000/223/348/posters/medium/22f821f30c.jpg","thumb":"https://walter.trakt.us/images/movies/000/223/348/posters/thumb/22f821f30c.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/223/348/fanarts/original/fce4925aef.jpg","medium":"https://walter.trakt.us/images/movies/000/223/348/fanarts/medium/fce4925aef.jpg","thumb":"https://walter.trakt.us/images/movies/000/223/348/fanarts/thumb/fce4925aef.jpg"}},"ids":{"trakt":223348,"slug":"containment-2015","imdb":"tt3561236","tmdb":347548}}},{"type":"movie","score":0.38057113,"movie":{"title":"Necroland","overview":"In
           an instant, 80% of the worlds population has turned into rage humans and
           the weather has gone out of control. Inside all of this chaos, the remaining
-          survivors attempt to unravel the answers to this convoluted mystery.","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/155/649/posters/original/b13965b8e3.jpg","medium":"https://walter.trakt.us/images/movies/000/155/649/posters/medium/b13965b8e3.jpg","thumb":"https://walter.trakt.us/images/movies/000/155/649/posters/thumb/b13965b8e3.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":155649,"slug":"necroland-2015","imdb":"tt3518152","tmdb":255561}}},{"type":"movie","score":0.30460492,"movie":{"title":"A
+          survivors attempt to unravel the answers to this convoluted mystery.","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/155/649/posters/original/b13965b8e3.jpg","medium":"https://walter.trakt.us/images/movies/000/155/649/posters/medium/b13965b8e3.jpg","thumb":"https://walter.trakt.us/images/movies/000/155/649/posters/thumb/b13965b8e3.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":155649,"slug":"necroland-2015","imdb":"tt3518152","tmdb":255561}}},{"type":"movie","score":0.3044569,"movie":{"title":"A
           Fall from Grace","overview":"Detective Michael Tabb knows the city of St.
           Louis inside and out. He has felt its true heart, as much as its dark underbelly:
           but he does not know who, in both the dark and light - is taking the lives
-          of young girls.","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/107/827/posters/original/072c499c6a.jpg","medium":"https://walter.trakt.us/images/movies/000/107/827/posters/medium/072c499c6a.jpg","thumb":"https://walter.trakt.us/images/movies/000/107/827/posters/thumb/072c499c6a.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":107827,"slug":"a-fall-from-grace-1969","imdb":"tt1621415","tmdb":168781}}},{"type":"movie","score":0.30460492,"movie":{"title":"A
+          of young girls.","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/107/827/posters/original/072c499c6a.jpg","medium":"https://walter.trakt.us/images/movies/000/107/827/posters/medium/072c499c6a.jpg","thumb":"https://walter.trakt.us/images/movies/000/107/827/posters/thumb/072c499c6a.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":107827,"slug":"a-fall-from-grace-1969","imdb":"tt1621415","tmdb":168781}}},{"type":"movie","score":0.3044569,"movie":{"title":"A
           Girl''s Best Friend","overview":"Penelope, better known as Polka-Dot, is
           a spunky young girl who has a knack for helping people, particularly her
           ailing mother. While out looking for a part-time job, Polka-Dot befriends
           a hard-nosed police officer and his tracking dog, Luey. When Polka-Dot''s
           mother''s condition worsens, Luey helps Polka-Dot find the strength and
-          faith inside to help her move forward.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":207177,"slug":"a-girl-s-best-friend-2015","imdb":"tt4220166","tmdb":326261}}},{"type":"movie","score":0.24718854,"movie":{"title":"Bad
+          faith inside to help her move forward.","year":2015,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":207177,"slug":"a-girl-s-best-friend-2015","imdb":"tt4220166","tmdb":326261}}},{"type":"movie","score":0.24701142,"movie":{"title":"Bad
           Building","overview":"The Desmond - the building''s pleasant sounding name
           hides a troubled past. The high rise has a long history of fires, murders,
           madness and even colonial era genocide upon the site. The towering building
@@ -51,14 +51,14 @@ interactions:
           way in, or out, Craig has contacted a group of urban explorers to help him
           and his film crew enter the building. But when Craig and his team set foot
           inside The Desmond the events that caused the building to be abandoned in
-          the first place begin to repeat.","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/224/054/posters/original/7b6c4c9a56.jpg","medium":"https://walter.trakt.us/images/movies/000/224/054/posters/medium/7b6c4c9a56.jpg","thumb":"https://walter.trakt.us/images/movies/000/224/054/posters/thumb/7b6c4c9a56.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":224054,"slug":"bad-building-2015","imdb":"tt2257216","tmdb":350052}}},{"type":"movie","score":0.2284537,"movie":{"title":"The
+          the first place begin to repeat.","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/224/054/posters/original/1b16602229.jpg","medium":"https://walter.trakt.us/images/movies/000/224/054/posters/medium/1b16602229.jpg","thumb":"https://walter.trakt.us/images/movies/000/224/054/posters/thumb/1b16602229.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/224/054/fanarts/original/7c6f2c044b.jpg","medium":"https://walter.trakt.us/images/movies/000/224/054/fanarts/medium/7c6f2c044b.jpg","thumb":"https://walter.trakt.us/images/movies/000/224/054/fanarts/thumb/7c6f2c044b.jpg"}},"ids":{"trakt":224054,"slug":"bad-building-2015","imdb":"tt2257216","tmdb":350052}}},{"type":"movie","score":0.22834267,"movie":{"title":"The
           New Family","overview":"The sleepy town of Murdoch is reawakened when young
           women in various stages of pregnancy begin to die at the hands of a brutal
           killer. As Blair Cassidy struggles with an overbearing mother and a less
           than happy father-to-be, she fears that the killer''s focus has shifted
           to her. With her life spiraling out-of-control, Blair must fight for her
           own life and for the baby growing inside her. But the killer has other plans
-          for Blair that are more terrifying than she could have ever imagined.","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/200/981/posters/original/5a1f1646d8.jpg","medium":"https://walter.trakt.us/images/movies/000/200/981/posters/medium/5a1f1646d8.jpg","thumb":"https://walter.trakt.us/images/movies/000/200/981/posters/thumb/5a1f1646d8.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":200981,"slug":"the-new-family-2015","imdb":"tt3213960","tmdb":320323}}},{"type":"movie","score":0.19037807,"movie":{"title":"Exeter","overview":"During
+          for Blair that are more terrifying than she could have ever imagined.","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/200/981/posters/original/5a1f1646d8.jpg","medium":"https://walter.trakt.us/images/movies/000/200/981/posters/medium/5a1f1646d8.jpg","thumb":"https://walter.trakt.us/images/movies/000/200/981/posters/thumb/5a1f1646d8.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":200981,"slug":"the-new-family-2015","imdb":"tt3213960","tmdb":320323}}},{"type":"movie","score":0.19028556,"movie":{"title":"Exeter","overview":"During
           an all-night, drug-fueled party at an abandoned asylum known for the horrific
           treatment of its patients, a group of ordinary teens decide to experiment
           with the occult, mysteriously leading to a violent possession. In an effort
@@ -71,33 +71,33 @@ interactions:
           chance of survival is to uncover the asylum''s deep mysteries and find a
           way out before it''s too late.","year":2015,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/138/557/posters/original/4fae1b8167.jpg","medium":"https://walter.trakt.us/images/movies/000/138/557/posters/medium/4fae1b8167.jpg","thumb":"https://walter.trakt.us/images/movies/000/138/557/posters/thumb/4fae1b8167.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/138/557/fanarts/original/307e3e73e8.jpg","medium":"https://walter.trakt.us/images/movies/000/138/557/fanarts/medium/307e3e73e8.jpg","thumb":"https://walter.trakt.us/images/movies/000/138/557/fanarts/thumb/307e3e73e8.jpg"}},"ids":{"trakt":138557,"slug":"exeter-2015","imdb":"tt1945044","tmdb":226458}}}]'}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [296c8a1401ba1fbe-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:57:34 GMT']
-        etag: [W/"46fae2df72ad481031e5ecbc43db5ba7"]
-        expires: ['Thu, 21 Apr 2016 03:57:34 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=de576847221e41c0a9679c2bc44e04ba01461196654; expires=Thu,
-            20-Apr-17 23:57:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['13']
-        x-pagination-limit: ['10']
-        x-pagination-page: ['1']
-        x-pagination-page-count: ['2']
-        x-request-id: [4faf748e-38d1-4a40-ade9-e4f88948e1a9]
-        x-runtime: ['0.167575']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de238fc44203d6-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:32 GMT']
+        ETag: [W/"ee858915f7cadf98cf575dd0957abfea"]
+        Expires: ['Wed, 04 May 2016 22:50:32 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=d8abc283022fd5c1ee411384ef37acd601462387832; expires=Thu,
+            04-May-17 18:50:32 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['13']
+        X-Pagination-Limit: ['10']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['2']
+        X-Request-Id: [ba399822-19f3-448d-9624-b04f96ffd988]
+        X-Runtime: ['0.044296']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=de576847221e41c0a9679c2bc44e04ba01461196654]
+        Cookie: [__cfduid=d8abc283022fd5c1ee411384ef37acd601462387832]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -113,24 +113,24 @@ interactions:
           struggle to adjust to a new life in San Francisco, turmoil ensues in Headquarters.
           Although Joy, Riley''s main and most important emotion, tries to keep things
           positive, the emotions conflict on how best to navigate a new city, house
-          and school.","released":"2015-06-19","runtime":94,"trailer":"http://youtube.com/watch?v=_MC3XuMvsDI","homepage":"http://movies.disney.com/inside-out","rating":8.16033,"votes":11052,"updated_at":"2016-04-13T09:45:52.000Z","language":"en","available_translations":["en","es","fr","ru","cs","sk","de","he","hu","zh","pt","tr","it","da","sv","nl","ko","ar","el","pl","lt","bg","th","uk","fa","fi","cn","ro","ja","bs","is","no","az","tw","et"],"genres":["animation","comedy","family"],"certification":"","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/098/998/fanarts/original/dd51480cb4.jpg","medium":"https://walter.trakt.us/images/movies/000/098/998/fanarts/medium/dd51480cb4.jpg","thumb":"https://walter.trakt.us/images/movies/000/098/998/fanarts/thumb/dd51480cb4.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/098/998/posters/original/09e0ae33aa.jpg","medium":"https://walter.trakt.us/images/movies/000/098/998/posters/medium/09e0ae33aa.jpg","thumb":"https://walter.trakt.us/images/movies/000/098/998/posters/thumb/09e0ae33aa.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/098/998/logos/original/dcf3f19052.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/098/998/cleararts/original/e75b250d8c.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/098/998/banners/original/ae3a70fc11.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/098/998/thumbs/original/b8672865af.jpg"}}}'}
+          and school.","released":"2015-06-19","runtime":94,"trailer":"http://youtube.com/watch?v=yRUAzGQ3nSY","homepage":"http://movies.disney.com/inside-out","rating":8.15379,"votes":11574,"updated_at":"2016-05-01T09:16:45.000Z","language":"en","available_translations":["en","es","fr","ru","cs","sk","de","he","hu","zh","pt","tr","it","da","sv","nl","ko","ar","el","pl","lt","bg","th","uk","fa","fi","cn","ro","ja","bs","is","no","az","tw","et"],"genres":["animation","comedy","family"],"certification":"","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/098/998/fanarts/original/dd51480cb4.jpg","medium":"https://walter.trakt.us/images/movies/000/098/998/fanarts/medium/dd51480cb4.jpg","thumb":"https://walter.trakt.us/images/movies/000/098/998/fanarts/thumb/dd51480cb4.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/098/998/posters/original/09e0ae33aa.jpg","medium":"https://walter.trakt.us/images/movies/000/098/998/posters/medium/09e0ae33aa.jpg","thumb":"https://walter.trakt.us/images/movies/000/098/998/posters/thumb/09e0ae33aa.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/098/998/logos/original/dcf3f19052.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/098/998/cleararts/original/e75b250d8c.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/098/998/banners/original/ae3a70fc11.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/098/998/thumbs/original/b8672865af.jpg"}}}'}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [296c8a1451bf1fbe-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:57:34 GMT']
-        etag: [W/"822c1922fbc39db78402c38893b73103"]
-        expires: ['Thu, 21 Apr 2016 03:57:34 GMT']
-        last-modified: ['Wed, 13 Apr 2016 09:45:52 GMT']
-        server: [cloudflare-nginx]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [d15ffe4b-5e42-4d1f-aca8-a86a1ef58f72]
-        x-runtime: ['0.037455']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de2390744c03d6-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:32 GMT']
+        ETag: [W/"2c952c31edce34874da5f306d91924d2"]
+        Expires: ['Wed, 04 May 2016 22:50:32 GMT']
+        Last-Modified: ['Sun, 01 May 2016 09:16:45 GMT']
+        Server: [cloudflare-nginx]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [76dd8e8f-6ee5-4d19-96c7-e2e1b238929a]
+        X-Runtime: ['0.248371']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
@@ -144,23 +144,23 @@ interactions:
       body: {string: '[{"collected_at":"2015-06-19T00:00:00.000Z","movie":{"title":"Inside
           Out","year":2015,"ids":{"trakt":98998,"slug":"inside-out-2015","imdb":"tt2096673","tmdb":150540}}}]'}
       headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-ray: [296c8a157155261d-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:57:35 GMT']
-        etag: [W/"93653854caa3e8100ef7720355448509"]
-        last-modified: ['Wed, 20 Apr 2016 22:56:59 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d788bb47c61c6699d59aa0c1db032256e1461196654; expires=Thu,
-            20-Apr-17 23:57:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-private-user: ['false']
-        x-request-id: [3ba54989-77f7-4704-899b-d81c9b9a0518]
-        x-runtime: ['0.059145']
-        x-xss-protection: [1; mode=block]
+        CF-RAY: [29de23919465116b-DFW]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:32 GMT']
+        ETag: [W/"9bfc893700145af3619e47a6b51a1884"]
+        Last-Modified: ['Wed, 04 May 2016 07:23:41 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=d943bdb7d0cd3d5093de8c97e02316d141462387832; expires=Thu,
+            04-May-17 18:50:32 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Private-User: ['false']
+        X-Request-Id: [ad81700a-3b88-43ad-90d9-cdffa77736b9]
+        X-Runtime: ['0.088982']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
@@ -171,7 +171,7 @@ interactions:
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=The+Matrix&type=movie&year=1999
     response:
-      body: {string: "[{\"type\":\"movie\",\"score\":70.25974,\"movie\":{\"title\"\
+      body: {string: "[{\"type\":\"movie\",\"score\":69.41414,\"movie\":{\"title\"\
           :\"The Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives.\
           \ By day he is an average computer programmer and by night a malevolent\
           \ hacker known as Neo, who finds himself targeted by the police when he\
@@ -184,7 +184,7 @@ interactions:
           ,\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg\"\
           }},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\"\
-          ,\"tmdb\":603}}},{\"type\":\"movie\",\"score\":56.207794,\"movie\":{\"title\"\
+          ,\"tmdb\":603}}},{\"type\":\"movie\",\"score\":55.53131,\"movie\":{\"title\"\
           :\"Making The Matrix\",\"overview\":\"A promotional making-of documentary\
           \ for the film Matrix, The (1999) that devotes its time to explaining the\
           \ digital and practical effects contained in the film. This is very interesting,\
@@ -196,7 +196,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\"\
-          ,\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":52.085907,\"movie\":{\"\
+          ,\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":51.44303,\"movie\":{\"\
           title\":\"V-World Matrix\",\"overview\":\"Two friends take a cyber vacation\
           \ to experience a world where they can act out their virtual fantasies!\
           \ They soon realize they've entered a virtual free-for-all. Forbidden fantasies\
@@ -209,7 +209,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/movies/000/158/764/posters/thumb/b5bd19302a.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":158764,\"slug\":\"v-world-matrix-1969\",\"imdb\":\"tt0211096\",\"\
-          tmdb\":259464}}},{\"type\":\"movie\",\"score\":4.79523,\"movie\":{\"title\"\
+          tmdb\":259464}}},{\"type\":\"movie\",\"score\":4.763437,\"movie\":{\"title\"\
           :\"The Tricky Master\",\"overview\":\"Undercover cop Leung Foon (Nick Cheung)\
           \ is having trouble taking down the illegal trading operation headed by\
           \ crime boss Ferrari (Wong Jing). So to accomplish his mission, he asks\
@@ -224,7 +224,7 @@ interactions:
           ,\"medium\":\"https://walter.trakt.us/images/movies/000/037/624/fanarts/medium/de31c092f7.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/movies/000/037/624/fanarts/thumb/de31c092f7.jpg\"\
           }},\"ids\":{\"trakt\":37624,\"slug\":\"the-tricky-master-1999\",\"imdb\"\
-          :\"tt0212864\",\"tmdb\":53281}}},{\"type\":\"movie\",\"score\":0.68568826,\"\
+          :\"tt0212864\",\"tmdb\":53281}}},{\"type\":\"movie\",\"score\":0.6872574,\"\
           movie\":{\"title\":\"Superstar\",\"overview\":\"Inspired by Yves Klein\u2019\
           s Leap into the Void (1960), Superstar was commissioned by Creative Time\
           \ to be presented on the Jumbotron screen in Times Square, New York City.\
@@ -236,33 +236,33 @@ interactions:
           :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":226862,\"slug\"\
           :\"superstar-1999-03-03\",\"imdb\":\"\",\"tmdb\":385552}}}]"}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [296c8a17f0960962-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:57:35 GMT']
-        etag: [W/"35175f7ee0c4e223b3b91f59ac1565c3"]
-        expires: ['Thu, 21 Apr 2016 03:57:35 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=de5c74893a4e08f33cfffc8c3e3c990971461196655; expires=Thu,
-            20-Apr-17 23:57:35 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['5']
-        x-pagination-limit: ['10']
-        x-pagination-page: ['1']
-        x-pagination-page-count: ['1']
-        x-request-id: [29c09ef5-15ad-4b06-b151-392a081c7b0b]
-        x-runtime: ['0.094281']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de23933a9a1fbe-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:32 GMT']
+        ETag: [W/"e110064850f1a0e9f0d1c6176f45e21e"]
+        Expires: ['Wed, 04 May 2016 22:50:32 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=dd88d6c6555e58f05facbc0741c3727271462387832; expires=Thu,
+            04-May-17 18:50:32 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['5']
+        X-Pagination-Limit: ['10']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['1']
+        X-Request-Id: [1a1b4639-58f9-4156-99f8-762df8a55429]
+        X-Runtime: ['0.024084']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=de5c74893a4e08f33cfffc8c3e3c990971461196655]
+        Cookie: [__cfduid=dd88d6c6555e58f05facbc0741c3727271462387832]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -273,23 +273,23 @@ interactions:
           By day he is an average computer programmer and by night a malevolent hacker
           known as Neo, who finds himself targeted by the police when he is contacted
           by Morpheus, a legendary computer hacker, who reveals the shocking truth
-          about our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.92313,"votes":19787,"updated_at":"2016-04-18T12:57:57.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id","fa","bs"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
+          about our reality.","released":"1999-03-30","runtime":136,"trailer":null,"homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.92215,"votes":19961,"updated_at":"2016-05-01T08:47:35.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id","fa","bs"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [296c8a1850970962-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:57:35 GMT']
-        etag: [W/"86831be49892c4a96b2ba405a7b93463"]
-        expires: ['Thu, 21 Apr 2016 03:57:35 GMT']
-        last-modified: ['Mon, 18 Apr 2016 12:57:57 GMT']
-        server: [cloudflare-nginx]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [bb2746a4-49bc-4f88-a9c8-a5f22805f1fa]
-        x-runtime: ['0.024743']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de23939aa51fbe-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:32 GMT']
+        ETag: [W/"839c412c457d52634cf714692bc10e07"]
+        Expires: ['Wed, 04 May 2016 22:50:32 GMT']
+        Last-Modified: ['Sun, 01 May 2016 08:47:35 GMT']
+        Server: [cloudflare-nginx]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [9aa48160-a3ee-4b67-b681-bbf209702c89]
+        X-Runtime: ['0.032518']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

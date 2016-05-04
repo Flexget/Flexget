@@ -18,6 +18,7 @@ class objects_container(object):
             "name": {'type': 'string'},
             "tmdb_id": {'type': 'integer'},
             "trakt_id": {'type': 'integer'},
+            "images": {'type': 'object'}
         }
     }
 
@@ -29,12 +30,12 @@ class objects_container(object):
             'genres': {'type': 'array', 'items': 'string'},
             'id': {'type': 'integer'},
             "overview": {'type': 'string'},
-            "poster": {'type': 'string'},
             "runtime": {'type': 'integer'},
             "rating": {'type': 'number'},
             "votes": {'type': 'integer'},
             "language": {'type': 'string'},
             "updated_at": {'type': 'string', 'format': 'date-time'},
+            "images": {'type': 'object'}
 
         }
     }
@@ -97,7 +98,7 @@ class TraktSeriesSearchApi(APIResource):
 
 
 @trakt_api.route('/movie/')
-class TraktSeriesSearchApi(APIResource):
+class TraktMovieSearchApi(APIResource):
     @api.response(200, 'Successfully found show', movie_return_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.doc(parser=lookup_parser)

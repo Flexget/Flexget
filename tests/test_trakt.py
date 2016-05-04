@@ -5,7 +5,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import pytest
 
 from flexget.manager import Session
-from flexget.plugins.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow
+from flexget.plugins.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow, get_session
 from future.utils import native
 
 
@@ -66,7 +66,7 @@ class TestTraktShowLookup(object):
         """trakt: Test Lookup (ONLINE)"""
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
-        assert entry['trakt_show_id'] == 1399, \
+        assert entry['trakt_id'] == 1399, \
             'Trakt_ID should be 1339 is %s for %s' % (entry['trakt_show_id'], entry['series_name'])
         assert entry['trakt_series_status'] == 'ended', 'Series Status should be "ENDED" returned %s' \
                                                         % (entry['trakt_series_status'])
@@ -90,13 +90,6 @@ class TestTraktShowLookup(object):
         entry = task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
-    @pytest.mark.skip(reason="no way of currently testing this. VCR crash's test")
-    def test_alternate_language(self, execute_task):
-        # Test Non-English lookups
-        task = execute_task('test_alternate_language')
-        entry = task.find_entry(title=native('Игра престолов (2011).s01e01.hdtv'))
-        assert entry['trakt_series_name'] == 'Game of Thrones', 'Should of returned GoT'
-
     def test_search_results(self, execute_task):
         task = execute_task('test_search_result')
         entry = task.entries[0]
@@ -118,19 +111,19 @@ class TestTraktShowLookup(object):
             series = ApiTrakt.lookup_series(**lookupargs)
 
             assert series.tvdb_id == entry['tvdb_id'], 'tvdb id should be the same as the first entry'
-            assert series.id == entry['trakt_show_id'], 'trakt id should be the same as the first entry'
+            assert series.id == entry['trakt_id'], 'trakt id should be the same as the first entry'
             assert series.title.lower() == entry['trakt_series_name'].lower(), 'series name should match first entry'
 
     def test_search_success(self, execute_task):
         task = execute_task('test_search_success')
         entry = task.find_entry('accepted', title='11-22-63.S01E01.HDTV.XViD-FlexGet')
-        assert entry.get('trakt_show_id') == 102771, 'Should have returned the correct trakt id'
+        assert entry.get('trakt_id') == 102771, 'Should have returned the correct trakt id'
 
     def test_date(self, execute_task):
         task = execute_task('test_date')
         entry = task.find_entry(title='the daily show 2012-6-6')
         # Make sure show data got populated
-        assert entry.get('trakt_show_id') == 2211, 'should have populated trakt show data'
+        assert entry.get('trakt_id') == 2211, 'should have populated trakt show data'
         # We don't support lookup by date at the moment, make sure there isn't a false positive
         if entry.get('trakt_episode_id') == 173423:
             assert False, 'We support trakt episode lookup by date now? Great! Change this test.'
@@ -142,9 +135,9 @@ class TestTraktShowLookup(object):
         task = execute_task('test_absolute')
         entry = task.find_entry(title='naruto 128')
         # Make sure show data got populated
-        assert entry.get('trakt_show_id') == 46003, 'should have populated trakt show data'
+        assert entry.get('trakt_id') == 46003, 'should have populated trakt show data'
         # We don't support lookup by absolute number at the moment, make sure there isn't a false positive
-        if entry.get('trakt_episode_id') == 916040:
+        if entry.get('trakt_id') == 916040:
             assert False, 'We support trakt episode lookup by absolute number now? Great! Change this test.'
         else:
             assert entry.get('trakt_episode_id') is None, 'false positive for episode match, we don\'t ' \
@@ -176,9 +169,9 @@ class TestTraktShowLookup(object):
         with Session() as session:
             actor = session.query(TraktActor).filter(TraktActor.name == 'Hugh Laurie').first()
             assert actor is not None, 'adding actor to actors table failed'
-            assert actor.imdb_id == 'nm0491402', 'saving imdb_id for actors in table failed'
-            assert actor.trakt_id == '297390', 'saving trakt_id for actors in table failed'
-            assert actor.tmdb_id == '41419', 'saving tmdb_id for actors table failed'
+            assert actor.imdb == 'nm0491402', 'saving imdb_id for actors in table failed'
+            assert str(actor.id) == '297390', 'saving trakt_id for actors in table failed'
+            assert str(actor.tmdb) == '41419', 'saving tmdb_id for actors table failed'
 
 
 @pytest.mark.online
@@ -414,6 +407,6 @@ class TestTraktMovieLookup(object):
         with Session() as session:
             actor = session.query(TraktActor).filter(TraktActor.name == 'Keanu Reeves').first()
             assert actor is not None, 'adding actor to actors table failed'
-            assert actor.imdb_id == 'nm0000206', 'saving imdb_id for actors in table failed'
-            assert actor.trakt_id == '7134', 'saving trakt_id for actors in table failed'
-            assert actor.tmdb_id == '6384', 'saving tmdb_id for actors table failed'
+            assert actor.imdb == 'nm0000206', 'saving imdb_id for actors in table failed'
+            assert str(actor.id) == '7134', 'saving trakt_id for actors in table failed'
+            assert str(actor.tmdb) == '6384', 'saving tmdb_id for actors table failed'
