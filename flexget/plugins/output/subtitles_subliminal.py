@@ -43,6 +43,7 @@ class PluginSubliminal(object):
           exact_match: no
           providers: addic7ed, opensubtitles
           single: no
+          directory: /disk/subtitles
     """
     
     schema = {
@@ -53,6 +54,7 @@ class PluginSubliminal(object):
             'exact_match': {'type': 'boolean', 'default': True},
             'providers': {'type': 'array', 'items': {'type': 'string', 'enum': PROVIDERS}},
             'single': {'type': 'boolean', 'default': True},
+            'directory': {'type:': 'string'},
         },
         'required': ['languages'],
         'additionalProperties': False
@@ -81,6 +83,7 @@ class PluginSubliminal(object):
                 exact_match: Use file hash only to search for subs, otherwise Subliminal will try to guess by filename.
                 providers: List of providers from where to download subtitles.
                 single: Download subtitles in single mode (no language code added to subtitle filename).
+                directory: Path to directory where to save the subtitles, default is next to the video.
         """
         if not task.accepted:
             log.debug('nothing accepted, aborting')
@@ -164,7 +167,10 @@ class PluginSubliminal(object):
             # save subtitles to disk
             for video, subtitle in downloaded_subtitles.items():
                 if subtitle:
-                    subliminal.save_subtitles(video, subtitle, single=single_mode)
+                    _directory = config.get('directory', None)
+                    if _directory:
+                        _directory = os.path.expanduser(_directory)
+                    subliminal.save_subtitles(video, subtitle, single=single_mode, directory=_directory)
 
 
 @event('plugin.register')
