@@ -159,13 +159,13 @@ class TestTraktShowLookup(object):
                   'Jennifer Crystal Foley',
                   'Bobbin Bergstrom']
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
-        trakt_actors = list(entry['trakt_series_actors'].values())
+        trakt_actors = list(entry['trakt_actors'].values())
         trakt_actors = [trakt_actor['name'] for trakt_actor in trakt_actors]
         assert entry['series_name'] == 'House', 'series lookup failed'
         assert set(trakt_actors) == set(actors), 'looking up actors for %s failed' % entry.get('title')
-        assert entry['trakt_series_actors']['297390']['name'] == 'Hugh Laurie', 'trakt id mapping failed'
-        assert entry['trakt_series_actors']['297390']['imdb_id'] == 'nm0491402', 'fetching imdb id for actor failed'
-        assert entry['trakt_series_actors']['297390']['tmdb_id'] == '41419', 'fetching tmdb id for actor failed'
+        assert entry['trakt_actors']['297390']['name'] == 'Hugh Laurie', 'trakt id mapping failed'
+        assert entry['trakt_actors']['297390']['imdb_id'] == 'nm0491402', 'fetching imdb id for actor failed'
+        assert entry['trakt_actors']['297390']['tmdb_id'] == '41419', 'fetching tmdb id for actor failed'
         with Session() as session:
             actor = session.query(TraktActor).filter(TraktActor.name == 'Hugh Laurie').first()
             assert actor is not None, 'adding actor to actors table failed'
@@ -397,13 +397,13 @@ class TestTraktMovieLookup(object):
                   'Chris Pattinson',
                   'Nigel Harbach',
                   'Rana Morrison']
-        trakt_actors = list(entry['trakt_movie_actors'].values())
+        trakt_actors = list(entry['trakt_actors'].values())
         trakt_actors = [trakt_actor['name'] for trakt_actor in trakt_actors]
         assert entry['movie_name'] == 'The Matrix', 'movie lookup failed'
         assert set(trakt_actors) == set(actors), 'looking up actors for %s failed' % entry.get('title')
-        assert entry['trakt_movie_actors']['7134']['name'] == 'Keanu Reeves', 'trakt id mapping failed'
-        assert entry['trakt_movie_actors']['7134']['imdb_id'] == 'nm0000206', 'fetching imdb id for actor failed'
-        assert entry['trakt_movie_actors']['7134']['tmdb_id'] == '6384', 'fetching tmdb id for actor failed'
+        assert entry['trakt_actors']['7134']['name'] == 'Keanu Reeves', 'trakt id mapping failed'
+        assert entry['trakt_actors']['7134']['imdb_id'] == 'nm0000206', 'fetching imdb id for actor failed'
+        assert entry['trakt_actors']['7134']['tmdb_id'] == '6384', 'fetching tmdb id for actor failed'
         with Session() as session:
             actor = session.query(TraktActor).filter(TraktActor.name == 'Keanu Reeves').first()
             assert actor is not None, 'adding actor to actors table failed'
