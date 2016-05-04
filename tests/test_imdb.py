@@ -29,6 +29,9 @@ class TestImdb(object):
               - {title: 'Taken[2008]DvDrip[Eng]-FOO'}
               # test short title, with repack and without year
               - {title: 'Up.REPACK.720p.Bluray.x264-FlexGet'}
+              # test confusing names for proper parsing
+              - {title: 'Dan.In.Real.Life.2007'}
+              - {title: 'The Final Cut.2004.720p.proper'}
             imdb:
               min_votes: 20
 
@@ -115,6 +118,10 @@ class TestImdb(object):
             'Failed to pick correct Taken from search results'
         assert task.find_entry(imdb_id='tt1049413'), \
             'Failed to lookup Up.REPACK.720p.Bluray.x264-FlexGet'
+        assert task.find_entry(imdb_id='tt0364343'), \
+            'Failed to lookup The Final Cut.2004.720p.proper'
+        assert task.find_entry(imdb_id='tt0480242'), \
+            'Failed to lookup Dan.In.Real.Life.2007'
 
     def test_year(self, execute_task):
         task = execute_task('year')
