@@ -7,7 +7,7 @@ import re
 import time
 from datetime import datetime, timedelta
 
-from dateutil.parser import parse as dateutil_parse
+from dateutil.parser import parse as dateutil_parse, tz
 from sqlalchemy import Table, Column, Integer, String, Unicode, Date, DateTime, Time, or_, func
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
@@ -238,6 +238,35 @@ def get_entry_ids(entry):
             break
     return ids
 
+class TraktTranslation(Base):
+    __tablename__ = 'trakt_translations'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(Unicode)
+
+show_trans_table = Table('trakt_show_trans', Base.metadata,
+                          Column('show_id', Integer, ForeignKey('trakt_shows.id')),
+                          Column('trans_id', Integer, ForeignKey('trakt_translations.id')))
+Base.register_table(show_trans_table)
+movie_trans_table = Table('trakt_movie_trans', Base.metadata,
+                           Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
+                           Column('trans_id', Integer, ForeignKey('trakt_translations.id')))
+Base.register_table(movie_trans_table)
+ep_trans_table = Table('trakt_ep_trans', Base.metadata,
+                          Column('ep_id', Integer, ForeignKey('trakt_episodes.id')),
+                          Column('trans_id', Integer, ForeignKey('trakt_translations.id')))
+Base.register_table(ep_trans_table)
+
+def get_db_trans(trans, session):
+    """Takes a list of genres as strings, returns the database instances for them."""
+    db_trans = []
+    for tran in trans:
+        db_tran = session.query(TraktTranslation).filter(TraktTranslation.name == tran).first()
+        if not db_tran:
+            db_tran = TraktTranslation(name=tran)
+            session.add(db_tran)
+        db_trans.append(db_tran)
+    return db_trans
 
 class TraktGenre(Base):
     __tablename__ = 'trakt_genres'
@@ -445,6 +474,7 @@ class TraktEpisode(Base):
     number_abs = Column(Integer)
     overview = Column(Unicode)
     images = relation(TraktImages, secondary=trakt_image_episodes)
+    translation = relation(TraktTranslation, secondary=ep_trans_table)
     first_aired = Column(DateTime)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
@@ -472,6 +502,7 @@ class TraktEpisode(Base):
             self.first_aired = dateutil_parse(trakt_episode['first_aired'], ignoretz=True)
         self.updated_at = dateutil_parse(trakt_episode.get('updated_at'), ignoretz=True)
         self.cached_at = datetime.now()
+        self.translations[:] = get_db_trans(trakt_episode.get('available_translations', []), session)
 
         for col in ['title', 'season', 'number', 'number_abs', 'overview']:
             setattr(self, col, trakt_episode.get(col))
@@ -497,6 +528,7 @@ class TraktShow(Base):
     first_aired = Column(DateTime)
     air_day = Column(Unicode)
     air_time = Column(Time)
+    timezone = Column(Unicode)
     runtime = Column(Integer)
     certification = Column(Unicode)
     network = Column(Unicode)
@@ -506,7 +538,10 @@ class TraktShow(Base):
     rating = Column(Integer)
     votes = Column(Integer)
     language = Column(Unicode)
+    homepage = Column(Unicode)
+    trailer = Column(Unicode)
     aired_episodes = Column(Integer)
+    translations = relation(TraktTranslation, secondary=show_trans_table)
     episodes = relation(TraktEpisode, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic')
     genres = relation(TraktGenre, secondary=show_genres_table)
     _actors = relation(TraktActor, secondary=show_actors_table)
@@ -527,6 +562,7 @@ class TraktShow(Base):
             "first_aired": self.first_aired,
             "air_day": self.air_day,
             "air_time": self.air_time,
+            "timezone": self.timezone,
             "runtime": self.runtime,
             "certification": self.certification,
             "network": self.network,
@@ -535,6 +571,7 @@ class TraktShow(Base):
             "rating": self.rating,
             "votes": self.votes,
             "language": self.language,
+            "homepage": self.homepage,
             "number_of_aired_episodes": self.aired_episodes,
             "genres": [g.name for g in self.genres],
             "actors": [a.to_dict() for a in self.actors],
@@ -560,21 +597,27 @@ class TraktShow(Base):
         self.tvdb_id = trakt_show['ids']['tvdb']
         if trakt_show.get('images'):
             self.images = get_db_images(trakt_show.get('images'), session)
-        if trakt_show.get('air_time'):
-            self.air_time = dateutil_parse(trakt_show.get('air_time'), ignoretz=True)
-        else:
-            self.air_time = None
+        if trakt_show.get('airs'):
+            airs = trakt_show.get('airs')
+            self.air_day = airs.get('day')
+            self.timezone = airs.get('timezone')
+            if airs.get('time'):
+                self.air_time = datetime.strptime(airs.get('time'), '%H:%M').time()
+            else:
+                self.air_time = None
         if trakt_show.get('first_aired'):
             self.first_aired = dateutil_parse(trakt_show.get('first_aired'), ignoretz=True)
         else:
             self.first_aired = None
         self.updated_at = dateutil_parse(trakt_show.get('updated_at'), ignoretz=True)
 
-        for col in ['overview', 'runtime', 'rating', 'votes', 'language', 'title', 'year', 'air_day',
-                    'runtime', 'certification', 'network', 'country', 'status', 'aired_episodes']:
+        for col in ['overview', 'runtime', 'rating', 'votes', 'language', 'title', 'year',
+                    'runtime', 'certification', 'network', 'country', 'status', 'aired_episodes',
+                    'trailer', 'homepage']:
             setattr(self, col, trakt_show.get(col))
 
         self.genres[:] = get_db_genres(trakt_show.get('genres', []), session)
+        self.translations[:] = get_db_trans(trakt_show.get('available_translations', []), session)
         self.cached_at = datetime.now()
 
     def get_episode(self, season, number, session, only_cached=False):
@@ -643,9 +686,12 @@ class TraktMovie(Base):
     runtime = Column(Integer)
     rating = Column(Integer)
     votes = Column(Integer)
+    trailer = Column(Unicode)
+    homepage = Column(Unicode)
     language = Column(Unicode)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
+    translations = relation(TraktTranslation, secondary=movie_trans_table)
     images = relation(TraktImages, secondary=trakt_image_movies)
     genres = relation(TraktGenre, secondary=movie_genres_table)
     _actors = relation(TraktActor, secondary=movie_actors_table)
@@ -669,6 +715,8 @@ class TraktMovie(Base):
             "rating": self.rating,
             "votes": self.votes,
             "language": self.language,
+            "homepage": self.homepage,
+            "trailer": self.trailer,
             "genres": [g.name for g in self.genres],
             "actors": [a.to_dict() for a in self.actors],
             "updated_at": self.updated_at,
@@ -685,12 +733,14 @@ class TraktMovie(Base):
         self.slug = trakt_movie['ids']['slug']
         self.imdb_id = trakt_movie['ids']['imdb']
         self.tmdb_id = trakt_movie['ids']['tmdb']
-        for col in ['title', 'overview', 'runtime', 'rating', 'votes', 'language', 'tagline', 'year']:
+        for col in ['title', 'overview', 'runtime', 'rating', 'votes',
+                    'language', 'tagline', 'year', 'trailer', 'homepage']:
             setattr(self, col, trakt_movie.get(col))
         if self.released:
             self.released = dateutil_parse(trakt_movie.get('released'), ignoretz=True)
         self.updated_at = dateutil_parse(trakt_movie.get('updated_at'), ignoretz=True)
         self.genres[:] = get_db_genres(trakt_movie.get('genres', []), session)
+        self.translations[:] = get_db_trans(trakt_movie.get('available_translations', []), session)
         self.cached_at = datetime.now()
         self.images = get_db_images(trakt_movie.get('images'), session)
 

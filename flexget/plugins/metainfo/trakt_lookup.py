@@ -75,9 +75,11 @@ class PluginTraktLookup(object):
         'imdb_id': 'imdb_id',
         'tvdb_id': 'tvdb_id',
         'tmdb_id': 'tmdb_id',
-        'trakt_show_id': 'id',
-        'trakt_series_slug': 'slug',
-        'trakt_series_tvrage': 'tvrage_id',
+        'trakt_id': 'id',
+        'trakt_slug': 'slug',
+        'tvrage_id': 'tvrage_id',
+        'trakt_trailer': 'trailer',
+        'trakt_homepage': 'homepage',
         'trakt_series_runtime': 'runtime',
         'trakt_series_first_aired': 'first_aired',
         'trakt_series_air_time': 'air_time',
@@ -91,6 +93,8 @@ class PluginTraktLookup(object):
         'trakt_series_status': 'status',
         'trakt_series_overview': 'overview',
         'trakt_series_rating': 'rating',
+        'trakt_series_votes': 'votes',
+        'trakt_series_language': 'language',
         'trakt_series_aired_episodes': 'aired_episodes',
         'trakt_series_episodes': lambda show: [episodes.title for episodes in show.episodes],
         'trakt_series_images': lambda im: list_images(im.images)
@@ -123,8 +127,8 @@ class PluginTraktLookup(object):
         'movie_year': 'year',
         'trakt_name': 'title',
         'trakt_year': 'year',
-        'trakt_movie_id': 'id',
-        'trakt_movie_slug': 'slug',
+        'trakt_id': 'id',
+        'trakt_slug': 'slug',
         'imdb_id': 'imdb_id',
         'tmdb_id': 'tmdb_id',
         'trakt_tagline': 'tagline',
@@ -133,9 +137,12 @@ class PluginTraktLookup(object):
         'trakt_runtime': 'runtime',
         'trakt_rating': 'rating',
         'trakt_votes': 'votes',
+        'trakt_homepage': 'homepage',
+        'trakt_trailer': 'trailer',
         'trakt_language': 'language',
         'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
-        'trakt_images': lambda im: list_images(im.images)
+        'trakt_images': lambda im: list_images(im.images),
+        'trakt_translations': lambda i: [t.name for t in i.translations]
     }
 
     movie_actor_map = {
@@ -148,6 +155,7 @@ class PluginTraktLookup(object):
             'properties': {
                 'account': {'type': 'string'},
                 'username': {'type': 'string'},
+                'language': {'type': 'string'},
             },
             'anyOf': [{'required': ['username']}, {'required': ['account']}],
             'error_anyOf': 'At least one of `username` or `account` options are needed.',
