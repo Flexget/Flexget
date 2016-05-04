@@ -24,7 +24,7 @@ class UrlRewriteNewPCT(object):
     def url_rewritable(self, task, entry):
         url = entry['url']
         rewritable_regex = '^http:\/\/(www.)?newpct1?.com\/.*'
-        return re.match(rewritable_regex, url) and not url.startswith('http://www.newpct.com/descargar/')
+        return re.match(rewritable_regex, url) and not url.startswith('http://www.newpct1.com/download/') and not url.startswith('http://www.newpct.com/torrents/')
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
@@ -32,6 +32,13 @@ class UrlRewriteNewPCT(object):
 
     @plugin.internet(log)
     def parse_download_page(self, url):
+        if 'newpct1' in url:
+            return self.parse_newpct1(url)
+        else:
+            return self.parse_newpct(url)
+
+    def parse_newpct(self, url):
+        log.verbose('Newpct URL: %s' % url)
         page = requests.get(url)
         try:
             soup = get_soup(page.text)
@@ -42,8 +49,22 @@ class UrlRewriteNewPCT(object):
         if len(torrent_ids) == 0:
             raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
         torrent_id = torrent_id_prog.search(torrent_ids[0]).group(1)
-        return 'http://www.newpct.com/descargar/torrent/%s/dummy.html' % torrent_id
+        return 'http://www.newpct.com/torrents/%s.torrent' % ('{:0>6}'.format(torrent_id))
 
+    def parse_newpct1(self, url):
+        log.verbose('Newpct1 URL: %s' % url)
+        url = url.replace('newpct1.com/', 'newpct1.com/descarga-torrent/')
+        page = requests.get(url)
+        try:
+            soup = get_soup(page.text)
+        except Exception as e:
+            raise UrlRewritingError(e)
+        torrent_id_prog = re.compile(r'descargar-torrent/(.+)/')
+        torrent_ids = soup.findAll(href=torrent_id_prog)
+        if len(torrent_ids) == 0:
+            raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
+        torrent_id = torrent_id_prog.search(torrent_ids[0]['href']).group(1)
+        return 'http://www.newpct1.com/download/%s.torrent' % torrent_id
 
 @event('plugin.register')
 def register_plugin():
