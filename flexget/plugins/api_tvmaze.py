@@ -124,7 +124,6 @@ class TVMazeSeries(Base):
             'runtime': self.runtime,
             'show_type': self.show_type,
             'network': self.network,
-            'actors': [actor.to_dict() for actor in self.actors],
             'last_update': self.last_update
         }
 

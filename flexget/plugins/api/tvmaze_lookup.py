@@ -63,7 +63,6 @@ tvmaze_series_object = {
         'runtime': {'type': 'integer'},
         'show_type': {'type': 'string'},
         'network': {'type': 'string'},
-        'actors': {'type': 'array', 'items': actor_object},
         'last_update': {'type': 'string', 'format': 'date-time'}
     }
 }
