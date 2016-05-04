@@ -2,13 +2,13 @@ interactions:
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=11-22-63&type=show
+      uri: https://api-v2launch.trakt.tv/search?type=show&query=11-22-63
     response:
-      body: {string: !!python/unicode '[{"type":"show","score":17.35185,"show":{"title":"11.22.63","overview":"Imagine
+      body: {string: '[{"type":"show","score":17.174925,"show":{"title":"11.22.63","overview":"Imagine
           having the power to change history. Would you journey down the \"rabbit
           hole\"? This event series follows Jake Epping, an ordinary high school teacher,
           presented with the unthinkable mission of traveling back in time to prevent
@@ -18,39 +18,39 @@ interactions:
           the past does not want to be changed. And trying to divert the course of
           history may prove fatal.","year":2016,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/102/771/posters/original/e9cfb8f315.jpg","medium":"https://walter.trakt.us/images/shows/000/102/771/posters/medium/e9cfb8f315.jpg","thumb":"https://walter.trakt.us/images/shows/000/102/771/posters/thumb/e9cfb8f315.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/102/771/fanarts/original/3c06324bd8.jpg","medium":"https://walter.trakt.us/images/shows/000/102/771/fanarts/medium/3c06324bd8.jpg","thumb":"https://walter.trakt.us/images/shows/000/102/771/fanarts/thumb/3c06324bd8.jpg"}},"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210}}}]'}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [EXPIRED]
-        cf-ray: [29a027e8f6900104-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 27 Apr 2016 06:18:13 GMT']
-        etag: [W/"549a92ea9793a3a8200bc4ee469b4be2"]
-        expires: ['Wed, 27 Apr 2016 10:18:13 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d778a73b51f068eb95cae49bb7b377dfe1461737893; expires=Thu,
-            27-Apr-17 06:18:13 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['1']
-        x-pagination-limit: ['10']
-        x-pagination-page: ['1']
-        x-pagination-page-count: ['1']
-        x-request-id: [25d84465-1eb8-41ad-95a2-3256ab9ae45a]
-        x-runtime: ['0.022671']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de237df6691fe2-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:29 GMT']
+        ETag: [W/"eea7a6b1a4b809980fdcfb17d9478435"]
+        Expires: ['Wed, 04 May 2016 22:50:29 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=dbf36363928e9c50830d272f08bd934341462387829; expires=Thu,
+            04-May-17 18:50:29 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['1']
+        X-Pagination-Limit: ['10']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['1']
+        X-Request-Id: [5518af52-f494-4ac1-98da-41b74ef94724]
+        X-Runtime: ['0.016516']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        Cookie: [__cfduid=d778a73b51f068eb95cae49bb7b377dfe1461737893]
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        Cookie: [__cfduid=dbf36363928e9c50830d272f08bd934341462387829]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/shows/102771?extended=full%2Cimages
     response:
-      body: {string: !!python/unicode '{"title":"11.22.63","year":2016,"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210},"overview":"Imagine
+      body: {string: '{"title":"11.22.63","year":2016,"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210},"overview":"Imagine
           having the power to change history. Would you journey down the \"rabbit
           hole\"? This event series follows Jake Epping, an ordinary high school teacher,
           presented with the unthinkable mission of traveling back in time to prevent
@@ -58,23 +58,23 @@ interactions:
           to the past in order to solve the most enduring mystery of the 20th century:
           who killed JFK, and could it have been stopped? But as Jake will learn,
           the past does not want to be changed. And trying to divert the course of
-          history may prove fatal.","first_aired":"2016-02-15T05:01:00.000Z","airs":{"day":"Monday","time":"00:01","timezone":"America/New_York"},"runtime":54,"certification":"TV-MA","network":"Hulu","country":"us","trailer":"http://youtube.com/watch?v=NXUx__qQGew","homepage":"http://www.hulu.com/112263","status":"ended","rating":8.27399,"votes":865,"updated_at":"2016-04-26T13:50:18.000Z","language":"en","available_translations":["en","fr","bs","he","pl","el","ru","pt","bg","cs","nl","de","es","hu"],"genres":["science-fiction","drama","fantasy"],"aired_episodes":8,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/102/771/fanarts/original/3c06324bd8.jpg","medium":"https://walter.trakt.us/images/shows/000/102/771/fanarts/medium/3c06324bd8.jpg","thumb":"https://walter.trakt.us/images/shows/000/102/771/fanarts/thumb/3c06324bd8.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/102/771/posters/original/e9cfb8f315.jpg","medium":"https://walter.trakt.us/images/shows/000/102/771/posters/medium/e9cfb8f315.jpg","thumb":"https://walter.trakt.us/images/shows/000/102/771/posters/thumb/e9cfb8f315.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/102/771/logos/original/47016c0f0c.png"},"clearart":{"full":null},"banner":{"full":"https://walter.trakt.us/images/shows/000/102/771/banners/original/97f4c7160f.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/102/771/thumbs/original/a8234a4ad9.jpg"}}}'}
+          history may prove fatal.","first_aired":"2016-02-15T08:00:00.000Z","airs":{"day":"Monday","time":"00:01","timezone":"America/New_York"},"runtime":60,"certification":"TV-MA","network":"Hulu","country":"us","trailer":"http://youtube.com/watch?v=NXUx__qQGew","homepage":"http://www.hulu.com/112263","status":"ended","rating":8.28693,"votes":941,"updated_at":"2016-05-04T10:50:26.000Z","language":"en","available_translations":["en","fr","bs","he","pl","el","ru","pt","bg","cs","nl","de","es","hu","it","it"],"genres":["science-fiction","drama","fantasy"],"aired_episodes":8,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/102/771/fanarts/original/3c06324bd8.jpg","medium":"https://walter.trakt.us/images/shows/000/102/771/fanarts/medium/3c06324bd8.jpg","thumb":"https://walter.trakt.us/images/shows/000/102/771/fanarts/thumb/3c06324bd8.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/102/771/posters/original/e9cfb8f315.jpg","medium":"https://walter.trakt.us/images/shows/000/102/771/posters/medium/e9cfb8f315.jpg","thumb":"https://walter.trakt.us/images/shows/000/102/771/posters/thumb/e9cfb8f315.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/102/771/logos/original/47016c0f0c.png"},"clearart":{"full":null},"banner":{"full":"https://walter.trakt.us/images/shows/000/102/771/banners/original/97f4c7160f.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/102/771/thumbs/original/a8234a4ad9.jpg"}}}'}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [EXPIRED]
-        cf-ray: [29a027e996980104-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 27 Apr 2016 06:18:13 GMT']
-        etag: [W/"9129de4fbe3a7fe908a92cccb504e1f8"]
-        expires: ['Wed, 27 Apr 2016 10:18:13 GMT']
-        last-modified: ['Tue, 26 Apr 2016 13:50:18 GMT']
-        server: [cloudflare-nginx]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [c5a097fc-143d-4086-a82b-2c7dfaa67cb3]
-        x-runtime: ['0.029874']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de237e46791fe2-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:29 GMT']
+        ETag: [W/"9a12eb0ca7ddac77d6a7f4a8539b15f2"]
+        Expires: ['Wed, 04 May 2016 22:50:29 GMT']
+        Last-Modified: ['Wed, 04 May 2016 10:50:26 GMT']
+        Server: [cloudflare-nginx]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [fcf8a735-5fa2-4056-a7bc-623fc3c67a6b]
+        X-Runtime: ['0.017437']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

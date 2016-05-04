@@ -2,13 +2,13 @@ interactions:
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=The+Matrix&type=movie&year=1999
+      uri: https://api-v2launch.trakt.tv/search?type=movie&year=1999&query=The+Matrix
     response:
-      body: {string: "[{\"type\":\"movie\",\"score\":69.50237,\"movie\":{\"title\"\
+      body: {string: "[{\"type\":\"movie\",\"score\":69.42665,\"movie\":{\"title\"\
           :\"The Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives.\
           \ By day he is an average computer programmer and by night a malevolent\
           \ hacker known as Neo, who finds himself targeted by the police when he\
@@ -21,7 +21,7 @@ interactions:
           ,\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg\"\
           }},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\"\
-          ,\"tmdb\":603}}},{\"type\":\"movie\",\"score\":55.6019,\"movie\":{\"title\"\
+          ,\"tmdb\":603}}},{\"type\":\"movie\",\"score\":55.54132,\"movie\":{\"title\"\
           :\"Making The Matrix\",\"overview\":\"A promotional making-of documentary\
           \ for the film Matrix, The (1999) that devotes its time to explaining the\
           \ digital and practical effects contained in the film. This is very interesting,\
@@ -33,7 +33,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\"\
-          ,\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":51.505898,\"movie\":{\"\
+          ,\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":51.458336,\"movie\":{\"\
           title\":\"V-World Matrix\",\"overview\":\"Two friends take a cyber vacation\
           \ to experience a world where they can act out their virtual fantasies!\
           \ They soon realize they've entered a virtual free-for-all. Forbidden fantasies\
@@ -46,7 +46,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/movies/000/158/764/posters/thumb/b5bd19302a.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":158764,\"slug\":\"v-world-matrix-1969\",\"imdb\":\"tt0211096\",\"\
-          tmdb\":259464}}},{\"type\":\"movie\",\"score\":4.767971,\"movie\":{\"title\"\
+          tmdb\":259464}}},{\"type\":\"movie\",\"score\":4.757874,\"movie\":{\"title\"\
           :\"The Tricky Master\",\"overview\":\"Undercover cop Leung Foon (Nick Cheung)\
           \ is having trouble taking down the illegal trading operation headed by\
           \ crime boss Ferrari (Wong Jing). So to accomplish his mission, he asks\
@@ -61,7 +61,7 @@ interactions:
           ,\"medium\":\"https://walter.trakt.us/images/movies/000/037/624/fanarts/medium/de31c092f7.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/movies/000/037/624/fanarts/thumb/de31c092f7.jpg\"\
           }},\"ids\":{\"trakt\":37624,\"slug\":\"the-tricky-master-1999\",\"imdb\"\
-          :\"tt0212864\",\"tmdb\":53281}}},{\"type\":\"movie\",\"score\":0.6841915,\"\
+          :\"tt0212864\",\"tmdb\":53281}}},{\"type\":\"movie\",\"score\":0.68695897,\"\
           movie\":{\"title\":\"Superstar\",\"overview\":\"Inspired by Yves Klein\u2019\
           s Leap into the Void (1960), Superstar was commissioned by Creative Time\
           \ to be presented on the Jumbotron screen in Times Square, New York City.\
@@ -73,67 +73,67 @@ interactions:
           :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":226862,\"slug\"\
           :\"superstar-1999-03-03\",\"imdb\":\"\",\"tmdb\":385552}}}]"}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [EXPIRED]
-        cf-ray: [29a027f6d4f20932-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 27 Apr 2016 06:18:15 GMT']
-        etag: [W/"7185a5a4bd1208f8c31851655673d8ba"]
-        expires: ['Wed, 27 Apr 2016 10:18:15 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d57da42a26d4acf0d7dc17a32cff5b6231461737895; expires=Thu,
-            27-Apr-17 06:18:15 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['5']
-        x-pagination-limit: ['10']
-        x-pagination-page: ['1']
-        x-pagination-page-count: ['1']
-        x-request-id: [e65cb9ba-e9da-4d4e-bd45-cf7f1fad259a]
-        x-runtime: ['0.031389']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [MISS]
+        CF-RAY: [29de23997fdb2623-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:34 GMT']
+        ETag: [W/"c14eacb3fb6f826dacce0a507825a9ab"]
+        Expires: ['Wed, 04 May 2016 22:50:34 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=df8fc19b48edd34976aba2e70d24a8c131462387833; expires=Thu,
+            04-May-17 18:50:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['5']
+        X-Pagination-Limit: ['10']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['1']
+        X-Request-Id: [ef73df22-e3b7-4c43-bb18-30f6df04d4dc]
+        X-Runtime: ['0.033033']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        Cookie: [__cfduid=d57da42a26d4acf0d7dc17a32cff5b6231461737895]
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        Cookie: [__cfduid=df8fc19b48edd34976aba2e70d24a8c131462387833]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
     response:
-      body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
+      body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
           to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
           By day he is an average computer programmer and by night a malevolent hacker
           known as Neo, who finds himself targeted by the police when he is contacted
           by Morpheus, a legendary computer hacker, who reveals the shocking truth
-          about our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.92311,"votes":19807,"updated_at":"2016-04-21T08:53:50.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id","fa","bs"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
+          about our reality.","released":"1999-03-30","runtime":136,"trailer":null,"homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.92215,"votes":19961,"updated_at":"2016-05-01T08:47:35.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id","fa","bs"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [29a027f815010932-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 27 Apr 2016 06:18:15 GMT']
-        etag: [W/"57a188607cedd99f883252a4a8ddef05"]
-        expires: ['Wed, 27 Apr 2016 10:18:15 GMT']
-        last-modified: ['Thu, 21 Apr 2016 08:53:50 GMT']
-        server: [cloudflare-nginx]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [c4c27aa0-9f35-47e0-88ce-54987cbdb63f]
-        x-runtime: ['0.031590']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de239b10152623-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:34 GMT']
+        ETag: [W/"839c412c457d52634cf714692bc10e07"]
+        Expires: ['Wed, 04 May 2016 22:50:34 GMT']
+        Last-Modified: ['Sun, 01 May 2016 08:47:35 GMT']
+        Server: [cloudflare-nginx]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [9aa48160-a3ee-4b67-b681-bbf209702c89]
+        X-Runtime: ['0.032518']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/movies/481/people?extended=full%2Cimages
@@ -659,22 +659,22 @@ interactions:
           \ on Wikipedia.\",\"birthday\":\"1965-06-21\",\"death\":null,\"birthplace\"\
           :\"Chicago, Illinois, USA \",\"homepage\":\"\"}}]}}"}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [29a027f8d36a03dc-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 27 Apr 2016 06:18:16 GMT']
-        etag: [W/"8b3844425461740439b060a2011aa912"]
-        expires: ['Wed, 27 Apr 2016 10:18:16 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d75418d1f41312b7b705f0c6822b7d3b71461737895; expires=Thu,
-            27-Apr-17 06:18:15 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [cd014a6c-c544-4177-8223-53c3aebe9b29]
-        x-runtime: ['0.111388']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de239c28cd2018-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:34 GMT']
+        ETag: [W/"07bd9b63ee748e467b67fdb15d3d0cfe"]
+        Expires: ['Wed, 04 May 2016 22:50:34 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=d0b3bf6569a94995a02e988ee498ede3e1462387834; expires=Thu,
+            04-May-17 18:50:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [7319bc4f-508e-49ac-b9be-84569bbadd7f]
+        X-Runtime: ['0.101701']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

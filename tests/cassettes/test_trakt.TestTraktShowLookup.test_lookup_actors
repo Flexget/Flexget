@@ -2,13 +2,13 @@ interactions:
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=House&type=show
+      uri: https://api-v2launch.trakt.tv/search?type=show&query=House
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":50.98358,\"show\":{\"title\":\"\
+      body: {string: "[{\"type\":\"show\",\"score\":50.13566,\"show\":{\"title\":\"\
           House\",\"overview\":\"Go deeper into the medical mysteries of House, TV's\
           \ most compelling drama. Hugh Laurie stars as the brilliant but sarcastic\
           \ Dr. Gregory House, a maverick physician who is devoid of bedside manner.\
@@ -24,25 +24,25 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg\"\
           }},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"\
           tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\"\
-          :41.20096,\"show\":{\"title\":\"House vs. House\",\"overview\":\"House vs.\
-          \ House is a new home makeover competition series where amateur and experienced\
-          \ renovation teams compete for the chance to win $10,000 by proving they\
-          \ can create the better DIY projects in their home. From painting and decorating,\
-          \ to one-of-a-kind, imaginative projects, each episode features two teams\
-          \ will go head-to-head in grueling challenges. Tanya McQueen, a DIY design\
-          \ expert, and David Brian Sanders, an architect and designer, will determine\
-          \ which team completes the most impressive transformation and award the\
-          \ cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"\
-          full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\"\
-          ,\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"\
-          type\":\"show\",\"score\":36.416847,\"show\":{\"title\":\"Full House\",\"\
-          overview\":\"Full House is an American sitcom created by Jeff Franklin for\
-          \ ABC. The show chronicles a widowed father, who enlists his best friend\
-          \ and his brother-in-law to help raise his three daughters. It aired from\
-          \ September 22, 1987, to May 23, 1995, broadcasting eight seasons and 192\
-          \ episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\"\
-          :{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/posters/original/17202e7ebc.jpg\"\
+          :40.515728,\"show\":{\"title\":\"House vs. House\",\"overview\":\"House\
+          \ vs. House is a new home makeover competition series where amateur and\
+          \ experienced renovation teams compete for the chance to win $10,000 by\
+          \ proving they can create the better DIY projects in their home. From painting\
+          \ and decorating, to one-of-a-kind, imaginative projects, each episode features\
+          \ two teams will go head-to-head in grueling challenges. Tanya McQueen,\
+          \ a DIY design expert, and David Brian Sanders, an architect and designer,\
+          \ will determine which team completes the most impressive transformation\
+          \ and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"\
+          poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\"\
+          :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\"\
+          :\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"\
+          tvrage\":null}}},{\"type\":\"show\",\"score\":35.811184,\"show\":{\"title\"\
+          :\"Full House\",\"overview\":\"Full House is an American sitcom created\
+          \ by Jeff Franklin for ABC. The show chronicles a widowed father, who enlists\
+          \ his best friend and his brother-in-law to help raise his three daughters.\
+          \ It aired from September 22, 1987, to May 23, 1995, broadcasting eight\
+          \ seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\"\
+          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/posters/original/17202e7ebc.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/004/289/posters/medium/17202e7ebc.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/posters/thumb/17202e7ebc.jpg\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/original/98635a003a.jpg\"\
@@ -50,7 +50,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/thumb/98635a003a.jpg\"\
           }},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"\
           imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\"\
-          ,\"score\":36.416847,\"show\":{\"title\":\"House Hunters\",\"overview\"\
+          ,\"score\":35.811184,\"show\":{\"title\":\"House Hunters\",\"overview\"\
           :\"House Hunters takes viewers behind the scenes as individuals, couples\
           \ and families learn what to look for and decide whether or not a home is\
           \ meant for them. Focusing on the emotional experience of finding and purchasing\
@@ -64,7 +64,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/thumb/36bdbe2817.jpg\"\
           }},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"\
           imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":36.416847,\"show\":{\"title\":\"Fuller House\",\"overview\":\"\
+          ,\"score\":35.811184,\"show\":{\"title\":\"Fuller House\",\"overview\":\"\
           Recently widowed D.J. Tanner-Fuller gets help from her sister Stephanie\
           \ and best friend Kimmy when the women move in with their families to help\
           \ D.J. raise her children in this spin-off series.\",\"year\":2016,\"status\"\
@@ -76,7 +76,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/thumb/37bbde27f6.jpg\"\
           }},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"\
           imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\"\
-          ,\"score\":36.416847,\"show\":{\"title\":\"Alpha House\",\"overview\":\"\
+          ,\"score\":35.811184,\"show\":{\"title\":\"Alpha House\",\"overview\":\"\
           Alpha House follows four senators who live together in a rented house in\
           \ Washington DC.Re-election battles, looming indictments, parties, their\
           \ Party... these senators need a drink. And a new housemate.\",\"year\"\
@@ -89,7 +89,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/thumb/e477e76c44.jpg\"\
           }},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"\
           imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\"\
-          ,\"score\":36.416847,\"show\":{\"title\":\"Playing House\",\"overview\"\
+          ,\"score\":35.811184,\"show\":{\"title\":\"Playing House\",\"overview\"\
           :\"A single-camera buddy comedy about what happens when two best friends\
           \ come back together, just when they need each other most.Inspired by the\
           \ ultra-close friendship between the series' creators and stars, \\\"Playing\
@@ -104,7 +104,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/thumb/49c78c5d22.jpg\"\
           }},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"\
           imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":36.416847,\"show\":{\"title\":\"House Husbands\",\"overview\"\
+          ,\"score\":35.811184,\"show\":{\"title\":\"House Husbands\",\"overview\"\
           :\"House Husbands centres around four families with one thing in common,\
           \ the husbands stay home to raise the children.\",\"year\":2012,\"status\"\
           :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/posters/original/8d6ef762b1.jpg\"\
@@ -115,7 +115,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/thumb/632ffeb8be.jpg\"\
           }},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"\
           imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":36.416847,\"show\":{\"title\":\"Bleak House\",\"overview\":\"\
+          ,\"score\":35.811184,\"show\":{\"title\":\"Bleak House\",\"overview\":\"\
           In this star-studded adaptation of a literary classic, acclaimed writer\
           \ Andrew Davies turns his talents to one of Charles Dickens' most brilliant\
           \ novels \u2014 arguably the greatest-ever depiction of Victorian London.\
@@ -138,7 +138,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/002/474/fanarts/thumb/4d61afbe9b.jpg\"\
           }},\"ids\":{\"trakt\":2474,\"slug\":\"bleak-house\",\"tvdb\":73558,\"imdb\"\
           :\"tt0442632\",\"tmdb\":2489,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :36.416847,\"show\":{\"title\":\"Full House\",\"overview\":\"Han Ji Eun\
+          :35.811184,\"show\":{\"title\":\"Full House\",\"overview\":\"Han Ji Eun\
           \ is a naive writer who got swindled out of everything she owned including\
           \ her house by her best friends. Stranded in China, She managed to borrow\
           \ money from an actor Lee Young Jae to return to Korea. On her return, she\
@@ -156,70 +156,70 @@ interactions:
           }},\"ids\":{\"trakt\":3482,\"slug\":\"full-house\",\"tvdb\":84928,\"imdb\"\
           :\"tt0464625\",\"tmdb\":3504,\"tvrage\":null}}}]"}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [29a027f1c5cd03d6-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 27 Apr 2016 06:18:14 GMT']
-        etag: [W/"b96d231ef0a6f44efd7eb24d5ccf50b3"]
-        expires: ['Wed, 27 Apr 2016 10:18:14 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dced37d4b4b1953cc2cfd17f5fe5d65321461737894; expires=Thu,
-            27-Apr-17 06:18:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['1564']
-        x-pagination-limit: ['10']
-        x-pagination-page: ['1']
-        x-pagination-page-count: ['157']
-        x-request-id: [d7969d32-8373-4b8a-8e61-57b4099ad4ba]
-        x-runtime: ['0.037867']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de2383c1520106-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:30 GMT']
+        ETag: [W/"938b0cd6657ea1be2f33342706e73598"]
+        Expires: ['Wed, 04 May 2016 22:50:30 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=dd9b46c79416338aed275304a33496c531462387830; expires=Thu,
+            04-May-17 18:50:30 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['1568']
+        X-Pagination-Limit: ['10']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['157']
+        X-Request-Id: [316c43ad-8175-4953-829c-d9b650edec69]
+        X-Runtime: ['0.045017']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        Cookie: [__cfduid=dced37d4b4b1953cc2cfd17f5fe5d65321461737894]
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        Cookie: [__cfduid=dd9b46c79416338aed275304a33496c531462387830]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/shows/1399?extended=full%2Cimages
     response:
-      body: {string: !!python/unicode '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
+      body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
           deeper into the medical mysteries of House, TV''s most compelling drama.
           Hugh Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
           physician who is devoid of bedside manner. While his behavior can border
           on antisocial, Dr. House thrives on the challenge of solving the medical
           puzzles that other doctors give up on. Together with his hand-picked team
           of young medical experts, he''ll do whatever it takes in the race against
-          the clock to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
-          (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.80163,"votes":16278,"updated_at":"2016-04-15T09:37:30.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es","ro","cs","bs","lt","uk"],"genres":["comedy","drama","mystery","action"],"aired_episodes":176,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/001/399/fanarts/original/c628f24771.jpg","medium":"https://walter.trakt.us/images/shows/000/001/399/fanarts/medium/c628f24771.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/001/399/posters/original/76fae8b69b.jpg","medium":"https://walter.trakt.us/images/shows/000/001/399/posters/medium/76fae8b69b.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/399/posters/thumb/76fae8b69b.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/001/399/logos/original/2a5748f5d7.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/001/399/cleararts/original/6a9b6f6448.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/001/399/banners/original/5395bb01d7.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/001/399/thumbs/original/ed951f1f59.jpg"}}}'}
+          the clock to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":44,"certification":"TV-14","network":"FOX
+          (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.8017,"votes":16369,"updated_at":"2016-04-27T09:52:29.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es","ro","cs","bs","lt","uk"],"genres":["comedy","drama","mystery"],"aired_episodes":176,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/001/399/fanarts/original/c628f24771.jpg","medium":"https://walter.trakt.us/images/shows/000/001/399/fanarts/medium/c628f24771.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/001/399/posters/original/76fae8b69b.jpg","medium":"https://walter.trakt.us/images/shows/000/001/399/posters/medium/76fae8b69b.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/399/posters/thumb/76fae8b69b.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/001/399/logos/original/2a5748f5d7.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/001/399/cleararts/original/6a9b6f6448.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/001/399/banners/original/5395bb01d7.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/001/399/thumbs/original/ed951f1f59.jpg"}}}'}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [29a027f205cf03d6-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 27 Apr 2016 06:18:14 GMT']
-        etag: [W/"728305d1b1b390d23cdca9343a14bc71"]
-        expires: ['Wed, 27 Apr 2016 10:18:14 GMT']
-        last-modified: ['Fri, 15 Apr 2016 09:37:30 GMT']
-        server: [cloudflare-nginx]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [b65509de-4d56-4e2b-854a-49dc97228297]
-        x-runtime: ['0.022726']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de238461700106-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:30 GMT']
+        ETag: [W/"1c7e7c5d16e8e9a8275505bae9057491"]
+        Expires: ['Wed, 04 May 2016 22:50:30 GMT']
+        Last-Modified: ['Wed, 27 Apr 2016 09:52:29 GMT']
+        Server: [cloudflare-nginx]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [4a74dc27-1b99-41d1-94a5-5fb0d6898ddc]
+        X-Runtime: ['0.019536']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/shows/1399/people?extended=full%2Cimages
@@ -245,11 +245,11 @@ interactions:
           \ article Hugh Laurie, licensed under CC-BY-SA, full list of contributors\
           \ on Wikipedia.\",\"birthday\":\"1959-06-11\",\"death\":null,\"birthplace\"\
           :\"Oxford, Oxfordshire, England UK\",\"homepage\":\"http://hughlaurieblues.com/\"\
-          }},{\"character\":\"Eric Foreman\",\"person\":{\"name\":\"Omar Epps\",\"\
-          ids\":{\"trakt\":412476,\"slug\":\"omar-epps\",\"imdb\":\"nm0004898\",\"\
-          tmdb\":4987,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/412/476/headshots/original/278e5ab826.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/people/000/412/476/headshots/medium/278e5ab826.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/people/000/412/476/headshots/thumb/278e5ab826.jpg\"\
+          }},{\"character\":\"Dr. Eric Foreman\",\"person\":{\"name\":\"Omar Epps\"\
+          ,\"ids\":{\"trakt\":412476,\"slug\":\"omar-epps\",\"imdb\":\"nm0004898\"\
+          ,\"tmdb\":4987,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/person_shows/000/078/313/headshots/original/661dcb8fee.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/person_shows/000/078/313/headshots/medium/661dcb8fee.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/person_shows/000/078/313/headshots/thumb/661dcb8fee.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
           :\"Omar Hashim Epps (born July 20, 1973) is an American actor, singer, songwriter,\
           \ and record producer. His film roles include Juice, Major League II, Higher\
@@ -259,12 +259,12 @@ interactions:
           \ series House which earned him a NAACP Image Award in 2007 and 2008 for\
           \ Outstanding Supporting Actor in a Drama Series.\",\"birthday\":\"1973-07-20\"\
           ,\"death\":null,\"birthplace\":\"Brooklyn, New York, USA\",\"homepage\"\
-          :\"\"}},{\"character\":\"James Wilson\",\"person\":{\"name\":\"Robert Sean\
-          \ Leonard\",\"ids\":{\"trakt\":411888,\"slug\":\"robert-sean-leonard\",\"\
-          imdb\":\"nm0000494\",\"tmdb\":2692,\"tvrage\":31687},\"images\":{\"headshot\"\
-          :{\"full\":\"https://walter.trakt.us/images/people/000/411/888/headshots/original/c42ea0ea7d.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/people/000/411/888/headshots/medium/c42ea0ea7d.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/people/000/411/888/headshots/thumb/c42ea0ea7d.jpg\"\
+          :\"\"}},{\"character\":\"Dr. James Wilson\",\"person\":{\"name\":\"Robert\
+          \ Sean Leonard\",\"ids\":{\"trakt\":411888,\"slug\":\"robert-sean-leonard\"\
+          ,\"imdb\":\"nm0000494\",\"tmdb\":2692,\"tvrage\":31687},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/person_shows/000/078/314/headshots/original/7b12982c20.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/person_shows/000/078/314/headshots/medium/7b12982c20.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/person_shows/000/078/314/headshots/thumb/7b12982c20.jpg\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/411/888/fanarts/original/0cef007397.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/people/000/411/888/fanarts/medium/0cef007397.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/people/000/411/888/fanarts/thumb/0cef007397.jpg\"\
@@ -276,12 +276,12 @@ interactions:
           \ above from the Wikipedia article Robert Sean Leonard, licensed under CC-BY-SA,\
           \ full list of contributors on Wikipedia.\",\"birthday\":\"1969-02-28\"\
           ,\"death\":null,\"birthplace\":\"Westwood, New Jersey, USA\",\"homepage\"\
-          :\"\"}},{\"character\":\"Allison Cameron\",\"person\":{\"name\":\"Jennifer\
+          :\"\"}},{\"character\":\"Dr. Allison Cameron\",\"person\":{\"name\":\"Jennifer\
           \ Morrison\",\"ids\":{\"trakt\":414513,\"slug\":\"jennifer-morrison\",\"\
           imdb\":\"nm0607185\",\"tmdb\":41421,\"tvrage\":28684},\"images\":{\"headshot\"\
-          :{\"full\":\"https://walter.trakt.us/images/people/000/414/513/headshots/original/942a7b69f8.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/people/000/414/513/headshots/medium/942a7b69f8.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/people/000/414/513/headshots/thumb/942a7b69f8.jpg\"\
+          :{\"full\":\"https://walter.trakt.us/images/person_shows/000/178/011/headshots/original/6ee3c43bce.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/person_shows/000/178/011/headshots/medium/6ee3c43bce.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/person_shows/000/178/011/headshots/thumb/6ee3c43bce.jpg\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/414/513/fanarts/original/a7141047c3.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/people/000/414/513/fanarts/medium/a7141047c3.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/people/000/414/513/fanarts/thumb/a7141047c3.jpg\"\
@@ -308,12 +308,12 @@ interactions:
           \ Wikipedia article Jennifer Morrison, licensed under CC-BY-SA, full list\
           \ of contributors on Wikipedia.\",\"birthday\":\"1979-04-12\",\"death\"\
           :null,\"birthplace\":\"Chicago - Illinois - USA\",\"homepage\":\"\"}},{\"\
-          character\":\"Robert Chase\",\"person\":{\"name\":\"Jesse Spencer\",\"ids\"\
-          :{\"trakt\":429766,\"slug\":\"jesse-spencer-5ede7178-b889-4092-bdc8-08a1e57de572\"\
+          character\":\"Dr. Robert Chase\",\"person\":{\"name\":\"Jesse Spencer\"\
+          ,\"ids\":{\"trakt\":429766,\"slug\":\"jesse-spencer-5ede7178-b889-4092-bdc8-08a1e57de572\"\
           ,\"imdb\":\"nm0817980\",\"tmdb\":41422,\"tvrage\":31685},\"images\":{\"\
-          headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/429/766/headshots/original/0c6d80a655.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/people/000/429/766/headshots/medium/0c6d80a655.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/people/000/429/766/headshots/thumb/0c6d80a655.jpg\"\
+          headshot\":{\"full\":\"https://walter.trakt.us/images/person_shows/000/078/312/headshots/original/e11fbaa4af.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/person_shows/000/078/312/headshots/medium/e11fbaa4af.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/person_shows/000/078/312/headshots/thumb/e11fbaa4af.jpg\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/429/766/fanarts/original/667dffe770.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/people/000/429/766/fanarts/medium/667dffe770.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/people/000/429/766/fanarts/thumb/667dffe770.jpg\"\
@@ -464,129 +464,39 @@ interactions:
           tmdb\":1224001,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"\
           medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
           thumb\":null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
-          :null,\"homepage\":null}}],\"crew\":{\"production\":[{\"job\":\"Executive\
-          \ Producer\",\"person\":{\"name\":\"Paul Attanasio\",\"ids\":{\"trakt\"\
-          :2009,\"slug\":\"paul-attanasio\",\"imdb\":\"nm0001921\",\"tmdb\":45543,\"\
-          tvrage\":71428},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/002/009/headshots/original/3171617932.jpg\"\
+          :null,\"homepage\":null}}],\"crew\":{\"production\":[{\"job\":\"Casting\"\
+          ,\"person\":{\"name\":\"Amy Lippens\",\"ids\":{\"trakt\":1995,\"slug\":\"\
+          amy-lippens\",\"imdb\":\"nm0513591\",\"tmdb\":2151,\"tvrage\":null},\"images\"\
+          :{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\"\
+          :null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"\
+          Executive Producer\",\"person\":{\"name\":\"Paul Attanasio\",\"ids\":{\"\
+          trakt\":2009,\"slug\":\"paul-attanasio\",\"imdb\":\"nm0001921\",\"tmdb\"\
+          :45543,\"tvrage\":71428},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/002/009/headshots/original/3171617932.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/people/000/002/009/headshots/medium/3171617932.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/people/000/002/009/headshots/thumb/3171617932.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
           :null,\"birthday\":\"1959-11-14\",\"death\":null,\"birthplace\":\"\",\"\
-          homepage\":null}},{\"job\":\"Executive Producer\",\"person\":{\"name\":\"\
-          Gerrit van der Meer\",\"ids\":{\"trakt\":9787,\"slug\":\"gerrit-van-der-meer\"\
+          homepage\":null}},{\"job\":\"Co-Executive Producer\",\"person\":{\"name\"\
+          :\"Gerrit van der Meer\",\"ids\":{\"trakt\":9787,\"slug\":\"gerrit-van-der-meer\"\
           ,\"imdb\":\"nm0576182\",\"tmdb\":12256,\"tvrage\":null},\"images\":{\"headshot\"\
           :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
           medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
-          :null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Producer\",\"person\"\
-          :{\"name\":\"David Hoselton\",\"ids\":{\"trakt\":36334,\"slug\":\"david-hoselton\"\
-          ,\"imdb\":\"nm0395924\",\"tmdb\":52873,\"tvrage\":null},\"images\":{\"headshot\"\
-          :{\"full\":\"https://walter.trakt.us/images/people/000/036/334/headshots/original/eee82edc77.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/people/000/036/334/headshots/medium/eee82edc77.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/people/000/036/334/headshots/thumb/eee82edc77.jpg\"\
-          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
-          :\"From Wikipedia, the free encyclopedia.\\n\\nDavid Hoselton is a Canadian\
-          \ screenwriter and television producer, best known for his work on the television\
-          \ series House and the animated films Over the Hedge and Brother Bear.\\\
-          n\\nHoselton attended the University of Toronto Law School where he met\
-          \ and befriended David Shore, the creator of House. Hoselton began his Hollywood\
-          \ career in 1987, as a writer for the film Like Father Like Son, and wrote\
-          \ or co-wrote several other films. In 2006, during the third season of House,\
-          \  Shore hired Hoselton as a writer for the show. In 2007, at the  beginning\
-          \ of season four, Hoselton became one of the show's producers.\",\"birthday\"\
-          :null,\"death\":null,\"birthplace\":\"\",\"homepage\":\"\"}},{\"job\":\"\
-          Executive Producer\",\"person\":{\"name\":\"Doris Egan\",\"ids\":{\"trakt\"\
-          :92689,\"slug\":\"doris-egan\",\"imdb\":\"nm0250668\",\"tmdb\":169466,\"\
+          :null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Unit Production\
+          \ Manager\",\"person\":{\"name\":\"Gerrit van der Meer\",\"ids\":{\"trakt\"\
+          :9787,\"slug\":\"gerrit-van-der-meer\",\"imdb\":\"nm0576182\",\"tmdb\":12256,\"\
           tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"\
           thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"\
           biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"\
           homepage\":null}},{\"job\":\"Executive Producer\",\"person\":{\"name\":\"\
-          Garrett Lerner\",\"ids\":{\"trakt\":106206,\"slug\":\"garrett-lerner\",\"\
-          imdb\":\"nm1068424\",\"tmdb\":114407,\"tvrage\":null},\"images\":{\"headshot\"\
-          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
-          :null,\"birthplace\":\"\",\"homepage\":null}},{\"job\":\"Executive Producer\"\
-          ,\"person\":{\"name\":\"Hugh Laurie\",\"ids\":{\"trakt\":297390,\"slug\"\
-          :\"hugh-laurie\",\"imdb\":\"nm0491402\",\"tmdb\":41419,\"tvrage\":30836},\"\
-          images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/297/390/headshots/original/438a36cdcb.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/people/000/297/390/headshots/medium/438a36cdcb.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/people/000/297/390/headshots/thumb/438a36cdcb.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/297/390/fanarts/original/0f0e43e217.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/people/000/297/390/fanarts/medium/0f0e43e217.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/people/000/297/390/fanarts/thumb/0f0e43e217.jpg\"\
-          }},\"biography\":\"James Hugh Calum Laurie better known as Hugh Laurie,\
-          \ is an English actor, voice artist, comedian, writer, musician, recording\
-          \ artist, and director. He first became known as one half of the Fry and\
-          \ Laurie double act, along with his friend and comedy partner Stephen Fry,\
-          \ whom he joined in the cast of Blackadder and Jeeves and Wooster from 1987\
-          \ until 1999. Since 2004, he has played the lead as Dr. Gregory House, the\
-          \ protagonist of House, for which he received two Golden Globe awards and\
-          \ several Emmy nominations. As of August 2010, he is the highest paid actor\
-          \ in a drama series on US television.\\n\\nDescription above from the Wikipedia\
-          \ article Hugh Laurie, licensed under CC-BY-SA, full list of contributors\
-          \ on Wikipedia.\",\"birthday\":\"1959-06-11\",\"death\":null,\"birthplace\"\
-          :\"Oxford, Oxfordshire, England UK\",\"homepage\":\"http://hughlaurieblues.com/\"\
-          }},{\"job\":\"Executive Producer\",\"person\":{\"name\":\"Eli Attie\",\"\
-          ids\":{\"trakt\":398540,\"slug\":\"eli-attie\",\"imdb\":\"nm1108368\",\"\
-          tmdb\":1219508,\"tvrage\":48322},\"images\":{\"headshot\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
-          thumb\":null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
-          :null,\"homepage\":null}},{\"job\":\"Producer\",\"person\":{\"name\":\"\
-          John Mankiewicz\",\"ids\":{\"trakt\":399129,\"slug\":\"john-mankiewicz\"\
-          ,\"imdb\":\"nm0542535\",\"tmdb\":1222278,\"tvrage\":31715},\"images\":{\"\
+          Peter Blake\",\"ids\":{\"trakt\":399346,\"slug\":\"peter-blake-5cd380a9-d696-46d4-84cc-b862c5b2e6b3\"\
+          ,\"imdb\":\"nm0086694\",\"tmdb\":1223964,\"tvrage\":null},\"images\":{\"\
           headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"\
           full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\"\
           :null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"\
-          Producer\",\"person\":{\"name\":\"Peter Blake\",\"ids\":{\"trakt\":399346,\"\
-          slug\":\"peter-blake-5cd380a9-d696-46d4-84cc-b862c5b2e6b3\",\"imdb\":\"\
-          nm0086694\",\"tmdb\":1223964,\"tvrage\":null},\"images\":{\"headshot\":{\"\
-          full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
-          :null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Executive Producer\"\
-          ,\"person\":{\"name\":\"Thomas L. Moran\",\"ids\":{\"trakt\":399347,\"slug\"\
-          :\"thomas-l-moran\",\"imdb\":\"nm0602981\",\"tmdb\":1223966,\"tvrage\":31719},\"\
-          images\":{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"\
-          fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"\
-          birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"\
-          job\":\"Executive Producer\",\"person\":{\"name\":\"Russel Friend\",\"ids\"\
-          :{\"trakt\":399348,\"slug\":\"russel-friend\",\"imdb\":\"nm1068423\",\"\
-          tmdb\":1213567,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
-          thumb\":null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
-          :null,\"homepage\":null}},{\"job\":\"Producer\",\"person\":{\"name\":\"\
-          Leonard Dick\",\"ids\":{\"trakt\":399350,\"slug\":\"leonard-dick\",\"imdb\"\
-          :\"nm0225272\",\"tmdb\":1223984,\"tvrage\":null},\"images\":{\"headshot\"\
-          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
-          :null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Producer\",\"person\"\
-          :{\"name\":\"Marcy Kaplan\",\"ids\":{\"trakt\":399351,\"slug\":\"marcy-kaplan\"\
-          ,\"imdb\":\"nm0438310\",\"tmdb\":1218759,\"tvrage\":null},\"images\":{\"\
-          headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"\
-          full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\"\
-          :null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"\
-          Producer\",\"person\":{\"name\":\"Heel and Toe Films\",\"ids\":{\"trakt\"\
-          :399352,\"slug\":\"heel-and-toe-films\",\"imdb\":null,\"tmdb\":1224005,\"\
-          tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"\
-          thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"\
-          biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"\
-          homepage\":null}},{\"job\":\"Producer\",\"person\":{\"name\":\"Shore Z Productions\"\
-          ,\"ids\":{\"trakt\":399353,\"slug\":\"shore-z-productions\",\"imdb\":null,\"\
-          tmdb\":1224006,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
-          thumb\":null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
-          :null,\"homepage\":null}},{\"job\":\"Producer\",\"person\":{\"name\":\"\
-          Bad Hat Harry Productions\",\"ids\":{\"trakt\":399354,\"slug\":\"bad-hat-harry-productions\"\
-          ,\"imdb\":null,\"tmdb\":1224007,\"tvrage\":null},\"images\":{\"headshot\"\
-          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
-          :null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Producer\",\"person\"\
-          :{\"name\":\"Greg Yaitanes\",\"ids\":{\"trakt\":399355,\"slug\":\"greg-yaitanes\"\
-          ,\"imdb\":\"nm0944981\",\"tmdb\":1216738,\"tvrage\":8433},\"images\":{\"\
-          headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"\
-          full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\"\
-          :null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"\
-          Executive Producer\",\"person\":{\"name\":\"Lawrence Kaplow\",\"ids\":{\"\
-          trakt\":399356,\"slug\":\"lawrence-kaplow\",\"imdb\":\"nm0438432\",\"tmdb\"\
-          :1223963,\"tvrage\":31697},\"images\":{\"headshot\":{\"full\":null,\"medium\"\
+          Executive Producer\",\"person\":{\"name\":\"Thomas L. Moran\",\"ids\":{\"\
+          trakt\":399347,\"slug\":\"thomas-l-moran\",\"imdb\":\"nm0602981\",\"tmdb\"\
+          :1223966,\"tvrage\":31719},\"images\":{\"headshot\":{\"full\":null,\"medium\"\
           :null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\"\
           :null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
           :null,\"homepage\":null}},{\"job\":\"Producer\",\"person\":{\"name\":\"\
@@ -595,14 +505,9 @@ interactions:
           headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"\
           full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\"\
           :null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"\
-          Producer\",\"person\":{\"name\":\"Matt Witten\",\"ids\":{\"trakt\":399358,\"\
-          slug\":\"matt-witten\",\"imdb\":\"nm0936976\",\"tmdb\":1212236,\"tvrage\"\
-          :null},\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\"\
-          :null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
-          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
-          :null}},{\"job\":\"Executive Producer\",\"person\":{\"name\":\"Bryan Singer\"\
-          ,\"ids\":{\"trakt\":413922,\"slug\":\"bryan-singer\",\"imdb\":\"nm0001741\"\
-          ,\"tmdb\":9032,\"tvrage\":31688},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/922/headshots/original/f80b4127ec.jpg\"\
+          Executive Producer\",\"person\":{\"name\":\"Bryan Singer\",\"ids\":{\"trakt\"\
+          :413922,\"slug\":\"bryan-singer\",\"imdb\":\"nm0001741\",\"tmdb\":9032,\"\
+          tvrage\":31688},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/922/headshots/original/f80b4127ec.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/people/000/413/922/headshots/medium/f80b4127ec.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/922/headshots/thumb/f80b4127ec.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
@@ -613,50 +518,10 @@ interactions:
           \ Description above from the Wikipedia article Bryan Singer, licensed under\
           \ CC-BY-SA, full list of contributors on Wikipedia.\",\"birthday\":\"1965-09-17\"\
           ,\"death\":null,\"birthplace\":\"New York City, New York, USA\",\"homepage\"\
-          :\"\"}},{\"job\":\"Executive Producer\",\"person\":{\"name\":\"Daniel Sackheim\"\
-          ,\"ids\":{\"trakt\":414782,\"slug\":\"daniel-sackheim\",\"imdb\":\"nm0755261\"\
-          ,\"tmdb\":12632,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/414/782/headshots/original/20ff6d93c7.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/people/000/414/782/headshots/medium/20ff6d93c7.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/people/000/414/782/headshots/thumb/20ff6d93c7.jpg\"\
-          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
-          :\"From Wikipedia, the free encyclopedia.\\n\\nDaniel Sackheim is an American\
-          \ TV and film director. He has directed several episodes of the TV show\
-          \ The X-Files, 3 episodes of Harsh Realm, House, and Life, the last two\
-          \ of which he also served on as an executive producer.\",\"birthday\":null,\"\
-          death\":null,\"birthplace\":null,\"homepage\":\"\"}},{\"job\":\"Executive\
-          \ Producer\",\"person\":{\"name\":\"Deran Sarafian\",\"ids\":{\"trakt\"\
-          :423098,\"slug\":\"deran-sarafian\",\"imdb\":\"nm0764776\",\"tmdb\":45645,\"\
-          tvrage\":25344},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/423/098/headshots/original/8ac41d9d39.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/people/000/423/098/headshots/medium/8ac41d9d39.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/people/000/423/098/headshots/thumb/8ac41d9d39.jpg\"\
-          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
-          :\"From Wikipedia, the free encyclopedia. Deran Sarafian (born January 17,\
-          \ 1968) is an Armenian-American actor, film and television director.\\n\\\
-          nSarafian has directed several episodes of the FOX series House and was\
-          \ made a co-executive producer of the show for the 2007/08 season. He also\
-          \ directed a Season 2 Lost episode, titled \\\"?\\\", and has directed for\
-          \ CSI: Crime Scene Investigation, CSI: Miami, CSI: NY, Cold Case, The District,\
-          \ Without a Trace, Buffy the Vampire Slayer, The Cape, Nash Bridges, and\
-          \ Fringe.\\n\\nSarafian is the son of film director, Richard C. Sarafian\
-          \ and the brother of Tedi Sarafian, Damon B. Sarafian, and Richard Sarafian,\
-          \ Jr. Sarafian is also the nephew of director Robert Altman. Sarafian is\
-          \ married to actress Laurie Fortier, with whom he has two children.\",\"\
-          birthday\":\"1968-01-17\",\"death\":null,\"birthplace\":\"Los Angeles -\
-          \ California - USA\",\"homepage\":\"\"}},{\"job\":\"Producer\",\"person\"\
-          :{\"name\":\"David Semel\",\"ids\":{\"trakt\":431170,\"slug\":\"david-semel\"\
-          ,\"imdb\":\"nm0783751\",\"tmdb\":17272,\"tvrage\":2478},\"images\":{\"headshot\"\
-          :{\"full\":\"https://walter.trakt.us/images/people/000/431/170/headshots/original/a072e3f3f9.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/people/000/431/170/headshots/medium/a072e3f3f9.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/people/000/431/170/headshots/thumb/a072e3f3f9.jpg\"\
-          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
-          :\"From Wikipedia, the free encyclopedia.\\n\\nDavid Semel is an American\
-          \ director and television producer.\\n\\nDescription above from the Wikipedia\
-          \ article David Semel, licensed under CC-BY-SA, full list of contributors\
-          \ on Wikipedia\",\"birthday\":null,\"death\":null,\"birthplace\":null,\"\
-          homepage\":null}},{\"job\":\"Executive Producer\",\"person\":{\"name\":\"\
-          David Shore\",\"ids\":{\"trakt\":434876,\"slug\":\"david-shore\",\"imdb\"\
-          :\"nm0794914\",\"tmdb\":169061,\"tvrage\":17176},\"images\":{\"headshot\"\
-          :{\"full\":\"https://walter.trakt.us/images/people/000/434/876/headshots/original/f9a66f827a.jpg\"\
+          :\"\"}},{\"job\":\"Executive Producer\",\"person\":{\"name\":\"David Shore\"\
+          ,\"ids\":{\"trakt\":434876,\"slug\":\"david-shore\",\"imdb\":\"nm0794914\"\
+          ,\"tmdb\":169061,\"tvrage\":17176},\"images\":{\"headshot\":{\"full\":\"\
+          https://walter.trakt.us/images/people/000/434/876/headshots/original/f9a66f827a.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/people/000/434/876/headshots/medium/f9a66f827a.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/people/000/434/876/headshots/thumb/f9a66f827a.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
@@ -669,47 +534,57 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/people/000/436/235/headshots/thumb/c4ae067940.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
           :null,\"birthday\":null,\"death\":null,\"birthplace\":\"\",\"homepage\"\
-          :null}},{\"job\":\"Producer\",\"person\":{\"name\":\"Liz Friedman\",\"ids\"\
-          :{\"trakt\":436909,\"slug\":\"liz-friedman\",\"imdb\":\"nm0295286\",\"tmdb\"\
-          :1218783,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/436/909/headshots/original/13368c6d24.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/people/000/436/909/headshots/medium/13368c6d24.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/people/000/436/909/headshots/thumb/13368c6d24.jpg\"\
-          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
-          :\"Liz Friedman is a producer and writer.\",\"birthday\":null,\"death\"\
-          :null,\"birthplace\":null,\"homepage\":\"\"}}],\"writing\":[{\"job\":\"\
-          Writer\",\"person\":{\"name\":\"Pam Davis\",\"ids\":{\"trakt\":155851,\"\
-          slug\":\"pam-davis\",\"imdb\":\"nm0205247\",\"tmdb\":1224002,\"tvrage\"\
-          :null},\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\"\
-          :null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
-          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
-          :null}},{\"job\":\"Writer\",\"person\":{\"name\":\"Marqui Jackson\",\"ids\"\
-          :{\"trakt\":399345,\"slug\":\"marqui-jackson\",\"imdb\":null,\"tmdb\":1224004,\"\
+          :null}}],\"directing\":[{\"job\":\"Script Supervisor\",\"person\":{\"name\"\
+          :\"Ira Hurvitz\",\"ids\":{\"trakt\":572489,\"slug\":\"ira-hurvitz\",\"imdb\"\
+          :\"nm0403779\",\"tmdb\":1533790,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
+          :null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Script Coordinator\"\
+          ,\"person\":{\"name\":\"Dustin Paddock\",\"ids\":{\"trakt\":618367,\"slug\"\
+          :\"dustin-paddock\",\"imdb\":null,\"tmdb\":1223981,\"tvrage\":null},\"images\"\
+          :{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\"\
+          :null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"sound\"\
+          :[{\"job\":\"Original Music Composer\",\"person\":{\"name\":\"Jon Ehrlich\"\
+          ,\"ids\":{\"trakt\":580789,\"slug\":\"jon-ehrlich\",\"imdb\":\"nm0251363\"\
+          ,\"tmdb\":1493983,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
+          :null,\"homepage\":null}},{\"job\":\"Original Music Composer\",\"person\"\
+          :{\"name\":\"Jason Derlatka\",\"ids\":{\"trakt\":618364,\"slug\":\"jason-derlatka\"\
+          ,\"imdb\":\"nm1628706\",\"tmdb\":1604953,\"tvrage\":null},\"images\":{\"\
+          headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"\
+          full\":null,\"medium\":null,\"thumb\":null}},\"biography\":\"\",\"birthday\"\
+          :null,\"death\":null,\"birthplace\":null,\"homepage\":\"\"}}],\"costume\
+          \ & make-up\":[{\"job\":\"Costume Design\",\"person\":{\"name\":\"Cathy\
+          \ Crandall\",\"ids\":{\"trakt\":618365,\"slug\":\"cathy-crandall\",\"imdb\"\
+          :\"nm0186285\",\"tmdb\":1604955,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
+          :null,\"birthplace\":null,\"homepage\":null}}],\"visual effects\":[{\"job\"\
+          :\"Visual Effects Supervisor\",\"person\":{\"name\":\"Elan Soltes\",\"ids\"\
+          :{\"trakt\":618366,\"slug\":\"elan-soltes\",\"imdb\":null,\"tmdb\":1488571,\"\
           tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"\
           thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"\
           biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"\
-          homepage\":null}},{\"job\":\"Writer\",\"person\":{\"name\":\"Kath Lingenfelter\"\
-          ,\"ids\":{\"trakt\":399359,\"slug\":\"kath-lingenfelter\",\"imdb\":\"nm1964417\"\
-          ,\"tmdb\":1224003,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
-          thumb\":null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
-          :null,\"homepage\":null}}]}}"}
+          homepage\":null}}]}}"}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [29a027f2aa8f0932-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 27 Apr 2016 06:18:15 GMT']
-        etag: [W/"00b043f2f2bca2cc4b869f46fa4cee5b"]
-        expires: ['Wed, 27 Apr 2016 10:18:15 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dd3772a22ab2ba43a7e269155bf8efc1d1461737894; expires=Thu,
-            27-Apr-17 06:18:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [ce9a0d62-356a-494e-a805-479f9ae9f0d1]
-        x-runtime: ['0.086360']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de2385500a0103-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:30 GMT']
+        ETag: [W/"2b833db2b1890f2cf339ed977a32b48f"]
+        Expires: ['Wed, 04 May 2016 22:50:30 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=d50a16f4659513b83563eff8a148aeb131462387830; expires=Thu,
+            04-May-17 18:50:30 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [95a8fd68-7f26-425c-b354-28027442d10b]
+        X-Runtime: ['0.074176']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1
