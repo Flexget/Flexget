@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flask import jsonify
 from flask_restplus import inputs
@@ -63,7 +63,6 @@ tvmaze_series_object = {
         'runtime': {'type': 'integer'},
         'show_type': {'type': 'string'},
         'network': {'type': 'string'},
-        'actors': {'type': 'array', 'items': actor_object},
         'last_update': {'type': 'string', 'format': 'date-time'}
     }
 }

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -9,9 +9,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from flexget.api import api, APIResource
 from flexget.plugins.filter.retry_failed import FailedEntry
 
-log = logging.getLogger('retry_failed_api')
+log = logging.getLogger('failed_api')
 
-retry_failed_api = api.namespace('retry_failed', description='View and manage failed entries')
+retry_failed_api = api.namespace('failed', description='View and manage failed entries')
 
 empty_response = api.schema('empty', {'type': 'object'})
 

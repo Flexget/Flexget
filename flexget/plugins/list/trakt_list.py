@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -105,22 +105,28 @@ class TraktSet(MutableSet):
         # Optimization to submit multiple entries at same time
         self.submit(entries, remove=True)
 
-    def __contains__(self, entry):
+    def _find_entry(self, entry):
         for item in self.items:
             if self.config['type'] in ['episodes', 'auto'] and self.episode_match(entry, item):
-                return True
+                return item
             if self.config['type'] in ['seasons', 'auto'] and self.season_match(entry, item):
-                return True
+                return item
             if self.config['type'] in ['shows', 'auto'] and self.show_match(entry, item):
-                return True
+                return item
             if self.config['type'] in ['movies', 'auto'] and self.movie_match(entry, item):
-                return True
+                return item
+
+    def __contains__(self, entry):
+        return self._find_entry(entry) is not None
 
     def clear(self):
         if self.items:
             for item in self.items:
                 self.discard(item)
             self._items = None
+
+    def get(self, entry):
+        return self._find_entry(entry)
 
     # -- Public interface ends here -- #
 
@@ -208,7 +214,7 @@ class TraktSet(MutableSet):
         return False
 
     def season_match(self, entry1, entry2):
-        return (self.series_match(entry1, entry2) and entry1.get('series_season') is not None and
+        return (self.show_match(entry1, entry2) and entry1.get('series_season') is not None and
                 entry1['series_season'] == entry2.get('series_season'))
 
     def episode_match(self, entry1, entry2):

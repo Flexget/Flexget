@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
 
 import logging
 import pickle
 from collections import MutableSet
 from datetime import datetime
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from sqlalchemy import Column, Unicode, select, Integer, DateTime, or_, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
@@ -168,6 +168,11 @@ class DBEntrySet(MutableSet):
         """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
         like test mode"""
         return False
+
+    @with_session
+    def get(self, entry, session=None):
+        match = self._entry_query(session=session, entry=entry)
+        return Entry(match.entry) if match else None
 
 
 class EntryList(object):

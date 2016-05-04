@@ -1,6 +1,6 @@
 """ Common tools used by plugins implementing search plugin api """
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import re
 from unicodedata import normalize
@@ -15,7 +15,7 @@ def clean_symbols(text):
         result = normalize('NFKD', result)
     result = re.sub('[ \(\)\-_\[\]\.]+', ' ', result).lower()
 
-	# Leftovers
+    # Leftovers
     result = re.sub(r"[^a-zA-Z0-9 ]", "", result)
 
     return result

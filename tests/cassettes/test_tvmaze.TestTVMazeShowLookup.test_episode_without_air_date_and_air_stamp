@@ -1,63 +1,50 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/singlesearch/shows?q=Firefly&embed=cast
-    response:
-      body: {string: !!python/unicode '{"id":180,"url":"http://www.tvmaze.com/shows/180/firefly","name":"Firefly","type":"Scripted","language":"English","genres":["Adventure","Science-Fiction","Western"],"status":"Ended","runtime":60,"premiered":"2002-09-20","schedule":{"time":"20:00","days":["Friday"]},"rating":{"average":9.4},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3548,"thetvdb":78874,"imdb":"tt0303461"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2600.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2600.jpg"},"summary":"<p>Five
-          hundred years in the future, a renegade crew aboard a small spacecraft tries
-          to survive as they travel the unknown parts of the galaxy and evade warring
-          factions as well as authority agents out to get them.</p>","updated":1449590156,"_links":{"self":{"href":"http://api.tvmaze.com/shows/180"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/13006"}},"_embedded":{"cast":[{"person":{"id":6101,"url":"http://www.tvmaze.com/people/6101/ron-glass","name":"Ron
-          Glass","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/6399.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/6399.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/6101"}}},"character":{"id":49347,"url":"http://www.tvmaze.com/characters/49347/firefly-the-shepherd-book","name":"The
-          Shepherd Book","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2610.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2610.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/49347"}}}},{"person":{"id":9135,"url":"http://www.tvmaze.com/people/9135/nathan-fillion","name":"Nathan
-          Fillion","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1651.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1651.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/9135"}}},"character":{"id":49339,"url":"http://www.tvmaze.com/characters/49339/firefly-captain-malcolm-mal-reynolds","name":"Captain
-          Malcolm \"Mal\" Reynolds","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2601.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2601.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/49339"}}}},{"person":{"id":12877,"url":"http://www.tvmaze.com/people/12877/gina-torres","name":"Gina
-          Torres","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/7973.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/7973.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/12877"}}},"character":{"id":49340,"url":"http://www.tvmaze.com/characters/49340/firefly-zoe","name":"Zoe","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2604.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2604.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/49340"}}}},{"person":{"id":22757,"url":"http://www.tvmaze.com/people/22757/alan-tudyk","name":"Alan
-          Tudyk","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10099.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10099.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/22757"}}},"character":{"id":49341,"url":"http://www.tvmaze.com/characters/49341/firefly-wash","name":"Wash","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2602.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2602.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/49341"}}}},{"person":{"id":890,"url":"http://www.tvmaze.com/people/890/morena-baccarin","name":"Morena
-          Baccarin","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/44/112177.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/44/112177.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/890"}}},"character":{"id":49342,"url":"http://www.tvmaze.com/characters/49342/firefly-inara-serra","name":"Inara
-          Serra","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2603.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2603.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/49342"}}}},{"person":{"id":4862,"url":"http://www.tvmaze.com/people/4862/adam-baldwin","name":"Adam
-          Baldwin","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/8166.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/8166.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/4862"}}},"character":{"id":49343,"url":"http://www.tvmaze.com/characters/49343/firefly-jayne-cobb","name":"Jayne
-          Cobb","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2605.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2605.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/49343"}}}},{"person":{"id":4279,"url":"http://www.tvmaze.com/people/4279/jewel-staite","name":"Jewel
-          Staite","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/7610.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/7610.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/4279"}}},"character":{"id":49344,"url":"http://www.tvmaze.com/characters/49344/firefly-kaylee","name":"Kaylee","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2606.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2606.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/49344"}}}},{"person":{"id":585,"url":"http://www.tvmaze.com/people/585/sean-maher","name":"Sean
-          Maher","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7437.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7437.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/585"}}},"character":{"id":49345,"url":"http://www.tvmaze.com/characters/49345/firefly-dr-simon-tam","name":"Dr.
-          Simon Tam","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2609.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2609.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/49345"}}}},{"person":{"id":513,"url":"http://www.tvmaze.com/people/513/summer-glau","name":"Summer
-          Glau","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/7754.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/7754.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/513"}}},"character":{"id":49346,"url":"http://www.tvmaze.com/characters/49346/firefly-river-tam","name":"River
-          Tam","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2608.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2608.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/49346"}}}}]}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:58 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/shows/180/episodebynumber?season=1&number=13
-    response:
-      body: {string: !!python/unicode '{"id":13007,"url":"http://www.tvmaze.com/episodes/13007/firefly-1x13-heart-of-gold","name":"Heart
-          of Gold","season":1,"number":13,"airdate":"","airtime":"20:00","airstamp":null,"runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/9/23981.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/9/23981.jpg"},"summary":"<p>The
-          crew comes to the aid of a bordello when its madam, an old acquaintance
-          of Inara''s, asks for help after a rancher claims a prostitute''s baby is
-          his and he''s taking it because his wife is barren.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/13007"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:59 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=Firefly
+  response:
+    body: {string: !!python/unicode '{"id":180,"url":"http://www.tvmaze.com/shows/180/firefly","name":"Firefly","type":"Scripted","language":"English","genres":["Adventure","Science-Fiction","Western"],"status":"Ended","runtime":60,"premiered":"2002-09-20","schedule":{"time":"20:00","days":["Friday"]},"rating":{"average":9.4},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3548,"thetvdb":78874,"imdb":"tt0303461"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2600.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2600.jpg"},"summary":"<p>Five
+        hundred years in the future, a renegade crew aboard a small spacecraft tries
+        to survive as they travel the unknown parts of the galaxy and evade warring
+        factions as well as authority agents out to get them.</p>","updated":1449590156,"_links":{"self":{"href":"http://api.tvmaze.com/shows/180"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/13006"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 13:06:29 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/180/episodebynumber?season=1&number=13
+  response:
+    body: {string: !!python/unicode '{"id":13007,"url":"http://www.tvmaze.com/episodes/13007/firefly-1x13-heart-of-gold","name":"Heart
+        of Gold","season":1,"number":13,"airdate":"","airtime":"20:00","airstamp":null,"runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/9/23981.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/9/23981.jpg"},"summary":"<p>The
+        crew comes to the aid of a bordello when its madam, an old acquaintance of
+        Inara''s, asks for help after a rancher claims a prostitute''s baby is his
+        and he''s taking it because his wife is barren.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/13007"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 13:06:29 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
 version: 1
