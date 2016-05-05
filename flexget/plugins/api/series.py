@@ -312,7 +312,7 @@ series_list_parser.add_argument('page', type=int, default=1, help='Page number. 
 series_list_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Max is 100.')
 
 series_list_parser.add_argument('sort_by', choices=('show_name', 'last_download_date'),
-                                default='show_name',
+                                default='last_download_date',
                                 help="Sort response by attribute.")
 series_list_parser.add_argument('descending', type=inputs.boolean, default=True, store_missing=True,
                                 help="Sorting order.")
