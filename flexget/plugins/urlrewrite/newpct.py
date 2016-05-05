@@ -32,19 +32,22 @@ class UrlRewriteNewPCT(object):
 
     @plugin.internet(log)
     def parse_download_page(self, url):
-        if 'newpct1.com/' in url:
+        if 'newpct1.com' in url:
             log.verbose('Newpct1 URL: %s', url)
             url = url.replace('newpct1.com/', 'newpct1.com/descarga-torrent/')
         else:
             log.verbose('Newpct URL: %s', url)
 
-        page = requests.get(url)
+        try:
+            page = requests.get(url)
+        except requests.exceptions.RequestException as e:
+            raise UrlRewritingError(e)
         try:
             soup = get_soup(page.text)
         except Exception as e:
             raise UrlRewritingError(e)
 
-        if 'newpct1.com/' in url:
+        if 'newpct1.com' in url:
             torrent_id_prog = re.compile(r'descargar-torrent/(.+)/')
             torrent_ids = soup.findAll(href=torrent_id_prog)
         else:
@@ -54,7 +57,7 @@ class UrlRewriteNewPCT(object):
         if len(torrent_ids) == 0:
             raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
 
-        if 'newpct1.com/' in url:
+        if 'newpct1.com' in url:
             torrent_id = torrent_id_prog.search(torrent_ids[0]['href']).group(1)
             return 'http://www.newpct1.com/download/%s.torrent' % torrent_id
         else:
