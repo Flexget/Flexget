@@ -2,13 +2,13 @@ $episodes-list-backdrop-overlay-color: rgba(0, 0, 0, .65);
 
 .show-indicator {
     content: '';
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     background-color: #000;
     transform: rotate(45deg);
     position: absolute;
     left: 50%;
-    bottom: -40px;
+    bottom: -37px;
 }
 
 .series-episodes {
