@@ -36,6 +36,10 @@ class TestImdb(object):
               # test confusing names for proper parsing
               - {title: 'Dan.In.Real.Life.2007'}
               - {title: 'The Final Cut.2004.720p.proper'}
+              # tricky names for year parsing
+              - {title: '2012 2009'}
+              - {title: 'Red Riding In The Year Of Our Lord 1974 (2009) 720p BRrip X264'}
+              - {title: 'Nightmare City 2035 (2007) DVDRip'}
             imdb:
               min_votes: 20
 
@@ -130,6 +134,12 @@ class TestImdb(object):
             'Failed to lookup The Final Cut.2004.720p.proper'
         assert task.find_entry(imdb_id='tt0480242'), \
             'Failed to lookup Dan.In.Real.Life.2007'
+        assert task.find_entry(imdb_id='tt1190080'), \
+            'Failed to lookup 2012 2009'
+        assert task.find_entry(imdb_id='tt1259574'), \
+            'Failed to lookup Red Riding In The Year Of Our Lord 1974 (2009) 720p BRrip X264'
+        assert task.find_entry(imdb_id='tt0910868'), \
+            'Failed to lookup Nightmare City 2035 (2007) DVDRip'
 
     def test_year(self, execute_task):
         task = execute_task('year')
