@@ -11,24 +11,24 @@ interactions:
       body: {string: '[{"rank":1,"listed_at":"2015-01-02T02:37:24.000Z","type":"movie","movie":{"title":"12
           Angry Men","year":1957,"ids":{"trakt":309,"slug":"12-angry-men-1957","imdb":"tt0050083","tmdb":389}}}]'}
       headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-ray: [296c89f46a02094a-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 20 Apr 2016 23:57:30 GMT']
-        etag: [W/"93653854caa3e8100ef7720355448509"]
-        last-modified: ['Wed, 20 Apr 2016 22:56:59 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=de1f00106ac025ab28745bd3d063327761461196649; expires=Thu,
-            20-Apr-17 23:57:29 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-private-user: ['false']
-        x-request-id: [aa344116-171a-4274-856c-d35fac630391]
-        x-runtime: ['0.189344']
-        x-sort-by: [rank]
-        x-sort-how: [asc]
-        x-xss-protection: [1; mode=block]
+        CF-RAY: [29de2384cf701fdc-DFW]
+        Cache-Control: ['max-age=0, private, must-revalidate']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:30 GMT']
+        ETag: [W/"9bfc893700145af3619e47a6b51a1884"]
+        Last-Modified: ['Wed, 04 May 2016 07:23:41 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=dbbea9eaa36c5c4bc11097bb9a935d63a1462387830; expires=Thu,
+            04-May-17 18:50:30 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Private-User: ['false']
+        X-Request-Id: [48c31364-65df-4af1-ae79-f41935537c50]
+        X-Runtime: ['0.028365']
+        X-Sort-By: [rank]
+        X-Sort-How: [asc]
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

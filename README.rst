@@ -32,6 +32,9 @@ directory support or provide interface for external utilities like FlexGet.
 .. image:: https://badges.gitter.im/Flexget/Flexget.svg
     :alt: Join the chat at https://gitter.im/Flexget/Flexget
     :target: https://gitter.im/Flexget/Flexget?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+    
+.. image:: http://isitmaintained.com/badge/resolution/Flexget/Flexget.svg
+    :target: http://isitmaintained.com/project/Flexget/Flexget
 
 
 **Help:** http://discuss.flexget.com/
