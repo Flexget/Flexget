@@ -314,7 +314,8 @@ series_list_parser.add_argument('page_size', type=int, default=10, help='Shows p
 series_list_parser.add_argument('sort_by', choices=('show_name', 'last_download_date'),
                                 default='show_name',
                                 help="Sort response by attribute.")
-series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
+series_list_parser.add_argument('descending', type=inputs.boolean, default=True, store_missing=True,
+                                help="Sorting order.")
 series_list_parser.add_argument('lookup', choices=('tvdb', 'tvmaze'), action='append',
                                 help="Get lookup result for every show by sending another request to lookup API")
 
@@ -337,13 +338,6 @@ class SeriesListAPI(APIResource):
         if page_size > 100:
             page_size = 100
 
-        order = args['order']
-        # In case the default 'desc' order was received
-        if order == 'desc':
-            descending = True
-        else:
-            descending = False
-
         start = page_size * (page - 1)
         stop = start + page_size
 
@@ -355,7 +349,7 @@ class SeriesListAPI(APIResource):
             'start': start,
             'stop': stop,
             'sort_by': args.get('sort_by'),
-            'descending': descending,
+            'descending': args.get('descending'),
             'session': session
 
         }
