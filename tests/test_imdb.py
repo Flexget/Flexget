@@ -40,6 +40,7 @@ class TestImdb(object):
               - {title: '2012 2009'}
               - {title: 'Red Riding In The Year Of Our Lord 1974 (2009) 720p BRrip X264'}
               - {title: 'Nightmare City 2035 (2007) DVDRip'}
+              - {title: '2010'}
             imdb:
               min_votes: 20
 
@@ -140,6 +141,9 @@ class TestImdb(object):
             'Failed to lookup Red Riding In The Year Of Our Lord 1974 (2009) 720p BRrip X264'
         assert task.find_entry(imdb_id='tt0910868'), \
             'Failed to lookup Nightmare City 2035 (2007) DVDRip'
+        assert task.find_entry(imdb_id='tt0086837'), \
+            'Failed to lookup 2010'
+
 
     def test_year(self, execute_task):
         task = execute_task('year')
