@@ -1,14 +1,15 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import logging
 import re
 import time
 from datetime import datetime, timedelta
 
+
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from dateutil.parser import parse as dateutil_parse
+from past.builtins import basestring
 from sqlalchemy import Table, Column, Integer, String, Unicode, Date, DateTime, Time, or_, func
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
@@ -20,7 +21,7 @@ from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
-from flexget.utils import requests
+from flexget.utils import requests, json
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.tools import TimedDict
@@ -246,13 +247,14 @@ class TraktTranslation(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(Unicode)
 
+
 show_trans_table = Table('trakt_show_trans', Base.metadata,
-                          Column('show_id', Integer, ForeignKey('trakt_shows.id')),
-                          Column('trans_id', Integer, ForeignKey('trakt_translations.id')))
+                         Column('show_id', Integer, ForeignKey('trakt_shows.id')),
+                         Column('trans_id', Integer, ForeignKey('trakt_translations.id')))
 Base.register_table(show_trans_table)
 movie_trans_table = Table('trakt_movie_trans', Base.metadata,
-                           Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
-                           Column('trans_id', Integer, ForeignKey('trakt_translations.id')))
+                          Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
+                          Column('trans_id', Integer, ForeignKey('trakt_translations.id')))
 Base.register_table(movie_trans_table)
 
 
@@ -290,6 +292,7 @@ def get_translation(ident, style):
         return translations
     except requests.RequestException as e:
         log.debug('Error adding translations to trakt id %s : %s'.format(ident, e))
+
 
 trans_show_table = Table('show_trans', Base.metadata,
                          Column('show_id', Integer, ForeignKey('trakt_shows.id')),
@@ -423,7 +426,7 @@ class TraktActor(Base):
             'trakt_id': self.id,
             'imdb_id': self.imdb,
             'tmdb_id': self.tmdb,
-            'images': self.images
+            'images': list_images(self.images)
         }
 
 
@@ -482,7 +485,7 @@ def get_db_actors(ident, style):
 def list_images(images):
     res = {}
     for image in images:
-        res.setdefault(image.ident, {})[image.style]=image.url
+        res.setdefault(image.ident, {})[image.style] = image.url
     return res
 
 
@@ -506,10 +509,10 @@ def list_actors(actors):
             'imdb_id': str(actor.imdb),
             'trakt_slug': actor.slug,
             'tmdb_id': str(actor.tmdb),
-            'birthday': actor.birthday,
+            'birthday': actor.birthday.strftime("%Y/%m/%d") if actor.birthday else None,
             'biography': actor.biography,
             'homepage': actor.homepage,
-            'death': actor.death,
+            'death': actor.death.strftime("%Y/%m/%d") if actor.death else None,
             'images': list_images(actor.images)
         }
         res[str(actor.id)] = info
@@ -616,7 +619,7 @@ class TraktShow(Base):
             "overview": self.overview,
             "first_aired": self.first_aired,
             "air_day": self.air_day,
-            "air_time": self.air_time,
+            "air_time": self.air_time.strftime("%H:%M"),
             "timezone": self.timezone,
             "runtime": self.runtime,
             "certification": self.certification,
@@ -629,7 +632,7 @@ class TraktShow(Base):
             "homepage": self.homepage,
             "number_of_aired_episodes": self.aired_episodes,
             "genres": [g.name for g in self.genres],
-            "actors": [a.to_dict() for a in self.actors],
+            "actors": list_actors(self.actors),
             "updated_at": self.updated_at,
             "cached_at": self.cached_at,
             "images": list_images(self.images)
@@ -780,7 +783,7 @@ class TraktMovie(Base):
             "homepage": self.homepage,
             "trailer": self.trailer,
             "genres": [g.name for g in self.genres],
-            "actors": [a.to_dict() for a in self.actors],
+            "actors": list_actors(self.actors),
             "updated_at": self.updated_at,
             "cached_at": self.cached_at,
             "images": list_images(self.images)

@@ -11,6 +11,8 @@ trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 
 
 class objects_container(object):
+    images_object = {'type': 'array', 'items': {'type': 'string'}}
+
     actor_object = {
         'type': 'object',
         'properties': {
@@ -18,7 +20,12 @@ class objects_container(object):
             "name": {'type': 'string'},
             "tmdb_id": {'type': 'integer'},
             "trakt_id": {'type': 'integer'},
-            "images": {'type': 'object'}
+            "images": images_object,
+            "trakt_slug": {'type': 'string'},
+            "birthday": {'type': 'string'},
+            "biography": {'type': 'string'},
+            "homepage": {'type': 'string'},
+            "death": {'type': 'string'}
         }
     }
 
@@ -35,8 +42,7 @@ class objects_container(object):
             "votes": {'type': 'integer'},
             "language": {'type': 'string'},
             "updated_at": {'type': 'string', 'format': 'date-time'},
-            "images": {'type': 'object'}
-
+            "images": images_object
         }
     }
 

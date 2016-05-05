@@ -1,6 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import argparse
 import logging
@@ -9,6 +7,8 @@ import time
 from copy import copy
 from datetime import datetime, timedelta
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
 from sqlalchemy.exc import OperationalError
@@ -444,7 +444,7 @@ def get_latest_status(episode):
 
 @with_session
 def get_series_summary(configured=None, premieres=None, status=None, days=None, start=None, stop=None, count=False,
-                       session=None):
+                       sort_by='show_name', descending=None, session=None):
     """
     Return a query with results for all series.
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
@@ -481,6 +481,11 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
     if count:
         return query.count()
+    if sort_by == 'show_name':
+        order_by = Series.name
+    elif sort_by == 'last_download_date':
+        order_by = func.max(Release.first_seen)
+    query = query.order_by(desc(order_by)) if descending else query.order_by(order_by)
     query = query.slice(start, stop).from_self()
     return query
 
