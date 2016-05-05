@@ -17,6 +17,9 @@
 
     function episodesReleasesController($http, $filter, $mdDialog, seriesService) {
         var vm = this;
+
+        loadReleases();
+
         //Call from a release item, to reset the release
         vm.resetRelease = function(release) {
 
@@ -55,7 +58,17 @@
                     }
                 })
             })
+        }
 
+
+        function loadReleases() {
+            $http.get('/api/series/' + vm.show.show_id + '/episodes/' + vm.episode.episode_id + '/releases')
+            .success(function(data) {
+                vm.releases = data.releases;
+
+            }).error(function(error) {
+                console.log(error);
+            });
         }
     }
 })();

@@ -18,7 +18,6 @@
     function seriesEpisodeController($mdDialog, $http, $stateParams, $filter){
         var vm = this;
 
-        loadReleases();
 
         vm.showReleases = function () {
 
@@ -51,8 +50,6 @@
                 .success(function(data) {
                     //Remove all loaded releases from the page and set variables for the accordion
                     vm.releases = undefined;
-                    vm.episode.episode_number_of_releases = 0;
-                    releasesOpen = false;
                 })
                 .error(function(error) {
                     var errorDialog = $mdDialog.alert()
@@ -65,15 +62,5 @@
             });
         }
 
-
-        function loadReleases() {
-            $http.get('/api/series/' + vm.show.show_id + '/episodes/' + vm.episode.episode_id + '/releases')
-            .success(function(data) {
-                vm.releases = data.releases;
-
-            }).error(function(error) {
-                console.log(error);
-            });
-        }
     }
 })();
