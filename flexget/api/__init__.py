@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import json
 import logging
@@ -23,7 +23,7 @@ from flexget.utils.database import with_session
 from flexget.webserver import User
 from flexget.webserver import register_app, get_secret
 
-__version__ = '0.5.2-beta'
+__version__ = '0.5.3-beta'
 
 log = logging.getLogger('api')
 

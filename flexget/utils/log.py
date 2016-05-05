@@ -1,6 +1,6 @@
 """Logging utilities"""
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import hashlib

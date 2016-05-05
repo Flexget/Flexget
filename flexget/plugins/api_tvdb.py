@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 from datetime import datetime, timedelta
@@ -436,14 +436,14 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         log.debug('Series %s not found in cache, looking up from tvdb.', id_str())
         if tvdb_id:
             series = session.merge(TVDBSeries(tvdb_id))
-            _update_search_strings(series, session, search=name)
         elif name:
             tvdb_id = find_series_id(name)
             if tvdb_id:
                 series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
                 if not series:
                     series = session.merge(TVDBSeries(tvdb_id))
-                    _update_search_strings(series, session, search=name)
+        if series:
+            _update_search_strings(series, session, search=name)
 
     if not series:
         raise LookupError('No results found from tvdb for %s' % id_str())

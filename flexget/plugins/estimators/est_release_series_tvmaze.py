@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 
 import logging
@@ -30,7 +30,7 @@ class EstimatesSeriesTVMaze(object):
         title, year_match = split_title_year(series_name)
 
         kwargs = {}
-        kwargs['maze_id'] = entry.get('tvmaze_id')
+        kwargs['tvmaze_id'] = entry.get('tvmaze_id')
         kwargs['tvdb_id'] = entry.get('tvdb_id') or entry.get('trakt_series_tvdb_id')
         kwargs['tvrage_id'] = entry.get('tvrage_id') or entry.get('trakt_series_tvrage_id')
         kwargs['imdb_id'] = entry.get('imdb_id')

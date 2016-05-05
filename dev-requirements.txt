@@ -13,4 +13,6 @@ pytest >= 2.7
 pytest-capturelog
 pytest-xdist
 pytest-runner
+pytest-cov
 gitpython
+codacy-coverage

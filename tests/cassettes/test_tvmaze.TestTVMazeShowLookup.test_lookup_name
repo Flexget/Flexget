@@ -1,48 +1,27 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        !!python/unicode 'Connection': [!!python/unicode 'close']
-        !!python/unicode 'Host': [!!python/unicode 'api.tvmaze.com']
-        !!python/unicode 'User-Agent': [!!python/unicode 'Python-urllib/2.7']
-      method: !!python/unicode 'GET'
-      uri: http://api.tvmaze.com/singlesearch/shows?q=House&embed=cast
-    response:
-      body: {string: !!python/unicode '{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255,"imdb":"tt0412142"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/43/109520.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/43/109520.jpg"},"summary":"<p>Sink
-          your teeth into meaty drama and intrigue with <em><strong>\"House\"</strong></em>,
-          FOX''s take on mystery, where the villain is a medical malady and the hero
-          is an irreverent, controversial doctor who trusts no one, least of all his
-          patients.</p>","updated":1457120192,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}},"_embedded":{"cast":[{"person":{"id":25439,"url":"http://www.tvmaze.com/people/25439/hugh-laurie","name":"Hugh
-          Laurie","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/46/117107.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/46/117107.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/25439"}}},"character":{"id":32873,"url":"http://www.tvmaze.com/characters/32873/house-dr-gregory-house","name":"Dr.
-          Gregory House","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1348.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1348.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32873"}}}},{"person":{"id":17012,"url":"http://www.tvmaze.com/people/17012/robert-sean-leonard","name":"Robert
-          Sean Leonard","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7478.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7478.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/17012"}}},"character":{"id":32876,"url":"http://www.tvmaze.com/characters/32876/house-dr-james-wilson","name":"Dr.
-          James Wilson","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1349.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1349.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32876"}}}},{"person":{"id":6320,"url":"http://www.tvmaze.com/people/6320/omar-epps","name":"Omar
-          Epps","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/996.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/996.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/6320"}}},"character":{"id":32875,"url":"http://www.tvmaze.com/characters/32875/house-dr-eric-foreman","name":"Dr.
-          Eric Foreman","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1350.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1350.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32875"}}}},{"person":{"id":7641,"url":"http://www.tvmaze.com/people/7641/jesse-spencer","name":"Jesse
-          Spencer","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/28/71015.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/28/71015.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/7641"}}},"character":{"id":32877,"url":"http://www.tvmaze.com/characters/32877/house-dr-robert-chase","name":"Dr.
-          Robert Chase","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1353.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1353.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32877"}}}},{"person":{"id":17144,"url":"http://www.tvmaze.com/people/17144/lisa-edelstein","name":"Lisa
-          Edelstein","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2908.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2908.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/17144"}}},"character":{"id":32874,"url":"http://www.tvmaze.com/characters/32874/house-dr-lisa-cuddy","name":"Dr.
-          Lisa Cuddy","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1352.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1352.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32874"}}}},{"person":{"id":12399,"url":"http://www.tvmaze.com/people/12399/peter-jacobson","name":"Peter
-          Jacobson","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7479.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7479.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/12399"}}},"character":{"id":32878,"url":"http://www.tvmaze.com/characters/32878/house-dr-christopher-taub","name":"Dr.
-          Christopher Taub","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1360.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1360.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32878"}}}},{"person":{"id":25440,"url":"http://www.tvmaze.com/people/25440/olivia-wilde","name":"Olivia
-          Wilde","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2887.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2887.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/25440"}}},"character":{"id":32879,"url":"http://www.tvmaze.com/characters/32879/house-dr-remy-thirteen-hadley","name":"Dr.
-          Remy \"Thirteen\" Hadley","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1359.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1359.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32879"}}}},{"person":{"id":2911,"url":"http://www.tvmaze.com/people/2911/jennifer-morrison","name":"Jennifer
-          Morrison","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/4212.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/4212.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/2911"}}},"character":{"id":32882,"url":"http://www.tvmaze.com/characters/32882/house-dr-allison-cameron","name":"Dr.
-          Allison Cameron","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1351.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1351.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32882"}}}},{"person":{"id":23121,"url":"http://www.tvmaze.com/people/23121/kal-penn","name":"Kal
-          Penn","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7482.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7482.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/23121"}}},"character":{"id":32883,"url":"http://www.tvmaze.com/characters/32883/house-dr-lawrence-kutner","name":"Dr.
-          Lawrence Kutner","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1356.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1356.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32883"}}}},{"person":{"id":8111,"url":"http://www.tvmaze.com/people/8111/odette-annable","name":"Odette
-          Annable","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7480.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7480.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8111"}}},"character":{"id":32880,"url":"http://www.tvmaze.com/characters/32880/house-dr-jessica-adams","name":"Dr.
-          Jessica Adams","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1354.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1354.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32880"}}}},{"person":{"id":25441,"url":"http://www.tvmaze.com/people/25441/charlyne-yi","name":"Charlyne
-          Yi","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7481.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7481.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/25441"}}},"character":{"id":32881,"url":"http://www.tvmaze.com/characters/32881/house-dr-chi-park","name":"Dr.
-          Chi Park","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1355.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1355.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/32881"}}}}]}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [close]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Tue, 15 Mar 2016 01:27:39 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.14]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=House
+  response:
+    body: {string: !!python/unicode '{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":2,"network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255,"imdb":"tt0412142"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/43/109520.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/43/109520.jpg"},"summary":"<p>Sink
+        your teeth into meaty drama and intrigue with <em><strong>\"House\"</strong></em>,
+        FOX''s take on mystery, where the villain is a medical malady and the hero
+        is an irreverent, controversial doctor who trusts no one, least of all his
+        patients.</p>","updated":1459815657,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 03 May 2016 13:06:12 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+    status: {code: 200, message: OK}
 version: 1

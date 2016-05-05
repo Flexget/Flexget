@@ -19,6 +19,23 @@ body {
     overflow-y: auto;
 }
 
+.construction-icon {
+	font-size: 10em;
+}
+
+.animate-remove.ng-leave {
+	-webkit-transition: all 0.75s ease-in-out;
+	-moz-transition: all 0.75s ease-in-out;
+  	transition: all 0.75s ease-in-out;
+}
+
+.animate-remove.ng-leave {
+	opacity: 1;
+}
+
+.animate-remove.ng-leave.ng-leave-active {
+	opacity: 0;
+}
 
 /*  inject sass files automatically */
 // injector
