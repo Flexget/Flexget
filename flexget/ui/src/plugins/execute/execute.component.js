@@ -9,7 +9,7 @@
           controller: executeController,
         });
 
-    function executeController($scope, $interval, $q, tasks) {
+    function executeController($scope, $interval, $q, tasks, $filter) {
         var vm = this,
             allTasks = [];
 
@@ -113,57 +113,26 @@
                 vm.stream.percent = totalPercent / vm.stream.tasks.length;
             };
 
-            var getTask = function (name) {
-                for (var i = 0; i < vm.stream.tasks.length; i++) {
-                    var task = vm.stream.tasks[i];
-                    if (task.name == name) {
-                        return task
-                    }
-                }
-            };
-
-            /*var streamTask = function (name) {
-                var task = getTask(name);
-
-                var options = {};
-                angular.copy(vm.options.settings, options);
-                angular.forEach(vm.options.optional, function (setting) {
-                    //options[setting.name] = setting.value;
-                });
-
-                return tasks.execute(name, options)
-                    .log(function (log) {
-                        task.log.push(log);
-                    })
-                    .progress(function (update) {
-                        angular.extend(task, update);
-                        updateProgress();
-                    })
-                    .summary(function (update) {
-                        angular.extend(task, update);
-                        updateProgress();
-                    })
-                    .entry_dump(function (entries) {
-                        task.entries = entries;
-                    });
-            };*/
-
-            /*var done = vm.tasksInput.tasks.reduce(function (previous, taskName) {
-                return previous.then(function () {
-                    if (vm.stream.running) {
-                        return streamTask(taskName);
-                    }
-                });
-            }, $q.when());
-
-            done.then(function () {
-                vm.stream.running = false;
-                vm.stream.percent = 100;
-            });*/
-
             var options = {};
             angular.copy(vm.options.settings, options);
-            tasks.execute(vm.tasksInput.tasks, options);
+            tasks.execute(vm.tasksInput.tasks, options)
+                .log(function(log) {
+                    console.log(log);
+                })
+                .progress(function (update) {
+                    var filtered = $filter('filter')(vm.stream.tasks, { status: '!complete' });
+                    angular.extend(filtered[0], update);
+                    updateProgress();
+                })
+                .summary(function (update) {
+                    var filtered = $filter('filter')(vm.stream.tasks, { status: 'complete' });
+                    angular.extend(filtered[filtered.length - 1], update);
+                    updateProgress();
+                })
+                .entry_dump(function (entries) {
+                    var filtered = $filter('filter')(vm.stream.tasks, { status: 'complete' });
+                    angular.extend(filtered[filtered.length - 1], { entries: entries });
+                });
         };
 
         var getRunning = function () {
