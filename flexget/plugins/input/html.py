@@ -169,9 +169,6 @@ class InputHtml(object):
             # not a valid link
             if not link.has_attr('href'):
                 continue
-            # no content in the link
-            if not link.contents:
-                continue
 
             url = link['href']
             # fix broken urls
@@ -238,10 +235,6 @@ class InputHtml(object):
             else:
                 raise plugin.PluginError('Unknown title_from value %s' % title_from)
 
-            if not title:
-                log.warning('title could not be determined for link %s' % log_link)
-                continue
-
             # strip unicode white spaces
             title = title.replace(u'\u200B', u'').strip()
 
@@ -250,11 +243,13 @@ class InputHtml(object):
             if title.lower().find('.torrent') > 0:
                 title = title[:title.lower().find('.torrent')]
 
-            if title_exists(title):
+            if not title or title_exists(title):
                 # title link should be unique, add CRC32 to end if it's not
                 hash = zlib.crc32(url.encode("utf-8"))
                 crc32 = '%08X' % (hash & 0xFFFFFFFF)
-                title = '%s [%s]' % (title, crc32)
+                if title:
+                    title+=" "
+                title = '%s[%s]' % (title, crc32)
                 # truly duplicate, title + url crc already exists in queue
                 if title_exists(title):
                     continue
