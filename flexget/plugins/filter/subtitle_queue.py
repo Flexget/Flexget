@@ -111,7 +111,8 @@ class SubtitleQueue(object):
                     'alternate_path': {'type': 'string'},
                 },
                 'required': ['action'],
-                'additionalProperties': False
+                'additionalProperties': False,
+                'deprecated': 'subtitle_queue plugin is deprecated. Please switch to subtitle_list'
             },
             {
                 'type': 'string', 'enum': ['emit']
