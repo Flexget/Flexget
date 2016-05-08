@@ -1,0 +1,126 @@
+from __future__ import unicode_literals, division, absolute_import
+
+import logging
+from collections import MutableSet
+
+import ftputil.session
+
+from flexget import plugin
+from flexget.config_schema import one_or_more
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.plugin import DependencyError
+
+try:
+    import ftputil
+
+    imported = True
+except ImportError:
+    imported = False
+
+log = logging.getLogger('ftp_list')
+
+
+class FTPListSet(MutableSet):
+    def _prepare_config(self):
+        self.config.setdefault('retrieve', ['files'])
+
+    def _connect(self):
+        self.username = self.config.get('username')
+        self.password = self.config.get('password')
+        self.host = self.config.get('host')
+        self.port = self.config.get('port')
+        session_factory = ftputil.session.session_factory(port=self.port)
+        return ftputil.FTPHost(self.host, self.username, self.password, session_factory=session_factory)
+
+    def _to_entry(self, base, object):
+        entry = Entry()
+        entry['title'] = object
+        entry['location'] = '{}'.format(self.FTP.path.join(base, object))
+        entry['url'] = 'ftp://{}:{}@{}:{}/{}'.format(self.username, self.password, self.host, self.port,
+                                                     self.FTP.path.join(base, object))
+
+    def _list_entries(self):
+        entries = []
+        with self.FTP as ftp:
+            for base, dirs, files in ftp.walk(ftp.curdir):
+                if 'files' in self.config['retrieve']:
+                    for file in files:
+                        entries.append(self._to_entry(base, file))
+                if 'dirs' in self.config['retrieve']:
+                    for dir in dirs:
+                        entries.append(self._to_entry(base, dir))
+        return entries
+
+    def _entry_match(self, entry):
+        for _entry in self._list_entries():
+            if entry['title'] == _entry['title']:
+                return _entry
+
+    def __init__(self, config):
+        if not imported:
+            raise DependencyError('ftp_list', 'ftp_list', 'ftputil is required for this plugin')
+        self.config = config
+        self._prepare_config()
+        self.FTP = self._connect()
+
+    def __iter__(self):
+        return self._list_entries()
+
+    def __len__(self):
+        return len(self._list_entries())
+
+    def __contains__(self, entry):
+        return self._entry_match(entry) is not None
+
+    def discard(self, entry):
+        match = self._entry_match(entry)
+        if match:
+            self.FTP.remove(match['location'])
+
+    def add(self, entry):
+        path = entry.get('location') or entry.get('path')
+        if path:
+            self.FTP.upload(path, '/')
+
+    @property
+    def immutable(self):
+        return False
+
+    def _from_iterable(self, it):
+        return set(it)
+
+    @property
+    def online(self):
+        """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
+        like test mode"""
+        return True
+
+    def get(self, entry):
+        return self._entry_match(entry)
+
+
+class FTPList(object):
+    schema = {
+        'type': 'object',
+        'properties': {
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'host': {'type': 'string'},
+            'port': {'type': 'integer'},
+            'retrieve': one_or_more({'type': 'string', 'enum': ['files', 'dirs']}, unique_items=True)
+        },
+        'required': ['username', 'password', 'host', 'port']
+    }
+
+    @staticmethod
+    def get_list(config):
+        return FTPListSet(config)
+
+    def on_task_input(self, task, config):
+        return list(FTPListSet(config))
+
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FTPList, 'ftp_list', api_ver=2, groups=['list'])
