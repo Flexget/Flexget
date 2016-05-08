@@ -237,7 +237,7 @@ class FilterSeen(object):
             return
 
         fields = config.get('fields')
-        local = config.get('local') == 'local'
+        local = (config.get('local') is True or config.get('local') == 'local')
 
         for entry in task.entries:
             # construct list of values looked
