@@ -224,25 +224,25 @@ class PluginSubtitleList(object):
     def on_task_input(self, task, config):
         subtitle_list = SubtitleList(config)
         if config['check_subtitles']:
-            try:
-                import subliminal
-                for file in subtitle_list:
-                    existing_subtitles = set(subliminal.core.search_external_subtitles(file['location']).values())
-                    wanted_languages = set(file['subtitle_languages']) or set(config.get('languages', []))
-                    file_exists = os.path.isfile(file['location'])
-                    if not file_exists:
-                        log.error('File %s does not exist. Removing from list.', file['location'])
-                    elif self._expired(file, config):
-                        log.verbose('File %s has been in the list for %s. Removing from list.', file['location'],
-                                    file['remove_after'] or config['remove_after'])
-                    elif wanted_languages and len(wanted_languages - existing_subtitles) == 0:
-                        log.verbose('Local subtitle(s) already exists for %s. Removing from list.', file['location'])
-                    else:
-                        continue
-                    # if we did not hit the else branch, the file should be removed from the list
+            for file in subtitle_list:
+                if not os.path.isfile(file['location']):
+                    log.error('File %s does not exist. Removing from list.', file['location'])
                     subtitle_list -= [file]
-            except ImportError:
-                log.warning('Subliminal not found. Unable to check for local subtitles. Skipping.')
+                elif self._expired(file, config):
+                    log.verbose('File %s has been in the list for %s. Removing from list.', file['location'],
+                                file['remove_after'] or config['remove_after'])
+                    subtitle_list -= [file]
+                else:
+                    try:
+                        import subliminal
+                        existing_subtitles = set(subliminal.core.search_external_subtitles(file['location']).values())
+                        wanted_languages = set(file['subtitle_languages']) or set(config.get('languages', []))
+                        if wanted_languages and len(wanted_languages - existing_subtitles) == 0:
+                            log.verbose('Local subtitle(s) already exists for %s. Removing from list.',
+                                        file['location'])
+                            subtitle_list -= [file]
+                    except ImportError:
+                        log.warning('Subliminal not found. Unable to check for local subtitles.')
 
         return list(subtitle_list)
 
