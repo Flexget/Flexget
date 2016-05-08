@@ -17,13 +17,13 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.tools import split_title_year
 
-log = logging.getLogger('movie_list')
-Base = versioned_base('movie_list', 0)
+log = logging.getLogger('subtitle_list')
+Base = versioned_base('subtitle_list', 1)
 
 
-association_table = Table('association', Base.metadata,
-                          Column('subtitle_list_file_id', Integer, ForeignKey('subtitle_list_files.id')),
-                          Column('subtitle_list_language_id', Integer, ForeignKey('subtitle_list_languages.id')))
+association_table = Table('file_lang_association', Base.metadata,
+                          Column('subtitle_list_files_id', Integer, ForeignKey('subtitle_list_files.id')),
+                          Column('subtitle_list_languages_id', Integer, ForeignKey('subtitle_list_languages.id')))
 Base.register_table(association_table)
 
 
@@ -56,7 +56,7 @@ class SubtitleListFile(Base):
     title = Column(Unicode)
     location = Column(Unicode)
     list_id = Column(Integer, ForeignKey(SubtitleListList.id), nullable=False)
-    languages = relationship('SubtitleListLanguage', backref='file', cascade='all, delete, delete-orphan')
+    languages = relationship('SubtitleListLanguage', secondary=association_table, backref="file", lazy='joined')
 
     def __repr__(self):
         return '<SubtitleListFile title=%s,path=%s,list_id=%d>' % (self.title, self.location, self.list_id)
@@ -88,6 +88,18 @@ class SubtitleListLanguage(Base):
     added = Column(DateTime, default=datetime.now)
     language = Column(Unicode)
 
+    def __eq__(self, other):
+        if isinstance(other, SubtitleListLanguage):
+            return self.language == other.language
+        else:
+            return False
+
+    def __ne__(self, other):
+        return (not self.__eq__(other))
+
+    def __hash__(self):
+        return hash(self.__repr__())
+
     def __repr__(self):
         return '<SubtitleListLanguage id=%s,language=%s>' % (self.id, self.language)
 
@@ -100,6 +112,16 @@ class SubtitleListLanguage(Base):
 
 
 class SubtitleList(MutableSet):
+    schema = {
+        'type': 'object',
+        'properties': {
+            'list': {'type': 'string'},
+            'languages': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
+        },
+        'required': ['list'],
+        'additionalProperties': False
+    }
+
     def _db_list(self, session):
         return session.query(SubtitleListList).filter(SubtitleListList.name == self.config['list']).first()
 
@@ -133,12 +155,15 @@ class SubtitleList(MutableSet):
         db_file = SubtitleListFile()
         db_file.title = entry['title']
         db_file.location = entry['location']
-        for subtitle_language in self.config['languages']:
+        db_file.languages = []
+        languages = set()
+        for subtitle_language in self.config.get('languages', []):
             normalized_language = normalize_language(subtitle_language)
             language = self._find_language(normalized_language)
             if not language:
                 language = SubtitleListLanguage(language=normalized_language)
-            db_file.languages.append(language)
+            languages.add(language)
+        db_file.languages.extend(list(languages))
         log.debug('adding entry %s', entry)
         db_list.files.append(db_file)
         session.commit()
@@ -176,10 +201,15 @@ class SubtitleList(MutableSet):
         like test mode"""
         return False
 
+    @with_session
+    def get(self, entry, session):
+        match = self._find_entry(entry=entry, session=session)
+        return match.to_entry() if match else None
+
 
 class PluginSubtitleList(object):
     """Subtitle list"""
-    schema = {'type': 'string'}
+    schema = SubtitleList.schema
 
     @staticmethod
     def get_list(config):
