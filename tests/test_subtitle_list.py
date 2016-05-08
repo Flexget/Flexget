@@ -8,6 +8,7 @@ import sys
 import pytest
 
 from flexget.manager import Session
+from flexget.plugins.list.subtitle_list import SubtitleListFile
 
 try:
     import babelfish
@@ -35,6 +36,7 @@ class TestSubtitleList(object):
              template: no_global
              subtitle_list:
                list: test
+               languages: [en]
            subtitle_remove:
              #subtitle_list:
              #  list: test
@@ -80,7 +82,7 @@ class TestSubtitleList(object):
              template: no_global
              mock:
                - {title: 'The Walking Dead S06E08', location:
-                  'tvmaze_test_dir/shows/The walking dead/The.Walking.Dead.S06E08.Start.to.Finish-SiCKBEARD.mp4'}
+                  'subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4'}
              accept_all: yes
              list_add:
                - subtitle_list:
@@ -90,13 +92,32 @@ class TestSubtitleList(object):
              template: no_global
              mock:
                - {title: "Marvel's Jessica Jones S01E02",
-                  location: "tvmaze_test_dir/shows/Marvel's Jessica Jones/
-                             Marvels.Jessica.Jones.S01E02.PROPER.720p.WEBRiP.x264-QCF.mkv"}
+                  location: "subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.mkv"}
              accept_all: yes
              list_add:
                - subtitle_list:
                    list: test
-
+           subtitle_add_a_third_local_file:
+             disable: seen
+             template: no_global
+             mock:
+               - {title: "The.Big.Bang.Theory.S09E09",
+                  location: "subtitle_list_test_dir/The.Big.Bang.Theory.S09E09-FlexGet.mkv"}
+             accept_all: yes
+             list_add:
+               - subtitle_list:
+                   list: test
+           subtitle_test_expiration_add:
+             disable: builtins
+             template: no_global
+             mock:
+               - {title: "The.Big.Bang.Theory.S09E09",
+                  location: "subtitle_list_test_dir/The.Big.Bang.Theory.S09E09-FlexGet.mkv"}
+             accept_all: yes
+             list_add:
+               - subtitle_list:
+                   list: test
+                   remove_after: 7 days
     """
 
     # def test_subtitle_queue_add(self, execute_task):
@@ -131,54 +152,15 @@ class TestSubtitleList(object):
     def test_subtitle_list_unique_lang(self, execute_task):
         task = execute_task('subtitle_add_with_languages')
 
-    # def test_subtitle_queue_old(self, execute_task):
-    #     config = {}
-    #     config['stop_after'] = "7 days"
-    #
-    #     queue_add('./series.mkv', 'Series', config)
-    #
-    #     with Session() as session:
-    #         s = session.query(QueuedSubtitle).first()
-    #         s.added = datetime.datetime.now() + datetime.timedelta(-8)
-    #
-    #     task = execute_task('subtitle_emit')
-    #     assert len(task.entries) == 0, 'Old entry should not be emitted.'
-    #
-    #     assert len(queue_get()) == 0, 'Old entry should have been removed.'
+    def test_subtitle_list_old(self, execute_task):
+        task = execute_task('subtitle_test_expiration_add')
 
-    # def test_subtitle_queue_update(self, execute_task):
-    #     config = {}
-    #     config['languages'] = ['en', 'eng']
-    #
-    #     queue_add('./movie.mkv', 'Movie', config)
-    #     assert queue_get()[0].stop_after == "7 days"
-    #
-    #     config['stop_after'] = "15 days"
-    #     queue_add('./movie.mkv', 'Movie', config)
-    #     assert queue_get()[0].stop_after == "15 days", 'File\'s stop_after field should have been updated.'
+        with Session() as session:
+            s = session.query(SubtitleListFile).first()
+            s.added = datetime.datetime.now() + datetime.timedelta(-8)
 
-    # def test_subtitle_queue_torrent(self, execute_task):
-    #     assert len(queue_get()) == 0, "Queue should be empty before run."
-    #     task = execute_task('subtitle_single_file_torrent')
-    #
-    #     queue = queue_get()
-    #     assert len(queue) == 1, 'Task should have accepted one item.'
-    #
-    #     assert queue[0].path == normalize_path(os.path.join('/', 'ubuntu-12.04.1-desktop-i386.iso')), \
-    #         'Queued path should be /ubuntu-12.04.1-desktop-i386.iso'
-    #
-    # def test_subtitle_queue_multi_file_torrent(self, execute_task):
-    #     assert len(queue_get()) == 0, "Queue should be empty before run."
-    #     task = execute_task('subtitle_torrent')
-    #
-    #     queue = queue_get()
-    #     assert len(queue) == 1, 'Task should have queued one item.'
-    #
-    #     assert queue[0].path == normalize_path(os.path.join('/', 'slackware-14.1-iso')), \
-    #         'Queued path should be torrent name in root dir'
-    #
-    #     assert queue[0].alternate_path == normalize_path(os.path.join('~/', 'slackware-14.1-iso')), \
-    #         'Queued path should be torrent name in user dir'
+        task = execute_task('subtitle_emit')
+        assert len(task.entries) == 0, 'File should have expired.'
 
     # Skip if subliminal is not installed or if python version <2.7
     @pytest.mark.online
@@ -204,7 +186,7 @@ class TestSubtitleList(object):
         task = execute_task('subtitle_fail')
         assert len(task.failed) == 1, 'Only one language should have been downloaded which results in failure'
         try:
-            os.remove('tvmaze_test_dir/shows/The walking dead/The.Walking.Dead.S06E08.Start.to.Finish-SiCKBEARD.en.srt')
+            os.remove('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt')
         except OSError:
             pass
 
@@ -225,10 +207,21 @@ class TestSubtitleList(object):
         task = execute_task('subtitle_emit')
         assert len(task.entries) == 1, 'Walking Dead should have been removed from the list'
         try:
-            os.remove('tvmaze_test_dir/shows/The walking dead/The.Walking.Dead.S06E08.Start.to.Finish-SiCKBEARD.en.srt')
+            os.remove('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt')
         except OSError:
             pass
         try:
-            os.remove('tvmaze_test_dir/shows/The walking dead/The.Walking.Dead.S06E08.Start.to.Finish-SiCKBEARD.ja.srt')
+            os.remove('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt')
         except OSError:
             pass
+
+    # Skip if subliminal is not installed or if python version <2.7
+    @pytest.mark.skipif(sys.version_info < (2, 7), reason='requires python2.7')
+    @pytest.mark.skipif(not subliminal, reason='requires subliminal')
+    def test_subtitle_list_local_subtitles(self, execute_task):
+        task = execute_task('subtitle_add_local_file')
+        task = execute_task('subtitle_add_another_local_file')
+        task = execute_task('subtitle_add_a_third_local_file')
+
+        task = execute_task('subtitle_emit')
+        assert len(task.entries) == 2, 'Big Bang Theory already has a local subtitle and should have been removed.'
