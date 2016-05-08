@@ -110,6 +110,7 @@ class TestFilterSeenMovies(object):
               - {title: 'Seen movie title 4', url: 'http://localhost/seen_movie4', imdb_id: 'tt0103064'}
               - {title: 'Seen movie title 5', url: 'http://localhost/seen_movie5', imdb_id: 'tt0231264'}
               - {title: 'Seen movie title 6', url: 'http://localhost/seen_movie6', tmdb_id: 123}
+              - {title: 'Seen movie title 13', url: 'http://localhost/seen_movie13', imdb_id: 'tt9901062'}
             seen_movies: loose
 
           strict:
@@ -119,6 +120,14 @@ class TestFilterSeenMovies(object):
               - {title: 'Seen movie title 9', url: 'http://localhost/seen_movie9', tmdb_id: 456}
               - {title: 'Seen movie title 10', url: 'http://localhost/seen_movie10'}
             seen_movies: strict
+
+          local:
+            mock:
+              - {title: 'Seen movie title 11', url: 'http://localhost/seen_movie11', imdb_id: 'tt0103064', tmdb_id: 123}
+              - {title: 'Seen movie title 12', url: 'http://localhost/seen_movie12', imdb_id: 'tt9901062'}
+            accept_all: yes
+            seen_movies:
+              scope: local
     """
 
     def test_seen_movies(self, execute_task):
@@ -146,3 +155,13 @@ class TestFilterSeenMovies(object):
         task = execute_task('strict')
         assert len(task.rejected) == 1, 'Too many movies were rejected'
         assert not task.find_entry(title='Seen movie title 10'), 'strict should not have passed movie 10'
+
+    def test_seen_movies_local(self, execute_task):
+        task = execute_task('local')
+        assert task.find_entry('accepted', title='Seen movie title 11'), 'local should have passed movie 11'
+        # execute again
+        task.execute()
+        assert task.find_entry('rejected', title='Seen movie title 12'), 'Test movie entry 12 should be rejected in second execution'
+        # test a global scope after
+        task = execute_task('test_2')
+        assert not task.find_entry('rejected', title='Seen movie title 13'), 'Changing scope should not have rejected Seen movie title 13'
