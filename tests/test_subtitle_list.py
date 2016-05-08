@@ -120,26 +120,6 @@ class TestSubtitleList(object):
                    remove_after: 7 days
     """
 
-    # def test_subtitle_queue_add(self, execute_task):
-    #     task = execute_task('subtitle_add')
-    #     assert len(task.entries) == 1, 'One movie should have been accepted.'
-    #
-    #     entry = task.entries[0]
-    #     assert entry.accepted
-    #
-    #     queue = queue_get()
-    #     assert len(queue) == 1, 'Accepted movie should be in queue after task is done.'
-    #
-    #     task = execute_task('subtitle_add')
-    #     assert len(task.entries) == 0, 'Movie should only be accepted once'
-    #
-    #     queue = queue_get()
-    #     assert len(queue) == 1
-    #
-    #     langs = queue[0].languages
-    #
-    #     assert len(langs) == 0, 'There should be no default language.'
-
     def test_subtitle_list_del(self, execute_task):
         task = execute_task('subtitle_add')
         task = execute_task('subtitle_emit')
