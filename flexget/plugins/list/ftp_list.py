@@ -39,6 +39,7 @@ class FTPListSet(MutableSet):
         entry['location'] = '{}'.format(self.FTP.path.join(base, object))
         entry['url'] = 'ftp://{}:{}@{}:{}/{}'.format(self.username, self.password, self.host, self.port,
                                                      self.FTP.path.join(base, object))
+        return entry
 
     def _list_entries(self):
         entries = []
@@ -65,7 +66,7 @@ class FTPListSet(MutableSet):
         self.FTP = self._connect()
 
     def __iter__(self):
-        return self._list_entries()
+        return (entry for entry in self._list_entries())
 
     def __len__(self):
         return len(self._list_entries())
