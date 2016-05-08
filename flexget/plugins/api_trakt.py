@@ -112,7 +112,7 @@ def token_auth(data):
         raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e.args[0]))
 
 
-def get_access_token(account, token=None, refresh=False, re_auth=False):
+def get_access_token(account, token=None, refresh=False, re_auth=False, called_from_cli=False):
     """
     Gets authorization info from a pin or refresh token.
     :param account: Arbitrary account name to attach authorization to.
@@ -142,9 +142,12 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
                 data['grant_type'] = 'authorization_code'
                 data['redirect_uri'] = 'urn:ietf:wg:oauth:2.0:oob'
                 token_dict = token_auth(data)
-            else:
+            elif called_from_cli:
                 log.debug('No pin specified for an unknown account %s. Attempting to authorize device.', account)
                 token_dict = device_auth()
+            else:
+                raise plugin.PluginError('Account %s has not been authorized. See `flexget trakt auth -h` on how to.' %
+                                         account)
             try:
                 access_token = token_dict['access_token']
                 refresh_token = token_dict['refresh_token']
@@ -1212,7 +1215,7 @@ def do_cli(manager, options):
             console('You must specify an account (local identifier) so we know where to save your access token!')
             return
         try:
-            get_access_token(options.account, options.pin, re_auth=True)
+            get_access_token(options.account, options.pin, re_auth=True, called_from_cli=True)
             console('Successfully authorized Flexget app on Trakt.tv. Enjoy!')
             return
         except plugin.PluginError as e:
@@ -1269,7 +1272,7 @@ def register_parser_arguments():
 
     auth_parser.add_argument('account', metavar='<account>', help=acc_text)
     auth_parser.add_argument('pin', metavar='<pin>', help='get this by authorizing FlexGet to use your trakt account '
-                                                          'at %s' % PIN_URL, nargs='?')
+                                                          'at %s. WARNING: DEPRECATED.' % PIN_URL, nargs='?')
 
     show_parser = subparsers.add_parser('show', help='show expiration date for Flexget authorization(s) (don\'t worry, '
                                                      'they will automatically refresh when expired)')
