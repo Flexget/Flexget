@@ -63,6 +63,11 @@ class FilterSeenMovies(FilterSeen):
                     else:
                         accepted_ids[field].add(entry[field])
 
+    def on_task_learn(self, task, config):
+        if not isinstance(config, dict):
+            config = {'matching': config}
+        # call super
+        super(FilterSeenMovies, self).on_task_learn(task, config.get('scope', True))
 
 @event('plugin.register')
 def register_plugin():
