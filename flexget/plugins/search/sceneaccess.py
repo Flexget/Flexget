@@ -211,11 +211,11 @@ class SceneAccessSearch(object):
 
             for category in categories:
                 try:
-                    cat_id = CATEGORIES[scope][category]
+                    id = CATEGORIES[scope][category]
                 except KeyError:            # User provided category id directly
-                    cat_id = category
+                    id = category
                 finally:
-                    if isinstance(cat_id, list):
+                    if isinstance(id, list):
                         [cat_id.append(l) for l in id]
                     else:
                         cat_id.append(cat_id)
