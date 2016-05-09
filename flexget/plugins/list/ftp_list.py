@@ -22,41 +22,7 @@ log = logging.getLogger('ftp_list')
 
 
 class FTPListSet(MutableSet):
-    def _prepare_config(self):
-        self.config.setdefault('retrieve', ['files'])
-
-    def _connect(self):
-        self.username = self.config.get('username')
-        self.password = self.config.get('password')
-        self.host = self.config.get('host')
-        self.port = self.config.get('port')
-        session_factory = ftputil.session.session_factory(port=self.port)
-        return ftputil.FTPHost(self.host, self.username, self.password, session_factory=session_factory)
-
-    def _to_entry(self, base, object):
-        entry = Entry()
-        entry['title'] = object
-        entry['location'] = '{}'.format(self.FTP.path.join(base, object))
-        entry['url'] = 'ftp://{}:{}@{}:{}/{}'.format(self.username, self.password, self.host, self.port,
-                                                     self.FTP.path.join(base, object))
-        return entry
-
-    def _list_entries(self):
-        entries = []
-        with self.FTP as ftp:
-            for base, dirs, files in ftp.walk(ftp.curdir):
-                if 'files' in self.config['retrieve']:
-                    for file in files:
-                        entries.append(self._to_entry(base, file))
-                if 'dirs' in self.config['retrieve']:
-                    for dir in dirs:
-                        entries.append(self._to_entry(base, dir))
-        return entries
-
-    def _entry_match(self, entry):
-        for _entry in self._list_entries():
-            if entry['title'] == _entry['title']:
-                return _entry
+    # Public interface
 
     def __init__(self, config):
         if not imported:
@@ -74,15 +40,33 @@ class FTPListSet(MutableSet):
     def __contains__(self, entry):
         return self._entry_match(entry) is not None
 
-    def discard(self, entry):
+    def discard(self, entry, ftp=None):
         match = self._entry_match(entry)
         if match:
-            self.FTP.remove(match['location'])
+            if not ftp:
+                with self.FTP:
+                    self.FTP.remove(match['location'])
+            else:
+                ftp.remove(match['location'])
 
-    def add(self, entry):
+    def add(self, entry, ftp=None):
         path = entry.get('location') or entry.get('path')
         if path:
-            self.FTP.upload(path, '/')
+            if not ftp:
+                with self.FTP:
+                    self.FTP.upload(path, '/')
+            else:
+                ftp.upload(path, '/')
+
+    def __ior__(self, entries):
+        with self.FTP as ftp:
+            for entry in entries:
+                self.add(entry, ftp)
+
+    def __iand__(self, entries):
+        with self.FTP as ftp:
+            for entry in entries:
+                self.discard(entry, ftp)
 
     @property
     def immutable(self):
@@ -99,6 +83,47 @@ class FTPListSet(MutableSet):
 
     def get(self, entry):
         return self._entry_match(entry)
+
+    # Internal methods
+
+    def _prepare_config(self):
+        self.config.setdefault('retrieve', ['files'])
+
+    def _connect(self):
+        self.username = self.config.get('username')
+        self.password = self.config.get('password')
+        self.host = self.config.get('host')
+        self.port = self.config.get('port')
+        session_factory = ftputil.session.session_factory(port=self.port)
+        return ftputil.FTPHost(self.host, self.username, self.password, session_factory=session_factory)
+
+    def _to_entry(self, base, object):
+        entry = Entry()
+        entry['title'] = object
+        entry['location'] = '{}'.format(self.FTP.path.join(base, object))
+        entry['url'] = 'ftp://{}:{}@{}:{}/{}'.format(self.username, self.password, self.host, self.port,
+                                                     self.FTP.path.join(base, object))
+        log.debug('adding entry {}'.format(entry))
+        return entry
+
+    def _list_entries(self):
+        entries = []
+        log.verbose('connecting to FTP: {}:<HIDDEN>@{}:{}'.format(self.username, self.host, self.port))
+        with self.FTP as ftp:
+            for base, dirs, files in ftp.walk(ftp.curdir):
+                if 'files' in self.config['retrieve']:
+                    for file in files:
+                        entries.append(self._to_entry(base, file))
+                if 'dirs' in self.config['retrieve']:
+                    for dir in dirs:
+                        entries.append(self._to_entry(base, dir))
+        return entries
+
+    def _entry_match(self, entry):
+        for _entry in self._list_entries():
+            if entry['title'] == _entry['title']:
+                log.debug('entry match found: {}'.format(_entry))
+                return _entry
 
 
 class FTPList(object):
