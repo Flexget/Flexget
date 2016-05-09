@@ -136,8 +136,8 @@ class TVMazeSeries(Base):
         self.language = series['language']
         self.schedule = series['schedule']
         self.url = series['url']
-        self.original_image = series['image'].get('original')
-        self.medium_image = series['image'].get('medium')
+        self.original_image = series.get('image').get('original') if series.get('image') else None
+        self.medium_image = series.get('image').get('medium') if series.get('image') else None
         self.tvdb_id = series['externals'].get('thetvdb')
         self.tvrage_id = series['externals'].get('tvrage')
         self.premiered = parser.parse(series.get('premiered'), ignoretz=True) if series.get('premiered') else None
