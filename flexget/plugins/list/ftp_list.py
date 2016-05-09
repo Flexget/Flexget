@@ -54,11 +54,12 @@ class FTPListSet(MutableSet):
     def add(self, entry, ftp=None):
         path = entry.get('location') or entry.get('path')
         if path:
+            log.debug('trying to upload entry {}'.format(entry))
             if not ftp:
                 with self.FTP:
-                    self.FTP.upload(path, '/')
+                    self.FTP.upload(path, entry['filename'])
             else:
-                ftp.upload(path, '/')
+                ftp.upload(path, entry['filename'])
 
     def __ior__(self, entries):
         with self.FTP as ftp:
@@ -91,6 +92,9 @@ class FTPListSet(MutableSet):
     def _prepare_config(self):
         self.config.setdefault('retrieve', ['files'])
         self.config.setdefault('use_ssl', False)
+        self.config.setdefault('dirs', ['.'])
+        if not isinstance(self.config['dirs'], list):
+            self.config['dirs'] = [self.config['dirs']]
 
     def _connect(self):
         self.username = self.config.get('username')
@@ -109,20 +113,21 @@ class FTPListSet(MutableSet):
 
     def _to_entry(self, base, object):
         entry = Entry()
-        entry['title'] = object
-        entry['location'] = '{}'.format(self.FTP.path.join(base, object))
+        entry['title'] = self.FTP.path.basename(object)
+        entry['location'] = '{}'.format(self.FTP.path.abspath(object))
         entry['url'] = 'ftp://{}:{}@{}:{}/{}'.format(self.username, self.password, self.host, self.port,
                                                      self.FTP.path.join(base, object))
+        entry['filename'] = self.FTP.path.basename(object)
         log.debug('adding entry {}'.format(entry))
         return entry
 
     def _list_entries(self):
         entries = []
-        log.verbose('connected to FTP, starting to retrfile files and dirs')
+        log.verbose('connected to FTP, starting to retrieve files and dirs')
         with self.FTP as ftp:
             for base, dirs, files in ftp.walk(ftp.curdir):
-                if self.dirs and base not in self.dirs:
-                    log.debug('dir {} is not in {}, skipping'.format(base, ' ,'.join(self.dirs)))
+                if not any(dir in base for dir in self.dirs):
+                    log.debug('dir {} is not in {}, skipping'.format(base, self.dirs))
                     continue
                 if 'files' in self.config['retrieve']:
                     for file in files:
@@ -148,7 +153,7 @@ class FTPList(object):
             'host': {'type': 'string'},
             'port': {'type': 'integer'},
             'use_ssl': {'type': 'boolean'},
-            'dirs': {'type': 'array', 'items': 'string'},
+            'dirs': one_or_more({'type': 'string'}),
             'retrieve': one_or_more({'type': 'string', 'enum': ['files', 'dirs']}, unique_items=True)
         },
         'required': ['username', 'password', 'host', 'port']
