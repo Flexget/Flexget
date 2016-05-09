@@ -61,7 +61,7 @@ class T411InputPlugin(object):
         """
         query = FriendlySearchQuery()
         query.category_name = config.get('category')
-        query.term_names = config.get('terms', [])
+        query.term_names = list(config.get('terms', []))
         query.max_results = config.get('max_results')
         return query
 
