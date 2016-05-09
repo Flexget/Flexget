@@ -1,5 +1,7 @@
 """Input plugin for www.betaseries.com"""
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 from hashlib import md5
 import logging
 
@@ -196,4 +198,4 @@ def query_series(api_key, user_token, member_name=None):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(BetaSeriesList, 'betaseries_list', api_ver=2)
+    plugin.register(BetaSeriesList, 'betaseries_list', api_ver=2, groups=['list'])

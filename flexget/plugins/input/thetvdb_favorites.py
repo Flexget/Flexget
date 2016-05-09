@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import logging
 import re
 from datetime import datetime, timedelta
@@ -8,7 +10,6 @@ from sqlalchemy import Column, Integer, Unicode, DateTime
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relationship
-
 
 from flexget import db_schema, plugin
 from flexget.entry import Entry
@@ -63,16 +64,16 @@ class InputThetvdbFavorites(object):
         from:
           thetvdb_favorites:
             username: some_username
-            password: some_password
+            account_id: some_password
     """
     schema = {
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
-            'password': {'type': 'string'},
+            'account_id': {'type': 'string'},
             'strip_dates': {'type': 'boolean'}
         },
-        'required': ['username', 'password'],
+        'required': ['username', 'account_id'],
         'additionalProperties': False
     }
 
@@ -92,7 +93,7 @@ class InputThetvdbFavorites(object):
             log.debug('Using cached thetvdb favorite series information for account %s' % config['username'])
         else:
             try:
-                req = TVDBRequest(username=config['username'], password=config['password']).get('user/favorites')
+                req = TVDBRequest(username=config['username'], account_id=config['account_id']).get('user/favorites')
                 user_favorites.series_ids = [int(f_id) for f_id in req['favorites']]
             except RequestException as e:
                 log.error('Error retrieving favorites from thetvdb: %s' % str(e))

@@ -1,28 +1,31 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.moves.urllib.parse import urlparse, urlsplit, urlunsplit, quote
+from future.moves.urllib.error import URLError
+
 import itertools
 import logging
 import threading
 import socket
-from urlparse import urlparse, SplitResult, urlsplit, urlunsplit
 import struct
+import binascii
 from random import randrange
-from httplib import BadStatusLine
-from urllib import quote
-from urllib2 import URLError
+from http.client import BadStatusLine
+from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.tools import urlopener
+from flexget.utils import requests
 from flexget.utils.bittorrent import bdecode
 
 log = logging.getLogger('torrent_alive')
 
 
 class TorrentAliveThread(threading.Thread):
-    _counter = itertools.count().next
+    _counter = itertools.count()
 
     def __init__(self, tracker, info_hash):
-        threading.Thread.__init__(self, name='torrent_alive-%d' % self._counter())
+        threading.Thread.__init__(self, name='torrent_alive-%d' % next(self._counter))
         self.tracker = tracker
         self.info_hash = info_hash
         self.tracker_seeds = 0
@@ -51,15 +54,14 @@ def max_seeds_from_threads(threads):
 def get_scrape_url(tracker_url, info_hash):
     if 'announce' in tracker_url:
         v = urlsplit(tracker_url)
-        sr = SplitResult(v.scheme, v.netloc, v.path.replace('announce', 'scrape'),
-                         v.query, v.fragment)
-        result = urlunsplit(sr)
+        result = urlunsplit([v.scheme, v.netloc, v.path.replace('announce', 'scrape'),
+                             v.query, v.fragment])
     else:
         log.debug('`announce` not contained in tracker url, guessing scrape address.')
         result = tracker_url + '/scrape'
 
     result += '&' if '?' in result else '?'
-    result += 'info_hash=%s' % quote(info_hash.decode('hex'))
+    result += 'info_hash=%s' % quote(binascii.unhexlify(info_hash))
     return result
 
 
@@ -100,7 +102,7 @@ def get_udp_seeds(url, info_hash):
         action, transaction_id, connection_id = struct.unpack(b">LLQ", res)
 
         # build packet hash out of decoded info_hash
-        packet_hash = info_hash.decode('hex')
+        packet_hash = binascii.unhexlify(info_hash)
 
         # construct packet for scrape with decoded info_hash setting action byte to 2 for scape
         packet = struct.pack(b">QLL", connection_id, 2, transaction_id) + packet_hash
@@ -131,10 +133,10 @@ def get_http_seeds(url, info_hash):
         log.debug('if not url is true returning 0')
         return 0
     log.debug('Checking for seeds from %s' % url)
-    data = None
+
     try:
-        data = bdecode(urlopener(url, log, retries=1, timeout=10).read()).get('files')
-    except URLError as e:
+        data = bdecode(requests.get(url).text.encode('utf-8')).get('files')
+    except RequestException as e:
         log.debug('Error scraping: %s' % e)
         return 0
     except SyntaxError as e:
@@ -149,8 +151,8 @@ def get_http_seeds(url, info_hash):
     if not data:
         log.debug('No data received from tracker scrape.')
         return 0
-    log.debug('get_http_seeds is returning: %s' % data.values()[0]['complete'])
-    return data.values()[0]['complete']
+    log.debug('get_http_seeds is returning: %s' % list(data.values())[0]['complete'])
+    return list(data.values())[0]['complete']
 
 
 def get_tracker_seeds(url, info_hash):
@@ -196,7 +198,7 @@ class TorrentAlive(object):
         for entry in task.entries:
             if 'torrent_seeds' in entry and entry['torrent_seeds'] < config['min_seeds']:
                 entry.reject(reason='Had < %d required seeds. (%s)' %
-                            (config['min_seeds'], entry['torrent_seeds']))
+                                    (config['min_seeds'], entry['torrent_seeds']))
 
     # Run on output phase so that we let torrent plugin output modified torrent file first
     @plugin.priority(250)

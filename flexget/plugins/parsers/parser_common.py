@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.utils import native_str
+from past.builtins import cmp
 
 import logging
 import re
@@ -108,7 +111,7 @@ def normalize_name(name):
     return name
 
 
-class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
+class ParsedEntry(ABCMeta(native_str('ParsedEntryABCMeta'), (object,), {})):
     """
     A parsed entry, containing parsed data like name, year, episodeNumber and season.
     """
@@ -254,7 +257,7 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
         return "<%s(name=%s)>" % (self.__class__.__name__, self.name)
 
 
-class ParsedVideo(ABCMeta(str('ParsedVideoABCMeta'), (ParsedEntry,), {})):
+class ParsedVideo(ABCMeta(native_str('ParsedVideoABCMeta'), (ParsedEntry,), {})):
     _old_quality = None
     _assumed_quality = None
 
@@ -306,7 +309,7 @@ class ParsedVideo(ABCMeta(str('ParsedVideoABCMeta'), (ParsedEntry,), {})):
         return self is other
 
 
-class ParsedVideoQuality(ABCMeta(str('ParsedVideoQualityABCMeta'), (object,), {})):
+class ParsedVideoQuality(ABCMeta(native_str('ParsedVideoQualityABCMeta'), (object,), {})):
     @abstractproperty
     def screen_size(self):
         raise NotImplementedError
@@ -348,7 +351,7 @@ class ParsedVideoQuality(ABCMeta(str('ParsedVideoQualityABCMeta'), (object,), {}
             self.__class__.__name__, self.screen_size, self.source, self.video_codec, self.audio_channels)
 
 
-class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
+class ParsedMovie(ABCMeta(native_str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
     @property
     def parsed_name(self):
         return self.title
@@ -366,7 +369,7 @@ class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
         return True
 
 
-class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
+class ParsedSerie(ABCMeta(native_str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     _valid_strict = None
 
     @property
@@ -523,7 +526,7 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
         if not self.valid:
             raise Exception('Series flagged invalid')
         if self.id_type == 'ep':
-            return ['S%02dE%02d' % (self.season, self.episode + x) for x in xrange(self.episodes)]
+            return ['S%02dE%02d' % (self.season, self.episode + x) for x in range(self.episodes)]
         elif self.id_type == 'date':
             return [self.id.strftime('%Y-%m-%d')]
         if self.id is None:

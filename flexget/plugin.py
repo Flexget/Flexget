@@ -1,14 +1,15 @@
-""" Plugin Loading & Management.
-"""
-
-from __future__ import absolute_import, division, unicode_literals
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.moves.urllib.error import HTTPError, URLError
+from future.utils import python_2_unicode_compatible
 
 import logging
 import os
 import re
 import time
 import warnings
-from itertools import ifilter
+from functools import total_ordering
+from http.client import BadStatusLine
 
 from path import Path
 from requests import RequestException
@@ -21,6 +22,7 @@ from flexget.event import fire_event, remove_event_handlers
 log = logging.getLogger('plugin')
 
 
+@python_2_unicode_compatible
 class DependencyError(Exception):
     """Plugin depends on other plugin, but it cannot be loaded.
 
@@ -68,6 +70,7 @@ class RegisterException(Exception):
         return repr(self.value)
 
 
+@python_2_unicode_compatible
 class PluginWarning(Warning):
 
     def __init__(self, value, logger=log, **kwargs):
@@ -77,28 +80,23 @@ class PluginWarning(Warning):
         self.kwargs = kwargs
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
-
-    def __unicode__(self):
         return self.value
 
 
+@python_2_unicode_compatible
 class PluginError(Exception):
 
     def __init__(self, value, logger=log, **kwargs):
         super(PluginError, self).__init__()
         # Value is expected to be a string
-        if not isinstance(value, basestring):
-            value = unicode(value)
+        if not isinstance(value, str):
+            value = str(value)
         self.value = value
         self.log = logger
         self.kwargs = kwargs
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
-
-    def __unicode__(self):
-        return unicode(self.value)
+        return self.value
 
 
 # TODO: move to utils or somewhere more appropriate
@@ -118,16 +116,14 @@ class internet(object):
     def __call__(self, func):
 
         def wrapped_func(*args, **kwargs):
-            from httplib import BadStatusLine
-            import urllib2
             try:
                 return func(*args, **kwargs)
             except RequestException as e:
                 log.debug('decorator caught RequestException. handled traceback:', exc_info=True)
                 raise PluginError('RequestException: %s' % e)
-            except urllib2.HTTPError as e:
+            except HTTPError as e:
                 raise PluginError('HTTPError %s' % e.code, self.log)
-            except urllib2.URLError as e:
+            except URLError as e:
                 log.debug('decorator caught urlerror. handled traceback:', exc_info=True)
                 raise PluginError('URLError %s' % e.reason, self.log)
             except BadStatusLine:
@@ -207,11 +203,12 @@ def register_task_phase(name, before=None, after=None):
     if not add_phase(name, before, after):
         _new_phase_queue[name] = [before, after]
 
-    for phase_name, args in _new_phase_queue.items():
+    for phase_name, args in list(_new_phase_queue.items()):
         if add_phase(phase_name, *args):
             del _new_phase_queue[phase_name]
 
 
+@total_ordering
 class PluginInfo(dict):
     """
     Allows accessing key/value pairs of this dictionary subclass via
@@ -245,7 +242,7 @@ class PluginInfo(dict):
             name = re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
         if contexts is None:
             contexts = ['task']
-        elif isinstance(contexts, basestring):
+        elif isinstance(contexts, str):
             contexts = [contexts]
         if category is None and plugin_class.__module__.startswith('flexget.plugins'):
             # By default look at the containing package of the plugin.
@@ -308,7 +305,7 @@ class PluginInfo(dict):
 
     def build_phase_handlers(self):
         """(Re)build phase_handlers in this plugin"""
-        for phase, method_name in phase_methods.iteritems():
+        for phase, method_name in phase_methods.items():
             if phase in self.phase_handlers:
                 continue
             if hasattr(self.instance, method_name):
@@ -335,6 +332,15 @@ class PluginInfo(dict):
 
     def __str__(self):
         return '<PluginInfo(name=%s)>' % self.name
+        
+    def _is_valid_operand(self, other):
+        return hasattr(other, 'name')
+
+    def __eq__(self, other):
+        return self.name == other.name
+    
+    def __lt__(self, other):
+        return self.name < other.name
 
     __repr__ = __str__
 
@@ -369,13 +375,13 @@ def _load_plugins_from_dirs(dirs):
     log.debug('Trying to load plugins from: %s' % dirs)
     dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
-    plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
+    plugins_pkg.__path__ = list(map(_strip_trailing_sep, dirs))
     for plugins_dir in dirs:
         for plugin_path in plugins_dir.walkfiles('*.py'):
             if plugin_path.name == '__init__.py':
                 continue
             # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
-            plugin_subpackages = filter(None, plugin_path.relpath(plugins_dir).parent.splitall())
+            plugin_subpackages = [_f for _f in plugin_path.relpath(plugins_dir).parent.splitall() if _f]
             module_name = '.'.join([plugins_pkg.__name__] + plugin_subpackages + [plugin_path.namebase])
             try:
                 __import__(module_name)
@@ -402,7 +408,7 @@ def _load_plugins_from_dirs(dirs):
                 log.trace('Loaded module %s from %s' % (module_name, plugin_path))
 
     if _new_phase_queue:
-        for phase, args in _new_phase_queue.iteritems():
+        for phase, args in _new_phase_queue.items():
             log.error('Plugin %s requested new phase %s, but it could not be created at requested '
                       'point (before, after). Plugin is not working properly.' % (args[0], phase))
 
@@ -428,7 +434,7 @@ def load_plugins(extra_dirs=None):
     # Plugins should only be registered once, remove their handlers after
     remove_event_handlers('plugin.register')
     # After they have all been registered, instantiate them
-    for plugin in plugins.values():
+    for plugin in list(plugins.values()):
         plugin.initialize()
     took = time.time() - start_time
     plugins_loaded = True
@@ -464,7 +470,7 @@ def get_plugins(phase=None, group=None, context=None, category=None, name=None, 
         if min_api is not None and plugin.api_ver < min_api:
             return False
         return True
-    return ifilter(matches, plugins.itervalues())
+    return filter(matches, iter(plugins.values()))
 
 
 def plugin_schemas(**kwargs):
@@ -510,7 +516,7 @@ def get_plugins_by_group(group):
 
 def get_plugin_keywords():
     """Return iterator over all plugin keywords."""
-    return plugins.iterkeys()
+    return iter(plugins.keys())
 
 
 def get_plugin_by_name(name, issued_by='???'):

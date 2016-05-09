@@ -1,4 +1,6 @@
-from __future__ import absolute_import, division, unicode_literals, print_function
+from __future__ import unicode_literals, division, absolute_import, print_function
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import collections
 import contextlib
 import logging
@@ -28,8 +30,15 @@ local_context = threading.local()
 
 def get_level_no(level):
     if not isinstance(level, int):
-        # Python logging api is horrible. This is getting the level number, which is required on python 2.6.
-        level = logging.getLevelName(level.upper())
+        # Cannot use getLevelName here as in 3.4.0 it returns a string.
+        level = level.upper()
+        if level == 'TRACE':
+            level = TRACE
+        elif level == 'VERBOSE':
+            level = VERBOSE
+        else:
+            level = getattr(logging, level)
+
     return level
 
 
@@ -105,7 +114,7 @@ def console(text, *args, **kwargs):
     Accepts arguments like the `print` function does.
     """
     if not isinstance(text, str):
-        text = unicode(text).encode(io_encoding, 'replace')
+        text = str(text).encode(io_encoding, 'replace')
     kwargs['file'] = getattr(local_context, 'output', sys.stdout)
     print(text, *args, **kwargs)
     kwargs['file'].flush()  # flush to make sure the output is printed right away
@@ -120,15 +129,16 @@ class RollingBuffer(collections.deque):
 class FlexGetLogger(logging.Logger):
     """Custom logger that adds trace and verbose logging methods, and contextual information to log records."""
 
-    def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None):
+    def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra, *exargs):
         extra = extra or {}
         extra.update(
             task=getattr(local_context, 'task', ''),
             session_id=getattr(local_context, 'session_id', ''))
         # Replace newlines in log messages with \n
-        if isinstance(msg, basestring):
+        if isinstance(msg, str):
             msg = msg.replace('\n', '\\n')
-        return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
+
+        return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra, *exargs)
 
     def trace(self, msg, *args, **kwargs):
         """Log at TRACE level (more detailed than DEBUG)."""

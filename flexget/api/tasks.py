@@ -1,13 +1,15 @@
+from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 import cgi
 import copy
-from Queue import Queue, Empty
 from datetime import datetime
 from json import JSONEncoder
 
-import cherrypy
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify, Response
 from flask import request
+from queue import Queue, Empty
 
 from flexget.api import api, APIResource, ApiError, NotFoundError
 from flexget.config_schema import process_config
@@ -243,14 +245,20 @@ inject_input = {
 task_execution_input = {
     'type': 'object',
     'properties': {
+        'tasks': {'type': "array",
+                  'items': {'type': 'string'},
+                  'minItems': 1,
+                  'uniqueItems': True},
         'progress': {'type': 'boolean', 'default': True},
         'summary': {'type': 'boolean', 'default': True},
-        'log': {'type': 'boolean', 'default': False},
         'entry_dump': {'type': 'boolean', 'default': True},
-        'inject': {'type': 'array', 'items': inject_input},
-        'log_level': {'type': "string",
-                      "enum": ['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace']}
-    }
+        'inject': {'type': 'array',
+                   'items': inject_input},
+        'loglevel': {'type': "string",
+                     "enum": ['critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace']}
+    },
+    'required': ['tasks']
+
 }
 
 task_api_queue_schema = api.schema('task.queue', task_queue_schema)
@@ -281,13 +289,13 @@ class ExecuteLog(Queue):
 
 _streams = {}
 
-execution_doc = "'progress': Include task progress updates<br>" \
+execution_doc = "'tasks': Array of tasks to be execute. Required<br>" \
+                "'progress': Include task progress updates<br>" \
                 "'summary': Include task summary<br>" \
-                "'log': Include execution log<br>" \
                 "'entry_dump': Include dump of entries including fields<br>" \
                 "'inject': A List of entry objects. See payload description for additional information<br>" \
-                "'loglevel': Specify log level. One of 'none', 'critical', 'error', 'warning', 'info', 'verbose', " \
-                "'debug', 'trace'<br>"
+                "'loglevel': Specify log level. One of 'critical', 'error', 'warning', 'info', 'verbose', " \
+                "'debug', 'trace'. Default is 'none'<br>"
 
 entry_doc = "Entry object:<br>" \
             "'title': Title of the entry. If not supplied it will be attempted to retrieve it from URL headers<br>" \
@@ -299,27 +307,30 @@ entry_doc = "Entry object:<br>" \
 inject_api = api.namespace('inject', description='Entry injection API')
 
 
-@inject_api.route('/<task>/')
-@tasks_api.route('/<task>/execute/')
-@api.doc(params={'task': 'task name'}, description=execution_doc)
+@inject_api.route('/')
+@tasks_api.route('/execute/')
+@api.doc(description=execution_doc)
 class TaskExecutionAPI(APIResource):
     @api.response(404, description='Task not found')
     @api.response(500, description='Could not resolve title from URL')
     @api.response(200, model=task_api_execute_schema)
     @api.validate(task_execution_schema, description=entry_doc)
-    def post(self, task, session=None):
+    def post(self, session=None):
         """ Execute task and stream results """
         data = request.json
-
-        if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {}).keys()]:
-            return {'error': 'task does not exist'}, 404
+        for task in data.get('tasks'):
+            if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {}).keys()]:
+                return {'error': 'task %s does not exist' % task}, 404
 
         queue = ExecuteLog()
-        output = queue if data.get('log') else None
+        output = queue if data.get('loglevel') else None
         stream = True if any(
-            arg[0] in ['progress', 'summary', 'log', 'entry_dump'] for arg in data.items() if arg[1]) else False
-        loglevel = data.get('loglevel')
-        options = {'tasks': [task]}
+            arg[0] in ['progress', 'summary', 'loglevel', 'entry_dump'] for arg in data.items() if arg[1]) else False
+        loglevel = data.pop('loglevel', None)
+
+        options = {}
+        for option, value in data.items():
+            options[option] = value
 
         if data.get('inject'):
             entries = []
@@ -345,35 +356,38 @@ class TaskExecutionAPI(APIResource):
                 entries.append(entry)
             options['inject'] = entries
 
-        task_id, __, task_event = self.manager.execute(options=options, output=output, loglevel=loglevel)[0]
+        executed_tasks = self.manager.execute(options=options, output=output, loglevel=loglevel)
+
+        tasks_queued = []
+
+        for task_id, task_name, task_event in executed_tasks:
+            tasks_queued.append({'id': task_id, 'name': task_name, 'event': task_event})
+            _streams[task_id] = {
+                'queue': queue,
+                'last_update': datetime.now(),
+                'args': data
+            }
 
         if not stream:
-            return {'task': {'id': task_id, 'name': task}}
-
-        _streams[task_id] = {
-            'queue': queue,
-            'last_update': datetime.now(),
-            'args': data
-        }
+            return jsonify({'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]})
 
         def stream_response():
-            yield '{"task": {"id": "%s", "name": "%s", "stream": [' % (task_id, task)
+            # First return the tasks to execute
+            yield '{"stream": ['
+            yield json.dumps({'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}) + ',\n'
 
             while True:
-                # If the server is shutting down then end the stream nicely
-                if cherrypy.engine.state != cherrypy.engine.states.STARTED:
-                    break
-
                 try:
                     yield queue.get(timeout=1) + ',\n'
                     continue
                 except Empty:
                     pass
 
-                if queue.empty() and task_event.is_set():
-                    del _streams[task_id]
+                if queue.empty() and all([task['event'].is_set() for task in tasks_queued]):
+                    for task in tasks_queued:
+                        del _streams[task['id']]
                     break
-            yield '{}]}}'
+            yield '{}]}'
 
         return Response(stream_response(), mimetype='text/event-stream')
 
@@ -388,7 +402,7 @@ def setup_params(mgr):
         if name in ignore:
             continue
         if isinstance(action, argparse._StoreConstAction) and action.help != '==SUPPRESS==':
-            global execution_doc
+            name = name.replace('-', '_')
             task_execution_input['properties'][name] = {'type': 'boolean'}
             TaskExecutionAPI.__apidoc__['description'] += "'{0}': {1}<br>".format(name, action.help)
 

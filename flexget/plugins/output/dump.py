@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
+
 import logging
 
 from flexget import options, plugin
@@ -21,12 +24,12 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
     def sort_key(field):
         # Sort certain fields above the rest
         if field == 'title':
-            return 0
+            return (0,)
         if field == 'url':
-            return 1
+            return (1,)
         if field == 'original_url':
-            return 2
-        return field
+            return (2,)
+        return (3, field)
 
     for entry in entries:
         for field in sorted(entry, key=sort_key):
@@ -45,7 +48,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
                 except Exception:
                     console('%-17s: %r (warning: unable to print)' % (field, value))
             elif isinstance(value, list):
-                console('%-17s: %s' % (field, '[%s]' % ', '.join(unicode(v) for v in value)))
+                console('%-17s: %s' % (field, '[%s]' % ', '.join(str(v) for v in value)))
             elif isinstance(value, (int, float, dict)):
                 console('%-17s: %s' % (field, value))
             elif value is None:

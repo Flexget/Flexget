@@ -7,6 +7,8 @@ import time
 from copy import copy
 from datetime import datetime, timedelta
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
 from sqlalchemy.exc import OperationalError
@@ -15,7 +17,7 @@ from sqlalchemy.orm import relation, backref, object_session
 
 from flexget import db_schema, options, plugin
 from flexget.config_schema import one_or_more
-from flexget.event import event
+from flexget.event import event, fire_event
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.plugins.parsers import SERIES_ID_TYPES
@@ -126,7 +128,7 @@ def upgrade(ver, session):
         unique_series = {}
         for row in all_series:
             unique_series.setdefault(normalize_series_name(row['name']), []).append(row['id'])
-        for series, ids in unique_series.iteritems():
+        for series, ids in unique_series.items():
             session.execute(update(ep_table, ep_table.c.series_id.in_(ids), {'series_id': ids[0]}))
             if len(ids) > 1:
                 session.execute(delete(series_table, series_table.c.id.in_(ids[1:])))
@@ -250,11 +252,11 @@ class AlternateNames(Base):
     def __init__(self, name):
         self.alt_name = name
 
-    def __unicode__(self):
+    def __str__(self):
         return '<SeriesAlternateName(series_id=%s, alt_name=%s)>' % (self.series_id, self.alt_name)
 
     def __repr__(self):
-        return unicode(self).encode('ascii', 'replace')
+        return str(self).encode('ascii', 'replace')
 
 
 class Series(Base):
@@ -289,11 +291,11 @@ class Series(Base):
     name = hybrid_property(name_getter, name_setter)
     name.comparator(name_comparator)
 
-    def __unicode__(self):
+    def __str__(self):
         return '<Series(id=%s,name=%s)>' % (self.id, self.name)
 
     def __repr__(self):
-        return unicode(self).encode('ascii', 'replace')
+        return str(self).encode('ascii', 'replace')
 
 
 class Episode(Base):
@@ -348,12 +350,12 @@ class Episode(Base):
     def downloaded_releases(self):
         return [release for release in self.releases if release.downloaded]
 
-    def __unicode__(self):
+    def __str__(self):
         return '<Episode(id=%s,identifier=%s,season=%s,number=%s)>' % \
                (self.id, self.identifier, self.season, self.number)
 
     def __repr__(self):
-        return unicode(self).encode('ascii', 'replace')
+        return str(self).encode('ascii', 'replace')
 
     def __eq__(self, other):
         if not isinstance(other, Episode):
@@ -373,6 +375,9 @@ class Episode(Base):
             return self.identifier < other.identifier
         # Can't compare id type identifiers
         return NotImplemented
+
+    def __hash__(self):
+        return self.id
 
 
 Index('episode_series_identifier', Episode.series_id, Episode.identifier)
@@ -400,12 +405,12 @@ class Release(Base):
         warnings.warn("accessing deprecated release.proper, use release.proper_count instead")
         return self.proper_count > 0
 
-    def __unicode__(self):
+    def __str__(self):
         return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % \
                (self.id, self.quality, self.downloaded, self.proper_count, self.title)
 
     def __repr__(self):
-        return unicode(self).encode('ascii', 'replace')
+        return str(self).encode('ascii', 'replace')
 
 
 class SeriesTask(Base):
@@ -439,7 +444,7 @@ def get_latest_status(episode):
 
 @with_session
 def get_series_summary(configured=None, premieres=None, status=None, days=None, start=None, stop=None, count=False,
-                       session=None):
+                       sort_by='show_name', descending=None, session=None):
     """
     Return a query with results for all series.
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
@@ -476,6 +481,11 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
     if count:
         return query.count()
+    if sort_by == 'show_name':
+        order_by = Series.name
+    elif sort_by == 'last_download_date':
+        order_by = func.max(Release.first_seen)
+    query = query.order_by(desc(order_by)) if descending else query.order_by(order_by)
     query = query.slice(start, stop).from_self()
     return query
 
@@ -515,7 +525,7 @@ def auto_identified_by(series):
         return 'auto'
     log.debug('%s episode type totals: %r', series.name, type_totals)
     # Find total number of parsed episodes
-    total = sum(type_totals.itervalues())
+    total = sum(type_totals.values())
     # See which type has the most
     best = max(type_totals, key=lambda x: type_totals[x])
 
@@ -716,26 +726,38 @@ def set_series_begin(series, ep_id):
     series.begin = episode
 
 
-def forget_series(name):
-    """Remove a whole series `name` from database."""
-    session = Session()
-    try:
+def remove_series(name, forget=False):
+    """
+    Remove a whole series `name` from database.
+    :param name: Name of series to be removed
+    :param forget: Indication whether or not to fire a 'forget' event
+    """
+    downloaded_releases = []
+    with Session() as session:
         series = session.query(Series).filter(Series.name == name).all()
         if series:
             for s in series:
+                if forget:
+                    for episode in s.episodes:
+                        downloaded_releases = [release.title for release in episode.downloaded_releases]
                 session.delete(s)
             session.commit()
             log.debug('Removed series %s from database.', name)
         else:
             raise ValueError('Unknown series %s' % name)
-    finally:
-        session.close()
+    for downloaded_release in downloaded_releases:
+        fire_event('forget', downloaded_release)
 
 
-def forget_series_episode(name, identifier):
-    """Remove all episodes by `identifier` from series `name` from database."""
-    session = Session()
-    try:
+def remove_series_episode(name, identifier, forget=False):
+    """
+    Remove all episodes by `identifier` from series `name` from database.
+    :param name: Name of series to be removed
+    :param identifier: Series identifier to be deleted
+    :param forget: Indication whether or not to fire a 'forget' event
+    """
+    downloaded_releases = []
+    with Session() as session:
         series = session.query(Series).filter(Series.name == name).first()
         if series:
             episode = session.query(Episode).filter(Episode.identifier == identifier). \
@@ -743,33 +765,16 @@ def forget_series_episode(name, identifier):
             if episode:
                 if not series.begin:
                     series.identified_by = ''  # reset identified_by flag so that it will be recalculated
+                if forget:
+                    downloaded_releases = [release.title for release in episode.downloaded_releases]
                 session.delete(episode)
-                session.commit()
                 log.debug('Episode %s from series %s removed from database.', identifier, name)
             else:
                 raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
         else:
             raise ValueError('Unknown series %s' % name)
-    finally:
-        session.close()
-
-
-def forget_episodes_by_id(series_id, episode_id):
-    """ Removes a specific episode using `series_id` and `episode_id`."""
-    with Session() as session:
-        series = session.query(Series).filter(Series.id == series_id).first()
-        if series:
-            episode = session.query(Episode).filter(Episode.id == episode_id).first()
-            if episode:
-                if not series.begin:
-                    series.identified_by = ''  # reset identified_by flag so that it will be recalculated
-                session.delete(episode)
-                session.commit()
-                log.debug('Episode %s from series %s removed from database.', episode_id, series_id)
-            else:
-                raise ValueError('Unknown identifier %s for series %s' % (episode_id, series_id))
-        else:
-            raise ValueError('Unknown series %s' % series_id)
+    for downloaded_release in downloaded_releases:
+        fire_event('forget', downloaded_release)
 
 
 def delete_release_by_id(release_id):
@@ -976,7 +981,7 @@ class FilterSeriesBase(object):
                 series_settings = {}
                 group_settings = config['settings'].get(group_name, {})
                 if isinstance(series, dict):
-                    series, series_settings = series.items()[0]
+                    series, series_settings = list(series.items())[0]
                     if series_settings is None:
                         raise Exception('Series %s has unexpected \':\'' % series)
                 # Make sure this isn't a series with no name
@@ -985,7 +990,7 @@ class FilterSeriesBase(object):
                     continue
                 # make sure series name is a string to accommodate for "24"
                 if not isinstance(series, basestring):
-                    series = unicode(series)
+                    series = str(series)
                 # if series have given path instead of dict, convert it into a dict
                 if isinstance(series_settings, basestring):
                     series_settings = {'path': series_settings}
@@ -1015,7 +1020,7 @@ class FilterSeriesBase(object):
         Applies group settings with advanced form."""
 
         config = self.apply_group_options(config)
-        return self.combine_series_lists(*config.values())
+        return self.combine_series_lists(*list(config.values()))
 
     def combine_series_lists(self, *series_lists, **kwargs):
         """Combines the series from multiple lists, making sure there are no doubles.
@@ -1025,7 +1030,7 @@ class FilterSeriesBase(object):
         unique_series = {}
         for series_list in series_lists:
             for series in series_list:
-                series, series_settings = series.items()[0]
+                series, series_settings = list(series.items())[0]
                 if series not in unique_series:
                     unique_series[series] = series_settings
                 else:
@@ -1099,12 +1104,12 @@ class FilterSeries(FilterSeriesBase):
         # generate list of all series in one dict
         all_series = {}
         for series_item in config:
-            series_name, series_config = series_item.items()[0]
+            series_name, series_config = list(series_item.items())[0]
             all_series[series_name] = series_config
 
         # scan for problematic names, enable exact mode for them
-        for series_name, series_config in all_series.iteritems():
-            for name in all_series.keys():
+        for series_name, series_config in all_series.items():
+            for name in list(all_series.keys()):
                 if (name.lower().startswith(series_name.lower())) and \
                         (name.lower() != series_name.lower()):
                     if 'exact' not in series_config:
@@ -1117,7 +1122,7 @@ class FilterSeries(FilterSeriesBase):
         config = self.prepare_config(config)
         self.auto_exact(config)
         for series_item in config:
-            series_name, series_config = series_item.items()[0]
+            series_name, series_config = list(series_item.items())[0]
             log.trace('series_name: %s series_config: %s', series_name, series_config)
             start_time = time.clock()
             self.parse_series(task.entries, series_name, series_config)
@@ -1138,12 +1143,12 @@ class FilterSeries(FilterSeriesBase):
 
         for series_item in config:
             with Session() as session:
-                series_name, series_config = series_item.items()[0]
+                series_name, series_config = list(series_item.items())[0]
                 if series_config.get('parse_only'):
                     log.debug('Skipping filtering of series %s because of parse_only', series_name)
                     continue
                 # Make sure number shows (e.g. 24) are turned into strings
-                series_name = unicode(series_name)
+                series_name = str(series_name)
                 db_series = session.query(Series).filter(Series.name == series_name).first()
                 if not db_series:
                     log.debug('adding series %s into db', series_name)
@@ -1253,7 +1258,7 @@ class FilterSeries(FilterSeriesBase):
         :param config: Series configuration
         """
 
-        for ep, entries in series_entries.iteritems():
+        for ep, entries in series_entries.items():
             if not entries:
                 continue
 
@@ -1473,7 +1478,7 @@ class FilterSeries(FilterSeriesBase):
         """
 
         latest = get_latest_release(episode.series)
-        if episode.series.begin and episode.series.begin > latest:
+        if episode.series.begin and (not latest or episode.series.begin > latest):
             latest = episode.series.begin
         log.debug('latest download: %s' % latest)
         log.debug('current: %s' % episode)
@@ -1615,9 +1620,9 @@ class SeriesDBManager(FilterSeriesBase):
                 return
             config = self.prepare_config(task.config['series'])
             for series_item in config:
-                series_name, series_config = series_item.items()[0]
+                series_name, series_config = list(series_item.items())[0]
                 # Make sure number shows (e.g. 24) are turned into strings
-                series_name = unicode(series_name)
+                series_name = str(series_name)
                 db_series = session.query(Series).filter(Series.name == series_name).first()
                 alts = series_config.get('alternate_name', [])
                 if not isinstance(alts, list):
@@ -1649,7 +1654,7 @@ class SeriesDBManager(FilterSeriesBase):
 
 
 def _add_alt_name(alt, db_series, series_name, session):
-    alt = unicode(alt)
+    alt = str(alt)
     db_series_alt = session.query(AlternateNames).filter(AlternateNames.alt_name == alt).first()
     if db_series_alt and db_series_alt.series_id == db_series.id:
         # Already exists, no need to create it then

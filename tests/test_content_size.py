@@ -1,20 +1,24 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import pytest
 
+
+@pytest.mark.usefixtures('tmpdir')
 class TestTorrentSize(object):
 
     config = """
         tasks:
           test_min:
             mock:
-              - {title: 'test', file: 'test_min.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
             accept_all: yes
             content_size:
               min: 2000
 
           test_max:
             mock:
-              - {title: 'test', file: 'test_max.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
             accept_all: yes
             content_size:
               max: 10
@@ -35,21 +39,21 @@ class TestTorrentSize(object):
               min: 2000
     """
 
-    @pytest.mark.filecopy('test.torrent', 'test_min.torrent')
+    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_min(self, execute_task):
         """Content Size: torrent with min size"""
         task = execute_task('test_min')
         assert task.find_entry('rejected', title='test'), \
             'should have rejected, minimum size'
 
-    @pytest.mark.filecopy('test.torrent', 'test_max.torrent')
+    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_max(self, execute_task):
         """Content Size: torrent with max size"""
         task = execute_task('test_max')
         assert task.find_entry('rejected', title='test'), \
             'should have rejected, maximum size'
 
-    @pytest.mark.filecopy('test.torrent', 'test_strict.torrent')
+    @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_strict(self, execute_task):
         """Content Size: strict enabled"""
         task = execute_task('test_strict')
@@ -68,6 +72,7 @@ class TestTorrentSize(object):
             'should have rejected, size present from the cache'
 
 
+@pytest.mark.usefixtures('tmpdir')
 class TestFileSize(object):
     """This is to test that content_size is picked up from the file itself when filesystem is used as the input.
     This doesn't do a super job of testing, because we don't have any test files bigger than 1 MB."""
@@ -76,14 +81,14 @@ class TestFileSize(object):
         tasks:
           test_min:
             mock:
-              - {title: 'test', location: 'min.file'}
+              - {title: 'test', location: '__tmp__/test.file'}
             accept_all: yes
             content_size:
               min: 2000
 
           test_max:
             mock:
-              - {title: 'test', location: 'max.file'}
+              - {title: 'test', location: '__tmp__/test.file'}
             accept_all: yes
             content_size:
               max: 2000
@@ -94,7 +99,7 @@ class TestFileSize(object):
               - {title: 'test', location: 'test.torrent'}
     """
 
-    @pytest.mark.filecopy('test.torrent', 'min.file')
+    @pytest.mark.filecopy('test.torrent', '__tmp__/test.file')
     def test_min(self, execute_task):
         """Content Size: torrent with min size"""
         task = execute_task('test_min')
@@ -103,7 +108,7 @@ class TestFileSize(object):
         assert entry['content_size'] == 0, \
             'content_size was not detected'
 
-    @pytest.mark.filecopy('test.torrent', 'max.file')
+    @pytest.mark.filecopy('test.torrent', '__tmp__/test.file')
     def test_max(self, execute_task):
         """Content Size: torrent with max size"""
         task = execute_task('test_max')

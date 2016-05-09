@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import logging
 
 from flexget import plugin
@@ -20,7 +22,7 @@ class ModifyExtension(object):
     schema = {'type': ['string', 'number']}
 
     def on_task_modify(self, task, config):
-        ext = unicode(config)
+        ext = str(config)
         if ext.startswith('.'):
             ext = ext[1:]
 

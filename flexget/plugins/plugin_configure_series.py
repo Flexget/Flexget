@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import hashlib
 import logging
 
@@ -59,7 +61,7 @@ class ConfigureSeries(FilterSeriesBase):
     def on_task_start(self, task, config):
 
         series = {}
-        for input_name, input_config in config.get('from', {}).iteritems():
+        for input_name, input_config in config.get('from', {}).items():
             input = plugin.get_plugin_by_name(input_name)
             if input.api_ver == 1:
                 raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
@@ -80,7 +82,7 @@ class ConfigureSeries(FilterSeriesBase):
                     s['set'] = {'tvdb_id': entry['tvdb_id']}
 
                 # Allow configure_series to set anything available to series
-                for key, schema in self.settings_schema['properties'].iteritems():
+                for key, schema in self.settings_schema['properties'].items():
                     if 'configure_series_' + key in entry:
                         errors = process_config(entry['configure_series_' + key], schema, set_defaults=False)
                         if errors:
@@ -89,7 +91,7 @@ class ConfigureSeries(FilterSeriesBase):
                             s[key] = entry['configure_series_' + key]
 
         # Set the config_modified flag if the list of shows changed since last time
-        new_hash = hashlib.md5(unicode(sorted(series))).hexdigest().decode('ascii')
+        new_hash = str(hashlib.md5(str(sorted(series)).encode('utf-8')).hexdigest())
         with Session() as session:
             last_hash = session.query(LastHash).filter(LastHash.task == task.name).first()
             if not last_hash:
@@ -105,7 +107,7 @@ class ConfigureSeries(FilterSeriesBase):
 
         # Make a series config with the found series
         # Turn our dict of series with settings into a list of one item dicts
-        series_config = {'generated_series': [dict([s]) for s in series.iteritems()]}
+        series_config = {'generated_series': [dict([s]) for s in series.items()]}
         # If options were specified, add them to the series config
         if 'settings' in config:
             series_config['settings'] = {'generated_series': config['settings']}

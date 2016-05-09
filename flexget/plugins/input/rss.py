@@ -1,10 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.utils import tobytes
+from past.builtins import basestring
+from future.moves.urllib.parse import urlparse, urlsplit
+
 import os
 import logging
-import urlparse
 import xml.sax
 import posixpath
-import httplib
+import http.client
 from datetime import datetime
 
 import dateutil.parser
@@ -132,7 +136,7 @@ class InputRSS(object):
         if config['link'] != 'auto':
             if not isinstance(config['link'], list):
                 config['link'] = [config['link']]
-            config['link'] = map(fp_field_name, config['link'])
+            config['link'] = list(map(fp_field_name, config['link']))
         config.setdefault('title', 'title')
         config['title'] = fp_field_name(config['title'])
         if config.get('other_fields'):
@@ -141,7 +145,7 @@ class InputRSS(object):
                 if isinstance(item, basestring):
                     key, val = item, item
                 else:
-                    key, val = item.items()[0]
+                    key, val = list(item.items())[0]
                 other_fields.append({fp_field_name(key): val.lower()})
             config['other_fields'] = other_fields
         # set default value for group_links as deactivated
@@ -156,6 +160,9 @@ class InputRSS(object):
         if data is None:
             log.critical('Received empty page - no content')
             return
+        else:
+            data = tobytes(data)
+
         ext = 'xml'
         if b'<html>' in data.lower():
             log.critical('Received content is HTML page, not an RSS feed')
@@ -168,12 +175,12 @@ class InputRSS(object):
         if not os.path.isdir(received):
             os.mkdir(received)
         filename = task.name
-        sourcename = urlparse.urlparse(url).netloc
+        sourcename = urlparse(url).netloc
         if sourcename:
             filename += '-' + sourcename
         filename = pathscrub(filename, filename=True)
         filepath = os.path.join(received, '%s.%s' % (filename, ext))
-        with open(filepath, 'w') as f:
+        with open(filepath, 'wb') as f:
             f.write(data)
         log.critical('I have saved the invalid content to %s for you to view', filepath)
 
@@ -190,7 +197,7 @@ class InputRSS(object):
             entry['type'] = enclosure['type']
         # TODO: better and perhaps join/in download plugin?
         # Parse filename from enclosure url
-        basename = posixpath.basename(urlparse.urlsplit(entry['url']).path)
+        basename = posixpath.basename(urlsplit(entry['url']).path)
         # If enclosure has size OR there are multiple enclosures use filename from url
         if (entry.get('size') or multiple and basename) and filename:
             entry['filename'] = basename
@@ -310,7 +317,7 @@ class InputRSS(object):
                         log.error('bozo error parsing rss: %s' % ex)
                     raise plugin.PluginError('Received invalid RSS content from task %s (%s)' % (task.name,
                                                                                                  config['url']))
-                elif isinstance(ex, httplib.BadStatusLine) or isinstance(ex, IOError):
+                elif isinstance(ex, http.client.BadStatusLine) or isinstance(ex, IOError):
                     raise ex  # let the @internet decorator handle
                 else:
                     # all other bozo errors
@@ -374,7 +381,7 @@ class InputRSS(object):
                 ea['title'] = entry.title
 
                 # fields dict may be modified during this loop, so loop over a copy (fields.items())
-                for rss_field, flexget_field in fields.items():
+                for rss_field, flexget_field in list(fields.items()):
                     if rss_field in entry:
                         if not isinstance(getattr(entry, rss_field), basestring):
                             # Error if this field is not a string

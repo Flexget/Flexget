@@ -1,11 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import cmp
+
 import logging
+import re
 from datetime import datetime, timedelta
 from string import capwords
 
 from dateutil.parser import parse as parsedate
 
-import re
 from flexget.utils.titles.parser import TitleParser
 from flexget.plugins.parsers import ParseWarning
 from flexget.plugins.parsers.parser_common import default_ignore_prefixes, name_to_re
@@ -316,7 +319,7 @@ class SeriesParser(TitleParser):
                     if ep_match['match'].start() > 1:
                         return
 
-                if ep_match['end_episode'] > ep_match['episode'] + 2:
+                if ep_match['end_episode'] and ep_match['end_episode'] > ep_match['episode'] + 2:
                     # This is a pack of too many episodes, ignore it.
                     log.debug('Series pack contains too many episodes (%d). Rejecting',
                               ep_match['end_episode'] - ep_match['episode'])
@@ -573,7 +576,7 @@ class SeriesParser(TitleParser):
         if not self.valid:
             raise Exception('Series flagged invalid')
         if self.id_type == 'ep':
-            return ['S%02dE%02d' % (self.season, self.episode + x) for x in xrange(self.episodes)]
+            return ['S%02dE%02d' % (self.season, self.episode + x) for x in range(self.episodes)]
         elif self.id_type == 'date':
             return [self.id.strftime('%Y-%m-%d')]
         if self.id is None:

@@ -1,19 +1,23 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import os
-import logging
 import json
+import sys
+import logging
+import threading
+import traceback
 from time import sleep
 
 import cherrypy
-
 from flask import Response
-
-from pyparsing import Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, Combine
+from flask_restplus import inputs
+from pyparsing import Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, \
+    Combine
 from pyparsing import nums, alphanums, printables
 
-from flask_restplus import inputs
-
-from flexget.api import api, APIResource, ApiError, __version__ as __api_version__
 from flexget._version import __version__
+from flexget.api import api, APIResource, ApiError, __version__ as __api_version__
 
 log = logging.getLogger('api.server')
 
@@ -51,11 +55,12 @@ class ServerPIDAPI(APIResource):
     @api.response(200, description='Reloaded config', model=pid_schema)
     def get(self, session=None):
         """ Get server PID """
-        return{'pid': os.getpid()}
+        return {'pid': os.getpid()}
 
 
 shutdown_parser = api.parser()
-shutdown_parser.add_argument('force', type=inputs.boolean, required=False, default=False, help='Ignore tasks in the queue')
+shutdown_parser.add_argument('force', type=inputs.boolean, required=False, default=False,
+                             help='Ignore tasks in the queue')
 
 
 @server_api.route('/shutdown/')
@@ -94,6 +99,49 @@ class ServerVersionAPI(APIResource):
         return {'flexget_version': __version__, 'api_version': __api_version__}
 
 
+dump_threads_schema = api.schema('server.dump_threads', {
+    'type': 'object',
+    'properties': {
+        'threads': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'name': {'type': 'string'},
+                    'id': {'type': 'string'},
+                    'dump': {
+                        'type': 'array',
+                        'items': {'type': 'string'}
+                    }
+                },
+            },
+        }
+    }
+})
+
+
+@server_api.route('/dump_threads/')
+class ServerDumpThreads(APIResource):
+    @api.response(200, description='Flexget threads dump', model=dump_threads_schema)
+    def get(self, session=None):
+        """ Dump Server threads for debugging """
+        id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
+        threads = []
+        for threadId, stack in sys._current_frames().items():
+            dump = []
+            for filename, lineno, name, line in traceback.extract_stack(stack):
+                dump.append('File: "%s", line %d, in %s' % (filename, lineno, name))
+                if line:
+                    dump.append(line.strip())
+            threads.append({
+                'name': id2name.get(threadId),
+                'id': threadId,
+                'dump': dump
+            })
+
+        return {'threads': threads}
+
+
 server_log_parser = api.parser()
 server_log_parser.add_argument(
     'lines', type=int, required=False, default=200,
@@ -116,7 +164,7 @@ def reverse_readline(fh, start_byte=0, buf_size=8192):
         fh.seek(-offset, os.SEEK_END)
         buf = fh.read(min(remaining_size, buf_size))
         remaining_size -= buf_size
-        lines = buf.split('\n')
+        lines = buf.decode(sys.getfilesystemencoding()).split('\n')
         # the first line of the buffer is probably not a complete line so
         # we'll save it and append it to the last line of the next buffer
         # we read
@@ -149,7 +197,6 @@ def file_inode(filename):
 
 @server_api.route('/log/')
 class ServerLogAPI(APIResource):
-
     @api.doc(parser=server_log_parser)
     @api.response(200, description='Streams as line delimited JSON')
     def get(self, session=None):
@@ -212,10 +259,11 @@ class ServerLogAPI(APIResource):
                 try:
                     with open(base_log_file, 'rb') as fh:
                         fh.seek(stream_from_byte)
-                        line = fh.readline()
+                        line = fh.readline().decode(sys.getfilesystemencoding())
                         stream_from_byte = fh.tell()
                 except IOError:
                     yield '{}'
+                    continue
 
                 # If a valid line is found and does not pass the filter then set it to none
                 line = log_parser.json_string(line) if log_parser.matches(line) else '{}'
@@ -231,7 +279,7 @@ class ServerLogAPI(APIResource):
         return Response(follow(args['lines'], args['search']), mimetype='text/event-stream')
 
 
-class LogParser:
+class LogParser(object):
     """
     Filter log file.
 
@@ -292,8 +340,8 @@ class LogParser:
         else:
             self._query_parser = False
 
-        integer = Word(nums).setParseAction(lambda t: int(t[0]))
-        date = Combine((integer + '-' + integer + '-' + integer) + ' ' + integer + ':' + integer)
+        time_cmpnt = Word(nums).setParseAction(lambda t: t[0].zfill(2))
+        date = Combine((time_cmpnt + '-' + time_cmpnt + '-' + time_cmpnt) + ' ' + time_cmpnt + ':' + time_cmpnt)
         word = Word(printables)
 
         self._log_parser = (

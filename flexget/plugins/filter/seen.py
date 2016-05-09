@@ -7,12 +7,12 @@ forget (string)
     task name then everything in that task will be forgotten. With title all learned fields from it and the
     title will be forgotten. With field value only that particular field is forgotten.
 """
-
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
 
 import logging
 from datetime import datetime, timedelta
-from types import NoneType
 
 from sqlalchemy import Column, Integer, DateTime, Unicode, Boolean, or_, select, update, Index
 from sqlalchemy.orm import relation
@@ -132,23 +132,23 @@ def forget(value):
     :param string value: Can be task name, entry title or field value
     :return: count, field_count where count is number of entries removed and field_count number of fields
     """
-    log.debug('forget called with %s' % value)
     with Session() as session:
+        log.debug('forget called with %s', value)
         count = 0
         field_count = 0
         for se in session.query(SeenEntry).filter(or_(SeenEntry.title == value, SeenEntry.task == value)).all():
             field_count += len(se.fields)
             count += 1
-            log.debug('forgetting %s' % se)
+            log.debug('forgetting %s', se)
             session.delete(se)
 
         for sf in session.query(SeenField).filter(SeenField.value == value).all():
             se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
             field_count += len(se.fields)
             count += 1
-            log.debug('forgetting %s' % se)
+            log.debug('forgetting %s', se)
             session.delete(se)
-        return count, field_count
+    return count, field_count
 
 
 @with_session
@@ -214,7 +214,7 @@ class FilterSeen(object):
         self.keyword = 'seen'
 
     def prepare_config(self, config):
-        if isinstance(config, NoneType):
+        if config is None:
             config = {}
         elif isinstance(config, bool):
             if config is False:
@@ -246,7 +246,7 @@ class FilterSeen(object):
                 if field not in entry:
                     continue
                 if entry[field] not in values and entry[field]:
-                    values.append(unicode(entry[field]))
+                    values.append(str(entry[field]))
             if values:
                 log.trace('querying for: %s' % ', '.join(values))
                 # check if SeenField.value is any of the values
@@ -283,7 +283,7 @@ class FilterSeen(object):
         # no explicit fields given, use default
         if not fields:
             fields = self.fields
-        se = SeenEntry(entry['title'], unicode(task.name), reason, local)
+        se = SeenEntry(entry['title'], str(task.name), reason, local)
         remembered = []
         for field in fields:
             if field not in entry:
@@ -292,9 +292,9 @@ class FilterSeen(object):
             if entry[field] in remembered:
                 continue
             remembered.append(entry[field])
-            sf = SeenField(unicode(field), unicode(entry[field]))
+            sf = SeenField(str(field), str(entry[field]))
             se.fields.append(sf)
-            log.debug("Learned '%s' (field: %s)" % (entry[field], field))
+            log.debug("Learned '%s' (field: %s, local: %d)" % (entry[field], field, local))
         # Only add the entry to the session if it has one of the required fields
         if se.fields:
             task.session.add(se)
@@ -329,7 +329,7 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
     :return: Seen Entry object as committed to DB
     """
     se = SeenEntry(title, task_name, reason, local)
-    for field, value in fields.items():
+    for field, value in list(fields.items()):
         sf = SeenField(field, value)
         se.fields.append(sf)
     session.add(se)
@@ -338,7 +338,8 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
 
 
 @with_session
-def search(value=None, status=None, start=None, stop=None, count=False, order_by='added', descending=False, session=None):
+def search(value=None, status=None, start=None, stop=None, count=False, order_by='added', descending=False,
+           session=None):
     query = session.query(SeenEntry)
     if descending:
         query = query.order_by(getattr(SeenEntry, order_by).desc())

@@ -1,9 +1,14 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.utils import old_div
+from future.moves.urllib.parse import quote
+
 import logging
 import ftplib
 import os
 import re
-import urllib
 
+from flexget.utils.tools import native_str_to_text
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
@@ -124,7 +129,7 @@ class InputFtpList(object):
 
         for p in dirs:
             if encoding:
-                p = p.decode(encoding)
+                p = native_str_to_text(p, encoding=encoding)
 
             # Clean file list when subdirectories are used
             p = p.replace(path + '/', '')
@@ -148,20 +153,20 @@ class InputFtpList(object):
                                   recursive, get_size, encoding)
 
             if not files_only or mlst.get('type') == 'file':
-                url = baseurl + urllib.quote(path) + '/' + urllib.quote(p)
+                url = baseurl + quote(path) + '/' + quote(p)
                 log.debug("Encoded URL: " + url)
                 title = os.path.basename(p)
                 log.info('Accepting entry "%s" [%s]' % (path + '/' + p, mlst.get('type') or "unknown",))
                 entry = Entry(title, url)
                 if get_size and 'size' not in mlst:
                     if mlst.get('type') == 'file':
-                        entry['content_size'] = ftp.size(path + '/' + p) / (1024 * 1024)
+                        entry['content_size'] = old_div(ftp.size(path + '/' + p), (1024 * 1024))
                         log.debug('(FILE) Size = %s', entry['content_size'])
                     elif mlst.get('type') == 'dir':
                         entry['content_size'] = self.get_folder_size(ftp, path, p)
                         log.debug('(DIR) Size = %s', entry['content_size'])
                 elif get_size:
-                    entry['content_size'] = float(mlst.get('size')) / (1024 * 1024)
+                    entry['content_size'] = old_div(float(mlst.get('size')), (1024 * 1024))
                 entries.append(entry)
 
     def parse_mlst(self, mlst):
@@ -199,7 +204,7 @@ class InputFtpList(object):
         for filename in dirs:
             filename = filename.replace(path + '/' + p + '/', '')
             try:
-                size += ftp.size(path + '/' + p + '/' + filename) / (1024 * 1024)
+                size += old_div(ftp.size(path + '/' + p + '/' + filename), (1024 * 1024))
             except ftplib.error_perm:
                 size += self.get_folder_size(ftp, path + '/' + p, filename)
         return size
@@ -207,4 +212,4 @@ class InputFtpList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(InputFtpList, 'ftp_list', api_ver=2)
+    plugin.register(InputFtpList, 'ftp_list', api_ver=2, groups=['list'])

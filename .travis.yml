@@ -3,6 +3,9 @@ cache: pip
 sudo: false
 python:
   - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
 # Install libyaml for vcr speedup?
 addons:
   apt:
@@ -10,10 +13,13 @@ addons:
       - libyaml-dev
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
+  - pip install --upgrade pip
   - pip install .
   - pip install -r dev-requirements.txt
 # command to run tests, e.g. python setup.py test
-script: py.test
+script: py.test --cov flexget --cov-report xml -n 3
+after_success:
+  - python-codacy-coverage -r coverage.xml
 env: VCR_RECORD_MODE=none
 notifications:
   email: false

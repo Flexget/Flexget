@@ -1,7 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-import mock
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.moves.xmlrpc import client as xmlrpc_client
+
 import os
-import xmlrpclib
+
+import mock
 
 from flexget.plugins.plugin_rtorrent import RTorrent
 
@@ -31,7 +34,7 @@ class Matcher(object):
         return self.compare(self.some_obj, other)
 
 
-@mock.patch('flexget.plugins.plugin_rtorrent.HTTPServerProxy')
+@mock.patch('flexget.plugins.plugin_rtorrent.xmlrpc_client.ServerProxy')
 class TestRTorrentClient(object):
 
     def test_version(self, mocked_proxy):
@@ -51,7 +54,7 @@ class TestRTorrentClient(object):
 
         resp = client.load(
             torrent_raw,
-            fields={'priority': 3, 'directory': '/data/downloads', 'custom1': 'test_custom1'},
+            fields={'priority': 3, 'directory': '/data/downloads', 'custom1': 'testing'},
             start=True,
             mkdir=True,
         )
@@ -62,14 +65,20 @@ class TestRTorrentClient(object):
         mocked_proxy.execute.throw.assert_called_with('', 'mkdir', '-p', '/data/downloads')
 
         # Ensure load was called
-        match_binary = Matcher(compare_binary, xmlrpclib.Binary(torrent_raw))
-        mocked_proxy.load.raw_start.assert_called_with(
-            '',
-            match_binary,
-            'd.priority.set=3',
-            'd.directory.set=\\/data\\/downloads',
-            'd.custom1.set=test\\_custom1'
-        )
+        assert mocked_proxy.load.raw_start.called
+
+        match_binary = Matcher(compare_binary, xmlrpc_client.Binary(torrent_raw))
+
+        called_args = mocked_proxy.load.raw_start.call_args_list[0][0]
+        assert len(called_args) == 5
+        assert '' == called_args[0]
+        assert match_binary in called_args
+
+        fields = [p for p in called_args[2:]]
+        assert len(fields) == 3
+        assert 'd.directory.set=\\/data\\/downloads' in fields
+        assert 'd.custom1.set=testing' in fields
+        assert 'd.priority.set=3' in fields
 
     def test_torrent(self, mocked_proxy):
         mocked_proxy = mocked_proxy()

@@ -1,9 +1,8 @@
-""" Torrent Scrubber Plugin.
-"""
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 
-from flexget import plugin, validator
+from flexget import plugin
 from flexget.event import event
 from flexget.plugins.modify.torrent import TorrentFilename
 from flexget.utils import bittorrent
@@ -100,7 +99,7 @@ class TorrentScrub(object):
                           " scrubbed from torrent '%s'!") % (", ".join(sorted(modified)), entry['title']))
                 new_infohash = entry["torrent"].info_hash
                 if infohash != new_infohash:
-                    log.warn("Info hash changed from #%s to #%s in '%s'" %
+                    log.warning("Info hash changed from #%s to #%s in '%s'" %
                              (infohash, new_infohash, entry['filename']))
 
 

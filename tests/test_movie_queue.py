@@ -1,3 +1,6 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import datetime
 import json
 
@@ -273,7 +276,7 @@ class TestMovieQueueAPI(object):
 
         rsp = api_client.json_put('/movie_queue/1/', data=json.dumps(payload))
 
-        assert json.loads(rsp.data) == valid_response, 'response data is %s' % json.loads(rsp.data)
+        assert json.loads(rsp.get_data(as_text=True)) == valid_response
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
 
         assert mocked_get_movie_by_id.called

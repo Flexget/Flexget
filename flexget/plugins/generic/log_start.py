@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from argparse import SUPPRESS
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import logging
 import os
-
+from argparse import SUPPRESS
 
 from flexget import options
 from flexget.event import event

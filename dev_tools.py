@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 import fileinput
 import os
 import shutil
@@ -8,12 +9,13 @@ import click
 
 
 def _get_version():
-    __version__ = None
     with open('flexget/_version.py') as f:
-        exec(f.read())
-    if not __version__:
+        g = globals()
+        l = {}
+        exec(f.read(), g, l)
+    if not l['__version__']:
         raise click.ClickException('Could not find __version__ from flexget/_version.py')
-    return __version__
+    return l['__version__']
 
 
 @click.group()
@@ -47,7 +49,12 @@ def bump_version(bump_type):
             # We don't have a revision number, assume 0
             ver_split.append('1')
         else:
-            ver_split[-1] = str(int(ver_split[-1]) + 1)
+            if 'b' in ver_split[2]:
+                # beta version
+                minor, beta = ver_split[-1].split('b')
+                ver_split[-1] = '%sb%s' % (minor, int(beta) + 1)
+            else:
+                ver_split[-1] = str(int(ver_split[-1]) + 1)
         if bump_type == 'dev':
             ver_split.append('dev')
     new_version = '.'.join(ver_split)

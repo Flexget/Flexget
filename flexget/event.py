@@ -1,7 +1,8 @@
 """
 Provides small event framework
 """
-from __future__ import absolute_import, division, unicode_literals
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -34,6 +35,9 @@ class Event(object):
         return '<Event(name=%s,func=%s,priority=%s)>' % (self.name, self.func.__name__, self.priority)
 
     __repr__ = __str__
+
+    def __hash__(self):
+        return hash((self.name, self.func, self.priority))
 
 
 def event(name, priority=128):
@@ -97,10 +101,9 @@ def fire_event(name, *args, **kwargs):
     :param args: List of arguments passed to handler function
     :param kwargs: Key Value arguments passed to handler function
     """
-    if name not in _events:
-        return
-    for event in get_events(name):
-        result = event(*args, **kwargs)
-        if result is not None:
-            args = (result,) + args[1:]
+    if name in _events:
+        for event in get_events(name):
+            result = event(*args, **kwargs)
+            if result is not None:
+                args = (result,) + args[1:]
     return args and args[0]

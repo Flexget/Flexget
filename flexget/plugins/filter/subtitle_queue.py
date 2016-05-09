@@ -1,9 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
+from future.moves.urllib.parse import urljoin
+from future.moves.urllib import request
+
 import glob
 import logging
 import os
-import urllib
-import urlparse
 import os.path
 
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, DateTime, Boolean
@@ -59,7 +62,7 @@ class SubtitleLanguages(Base):
     language = Column(String, unique=True, index=True)
 
     def __init__(self, language):
-        self.language = unicode(Language.fromietf(language))
+        self.language = str(Language.fromietf(language))
 
     def __str__(self):
         return '<SubtitleLanguage(%s)>' % self.language
@@ -161,7 +164,7 @@ class SubtitleQueue(object):
                 elif not config['remove_not_found'] and \
                         sub_item.added + parse_timedelta('24 hours') > datetime.combine(date.today(), time()):
                     log.warning('File %s was not found. Deleting after %s.' %
-                                (sub_item.path, unicode(sub_item.added + parse_timedelta('24 hours'))))
+                                (sub_item.path, str(sub_item.added + parse_timedelta('24 hours'))))
                     continue
                 else:
                     log.error('File not found. Removing "%s" from queue.' % sub_item.title)
@@ -186,16 +189,16 @@ class SubtitleQueue(object):
                     if not file.lower().endswith(VIDEO_EXTENSIONS):
                         continue
                     file = normalize_path(os.path.join(path_dir, file))
-                    entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(file.encode('utf-8')))
+                    entry['url'] = urljoin('file:', request.pathname2url(file))
                     entry['location'] = file
                     entry['title'] = os.path.splitext(os.path.basename(file))[0]  # filename without ext
                     entry['subtitle_languages'] = primary
 
                     try:
-                        import subliminal
+                        from subliminal.core import search_external_subtitles
                         try:
-                            video = subliminal.scan_video(normalize_path(file))
-                            if primary and not primary - video.subtitle_languages:
+                            existing_subtitles = set(search_external_subtitles(normalize_path(file)).values())
+                            if primary and not primary - existing_subtitles:
                                 log.debug('All subtitles already fetched for %s.' % entry['title'])
                                 sub_item.downloaded = True
                                 continue
@@ -329,7 +332,7 @@ def queue_add(path, title, config, alternate_path=None, location=None, session=N
         session.add(item)
         item.languages = primary
         log.info('Added %s to queue with langs: [%s].' %
-                 (item.path, ', '.join([unicode(s.language) for s in item.languages])))
+                 (item.path, ', '.join([str(s.language) for s in item.languages])))
         return True
 
 
@@ -395,7 +398,7 @@ def queue_get(session=None):
 # must always pass the session
 @with_session
 def get_lang(lang, session=None):
-    return session.query(SubtitleLanguages).filter(SubtitleLanguages.language == unicode(lang)).first()
+    return session.query(SubtitleLanguages).filter(SubtitleLanguages.language == str(lang)).first()
 
 
 @with_session
@@ -403,11 +406,11 @@ def make_lang_list(languages, session=None):
     if not isinstance(languages, list):
         languages = [languages]
     # TODO: find better way of enforcing uniqueness without catching exceptions or doing dumb shit like this
-    languages = set([unicode(Language.fromietf(l)) for l in languages])
+    languages = set([str(Language.fromietf(l)) for l in languages])
 
     result = set()
     for language in languages:
-        lang = get_lang(language, session=session) or SubtitleLanguages(unicode(language))
+        lang = get_lang(language, session=session) or SubtitleLanguages(str(language))
         result.add(lang)
     return list(result)
 

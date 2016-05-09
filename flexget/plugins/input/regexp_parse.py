@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import codecs
 import re
 import logging
@@ -175,7 +177,7 @@ class RegexpParse(object):
         key_to_regexps = {}
 
         # put every key in keys into the rey_to_regexps list
-        for key, value in config['keys'].iteritems():
+        for key, value in config['keys'].items():
             key_to_regexps[key] = self.compile_regexp_dict_list(value['regexps'])
             if 'required' in value and value['required']:
                 self.required.append(key)
@@ -183,7 +185,7 @@ class RegexpParse(object):
         entries = []
         for section in sections:
             entry = Entry()
-            for key, regexps in key_to_regexps.iteritems():
+            for key, regexps in key_to_regexps.items():
                 for regexp in regexps:
                     m = regexp.search(section)
                     if m:

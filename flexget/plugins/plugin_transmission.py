@@ -1,13 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
+from future.moves.urllib.parse import urlparse
+
 import os
-from datetime import datetime
-from datetime import timedelta
-from netrc import netrc, NetrcParseError
 import logging
 import base64
 import re
 import time
-from urlparse import urlparse
+from datetime import datetime
+from datetime import timedelta
+from netrc import netrc, NetrcParseError
 
 from flexget import plugin, validator
 from flexget.entry import Entry
@@ -19,25 +22,16 @@ from flexget.utils.tools import parse_timedelta
 from flexget.config_schema import one_or_more
 from fnmatch import fnmatch
 
+try:
+    import transmissionrpc
+    from transmissionrpc import TransmissionError
+    from transmissionrpc import HTTPHandlerError
+except ImportError:
+    # If transmissionrpc is not found, errors will be shown later
+    pass
+
+
 log = logging.getLogger('transmission')
-
-
-def save_opener(f):
-    """
-        Transmissionrpc sets a new default opener for urllib2
-        We use this as a decorator to capture and restore it when needed
-    """
-
-    def new_f(self, *args, **kwargs):
-        import urllib2
-        prev_opener = urllib2._opener
-        urllib2.install_opener(self.opener)
-        try:
-            f(self, *args, **kwargs)
-            self.opener = urllib2._opener
-        finally:
-            urllib2.install_opener(prev_opener)
-    return new_f
 
 
 class TransmissionBase(object):
@@ -75,10 +69,6 @@ class TransmissionBase(object):
         return config
 
     def create_rpc_client(self, config):
-        import transmissionrpc
-        from transmissionrpc import TransmissionError
-        from transmissionrpc import HTTPHandlerError
-
         user, password = config.get('username'), config.get('password')
 
         try:
@@ -101,7 +91,7 @@ class TransmissionBase(object):
         done = torrent.totalSize > 0
         vloc = None
         best = None
-        for t in torrent.files().iteritems():
+        for t in torrent.files().items():
             tf = t[1]
             if tf['selected']:
                 if tf['size'] <= 0 or tf['completed'] < tf['size']:
@@ -131,7 +121,6 @@ class TransmissionBase(object):
 
         return seed_limit_ok, idle_limit_ok
 
-    @save_opener
     def on_task_start(self, task, config):
         try:
             import transmissionrpc
@@ -289,9 +278,7 @@ class PluginTransmission(TransmissionBase):
             download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
     @plugin.priority(135)
-    @save_opener
     def on_task_output(self, task, config):
-        from transmissionrpc import TransmissionError
         config = self.prepare_config(config)
         # don't add when learning
         if task.options.learn:
@@ -388,7 +375,6 @@ class PluginTransmission(TransmissionBase):
 
     def add_to_transmission(self, cli, task, config):
         """Adds accepted entries to transmission """
-        from transmissionrpc import TransmissionError
         for entry in task.accepted:
             if task.options.test:
                 log.info('Would add %s to transmission' % entry['url'])
@@ -413,7 +399,7 @@ class PluginTransmission(TransmissionBase):
             try:
                 if downloaded:
                     with open(entry['file'], 'rb') as f:
-                        filedump = base64.b64encode(f.read()).encode('utf-8')
+                        filedump = base64.b64encode(f.read()).decode('utf-8')
                     r = cli.add_torrent(filedump, 30, **options['add'])
                 else:
                     # we need to set paused to false so the magnetization begins immediately
@@ -554,7 +540,7 @@ class PluginTransmission(TransmissionBase):
                                 try:
                                     cli.rename_torrent_path(r.id, fl[r.id][index]['name'],
                                                             os.path.basename(
-                                                                pathscrub(filename + file_ext).encode('utf-8'))
+                                                                pathscrub(filename + file_ext)).encode('utf-8')
                                                             )
                                 except TransmissionError:
                                     log.error('content_filename only supported with transmission 2.8+')
@@ -582,7 +568,7 @@ class PluginTransmission(TransmissionBase):
                                               % (len(options['change']['files_wanted']), len(full_list)))
                 
                 # Set any changed file properties
-                if options['change'].keys():
+                if list(options['change'].keys()):
                     cli.change_torrent(r.id, 30, **options['change'])
                            
                 # if addpaused was defined and set to False start the torrent;

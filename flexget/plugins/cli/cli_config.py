@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
+
 import argparse
 import functools
 import logging
@@ -33,15 +36,15 @@ def replace_in_item(replaces, item):
     replace = functools.partial(replace_in_item, replaces)
     if isinstance(item, basestring):
         # Do replacement in text objects
-        for key, val in replaces.iteritems():
+        for key, val in replaces.items():
             item = item.replace('$%s' % key, val)
         return item
     elif isinstance(item, list):
         # Make a new list with replacements done on each item
-        return map(replace, item)
+        return list(map(replace, item))
     elif isinstance(item, dict):
         # Make a new dict with replacements done on keys and values
-        return dict(map(replace, kv_pair) for kv_pair in item.iteritems())
+        return dict(list(map(replace, kv_pair)) for kv_pair in item.items())
     else:
         # We don't know how to do replacements on this item, just return it
         return item

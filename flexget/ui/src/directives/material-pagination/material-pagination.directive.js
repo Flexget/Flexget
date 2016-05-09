@@ -23,11 +23,11 @@
   }
 
   function pagingLink(scope, element, attributes) {
-    scope.$watch('page', function(newValue, oldValue) {
+    scope.$watch('[page,total]', function(newValue, oldValue) {
       if(newValue) {
         updateButtons(scope, attributes);
       }
-    })
+    }, true)
   }
 
   function addRange(start, end, scope) {

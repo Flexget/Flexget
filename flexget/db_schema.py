@@ -1,14 +1,19 @@
-from __future__ import absolute_import, division, unicode_literals
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.utils import native_str
 
 import logging
+from datetime import datetime
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.exc import OperationalError
 
+import flexget
 from flexget.event import event
 from flexget.manager import Base, Session
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_schema
+from flexget.utils.tools import get_current_flexget_version
 
 log = logging.getLogger('schema')
 
@@ -16,8 +21,40 @@ log = logging.getLogger('schema')
 plugin_schemas = {}
 
 
-class PluginSchema(Base):
+class FlexgetVersion(Base):
+    __tablename__ = 'flexget_version'
 
+    version = Column(String, primary_key=True)
+    created = Column(DateTime, default=datetime.now)
+
+    def __init__(self):
+        self.version = get_current_flexget_version()
+
+
+@event('manager.startup')
+def set_flexget_db_version(manager=None):
+    with Session() as session:
+        db_version = session.query(FlexgetVersion).first()
+        if not db_version:
+            log.debug('entering flexget version %s to db', get_current_flexget_version())
+            session.add(FlexgetVersion())
+        elif db_version.version != get_current_flexget_version():
+            log.debug('updating flexget version %s in db', get_current_flexget_version())
+            db_version.version = get_current_flexget_version()
+            db_version.created = datetime.now()
+            session.commit()
+        else:
+            log.debug('current flexget version already exist in db %s', db_version.version)
+
+
+def get_flexget_db_version():
+    with Session() as session:
+        version = session.query(FlexgetVersion).first()
+        if version:
+            return version.version
+
+
+class PluginSchema(Base):
     __tablename__ = 'plugin_schema'
 
     id = Column(Integer, primary_key=True)
@@ -120,6 +157,7 @@ def upgrade(plugin):
                     session.rollback()
                     manager.shutdown(finish_queue=False)
                 else:
+                    current_ver = -1 if current_ver is None else current_ver
                     if new_ver > current_ver:
                         log.info('Plugin `%s` schema upgraded successfully' % plugin)
                         set_version(plugin, new_ver, session=session)
@@ -131,6 +169,7 @@ def upgrade(plugin):
                         manager.shutdown(finish_queue=False)
 
         return upgrade_wrapper
+
     return upgrade_decorator
 
 
@@ -152,7 +191,7 @@ def reset_schema(plugin, session=None):
         except OperationalError as e:
             if 'no such table' in str(e):
                 continue
-            raise e    # Remove the plugin from schema table
+            raise e  # Remove the plugin from schema table
     session.query(PluginSchema).filter(PluginSchema.plugin == plugin).delete()
     # We need to commit our current changes to close the session before calling create_all
     session.commit()
@@ -182,6 +221,7 @@ class Meta(type):
                 if not any(isinstance(base, type(Base)) for base in bases):
                     # We are not already subclassing Base, add it in to the list of bases instead of VersionedBase
                     new_bases.append(Base)
+
                     # Since Base and VersionedBase have 2 different metaclasses, a class that subclasses both of them
                     # must have a metaclass that subclasses both of their metaclasses.
 
@@ -190,7 +230,7 @@ class Meta(type):
             else:
                 new_bases.append(base)
 
-        return type.__new__(mcs, str(metaname), tuple(new_bases), dict_)
+        return type.__new__(mcs, native_str(metaname), tuple(new_bases), dict_)
 
     def register_table(cls, table):
         """
@@ -198,7 +238,7 @@ class Meta(type):
 
         :param table: Can either be the name of the table, or an :class:`sqlalchemy.Table` instance.
         """
-        if isinstance(table, basestring):
+        if isinstance(table, str):
             register_plugin_table(table, cls.plugin, cls.version)
         else:
             register_plugin_table(table.name, cls.plugin, cls.version)
@@ -216,15 +256,15 @@ def versioned_base(plugin, version):
 
 def after_table_create(event, target, bind, tables=None, **kw):
     """Sets the schema version to most recent for a plugin when it's tables are freshly created."""
-    from flexget.manager import manager
     if tables:
         # TODO: Detect if any database upgrading is needed and acquire the lock only in one place
-        with manager.acquire_lock(event=False):
+        with flexget.manager.manager.acquire_lock(event=False):
             tables = [table.name for table in tables]
-            for plugin, info in plugin_schemas.iteritems():
+            for plugin, info in plugin_schemas.items():
                 # Only set the version if all tables for a given plugin are being created
                 if all(table in tables for table in info['tables']):
                     set_version(plugin, info['version'])
+
 
 # Register a listener to call our method after tables are created
 Base.metadata.append_ddl_listener('after-create', after_table_create)

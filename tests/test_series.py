@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-from StringIO import StringIO
+from io import StringIO
 
 import pytest
 from jinja2 import Template
@@ -2008,7 +2009,7 @@ class TestCLI(object):
         assert all(any(line.lstrip().startswith(series) for line in lines) for series in ['Some Show', 'Other Show'])
 
 
-class TestSeriesForget(object):
+class TestSeriesRemove(object):
     config = """
         templates:
           global:
@@ -2022,23 +2023,23 @@ class TestSeriesForget(object):
             mock:
             - title: My Show S01E01 1080p
             - title: My Show S01E01 720p
-          forget_episode:
+          remove_episode:
             seen: no
             mock:
             - title: My Show S01E01
               series_name: My Show
               series_id: S01E01
             accept_all: yes
-            series_forget: yes
+            series_remove: yes
     """
 
-    def test_forget_episode(self, execute_task):
+    def test_remove_episode(self, execute_task):
         task = execute_task('get_episode')
         assert len(task.accepted) == 1
         first_rls = task.accepted[0]
         task = execute_task('get_episode')
         assert not task.accepted, 'series plugin duplicate blocking not working?'
-        task = execute_task('forget_episode')
+        task = execute_task('remove_episode')
         task = execute_task('get_episode')
         assert len(task.accepted) == 1, 'new release not accepted after forgetting ep'
         assert task.accepted[0] != first_rls, 'same release accepted on second run'

@@ -1,10 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import re
 from datetime import datetime, timedelta
+
 import mock
 import pytest
+
 from flexget.manager import Session
-from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode
+from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode, find_series_id
 from flexget.plugins.input.thetvdb_favorites import TVDBUserFavorite
 
 
@@ -105,6 +109,8 @@ class TestTVDBLookup(object):
         assert entry['tvdb_ep_rating'] == 7.8
 
     def test_no_posters_actors(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
         task = execute_task('test_no_poster_actors')
         entry = task.find_entry(tvdb_series_name='Sex House')
         assert entry['tvdb_posters'] == []
@@ -153,6 +159,13 @@ class TestTVDBLookup(object):
         assert entry
         assert entry['tvdb_ep_name'] == 'A Cry on Deaf Ears'
 
+    def test_find_series_id(self, mocked_expired, execute_task):
+        # Test the best match logic
+        assert find_series_id('Once Upon A Time') == 248835
+        assert find_series_id('Once Upon A Time 2011') == 248835
+        assert find_series_id('House M.D.') == 73255
+        assert find_series_id('House') == 73255
+
 
 @pytest.mark.online
 class TestTVDBExpire(object):
@@ -189,8 +202,8 @@ class TestTVDBExpire(object):
         with mock.patch('requests.sessions.Session.request',
                         side_effect=Exception('Tried to expire or lookup, less then an hour since last check')) as _:
             # Ensure series is not marked as expired
-            mark_expired()
             with Session() as session:
+                mark_expired(session)
                 ep = session.query(TVDBEpisode)\
                     .filter(TVDBEpisode.series_id == 73255)\
                     .filter(TVDBEpisode.episode_number == 2)\
@@ -227,8 +240,8 @@ class TestTVDBExpire(object):
 
         # Ensure series is marked as expired
         with mock.patch.object(TVDBRequest, 'get', side_effect=[expired_data]) as _:
-            mark_expired()
             with Session() as session:
+                mark_expired(session)
                 ep = session.query(TVDBEpisode)\
                     .filter(TVDBEpisode.series_id == 73255)\
                     .filter(TVDBEpisode.episode_number == 2)\
@@ -236,6 +249,18 @@ class TestTVDBExpire(object):
                     .first()
                 assert ep.expired
                 assert ep.series.expired
+
+        # Run the task again, should be re-populated from tvdb
+        test_run()
+
+        with Session() as session:
+            ep = session.query(TVDBEpisode)\
+                .filter(TVDBEpisode.series_id == 73255)\
+                .filter(TVDBEpisode.episode_number == 2)\
+                .filter(TVDBEpisode.season_number == 2)\
+                .first()
+            assert not ep.expired
+            assert not ep.series.expired
 
 
 @mock.patch('flexget.plugins.api_tvdb.mark_expired')
@@ -261,11 +286,11 @@ class TestTVDBFavorites(object):
               from:
                 thetvdb_favorites:
                   username: flexget
-                  password: flexget
+                  account_id: 80FB8BD0720CA5EC
           test_strip_dates:
             thetvdb_favorites:
               username: flexget
-              password: flexget
+              account_id: 80FB8BD0720CA5EC
               strip_dates: yes
     """
 
@@ -310,7 +335,7 @@ class TestTVDBSubmit(object):
             thetvdb_lookup: yes
             thetvdb_add:
               username: flexget
-              password: flexget
+              account_id: 80FB8BD0720CA5EC
             series:
               - House
           delete:
@@ -320,7 +345,7 @@ class TestTVDBSubmit(object):
             thetvdb_lookup: yes
             thetvdb_remove:
               username: flexget
-              password: flexget
+              account_id: 80FB8BD0720CA5EC
             series:
               - The Big Bang Theory
 

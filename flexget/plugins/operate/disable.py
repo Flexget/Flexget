@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
+
 import logging
 
 from flexget import plugin
@@ -10,7 +13,7 @@ log = logging.getLogger('disable')
 
 def all_builtins():
     """Helper function to return an iterator over all builtin plugins."""
-    return (p for p in plugin.plugins.itervalues() if p.builtin)
+    return (p for p in plugin.plugins.values() if p.builtin)
 
 
 class DisablePlugin(object):

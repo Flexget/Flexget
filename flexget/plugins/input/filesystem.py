@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.utils import PY2
+
 import logging
 import re
 import sys
-import urllib
-import urlparse
 from datetime import datetime
 
 from path import Path
@@ -108,7 +109,12 @@ class Filesystem(object):
         filepath = filepath.abspath()
         entry = Entry()
         entry['location'] = filepath
-        entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(filepath.encode('utf8')))
+        if PY2:
+            import urllib, urlparse
+            entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(filepath.encode('utf8')))
+        else:
+            import pathlib
+            entry['url'] = pathlib.Path(filepath).absolute().as_uri()
         entry['filename'] = filepath.name
         if filepath.isfile():
             entry['title'] = filepath.namebase

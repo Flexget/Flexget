@@ -1,4 +1,8 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 from datetime import datetime
+
 from flexget.utils import json
 
 

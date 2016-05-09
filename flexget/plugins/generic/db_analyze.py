@@ -1,5 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import logging
+
 from flexget.event import event
 
 log = logging.getLogger('db_analyze')

@@ -8,21 +8,21 @@ interactions:
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=naruto&type=show
     response:
-      body: {string: '[{"type":"show","score":108.069405,"show":{"title":"Naruto","overview":"In
+      body: {string: '[{"type":"show","score":109.72761,"show":{"title":"Naruto","overview":"In
           another world, ninja are the ultimate power, and in the Village Hidden in
           the Leaves live the stealthiest ninja in the land. Twelve years earlier,
           the fearsome Nine-Tailed Fox terrorized the village and claimed many lives
           before it was subdued and its spirit sealed within the body of a baby boy.
           That boy, Naruto Uzumaki, has grown up to become a ninja-in-training who''s
           more interested in pranks than in studying ninjutsu.. but Naruto is determined
-          to become the greatest ninja ever!","year":2002,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/046/003/posters/original/362a7f25fa.jpg","medium":"https://walter.trakt.us/images/shows/000/046/003/posters/medium/362a7f25fa.jpg","thumb":"https://walter.trakt.us/images/shows/000/046/003/posters/thumb/362a7f25fa.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/046/003/fanarts/original/057a423eb7.jpg","medium":"https://walter.trakt.us/images/shows/000/046/003/fanarts/medium/057a423eb7.jpg","thumb":"https://walter.trakt.us/images/shows/000/046/003/fanarts/thumb/057a423eb7.jpg"}},"ids":{"trakt":46003,"slug":"naruto","tvdb":78857,"imdb":"tt0409591","tmdb":46260,"tvrage":4620}}},{"type":"show","score":77.19243,"show":{"title":"Naruto
+          to become the greatest ninja ever!","year":2002,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/046/003/posters/original/362a7f25fa.jpg","medium":"https://walter.trakt.us/images/shows/000/046/003/posters/medium/362a7f25fa.jpg","thumb":"https://walter.trakt.us/images/shows/000/046/003/posters/thumb/362a7f25fa.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/046/003/fanarts/original/057a423eb7.jpg","medium":"https://walter.trakt.us/images/shows/000/046/003/fanarts/medium/057a423eb7.jpg","thumb":"https://walter.trakt.us/images/shows/000/046/003/fanarts/thumb/057a423eb7.jpg"}},"ids":{"trakt":46003,"slug":"naruto","tvdb":78857,"imdb":"tt0409591","tmdb":46260,"tvrage":4620}}},{"type":"show","score":78.37686,"show":{"title":"Naruto
           Shippuden","overview":"Naruto: Shippuden is an anime series adapted from
           Part II of the Naruto manga series by Masashi Kishimoto. The series is directed
           by Hayato Date and produced by Studio Pierrot and TV Tokyo. Naruto: Shippuden
           is a continuation of the Naruto manga, and continues the same storyline
           after the passing of two and a half years in the Naruto universe. It began
           broadcasting on TV Tokyo on February 15, 2007.","year":2007,"status":"returning
-          series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/031/770/posters/original/85036f6398.jpg","medium":"https://walter.trakt.us/images/shows/000/031/770/posters/medium/85036f6398.jpg","thumb":"https://walter.trakt.us/images/shows/000/031/770/posters/thumb/85036f6398.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/031/770/fanarts/original/a3219c47aa.jpg","medium":"https://walter.trakt.us/images/shows/000/031/770/fanarts/medium/a3219c47aa.jpg","thumb":"https://walter.trakt.us/images/shows/000/031/770/fanarts/thumb/a3219c47aa.jpg"}},"ids":{"trakt":31770,"slug":"naruto-shippuden","tvdb":79824,"imdb":"tt0988824","tmdb":31910,"tvrage":null}}},{"type":"show","score":77.19243,"show":{"title":"Naruto
+          series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/031/770/posters/original/61c3e86d67.jpg","medium":"https://walter.trakt.us/images/shows/000/031/770/posters/medium/61c3e86d67.jpg","thumb":"https://walter.trakt.us/images/shows/000/031/770/posters/thumb/61c3e86d67.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/031/770/fanarts/original/a3219c47aa.jpg","medium":"https://walter.trakt.us/images/shows/000/031/770/fanarts/medium/a3219c47aa.jpg","thumb":"https://walter.trakt.us/images/shows/000/031/770/fanarts/thumb/a3219c47aa.jpg"}},"ids":{"trakt":31770,"slug":"naruto-shippuden","tvdb":79824,"imdb":"tt0988824","tmdb":31910,"tvrage":null}}},{"type":"show","score":78.37686,"show":{"title":"Naruto
           Kai","overview":"Naruto Kai is an abridged version of the anime that removes
           filler, OPs/EDs, recaps, and previews. Several episodes are merged together
           to create one long episode, and each episode covers its respective manga
@@ -31,12 +31,12 @@ interactions:
           its spirit sealed within the body of a baby boy. That boy, Naruto Uzumaki,
           has grown up to become a ninja-in-training who''s more interested in pranks
           than in studying ninjutsu.. but Naruto is determined to become the greatest
-          ninja ever!","year":2002,"status":"returning series","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":101599,"slug":"naruto-kai","tvdb":300072,"imdb":null,"tmdb":null,"tvrage":null}}},{"type":"show","score":38.596214,"show":{"title":"Naruto:
+          ninja ever!","year":2002,"status":"returning series","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":101599,"slug":"naruto-kai","tvdb":300072,"imdb":null,"tmdb":null,"tvrage":null}}},{"type":"show","score":39.18843,"show":{"title":"Naruto:
           The Abridged Comedy Fandub Spoof Series Show","year":2009,"status":"returning
-          series","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":67973,"slug":"naruto-the-abridged-comedy-fandub-spoof-series-show","tvdb":261343,"imdb":"tt1578671","tmdb":null,"tvrage":null}}},{"type":"show","score":4.4595017,"show":{"title":"GeGeGe
+          series","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":67973,"slug":"naruto-the-abridged-comedy-fandub-spoof-series-show","tvdb":261343,"imdb":"tt1578671","tmdb":null,"tvrage":null}}},{"type":"show","score":4.1736937,"show":{"title":"GeGeGe
           no Kitaro","overview":"A truly bizzarre anime with a flavour of traditional
           Japanese folklore. The boy, Kitarou, encounters various forms of evil with
-          his father, who happens to be an eyeball.","year":1968,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/036/987/posters/original/f1c148bcbd.jpg","medium":"https://walter.trakt.us/images/shows/000/036/987/posters/medium/f1c148bcbd.jpg","thumb":"https://walter.trakt.us/images/shows/000/036/987/posters/thumb/f1c148bcbd.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/036/987/fanarts/original/f1c148bcbd.jpg","medium":"https://walter.trakt.us/images/shows/000/036/987/fanarts/medium/f1c148bcbd.jpg","thumb":"https://walter.trakt.us/images/shows/000/036/987/fanarts/thumb/f1c148bcbd.jpg"}},"ids":{"trakt":36987,"slug":"gegege-no-kitaro","tvdb":265216,"imdb":null,"tmdb":37144,"tvrage":null}}},{"type":"show","score":0.72945356,"show":{"title":"Rock
+          his father, who happens to be an eyeball.","year":1968,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/036/987/posters/original/f1c148bcbd.jpg","medium":"https://walter.trakt.us/images/shows/000/036/987/posters/medium/f1c148bcbd.jpg","thumb":"https://walter.trakt.us/images/shows/000/036/987/posters/thumb/f1c148bcbd.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/036/987/fanarts/original/f1c148bcbd.jpg","medium":"https://walter.trakt.us/images/shows/000/036/987/fanarts/medium/f1c148bcbd.jpg","thumb":"https://walter.trakt.us/images/shows/000/036/987/fanarts/thumb/f1c148bcbd.jpg"}},"ids":{"trakt":36987,"slug":"gegege-no-kitaro","tvdb":265216,"imdb":null,"tmdb":37144,"tvrage":null}}},{"type":"show","score":0.7593677,"show":{"title":"Rock
           Lee & His Ninja Pals","overview":"Welcome to the Hidden Leaf Village. The
           village where Uzumaki Naruto, star of the TV show \"Naruto\" makes his home.
           Every day, countless powerful ninjas carry out missions and train to hone
@@ -47,7 +47,7 @@ interactions:
           his dream, he puts in more effort than anyone else. Under the hot-blooded
           tutelage of his teacher Guy, he works alongside his teammates Tenten and
           Neji. Watch the Beautiful Green Beast Rock Lee train, go on missions, and
-          have all sorts of adventures! ","year":2012,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/066/108/posters/original/0e7a6a2614.jpg","medium":"https://walter.trakt.us/images/shows/000/066/108/posters/medium/0e7a6a2614.jpg","thumb":"https://walter.trakt.us/images/shows/000/066/108/posters/thumb/0e7a6a2614.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/066/108/fanarts/original/5add6a78d5.jpg","medium":"https://walter.trakt.us/images/shows/000/066/108/fanarts/medium/5add6a78d5.jpg","thumb":"https://walter.trakt.us/images/shows/000/066/108/fanarts/thumb/5add6a78d5.jpg"}},"ids":{"trakt":66108,"slug":"rock-lee-his-ninja-pals","tvdb":257837,"imdb":"tt2301807","tmdb":null,"tvrage":null}}},{"type":"show","score":0.4211502,"show":{"title":"Pucca","overview":"\"Pucca\"
+          have all sorts of adventures! ","year":2012,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/066/108/posters/original/0e7a6a2614.jpg","medium":"https://walter.trakt.us/images/shows/000/066/108/posters/medium/0e7a6a2614.jpg","thumb":"https://walter.trakt.us/images/shows/000/066/108/posters/thumb/0e7a6a2614.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/066/108/fanarts/original/5add6a78d5.jpg","medium":"https://walter.trakt.us/images/shows/000/066/108/fanarts/medium/5add6a78d5.jpg","thumb":"https://walter.trakt.us/images/shows/000/066/108/fanarts/thumb/5add6a78d5.jpg"}},"ids":{"trakt":66108,"slug":"rock-lee-his-ninja-pals","tvdb":257837,"imdb":"tt2301807","tmdb":null,"tvrage":null}}},{"type":"show","score":0.4384212,"show":{"title":"Pucca","overview":"\"Pucca\"
           is a TV series based on a Flash animation series published by Vooz Character
           Systems.  It follows the trails and exploits of a South Korean girl named
           Pucca who is insanely in love with a prideful ninja named Garu.  Meanwhile,
@@ -58,37 +58,37 @@ interactions:
           adult humor; but most of the adult jokes would not go noticed by small children,
           who are the primary audience.","year":2006,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/006/742/posters/original/08a1152b05.jpg","medium":"https://walter.trakt.us/images/shows/000/006/742/posters/medium/08a1152b05.jpg","thumb":"https://walter.trakt.us/images/shows/000/006/742/posters/thumb/08a1152b05.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/006/742/fanarts/original/39a770759a.jpg","medium":"https://walter.trakt.us/images/shows/000/006/742/fanarts/medium/39a770759a.jpg","thumb":"https://walter.trakt.us/images/shows/000/006/742/fanarts/thumb/39a770759a.jpg"}},"ids":{"trakt":6742,"slug":"pucca","tvdb":81774,"imdb":"tt0795256","tmdb":6782,"tvrage":null}}}]'}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [27dce676dd6319c2-SYD]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 11:55:34 GMT']
-        etag: [W/"4865255802d2834e7964b12548c5329c"]
-        expires: ['Thu, 03 Mar 2016 15:55:34 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dd376971ed900c9b46efacc76eb56c9e41457006134; expires=Fri,
-            03-Mar-17 11:55:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['7']
-        x-pagination-limit: ['10']
-        x-pagination-page: ['1']
-        x-pagination-page-count: ['1']
-        x-request-id: [d61b5ae7-1bbf-427f-b7ac-a24d71b6d031]
-        x-runtime: ['0.021189']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de238203c203d6-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:30 GMT']
+        ETag: [W/"95f5dfbcd1593038c4c6dfd88b198dc6"]
+        Expires: ['Wed, 04 May 2016 22:50:30 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=dedb2ee454323d7c7a90e358ce25061741462387830; expires=Thu,
+            04-May-17 18:50:30 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['7']
+        X-Pagination-Limit: ['10']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['1']
+        X-Request-Id: [f509861f-41fb-4a74-ad70-f031168ff10a]
+        X-Runtime: ['0.023313']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=dd376971ed900c9b46efacc76eb56c9e41457006134]
+        Cookie: [__cfduid=dedb2ee454323d7c7a90e358ce25061741462387830]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/46003?extended=full
+      uri: https://api-v2launch.trakt.tv/shows/46003?extended=full%2Cimages
     response:
       body: {string: '{"title":"Naruto","year":2002,"ids":{"trakt":46003,"slug":"naruto","tvdb":78857,"imdb":"tt0409591","tmdb":46260,"tvrage":4620},"overview":"In
           another world, ninja are the ultimate power, and in the Village Hidden in
@@ -97,24 +97,24 @@ interactions:
           before it was subdued and its spirit sealed within the body of a baby boy.
           That boy, Naruto Uzumaki, has grown up to become a ninja-in-training who''s
           more interested in pranks than in studying ninjutsu.. but Naruto is determined
-          to become the greatest ninja ever!","first_aired":"2002-10-03T07:00:00.000Z","airs":{"day":"Thursday","time":null,"timezone":"Asia/Tokyo"},"runtime":25,"certification":"TV-PG","network":"TV
-          Tokyo","country":"jp","trailer":null,"homepage":null,"status":"ended","rating":8.20478,"votes":1675,"updated_at":"2016-03-02T11:14:51.000Z","language":"ja","available_translations":["en","de","fr","he","ar","es","it","ru","cs","pt","ko"],"genres":["animation","comedy","action","adventure","fantasy","thriller"],"aired_episodes":220}'}
+          to become the greatest ninja ever!","first_aired":"2002-10-03T07:00:00.000Z","airs":{"day":"Thursday","time":null,"timezone":"Asia/Tokyo"},"runtime":30,"certification":"TV-PG","network":"TV
+          Tokyo","country":"jp","trailer":null,"homepage":"http://naruto.wikia.com/wiki/Narutopedia","status":"ended","rating":8.18689,"votes":1755,"updated_at":"2016-05-04T10:53:22.000Z","language":"ja","available_translations":["en","de","fr","he","ar","es","it","ru","cs","pt","ko","ja","zh","nl","el","ro"],"genres":["animation","comedy"],"aired_episodes":220,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/046/003/fanarts/original/057a423eb7.jpg","medium":"https://walter.trakt.us/images/shows/000/046/003/fanarts/medium/057a423eb7.jpg","thumb":"https://walter.trakt.us/images/shows/000/046/003/fanarts/thumb/057a423eb7.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/046/003/posters/original/362a7f25fa.jpg","medium":"https://walter.trakt.us/images/shows/000/046/003/posters/medium/362a7f25fa.jpg","thumb":"https://walter.trakt.us/images/shows/000/046/003/posters/thumb/362a7f25fa.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/046/003/logos/original/be8f2bf1bb.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/046/003/cleararts/original/f36509688e.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/046/003/banners/original/21e087b7c3.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/046/003/thumbs/original/a0730c6a23.jpg"}}}'}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [27dce6771d6f19c2-SYD]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 11:55:34 GMT']
-        etag: [W/"343fb9f617322846df60772c458d8f78"]
-        expires: ['Thu, 03 Mar 2016 15:55:34 GMT']
-        last-modified: ['Wed, 02 Mar 2016 11:14:51 GMT']
-        server: [cloudflare-nginx]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [55b1f9fd-2c2a-41ea-8a2c-318cb5a5f4c4]
-        x-runtime: ['0.016877']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de2382f3cd03d6-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:30 GMT']
+        ETag: [W/"38352831b48f6fb21067f55557f930c4"]
+        Expires: ['Wed, 04 May 2016 22:50:30 GMT']
+        Last-Modified: ['Wed, 04 May 2016 10:53:22 GMT']
+        Server: [cloudflare-nginx]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [0a88455c-9412-4ae1-bdff-3612d2956ecb]
+        X-Runtime: ['0.013506']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

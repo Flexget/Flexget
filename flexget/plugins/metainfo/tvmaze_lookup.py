@@ -2,12 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 
 import logging
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.api_tvmaze import APITVMaze, get_actor_details
+    from flexget.plugins.api_tvmaze import APITVMaze
 
     series_lookup = APITVMaze.series_lookup
     episode_lookup = APITVMaze.episode_lookup
@@ -82,7 +84,7 @@ class PluginTVMazeLookup(object):
         'tvmaze_series_tvrage': 'tvrage_id',
         'tvmaze_series_runtime': 'runtime',
         'tvmaze_series_premiered': 'premiered',
-        'tvmaze_series_airdays': lambda show: show.schedule.get('days') if show.schedule else None,
+        'tvmaze_series_airdays': 'schedule',
         'tvmaze_series_weight': 'weight',
         'tvmaze_series_update_date': 'updated',
         'tvmaze_series_language': 'language',
@@ -96,8 +98,7 @@ class PluginTVMazeLookup(object):
         'tvmaze_series_url': 'url',
         'tvmaze_series_status': 'status',
         'tvmaze_series_rating': 'rating',
-        'tvmaze_series_episodes': lambda show: [episodes.title for episodes in show.episodes],
-        'tvmaze_series_actors': lambda show: [get_actor_details(actor) for actor in show.actors]
+        'tvmaze_series_episodes': lambda show: [episodes.title for episodes in show.episodes]
     }
 
     # Episode info
@@ -129,7 +130,7 @@ class PluginTVMazeLookup(object):
             try:
                 series = series_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e.args[0])
+                log.debug(e)
             else:
                 entry.update_using_map(self.series_map, series)
         return entry
@@ -149,7 +150,7 @@ class PluginTVMazeLookup(object):
             try:
                 episode = episode_lookup(**lookupargs)
             except LookupError as e:
-                log.debug(e.args[0])
+                log.debug(e)
             else:
                 entry.update_using_map(self.episode_map, episode)
         return entry

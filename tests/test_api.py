@@ -1,3 +1,6 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import json
 import os
 
@@ -24,7 +27,7 @@ class TestValidator(object):
         rsp = api_client.json_post('/tasks/', data=json.dumps(new_task))
 
         assert rsp.status_code == 400
-        data = json.loads(rsp.data)
+        data = json.loads(rsp.get_data(as_text=True))
         assert data.get('code') == 400
         assert data.get('message') == 'validation error'
         assert data.get('validation_errors')
@@ -46,7 +49,7 @@ class TestServerAPI(object):
     def test_pid(self, api_client):
         rsp = api_client.get('/server/pid/', headers={})
         assert rsp.status_code == 200
-        assert json.loads(rsp.data) == {'pid': os.getpid()}
+        assert json.loads(rsp.get_data(as_text=True)) == {'pid': os.getpid()}
 
     @patch.object(MockManager, 'load_config')
     def test_reload(self, mocked_load_config, api_client):
@@ -62,7 +65,7 @@ class TestServerAPI(object):
     def test_get_config(self, api_client):
         rsp = api_client.get('/server/config/')
         assert rsp.status_code == 200
-        assert json.loads(rsp.data) == {
+        assert json.loads(rsp.get_data(as_text=True)) == {
             'tasks': {
                 'test': {
                     'mock': [{'title': 'entry 1'}],
@@ -80,7 +83,7 @@ class TestServerAPI(object):
     def test_version(self, api_client):
         rsp = api_client.get('/server/version/')
         assert rsp.status_code == 200
-        assert json.loads(rsp.data) == {'flexget_version': __version__, 'api_version': __api_version__}
+        assert json.loads(rsp.get_data(as_text=True)) == {'flexget_version': __version__, 'api_version': __api_version__}
 
 
 class TestTaskAPI(object):
@@ -95,7 +98,7 @@ class TestTaskAPI(object):
 
     def test_list_tasks(self, api_client):
         rsp = api_client.get('/tasks/')
-        data = json.loads(rsp.data)
+        data = json.loads(rsp.get_data(as_text=True))
         assert data == {
             'tasks': [
                 {
@@ -128,7 +131,7 @@ class TestTaskAPI(object):
 
         assert rsp.status_code == 201
         assert mocked_save_config.called
-        assert json.loads(rsp.data) == new_task
+        assert json.loads(rsp.get_data(as_text=True)) == new_task
         assert manager.user_config['tasks']['new_task'] == new_task['config']
         assert manager.config['tasks']['new_task'] == new_task['config']
 
@@ -145,7 +148,7 @@ class TestTaskAPI(object):
 
     def test_get_task(self, api_client):
         rsp = api_client.get('/tasks/test/')
-        data = json.loads(rsp.data)
+        data = json.loads(rsp.get_data(as_text=True))
         assert data == {
             'name': 'test',
             'config': {
@@ -174,7 +177,7 @@ class TestTaskAPI(object):
 
         assert rsp.status_code == 200
         assert mocked_save_config.called
-        assert json.loads(rsp.data) == updated_task
+        assert json.loads(rsp.get_data(as_text=True)) == updated_task
         assert manager.user_config['tasks']['test'] == updated_task['config']
         assert manager.config['tasks']['test'] == updated_task['config']
 
@@ -192,7 +195,7 @@ class TestTaskAPI(object):
 
         assert rsp.status_code == 201
         assert mocked_save_config.called
-        assert json.loads(rsp.data) == updated_task
+        assert json.loads(rsp.get_data(as_text=True)) == updated_task
         assert 'test' not in manager.user_config['tasks']
         assert 'test' not in manager.config['tasks']
         assert manager.user_config['tasks']['new_test'] == updated_task['config']
@@ -231,8 +234,9 @@ class TestExecuteAPI(object):
         """
 
     def test_execute(self, api_client, manager):
-        # Empty payload
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps({}))
+        # Minimal payload
+        payload = {'tasks': ['test_task']}
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -247,9 +251,10 @@ class TestExecuteAPI(object):
         }
 
         payload = {
-            "inject": [entry]
+            "inject": [entry],
+            'tasks': ['test_task']
         }
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -262,13 +267,15 @@ class TestExecuteAPI(object):
         entry = {
             'title': "injected",
             'url': 'http://test.com',
-            'accept': True
+            'accept': True,
+            'tasks': ['test_task']
         }
 
         payload = {
-            "inject": [entry]
+            "inject": [entry],
+            'tasks': ['test_task']
         }
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -284,9 +291,10 @@ class TestExecuteAPI(object):
         }
 
         payload = {
-            "inject": [entry]
+            "inject": [entry],
+            'tasks': ['test_task']
         }
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -295,7 +303,7 @@ class TestExecuteAPI(object):
         assert len(task.all_entries) == 1
         assert len(task.accepted) == 1
 
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -308,7 +316,7 @@ class TestExecuteAPI(object):
         # Forcing the entry not to be disabled
         entry['force'] = True
 
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -328,10 +336,11 @@ class TestExecuteAPI(object):
         }
 
         payload = {
-            "inject": [entry]
+            "inject": [entry],
+            'tasks': ['test_task']
         }
 
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -357,9 +366,10 @@ class TestExecuteAPI(object):
         }
 
         payload = {
-            "inject": [entry1, entry2]
+            "inject": [entry1, entry2],
+            'tasks': ['test_task']
         }
-        rsp = api_client.json_post('/tasks/test_task/execute/', data=json.dumps(payload))
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -376,9 +386,10 @@ class TestExecuteAPI(object):
         }
 
         payload = {
-            "inject": [entry]
+            "inject": [entry],
+            'tasks': ['test_task']
         }
-        rsp = api_client.json_post('/inject/test_task/', data=json.dumps(payload))
+        rsp = api_client.json_post('/inject/', data=json.dumps(payload))
         assert rsp.status_code == 200
 
         task = self.get_task_queue(manager)
@@ -386,3 +397,29 @@ class TestExecuteAPI(object):
 
         assert len(task.all_entries) == 1
         assert len(task.accepted) == 1
+
+
+class TestExecuteMultipleTasks(object):
+    config = """
+        tasks:
+          test_task1:
+            mock:
+              - title: accept_me1
+            accept_all: yes
+          test_task2:
+            mock:
+              - title: accept_me2
+            accept_all: yes
+        """
+
+    def test_execute_multiple_tasks(self, api_client, manager):
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps({}))
+        assert rsp.status_code == 400
+
+        payload = {'tasks': ['non_existing_test_task']}
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
+        assert rsp.status_code == 404
+
+        payload = {'tasks': ['test_task1', 'test_task2']}
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
+        assert rsp.status_code == 200

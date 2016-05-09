@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import logging
 import re
 from itertools import chain
@@ -92,11 +94,11 @@ class MyEpisodesList(object):
                 log.debug('Invalid entry created? %s' % entry)
 
         if not entries:
-            log.warn("No shows found on myepisodes.com list. Maybe you need to add some first?")
+            log.warning("No shows found on myepisodes.com list. Maybe you need to add some first?")
 
         return entries
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(MyEpisodesList, 'myepisodes_list', api_ver=2)
+    plugin.register(MyEpisodesList, 'myepisodes_list', api_ver=2, groups=['list'])

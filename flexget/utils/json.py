@@ -5,6 +5,8 @@ Plugins can just import the methods from this module.
 Also allows date and datetime objects to be encoded/decoded.
 """
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import datetime
 
 from flexget.plugin import DependencyError
@@ -33,7 +35,7 @@ class DTDecoder(json.JSONDecoder):
         if obj == b'':
             return ''
 
-        if isinstance(obj, basestring):
+        if isinstance(obj, str):
             dt_str = obj.strip('"')
             try:
                 return datetime.datetime.strptime(dt_str, ISO8601_FMT)
@@ -55,7 +57,7 @@ def _datetime_encoder(obj):
 
 
 def _datetime_decoder(dict_):
-    for key, value in dict_.iteritems():
+    for key, value in dict_.items():
         # The built-in `json` library will `unicode` strings, except for empty strings. patch this for
         # consistency so that `unicode` is always returned.
         if value == b'':
@@ -76,7 +78,7 @@ def _datetime_decoder(dict_):
 
 
 def _empty_unicode_decoder(dict_):
-    for key, value in dict_.iteritems():
+    for key, value in dict_.items():
         # The built-in `json` library will `unicode` strings, except for empty strings. patch this for
         # consistency so that `unicode` is always returned.
         if value == b'':

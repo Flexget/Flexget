@@ -1,9 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import copy
-import datetime
 from math import ceil
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
 from flask import request
 from flask_restplus import inputs
@@ -311,15 +311,16 @@ series_list_parser.add_argument('days', type=int,
 series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
 series_list_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Max is 100.')
 
-series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behind_latest', 'last_download_date'),
-                                default='show_name',
+series_list_parser.add_argument('sort_by', choices=('show_name', 'last_download_date'),
+                                default='last_download_date',
                                 help="Sort response by attribute.")
-series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
+series_list_parser.add_argument('descending', type=inputs.boolean, default=True, store_missing=True,
+                                help="Sorting order.")
 series_list_parser.add_argument('lookup', choices=('tvdb', 'tvmaze'), action='append',
                                 help="Get lookup result for every show by sending another request to lookup API")
 
-
 ep_identifier_doc = "'episode_identifier' should be one of SxxExx, integer or date formatted such as 2012-12-12"
+
 
 @series_api.route('/')
 class SeriesListAPI(APIResource):
@@ -337,14 +338,6 @@ class SeriesListAPI(APIResource):
         if page_size > 100:
             page_size = 100
 
-        sort_by = args['sort_by']
-        order = args['order']
-        # In case the default 'desc' order was received
-        if order == 'desc':
-            order = True
-        else:
-            order = False
-
         start = page_size * (page - 1)
         stop = start + page_size
 
@@ -355,6 +348,8 @@ class SeriesListAPI(APIResource):
             'days': args.get('days'),
             'start': start,
             'stop': stop,
+            'sort_by': args.get('sort_by'),
+            'descending': args.get('descending'),
             'session': session
 
         }
@@ -362,19 +357,6 @@ class SeriesListAPI(APIResource):
 
         raw_series_list = series.get_series_summary(**kwargs)
         converted_series_list = [get_series_details(show) for show in raw_series_list]
-        sorted_show_list = []
-        if sort_by == 'show_name':
-            sorted_show_list = sorted(converted_series_list, key=lambda show: show['show_name'], reverse=order)
-        elif sort_by == 'episodes_behind_latest':
-            sorted_show_list = sorted(converted_series_list,
-                                      key=lambda show: show['latest_downloaded_episode']['number_of_episodes_behind'],
-                                      reverse=order)
-        elif sort_by == 'last_download_date':
-            sorted_show_list = sorted(converted_series_list,
-                                      key=lambda show: show['latest_downloaded_episode']['last_downloaded_release'][
-                                          'release_first_seen'] if show['latest_downloaded_episode'][
-                                          'last_downloaded_release'] else datetime.datetime(1970, 1, 1),
-                                      reverse=order)
 
         pages = int(ceil(num_of_shows / float(page_size)))
 
@@ -384,7 +366,7 @@ class SeriesListAPI(APIResource):
         number_of_shows = min(page_size, num_of_shows)
 
         response = {
-            'shows': sorted_show_list,
+            'shows': converted_series_list,
             'page_size': number_of_shows,
             'total_number_of_shows': num_of_shows,
             'page': page,
@@ -463,6 +445,12 @@ class SeriesGetShowsAPI(APIResource):
         })
 
 
+delete_parser = api.parser()
+delete_parser.add_argument('forget', type=inputs.boolean, default=False,
+                           help="Enabling this will fire a 'forget' event that will delete the downloaded releases "
+                                "from the entire DB, enabling to re-download them")
+
+
 @series_api.route('/<int:show_id>')
 @api.doc(params={'show_id': 'ID of the show'})
 class SeriesShowAPI(APIResource):
@@ -484,7 +472,8 @@ class SeriesShowAPI(APIResource):
 
     @api.response(200, 'Removed series from DB', empty_response)
     @api.response(404, 'Show ID not found', default_error_schema)
-    @api.doc(description='Delete a specific show using its ID')
+    @api.doc(description='Delete a specific show using its ID',
+             parser=delete_parser)
     def delete(self, show_id, session):
         """ Remove series from DB """
         try:
@@ -495,9 +484,9 @@ class SeriesShowAPI(APIResource):
                     }, 404
 
         name = show.name
-
+        args = delete_parser.parse_args()
         try:
-            series.forget_series(name)
+            series.remove_series(name, forget=args.get('forget'))
         except ValueError as e:
             return {'status': 'error',
                     'message': e.args[0]
@@ -605,30 +594,25 @@ class SeriesEpisodesAPI(APIResource):
 
     @api.response(500, 'Error when trying to forget episode', default_error_schema)
     @api.response(200, 'Successfully forgotten all episodes from show', empty_response)
-    @api.doc(description='Delete all show episodes via its ID. Deleting an episode will mark it as wanted again')
+    @api.doc(description='Delete all show episodes via its ID. Deleting an episode will mark it as wanted again',
+             parser=delete_parser)
     def delete(self, show_id, session):
-        """ Forgets all episodes of a show"""
+        """ Deletes all episodes of a show"""
         try:
             show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
-
-        for episode in show.episodes:
-            try:
-                series.forget_episodes_by_id(show.id, episode.id)
-            except ValueError as e:
-                return {'status': 'error',
-                        'message': e.args[0]
-                        }, 500
+        name = show.name
+        args = delete_parser.parse_args()
+        try:
+            series.remove_series(name, forget=args.get('forget'))
+        except ValueError as e:
+            return {'status': 'error',
+                    'message': e.args[0]
+                    }, 404
         return {}
-
-
-delete_parser = api.parser()
-delete_parser.add_argument('delete_seen', type=inputs.boolean, default=False,
-                           help="Enabling this will delete all the related releases from seen entries list as well, "
-                                "enabling to re-download them")
 
 
 @api.response(404, 'Show ID not found', default_error_schema)
@@ -685,11 +669,12 @@ class SeriesEpisodeAPI(APIResource):
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
 
         args = delete_parser.parse_args()
-        if args.get('delete_seen'):
-            for release in episode.releases:
-                fire_event('forget', release.title)
-
-        series.forget_episodes_by_id(show_id, ep_id)
+        try:
+            series.remove_series_episode(show.name, episode.identifier, args.get('forget'))
+        except ValueError as e:
+            return {'status': 'error',
+                    'message': e.args[0]
+                    }, 404
         return {}
 
 
@@ -697,9 +682,9 @@ release_list_parser = api.parser()
 release_list_parser.add_argument('downloaded', type=inputs.boolean, help='Filter between release status')
 
 release_delete_parser = release_list_parser.copy()
-release_delete_parser.add_argument('delete_seen', type=inputs.boolean, default=False,
-                                   help="Enabling this will delete all the related releases from seen entries list as well, "
-                                        "enabling to re-download them")
+release_delete_parser.add_argument('forget', type=inputs.boolean, default=False,
+                                   help="Enabling this will for 'forget' event that will delete the downloaded"
+                                        " releases from the entire DB, enabling to re-download them")
 
 
 @api.response(404, 'Show ID not found', default_error_schema)

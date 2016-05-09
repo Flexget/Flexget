@@ -1,7 +1,11 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 from mock import patch, Mock
 
 from flexget.task import Task
 from flexget.plugins.output import notify_sns
+
 
 class TestNotifySNS(object):
 

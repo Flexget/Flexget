@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
 
 from datetime import timedelta, datetime
 
 import pytest
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget.manager import Session
 from flexget.plugins.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries
@@ -155,7 +157,7 @@ class TestTVMazeShowLookup(object):
     def test_search_results(self, execute_task):
         task = execute_task('test_search_result')
         entry = task.entries[0]
-        print entry['tvmaze_series_name'].lower()
+        print(entry['tvmaze_series_name'].lower())
         assert entry['tvmaze_series_name'].lower() == 'Shameless'.lower(), 'lookup failed'
         with Session() as session:
             assert task.entries[1]['tvmaze_series_name'].lower() == 'Shameless'.lower(), 'second lookup failed'
@@ -234,7 +236,7 @@ class TestTVMazeShowLookup(object):
             session.commit()
 
             # Verify value has changed successfully and series expiration status is still False
-            assert session.query(TVMazeSeries).first().expired == False, 'expired status should be False'
+            assert not session.query(TVMazeSeries).first().expired, 'expired status should be False'
             assert session.query(TVMazeSeries).first().weight == 99, 'should be updated to 99'
 
             # Set series last_update time to 8 days ago, to trigger a show refresh upon request.
@@ -243,21 +245,21 @@ class TestTVMazeShowLookup(object):
             session.commit()
 
             # Verify series expiration flag is now True
-            assert session.query(TVMazeSeries).first().expired == True, 'expired status should be True'
+            assert session.query(TVMazeSeries).first().expired, 'expired status should be True'
 
             lookupargs = {'title': "Shameless"}
             series = APITVMaze.series_lookup(**lookupargs)
 
             # Verify series data has been refreshed with actual values upon 2nd call, and series expiration flag
             # is set to False
-            assert series.weight == 15, \
+            assert series.weight == 3, \
                 'weight should have been updated back to 15 from 99, instead its %s' % series.weight
-            assert session.query(TVMazeSeries).first().expired == False, 'expired status should be False'
+            assert not session.query(TVMazeSeries).first().expired, 'expired status should be False'
 
     def test_test_show_is_number(self, execute_task):
         task = execute_task('test_show_is_number')
         entry = task.find_entry(series_name='1992')
-        assert entry['tvmaze_series_name'] == '1992'.lower(), 'lookup failed'
+        assert entry['tvmaze_series_name'] == '1992', 'lookup failed'
         assert entry['tvmaze_series_id'] == 4879, 'series id should be 4879, instead its %s' % entry[
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 308487, 'episode id should be 308487, instead its %s' % entry[
@@ -308,16 +310,16 @@ class TestTVMazeShowLookup(object):
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 13007, 'episode id should be 13007, instead its %s' % entry[
             'tvmaze_episode_id']
-        assert entry['tvmaze_episode_airdate'] == None, \
+        assert entry['tvmaze_episode_airdate'] is None, \
             'Expected airdate to be None, got %s' % entry['tvmaze_episode_airdate']
-        assert entry['tvmaze_episode_airstamp'] == None, \
+        assert entry['tvmaze_episode_airstamp'] is None, \
             'Expected airdate to be None, got %s' % entry['tvmaze_episode_airstamp']
 
     def test_episode_summary(self, execute_task):
-        expected_summary = u"The team's visitor, Jay Garrick, explains that he comes from a parallel world and " \
-                           u"was a speedster there, but lost his powers transitioning over. Now he insists that" \
-                           u" Barry needs his help fighting a new metahuman, Sand Demon, who came from Jay's world." \
-                           u" Meanwhile, Officer Patty Spivot tries to join Joe's Metahuman Taskforce."
+        expected_summary = "<p>The team's visitor, Jay Garrick, explains that he comes from a parallel world and " \
+                           "was a speedster there, but lost his powers transitioning over. Now he insists that Barry" \
+                           " needs his help fighting a new metahuman, Sand Demon, who came from Jay's world." \
+                           " Meanwhile, Officer Patty Spivot tries to join Joe's Metahuman Taskforce.</p>"
 
         task = execute_task('test_episode_summary')
         entry = task.entries[0]
@@ -337,17 +339,6 @@ class TestTVMazeShowLookup(object):
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 476294, 'episode id should be 476294, instead its %s' % entry[
             'tvmaze_episode_id']
-
-    def test_show_cast(self, execute_task):
-        task = execute_task('test_show_cast')
-        entry = task.entries[0]
-        assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[
-            'tvmaze_series_id']
-        assert entry['tvmaze_episode_id'] == 211206, 'episode id should be 211206, instead its %s' % entry[
-            'tvmaze_episode_id']
-        assert len(entry['tvmaze_series_actors']) == 9, \
-            'expected actors list for series to contain 9 members,' \
-            ' instead it contains %s' % len(entry['tvmaze_series_actors'])
 
     def test_episode_air_date(self, execute_task):
         task = execute_task('test_episode_air_date')
@@ -377,4 +368,3 @@ class TestTVMazeShowLookup(object):
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 284974, 'episode id should be 284974, instead its %s' % entry[
             'tvmaze_episode_id']
-

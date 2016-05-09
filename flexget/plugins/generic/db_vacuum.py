@@ -1,6 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import logging
 from datetime import datetime, timedelta
+
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.event import event
 

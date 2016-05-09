@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
+
 import codecs
 import os
 import yaml
@@ -32,7 +35,7 @@ def process_secrets(config, manager):
 
 def _process(element, environment):
     if isinstance(element, dict):
-        for k, v in element.iteritems():
+        for k, v in element.items():
             new_key = _process(k, environment)
             if new_key:
                 element[new_key] = element.pop(k)

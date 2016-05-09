@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import os
 import logging
 
@@ -11,7 +13,7 @@ PLUGIN_NAME = 'make_html'
 log = logging.getLogger(PLUGIN_NAME)
 
 
-class OutputHtml:
+class OutputHtml(object):
 
     schema = {
         'type': 'object',
@@ -38,7 +40,7 @@ class OutputHtml:
         try:
             template = render_from_task(get_template(filename, PLUGIN_NAME), task)
             log.verbose('Writing output html to %s' % output)
-            with open(output, 'w') as f:
+            with open(output, 'wb') as f:
                 f.write(template.encode('utf-8'))
         except RenderError as e:
             log.error('Error while rendering task %s, Error: %s' % (task, e))

@@ -1,6 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import copy
+
 from flask import request, jsonify
+
 from flexget.manager import manager
 from flexget.plugins.daemon.scheduler import schedule_schema, main_schema, scheduler, scheduler_job_map
 from flexget.api import api, APIResource
@@ -64,8 +68,8 @@ class SchedulesAPI(APIResource):
             # Schedules not defined or are disabled, enable as one is being created
             manager.config['schedules'] = []
 
-        manager.config['schedules'].append(data['schedule'])
-        new_schedule = _schedule_by_id(id(data['schedule']))
+        manager.config['schedules'].append(data)
+        new_schedule = _schedule_by_id(id(data))
 
         if not new_schedule:
             return {'error': 'schedule went missing after add'}, 500

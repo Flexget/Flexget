@@ -1,4 +1,0 @@
-python-targets: [2]
-max-line-length: 120
-dodgy:
-  run: no

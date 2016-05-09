@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import logging
 
 from flexget import plugin
@@ -27,10 +29,10 @@ class PluginPriority(object):
     def on_task_start(self, task, config):
         self.priorities = {}
         names = []
-        for name, priority in config.iteritems():
+        for name, priority in config.items():
             names.append(name)
             originals = self.priorities.setdefault(name, {})
-            for phase, event in plugin.plugins[name].phase_handlers.iteritems():
+            for phase, event in plugin.plugins[name].phase_handlers.items():
                 originals[phase] = event.priority
                 log.debug('stored %s original value %s' % (phase, event.priority))
                 event.priority = priority
@@ -42,10 +44,10 @@ class PluginPriority(object):
             log.debug('nothing changed, aborting restore')
             return
         names = []
-        for name in config.keys():
+        for name in list(config.keys()):
             names.append(name)
             originals = self.priorities[name]
-            for phase, priority in originals.iteritems():
+            for phase, priority in originals.items():
                 plugin.plugins[name].phase_handlers[phase].priority = priority
         log.debug('Restored priority for: %s' % ', '.join(names))
         self.priorities = {}

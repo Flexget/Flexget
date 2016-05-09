@@ -1,9 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.utils import native_str
 
 import sys
 from distutils.version import LooseVersion
-from ssl import SSLError
-from urllib2 import URLError
 
 from sqlalchemy import Column, Integer, String
 
@@ -16,10 +16,11 @@ from flexget.utils.template import RenderError
 try:
     import telegram
     from telegram.error import TelegramError
+    from telegram.utils.request import URLError, SSLError
 except ImportError:
     telegram = None
 
-_MIN_TELEGRAM_VER = '3.2.0'
+_MIN_TELEGRAM_VER = '3.4'
 
 _PLUGIN_NAME = 'send_telegram'
 
@@ -282,7 +283,7 @@ class SendTelegram(object):
             raise plugin.PluginWarning('missing python-telegram-bot pkg')
         elif not hasattr(telegram, str('__version__')):
             raise plugin.PluginWarning('invalid or old python-telegram-bot pkg')
-        elif LooseVersion(telegram.__version__) < str(_MIN_TELEGRAM_VER):
+        elif LooseVersion(telegram.__version__) < native_str(_MIN_TELEGRAM_VER):
             raise plugin.PluginWarning('old python-telegram-bot ({0})'.format(telegram.__version__))
 
     def _send_msgs(self, task, chat_ids):
@@ -487,7 +488,7 @@ class SendTelegram(object):
             elif chat.type in ('group', 'supergroup' or 'channel'):
                 groups[chat.title] = chat
             else:
-                self.log.warn('unknown chat type: {0}'.format(type(chat)))
+                self.log.warning('unknown chat type: {0}'.format(type(chat)))
 
         return usernames, fullnames, groups
 
@@ -502,7 +503,7 @@ class SendTelegram(object):
         # avoid duplicate chat_ids. (this is possible if configuration specified both username & fullname
         chat_ids_d = dict((x.id, x) for x in chat_ids)
 
-        session.add_all(chat_ids_d.itervalues())
+        session.add_all(iter(chat_ids_d.values()))
         session.commit()
 
 

@@ -1,4 +1,6 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.utils import with_metaclass
 
 import re
 
@@ -22,7 +24,7 @@ class Errors(object):
 
     def add(self, msg):
         """Add new error message to current path."""
-        path = [unicode(p) for p in self.path]
+        path = [str(p) for p in self.path]
         msg = '[/%s] %s' % ('/'.join(path), msg)
         self.messages.append(msg)
 
@@ -73,17 +75,18 @@ def any_schema(schemas):
         return {'anyOf': schemas}
 
 
-class Validator(object):
+class ValidatorType(type):
+    """Automatically adds subclasses to the registry."""
+
+    def __init__(cls, name, bases, dict):
+        type.__init__(cls, name, bases, dict)
+        if 'name' not in dict:
+            raise Exception('Validator %s is missing class-attribute name' % name)
+        registry[dict['name']] = cls
+
+
+class Validator(with_metaclass(ValidatorType)):
     name = 'validator'
-
-    class __metaclass__(type):
-        """Automatically adds subclasses to the registry."""
-
-        def __init__(cls, name, bases, dict):
-            type.__init__(cls, name, bases, dict)
-            if 'name' not in dict:
-                raise Exception('Validator %s is missing class-attribute name' % name)
-            registry[dict['name']] = cls
 
     def __init__(self, parent=None, message=None, **kwargs):
         self.valid = []
@@ -180,9 +183,9 @@ class ChoiceValidator(Validator):
         :param value: accepted text, int or boolean
         :param bool ignore_case: Whether case matters for text values
         """
-        if not isinstance(value, (basestring, int, float)):
+        if not isinstance(value, (str, int, float)):
             raise Exception('Choice validator only accepts strings and numbers')
-        if isinstance(value, basestring) and ignore_case:
+        if isinstance(value, str) and ignore_case:
             self.valid_ic.append(value.lower())
         else:
             self.valid.append(value)
@@ -199,7 +202,7 @@ class ChoiceValidator(Validator):
         if self.valid_ic:
             schemas.append(any_schema({"type": "string", "pattern": "(?i)^%s$" % p} for p in self.valid_ic))
         s = any_schema(schemas)
-        s['error'] = 'Must be one of the following: %s' % ', '.join(map(unicode, self.valid + self.valid_ic))
+        s['error'] = 'Must be one of the following: %s' % ', '.join(map(str, self.valid + self.valid_ic))
         return s
 
 
@@ -443,7 +446,7 @@ class DictValidator(Validator):
             # Make sure errors show up in our list
             key_validator.add_parent(self)
         elif key_type:
-            if isinstance(key_type, basestring):
+            if isinstance(key_type, str):
                 key_type = [key_type]
             key_validator = self.get_validator('root')
             for key_type in key_type:
@@ -457,7 +460,7 @@ class DictValidator(Validator):
     def _schema(self):
         schema = {'type': 'object'}
         properties = schema['properties'] = {}
-        for key, validators in self.valid.iteritems():
+        for key, validators in self.valid.items():
             if not validators:
                 continue
             properties[key] = any_schema(v.schema() for v in validators)

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -61,7 +62,8 @@ class OutputQBitTorrent(object):
     def add_torrent(self, data):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
-        self.session.post(self.url + '/command/download', data=data)
+        multipart_data = {k: (None, v) for k, v in data.items()}
+        self.session.post(self.url + '/command/download', files=multipart_data)
         log.debug('Added task to qBittorrent')
 
     def prepare_config(self, config):
@@ -96,7 +98,7 @@ class OutputQBitTorrent(object):
             data = {}
             data['savepath'] = entry.get('path', config.get('path'))
             data['label'] = entry.get('label', config['label']).lower()
-            data['urls'] = [entry.get('url')]
+            data['urls'] = entry.get('url')
             if task.manager.options.test:
                 log.info('Test mode.')
                 log.info('Would add torrent to qBittorrent with:')

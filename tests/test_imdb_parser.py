@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 
 import pytest
 
@@ -28,9 +30,10 @@ class TestImdbParser(object):
             'nm0000860': 'Paul Bartel'
         }, 'Actors not parsed correctly'
         assert parser.directors == {'nm0001741': 'Bryan Singer'}, 'Directors not parsed correctly'
-        assert parser.genres == [u'crime', u'drama', u'mystery', u'thriller'], 'Genres not parsed correctly'
+        assert len(set(parser.genres).intersection([u'crime', u'drama', u'mystery', u'thriller'])) == \
+               len([u'crime', u'drama', u'mystery', u'thriller']), 'Genres not parsed correctly'
         assert parser.imdb_id == 'tt0114814', 'ID not parsed correctly'
-        assert parser.languages == ['english', 'hungarian', 'spanish', 'french'], 'Languages not parsed correctly'
+        assert len(set(parser.languages).intersection(['english', 'hungarian', 'spanish', 'french'])) == 4 , 'Languages not parsed correctly'
         assert parser.mpaa_rating == 'R', 'Rating not parsed correctly'
         assert parser.name == 'The Usual Suspects', 'Name not parsed correctly'
         assert (parser.photo ==

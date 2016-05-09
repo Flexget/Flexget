@@ -1,4 +1,5 @@
-from __future__ import unicode_literals
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -6,15 +7,15 @@ from flexget import plugin
 from flexget.event import event
 
 try:
-    from flexget.plugins.filter.series import forget_series_episode
+    from flexget.plugins.filter.series import remove_series_episode
 except ImportError:
-    raise plugin.DependencyError(issued_by='series_forget', missing='series',
+    raise plugin.DependencyError(issued_by='series_remove', missing='series',
                                  message='series_forget plugin need series plugin to work')
 
 log = logging.getLogger('series_forget')
 
 
-class OutputSeriesForget(object):
+class OutputSeriesRemove(object):
     schema = {'type': 'boolean'}
 
     def on_task_output(self, task, config):
@@ -23,7 +24,7 @@ class OutputSeriesForget(object):
         for entry in task.accepted:
             if 'series_name' in entry and 'series_id' in entry:
                 try:
-                    forget_series_episode(entry['series_name'], entry['series_id'])
+                    remove_series_episode(entry['series_name'], entry['series_id'])
                     log.info('Removed episode `%s` from series `%s` download history.' %
                              (entry['series_id'], entry['series_name']))
                 except ValueError:
@@ -32,4 +33,4 @@ class OutputSeriesForget(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OutputSeriesForget, 'series_forget', api_ver=2)
+    plugin.register(OutputSeriesRemove, 'series_remove', api_ver=2)

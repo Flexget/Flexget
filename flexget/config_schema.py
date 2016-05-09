@@ -1,8 +1,10 @@
-from __future__ import absolute_import, division, unicode_literals
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
+from future.moves.urllib.parse import urlparse, parse_qsl
 
 import os
 import re
-import urlparse
 import logging
 from collections import defaultdict
 from datetime import datetime
@@ -80,11 +82,11 @@ def resolve_ref(uri):
     """
     Finds and returns a schema pointed to by `uri` that has been registered in the register_schema function.
     """
-    parsed = urlparse.urlparse(uri)
+    parsed = urlparse(uri)
     if parsed.path in schema_paths:
         schema = schema_paths[parsed.path]
         if callable(schema):
-            return schema(**dict(urlparse.parse_qsl(parsed.query)))
+            return schema(**dict(parse_qsl(parsed.query)))
         return schema
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 
@@ -110,7 +112,7 @@ def process_config(config, schema=None, set_defaults=True):
     # Customize the error messages
     for e in errors:
         set_error_message(e)
-        e.json_pointer = '/' + '/'.join(map(unicode, e.path))
+        e.json_pointer = '/' + '/'.join(map(str, e.path))
     return errors
 
 
@@ -260,7 +262,7 @@ def set_error_message(error):
     """
     # First, replace default error messages with our custom ones
     if error.validator == 'type':
-        if isinstance(error.validator_value, basestring):
+        if isinstance(error.validator_value, str):
             valid_types = [error.validator_value]
         else:
             valid_types = list(error.validator_value)
@@ -276,9 +278,9 @@ def set_error_message(error):
         error.message = 'Got `%s`, expected: %s' % (error.instance, valid_types)
     elif error.validator == 'format':
         if error.cause:
-            error.message = unicode(error.cause)
+            error.message = str(error.cause)
     elif error.validator == 'enum':
-        error.message = 'Must be one of the following: %s' % ', '.join(map(unicode, error.validator_value))
+        error.message = 'Must be one of the following: %s' % ', '.join(map(str, error.validator_value))
     elif error.validator == 'additionalProperties':
         if error.validator_value is False:
             extras = set(jsonschema._utils.find_additional_properties(error.instance, error.schema))
@@ -312,7 +314,7 @@ def select_child_errors(validator, errors):
         # Find the subschemas that did not have a 'type' error validating the instance at this path
         no_type_errors = dict(subschema_errors)
         valid_types = set()
-        for i, errors in subschema_errors.iteritems():
+        for i, errors in subschema_errors.items():
             for e in errors:
                 if e.validator == 'type' and not e.path:
                     # Remove from the no_type_errors dict
@@ -329,7 +331,7 @@ def select_child_errors(validator, errors):
         elif len(no_type_errors) == 1:
             # If one of the possible schemas did not have a 'type' error, assume that is the intended one and issue
             # all errors from that subschema
-            for e in no_type_errors.values()[0]:
+            for e in list(no_type_errors.values())[0]:
                 e.schema_path.extendleft(reversed(error.schema_path))
                 e.path.extendleft(reversed(error.path))
                 yield e
@@ -340,7 +342,7 @@ def select_child_errors(validator, errors):
 def validate_properties_w_defaults(validator, properties, instance, schema):
     if not validator.is_type(instance, 'object'):
         return
-    for key, subschema in properties.iteritems():
+    for key, subschema in properties.items():
         if 'default' in subschema:
             instance.setdefault(key, subschema['default'])
     for error in jsonschema.Draft4Validator.VALIDATORS["properties"](validator, properties, instance, schema):

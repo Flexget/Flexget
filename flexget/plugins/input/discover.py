@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import datetime
 import logging
 import random
@@ -86,7 +88,7 @@ class Discover(object):
         entry_urls = set()
         # run inputs
         for item in config['what']:
-            for input_name, input_config in item.iteritems():
+            for input_name, input_config in item.items():
                 input = get_plugin_by_name(input_name)
                 if input.api_ver == 1:
                     raise PluginError('Plugin %s does not support API v2' % input_name)
@@ -128,7 +130,7 @@ class Discover(object):
             entry_results = []
             for item in config['from']:
                 if isinstance(item, dict):
-                    plugin_name, plugin_config = item.items()[0]
+                    plugin_name, plugin_config = list(item.items())[0]
                 else:
                     plugin_name, plugin_config = item, None
                 search = get_plugin_by_name(plugin_name).instance
@@ -150,7 +152,7 @@ class Discover(object):
                     log.debug('Discovered %s entries from %s' % (len(search_results), plugin_name))
                     if config.get('limit'):
                         search_results = sorted(search_results, reverse=True,
-                                                key=lambda x: x.get('search_sort'))[:config['limit']]
+                                                key=lambda x: x.get('search_sort', ''))[:config['limit']]
                     for e in search_results:
                         e['discovered_from'] = entry['title']
                         e['discovered_with'] = plugin_name
@@ -168,7 +170,7 @@ class Discover(object):
                 continue
             result.extend(entry_results)
 
-        return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
+        return sorted(result, reverse=True, key=lambda x: x.get('search_sort', -1))
 
     def entry_complete(self, entry, query=None, search_results=None, **kwargs):
         if entry.accepted:

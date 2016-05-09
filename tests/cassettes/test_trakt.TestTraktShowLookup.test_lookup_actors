@@ -6,9 +6,9 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=House&type=show
+      uri: https://api-v2launch.trakt.tv/search?type=show&query=House
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":49.67352,\"show\":{\"title\":\"\
+      body: {string: "[{\"type\":\"show\",\"score\":50.13566,\"show\":{\"title\":\"\
           House\",\"overview\":\"Go deeper into the medical mysteries of House, TV's\
           \ most compelling drama. Hugh Laurie stars as the brilliant but sarcastic\
           \ Dr. Gregory House, a maverick physician who is devoid of bedside manner.\
@@ -24,7 +24,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg\"\
           }},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"\
           tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\"\
-          :40.142265,\"show\":{\"title\":\"House vs. House\",\"overview\":\"House\
+          :40.515728,\"show\":{\"title\":\"House vs. House\",\"overview\":\"House\
           \ vs. House is a new home makeover competition series where amateur and\
           \ experienced renovation teams compete for the chance to win $10,000 by\
           \ proving they can create the better DIY projects in their home. From painting\
@@ -36,7 +36,7 @@ interactions:
           poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\"\
           :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\"\
           :\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"\
-          tvrage\":null}}},{\"type\":\"show\",\"score\":35.481087,\"show\":{\"title\"\
+          tvrage\":null}}},{\"type\":\"show\",\"score\":35.811184,\"show\":{\"title\"\
           :\"Full House\",\"overview\":\"Full House is an American sitcom created\
           \ by Jeff Franklin for ABC. The show chronicles a widowed father, who enlists\
           \ his best friend and his brother-in-law to help raise his three daughters.\
@@ -50,7 +50,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/thumb/98635a003a.jpg\"\
           }},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"\
           imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\"\
-          ,\"score\":35.481087,\"show\":{\"title\":\"House Hunters\",\"overview\"\
+          ,\"score\":35.811184,\"show\":{\"title\":\"House Hunters\",\"overview\"\
           :\"House Hunters takes viewers behind the scenes as individuals, couples\
           \ and families learn what to look for and decide whether or not a home is\
           \ meant for them. Focusing on the emotional experience of finding and purchasing\
@@ -64,7 +64,19 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/thumb/36bdbe2817.jpg\"\
           }},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"\
           imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":35.481087,\"show\":{\"title\":\"Alpha House\",\"overview\":\"\
+          ,\"score\":35.811184,\"show\":{\"title\":\"Fuller House\",\"overview\":\"\
+          Recently widowed D.J. Tanner-Fuller gets help from her sister Stephanie\
+          \ and best friend Kimmy when the women move in with their families to help\
+          \ D.J. raise her children in this spin-off series.\",\"year\":2016,\"status\"\
+          :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/102/424/posters/original/ff4124c48a.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/102/424/posters/medium/ff4124c48a.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/102/424/posters/thumb/ff4124c48a.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/original/37bbde27f6.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/medium/37bbde27f6.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/thumb/37bbde27f6.jpg\"\
+          }},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"\
+          imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\"\
+          ,\"score\":35.811184,\"show\":{\"title\":\"Alpha House\",\"overview\":\"\
           Alpha House follows four senators who live together in a rented house in\
           \ Washington DC.Re-election battles, looming indictments, parties, their\
           \ Party... these senators need a drink. And a new housemate.\",\"year\"\
@@ -77,19 +89,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/thumb/e477e76c44.jpg\"\
           }},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"\
           imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\"\
-          ,\"score\":35.481087,\"show\":{\"title\":\"Fuller House\",\"overview\":\"\
-          Recently widowed D.J. Tanner-Fuller gets help from her sister Stephanie\
-          \ and best friend Kimmy when the women move in with their families to help\
-          \ D.J. raise her children in this spin-off series.\",\"year\":2016,\"status\"\
-          :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/102/424/posters/original/ff4124c48a.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/102/424/posters/medium/ff4124c48a.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/102/424/posters/thumb/ff4124c48a.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/original/37bbde27f6.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/medium/37bbde27f6.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/thumb/37bbde27f6.jpg\"\
-          }},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"\
-          imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\"\
-          ,\"score\":35.481087,\"show\":{\"title\":\"Playing House\",\"overview\"\
+          ,\"score\":35.811184,\"show\":{\"title\":\"Playing House\",\"overview\"\
           :\"A single-camera buddy comedy about what happens when two best friends\
           \ come back together, just when they need each other most.Inspired by the\
           \ ultra-close friendship between the series' creators and stars, \\\"Playing\
@@ -104,7 +104,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/thumb/49c78c5d22.jpg\"\
           }},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"\
           imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":35.481087,\"show\":{\"title\":\"House Husbands\",\"overview\"\
+          ,\"score\":35.811184,\"show\":{\"title\":\"House Husbands\",\"overview\"\
           :\"House Husbands centres around four families with one thing in common,\
           \ the husbands stay home to raise the children.\",\"year\":2012,\"status\"\
           :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/posters/original/8d6ef762b1.jpg\"\
@@ -115,65 +115,78 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/thumb/632ffeb8be.jpg\"\
           }},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"\
           imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":35.481087,\"show\":{\"title\":\"Full House\",\"overview\":\"\
-          Han Ji Eun is a naive writer who got swindled out of everything she owned\
-          \ including her house by her best friends. Stranded in China, She managed\
-          \ to borrow money from an actor Lee Young Jae to return to Korea. On her\
-          \ return, she found out that her house was bought by Lee Young Jae. In an\
-          \ attempt to get her possessions back, she entered in a contract marriage\
-          \ with Young Jae for one year. In spite of losing all, Ji Eun manages to\
-          \ be cheerful and takes things in strike and the business relationship between\
-          \ the two becomes personal as they start to rely and care for each other.\
-          \ \",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\"\
-          :\"https://walter.trakt.us/images/shows/000/003/482/posters/original/3d0d97a090.jpg\"\
+          ,\"score\":35.811184,\"show\":{\"title\":\"Bleak House\",\"overview\":\"\
+          In this star-studded adaptation of a literary classic, acclaimed writer\
+          \ Andrew Davies turns his talents to one of Charles Dickens' most brilliant\
+          \ novels \u2014 arguably the greatest-ever depiction of Victorian London.\
+          \ Fresh and imaginative, yet faithful to the original, this thrilling fast-paced\
+          \ adaptation is shot with a contemporary edge. At its heart is the story\
+          \ of the icily beautiful Lady Dedlock, who nurses a dark secret, and the\
+          \ merciless lawyer Tulkinghorn, who seeks to uncover it. The generous John\
+          \ Jarndyce, struggling with his own past, and his two young wards Richard\
+          \ and Ada, are all caught up, like Lady Dedlock, in the infamous case of\
+          \ Jarndyce vs. Jarndyce, which will make one of them rich beyond imagination\
+          \ if it can ever be brought to a conclusion. As Tulkinghorn digs deeper\
+          \ into Lady Dedlock's past, he unearths a secret that will change their\
+          \ lives forever, and which is almost as astounding as the final outcome\
+          \ of the Jarndyce case.\",\"year\":2005,\"status\":\"ended\",\"images\"\
+          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/002/474/posters/original/bc8a5abb1d.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/002/474/posters/medium/bc8a5abb1d.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/002/474/posters/thumb/bc8a5abb1d.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/002/474/fanarts/original/4d61afbe9b.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/002/474/fanarts/medium/4d61afbe9b.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/002/474/fanarts/thumb/4d61afbe9b.jpg\"\
+          }},\"ids\":{\"trakt\":2474,\"slug\":\"bleak-house\",\"tvdb\":73558,\"imdb\"\
+          :\"tt0442632\",\"tmdb\":2489,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
+          :35.811184,\"show\":{\"title\":\"Full House\",\"overview\":\"Han Ji Eun\
+          \ is a naive writer who got swindled out of everything she owned including\
+          \ her house by her best friends. Stranded in China, She managed to borrow\
+          \ money from an actor Lee Young Jae to return to Korea. On her return, she\
+          \ found out that her house was bought by Lee Young Jae. In an attempt to\
+          \ get her possessions back, she entered in a contract marriage with Young\
+          \ Jae for one year. In spite of losing all, Ji Eun manages to be cheerful\
+          \ and takes things in strike and the business relationship between the two\
+          \ becomes personal as they start to rely and care for each other. \",\"\
+          year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/003/482/posters/original/3d0d97a090.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/003/482/posters/medium/3d0d97a090.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/003/482/posters/thumb/3d0d97a090.jpg\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/003/482/fanarts/original/eedae3b9b4.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/003/482/fanarts/medium/eedae3b9b4.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/003/482/fanarts/thumb/eedae3b9b4.jpg\"\
           }},\"ids\":{\"trakt\":3482,\"slug\":\"full-house\",\"tvdb\":84928,\"imdb\"\
-          :\"tt0464625\",\"tmdb\":3504,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :35.481087,\"show\":{\"title\":\"House Arrest\",\"year\":2011,\"status\"\
-          :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/065/016/posters/original/8e883c8947.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/065/016/posters/medium/8e883c8947.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/065/016/posters/thumb/8e883c8947.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/065/016/fanarts/original/8e883c8947.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/065/016/fanarts/medium/8e883c8947.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/065/016/fanarts/thumb/8e883c8947.jpg\"\
-          }},\"ids\":{\"trakt\":65016,\"slug\":\"house-arrest\",\"tvdb\":253261,\"\
-          imdb\":\"tt2279701\",\"tmdb\":null,\"tvrage\":null}}}]"}
+          :\"tt0464625\",\"tmdb\":3504,\"tvrage\":null}}}]"}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [27dce67a16100b0e-SYD]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 11:55:35 GMT']
-        etag: [W/"20793cb1d9858d55c6f9a2ae72306f0c"]
-        expires: ['Thu, 03 Mar 2016 15:55:35 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d264ed6af9bebcfa7b058f6eb81061f4f1457006135; expires=Fri,
-            03-Mar-17 11:55:35 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['1533']
-        x-pagination-limit: ['10']
-        x-pagination-page: ['1']
-        x-pagination-page-count: ['154']
-        x-request-id: [1197df3b-d2c4-45f4-bd79-19ee002cabbc]
-        x-runtime: ['0.025071']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de2383c1520106-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:30 GMT']
+        ETag: [W/"938b0cd6657ea1be2f33342706e73598"]
+        Expires: ['Wed, 04 May 2016 22:50:30 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=dd9b46c79416338aed275304a33496c531462387830; expires=Thu,
+            04-May-17 18:50:30 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['1568']
+        X-Pagination-Limit: ['10']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['157']
+        X-Request-Id: [316c43ad-8175-4953-829c-d9b650edec69]
+        X-Runtime: ['0.045017']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=d264ed6af9bebcfa7b058f6eb81061f4f1457006135]
+        Cookie: [__cfduid=dd9b46c79416338aed275304a33496c531462387830]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/1399?extended=full
+      uri: https://api-v2launch.trakt.tv/shows/1399?extended=full%2Cimages
     response:
       body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
           deeper into the medical mysteries of House, TV''s most compelling drama.
@@ -182,25 +195,25 @@ interactions:
           on antisocial, Dr. House thrives on the challenge of solving the medical
           puzzles that other doctors give up on. Together with his hand-picked team
           of young medical experts, he''ll do whatever it takes in the race against
-          the clock to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
-          (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.80422,"votes":15819,"updated_at":"2016-02-11T10:31:53.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es","ro","cs","bs","lt"],"genres":["comedy","drama","mystery","action"],"aired_episodes":176}'}
+          the clock to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":44,"certification":"TV-14","network":"FOX
+          (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.8017,"votes":16369,"updated_at":"2016-04-27T09:52:29.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es","ro","cs","bs","lt","uk"],"genres":["comedy","drama","mystery"],"aired_episodes":176,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/001/399/fanarts/original/c628f24771.jpg","medium":"https://walter.trakt.us/images/shows/000/001/399/fanarts/medium/c628f24771.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/001/399/posters/original/76fae8b69b.jpg","medium":"https://walter.trakt.us/images/shows/000/001/399/posters/medium/76fae8b69b.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/399/posters/thumb/76fae8b69b.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/001/399/logos/original/2a5748f5d7.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/001/399/cleararts/original/6a9b6f6448.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/001/399/banners/original/5395bb01d7.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/001/399/thumbs/original/ed951f1f59.jpg"}}}'}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [27dce67a76140b0e-SYD]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 11:55:35 GMT']
-        etag: [W/"d59feb20b1932bbe0d26e500a30e74b5"]
-        expires: ['Thu, 03 Mar 2016 15:55:35 GMT']
-        last-modified: ['Thu, 11 Feb 2016 10:31:53 GMT']
-        server: [cloudflare-nginx]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [fc712727-9a77-4be8-a8f0-40178b7bb579]
-        x-runtime: ['0.019998']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de238461700106-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:30 GMT']
+        ETag: [W/"1c7e7c5d16e8e9a8275505bae9057491"]
+        Expires: ['Wed, 04 May 2016 22:50:30 GMT']
+        Last-Modified: ['Wed, 27 Apr 2016 09:52:29 GMT']
+        Server: [cloudflare-nginx]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [4a74dc27-1b99-41d1-94a5-5fb0d6898ddc]
+        X-Runtime: ['0.019536']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
@@ -209,69 +222,369 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/1399/people
+      uri: https://api-v2launch.trakt.tv/shows/1399/people?extended=full%2Cimages
     response:
-      body: {string: '{"cast":[{"character":"Dr. Gregory House","person":{"name":"Hugh
-          Laurie","ids":{"trakt":297390,"slug":"hugh-laurie","imdb":"nm0491402","tmdb":41419,"tvrage":30836}}},{"character":"Eric
-          Foreman","person":{"name":"Omar Epps","ids":{"trakt":412476,"slug":"omar-epps","imdb":"nm0004898","tmdb":4987,"tvrage":null}}},{"character":"James
-          Wilson","person":{"name":"Robert Sean Leonard","ids":{"trakt":411888,"slug":"robert-sean-leonard","imdb":"nm0000494","tmdb":2692,"tvrage":31687}}},{"character":"Allison
-          Cameron","person":{"name":"Jennifer Morrison","ids":{"trakt":414513,"slug":"jennifer-morrison","imdb":"nm0607185","tmdb":41421,"tvrage":28684}}},{"character":"Robert
-          Chase","person":{"name":"Jesse Spencer","ids":{"trakt":429766,"slug":"jesse-spencer-5ede7178-b889-4092-bdc8-08a1e57de572","imdb":"nm0817980","tmdb":41422,"tvrage":31685}}},{"character":"Chris
-          Taub","person":{"name":"Peter Jacobson","ids":{"trakt":418546,"slug":"peter-jacobson","imdb":"nm0414907","tmdb":31514,"tvrage":4259}}},{"character":"Lawrence
-          Kutner","person":{"name":"Kal Penn","ids":{"trakt":415949,"slug":"kal-penn","imdb":"nm0671980","tmdb":53493,"tvrage":11806}}},{"character":"Thirteen","person":{"name":"Olivia
-          Wilde","ids":{"trakt":421662,"slug":"olivia-wilde","imdb":"nm1312575","tmdb":59315,"tvrage":51856}}},{"character":"Jessica
-          Adams","person":{"name":"Odette Annable","ids":{"trakt":421384,"slug":"odette-annable","imdb":"nm0951148","tmdb":51992,"tvrage":57233}}},{"character":"Chi
-          Park","person":{"name":"Charlyne Yi","ids":{"trakt":419887,"slug":"charlyne-yi","imdb":"nm2304722","tmdb":93285,"tvrage":182394}}},{"character":"Dr.
-          Amber Volakis","person":{"name":"Anne Dudek","ids":{"trakt":417236,"slug":"anne-dudek","imdb":"nm0240043","tmdb":24198,"tvrage":29000}}},{"character":"Rachel
-          Taub","person":{"name":"Jennifer Crystal Foley","ids":{"trakt":79432,"slug":"jennifer-crystal-foley","imdb":"nm0190571","tmdb":532890,"tvrage":18075}}},{"character":"Nurse","person":{"name":"Bobbin
-          Bergstrom","ids":{"trakt":399343,"slug":"bobbin-bergstrom","imdb":null,"tmdb":1224001,"tvrage":null}}}],"crew":{"production":[{"job":"Executive
-          Producer","person":{"name":"Paul Attanasio","ids":{"trakt":2009,"slug":"paul-attanasio","imdb":"nm0001921","tmdb":45543,"tvrage":71428}}},{"job":"Executive
-          Producer","person":{"name":"Gerrit van der Meer","ids":{"trakt":9787,"slug":"gerrit-van-der-meer","imdb":"nm0576182","tmdb":12256,"tvrage":null}}},{"job":"Producer","person":{"name":"David
-          Hoselton","ids":{"trakt":36334,"slug":"david-hoselton","imdb":"nm0395924","tmdb":52873,"tvrage":null}}},{"job":"Executive
-          Producer","person":{"name":"Doris Egan","ids":{"trakt":92689,"slug":"doris-egan","imdb":"nm0250668","tmdb":169466,"tvrage":null}}},{"job":"Executive
-          Producer","person":{"name":"Garrett Lerner","ids":{"trakt":106206,"slug":"garrett-lerner","imdb":"nm1068424","tmdb":114407,"tvrage":null}}},{"job":"Executive
-          Producer","person":{"name":"Hugh Laurie","ids":{"trakt":297390,"slug":"hugh-laurie","imdb":"nm0491402","tmdb":41419,"tvrage":30836}}},{"job":"Executive
-          Producer","person":{"name":"Eli Attie","ids":{"trakt":398540,"slug":"eli-attie","imdb":"nm1108368","tmdb":1219508,"tvrage":48322}}},{"job":"Producer","person":{"name":"John
-          Mankiewicz","ids":{"trakt":399129,"slug":"john-mankiewicz","imdb":"nm0542535","tmdb":1222278,"tvrage":31715}}},{"job":"Producer","person":{"name":"Peter
-          Blake","ids":{"trakt":399346,"slug":"peter-blake-5cd380a9-d696-46d4-84cc-b862c5b2e6b3","imdb":"nm0086694","tmdb":1223964,"tvrage":null}}},{"job":"Executive
-          Producer","person":{"name":"Thomas L. Moran","ids":{"trakt":399347,"slug":"thomas-l-moran","imdb":"nm0602981","tmdb":1223966,"tvrage":31719}}},{"job":"Executive
-          Producer","person":{"name":"Russel Friend","ids":{"trakt":399348,"slug":"russel-friend","imdb":"nm1068423","tmdb":1213567,"tvrage":null}}},{"job":"Producer","person":{"name":"Leonard
-          Dick","ids":{"trakt":399350,"slug":"leonard-dick","imdb":"nm0225272","tmdb":1223984,"tvrage":null}}},{"job":"Producer","person":{"name":"Marcy
-          Kaplan","ids":{"trakt":399351,"slug":"marcy-kaplan","imdb":"nm0438310","tmdb":1218759,"tvrage":null}}},{"job":"Producer","person":{"name":"Heel
-          and Toe Films","ids":{"trakt":399352,"slug":"heel-and-toe-films","imdb":null,"tmdb":1224005,"tvrage":null}}},{"job":"Producer","person":{"name":"Shore
-          Z Productions","ids":{"trakt":399353,"slug":"shore-z-productions","imdb":null,"tmdb":1224006,"tvrage":null}}},{"job":"Producer","person":{"name":"Bad
-          Hat Harry Productions","ids":{"trakt":399354,"slug":"bad-hat-harry-productions","imdb":null,"tmdb":1224007,"tvrage":null}}},{"job":"Producer","person":{"name":"Greg
-          Yaitanes","ids":{"trakt":399355,"slug":"greg-yaitanes","imdb":"nm0944981","tmdb":1216738,"tvrage":8433}}},{"job":"Executive
-          Producer","person":{"name":"Lawrence Kaplow","ids":{"trakt":399356,"slug":"lawrence-kaplow","imdb":"nm0438432","tmdb":1223963,"tvrage":31697}}},{"job":"Producer","person":{"name":"Marcy
-          G. Kaplan","ids":{"trakt":399357,"slug":"marcy-g-kaplan","imdb":"nm0438309","tmdb":1224008,"tvrage":null}}},{"job":"Producer","person":{"name":"Matt
-          Witten","ids":{"trakt":399358,"slug":"matt-witten","imdb":"nm0936976","tmdb":1212236,"tvrage":null}}},{"job":"Executive
-          Producer","person":{"name":"Bryan Singer","ids":{"trakt":413922,"slug":"bryan-singer","imdb":"nm0001741","tmdb":9032,"tvrage":31688}}},{"job":"Executive
-          Producer","person":{"name":"Daniel Sackheim","ids":{"trakt":414782,"slug":"daniel-sackheim","imdb":"nm0755261","tmdb":12632,"tvrage":null}}},{"job":"Executive
-          Producer","person":{"name":"Deran Sarafian","ids":{"trakt":423098,"slug":"deran-sarafian","imdb":"nm0764776","tmdb":45645,"tvrage":25344}}},{"job":"Producer","person":{"name":"David
-          Semel","ids":{"trakt":431170,"slug":"david-semel","imdb":"nm0783751","tmdb":17272,"tvrage":2478}}},{"job":"Executive
-          Producer","person":{"name":"David Shore","ids":{"trakt":434876,"slug":"david-shore","imdb":"nm0794914","tmdb":169061,"tvrage":17176}}},{"job":"Executive
-          Producer","person":{"name":"Katie Jacobs","ids":{"trakt":436235,"slug":"katie-jacobs","imdb":"nm0414498","tmdb":41424,"tvrage":null}}},{"job":"Producer","person":{"name":"Liz
-          Friedman","ids":{"trakt":436909,"slug":"liz-friedman","imdb":"nm0295286","tmdb":1218783,"tvrage":null}}}],"writing":[{"job":"Writer","person":{"name":"Pam
-          Davis","ids":{"trakt":155851,"slug":"pam-davis","imdb":"nm0205247","tmdb":1224002,"tvrage":null}}},{"job":"Writer","person":{"name":"Marqui
-          Jackson","ids":{"trakt":399345,"slug":"marqui-jackson","imdb":null,"tmdb":1224004,"tvrage":null}}},{"job":"Writer","person":{"name":"Kath
-          Lingenfelter","ids":{"trakt":399359,"slug":"kath-lingenfelter","imdb":null,"tmdb":1224003,"tvrage":null}}}]}}'}
+      body: {string: "{\"cast\":[{\"character\":\"Dr. Gregory House\",\"person\":{\"\
+          name\":\"Hugh Laurie\",\"ids\":{\"trakt\":297390,\"slug\":\"hugh-laurie\"\
+          ,\"imdb\":\"nm0491402\",\"tmdb\":41419,\"tvrage\":30836},\"images\":{\"\
+          headshot\":{\"full\":\"https://walter.trakt.us/images/person_shows/000/078/311/headshots/original/5500c4f13a.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/person_shows/000/078/311/headshots/medium/5500c4f13a.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/person_shows/000/078/311/headshots/thumb/5500c4f13a.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/297/390/fanarts/original/0f0e43e217.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/297/390/fanarts/medium/0f0e43e217.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/297/390/fanarts/thumb/0f0e43e217.jpg\"\
+          }},\"biography\":\"James Hugh Calum Laurie better known as Hugh Laurie,\
+          \ is an English actor, voice artist, comedian, writer, musician, recording\
+          \ artist, and director. He first became known as one half of the Fry and\
+          \ Laurie double act, along with his friend and comedy partner Stephen Fry,\
+          \ whom he joined in the cast of Blackadder and Jeeves and Wooster from 1987\
+          \ until 1999. Since 2004, he has played the lead as Dr. Gregory House, the\
+          \ protagonist of House, for which he received two Golden Globe awards and\
+          \ several Emmy nominations. As of August 2010, he is the highest paid actor\
+          \ in a drama series on US television.\\n\\nDescription above from the Wikipedia\
+          \ article Hugh Laurie, licensed under CC-BY-SA, full list of contributors\
+          \ on Wikipedia.\",\"birthday\":\"1959-06-11\",\"death\":null,\"birthplace\"\
+          :\"Oxford, Oxfordshire, England UK\",\"homepage\":\"http://hughlaurieblues.com/\"\
+          }},{\"character\":\"Dr. Eric Foreman\",\"person\":{\"name\":\"Omar Epps\"\
+          ,\"ids\":{\"trakt\":412476,\"slug\":\"omar-epps\",\"imdb\":\"nm0004898\"\
+          ,\"tmdb\":4987,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/person_shows/000/078/313/headshots/original/661dcb8fee.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/person_shows/000/078/313/headshots/medium/661dcb8fee.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/person_shows/000/078/313/headshots/thumb/661dcb8fee.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"Omar Hashim Epps (born July 20, 1973) is an American actor, singer, songwriter,\
+          \ and record producer. His film roles include Juice, Major League II, Higher\
+          \ Learning, Scream 2, The Wood, In Too Deep, and Love and Basketball. Epps'\
+          \ television work includes the role of Dr. Dennis Gant on the US medical\
+          \ drama series ER, and since 2004 Dr. Eric Foreman on the Fox medical drama\
+          \ series House which earned him a NAACP Image Award in 2007 and 2008 for\
+          \ Outstanding Supporting Actor in a Drama Series.\",\"birthday\":\"1973-07-20\"\
+          ,\"death\":null,\"birthplace\":\"Brooklyn, New York, USA\",\"homepage\"\
+          :\"\"}},{\"character\":\"Dr. James Wilson\",\"person\":{\"name\":\"Robert\
+          \ Sean Leonard\",\"ids\":{\"trakt\":411888,\"slug\":\"robert-sean-leonard\"\
+          ,\"imdb\":\"nm0000494\",\"tmdb\":2692,\"tvrage\":31687},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/person_shows/000/078/314/headshots/original/7b12982c20.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/person_shows/000/078/314/headshots/medium/7b12982c20.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/person_shows/000/078/314/headshots/thumb/7b12982c20.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/411/888/fanarts/original/0cef007397.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/411/888/fanarts/medium/0cef007397.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/411/888/fanarts/thumb/0cef007397.jpg\"\
+          }},\"biography\":\"\u200BFrom Wikipedia, the free encyclopedia\\n\\nRobert\
+          \ Sean Leonard (born February 28, 1969) is an award-winning American actor,\
+          \ who has regularly starred in Broadway and off-Broadway productions. Since\
+          \ 2004 he has played the role of Dr. James Wilson on the TV series House.\
+          \ He played Neil Perry in the 1989 movie Dead Poets Society.\\n\\nDescription\
+          \ above from the Wikipedia article Robert Sean Leonard, licensed under CC-BY-SA,\
+          \ full list of contributors on Wikipedia.\",\"birthday\":\"1969-02-28\"\
+          ,\"death\":null,\"birthplace\":\"Westwood, New Jersey, USA\",\"homepage\"\
+          :\"\"}},{\"character\":\"Dr. Allison Cameron\",\"person\":{\"name\":\"Jennifer\
+          \ Morrison\",\"ids\":{\"trakt\":414513,\"slug\":\"jennifer-morrison\",\"\
+          imdb\":\"nm0607185\",\"tmdb\":41421,\"tvrage\":28684},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/person_shows/000/178/011/headshots/original/6ee3c43bce.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/person_shows/000/178/011/headshots/medium/6ee3c43bce.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/person_shows/000/178/011/headshots/thumb/6ee3c43bce.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/414/513/fanarts/original/a7141047c3.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/414/513/fanarts/medium/a7141047c3.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/414/513/fanarts/thumb/a7141047c3.jpg\"\
+          }},\"biography\":\"Jennifer Marie Morrison (born April 12, 1979, height\
+          \ 5' 5\xBC\\\" (1,66 m)) is an American actress, model and film producer.\
+          \ She is best known for her role as Dr. Allison Cameron in House, whom she\
+          \ played for over five years, and also as Zoey Pierson in the sixth season\
+          \ of How I Met Your Mother.\\n\\nJennifer Morrison was born in Chicago,\
+          \ Illinois, and raised in Arlington Heights, Illinois. She is the eldest\
+          \ of three children with a sister, Julia, and a brother, Daniel. Her father,\
+          \ David L. Morrison, is a retired music teacher who was named teacher of\
+          \ the year by the Illinois State Board of Education in 2003. Morrison's\
+          \ mother, Judy Morrison, is also a retired teacher.\\n\\nMorrison attended\
+          \ South Middle School then graduated from Prospect High School in 1997 where\
+          \ her parents worked. She played clarinet in the school's marching band,\
+          \ sang in the choir and was a cheerleader with the school's pep squad. She\
+          \ attended Loyola University Chicago where she majored in Theatre and minored\
+          \ in English, graduating in 2000. She studied with the Steppenwolf Theatre\
+          \ Company before moving to Los Angeles to pursue a career in film and television.\\\
+          n\\nMorrison started dating her House co-star Jesse Spencer in July 2004.\
+          \ Spencer proposed to Morrison on December 23, 2006, at the Eiffel Tower\
+          \ and the two had planned to marry later in 2007. In August 2007, Morrison\
+          \ and Spencer called off their engagement.\\n\\nDescription above from the\
+          \ Wikipedia article Jennifer Morrison, licensed under CC-BY-SA, full list\
+          \ of contributors on Wikipedia.\",\"birthday\":\"1979-04-12\",\"death\"\
+          :null,\"birthplace\":\"Chicago - Illinois - USA\",\"homepage\":\"\"}},{\"\
+          character\":\"Dr. Robert Chase\",\"person\":{\"name\":\"Jesse Spencer\"\
+          ,\"ids\":{\"trakt\":429766,\"slug\":\"jesse-spencer-5ede7178-b889-4092-bdc8-08a1e57de572\"\
+          ,\"imdb\":\"nm0817980\",\"tmdb\":41422,\"tvrage\":31685},\"images\":{\"\
+          headshot\":{\"full\":\"https://walter.trakt.us/images/person_shows/000/078/312/headshots/original/e11fbaa4af.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/person_shows/000/078/312/headshots/medium/e11fbaa4af.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/person_shows/000/078/312/headshots/thumb/e11fbaa4af.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/429/766/fanarts/original/667dffe770.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/429/766/fanarts/medium/667dffe770.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/429/766/fanarts/thumb/667dffe770.jpg\"\
+          }},\"biography\":\"\u200BFrom Wikipedia, the free encyclopedia. \_\\n\\\
+          nJesse Gordon Spencer (born 12 February 1979) is an Australian actor and\
+          \ musician. He is best known for his current portrayal of Dr. Robert Chase\
+          \ on the medical drama House and for playing Billy Kennedy in the Australian\
+          \ soap-opera Neighbours.\",\"birthday\":\"1979-02-12\",\"death\":null,\"\
+          birthplace\":\"Melbourne - Victoria - Australia\",\"homepage\":\"\"}},{\"\
+          character\":\"Chris Taub\",\"person\":{\"name\":\"Peter Jacobson\",\"ids\"\
+          :{\"trakt\":418546,\"slug\":\"peter-jacobson\",\"imdb\":\"nm0414907\",\"\
+          tmdb\":31514,\"tvrage\":4259},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/418/546/headshots/original/bb74d7b744.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/418/546/headshots/medium/bb74d7b744.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/418/546/headshots/thumb/bb74d7b744.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"From Wikipedia, the free encyclopedia\\n\\nPeter S. Jacobson (born March\
+          \ 24, 1965) is an American film and television actor.\",\"birthday\":\"\
+          1965-03-24\",\"death\":null,\"birthplace\":\"Chicago - Illinois - USA\"\
+          ,\"homepage\":\"\"}},{\"character\":\"Lawrence Kutner\",\"person\":{\"name\"\
+          :\"Kal Penn\",\"ids\":{\"trakt\":415949,\"slug\":\"kal-penn\",\"imdb\":\"\
+          nm0671980\",\"tmdb\":53493,\"tvrage\":11806},\"images\":{\"headshot\":{\"\
+          full\":\"https://walter.trakt.us/images/people/000/415/949/headshots/original/8cb1b06623.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/415/949/headshots/medium/8cb1b06623.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/415/949/headshots/thumb/8cb1b06623.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/415/949/fanarts/original/89a27112e9.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/415/949/fanarts/medium/89a27112e9.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/415/949/fanarts/thumb/89a27112e9.jpg\"\
+          }},\"biography\":\"From Wikipedia, the free encyclopedia\\n\\nKalpen Suresh\
+          \ Modi (born April 23, 1977), best known by his stage name Kal Penn, is\
+          \ an American film actor and politician.\\n\\nAs an actor, he is known for\
+          \ his role on the television program House portraying the character Dr.\
+          \ Lawrence Kutner and in the Harold and Kumar comedy films as Kumar Patel.\
+          \ He is also recognized for the critically acclaimed film The Namesake.\
+          \ Penn has also taught at the University of Pennsylvania as a visiting lecturer\
+          \ in the Cinema Studies Program.\\n\\nOn April 8, 2009, it was announced\
+          \ that Penn would join the Obama administration as an Associate Director\
+          \ in the White House Office of Public Engagement. This necessitated that\
+          \ his character Lawrence Kutner be written out of the TV series House. Penn\
+          \ resigned his post as Barack Obama's associate director of public engagement\
+          \ on June 1, 2010, for a brief return to his acting career. He filmed the\
+          \ third installment of the Harold and Kumar series, A Very Harold and Kumar\
+          \ Christmas, then returned to the White House Office of Public Engagement\
+          \ as an Associate Director.\\n\\nDescription above from the Wikipedia article\
+          \ Kal Penn, licensed under CC-BY-SA, full list of contributors on Wikipedia.\"\
+          ,\"birthday\":\"1977-04-23\",\"death\":null,\"birthplace\":\" Montclair,\
+          \ New Jersey, USA\",\"homepage\":\"\"}},{\"character\":\"Thirteen\",\"person\"\
+          :{\"name\":\"Olivia Wilde\",\"ids\":{\"trakt\":421662,\"slug\":\"olivia-wilde\"\
+          ,\"imdb\":\"nm1312575\",\"tmdb\":59315,\"tvrage\":51856},\"images\":{\"\
+          headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/421/662/headshots/original/44e5e551ec.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/421/662/headshots/medium/44e5e551ec.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/421/662/headshots/thumb/44e5e551ec.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/421/662/fanarts/original/de7fdeabc3.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/421/662/fanarts/medium/de7fdeabc3.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/421/662/fanarts/thumb/de7fdeabc3.jpg\"\
+          }},\"biography\":\"Olivia Wilde (born Olivia Jane Cockburn; March 10, 1984)\
+          \ is an American actress and model. She began acting in the early 2000s,\
+          \ and has since appeared in a number of film and television parts, including\
+          \ roles in the serial-drama The O.C. and The Black Donnellys. She portrays\
+          \ Dr. Remy \\\"Thirteen\\\" Hadley in the TV drama House, and in 2010 starred\
+          \ as Quorra in Tron: Legacy.\\n\\nDescription above from the Wikipedia article\
+          \ Olivia Wilde, licensed under CC-BY-SA, full list of contributors on Wikipedia.\"\
+          ,\"birthday\":\"1984-03-10\",\"death\":null,\"birthplace\":\"New York City\
+          \ - New York - USA\",\"homepage\":\"http://www.oliviawildefan.com/\"}},{\"\
+          character\":\"Jessica Adams\",\"person\":{\"name\":\"Odette Annable\",\"\
+          ids\":{\"trakt\":421384,\"slug\":\"odette-annable\",\"imdb\":\"nm0951148\"\
+          ,\"tmdb\":51992,\"tvrage\":57233},\"images\":{\"headshot\":{\"full\":\"\
+          https://walter.trakt.us/images/people/000/421/384/headshots/original/b29b737b94.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/421/384/headshots/medium/b29b737b94.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/421/384/headshots/thumb/b29b737b94.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/421/384/fanarts/original/b115dc69fb.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/421/384/fanarts/medium/b115dc69fb.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/421/384/fanarts/thumb/b115dc69fb.jpg\"\
+          }},\"biography\":\"From Wikipedia, the free encyclopedia\\n\\nOdette Annable\
+          \ (n\xE9e Yustman, born May 10, 1985), is an American actress.\\n\\nShe\
+          \ was born in Los Angeles, California. Her mother, Lydia, is Cuban. Her\
+          \ father, Victor Yustman, who is of Italian and French descent, was born\
+          \ in Bogot\xE1, Colombia and raised in Nicaragua.She graduated from Woodcrest\
+          \ Christian High School in Riverside, California. After graduating, she\
+          \ had planned on getting a degree in business finance at Loyola Marymount\
+          \ University before she decided to pursue a career in acting.Annable made\
+          \ her acting debut at an early age, playing a young, Spanish-speaking student\
+          \ named Rosa in Kindergarten Cop, and later moved on to various television\
+          \ shows and movies such as South Beach and October Road.In 2007, she starred\
+          \ in the Lifetime original movie Reckless Behavior: Caught on Tape and followed\
+          \ it quickly with a lead role in J. J. Abrams' Cloverfield.In addition to\
+          \ this, she made a short appearance in the John C. Reilly comedy film Walk\
+          \ Hard. She also provided the voice of the character Amata in Fallout 3.\
+          \ On January 29, 2008, Variety announced that she would appear in The Unborn,\
+          \ which was released in 2009.\\n\\nShe is featured in the 2009 music video\
+          \ for \\\"(If You're Wondering If I Want You To) I Want You To\\\" by Weezer.\\\
+          n\\nShe starred as Melanie in the Fox comedy, Breaking In.\\n\\nOn August\
+          \ 24, 2011, the show was renewed by Fox for thirteen episodes and was scheduled\
+          \ to air in the midseason comedy block. Fox canceled the series May 2011\
+          \ and it ended its run April 2012.\\n\\nIn October 2011, Annable began starring\
+          \ in Fox's House as Dr. Jessica Adams, a former prison doctor hired by Dr.\
+          \ Gregory House to join his team She made her first appearance in the eighth\
+          \ season premiere titled \\\"Twenty Vicodin\\\" and remained on the show\
+          \ until it ended with the twenty-second episode titled \\\"Everybody Dies\\\
+          \" in May 2012.\\n\\nIn February 2013, Annable signed on for the lead role\
+          \ of the ABC drama pilot Westside produced by McG and developed by Ilene\
+          \ Chaiken , but it was not picked up as a series.She was previously engaged\
+          \ to actor Trevor Wright.She married her former Brothers &amp; Sisters co-star\
+          \ Dave Annable on October 10, 2010.Annable was nominated in 2008 for a Teen\
+          \ Choice Award at the Teen Choice Awards for Choice Movie Actress: Horror/Thriller\
+          \ for Cloverfield (2008).\",\"birthday\":\"1985-05-10\",\"death\":null,\"\
+          birthplace\":\"Los Angeles, California, USA\",\"homepage\":\"\"}},{\"character\"\
+          :\"Chi Park\",\"person\":{\"name\":\"Charlyne Yi\",\"ids\":{\"trakt\":419887,\"\
+          slug\":\"charlyne-yi\",\"imdb\":\"nm2304722\",\"tmdb\":93285,\"tvrage\"\
+          :182394},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/419/887/headshots/original/438841356b.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/419/887/headshots/medium/438841356b.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/419/887/headshots/thumb/438841356b.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"From Wikipedia, the free encyclopedia.\\n\\nCharlyne Amanda Yi (born\
+          \ January 4, 1986) is an American actress, comedian, musician, writer, and\
+          \ painter. Her performances do not always include joke-telling as in standup\
+          \ comedy; instead, she uses different tactics such as music, magic, games,\
+          \ and often audience participation. Her screenwriting debut, the feature\
+          \ film Paper Heart, won the Waldo Salt Screenwriting Award at the 2009 Sundance\
+          \ Film Festival.\\n\\nDescription above from the Wikipedia article Charlyne\
+          \ Yi, licensed under CC-BY-SA, full list of contributors on Wikipedia.\"\
+          ,\"birthday\":\"1986-01-04\",\"death\":null,\"birthplace\":\"Los Angeles,\
+          \ California, U.S.\",\"homepage\":\"\"}},{\"character\":\"Dr. Amber Volakis\"\
+          ,\"person\":{\"name\":\"Anne Dudek\",\"ids\":{\"trakt\":417236,\"slug\"\
+          :\"anne-dudek\",\"imdb\":\"nm0240043\",\"tmdb\":24198,\"tvrage\":29000},\"\
+          images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/person_shows/000/078/322/headshots/original/a321f90990.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/person_shows/000/078/322/headshots/medium/a321f90990.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/person_shows/000/078/322/headshots/thumb/a321f90990.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"From Wikipedia, the free encyclopedia\\n\\nAnne Louise Dudek (born March\
+          \ 22, 1975 height 5' 10\xBD\\\" (1,79 m)) is an American actress. She is\
+          \ known for her roles as Tiffany Wilson in the 2004 film White Chicks, Dr.\
+          \ Amber Volakis on American television show House, Clare Pettengill on British\
+          \ television show The Book Group, and Francine Hanson in the American television\
+          \ show Mad Men.\\n\\nEarly life\\n\\nDudek was born and raised in Boston,\
+          \ Massachusetts. She attended Northwestern University. Her surname is Slavic\
+          \ and means hoopoe (a type of bird).\",\"birthday\":\"1975-03-22\",\"death\"\
+          :null,\"birthplace\":\"Boston - Massachusetts - USA\",\"homepage\":\"\"\
+          }},{\"character\":\"Rachel Taub\",\"person\":{\"name\":\"Jennifer Crystal\
+          \ Foley\",\"ids\":{\"trakt\":79432,\"slug\":\"jennifer-crystal-foley\",\"\
+          imdb\":\"nm0190571\",\"tmdb\":532890,\"tvrage\":18075},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/people/000/079/432/headshots/original/bc6cd4390f.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/079/432/headshots/medium/bc6cd4390f.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/079/432/headshots/thumb/bc6cd4390f.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\"\
+          :null}},{\"character\":\"Nurse\",\"person\":{\"name\":\"Bobbin Bergstrom\"\
+          ,\"ids\":{\"trakt\":399343,\"slug\":\"bobbin-bergstrom\",\"imdb\":null,\"\
+          tmdb\":1224001,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
+          :null,\"homepage\":null}}],\"crew\":{\"production\":[{\"job\":\"Casting\"\
+          ,\"person\":{\"name\":\"Amy Lippens\",\"ids\":{\"trakt\":1995,\"slug\":\"\
+          amy-lippens\",\"imdb\":\"nm0513591\",\"tmdb\":2151,\"tvrage\":null},\"images\"\
+          :{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\"\
+          :null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"\
+          Executive Producer\",\"person\":{\"name\":\"Paul Attanasio\",\"ids\":{\"\
+          trakt\":2009,\"slug\":\"paul-attanasio\",\"imdb\":\"nm0001921\",\"tmdb\"\
+          :45543,\"tvrage\":71428},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/002/009/headshots/original/3171617932.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/002/009/headshots/medium/3171617932.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/002/009/headshots/thumb/3171617932.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":\"1959-11-14\",\"death\":null,\"birthplace\":\"\",\"\
+          homepage\":null}},{\"job\":\"Co-Executive Producer\",\"person\":{\"name\"\
+          :\"Gerrit van der Meer\",\"ids\":{\"trakt\":9787,\"slug\":\"gerrit-van-der-meer\"\
+          ,\"imdb\":\"nm0576182\",\"tmdb\":12256,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
+          :null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Unit Production\
+          \ Manager\",\"person\":{\"name\":\"Gerrit van der Meer\",\"ids\":{\"trakt\"\
+          :9787,\"slug\":\"gerrit-van-der-meer\",\"imdb\":\"nm0576182\",\"tmdb\":12256,\"\
+          tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"\
+          biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"\
+          homepage\":null}},{\"job\":\"Executive Producer\",\"person\":{\"name\":\"\
+          Peter Blake\",\"ids\":{\"trakt\":399346,\"slug\":\"peter-blake-5cd380a9-d696-46d4-84cc-b862c5b2e6b3\"\
+          ,\"imdb\":\"nm0086694\",\"tmdb\":1223964,\"tvrage\":null},\"images\":{\"\
+          headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"\
+          full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\"\
+          :null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"\
+          Executive Producer\",\"person\":{\"name\":\"Thomas L. Moran\",\"ids\":{\"\
+          trakt\":399347,\"slug\":\"thomas-l-moran\",\"imdb\":\"nm0602981\",\"tmdb\"\
+          :1223966,\"tvrage\":31719},\"images\":{\"headshot\":{\"full\":null,\"medium\"\
+          :null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\"\
+          :null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
+          :null,\"homepage\":null}},{\"job\":\"Producer\",\"person\":{\"name\":\"\
+          Marcy G. Kaplan\",\"ids\":{\"trakt\":399357,\"slug\":\"marcy-g-kaplan\"\
+          ,\"imdb\":\"nm0438309\",\"tmdb\":1224008,\"tvrage\":null},\"images\":{\"\
+          headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"\
+          full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\"\
+          :null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"\
+          Executive Producer\",\"person\":{\"name\":\"Bryan Singer\",\"ids\":{\"trakt\"\
+          :413922,\"slug\":\"bryan-singer\",\"imdb\":\"nm0001741\",\"tmdb\":9032,\"\
+          tvrage\":31688},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/413/922/headshots/original/f80b4127ec.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/413/922/headshots/medium/f80b4127ec.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/413/922/headshots/thumb/f80b4127ec.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"Bryan Singer (born September 17, 1965) is an American film director and\
+          \ film producer. Singer won critical acclaim for his work on The Usual Suspects,\
+          \ and is especially well-known among fans of the science fiction and comic\
+          \ book genres for his work on the first two X-Men films and Superman Returns.\
+          \ Description above from the Wikipedia article Bryan Singer, licensed under\
+          \ CC-BY-SA, full list of contributors on Wikipedia.\",\"birthday\":\"1965-09-17\"\
+          ,\"death\":null,\"birthplace\":\"New York City, New York, USA\",\"homepage\"\
+          :\"\"}},{\"job\":\"Executive Producer\",\"person\":{\"name\":\"David Shore\"\
+          ,\"ids\":{\"trakt\":434876,\"slug\":\"david-shore\",\"imdb\":\"nm0794914\"\
+          ,\"tmdb\":169061,\"tvrage\":17176},\"images\":{\"headshot\":{\"full\":\"\
+          https://walter.trakt.us/images/people/000/434/876/headshots/original/f9a66f827a.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/434/876/headshots/medium/f9a66f827a.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/434/876/headshots/thumb/f9a66f827a.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :\"\",\"birthday\":\"1959-07-03\",\"death\":null,\"birthplace\":null,\"\
+          homepage\":\"\"}},{\"job\":\"Executive Producer\",\"person\":{\"name\":\"\
+          Katie Jacobs\",\"ids\":{\"trakt\":436235,\"slug\":\"katie-jacobs\",\"imdb\"\
+          :\"nm0414498\",\"tmdb\":41424,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":\"https://walter.trakt.us/images/people/000/436/235/headshots/original/c4ae067940.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/436/235/headshots/medium/c4ae067940.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/436/235/headshots/thumb/c4ae067940.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
+          :null,\"birthday\":null,\"death\":null,\"birthplace\":\"\",\"homepage\"\
+          :null}}],\"directing\":[{\"job\":\"Script Supervisor\",\"person\":{\"name\"\
+          :\"Ira Hurvitz\",\"ids\":{\"trakt\":572489,\"slug\":\"ira-hurvitz\",\"imdb\"\
+          :\"nm0403779\",\"tmdb\":1533790,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
+          :null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"Script Coordinator\"\
+          ,\"person\":{\"name\":\"Dustin Paddock\",\"ids\":{\"trakt\":618367,\"slug\"\
+          :\"dustin-paddock\",\"imdb\":null,\"tmdb\":1223981,\"tvrage\":null},\"images\"\
+          :{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\"\
+          :null,\"death\":null,\"birthplace\":null,\"homepage\":null}}],\"sound\"\
+          :[{\"job\":\"Original Music Composer\",\"person\":{\"name\":\"Jon Ehrlich\"\
+          ,\"ids\":{\"trakt\":580789,\"slug\":\"jon-ehrlich\",\"imdb\":\"nm0251363\"\
+          ,\"tmdb\":1493983,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
+          :null,\"homepage\":null}},{\"job\":\"Original Music Composer\",\"person\"\
+          :{\"name\":\"Jason Derlatka\",\"ids\":{\"trakt\":618364,\"slug\":\"jason-derlatka\"\
+          ,\"imdb\":\"nm1628706\",\"tmdb\":1604953,\"tvrage\":null},\"images\":{\"\
+          headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"\
+          full\":null,\"medium\":null,\"thumb\":null}},\"biography\":\"\",\"birthday\"\
+          :null,\"death\":null,\"birthplace\":null,\"homepage\":\"\"}}],\"costume\
+          \ & make-up\":[{\"job\":\"Costume Design\",\"person\":{\"name\":\"Cathy\
+          \ Crandall\",\"ids\":{\"trakt\":618365,\"slug\":\"cathy-crandall\",\"imdb\"\
+          :\"nm0186285\",\"tmdb\":1604955,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\":null,\"death\"\
+          :null,\"birthplace\":null,\"homepage\":null}}],\"visual effects\":[{\"job\"\
+          :\"Visual Effects Supervisor\",\"person\":{\"name\":\"Elan Soltes\",\"ids\"\
+          :{\"trakt\":618366,\"slug\":\"elan-soltes\",\"imdb\":null,\"tmdb\":1488571,\"\
+          tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"\
+          biography\":null,\"birthday\":null,\"death\":null,\"birthplace\":null,\"\
+          homepage\":null}}]}}"}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [27dce67bfa9e19b6-SYD]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 11:55:35 GMT']
-        etag: [W/"70eef265c5515d53430d850bdb68125e"]
-        expires: ['Thu, 03 Mar 2016 15:55:35 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d440d5bf47ce326ccf9fc0684dfc00c301457006135; expires=Fri,
-            03-Mar-17 11:55:35 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [3a353ba4-3857-4a54-b1fd-d13e11920ef9]
-        x-runtime: ['0.038071']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de2385500a0103-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:30 GMT']
+        ETag: [W/"2b833db2b1890f2cf339ed977a32b48f"]
+        Expires: ['Wed, 04 May 2016 22:50:30 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=d50a16f4659513b83563eff8a148aeb131462387830; expires=Thu,
+            04-May-17 18:50:30 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [95a8fd68-7f26-425c-b354-28027442d10b]
+        X-Runtime: ['0.074176']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

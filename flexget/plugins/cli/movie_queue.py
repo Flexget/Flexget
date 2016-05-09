@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser
 
@@ -19,6 +20,7 @@ except ImportError:
 
 def do_cli(manager, options):
     """Handle movie-queue subcommand"""
+    console('WARNING!: movie_queue plugin is deprecated. Please switch to using movie_list\n')
 
     if options.queue_action == 'list':
         queue_list(options)

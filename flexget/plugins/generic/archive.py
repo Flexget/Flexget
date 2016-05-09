@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 from collections import defaultdict
 import logging
 import re
@@ -367,7 +369,7 @@ def search(session, text, tags=None, sources=None, desc=False):
     :param bool desc: Sort results descending
     :return: ArchiveEntries responding to query
     """
-    keyword = unicode(text).replace(' ', '%').replace('.', '%')
+    keyword = str(text).replace(' ', '%').replace('.', '%')
     # clean the text from any unwanted regexp, convert spaces and keep dots as dots
     normalized_re = re.escape(text.replace('.', ' ')).replace('\\ ', ' ').replace(' ', '.')
     find_re = re.compile(normalized_re, re.IGNORECASE)

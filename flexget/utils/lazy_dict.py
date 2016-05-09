@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 
 import logging
 from collections import MutableMapping
@@ -99,7 +101,7 @@ class LazyDict(MutableMapping):
         The LazyLookup instance for this LazyDict.
         If one is already stored in this LazyDict, it is returned, otherwise a new one is instantiated.
         """
-        for val in self.store.itervalues():
+        for val in self.store.values():
             if isinstance(val, LazyLookup):
                 return val
         return LazyLookup(self)

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
 from functools import partial
 import json
@@ -355,7 +356,7 @@ class T411ObjectMapper(object):
 
         json_sub_categories = json_category.get(u'cats')
         if json_sub_categories is not None:
-            for json_sub_category in json_sub_categories.itervalues():
+            for json_sub_category in json_sub_categories.values():
                 mapped_sub_category = self.map_category(json_sub_category)
                 mapped_category.sub_categories.append(mapped_sub_category)
 
@@ -368,7 +369,7 @@ class T411ObjectMapper(object):
         """
         indexed_categories = {}
         main_categories = []
-        for json_main_category in json_category_tree.itervalues():
+        for json_main_category in json_category_tree.values():
             main_category = self.map_category(json_main_category)
             if main_category is not None:
                 main_categories.append(main_category)
@@ -388,8 +389,8 @@ class T411ObjectMapper(object):
         category_to_term_type = []  # relations category-term type
         term_types = {}  # term types, indexed by termtype id
         terms = {}  # terms, indexed by id
-        for category_key, json_term_types in json_tree.iteritems():
-            for term_type_key, term_type_content in json_term_types.iteritems():
+        for category_key, json_term_types in json_tree.items():
+            for term_type_key, term_type_content in json_term_types.items():
                 term_type_id = int(term_type_key)
                 category_to_term_type.append((int(category_key), term_type_id))
 
@@ -401,7 +402,7 @@ class T411ObjectMapper(object):
                     term_type.name = term_type_content.get('type')
                     term_type.mode = term_type_content.get('mode')
                     term_types[term_type.id] = term_type  # index term type
-                    for term_id, term_name in term_type_content.get('terms').iteritems():
+                    for term_id, term_name in term_type_content.get('terms').items():
                         # Parsing & indexing terms
                         if term_id not in terms:
                             term = Term(id=int(term_id), name=term_name)
@@ -447,7 +448,7 @@ class T411ObjectMapper(object):
         result.category_id = json_details.get('category')
 
         # Parse collection of termtype-termvalue
-        for (term_type_name, terms_candidat) in json_details.get('terms').iteritems():
+        for (term_type_name, terms_candidat) in json_details.get('terms').items():
             if isinstance(terms_candidat, list):
                 # Some terms type are multi-valuable, eg. Genres
                 for term_name in terms_candidat:
@@ -657,14 +658,14 @@ class T411Proxy(object):
         client_query = self.friendly_query_to_client_query(query)
         json_results = self.rest_client.search(client_query)
         json_torrents = json_results.get('torrents', [])
-        json_not_pending_torrents = filter(lambda x: not isinstance(x, int), json_torrents)
+        json_not_pending_torrents = [x for x in json_torrents if not isinstance(x, int)]
         log.debug("Search produces %d results including %d 'on pending' (the latter will not produces entries)",
                   len(json_torrents),
                   len(json_torrents) - len(json_not_pending_torrents))
         download_auth = T411BindAuth(self.rest_client.api_token)
 
         map_function = partial(T411ObjectMapper.map_search_result_entry, download_auth=download_auth)
-        return map(map_function, json_not_pending_torrents)
+        return list(map(map_function, json_not_pending_torrents))
 
     @cache_required
     @with_session

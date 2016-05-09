@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import logging
 import math
 
@@ -168,13 +170,13 @@ class InputWhatCD(object):
                 'album': {'type': 'string'},
                 'year': {'type': ['string', 'integer']},
                 'tags': one_or_more({'type': 'string'}),
-                'tag_type': {'type': 'string', 'enum': self._opts('tag_type').keys()},
+                'tag_type': {'type': 'string', 'enum': list(self._opts('tag_type').keys())},
                 'encoding': {'type': 'string', 'enum': self._opts('encoding')},
                 'format': {'type': 'string', 'enum': self._opts('format')},
                 'media': {'type': 'string', 'enum': self._opts('media')},
-                'release_type': {'type': 'string', 'enum': self._opts('release_type').keys()},
-                'log': {'oneOf': [{'type': 'string', 'enum': self._opts('log').keys()}, {'type': 'boolean'}]},
-                'leech_type': {'type': 'string', 'enum': self._opts('leech_type').keys()},
+                'release_type': {'type': 'string', 'enum': list(self._opts('release_type').keys())},
+                'log': {'oneOf': [{'type': 'string', 'enum': list(self._opts('log').keys())}, {'type': 'boolean'}]},
+                'leech_type': {'type': 'string', 'enum': list(self._opts('leech_type').keys())},
                 'hascue': {'type': 'boolean'},
                 'scene': {'type': 'boolean'},
                 'vanityhouse': {'type': 'boolean'},
@@ -217,7 +219,7 @@ class InputWhatCD(object):
         params = {}
 
         # Filter params and map config values -> api values
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             params[self._key(k)] = self._getval(k, v)
 
         # Params other than the searching ones

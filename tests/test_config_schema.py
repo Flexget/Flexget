@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from datetime import timedelta
 import jsonschema
@@ -26,7 +27,7 @@ class TestSchemaValidator(object):
     def test_refs_in_schemas_are_resolvable(self):
         def refs_in(item):
             if isinstance(item, dict):
-                for key, value in item.iteritems():
+                for key, value in item.items():
                     if key == '$ref':
                         yield value
                     else:

@@ -13,13 +13,14 @@
       },
     });
 
-    function seriesShowController($state, $mdDialog) {
+    function seriesShowController($state, $mdDialog, $http) {
       var vm = this;
 
       vm.gotoEpisodes = function() {
         $state.go('flexget.episodes', { id: vm.show.show_id });
       };
 
+      //Dialog for the update possibilities, such as begin and alternate names
       function showDialog(params) {
         return $mdDialog.show({
           controller: 'seriesUpdateController',
@@ -32,6 +33,16 @@
         });
       }
 
+      function loadMetadata() {
+        $http.get('/api/tvdb/series/' + vm.show.show_name, { cache: true })
+          .success(function(data) {
+            vm.metadata = data;
+          })
+      }
+
+      loadMetadata();
+
+      //Call from the page, to open a dialog with alternate names
       vm.alternateName = function(ev) {
         var params = {
           alternate_names: vm.show.alternate_names
@@ -44,6 +55,7 @@
         });
       }
 
+      //Cat from the page, to open a dialog to set the begin
       vm.setBegin = function(ev) {
         var params = {
           episode_identifier: vm.show.begin_episode.episode_identifier

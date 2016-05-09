@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import os
 import re
 import logging
@@ -6,6 +8,7 @@ import logging
 from sqlalchemy import Column, Integer, Unicode
 
 from flexget import options, plugin
+from flexget.utils.tools import native_str_to_text
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry
 from flexget.event import event
@@ -74,7 +77,7 @@ class InputTail(object):
     }
 
     def format_entry(self, entry, d):
-        for k, v in d.iteritems():
+        for k, v in d.items():
             entry[k] = v % entry
 
     def on_task_input(self, task, config):
@@ -122,14 +125,14 @@ class InputTail(object):
                     line = file.readline()
                     if encoding:
                         try:
-                            line = line.decode(encoding)
+                            line = native_str_to_text(line, encoding=encoding)
                         except UnicodeError:
                             raise plugin.PluginError('Failed to decode file using %s. Check encoding.' % encoding)
 
                     if not line:
                         break
 
-                    for field, regexp in entry_config.iteritems():
+                    for field, regexp in entry_config.items():
                         # log.debug('search field: %s regexp: %s' % (field, regexp))
                         match = re.search(regexp, line)
                         if match:

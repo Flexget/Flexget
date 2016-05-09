@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import logging
 import smtplib
 import socket
@@ -12,7 +14,6 @@ from flexget import config_schema, manager, plugin
 from flexget.event import event
 from flexget.utils.template import render_from_task, get_template, RenderError
 from flexget.utils.tools import merge_dict_from_to, MergeException
-from flexget import validator
 from flexget.config_schema import one_or_more
 
 log = logging.getLogger('email')
@@ -35,7 +36,7 @@ def setup(manager, options):
     config['global'] = True
     global task_content
     task_content = {}
-    for task_name, task_config in manager.config['tasks'].iteritems():
+    for task_name, task_config in manager.config['tasks'].items():
         task_config.setdefault('email', {})
         try:
             merge_dict_from_to(config, task_config['email'])
@@ -50,7 +51,7 @@ def global_send(manager, options):
         return
     config = prepare_config(manager.config['email'])
     content = ''
-    for task, text in task_content.iteritems():
+    for task, text in task_content.items():
         content += '_' * 30 + ' Task: %s ' % task + '_' * 30 + '\n'
 
         content += text + '\n'
@@ -101,7 +102,7 @@ def send_email(subject, content, config):
         except socket.error as e:
             log.warning('Socket error: %s' % e)
             return
-        except SMTPException as e:
+        except OSError as e:
             # Ticket #1133
             log.warning('Unable to send email: %s' % e)
             return
@@ -115,9 +116,6 @@ def send_email(subject, content, config):
         except IOError as e:
             # Ticket #686
             log.warning('Unable to send email! IOError: %s' % e)
-            return
-        except SMTPException as e:
-            log.warning('Unable to send email! SMTPException: %s' % e)
             return
 
         mailServer.quit()

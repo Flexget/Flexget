@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import logging
 
 from flexget import plugin
@@ -24,7 +26,7 @@ def init_parsers(manager):
             parsers[parser_type][p.name.replace('parser_', '')] = p.instance
         # Select default parsers based on priority
         func_name = 'parse_' + parser_type
-        default_parsers[parser_type] = max(parsers[parser_type].iteritems(),
+        default_parsers[parser_type] = max(iter(parsers[parser_type].items()),
                                           key=lambda p: getattr(getattr(p[1], func_name), 'priority', 0))[0]
         log.debug('setting default %s parser to %s. (options: %s)' %
                   (parser_type, default_parsers[parser_type], parsers[parser_type]))

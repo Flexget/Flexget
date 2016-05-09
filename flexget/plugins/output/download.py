@@ -1,5 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.moves.urllib.parse import unquote
+
 import hashlib
+import io
 import logging
 import mimetypes
 import os
@@ -8,14 +13,13 @@ import socket
 import sys
 import tempfile
 from cgi import parse_header
-from httplib import BadStatusLine
-from urllib import unquote
+from http.client import BadStatusLine
 
 from requests import RequestException
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.utils.tools import decode_html
+from flexget.utils.tools import decode_html, native_str_to_text
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
 
@@ -71,7 +75,7 @@ class PluginDownload(object):
 
     def process_config(self, config):
         """Return plugin configuration in advanced form"""
-        if isinstance(config, basestring):
+        if isinstance(config, str):
             config = {'path': config}
         if not isinstance(config, dict):
             config = {}
@@ -154,7 +158,7 @@ class PluginDownload(object):
             os.makedirs(received)
         filename = os.path.join(received, '%s.error' % entry['title'].encode(sys.getfilesystemencoding(), 'replace'))
         log.error('Error retrieving %s, the error page has been saved to %s' % (entry['title'], filename))
-        with open(filename, 'w') as outfile:
+        with io.open(filename, 'wb') as outfile:
             outfile.write(page)
 
     def get_temp_files(self, task, require_path=False, handle_magnets=False, fail_html=True,
@@ -266,7 +270,7 @@ class PluginDownload(object):
         tmp_dir = tempfile.mkdtemp(dir=tmp_path)
         fname = hashlib.md5(url.encode('utf-8', 'replace')).hexdigest()
         datafile = os.path.join(tmp_dir, fname)
-        outfile = open(datafile, 'wb')
+        outfile = io.open(datafile, 'wb')
         try:
             for chunk in response.iter_content(chunk_size=150 * 1024, decode_unicode=False):
                 outfile.write(chunk)
@@ -293,7 +297,7 @@ class PluginDownload(object):
             log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
 
         if 'content-type' in response.headers:
-            entry['mime-type'] = parse_header(response.headers['content-type'])[0]
+            entry['mime-type'] = str(parse_header(response.headers['content-type'])[0])
         else:
             entry['mime-type'] = "unknown/unknown"
 
@@ -326,11 +330,11 @@ class PluginDownload(object):
         if filename:
             # try to decode to unicode, specs allow latin1, some may do utf-8 anyway
             try:
-                filename = filename.decode('latin1')
+                filename = native_str_to_text(filename, encoding='latin1')
                 log.debug('filename header latin1 decoded')
             except UnicodeError:
                 try:
-                    filename = filename.decode('utf-8')
+                    filename = native_str_to_text(filename, encoding='utf-8')
                     log.debug('filename header UTF-8 decoded')
                 except UnicodeError:
                     pass
@@ -384,7 +388,7 @@ class PluginDownload(object):
         try:
             # use path from entry if has one, otherwise use from download definition parameter
             path = entry.get('path', config.get('path'))
-            if not isinstance(path, basestring):
+            if not isinstance(path, str):
                 raise plugin.PluginError('Invalid `path` in entry `%s`' % entry['title'])
 
             # override path from command line parameter

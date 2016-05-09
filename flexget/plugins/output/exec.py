@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
+
 import logging
 import subprocess
 
@@ -8,7 +11,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.template import render_from_entry, render_from_task, RenderError
-from flexget.utils.tools import io_encoding
+from flexget.utils.tools import io_encoding, native_str_to_text
 
 log = logging.getLogger('exec')
 
@@ -102,11 +105,12 @@ class PluginExec(object):
 
     def execute_cmd(self, cmd, allow_background, encoding):
         log.verbose('Executing: %s' % cmd)
-        p = subprocess.Popen(cmd.encode(encoding), shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+        # if PY2: cmd = cmd.encode(encoding) ?
+        p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT, close_fds=False)
         if not allow_background:
             (r, w) = (p.stdout, p.stdin)
-            response = r.read().decode(encoding, 'replace')
+            response = native_str_to_text(r.read(), encoding=encoding, errors='replace')
             r.close()
             w.close()
             if response:
@@ -123,7 +127,7 @@ class PluginExec(object):
                     'for_rejected': task.rejected, 'for_failed': task.failed}
 
         allow_background = config.get('allow_background')
-        for operation, entries in name_map.iteritems():
+        for operation, entries in name_map.items():
             if operation not in config[phase_name]:
                 continue
 

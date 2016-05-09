@@ -1,11 +1,11 @@
-from __future__ import absolute_import, division, unicode_literals
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
-import Queue
+import queue
+import sys
 import threading
 import time
-from datetime import datetime
-
 
 from sqlalchemy.exc import ProgrammingError, OperationalError
 
@@ -20,7 +20,7 @@ class TaskQueue(object):
     Only executes one task at a time, if more are requested they are queued up and run in turn.
     """
     def __init__(self):
-        self.run_queue = Queue.PriorityQueue()
+        self.run_queue = queue.PriorityQueue()
         self._shutdown_now = False
         self._shutdown_when_finished = False
 
@@ -39,7 +39,7 @@ class TaskQueue(object):
             # Grab the first job from the run queue and do it
             try:
                 self.current_task = self.run_queue.get(timeout=0.5)
-            except Queue.Empty:
+            except queue.Empty:
                 if self._shutdown_when_finished:
                     self._shutdown_now = True
                 continue
@@ -93,6 +93,12 @@ class TaskQueue(object):
         Waits for the thread to exit.
         Allows abortion of task queue with ctrl-c
         """
+        if sys.version_info >= (3, 4):
+            # Due to python bug, Thread.is_alive doesn't seem to work properly under our conditions on python 3.4+
+            # http://bugs.python.org/issue26793
+            # TODO: Is it important to have the clean abortion? Do we need to find a better way?
+            self._thread.join()
+            return
         try:
             while self._thread.is_alive():
                 time.sleep(0.5)

@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import logging
 import re
 
@@ -90,4 +92,4 @@ class AnidbList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(AnidbList, 'anidb_list', api_ver=2)
+    plugin.register(AnidbList, 'anidb_list', api_ver=2, groups=['list'])
