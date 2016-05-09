@@ -1,15 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import ftplib
 import logging
 from collections import MutableSet
 
 import ftputil.session
+from ftputil.error import FTPOSError
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugin import DependencyError
+from flexget.plugin import DependencyError, PluginError
 
 try:
     import ftputil
@@ -88,14 +90,22 @@ class FTPListSet(MutableSet):
 
     def _prepare_config(self):
         self.config.setdefault('retrieve', ['files'])
+        self.config.setdefault('use_ssl', False)
 
     def _connect(self):
         self.username = self.config.get('username')
         self.password = self.config.get('password')
         self.host = self.config.get('host')
         self.port = self.config.get('port')
-        session_factory = ftputil.session.session_factory(port=self.port)
-        return ftputil.FTPHost(self.host, self.username, self.password, session_factory=session_factory)
+        self.dirs = self.config.get('dirs')
+        base_class = ftplib.FTP_TLS if self.config.get('use_ssl') else ftplib.FTP
+        session_factory = ftputil.session.session_factory(port=self.port, base_class=base_class)
+        try:
+            log.verbose(
+                'trying to establish connection to FTP: {}:<HIDDEN>@{}:{}'.format(self.username, self.host, self.port))
+            return ftputil.FTPHost(self.host, self.username, self.password, session_factory=session_factory)
+        except FTPOSError as e:
+            raise PluginError('Could not connect to FTP: {}'.format(e.args[0]))
 
     def _to_entry(self, base, object):
         entry = Entry()
@@ -108,9 +118,12 @@ class FTPListSet(MutableSet):
 
     def _list_entries(self):
         entries = []
-        log.verbose('connecting to FTP: {}:<HIDDEN>@{}:{}'.format(self.username, self.host, self.port))
+        log.verbose('connected to FTP, starting to retrfile files and dirs')
         with self.FTP as ftp:
             for base, dirs, files in ftp.walk(ftp.curdir):
+                if self.dirs and base not in self.dirs:
+                    log.debug('dir {} is not in {}, skipping'.format(base, ' ,'.join(self.dirs)))
+                    continue
                 if 'files' in self.config['retrieve']:
                     for file in files:
                         entries.append(self._to_entry(base, file))
@@ -134,6 +147,8 @@ class FTPList(object):
             'password': {'type': 'string'},
             'host': {'type': 'string'},
             'port': {'type': 'integer'},
+            'use_ssl': {'type': 'boolean'},
+            'dirs': {'type': 'array', 'items': 'string'},
             'retrieve': one_or_more({'type': 'string', 'enum': ['files', 'dirs']}, unique_items=True)
         },
         'required': ['username', 'password', 'host', 'port']
