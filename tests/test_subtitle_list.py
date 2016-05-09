@@ -8,7 +8,7 @@ import sys
 import pytest
 
 from flexget.manager import Session
-from flexget.plugins.list.subtitle_list import SubtitleListFile
+from flexget.plugins.list.subtitle_list import SubtitleListFile, SubtitleListLanguage
 
 try:
     import babelfish
@@ -87,6 +87,7 @@ class TestSubtitleList(object):
              list_add:
                - subtitle_list:
                    list: test
+                   languages: [en, ja]
            subtitle_add_another_local_file:
              disable: seen
              template: no_global
@@ -97,6 +98,7 @@ class TestSubtitleList(object):
              list_add:
                - subtitle_list:
                    list: test
+                   languages: [en, ja]
            subtitle_add_a_third_local_file:
              disable: seen
              template: no_global
@@ -131,6 +133,12 @@ class TestSubtitleList(object):
 
     def test_subtitle_list_unique_lang(self, execute_task):
         task = execute_task('subtitle_add_with_languages')
+
+        with Session() as session:
+            s = session.query(SubtitleListLanguage).all()
+
+            assert s[0].file.title != s[1].file.title, 'There should only be one row per entry as "en" and "eng" are eq'
+            assert len(s) == 2, 'Language "en" and "eng" are equivalent and only one should exist per entry'
 
     def test_subtitle_list_old(self, execute_task):
         task = execute_task('subtitle_test_expiration_add')
@@ -171,7 +179,6 @@ class TestSubtitleList(object):
             pass
 
     # Skip if subliminal is not installed or if python version <2.7
-    @pytest.mark.online
     @pytest.mark.skipif(sys.version_info < (2, 7), reason='requires python2.7')
     @pytest.mark.skipif(not subliminal, reason='requires subliminal')
     def test_subtitle_list_subliminal_success(self, execute_task):
@@ -192,6 +199,10 @@ class TestSubtitleList(object):
             pass
         try:
             os.remove('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt')
+        except OSError:
+            pass
+        try:
+            os.remove('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt')
         except OSError:
             pass
 

@@ -6,7 +6,7 @@ import os
 from collections import MutableSet
 from datetime import datetime, date, time
 
-from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime
+from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime, and_
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Table
 from babelfish import Language
@@ -19,12 +19,6 @@ from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('subtitle_list')
 Base = versioned_base('subtitle_list', 1)
-
-
-association_table = Table('file_lang_association', Base.metadata,
-                          Column('subtitle_list_files_id', Integer, ForeignKey('subtitle_list_files.id')),
-                          Column('subtitle_list_languages_id', Integer, ForeignKey('subtitle_list_languages.id')))
-Base.register_table(association_table)
 
 
 def normalize_language(language):
@@ -56,7 +50,7 @@ class SubtitleListFile(Base):
     title = Column(Unicode)
     location = Column(Unicode)
     list_id = Column(Integer, ForeignKey(SubtitleListList.id), nullable=False)
-    languages = relationship('SubtitleListLanguage', secondary=association_table, backref="file", lazy='joined')
+    languages = relationship('SubtitleListLanguage', backref='file', lazy='joined', cascade='all, delete-orphan')
     remove_after = Column(Unicode)
 
     def __repr__(self):
@@ -67,15 +61,15 @@ class SubtitleListFile(Base):
         entry['title'] = self.title
         entry['url'] = 'mock://localhost/subtitle_list/%d' % self.id
         entry['location'] = self.location
-        entry['subtitle_languages'] = []
         entry['remove_after'] = self.remove_after
         entry['added'] = self.added
+        entry['subtitle_languages'] = []
         for subtitle_language in self.languages:
-            entry['subtitle_languages'].append(subtitle_language.language)
+            entry['subtitle_languages'].append(Language.fromietf(subtitle_language.language))
         return entry
 
     def to_dict(self):
-        subtitle_languages = [subtitle_list_language.to_dict() for subtitle_list_language in self.languages]
+        subtitle_languages = [subtitle_list_language.language for subtitle_list_language in self.languages]
         return {
             'id': self.id,
             'added_on': self.added,
@@ -90,28 +84,7 @@ class SubtitleListLanguage(Base):
     id = Column(Integer, primary_key=True)
     added = Column(DateTime, default=datetime.now)
     language = Column(Unicode)
-
-    def __eq__(self, other):
-        if isinstance(other, SubtitleListLanguage):
-            return self.language == other.language
-        else:
-            return False
-
-    def __ne__(self, other):
-        return (not self.__eq__(other))
-
-    def __hash__(self):
-        return hash(self.__repr__())
-
-    def __repr__(self):
-        return '<SubtitleListLanguage id=%s,language=%s>' % (self.id, self.language)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'added_on': self.added,
-            'language': self.language
-        }
+    subtitle_list_file_id = Column(Integer, ForeignKey('subtitle_list_files.id'))
 
 
 class SubtitleList(MutableSet):
@@ -162,14 +135,13 @@ class SubtitleList(MutableSet):
         db_file.location = entry['location']
         db_file.languages = []
         db_file.remove_after = self.config.get('remove_after')
-        languages = set()
-        for subtitle_language in self.config.get('languages', []):
+        db_file.languages = []
+        normalized_languages = {normalize_language(subtitle_language) for subtitle_language in
+                                self.config.get('languages', [])}
+        for subtitle_language in normalized_languages:
             normalized_language = normalize_language(subtitle_language)
-            language = self._find_language(normalized_language)
-            if not language:
-                language = SubtitleListLanguage(language=normalized_language)
-            languages.add(language)
-        db_file.languages.extend(list(languages))
+            language = SubtitleListLanguage(language=normalized_language)
+            db_file.languages.append(language)
         log.debug('adding entry %s', entry)
         db_list.files.append(db_file)
         session.commit()
@@ -192,9 +164,10 @@ class SubtitleList(MutableSet):
         return res
 
     @with_session
-    def _find_language(self, language, session=None):
-        res = session.query(SubtitleListLanguage).filter(func.lower(SubtitleListLanguage.language) ==
-                                                         str(language).lower()).first()
+    def _find_language(self, file_id, language, session=None):
+        res = session.query(SubtitleListLanguage).filter(and_(
+            func.lower(SubtitleListLanguage.language) == str(language).lower(),
+            SubtitleListLanguage.subtitle_list_file_id == file_id)).first()
         return res
 
     @property
@@ -227,11 +200,11 @@ class PluginSubtitleList(object):
             for file in subtitle_list:
                 if not os.path.isfile(file['location']):
                     log.error('File %s does not exist. Removing from list.', file['location'])
-                    subtitle_list -= [file]
+                    subtitle_list.discard(file)
                 elif self._expired(file, config):
                     log.verbose('File %s has been in the list for %s. Removing from list.', file['location'],
                                 file['remove_after'] or config['remove_after'])
-                    subtitle_list -= [file]
+                    subtitle_list.discard(file)
                 else:
                     try:
                         import subliminal
@@ -240,7 +213,7 @@ class PluginSubtitleList(object):
                         if wanted_languages and len(wanted_languages - existing_subtitles) == 0:
                             log.verbose('Local subtitle(s) already exists for %s. Removing from list.',
                                         file['location'])
-                            subtitle_list -= [file]
+                            subtitle_list.discard(file)
                     except ImportError:
                         log.warning('Subliminal not found. Unable to check for local subtitles.')
 
