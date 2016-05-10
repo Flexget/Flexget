@@ -3,7 +3,6 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.xmlrpc import client as xmlrpc_client
 from future.moves.urllib.parse import urlparse
 from future.utils import native_str
-from future.utils import PY3
 
 import logging
 import os
@@ -61,7 +60,7 @@ class SCGITransport(xmlrpc_client.Transport):
                 host = parsed_host.hostname
                 port = parsed_host.port
 
-                addr_info = socket.getaddrinfo(host, int(port), socket.AF_INET, socket.SOCK_STREAM)
+                addr_info = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
                 sock = socket.socket(*addr_info[0][:3])
                 sock.connect(addr_info[0][4])
             else:
