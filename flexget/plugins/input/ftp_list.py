@@ -34,7 +34,7 @@ class FTPList(object):
             'use_ssl': {'type': 'boolean'},
             'regexp': {'type': 'string', 'format': 'regex'},
             'directories': one_or_more({'type': 'string'}),
-            'retrieve': one_or_more({'type': 'string', 'enum': ['files', 'dirs']}, unique_items=True)
+            'retrieve': one_or_more({'type': 'string', 'enum': ['files', 'dirs', 'symlinks']}, unique_items=True)
         },
         'required': ['username', 'host']
     }
@@ -94,16 +94,20 @@ class FTPList(object):
                 if not any(dir in base for dir in directories):
                     log.debug('dir %s is not in %s, skipping', base, directories)
                     continue
-                if 'files' in config['retrieve']:
+                if 'files' in config['retrieve'] or 'symlinks' in config['retrieve']:
                     for file in files:
                         if match(file):
                             path = ftp.path.join(base, file)
-                            entries.append(self._to_entry(path))
-                if 'dirs' in config['retrieve']:
+                            if ftp.path.isfile(path) and 'files' in config['retrieve'] or ftp.path.islink(
+                                    path) and 'symlinks' in config['retrieve']:
+                                entries.append(self._to_entry(path))
+                if 'dirs' in config['retrieve'] or 'symlinks' in config['retrieve']:
                     for dir in dirs:
                         if match(dir):
                             path = ftp.path.join(base, dir)
-                            entries.append(self._to_entry(path))
+                            if ftp.path.isdir(path) and 'dirs' in config['retrieve'] or ftp.path.islink(
+                                    path) and 'symlinks' in config['retrieve']:
+                                entries.append(self._to_entry(path))
         return entries
 
 
