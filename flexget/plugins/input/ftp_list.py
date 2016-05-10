@@ -52,13 +52,14 @@ class FTPList(object):
 
     def _to_entry(self, object):
         entry = Entry()
-        name = self.FTP.path.basename(object)
+
+        title = self.FTP.path.basename(object)
         location = self.FTP.path.abspath(object)
 
-        entry['title'] = self.FTP.path.basename(object)
-        entry['location'] = '{}'.format(self.FTP.path.abspath(object))
+        entry['title'] = title
+        entry['location'] = location
         entry['url'] = 'ftp://{}:{}@{}:{}/{}'.format(self.username, self.password, self.host, self.port, location)
-        entry['filename'] = self.FTP.path.basename(object)
+        entry['filename'] = title
 
         log.debug('adding entry %s', entry)
         if entry.isvalid():
@@ -70,12 +71,14 @@ class FTPList(object):
         if not imported:
             raise DependencyError('ftp_list', 'ftp_list', 'ftputil is required for this plugin')
         config = self.prepare_config(config)
+
         self.username = config.get('username')
         self.password = config.get('password')
         self.host = config.get('host')
         self.port = config.get('port')
-        self.dirs = config.get('dirs')
-        self.match = re.compile(config['regexp'], re.IGNORECASE).match
+
+        directories = config.get('dirs')
+        match = re.compile(config['regexp'], re.IGNORECASE).match
         base_class = ftplib.FTP_TLS if config.get('use_ssl') else ftplib.FTP
         session_factory = ftputil.session.session_factory(port=self.port, base_class=base_class)
         try:
@@ -88,17 +91,17 @@ class FTPList(object):
         entries = []
         with self.FTP as ftp:
             for base, dirs, files in ftp.walk(ftp.curdir):
-                if not any(dir in base for dir in self.dirs):
-                    log.debug('dir %s is not in %s, skipping', base, self.dirs)
+                if not any(dir in base for dir in directories):
+                    log.debug('dir %s is not in %s, skipping', base, directories)
                     continue
                 if 'files' in config['retrieve']:
                     for file in files:
-                        if self.match(file):
+                        if match(file):
                             path = ftp.path.join(base, file)
                             entries.append(self._to_entry(path))
                 if 'dirs' in config['retrieve']:
                     for dir in dirs:
-                        if self.match(dir):
+                        if match(dir):
                             path = ftp.path.join(base, dir)
                             entries.append(self._to_entry(path))
         return entries
