@@ -24,6 +24,13 @@ log = logging.getLogger('ftp_list')
 
 
 class FTPList(object):
+    def __init__(self):
+        self.username = None
+        self.password = None
+        self.host = None
+        self.port = None
+        self.FTP = None
+
     schema = {
         'type': 'object',
         'properties': {
@@ -50,11 +57,11 @@ class FTPList(object):
             config['dirs'] = [config['dirs']]
         return config
 
-    def _to_entry(self, object):
+    def _to_entry(self, path):
         entry = Entry()
 
-        title = self.FTP.path.basename(object)
-        location = self.FTP.path.abspath(object)
+        title = self.FTP.path.basename(path)
+        location = self.FTP.path.abspath(path)
 
         entry['title'] = title
         entry['location'] = location
@@ -78,7 +85,7 @@ class FTPList(object):
         self.port = config.get('port')
 
         directories = config.get('dirs')
-        match = re.compile(config['regexp'], re.IGNORECASE).match
+        search = re.compile(config['regexp'], re.IGNORECASE).search
         base_class = ftplib.FTP_TLS if config.get('use_ssl') else ftplib.FTP
         session_factory = ftputil.session.session_factory(port=self.port, base_class=base_class)
         try:
@@ -91,20 +98,20 @@ class FTPList(object):
         entries = []
         with self.FTP as ftp:
             for base, dirs, files in ftp.walk(ftp.curdir):
-                if not any(dir in base for dir in directories):
+                if not any(directory in base for directory in directories):
                     log.debug('dir %s is not in %s, skipping', base, directories)
                     continue
                 if 'files' in config['retrieve'] or 'symlinks' in config['retrieve']:
-                    for file in files:
-                        if match(file):
-                            path = ftp.path.join(base, file)
+                    for _file in files:
+                        if search(_file):
+                            path = ftp.path.join(base, _file)
                             if ftp.path.isfile(path) and 'files' in config['retrieve'] or ftp.path.islink(
                                     path) and 'symlinks' in config['retrieve']:
                                 entries.append(self._to_entry(path))
                 if 'dirs' in config['retrieve'] or 'symlinks' in config['retrieve']:
-                    for dir in dirs:
-                        if match(dir):
-                            path = ftp.path.join(base, dir)
+                    for _dir in dirs:
+                        if search(_dir):
+                            path = ftp.path.join(base, _dir)
                             if ftp.path.isdir(path) and 'dirs' in config['retrieve'] or ftp.path.islink(
                                     path) and 'symlinks' in config['retrieve']:
                                 entries.append(self._to_entry(path))
