@@ -40,7 +40,7 @@ class FTPList(object):
             'port': {'type': 'integer'},
             'use_ssl': {'type': 'boolean'},
             'regexp': {'type': 'string', 'format': 'regex'},
-            'directories': one_or_more({'type': 'string'}),
+            'dirs': one_or_more({'type': 'string'}),
             'retrieve': one_or_more({'type': 'string', 'enum': ['files', 'dirs', 'symlinks']}, unique_items=True)
         },
         'required': ['username', 'host']
@@ -55,6 +55,8 @@ class FTPList(object):
         config.setdefault('regexp', '.')
         if not isinstance(config['dirs'], list):
             config['dirs'] = [config['dirs']]
+        if not isinstance(config['retrieve'], list):
+            config['retrieve'] = [config['retrieve']]
         return config
 
     def _to_entry(self, path):
