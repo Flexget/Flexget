@@ -3,9 +3,10 @@ from __future__ import unicode_literals, division, absolute_import
 import copy
 
 from flask import jsonify
+from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.plugins.api_trakt import ApiTrakt as at
+from flexget.plugins.api_trakt import ApiTrakt as at, list_actors
 
 trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 
@@ -84,6 +85,7 @@ lookup_parser.add_argument('tmdb_id', type=int, help='TMDB ID')
 lookup_parser.add_argument('imdb_id', help='IMDB ID')
 lookup_parser.add_argument('tvdb_id', type=int, help='TVDB ID')
 lookup_parser.add_argument('tvrage_id', type=int, help='TVRage ID')
+lookup_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
 
 
 @trakt_api.route('/series/')
@@ -93,14 +95,17 @@ class TraktSeriesSearchApi(APIResource):
     @api.doc(parser=lookup_parser)
     def get(self, session=None):
         args = lookup_parser.parse_args()
+        include_actors = args.pop('include_actors')
         try:
-            result = at.lookup_series(session=session, **args)
+            series = at.lookup_series(session=session, **args)
         except LookupError as e:
             return {'status': 'error',
                     'message': e.args[0]
                     }, 404
-
-        return jsonify(result.to_dict())
+        result = series.to_dict()
+        if include_actors:
+            result["actors"] = list_actors(series.actors),
+        return jsonify(result)
 
 
 @trakt_api.route('/movie/')
@@ -110,11 +115,14 @@ class TraktMovieSearchApi(APIResource):
     @api.doc(parser=lookup_parser)
     def get(self, session=None):
         args = lookup_parser.parse_args()
+        include_actors = args.pop('include_actors')
         try:
-            result = at.lookup_movie(session=session, **args)
+            movie = at.lookup_movie(session=session, **args)
         except LookupError as e:
             return {'status': 'error',
                     'message': e.args[0]
                     }, 404
-
-        return jsonify(result.to_dict())
+        result = movie.to_dict()
+        if include_actors:
+            result["actors"] = list_actors(movie.actors),
+        return jsonify(result)

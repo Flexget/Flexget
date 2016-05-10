@@ -622,7 +622,7 @@ class TraktShow(Base):
             "overview": self.overview,
             "first_aired": self.first_aired,
             "air_day": self.air_day,
-            "air_time": self.air_time.strftime("%H:%M"),
+            "air_time": self.air_time.strftime("%H:%M") if self.air_time else None,
             "timezone": self.timezone,
             "runtime": self.runtime,
             "certification": self.certification,
@@ -635,7 +635,6 @@ class TraktShow(Base):
             "homepage": self.homepage,
             "number_of_aired_episodes": self.aired_episodes,
             "genres": [g.name for g in self.genres],
-            "actors": list_actors(self.actors),
             "updated_at": self.updated_at,
             "cached_at": self.cached_at,
             "images": list_images(self.images)
@@ -786,7 +785,6 @@ class TraktMovie(Base):
             "homepage": self.homepage,
             "trailer": self.trailer,
             "genres": [g.name for g in self.genres],
-            "actors": list_actors(self.actors),
             "updated_at": self.updated_at,
             "cached_at": self.cached_at,
             "images": list_images(self.images)
