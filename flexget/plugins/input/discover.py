@@ -140,12 +140,7 @@ class Discover(object):
                 log.verbose('Searching for `%s` with plugin `%s` (%i of %i)' %
                             (entry['title'], plugin_name, index + 1, len(entries)))
                 try:
-                    try:
-                        search_results = search.search(task=task, entry=entry, config=plugin_config)
-                    except TypeError:
-                        # Old search api did not take task argument
-                        log.warning('Search plugin %s does not support latest search api.' % plugin_name)
-                        search_results = search.search(entry, plugin_config)
+                    search_results = search.search(task=task, entry=entry, config=plugin_config)
                     if not search_results:
                         log.debug('No results from %s' % plugin_name)
                         continue
