@@ -187,7 +187,7 @@ class IRCConnection(SingleServerIRCBot):
         nickname = config.get('nickname', 'Flexget-%s' % str(uuid4()))
         super(IRCConnection, self).__init__(self, [(server, port)], nickname, nickname)
         self.running = True
-
+        self.execute_before_shutdown = False
         self.entry_queue = []
         self.line_cache = {}
 
@@ -200,6 +200,8 @@ class IRCConnection(SingleServerIRCBot):
         self._connect()
         while self.running:
             self.reactor.process_once(timeout)
+        if self.execute_before_shutdown and len(self.entry_queue):
+            self.run_tasks()
         self.disconnect()
 
     def run_tasks(self):
@@ -468,11 +470,6 @@ class IRCConnection(SingleServerIRCBot):
         if entry:
             self.queue_entry(entry)
 
-    def shutdown(self, wait=False):
-        if wait and len(self.entry_queue):
-            self.run_tasks()
-        self.running = False
-
 
 @event('manager.daemon.started')
 def irc_start(manager):
@@ -516,7 +513,9 @@ def stop_irc(manager, wait=False):
 
     for conn, thread in irc:
         if conn.connection.is_connected():
-            conn.shutdown(wait)
+            if wait and len(conn.entry_queue):
+                conn.execute_before_shutdown = True
+            conn.running = False
             thread.join()
     irc = []
 
