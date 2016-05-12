@@ -16,9 +16,14 @@ from flexget.entry import Entry
 from flexget.config_schema import register_config_key, format_checker
 from flexget.event import event
 from flexget.plugin import PluginError
-
+from flexget.manager import manager
 
 log = logging.getLogger('irc')
+
+MESSAGE_CLEAN = re.compile("\x0f|\x1f|\x02|\x03(?:[\d]{1,2}(?:,[\d]{1,2})?)?", re.MULTILINE | re.UNICODE)
+URL_MATCHER = re.compile(r'(https?://[\da-z\.-]+\.[a-z\.]{2,6}[/\w\.-\?&]*/?)', re.MULTILINE | re.UNICODE)
+EXECUTION_DELAY = 5  # number of seconds for command execution delay
+EXECUTION_DELAY_SHORT = 1  # number of seconds for command execution delay
 
 schema = {
     'oneOf': [
@@ -63,6 +68,7 @@ irc = []
 
 @format_checker.checks('irc_channel', raises=ValueError)
 def is_irc_channel(instance):
+    """IRC channel validator for config schema"""
     if not isinstance(instance, str) or instance[0] not in '#&!+.~' or not instance.isalnum():
         raise ValueError('%s isn\'t a valid IRC channel name.' % instance)
 
@@ -77,9 +83,18 @@ def irc_prefix(var):
         return 'irc_%s' % var.lower()
 
 
+def strip_whitespace(value):
+    """
+    Remove leading and trailing whitespace from strings. Return value if not a string.
+    :param value:
+    :return: stripped string or value
+    """
+    if isinstance(value, str):
+        return value.strip()
+    return value
+
+
 class IRCConnection(SingleServerIRCBot):
-    MESSAGE_CLEAN = re.compile("\x0f|\x1f|\x02|\x03(?:[\d]{1,2}(?:,[\d]{1,2})?)?", re.MULTILINE | re.UNICODE)
-    URL_MATCHER = re.compile(r'(https?://[\da-z\.-]+\.[a-z\.]{2,6}[/\w\.-\?&]*/?)', re.MULTILINE | re.UNICODE)
 
     def __init__(self, config, config_name):
         self.config = config
@@ -170,8 +185,8 @@ class IRCConnection(SingleServerIRCBot):
         server = choice(self.server_list)
         port = config.get('port', 6667)
         nickname = config.get('nickname', 'Flexget-%s' % str(uuid4()))
-        SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
-        self.stop_bot = False
+        super(IRCConnection, self).__init__(self, [(server, port)], nickname, nickname)
+        self.running = True
 
         self.entry_queue = []
         self.line_cache = {}
@@ -183,24 +198,22 @@ class IRCConnection(SingleServerIRCBot):
         :return:
         """
         self._connect()
-        while not self.stop_bot:
+        while self.running:
             self.reactor.process_once(timeout)
         self.disconnect()
 
-    def run_tasks(self, entries):
+    def run_tasks(self):
         """
         Passes entries to the target task configured for this connection
         :param entries:
         :return:
         """
-        from flexget.manager import manager
-
         tasks = self.config.get('task')
         if isinstance(tasks, str):
             tasks = [tasks]
 
-        log.info('Injecting %d entries into tasks %s', len(entries), ', '.join(tasks))
-        manager.execute(options={'tasks': tasks, 'cron': True, 'inject': entries}, priority=5)
+        log.info('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
+        manager.execute(options={'tasks': tasks, 'cron': True, 'inject': self.entry_queue}, priority=5)
 
     def queue_entry(self, entry):
         """
@@ -211,12 +224,12 @@ class IRCConnection(SingleServerIRCBot):
         self.entry_queue.append(entry)
         log.debug('Entry: %s', entry)
         if len(self.entry_queue) >= self.config.get('queue_entries', 1):
-            self.run_tasks(self.entry_queue)
+            self.run_tasks()
             self.entry_queue = []
 
     def parse_message(self, nickname, channel, message):
         """
-        Parses a public message and generates an entry if needed
+        Parses a public message and generates an entry if the message matches the regex or contains a url
         :param nickname: Nickname of who sent the message
         :param channel: Channel where the message was receivied
         :param message: Message text
@@ -224,14 +237,14 @@ class IRCConnection(SingleServerIRCBot):
         """
 
         # Clean up the message
-        message = self.MESSAGE_CLEAN.sub('', message)
+        message = MESSAGE_CLEAN.sub('', message)
 
         # If we have announcers defined, ignore any messages not from them
         if len(self.announcer_list) and nickname not in self.announcer_list:
             log.debug('Ignoring message: from non-announcer %s', nickname)
             return
 
-        # If its listed in ignore lines, skip it
+        # If it's listed in ignore lines, skip it
         for rx in self.ignore_lines:
             if rx.match(message):
                 log.debug('Ignoring message: matched ignore line')
@@ -245,13 +258,7 @@ class IRCConnection(SingleServerIRCBot):
             match = rx.search(message)
             if match:
                 val_names = [irc_prefix(val.lower()) for val in vals]
-
-                def clean_value(value):
-                    if isinstance(value, str):
-                        return value.strip()
-                    return value
-
-                val_values = [clean_value(x) for x in match.groups()]
+                val_values = [strip_whitespace(x) for x in match.groups()]
                 entry.update(dict(zip(val_names, val_values)))
 
         # Generate the entry and process it through the linematched rules
@@ -266,7 +273,7 @@ class IRCConnection(SingleServerIRCBot):
             entry['url'] = entry['irc_torrenturl']
         else:
             # find a url...
-            url_match = self.URL_MATCHER.findall(message)
+            url_match = URL_MATCHER.findall(message)
             if url_match:
                 # We have a URL(s)!, generate an entry
                 urls = list(url_match)
@@ -281,7 +288,7 @@ class IRCConnection(SingleServerIRCBot):
 
     def process_tracker_config_rules(self, entry, rules=None):
         """
-        Processes a Entry object with the linematched rules defined in a tracker config file
+        Processes an Entry object with the linematched rules defined in a tracker config file
         :param entry: Entry to be updated
         :param rules: Ruleset to use.
         :return:
@@ -350,7 +357,7 @@ class IRCConnection(SingleServerIRCBot):
             elif rule.tag == 'extracttags':
                 source_var = irc_prefix(rule.get('srcvar'))
                 split = rule.get('split')
-                values = [x.strip() for x in entry[source_var].split(split)]
+                values = [strip_whitespace(x) for x in entry[source_var].split(split)]
                 for element in rule:
                     if element.tag == 'setvarif':
                         target_var = irc_prefix(element.get('varName'))
@@ -382,18 +389,16 @@ class IRCConnection(SingleServerIRCBot):
 
                 if source_var and regex:
                     if source_var in entry and re.match(regex, entry[source_var]):
-                        entry = self.process_tracker_config_rules(entry, rule)
+                        self.process_tracker_config_rules(entry, rule)
                 else:
                     log.error('Option missing for if statement, skipping rule')
 
             else:
                 log.warning('Unsupported linematched tag: %s', rule.tag)
 
-        return entry
-
     def on_welcome(self, conn, irc_event):
         log.info('IRC connected to %s', self.connection_name)
-        self.connection.execute_delayed(1, self.identify_with_nickserv)
+        self.connection.execute_delayed(EXECUTION_DELAY_SHORT, self.identify_with_nickserv)
 
     def identify_with_nickserv(self):
         """
@@ -412,9 +417,9 @@ class IRCConnection(SingleServerIRCBot):
             log.info('Identifying with NickServ as %s', self._nickname)
             self.connection.privmsg('NickServ', 'IDENTIFY %s %s' % (self._nickname, nickserv_password))
         if self.config.get('invite_nickname'):
-            self.connection.execute_delayed(5, self.request_channel_invite)
+            self.connection.execute_delayed(EXECUTION_DELAY, self.request_channel_invite)
         else:
-            self.connection.execute_delayed(5, self.join_channels)
+            self.connection.execute_delayed(EXECUTION_DELAY, self.join_channels)
 
     def request_channel_invite(self):
         """
@@ -425,7 +430,7 @@ class IRCConnection(SingleServerIRCBot):
         invite_message = self.config.get('invite_message')
         log.info('Requesting an invite to channels from %s', invite_nickname)
         self.connection.privmsg(invite_nickname, invite_message)
-        self.connection.execute_delayed(5, self.join_channels)
+        self.connection.execute_delayed(EXECUTION_DELAY, self.join_channels)
 
     def join_channels(self):
         """
@@ -448,7 +453,7 @@ class IRCConnection(SingleServerIRCBot):
         self.line_cache[channel][nickname].append(irc_event.arguments[0])
         if len(self.line_cache[channel][nickname]) == 1:
             # Schedule a parse of the message in 1 second (for multilines)
-            conn.execute_delayed(1, self.process_message, (nickname, channel))
+            conn.execute_delayed(EXECUTION_DELAY_SHORT, self.process_message, (nickname, channel))
 
     def process_message(self, nickname, channel):
         """
@@ -505,7 +510,7 @@ def stop_irc(manager):
 
     for conn, thread in irc:
         if conn.connection.is_connected():
-            conn.stop_bot = True
+            conn.running = False
             thread.join()
     irc = []
 
