@@ -468,6 +468,11 @@ class IRCConnection(SingleServerIRCBot):
         if entry:
             self.queue_entry(entry)
 
+    def shutdown(self, wait=False):
+        if wait and len(self.entry_queue):
+            self.run_tasks()
+        self.running = False
+
 
 @event('manager.daemon.started')
 def irc_start(manager):
@@ -482,14 +487,15 @@ def irc_update_config(manager):
     if not manager.is_daemon:
         return
 
-    # No config, no connections
-    if 'irc' not in manager.config:
-        log.info('No irc connections defined in the config')
-
     config = manager.config.get('irc')
 
     # Config for IRC has been removed, shutdown all instances
     stop_irc(manager)
+
+    # No config, no connections
+    if not config:
+        log.info('No irc connections defined in the config')
+        return
 
     for key, connection in config.items():
         log.info('Starting IRC connection for %s', key)
@@ -501,16 +507,16 @@ def irc_update_config(manager):
 
 @event('manager.shutdown_requested')
 def shutdown_requested(manager):
-    stop_irc(manager)
+    stop_irc(manager, wait=True)
 
 
 @event('manager.shutdown')
-def stop_irc(manager):
+def stop_irc(manager, wait=False):
     global irc
 
     for conn, thread in irc:
         if conn.connection.is_connected():
-            conn.running = False
+            conn.shutdown(wait)
             thread.join()
     irc = []
 
