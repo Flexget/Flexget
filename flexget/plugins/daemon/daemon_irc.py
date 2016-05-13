@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import, with_statement
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
 
 import os
 import re
@@ -79,7 +80,7 @@ def irc_prefix(var):
     :param var: Variable to prefix
     :return: Prefixed variable
     """
-    if isinstance(var, str):
+    if isinstance(var, basestring):
         return 'irc_%s' % var.lower()
 
 
@@ -89,7 +90,7 @@ def strip_whitespace(value):
     :param value:
     :return: stripped string or value
     """
-    if isinstance(value, str):
+    if isinstance(value, basestring):
         return value.strip()
     return value
 
@@ -180,12 +181,14 @@ class IRCConnection(SingleServerIRCBot):
         log.debug('Announcers: %s', self.announcer_list)
         log.debug('Ignore Lines: %d', len(self.ignore_lines))
         log.debug('Message Regexs: %d', len(self.message_regex))
+        for rx, vals in self.message_regex:
+            log.debug('Pattern "%s" extracts %s', rx.pattern, vals)
 
         # Init the IRC Bot
         server = choice(self.server_list)
         port = config.get('port', 6667)
         nickname = config.get('nickname', 'Flexget-%s' % str(uuid4()))
-        super(IRCConnection, self).__init__(self, [(server, port)], nickname, nickname)
+        super(IRCConnection, self).__init__([(server, port)], nickname, nickname)
         self.running = True
         self.execute_before_shutdown = False
         self.entry_queue = []
@@ -211,7 +214,7 @@ class IRCConnection(SingleServerIRCBot):
         :return:
         """
         tasks = self.config.get('task')
-        if isinstance(tasks, str):
+        if isinstance(tasks, basestring):
             tasks = [tasks]
 
         log.info('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
@@ -257,15 +260,19 @@ class IRCConnection(SingleServerIRCBot):
 
         # Run the config regex patterns over the message
         for rx, vals in self.message_regex:
+            log.debug('Using pattern %s to parse message vars', rx.pattern)
             match = rx.search(message)
             if match:
                 val_names = [irc_prefix(val.lower()) for val in vals]
                 val_values = [strip_whitespace(x) for x in match.groups()]
                 entry.update(dict(zip(val_names, val_values)))
+                log.debug('Found: %s', dict(zip(val_names, val_values)))
+            else:
+                log.debug('No matches found')
 
         # Generate the entry and process it through the linematched rules
         if self.tracker_config is not None:
-            entry = self.process_tracker_config_rules(entry)
+            self.process_tracker_config_rules(entry)
 
         # If we have a torrentname, use it as the title
         entry['title'] = entry.get('irc_torrentname', message)
@@ -325,6 +332,7 @@ class IRCConnection(SingleServerIRCBot):
                         break
                 else:
                     # Only set the result if we processed all elements
+                    log.debug('Result for rule %s: %s=%s', rule.tag, rule.get('name'), result)
                     entry[irc_prefix(rule.get('name'))] = result
 
             # Var Replace - replace text in a var
@@ -335,6 +343,7 @@ class IRCConnection(SingleServerIRCBot):
                 replace = rule.get('replace')
                 if source_var and target_var and regex is not None and replace is not None:
                     entry[target_var] = re.sub(regex, replace, entry[source_var])
+                    log.debug('varreplace: %s=%s', target_var, entry[target_var])
                 else:
                     log.error('Invalid varreplace options, skipping rule')
 
@@ -354,6 +363,8 @@ class IRCConnection(SingleServerIRCBot):
                 match = re.search(regex, entry[source_var])
                 if match:
                     entry.update(dict(zip(group_names, match.groups())))
+                else:
+                    log.debug('No match found for rule extract')
 
             # Extract Tag - set a var if a regex matches a tag in a var
             elif rule.tag == 'extracttags':
@@ -369,6 +380,8 @@ class IRCConnection(SingleServerIRCBot):
                                 match = re.match(regex, val)
                                 if match:
                                     entry[target_var] = val
+                                else:
+                                    log.debug('No match for rule extracttags')
                         else:
                             log.error('Missing regex for setvarif command, ignoring')
 
@@ -499,6 +512,7 @@ def irc_update_config(manager):
         conn = IRCConnection(connection, key)
         thread = threading.Thread(target=conn.start_interruptable, name=key)
         irc.append((conn, thread))
+        thread.setDaemon(True)  # set threads to daemon so they die with FlexGet when using Ctrl-C
         thread.start()
 
 
