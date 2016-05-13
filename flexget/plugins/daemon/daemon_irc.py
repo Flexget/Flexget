@@ -167,14 +167,14 @@ class IRCConnection(SingleServerIRCBot):
                 vals = [var.get('name') for idx, var in enumerate(pattern.find('vars'))]
                 self.message_regex.append((rx, vals))
 
-        if not self.server_list or not self.channel_list:
-            if self.tracker_config is not None:
-                log.warning('No server or channel provided by tracker file, falling back to Flexget config options')
-            self.server_list = [config.get('server')]
-            channels = config.get('channels')
-            if not isinstance(channels, str):
-                channels = [channels]
-            self.channel_list = channels
+        # overwrite tracker config with flexget config
+        if self.config.get('server'):
+            self.server_list = [self.config['server']]
+            log.debug('Using server specified from config')
+        channels = config.get('channels')
+        if channels:
+            self.channel_list = channels if isinstance(channels, list) else [channels]
+            log.debug('Using channel(s) specified from config')
 
         log.debug('Servers: %s', self.server_list)
         log.debug('Channels: %s', self.channel_list)
@@ -182,7 +182,7 @@ class IRCConnection(SingleServerIRCBot):
         log.debug('Ignore Lines: %d', len(self.ignore_lines))
         log.debug('Message Regexs: %d', len(self.message_regex))
         for rx, vals in self.message_regex:
-            log.debug('Pattern "%s" extracts %s', rx.pattern, vals)
+            log.debug('    Pattern "%s" extracts %s', rx.pattern, vals)
 
         # Init the IRC Bot
         server = choice(self.server_list)
