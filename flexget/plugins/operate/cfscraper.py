@@ -6,7 +6,6 @@ import logging
 from flexget import plugin, validator
 from flexget.event import event
 from flexget.utils.requests import Session
-
  
 log = logging.getLogger('cfscraper')
 
@@ -30,18 +29,13 @@ class CFScraper(object):
             log.debug('Error importing cfscrape: %s' % e)
             raise plugin.DependencyError('cfscraper', 'cfscrape', 'cfscrape module required. ImportError: %s' % e)
 
-        class CFScrapeWrapper(cfscrape.CloudflareScraper, Session):
+        class CFScrapeWrapper(Session, cfscrape.CloudflareScraper):
             """
             Wrapper class to strip unwanted input args from the Flexget requests class
             """
 
             def request(self, method, url, *args, **kwargs):
-                raise_status = kwargs.pop('raise_status', False)
-                resp = super(CFScrapeWrapper, self).request(method, url, *args, **kwargs)
-
-                if raise_status:
-                    resp.raise_for_status()
-                return resp
+                return super(CFScrapeWrapper, self).request(method, url, *args, **kwargs)
 
         if config is True:
             task.requests = CFScrapeWrapper.create_scraper(task.requests)

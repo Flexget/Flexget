@@ -231,7 +231,7 @@ class Session(requests.Session):
 
         try:
             log.debug('Fetching %s' % url)
-            result = requests.Session.request(self, method, url, *args, **kwargs)
+            result = super(Session, self).request(method, url, *args, **kwargs)
         except requests.Timeout:
             # Mark this site in known unresponsive list
             set_unresponsive(url)
