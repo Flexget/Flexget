@@ -26,11 +26,16 @@ URL_MATCHER = re.compile(r'(https?://[\da-z\.-]+\.[a-z\.]{2,6}[/\w\.-\?&]*/?)', 
 EXECUTION_DELAY = 5  # number of seconds for command execution delay
 EXECUTION_DELAY_SHORT = 1  # number of seconds for command execution delay
 
+channel_pattern = {
+    'type': 'string', 'pattern': '^([#&][^\x07\x2C\s]{0,200})',
+    'error_pattern': 'channel name must start with # or & and contain no commas and whitespace'
+}
 schema = {
     'oneOf': [
         {
             'type': 'object',
-            'items': {
+            'additionalProperties': {
+                'type': 'object',
                 'properties': {
                     'tracker_file': {'type': 'string', 'format': 'file'},
                     'server': {'type': 'string'},
@@ -39,10 +44,10 @@ schema = {
                     'channels': {
                         'oneOf': [
                             {'type': 'array',
-                             'items': {'type': 'string', 'format': 'irc_channel'},
+                             'items': channel_pattern
                              },
-                            {'type': 'string', 'format': 'irc_channel'},
-                        ]
+                            channel_pattern
+                        ],
                     },
                     'nickserv_password': {'type': 'string'},
                     'invite_nickname': {'type': 'string'},
@@ -55,23 +60,21 @@ schema = {
                     },
                     'queue_entries': {'type': 'integer', 'default': 1},
                 },
-                'required': ['task', 'server'],
+                'anyOf': [
+                    {'required': ['server', 'channels']},
+                    {'required': ['tracker_file']}
+                ],
+                'error_anyOf': 'Must specify a tracker file or server and channel(s)',
+                'required': ['task'],
                 'additionalProperties': {'type': 'string'},
             }
         },
         {'type': 'boolean', 'enum': [False]},
-    ],
+    ]
 }
 
 # Global that holds all the IRCConnection instances
 irc = []
-
-
-@format_checker.checks('irc_channel', raises=ValueError)
-def is_irc_channel(instance):
-    """IRC channel validator for config schema"""
-    if not isinstance(instance, str) or instance[0] not in '#&!+.~' or not instance.isalnum():
-        raise ValueError('%s isn\'t a valid IRC channel name.' % instance)
 
 
 def irc_prefix(var):
