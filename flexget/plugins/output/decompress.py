@@ -18,6 +18,124 @@ except ImportError:
 
 log = logging.getLogger('decompress')
 
+def set_rar_tool(config):
+        unrar_tool = config['unrar_tool']
+
+        if unrar_tool:
+            if not rarfile:
+                raise plugin.DependencyError(issued_by='decompress',
+                                             missing='rarfile',
+                                             message='rar_tool specified with no rarfile module installed.')
+            else:
+                rarfile.UNRAR_TOOL = unrar_tool
+                log.debug('Set RarFile.unrar_tool to: %s', unrar_tool)
+
+def open_archive(entry):
+    """
+    Returns the appropriate archive object
+    """
+
+    archive_path = entry['location']
+
+    archive = None
+
+    if zipfile.is_zipfile(archive_path):
+            archive = zipfile.ZipFile(file=archive_path)
+            log.debug('Successfully opened ZIP: %s', archive_path)
+    elif rarfile and rarfile.is_rarfile(archive_path):
+            archive = rarfile.RarFile(rarfile=archive_path)
+            log.debug('Successfully opened RAR: %s', archive_path)
+    else:
+        if not rarfile:
+            log.warning('Rarfile module not installed; unable to extract RAR archives.')
+
+    return archive
+
+def is_archive(entry):
+    """
+    Attempts to open an entry as an archive; returns True on success, False on failure.
+    """
+
+    archive = None
+    ret = False
+
+    try:
+        archive = open_archive(entry)
+        archive.close()
+        ret = True
+    except Exception as error:
+        error_message = 'Failed to open file as archive: %s (%s)' % (entry['location'], error)
+        log.debug(error_message)
+
+    return ret
+
+def is_dir(info):
+    """
+    Tests whether the file descibed in info is a directory
+    """
+
+    if hasattr(info, 'isdir'):
+        return info.isdir()
+    else:
+        base = os.path.basename(info.filename)
+        return not base
+
+class FilterArchives(object):
+    """
+    Accepts entries that are valid Zip or RAR archives
+
+    This plugin requires the rarfile Python module and unrar command line utility to handle RAR
+    archives.
+
+    Configuration:
+
+    unrar_tool:         Specifies the path of the unrar tool. Only necessary if its location is not
+                        defined in the operating system's PATH environment variable.
+    """
+
+    schema = {
+        'anyOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'unrar_tool': {'type': 'string'},
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
+
+
+    def prepare_config(self, config):
+        """
+        Prepare config for processing
+        """
+
+        if not isinstance(config, dict):
+            config = {}
+
+        config.setdefault('unrar_tool', '')
+
+        return config
+
+    @plugin.priority(200)
+    def on_task_filter(self, task, config):
+        """
+        Task handler for is_archive
+        """
+        if isinstance(config, bool) and not config:
+            return
+
+        config = self.prepare_config(config)
+        set_rar_tool(config)
+
+        for entry in task.entries:
+            if is_archive(entry):
+                entry.accept()
+            else:
+                entry.reject()
+
 
 class Decompress(object):
     """
@@ -70,48 +188,6 @@ class Decompress(object):
         ]
     }
 
-    def open_archive(self, entry):
-        """
-        Returns the appropriate archive
-        """
-
-        archive_path = entry['location']
-
-        archive = None
-
-        if zipfile.is_zipfile(archive_path):
-            try:
-                archive = zipfile.ZipFile(file=archive_path)
-                log.debug('Successfully opened ZIP: %s', archive_path)
-            except zipfile.BadZipfile:
-                error_message = 'Bad ZIP file: %s' % archive_path
-                log.error(error_message)
-                entry.fail(error_message)
-            except Exception as error:
-                error_message = 'Failed to open ZIP: %s (%s)' % (archive_path, error)
-                log.error(error_message)
-                entry.fail(error_message)
-        elif rarfile and rarfile.is_rarfile(archive_path):
-            try:
-                archive = rarfile.RarFile(rarfile=archive_path)
-                log.debug('Successfully opened RAR: %s', archive_path)
-            except rarfile.BadRarFile:
-                error_message = 'Bad RAR file: %s' % archive_path
-                log.error(error_message)
-                entry.fail(error_message)
-            except rarfile.NeedFirstVolume:
-                log.error('Not the first volume: %s', archive_path)
-            except Exception as error:
-                error_message = 'Failed to open RAR: %s (%s)' % (archive_path, error)
-                log.error(error_message)
-                entry.fail(error_message)
-        else:
-            if not rarfile:
-                log.warning('Rarfile module not installed; unable to extract RAR archives.')
-            log.error('Can\'t open file: %s', archive_path)
-
-        return archive
-
     def prepare_config(self, config):
         """
         Prepare config for processing
@@ -135,17 +211,6 @@ class Decompress(object):
 
         return config
 
-    def is_dir(self, info):
-        """
-        Tests whether the file descibed in info is a directory
-        """
-
-        if hasattr(info, 'isdir'):
-            return info.isdir()
-        else:
-            base = os.path.basename(info.filename)
-            return not base
-
     def handle_entry(self, entry, config):
         """
         Extract matching files into the directory specified
@@ -165,7 +230,18 @@ class Decompress(object):
             log.warning('File no longer exists: %s', archive_path)
             return
 
-        archive = self.open_archive(entry)
+        try:
+            archive = open_archive(entry)
+        except (zipfile.BadZipfile, rarfile.BadRarFile):
+            error_message = 'Bad archive: %s' % entry['location']
+            log.error(error_message)
+            entry.fail(error_message)
+        except rarfile.NeedFirstVolume:
+            log.error('Not the first volume: %s', entry['location'])
+        except Exception as error:
+            error_message = 'Failed to open Archive: %s (%s)' % (entry['location'], error)
+            log.error(error_message)
+            entry.fail(error_message)        
 
         if not archive:
             return
@@ -185,7 +261,7 @@ class Decompress(object):
             path = info.filename
             filename = os.path.basename(path)
 
-            if self.is_dir(info):
+            if is_dir(info):
                 log.debug('Appears to be a directory: %s', path)
                 continue
 
@@ -261,19 +337,10 @@ class Decompress(object):
             return
 
         config = self.prepare_config(config)
-
-        # Set the path of the unrar tool if it's not specified in PATH
-        unrar_tool = config['unrar_tool']
+        set_rar_tool(config)
 
         if rarfile:
             rarfile.PATH_SEP = os.path.sep
-
-        if unrar_tool:
-            if not rarfile:
-                raise log.warning('rarfile Python module is not installed.')
-            else:
-                rarfile.UNRAR_TOOL = unrar_tool
-                log.debug('Set RarFile.unrar_tool to: %s', unrar_tool)
 
         for entry in task.accepted:
             self.handle_entry(entry, config)
@@ -282,3 +349,4 @@ class Decompress(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(Decompress, 'decompress', api_ver=2)
+    plugin.register(FilterArchives, 'archives', api_ver=2)
