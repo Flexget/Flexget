@@ -40,7 +40,7 @@ schema = {
                     'tracker_file': {'type': 'string', 'format': 'file'},
                     'server': {'type': 'string'},
                     'port': {'type': 'integer', 'default': 6667},
-                    'nickname': {'type': 'string', 'default': 'Flexget'},
+                    'nickname': {'type': 'string'},
                     'channels': {
                         'oneOf': [
                             {'type': 'array',
@@ -192,6 +192,7 @@ class IRCConnection(SingleServerIRCBot):
         port = config.get('port', 6667)
         nickname = config.get('nickname', 'Flexget-%s' % str(uuid4()))
         super(IRCConnection, self).__init__([(server, port)], nickname, nickname)
+        self.connection.add_global_handler('nicknameinuse', self.on_nicknameinuse)
         self.running = True
         self.execute_before_shutdown = False
         self.entry_queue = []
@@ -418,6 +419,9 @@ class IRCConnection(SingleServerIRCBot):
         log.info('IRC connected to %s', self.connection_name)
         self.connection.execute_delayed(EXECUTION_DELAY_SHORT, self.identify_with_nickserv)
 
+    def on_nicknameinuse(self, conn, irc_event):
+        conn.nick(conn.get_nickname() + "_")
+
     def identify_with_nickserv(self):
         """
         Identifies the connection with Nickserv, ghosting to recover the nickname if required
@@ -530,7 +534,7 @@ def stop_irc(manager, wait=False):
 
     for conn, thread in irc:
         if conn.connection.is_connected():
-            if wait and conn.entry_queue:
+            if wait:
                 conn.execute_before_shutdown = True
             conn.running = False
             thread.join()
