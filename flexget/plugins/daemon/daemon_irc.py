@@ -206,7 +206,7 @@ class IRCConnection(SingleServerIRCBot):
         self._connect()
         while self.running:
             self.reactor.process_once(timeout)
-        if self.execute_before_shutdown and len(self.entry_queue):
+        if self.execute_before_shutdown and self.entry_queue:
             self.run_tasks()
         self.disconnect()
 
@@ -231,7 +231,7 @@ class IRCConnection(SingleServerIRCBot):
         """
         self.entry_queue.append(entry)
         log.debug('Entry: %s', entry)
-        if len(self.entry_queue) >= self.config.get('queue_entries', 1):
+        if len(self.entry_queue) >= self.config['queue_entries']:
             self.run_tasks()
             self.entry_queue = []
 
@@ -248,7 +248,7 @@ class IRCConnection(SingleServerIRCBot):
         message = MESSAGE_CLEAN.sub('', message)
 
         # If we have announcers defined, ignore any messages not from them
-        if len(self.announcer_list) and nickname not in self.announcer_list:
+        if self.announcer_list and nickname not in self.announcer_list:
             log.debug('Ignoring message: from non-announcer %s', nickname)
             return
 
@@ -530,7 +530,7 @@ def stop_irc(manager, wait=False):
 
     for conn, thread in irc:
         if conn.connection.is_connected():
-            if wait and len(conn.entry_queue):
+            if wait and conn.entry_queue:
                 conn.execute_before_shutdown = True
             conn.running = False
             thread.join()
