@@ -31,11 +31,8 @@ class CFScraper(object):
 
         class CFScrapeWrapper(Session, cfscrape.CloudflareScraper):
             """
-            Wrapper class to strip unwanted input args from the Flexget requests class
+            This class allows the FlexGet session to inherit from CFScraper instead of the requests.Session directly.
             """
-
-            def request(self, method, url, *args, **kwargs):
-                return super(CFScrapeWrapper, self).request(method, url, *args, **kwargs)
 
         if config is True:
             task.requests = CFScrapeWrapper.create_scraper(task.requests)
