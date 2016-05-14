@@ -437,7 +437,7 @@ class IRCConnection(SingleServerIRCBot):
 
             # Identify with NickServ
             log.info('Identifying with NickServ as %s', self._nickname)
-            self.connection.privmsg('NickServ', 'IDENTIFY %s %s' % (self._nickname, nickserv_password))
+            self.connection.privmsg('NickServ', 'IDENTIFY %s' % nickserv_password)
         if self.config.get('invite_nickname'):
             self.connection.execute_delayed(EXECUTION_DELAY, self.request_channel_invite)
         else:
