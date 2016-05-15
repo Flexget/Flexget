@@ -233,7 +233,6 @@ class TVDBSeries(Base):
             'banner': self.banner,
             'posters': self.posters,
             'genres': [g for g in self.genres],
-            'actors': self.actors,
             'first_aired': self.first_aired,
         }
 

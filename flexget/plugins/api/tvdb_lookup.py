@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
+from flask_restplus import inputs
 
 from flexget.api import api, APIResource
 from flexget.plugins.api_tvdb import lookup_series, lookup_episode
@@ -66,13 +67,17 @@ episode_object = {
 tvdb_series_schema = api.schema('tvdb_series_schema', tvdb_series_object)
 tvdb_episode_schema = api.schema('tvdb_episode_schema', episode_object)
 
+series_parser = api.parser()
+series_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
+
 
 @tvdb_api.route('/series/<string:search>/')
-@api.doc(params={'search': 'TV Show name or TVDB ID'})
+@api.doc(params={'search': 'TV Show name or TVDB ID'}, parser=series_parser)
 class TVDBSeriesSearchApi(APIResource):
     @api.response(200, 'Successfully found show', tvdb_series_schema)
     @api.response(404, 'No show found', default_error_schema)
     def get(self, search, session=None):
+        args = series_parser.parse_args()
         try:
             tvdb_id = int(search)
         except ValueError:
@@ -80,26 +85,28 @@ class TVDBSeriesSearchApi(APIResource):
 
         try:
             if tvdb_id:
-                result = lookup_series(tvdb_id=tvdb_id, session=session)
+                series = lookup_series(tvdb_id=tvdb_id, session=session)
             else:
-                result = lookup_series(name=search, session=session)
+                series = lookup_series(name=search, session=session)
         except LookupError as e:
             return {'status': 'error',
                     'message': e.args[0]
                     }, 404
-
-        return jsonify(result.to_dict())
+        result = series.to_dict()
+        if args.get('include_actors'):
+            result['actors'] = self.actors
+        return jsonify(result)
 
 
 episode_parser = api.parser()
 episode_parser.add_argument('season_number', type=int, help='Season number')
 episode_parser.add_argument('ep_number', type=int, help='Episode number')
 episode_parser.add_argument('absolute_number', type=int, help='Absolute episode number')
+episode_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
 
 
 @tvdb_api.route('/episode/<int:tvdb_id>/')
-@api.doc(params={'tvdb_id': 'TVDB ID of show'})
-@api.doc(parser=episode_parser)
+@api.doc(params={'tvdb_id': 'TVDB ID of show'}, parser=episode_parser)
 class TVDBEpisodeSearchAPI(APIResource):
     @api.response(200, 'Successfully found episode', tvdb_episode_schema)
     @api.response(404, 'No show found', default_error_schema)
@@ -125,4 +132,7 @@ class TVDBEpisodeSearchAPI(APIResource):
             return {'status': 'error',
                     'message': e.args[0]
                     }, 404
-        return jsonify(episode.to_dict())
+        result = episode.to_dict()
+        if args.get('include_actors'):
+            result['actors'] = self.actors
+        return jsonify(result)
