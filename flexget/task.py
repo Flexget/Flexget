@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
 
 import copy
 import hashlib
@@ -511,7 +512,13 @@ class Task(object):
 
         # Save current config hash and set config_modidied flag
         with Session() as session:
-            config_hash = hashlib.md5(str(sorted(self.config.items())).encode('utf-8')).hexdigest()
+            task_templates = {}
+            templates = self.config.get('template', [])
+            for template, value in self.manager.config.get('templates', {}).items():
+                if isinstance(templates, basestring) or isinstance(templates, list) and template in templates:
+                    task_templates.update({template: value})
+            hashable_config = list(self.config.items()) + list(task_templates.items())
+            config_hash = hashlib.md5(str(sorted(hashable_config)).encode('utf-8')).hexdigest()
             last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
             if self.is_rerun:
                 # Restore the config to state right after start phase
