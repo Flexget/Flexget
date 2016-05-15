@@ -5,9 +5,10 @@ import logging
  
 from flexget import plugin, validator
 from flexget.event import event
+from flexget.utils.requests import Session
  
 log = logging.getLogger('cfscraper')
- 
+
  
 class CFScraper(object):
     """
@@ -27,8 +28,14 @@ class CFScraper(object):
         except ImportError as e:
             log.debug('Error importing cfscrape: %s' % e)
             raise plugin.DependencyError('cfscraper', 'cfscrape', 'cfscrape module required. ImportError: %s' % e)
+
+        class CFScrapeWrapper(Session, cfscrape.CloudflareScraper):
+            """
+            This class allows the FlexGet session to inherit from CFScraper instead of the requests.Session directly.
+            """
+
         if config is True:
-            task.requests = cfscrape.create_scraper(task.requests)
+            task.requests = CFScrapeWrapper.create_scraper(task.requests)
  
  
 @event('plugin.register')
