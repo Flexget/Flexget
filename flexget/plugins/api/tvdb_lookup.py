@@ -71,15 +71,15 @@ series_parser = api.parser()
 series_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
 
 
-@tvdb_api.route('/series/<string:search>/')
-@api.doc(params={'search': 'TV Show name or TVDB ID'}, parser=series_parser)
+@tvdb_api.route('/series/<string:title>/')
+@api.doc(params={'title': 'TV Show name or TVDB ID'}, parser=series_parser)
 class TVDBSeriesSearchApi(APIResource):
     @api.response(200, 'Successfully found show', tvdb_series_schema)
     @api.response(404, 'No show found', default_error_schema)
-    def get(self, search, session=None):
+    def get(self, title, session=None):
         args = series_parser.parse_args()
         try:
-            tvdb_id = int(search)
+            tvdb_id = int(title)
         except ValueError:
             tvdb_id = None
 
@@ -87,7 +87,7 @@ class TVDBSeriesSearchApi(APIResource):
             if tvdb_id:
                 series = lookup_series(tvdb_id=tvdb_id, session=session)
             else:
-                series = lookup_series(name=search, session=session)
+                series = lookup_series(name=title, session=session)
         except LookupError as e:
             return {'status': 'error',
                     'message': e.args[0]

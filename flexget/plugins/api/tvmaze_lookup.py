@@ -90,14 +90,14 @@ tvmaze_series_schema = api.schema('tvmaze_series_schema', tvmaze_series_object)
 tvmaze_episode_schema = api.schema('tvmaze_episode_schema', tvmaze_episode_object)
 
 
-@tvmaze_api.route('/series/<string:search>/')
-@api.doc(params={'search': 'TV Show name or TVMaze ID'})
+@tvmaze_api.route('/series/<string:title>/')
+@api.doc(params={'title': 'TV Show name or TVMaze ID'})
 class TVDBSeriesSearchApi(APIResource):
     @api.response(200, 'Successfully found show', model=tvmaze_series_schema)
     @api.response(404, 'No show found', default_error_schema)
-    def get(self, search, session=None):
+    def get(self, title, session=None):
         try:
-            tvmaze_id = int(search)
+            tvmaze_id = int(title)
         except ValueError:
             tvmaze_id = None
 
@@ -105,7 +105,7 @@ class TVDBSeriesSearchApi(APIResource):
             if tvmaze_id:
                 result = tvm.series_lookup(tvmaze_id=tvmaze_id, session=session)
             else:
-                result = tvm.series_lookup(series_name=search, session=session)
+                result = tvm.series_lookup(series_name=title, session=session)
         except LookupError as e:
             return {'status': 'error',
                     'message': e.args[0]
