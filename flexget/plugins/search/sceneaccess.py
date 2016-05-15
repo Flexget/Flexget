@@ -215,7 +215,7 @@ class SceneAccessSearch(object):
                 except KeyError:            # User provided category id directly
                     the_id = category
                 finally:
-                    if isinstance(cat_id, list):
+                    if isinstance(the_id, list):
                         [cat_id.append(l) for l in the_id]
                     else:
                         cat_id.append(cat_id)
