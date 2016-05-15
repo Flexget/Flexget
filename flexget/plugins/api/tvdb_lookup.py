@@ -94,7 +94,7 @@ class TVDBSeriesSearchApi(APIResource):
                     }, 404
         result = series.to_dict()
         if args.get('include_actors'):
-            result['actors'] = self.actors
+            result['actors'] = series.actors
         return jsonify(result)
 
 
@@ -102,7 +102,6 @@ episode_parser = api.parser()
 episode_parser.add_argument('season_number', type=int, help='Season number')
 episode_parser.add_argument('ep_number', type=int, help='Episode number')
 episode_parser.add_argument('absolute_number', type=int, help='Absolute episode number')
-episode_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
 
 
 @tvdb_api.route('/episode/<int:tvdb_id>/')
@@ -132,7 +131,4 @@ class TVDBEpisodeSearchAPI(APIResource):
             return {'status': 'error',
                     'message': e.args[0]
                     }, 404
-        result = episode.to_dict()
-        if args.get('include_actors'):
-            result['actors'] = self.actors
-        return jsonify(result)
+        return jsonify(episode.to_dict())
