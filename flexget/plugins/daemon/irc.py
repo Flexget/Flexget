@@ -297,6 +297,9 @@ class IRCConnection(SingleServerIRCBot):
                 })
 
         log.debug('Entry after processing: %s', dict(entry))
+        if not entry['url']:
+            log.error('Parsing message failed. No url found.')
+            return None
         return entry
 
     def process_tracker_config_rules(self, entry, rules=None):
