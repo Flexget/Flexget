@@ -491,6 +491,7 @@ class IRCConnection(SingleServerIRCBot):
         self.line_cache[channel][nickname] = []
         entry = self.parse_message(nickname, channel, lines)
         if entry:
+            log.verbose('IRC message in %s generated an entry: %s', channel, entry)
             self.queue_entry(entry)
 
 
