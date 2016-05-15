@@ -77,7 +77,6 @@ series_return_schema = api.schema('series_return_schema', objects_container.seri
 movie_return_schema = api.schema('movie_return_schema', objects_container.movie_return_object)
 
 lookup_parser = api.parser()
-lookup_parser.add_argument('title', required=True, help='Lookup title')
 lookup_parser.add_argument('year', type=int, help='Lookup year')
 lookup_parser.add_argument('trakt_id', type=int, help='Trakt ID')
 lookup_parser.add_argument('trakt_slug', help='Trakt slug')
@@ -88,16 +87,19 @@ lookup_parser.add_argument('tvrage_id', type=int, help='TVRage ID')
 lookup_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
 
 
-@trakt_api.route('/series/')
+@trakt_api.route('/series/<string:title>/')
+@api.doc(params={'title': 'Series name'})
 class TraktSeriesSearchApi(APIResource):
     @api.response(200, 'Successfully found show', series_return_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.doc(parser=lookup_parser)
-    def get(self, session=None):
+    def get(self, title, session=None):
         args = lookup_parser.parse_args()
         include_actors = args.pop('include_actors')
+        kwargs = args
+        kwargs['title'] = title
         try:
-            series = at.lookup_series(session=session, **args)
+            series = at.lookup_series(session=session, **kwargs)
         except LookupError as e:
             return {'status': 'error',
                     'message': e.args[0]
@@ -108,16 +110,19 @@ class TraktSeriesSearchApi(APIResource):
         return jsonify(result)
 
 
-@trakt_api.route('/movie/')
+@trakt_api.route('/movie/<string:title>/')
+@api.doc(params={'title': 'Movie name'})
 class TraktMovieSearchApi(APIResource):
     @api.response(200, 'Successfully found show', movie_return_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.doc(parser=lookup_parser)
-    def get(self, session=None):
+    def get(self, title, session=None):
         args = lookup_parser.parse_args()
         include_actors = args.pop('include_actors')
+        kwargs = args
+        kwargs['title'] = title
         try:
-            movie = at.lookup_movie(session=session, **args)
+            movie = at.lookup_movie(session=session, **kwargs)
         except LookupError as e:
             return {'status': 'error',
                     'message': e.args[0]
