@@ -58,7 +58,7 @@ schema = {
                             {'type': 'array', 'items': {'type': 'string'}},
                         ]
                     },
-                    'queue_entries': {'type': 'integer', 'default': 1},
+                    'queue_size': {'type': 'integer', 'default': 1},
                 },
                 'anyOf': [
                     {'required': ['server', 'channels']},
@@ -232,7 +232,7 @@ class IRCConnection(SingleServerIRCBot):
         """
         self.entry_queue.append(entry)
         log.debug('Entry: %s', entry)
-        if len(self.entry_queue) >= self.config['queue_entries']:
+        if len(self.entry_queue) >= self.config['queue_size']:
             self.run_tasks()
             self.entry_queue = []
 
