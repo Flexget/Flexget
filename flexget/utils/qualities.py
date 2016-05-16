@@ -21,7 +21,7 @@ class QualityComponent(object):
         :param defaults: An iterable defining defaults for other quality components if this component matches.
         """
 
-        if type not in ['resolution', 'source', 'codec', 'audio']:
+        if type not in ['resolution', 'source', 'codec', 'audio', 'language']:
             raise ValueError('%s is not a valid quality component type.' % type)
         self.type = type
         self.value = value
@@ -142,7 +142,7 @@ _sources = [
     QualityComponent('source', 130, 'dvdscr', '(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
     QualityComponent('source', 140, 'bdscr', 'bdscr(?:eener)?'),
     QualityComponent('source', 150, 'hdtv', 'a?hdtv(?:[\W_]?rip)?'),
-    QualityComponent('source', 160, 'webdl', 'web(?:[\W_]?(dl|hd))'),
+    QualityComponent('source', 160, 'webdl', '(web|iTunes|Netflix)(?:[\W_]?(dl|hd))'),
     QualityComponent('source', 170, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
     QualityComponent('source', 175, 'remux'),
     QualityComponent('source', 180, 'bluray', '(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)')
@@ -168,11 +168,27 @@ _audios = [
     QualityComponent('audio', 80, 'truehd')
 ]
 
+_languages = [
+    # TODO: No idea what order these should go in or if we need different regexps
+    QualityComponent('language', 1, 'englisch', 'eng?(lish)?'),
+    QualityComponent('language', 2, 'spanish', 'spa(nish)?'),
+    QualityComponent('language', 3, 'german', 'ger(man)?|deu?(tsch)?'),
+    QualityComponent('language', 4, 'italian', 'ita(lian)?'),
+    QualityComponent('language', 4, 'french', 'french'),
+    QualityComponent('language', 5, 'hungarian', 'hun(garian)?'),
+    QualityComponent('language', 7, 'japanese', 'jap(anese)?'),
+    QualityComponent('language', 8, 'dutch', 'dutch|netherlandi(sh|c)'),
+    QualityComponent('language', 9, 'korean', 'korean'),
+    # Dual Language
+    QualityComponent('language', 10, 'dl', 'DL')
+]
+
 _UNKNOWNS = {
     'resolution': QualityComponent('resolution', 0, 'unknown'),
     'source': QualityComponent('source', 0, 'unknown'),
     'codec': QualityComponent('codec', 0, 'unknown'),
-    'audio': QualityComponent('audio', 0, 'unknown')
+    'audio': QualityComponent('audio', 0, 'unknown'),
+    'language':QualityComponent('language', 0, 'unknown')
 }
 
 # For wiki generating help
@@ -185,7 +201,7 @@ _UNKNOWNS = {
 
 
 _registry = {}
-for items in (_resolutions, _sources, _codecs, _audios):
+for items in (_resolutions, _sources, _codecs, _audios, _languages):
     for item in items:
         _registry[item.name] = item
 
@@ -210,6 +226,7 @@ class Quality(object):
             self.source = _UNKNOWNS['source']
             self.codec = _UNKNOWNS['codec']
             self.audio = _UNKNOWNS['audio']
+            self.language = _UNKNOWNS['language']
 
     def parse(self, text):
         """Parses a string to determine the quality in the four component categories.
@@ -222,6 +239,7 @@ class Quality(object):
         self.source = self._find_best(_sources, _UNKNOWNS['source'])
         self.codec = self._find_best(_codecs, _UNKNOWNS['codec'])
         self.audio = self._find_best(_audios, _UNKNOWNS['audio'])
+        self.language = self._find_best(_languages, _UNKNOWNS['language'])
         # If any of the matched components have defaults, set them now.
         for component in self.components:
             for default in component.defaults:
@@ -249,12 +267,12 @@ class Quality(object):
 
     @property
     def name(self):
-        name = ' '.join(str(p) for p in (self.resolution, self.source, self.codec, self.audio) if p.value != 0)
+        name = ' '.join(str(p) for p in (self.resolution, self.source, self.codec, self.audio, self.language) if p.value != 0)
         return name or 'unknown'
 
     @property
     def components(self):
-        return [self.resolution, self.source, self.codec, self.audio]
+        return [self.resolution, self.source, self.codec, self.audio, self.language]
 
     @property
     def _comparator(self):
@@ -266,7 +284,7 @@ class Quality(object):
             other = Quality(other)
         if not other or not self:
             return False
-        for cat in ('resolution', 'source', 'audio', 'codec'):
+        for cat in ('resolution', 'source', 'audio', 'codec', 'language'):
             othercat = getattr(other, cat)
             if othercat and othercat != getattr(self, cat):
                 return False
@@ -308,8 +326,8 @@ class Quality(object):
         return not self.__le__(other)
 
     def __repr__(self):
-        return '<Quality(resolution=%s,source=%s,codec=%s,audio=%s)>' % (self.resolution, self.source,
-                                                                         self.codec, self.audio)
+        return '<Quality(resolution=%s,source=%s,codec=%s,audio=%s,language=%s)>' % (self.resolution, self.source,
+                                                                         self.codec, self.audio, self.language)
 
     def __str__(self):
         return self.name
@@ -418,12 +436,13 @@ class Requirements(object):
         self.source = RequirementComponent('source')
         self.codec = RequirementComponent('codec')
         self.audio = RequirementComponent('audio')
+        self.language = RequirementComponent('language')
         if req:
             self.parse_requirements(req)
 
     @property
     def components(self):
-        return [self.resolution, self.source, self.codec, self.audio]
+        return [self.resolution, self.source, self.codec, self.audio, self.language]
 
     def parse_requirements(self, text):
         """
