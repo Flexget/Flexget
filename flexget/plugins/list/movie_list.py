@@ -288,6 +288,6 @@ def get_db_movie_identifiers(identifier_list, movie_id=None, session=None):
                 if not db_movie_id:
                     log.debug('creating movie identifier %s: %s', key, value)
                     db_movie_id = MovieListID(id_name=key, id_value=value, movie_id=movie_id)
-                    session.add(db_movie_id)
+                session.merge(db_movie_id)
                 db_movie_ids.append(db_movie_id)
     return db_movie_ids

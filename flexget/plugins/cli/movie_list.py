@@ -5,12 +5,33 @@ from argparse import ArgumentParser, ArgumentTypeError
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
+from flexget.plugin import PluginError
 from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
     get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, SUPPORTED_IDS
+from flexget.plugins.metainfo.imdb_lookup import ImdbLookup
+from flexget.plugins.metainfo.tmdb_lookup import PluginTmdbLookup
 from flexget.utils.tools import split_title_year
+
+imdb_lookup = ImdbLookup().lookup
+tmdb_lookup = PluginTmdbLookup().lookup
+
+
+def lookup_movie(title, session, identifiers=None):
+    entry = Entry(title=title)
+    if identifiers:
+        for identifier in identifiers:
+            for key, value in identifier.items():
+                entry[key] = value
+    try:
+        imdb_lookup(entry, session=session)
+    except PluginError:
+        tmdb_lookup(entry)
+    if entry.get('movie_name'):
+        return entry
 
 
 def movie_list_keyword_type(identifier):
@@ -80,23 +101,34 @@ def movie_list_add(options):
         except NoResultFound:
             console('Could not find movie list with name {}, creating'.format(options.list_name))
             movie_list = MovieListList(name=options.list_name)
-            session.add(movie_list)
         session.merge(movie_list)
         title, year = split_title_year(options.movie_title)
-        movie_exist = get_movie_by_title(list_id=movie_list.id, title=title, session=session)
-        if movie_exist:
-            console("Movie with the title {} already exist with list {}. Will replace identifiers if given".format(
-                title, movie_list.name))
-            output = 'Successfully updated movie {} to movie list {} '.format(title, movie_list.name)
-        else:
+        console('Trying to lookup movie %s title' % title)
+        entry = lookup_movie(title=title, session=session, identifiers=options.identifiers)
+        if not entry:
+            console('movie lookup failed for movie %s, aborting')
+            return
+        title = entry['movie_name']
+        movie = get_movie_by_title(list_id=movie_list.id, title=title, session=session)
+        if not movie:
             console("Adding movie with title {} to list {}".format(title, movie_list.name))
-            movie_exist = MovieListMovie(title=title, year=year, list_id=movie_list.id)
-            session.add(movie_exist)
-            output = 'Successfully added movie {} to movie list {} '.format(title, movie_list.name)
+            movie = MovieListMovie(title=entry['movie_name'], year=year, list_id=movie_list.id)
+        else:
+            console("Movie with title {} already exist in list {}".format(title, movie_list.name))
+
+        id_list = []
         if options.identifiers:
-            console('Adding identifiers {} to movie {}'.format(options.identifiers, title))
-            movie_exist.ids = get_db_movie_identifiers(identifier_list=options.identifiers, session=session)
-        console(output)
+            id_list = options.identifiers
+        else:
+            for _id in SUPPORTED_IDS:
+                if entry.get(_id):
+                    id_list.append({_id: entry.get(_id)})
+        if id_list:
+            console('Setting movie identifiers:', id_list)
+            movie.ids = get_db_movie_identifiers(identifier_list=id_list, session=session)
+        session.merge(movie)
+
+    console('Successfully added movie {} to movie list {} '.format(title, movie_list.name))
 
 
 def movie_list_del(options):
@@ -139,7 +171,7 @@ def register_parser_arguments():
                                     help='Can be a string or a list of string with the format imdb_id=XXX,'
                                          ' tmdb_id=XXX, etc')
     list_name_parser = ArgumentParser(add_help=False)
-    list_name_parser.add_argument('list_name', help='name of movie list to operate on')
+    list_name_parser.add_argument('list_name', nargs='?', default='movies', help='Name of movie list to operate on')
     # Register subcommand
     parser = options.register_command('movie-list', do_cli, help='view and manage movie lists')
     # Set up our subparsers
@@ -147,7 +179,7 @@ def register_parser_arguments():
     subparsers.add_parser('all', help='shows all existing movie lists')
     subparsers.add_parser('list', parents=[list_name_parser], help='list movies from a list')
     subparsers.add_parser('add', parents=[list_name_parser, movie_parser, identifiers_parser],
-                                       help='add a movie to a list')
+                          help='add a movie to a list')
     subparsers.add_parser('del', parents=[list_name_parser, movie_parser],
                           help='remove a movie from a list using its title')
     subparsers.add_parser('purge', parents=[list_name_parser],
