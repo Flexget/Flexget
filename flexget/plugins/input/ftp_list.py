@@ -37,7 +37,7 @@ class FTPList(object):
             'password': {'type': 'string'},
             'host': {'type': 'string'},
             'port': {'type': 'integer'},
-            'use_ssl': {'type': 'boolean'},
+            'ssl': {'type': 'boolean'},
             'dirs': one_or_more({'type': 'string'}),
             'recursion': {'type': 'boolean'},
             'recursion_depth': {'type': 'integer'},
@@ -49,7 +49,7 @@ class FTPList(object):
     @staticmethod
     def prepare_config(config):
         config.setdefault('retrieve', ['files'])
-        config.setdefault('use_ssl', False)
+        config.setdefault('ssl', False)
         config.setdefault('dirs', [''])
         config.setdefault('port', 21)
         config.setdefault('recursion', False)
@@ -90,7 +90,7 @@ class FTPList(object):
         recursion = config.get('recursion')
         recursion_depth = -1 if recursion else 0
 
-        base_class = ftplib.FTP_TLS if config.get('use_ssl') else ftplib.FTP
+        base_class = ftplib.FTP_TLS if config.get('ssl') else ftplib.FTP
         session_factory = ftputil.session.session_factory(port=self.port, base_class=base_class)
         try:
             log.verbose(
