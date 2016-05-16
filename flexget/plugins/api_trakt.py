@@ -848,6 +848,13 @@ class TraktShowSearchResult(Base):
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=True)
     series = relation(TraktShow, backref='search_strings')
 
+    def __init__(self, search, series_id=None, series=None):
+        self.search = search.lower()
+        if series_id:
+            self.series_id = series_id
+        if series:
+            self.series = series
+
 
 class TraktMovieSearchResult(Base):
     __tablename__ = 'trakt_movie_search_results'
@@ -856,6 +863,13 @@ class TraktMovieSearchResult(Base):
     search = Column(Unicode, unique=True, nullable=False)
     movie_id = Column(Integer, ForeignKey('trakt_movies.id'), nullable=True)
     movie = relation(TraktMovie, backref='search_strings')
+
+    def __init__(self, search, movie_id=None, movie=None):
+        self.search = search.lower()
+        if movie_id:
+            self.movie_id = movie_id
+        if movie:
+            self.movie = movie
 
 
 def split_title_year(title):
@@ -1051,8 +1065,7 @@ class ApiTrakt(object):
         title = lookup_params.get('title', '')
         found = None
         if not series and title:
-            found = session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
-                                                                title.lower()).first()
+            found = session.query(TraktShowSearchResult).filter(TraktShowSearchResult.search == title.lower()).first()
             if found and found.series:
                 log.debug('Found %s in previous search results as %s', title, found.series.title)
                 series = found.series
@@ -1078,8 +1091,7 @@ class ApiTrakt(object):
         if series and title.lower() == series.title.lower():
             return series
         elif series and not found:
-            if not session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
-                                                                       title.lower()).first():
+            if not session.query(TraktShowSearchResult).filter(TraktShowSearchResult.search == title.lower()).first():
                 log.debug('Adding search result to db')
                 session.add(TraktShowSearchResult(search=title, series=series))
         elif series and found:
@@ -1094,8 +1106,7 @@ class ApiTrakt(object):
         title = lookup_params.get('title', '')
         found = None
         if not movie and title:
-            found = session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
-                                                                 title.lower()).first()
+            found = session.query(TraktMovieSearchResult).filter(TraktMovieSearchResult.search == title.lower()).first()
             if found and found.movie:
                 log.debug('Found %s in previous search results as %s', title, found.movie.title)
                 movie = found.movie
@@ -1121,8 +1132,7 @@ class ApiTrakt(object):
         if movie and title.lower() == movie.title.lower():
             return movie
         if movie and not found:
-            if not session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
-                                                                        title.lower()).first():
+            if not session.query(TraktMovieSearchResult).filter(TraktMovieSearchResult.search == title.lower()).first():
                 log.debug('Adding search result to db')
                 session.add(TraktMovieSearchResult(search=title, movie=movie))
         elif movie and found:

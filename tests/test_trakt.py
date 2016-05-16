@@ -104,7 +104,7 @@ class TestTraktShowLookup(object):
             assert session.query(TraktShow).first().title == 'Shameless', 'should have added Shameless and' \
                                                                           'not Shameless (2011)'
             # change the search query
-            session.query(TraktShowSearchResult).update({'search': "Shameless.S01E03.HDTV-FlexGet"})
+            session.query(TraktShowSearchResult).update({'search': "shameless.s01e03.hdtv-flexget"})
             session.commit()
 
             lookupargs = {'title': "Shameless.S01E03.HDTV-FlexGet"}
@@ -410,3 +410,31 @@ class TestTraktMovieLookup(object):
             assert actor.imdb == 'nm0000206', 'saving imdb_id for actors in table failed'
             assert str(actor.id) == '7134', 'saving trakt_id for actors in table failed'
             assert str(actor.tmdb) == '6384', 'saving tmdb_id for actors table failed'
+
+
+@pytest.mark.online
+class TestTraktUnicodeLookup(object):
+    config = """
+        templates:
+          global:
+            trakt_lookup: yes
+        tasks:
+          test_unicode:
+            disable: seen
+            mock:
+                - {'title': '\u0417\u0435\u0440\u043a\u0430\u043b\u0430 Mirrors 2008', 'url': 'mock://whatever'}
+            if:
+                - trakt_year > now.year - 1: reject
+    """
+
+    def test_unicode(self, execute_task):
+        task = execute_task('test_unicode')
+        with Session() as session:
+            r = session.query(TraktMovieSearchResult).all()
+            assert len(r) == 1, 'Should have added a search result'
+            assert r[0].search == '\u0417\u0435\u0440\u043a\u0430\u043b\u0430 Mirrors 2008'.lower(), \
+                'The search result should be lower case'
+        task = execute_task('test_unicode')
+        with Session() as session:
+            r = session.query(TraktMovieSearchResult).all()
+            assert len(r) == 1, 'Should not have added a new row'
