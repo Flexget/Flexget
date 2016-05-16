@@ -40,6 +40,8 @@ class FTPList(object):
             'use_ssl': {'type': 'boolean'},
             'regexp': {'type': 'string', 'format': 'regex'},
             'dirs': one_or_more({'type': 'string'}),
+            'recursion': {'type': 'boolean'},
+            'recursion_depth': {'type': 'integer'},
             'retrieve': one_or_more({'type': 'string', 'enum': ['files', 'dirs', 'symlinks']}, unique_items=True)
         },
         'required': ['username', 'host']
@@ -49,9 +51,10 @@ class FTPList(object):
     def prepare_config(config):
         config.setdefault('retrieve', ['files'])
         config.setdefault('use_ssl', False)
-        config.setdefault('dirs', ['.'])
+        config.setdefault('dirs', [''])
         config.setdefault('port', 21)
         config.setdefault('regexp', '.')
+        config.setdefault('recursion', False)
         if not isinstance(config['dirs'], list):
             config['dirs'] = [config['dirs']]
         if not isinstance(config['retrieve'], list):
@@ -86,7 +89,10 @@ class FTPList(object):
         self.port = config.get('port')
 
         directories = config.get('dirs')
+        recursion = config.get('recursion')
+        recursion_depth = -1 if recursion else 0
         search = re.compile(config['regexp'], re.IGNORECASE).search
+
         base_class = ftplib.FTP_TLS if config.get('use_ssl') else ftplib.FTP
         session_factory = ftputil.session.session_factory(port=self.port, base_class=base_class)
         try:
@@ -97,25 +103,36 @@ class FTPList(object):
             raise PluginError('Could not connect to FTP: {}'.format(e.args[0]))
 
         entries = []
-        with self.FTP as ftp:
-            for base, dirs, files in ftp.walk(ftp.curdir):
-                if not any(directory in base for directory in directories):
-                    log.debug('dir %s is not in %s, skipping', base, directories)
+        for dir in directories:
+            with self.FTP as ftp:
+                if not ftp.path.isdir(dir):
+                    log.warning('Directory %s is not a valid dir, skipping', dir)
                     continue
-                if 'files' in config['retrieve'] or 'symlinks' in config['retrieve']:
-                    for _file in files:
-                        if search(_file):
-                            path = ftp.path.join(base, _file)
-                            if ftp.path.isfile(path) and 'files' in config['retrieve'] or ftp.path.islink(
-                                    path) and 'symlinks' in config['retrieve']:
-                                entries.append(self._to_entry(path))
-                if 'dirs' in config['retrieve'] or 'symlinks' in config['retrieve']:
-                    for _dir in dirs:
-                        if search(_dir):
-                            path = ftp.path.join(base, _dir)
-                            if ftp.path.isdir(path) and 'dirs' in config['retrieve'] or ftp.path.islink(
-                                    path) and 'symlinks' in config['retrieve']:
-                                entries.append(self._to_entry(path))
+                for base, dirs, files in ftp.walk(dir):
+                    current_depth = base.count('/')
+                    if current_depth > recursion_depth != -1:
+                        log.debug('recursion depth limit of %s reached, continuing', current_depth)
+                        continue
+                    if 'files' in config['retrieve'] or 'symlinks' in config['retrieve']:
+                        for _file in files:
+                            if search(_file):
+                                log.debug('file %s matches regexp %s, checking for type match', _file, config['regexp'])
+                                path = ftp.path.join(base, _file)
+                                if ftp.path.isfile(path) and 'files' in config['retrieve'] or ftp.path.islink(
+                                        path) and 'symlinks' in config['retrieve']:
+                                    log.debug('type match successful for file %s, trying to create entry', _file)
+                                    entries.append(self._to_entry(path))
+                    if 'dirs' in config['retrieve'] or 'symlinks' in config['retrieve']:
+                        for _dir in dirs:
+                            if search(_dir):
+                                log.debug('directory %s matches regexp %s, checking for type match', _dir,
+                                          config['regexp'])
+                                path = ftp.path.join(base, _dir)
+                                if ftp.path.isdir(path) and 'dirs' in config['retrieve'] or ftp.path.islink(
+                                        path) and 'symlinks' in config['retrieve']:
+                                    log.debug('type match successful for directory %s, trying to create entry', _dir)
+                                    entries.append(self._to_entry(path))
+
         return entries
 
 
