@@ -168,7 +168,7 @@ class TestTVMazeShowLookup(object):
             assert session.query(
                 TVMazeSeries).first().name == 'Shameless', 'should have added Shameless and not Shameless (2011)'
             # change the search query
-            session.query(TVMazeLookup).update({'search_name': "Shameless.S01E03.HDTV-FlexGet"})
+            session.query(TVMazeLookup).update({'search_name': "shameless.s01e03.hdtv-flexget"})
             session.commit()
 
             lookupargs = {'title': "Shameless.S01E03.HDTV-FlexGet"}
@@ -368,3 +368,31 @@ class TestTVMazeShowLookup(object):
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 284974, 'episode id should be 284974, instead its %s' % entry[
             'tvmaze_episode_id']
+
+
+@pytest.mark.online
+class TestTVMazeUnicodeLookup(object):
+    config = """
+        templates:
+          global:
+            tvmaze_lookup: yes
+            metainfo_series: yes
+        tasks:
+          test_unicode:
+            disable: seen
+            mock:
+                - {'title': 'KrØniken 2004 S01E01', 'url': 'mock://whatever'}
+            if:
+                - tvmaze_series_year > now.year - 1: reject
+    """
+
+    def test_unicode(self, execute_task):
+        task = execute_task('test_unicode')
+        with Session() as session:
+            r = session.query(TVMazeLookup).all()
+            assert len(r) == 1, 'Should have added a search result'
+            assert r[0].search_name == 'kr\xf8niken 2004', 'The search result should be lower case'
+        task = execute_task('test_unicode')
+        with Session() as session:
+            r = session.query(TVMazeLookup).all()
+            assert len(r) == 1, 'Should not have added a new row'

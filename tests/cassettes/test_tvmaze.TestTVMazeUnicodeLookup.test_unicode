@@ -1,0 +1,45 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.0.24.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.tvmaze.com/singlesearch/shows?q=Kr%C3%B8niken
+    response:
+      body: {string: "{\"id\":15824,\"url\":\"http://www.tvmaze.com/shows/15824/kroniken\"\
+          ,\"name\":\"Kr\xF8niken\",\"type\":\"Scripted\",\"language\":\"English\"\
+          ,\"genres\":[],\"status\":\"Ended\",\"runtime\":60,\"premiered\":\"2004-01-04\"\
+          ,\"schedule\":{\"time\":\"\",\"days\":[]},\"rating\":{\"average\":null},\"\
+          weight\":0,\"network\":{\"id\":115,\"name\":\"DR1\",\"country\":{\"name\"\
+          :\"Denmark\",\"code\":\"DK\",\"timezone\":\"Europe/Copenhagen\"}},\"webChannel\"\
+          :null,\"externals\":{\"tvrage\":null,\"thetvdb\":83471,\"imdb\":\"tt0327321\"\
+          },\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/53/133203.jpg\"\
+          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/53/133203.jpg\"\
+          },\"summary\":\"<p>In 1949, the young Ida N\xF8rregaard travels from Jutland\
+          \ to Copenhagen to \\nenroll in a home economics school and an evening school\
+          \ programme. When \\nshe is told that she can't do both, she chooses the\
+          \ evening school. Her \\nparents are unhappy with her choice, but Ida is\
+          \ decided upon making it \\non her own in the big city. She finds a job\
+          \ as a secretary at a radio \\nfactory, but when her boss's son Erik Nielsen\
+          \ has a crush on Ida, he \\ncauses her to lose her job. While Erik is trying\
+          \ to convince his father \\nof the future of television, he also succeeds\
+          \ in attracting Ida's \\nattention. Meanwhile, Erik's lively sister S\xF8\
+          s Nielsen is engaged to a \\nman she doesn't love. When he tries to rape\
+          \ her one night, she is helped\\n by Palle From who is a working class university\
+          \ student and lives next \\ndoor to Ida. When S\xF8s finds him to thank\
+          \ him an attraction builds \\nbetween them.</p>\",\"updated\":1460849914,\"\
+          _links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/15824\"},\"previousepisode\"\
+          :{\"href\":\"http://api.tvmaze.com/episodes/718785\"}}}"}
+      headers:
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [keep-alive]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Mon, 16 May 2016 18:33:18 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      status: {code: 200, message: OK}
+version: 1

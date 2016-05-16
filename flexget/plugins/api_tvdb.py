@@ -325,6 +325,13 @@ class TVDBSearchResult(Base):
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=True)
     series = relation(TVDBSeries, backref='search_strings')
 
+    def __init__(self, search, series_id=None, series=None):
+        self.search = search.lower()
+        if series_id:
+            self.series_id = series_id
+        if series:
+            self.series = series
+
 
 def find_series_id(name):
     """Looks up the tvdb id for a series"""
@@ -373,8 +380,7 @@ def _update_search_strings(series, session, search=None):
     add = [series.name.lower()] + ([a.lower() for a in series.aliases] if series.aliases else []) + [search.lower()] if search else []
     for name in set(add):
         if name not in search_strings:
-            search_result = session.query(TVDBSearchResult).filter(
-                func.lower(TVDBSearchResult.search) == name).first()
+            search_result = session.query(TVDBSearchResult).filter(TVDBSearchResult.search == name).first()
             if not search_result:
                 search_result = TVDBSearchResult(search=name)
             search_result.series_id = series.id
@@ -411,7 +417,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     if tvdb_id:
         series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
     if not series and name:
-        found = session.query(TVDBSearchResult).filter(func.lower(TVDBSearchResult.search) == name.lower()).first()
+        found = session.query(TVDBSearchResult).filter(TVDBSearchResult.search == name.lower()).first()
         if found and found.series:
                 series = found.series
     if series:
