@@ -131,7 +131,7 @@ def movie_list_purge(options):
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
     movie_parser = ArgumentParser(add_help=False)
-    movie_parser.add_argument('-t', '--movie_title', required=True, help="Title of the movie")
+    movie_parser.add_argument('movie_title', help="Title of the movie")
 
     identifiers_parser = ArgumentParser(add_help=False)
     identifiers_parser.add_argument('-i', '--identifiers', metavar='<identifiers>', nargs='+',
@@ -139,17 +139,16 @@ def register_parser_arguments():
                                     help='Can be a string or a list of string with the format imdb_id=XXX,'
                                          ' tmdb_id=XXX, etc')
     list_name_parser = ArgumentParser(add_help=False)
-    list_name_parser.add_argument('-l', '--list_name', metavar='<list_name>', required=True,
-                                  help='name of movie list to operate on')
+    list_name_parser.add_argument('list_name', help='name of movie list to operate on')
     # Register subcommand
     parser = options.register_command('movie-list', do_cli, help='view and manage movie lists')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='list_action')
-    all_parser = subparsers.add_parser('all', help='shows all existing movie lists')
-    list_parser = subparsers.add_parser('list', parents=[list_name_parser], help='list movies from a list')
-    add_parser = subparsers.add_parser('add', parents=[identifiers_parser, list_name_parser, movie_parser],
+    subparsers.add_parser('all', help='shows all existing movie lists')
+    subparsers.add_parser('list', parents=[list_name_parser], help='list movies from a list')
+    subparsers.add_parser('add', parents=[list_name_parser, movie_parser, identifiers_parser],
                                        help='add a movie to a list')
-    subparsers.add_parser('del', parents=[movie_parser, list_name_parser],
+    subparsers.add_parser('del', parents=[list_name_parser, movie_parser],
                           help='remove a movie from a list using its title')
     subparsers.add_parser('purge', parents=[list_name_parser],
                           help='removes an entire list with all of its movies. Use this with caution')
