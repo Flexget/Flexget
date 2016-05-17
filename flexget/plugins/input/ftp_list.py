@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 
 import ftplib
 import logging
-import re
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -76,6 +75,40 @@ class FTPList(object):
         else:
             log.warning('tried to return an illegal entry: %s', entry)
 
+    def get_content(self, path, recursion, recursion_depth, content_types):
+        content_list = []
+        with self.FTP as ftp:
+            if not ftp.path.isdir(dir):
+                log.warning('Directory %s is not a valid dir, skipping', path)
+                return []
+            if recursion:
+                for base, dirs, files in ftp.walk(path):
+                    current_depth = base.count('/')
+                    if current_depth > recursion_depth != -1:
+                        log.debug('recursion depth limit of %s reached, continuing', current_depth)
+                        continue
+                    if 'files' in content_types or 'symlinks' in content_types:
+                        for _file in files:
+                            content = ftp.path.join(base, _file)
+                            if ftp.path.isfile(content) and 'files' in content_types or ftp.path.islink(
+                                    path) and 'symlinks' in content_types:
+                                log.debug('type match successful for file %s, trying to create entry', _file)
+                                content_list.append(content)
+                    if 'dirs' in content_types or 'symlinks' in content_types:
+                        for _dir in dirs:
+                            content = ftp.path.join(base, _dir)
+                            if ftp.path.isdir(content) and 'dirs' in content_types or ftp.path.islink(
+                                    path) and 'symlinks' in content_types:
+                                content_list.append(content)
+            else:
+                for _object in ftp.listdir(path):
+                    content = ftp.path.join('./', path, _object)
+                    if ('files' in content_types and ftp.path.isfile(content)) or (
+                                    'dirs' in content_types and ftp.path.isdir(content)) or (
+                                    'symlinks' in content_types and ftp.path.islink(content)):
+                        content_list.append(ftp.path.join('./', path, content))
+        return content_list
+
     def on_task_input(self, task, config):
         if not imported:
             raise DependencyError('ftp_list', 'ftp_list', 'ftputil is required for this plugin')
@@ -88,6 +121,7 @@ class FTPList(object):
 
         directories = config.get('dirs')
         recursion = config.get('recursion')
+        content_types = config.get('retrieve')
         recursion_depth = -1 if recursion else 0
 
         base_class = ftplib.FTP_TLS if config.get('ssl') else ftplib.FTP
@@ -101,30 +135,8 @@ class FTPList(object):
 
         entries = []
         for dir in directories:
-            with self.FTP as ftp:
-                if not ftp.path.isdir(dir):
-                    log.warning('Directory %s is not a valid dir, skipping', dir)
-                    continue
-                for base, dirs, files in ftp.walk(dir):
-                    current_depth = base.count('/')
-                    if current_depth > recursion_depth != -1:
-                        log.debug('recursion depth limit of %s reached, continuing', current_depth)
-                        continue
-                    if 'files' in config['retrieve'] or 'symlinks' in config['retrieve']:
-                        for _file in files:
-                            path = ftp.path.join(base, _file)
-                            if ftp.path.isfile(path) and 'files' in config['retrieve'] or ftp.path.islink(
-                                    path) and 'symlinks' in config['retrieve']:
-                                log.debug('type match successful for file %s, trying to create entry', _file)
-                                entries.append(self._to_entry(path))
-                    if 'dirs' in config['retrieve'] or 'symlinks' in config['retrieve']:
-                        for _dir in dirs:
-                            path = ftp.path.join(base, _dir)
-                            if ftp.path.isdir(path) and 'dirs' in config['retrieve'] or ftp.path.islink(
-                                    path) and 'symlinks' in config['retrieve']:
-                                log.debug('type match successful for directory %s, trying to create entry', _dir)
-                                entries.append(self._to_entry(path))
-
+            for content in self.get_content(dir, recursion, recursion_depth, content_types):
+                entries.append(self._to_entry(content))
         return entries
 
 
