@@ -623,3 +623,235 @@ class TestTraktLookupAPI(object):
 
         data = self._clean_attributes(json.loads(rsp.get_data(as_text=True)))
         assert data == expected_payload
+
+    def test_trakt_series_lookup_with_translations_param(self, api_client):
+        expected_payload = {
+            "air_day": "Sunday",
+            "air_time": "21:00",
+            "certification": "TV-MA",
+            "country": "us",
+            "first_aired": "Sun, 17 Apr 2011 07:00:00 GMT",
+            "genres": [
+                "drama",
+                "fantasy",
+                "science fiction",
+                "action",
+                "adventure"
+            ],
+            "homepage": "http://www.hbo.com/game-of-thrones",
+            "id": 1390,
+            "images": {
+                "banner": {
+                    "full": "https://walter.trakt.us/images/shows/000/001/390/banners/original/9fefff703d.jpg"
+                },
+                "clearart": {
+                    "full": "https://walter.trakt.us/images/shows/000/001/390/cleararts/original/5cbde9e647.png"
+                },
+                "fanart": {
+                    "full": "https://walter.trakt.us/images/shows/000/001/390/fanarts/original/76d5df8aed.jpg",
+                    "medium": "https://walter.trakt.us/images/shows/000/001/390/fanarts/medium/76d5df8aed.jpg",
+                    "thumb": "https://walter.trakt.us/images/shows/000/001/390/fanarts/thumb/76d5df8aed.jpg"
+                },
+                "logo": {
+                    "full": "https://walter.trakt.us/images/shows/000/001/390/logos/original/13b614ad43.png"
+                },
+                "poster": {
+                    "full": "https://walter.trakt.us/images/shows/000/001/390/posters/original/93df9cd612.jpg",
+                    "medium": "https://walter.trakt.us/images/shows/000/001/390/posters/medium/93df9cd612.jpg",
+                    "thumb": "https://walter.trakt.us/images/shows/000/001/390/posters/thumb/93df9cd612.jpg"
+                },
+                "thumb": {
+                    "full": "https://walter.trakt.us/images/shows/000/001/390/thumbs/original/7beccbd5a1.jpg"
+                }
+            },
+            "imdb_id": "tt0944947",
+            "language": "en",
+            "network": "HBO",
+            "overview": "Seven noble families fight for control of the mythical land of Westeros. Friction between the houses leads to full-scale war. All while a very ancient evil awakens in the farthest north. Amidst the war, a neglected military order of misfits, the Night's Watch, is all that stands between the realms of men and the icy horrors beyond.",
+            "runtime": 55,
+            "slug": "game-of-thrones",
+            "timezone": "America/New_York",
+            "title": "Game of Thrones",
+            "tmdb_id": 1399,
+            "translations": {
+                "ar": {
+                    "overview": "",
+                    "tagline": None,
+                    "title": "Game of Thrones"
+                },
+                "bg": {
+                    "overview": "„Игра на тронове“ е сериал на HBO, който следва историята на фентъзи епос поредицата „Песен за огън и лед“, вземайки името на първата книга. Действието на сериала се развива в Седемте кралства на Вестерос, където лятото продължава десетилетия, а зимата – цяла вечност.",
+                    "tagline": None,
+                    "title": "Игра на тронове"
+                },
+                "bs": {
+                    "overview": "Game of Thrones (Igra Prijestolja) srednjovjekovna je fantazija bazirana na seriji romana Georgea R. R. Martina smještena u izmišljenom svijetu Sedam kraljevina i prati dinastička previranja i borbu nekoliko Kuća za kontrolu nad Željeznim prijestoljem. Osim međusobnih borbi plemićkih obitelji, stanovništvu prijeti natprirodna invazija s ledenog sjevera, prognana zmajeva princeza koja želi povratiti obiteljsko naslijeđe te zima koja će trajati godinama.\n\nNakon sumnjive smrti namjesnika kralja Roberta Baratheona, on sa svojom kraljicom Cersei iz bogate i iskvarene obitelji Lannister kreće na putovanje na sjever svome prijatelju knezu Eddardu Starku od Oštrozimlja, od kojega zatraži za postane novi Kraljev Namjesnik. Eddard nevoljko pristaje i tu započinje epska priča o časti i izdaji, ljubavi i mržnji, tajnama i osveti...",
+                    "tagline": None,
+                    "title": "Game of Thrones"
+                },
+                "cs": {
+                    "overview": "Kontinent, kde léta trvají desítky roků a zimy se mohou protáhnout na celý lidský život, začínají sužovat nepokoje. Všech Sedm království Západozemí – pletichářský jih, divoké východní krajiny i ledový sever ohraničený starobylou Zdí, která chrání království před pronikáním temnoty – je zmítáno bojem dvou mocných rodů na život a na smrt o nadvládu nad celou říší. Zemí otřásá zrada, chtíč, intriky a nadpřirozené síly. Krvavý boj o Železný trůn, post nejvyššího vládce Sedmi království, bude mít nepředvídatelné a dalekosáhlé důsledky…",
+                    "tagline": None,
+                    "title": "Hra o trůny"
+                },
+                "da": {
+                    "overview": "George R. R. Martins Game of Thrones er en lang fortælling gennem syv bøger. Handlingen foregår i et fiktivt kongerige kaldet Westeros. Denne middelalderlige verden er fuld af kæmper, profetier og fortryllede skove, og bag en mur af is, der adskiller Riget, truer spøgelser og andre farer. Men de overnaturlige elementer er ikke rigtig så fremtrædende i serien. Den narrative ramme er den hensynsløse kamp om magten, hvilket involverer en række konger, riddere og herremænd med navne som Baratheon, Stark og Lannister. Det er ingen opløftende historie, hvor det gode nødvendigvis sejrer frem for det onde, eller hvor det egentlig er så let at afgøre, hvad der er godt og ondt. Men Martin formår at tryllebinde publikum - også dem, der normalt ikke synes om magi og fantasiverdener.",
+                    "tagline": None,
+                    "title": "Game of Thrones"
+                },
+                "de": {
+                    "overview": "Die Handlung ist in einer fiktiven Welt angesiedelt und spielt auf den Kontinenten Westeros (den Sieben Königreichen sowie im Gebiet der „Mauer“ und jenseits davon im Norden) und Essos. In dieser Welt ist die Länge der Sommer und Winter unvorhersehbar und variabel; eine Jahreszeit kann Jahre oder sogar Jahrzehnte dauern. Der Handlungsort auf dem Kontinent Westeros in den Sieben Königreichen ähnelt dabei stark dem mittelalterlichen Europa. Die Geschichte spielt am Ende eines langen Sommers und wird in drei Handlungssträngen weitgehend parallel erzählt. In den Sieben Königreichen bauen sich zwischen den mächtigsten Adelshäusern des Reiches Spannungen auf, die schließlich zum offenen Thronkampf führen. Gleichzeitig droht der Wintereinbruch und es zeichnet sich eine Gefahr durch eine fremde Rasse im hohen Norden von Westeros ab. Der dritte Handlungsstrang spielt auf dem Kontinent Essos, wo Daenerys Targaryen, Mitglied der vor Jahren abgesetzten Königsfamilie, bestrebt ist, wieder an die Macht zu gelangen. Die komplexe Handlung umfasst zahlreiche Figuren und thematisiert unter anderem Politik und Machtkämpfe, Gesellschaftsverhältnisse und Religion.",
+                    "tagline": None,
+                    "title": "Game of Thrones"
+                },
+                "el": {
+                    "overview": "Από τις κόκκινες αμμουδιές του Νότου και τις άγριες πεδιάδες της Ανατολής έως τον παγωμένο Βορρά και το αρχαίο Τείχος, που προστατεύει το Στέμμα από σκοτεινά όντα, οι ισχυρές οικογένειες των Επτά Βασιλείων επιδίδονται σε μια ανελέητη μάχη στη διαδοχή του Σιδερένιου Θρόνου. Μια ιστορία γεμάτη ίντριγκες και προδοσίες, ιπποτισμό και τιμή, κατακτήσεις και θριάμβους. Στο Παιχνίδι του Στέμματος, θα νικήσεις ή θα πεθάνεις.",
+                    "tagline": None,
+                    "title": "Game of Thrones"
+                },
+                "en": {
+                    "overview": "Seven noble families fight for control of the mythical land of Westeros. Friction between the houses leads to full-scale war. All while a very ancient evil awakens in the farthest north. Amidst the war, a neglected military order of misfits, the Night's Watch, is all that stands between the realms of men and icy horrors beyond.",
+                    "tagline": None,
+                    "title": "Game of Thrones"
+                },
+                "es": {
+                    "overview": "Juego de Tronos es una serie de televisión de drama y fantasía creada para la HBO por David Benioff y D. B. Weiss. Es una adaptación de la saga de novelas de fantasía Canción de Hielo y Fuego de George R. R. Martin. La primera de las novelas es la que da nombre a la serie.\n\nLa serie, ambientada en los continentes ficticios de Westeros y Essos al final de un verano de una decada de duración, entrelaza varias líneas argumentales. La primera sigue a los miembros de varias casas nobles inmersos en una guerra civil por conseguir el Trono de Hierro de los Siete Reinos. La segunda trata sobre la creciente amenaza de un inminente invierno y sobre las temibles criaturas del norte. La tercera relata los esfuerzos por reclamar el trono de los últimos miembros exiliados de una dinastía destronada. A pesar de sus personajes moralmente ambiguos, la serie profundiza en los problemas de la jerarquía social, religión, lealtad, corrupción, sexo, guerra civil, crimen y castigo.",
+                    "tagline": None,
+                    "title": "Juego de Tronos"
+                },
+                "fa": {
+                    "overview": "هفت خاندان اشرافی برای حاکمیت بر سرزمین افسانه ای «وستروس» در حال ستیز با یکدیگرند. خاندان «استارک»، «لنیستر» و «باراثیون» برجسته ترین آنها هستند. داستان از جایی شروع می شود که «رابرت باراثیون» پادشاه وستروس، از دوست قدیمی اش، «ادارد» ارباب خاندان استارک، تقاضا می کند که بعنوان مشاور پادشاه، برترین سمت دربار، به او خدمت کند. این در حالی است که مشاور قبلی به طرز مرموزی به قتل رسیده است، با این حال ادارد تقاضای پادشاه را می پذیرد و به سرزمین شاهی راهی می شود. خانواده ملکه، یعنی لنیستر ها در حال توطئه برای بدست آوردن قدرت هستند. از سوی دیگر، بازمانده های خاندان پادشاه قبلی وستروس، «تارگرین ها» نیز نقشه ی پس گرفتن تاج و تخت را در سر می پرورانند، و تمام این ماجراها موجب در گرفتن نبردی عظیم میان آن‌ها خواهد شد...",
+                    "tagline": None,
+                    "title": "بازی تاج و تخت"
+                },
+                "fi": {
+                    "overview": "George R.R. Martinin kirjoihin perustuva, eeppinen sarja valtataistelusta, kunniasta ja petoksesta myyttisessä Westerosissa",
+                    "tagline": None,
+                    "title": "Game of Thrones"
+                },
+                "fr": {
+                    "overview": "Il y a très longtemps, à une époque oubliée, une force a détruit l'équilibre des saisons. Dans un pays où l'été peut durer plusieurs années et l'hiver toute une vie, des forces sinistres et surnaturelles se pressent aux portes du Royaume des Sept Couronnes. La confrérie de la Garde de Nuit, protégeant le Royaume de toute créature pouvant provenir d'au-delà du Mur protecteur, n'a plus les ressources nécessaires pour assurer la sécurité de tous. Après un été de dix années, un hiver rigoureux s'abat sur le Royaume avec la promesse d'un avenir des plus sombres. Pendant ce temps, complots et rivalités se jouent sur le continent pour s'emparer du Trône de fer, le symbole du pouvoir absolu.",
+                    "tagline": None,
+                    "title": "Le Trône de fer"
+                },
+                "he": {
+                    "overview": "משחקי הכס של אייץ'-בי-או היא עיבוד לטלוויזיה של סדרת הספרים רבי-המכר של ג'ורג' ר.ר. מרטין (\"שיר של אש ושל קרח\") בהם הקיץ נמשך על פני עשורים, החורף יכול להימשך דור והמאבק על כס הברזל החל. הוא ישתרע מן הדרום, בו החום מוליד מזימות, תאוות וקנוניות; אל אדמות המזרח הנרחבות והפראיות; כל הדרך אל הצפון הקפוא, שם חומת קרח אדירה מגנה על הממלכה מפני כוחות האופל השוכנים מצדה השני. מלכים ומלכות, אבירים ופורעי חוק, שקרנים, אדונים ואנשים ישרים. עולם בו מתבשלות קנוניות בצורת ניסיונות רצח ומגעים אסורים.",
+                    "tagline": None,
+                    "title": "משחקי הכס"
+                },
+                "hr": {
+                    "overview": "Game of Thrones (Igra Prijestolja) srednjovjekovna je fantazija bazirana na seriji romana Georgea R. R. Martina smještena u izmišljenom svijetu Sedam kraljevina i prati dinastička previranja i borbu nekoliko Kuća za kontrolu nad Željeznim prijestoljem. Osim međusobnih borbi plemićkih obitelji, stanovništvu prijeti natprirodna invazija s ledenog sjevera, prognana zmajeva princeza koja želi povratiti obiteljsko naslijeđe te zima koja će trajati godinama.\n\nNakon sumnjive smrti namjesnika kralja Roberta Baratheona, on sa svojom kraljicom Cersei iz bogate i iskvarene obitelji Lannister kreće na putovanje na sjever svome prijatelju knezu Eddardu Starku od Oštrozimlja, od kojega zatraži za postane novi Kraljev Namjesnik. Eddard nevoljko pristaje i tu započinje epska priča o časti i izdaji, ljubavi i mržnji, tajnama i osveti...",
+                    "tagline": None,
+                    "title": "Igra Prijestolja"
+                },
+                "hu": {
+                    "overview": "Westeros fölött valaha a sárkánykirályok uralkodtak, ám a Targaryen-dinasztiát 15 évvel ezelőtt elűzték, és most Robert Baratheon uralkodik hű barátai, Jon Arryn, majd Eddard Stark segítségével. A konfliktus középpontjában Deres urai, a Starkok állnak. Olyanok, mint a föld, ahol születtek: makacs, kemény jellemű család. Szemünk előtt hősök, gazemberek és egy gonosz hatalom története elevenedik meg. Ám hamar rá kell ébrednünk, hogy ebben a világban mégsem egyszerűen jók és gonoszok kerülnek szembe egymással, hanem mesterien ábrázolt jellemek bontakoznak ki előttünk különböző vágyakkal, célokkal, félelmekkel és sebekkel. George R.R. Martin nagy sikerű, A tűz és jég dala című regényciklusának első kötete sorozat formájában, amelyben két nagyhatalmú család vív halálos harcot a Westeros Hét Királyságának irányít.",
+                    "tagline": None,
+                    "title": "Trónok harca"
+                },
+                "id": {
+                    "overview": "",
+                    "tagline": None,
+                    "title": "Game of Thrones"
+                },
+                "is": {
+                    "overview": "",
+                    "tagline": None,
+                    "title": "Krúnuleikar"
+                },
+                "it": {
+                    "overview": "Il Trono di Spade (Game of Thrones) è una serie televisiva statunitense di genere fantasy creata da David Benioff e D.B. Weiss, che ha debuttato il 17 aprile 2011 sul canale via cavo HBO. È nata come trasposizione televisiva del ciclo di romanzi Cronache del ghiaccio e del fuoco (A Song of Ice and Fire) di George R. R. Martin.\n\nLa serie racconta le avventure di molti personaggi che vivono in un grande mondo immaginario costituito principalmente da due continenti. Il centro più grande e civilizzato del continente occidentale è la città capitale Approdo del Re, dove risiede il Trono di Spade. La lotta per la conquista del trono porta le più grandi famiglie del continente a scontrarsi o allearsi tra loro in un contorto gioco del potere. Ma oltre agli uomini, emergono anche altre forze oscure e magiche.",
+                    "tagline": None,
+                    "title": "Il Trono di Spade"
+                },
+                "ko": {
+                    "overview": "수십 년간 이어진 여름, 하지만 이제 영원히 끝나지 않을 겨울이 다가온다.\n\n그리고... 철왕좌를 둘러싼 혈투가 시작된다.\n\n술수와 탐욕, 음모가 난무하는 남부에서 야만이 숨 쉬는 동부의 광활한 대지, 어둠의 존재들로부터 왕국을 지키기 위해 250M 높이의 장벽을 쌓은 북부에 이르기까지 펼쳐지는 대서사시.\n\n왕들과 왕비들, 기사들과 배신자들, 모략가들, 영주들과 정직한 인물들이 왕좌의 게임을 벌인다.",
+                    "tagline": None,
+                    "title": "왕좌의 게임"
+                },
+                "lb": {
+                    "overview": "",
+                    "tagline": None,
+                    "title": "Game of Thrones"
+                },
+                "lt": {
+                    "overview": "",
+                    "tagline": None,
+                    "title": "Sostų karai"
+                },
+                "nl": {
+                    "overview": "Een eeuwenoude machtsstrijd barst los in het land waar de zomers decennia duren en de winters een leven lang kunnen aanslepen. Twee machtige geslachten - de regerende Baratheons en de verbannen Targaryens - maken zich op om de IJzeren Troon te claimen en de Zeven Koninkrijken van Westeros onder hun controle te krijgen. Maar in een tijdperk waarin verraad, lust, intriges en bovennatuurlijke krachten hoogtij vieren, zal hun dodelijke kat-en-muisspelletje onvoorziene en verreikende gevolgen hebben. Achter een eeuwenoude, gigantische muur van ijs in het uiterste noorden van Westeros maakt een kille vijand zich immers op om het land onder de voet te lopen. Gebaseerd op de bestseller fantasyreeks \"A Song of Ice and Fire\" van George R.R. Martin.",
+                    "tagline": None,
+                    "title": "Game of Thrones"
+                },
+                "pl": {
+                    "overview": "Siedem rodzin szlacheckich walczy o panowanie nad ziemiami krainy Westeros. Polityczne i seksualne intrygi są na porządku dziennym. Pierwszorzędne role wiodą rodziny: Stark, Lannister i Baratheon. Robert Baratheon, król Westeros, prosi swojego starego przyjaciela, Eddarda Starka, aby służył jako jego główny doradca. Eddard, podejrzewając, że jego poprzednik na tym stanowisku został zamordowany, przyjmuje propozycję, aby dogłębnie zbadać sprawę. Okazuje się, że przejęcie tronu planuje kilka rodzin. Lannisterowie, familia królowej, staje się podejrzana o podstępne knucie spisku. Po drugiej stronie morza, pozbawieni władzy ostatni przedstawiciele poprzednio rządzącego rodu, Targaryenów, również planują odzyskać kontrolę nad królestwem. Narastający konflikt pomiędzy rodzinami, do którego włączają się również inne rody, prowadzi do wojny. W międzyczasie na dalekiej północy budzi się starodawne zło. W chaosie pełnym walk i konfliktów tylko grupa wyrzutków zwana Nocną Strażą stoi pomiędzy królestwem ludzi, a horrorem kryjącym się poza nim.",
+                    "tagline": None,
+                    "title": "Gra o Tron"
+                },
+                "pt": {
+                    "overview": "Adaptada por David Benioff e Dan Weiss, a primeira temporada, com dez episódios encomendados, terá como base o livro “Game of Thrones”. Game of Thrones se passa em Westeros, uma terra reminiscente da Europa Medieval, onde as estações duram por anos ou até mesmo décadas. A história gira em torno de uma batalha entre os Sete Reinos, onde duas famílias dominantes estão lutando pelo controle do Trono de Ferro, cuja posse assegura a sobrevivência durante o inverno de 40 anos que está por vir. A série é encabeçada por Lena Headey, Sean Bean e Mark Addy. Bean interpreta Eddard “Ned” Stark, Lorde de Winterfell, um homem conhecido pelo seu senso de honra e justiça que se torna o principal conselheiro do Rei Robert, vivido por Addy.",
+                    "tagline": None,
+                    "title": "A Guerra dos Tronos"
+                },
+                "ro": {
+                    "overview": "",
+                    "tagline": None,
+                    "title": "Urzeala tronurilor"
+                },
+                "ru": {
+                    "overview": "К концу подходит время благоденствия, и лето, длившееся почти десятилетие, угасает. Вокруг средоточия власти Семи королевств, Железного трона, зреет заговор, и в это непростое время король решает искать поддержки у друга юности Эддарда Старка. В мире, где все — от короля до наемника — рвутся к власти, плетут интриги и готовы вонзить нож в спину, есть место и благородству, состраданию и любви. Между тем, никто не замечает пробуждение тьмы из легенд далеко на Севере — и лишь Стена защищает живых к югу от нее.",
+                    "tagline": None,
+                    "title": "Игра престолов"
+                },
+                "sk": {
+                    "overview": "",
+                    "tagline": None,
+                    "title": "Hra o Tróny"
+                },
+                "sv": {
+                    "overview": "Serien utspelar sig på den fiktiva kontinenten Westeros, oftast kallad \"De sju konungarikena\". Eddard \"Ned\" Stark bekymras av rykten från muren i norr då han får besked om att Jon Arryn, hans mentor och kungens hand, dött och att kung Robert Baratheon är på väg till Vinterhed. På andra sidan havet smider exilprinsen Viseras Targaryen planer för att återerövra De sju konungarikena.",
+                    "tagline": None,
+                    "title": "Game of Thrones"
+                },
+                "th": {
+                    "overview": "",
+                    "tagline": None,
+                    "title": "เกมล่าบัลลังก์"
+                },
+                "tr": {
+                    "overview": "Krallık dediğin savaşsız olur mu? En güçlü krallığı kurup, huzuru sağlamış olsan bile bu gücü elinde nasıl koruyacaksın? Burada yanlış yapana yer yok, affetmek yok. Kuzey Krallığının hükümdarı Lord Ned Stark, uzun ve zorlu savaşlardan sonra anayurduna dönüp krallığını bütünlük içerisinde tutmayı başarmıştır. Kral Robert Baratheon ile yıllarca omuz omuza çarpışan ve Baratheon'un kral olmasını sağlayan Ned Stark'ın tek istediği kuzey sınırlarını koruyan krallığında ailesiyle ve halkıyla yaşamaktır. \n\nFakat suyun öte yanında kendi topraklarından ve krallığından kovulduğunu iddia eden Viserys Targaryen , kız kardeşi Daenerys'i barbar kavimlerin başı Han Drogo'ya vererek, güç birliği planları yapmaktadır. Tahtını büyük bir iştahla geri isteyen ama kraliyet oyunlarından habersiz olan Viserys'in planları Kral Baratheon'a ulaşır. Savaş alanında büyük cengaver olan ama ülke ve aile yönetiminde aynı başarıyı tutturamayan Baratheon'un tamamen güvenebileceği ve her yanlış hamlesini arkasından toplayacak yeni bir sağ kola ihtiyacı vardır. Kuzeyin Lordu Ned Stark bu görev için seçilen tek aday isimdir. Kış yaklaşıyor...\n\nHanedan entrikaları, kapılı kapılar ardında dönen oyunlar, birilerinin kuyusunu kazmak için düşmanın koynuna girmekten çekinmeyen kadınlar, kardeşler arası çekişmeler, dışlanmalar... Hepsi tek bir hedef için: taht kavgası..",
+                    "tagline": None,
+                    "title": "Taht Oyunları"
+                },
+                "tw": {
+                    "overview": "",
+                    "tagline": None,
+                    "title": "冰與火之歌：權力遊戲"
+                },
+                "uk": {
+                    "overview": "Серіал \"Гра Престолів\" знято за сюжетом фентезі-бестселерів \"Пісня льоду і полум'я\" Джорджа Р.Р. Мартіна (володаря премій Г'юґо та Неб'юла). З моменту свого створення \"Гра Престолів\" став одним з найдорожчих фентезі-серіалів в історії телебачення. Це одна з причин, з якої телекритики вважають серіал головним претендентом на лаври \"Володара перстенів\" (як першовідкривача жанру) на телебаченні.\n\nПодії серіалу розгортаються у фентезійному світі, мешканцями якого - амбіційні чоловіки та жінки, котрим притаманні як гідність, так і розпуста. Найцінніша річ у цьому Королівстві – Залізний Трон. Той, хто ним володіє, отримує неймовірну владу і визнання.\n\nЗа панування у Королівстві бореться одразу декілька відомих родин. Серед них: благородні Старки, змовники Ланністери, принцеса драконів Дейнеріс і її жорстокий брат Візеріс.\n\n\"Гра престолів\" – це історія про двовладдя і зраду, гідність і безчестя, завоювання й тріумф. І кожного учасника цієї гри очікує або перемога, або смерть.",
+                    "tagline": None,
+                    "title": "Гра Престолів"
+                },
+                "vi": {
+                    "overview": "",
+                    "tagline": None,
+                    "title": "Game of Thrones"
+                },
+                "zh": {
+                    "overview": "故事背景是一个虚构的世界，主要分为两片大陆，位于西面的是“日落国度”维斯特洛（Westeros），面积约等于南美洲。位于东面的是一块面积、形状近似于亚欧大陆的陆地。故事的主线便发生在维斯特洛大陆上。从国王劳勃·拜拉席恩前往此地拜访他的好友临冬城主、北境守护艾德·史塔克开始，渐渐展示了这片国度的全貌。单纯的国王，耿直的首相，各怀心思的大臣，拥兵自重的四方诸侯，全国仅靠着一根细弦维系着表面的和平，而当弦断之时，国家再度陷入无尽的战乱之中。而更让人惊悚的、那些远古的传说和早已灭绝的生物，正重新回到这片土地。",
+                    "tagline": None,
+                    "title": "权力的游戏"
+                }
+            },
+            "tvdb_id": 121361,
+            "tvrage_id": 24493,
+            "year": 2011
+        }
+
+        rsp = api_client.get('/trakt/series/game of thrones/?include_translations=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = self._clean_attributes(json.loads(rsp.get_data(as_text=True)))
+        assert data == expected_payload

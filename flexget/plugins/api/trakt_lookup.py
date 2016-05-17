@@ -14,6 +14,18 @@ trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 class objects_container(object):
     images_object = {'type': 'array', 'items': {'type': 'string'}}
 
+    translation_object = {
+        'type': 'object',
+        'properties': {
+            'language': {'type': 'object',
+                         'properties': {
+                             "overview": {'type': 'string'},
+                             "tagline": {'type': 'string'},
+                             "title": {'type': 'string'},
+                         }}
+        }
+    }
+
     actor_object = {
         'type': 'object',
         'properties': {
@@ -33,6 +45,7 @@ class objects_container(object):
     base_return_object = {
         'type': 'object',
         'properties': {
+            'translations': translation_object,
             'actors': {'type': 'array', 'items': actor_object},
             'cached_at': {'type': 'string', 'format': 'date-time'},
             'genres': {'type': 'array', 'items': 'string'},
@@ -110,7 +123,7 @@ class TraktSeriesSearchApi(APIResource):
         if include_actors:
             result["actors"] = list_actors(series.actors),
         if include_translations:
-            result["translate"] = get_translations(series.translate)
+            result["translations"] = get_translations(series.translate)
         return jsonify(result)
 
 
@@ -136,5 +149,5 @@ class TraktMovieSearchApi(APIResource):
         if include_actors:
             result["actors"] = list_actors(movie.actors)
         if include_translations:
-            result["translate"] = get_translations(movie.translate)
+            result["translations"] = get_translations(movie.translate)
         return jsonify(result)
