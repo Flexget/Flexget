@@ -40,6 +40,7 @@ class TestTmdbUnicodeLookup(object):
                 - tmdb_year > now.year - 1: reject
     """
 
+    @pytest.mark.xfail(reason='VCR attempts to compare str to unicode')
     def test_unicode(self, execute_task):
         task = execute_task('test_unicode')
         with Session() as session:
