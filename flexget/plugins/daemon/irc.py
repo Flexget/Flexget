@@ -16,7 +16,7 @@ from irc.bot import SingleServerIRCBot
 from irc.client import ServerConnectionError
 
 from flexget.entry import Entry
-from flexget.config_schema import register_config_key, format_checker
+from flexget.config_schema import register_config_key
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.manager import manager
@@ -26,7 +26,6 @@ log = logging.getLogger('irc')
 MESSAGE_CLEAN = re.compile("\x0f|\x1f|\x02|\x03(?:[\d]{1,2}(?:,[\d]{1,2})?)?", re.MULTILINE | re.UNICODE)
 URL_MATCHER = re.compile(r'(https?://[\da-z\.-]+\.[a-z\.]{2,6}[/\w\.-\?&]*/?)', re.MULTILINE | re.UNICODE)
 EXECUTION_DELAY = 5  # number of seconds for command execution delay
-EXECUTION_DELAY_SHORT = 1  # number of seconds for command execution delay
 
 channel_pattern = {
     'type': 'string', 'pattern': '^([#&][^\x07\x2C\s]{0,200})',
@@ -76,7 +75,20 @@ schema = {
 }
 
 # Global that holds all the IRCConnection instances
-irc_connections = []
+irc_connections = {}
+# The manager object and thread
+irc_manager = None
+
+
+def spawn_thread(name, conn):
+    """
+    Creates a new thread and starts it
+    :param conn: IRCConnection or IRCConnectionManager object
+    :return: Thread
+    """
+    thread = threading.Thread(target=conn.start_interruptable, name=name)
+    thread.start()
+    return thread
 
 
 def irc_prefix(var):
@@ -195,11 +207,20 @@ class IRCConnection(SingleServerIRCBot):
         nickname = config.get('nickname', 'Flexget-%s' % str(uuid4()))
         super(IRCConnection, self).__init__([(server, port)], nickname, nickname)
         self.connection.add_global_handler('nicknameinuse', self.on_nicknameinuse)
-        self.running = True
+        self.connection.add_global_handler('error', self.on_error)
+        self.shutdown_event = threading.Event()
         self.connection_attempts = 0
-        self.execute_before_shutdown = False
+        self.inject_before_shutdown = False
         self.entry_queue = []
         self.line_cache = {}
+
+        self.start_thread()
+
+    def start_thread(self):
+        self.thread = spawn_thread(self.connection_name, self)
+
+    def is_alive(self):
+        return self.thread and self.thread.is_alive()
 
     def start_interruptable(self, timeout=0.2):
         """
@@ -208,20 +229,20 @@ class IRCConnection(SingleServerIRCBot):
         :return:
         """
         self._connect()
-        while self.running:
-            if not self.connection.connected and self.connection_attempts < 5:
+        while not self.shutdown_event.is_set():
+            if not self.connection.is_connected() and self.connection_attempts < 5:
                 time.sleep(self.connection_attempts * 2)
                 self._connect()
-            elif not self.connection.connected:
+            elif not self.connection.is_connected():
                 server = self.server_list[0]
                 log.error('Failed to connect to %s:%s after %s attempts. Stopping thread.', server.host, server.port,
                           self.connection_attempts)
-                self.running = False
+                self.shutdown_event.set()
             self.reactor.process_once(timeout)
-
-        if self.execute_before_shutdown and self.entry_queue:
+        if self.inject_before_shutdown and self.entry_queue:
             self.run_tasks()
         self.disconnect()
+        log.info('Shutting down IRC connection for %s', self.connection_name)
 
     def _connect(self):
         """
@@ -323,7 +344,7 @@ class IRCConnection(SingleServerIRCBot):
                 })
 
         log.debug('Entry after processing: %s', dict(entry))
-        if not entry['url']:
+        if not entry.get('url'):
             log.error('Parsing message failed. No url found.')
             return None
         return entry
@@ -446,7 +467,7 @@ class IRCConnection(SingleServerIRCBot):
 
     def on_welcome(self, conn, irc_event):
         log.info('IRC connected to %s', self.connection_name)
-        self.connection.execute_delayed(EXECUTION_DELAY_SHORT, self.identify_with_nickserv)
+        self.connection.execute_delayed(1, self.identify_with_nickserv)
 
     def on_nicknameinuse(self, conn, irc_event):
         conn.nick(conn.get_nickname() + "_")
@@ -504,7 +525,7 @@ class IRCConnection(SingleServerIRCBot):
         self.line_cache[channel][nickname].append(irc_event.arguments[0])
         if len(self.line_cache[channel][nickname]) == 1:
             # Schedule a parse of the message in 1 second (for multilines)
-            conn.execute_delayed(EXECUTION_DELAY_SHORT, self.process_message, (nickname, channel))
+            conn.execute_delayed(1, self.process_message, (nickname, channel))
 
     def process_message(self, nickname, channel):
         """
@@ -520,6 +541,18 @@ class IRCConnection(SingleServerIRCBot):
             log.verbose('IRC message in %s generated an entry: %s', channel, entry)
             self.queue_entry(entry)
 
+    def on_error(self, conn, irc_event):
+        log.error('Error message received: %s', irc_event)
+
+    def is_connected(self):
+        return self.connection.is_connected()
+
+    def stop(self, wait):
+        if self.is_connected():
+            if wait:
+                self.inject_before_shutdown = True
+            self.shutdown_event.set()
+
 
 @event('manager.daemon.started')
 def irc_start(manager):
@@ -528,7 +561,7 @@ def irc_start(manager):
 
 @event('manager.config_updated')
 def irc_update_config(manager):
-    global irc_connections
+    global irc_manager
 
     # Exit if we're not running daemon mode
     if not manager.is_daemon:
@@ -544,28 +577,81 @@ def irc_update_config(manager):
         log.info('No irc connections defined in the config')
         return
 
-    for key, connection in config.items():
-        log.info('Starting IRC connection for %s', key)
-        conn = IRCConnection(connection, key)
-        thread = threading.Thread(target=conn.start_interruptable, name=key)
-        irc_connections.append((conn, thread))
-        thread.setDaemon(True)  # set threads to daemon so they die with FlexGet when using Ctrl-C
-        thread.start()
+    irc_manager = IRCConnectionManager(config)
 
 
-# class IRCConnectionManager(object):
-#
-#     def __init__(self, max_revives=5):
-#         self.max_revives = max_revives
-#
-#     def runnable(self):
-#         global irc_connections
-#
-#         for conn, thread in irc_connections:
-#
-#
-#     def ping_threads
-#
+class IRCConnectionManager(object):
+
+    def __init__(self, config):
+        self.config = config
+        self.shutdown_event = threading.Event()
+        self.wait = False
+        self.restart_log = {}
+        self.warning_delay = 30
+        self.max_delay = 300  # 5 minutes
+        self.thread = spawn_thread('irc_manager', self)
+
+    def is_alive(self):
+        return self.thread and self.thread.is_alive()
+
+    def start_interruptable(self):
+        """
+        Checks for dead threads and attempts to restart them. Uses a pseudo exponential backoff strategy for
+        reconnecting to avoid being throttled by the IRC server(s).
+        :return:
+        """
+        global irc_connections
+
+        self.start_connections()
+
+        while not self.shutdown_event.is_set():
+            for conn_name, conn in irc_connections.items():
+                if not conn and self.config.get(conn_name):
+                    new_conn = IRCConnection(self.config[conn_name], conn_name)
+                    irc_connections[conn_name] = new_conn
+                elif not conn.is_alive() and self.restart_log[conn_name]['delay'] <= 0:
+                    log.info('IRC connection for %s has died unexpectedly. Restarting it.', conn_name)
+                    self.restart_log[conn_name]['attempts'] += 1
+                    self.restart_log[conn_name]['delay'] = min(pow(2, self.restart_log[conn_name]['attempts']),
+                                                               self.max_delay)
+                    conn.start_thread()
+
+                if self.restart_log[conn_name]['delay'] > 0:
+                    # reduce delay with 1 second. This is not meant to be precise, merely to avoid throttling.
+                    self.restart_log[conn_name]['delay'] -= 0.2
+                else:
+                    self.restart_log[conn_name] = {'attempts': 0, 'delay': 0}
+            time.sleep(0.2)
+
+        self.stop_connections(self.wait)
+
+    def start_connections(self):
+        global irc_connections
+
+        for conn_name, connection in self.config.items():
+            log.info('Starting IRC connection for %s', conn_name)
+            conn = IRCConnection(connection, conn_name)
+            irc_connections[conn_name] = conn
+            self.restart_log[conn_name] = {'attempts': 0, 'delay': 0}
+
+    def stop_connections(self, wait):
+        global irc_connections
+
+        for conn_name, conn in irc_connections.items():
+            conn.stop(wait)
+            conn.thread.join()
+        irc_connections = {}
+
+    def restart_connection(self, conn_name):
+        global irc_connections
+
+        if not irc_connections[conn_name].is_alive():
+            irc_connections[conn_name][0].start_thread()
+
+    def stop(self, wait):
+        self.wait = wait
+        self.shutdown_event.set()
+
 
 @event('manager.shutdown_requested')
 def shutdown_requested(manager):
@@ -574,15 +660,12 @@ def shutdown_requested(manager):
 
 @event('manager.shutdown')
 def stop_irc(manager, wait=False):
-    global irc_connections
+    global irc_manager
 
-    for conn, thread in irc_connections:
-        if conn.connection.is_connected():
-            if wait:
-                conn.execute_before_shutdown = True
-            conn.running = False
-            thread.join()
-    irc_connections = []
+    if irc_manager and irc_manager.is_alive():
+        log.info('Shutting down IRC.')
+        irc_manager.stop(wait)
+        irc_manager.thread.join(10)
 
 
 @event('config.register')
