@@ -296,6 +296,7 @@ class IRCConnection(SingleServerIRCBot):
                 val_values = [strip_whitespace(x) for x in match.groups()]
                 entry.update(dict(zip(val_names, val_values)))
                 log.debug('Found: %s', dict(zip(val_names, val_values)))
+                break
             else:
                 log.debug('No matches found')
 
