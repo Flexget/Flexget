@@ -218,7 +218,6 @@ class IRCConnection(SingleServerIRCBot):
                           self.connection_attempts)
                 self.running = False
             self.reactor.process_once(timeout)
-            raise Exception()
 
         if self.execute_before_shutdown and self.entry_queue:
             self.run_tasks()
@@ -552,6 +551,20 @@ def irc_update_config(manager):
         thread.setDaemon(True)  # set threads to daemon so they die with FlexGet when using Ctrl-C
         thread.start()
 
+
+# class IRCConnectionManager(object):
+#
+#     def __init__(self, max_revives=5):
+#         self.max_revives = max_revives
+#
+#     def runnable(self):
+#         global irc_connections
+#
+#         for conn, thread in irc_connections:
+#
+#
+#     def ping_threads
+#
 
 @event('manager.shutdown_requested')
 def shutdown_requested(manager):
