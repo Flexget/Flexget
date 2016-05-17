@@ -7,24 +7,24 @@ import pytest
 from flexget.utils import json
 
 
+def clean_attributes(data):
+    """
+    Removes non constant attributes from response since they can change and will trigger a fail
+    :param data: Original response json
+    :return: Response json without non constant attributes
+    """
+    data.pop('cached_at')
+    data.pop('votes')
+    data.pop('updated_at')
+    data.pop('rating')
+    data.pop('status', None)
+    data.pop('number_of_aired_episodes', None)
+    return data
+
+
 @pytest.mark.online
 class TestTraktSeriesLookupAPI(object):
     config = 'tasks: {}'
-
-    @staticmethod
-    def _clean_attributes(data):
-        """
-        Removes non constant attributes from response since they can change and will trigger a fail
-        :param data: Original response json
-        :return: Response json without non constant attributes
-        """
-        data.pop('cached_at')
-        data.pop('votes')
-        data.pop('updated_at')
-        data.pop('rating')
-        data.pop('status')
-        data.pop('number_of_aired_episodes')
-        return data
 
     def test_trakt_series_lookup_no_params(self, api_client):
         # Bad API call
@@ -86,7 +86,7 @@ class TestTraktSeriesLookupAPI(object):
         rsp = api_client.get('/trakt/series/the x-files/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        data = self._clean_attributes(json.loads(rsp.get_data(as_text=True)))
+        data = clean_attributes(json.loads(rsp.get_data(as_text=True)))
         assert data == expected_payload
 
     def test_trakt_series_lookup_with_year_param(self, api_client):
@@ -145,7 +145,7 @@ class TestTraktSeriesLookupAPI(object):
         rsp = api_client.get('/trakt/series/the flash/?year=1990')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        data = self._clean_attributes(json.loads(rsp.get_data(as_text=True)))
+        data = clean_attributes(json.loads(rsp.get_data(as_text=True)))
         assert data == expected_payload
 
     def test_trakt_series_lookup_with_trakt_slug_id_param(self, api_client):
@@ -201,7 +201,7 @@ class TestTraktSeriesLookupAPI(object):
         rsp = api_client.get('/trakt/series/the flash/?trakt_slug=the-flash-1967')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        data = self._clean_attributes(json.loads(rsp.get_data(as_text=True)))
+        data = clean_attributes(json.loads(rsp.get_data(as_text=True)))
         assert data == expected_payload
 
     def test_trakt_series_lookup_with_tmdb_id_param(self, api_client):
@@ -261,7 +261,7 @@ class TestTraktSeriesLookupAPI(object):
         rsp = api_client.get('/trakt/series/the flash/?tmdb_id=60735')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        data = self._clean_attributes(json.loads(rsp.get_data(as_text=True)))
+        data = clean_attributes(json.loads(rsp.get_data(as_text=True)))
         assert data == expected_payload
 
     def test_trakt_series_lookup_with_imdb_id_param(self, api_client):
@@ -321,7 +321,7 @@ class TestTraktSeriesLookupAPI(object):
         rsp = api_client.get('/trakt/series/the flash/?imdb_id=tt3107288')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        data = self._clean_attributes(json.loads(rsp.get_data(as_text=True)))
+        data = clean_attributes(json.loads(rsp.get_data(as_text=True)))
         assert data == expected_payload
 
     def test_trakt_series_lookup_with_tvdb_id_param(self, api_client):
@@ -381,7 +381,7 @@ class TestTraktSeriesLookupAPI(object):
         rsp = api_client.get('/trakt/series/the flash/?tvdb_id=279121')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        data = self._clean_attributes(json.loads(rsp.get_data(as_text=True)))
+        data = clean_attributes(json.loads(rsp.get_data(as_text=True)))
         assert data == expected_payload
 
     def test_trakt_series_lookup_with_tvrage_id_param(self, api_client):
@@ -441,7 +441,7 @@ class TestTraktSeriesLookupAPI(object):
         rsp = api_client.get('/trakt/series/the flash/?tvrage_id=36939')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        data = self._clean_attributes(json.loads(rsp.get_data(as_text=True)))
+        data = clean_attributes(json.loads(rsp.get_data(as_text=True)))
         assert data == expected_payload
 
     def test_trakt_series_lookup_with_trakt_id_param(self, api_client):
@@ -497,7 +497,7 @@ class TestTraktSeriesLookupAPI(object):
         rsp = api_client.get('/trakt/series/the flash/?trakt_id=75481')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        data = self._clean_attributes(json.loads(rsp.get_data(as_text=True)))
+        data = clean_attributes(json.loads(rsp.get_data(as_text=True)))
         assert data == expected_payload
 
     def test_trakt_series_lookup_with_actors_param(self, api_client):
@@ -629,7 +629,7 @@ class TestTraktSeriesLookupAPI(object):
         rsp = api_client.get('/trakt/series/the x-files/?include_actors=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        data = self._clean_attributes(json.loads(rsp.get_data(as_text=True)))
+        data = clean_attributes(json.loads(rsp.get_data(as_text=True)))
         assert data == expected_payload
 
     def test_trakt_series_lookup_with_translations_param(self, api_client):
@@ -861,5 +861,67 @@ class TestTraktSeriesLookupAPI(object):
         rsp = api_client.get('/trakt/series/game of thrones/?include_translations=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        data = self._clean_attributes(json.loads(rsp.get_data(as_text=True)))
+        data = clean_attributes(json.loads(rsp.get_data(as_text=True)))
+        assert data == expected_payload
+
+
+@pytest.mark.online
+class TestTraktMovieLookupAPI(object):
+    config = 'tasks: {}'
+
+    def test_trakt_movies_lookup_no_params(self, api_client):
+        # Bad API call
+        rsp = api_client.get('/trakt/movies/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+        expected_payload = {
+            "genres": [
+                "action",
+                "adventure",
+                "science fiction",
+                "thriller"
+            ],
+            "homepage": "http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html",
+            "id": 481,
+            "images": {
+                "banner": {
+                    "full": "https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"
+                },
+                "clearart": {
+                    "full": "https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"
+                },
+                "fanart": {
+                    "full": "https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg",
+                    "medium": "https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg",
+                    "thumb": "https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"
+                },
+                "logo": {
+                    "full": "https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"
+                },
+                "poster": {
+                    "full": "https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg",
+                    "medium": "https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg",
+                    "thumb": "https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"
+                },
+                "thumb": {
+                    "full": "https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"
+                }
+            },
+            "imdb_id": "tt0133093",
+            "language": "en",
+            "overview": "Thomas A. Anderson is a man living two lives. By day he is an average computer programmer and by night a malevolent hacker known as Neo, who finds himself targeted by the police when he is contacted by Morpheus, a legendary computer hacker, who reveals the shocking truth about our reality.",
+            "released": None,
+            "runtime": 136,
+            "slug": "the-matrix-1999",
+            "tagline": "Welcome to the Real World.",
+            "title": "The Matrix",
+            "tmdb_id": 603,
+            "trailer": "http://youtube.com/watch?v=m8e-FF8MsqU",
+            "year": 1999
+        }
+
+        rsp = api_client.get('/trakt/movies/the matrix/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = clean_attributes(json.loads(rsp.get_data(as_text=True)))
         assert data == expected_payload
