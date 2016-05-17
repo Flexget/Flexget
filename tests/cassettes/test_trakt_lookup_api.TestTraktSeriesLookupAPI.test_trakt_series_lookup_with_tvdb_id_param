@@ -32,15 +32,15 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a4743e4955015b9-FRA]
+      cf-ray: [2a476d9034872756-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 13:02:41 GMT']
+      date: ['Tue, 17 May 2016 13:31:08 GMT']
       etag: [W/"d42cf1a02d790f2bc4cf471680bf0142"]
-      expires: ['Tue, 17 May 2016 17:02:41 GMT']
+      expires: ['Tue, 17 May 2016 17:31:08 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d925578f610bac79b6bbf85f8fe2f15731463490161; expires=Wed,
-          17-May-17 13:02:41 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d5f3deb322a97c3737d266e635dfc45521463491868; expires=Wed,
+          17-May-17 13:31:08 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
@@ -56,7 +56,7 @@ interactions:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=d925578f610bac79b6bbf85f8fe2f15731463490161]
+      Cookie: [__cfduid=d5f3deb322a97c3737d266e635dfc45521463491868]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
@@ -78,12 +78,12 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a4743e6555815b9-FRA]
+      cf-ray: [2a476d91249a2756-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 13:02:41 GMT']
+      date: ['Tue, 17 May 2016 13:31:08 GMT']
       etag: [W/"7f6b873397348fe85dd6ea7cbe0464e6"]
-      expires: ['Tue, 17 May 2016 17:02:41 GMT']
+      expires: ['Tue, 17 May 2016 17:31:08 GMT']
       last-modified: ['Tue, 17 May 2016 10:58:37 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]
