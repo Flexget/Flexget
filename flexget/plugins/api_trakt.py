@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import, print_function
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
 
 import logging
 import re
 import time
+
 from datetime import datetime, timedelta
-
-
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from dateutil.parser import parse as dateutil_parse
-from past.builtins import basestring
 from sqlalchemy import Table, Column, Integer, String, Unicode, Date, DateTime, Time, or_, func
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey

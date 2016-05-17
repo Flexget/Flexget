@@ -11,12 +11,12 @@ from flexget.manager import Session
 
 try:
     from flexget.plugins.api_trakt import ApiTrakt, list_actors, list_images, get_translations
+
     lookup_series = ApiTrakt.lookup_series
     lookup_movie = ApiTrakt.lookup_movie
 except ImportError:
     raise plugin.DependencyError(issued_by='trakt_lookup', missing='api_trakt',
                                  message='trakt_lookup requires the `api_trakt` plugin')
-
 
 log = logging.getLogger('trakt_lookup')
 
@@ -220,7 +220,6 @@ class PluginTraktLookup(object):
                 entry.update_using_map(self.show_translate_map, series)
         return entry
 
-
     def lazy_episode_lookup(self, entry):
         with Session(expire_on_commit=False) as session:
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
@@ -271,7 +270,7 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         with Session() as session:
             lookupargs = {'trakt_id': entry.get('trakt_movie_id', eval_lazy=False),
-                          'title': entry.get('series_name', eval_lazy=False),
+                          'title': entry.get('movie_name', eval_lazy=False),
                           'session': session}
             try:
                 movie = lookup_movie(**lookupargs)

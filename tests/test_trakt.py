@@ -5,9 +5,9 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import pytest
 
 from flexget.manager import Session
-from flexget.plugins.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow, get_session
+from flexget.plugins.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow, \
+    get_session
 from future.utils import native
-
 
 lookup_series = ApiTrakt.lookup_series
 
@@ -332,6 +332,9 @@ class TestTraktMovieLookup(object):
           test_search_results2:
             mock:
             - title: harry.potter.and.the.philosopher's.stone
+          test_lookup_translations:
+            mock:
+            - title: The Matrix Reloaded (2003)
     """
 
     def test_lookup_sources(self, execute_task):
@@ -410,6 +413,152 @@ class TestTraktMovieLookup(object):
             assert actor.imdb == 'nm0000206', 'saving imdb_id for actors in table failed'
             assert str(actor.id) == '7134', 'saving trakt_id for actors in table failed'
             assert str(actor.tmdb) == '6384', 'saving tmdb_id for actors table failed'
+
+    def test_lookup_translations(self, execute_task):
+        translations = {
+            "bg": {
+                "overview": "Нео вече разполага с по-голям контрол върху свръхестествените си сили, след като Цион пада под обсадата на Армията на Машините. Само часове делят последният човешки анклав на Земята от 250,000 стражи, програмирани да унищожат човечеството. Но за гражданите на Зион, насърчавани от обещанието на Морфей, че Един ще изпълни Пророчеството на Оракула и ще донесе победа във войната с Машините, всички надежди и очаквания са съсредоточени в Нео. А той се сблъсква с объркващи видения, докато търси посоката, в която да действа.",
+                "tagline": "",
+                "title": "Матрицата: Презареждане"
+            },
+            "ca": {
+                "overview": "Thomas \"Neo\" Anderson va prendre una costosa decisió quan va decidir fer la pregunta que Morfeu i Trinity havien formulat abans que ell. Cercar i acceptar la veritat. Alliberar la seva ment de Matrix. Ara, Neo adquireix un major domini dels seus extraordinaris poders mentre Sió cau assetjada per l'Exèrcit de les Màquines. Només una qüestió d'hores separa a l'últim enclavament humà a la Terra de 250.000 Sentinelles programats per destruir a la humanitat. Però els ciutadans de Sió, animats per la convicció de Morfeu que l'Elegit farà realitat la Profecia de l'Oracle i posarà fi a la guerra amb les Màquines, posen totes les seves esperances i expectatives en Neo, que es troba bloquejat per visions inquietants mentre cerca quines mesures prendre.",
+                "tagline": "",
+                "title": "Matrix Reloaded"
+            },
+            "cs": {
+                "overview": "Druhé pokračování trilogie Matrix nás opět zavede do temného světa budoucnosti ovládaného stroji. Lidstvo stále trpí v otroctví virtuální reality, z kterého ho může osvobodit jen Vyvolený. Nea s Morpheem a Trinity čeká boj s armádou strojů a jejich arzenálem počítačově nelidských schopností a zbraní. Pokud ale chtějí zastavit zotročování lidstva, není jiná možnost než boj na život a na smrt. Nezbývá jim nic jiného než proniknout hluboko do struktur Matrixu a během 72 hodin objevit a zlikvidovat centrum Zion i s jeho pomocnými jednotkami. Neo ve svých temných nočních můrách vidí, že Trinitiným osudem je smrt. Dokáže se znovu vzepřít osudu a svou mocí zastavit nekonečné útoky strojů?",
+                "tagline": "Osvoboď svoji mysl.",
+                "title": "Matrix Reloaded"
+            },
+            "da": {
+                "overview": "250.000 maskiner er ved at bore sig gennem jorden ind til Zion og inden 72 timer når de byen og vil udslette befolkningen. Neo må have sine mægtige kræfter i spil i en fart og han møder oraklet.  Agent Smith har fået storhedsvanvid og kører sit eget løb og samtidig forudser Neo i drømme, hvordan hans elskede Trinity dør - en skæbne han for alt i verden må redde hende fra.",
+                "tagline": "",
+                "title": "The Matrix Reloaded"
+            },
+            "de": {
+                "overview": "Die Wächter schwärmen aus. Smith klont sich. Neo fliegt... aber vielleicht kann selbst der Auserwählte mit seinen atemberaubenden neuen Fähigkeiten den Angriff der Maschinen nicht mehr aufhalten. Neo. Morpheus, Trinity. Zurück im spannenden zweiten Kapitel der Matrix-Trilogie treffen sie auf außergewöhnliche Verbündete: Gemeinsam bekämpfen sie ihre Gegner, die sich klonen, durch Upgrades immer stärker werden und die letzte Festung der Menschheit belagern.",
+                "tagline": "Befreie Deinen Geist.",
+                "title": "Matrix Reloaded"
+            },
+            "el": {
+                "overview": "Στο THE MATRIX RELOADED οι μαχητές της ελευθερίας, ο Νίο, η Τρίνιτι κι ο Μορφέας, συνεχίζουν τον αγώνα τους ενάντια στο Στρατό των Μηχανών, προβάλλοντας εξαιρετικές ικανότητες μάχης κι όπλων ενάντια στις συστηματικές δυνάμεις καταστολής και εκμετάλλευσης της ανθρώπινης φυλής. Στην προσπάθειά τους να σώσουν τους ανθρώπους που απειλούνται, «εντάσσονται» ακόμα περισσότερο μέσα στο MATRIX και διαδραματίζουν καθοριστικό ρόλο στην έκβαση της μοίρας των ανθρώπων.  Υπάρχουν δύο πραγματικότητες: μία που αποτελείται από την καθημερινή μας ζωή - και μία που συνθλίβει αυτό που ξέρουμε μέχρι σήμερα. Η πρώτη είναι ένα όνειρο. Η άλλη είναι το Μatrix. Ο Νίο (Κιάνου Ριβς), ο Μορφέας (Λόρενς Φίσμπερν) και η Τρίνιτι (Κάρι Αν Μος) μας \"ξυπνάνε\" μέσα στον αφόρητα πραγματικό και σκοτεινό κόσμο του Matrix. Μαζί αγωνίζονται πάλι για να σώσουν κι άλλους \"ελεύθερους\" ανθρώπους που προσπαθούν να επιβιώσουν έναντι των μηχανών, οι οποίες κυριαρχούν.",
+                "tagline": "",
+                "title": "The Matrix Reloaded"
+            },
+            "en": {
+                "overview": "Six months after the events depicted in The Matrix, Neo has proved to be a good omen for the free humans, as more and more humans are being freed from the matrix and brought to Zion, the one and only stronghold of the Resistance.  Neo himself has discovered his superpowers including super speed, ability to see the codes of the things inside the matrix and a certain degree of pre-cognition. But a nasty piece of news hits the human resistance: 250,000 machine sentinels are digging to Zion and would reach them in 72 hours. As Zion prepares for the ultimate war, Neo, Morpheus and Trinity are advised by the Oracle to find the Keymaker who would help them reach the Source.  Meanwhile Neo's recurrent dreams depicting Trinity's death have got him worried and as if it was not enough, Agent Smith has somehow escaped deletion, has become more powerful than before and has fixed Neo as his next target.",
+                "tagline": "Free your mind.",
+                "title": "The Matrix Reloaded"
+            },
+            "es": {
+                "overview": "Las máquinas avanzan imparables hacia Zion en su afán por destruir a toda la humanidad y todas las naves se preparan para la dura batalla. Neo junto con Morfeo y Trinity buscan el camino del elegido dentro de Matrix para vencer a las máquinas y se encuentran con dificultades inesperadas: el agente Smith ha vuelto, y no solo eso, otros programas dentro de Matrix intentarán acabar con su misión. Mientras tanto Neo se tendrá que adaptar a la vida real y a la fama de ser el elegido.",
+                "tagline": "Abre tu mente",
+                "title": "Matrix Reloaded"
+            },
+            "fa": {
+                "overview": "نئو و رهبران شورش تخمین میزنند که حدود ۷۲ ساعت تا حمله ۲۵۰ هزار ماشین به صهیون، وقت دارند. در همین زمان نئو باید تصمیم بگیرد که چگونه ترینیتی را از سرنوشت تاریکی که در رویا برایش دیده، نجات دهد.",
+                "tagline": "",
+                "title": "ماتریکس: بارگذاری مجدد"
+            },
+            "fi": {
+                "overview": "Koneiden armeija valmistautuu hyökkäykseen. Smith-klooneja on kaikkialla. Neo lentää…mutta ehkäpä edes Valitun uskomattomat voimat eivät ole tarpeeksi pysäyttämään metallihirviöiden etenemistä. Uudet liittolaiset liittyvät ihmisten riveihin taistelussa vastustajia vastaan, joiden lukumäärä on lisääntynyt ja taidot päivitetty sitten viime näkemän.",
+                "tagline": "",
+                "title": "Matrix Reloaded"
+            },
+            "fr": {
+                "overview": "Neo apprend à mieux contrôler ses dons naturels, alors même que Sion s'apprête à tomber sous l'assaut de l'Armée des Machines. D'ici quelques heures, 250 000 Sentinelles programmées pour anéantir notre espèce envahiront la dernière enclave humaine de la Terre. Mais Morpheus galvanise les citoyens de Sion en leur rappelant la Parole de l'Oracle : il est encore temps pour l’Élu d'arrêter la guerre contre les Machines. Tous les espoirs se reportent dès lors sur Neo. Au long de sa périlleuse plongée au sein de la Matrix et de sa propre destinée, ce dernier sera confronté à une résistance croissante, une vérité encore plus aveuglante, un choix encore plus douloureux que tout ce qu'il avait jamais imaginé.",
+                "tagline": "Libérez votre esprit.",
+                "title": "Matrix Reloaded"
+            },
+            "he": {
+                "overview": "אחד משוברי הקופות הגדולים בכל הזמנים. כשישה חודשים אחרי ה-\"מטריקס\" המקורי נפתח החלק השני של הטרילוגיה ובה יותר ויותר אנשים משתחררים ומגלים את העולם האמיתי. אך במקביל, צבא המשוכפלים עומד להשתלט על המבצר האנושי האחרון, וניאו, מורפיאוס, טריניטי ושותפיהם מנסים למצוא פיתרון, רגע לפני הסוף הסופי בהחלט. מהר יותר, חזק יותר, מעופף יותר.",
+                "tagline": "תנו למחשבותיכם חופש...",
+                "title": "מטריקס רילודד"
+            },
+            "hu": {
+                "overview": "Mi történne, ha a prófécia igaznak bizonyulna? Mi lenne, ha holnap véget érne a harc? Thomas \"Neo\" Anderson (Keanu Reeves) úgy dönt, szembenéz a kérdéssel, amelyet Morpheus (Laurence Fishburne) és Trinity (Carrie-Anne Moss) sugallt neki. Elindul, hogy felkutassa és megismerje az igazságot, és értelmét kiszabadítsa a Mátrix rabságából.A trilógia második epizódjában Neo elhatározza, hogy a benne rejlő erőket még jobban uralma alá hajtja. A gépek hadserege támadást indít Zion városa ellen. Órák kérdése csupán, hogy a Föld utolsó ember uralta területét is elfoglalják az emberiség elpusztítására beprogramozott gépek. Morpheusnak azonban sikerül felráznia Zion polgárait, és meggyőznie őket arról, hogy be fog teljesülni a jóslat, és a Kiválasztott véget fog vetni a gépekkel vívott háborúnak. Szerelmükkel és egymásba vetett hitükkel felvértezve Neo és Trinity úgy döntenek, visszatérnek a Mátrixba, hogy különleges képességeiket és fegyvereiket latba vetve szembeszálljanak a zsarnoksággal.",
+                "tagline": "Szabadítsd fel a tudatod.",
+                "title": "Mátrix - Újratöltve"
+            },
+            "it": {
+                "overview": "Ora Neo controlla perfettamente i suoi straordinari poteri e Zion è assediata dall'Esercito delle Macchine. Solo poche ore separano l'ultima enclave umana sulla Terra da 250.000 Sentinelle programmate per distruggere il genere umano. Ma i cittadini di Zion, incoraggiati dalla convinzione di Morpheus che L'Eletto adempierà la Profezia dell'Oracolo e metterà fine alla guerra con le Macchine, puntano tutte le loro speranze su Neo, che si ritrova bloccato da visioni sconvolgenti. Resi più forti dall'amore e dalla fiducia che li lega, Neo e Trinity scelgono di tornare in Matrix con Morpheus e di lottare contro le forze della repressione e dello sfruttamento. Ma esistono ancora figure potenti dentro Matrix che si oppongono all'artificio della scelta, e si sottraggono alla responsabilità che comporta, poiché si cibano delle verità emotive degli altri.",
+                "tagline": "Libera la tua mente",
+                "title": "Matrix reloaded"
+            },
+            "ja": {
+                "overview": "人類の最期の砦「ザイオン」に残されたのは72時間。それを過ぎれば25万のセンチネルに襲われるだろう。しかしモーフィアスの信念は堅い。オラクルによればネオがこの戦争に終止符を打つ。一方のネオはヒントを得るためオラクルに会いに行く。",
+                "tagline": "",
+                "title": "マトリックス リローデッド"
+            },
+            "ko": {
+                "overview": "1편의 엔딩 크레딧과 함께 인류를 구원해야 하는 자신의 운명을 받아들이며 하늘로 날아오른 네오(키아누 리브스). 내일 이 전쟁이 끝난다면, 한번 싸워 볼만하지 않을까...? 목숨도 걸어 볼만 하지 않을까...? 모피어스(로렌스 피쉬번)와 트리니티(캐리-앤 모스)가 전에 자신에게 던졌던 질문을 스스로에게 던져보는 네오는 마침내, 중대한 결정을 내린다.  시온이 컴퓨터 군단에게 장악될 위기에 처하면서, 네오는 자신의 능력에 대한 더 큰 통제력을 갖게 된다. 이제 몇시간 후면 지구상에 남은 인류 최후의 보루인 시온이 인간 말살을 목적으로 프로그래밍 된 센티넬 무리에 의해 짓밟히게 될 터... 그러나 시온의 시민들은 오라클의 예언이 이루어져 전쟁이 끝날 것이라는 모피어스의 신념에 용기를 얻고, 네오에게 모든 희망과 기대를 걸어보기로 한다.",
+                "tagline": "",
+                "title": "매트릭스 2 - 리로디드"
+            },
+            "nl": {
+                "overview": "De machines hebben de locatie van Zion, de laatste menselijke stad, gevonden. De enige hoop voor de rebellen is The Keymaker, een man met toegang tot alle deuren naar de machinewereld. Hij wordt echter bewaakt door The Twins, een gedreadlocked duo dat kan verdwijnen en verschijnen als geesten. Agent Smith kan zich inmiddels als een virus in The Matrix vermenigvuldigen, wat de zoektocht voor Neo, Trinity en Morpheus bemoeilijkt.",
+                "tagline": "",
+                "title": "The Matrix Reloaded"
+            },
+            "pl": {
+                "overview": "Kontynuacja kultowego \"Matrixa\". \"Matrix Reaktywacja\" zaczyna się w momencie, w którym kończyła się pierwsza część. Maszyny dokonały brzemiennego w skutkach odkrycia: poznały lokalizację Zion, ostatniego miasta ludzi, ukrytego w pobliżu jądra Ziemi. Za 72 godziny tysiące Strażników - kałamarnicowatych maszyn znanych z pierwszej części - przebiją się do miasta. Jedyną nadzieją ludzi jest odnalezienie tajemniczej postaci, znanej jako Twórca Kluczy, chronionej przez parę uzbrojonych w noże Bliźniaków, nienaturalnie białych zabójców, potrafiących znikać i pojawiać się jak duchy.",
+                "tagline": "Uwolnij się zanim zacznie się rewolucja!",
+                "title": "Matrix Reaktywacja"
+            },
+            "pt": {
+                "overview": "Após derrotar as máquinas em seu combate inicial, Neo (Keanu Reeves) ainda vive na Nabuconodosor ao lado de Morpheus (Laurence Fishburne), Trinity (Carrie-Anne Moss) e Link (Harold Perrineau Jr.), o novo tripulante da nave. As máquinas estão realizando uma grande ofensiva contra Zion, onde 250 mil máquinas estão escavando rumo à cidade e podem alcançá-la em poucos dias. A Nabucodonosor é convocada para retornar a Zion, para participar da reunião que definirá o contra-ataque humano às máquinas. Entretanto, um recado enviado pelo Oráculo (Gloria Foster) faz com que a nave parta novamente, levando Neo de volta à matrix. Lá ele descobre que precisa encontrar o Chaveiro (Randall Duk Kim), um ser que possui a chave para todos os caminhos da matrix e que é mantido como prisioneiro por Merovingian (Lambert Wilson) e sua esposa, Persephone (Monica Bellucci).",
+                "tagline": "Liberte sua mente.",
+                "title": "The Matrix Reloaded"
+            },
+            "ro": {
+                "overview": "",
+                "tagline": "Eliberează-ți mintea.",
+                "title": "Matricea: Reîncărcată"
+            },
+            "ru": {
+                "overview": "Борцы за свободу Нео, Тринити и Морфеус продолжают руководить восстанием людей против Армии Машин. Для уничтожения системы репрессий и эксплуатации они вынуждены прибегнуть не только к арсеналу превосходного оружия, но и к своим выдающимся навыкам.Участие в миссии по спасению человеческой расы от ее полного истребления приносит им более глубокое понимание конструкции Матрицы и осознание центральной роли Нео в судьбе человечества.",
+                "tagline": "Одни машины помогают нам жить, другие – пытаются нас убить",
+                "title": "Матрица: Перезагрузка"
+            },
+            "sk": {
+                "overview": "Pokracovanie kultoveho sci-fi, ktore redefinovalo zaner akcneho filmu a ziskalo 4 Oskarov, nas opat zavedie do temneho sveta buducnosti. Ludstvo nadalej trpi v otroctve virtualnej reality, z ktorej ho moze oslobodit len vestbou predpovedany Vyvoleny. Novodoby spasitel Neo (Keanu Reeves) musi v druhej casti celit novym protivnikom - su nimi Dvojcata, nemilosrdni zabijaci, ktory dokazu menit Matrix a podriadovat ho svojej voly rovnako ako Neo. Okrem nich mu ide po krku aj agent Smith, ktory sa oddelil od Matrixu a teraz Nea prenasleduje na vlastnu past. Navyse ako virus dokaze naklonovat sam seba, takze Neo bude v jednej z vrcholnych scen filmu celit stovkam identickych agentov. Medzitym sa Trinity a Morpheus snazia zachranit tajomneho Kluciara, ktory dokaze otvorit kazde dvere v Matrixe a je dolezitou zbranou ludi v boji proti strojom. Aj medzi robotmi prebieha boj o nadvladu nad virtualnou realitou. Vsetky udalosti vedu k velkej vojne ludi proti strojom, ktory vypukne v tretej casti.",
+                "tagline": "",
+                "title": "Matrix Reloaded"
+            },
+            "sv": {
+                "overview": "Neo uppskattar att han har ungefär 72 timmar på sig att förstöra de 250.000 destruktiva sonder han vet är utskickade. Under tiden måste han också bestämma sig för hur han ska rädda Trinity från det mörka öde han drömmer att hon ska drabbas av.",
+                "tagline": "",
+                "title": "Matrix Reloaded"
+            },
+            "th": {
+                "overview": "",
+                "tagline": "",
+                "title": "สงครามมนุษย์เหนือโลก"
+            },
+            "tr": {
+                "overview": "Neo ve Zion'un diğer isyancıları, Matrix'i dönüştürme çalışmalarına başlıyor. Neo'nun kendi gücünün ve misyonunun iyice farkına vardığı noktadan başlıyoruz filme. İlk filmde kendisini ve yoldaşlarını ajanların elinden kurtaran Neo, ikinci filmde bütün bir Zion şehrini ve sakinlerini kanatları altına almaya çalışacak. Bunun için de, ulaşmak son derece güç olsa da, Anahtarcı'yı bulmaları gerekiyor. Bu durum ise düşmanlarına yenilerini de katacaktır. Kendisini kopyalayıp, kopyalarından bir ordu hazırlayan Ajan Smith'e İkizler de katılır. The Matrix Reloaded'da, direnmeyi sürdüren tek insan kolonisi olan Zion'un kapıları seyircilere açılıyor. Fakat açılan kapılarından girmeye çalışan başkaları da olacaktır!..",
+                "tagline": "",
+                "title": "Matrix Reloaded"
+            },
+            "uk": {
+                "overview": "Нео, Морфей та Трініті намагаються захистити підземне місто Зіон - останню схованку людей,  про існування якої нарешті дізнались безжалісні машини. Для цього героям потрібно проникнути у світ Матриці і перезавантажити її...",
+                "tagline": "",
+                "title": "Матриця: Перезавантаження"
+            },
+            "zh": {
+                "overview": "上一部结尾，尼奥（基奴李维斯 饰）终于意识到自己的能力和使命，中弹复活后，变成了无所不能的“救世主”，他和女友崔妮蒂（凯莉·安·摩丝 饰），舰长墨菲斯（劳伦斯·菲什伯恩 饰）回到了人类的基地锡安，受到人们的热烈欢迎。此时，“母体”决定先下手为强，派出了两万五千只电子乌贼攻击锡安基地；墨菲斯、尼奥和崔妮蒂则再次进入“母体”，寻找“制钥者”，准备从内部破坏；而本该被尼奥消灭的特勤史密斯似乎出了点问题，脱离了“母体”的控制，拥有可怕的复制能力，阻碍尼奥他们的行动....",
+                "tagline": "",
+                "title": "黑客帝国2：重装上阵"
+            }
+        }
+
+        task = execute_task('test_lookup_translations')
+        assert len(task.entries) == 1
+        entry = task.entries[0]
+
+        assert entry['movie_name'] == 'The Matrix Reloaded', 'movie lookup failed'
+        assert entry['trakt_translations'] == translations
 
 
 @pytest.mark.online
