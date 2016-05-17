@@ -617,9 +617,10 @@ class IRCConnectionManager(object):
                     conn.start_thread()
 
                 if self.restart_log[conn_name]['delay'] > 0:
-                    # reduce delay with 1 second. This is not meant to be precise, merely to avoid throttling.
+                    # reduce delay with 0.2 seconds. This is not meant to be precise, merely to avoid throttling.
                     self.restart_log[conn_name]['delay'] -= 0.2
-                else:
+                elif self.restart_log[conn_name]['attempts'] > 0:
+                    log.info('IRC connection for %s has been successfully restarted.', conn_name)
                     self.restart_log[conn_name] = {'attempts': 0, 'delay': 0}
             time.sleep(0.2)
 
