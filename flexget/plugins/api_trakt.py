@@ -9,7 +9,7 @@ import time
 
 from datetime import datetime, timedelta
 from dateutil.parser import parse as dateutil_parse
-from sqlalchemy import Table, Column, Integer, String, Unicode, Date, DateTime, Time, or_, func
+from sqlalchemy import Table, Column, Integer, String, Unicode, Date, DateTime, Time, or_, and_
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
@@ -286,8 +286,9 @@ def get_translation(ident, style):
         results = req_session.get(url, params={'extended': 'full,images'}).json()
         with Session() as session:
             for result in results:
-                translate = session.query(TraktTranslate).filter(
-                    TraktTranslate.language == result.get('language')).first()
+                translate = session.query(TraktTranslate).filter(and_(
+                    TraktTranslate.language == result.get('language'),
+                    TraktTranslate.title == result.get('title'))).first()
                 if not translate:
                     translate = TraktTranslate(result, session)
                 translations.append(translate)
