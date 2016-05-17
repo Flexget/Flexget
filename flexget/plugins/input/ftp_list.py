@@ -108,7 +108,7 @@ class FTPList(object):
                                     'dirs' in content_types and ftp.path.isdir(content)) or (
                                     'symlinks' in content_types and ftp.path.islink(content)):
                         log.debug('type match successful for object %s, trying to create entry', content)
-                        content_list.append(ftp.path.join('./', path, content))
+                        content_list.append(content)
         return content_list
 
     def on_task_input(self, task, config):
