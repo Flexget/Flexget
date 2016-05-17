@@ -5,12 +5,12 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=Marvels%20Jessica%20Jones
   response:
     body: {string: !!python/unicode '{"id":1370,"url":"http://www.tvmaze.com/shows/1370/marvels-jessica-jones","name":"Marvel''s
-        Jessica Jones","type":"Scripted","language":"English","genres":["Action","Crime","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2015-11-20","schedule":{"time":"","days":["Friday"]},"rating":{"average":7.9},"weight":5,"network":null,"webChannel":{"id":1,"name":"Netflix","country":{"name":"United
+        Jessica Jones","type":"Scripted","language":"English","genres":["Action","Crime","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2015-11-20","schedule":{"time":"","days":["Friday"]},"rating":{"average":8.1},"weight":2,"network":null,"webChannel":{"id":1,"name":"Netflix","country":{"name":"United
         States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":38797,"thetvdb":284190,"imdb":"tt2357547"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/31/77884.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/77884.jpg"},"summary":"<p>Haunted
         by a traumatic past, Jessica Jones uses her gifts as a private eye to find
         her tormentor before he can harm anyone else in Hell''s Kitchen.</p>","updated":1457735325,"_links":{"self":{"href":"http://api.tvmaze.com/shows/1370"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/206167"}}}'}
@@ -19,9 +19,9 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:19 GMT']
+      date: ['Tue, 17 May 2016 08:58:19 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -29,7 +29,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/1370/episodebynumber?season=1&number=2
   response:
@@ -44,9 +44,9 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:19 GMT']
+      date: ['Tue, 17 May 2016 08:58:19 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -54,7 +54,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/1370/episodebynumber?season=1&number=3
   response:
@@ -68,9 +68,9 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:19 GMT']
+      date: ['Tue, 17 May 2016 08:58:20 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -78,29 +78,29 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Big%20Bang%20Theory
   response:
     body: {string: !!python/unicode '{"id":66,"url":"http://www.tvmaze.com/shows/66/the-big-bang-theory","name":"The
-        Big Bang Theory","type":"Scripted","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2007-09-24","schedule":{"time":"20:00","days":["Thursday"]},"rating":{"average":8.4},"weight":20,"network":{"id":2,"name":"CBS","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":8511,"thetvdb":80379,"imdb":"tt0898266"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/55/139111.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/55/139111.jpg"},"summary":"<p><strong><em>\"The
-        Big Bang Theory\"</em></strong> is a comedy about brilliant physicists, Leonard
+        Big Bang Theory","type":"Scripted","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2007-09-24","schedule":{"time":"20:00","days":["Thursday"]},"rating":{"average":8.4},"weight":27,"network":{"id":2,"name":"CBS","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":8511,"thetvdb":80379,"imdb":"tt0898266"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/58/145637.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/58/145637.jpg"},"summary":"<p><em><strong>\"The
+        Big Bang Theory\"</strong> </em>is a comedy about brilliant physicists, Leonard
         and Sheldon, who are the kind of \"beautiful minds\" that understand how the
         universe works. But none of that genius helps them interact with people, especially
         women. All this begins to change when a free-spirited beauty named Penny moves
         in next door. Sheldon, Leonard''s roommate, is quite content spending his
         nights playing Klingon Boggle with their socially dysfunctional friends, fellow
         Cal Tech scientists Wolowitz and Koothrappali. However, Leonard sees in Penny
-        a whole new universe of possibilities... including love.</p>","updated":1462235634,"_links":{"self":{"href":"http://api.tvmaze.com/shows/66"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/663423"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/663424"}}}'}
+        a whole new universe of possibilities... including love.</p>","updated":1463414832,"_links":{"self":{"href":"http://api.tvmaze.com/shows/66"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/663425"}}}'}
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:20 GMT']
+      date: ['Tue, 17 May 2016 08:58:20 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -108,7 +108,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/66/episodebynumber?season=9&number=9
   response:
@@ -123,9 +123,9 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:20 GMT']
+      date: ['Tue, 17 May 2016 08:58:20 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -133,12 +133,12 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Flash
   response:
     body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
-        Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":22,"network":{"id":5,"name":"The
+        Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":38,"network":{"id":5,"name":"The
         CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/49/124187.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/49/124187.jpg"},"summary":"<p>After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
         is struck by lightning and falls into a coma. Months later he awakens with
@@ -149,15 +149,15 @@ interactions:
         using their new powers for good. Barry partners with S.T.A.R. Labs and dedicates
         his life to protect the innocent. For now, only a few close friends and associates
         know that Barry is literally the fastest man alive, but it won''t be long
-        before the world learns what Barry Allen has become...The Flash.</p>","updated":1462013745,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/670723"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/647394"}}}'}
+        before the world learns what Barry Allen has become...The Flash.</p>","updated":1463464373,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647395"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/647396"}}}'}
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:20 GMT']
+      date: ['Tue, 17 May 2016 08:58:21 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -165,7 +165,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=4
   response:
@@ -181,9 +181,9 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:20 GMT']
+      date: ['Tue, 17 May 2016 08:58:21 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -191,12 +191,12 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Walking%20Dead
   response:
     body: {string: "{\"id\":73,\"url\":\"http://www.tvmaze.com/shows/73/the-walking-dead\",\"name\":\"The
-        Walking Dead\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Drama\",\"Action\",\"Horror\",\"Thriller\"],\"status\":\"Running\",\"runtime\":60,\"premiered\":\"2010-10-31\",\"schedule\":{\"time\":\"21:00\",\"days\":[\"Sunday\"]},\"rating\":{\"average\":8.7},\"weight\":20,\"network\":{\"id\":20,\"name\":\"AMC\",\"country\":{\"name\":\"United
+        Walking Dead\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Drama\",\"Action\",\"Horror\",\"Thriller\"],\"status\":\"Running\",\"runtime\":60,\"premiered\":\"2010-10-31\",\"schedule\":{\"time\":\"21:00\",\"days\":[\"Sunday\"]},\"rating\":{\"average\":8.7},\"weight\":6,\"network\":{\"id\":20,\"name\":\"AMC\",\"country\":{\"name\":\"United
         States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":25056,\"thetvdb\":153021,\"imdb\":\"tt1520211\"},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/509.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/509.jpg\"},\"summary\":\"<p><em>The
         Walking Dead</em> is an American horror drama television series developed
         by Frank Darabont, based on the comic book series of the same name by Robert
@@ -220,9 +220,9 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:21 GMT']
+      date: ['Tue, 17 May 2016 08:58:21 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -230,7 +230,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/73/episodebynumber?season=6&number=8
   response:
@@ -243,8 +243,8 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:21 GMT']
+      date: ['Tue, 17 May 2016 08:58:22 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 version: 1
