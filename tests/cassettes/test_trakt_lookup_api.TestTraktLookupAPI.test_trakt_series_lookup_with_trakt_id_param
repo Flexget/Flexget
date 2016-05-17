@@ -1,0 +1,38 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/75481?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The Flash","year":1967,"ids":{"trakt":75481,"slug":"the-flash-1967","tvdb":272094,"imdb":null,"tmdb":null,"tvrage":null},"overview":"The
+        Flash is- of course!- the fastest man alive. Barry Allen, otherwise known
+        as the Flash, and his sidekick Wally West, otherwise known as Kid Flash, battle
+        evil villains and aliens who try to cause mayhem on Earth. They can outrun
+        a bullet, vibrate through solid walls, and do all sorts of other things with
+        their incredible speed. When there is trouble, Barry and Wally open up their
+        rings which shoot out their costumes.","first_aired":"1967-11-11T00:00:00.000Z","airs":{"day":"Saturday","time":null,"timezone":"Europe/London"},"runtime":7,"certification":null,"network":"CBS","country":null,"trailer":null,"homepage":null,"status":"ended","rating":5.0,"votes":1,"updated_at":"2016-01-27T10:30:38.000Z","language":null,"available_translations":[],"genres":["animation"],"aired_episodes":3,"images":{"fanart":{"full":null,"medium":null,"thumb":null},"poster":{"full":"https://walter.trakt.us/images/shows/000/075/481/posters/original/0782d34337.jpg","medium":"https://walter.trakt.us/images/shows/000/075/481/posters/medium/0782d34337.jpg","thumb":"https://walter.trakt.us/images/shows/000/075/481/posters/thumb/0782d34337.jpg"},"logo":{"full":null},"clearart":{"full":null},"banner":{"full":null},"thumb":{"full":null}}}'}
+    headers:
+      cache-control: ['public, max-age=14400']
+      cf-cache-status: [MISS]
+      cf-ray: [2a4687271352234e-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Tue, 17 May 2016 10:53:51 GMT']
+      etag: [W/"919ca9e3eb128e06e8b02f75f3a159d3"]
+      expires: ['Tue, 17 May 2016 14:53:51 GMT']
+      last-modified: ['Wed, 27 Jan 2016 10:30:38 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d3be6605734ccd25008c60571a7fcc04e1463482430; expires=Wed,
+          17-May-17 10:53:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [2a3564c0-0460-440d-8b0f-4b8356ea78a6]
+      x-runtime: ['0.136998']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1
