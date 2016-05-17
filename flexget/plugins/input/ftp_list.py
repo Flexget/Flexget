@@ -78,7 +78,7 @@ class FTPList(object):
     def get_content(self, path, recursion, recursion_depth, content_types):
         content_list = []
         with self.FTP as ftp:
-            if not ftp.path.isdir(dir):
+            if not ftp.path.isdir(path):
                 log.warning('Directory %s is not a valid dir, skipping', path)
                 return []
             if recursion:
@@ -99,6 +99,7 @@ class FTPList(object):
                             content = ftp.path.join(base, _dir)
                             if ftp.path.isdir(content) and 'dirs' in content_types or ftp.path.islink(
                                     path) and 'symlinks' in content_types:
+                                log.debug('type match successful for dir %s, trying to create entry', _dir)
                                 content_list.append(content)
             else:
                 for _object in ftp.listdir(path):
@@ -106,6 +107,7 @@ class FTPList(object):
                     if ('files' in content_types and ftp.path.isfile(content)) or (
                                     'dirs' in content_types and ftp.path.isdir(content)) or (
                                     'symlinks' in content_types and ftp.path.islink(content)):
+                        log.debug('type match successful for object %s, trying to create entry', content)
                         content_list.append(ftp.path.join('./', path, content))
         return content_list
 
