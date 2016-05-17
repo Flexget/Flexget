@@ -34,7 +34,7 @@
       })
 
 
-      $http.get('/api/trakt/movie/' + vm.movie.title + '/', {
+      $http.get('/api/trakt/movies/' + vm.movie.title + '/', {
         params: params,
         cache: true
       })

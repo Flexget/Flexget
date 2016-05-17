@@ -127,7 +127,7 @@ class TraktSeriesSearchApi(APIResource):
         return jsonify(result)
 
 
-@trakt_api.route('/movie/<string:title>/')
+@trakt_api.route('/movies/<string:title>/')
 @api.doc(params={'title': 'Movie name'})
 class TraktMovieSearchApi(APIResource):
     @api.response(200, 'Successfully found show', movie_return_schema)
