@@ -232,12 +232,12 @@ class TestTVMazeShowLookup(object):
             # Manually change a value of the series to differ from actual value
             assert session.query(
                 TVMazeSeries).first().name == 'Shameless', 'should have added Shameless and not Shameless (2011)'
-            session.query(TVMazeSeries).update({'weight': 99})
+            session.query(TVMazeSeries).update({'runtime': 100})
             session.commit()
 
             # Verify value has changed successfully and series expiration status is still False
             assert not session.query(TVMazeSeries).first().expired, 'expired status should be False'
-            assert session.query(TVMazeSeries).first().weight == 99, 'should be updated to 99'
+            assert session.query(TVMazeSeries).first().runtime == 100, 'should be updated to 99'
 
             # Set series last_update time to 8 days ago, to trigger a show refresh upon request.
             last_week = datetime.now() - timedelta(days=8)  # Assuming max days between refreshes is 7
@@ -252,8 +252,8 @@ class TestTVMazeShowLookup(object):
 
             # Verify series data has been refreshed with actual values upon 2nd call, and series expiration flag
             # is set to False
-            assert series.weight == 3, \
-                'weight should have been updated back to 15 from 99, instead its %s' % series.weight
+            assert series.runtime == 60, \
+                'runtime should have been updated back to 60 from 100, instead its %s' % series.runtime
             assert not session.query(TVMazeSeries).first().expired, 'expired status should be False'
 
     def test_test_show_is_number(self, execute_task):
