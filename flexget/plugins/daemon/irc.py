@@ -10,8 +10,10 @@ from random import choice
 from xml.etree.ElementTree import fromstring
 import urllib
 from uuid import uuid4
+import time
 
 from irc.bot import SingleServerIRCBot
+from irc.client import ServerConnectionError
 
 from flexget.entry import Entry
 from flexget.config_schema import register_config_key, format_checker
@@ -74,7 +76,7 @@ schema = {
 }
 
 # Global that holds all the IRCConnection instances
-irc = []
+irc_connections = []
 
 
 def irc_prefix(var):
@@ -194,6 +196,7 @@ class IRCConnection(SingleServerIRCBot):
         super(IRCConnection, self).__init__([(server, port)], nickname, nickname)
         self.connection.add_global_handler('nicknameinuse', self.on_nicknameinuse)
         self.running = True
+        self.connection_attempts = 0
         self.execute_before_shutdown = False
         self.entry_queue = []
         self.line_cache = {}
@@ -206,10 +209,33 @@ class IRCConnection(SingleServerIRCBot):
         """
         self._connect()
         while self.running:
+            if not self.connection.connected and self.connection_attempts < 5:
+                time.sleep(self.connection_attempts * 2)
+                self._connect()
+            elif not self.connection.connected:
+                server = self.server_list[0]
+                log.error('Failed to connect to %s:%s after %s attempts. Stopping thread.', server.host, server.port,
+                          self.connection_attempts)
+                self.running = False
             self.reactor.process_once(timeout)
+            raise Exception()
+
         if self.execute_before_shutdown and self.entry_queue:
             self.run_tasks()
         self.disconnect()
+
+    def _connect(self):
+        """
+        Establish a connection to the server at the front of the server_list.
+        """
+        server = self.server_list[0]
+        try:
+            self.connection_attempts += 1
+            self.connect(server.host, server.port, self._nickname,
+                server.password, ircname=self._realname)
+        except ServerConnectionError as e:
+            log.error('Connection to %s on port %s failed: %s. Please recheck your config.', server.host,
+                      server.port, e)
 
     def run_tasks(self):
         """
@@ -502,7 +528,7 @@ def irc_start(manager):
 
 @event('manager.config_updated')
 def irc_update_config(manager):
-    global irc
+    global irc_connections
 
     # Exit if we're not running daemon mode
     if not manager.is_daemon:
@@ -522,7 +548,7 @@ def irc_update_config(manager):
         log.info('Starting IRC connection for %s', key)
         conn = IRCConnection(connection, key)
         thread = threading.Thread(target=conn.start_interruptable, name=key)
-        irc.append((conn, thread))
+        irc_connections.append((conn, thread))
         thread.setDaemon(True)  # set threads to daemon so they die with FlexGet when using Ctrl-C
         thread.start()
 
@@ -534,15 +560,15 @@ def shutdown_requested(manager):
 
 @event('manager.shutdown')
 def stop_irc(manager, wait=False):
-    global irc
+    global irc_connections
 
-    for conn, thread in irc:
+    for conn, thread in irc_connections:
         if conn.connection.is_connected():
             if wait:
                 conn.execute_before_shutdown = True
             conn.running = False
             thread.join()
-    irc = []
+    irc_connections = []
 
 
 @event('config.register')
