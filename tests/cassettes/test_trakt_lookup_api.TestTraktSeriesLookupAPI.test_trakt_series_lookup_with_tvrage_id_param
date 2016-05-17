@@ -23,15 +23,15 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a46b74e85af0f93-FRA]
+      cf-ray: [2a4743ee28f9064a-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 11:26:42 GMT']
+      date: ['Tue, 17 May 2016 13:02:42 GMT']
       etag: [W/"7f4c6de384499cc015649573ed1d20f8"]
-      expires: ['Tue, 17 May 2016 15:26:42 GMT']
+      expires: ['Tue, 17 May 2016 17:02:42 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=dd72beff24047ecac12dd54cf826ce5ed1463484402; expires=Wed,
-          17-May-17 11:26:42 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d947b956cd081b15d1bfe46c88cb963ab1463490162; expires=Wed,
+          17-May-17 13:02:42 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
@@ -47,7 +47,7 @@ interactions:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=dd72beff24047ecac12dd54cf826ce5ed1463484402]
+      Cookie: [__cfduid=d947b956cd081b15d1bfe46c88cb963ab1463490162]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
@@ -63,25 +63,25 @@ interactions:
         is using their new powers for good. Barry partners with S.T.A.R. Labs and
         dedicates his life to protect the innocent. For now, only a few close friends
         and associates know that Barry is literally the fastest man alive, but it
-        won't be long before the world learns what Barry Allen has become... The Flash.\",\"first_aired\":\"2014-10-08T00:00:00.000Z\",\"airs\":{\"day\":\"Tuesday\",\"time\":\"20:00\",\"timezone\":\"America/New_York\"},\"runtime\":44,\"certification\":\"TV-14\",\"network\":\"The
+        won't be long before the world learns what Barry Allen has become... The Flash.\",\"first_aired\":\"2014-10-07T07:00:00.000Z\",\"airs\":{\"day\":\"Tuesday\",\"time\":\"20:00\",\"timezone\":\"America/New_York\"},\"runtime\":45,\"certification\":\"TV-14\",\"network\":\"The
         CW\",\"country\":\"us\",\"trailer\":\"http://youtube.com/watch?v=aZxhA_Jihmw\",\"homepage\":\"http://www.cwtv.com/shows/the-flash/\",\"status\":\"returning
-        series\",\"rating\":8.33229,\"votes\":9868,\"updated_at\":\"2016-05-16T10:41:52.000Z\",\"language\":\"en\",\"available_translations\":[\"pl\",\"sv\",\"fr\",\"en\",\"zh\",\"da\",\"pt\",\"el\",\"de\",\"es\",\"bg\",\"it\",\"tr\",\"ru\",\"nl\",\"hu\",\"ko\",\"lt\",\"cs\",\"hr\",\"bs\",\"za\",\"he\",\"id\",\"ro\",\"fa\",\"th\",\"ar\",\"te\",\"uk\",\"ms\",\"sk\",\"ml\",\"vi\",\"lb\",\"lb\"],\"genres\":[\"drama\",\"fantasy\",\"science-fiction\"],\"aired_episodes\":44,\"images\":{\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/original/df36c9a731.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"},\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/posters/original/79bd96a4d3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/posters/thumb/79bd96a4d3.jpg\"},\"logo\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/logos/original/ab151d1043.png\"},\"clearart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/cleararts/original/660e6efe67.png\"},\"banner\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/banners/original/b2c305a2dc.jpg\"},\"thumb\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/thumbs/original/eab955a39c.jpg\"}}}"}
+        series\",\"rating\":8.33222,\"votes\":9882,\"updated_at\":\"2016-05-17T10:58:37.000Z\",\"language\":\"en\",\"available_translations\":[\"pl\",\"sv\",\"fr\",\"en\",\"zh\",\"da\",\"pt\",\"el\",\"de\",\"es\",\"bg\",\"it\",\"tr\",\"ru\",\"nl\",\"hu\",\"ko\",\"lt\",\"cs\",\"hr\",\"bs\",\"za\",\"he\",\"id\",\"ro\",\"fa\",\"th\",\"ar\",\"te\",\"uk\",\"ms\",\"sk\",\"ml\",\"vi\",\"lb\",\"lb\"],\"genres\":[\"drama\",\"fantasy\",\"science-fiction\",\"action\",\"adventure\"],\"aired_episodes\":44,\"images\":{\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/original/df36c9a731.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"},\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/posters/original/79bd96a4d3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/posters/thumb/79bd96a4d3.jpg\"},\"logo\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/logos/original/ab151d1043.png\"},\"clearart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/cleararts/original/660e6efe67.png\"},\"banner\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/banners/original/b2c305a2dc.jpg\"},\"thumb\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/thumbs/original/eab955a39c.jpg\"}}}"}
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a46b74f85b30f93-FRA]
+      cf-ray: [2a4743ef28fe064a-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 11:26:43 GMT']
-      etag: [W/"901473f90c1a3bb035458f277f8081c7"]
-      expires: ['Tue, 17 May 2016 15:26:43 GMT']
-      last-modified: ['Mon, 16 May 2016 10:41:52 GMT']
+      date: ['Tue, 17 May 2016 13:02:43 GMT']
+      etag: [W/"7f6b873397348fe85dd6ea7cbe0464e6"]
+      expires: ['Tue, 17 May 2016 17:02:43 GMT']
+      last-modified: ['Tue, 17 May 2016 10:58:37 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
-      x-request-id: [a491c6e9-5116-4629-bc77-4d091b1d1c96]
-      x-runtime: ['0.029698']
+      x-request-id: [9b2031e5-5272-4992-b645-7dda39c10778]
+      x-runtime: ['0.041300']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 version: 1

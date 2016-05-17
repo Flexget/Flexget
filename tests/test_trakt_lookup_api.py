@@ -8,7 +8,7 @@ from flexget.utils import json
 
 
 @pytest.mark.online
-class TestTraktLookupAPI(object):
+class TestTraktSeriesLookupAPI(object):
     config = 'tasks: {}'
 
     @staticmethod
@@ -26,7 +26,7 @@ class TestTraktLookupAPI(object):
         data.pop('number_of_aired_episodes')
         return data
 
-    def test_trakt_series_lookup(self, api_client):
+    def test_trakt_series_lookup_no_params(self, api_client):
         # Bad API call
         rsp = api_client.get('/trakt/series/')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
@@ -210,11 +210,12 @@ class TestTraktLookupAPI(object):
             "air_time": "20:00",
             "certification": "TV-14",
             "country": "us",
-            "first_aired": "Wed, 08 Oct 2014 00:00:00 GMT",
+            "first_aired": "Wed, 07 Oct 2014 07:00:00 GMT",
             "genres": [
                 "drama",
                 "fantasy",
-                "science fiction"
+                "science fiction",
+                "adventure"
             ],
             "homepage": "http://www.cwtv.com/shows/the-flash/",
             "id": 60300,
@@ -268,11 +269,12 @@ class TestTraktLookupAPI(object):
             "air_time": "20:00",
             "certification": "TV-14",
             "country": "us",
-            "first_aired": "Wed, 08 Oct 2014 00:00:00 GMT",
+            "first_aired": "Wed, 07 Oct 2014 07:00:00 GMT",
             "genres": [
                 "drama",
                 "fantasy",
-                "science fiction"
+                "science fiction",
+                "adventure"
             ],
             "homepage": "http://www.cwtv.com/shows/the-flash/",
             "id": 60300,
@@ -326,11 +328,12 @@ class TestTraktLookupAPI(object):
             "air_time": "20:00",
             "certification": "TV-14",
             "country": "us",
-            "first_aired": "Wed, 08 Oct 2014 00:00:00 GMT",
+            "first_aired": "Wed, 07 Oct 2014 07:00:00 GMT",
             "genres": [
                 "drama",
                 "fantasy",
-                "science fiction"
+                "science fiction",
+                "adventure"
             ],
             "homepage": "http://www.cwtv.com/shows/the-flash/",
             "id": 60300,
@@ -384,11 +387,12 @@ class TestTraktLookupAPI(object):
             "air_time": "20:00",
             "certification": "TV-14",
             "country": "us",
-            "first_aired": "Wed, 08 Oct 2014 00:00:00 GMT",
+            "first_aired": "Wed, 07 Oct 2014 07:00:00 GMT",
             "genres": [
                 "drama",
                 "fantasy",
-                "science fiction"
+                "science fiction",
+                "adventure"
             ],
             "homepage": "http://www.cwtv.com/shows/the-flash/",
             "id": 60300,

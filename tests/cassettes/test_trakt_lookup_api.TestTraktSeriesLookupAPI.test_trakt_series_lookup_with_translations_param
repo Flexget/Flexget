@@ -68,15 +68,15 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a47228b8fa126a8-FRA]
+      cf-ray: [2a47440dff9b272c-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 12:39:55 GMT']
+      date: ['Tue, 17 May 2016 13:02:48 GMT']
       etag: [W/"29fee946403e079b6b169145bb04f8ad"]
-      expires: ['Tue, 17 May 2016 16:39:55 GMT']
+      expires: ['Tue, 17 May 2016 17:02:48 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=de732047122a90dc03a8163aba2b95d0b1463488795; expires=Wed,
-          17-May-17 12:39:55 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=de88b83341230bd76fcba58b69a3c3fe81463490168; expires=Wed,
+          17-May-17 13:02:48 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
@@ -92,7 +92,7 @@ interactions:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=de732047122a90dc03a8163aba2b95d0b1463488795]
+      Cookie: [__cfduid=de88b83341230bd76fcba58b69a3c3fe81463490168]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
@@ -108,12 +108,12 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a47228cffbf26a8-FRA]
+      cf-ray: [2a47440f9fb6272c-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 12:39:55 GMT']
+      date: ['Tue, 17 May 2016 13:02:48 GMT']
       etag: [W/"c9ee819fd668e7d59fd3c7d97c4d0008"]
-      expires: ['Tue, 17 May 2016 16:39:55 GMT']
+      expires: ['Tue, 17 May 2016 17:02:48 GMT']
       last-modified: ['Mon, 16 May 2016 10:53:23 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]
@@ -532,15 +532,15 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a472290f7d226a8-FRA]
+      cf-ray: [2a474412f0f9272c-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 12:39:56 GMT']
+      date: ['Tue, 17 May 2016 13:02:48 GMT']
       etag: [W/"f95c3dd4a0f85cf0b719de4a5b58a29e"]
-      expires: ['Tue, 17 May 2016 16:39:56 GMT']
+      expires: ['Tue, 17 May 2016 17:02:48 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=db1838a609d157e36ed7ac71c0dfeab651463488796; expires=Wed,
-          17-May-17 12:39:56 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=de88b83341230bd76fcba58b69a3c3fe81463490168; expires=Wed,
+          17-May-17 13:02:48 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]

@@ -103,15 +103,15 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a46b71d8df5278c-FRA]
+      cf-ray: [2a4743b8ff3e2318-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 11:26:35 GMT']
+      date: ['Tue, 17 May 2016 13:02:34 GMT']
       etag: [W/"281733793929067bf4b0062bd10c015d"]
-      expires: ['Tue, 17 May 2016 15:26:35 GMT']
+      expires: ['Tue, 17 May 2016 17:02:34 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d8f783c6afa4174e0eaa6247c3d61fa1c1463484395; expires=Wed,
-          17-May-17 11:26:35 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d7e0fc8b8b2fee96c63ca5383d24a28231463490154; expires=Wed,
+          17-May-17 13:02:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
@@ -127,7 +127,7 @@ interactions:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=d8f783c6afa4174e0eaa6247c3d61fa1c1463484395]
+      Cookie: [__cfduid=d7e0fc8b8b2fee96c63ca5383d24a28231463490154]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
@@ -145,12 +145,12 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a46b71eee13278c-FRA]
+      cf-ray: [2a4743ba7f672318-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 11:26:35 GMT']
+      date: ['Tue, 17 May 2016 13:02:34 GMT']
       etag: [W/"b2b1e5e3091577cde21a55a1af53d4da"]
-      expires: ['Tue, 17 May 2016 15:26:35 GMT']
+      expires: ['Tue, 17 May 2016 17:02:34 GMT']
       last-modified: ['Sat, 14 May 2016 10:58:24 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]
