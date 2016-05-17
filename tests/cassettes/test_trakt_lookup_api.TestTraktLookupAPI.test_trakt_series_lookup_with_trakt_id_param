@@ -17,17 +17,17 @@ interactions:
         rings which shoot out their costumes.","first_aired":"1967-11-11T00:00:00.000Z","airs":{"day":"Saturday","time":null,"timezone":"Europe/London"},"runtime":7,"certification":null,"network":"CBS","country":null,"trailer":null,"homepage":null,"status":"ended","rating":5.0,"votes":1,"updated_at":"2016-01-27T10:30:38.000Z","language":null,"available_translations":[],"genres":["animation"],"aired_episodes":3,"images":{"fanart":{"full":null,"medium":null,"thumb":null},"poster":{"full":"https://walter.trakt.us/images/shows/000/075/481/posters/original/0782d34337.jpg","medium":"https://walter.trakt.us/images/shows/000/075/481/posters/medium/0782d34337.jpg","thumb":"https://walter.trakt.us/images/shows/000/075/481/posters/thumb/0782d34337.jpg"},"logo":{"full":null},"clearart":{"full":null},"banner":{"full":null},"thumb":{"full":null}}}'}
     headers:
       cache-control: ['public, max-age=14400']
-      cf-cache-status: [MISS]
-      cf-ray: [2a4687271352234e-FRA]
+      cf-cache-status: [HIT]
+      cf-ray: [2a46b75736ba0f93-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 10:53:51 GMT']
+      date: ['Tue, 17 May 2016 11:26:44 GMT']
       etag: [W/"919ca9e3eb128e06e8b02f75f3a159d3"]
-      expires: ['Tue, 17 May 2016 14:53:51 GMT']
+      expires: ['Tue, 17 May 2016 15:26:44 GMT']
       last-modified: ['Wed, 27 Jan 2016 10:30:38 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d3be6605734ccd25008c60571a7fcc04e1463482430; expires=Wed,
-          17-May-17 10:53:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d9e969445e2dec44e79dbf408b8b8d1181463484404; expires=Wed,
+          17-May-17 11:26:44 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]

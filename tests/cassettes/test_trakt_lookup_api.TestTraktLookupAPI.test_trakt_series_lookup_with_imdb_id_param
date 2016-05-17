@@ -23,15 +23,15 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a4652ce137e0f5d-FRA]
+      cf-ray: [2a46b73df2760f93-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 10:18:06 GMT']
-      etag: [W/"7f9c2a3c1afd4c6416fe4b6ce9a36950"]
-      expires: ['Tue, 17 May 2016 14:18:06 GMT']
+      date: ['Tue, 17 May 2016 11:26:40 GMT']
+      etag: [W/"cac1a38f89e78d630408277510af5501"]
+      expires: ['Tue, 17 May 2016 15:26:40 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d0d99f3cad2df12c431dacd8c5546f1da1463480286; expires=Wed,
-          17-May-17 10:18:06 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d875f9e8b685272476fca2d071b241a291463484400; expires=Wed,
+          17-May-17 11:26:40 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
@@ -39,15 +39,15 @@ interactions:
       x-pagination-limit: ['10']
       x-pagination-page: ['1']
       x-pagination-page-count: ['1']
-      x-request-id: [3a8f07ba-0ee2-4b29-a599-e1230844411c]
-      x-runtime: ['0.014511']
+      x-request-id: [dd6a3416-1713-43a7-956d-d9b8ad0255a9]
+      x-runtime: ['0.018815']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=d0d99f3cad2df12c431dacd8c5546f1da1463480286]
+      Cookie: [__cfduid=d875f9e8b685272476fca2d071b241a291463484400]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
@@ -69,12 +69,12 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a4652cf03910f5d-FRA]
+      cf-ray: [2a46b73ee28e0f93-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 10:18:06 GMT']
+      date: ['Tue, 17 May 2016 11:26:40 GMT']
       etag: [W/"901473f90c1a3bb035458f277f8081c7"]
-      expires: ['Tue, 17 May 2016 14:18:06 GMT']
+      expires: ['Tue, 17 May 2016 15:26:40 GMT']
       last-modified: ['Mon, 16 May 2016 10:41:52 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]

@@ -22,16 +22,16 @@ interactions:
         series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/posters/original/79bd96a4d3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/posters/thumb/79bd96a4d3.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/original/df36c9a731.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"}},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}}]"}
     headers:
       cache-control: ['public, max-age=14400']
-      cf-cache-status: [EXPIRED]
-      cf-ray: [2a4652de77f7275c-FRA]
+      cf-cache-status: [HIT]
+      cf-ray: [2a46b74e85af0f93-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 10:18:09 GMT']
+      date: ['Tue, 17 May 2016 11:26:42 GMT']
       etag: [W/"7f4c6de384499cc015649573ed1d20f8"]
-      expires: ['Tue, 17 May 2016 14:18:09 GMT']
+      expires: ['Tue, 17 May 2016 15:26:42 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d99fc9244b74705e6dfd906d4754d7e491463480289; expires=Wed,
-          17-May-17 10:18:09 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=dd72beff24047ecac12dd54cf826ce5ed1463484402; expires=Wed,
+          17-May-17 11:26:42 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
@@ -47,7 +47,7 @@ interactions:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=d99fc9244b74705e6dfd906d4754d7e491463480289]
+      Cookie: [__cfduid=dd72beff24047ecac12dd54cf826ce5ed1463484402]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
@@ -69,12 +69,12 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a4652e3381f275c-FRA]
+      cf-ray: [2a46b74f85b30f93-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 10:18:09 GMT']
+      date: ['Tue, 17 May 2016 11:26:43 GMT']
       etag: [W/"901473f90c1a3bb035458f277f8081c7"]
-      expires: ['Tue, 17 May 2016 14:18:09 GMT']
+      expires: ['Tue, 17 May 2016 15:26:43 GMT']
       last-modified: ['Mon, 16 May 2016 10:41:52 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]

@@ -18,16 +18,16 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2a46629bb2d12348-FRA]
+      cf-ray: [2a46b72e87832732-FRA]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Tue, 17 May 2016 10:28:53 GMT']
+      date: ['Tue, 17 May 2016 11:26:37 GMT']
       etag: [W/"919ca9e3eb128e06e8b02f75f3a159d3"]
-      expires: ['Tue, 17 May 2016 14:28:53 GMT']
+      expires: ['Tue, 17 May 2016 15:26:37 GMT']
       last-modified: ['Wed, 27 Jan 2016 10:30:38 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d307a7ef51bc03bf634a21c8254b88a851463480933; expires=Wed,
-          17-May-17 10:28:53 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d8eac1e44074a180216861d2b9c4646a51463484397; expires=Wed,
+          17-May-17 11:26:37 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
