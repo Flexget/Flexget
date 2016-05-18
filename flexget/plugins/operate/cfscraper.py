@@ -3,7 +3,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
  
-from flexget import plugin, validator
+from flexget import plugin
 from flexget.event import event
 from flexget.utils.requests import Session
  
@@ -18,8 +18,7 @@ class CFScraper(object):
       cfscraper: yes
     """
  
-    def validator(self):
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
  
     @plugin.priority(253)
     def on_task_start(self, task, config):
