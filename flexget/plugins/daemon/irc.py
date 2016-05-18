@@ -12,13 +12,18 @@ import urllib
 from uuid import uuid4
 import time
 
-from irc.bot import SingleServerIRCBot
-from irc.client import ServerConnectionError
+try:
+    from irc.bot import SingleServerIRCBot
+    from irc.client import ServerConnectionError
+    irc_exists = True
+except ImportError as e:
+    irc_exists = False
+    irc_exception = e  # passed to the raised exception in case it's not a simple case of "irc module not found"
 
 from flexget.entry import Entry
 from flexget.config_schema import register_config_key
 from flexget.event import event
-from flexget.plugin import PluginError
+from flexget.plugin import PluginError, DependencyError
 from flexget.manager import manager
 
 log = logging.getLogger('irc')
@@ -112,6 +117,10 @@ def strip_whitespace(value):
     return value
 
 
+class TrackerFileParseError(Exception):
+    """Exception thrown when parsing the tracker file fails"""
+
+
 class IRCConnection(SingleServerIRCBot):
 
     def __init__(self, config, config_name):
@@ -126,16 +135,17 @@ class IRCConnection(SingleServerIRCBot):
 
         # If we have a tracker config file, load it
         tracker_config_file = config.get('tracker_file')
-        if tracker_config_file is not None:
+        if tracker_config_file:
             tracker_config_file = os.path.abspath(os.path.expanduser(tracker_config_file))
             if not os.path.exists(tracker_config_file):
-                log.error('Unable to open tracker config file %s, ignoring', tracker_config_file)
+                raise TrackerFileParseError('Unable to open tracker config file %s', tracker_config_file)
             else:
                 with open(tracker_config_file, 'r') as f:
                     try:
                         tracker_config = fromstring(f.read())
                     except Exception as e:
-                        log.error('Unable to parse tracker config file %s: %s', tracker_config_file, e)
+                        raise TrackerFileParseError('Unable to parse tracker config file %s: %s',
+                                                    tracker_config_file, e)
                     else:
                         self.tracker_config = tracker_config
 
@@ -571,6 +581,9 @@ def irc_update_config(manager):
     # Exit if we're not running daemon mode
     if not manager.is_daemon:
         return
+
+    if not irc_exists:
+        raise DependencyError('irc', 'irc', 'irc module required: %s' % irc_exception)
 
     config = manager.config.get('irc')
 
