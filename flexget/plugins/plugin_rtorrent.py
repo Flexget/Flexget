@@ -105,7 +105,7 @@ class SCGIServerProxy(object):
                  verbose=False, allow_none=False, use_datetime=False):
         parsed_url = urlparse(uri)
         self.__host = uri if parsed_url.scheme else None
-        self.__handler = urlparse(uri).path
+        self.__handler = parsed_url.path
         if not self.__handler:
             self.__handler = '/'
 
