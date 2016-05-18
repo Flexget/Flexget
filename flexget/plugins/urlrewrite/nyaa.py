@@ -25,15 +25,19 @@ FILTERS = ['all', 'filter remakes', 'trusted only', 'a+ only']
 class UrlRewriteNyaa(object):
     """Nyaa urlrewriter and search plugin."""
 
-    def validator(self):
-        from flexget import validator
-
-        root = validator.factory()
-        root.accept('choice').accept_choices(CATEGORIES)
-        advanced = root.accept('dict')
-        advanced.accept('choice', key='category').accept_choices(CATEGORIES)
-        advanced.accept('choice', key='filter').accept_choices(FILTERS)
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'string', 'enum': list(CATEGORIES)},
+            {
+                'type': 'object',
+                'properties': {
+                    'category': {'type': 'string', 'enum': list(CATEGORIES)},
+                    'filter': {'type': 'string', 'enum': list(FILTERS)}
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def search(self, task, entry, config):
         if not isinstance(config, dict):
