@@ -311,7 +311,7 @@ class T411RestClient(object):
             url_params['offset'] = query['page_index']
         if query.get('terms') is not None:
             for (term_type_id, term_id) in query['terms']:
-                term_type_key_param = 'term[' + str(term_type_id) + '][]'
+                term_type_key_param = 'term[%s][]' % term_type_id
 
                 if url_params.get(term_type_key_param) is None:
                     url_params[term_type_key_param] = []
