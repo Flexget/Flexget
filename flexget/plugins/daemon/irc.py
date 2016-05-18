@@ -19,6 +19,8 @@ try:
 except ImportError as e:
     irc_exists = False
     irc_exception = e  # passed to the raised exception in case it's not a simple case of "irc module not found"
+    SingleServerIRCBot = object
+    ServerConnectionError = object
 
 from flexget.entry import Entry
 from flexget.config_schema import register_config_key
@@ -582,10 +584,10 @@ def irc_update_config(manager):
     if not manager.is_daemon:
         return
 
-    if not irc_exists:
-        raise DependencyError('irc', 'irc', 'irc module required: %s' % irc_exception)
-
     config = manager.config.get('irc')
+
+    if not irc_exists and config:
+        raise DependencyError('irc', 'irc', 'irc module required: %s' % irc_exception)
 
     # Config for IRC has been removed, shutdown all instances
     stop_irc(manager)
