@@ -222,6 +222,18 @@ class IRCConnection(SingleServerIRCBot):
     def is_alive(self):
         return self.thread and self.thread.is_alive()
 
+    def check_connection_and_reconnect(self):
+        if not self.is_connected() and self.connection_attempts < 5:
+            time.sleep(self.connection_attempts * 2)
+            self._connect()
+        elif not self.is_connected():
+            server = self.server_list[0]
+            log.error('Failed to connect to %s:%s after %s attempts. Stopping thread.', server.host, server.port,
+                      self.connection_attempts)
+            self.shutdown_event.set()
+        elif self.connection_attempts > 0:
+            self.connection_attempts = 0
+
     def start_interruptable(self, timeout=0.2):
         """
         Start the IRC bot
@@ -230,14 +242,7 @@ class IRCConnection(SingleServerIRCBot):
         """
         self._connect()
         while not self.shutdown_event.is_set():
-            if not self.connection.is_connected() and self.connection_attempts < 5:
-                time.sleep(self.connection_attempts * 2)
-                self._connect()
-            elif not self.connection.is_connected():
-                server = self.server_list[0]
-                log.error('Failed to connect to %s:%s after %s attempts. Stopping thread.', server.host, server.port,
-                          self.connection_attempts)
-                self.shutdown_event.set()
+            self.check_connection_and_reconnect()
             self.reactor.process_once(timeout)
         if self.inject_before_shutdown and self.entry_queue:
             self.run_tasks()
