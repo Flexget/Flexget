@@ -4,16 +4,16 @@
 
 ### Steps to reproduce:
 
-#### Link to Config:
-#### Link to debug logs:
+- Link to Config:
+- Link to debug logs:
 
 ### Additional information:
 
-#### Flexget Version:
-#### Python Version:
-#### Installation method:
-#### OS and version:
-#### Link to crash log:
+- Flexget Version:
+- Python Version:
+- Installation method:
+- OS and version:
+- Link to crash log:
 
 Please verify that the following checkboxes are checked and data is present before submitting your issue:
 
