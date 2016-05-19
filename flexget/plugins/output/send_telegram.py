@@ -507,59 +507,6 @@ class SendTelegram(object):
         session.commit()
 
 
-def _return_plugin_config(manager):
-    plugin_config = None
-    for task in manager.tasks:
-        if task and _get_config(manager, task):
-            plugin_config = _get_config(manager, task)
-    for template in manager.config.get('templates'):
-        if _get_template(manager, template):
-            plugin_config = _get_template(manager, template)
-    return plugin_config
-
-
-def _get_config(manager, task):
-    return manager.config['tasks'][task].get(_PLUGIN_NAME)
-
-
-def _get_template(manager, template):
-    return manager.config['templates'][template].get(_PLUGIN_NAME)
-
-
-@with_session()
-def do_cli(manager, args, session=None):
-    """
-    :type manager: flexget.Manager
-
-    """
-    config = _return_plugin_config(manager)
-    if not config:
-        console('could not find %s settings in tasks or templates' % _PLUGIN_NAME)
-        return
-    plugin_info = plugin.get_plugin_by_name(_PLUGIN_NAME)
-    send_telegram = plugin_info.instance
-    """:type: SendTelegram"""
-
-    if args.action == 'bootstrap':
-        res = send_telegram.bootstrap(session, config)
-    elif args.action == 'test-msg':
-        res = send_telegram.test_msg(session, config)
-    else:
-        raise RuntimeError('unknown action')
-
-    sys.exit(int(not res))
-
-
 @event('plugin.register')
 def register_plugin():
     plugin.register(SendTelegram, _PLUGIN_NAME, api_ver=2)
-
-
-@event('options.register')
-def register_parser_arguments():
-    parser = options.register_command(_PLUGIN_NAME, do_cli, help='{0} cli'.format(_PLUGIN_NAME))
-    """:type: options.CoreArgumentParser"""
-    subp = parser.add_subparsers(dest='action')
-    bsp = subp.add_parser('bootstrap', help='bootstrap the plugin according to config')
-    bsp.add_argument('--tasks', )
-    subp.add_parser('test-msg', help='send test message to all configured recipients')
