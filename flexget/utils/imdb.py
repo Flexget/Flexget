@@ -62,7 +62,7 @@ class ImdbSearch(object):
         self.min_diff = 0.01
         self.debug = False
 
-        self.max_results = 10
+        self.max_results = 50
 
     def ireplace(self, text, old, new, count=0):
         """Case insensitive string replace"""
@@ -174,7 +174,7 @@ class ImdbSearch(object):
                     movie['year'] = additional[-2]
                     if additional[-1] not in ['TV Movie', 'Video']:
                         log.debug('skipping %s', row.text)
-                        break
+                        continue
 
             link = row.find_next('a')
             movie['name'] = link.text

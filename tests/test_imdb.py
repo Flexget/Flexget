@@ -33,6 +33,10 @@ class TestImdb(object):
               - {title: 'Futurama.Into.The.Wild.Green.Yonder.2009.PROPER'}
               # test (TV Movie) result
               - {title: 'Carny 2009'}
+              # test a movie that is far from the top in search results
+              - {title: 'The Hunter 2010'}
+              # test a search in which a movie has lower relevance than tv episodes
+              - {title: 'Mad Max Fury Road 2015'}
             imdb:
               min_votes: 20
 
@@ -123,6 +127,10 @@ class TestImdb(object):
             'Failed to lookup Futurama.Into.The.Wild.Green.Yonder.2009.PROPER'
         assert task.find_entry(imdb_id='tt1397497'), \
             'Failed to lookup Carny 2009'
+        assert task.find_entry(imdb_id='tt1190072'), \
+            'Failed to lookup The Hunter 2010'
+        assert task.find_entry(imdb_id='tt1392190'), \
+            'Failed to lookup Mad Max Fury Road 2015'
 
     def test_year(self, execute_task):
         task = execute_task('year')
