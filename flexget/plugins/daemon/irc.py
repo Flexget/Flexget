@@ -218,6 +218,9 @@ def install_ircconnection():
             self.entry_queue = []
             self.line_cache = {}
 
+            self.throttled = False
+            self.delay = 0
+            self.max_delay = 300
             self.start_thread()
 
         def start_thread(self):
@@ -228,7 +231,13 @@ def install_ircconnection():
 
         def check_connection_and_reconnect(self):
             if not self.is_connected() and self.connection_attempts < 5:
-                time.sleep(self.connection_attempts * 2)
+                if self.throttled:
+                    log.warning('Too many reconnection attempts. Throttled by server. Going to sleep for %ss.',
+                                self.delay)
+                    time.sleep(self.delay)
+                    self.throttled = False
+                else:
+                    time.sleep(self.connection_attempts * 2)
                 self._connect()
             elif not self.is_connected():
                 server = self.server_list[0]
@@ -237,6 +246,7 @@ def install_ircconnection():
                 self.shutdown_event.set()
             elif self.connection_attempts > 0:
                 self.connection_attempts = 0
+                self.delay = 0
 
         def start_interruptable(self, timeout=0.2):
             """
@@ -590,6 +600,10 @@ def install_ircconnection():
 
         def on_error(self, conn, irc_event):
             log.error('Error message received: %s', irc_event)
+            msg = irc_event.target.lower()
+            if 'throttled' in msg or 'throttling' in msg:
+                self.throttled = True
+                self.delay = min(self.delay + 30, self.max_delay)
 
         def is_connected(self):
             return self.connection.is_connected()
@@ -662,6 +676,9 @@ def install_ircconnection():
                         self.restart_log[conn_name]['attempts'] += 1
                         self.restart_log[conn_name]['delay'] = min(pow(2, self.restart_log[conn_name]['attempts']),
                                                                    self.max_delay)
+                        if conn.throttled:
+                            log.error('Server has throttled the connection. Adding 30s to reconnection delay.')
+                            self.restart_log[conn_name]['delay'] += 30
                         conn.start_thread()
 
                     if self.restart_log[conn_name]['delay'] > 0:
