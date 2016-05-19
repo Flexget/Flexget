@@ -84,6 +84,7 @@ def spawn_thread(name, conn):
     :return: Thread
     """
     thread = threading.Thread(target=conn.start_interruptable, name=name)
+    thread.setDaemon(True)
     thread.start()
     return thread
 
