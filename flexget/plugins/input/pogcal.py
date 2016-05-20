@@ -37,7 +37,7 @@ class InputPogDesign(object):
             page = session.get('http://www.pogdesign.co.uk/cat/show-select')
         except requests.RequestException as e:
             raise plugin.PluginError('Error retrieving source: %s' % e)
-        soup = BeautifulSoup(page.text)
+        soup = get_soup(page.text)
         entries = []
         for row in soup.find_all('li', {'class': 'selectgrp checked'}):
 
