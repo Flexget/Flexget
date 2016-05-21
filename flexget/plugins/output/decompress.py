@@ -34,7 +34,7 @@ def open_archive_entry(entry):
         fail_entry_with_error(entry, 'Bad archive: %s (%s)' % (archive_path, error))
     except archive.NeedFirstVolume:
         log.error('Not the first volume: %s', archive_path)
-    except Exception as error:
+    except archive.ArchiveError as error:
         fail_entry_with_error(entry, 'Failed to open Archive: %s (%s)' % (archive_path, error))
 
     return arch
@@ -204,7 +204,7 @@ class Decompress(object):
             log.debug('Attempting to extract: %s to %s', arch_file, destination)
             try:
                 arch.extract_file(info, destination)
-            except (IOError, os.error) as error:
+            except archive.FSError as error:
                 error_message = 'OS error while creating file: %s (%s)' % (destination, error)
             except archive.ArchiveError as error:
                 error_message = 'Failed to extract file: %s in %s (%s)' % (info.filename, \

@@ -33,6 +33,12 @@ class BadArchive(ArchiveError):
 class NeedFirstVolume(ArchiveError):
     """Wrapper exception for rarfile.NeedFirstVolume"""
     pass
+class PathError(ArchiveError):
+    """Exception to be raised when an archive file doesn't exist"""
+    pass
+class FSError(ArchiveError):
+    """Exception to be raised on OS/IO exceptions"""
+    pass
 
 def rarfile_set_tool_path(config):
     """
@@ -62,6 +68,7 @@ class Archive(object):
     """
     def __init__(self, archive_object, path):
         self.path = path
+
         self.archive = archive_object(self.path)
         log.debug('Successfully opened RAR: %s', self.path)
 
@@ -74,10 +81,13 @@ class Archive(object):
         volumes = self.volumes()
         self.close()
 
-        for volume in volumes:
-            log.debug('Deleting volume: %s', volume)
-            os.remove(volume)
-            log.verbose('Deleted archive: %s', volume)
+        try:
+            for volume in volumes:
+                os.remove(volume)
+                log.verbose('Deleted archive: %s', volume)
+        except (IOError, os.error) as error:
+            raise FSError(error)
+
 
     def volumes(self):
         """Returns the list of volumes that comprise this archive"""
@@ -93,9 +103,12 @@ class Archive(object):
 
     def extract_file(self, member, destination):
         """Extract a member file to the specified destination"""
-        with self.open(member) as source:
-            with open(destination, 'wb') as target:
-                shutil.copyfileobj(source, target)
+        try:
+            with self.open(member) as source:
+                with open(destination, 'wb') as target:
+                    shutil.copyfileobj(source, target)
+        except (IOError, os.error) as error:
+            raise FSError(error)
 
         log.verbose('Extracted: %s', member)
 
@@ -154,6 +167,9 @@ def open_archive(archive_path):
 
     archive = None
 
+    if not os.path.exists(archive_path):
+        raise PathError('Path doesn\'t exist')
+
     if zipfile.is_zipfile(archive_path):
         archive = ZipArchive(archive_path)
         log.debug('Successfully opened ZIP: %s', archive_path)
@@ -172,15 +188,14 @@ def is_archive(path):
     """
 
     archive = None
-    ret = False
 
     try:
         archive = open_archive(path)
         if archive:
             archive.close()
-            ret = True
+            return True
     except ArchiveError as error:
         error_message = 'Failed to open file as archive: %s (%s)' % (path, error)
         log.debug(error_message)
 
-    return ret
+    return False
