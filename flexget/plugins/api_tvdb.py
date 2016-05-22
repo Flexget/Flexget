@@ -611,12 +611,13 @@ def search_for_series(search_name=None, imdb_id=None, zap2it_id=None, force_sear
             lookup_by = 'search_name'
             lookup_url = 'search/series?name=%s' % search_name
         try:
-            series_search_results = TVDBRequest().get(lookup_url)
+            fetched_results = TVDBRequest().get(lookup_url)
         except requests.RequestException as e:
             raise LookupError('Error searching series from TVDb (%s)' % e)
-    fetched_results = [session.merge(TVDBSeriesSearchResult(series, search_name)) for series in series_search_results]
-    if fetched_results:
-        return fetched_results
+        series_search_results = [session.merge(TVDBSeriesSearchResult(series, search_name)) for series in
+                                 fetched_results]
+    if series_search_results:
+        return series_search_results
     raise LookupError('No results found for series lookup %s' % lookup_by)
 
 
