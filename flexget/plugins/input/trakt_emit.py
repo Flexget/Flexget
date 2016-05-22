@@ -87,7 +87,7 @@ class TraktEmit(object):
             try:
                 data = session.get(url).json()
             except RequestException as e:
-                raise plugin.PluginError('TODO: error message')
+                raise plugin.PluginError('An error has occured looking up: Trakt_id: %s Error: %s' % (trakt_id, e))
             if config['position'] == 'next' and data.get('next_episode'):
                 # If the next episode is already in the trakt database, we'll get it here
                 eps = data['next_episode']['season']
