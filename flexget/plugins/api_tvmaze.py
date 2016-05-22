@@ -37,7 +37,7 @@ TVMAZE_ENDPOINTS = {
 
 @db_schema.upgrade('tvmaze')
 def upgrade(ver, session):
-    if ver is None or ver < 5:
+    if ver is None or ver < 6:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -63,6 +63,13 @@ class TVMazeLookup(Base):
     search_name = Column(Unicode, index=True, unique=True)
     series_id = Column(Integer, ForeignKey('tvmaze_series.tvmaze_id'))
     series = relation('TVMazeSeries', backref='search_strings')
+
+    def __init__(self, search_name, series_id=None, series=None):
+        self.search_name = search_name.lower()
+        if series_id:
+            self.series_id = series_id
+        if series:
+            self.series = series
 
     def __repr__(self):
         return '<TVMazeLookup(search_name={0},series_id={1})'.format(self.search_name, self.series_id)
@@ -124,7 +131,6 @@ class TVMazeSeries(Base):
             'runtime': self.runtime,
             'show_type': self.show_type,
             'network': self.network,
-            'actors': [actor.to_dict() for actor in self.actors],
             'last_update': self.last_update
         }
 
@@ -137,8 +143,8 @@ class TVMazeSeries(Base):
         self.language = series['language']
         self.schedule = series['schedule']
         self.url = series['url']
-        self.original_image = series['image'].get('original')
-        self.medium_image = series['image'].get('medium')
+        self.original_image = series.get('image').get('original') if series.get('image') else None
+        self.medium_image = series.get('image').get('medium') if series.get('image') else None
         self.tvdb_id = series['externals'].get('thetvdb')
         self.tvrage_id = series['externals'].get('tvrage')
         self.premiered = parser.parse(series.get('premiered'), ignoretz=True) if series.get('premiered') else None
@@ -280,13 +286,13 @@ def from_cache(session=None, search_params=None, cache_type=None):
 @with_session
 def from_lookup(session=None, title=None):
     log.debug('searching lookup table using title {0}'.format(title))
-    return session.query(TVMazeLookup).filter(func.lower(TVMazeLookup.search_name) == title.lower()).first()
+    return session.query(TVMazeLookup).filter(TVMazeLookup.search_name == title.lower()).first()
 
 
 @with_session
 def add_to_lookup(session=None, title=None, series=None):
     log.debug('trying to add search title {0} to series {1} in lookup table'.format(title, series.name))
-    exist = session.query(TVMazeLookup).filter(TVMazeLookup.search_name == title).first()
+    exist = session.query(TVMazeLookup).filter(TVMazeLookup.search_name == title.lower()).first()
     if exist:
         log.debug('title {0} already exist for series {1}, no need to save lookup'.format(title, series.name))
         return

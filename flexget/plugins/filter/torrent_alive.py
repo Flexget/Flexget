@@ -135,7 +135,7 @@ def get_http_seeds(url, info_hash):
     log.debug('Checking for seeds from %s' % url)
 
     try:
-        data = bdecode(requests.get(url).text.encode('utf-8')).get('files')
+        data = bdecode(requests.get(url).content).get('files')
     except RequestException as e:
         log.debug('Error scraping: %s' % e)
         return 0

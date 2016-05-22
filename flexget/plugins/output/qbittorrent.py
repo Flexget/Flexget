@@ -96,8 +96,12 @@ class OutputQBitTorrent(object):
             self.connect(config)
         for entry in task.accepted:
             data = {}
-            data['savepath'] = entry.get('path', config.get('path'))
-            data['label'] = entry.get('label', config['label']).lower()
+            savepath = entry.get('path', config.get('path'))
+            if savepath:
+                data['savepath'] = savepath
+            label = entry.get('label', config['label']).lower()
+            if label:
+                data['label'] = label
             data['urls'] = entry.get('url')
             if task.manager.options.test:
                 log.info('Test mode.')

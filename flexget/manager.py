@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
+native_int = int
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import atexit
@@ -700,7 +701,7 @@ class Manager(object):
                 result[key.strip().lower()] = value.strip()
             for key in result:
                 if result[key].isdigit():
-                    result[key] = int(result[key])
+                    result[key] = native_int(result[key])
             result.setdefault('pid', None)
             if not result['pid']:
                 log.error('Invalid lock file. Make sure FlexGet is not running, then delete it.')

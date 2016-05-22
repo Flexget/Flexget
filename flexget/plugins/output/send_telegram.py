@@ -219,7 +219,7 @@ class SendTelegram(object):
         self._enforce_telegram_plugin_ver()
         self._parse_config(config)
         self.log.debug('token={0} parse_mode={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
-                self._token, self._usernames, self._fullnames, self._groups, self._tmpl, self._parse_mode))
+            self._token, self._usernames, self._fullnames, self._groups, self._tmpl, self._parse_mode))
         self._init_bot()
         chat_ids = self._get_chat_ids_n_update_db(session)
         return chat_ids
@@ -300,8 +300,8 @@ class SendTelegram(object):
                 except TelegramError as e:
                     if kwargs.get('parse_mode') and "can't parse message text" in e.message:
                         self.log.warning(
-                                'Failed to render message using parse mode %s. Falling back to basic parsing: %s' % (
-                                    kwargs['parse_mode'], e.message))
+                            'Failed to render message using parse mode %s. Falling back to basic parsing: %s' % (
+                                kwargs['parse_mode'], e.message))
                         del kwargs['parse_mode']
                         try:
                             self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
@@ -507,51 +507,6 @@ class SendTelegram(object):
         session.commit()
 
 
-def _guess_task_name(manager):
-    for task in manager.tasks:
-        if _get_config(manager, task) is not None:
-            break
-    else:
-        task = None
-    return task
-
-
-def _get_config(manager, task):
-    return manager.config['tasks'][task].get(_PLUGIN_NAME)
-
-
-@with_session()
-def do_cli(manager, args, session=None):
-    """
-    :type manager: flexget.Manager
-
-    """
-    task_name = _guess_task_name(manager)
-    config = _get_config(manager, task_name)
-    plugin_info = plugin.get_plugin_by_name(_PLUGIN_NAME)
-    send_telegram = plugin_info.instance
-    """:type: SendTelegram"""
-
-    if args.action == 'bootstrap':
-        res = send_telegram.bootstrap(session, config)
-    elif args.action == 'test-msg':
-        res = send_telegram.test_msg(session, config)
-    else:
-        raise RuntimeError('unknown action')
-
-    sys.exit(int(not res))
-
-
 @event('plugin.register')
 def register_plugin():
     plugin.register(SendTelegram, _PLUGIN_NAME, api_ver=2)
-
-
-@event('options.register')
-def register_parser_arguments():
-    parser = options.register_command(_PLUGIN_NAME, do_cli, help='{0} cli'.format(_PLUGIN_NAME))
-    """:type: options.CoreArgumentParser"""
-    subp = parser.add_subparsers(dest='action')
-    bsp = subp.add_parser('bootstrap', help='bootstrap the plugin according to config')
-    bsp.add_argument('--tasks', )
-    subp.add_parser('test-msg', help='send test message to all configured recipients')

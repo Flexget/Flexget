@@ -245,7 +245,8 @@ class PluginTransmission(TransmissionBase):
                     'honourlimits': {'type': 'boolean'},
                     'include_files': one_or_more({'type': 'string'}),
                     'skip_files': one_or_more({'type': 'string'}),
-                    'rename_like_files': {'type': 'boolean'}
+                    'rename_like_files': {'type': 'boolean'},
+                    'queue_position': {'type': 'integer'}
                 },
                 'additionalProperties': False
             }
@@ -303,7 +304,8 @@ class PluginTransmission(TransmissionBase):
 
         for opt_key in ('path', 'addpaused', 'honourlimits', 'bandwidthpriority', 'maxconnections', 'maxupspeed', 
                         'maxdownspeed', 'ratio', 'main_file_only', 'main_file_ratio', 'magnetization_timeout',
-                        'include_subs', 'content_filename', 'include_files', 'skip_files', 'rename_like_files'):
+                        'include_subs', 'content_filename', 'include_files', 'skip_files', 'rename_like_files',
+                        'queue_position'):
             # Values do not merge config with task
             # Task takes priority then config is used
             if opt_key in entry:
@@ -347,6 +349,9 @@ class PluginTransmission(TransmissionBase):
                 change['seedRatioMode'] = 2
             else:
                 change['seedRatioMode'] = 1
+
+        if 'queue_position' in opt_dic:
+            change['queuePosition'] = opt_dic['queue_position']
 
         post = options['post']
         # set to modify paused status after 

@@ -79,6 +79,7 @@ class ImdbEntrySet(MutableSet):
         data = dict((i['name'], i.get('value')) for i in inputs if i.get('name'))
         data['email'] = self.config['login']
         data['password'] = self.config['password']
+        log.debug('email=%s, password=%s', data['email'], data['password'])
         d = self._session.post('https://www.imdb.com/ap/signin', data=data)
         # Get user id by extracting from redirect url
         r = self._session.head('http://www.imdb.com/profile', allow_redirects=False)

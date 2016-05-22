@@ -24,7 +24,6 @@
     function getMetadata() {
 
       var params = {
-        title: vm.movie.title,
         year : vm.movie.year
       }
 
@@ -35,7 +34,7 @@
       })
 
 
-      $http.get('/api/trakt/movie/', {
+      $http.get('/api/trakt/movies/' + vm.movie.title + '/', {
         params: params,
         cache: true
       })

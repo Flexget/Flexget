@@ -294,7 +294,7 @@ class FilterSeen(object):
             remembered.append(entry[field])
             sf = SeenField(str(field), str(entry[field]))
             se.fields.append(sf)
-            log.debug("Learned '%s' (field: %s)" % (entry[field], field))
+            log.debug("Learned '%s' (field: %s, local: %d)" % (entry[field], field, local))
         # Only add the entry to the session if it has one of the required fields
         if se.fields:
             task.session.add(se)

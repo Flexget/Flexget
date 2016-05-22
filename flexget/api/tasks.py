@@ -1,15 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import cgi
 import copy
 from datetime import datetime
-from queue import Queue, Empty
 from json import JSONEncoder
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify, Response
 from flask import request
+from queue import Queue, Empty
 
 from flexget.api import api, APIResource, ApiError, NotFoundError
 from flexget.config_schema import process_config
@@ -294,7 +294,7 @@ execution_doc = "'tasks': Array of tasks to be execute. Required<br>" \
                 "'summary': Include task summary<br>" \
                 "'entry_dump': Include dump of entries including fields<br>" \
                 "'inject': A List of entry objects. See payload description for additional information<br>" \
-                "'loglevel': Specify log level. One of 'none', 'critical', 'error', 'warning', 'info', 'verbose', " \
+                "'loglevel': Specify log level. One of 'critical', 'error', 'warning', 'info', 'verbose', " \
                 "'debug', 'trace'. Default is 'none'<br>"
 
 entry_doc = "Entry object:<br>" \
@@ -326,8 +326,13 @@ class TaskExecutionAPI(APIResource):
         output = queue if data.get('loglevel') else None
         stream = True if any(
             arg[0] in ['progress', 'summary', 'loglevel', 'entry_dump'] for arg in data.items() if arg[1]) else False
-        loglevel = data.get('loglevel')
-        options = {'tasks': data.get('tasks')}
+        loglevel = data.pop('loglevel', None)
+
+        # This emulates the CLI command of using `--now`
+        options = {'interval_ignore': data.pop('now', None)}
+
+        for option, value in data.items():
+            options[option] = value
 
         if data.get('inject'):
             entries = []
@@ -399,6 +404,7 @@ def setup_params(mgr):
         if name in ignore:
             continue
         if isinstance(action, argparse._StoreConstAction) and action.help != '==SUPPRESS==':
+            name = name.replace('-', '_')
             task_execution_input['properties'][name] = {'type': 'boolean'}
             TaskExecutionAPI.__apidoc__['description'] += "'{0}': {1}<br>".format(name, action.help)
 

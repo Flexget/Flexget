@@ -5,7 +5,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=Unite%209
   response:
@@ -17,9 +17,9 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:31 GMT']
+      date: ['Tue, 17 May 2016 08:58:32 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -27,7 +27,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/8652/episodebynumber?season=1&number=16
   response:
@@ -38,8 +38,8 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:31 GMT']
+      date: ['Tue, 17 May 2016 08:58:32 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 version: 1

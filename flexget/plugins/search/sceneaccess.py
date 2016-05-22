@@ -207,7 +207,7 @@ class SceneAccessSearch(object):
         ret = list()
 
         for scope, categories in to_process.items():
-            cat_id = list()
+            cat_id_list = list()
 
             for category in categories:
                 try:
@@ -216,14 +216,14 @@ class SceneAccessSearch(object):
                     cat_id = category
                 finally:
                     if isinstance(cat_id, list):
-                        [cat_id.append(l) for l in id]
+                        [cat_id_list.append(l) for l in cat_id]
                     else:
-                        cat_id.append(cat_id)
+                        cat_id_list.append(cat_id)
 
             if scope == 'mp3/0day':     # mp3/0day is actually /spam?search= in URL, can safely change it now
                 scope = 'spam'
 
-            category_url_string = ''.join(['&c' + str(x) + '=' + str(x) for x in cat_id])  # &c<id>=<id>&...
+            category_url_string = ''.join(['&c' + str(x) + '=' + str(x) for x in cat_id_list])  # &c<id>=<id>&...
             ret.append({'url_path': scope, 'category_url_string': category_url_string})
             return ret
 

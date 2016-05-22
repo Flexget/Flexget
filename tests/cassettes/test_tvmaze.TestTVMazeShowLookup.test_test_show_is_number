@@ -5,7 +5,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=1992
   response:
@@ -22,9 +22,9 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:24 GMT']
+      date: ['Tue, 17 May 2016 08:58:24 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -32,7 +32,7 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/4879/episodebynumber?season=1&number=2
   response:
@@ -45,9 +45,9 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:24 GMT']
+      date: ['Tue, 17 May 2016 08:58:24 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -55,25 +55,25 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=24
   response:
-    body: {string: !!python/unicode '{"id":167,"url":"http://www.tvmaze.com/shows/167/24","name":"24","type":"Scripted","language":"English","genres":["Drama","Action","Crime","Thriller","Mystery"],"status":"Ended","runtime":60,"premiered":"2001-11-06","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":8.5},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
+    body: {string: !!python/unicode '{"id":167,"url":"http://www.tvmaze.com/shows/167/24","name":"24","type":"Scripted","language":"English","genres":["Drama","Action","Crime","Thriller","Mystery"],"status":"Ended","runtime":60,"premiered":"2001-11-06","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":8.5},"weight":0,"network":{"id":4,"name":"FOX","country":{"name":"United
         States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":2445,"thetvdb":76290,"imdb":"tt0285331"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2330.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2330.jpg"},"summary":"<p>Jack
         Bauer, agent of CTU (Counter Terrorist Unit) faces threats against his country
         and himself in this action packed show. Each season contains of one day, each
         episode shows one hour of Jack Bauer''s day. <em><strong>24</strong></em>
         is the only action show in real time and gained alot of fans during the years
-        with this concept.</p>","updated":1459697635,"_links":{"self":{"href":"http://api.tvmaze.com/shows/167"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/12094"}}}'}
+        with this concept.</p>","updated":1462631039,"_links":{"self":{"href":"http://api.tvmaze.com/shows/167"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/12094"}}}'}
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:24 GMT']
+      date: ['Tue, 17 May 2016 08:58:25 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -81,19 +81,22 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.10.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/167/episodebynumber?season=9&number=12
   response:
     body: {string: !!python/unicode '{"id":12094,"url":"http://www.tvmaze.com/episodes/12094/24-9x12-day-9-1000-pm-1100-am","name":"Day
-        9: 10:00 PM-11:00 AM","season":9,"number":12,"airdate":"2014-07-14","airtime":"21:00","airstamp":"2014-07-14T21:00:00-04:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/12094"}}}'}
+        9: 10:00 PM-11:00 AM","season":9,"number":12,"airdate":"2014-07-14","airtime":"21:00","airstamp":"2014-07-14T21:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/56/140876.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/56/140876.jpg"},"summary":"<p>The
+        day comes to an end with Jack doing everything in his power to prevent a terror
+        plot and an international crisis. But to save the world, he''s faced with
+        an unthinkable and grave decision.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/12094"}}}'}
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 03 May 2016 13:06:24 GMT']
+      date: ['Tue, 17 May 2016 08:58:25 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
 version: 1

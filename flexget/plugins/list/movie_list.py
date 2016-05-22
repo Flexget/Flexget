@@ -153,8 +153,8 @@ class MovieList(MutableSet):
     def _find_entry(self, entry, session=None):
         """Finds `MovieListMovie` corresponding to this entry, if it exists."""
         for id_name in SUPPORTED_IDS:
-            if id_name in entry:
-                log.debug('finding movie based off id %s:%s', id_name, entry[id_name])
+            if entry.get(id_name):
+                log.debug('trying to match movie based off id %s: %s', id_name, entry[id_name])
                 res = (self._db_list(session).movies.join(MovieListMovie.ids).filter(
                     and_(
                         MovieListID.id_name == id_name,
@@ -164,12 +164,18 @@ class MovieList(MutableSet):
                     log.debug('found movie %s', res)
                     return res
         # Fall back to title/year match
-        if 'movie_name' in entry and 'movie_year' in entry:
+        if entry.get('movie_name') and entry.get('movie_year'):
             name, year = entry['movie_name'], entry['movie_year']
         else:
             name, year = split_title_year(entry['title'])
+        if not name:
+            log.verbose('no movie name to match, skipping')
+            return
+        log.debug('trying to match movie based of name: %s and year: %d', name, year)
         res = (self._db_list(session).movies.filter(func.lower(MovieListMovie.title) == name.lower())
                .filter(MovieListMovie.year == year).first())
+        if res:
+            log.debug('found movie %s', res)
         return res
 
     @property
@@ -282,6 +288,6 @@ def get_db_movie_identifiers(identifier_list, movie_id=None, session=None):
                 if not db_movie_id:
                     log.debug('creating movie identifier %s: %s', key, value)
                     db_movie_id = MovieListID(id_name=key, id_value=value, movie_id=movie_id)
-                    session.add(db_movie_id)
+                session.merge(db_movie_id)
                 db_movie_ids.append(db_movie_id)
     return db_movie_ids

@@ -23,10 +23,10 @@ class TestTVMazeShowLookup(object):
         tasks:
           test:
             mock:
-              - {title: 'House.S01E02.HDTV.XViD-FlexGet'}
+              - {title: 'House.MD.S01E02.HDTV.XViD-FlexGet'}
               - {title: 'Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'}
             series:
-              - House
+              - House MD
               - Doctor Who 2005
           test_unknown_series:
             mock:
@@ -46,7 +46,7 @@ class TestTVMazeShowLookup(object):
               - Shameless (2011)
           test_title_with_year:
             mock:
-              - {title: 'The.Flash.2014.S02E06.HDTV.x264-LOL'}
+              - {title: 'The.Flash.2014.S02E06.HDTV.x264-FlexGet'}
             series:
               - The Flash (2014)
           test_from_filesystem:
@@ -66,16 +66,16 @@ class TestTVMazeShowLookup(object):
           test_show_is_number:
             mock:
               - {title: '1992.S01E02.720p.HDTV.XViD-FlexGet'}
-              - {title: '24 S09E12 HDTV x264-LOL'}
+              - {title: '24 S09E12 HDTV x264-FlexGet'}
             series:
               - 1992
               - 24
           test_show_contain_number:
             mock:
-              - {title: 'Tosh.0 S07E30 HDTV x264-MiNDTHEGAP'}
-              - {title: 'Unwrapped 2.0 S02E06 HDTV x264-MiNDTHEGAP'}
-              - {title: 'Detroit 1-8-7 S01E16 HDTV x264-MiNDTHEGAP'}
-              - {title: 'Jake 2.0 S01E10 HDTV x264-MiNDTHEGAP'}
+              - {title: 'Tosh.0 S07E30 HDTV x264-FlexGet'}
+              - {title: 'Unwrapped 2.0 S02E06 HDTV x264-FlexGet'}
+              - {title: 'Detroit 1-8-7 S01E16 HDTV x264-FlexGet'}
+              - {title: 'Jake 2.0 S01E10 HDTV x264-FlexGet'}
             series:
               - Detroit 1-8-7
               - Jake 2.0
@@ -83,52 +83,52 @@ class TestTVMazeShowLookup(object):
               - Tosh.0
           test_episode_without_air_date:
             mock:
-              - {title: 'Firefly S01E13 HDTV x264-LOL'}
+              - {title: 'Firefly S01E13 HDTV x264-FlexGet'}
             series:
               - Firefly
             set:
               bfield: "{{tvmaze_episode_airdate}}{{tvmaze_episode_airstamp}}"
           test_episode_summary:
             mock:
-              - {title: 'The.Flash.2014.S02E02.HDTV.x264-LOL'}
+              - {title: 'The.Flash.2014.S02E02.HDTV.x264-FlexGet'}
             series:
               - The Flash
           test_show_with_non_ascii_chars:
             mock:
-              - {title: 'Unite 9 S01E16 VFQ HDTV XviD-bLinKkY'}
+              - {title: 'Unite 9 S01E16 VFQ HDTV XviD-FlexGet'}
             series:
               - Unite 9
           test_show_cast:
             mock:
-              - {title: 'The.Flash.2014.S02E02.HDTV.x264-LOL'}
+              - {title: 'The.Flash.2014.S02E02.HDTV.x264-FlexGet'}
             series:
               - The Flash
           test_multiple_characters_per_actor:
             mock:
-              - {title: 'Californication.S01E01.HDTV.x264-LOL'}
-              - {title: 'The.X-Files.S01E01.HDTV.x264-LOL'}
-              - {title: 'Aquarius.US.S01E1.HDTV.x264-LOL'}
+              - {title: 'Californication.S01E01.HDTV.x264-FlexGet'}
+              - {title: 'The.X-Files.S01E01.HDTV.x264-FlexGet'}
+              - {title: 'Aquarius.US.S01E1.HDTV.x264-FlexGet'}
             series:
               - Californication
               - The X-Files
               - Aquarius
           test_episode_air_date:
             mock:
-              - {title: 'The.Flash.2014.S02E02.HDTV.x264-LOL'}
+              - {title: 'The.Flash.2014.S02E02.HDTV.x264-FlexGet'}
             series:
               - The Flash
           test_queries_via_ids:
             mock:
-              - {title: 'The.Flash.2014.S02E02.HDTV.x264-LOL', tvmaze_id: '13'}
-              - {title: 'The.Flash.2014.S02E03.HDTV.x264-LOL', tvdb_id: '279121'}
-              - {title: 'The.Flash.2014.S02E04.HDTV.x264-LOL', imdb_id: 'tt3107288'}
+              - {title: 'The.Flash.2014.S02E02.HDTV.x264-FlexGet', tvmaze_id: '13'}
+              - {title: 'The.Flash.2014.S02E03.HDTV.x264-FlexGet', tvdb_id: '279121'}
+              - {title: 'The.Flash.2014.S02E04.HDTV.x264-FlexGet', imdb_id: 'tt3107288'}
             series:
               - The Flash
     """
 
     def test_lookup_name(self, execute_task):
         task = execute_task('test')
-        entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
+        entry = task.find_entry(title='House.MD.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvmaze_series_id'] == 118, \
             'Tvmaze_ID should be 118 is %s for %s' % (entry['tvmaze_series_name'], entry['series_name'])
         assert entry['tvmaze_series_status'] == 'Ended', 'Series Status should be "ENDED" returned %s' \
@@ -136,14 +136,14 @@ class TestTVMazeShowLookup(object):
 
     def test_lookup(self, execute_task):
         task = execute_task('test')
-        entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
+        entry = task.find_entry(title='House.MD.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvmaze_episode_name'] == 'Paternity', \
             '%s tvmaze_episode_name should be Paternity, is actually %s' % (
                 entry['title'], entry['tvmaze_episode_name'])
         assert entry['tvmaze_series_status'] == 'Ended', \
             'status for %s is %s, should be "ended"' % (entry['title'], entry['tvmaze_series_status'])
-        assert entry['afield'] == '73255PaternityHouse', \
-            'afield was not set correctly, expected 73255PaternityHouse, got %s' % entry['afield']
+        assert entry['afield'] == '73255PaternityHouse M.D.', \
+            'afield was not set correctly, expected 73255PaternityHouse M.D., got %s' % entry['afield']
         assert task.find_entry(tvmaze_episode_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
 
@@ -168,7 +168,7 @@ class TestTVMazeShowLookup(object):
             assert session.query(
                 TVMazeSeries).first().name == 'Shameless', 'should have added Shameless and not Shameless (2011)'
             # change the search query
-            session.query(TVMazeLookup).update({'search_name': "Shameless.S01E03.HDTV-FlexGet"})
+            session.query(TVMazeLookup).update({'search_name': "shameless.s01e03.hdtv-flexget"})
             session.commit()
 
             lookupargs = {'title': "Shameless.S01E03.HDTV-FlexGet"}
@@ -188,7 +188,7 @@ class TestTVMazeShowLookup(object):
 
     def test_title_with_year(self, execute_task):
         task = execute_task('test_title_with_year')
-        entry = task.find_entry(title='The.Flash.2014.S02E06.HDTV.x264-LOL')
+        entry = task.find_entry(title='The.Flash.2014.S02E06.HDTV.x264-FlexGet')
         assert entry.get('tvmaze_series_id') == 13, 'expected tvmaze_series_id 13, got %s' % entry.get(
             'tvmaze_series_id')
         assert entry.get('tvmaze_series_year') == 2014, 'expected tvmaze_series_year 2014, got %s' % entry.get(
@@ -196,27 +196,27 @@ class TestTVMazeShowLookup(object):
 
     def test_from_filesystem(self, execute_task):
         task = execute_task('test_from_filesystem')
-        entry = task.find_entry(title='Marvels.Jessica.Jones.S01E02.PROPER.720p.WEBRiP.x264-QCF')
+        entry = task.find_entry(title='Marvels.Jessica.Jones.S01E02.PROPER.720p.WEBRiP.x264-FlexGet')
         assert entry.get('tvmaze_series_id') == 1370, 'expected tvmaze_series_id 1370, got %s' % entry.get(
             'tvmaze_series_id')
         assert entry.get('tvmaze_episode_id') == 206178, 'episode id should be 206178, is actually %s' % entry.get(
             'tvmaze_episode_id')
-        entry = task.find_entry(title='Marvels.Jessica.Jones.S01E03.720p.WEBRiP.x264-QCF')
+        entry = task.find_entry(title='Marvels.Jessica.Jones.S01E03.720p.WEBRiP.x264-FlexGet')
         assert entry.get('tvmaze_series_id') == 1370, 'expected tvmaze_series_id 1370, got %s' % entry.get(
             'tvmaze_series_id')
         assert entry.get('tvmaze_episode_id') == 206177, 'episode id should be 206177, is actually %s' % entry.get(
             'tvmaze_episode_id')
-        entry = task.find_entry(title='The.Big.Bang.Theory.S09E09.720p.HDTV.X264-DIMENSION')
+        entry = task.find_entry(title='The.Big.Bang.Theory.S09E09.720p.HDTV.X264-FlexGet')
         assert entry.get('tvmaze_series_id') == 66, 'expected tvmaze_series_id 66, got %s' % entry.get(
             'tvmaze_series_id')
         assert entry.get('tvmaze_episode_id') == 409180, 'episode id should be 409180, is actually %s' % entry.get(
             'tvmaze_episode_id')
-        entry = task.find_entry(title='The.Flash.S02E04.1080p.WEB-DL.DD5.1.H.264-KiNGS')
+        entry = task.find_entry(title='The.Flash.S02E04.1080p.WEB-DL.DD5.1.H.264-FlexGet')
         assert entry.get('tvmaze_series_id') == 13, 'expected tvmaze_series_id 13, got %s' % entry.get(
             'tvmaze_series_id')
         assert entry.get('tvmaze_episode_id') == 284974, 'episode id should be 284974, is actually %s' % entry.get(
             'tvmaze_episode_id')
-        entry = task.find_entry(title='The.Walking.Dead.S06E08.Start.to.Finish-SiCKBEARD')
+        entry = task.find_entry(title='The.Walking.Dead.S06E08.Start.to.Finish-FlexGet')
         assert entry.get('tvmaze_series_id') == 73, 'expected tvmaze_series_id 73, got %s' % entry.get(
             'tvmaze_series_id')
         assert entry.get('tvmaze_episode_id') == 185073, 'episode id should be 185073, is actually %s' % entry.get(
@@ -232,12 +232,12 @@ class TestTVMazeShowLookup(object):
             # Manually change a value of the series to differ from actual value
             assert session.query(
                 TVMazeSeries).first().name == 'Shameless', 'should have added Shameless and not Shameless (2011)'
-            session.query(TVMazeSeries).update({'weight': 99})
+            session.query(TVMazeSeries).update({'runtime': 100})
             session.commit()
 
             # Verify value has changed successfully and series expiration status is still False
             assert not session.query(TVMazeSeries).first().expired, 'expired status should be False'
-            assert session.query(TVMazeSeries).first().weight == 99, 'should be updated to 99'
+            assert session.query(TVMazeSeries).first().runtime == 100, 'should be updated to 99'
 
             # Set series last_update time to 8 days ago, to trigger a show refresh upon request.
             last_week = datetime.now() - timedelta(days=8)  # Assuming max days between refreshes is 7
@@ -252,8 +252,8 @@ class TestTVMazeShowLookup(object):
 
             # Verify series data has been refreshed with actual values upon 2nd call, and series expiration flag
             # is set to False
-            assert series.weight == 3, \
-                'weight should have been updated back to 15 from 99, instead its %s' % series.weight
+            assert series.runtime == 60, \
+                'runtime should have been updated back to 60 from 100, instead its %s' % series.runtime
             assert not session.query(TVMazeSeries).first().expired, 'expired status should be False'
 
     def test_test_show_is_number(self, execute_task):
@@ -305,7 +305,7 @@ class TestTVMazeShowLookup(object):
     def test_episode_without_air_date_and_air_stamp(self, execute_task):
         task = execute_task('test_episode_without_air_date')
 
-        entry = task.find_entry(title='Firefly S01E13 HDTV x264-LOL')
+        entry = task.find_entry(title='Firefly S01E13 HDTV x264-FlexGet')
         assert entry['tvmaze_series_id'] == 180, 'series id should be 180, instead its %s' % entry[
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 13007, 'episode id should be 13007, instead its %s' % entry[
@@ -368,3 +368,32 @@ class TestTVMazeShowLookup(object):
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 284974, 'episode id should be 284974, instead its %s' % entry[
             'tvmaze_episode_id']
+
+
+@pytest.mark.online
+class TestTVMazeUnicodeLookup(object):
+    config = """
+        templates:
+          global:
+            tvmaze_lookup: yes
+            metainfo_series: yes
+        tasks:
+          test_unicode:
+            disable: seen
+            mock:
+                - {'title': 'KrØniken 2004 S01E01', 'url': 'mock://whatever'}
+            if:
+                - tvmaze_series_year > now.year - 1: reject
+    """
+
+    @pytest.mark.xfail(reason='VCR attempts to compare str to unicode')
+    def test_unicode(self, execute_task):
+        task = execute_task('test_unicode')
+        with Session() as session:
+            r = session.query(TVMazeLookup).all()
+            assert len(r) == 1, 'Should have added a search result'
+            assert r[0].search_name == 'kr\xf8niken 2004', 'The search result should be lower case'
+        task = execute_task('test_unicode')
+        with Session() as session:
+            r = session.query(TVMazeLookup).all()
+            assert len(r) == 1, 'Should not have added a new row'

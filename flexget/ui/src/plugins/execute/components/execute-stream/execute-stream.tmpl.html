@@ -6,7 +6,7 @@
   <md-tabs md-selected="selectedIndex" md-border-bottom md-dynamic-height flex>
       <md-tab ng-repeat="task in vm.stream.tasks" flex>
           <md-tab-label>
-              <h3>{{ task.name }}</h3>
+              <span>{{ task.name }}</span>
           </md-tab-label>
           <md-tab-body>
               <div layout="row" layout-align="space-around center">

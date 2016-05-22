@@ -41,7 +41,7 @@ def tmdb_request(endpoint, **params):
 
 @db_schema.upgrade('api_tmdb')
 def upgrade(ver, session):
-    if ver is None or ver == 0:
+    if ver is None or ver <= 1:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -153,6 +153,13 @@ class TMDBSearchResult(Base):
     movie_id = Column(Integer, ForeignKey('tmdb_movies.id'), nullable=True)
     movie = relation(TMDBMovie)
 
+    def __init__(self, search, movie_id=None, movie=None):
+        self.search = search.lower()
+        if movie_id:
+            self.movie_id = movie_id
+        if movie:
+            self.movie = movie
+
 
 class ApiTmdb(object):
     """Does lookups to TMDb and provides movie information. Caches lookups."""
@@ -205,7 +212,7 @@ class ApiTmdb(object):
             if not movie:
                 search_string = title + ' ({})'.format(year) if year else ''
                 found = session.query(TMDBSearchResult). \
-                    filter(func.lower(TMDBSearchResult.search) == search_string.lower()).first()
+                    filter(TMDBSearchResult.search == search_string.lower()).first()
                 if found and found.movie:
                     movie = found.movie
         if movie:

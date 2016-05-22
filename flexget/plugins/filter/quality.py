@@ -30,7 +30,7 @@ class FilterQuality(object):
             config = [config]
         reqs = [qualities.Requirements(req) for req in config]
         for entry in task.entries:
-            if not entry.get('quality'):
+            if entry.get('quality') is None:
                 entry.reject('Entry doesn\'t have a quality')
                 continue
             if not any(req.allows(entry['quality']) for req in reqs):

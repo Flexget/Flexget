@@ -134,7 +134,10 @@ class UrlRewritePirateBay(object):
             soup = get_soup(page)
             for link in soup.find_all('a', attrs={'class': 'detLink'}):
                 entry = Entry()
-                entry['title'] = link.contents[0]
+                entry['title'] = self.extract_title(link)
+                if not entry['title']:
+                    log.error('Malformed search result. No title or url found. Skipping.')
+                    continue
                 entry['url'] = 'http://thepiratebay.%s%s' % (CUR_TLD, link.get('href'))
                 tds = link.parent.parent.parent.find_all('td')
                 entry['torrent_seeds'] = int(tds[-2].contents[0])
@@ -153,6 +156,14 @@ class UrlRewritePirateBay(object):
                 entries.add(entry)
 
         return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
+
+    @staticmethod
+    def extract_title(soup):
+        """Sometimes search results have no contents. This function tries to extract something sensible."""
+        if isinstance(soup.contents, list) and soup.contents:
+            return soup.contents[0]
+        if soup.get('href') and 'torrent' in soup.get('href'):
+            return soup.get('href').rsplit('/', 1)[-1]
 
 
 @event('plugin.register')

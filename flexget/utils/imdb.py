@@ -5,6 +5,7 @@ from past.builtins import basestring
 import difflib
 import logging
 import re
+import random
 
 from bs4.element import Tag
 
@@ -22,6 +23,7 @@ requests.headers.update({'User-Agent': 'Python-urllib/2.6'})
 
 # this makes most of the titles to be returned in english translation, but not all of them
 requests.headers.update({'Accept-Language': 'en-US,en;q=0.8'})
+requests.headers.update({'X-Forwarded-For': '24.110.%d.%d' % (random.randint(0, 254), random.randint(0, 254))})
 
 # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
 requests.add_domain_limiter(TimedLimiter('imdb.com', '3 seconds'))
@@ -60,7 +62,7 @@ class ImdbSearch(object):
         self.min_diff = 0.01
         self.debug = False
 
-        self.max_results = 10
+        self.max_results = 50
 
     def ireplace(self, text, old, new, count=0):
         """Case insensitive string replace"""
@@ -125,8 +127,8 @@ class ImdbSearch(object):
         """Return array of movie details (dict)"""
         log.debug('Searching: %s' % name)
         url = u'http://www.imdb.com/find'
-        # This will only include movies searched by title in the results
-        params = {'q': name, 's': 'tt', 'ttype': 'ft'}
+        # This may include Shorts and TV series in the results
+        params = {'q': name, 's': 'tt'}
 
         log.debug('Search query: %s' % repr(url))
         page = requests.get(url, params=params)
@@ -166,7 +168,13 @@ class ImdbSearch(object):
             movie = {}
             additional = re.findall(r'\((.*?)\)', row.text)
             if len(additional) > 0:
-                movie['year'] = additional[-1]
+                if re.match('^\d{4}$', additional[-1]):
+                    movie['year'] = additional[-1]
+                elif len(additional) > 1:
+                    movie['year'] = additional[-2]
+                    if additional[-1] not in ['TV Movie', 'Video']:
+                        log.debug('skipping %s', row.text)
+                        continue
 
             link = row.find_next('a')
             movie['name'] = link.text
