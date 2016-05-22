@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, or_
+from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, or_, and_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
@@ -342,6 +342,7 @@ class TVDBSeriesSearchResult(Base):
     __tablename__ = 'tvdb_series_search_results'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
+    original_name = Column(Unicode)
     name = Column(Unicode)
     imdb_id = Column(Unicode)
     zap2it_id = Column(Unicode)
@@ -356,7 +357,8 @@ class TVDBSeriesSearchResult(Base):
 
     def __init__(self, search_series_name, imdb_id=None, zap2it_id=None):
         self.id = search_series_name['id']
-        self.name = search_series_name['seriesName']
+        self.original_name = search_series_name['seriesName']
+        self.name = self.original_name.lower()
         self.first_aired = search_series_name['firstAired']
         self.network = search_series_name['network']
         self.overview = search_series_name['overview']
@@ -379,7 +381,7 @@ class TVDBSeriesSearchResult(Base):
             'tvdb_id': self.id,
             'network': self.network,
             'overview': self.overview,
-            'series_name': self.name,
+            'series_name': self.original_name,
             'status': self.status
         }
 
@@ -605,10 +607,11 @@ def search_for_series(series_name=None, imdb_id=None, zap2it_id=None, force_sear
     """
     series_search_results = []
     if not force_search:
+        log.debug('trying to fetch TVDB search results from DB')
         series_search_results = session.query(TVDBSeriesSearchResult).filter(
-            or_(TVDBSeriesSearchResult.name == series_name,
-                TVDBSeriesSearchResult.imdb_id == imdb_id,
-                TVDBSeriesSearchResult.zap2it_id == zap2it_id)).all()
+            or_(TVDBSeriesSearchResult.name == series_name.lower(),
+                and_(TVDBSeriesSearchResult.imdb_id, TVDBSeriesSearchResult.imdb_id == imdb_id),
+                and_(TVDBSeriesSearchResult.zap2it_id, TVDBSeriesSearchResult.zap2it_id == zap2it_id))).all()
 
     if not series_search_results:
         if imdb_id:
@@ -618,6 +621,7 @@ def search_for_series(series_name=None, imdb_id=None, zap2it_id=None, force_sear
         else:
             lookup_url = 'search/series?name=%s' % series_name
         try:
+            log.debug('trying to fetch TVDB search results from TVDB')
             fetched_results = TVDBRequest().get(lookup_url)
         except requests.RequestException as e:
             raise LookupError('Error searching series from TVDb (%s)' % e)

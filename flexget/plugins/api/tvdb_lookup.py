@@ -9,63 +9,86 @@ from flexget.plugins.api_tvdb import lookup_series, lookup_episode, search_for_s
 
 tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
 
-default_error_schema = {
-    'type': 'object',
-    'properties': {
-        'status': {'type': 'string'},
-        'message': {'type': 'string'}
+
+class objects_container(object):
+    default_error_schema = {
+        'type': 'object',
+        'properties': {
+            'status': {'type': 'string'},
+            'message': {'type': 'string'}
+        }
     }
-}
 
-default_error_schema = api.schema('default_error_schema', default_error_schema)
-
-tvdb_series_object = {
-    'type': 'object',
-    'properties': {
-        'tvdb_id': {'type': 'integer'},
-        'last_updated': {'type': 'string', 'format': 'date-time'},
-        'expired': {'type': 'boolean'},
-        'name': {'type': 'string'},
-        'rating': {'type': 'number'},
-        'status': {'type': 'string'},
-        'runtime': {'type': 'integer'},
-        'airs_time': {'type': 'string'},
-        'airs_dayofweek': {'type': 'string'},
-        'content_rating': {'type': 'string'},
-        'network': {'type': 'string'},
-        'overview': {'type': 'string'},
-        'imdb_id': {'type': 'string'},
-        'zap2it_id': {'type': 'string'},
-        'banner': {'type': 'string'},
-        'first_aired': {'type': 'string'},
-        'actors': {'type': 'array', 'items': {'type': 'string'}},
-        'posters': {'type': 'array', 'items': {'type': 'string'}},
-        'genres': {'type': 'array', 'items': {'type': 'string'}},
+    tvdb_series_object = {
+        'type': 'object',
+        'properties': {
+            'tvdb_id': {'type': 'integer'},
+            'last_updated': {'type': 'string', 'format': 'date-time'},
+            'expired': {'type': 'boolean'},
+            'name': {'type': 'string'},
+            'rating': {'type': 'number'},
+            'status': {'type': 'string'},
+            'runtime': {'type': 'integer'},
+            'airs_time': {'type': 'string'},
+            'airs_dayofweek': {'type': 'string'},
+            'content_rating': {'type': 'string'},
+            'network': {'type': 'string'},
+            'overview': {'type': 'string'},
+            'imdb_id': {'type': 'string'},
+            'zap2it_id': {'type': 'string'},
+            'banner': {'type': 'string'},
+            'first_aired': {'type': 'string'},
+            'actors': {'type': 'array', 'items': {'type': 'string'}},
+            'posters': {'type': 'array', 'items': {'type': 'string'}},
+            'genres': {'type': 'array', 'items': {'type': 'string'}},
+        }
     }
-}
 
-episode_object = {
-    'type': 'object',
-    'properties': {
-        'id': {'type': 'integer'},
-        'expired': {'type': 'boolean'},
-        'last_update': {'type': 'string'},
-        'season_number': {'type': 'integer'},
-        'episode_number': {'type': 'integer'},
-        'absolute_number': {'type': 'integer'},
-        'episode_name': {'type': 'string'},
-        'overview': {'type': 'string'},
-        'director': {'type': 'array', 'items': {'type': 'string'}},
-        'writer': {'type': 'array', 'items': {'type': 'string'}},
-        'rating': {'type': 'number'},
-        'image': {'type': 'string'},
-        'first_aired': {'type': 'string'},
-        'series_id': {'type': 'integer'}
+    episode_object = {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'integer'},
+            'expired': {'type': 'boolean'},
+            'last_update': {'type': 'string'},
+            'season_number': {'type': 'integer'},
+            'episode_number': {'type': 'integer'},
+            'absolute_number': {'type': 'integer'},
+            'episode_name': {'type': 'string'},
+            'overview': {'type': 'string'},
+            'director': {'type': 'array', 'items': {'type': 'string'}},
+            'writer': {'type': 'array', 'items': {'type': 'string'}},
+            'rating': {'type': 'number'},
+            'image': {'type': 'string'},
+            'first_aired': {'type': 'string'},
+            'series_id': {'type': 'integer'}
+        }
     }
-}
 
-tvdb_series_schema = api.schema('tvdb_series_schema', tvdb_series_object)
-tvdb_episode_schema = api.schema('tvdb_episode_schema', episode_object)
+    search_result_object = {
+        'type': 'object',
+        'properties': {
+            'aliases': {'type': 'array', 'items': {'type': 'string'}},
+            'first_aired': {'type': 'string', 'format': 'date-time'},
+            'banner': {'type': 'string'},
+            'network': {'type': 'string'},
+            'series_name': {'type': 'string'},
+            'status': {'type': 'string'},
+            'overview': {'type': 'string'},
+            'tvdb_id': {'type': 'integer'}
+        }
+    }
+    search_results_object = {
+        'type': 'object',
+        'properties': {
+            'search_results': {'type': 'array', 'items': search_result_object}
+        }
+    }
+
+
+default_error_schema = api.schema('default_error_schema', objects_container.default_error_schema)
+tvdb_series_schema = api.schema('tvdb_series_schema', objects_container.tvdb_series_object)
+tvdb_episode_schema = api.schema('tvdb_episode_schema', objects_container.episode_object)
+search_results_schema = api.schema('tvdb_search_results_schema', objects_container.search_results_object)
 
 series_parser = api.parser()
 series_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
@@ -144,12 +167,15 @@ search_parser.add_argument('force_search', type=inputs.boolean, help='Force onli
 @tvdb_api.route('/search/')
 @api.doc(parser=search_parser)
 class TVDBSeriesSearchAPI(APIResource):
+    @api.response(200, 'Successfully got results', search_results_schema)
+    @api.response(404, 'No results found', default_error_schema)
+    @api.response(500, 'Not enough parameters for lookup', default_error_schema)
     def get(self, session=None):
         args = search_parser.parse_args()
         if not (args.get('series_name') or args.get('imdb_id') or args.get('zap2it_id')):
             return {'status': 'error',
                     'message': 'Not enough lookup arguments'
-                    }, 400
+                    }, 500
         kwargs = {
             'series_name': args.get('series_name'),
             'imdb_id': args.get('imdb_id'),
@@ -163,4 +189,4 @@ class TVDBSeriesSearchAPI(APIResource):
             return {'status': 'error',
                     'message': e.args[0]
                     }, 404
-        return jsonify({'results': [a.to_dict() for a in search_results]})
+        return jsonify({'search_results': [a.to_dict() for a in search_results]})
