@@ -16,7 +16,7 @@ from flexget.utils.database import with_session, text_date_synonym, json_synonym
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('api_tvdb')
-Base = db_schema.versioned_base('api_tvdb', 6)
+Base = db_schema.versioned_base('api_tvdb', 7)
 
 # This is a FlexGet API key
 persist = SimplePersistence('api_tvdb')
@@ -88,7 +88,7 @@ class TVDBRequest(object):
 
 @db_schema.upgrade('api_tvdb')
 def upgrade(ver, session):
-    if ver is None or ver <= 5:
+    if ver is None or ver <= 6:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -362,11 +362,12 @@ class TVDBSeriesSearchResult(Base):
 
         self.id = search_series_name['id']
         self.name = search_series_name['seriesName']
-        self.first_aired = search_series_name['first_aired']
+        self.first_aired = search_series_name['firstAired']
         self.network = search_series_name['network']
         self.overview = search_series_name['overview']
         self.status = search_series_name['status']
         self._banner = search_series_name['banner']
+        self.aliases = search_series_name['aliases']
 
     @property
     def banner(self):
@@ -594,7 +595,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
 
 
 @with_session()
-def search_series(search_name, imdb_id=None, zap2it_id=None, force_search=None, session=None):
+def search_for_series(search_name=None, imdb_id=None, zap2it_id=None, force_search=None, session=None):
     series_search_results = []
     if not force_search:
         series_search_results = session.query(TVDBSeriesSearchResult).filter(
@@ -602,21 +603,20 @@ def search_series(search_name, imdb_id=None, zap2it_id=None, force_search=None, 
     if not series_search_results:
         if imdb_id:
             lookup_by = 'imdb_id'
-            lookup_url = 'search/series/?imdb_id=%s' % imdb_id,
+            lookup_url = 'search/series?imdb_id=%s' % imdb_id
         elif zap2it_id:
             lookup_by = 'zap2itId'
-            lookup_url = 'search/series/?zap2itId=%s' % zap2it_id,
+            lookup_url = 'search/series?zap2itId=%s' % zap2it_id
         else:
             lookup_by = 'search_name'
-            lookup_url = 'search/series/?name=%s' % search_name,
+            lookup_url = 'search/series?name=%s' % search_name
         try:
             series_search_results = TVDBRequest().get(lookup_url)
-            series_search_results = [session.merge(fetched_search_series) for fetched_search_series in
-                                     TVDBRequest().get(lookup_url)]
         except requests.RequestException as e:
             raise LookupError('Error searching series from TVDb (%s)' % e)
-    if series_search_results:
-        return series_search_results
+    fetched_results = [session.merge(TVDBSeriesSearchResult(series, search_name)) for series in series_search_results]
+    if fetched_results:
+        return fetched_results
     raise LookupError('No results found for series lookup %s' % lookup_by)
 
 

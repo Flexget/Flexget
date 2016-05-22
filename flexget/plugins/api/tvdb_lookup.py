@@ -5,7 +5,7 @@ from flask import jsonify
 from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.plugins.api_tvdb import lookup_series, lookup_episode
+from flexget.plugins.api_tvdb import lookup_series, lookup_episode, search_for_series
 
 tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
 
@@ -132,3 +132,31 @@ class TVDBEpisodeSearchAPI(APIResource):
                     'message': e.args[0]
                     }, 404
         return jsonify(episode.to_dict())
+
+
+search_parser = api.parser()
+search_parser.add_argument('series_name')
+search_parser.add_argument('imdb_id')
+search_parser.add_argument('zap2it_id')
+search_parser.add_argument('force_search')
+
+
+@tvdb_api.route('/search/')
+@api.doc(parser=search_parser)
+class TVDBSeriesSearchAPI(APIResource):
+    def get(self, session=None):
+        args = search_parser.parse_args()
+        kwargs = {
+            'search_name': args.get('series_name'),
+            'imdb_id': args.get('imdb_id'),
+            'zap2it_id': args.get('zap2it_id'),
+            'force_search': args.get('force_search'),
+            'session': session
+        }
+        try:
+            search_results = search_for_series(**kwargs)
+        except LookupError as e:
+            return {'status': 'error',
+                    'message': e.args[0]
+                    }, 404
+        return jsonify({'results': [a.to_dict() for a in search_results]})
