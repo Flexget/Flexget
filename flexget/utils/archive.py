@@ -70,7 +70,6 @@ class Archive(object):
         self.path = path
 
         self.archive = archive_object(self.path)
-        log.debug('Successfully opened RAR: %s', self.path)
 
     def close(self):
         """Release open resources."""
