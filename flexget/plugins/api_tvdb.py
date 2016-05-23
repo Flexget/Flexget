@@ -21,6 +21,8 @@ Base = db_schema.versioned_base('api_tvdb', 7)
 # This is a FlexGet API key
 persist = SimplePersistence('api_tvdb')
 
+SEARCH_RESULT_EXPIRATION_DAYS = 3
+
 
 class TVDBRequest(object):
     API_KEY = '4D297D8CFDE0E105'
@@ -343,7 +345,7 @@ class TVDBSeriesSearchResult(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=False)
     original_name = Column(Unicode)
-    name = Column(Unicode)
+    lower_case_name = Column(Unicode)
     imdb_id = Column(Unicode)
     zap2it_id = Column(Unicode)
     status = Column(Unicode)
@@ -354,11 +356,14 @@ class TVDBSeriesSearchResult(Base):
     first_aired = text_date_synonym('_first_aired')
     _aliases = Column('aliases', Unicode)
     aliases = json_synonym('_aliases')
+    created_at = Column(DateTime)
+    search_name = Column(Unicode)
 
-    def __init__(self, search_series_name, imdb_id=None, zap2it_id=None):
+    def __init__(self, search_series_name, search_name=None, imdb_id=None, zap2it_id=None):
+        self.search_name = search_name
         self.id = search_series_name['id']
         self.original_name = search_series_name['seriesName']
-        self.name = self.original_name.lower()
+        self.lower_case_name = self.original_name.lower()
         self.first_aired = search_series_name['firstAired']
         self.network = search_series_name['network']
         self.overview = search_series_name['overview']
@@ -367,6 +372,7 @@ class TVDBSeriesSearchResult(Base):
         self.aliases = search_series_name['aliases']
         self.imdb_id = imdb_id
         self.zap2it_id = zap2it_id
+        self.created_at = datetime.now()
 
     @property
     def banner(self):
@@ -384,6 +390,15 @@ class TVDBSeriesSearchResult(Base):
             'series_name': self.original_name,
             'status': self.status
         }
+
+    @property
+    def expired(self):
+        log.debug('checking series %s for expiration', self.original_name)
+        if datetime.now() - self.created_at >= timedelta(days=SEARCH_RESULT_EXPIRATION_DAYS):
+            log.debug('series %s is expires, should refetch', self.original_name)
+            return True
+        log.debug('series %s is not expired', self.original_name)
+        return False
 
 
 def find_series_id(name):
@@ -594,11 +609,11 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
 
 
 @with_session
-def search_for_series(series_name=None, imdb_id=None, zap2it_id=None, force_search=None, session=None):
+def search_for_series(search_name=None, imdb_id=None, zap2it_id=None, force_search=None, session=None):
     """
     Search IMDB using a an identifier, return a list of cached search results. One if `search_name`, `imdb_id` or
     `zap2it_id` is required.
-    :param series_name: Name of search to use
+    :param search_name: Name of search to use
     :param imdb_id: Search via IMDB ID
     :param zap2it_id: Search via zap2it ID
     :param force_search: Should search use cache
@@ -609,23 +624,23 @@ def search_for_series(series_name=None, imdb_id=None, zap2it_id=None, force_sear
     if not force_search:
         log.debug('trying to fetch TVDB search results from DB')
         series_search_results = session.query(TVDBSeriesSearchResult).filter(
-            or_(TVDBSeriesSearchResult.name == series_name.lower(),
-                and_(TVDBSeriesSearchResult.imdb_id, TVDBSeriesSearchResult.imdb_id == imdb_id),
-                and_(TVDBSeriesSearchResult.zap2it_id, TVDBSeriesSearchResult.zap2it_id == zap2it_id))).all()
+            or_(TVDBSeriesSearchResult.search_name is not None, TVDBSeriesSearchResult.search_name == search_name,
+                TVDBSeriesSearchResult.imdb_id is not None, TVDBSeriesSearchResult.imdb_id == imdb_id,
+                TVDBSeriesSearchResult.zap2it_id is not None, TVDBSeriesSearchResult.zap2it_id == zap2it_id)).all()
 
-    if not series_search_results:
+    if not series_search_results or any(series.expired for series in series_search_results):
         if imdb_id:
             lookup_url = 'search/series?imdbId=%s' % imdb_id
         elif zap2it_id:
             lookup_url = 'search/series?zap2itId=%s' % zap2it_id
         else:
-            lookup_url = 'search/series?name=%s' % series_name
+            lookup_url = 'search/series?name=%s' % search_name
         try:
             log.debug('trying to fetch TVDB search results from TVDB')
             fetched_results = TVDBRequest().get(lookup_url)
         except requests.RequestException as e:
             raise LookupError('Error searching series from TVDb (%s)' % e)
-        series_search_results = [session.merge(TVDBSeriesSearchResult(series)) for series in
+        series_search_results = [session.merge(TVDBSeriesSearchResult(series, search_name)) for series in
                                  fetched_results]
     if series_search_results:
         return series_search_results

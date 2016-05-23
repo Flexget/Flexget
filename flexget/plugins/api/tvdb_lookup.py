@@ -158,7 +158,7 @@ class TVDBEpisodeSearchAPI(APIResource):
 
 
 search_parser = api.parser()
-search_parser.add_argument('series_name', help='Series Name')
+search_parser.add_argument('search_name', help='Series Name')
 search_parser.add_argument('imdb_id', help='Series IMDB ID')
 search_parser.add_argument('zap2it_id', help='Series ZAP2IT ID')
 search_parser.add_argument('force_search', type=inputs.boolean, help='Force online lookup')
@@ -172,12 +172,12 @@ class TVDBSeriesSearchAPI(APIResource):
     @api.response(500, 'Not enough parameters for lookup', default_error_schema)
     def get(self, session=None):
         args = search_parser.parse_args()
-        if not (args.get('series_name') or args.get('imdb_id') or args.get('zap2it_id')):
+        if not (args.get('search_name') or args.get('imdb_id') or args.get('zap2it_id')):
             return {'status': 'error',
                     'message': 'Not enough lookup arguments'
                     }, 500
         kwargs = {
-            'series_name': args.get('series_name'),
+            'search_name': args.get('search_name'),
             'imdb_id': args.get('imdb_id'),
             'zap2it_id': args.get('zap2it_id'),
             'force_search': args.get('force_search'),
