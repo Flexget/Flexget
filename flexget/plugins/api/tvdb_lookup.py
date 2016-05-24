@@ -39,6 +39,7 @@ class objects_container(object):
             'banner': {'type': 'string'},
             'first_aired': {'type': 'string'},
             'actors': {'type': 'array', 'items': {'type': 'string'}},
+            'aliases': {'type': 'array', 'items': {'type': 'string'}},
             'posters': {'type': 'array', 'items': {'type': 'string'}},
             'genres': {'type': 'array', 'items': {'type': 'string'}},
         }
@@ -138,6 +139,11 @@ class TVDBEpisodeSearchAPI(APIResource):
         absolute_number = args.get('absolute_number')
         season_number = args.get('season_number')
         ep_number = args.get('ep_number')
+        if not ((season_number and ep_number) or absolute_number):
+            return {'status': 'error',
+                    'message': 'not enough parameters for lookup. Either season and episode number or absolute number '
+                               'are required.'
+                    }, 500
 
         kwargs = {'tvdb_id': tvdb_id,
                   'session': session}

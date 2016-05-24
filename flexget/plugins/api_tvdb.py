@@ -344,34 +344,34 @@ class TVDBSeriesSearchResult(Base):
     __tablename__ = 'tvdb_series_search_results'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
-    original_name = Column(Unicode)
-    lower_case_name = Column(Unicode)
-    imdb_id = Column(Unicode)
-    zap2it_id = Column(Unicode)
+    lookup_term = Column(Unicode)
+
+    name = Column(Unicode)
     status = Column(Unicode)
     network = Column(Unicode)
     overview = Column(Unicode)
+
     _banner = Column('banner', Unicode)
+
     _first_aired = Column('first_aired', DateTime)
     first_aired = text_date_synonym('_first_aired')
+
     _aliases = Column('aliases', Unicode)
     aliases = json_synonym('_aliases')
+
     created_at = Column(DateTime)
     search_name = Column(Unicode)
 
-    def __init__(self, search_series_name, search_name=None, imdb_id=None, zap2it_id=None):
-        self.search_name = search_name
-        self.id = search_series_name['id']
-        self.original_name = search_series_name['seriesName']
-        self.lower_case_name = self.original_name.lower()
-        self.first_aired = search_series_name['firstAired']
-        self.network = search_series_name['network']
-        self.overview = search_series_name['overview']
-        self.status = search_series_name['status']
-        self._banner = search_series_name['banner']
-        self.aliases = search_series_name['aliases']
-        self.imdb_id = imdb_id
-        self.zap2it_id = zap2it_id
+    def __init__(self, series, lookup_term=None):
+        self.lookup_term = lookup_term
+        self.id = series['id']
+        self.name = series['seriesName']
+        self.first_aired = series['firstAired']
+        self.network = series['network']
+        self.overview = series['overview']
+        self.status = series['status']
+        self._banner = series['banner']
+        self.aliases = series['aliases']
         self.created_at = datetime.now()
 
     @property
@@ -387,7 +387,7 @@ class TVDBSeriesSearchResult(Base):
             'tvdb_id': self.id,
             'network': self.network,
             'overview': self.overview,
-            'series_name': self.original_name,
+            'series_name': self.name,
             'status': self.status
         }
 
@@ -620,27 +620,30 @@ def search_for_series(search_name=None, imdb_id=None, zap2it_id=None, force_sear
     :param session: Current DB session
     :return: A List of TVDBSeriesSearchResult objects
     """
+    if imdb_id:
+        lookup_term = imdb_id
+        lookup_url = 'search/series?imdbId=%s' % imdb_id
+    elif zap2it_id:
+        lookup_term = zap2it_id
+        lookup_url = 'search/series?zap2itId=%s' % zap2it_id
+    elif search_name:
+        lookup_term = search_name
+        lookup_url = 'search/series?name=%s' % search_name
+    else:
+        raise LookupError('not enough parameters for lookup')
     series_search_results = []
     if not force_search:
         log.debug('trying to fetch TVDB search results from DB')
         series_search_results = session.query(TVDBSeriesSearchResult).filter(
-            or_(TVDBSeriesSearchResult.search_name is not None, TVDBSeriesSearchResult.search_name == search_name,
-                TVDBSeriesSearchResult.imdb_id is not None, TVDBSeriesSearchResult.imdb_id == imdb_id,
-                TVDBSeriesSearchResult.zap2it_id is not None, TVDBSeriesSearchResult.zap2it_id == zap2it_id)).all()
+            TVDBSeriesSearchResult.lookup_term == lookup_term).all()
 
     if not series_search_results or any(series.expired for series in series_search_results):
-        if imdb_id:
-            lookup_url = 'search/series?imdbId=%s' % imdb_id
-        elif zap2it_id:
-            lookup_url = 'search/series?zap2itId=%s' % zap2it_id
-        else:
-            lookup_url = 'search/series?name=%s' % search_name
         try:
             log.debug('trying to fetch TVDB search results from TVDB')
             fetched_results = TVDBRequest().get(lookup_url)
         except requests.RequestException as e:
             raise LookupError('Error searching series from TVDb (%s)' % e)
-        series_search_results = [session.merge(TVDBSeriesSearchResult(series, search_name)) for series in
+        series_search_results = [session.merge(TVDBSeriesSearchResult(series, lookup_term)) for series in
                                  fetched_results]
     if series_search_results:
         return series_search_results
