@@ -3,5 +3,6 @@
 
     angular
         .module('flexget.services', [
+            'flexget.components'
         ]);
 })();

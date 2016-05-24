@@ -3,6 +3,9 @@
 
     angular
         .module('flexget.components', [
-		'flexget.components.requestInterceptor']);
+		'flexget.components.requestInterceptor',
+            'ui.router',
+            'ngMaterial'
+        ]);
 
 })();
