@@ -20,6 +20,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'test-helpers/**/*.js',
+	  'src/app.loading.js',
       'src/app.utils.js',
       'src/app.module.js',
       'src/app.routes.js',
