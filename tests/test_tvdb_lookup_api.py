@@ -31,7 +31,7 @@ class TestTVDBSeriesLookupAPI(object):
             ],
             "imdb_id": "tt0106179",
             "language": "en",
-            "last_updated": "2016-05-24 00:07:19",
+            "last_updated": "2016-05-23 21:07:19",
             "network": "FOX (US)",
             "overview": "The X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John Doggett and "
                         "Monica Reyes and their investigations into the paranormal. From genetic mutants and killer "
@@ -100,7 +100,7 @@ class TestTVDBSeriesWithActorsLookupAPI(object):
             ],
             "imdb_id": "tt0106179",
             "language": "en",
-            "last_updated": "2016-05-24 00:07:19",
+            "last_updated": "2016-05-23 21:07:19",
             "network": "FOX (US)",
             "overview": "The X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John Doggett and "
                         "Monica Reyes and their investigations into the paranormal. From genetic mutants and killer "
