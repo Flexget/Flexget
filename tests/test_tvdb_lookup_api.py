@@ -31,7 +31,7 @@ class TestTVDBSeriesLookupAPI(object):
             ],
             "imdb_id": "tt0106179",
             "language": "en",
-            "last_updated": "2016-05-23 21:07:19",
+            "last_updated": "2016-05-24 00:07:19",
             "network": "FOX (US)",
             "overview": "The X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John Doggett and "
                         "Monica Reyes and their investigations into the paranormal. From genetic mutants and killer "
@@ -100,7 +100,7 @@ class TestTVDBSeriesWithActorsLookupAPI(object):
             ],
             "imdb_id": "tt0106179",
             "language": "en",
-            "last_updated": "2016-05-23 21:07:19",
+            "last_updated": "2016-05-24 00:07:19",
             "network": "FOX (US)",
             "overview": "The X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John Doggett and "
                         "Monica Reyes and their investigations into the paranormal. From genetic mutants and killer "
@@ -133,7 +133,7 @@ class TestTVDBSeriesWithActorsLookupAPI(object):
 class TestTVDBEpisodeLookupAPI(object):
     config = 'tasks: {}'
 
-    def test_tvdb_episode_lookup(self, api_client):
+    def test_tvdb_episode_lookup_season_and_ep_number(self, api_client):
         rsp = api_client.get('/tvdb/episode/77398/')
         assert rsp.status_code == 500, 'Response code is %s' % rsp.status_code
 
@@ -162,6 +162,7 @@ class TestTVDBEpisodeLookupAPI(object):
         data = json.loads(rsp.get_data(as_text=True))
         assert data == expected_response
 
+    def test_tvdb_episode_lookup_by_absolute_number(self, api_client):
         expected_response = {
             "absolute_number": 46,
             "director": "Antonio Negret",
@@ -189,12 +190,12 @@ class TestTVDBEpisodeLookupAPI(object):
 class TestTVDBSearchLookupAPI(object):
     config = 'tasks: {}'
 
-    def test_tvdb_search_results(self, api_client):
+    def test_tvdb_search_results_by_name(self, api_client):
         expected_response = {u'search_results': [{u'status': u'Continuing', u'network': u'The CW',
                                                   u'overview': u'Two brothers follow their father\'s footsteps as "hunters" fighting evil supernatural beings of many kinds including monsters, demons, and gods that roam the earth.',
                                                   u'tvdb_id': 78901, u'series_name': u'Supernatural',
                                                   u'first_aired': u'Tue, 13 Sep 2005 00:00:00 GMT',
-                                                  u'banner': u'http://thetvdb.com/banners/graphical/78901-g45.jpg',
+                                                  u'banner': u'http://thetvdb.com/banners/graphical/78901-g46.jpg',
                                                   u'aliases': []}, {u'status': u'Ended', u'network': u'The CW',
                                                                     u'overview': u'Supernatural the Animation will not only remake the best episodes from the live-action version, but also depict original episodes. These original episodes will include prologues of the Winchester brothers\u2019 childhood, anime-only enemies, and episodes featuring secondary characters from the original series.',
                                                                     u'tvdb_id': 197001,
@@ -257,6 +258,7 @@ class TestTVDBSearchLookupAPI(object):
         data = json.loads(rsp.get_data(as_text=True))
         assert data == expected_response
 
+    def test_tvdb_search_results_by_imdb_id(self, api_client):
         expected_response = {
             u'search_results': [
                 {u'status': u'Continuing',
@@ -277,6 +279,7 @@ class TestTVDBSearchLookupAPI(object):
         data = json.loads(rsp.get_data(as_text=True))
         assert data == expected_response
 
+    def test_tvdb_search_results_by_zap2it_id(self, api_client):
         expected_response = {
             u'search_results': [
                 {u'status': u'Continuing',

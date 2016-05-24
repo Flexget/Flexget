@@ -1,0 +1,36 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Authorization: [Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NjQxODA3OTgsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDY0MDk0Mzk4fQ.x4jzIT2bg03w6YJwrbbZIeLmjVuZNfxMsJJ3fGluYPqqkMKzgH3v4EjihTw5oVSknK36EjhTieLOpN_-4hf5zezVYdDVVbfTkUXRYP4PmCtgaNGTkqpH22mKG11VTqaMJ0YagtnMTWAIysp5kX6b3ndSXQscCitvZW57_WQcCmV7JFMSFOLbmtPnECGzBT45ujqB5VMbqmjDBWvXOdEvC7jbB2STg6VqksOO7pwzwuNlzl1qEL0JIEzlcS2nhBkJ62OB1xn7IthBjj4aZi7aA66wJwx0iX1hi-Hjgqrhc_tJFNa0_ZaySHlgZ8jUsZXFPLnrHSVM54IDzieGE1onOQ]
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.0.30.dev (www.flexget.com)]
+      method: GET
+      uri: https://api.thetvdb.com/search/series?imdbId=tt0944947
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA1SSMW/bQAyFd/+KBy1dbDdKixbN5gZoO6VDC2QoMtASpWNy4gUkbcEI8t+LU9C4
+          WW5473sEH3FPK6DpKai5wp8VADwtL9BQFnL2atyt/4l7UmVrrtCMRo9JOsrv28v2w6d2M7ZftveP
+          Y/PKDmIeOzHuK3950babi4+b9vOZkOq8xF815ZiLPdTIj68/z2w5sh2F52r84iMrtOwzY6BJsrBj
+          kDEFhmLoioaVjDIgEmM6xbIoMmlfxVv2YCu+xTeTLqQo9hwzsy58KgdnR2bqHVEwHHLeeEeZMZNt
+          scsZc5LMIBzZTiDthDXAR8mgmR5YHfIybCCLxB7QYpG22E3SeyzWTLYGQXnM3AX3qEWC7IRiPVvd
+          dBIfJHy98De14DvHLUWX1hAH5YxIFPAg7f1NC2PKky9DWFGbV1W6E1IxK1bpU9F+ez6xswn7DU1c
+          j/ydJq7x38mKsv+HBcWh/ovmumiIHkTHZjGfV8Dd6vkvAAAA//8DAHag5qZVAgAA
+      headers:
+        CF-RAY: [2a80e438671215e3-FRA]
+        Cache-Control: ['private, max-age=600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json]
+        Date: ['Tue, 24 May 2016 12:53:37 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=d5953289535da63e0e7074f7967b6eede1464094416; expires=Wed,
+            24-May-17 12:53:36 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+        Vary: [Accept-Language]
+        X-Powered-By: [Thundar!]
+        X-Thetvdb-Api-Version: [2.1.0]
+      status: {code: 200, message: OK}
+version: 1
