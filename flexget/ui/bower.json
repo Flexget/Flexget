@@ -22,7 +22,10 @@
   "resolutions": {
     "angular": "1.5.5"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "angular-mocks": "^1.5.5",
+    "bardjs": "^0.1.8"
+  },
   "overrides": {
     "please-wait": {
       "ignore": true
