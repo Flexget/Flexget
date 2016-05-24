@@ -20,6 +20,8 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'src/app.utils.js',
+      'src/app.module.js',
+      'src/app.routes.js',
       'src/**/*.module.js',
       'src/**/*.js'
     ],
