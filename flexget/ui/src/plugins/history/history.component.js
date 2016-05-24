@@ -12,13 +12,18 @@
     var vm = this;
 
     vm.title = 'History';
-    $http.get('/api/history/')
-      .success(function (data) {
-        vm.entries = data['entries'];
-      })
-      .error(function (data, status, headers, config) {
-        // log error
-      });
+    
+    activate();
+    
+    function activate() {    
+      $http.get('/api/history/')
+        .success(function (data) {
+          vm.entries = data['entries'];
+        })
+        .error(function (data, status, headers, config) {
+          // log error
+        });
+    }
   }
 
 })();
