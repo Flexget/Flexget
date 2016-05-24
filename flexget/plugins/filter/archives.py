@@ -61,7 +61,7 @@ class FilterArchives(object):
         archive.rarfile_set_tool_path(config)
 
         for entry in task.entries:
-            archive_path = entry.get('location') or ''
+            archive_path = entry.get('location', '')
 
             if archive.is_archive(archive_path):
                 entry.accept()
