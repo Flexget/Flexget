@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, func
+from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, or_, and_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
@@ -16,10 +16,12 @@ from flexget.utils.database import with_session, text_date_synonym, json_synonym
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('api_tvdb')
-Base = db_schema.versioned_base('api_tvdb', 6)
+Base = db_schema.versioned_base('api_tvdb', 7)
 
 # This is a FlexGet API key
 persist = SimplePersistence('api_tvdb')
+
+SEARCH_RESULT_EXPIRATION_DAYS = 3
 
 
 class TVDBRequest(object):
@@ -88,7 +90,7 @@ class TVDBRequest(object):
 
 @db_schema.upgrade('api_tvdb')
 def upgrade(ver, session):
-    if ver is None or ver <= 5:
+    if ver is None or ver <= 6:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -215,6 +217,7 @@ class TVDBSeries(Base):
 
     def to_dict(self):
         return {
+            'aliases': [a for a in self.aliases],
             'tvdb_id': self.id,
             'last_updated': datetime.fromtimestamp(self.last_updated).strftime('%Y-%m-%d %H:%M:%S'),
             'expired': self.expired,
@@ -333,6 +336,71 @@ class TVDBSearchResult(Base):
             self.series = series
 
 
+class TVDBSeriesSearchResult(Base):
+    """
+    This table will hold a single result that results from the /search/series endpoint,
+    which return a series with a minimal set of parameters.
+    """
+    __tablename__ = 'tvdb_series_search_results'
+
+    id = Column(Integer, primary_key=True, autoincrement=False)
+    lookup_term = Column(Unicode)
+
+    name = Column(Unicode)
+    status = Column(Unicode)
+    network = Column(Unicode)
+    overview = Column(Unicode)
+
+    _banner = Column('banner', Unicode)
+
+    _first_aired = Column('first_aired', DateTime)
+    first_aired = text_date_synonym('_first_aired')
+
+    _aliases = Column('aliases', Unicode)
+    aliases = json_synonym('_aliases')
+
+    created_at = Column(DateTime)
+    search_name = Column(Unicode)
+
+    def __init__(self, series, lookup_term=None):
+        self.lookup_term = lookup_term
+        self.id = series['id']
+        self.name = series['seriesName']
+        self.first_aired = series['firstAired']
+        self.network = series['network']
+        self.overview = series['overview']
+        self.status = series['status']
+        self._banner = series['banner']
+        self.aliases = series['aliases']
+        self.created_at = datetime.now()
+
+    @property
+    def banner(self):
+        if self._banner:
+            return TVDBRequest.BANNER_URL + self._banner
+
+    def to_dict(self):
+        return {
+            'aliases': [a for a in self.aliases],
+            'banner': self.banner,
+            'first_aired': self.first_aired,
+            'tvdb_id': self.id,
+            'network': self.network,
+            'overview': self.overview,
+            'series_name': self.name,
+            'status': self.status
+        }
+
+    @property
+    def expired(self):
+        log.debug('checking series %s for expiration', self.original_name)
+        if datetime.now() - self.created_at >= timedelta(days=SEARCH_RESULT_EXPIRATION_DAYS):
+            log.debug('series %s is expires, should refetch', self.original_name)
+            return True
+        log.debug('series %s is not expired', self.original_name)
+        return False
+
+
 def find_series_id(name):
     """Looks up the tvdb id for a series"""
     try:
@@ -377,7 +445,8 @@ def find_series_id(name):
 
 def _update_search_strings(series, session, search=None):
     search_strings = series.search_strings
-    add = [series.name.lower()] + ([a.lower() for a in series.aliases] if series.aliases else []) + [search.lower()] if search else []
+    add = [series.name.lower()] + ([a.lower() for a in series.aliases] if series.aliases else []) + [
+        search.lower()] if search else []
     for name in set(add):
         if name not in search_strings:
             search_result = session.query(TVDBSearchResult).filter(TVDBSearchResult.search == name).first()
@@ -419,7 +488,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     if not series and name:
         found = session.query(TVDBSearchResult).filter(TVDBSearchResult.search == name.lower()).first()
         if found and found.series:
-                series = found.series
+            series = found.series
     if series:
         # Series found in cache, update if cache has expired.
         if not only_cached:
@@ -539,6 +608,48 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
         raise LookupError('No results found for %s' % ep_description)
 
 
+@with_session
+def search_for_series(search_name=None, imdb_id=None, zap2it_id=None, force_search=None, session=None):
+    """
+    Search IMDB using a an identifier, return a list of cached search results. One if `search_name`, `imdb_id` or
+    `zap2it_id` is required.
+    :param search_name: Name of search to use
+    :param imdb_id: Search via IMDB ID
+    :param zap2it_id: Search via zap2it ID
+    :param force_search: Should search use cache
+    :param session: Current DB session
+    :return: A List of TVDBSeriesSearchResult objects
+    """
+    if imdb_id:
+        lookup_term = imdb_id
+        lookup_url = 'search/series?imdbId=%s' % imdb_id
+    elif zap2it_id:
+        lookup_term = zap2it_id
+        lookup_url = 'search/series?zap2itId=%s' % zap2it_id
+    elif search_name:
+        lookup_term = search_name
+        lookup_url = 'search/series?name=%s' % search_name
+    else:
+        raise LookupError('not enough parameters for lookup')
+    series_search_results = []
+    if not force_search:
+        log.debug('trying to fetch TVDB search results from DB')
+        series_search_results = session.query(TVDBSeriesSearchResult).filter(
+            TVDBSeriesSearchResult.lookup_term == lookup_term).all()
+
+    if not series_search_results or any(series.expired for series in series_search_results):
+        try:
+            log.debug('trying to fetch TVDB search results from TVDB')
+            fetched_results = TVDBRequest().get(lookup_url)
+        except requests.RequestException as e:
+            raise LookupError('Error searching series from TVDb (%s)' % e)
+        series_search_results = [session.merge(TVDBSeriesSearchResult(series, lookup_term)) for series in
+                                 fetched_results]
+    if series_search_results:
+        return series_search_results
+    raise LookupError('No results found for series lookup')
+
+
 def mark_expired(session):
     """Marks series and episodes that have expired since we cached them"""
     # Only get the expired list every hour
@@ -572,7 +683,8 @@ def mark_expired(session):
     # Update our cache to mark the items that have expired
     for chunk in chunked(expired_series):
         series_updated = session.query(TVDBSeries).filter(TVDBSeries.id.in_(chunk)).update({'expired': True}, 'fetch')
-        episodes_updated = session.query(TVDBEpisode).filter(TVDBEpisode.series_id.in_(chunk)).update({'expired': True}, 'fetch')
+        episodes_updated = session.query(TVDBEpisode).filter(TVDBEpisode.series_id.in_(chunk)).update({'expired': True},
+                                                                                                      'fetch')
         log.debug('%s series and %s episodes marked as expired', series_updated, episodes_updated)
 
     persist['last_check'] = new_last_check
