@@ -2,6 +2,9 @@
     'use strict';
 
     angular
-        .module('flexget.components', []);
+        .module('flexget.components', [
+            'ui.router',
+            'ngMaterial'
+        ]);
 
 })();

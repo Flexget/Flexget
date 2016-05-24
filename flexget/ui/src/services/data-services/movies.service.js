@@ -4,7 +4,7 @@
     angular.module('flexget.services')
         .factory('moviesService', moviesService);
 
-    function moviesService($http, CacheFactory, $mdDialog, errorService) {
+    function moviesService($http, CacheFactory, errorService) {
         // If cache doesn't exist, create it
         if (!CacheFactory.get('moviesCache')) {
             CacheFactory.createCache('moviesCache');
