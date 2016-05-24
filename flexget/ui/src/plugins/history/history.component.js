@@ -12,10 +12,9 @@
     var vm = this;
 
     vm.title = 'History';
-    
-    activate();
-    
-    function activate() {    
+    vm.$onInit = activate;
+        
+    function activate() {
       $http.get('/api/history/')
         .success(function (data) {
           vm.entries = data['entries'];
