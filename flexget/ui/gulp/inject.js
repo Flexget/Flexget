@@ -16,6 +16,7 @@ gulp.task('inject', ['styles'], function () {
     paths.src + '/**/*.js',
     '!' + paths.src + '/app.utils.js',
     '!' + paths.src + '/app.module.js',
+    '!' + paths.src + '/app.loading.js',
     '!' + paths.src + '/**/*.spec.js'
   ]).pipe($.angularFilesort());
 
