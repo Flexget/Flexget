@@ -80,6 +80,7 @@
   <script src="/test-helpers/history.js"></script>
   <script src="/test-helpers/mockModule.js"></script>
   <script src="/test-helpers/movie_list.js"></script>
+  <script src="/test-helpers/states.js"></script>
   <!-- endinject -->
 
   <script src="/src/app.utils.js"></script>
@@ -89,8 +90,8 @@
   <script src="/src/plugins/series/components/series-show/series-show.component.js"></script>
   <script src="/src/plugins/series/components/series-episode/series-episode.component.js"></script>
   <script src="/src/plugins/seen/seen.module.js"></script>
-  <script src="/src/plugins/seen/components/seen-entry/seen-entry.component.js"></script>
   <script src="/src/plugins/seen/components/seen-field/seen-field.component.js"></script>
+  <script src="/src/plugins/seen/components/seen-entry/seen-entry.component.js"></script>
   <script src="/src/plugins/movies/movies.module.js"></script>
   <script src="/src/plugins/movies/components/movie-entry/movie-entry.component.js"></script>
   <script src="/src/plugins/execute/execute.module.js"></script>
@@ -115,15 +116,18 @@
   <script src="/src/plugins/history/history.component.js"></script>
   <script src="/src/plugins/execute/execute.filter.js"></script>
   <script src="/src/plugins/execute/execute.component.js"></script>
+  <script src="/src/components/components.module.js"></script>
+  <script src="/src/layout/toolbar/toolbar.service.js"></script>
+  <script src="/src/layout/layout.module.js"></script>
+  <script src="/src/layout/toolbar/toolbar.component.js"></script>
+  <script src="/src/layout/sidenav/sidenav.service.js"></script>
+  <script src="/src/layout/sidenav/sidenav.component.js"></script>
   <script src="/src/directives/directives.module.js"></script>
   <script src="/src/directives/palette-background/palette-background.directive.js"></script>
   <script src="/src/directives/material-pagination/material-pagination.directive.js"></script>
-  <script src="/src/components/components.module.js"></script>
   <script src="/src/components/user/user.module.js"></script>
-  <script src="/src/components/toolbar/toolbar.service.js"></script>
-  <script src="/src/components/toolbar/toolbar.directive.js"></script>
-  <script src="/src/components/sidenav/sidenav.service.js"></script>
-  <script src="/src/components/sidenav/sidenav.directive.js"></script>
+  <script src="/src/components/router/router.module.js"></script>
+  <script src="/src/components/router/router-helper.provider.js"></script>
   <script src="/src/components/home/home.module.js"></script>
   <script src="/src/components/home/home.component.js"></script>
   <script src="/src/components/error/error.service.js"></script>
@@ -133,11 +137,13 @@
   <script src="/src/services/tasks.service.js"></script>
   <script src="/src/services/schema.service.js"></script>
   <script src="/src/plugins/plugins.module.js"></script>
+  <script src="/src/layout/layout.run.js"></script>
   <script src="/src/app.theme.js"></script>
   <script src="/src/app.routes.js"></script>
   <!-- endinject -->
 
   <!-- inject:specs:js -->
+  <script src="/src/layout/sidenav/sidenav.component.spec.js"></script>
   <script src="/src/plugins/history/history.component.spec.js"></script>
   <script src="/src/services/data-services/movies.service.spec.js"></script>
   <!-- endinject -->
