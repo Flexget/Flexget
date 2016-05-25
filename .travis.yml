@@ -1,5 +1,9 @@
 language: python
-cache: pip
+cache: 
+  - pip
+  directories:
+    - ./flexget/ui/node_modules
+	- ./flexget/ui/bower_components
 sudo: false
 python:
   - "2.7"
