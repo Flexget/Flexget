@@ -55,7 +55,7 @@
     "karma-sinon": "^1.0.5",
     "karma-wiredep": "^1.0.2",
     "main-bower-files": "~2.11.0",
-    "mocha": "^2.5.2",
+    "mocha": "^2.5.3",
     "phantomjs-prebuilt": "^2.1.7",
     "require-dir": "^0.3.0",
     "sinon": "^1.17.4",
