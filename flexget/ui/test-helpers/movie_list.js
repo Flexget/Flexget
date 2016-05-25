@@ -1,12 +1,12 @@
 var mockMovieListData = (function () {
   return {
-    getLists: getLists,
+    getMovieLists: getMovieLists,
     getMovieListById: getMovieListById,
     getMovieListMovies: getMovieListMovies,
     getMovieListMovieById: getMovieListMovieById
   };
 
-  function getLists() {
+  function getMovieLists() {
     return {
       "movie_lists": [
         {

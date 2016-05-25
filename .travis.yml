@@ -16,8 +16,12 @@ install:
   - pip install --upgrade pip
   - pip install .
   - pip install -r dev-requirements.txt
+  - npm install ./flexget/ui  --prefix ./flexget/ui
+  - bower install --config.cwd=./flexget/ui
 # command to run tests, e.g. python setup.py test
-script: py.test --cov flexget --cov-report xml -n 3
+script:
+  - py.test --cov flexget --cov-report xml -n 3
+  - ./flexget/ui/node_modules/karma/bin/karma start ./flexget/ui/karma.conf.js
 after_success:
   - python-codacy-coverage -r coverage.xml
 env: VCR_RECORD_MODE=none
