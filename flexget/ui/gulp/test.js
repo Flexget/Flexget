@@ -9,6 +9,11 @@ var $ = require('gulp-load-plugins')();
 var browserSync = require('browser-sync').create();
 
 gulp.task('serve-specs', ['build-specs'], function (done) {
+
+    gulp.watch([paths.src + '/**/*.js'], function () {
+        browserSync.reload();
+    });
+
     var options = {
         //proxy: 'localhost:3050',
         port: 3050,
