@@ -3,6 +3,7 @@
 
     angular
         .module('flexget.services', [
-            'flexget.components'
+            'flexget.components',
+            'angular-cache'
         ]);
 })();

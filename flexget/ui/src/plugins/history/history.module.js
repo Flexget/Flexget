@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    var historyModule = angular.module("flexget.plugins.history", ['angular.filter']);
+    var historyModule = angular.module("flexget.plugins.history", ['angular.filter', 'flexget.components', 'flexget']);
 
     registerPlugin(historyModule);
 

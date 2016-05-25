@@ -3,22 +3,8 @@ describe("Plugin: History.component", function () {
 	var history = mockHistoryData.getMockHistory();
 
 	beforeEach(function () {
-		bard.appModule('flexget.plugins.history', function ($provide) {
-			$provide.provider('route', function () {
-				this.$get = function () {
-
-					function register() { };
-
-					return {
-						register: register
-					}
-				}
-			});
-
-			$provide.service('sideNav', function () {
-				this.register = function () { };
-			});
-		});
+		bard.appModule('flexget.plugins.history');
+		//TODO: Instead of injecting the entire 'flexget' and 'flexget.components' module in the history module, seperate the 'layout' functions in seperate modules so it doesn't need to load all the other functions as well
 
 		bard.inject('$componentController', '$rootScope', '$http', '$httpBackend', 'route', 'sideNav', '$q');
 	});
