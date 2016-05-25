@@ -5,9 +5,9 @@
 
     registerPlugin(historyModule);
 
-    historyModule.run(function (route, sideNav) {
+    /*historyModule.run(function (route, sideNav) {
         route.register('history', '/history', 'history-view');
         sideNav.register('/history', 'History', 'fa fa-history', 30);
-    });
+    });*/
 
 })();

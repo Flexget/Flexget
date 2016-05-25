@@ -3,6 +3,7 @@
 
     angular
         .module('flexget.layout', [
-			'ngMaterial'
+			'ngMaterial',
+			'flexget.components.router'
 		]);
 })();

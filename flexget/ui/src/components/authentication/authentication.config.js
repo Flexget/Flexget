@@ -2,8 +2,8 @@
   'use strict';
 
   angular.module('flexget.components')
-  .run(authenticationSetup)
-  .config(authenticationConfig);
+    .run(authenticationSetup)
+    .config(authenticationConfig);
 
   function authenticationSetup($rootScope, $state, $http, toolBar, authService) {
     var loginEvent = $rootScope.$on('event:auth-loginRequired', function (event, timeout) {
@@ -12,9 +12,9 @@
 
     var logout = function () {
       $http.get('/api/auth/logout/')
-      .success(function () {
-        $state.go('login');
-      });
+        .success(function () {
+          $state.go('login');
+        });
     };
 
     /* Ensure user is authenticated when changing states (pages) unless we are on the login page */
@@ -24,14 +24,14 @@
       }
 
       authService.loggedIn()
-      .then(function (loggedIn) {
-        // already logged in
-      }, function () {
-        // Not logged in
-        event.preventDefault();
-        authService.state(toState, toParams);
-        $rootScope.$broadcast('event:auth-loginRequired', false);
-      });
+        .then(function (loggedIn) {
+          // already logged in
+        }, function () {
+          // Not logged in
+          event.preventDefault();
+          authService.state(toState, toParams);
+          $rootScope.$broadcast('event:auth-loginRequired', false);
+        });
     });
 
     toolBar.registerMenuItem('Manage', 'Logout', 'fa fa-sign-out', logout, 255);
@@ -49,28 +49,28 @@
     /* Intercept 401/403 http return codes and redirect to login page */
 
     $httpProvider
-    .interceptors.push(['$rootScope', '$q', '$injector', function ($rootScope, $q, $injector) {
-      var loginRequired = function () {
-        var stateService = $injector.get('$state');
-        var authService = $injector.get('authService');
-        authService.state(stateService.current, stateService.params);
-        $rootScope.$broadcast('event:auth-loginRequired', true);
-      };
+      .interceptors.push(['$rootScope', '$q', '$injector', function ($rootScope, $q, $injector) {
+        var loginRequired = function () {
+          var stateService = $injector.get('$state');
+          var authService = $injector.get('authService');
+          authService.state(stateService.current, stateService.params);
+          $rootScope.$broadcast('event:auth-loginRequired', true);
+        };
 
-      return {
-        responseError: function (rejection) {
-          if (!rejection.config.ignoreAuthModule) {
-            switch (rejection.status) {
-              case 401:
-              case 403:
-                loginRequired();
-                break;
+        return {
+          responseError: function (rejection) {
+            if (!rejection.config.ignoreAuthModule) {
+              switch (rejection.status) {
+                case 401:
+                case 403:
+                  loginRequired();
+                  break;
+              }
             }
-          }
-          // otherwise, default behaviour
-          return $q.reject(rejection);
-        },
-      };
-    }]);
+            // otherwise, default behaviour
+            return $q.reject(rejection);
+          },
+        };
+      }]);
   }
-})();
+});
