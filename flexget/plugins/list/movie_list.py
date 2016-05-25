@@ -51,12 +51,13 @@ class MovieListMovie(Base):
     def __repr__(self):
         return '<MovieListMovie title=%s,year=%s,list_id=%d>' % (self.title, self.year, self.list_id)
 
-    def to_entry(self):
+    def to_entry(self, strip_year=False):
         entry = Entry()
         entry['title'] = entry['movie_name'] = self.title
         entry['url'] = 'mock://localhost/movie_list/%d' % self.id
         if self.year:
-            entry['title'] += ' (%d)' % self.year
+            if strip_year is False:
+                entry['title'] += ' (%d)' % self.year
             entry['movie_year'] = self.year
         for movie_list_id in self.ids:
             entry[movie_list_id.id_name] = movie_list_id.id_value
@@ -97,7 +98,7 @@ class MovieListID(Base):
 
 class MovieList(MutableSet):
     def _db_list(self, session):
-        return session.query(MovieListList).filter(MovieListList.name == self.config).first()
+        return session.query(MovieListList).filter(MovieListList.name == self.list_name).first()
 
     def _from_iterable(self, it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
@@ -105,14 +106,19 @@ class MovieList(MutableSet):
 
     @with_session
     def __init__(self, config, session=None):
-        self.config = config
+        if not isinstance(config, dict):
+            config = {'list_name': config}
+        config.setdefault('strip_year', False)
+        self.list_name = config.get('list_name')
+        self.strip_year = config.get('strip_year')
+
         db_list = self._db_list(session)
         if not db_list:
-            session.add(MovieListList(name=self.config))
+            session.add(MovieListList(name=self.list_name))
 
     @with_session
     def __iter__(self, session=None):
-        return iter([movie.to_entry() for movie in self._db_list(session).movies])
+        return iter([movie.to_entry(self.strip_year) for movie in self._db_list(session).movies])
 
     @with_session
     def __len__(self, session=None):
@@ -171,7 +177,7 @@ class MovieList(MutableSet):
         if not name:
             log.verbose('no movie name to match, skipping')
             return
-        log.debug('trying to match movie based of name: %s and year: %d', name, year)
+        log.debug('trying to match movie based of name: %s and year: %s', name, year)
         res = (self._db_list(session).movies.filter(func.lower(MovieListMovie.title) == name.lower())
                .filter(MovieListMovie.year == year).first())
         if res:
@@ -196,7 +202,17 @@ class MovieList(MutableSet):
 
 class PluginMovieList(object):
     """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
-    schema = {'type': 'string'}
+    schema = {'oneOf': [
+        {'type': 'string'},
+        {'type': 'object',
+         'properties': {
+             'list_name': {'type': 'string'},
+             'strip_year': {'type': 'boolean'}
+         },
+         'required': ['list_name'],
+         'additionalProperties': False
+         }
+    ]}
 
     @staticmethod
     def get_list(config):

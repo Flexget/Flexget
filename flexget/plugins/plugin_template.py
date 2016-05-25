@@ -132,4 +132,4 @@ def register_config():
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--template', metavar='NAME', help='execute tasks using given template')
+    options.get_parser('execute').add_argument('-T', '--template', metavar='NAME', help='execute tasks using given template')
