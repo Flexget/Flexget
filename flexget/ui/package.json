@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "gulp serve",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "gulp serve-specs"
   },
   "devDependencies": {
     "bardjs": "^0.1.8",
