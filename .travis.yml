@@ -1,6 +1,6 @@
 language: python
 cache: 
-  - pip
+  pip: true
   directories:
   - ./flexget/ui/node_modules
   - ./flexget/ui/bower_components
