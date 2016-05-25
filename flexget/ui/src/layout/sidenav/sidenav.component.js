@@ -1,24 +1,34 @@
 (function () {
-    'use strict';
+	'use strict';
 
-    angular
-        .module('flexget.layout')
-        .component('sideNav', {
-            templateUrl: 'layout/sidenav/sidenav.tmpl.html',
-            controllerAs: 'vm',
-            controller: sideNavController
-        });
+	angular
+		.module('flexget.layout')
+		.component('sideNav', {
+			templateUrl: 'layout/sidenav/sidenav.tmpl.html',
+			controllerAs: 'vm',
+			controller: sideNavController
+		});
 
-    function sideNavController(routerHelper) {
-        var vm = this;
+	function sideNavController(routerHelper) {
+		var vm = this;
+		
+		var allStates = routerHelper.getStates();
+		vm.$onInit = activate;
 
-        //TODO: Move from sideNav service to router, mainly the items, not close function
-        vm.navItems = routerHelper.getStates();
+		function activate() {
+			getNavRoutes();
+		}
 
-        console.log(vm.navItems);        
-        
-        //console.log(routerHelper.getStates);
-
-       // vm.close = sideNav.close;
-    }
+		function getNavRoutes() {
+			vm.navItems = allStates.filter(function (r) {
+				return r.settings && r.settings.weight;
+			}).sort(function (r1, r2) {
+				return r1.settings.weight - r2.settings.weight;
+			});
+		}
+		
+		
+		//TODO: Implement functions again, the ones that make the collapsing etc work
+		// vm.close = sideNav.close;
+	}
 })();
