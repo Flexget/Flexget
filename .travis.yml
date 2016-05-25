@@ -17,7 +17,7 @@ install:
   - pip install .
   - pip install -r dev-requirements.txt
   - npm install ./flexget/ui  --prefix ./flexget/ui
-  - bower install --config.cwd=./flexget/ui
+  - ./flexget/ui/node_modules/bower/bin/bower install --config.cwd=./flexget/ui
 # command to run tests, e.g. python setup.py test
 script:
   - py.test --cov flexget --cov-report xml -n 3
