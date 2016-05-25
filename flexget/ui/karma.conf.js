@@ -44,8 +44,13 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['mocha', 'coverage'],
+    reporters: ['dots', 'coverage'],
 
+    coverageReporter: {
+      type: 'lcovonly',
+      dir: './node_modules/.bin/codacy-coverage',
+      file: 'webui-coverage.info'
+    },
 
     // web server port
     port: 9876,
