@@ -31,7 +31,6 @@ class TestTVDBSeriesLookupAPI(object):
             ],
             "imdb_id": "tt0106179",
             "language": "en",
-            "last_updated": "2016-05-23 21:07:19",
             "network": "FOX (US)",
             "overview": "The X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John Doggett and "
                         "Monica Reyes and their investigations into the paranormal. From genetic mutants and killer "
@@ -57,6 +56,8 @@ class TestTVDBSeriesLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
+        # This value causes trouble with VCR
+        data.pop("last_updated")
         assert data == expected_response
 
 
@@ -100,7 +101,6 @@ class TestTVDBSeriesWithActorsLookupAPI(object):
             ],
             "imdb_id": "tt0106179",
             "language": "en",
-            "last_updated": "2016-05-23 21:07:19",
             "network": "FOX (US)",
             "overview": "The X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John Doggett and "
                         "Monica Reyes and their investigations into the paranormal. From genetic mutants and killer "
@@ -126,6 +126,9 @@ class TestTVDBSeriesWithActorsLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
+
+        # This value causes trouble with VCR
+        data.pop("last_updated")
         assert data == expected_response
 
 
