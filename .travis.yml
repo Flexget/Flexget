@@ -22,10 +22,11 @@ install:
   - ./flexget/ui/node_modules/bower/bin/bower install --config.cwd=./flexget/ui
 # command to run tests, e.g. python setup.py test
 script:
-  - py.test --cov flexget --cov-report xml -n 3
   - ./flexget/ui/node_modules/karma/bin/karma start ./flexget/ui/karma.conf.js
+ # - py.test --cov flexget --cov-report xml -n 3
 after_success:
   - python-codacy-coverage -r coverage.xml
+  #- node-codacy-coverage  -r web-ui coverage.info
 env: VCR_RECORD_MODE=none
 notifications:
   email: false
