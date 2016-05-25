@@ -10,7 +10,7 @@ var browserSync = require('browser-sync').create();
 
 gulp.task('serve-specs', ['build-specs'], function (done) {
 
-    gulp.watch([paths.src + '/**/*.js'], function () {
+    gulp.watch([paths.src + '/**/*.js', paths.spechelpers + '/**/*.js'], function () {
         browserSync.reload();
     });
 
