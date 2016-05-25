@@ -48,8 +48,9 @@ module.exports = function(config) {
 
     coverageReporter: {
       type: 'lcovonly',
-      dir: './node_modules/.bin/codacy-coverage',
-      file: 'webui-coverage.info'
+      dir: './node_modules/.bin/codacy-coverage/',
+      file: 'webui-coverage.info',
+      subdir: 'coverage'
     },
 
     // web server port
