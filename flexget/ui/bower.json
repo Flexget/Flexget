@@ -3,7 +3,7 @@
   "dependencies": {
     "angular": "angularjs#~1.5.3",
     "angular-material": "^1.0.7",
-    "angular-ui-router": "ui-router#~0.2.15",
+    "angular-ui-router": "1.0.0-alpha.5",
     "angular-filter": "~0.5.8",
     "angular-schema-form": "~0.8.13",
     "font-awesome": "~4.5.0",
