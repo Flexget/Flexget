@@ -25,7 +25,8 @@ script:
   - ./flexget/ui/node_modules/karma/bin/karma start ./flexget/ui/karma.conf.js
  # - py.test --cov flexget --cov-report xml -n 3
 after_success:
-  - python-codacy-coverage -r coverage.xml
+  #- python-codacy-coverage -r coverage.xml
+  - cat webui-coverage.info | ./flexget/ui/node_modules/.bin/codacy-coverage
   #- node-codacy-coverage  -r web-ui coverage.info
 env: VCR_RECORD_MODE=none
 notifications:
