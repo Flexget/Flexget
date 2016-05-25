@@ -2,8 +2,8 @@ language: python
 cache: 
   - pip
   directories:
-    - ./flexget/ui/node_modules
-    - ./flexget/ui/bower_components
+  - ./flexget/ui/node_modules
+  - ./flexget/ui/bower_components
 sudo: false
 python:
   - "2.7"
