@@ -1,10 +1,23 @@
 (function () {
     'use strict';
 
-    var home = angular.module("flexget.home", ['angular.filter']);
-    registerPlugin(home);
+    angular
+        .module("flexget.components.home", ['angular.filter'])
+        .run(appRun);
 
-    home.run(function (route) {
-        route.register('home', '/home', 'home');
-    });
+    function appRun(routerHelper) {
+        routerHelper.configureStates(getStates());
+    };
+
+    function getStates() {
+        return [
+            {
+                state: 'home',
+                config: {
+                    url: '/',
+                    component: 'home'
+                }
+            }
+        ]
+    }
 })();

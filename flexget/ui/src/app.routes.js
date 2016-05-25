@@ -20,7 +20,7 @@
 
   function routeConfig($stateProvider, $urlRouterProvider) {
     $stateProvider
-    // 404 & 500 pages
+      // 404 & 500 pages
       .state('404', {
         url: '/404',
         templateUrl: '404.tmpl.html',
@@ -46,4 +46,4 @@
     $urlRouterProvider.otherwise('/404');
 
   }
-})();
+});

@@ -9,11 +9,16 @@
             controller: sideNavController
         });
 
-    function sideNavController(sideNav) {
+    function sideNavController(routerHelper) {
         var vm = this;
 
-        //TODO: Move from sideNav service to router, mainly the items, not close function        
-        vm.navItems = sideNav.items;
-        vm.close = sideNav.close;
+        //TODO: Move from sideNav service to router, mainly the items, not close function
+        vm.navItems = routerHelper.getStates();
+
+        console.log(vm.navItems);        
+        
+        //console.log(routerHelper.getStates);
+
+       // vm.close = sideNav.close;
     }
 })();

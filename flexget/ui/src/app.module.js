@@ -8,12 +8,13 @@
     'ngCookies',
     'ngMessages',
     'angular-loading-bar',
-    'flexget.components',
+    //'flexget.components',
     'flexget.directives',
     'flexget.services',
     'angular-cache',
 
-    'flexget.layout'    
+    'flexget.layout',
+    'flexget.components.home'
   ]);
 
   function bootstrapApplication() {
