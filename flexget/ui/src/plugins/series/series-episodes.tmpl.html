@@ -1,18 +1,20 @@
 <md-card layout="column" layout-wrap layout-fill class="episodes-list-card">
     <div class="episodes-backdrop-filler"></div>
-    <md-card-content class="episodes-backdrop-image">
-        <img ng-src="{{ vm.show.metadata.banner }}" />
+
+
+    <!-- <md-card-content class="episodes-backdrop-image">
+    </md-card-content> -->
+
+    <md-card-content ng-style="{'background-image':'url({{vm.show.metadata.banner}})'}">
         <div class="episodes-backdrop-image-shadow"></div>
-    </md-card-content>
 
-
-
-    <md-card-content class="episodes-backdrop-overlay">
         <ng-transclude></ng-transclude>
+
         <div class="episodes-list">
             <series-episode episode="episode" delete-episode="vm.deleteEpisode(episode)" show="vm.show" reset-releases="vm.resetReleases(episode)"
                 ng-repeat="episode in vm.show.episodes"></series-episode>
         </div>
+
         <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.show.totalEpisodes" active-class="md-primary"
             paging-action="vm.updateListPage(index)"></fg-material-pagination>
 
