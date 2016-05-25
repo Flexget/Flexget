@@ -11,7 +11,9 @@
     'flexget.components',
     'flexget.directives',
     'flexget.services',
-    'angular-cache'
+    'angular-cache',
+
+    'flexget.layout'    
   ]);
 
   function bootstrapApplication() {

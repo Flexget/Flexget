@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('flexget.components')
+    angular.module('flexget.layout')
         .factory('sideNav', sideNavService);
 
     function sideNavService($rootScope, $mdSidenav, $mdMedia) {
