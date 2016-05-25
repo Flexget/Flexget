@@ -529,17 +529,19 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
 
 @with_session
 def lookup_episode(name=None, season_number=None, episode_number=None, absolute_number=None,
-                   tvdb_id=None, only_cached=False, session=None):
+                   tvdb_id=None, first_aired=None, only_cached=False, session=None):
     """
     Look up information on an episode. Will be returned from cache if available, and looked up online and cached if not.
 
     Either `name` or `tvdb_id` parameter are needed to specify the series.
-    Either `seasonnum` and `episodedum`, `absolutenum`, or `airdate` are required to specify episode number.
+    Either `season_number` and `episode_number`, `absolute_number`, or `first_aired` are required to specify episode
+     number.
     :param unicode name: Name of series episode belongs to.
     :param int tvdb_id: TVDb ID of series episode belongs to.
     :param int season_number: Season number of episode.
     :param int episode_number: Episode number of episode.
     :param int absolute_number: Absolute number of episode.
+    :param date first_aired: Air date of episode. DateTime object.
     :param bool only_cached: If True, will not cause an online lookup. LookupError will be raised if not available
         in the cache.
     :param session: An sqlalchemy session to be used to lookup and store to cache. Commit(s) may occur when passing in
@@ -573,6 +575,11 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
         episode = episode.filter(TVDBEpisode.episode_number == episode_number)
         query_params['airedEpisode'] = episode_number
         ep_description = '%s e%s' % (ep_description, episode_number)
+
+    if first_aired:
+        episode = episode.filter(TVDBEpisode.first_aired == first_aired)
+        query_params['firstAired'] = datetime.strftime(first_aired, '%Y-%m-%d')
+        ep_description = '%s e%s' % (ep_description, first_aired)
 
     episode = episode.first()
 
