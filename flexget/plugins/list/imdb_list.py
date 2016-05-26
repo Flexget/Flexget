@@ -15,11 +15,13 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.requests import Session, TimedLimiter
+from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('imdb_list')
 IMMUTABLE_LISTS = ['ratings', 'checkins']
 
+credentials = SimplePersistence('imdb_list')
 
 if PY3:
     csv_reader = csv.reader
@@ -49,13 +51,32 @@ class ImdbEntrySet(MutableSet):
 
     def __init__(self, config):
         self.config = config
+        self.login_name = config.get('login')
+        self.list_name = config['list']
+        if config.get('login') not in credentials:
+            log.debug('no credentials saved for login name %s', self.login_name)
+            credentials[self.login_name] = {}
+
+        if credentials[self.login_name].get('user_id'):
+            log.verbose('found stored credentials for login %s', self.login_name)
+            self.user_id = credentials[self.login_name].get('user_id')
+            self.cookies = credentials[self.login_name].get('cookies')
+            if credentials[self.login_name].get(self.list_name):
+                self.list_id = credentials[self.login_name][self.list_name]
+                self._authenticated = True
+            else:
+                self.list_id = None
+                self._authenticated = False
+        else:
+            self.user_id = None
+            self.list_id = None
+            self._authenticated = False
+            self.cookies = None
+
         self._session = Session()
         self._session.add_domain_limiter(TimedLimiter('imdb.com', '5 seconds'))
         self._session.headers = {'Accept-Language': config.get('force_language', 'en-us')}
-        self.user_id = None
-        self.list_id = None
         self._items = None
-        self._authenticated = False
 
     @property
     def session(self):
@@ -63,8 +84,7 @@ class ImdbEntrySet(MutableSet):
             self.authenticate()
         return self._session
 
-    def authenticate(self):
-        """Authenticates a session with imdb, and grabs any IDs needed for getting/modifying list."""
+    def get_cookies(self):
         try:
             r = self._session.get(
                 'https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
@@ -81,28 +101,39 @@ class ImdbEntrySet(MutableSet):
         data['password'] = self.config['password']
         log.debug('email=%s, password=%s', data['email'], data['password'])
         d = self._session.post('https://www.imdb.com/ap/signin', data=data)
+        log.verbose('successfully logged in, saving credentials')
+        credentials[self.login_name] = {'cookies': dict(d.cookies)}
+        self.cookies = credentials[self.login_name]['cookies']
+
+    def authenticate(self):
+        """Authenticates a session with imdb, and grabs any IDs needed for getting/modifying list."""
+        if not self.cookies:
+            self.get_cookies()
         # Get user id by extracting from redirect url
-        r = self._session.head('http://www.imdb.com/profile', allow_redirects=False)
+        r = self._session.head('http://www.imdb.com/profile', allow_redirects=False, cookies=self.cookies)
         if not r.headers.get('location') or 'login' in r.headers['location']:
             raise plugin.PluginError('Login to imdb failed. Check your credentials.')
-        self.user_id = re.search('ur\d+(?!\d)', r.headers['location']).group()
+        credentials[self.login_name]['user_id'] = self.user_id = re.search('ur\d+(?!\d)', r.headers['location']).group()
+        log.debug('found user_id %s', self.user_id)
         # Get list ID
         if self.config['list'] == 'watchlist':
             data = {'consts[]': 'tt0133093', 'tracking_tag': 'watchlistRibbon'}
-            wl_data = self._session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data).json()
+            wl_data = self._session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data,
+                                         cookies=self.cookies).json()
             try:
-                self.list_id = wl_data['list_id']
+                credentials[self.login_name][self.list_name] = self.list_id = wl_data['list_id']
+                log.debug('retrieved list_id %s', self.list_id)
             except KeyError:
                 raise PluginError('No list ID could be received. Please initialize list by '
                                   'manually adding an item to it and try again')
         elif self.config['list'] in IMMUTABLE_LISTS or self.config['list'].startswith('ls'):
-            self.list_id = self.config['list']
+            credentials[self.login_name][self.list_name] = self.list_id = self.config['list']
         else:
             data = {'tconst': 'tt0133093'}
             list_data = self._session.post('http://www.imdb.com/list/_ajax/wlb_dropdown', data=data).json()
             for li in list_data['items']:
                 if li['wlb_text'] == self.config['list']:
-                    self.list_id = li['data_list_id']
+                    credentials[self.login_name][self.list_name] = self.list_id = li['data_list_id']
                     break
             else:
                 raise plugin.PluginError('Could not find list %s' % self.config['list'])
@@ -112,14 +143,16 @@ class ImdbEntrySet(MutableSet):
     def invalidate_cache(self):
         self._items = None
 
+    def get_movies_list(self):
+        return self.session.get(
+            'http://www.imdb.com/list/export?list_id=%s&author_id=%s' % (self.list_id, self.user_id),
+            cookies=credentials[self.login_name].get('cookies'))
+
     @property
     def items(self):
         if self._items is None:
-            try:
-                r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
-                                     (self.list_id, self.user_id))
-            except RequestException as e:
-                raise PluginError(e.args[0])
+            # TODO: check for cookie expiration and all other sort of request issues
+            r = self.get_movies_list()
             lines = r.iter_lines(decode_unicode=True)
             # Throw away first line with headers
             next(lines)
