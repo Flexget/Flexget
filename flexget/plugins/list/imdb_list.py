@@ -146,7 +146,7 @@ class ImdbEntrySet(MutableSet):
     def get_movies_list(self):
         return self.session.get(
             'http://www.imdb.com/list/export?list_id=%s&author_id=%s' % (self.list_id, self.user_id),
-            cookies=credentials[self.login_name].get('cookies'))
+            cookies=self.cookies)
 
     @property
     def items(self):
