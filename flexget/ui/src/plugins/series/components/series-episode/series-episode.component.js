@@ -41,7 +41,7 @@
         vm.deleteReleases = function() {
             var confirm = $mdDialog.confirm()
             .title('Confirm deleting releases.')
-            .htmlContent("Are you sure you want to delete all releases for <b>" + vm.episode.episode_identifier + "</b> from show " + vm.show + "?<br /> This also removes all seen releases for this episode!")
+            .htmlContent("Are you sure you want to delete all releases for <b>" + vm.episode.episode_identifier + "</b> from show <b>" + vm.show.show_name + "</b>?<br /> This also removes all seen releases for this episode!")
             .ok("Forget")
             .cancel("No");
 

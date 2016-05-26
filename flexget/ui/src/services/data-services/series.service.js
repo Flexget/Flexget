@@ -122,7 +122,7 @@
             .catch(callFailed);
 
             function resetReleaseComplete(data) {
-                return datal
+                return data;
             }
         }
 

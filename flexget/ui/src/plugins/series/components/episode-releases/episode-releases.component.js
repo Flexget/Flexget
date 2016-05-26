@@ -32,7 +32,7 @@
             $mdDialog.show(confirm).then(function () {
                 seriesService.resetRelease(vm.show, vm.episode, release).then(function (data) {
                     //Find all downloaded releases, and set their download status to false, which will make the downloaded icon disappear
-                    $filter('filter')(vm.releases, { release_id: id})[0].release_downloaded = false;
+                    //$filter('filter')(vm.releases, { release_id: id})[0].release_downloaded = false;
                 })
             })
 
