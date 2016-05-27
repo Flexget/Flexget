@@ -7,8 +7,6 @@
 
     function appRun(routerHelper) {
         routerHelper.configureStates(getStates(), '/404');
-		
-		console.log(routerHelper.getStates());
     };
 
     function getStates() {

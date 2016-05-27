@@ -4,7 +4,7 @@
     angular.module('flexget.services')
         .factory('moviesService', moviesService);
 
-    function moviesService($http, CacheFactory, errorService) {
+    function moviesService($http, CacheFactory, exception) {
         // If cache doesn't exist, create it
         if (!CacheFactory.get('moviesCache')) {
             CacheFactory.createCache('moviesCache');
@@ -61,13 +61,8 @@
             }
         }
 
-
         function callFailed(error) {
-            //TODO: handle error
-
-            console.log(error);
-
-            errorService.showToast(error);
+			return exception.catcher(error);
         }
     }
 })();
