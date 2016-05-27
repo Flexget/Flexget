@@ -7,7 +7,7 @@
 
     function appRun(routerHelper) {
         routerHelper.configureStates(getStates());
-    };
+	};
 
     function getStates() {
         return [
