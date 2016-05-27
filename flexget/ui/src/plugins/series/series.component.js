@@ -33,10 +33,18 @@
         }
 
         vm.forgetShow = function (show) {
-            seriesService.deleteShow(show).then(function (data) {
-                getSeriesList();
-            });
-        }
+			var confirm = $mdDialog.confirm()
+                .title('Confirm forgetting show.')
+                .htmlContent("Are you sure you want to completely forget <b>" + show.show_name + "</b>?<br /> This will also forget all downloaded releases.")
+                .ok("Forget")
+                .cancel("No");
+
+			$mdDialog.show(confirm).then(function () {
+				seriesService.deleteShow(show).then(function (data) {
+					getSeriesList();
+				});
+			});
+		};
 
 
         /*vm.forgetShow = function (show) {
