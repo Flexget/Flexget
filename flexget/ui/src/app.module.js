@@ -14,7 +14,8 @@
     'angular-cache',
 
     'flexget.layout',
-    'flexget.components.home'
+    'flexget.components.home',
+	'flexget.components.404'
   ]);
 
   function bootstrapApplication() {
