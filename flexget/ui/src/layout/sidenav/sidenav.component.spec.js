@@ -8,7 +8,6 @@ describe("Layout: Sidenav.component", function () {
 	});
 
 	beforeEach(function () {
-		console.log(mockStates);
 		routerHelper.configureStates(mockStates, '/');
 		controller = $componentController('sideNav');
 	});
