@@ -15,6 +15,7 @@ from flexget.manager import Session
 from flexget.utils.database import json_synonym
 from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger('mtv')
 Base = db_schema.versioned_base('mtv', 0)
@@ -114,19 +115,11 @@ class SearchMTV(object):
         'properties': {
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'category': {
-                'oneOf': [
-                    {'type': 'string', 'enum': CATEGORIES.keys()},
-                    {'type': 'array', 'items': {'type': 'string', 'enum': CATEGORIES.keys()}},
-                ]},
+            'category': one_or_more({'type': 'array', 'items': {'type': 'string', 'enum': list(CATEGORIES.keys())}},
+                                    unique_items=True),
             'order_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'time'], 'default': 'time'},
             'order_way': {'type': 'string', 'enum': ['desc', 'asc'], 'default': 'desc'},
-            'tags': {
-                'oneOf': [
-                    {'type': 'string', 'enum': TAGS},
-                    {'type': 'array', 'items': {'type': 'string', 'enum': TAGS}}
-                ]
-            },
+            'tags': one_or_more({'type': 'array', 'items': {'type': 'string', 'enum': TAGS}}, unique_items=True),
             'all_tags': {'type': 'boolean', 'default': True}
         },
         'required': ['username', 'password'],
