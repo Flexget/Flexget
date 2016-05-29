@@ -198,6 +198,7 @@ class SearchMTV(object):
                 url = self.base_url + group_info.find('a', href=re.compile('torrents.php\?action=download'))['href']
                 torrent_info = result.findAll('td', attrs={'class': 'number_column'})
                 size = re.search('(\d+(?:[.,]\d+)*)\s?([KMG]B)', torrent_info[0].text)
+                torrent_tags = ', '.join([tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})])
 
                 e = Entry()
 
@@ -206,6 +207,10 @@ class SearchMTV(object):
                 e['torrent_snatches'] = int(torrent_info[1].text)
                 e['torrent_seeds'] = int(torrent_info[2].text)
                 e['torrent_leeches'] = int(torrent_info[3].text)
+                e['torrent_internal'] = True if group_info.find('span', attrs={'class': 'flag_internal'}) else False
+                e['torrent_fast_server'] = True if group_info.find('span', attrs={'class': 'flag_fast'}) else False
+                e['torrent_sticky'] = True if group_info.find('span', attrs={'class': 'flag_sticky'}) else False
+                e['torrent_tags'] = torrent_tags
 
                 if size:
                     if size.group(2) == 'GB':
