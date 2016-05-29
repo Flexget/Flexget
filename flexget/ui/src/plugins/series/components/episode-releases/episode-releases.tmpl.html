@@ -1,0 +1,19 @@
+<md-dialog-content>
+    <md-list flex>
+        <md-list-item ng-repeat="release in vm.releases | orderBy : 'release_downloaded' : true" class="md-2-line episode-release">
+            <div class="md-list-item-text">
+                <h3 class="release-title">
+                    <i ng-if="release.release_downloaded" class="fa fa-download"></i> {{ ::release.release_title }}
+                </h3>
+                <p>{{ ::release.release_quality }}</p>
+            </div>
+            <md-button ng-click="vm.resetRelease(release)" ng-if="release.release_downloaded" class="md-icon-button" aria-label="reset the release">
+                <i class="fa fa-refresh" aria-hidden="true"></i>
+            </md-button>
+            <md-button ng-click="vm.forgetRelease(release)" class="md-icon-button" aria-label="forget the release">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+            </md-button>
+
+        </md-list-item>
+    </md-list>
+</md-dialog-content>

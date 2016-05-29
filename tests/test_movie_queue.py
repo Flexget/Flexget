@@ -292,6 +292,7 @@ class TestMovieQueueAPI(object):
 
     @patch.object(movie_queue, 'get_movie_by_id')
     def test_queue_get_movie(self, mocked_get_movie_by_id, api_client):
+        mocked_get_movie_by_id.return_value = {}
         rsp = api_client.get('/movie_queue/7/')
 
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
