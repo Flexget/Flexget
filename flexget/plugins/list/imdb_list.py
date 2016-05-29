@@ -139,7 +139,7 @@ class ImdbEntrySet(MutableSet):
             for list in user.lists:
                 if self.config['list'] == list.list_name:
                     log.debug('found list ID %s matching list name %s in cache', list.list_id, list.list_name)
-                    self.list_id = list.list_id
+                    self.list_id = list.list_idk
         if not self.list_id:
             log.debug('could not find list ID in cache, fetching from IMDB')
             if self.config['list'] == 'watchlist':
