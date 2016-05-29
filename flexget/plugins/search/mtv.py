@@ -115,11 +115,10 @@ class SearchMTV(object):
         'properties': {
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'category': one_or_more({'type': 'array', 'items': {'type': 'string', 'enum': list(CATEGORIES.keys())}},
-                                    unique_items=True),
+            'category': one_or_more({'type': 'string', 'enum': list(CATEGORIES.keys())}, unique_items=True),
             'order_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'time'], 'default': 'time'},
             'order_way': {'type': 'string', 'enum': ['desc', 'asc'], 'default': 'desc'},
-            'tags': one_or_more({'type': 'array', 'items': {'type': 'string', 'enum': TAGS}}, unique_items=True),
+            'tags': one_or_more({'type': 'string', 'enum': TAGS}, unique_items=True),
             'all_tags': {'type': 'boolean', 'default': True}
         },
         'required': ['username', 'password'],
