@@ -17,8 +17,8 @@ from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
 from flexget.config_schema import one_or_more
 
-log = logging.getLogger('mtv')
-Base = db_schema.versioned_base('mtv', 0)
+log = logging.getLogger('morethantv')
+Base = db_schema.versioned_base('morethantv', 0)
 
 requests = RequestSession()
 requests.add_domain_limiter(TimedLimiter('morethan.tv', '5 seconds'))  # TODO find out if they want a delay
@@ -96,8 +96,8 @@ TAGS = [
 ]
 
 
-class MTVCookie(Base):
-    __tablename__ = 'mtv_cookie'
+class MoreThanTVCookie(Base):
+    __tablename__ = 'morethantv_cookie'
 
     username = Column(Unicode, primary_key=True)
     _cookie = Column('cookie', Unicode)
@@ -105,7 +105,7 @@ class MTVCookie(Base):
     expires = Column(DateTime)
 
 
-class SearchMTV(object):
+class SearchMoreThanTV(object):
     """
         MorethanTV search plugin.
     """
@@ -129,21 +129,21 @@ class SearchMTV(object):
 
     def get_login_cookie(self, request_session, username, password):
         with Session() as session:
-            saved_cookie = session.query(MTVCookie).filter(MTVCookie.username == username).first()
+            saved_cookie = session.query(MoreThanTVCookie).filter(MoreThanTVCookie.username == username).first()
             if saved_cookie and saved_cookie.expires is not None and saved_cookie.expires >= datetime.datetime.now():
                 log.debug('Found valid login cookie')
                 return saved_cookie.cookie
 
         url = self.base_url + 'login.php'
         try:
-            log.debug('Attempting to retrieve MTV cookie')
+            log.debug('Attempting to retrieve MoreThanTV cookie')
             response = request_session.post(url, data={'username': username, 'password': password, 'login': 'Log in',
                                                        'keeplogged': '1'}, timeout=30)
         except RequestException as e:
-            raise plugin.PluginError('MTV login failed: %s', e)
+            raise plugin.PluginError('MoreThanTV login failed: %s', e)
 
         if 'Your username or password was incorrect.' in response.text:
-            raise plugin.PluginError('MTV login failed: Your username or password was incorrect.')
+            raise plugin.PluginError('MoreThanTV login failed: Your username or password was incorrect.')
 
         with Session() as session:
             expires = None
@@ -152,15 +152,15 @@ class SearchMTV(object):
                     expires = c.expires
             if expires:
                 expires = datetime.datetime.fromtimestamp(expires)
-            log.debug('Saving or updating MTV cookie in db')
-            cookie = MTVCookie(username=username, cookie=dict(request_session.cookies), expires=expires)
+            log.debug('Saving or updating MoreThanTV cookie in db')
+            cookie = MoreThanTVCookie(username=username, cookie=dict(request_session.cookies), expires=expires)
             session.merge(cookie)
             return cookie.cookie
 
     @plugin.internet(log)
     def search(self, task, entry, config):
         """
-            Search for entries on MTV
+            Search for entries on MoreThanTV
         """
         cookies = self.get_login_cookie(requests, config['username'], config['password'])
 
@@ -188,7 +188,7 @@ class SearchMTV(object):
                 page = requests.get(self.base_url + 'torrents.php', params=params, cookies=cookies)
                 log.debug('requesting: %s', page.url)
             except RequestException as e:
-                log.error('MTV request failed: %s', e)
+                log.error('MoreThanTV request failed: %s', e)
                 continue
 
             soup = get_soup(page.content)
@@ -229,4 +229,4 @@ class SearchMTV(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchMTV, 'mtv', groups=['search'], api_ver=2)
+    plugin.register(SearchMoreThanTV, 'morethantv', groups=['search'], api_ver=2)
