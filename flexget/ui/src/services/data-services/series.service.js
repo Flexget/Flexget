@@ -4,7 +4,7 @@
     angular.module('flexget.services')
     .factory('seriesService', seriesService);
 
-    function seriesService($http, CacheFactory, $mdDialog, errorService) {
+    function seriesService($http, CacheFactory, exception) {
         // If cache doesn't exist, create it
         if (!CacheFactory.get('seriesCache')) {
             CacheFactory.createCache('seriesCache');
@@ -50,7 +50,6 @@
         }
 
         function deleteShow(show) {
-            //TODO: Prob add warning messages again
 
             return $http.delete('/api/series/' + show.show_id,
             {
@@ -128,11 +127,7 @@
 
 
         function callFailed(error) {
-            //TODO: handle error
-
-            console.log(error);
-
-            errorService.showToast(error);
+			return exception.catcher(error);
         }
 
     }
