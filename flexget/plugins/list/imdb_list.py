@@ -32,7 +32,7 @@ Base = db_schema.versioned_base('imdb_list', 0)
 class IMDBListUser(Base):
     __tablename__ = "imdb_list_user"
 
-    user_id = Column(Unicode, primary_key=True)
+    user_id = Column(String, primary_key=True)
     user_name = Column(Unicode)
     _cookies = Column('cookies', Unicode)
     cookies = json_synonym('_cookies')
