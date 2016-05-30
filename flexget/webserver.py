@@ -10,7 +10,7 @@ import threading
 import cherrypy
 import safe
 from flask import Flask, abort, redirect
-from flask.ext.login import UserMixin
+from flask_login import UserMixin
 from sqlalchemy import Column, Integer, Unicode
 from werkzeug.security import generate_password_hash
 

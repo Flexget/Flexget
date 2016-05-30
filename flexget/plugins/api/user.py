@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flask import request
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from flexget.api import api, APIResource
 from flexget.webserver import change_password, generate_token, WeakPassword

@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import base64
 
 from flask import request, jsonify, session as flask_session
-from flask.ext.login import login_user, LoginManager, current_user, current_app
+from flask_login import login_user, LoginManager, current_user, current_app
 from flask_restplus import inputs
 from werkzeug.security import check_password_hash
 

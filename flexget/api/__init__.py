@@ -9,7 +9,7 @@ from collections import deque
 from functools import wraps
 
 from flask import Flask, request
-from flask.ext.cors import CORS
+from flask_cors import CORS
 from flask_compress import Compress
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.model import Model
