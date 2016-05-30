@@ -106,62 +106,62 @@ class ImdbEntrySet(MutableSet):
         """Authenticates a session with imdb, and grabs any IDs needed for getting/modifying list."""
         with Session() as session:
             user = session.query(IMDBListUser).filter(IMDBListUser.user_name == self.config.get('login')).one_or_none()
-        if user and user.cookies and user.user_id:
-            log.debug('user credentials found in cache')
-            self.cookies = user.cookies
-            self.user_id = user.user_id
-        else:
-            log.debug('user credentials not found in cache, fetching from IMDB')
-            try:
-                r = self._session.get(
-                    'https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
-                    'handler&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&'
-                    'openid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%'
-                    '2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.ope'
-                    'nid.net%2Fauth%2F2.0')
-            except RequestException as e:
-                raise PluginError(e.args[0])
-            soup = get_soup(r.content)
-            inputs = soup.select('form#ap_signin_form input')
-            data = dict((i['name'], i.get('value')) for i in inputs if i.get('name'))
-            data['email'] = self.config['login']
-            data['password'] = self.config['password']
-            log.debug('email=%s, password=%s', data['email'], data['password'])
-            d = self._session.post('https://www.imdb.com/ap/signin', data=data)
-            # Get user id by extracting from redirect url
-            r = self._session.head('http://www.imdb.com/profile', allow_redirects=False)
-            if not r.headers.get('location') or 'login' in r.headers['location']:
-                raise plugin.PluginError('Login to imdb failed. Check your credentials.')
-            self.user_id = re.search('ur\d+(?!\d)', r.headers['location']).group()
-            self.cookies = dict(d.cookies)
-            # Get list ID
-        if user:
-            for list in user.lists:
-                if self.config['list'] == list.list_name:
-                    log.debug('found list ID %s matching list name %s in cache', list.list_id, list.list_name)
-                    self.list_id = list.list_idk
-        if not self.list_id:
-            log.debug('could not find list ID in cache, fetching from IMDB')
-            if self.config['list'] == 'watchlist':
-                data = {'consts[]': 'tt0133093', 'tracking_tag': 'watchlistRibbon'}
-                wl_data = self._session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data).json()
-                try:
-                    self.list_id = wl_data['list_id']
-                except KeyError:
-                    raise PluginError('No list ID could be received. Please initialize list by '
-                                      'manually adding an item to it and try again')
-            elif self.config['list'] in IMMUTABLE_LISTS or self.config['list'].startswith('ls'):
-                self.list_id = self.config['list']
+            if user and user.cookies and user.user_id:
+                log.debug('login  credentials found in cache')
+                self.cookies = user.cookies
+                self.user_id = user.user_id
             else:
-                data = {'tconst': 'tt0133093'}
-                list_data = self._session.post('http://www.imdb.com/list/_ajax/wlb_dropdown', data=data).json()
-                for li in list_data['items']:
-                    if li['wlb_text'] == self.config['list']:
-                        self.list_id = li['data_list_id']
-                        break
+                log.debug('user credentials not found in cache, fetching from IMDB')
+                try:
+                    r = self._session.get(
+                        'https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
+                        'handler&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&'
+                        'openid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%'
+                        '2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.ope'
+                        'nid.net%2Fauth%2F2.0')
+                except RequestException as e:
+                    raise PluginError(e.args[0])
+                soup = get_soup(r.content)
+                inputs = soup.select('form#ap_signin_form input')
+                data = dict((i['name'], i.get('value')) for i in inputs if i.get('name'))
+                data['email'] = self.config['login']
+                data['password'] = self.config['password']
+                log.debug('email=%s, password=%s', data['email'], data['password'])
+                d = self._session.post('https://www.imdb.com/ap/signin', data=data)
+                # Get user id by extracting from redirect url
+                r = self._session.head('http://www.imdb.com/profile', allow_redirects=False)
+                if not r.headers.get('location') or 'login' in r.headers['location']:
+                    raise plugin.PluginError('Login to imdb failed. Check your credentials.')
+                self.user_id = re.search('ur\d+(?!\d)', r.headers['location']).group()
+                self.cookies = dict(d.cookies)
+                # Get list ID
+            if user:
+                for list in user.lists:
+                    if self.config['list'] == list.list_name:
+                        log.debug('found list ID %s matching list name %s in cache', list.list_id, list.list_name)
+                        self.list_id = list.list_id
+            if not self.list_id:
+                log.debug('could not find list ID in cache, fetching from IMDB')
+                if self.config['list'] == 'watchlist':
+                    data = {'consts[]': 'tt0133093', 'tracking_tag': 'watchlistRibbon'}
+                    wl_data = self._session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data).json()
+                    try:
+                        self.list_id = wl_data['list_id']
+                    except KeyError:
+                        raise PluginError('No list ID could be received. Please initialize list by '
+                                          'manually adding an item to it and try again')
+                elif self.config['list'] in IMMUTABLE_LISTS or self.config['list'].startswith('ls'):
+                    self.list_id = self.config['list']
                 else:
-                    raise plugin.PluginError('Could not find list %s' % self.config['list'])
-        with Session() as session:
+                    data = {'tconst': 'tt0133093'}
+                    list_data = self._session.post('http://www.imdb.com/list/_ajax/wlb_dropdown', data=data).json()
+                    for li in list_data['items']:
+                        if li['wlb_text'] == self.config['list']:
+                            self.list_id = li['data_list_id']
+                            break
+                    else:
+                        raise plugin.PluginError('Could not find list %s' % self.config['list'])
+
             user = IMDBListUser(self.config['login'], self.user_id, self.cookies)
             list = IMDBListList(self.list_id, self.config['list'], self.user_id)
             user.lists.append(list)
