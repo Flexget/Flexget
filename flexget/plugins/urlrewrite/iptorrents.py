@@ -72,7 +72,10 @@ class UrlRewriteIPTorrents(object):
         'type': 'object',
         'properties': {
             'rss_key': {'type': 'string'},
-            'uid': {'type': 'integer'},
+            'uid': {'oneOf': [ 
+                {'type': 'integer'}, 
+                {'type': 'string'} 
+            ]},
             'password': {'type': 'string'},
             'category': one_or_more({
                 'oneOf': [
