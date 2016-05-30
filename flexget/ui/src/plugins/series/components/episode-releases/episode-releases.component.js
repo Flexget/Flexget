@@ -19,6 +19,10 @@
         var vm = this;
 		vm.cancel = cancel;
 
+		var params = {
+			forget: true
+		};
+
         loadReleases();
 
         //Call from a release item, to reset the release
@@ -48,7 +52,7 @@
 				.cancel("No");
 
             $mdDialog.show(confirm).then(function () {
-                seriesService.forgetRelease(vm.show, vm.episode, release).then(function (data) {
+                seriesService.forgetRelease(vm.show, vm.episode, release, params).then(function (data) {
                     //Find index of the release and remove it from the list
                     var index = vm.releases.indexOf(release);
                     vm.releases.splice(index, 1);
