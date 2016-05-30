@@ -95,7 +95,6 @@ class ImdbEntrySet(MutableSet):
         self._items = None
         self._authenticated = False
 
-
     @property
     def session(self):
         if not self._authenticated:
@@ -103,15 +102,21 @@ class ImdbEntrySet(MutableSet):
         return self._session
 
     def authenticate(self):
-        """Authenticates a session with imdb, and grabs any IDs needed for getting/modifying list."""
+        """Authenticates a session with IMDB, and grabs any IDs needed for getting/modifying list."""
+        cached_credentials = False
         with Session() as session:
             user = session.query(IMDBListUser).filter(IMDBListUser.user_name == self.config.get('login')).one_or_none()
             if user and user.cookies and user.user_id:
-                log.debug('login  credentials found in cache')
+                log.debug('login credentials found in cache, testing')
                 self.cookies = user.cookies
                 self.user_id = user.user_id
-            else:
-                log.debug('user credentials not found in cache, fetching from IMDB')
+                r = self._session.head('http://www.imdb.com/profile', allow_redirects=False, cookies=self.cookies)
+                if not r.headers.get('location') or 'login' in r.headers['location']:
+                    log.debug('cache credentials expired')
+                else:
+                    cached_credentials = True
+            if not cached_credentials:
+                log.debug('user credentials not found in cache or outdated, fetching from IMDB')
                 try:
                     r = self._session.get(
                         'https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
@@ -131,7 +136,7 @@ class ImdbEntrySet(MutableSet):
                 # Get user id by extracting from redirect url
                 r = self._session.head('http://www.imdb.com/profile', allow_redirects=False)
                 if not r.headers.get('location') or 'login' in r.headers['location']:
-                    raise plugin.PluginError('Login to imdb failed. Check your credentials.')
+                    raise plugin.PluginError('Login to IMDB failed. Check your credentials.')
                 self.user_id = re.search('ur\d+(?!\d)', r.headers['location']).group()
                 self.cookies = dict(d.cookies)
                 # Get list ID
