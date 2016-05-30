@@ -22,6 +22,10 @@
             page_size: 10
         }
 
+		var params = {
+			forget: true
+		};
+		
         //Call from the pagination directive, which triggers other episodes to load
         vm.updateListPage = function(index) {
             options.page = index;
@@ -61,7 +65,7 @@
             .cancel("No");
 
             $mdDialog.show(confirm).then(function() {
-                seriesService.deleteEpisode(vm.show, episode)
+                seriesService.deleteEpisode(vm.show, episode, params)
                 .then(function(data) {
                     //Find the index of the episode in the data
                     var index = vm.show.episodes.indexOf(episode);

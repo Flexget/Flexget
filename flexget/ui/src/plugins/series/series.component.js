@@ -19,6 +19,10 @@
             in_config: 'all',
             sort_by: 'show_name'
         }
+		
+		var params = {
+			forget: true
+		}
 
         vm.searchTerm = "";
 
@@ -40,7 +44,7 @@
                 .cancel("No");
 
 			$mdDialog.show(confirm).then(function () {
-				seriesService.deleteShow(show).then(function (data) {
+				seriesService.deleteShow(show, params).then(function (data) {
 					getSeriesList();
 				});
 			});

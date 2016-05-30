@@ -40,7 +40,7 @@
 
 
         function getShowMetadata(show) {
-            return $http.get('/api/tvdb/series/' + show.show_name, { cache: true })
+            return $http.get('/api/tvdb/series/' + show.show_name + '/', { cache: true })
             .then(getShowMetadataComplete)
             .catch(callFailed);
 
@@ -49,11 +49,11 @@
             }
         }
 
-        function deleteShow(show) {
+        function deleteShow(show, params) {
 
-            return $http.delete('/api/series/' + show.show_id,
+            return $http.delete('/api/series/' + show.show_id + '/',
             {
-                params: { forget: true }
+                params: params
             })
             .then(deleteShowComplete)
             .catch(callFailed)
@@ -66,7 +66,7 @@
         }
 
         function searchShows(searchTerm) {
-            return $http.get('/api/series/search/' + searchTerm)
+            return $http.get('/api/series/search/' + searchTerm + '/')
             .then(searchShowsComplete)
             .catch(callFailed);
 
@@ -76,7 +76,7 @@
         }
 
         function getEpisodes(show, params) {
-            return $http.get('/api/series/' + show.show_id + '/episodes', { params: params })
+            return $http.get('/api/series/' + show.show_id + '/episodes/', { params: params })
             .then(getEpisodesComplete)
             .catch(callFailed);
 
@@ -85,8 +85,8 @@
             }
         }
 
-        function deleteEpisode(show, episode) {
-            return $http.delete('/api/series/' + show.show_id + '/episodes/' + episode.episode_id, { params: { forget: true} })
+        function deleteEpisode(show, episode, params) {
+            return $http.delete('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/', { params: params })
             .then(deleteEpisodeComplete)
             .catch(callFailed)
 
@@ -96,7 +96,7 @@
         }
 
         function resetReleases(show, episode) {
-            return $http.put('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/releases')
+            return $http.put('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/releases/')
             .then(resetReleasesComplete)
             .catch(callFailed)
 
@@ -105,8 +105,8 @@
             }
         }
 
-        function forgetRelease(show, episode, release) {
-            return $http.delete('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/releases/' + release.release_id + '/', { params: { forget: true }})
+        function forgetRelease(show, episode, release, params) {
+            return $http.delete('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/releases/' + release.release_id + '/', { params: params})
             .then(forgetReleaseComplete)
             .catch(callFailed);
 
