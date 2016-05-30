@@ -46,7 +46,7 @@ CATEGORIES = {
     'TV-Web-DL': 22
 }
 
-BASE_URL = 'http://iptorrents.com'
+BASE_URL = 'https://iptorrents.com'
 
 
 class UrlRewriteIPTorrents(object):
@@ -121,7 +121,7 @@ class UrlRewriteIPTorrents(object):
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c]
                       for c in categories]
-        filter_url = '&'.join(('l' + str(c) + '=') for c in categories)
+        filter_url = '&'.join((str(c) + '=') for c in categories)
 
         entries = set()
 
