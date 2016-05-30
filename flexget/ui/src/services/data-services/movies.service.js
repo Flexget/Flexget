@@ -16,7 +16,8 @@
             getLists: getLists,
             deleteList: deleteList,
             getListMovies: getListMovies,
-            deleteMovie: deleteMovie
+            deleteMovie: deleteMovie,
+            createList: createList
         }
 
         function getLists() {
@@ -60,6 +61,16 @@
                 return;
             }
         }
+
+        function createList(name) {
+            return $http.post('/api/movie_list/', { name: name })
+                .then(createListComplete)
+                .catch(callFailed);
+
+            function createListComplete(response) {
+                return response.data;
+            };
+        };
 
         function callFailed(error) {
 			return exception.catcher(error);

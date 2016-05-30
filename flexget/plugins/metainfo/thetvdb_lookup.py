@@ -138,6 +138,9 @@ class PluginThetvdbLookup(object):
                 lookupargs['episode_number'] = entry['series_episode'] + episode_offset
             elif entry['series_id_type'] == 'sequence':
                 lookupargs['absolute_number'] = entry['series_id'] + episode_offset
+            elif entry['series_id_type'] == 'date':
+                # TODO: Should thetvdb_lookup_episode_offset be used for date lookups as well?
+                lookupargs['first_aired'] = entry['series_date']
 
             episode = lookup_episode(**lookupargs)
             entry.update_using_map(self.episode_map, episode)

@@ -239,3 +239,68 @@ class TestListInterface(object):
 
         task = execute_task('test_list_reject')
         assert len(task.rejected) == 1
+
+
+class TestMovieListStripYearInterface(object):
+    config = """
+        templates:
+          global:
+            disable: [seen]
+
+        tasks:
+          test_list_add:
+            mock:
+              - {title: 'The Matrix (1999)', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
+            accept_all: yes
+            list_add:
+              - movie_list: test_list
+
+          test_list_get_simple:
+             movie_list: test_list
+
+          test_list_get_list_name:
+             movie_list:
+               list_name: test_list
+
+          test_list_get_strip_year:
+             movie_list:
+               list_name: test_list
+               strip_year: yes
+
+          test_list_get_strip_year_negative:
+             movie_list:
+               list_name: test_list
+               strip_year: no
+    """
+
+    def test_strip_year_regression_test(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 1
+
+        task = execute_task('test_list_get_simple')
+        assert len(task.entries) == 1
+        assert task.find_entry(title='The Matrix (1999)')
+
+    def test_strip_year_just_list_name(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 1
+
+        task = execute_task('test_list_get_list_name')
+        assert len(task.entries) == 1
+        assert task.find_entry(title='The Matrix (1999)')
+
+    def test_strip_year_positive(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 1
+
+        task = execute_task('test_list_get_strip_year')
+        assert len(task.entries) == 1
+        assert task.find_entry(title='The Matrix')
+
+    def test_strip_year_negative(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 1
+
+        task = execute_task('test_list_get_strip_year_negative')
+        assert len(task.entries) == 1
+        assert task.find_entry(title='The Matrix (1999)')
