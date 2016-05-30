@@ -248,11 +248,13 @@ class ImdbEntrySet(MutableSet):
         item_ids = None
         if self.config['list'] == 'watchlist':
             data = {'consts[]': entry['imdb_id'], 'tracking_tag': 'watchlistRibbon'}
-            status = self.session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data).json()
+            status = self.session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data,
+                                       cookies=self.cookies).json()
             item_ids = status.get('has', {}).get(entry['imdb_id'])
         else:
             data = {'tconst': entry['imdb_id']}
-            status = self.session.post('http://www.imdb.com/list/_ajax/wlb_dropdown', data=data).json()
+            status = self.session.post('http://www.imdb.com/list/_ajax/wlb_dropdown', data=data,
+                                       cookies=self.cookies).json()
             for a_list in status['items']:
                 if a_list['data_list_id'] == self.list_id:
                     item_ids = a_list['data_list_item_ids']
@@ -266,9 +268,11 @@ class ImdbEntrySet(MutableSet):
             'ref_tag': 'title'
         }
         for item_id in item_ids:
-            self.session.post('http://www.imdb.com/list/_ajax/edit', data=dict(data, list_item_id=item_id))
-        # We don't need to invalidate our cache if we remove the item
-        self._items = [i for i in self._items if i['imdb_id'] != entry['imdb_id']] if self._items else None
+            log.debug('found movie %s with ID %s in list %s, removing', entry['title'], entry['imdb_id'], self.list_id)
+            self.session.post('http://www.imdb.com/list/_ajax/edit', data=dict(data, list_item_id=item_id),
+                              cookies=self.cookies)
+            # We don't need to invalidate our cache if we remove the item
+            self._items = [i for i in self._items if i['imdb_id'] != entry['imdb_id']] if self._items else None
 
     def add(self, entry):
         if self.config['list'] in IMMUTABLE_LISTS:
@@ -276,12 +280,15 @@ class ImdbEntrySet(MutableSet):
         if 'imdb_id' not in entry:
             log.warning('Cannot add %s to imdb_list because it does not have an imdb_id', entry['title'])
             return
+        # Manually calling authenticate to fetch list_id and cookies
+        self.authenticate()
         data = {
             'const': entry['imdb_id'],
             'list_id': self.list_id,
             'ref_tag': 'title'
         }
-        self.session.post('http://www.imdb.com/list/_ajax/edit', data=data)
+        log.debug('adding title %s with ID %s to imdb %s', entry['title'], entry['imdb_id'], self.list_id)
+        self.session.post('http://www.imdb.com/list/_ajax/edit', data=data, cookies=self.cookies)
         # Invalidate cache so that new movie info will be grabbed
         self.invalidate_cache()
 
