@@ -94,4 +94,25 @@ describe("Service: Movies", function () {
 			$httpBackend.flush();
 		});
 	});
+
+	describe('createList()', function () {
+		it('should issue a POST /api/movie_list/ request', function () {
+			$httpBackend.expect('POST', '/api/movie_list/').respond(200, {});
+			moviesService.createList("New List").then(function (data) {
+				expect(data).to.exist;
+			});
+			$httpBackend.flush();
+		});
+
+		it('should report an error if request fails', function () {
+			$httpBackend.expect('POST', '/api/movie_list/').respond(500, {
+				message: "Request failed"
+			});
+			moviesService.createList("New List").catch(function (error) {
+				expect(error.data.message).to.equal("Request failed");
+				expect(exception.catcher).to.have.been.calledOnce;
+			});
+			$httpBackend.flush();
+		});
+	});
 });
