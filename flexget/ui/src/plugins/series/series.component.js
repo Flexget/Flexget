@@ -97,12 +97,11 @@
 
         vm.showEpisodes = function (show) {
             if (show !== vm.selectedShow) {
-                vm.selectedShow = null;
-
                 $timeout(function () {
                     vm.selectedShow = show;
                 }, 10);
-            }
+            };
+			vm.selectedShow = null;
         }
 
         vm.hideEpisodes = function () {
