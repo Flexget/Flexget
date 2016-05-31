@@ -32,7 +32,7 @@
                     remember = false;
                 }
 
-                return $http.post('/api/auth/login/?remember=' + remember, {username: username, password: password})
+                return $http.post('/api/auth/login/', {username: username, password: password}, { params: { remember: remember } })
                     .success(function () {
                         loggedIn = true;
 
