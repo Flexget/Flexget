@@ -126,19 +126,49 @@ class SearchMoreThanTV(object):
     }
 
     base_url = 'https://www.morethan.tv/'
+    errors = False
 
-    def get_login_cookie(self, request_session, username, password):
-        with Session() as session:
-            saved_cookie = session.query(MoreThanTVCookie).filter(MoreThanTVCookie.username == username).first()
-            if saved_cookie and saved_cookie.expires is not None and saved_cookie.expires >= datetime.datetime.now():
-                log.debug('Found valid login cookie')
-                return saved_cookie.cookie
+    def get(self, url, params, username, password, force=False):
+        """
+        Wrapper to allow refreshing the cookie if it is invalid for some reason
+        :param url:
+        :param params:
+        :param username:
+        :param password:
+        :param force: flag used to refresh the cookie forcefully ie. forgo DB lookup
+        :return:
+        """
+        cookies = self.get_login_cookie(username, password, force=force)
+
+        response = requests.get(url, params=params, cookies=cookies)
+
+        if self.base_url + 'login.php' in response.url:
+            if self.errors:
+                raise plugin.PluginError('MoreThanTV login cookie is invalid. Login page received?')
+            self.errors = True
+            # try again
+            self.get(url, params, username, password, force=True)
+
+    def get_login_cookie(self, username, password, force=False):
+        """
+        Retrieves login cookie
+        :param username:
+        :param password:
+        :param force: if True, then retrieve a fresh cookie instead of looking in the DB
+        :return:
+        """
+        if not force:
+            with Session() as session:
+                saved_cookie = session.query(MoreThanTVCookie).filter(MoreThanTVCookie.username == username).first()
+                if saved_cookie and saved_cookie.expires and saved_cookie.expires >= datetime.datetime.now():
+                    log.debug('Found valid login cookie')
+                    return saved_cookie.cookie
 
         url = self.base_url + 'login.php'
         try:
             log.debug('Attempting to retrieve MoreThanTV cookie')
-            response = request_session.post(url, data={'username': username, 'password': password, 'login': 'Log in',
-                                                       'keeplogged': '1'}, timeout=30)
+            response = requests.post(url, data={'username': username, 'password': password, 'login': 'Log in',
+                                                'keeplogged': '1'}, timeout=30)
         except RequestException as e:
             raise plugin.PluginError('MoreThanTV login failed: %s', e)
 
@@ -147,13 +177,13 @@ class SearchMoreThanTV(object):
 
         with Session() as session:
             expires = None
-            for c in request_session.cookies:
+            for c in requests.cookies:
                 if c.name == 'session':
                     expires = c.expires
             if expires:
                 expires = datetime.datetime.fromtimestamp(expires)
             log.debug('Saving or updating MoreThanTV cookie in db')
-            cookie = MoreThanTVCookie(username=username, cookie=dict(request_session.cookies), expires=expires)
+            cookie = MoreThanTVCookie(username=username, cookie=dict(requests.cookies), expires=expires)
             session.merge(cookie)
             return cookie.cookie
 
@@ -162,8 +192,6 @@ class SearchMoreThanTV(object):
         """
             Search for entries on MoreThanTV
         """
-        cookies = self.get_login_cookie(requests, config['username'], config['password'])
-
         params = {}
 
         if 'category' in config:
@@ -185,7 +213,7 @@ class SearchMoreThanTV(object):
             params['searchstr'] = search_string
             log.debug('Using search params: %s', params)
             try:
-                page = requests.get(self.base_url + 'torrents.php', params=params, cookies=cookies)
+                page = self.get(self.base_url + 'torrents.php', params, config['username'], config['password'])
                 log.debug('requesting: %s', page.url)
             except RequestException as e:
                 log.error('MoreThanTV request failed: %s', e)
