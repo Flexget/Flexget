@@ -4,7 +4,7 @@
     angular
         .module('flexget.components', [
             'ui.router',
-            'ngMaterial'
-        ]);
-
+            'ngMaterial',
+			'flexget.components.requestInterceptor'
+		]);
 })();
