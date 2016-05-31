@@ -10,4 +10,10 @@ describe("Blocks: Exception", function () {
 	it("should exist", function () {
 		expect(exception).to.exist;
 	});
+	
+	describe('catcher()', function () {
+		it('should exist', function () {
+			expect(exception.catcher).to.exist;
+		});
+	});
 });

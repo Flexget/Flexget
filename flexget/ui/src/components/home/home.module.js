@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module("flexget.components.home", ['angular.filter'])
+        .module("flexget.components.home", [])
         .run(appRun);
 
     function appRun(routerHelper) {
