@@ -1,14 +1,23 @@
 describe("Blocks: UrlInterceptor", function () {
+	var httpProvider;
 	beforeEach(function () {
-		bard.appModule('blocks.urlInterceptor');
+		bard.appModule('blocks.urlInterceptor',
+			function ($httpProvider) {
+				httpProvider = $httpProvider;
+				console.log(httpProvider);
+			});
 
-		bard.inject('urlInterceptor', '$httpBackend');
-
-		//sinon.spy(exception, 'catcher');
+		bard.inject('urlInterceptor');
 	});
 
 	it("should exist", function () {
 		expect(urlInterceptor).to.exist;
+	});
+
+	describe('config', function () {
+		it('should add the urlInterceptor to the list of interceptors', function () {
+			expect(httpProvider.interceptors).to.contain('urlInterceptor');
+		});
 	});
 
 	describe('request()', function () {
