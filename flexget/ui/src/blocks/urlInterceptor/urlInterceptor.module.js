@@ -2,5 +2,5 @@
     'use strict';
 
     angular
-        .module('flexget.components', []);
+        .module("blocks.urlInterceptor", []);
 })();
