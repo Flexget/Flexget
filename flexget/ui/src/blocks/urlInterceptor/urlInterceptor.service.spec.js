@@ -4,7 +4,6 @@ describe("Blocks: UrlInterceptor", function () {
 		bard.appModule('blocks.urlInterceptor',
 			function ($httpProvider) {
 				httpProvider = $httpProvider;
-				console.log(httpProvider);
 			});
 
 		bard.inject('urlInterceptor');
