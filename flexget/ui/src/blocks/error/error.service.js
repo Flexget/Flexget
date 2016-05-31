@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('flexget.components')
+    angular.module('blocks.error')
         .factory('errorService', errorService);
 
     function errorService($mdToast, $mdDialog) {
