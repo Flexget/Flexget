@@ -1,4 +1,4 @@
-describe("Plugin: History.component", function () {
+describe.skip("Plugin: History.component", function () {
 	var controller;
 	var history = mockHistoryData.getMockHistory();
 
