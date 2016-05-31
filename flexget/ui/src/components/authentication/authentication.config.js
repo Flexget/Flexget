@@ -36,7 +36,6 @@
 
 	function authenticationConfig($httpProvider, $stateProvider) {
 		/* Register login page and redirect to page when login is required */
-		console.log('login route');
 		$stateProvider.state('login', {
 			url: '/login',
 			controller: 'LoginController',
