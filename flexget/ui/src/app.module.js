@@ -14,7 +14,6 @@
 			'angular-cache',
 
 			'flexget.layout',
-			'flexget.components.exception',
 			'flexget.components.home',
 			'flexget.components.404'
 		]);

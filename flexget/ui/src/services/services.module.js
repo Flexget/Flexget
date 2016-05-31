@@ -4,7 +4,7 @@
     angular
         .module('flexget.services', [
 			'flexget.components',
-			'flexget.components.exception',
+			'blocks.exception',
             'angular-cache'
         ]);
 })();
