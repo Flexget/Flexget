@@ -2,7 +2,7 @@
 	'use strict';
 
 	angular
-		.module('flexget.components.router')
+		.module('blocks.router')
 		.provider('routerHelper', routerHelperProvider);
 
 	function routerHelperProvider($locationProvider, $stateProvider, $urlRouterProvider) {
@@ -11,8 +11,8 @@
 		}
 
 		//$locationProvider.html5Mode(true);
-		
-		
+
+
 
 		this.$get = RouterHelper;
 

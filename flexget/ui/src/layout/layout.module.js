@@ -4,6 +4,6 @@
     angular
         .module('flexget.layout', [
 			'ngMaterial',
-			'flexget.components.router'
+			'blocks.router'
 		]);
 })();
