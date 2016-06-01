@@ -57,7 +57,7 @@ class TestSeriesAPI(object):
         mock_new_eps_after.return_value = 0
         mocked_series_search.return_value = [show]
 
-        rsp = api_client.get('/series/search/the%20big%20bang%20theory')
+        rsp = api_client.get('/series/search/the%20big%20bang%20theory/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         assert mock_latest_release.called
         assert mock_new_eps_after.called
@@ -77,7 +77,7 @@ class TestSeriesAPI(object):
         mock_latest_release.return_value = episode
         mock_new_eps_after.return_value = 0
 
-        rsp = api_client.get('/series/1')
+        rsp = api_client.get('/series/1/')
 
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         assert mock_latest_release.called
@@ -92,7 +92,7 @@ class TestSeriesAPI(object):
 
         mock_show_by_id.return_value = show
 
-        rsp = api_client.delete('/series/1')
+        rsp = api_client.delete('/series/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         assert mock_show_by_id.called
         assert mock_forget_series.called
@@ -114,7 +114,7 @@ class TestSeriesAPI(object):
         mock_latest_release.return_value = episode
         mock_new_eps_after.return_value = 0
 
-        rsp = api_client.json_put('/series/1', data=json.dumps(ep_id))
+        rsp = api_client.json_put('/series/1/', data=json.dumps(ep_id))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         assert mock_show_by_id.called
 
@@ -140,7 +140,7 @@ class TestSeriesAPI(object):
 
         mock_show_by_id.return_value = show
 
-        rsp = api_client.get('/series/1/episodes')
+        rsp = api_client.get('/series/1/episodes/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         assert mock_show_by_id.called
 
@@ -155,7 +155,7 @@ class TestSeriesAPI(object):
         rsp = api_client.json_post(('/series/'), data=json.dumps(new_show))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        rsp = api_client.delete('/series/1/episodes')
+        rsp = api_client.delete('/series/1/episodes/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
     @patch.object(series, 'episode_in_show')
@@ -168,7 +168,7 @@ class TestSeriesAPI(object):
         mock_show_by_id.return_value = show
         mock_episode_by_id.return_value = episode
 
-        rsp = api_client.get('/series/1/episodes/1')
+        rsp = api_client.get('/series/1/episodes/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         assert mock_show_by_id.called
         assert mock_episode_by_id.called
@@ -186,7 +186,7 @@ class TestSeriesAPI(object):
         mock_show_by_id.return_value = show
         mock_episode_by_id.return_value = episode
 
-        rsp = api_client.delete('/series/1/episodes/1')
+        rsp = api_client.delete('/series/1/episodes/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         assert mock_show_by_id.called
         assert mock_episode_by_id.called
@@ -203,13 +203,13 @@ class TestSeriesAPI(object):
         mock_show_by_id.return_value = show
         mock_episode_by_id.return_value = episode
 
-        rsp = api_client.get('/series/1/episodes/1/releases')
+        rsp = api_client.get('/series/1/episodes/1/releases/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        rsp = api_client.get('/series/1/episodes/1/releases?downloaded=true')
+        rsp = api_client.get('/series/1/episodes/1/releases/?downloaded=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        rsp = api_client.get('/series/1/episodes/1/releases?downloaded=false')
+        rsp = api_client.get('/series/1/episodes/1/releases/?downloaded=false')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         assert mock_show_by_id.call_count == 3
@@ -227,13 +227,13 @@ class TestSeriesAPI(object):
         mock_show_by_id.return_value = show
         mock_episode_by_id.return_value = episode
 
-        rsp = api_client.delete('/series/1/episodes/1/releases')
+        rsp = api_client.delete('/series/1/episodes/1/releases/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        rsp = api_client.delete('/series/1/episodes/1/releases?downloaded=true')
+        rsp = api_client.delete('/series/1/episodes/1/releases/?downloaded=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        rsp = api_client.delete('/series/1/episodes/1/releases?downloaded=false')
+        rsp = api_client.delete('/series/1/episodes/1/releases/?downloaded=false')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         assert mock_show_by_id.call_count == 3
