@@ -11,7 +11,7 @@
 			position: "bottom right",
 			controller: 'errorToastController',
 			controllerAs: 'vm',
-			hideDelay: 0
+			hideDelay: 5000
 		};
 
 		var service = {

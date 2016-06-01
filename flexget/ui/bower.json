@@ -20,7 +20,8 @@
     "angular-cache": "^4.5.0",
     "jquery": "^2.2.4",
     "angular-ui-ace": "^0.2.3",
-    "angular-utf8-base64": "^0.0.5"
+    "angular-utf8-base64": "^0.0.5",
+    "ngclipboard": "^1.1.1"
   },
   "resolutions": {
     "angular": "~1.5.6"

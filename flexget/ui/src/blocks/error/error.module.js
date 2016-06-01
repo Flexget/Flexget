@@ -3,6 +3,7 @@
 
     angular
         .module("blocks.error", [
-			'ngMaterial'
+			'ngMaterial',
+			'ngclipboard'
 		]);
 })();

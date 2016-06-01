@@ -13,8 +13,9 @@
 
 	function errorDialogController($mdDialog) {
 		var vm = this;
+		
 		vm.close = close;
-
+		
 		function close() {
 			$mdDialog.hide();
 		};
