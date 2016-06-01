@@ -17,7 +17,8 @@
     "ui-grid-auto-scroll": "~1.0.1",
     "animate.css-scss": "~3.1.0",
     "angular-messages": "^1.5.1",
-    "angular-cache": "^4.5.0"
+    "angular-cache": "^4.5.0",
+    "ngclipboard": "^1.1.1"
   },
   "resolutions": {
     "angular": "1.5.6"

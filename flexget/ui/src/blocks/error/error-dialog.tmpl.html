@@ -8,7 +8,14 @@
 	</div>
 </md-toolbar>
 <md-dialog-content>
-	<div class="md-dialog-content">
-      <pre>{{ vm.error | json }}</pre>
+	<div class="md-dialog-content" layout="row">
+		<div layout="column">
+			<pre>{{ vm.error | json }}</pre>
+		</div>
+		<div layout="column">
+			<md-button class="md-icon-button" ngclipboard data-clipboard-text="{{ vm.error }}">
+				<md-icon md-font-icon="fa-clipboard" class="fa fa-lg" aria-label="copy to clipboard"></md-icon>
+			</md-button>
+		</div>
 	</div>
 </md-dialog-content>
