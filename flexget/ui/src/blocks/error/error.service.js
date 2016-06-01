@@ -4,7 +4,7 @@
     angular.module('blocks.error')
         .factory('errorService', errorService);
 
-    function errorService($mdToast, $mdDialog, $rootElement) {
+    function errorService($mdToast) {
 		//TODO: Check if later on this can be converted to a component, right now this is not possible with ngMaterial
 		var toast = {
 			templateUrl: "blocks/error/error-toast.tmpl.html",
