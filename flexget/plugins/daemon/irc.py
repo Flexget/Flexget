@@ -15,8 +15,9 @@ import time
 from flexget.entry import Entry
 from flexget.config_schema import register_config_key
 from flexget.event import event
-from flexget.plugin import PluginError, DependencyError
+from flexget.plugin import PluginError
 from flexget.manager import manager
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger('irc')
 
@@ -39,22 +40,24 @@ schema = {
                     'server': {'type': 'string'},
                     'port': {'type': 'integer', 'default': 6667},
                     'nickname': {'type': 'string'},
-                    'channels': {
-                        'oneOf': [
-                            {'type': 'array',
-                             'items': channel_pattern
-                             },
-                            channel_pattern
-                        ],
-                    },
+                    'channels': one_or_more(channel_pattern),
                     'nickserv_password': {'type': 'string'},
                     'invite_nickname': {'type': 'string'},
                     'invite_message': {'type': 'string'},
-                    'task': {
-                        'oneOf': [
-                            {'type': 'string'},
-                            {'type': 'array', 'items': {'type': 'string'}},
-                        ]
+                    'task': one_or_more({
+                        'type': 'string'
+                    }),
+                    'task_re': {
+                        'type': 'object',
+                        'additionalProperties': one_or_more({
+                            'type': 'object',
+                            'properties': {
+                                'regexp': {'type': 'string'},
+                                'field': {'type': 'string'}
+                            },
+                            'required': ['regexp', 'field'],
+                            'additionalProperties': False
+                        })
                     },
                     'queue_size': {'type': 'integer', 'default': 1},
                 },
@@ -63,7 +66,11 @@ schema = {
                     {'required': ['tracker_file']}
                 ],
                 'error_anyOf': 'Must specify a tracker file or server and channel(s)',
-                'required': ['task'],
+                'oneOf': [
+                    {'required': ['task']},
+                    {'required': ['task_re']}
+                ],
+                'error_oneOf': 'Must specify a task',
                 'additionalProperties': {'type': 'string'},
             }
         },
@@ -283,11 +290,32 @@ def install_ircconnection():
             :return:
             """
             tasks = self.config.get('task')
-            if isinstance(tasks, basestring):
-                tasks = [tasks]
+            tasks_re = self.config.get('task_re')
+            if tasks:
+                if isinstance(tasks, basestring):
+                    tasks = [tasks]
+                log.info('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
+                manager.execute(options={'tasks': tasks, 'cron': True, 'inject': self.entry_queue}, priority=5)
 
-            log.info('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
-            manager.execute(options={'tasks': tasks, 'cron': True, 'inject': self.entry_queue}, priority=5)
+            if tasks_re:
+                tasks_entry_map = {}
+                for entry in self.entry_queue:
+                    matched = False
+                    for task, config in tasks_re.items():
+                        if isinstance(config, dict):
+                            config = [config]
+                        for c in config:
+                            if re.search(c['regexp'], entry.get(c['field'])):
+                                matched = True
+                                if not tasks_entry_map.get(task):
+                                    tasks_entry_map[task] = []
+                                tasks_entry_map[task].append(entry)
+                    if not matched:
+                        log.info('Entry %s did not match any task regexp.', entry['title'])
+
+                for task, entries in tasks_entry_map.items():
+                    log.info('Injecting %d entries into task %s', len(entries), task)
+                    manager.execute(options={'tasks': [task], 'cron': True, 'inject': entries}, priority=5)
 
         def queue_entry(self, entry):
             """
