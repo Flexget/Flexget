@@ -4,7 +4,7 @@ describe("Service: Movies", function () {
 
 		bard.inject('$httpBackend', 'moviesService', 'exception');
 
-		sinon.spy(exception, 'catcher');
+		sinon.stub(exception, 'catcher');
 	});
 
 	it("should exist", function () {

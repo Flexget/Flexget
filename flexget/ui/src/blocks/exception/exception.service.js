@@ -5,7 +5,7 @@
 		.module('blocks.exception')
 		.factory('exception', exception);
 
-	function exception($q, $log) {
+	function exception($q, $log, errorService) {
 		var service = {
 			catcher: catcher
 		};
@@ -14,9 +14,6 @@
 		function catcher(error) {
 			$log.log(error.data.message);
 
-			//TODO: Make this better: show toasts with the message, and popup with more info
-			// Also, when this gets implemented, stub out the functions in the tests so it doesn't call all the log or toast functions		
-
 			// return function(e) {
 			/*var thrownDescription;
 			var newMessage;
@@ -24,8 +21,10 @@
 			  thrownDescription = '\n' + e.data.description;
 			  newMessage = message + thrownDescription;
 			}
-			e.data.description = newMessage;
-			//logger.error(newMessage);*/
+
+			e.data.description = newMessage;*/
+
+			errorService.showToast(error.data);
 			return $q.reject(error);
 			//};
 		}

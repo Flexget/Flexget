@@ -4,7 +4,7 @@ describe("Service: Series", function () {
 
 		bard.inject('$httpBackend', 'seriesService', 'exception', 'CacheFactory');
 
-		sinon.spy(exception, 'catcher');
+		sinon.stub(exception, 'catcher');
 
 		//Clear all caches before the tests to prevent cross test caching
 		CacheFactory.clearAll();
