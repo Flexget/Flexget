@@ -10,6 +10,7 @@
 			window.location.hash = '/';
 		}
 
+		//TODO: Figure out if htlm5Mode is possible
 		//$locationProvider.html5Mode(true);
 
 
@@ -24,21 +25,28 @@
 				getStates: getStates
 			};
 
-			init();
+			//init();
 
 			return service;
 
 			function configureStates(states, otherwisePath) {
 				states.forEach(function (state) {
 					$stateProvider.state((state.config.abstract ? '' : 'flexget.') + state.state, state.config);
+
+					if (state.when) {
+						for (var i = 0; i < state.when.length; i++) {
+							$urlRouterProvider.when(state.when[i], state.config.url);
+						}
+					}
 				});
 				if (otherwisePath && !hasOtherwise) {
 					hasOtherwise = true;
 					$urlRouterProvider.otherwise(otherwisePath);
-				}
-			}
+				};
+			};
 
 			function handleRoutingErrors() {
+				//TODO: Convert to UI-router v1 (using transition.start etc.)
 				$rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
 					if (handlingStateChangeError) {
 						return;

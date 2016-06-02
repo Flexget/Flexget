@@ -16,7 +16,11 @@
                 config: {
                     url: '/',
                     component: 'home'
-                }
+                },
+				when: [
+					'',
+					'/'
+				]
             }
         ]
     }
