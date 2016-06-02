@@ -16,4 +16,3 @@ pytest-runner
 pytest-cov
 gitpython
 codacy-coverage
-subliminal >= 2.0rc1
