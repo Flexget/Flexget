@@ -11,6 +11,7 @@ from xml.etree.ElementTree import fromstring
 import urllib
 from uuid import uuid4
 import time
+import hashlib
 
 from flexget.entry import Entry
 from flexget.config_schema import register_config_key
@@ -82,6 +83,8 @@ schema = {
 irc_connections = {}
 # The manager object and thread
 irc_manager = None
+# To avoid having to restart the connections whenever the config updated event is fired (which is apparently a lot)
+config_hash = None
 
 
 def spawn_thread(name, conn):
@@ -648,7 +651,7 @@ def install_ircconnection():
 
     @event('manager.config_updated')
     def irc_update_config(manager):
-        global irc_manager
+        global irc_manager, config_hash
 
         # Exit if we're not running daemon mode
         if not manager.is_daemon:
@@ -659,6 +662,13 @@ def install_ircconnection():
         if not irc_exists and config:
             log.error('irc module required to use the daemon irc plugin. Install with `pip install irc`.')
             sys.exit(-1)
+
+        new_config_hash = hashlib.md5(str(sorted(list(config.items()))).encode('utf-8')).hexdigest()
+        if config_hash == new_config_hash:
+            log.debug('IRC config has not been changed. Not reloading the connections.')
+            return
+
+        config_hash = new_config_hash
 
         # Config for IRC has been removed, shutdown all instances
         stop_irc(manager)
