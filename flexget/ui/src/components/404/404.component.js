@@ -1,7 +1,7 @@
 (function () {
 
 	angular
-		.module('flexget.components.404')
+		.module('components.404')
 		.component('notFound', {
 			templateUrl: 'components/404/404.tmpl.html',
 			controllerAs: 'vm',
