@@ -2,5 +2,8 @@
     'use strict';
 
     angular
-        .module('flexget.components', ['ui.router']);
+        .module('flexget.components', [
+			'components.404',
+			'components.home'
+		]);
 })();

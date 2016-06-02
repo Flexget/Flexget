@@ -1,7 +1,7 @@
 (function () {
 
   angular
-    .module('flexget.components.home')
+    .module('components.home')
     .component('home', {
 		templateUrl: 'components/home/home.tmpl.html'
     })
