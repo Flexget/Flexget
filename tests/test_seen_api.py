@@ -49,7 +49,7 @@ class TestSeenAPI(object):
 
     @patch.object(seen, 'forget_by_id')
     def test_delete_seen_entry(self, mock_forget, api_client):
-        rsp = api_client.delete('/seen/1234')
+        rsp = api_client.delete('/seen/1234/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_cod
         assert mock_forget.called
 

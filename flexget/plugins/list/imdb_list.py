@@ -149,7 +149,8 @@ class ImdbEntrySet(MutableSet):
                 log.debug('could not find list ID in cache, fetching from IMDB')
                 if self.config['list'] == 'watchlist':
                     data = {'consts[]': 'tt0133093', 'tracking_tag': 'watchlistRibbon'}
-                    wl_data = self._session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data).json()
+                    wl_data = self._session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data,
+                                                 cookies=self.cookies).json()
                     try:
                         self.list_id = wl_data['list_id']
                     except KeyError:
@@ -159,7 +160,8 @@ class ImdbEntrySet(MutableSet):
                     self.list_id = self.config['list']
                 else:
                     data = {'tconst': 'tt0133093'}
-                    list_data = self._session.post('http://www.imdb.com/list/_ajax/wlb_dropdown', data=data).json()
+                    list_data = self._session.post('http://www.imdb.com/list/_ajax/wlb_dropdown', data=data,
+                                                   cookies=self.cookies).json()
                     for li in list_data['items']:
                         if li['wlb_text'] == self.config['list']:
                             self.list_id = li['data_list_id']

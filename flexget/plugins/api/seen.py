@@ -224,7 +224,7 @@ class SeenSearchAPI(APIResource):
         return {}
 
 
-@seen_api.route('/<int:seen_entry_id>')
+@seen_api.route('/<int:seen_entry_id>/')
 @api.doc(params={'seen_entry_id': 'ID of seen entry'}, description='Delete a specific seen entry via its ID')
 @api.response(500, 'Delete process failed', model=default_error_schema)
 @api.response(200, 'Successfully deleted entry', empty_response)
