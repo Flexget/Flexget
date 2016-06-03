@@ -5,20 +5,13 @@
 		.run(authenticationSetup)
 		.config(authenticationConfig);
 
-		//TODO: Implement JWT, make back end first?
+	//TODO: Implement JWT, make back end first?
 	function authenticationSetup($rootScope, $state, $http, toolBar, authService, $transitions) {
 
 		$rootScope.$on('event:auth-loginRequired', function (event, timeout) {
 			$state.go('login', { timeout: timeout });
 		});
 
-
-		var logout = function () {
-			$http.get('/api/auth/logout/')
-				.success(function () {
-					$state.go('login');
-				});
-		};
 
 		/* Ensure user is authenticated when changing states (pages) unless we are on the login page */
 		$transitions.onBefore({ to: 'flexget.*' }, function () {
@@ -31,17 +24,10 @@
 				});
 		});
 
-		toolBar.registerMenuItem('Manage', 'Logout', 'fa fa-sign-out', logout, 255);
+		//toolBar.registerMenuItem('Manage', 'Logout', 'fa fa-sign-out', logout, 255);
 	}
 
 	function authenticationConfig($httpProvider, $stateProvider) {
-		/* Register login page and redirect to page when login is required */
-		$stateProvider.state('login', {
-			url: '/login',
-			controller: 'LoginController',
-			controllerAs: 'vm',
-			templateUrl: 'components/authentication/login.tmpl.html',
-		});
 
 		/* Intercept 401/403 http return codes and redirect to login page */
 
@@ -69,5 +55,5 @@
 					},
 				};
 			}]);
-	}
-})();
+	};
+});
