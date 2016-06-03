@@ -2,7 +2,7 @@
     <md-content layout="column" flex>
         <md-list>
             <md-list-item ng-repeat="item in ::vm.navItems">
-                <md-button href="{{ ::item.url }}" ng-click="vm.close()" flex>
+                <md-button ui-sref="{{ ::item.name }}" ng-click="vm.close()" flex>
                     <md-icon class="fa fa-{{ ::item.settings.icon }}"></md-icon>{{ ::item.settings.caption }}
 				</md-button>
             </md-list-item>
