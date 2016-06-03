@@ -2,9 +2,9 @@ describe('404 Component:', function () {
 	var component;
 
 	beforeEach(function () {
-		module('components.404');
+		bard.appModule('components.404');
 		bard.inject('$state', '$componentController');
-		sinon.stub($state, 'go');
+		$state.go = sinon.spy();
 	});
 
 	beforeEach(function () {
