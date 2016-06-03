@@ -31,7 +31,7 @@
 
 			function configureStates(states, otherwisePath) {
 				states.forEach(function (state) {
-					$stateProvider.state((state.config.abstract ? '' : 'flexget.') + state.state, state.config);
+					$stateProvider.state(((state.config.root ||state.config.abstract) ? '' : 'flexget.') + state.state, state.config);
 
 					if (state.when) {
 						for (var i = 0; i < state.when.length; i++) {

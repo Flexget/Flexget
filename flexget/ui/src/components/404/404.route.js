@@ -15,7 +15,8 @@
                 state: '404',
                 config: {
                     url: '/404',
-                    component: 'notFound'
+                    component: 'notFound',
+					root: true
                 }
             }
         ]
