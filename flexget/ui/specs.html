@@ -70,6 +70,8 @@
   <script src="bower_components/angular-loading-bar/build/loading-bar.js"></script>
   <script src="bower_components/ui-grid-auto-scroll/js/auto-scroll.js"></script>
   <script src="bower_components/angular-cache/dist/angular-cache.js"></script>
+  <script src="bower_components/clipboard/dist/clipboard.js"></script>
+  <script src="bower_components/ngclipboard/dist/ngclipboard.js"></script>
   <script src="bower_components/angular-mocks/angular-mocks.js"></script>
   <script src="bower_components/sinon/index.js"></script>
   <script src="bower_components/bardjs/dist/bard.js"></script>
@@ -89,10 +91,12 @@
   <script src="/src/plugins/series/components/series-update/series-update.controller.js"></script>
   <script src="/src/plugins/series/components/series-show/series-show.component.js"></script>
   <script src="/src/plugins/series/components/series-episode/series-episode.component.js"></script>
+  <script src="/src/plugins/series/components/episode-releases/episode-releases.component.js"></script>
   <script src="/src/plugins/seen/seen.module.js"></script>
   <script src="/src/plugins/seen/components/seen-field/seen-field.component.js"></script>
   <script src="/src/plugins/seen/components/seen-entry/seen-entry.component.js"></script>
   <script src="/src/plugins/movies/movies.module.js"></script>
+  <script src="/src/plugins/movies/components/new-list/new-list.controller.js"></script>
   <script src="/src/plugins/movies/components/movie-entry/movie-entry.component.js"></script>
   <script src="/src/plugins/execute/execute.module.js"></script>
   <script src="/src/plugins/execute/components/execute-stream/execute-stream.component.js"></script>
@@ -116,26 +120,41 @@
   <script src="/src/plugins/history/history.component.js"></script>
   <script src="/src/plugins/execute/execute.filter.js"></script>
   <script src="/src/plugins/execute/execute.component.js"></script>
-  <script src="/src/components/components.module.js"></script>
-  <script src="/src/layout/toolbar/toolbar.service.js"></script>
   <script src="/src/layout/layout.module.js"></script>
+  <script src="/src/layout/toolbar/toolbar.service.js"></script>
   <script src="/src/layout/toolbar/toolbar.component.js"></script>
-  <script src="/src/layout/sidenav/sidenav.service.js"></script>
-  <script src="/src/layout/sidenav/sidenav.component.js"></script>
   <script src="/src/directives/directives.module.js"></script>
   <script src="/src/directives/palette-background/palette-background.directive.js"></script>
   <script src="/src/directives/material-pagination/material-pagination.directive.js"></script>
   <script src="/src/components/user/user.module.js"></script>
-  <script src="/src/components/router/router.module.js"></script>
-  <script src="/src/components/router/router-helper.provider.js"></script>
+  <script src="/src/components/sidenav/sidenav.module.js"></script>
+  <script src="/src/components/sidenav/sidenav.service.js"></script>
+  <script src="/src/components/sidenav/sidenav.component.js"></script>
+  <script src="/src/components/login/login.module.js"></script>
+  <script src="/src/components/login/login.route.js"></script>
+  <script src="/src/components/login/login.component.js"></script>
   <script src="/src/components/home/home.module.js"></script>
+  <script src="/src/components/home/home.route.js"></script>
   <script src="/src/components/home/home.component.js"></script>
-  <script src="/src/components/error/error.service.js"></script>
-  <script src="/src/components/authentication/authentication.service.js"></script>
-  <script src="/src/components/authentication/authentication.controller.js"></script>
+  <script src="/src/components/components.module.js"></script>
   <script src="/src/components/authentication/authentication.config.js"></script>
+  <script src="/src/components/404/404.module.js"></script>
+  <script src="/src/components/404/404.route.js"></script>
+  <script src="/src/components/404/404.component.js"></script>
+  <script src="/src/blocks/url-interceptor/url-interceptor.module.js"></script>
+  <script src="/src/blocks/url-interceptor/url-interceptor.service.js"></script>
+  <script src="/src/blocks/router/router-helper.module.js"></script>
+  <script src="/src/blocks/router/router-helper.provider.js"></script>
+  <script src="/src/blocks/exception/exception.module.js"></script>
+  <script src="/src/blocks/exception/exception.service.js"></script>
+  <script src="/src/blocks/error/error.module.js"></script>
+  <script src="/src/blocks/error/error.service.js"></script>
+  <script src="/src/blocks/error/error-toast.controller.js"></script>
+  <script src="/src/blocks/error/error-toast.component.js"></script>
+  <script src="/src/blocks/error/error-dialog.component.js"></script>
   <script src="/src/services/tasks.service.js"></script>
   <script src="/src/services/schema.service.js"></script>
+  <script src="/src/services/auth.service.js"></script>
   <script src="/src/plugins/plugins.module.js"></script>
   <script src="/src/layout/layout.run.js"></script>
   <script src="/src/app.theme.js"></script>
@@ -143,9 +162,23 @@
   <!-- endinject -->
 
   <!-- inject:specs:js -->
-  <script src="/src/layout/sidenav/sidenav.component.spec.js"></script>
+  <script src="/src/blocks/error/error-dialog.component.spec.js"></script>
+  <script src="/src/blocks/error/error-toast.controller.spec.js"></script>
+  <script src="/src/blocks/error/error.service.spec.js"></script>
+  <script src="/src/blocks/exception/exception.service.spec.js"></script>
+  <script src="/src/blocks/router/router-helper.provider.spec.js"></script>
+  <script src="/src/blocks/url-interceptor/url-interceptor.service.spec.js"></script>
+  <script src="/src/components/404/404.component.spec.js"></script>
+  <script src="/src/components/404/404.route.spec.js"></script>
+  <script src="/src/components/home/home.component.spec.js"></script>
+  <script src="/src/components/home/home.route.spec.js"></script>
+  <script src="/src/components/login/login.component.spec.js"></script>
+  <script src="/src/components/login/login.route.spec.js"></script>
+  <script src="/src/components/sidenav/sidenav.component.spec.js"></script>
+  <script src="/src/components/sidenav/sidenav.service.spec.js"></script>
   <script src="/src/plugins/history/history.component.spec.js"></script>
   <script src="/src/services/data-services/movies.service.spec.js"></script>
+  <script src="/src/services/data-services/series.service.spec.js"></script>
   <!-- endinject -->
 
   <script>

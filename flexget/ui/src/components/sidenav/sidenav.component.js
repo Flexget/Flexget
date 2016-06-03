@@ -21,7 +21,6 @@
 		}
 
 		function getNavRoutes() {
-			console.log(allStates);
 			vm.navItems = allStates.filter(function (r) {
 				return r.settings && r.settings.weight;
 			}).sort(function (r1, r2) {
