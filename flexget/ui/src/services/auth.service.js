@@ -35,21 +35,23 @@
 			return def.promise;
 		};
 
-		function login(username, password, remember) {
+		function login(credentials, remember) {
 			if (!remember) {
 				remember = false;
 			}
 
-			return $http.post('/api/auth/login/', { username: username, password: password }, { params: { remember: remember } })
-				.then(function () {
-					loggedIn = true;
+			return $http.post('/api/auth/login/', credentials, { params: { remember: remember } })
+				.then(loginComplete)
+				.catch(loginCallFailed);
+			
+			function loginComplete(response) {
+				isLoggedIn = true;
+				return;
+			};
 
-					if (prevState) {
-						$state.go(prevState, prevParams);
-					} else {
-						$state.go('flexget.home');
-					}
-				});
+			function loginCallFailed(error) {
+				return $q.reject(error.data);
+			};
 		};
 
 		function state(state, params) {
@@ -58,5 +60,10 @@
 				prevParams = params;
 			}
 		}
+
+		function callFailed(error) {
+			console.log(error);
+			return exception.catcher(error);
+        }
 	};
 })();
