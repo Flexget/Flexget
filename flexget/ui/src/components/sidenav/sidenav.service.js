@@ -20,7 +20,6 @@
         };
 
         function close() {
-			console.log('close');
             if (!$mdMedia('gt-lg')) {
                 $mdSidenav('left').close();
             }
