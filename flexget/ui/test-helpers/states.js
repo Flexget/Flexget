@@ -6,35 +6,30 @@ var mockStatesData = (function () {
 	function getStates() {
 		return [
 			{
-                state: 'home',
-                config: {
-                    url: '/',
-                    component: 'home'
-                }
+                name: 'flexget.home',
+                url: '/',
+                component: 'home'
 			},
 			{
-				state: 'log',
-				config: {
-					url: '/log',
-					component: 'logView',
-					settings: {
-						weight: 1,
-						icon: 'file-text-o',
-						caption: 'Log'
-					}
+				name: 'flexget.log',
+				url: '/log',
+				component: 'log',
+				settings: {
+					caption: 'Log',
+					icon: 'file-text-o',
+					weight: 1
 				}
 			},
 			{
-				state: 'movies',
-				config: {
-					url: '/movies',
-					components: 'moviesView',
-					settings: {
-						weight: 2,
-						icon: 'tv',
-						caption: 'Movies'
-					}
+				name: 'flexget.movies',
+				url: '/movies',
+				components: 'moviesView',
+				settings: {
+					weight: 2,
+					icon: 'tv',
+					caption: 'Movies'
 				}
+
 			}
 		]
 	}
