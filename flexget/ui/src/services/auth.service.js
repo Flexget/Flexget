@@ -12,6 +12,7 @@
         return {
             loggedIn: loggedIn,
 			login: login,
+			logout: logout,
 			state: state
 		};
 
@@ -51,6 +52,17 @@
 
 			function loginCallFailed(error) {
 				return $q.reject(error.data);
+			};
+		};
+
+		function logout() {
+			return $http.get('/api/auth/logout/')
+				.then(logoutComplete)
+				.catch(callFailed);
+
+			function logoutComplete(response) {
+				isLoggedIn = false;
+				return;
 			};
 		};
 
