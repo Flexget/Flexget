@@ -8,28 +8,27 @@
 			controller: loginController
 		});
 
-	function loginController($stateParams, authService) {
+	function loginController($stateParams, authService, $state) {
 		var vm = this;
 
 		vm.timeout = $stateParams.timeout;
-        vm.remember = false;
-        vm.error = '';
-        vm.credentials = {
-            username: '',
-            password: ''
-        };
+        vm.login = login;
+		vm.credentials = {};
 
-        vm.login = function () {
-            authService.login(vm.credentials.username, vm.credentials.password, vm.remember)
+		function login() {
+            authService.login(vm.credentials, vm.remember)
+				.then(function () {
+					//TODO: Route to previous requested route
+					$state.go('flexget.home');
+				})
                 .catch(function (data) {
                     vm.credentials.password = '';
-                    if ('message' in data) {
+                    if (data.message) {
                         vm.error = data.message;
                     } else {
                         vm.error = 'Error during authentication';
                     }
                 });
         };
-		
 	};
 })();
