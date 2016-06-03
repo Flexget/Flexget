@@ -5,6 +5,8 @@
         .module('flexget.components', [
 			'components.404',
 			'components.home',
-			'components.login'
+			'components.login',
+			'components.user',
+			'components.sidenav'
 		]);
 })();
