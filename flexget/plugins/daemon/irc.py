@@ -39,7 +39,7 @@ schema = {
                 'properties': {
                     'tracker_file': {'type': 'string', 'format': 'file'},
                     'server': {'type': 'string'},
-                    'port': {'type': 'integer', 'default': 6667},
+                    'port': {'type': 'integer'},
                     'nickname': {'type': 'string'},
                     'channels': one_or_more(channel_pattern),
                     'nickserv_password': {'type': 'string'},
@@ -72,6 +72,7 @@ schema = {
                     {'required': ['task_re']}
                 ],
                 'error_oneOf': 'Must specify a task',
+                'required': ['port'],
                 'additionalProperties': {'type': 'string'},
             }
         },
