@@ -4,6 +4,7 @@
     angular
         .module('flexget.components', [
 			'components.404',
-			'components.home'
+			'components.home',
+			'components.login'
 		]);
 })();

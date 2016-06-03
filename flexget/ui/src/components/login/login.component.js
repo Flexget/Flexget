@@ -1,13 +1,17 @@
 (function () {
-    'use strict';
 
-    angular.module('flexget.components')
-        .controller('LoginController', loginController);
+	angular
+		.module('components.login')
+		.component('login', {
+			templateUrl: 'components/login/login.tmpl.html',
+			controllerAs: 'vm',
+			controller: loginController
+		});
 
-    function loginController($stateParams, authService) {
-        var vm = this;
+	function loginController($stateParams, authService) {
+		var vm = this;
 
-        vm.timeout = $stateParams.timeout;
+		vm.timeout = $stateParams.timeout;
         vm.remember = false;
         vm.error = '';
         vm.credentials = {
@@ -17,7 +21,7 @@
 
         vm.login = function () {
             authService.login(vm.credentials.username, vm.credentials.password, vm.remember)
-                .error(function (data) {
+                .catch(function (data) {
                     vm.credentials.password = '';
                     if ('message' in data) {
                         vm.error = data.message;
@@ -26,6 +30,6 @@
                     }
                 });
         };
-    }
-
+		
+	};
 })();
