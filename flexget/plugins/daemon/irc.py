@@ -170,12 +170,12 @@ def install_ircconnection():
                         value_name = value_name.replace('gazelle_', '')
 
                     # Skip descriptions
-                    if value_name in ['description']:
+                    if 'description' in value_name:
                         continue
 
                     if self.config.get(value_name) is None:
-                        raise PluginError('missing configuration option on irc config %s - %s' % (self.connection_name,
-                                                                                                  value_name))
+                        raise PluginError('missing configuration option on irc config %s: %s' %
+                                          (self.connection_name, value_name))
 
                 # Get the tracker name, for use in the connection name
                 self.connection_name = self.tracker_config.get('longName', config_name)
@@ -773,7 +773,9 @@ def install_ircconnection():
 
 try:
     from irc.bot import SingleServerIRCBot
-    from irc.client import ServerConnectionError
+    from irc.client import ServerConnectionError, ServerConnection
+    from jaraco.stream.buffer import LenientDecodingLineBuffer
+    ServerConnection.buffer_class = LenientDecodingLineBuffer
     irc_exists = True
 except ImportError:
     irc_exists = False
