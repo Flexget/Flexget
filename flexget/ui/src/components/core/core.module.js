@@ -2,8 +2,7 @@
     'use strict';
 
     angular
-        .module('flexget.layout', [
-			'ngMaterial',
+        .module("components.core", [
 			'blocks.router'
 		]);
 })();

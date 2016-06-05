@@ -10,9 +10,13 @@
 			'angular-loading-bar',
 			'angular-cache',
 
+			'blocks.error',
+			'blocks.exception',
+			'blocks.router',
+			'blocks.urlInterceptor',
+
 			'flexget.directives',
 			'flexget.services',
-			'flexget.layout',
 			'flexget.components'
 		]);
 
