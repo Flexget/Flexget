@@ -92,13 +92,6 @@ class SeriesListSeries(Base):
     def __repr__(self):
         return '<SeriesListSeries title=%s,list_id=%d>' % (self.title, self.list_id)
 
-    @property
-    def attributes(self):
-        # This will build a list of attributes without the irrelevant class ones
-        return [a for a in dir(self) if
-                not a.startswith('_') and a not in ['id', 'added', 'title', 'list_id', 'ids', 'list', 'attributes',
-                                                    'to_dict', 'to_entry', 'metadata']]
-
     def to_entry(self, strip_year=False):
         entry = Entry()
         entry['title'] = entry['series_name'] = self.title
@@ -119,7 +112,7 @@ class SeriesListSeries(Base):
             'list_id': self.list_id,
             'series_list_ids': series_list_ids
         }
-        for attribute in self.attributes:
+        for attribute in settings_schema['properties']:
             series_dict[attribute] = getattr(self, attribute) if getattr(self, attribute) else None
         return series_dict
 
