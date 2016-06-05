@@ -191,13 +191,11 @@ def install_ircconnection():
                     rx = re.compile(regex_values.get('value'), re.UNICODE | re.MULTILINE)
                     self.ignore_lines.append(rx)
 
-                # Parse line patterns
-                patterns = list(self.tracker_config.findall('parseinfo/multilinepatterns/extract')) + \
-                    list(self.tracker_config.findall('parseinfo/linepatterns/extract'))
-                for pattern in patterns:
-                    rx = re.compile(pattern.find('regex').get('value'), re.UNICODE | re.MULTILINE)
-                    vals = [var.get('name') for idx, var in enumerate(pattern.find('vars'))]
-                    self.message_regex.append((rx, vals))
+                # Parse patterns
+                self.multilinepatterns = self.parse_patterns(list(
+                    self.tracker_config.findall('parseinfo/multilinepatterns/extract')))
+                self.linepatterns = self.parse_patterns(list(
+                    self.tracker_config.findall('parseinfo/linepatterns/extract')))
 
             # overwrite tracker config with flexget config
             if self.config.get('server'):
@@ -239,6 +237,14 @@ def install_ircconnection():
 
         def is_alive(self):
             return self.thread and self.thread.is_alive()
+
+        def parse_patterns(self, patterns):
+            result = []
+            for pattern in patterns:
+                rx = re.compile(pattern.find('regex').get('value'), re.UNICODE | re.MULTILINE)
+                vals = [var.get('name') for idx, var in enumerate(pattern.find('vars'))]
+                result.append((rx, vals))
+            return result
 
         def check_connection_and_reconnect(self):
             if not self.is_connected() and self.connection_attempts < 5:
@@ -361,18 +367,15 @@ def install_ircconnection():
 
             match_found = False
             # Run the config regex patterns over the message
-            for rx, vals in self.message_regex:
-                log.debug('Using pattern %s to parse message vars', rx.pattern)
-                match = rx.search(message)
-                if match:
-                    val_names = [irc_prefix(val.lower()) for val in vals]
-                    val_values = [strip_whitespace(x) for x in match.groups()]
-                    entry.update(dict(zip(val_names, val_values)))
-                    log.debug('Found: %s', dict(zip(val_names, val_values)))
-                    match_found = True
-                    break
-                else:
-                    log.debug('No matches found')
+            matched_linepatterns = self.match_message_patterns(self.linepatterns, message)
+            matched_multilinepatterns = self.match_message_patterns(self.multilinepatterns, message, multiline=True)
+
+            if matched_linepatterns:
+                match_found = True
+                entry.update(matched_linepatterns)
+            elif matched_multilinepatterns:
+                match_found = True
+                entry.update(matched_multilinepatterns)
 
             # Generate the entry and process it through the linematched rules
             if self.tracker_config is not None and match_found:
@@ -404,6 +407,22 @@ def install_ircconnection():
                 log.error('Parsing message failed. No url found.')
                 return None
             return entry
+
+        def match_message_patterns(self, patterns, msg, multiline=False):
+            result = {}
+            for rx, vals in patterns:
+                log.debug('Using pattern %s to parse message vars', rx.pattern)
+                match = rx.search(msg)
+                if match:
+                    val_names = [irc_prefix(val.lower()) for val in vals]
+                    val_values = [strip_whitespace(x) for x in match.groups()]
+                    result.update(dict(zip(val_names, val_values)))
+                    log.debug('Found: %s', dict(zip(val_names, val_values)))
+                    if not multiline:
+                        break
+                else:
+                    log.debug('No matches found')
+            return result
 
         def process_tracker_config_rules(self, entry, rules=None):
             """
