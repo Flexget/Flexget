@@ -9,6 +9,7 @@ from sqlalchemy import Column, Unicode, Integer, ForeignKey, Boolean, DateTime, 
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 
+from flexget.plugins.filter.series import FilterSeriesBase
 from flexget import plugin
 from flexget.db_schema import versioned_base
 from flexget.utils.database import json_synonym, with_session
@@ -20,6 +21,7 @@ log = logging.getLogger('series_list')
 Base = versioned_base('series_list', 0)
 
 SUPPORTED_IDS = ['tvdb_id', 'trakt_series_id', 'tvmaze_id']
+settings_schema = FilterSeriesBase().settings_schema
 
 
 class SeriesListList(Base):
@@ -48,9 +50,10 @@ class SeriesListSeries(Base):
     title = Column(Unicode)
 
     # Internal series attributes
+    set = Column(Unicode)
     path = Column(Unicode)
-    _alternate_names = Column('alternate_names', Unicode)
-    alternate_names = json_synonym('_alternate_names')
+    _alternate_name = Column('alternate_name', Unicode)
+    alternate_name = json_synonym('_alternate_name')
     _name_regexp = Column('name_regexp', Unicode)
     name_regexp = json_synonym('_name_regexp')
     _ep_regexp = Column('ep_regexp', Unicode)
@@ -92,13 +95,15 @@ class SeriesListSeries(Base):
     @property
     def attributes(self):
         # This will build a list of attributes without the irrelevant class ones
-        return [a for a in dir(self) if not a.startswith('_') and a not in ['id', 'added', 'title']]
+        return [a for a in dir(self) if
+                not a.startswith('_') and a not in ['id', 'added', 'title', 'list_id', 'ids', 'list', 'attributes',
+                                                    'to_dict', 'to_entry', 'metadata']]
 
     def to_entry(self, strip_year=False):
         entry = Entry()
         entry['title'] = entry['series_name'] = self.title
         entry['url'] = 'mock://localhost/series_list/%d' % self.id
-        for attribute in self.attributes:
+        for attribute in settings_schema['properties']:
             if getattr(self, attribute):
                 entry['configure_series_' + attribute] = getattr(self, attribute)
         for series_list_id in self.ids:
