@@ -26,6 +26,21 @@ class TestSeriesList(object):
               from:
                 series_list: test_list
 
+          test_add_with_attributes:
+            mock:
+              - {title: 'series 1',
+                 url: "http://mock.url/file1.torrent",
+                 alternate_name: [SER1, SER2],
+                 qualities: [720p, 1080p],
+                 timeframe: '2 days',
+                 upgrade: yes,
+                 propers: yes,
+                 not_a_real_attribute: yes,
+                 tracking: 'backfill'}
+            accept_all: yes
+            list_add:
+              - series_list: test_list
+
     """
 
     def test_base_series_list(self, execute_task):
@@ -43,5 +58,20 @@ class TestSeriesList(object):
         task = execute_task('test_basic_configure_series')
         assert len(task.entries) == 1
         assert task.find_entry(series_name='series 1')
+
+    def test_series_list_with_attributes(self, execute_task):
+        task = execute_task('test_add_with_attributes')
+        assert len(task.entries) == 1
+
+        task = execute_task('list_get')
+        assert len(task.entries) == 1
+        assert task.find_entry(title='series 1')
+        assert task.find_entry(alternate_name=['SER1', 'SER2'])
+        assert task.find_entry(qualities=['720p', '1080p'])
+        assert task.find_entry(timeframe='2 days')
+        assert task.find_entry(upgrade=True)
+        assert task.find_entry(propers=True)
+        assert task.find_entry(tracking='backfill')
+        assert not task.find_entry(not_a_real_attribute=True)
 
 

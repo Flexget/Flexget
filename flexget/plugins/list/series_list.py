@@ -93,6 +93,20 @@ class SeriesListSeries(Base):
     def __repr__(self):
         return '<SeriesListSeries title=%s,list_id=%d>' % (self.title, self.list_id)
 
+    def format_converter(self, attribute):
+        """
+        Return correct attribute format, based on schema. This is needed to maintain consistency with multi
+        type schema formats
+        """
+        value = getattr(self, attribute)
+        if not value:
+            return
+        if attribute in ['propers', 'tracking']:
+            # Value can be either bool or unicode
+            if value in ['0', '1']:
+                return bool(value)
+        return value
+
     def to_entry(self, strip_year=False):
         entry = Entry()
         entry['title'] = entry['series_name'] = self.title
@@ -100,19 +114,18 @@ class SeriesListSeries(Base):
         for attribute in SERIES_ATTRIBUTES:
             if getattr(self, attribute):
                 # Maintain support for configure_series plugin expected format
-                entry['configure_series_' + attribute] = entry[attribute] = getattr(self, attribute)
+                entry['configure_series_' + attribute] = entry[attribute] = self.format_converter(attribute)
         for series_list_id in self.ids:
             entry[series_list_id.id_name] = series_list_id.id_value
         return entry
 
     def to_dict(self):
-        series_list_ids = [series_list_id.to_dict() for series_list_id in self.ids]
         series_dict = {
             'id': self.id,
             'added_on': self.added,
             'title': self.title,
             'list_id': self.list_id,
-            'series_list_ids': series_list_ids
+            'series_list_ids': [series_list_id.to_dict() for series_list_id in self.ids]
         }
         for attribute in SETTINGS_SCHEMA['properties']:
             series_dict[attribute] = getattr(self, attribute) if getattr(self, attribute) else None
@@ -183,7 +196,7 @@ class SeriesList(MutableSet):
         # Setting series attributes
         for attribute in SERIES_ATTRIBUTES:
             if entry.get(attribute):
-                setattr(db_series, attribute, entry['attribute'])
+                setattr(db_series, attribute, entry[attribute])
         # Get list of supported identifiers
         for id_name in SUPPORTED_IDS:
             if entry.get(id_name):
