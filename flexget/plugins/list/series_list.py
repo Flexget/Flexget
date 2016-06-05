@@ -22,6 +22,7 @@ Base = versioned_base('series_list', 0)
 
 SUPPORTED_IDS = FilterSeriesBase().supported_ids
 SETTINGS_SCHEMA = FilterSeriesBase().settings_schema
+SERIES_ATTRIBUTES = SETTINGS_SCHEMA['properties']
 
 
 class SeriesListList(Base):
@@ -96,9 +97,10 @@ class SeriesListSeries(Base):
         entry = Entry()
         entry['title'] = entry['series_name'] = self.title
         entry['url'] = 'mock://localhost/series_list/%d' % self.id
-        for attribute in SETTINGS_SCHEMA['properties']:
+        for attribute in SERIES_ATTRIBUTES:
             if getattr(self, attribute):
-                entry['configure_series_' + attribute] = getattr(self, attribute)
+                # Maintain support for configure_series plugin expected format
+                entry['configure_series_' + attribute] = entry[attribute] = getattr(self, attribute)
         for series_list_id in self.ids:
             entry[series_list_id.id_name] = series_list_id.id_value
         return entry
@@ -173,12 +175,18 @@ class SeriesList(MutableSet):
         if db_series:
             session.delete(db_series)
         db_series = SeriesListSeries()
+        # Setting series title
         if 'series_name' in entry:
             db_series.title = entry['series_name']
         else:
             db_series.title = entry['title']
+        # Setting series attributes
+        for attribute in SERIES_ATTRIBUTES:
+            if entry.get(attribute):
+                setattr(db_series, attribute, entry['attribute'])
+        # Get list of supported identifiers
         for id_name in SUPPORTED_IDS:
-            if id_name in entry:
+            if entry.get(id_name):
                 db_series.ids.append(SeriesListID(id_name=id_name, id_value=entry[id_name]))
         log.debug('adding entry %s', entry)
         db_list.series.append(db_series)
