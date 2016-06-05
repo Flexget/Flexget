@@ -189,7 +189,7 @@ def install_ircconnection():
                 # Process ignore lines
                 for regex_values in self.tracker_config.findall('parseinfo/ignore/regex'):
                     rx = re.compile(regex_values.get('value'), re.UNICODE | re.MULTILINE)
-                    self.ignore_lines.append(rx)
+                    self.ignore_lines.append((rx, regex_values.get('expected') != 'false'))
 
                 # Parse patterns
                 self.multilinepatterns = self.parse_patterns(list(
@@ -357,8 +357,8 @@ def install_ircconnection():
                 return
 
             # If it's listed in ignore lines, skip it
-            for rx in self.ignore_lines:
-                if rx.match(message):
+            for (rx, expected) in self.ignore_lines:
+                if rx.match(message) and expected:
                     log.debug('Ignoring message: matched ignore line')
                     return
 
@@ -470,7 +470,7 @@ def install_ircconnection():
                     target_var = irc_prefix(rule.get('name'))
                     regex = rule.get('regex')
                     replace = rule.get('replace')
-                    if source_var and target_var and regex is not None and replace is not None:
+                    if source_var and target_var and regex is not None and replace is not None and source_var in entry:
                         entry[target_var] = re.sub(regex, replace, entry[source_var])
                         log.debug('varreplace: %s=%s', target_var, entry[target_var])
                     else:
