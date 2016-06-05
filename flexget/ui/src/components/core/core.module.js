@@ -3,6 +3,7 @@
 
     angular
         .module("components.core", [
-			'blocks.router'
+			'blocks.router',
+			'ngMaterial'
 		]);
 })();
