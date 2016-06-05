@@ -20,8 +20,8 @@ from flexget.utils.tools import split_title_year
 log = logging.getLogger('series_list')
 Base = versioned_base('series_list', 0)
 
-SUPPORTED_IDS = ['tvdb_id', 'trakt_series_id', 'tvmaze_id']
-settings_schema = FilterSeriesBase().settings_schema
+SUPPORTED_IDS = FilterSeriesBase().supported_ids
+SETTINGS_SCHEMA = FilterSeriesBase().settings_schema
 
 
 class SeriesListList(Base):
@@ -96,7 +96,7 @@ class SeriesListSeries(Base):
         entry = Entry()
         entry['title'] = entry['series_name'] = self.title
         entry['url'] = 'mock://localhost/series_list/%d' % self.id
-        for attribute in settings_schema['properties']:
+        for attribute in SETTINGS_SCHEMA['properties']:
             if getattr(self, attribute):
                 entry['configure_series_' + attribute] = getattr(self, attribute)
         for series_list_id in self.ids:
@@ -112,7 +112,7 @@ class SeriesListSeries(Base):
             'list_id': self.list_id,
             'series_list_ids': series_list_ids
         }
-        for attribute in settings_schema['properties']:
+        for attribute in SETTINGS_SCHEMA['properties']:
             series_dict[attribute] = getattr(self, attribute) if getattr(self, attribute) else None
         return series_dict
 
