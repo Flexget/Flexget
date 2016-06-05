@@ -271,3 +271,13 @@ class PluginSeriesList(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginSeriesList, 'series_list', api_ver=2, groups=['list'])
+
+
+@with_session
+def get_series_lists(name=None, session=None):
+    log.debug('retrieving series lists')
+    query = session.query(SeriesListList)
+    if name:
+        log.debug('filtering by name %s', name)
+        query = query.filter(SeriesListList.name == name)
+    return query.all()

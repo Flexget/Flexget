@@ -73,5 +73,3 @@ class TestSeriesList(object):
         assert task.find_entry(propers=True)
         assert task.find_entry(tracking='backfill')
         assert not task.find_entry(not_a_real_attribute=True)
-
-
