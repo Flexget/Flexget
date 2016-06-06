@@ -1,19 +1,19 @@
 (function () {
-    'use strict';
+	  'use strict';
 
-    angular
-      .module('flexget.plugins.execute')
-        .component('executeView', {
-          templateUrl: 'plugins/execute/execute.tmpl.html',
-          controllerAs: 'vm',
-          controller: executeController,
-        });
+	  angular
+		odule('flexget.plugins.execute')
+		    .component('executeView', {
+			plateUrl: 'plugins/execute/execute.tmpl.html',
+			trollerAs: 'vm',
+			troller: executeController,
+				});
+				
+			function executeController($scope, $interval, $q, tasks, $filter) {
+			  var vm = this,
+		        allTasks = [];
 
-    function executeController($scope, $interval, $q, tasks, $filter) {
-        var vm = this,
-            allTasks = [];
-
-        vm.stream = {running: false, tasks: []};
+        vm.stream = { running: false, tasks: [] };
         vm.options = {
             isOpen: false,
             settings: {
@@ -24,14 +24,14 @@
                 now: true
             },
             optional: [
-                {name: 'test', value: false, help: '......', display: 'Test Mode'},
-                {name: 'no-cache', value: false, help: 'disable caches. works only in plugins that have explicit support', display: 'Caching'},
-                {name: 'stop-waiting', value: null, help: 'matches are not downloaded but will be skipped in the future', display: 'Waiting'},
-                {name: 'learn', value: null, help: 'matches are not downloaded but will be skipped in the future', display: 'Learn'},
-                {name: 'disable-tracking', value: null, help: 'disable episode advancement for this run', display: 'Tracking'},
-                {name: 'discover-now', value: null, help: 'immediately try to discover everything', display: 'Discover'}
+                { name: 'test', value: false, help: '......', display: 'Test Mode' },
+                { name: 'no-cache', value: false, help: 'disable caches. works only in plugins that have explicit support', display: 'Caching' },
+                { name: 'stop-waiting', value: null, help: 'matches are not downloaded but will be skipped in the future', display: 'Waiting' },
+                { name: 'learn', value: null, help: 'matches are not downloaded but will be skipped in the future', display: 'Learn' },
+                { name: 'disable-tracking', value: null, help: 'disable episode advancement for this run', display: 'Tracking' },
+                { name: 'discover-now', value: null, help: 'immediately try to discover everything', display: 'Discover' }
             ],
-            toggle: function(option) {
+            toggle: function (option) {
                 option.value = !option.value;
             }
         };
@@ -116,7 +116,7 @@
             var options = {};
             angular.copy(vm.options.settings, options);
             tasks.execute(vm.tasksInput.tasks, options)
-                .log(function(log) {
+                .log(function (log) {
                     console.log(log);
                 })
                 .progress(function (update) {
@@ -152,4 +152,4 @@
         });
     }
 
-})();
+});
