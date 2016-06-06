@@ -11,7 +11,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from flexget.plugins.filter.series import FilterSeriesBase
 from flexget.api import api, APIResource
 from flexget.plugins.list import series_list as sl
-from flexget.utils.tools import split_title_year
 
 SUPPORTED_IDS = FilterSeriesBase().supported_ids
 SETTINGS_SCHEMA = FilterSeriesBase().settings_schema
@@ -130,9 +129,10 @@ class SeriesListListAPI(APIResource):
         session.delete(series_list)
         return {}
 
+choices = sorted([attribute for attribute in SERIES_ATTRIBUTES if attribute != 'set'])
 
 series_parser = api.parser()
-series_parser.add_argument('sort_by', choices=('test'), default='title',
+series_parser.add_argument('sort_by', choices=(choices), default='title',
                            help='Sort by attribute')
 series_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
 series_parser.add_argument('page', type=int, default=1, help='Page number')
