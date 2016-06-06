@@ -4,6 +4,8 @@
     angular
 		.module("plugins.history", [
 			'blocks.router',
-			'angular.filter'
+			'blocks.exception',
+			'angular.filter',
+			'angular-cache'
 		]);
 })();
