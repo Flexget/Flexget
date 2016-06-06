@@ -235,7 +235,7 @@ class OutputAria2(object):
                     if cur_filename.lower().find('sample') > -1:
                         continue
 
-                if file_ext not in config['file_exts']:
+                if file_ext in config['file_exts']:
                     if config['exclude_non_content'] == True:
                         # don't download non-content files, like nfos - definable in file_exts
                         continue
