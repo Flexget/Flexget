@@ -30,13 +30,17 @@ class TestSeriesList(object):
             mock:
               - {title: 'series 1',
                  url: "http://mock.url/file1.torrent",
+                 set: {tvdb_id: "1234", tvmaze_id: "1234", not_valid_id: "1234"},
                  alternate_name: [SER1, SER2],
+                 name_regexp: ["^ser", "^series 1$"],
                  qualities: [720p, 1080p],
                  timeframe: '2 days',
                  upgrade: yes,
                  propers: yes,
+                 specials: yes,
                  not_a_real_attribute: yes,
-                 tracking: 'backfill'}
+                 tracking: 'backfill',
+                 identified_by: "ep"}
             accept_all: yes
             list_add:
               - series_list: test_list
@@ -66,10 +70,14 @@ class TestSeriesList(object):
         task = execute_task('list_get')
         assert len(task.entries) == 1
         assert task.find_entry(title='series 1')
+        assert task.find_entry(set={'tvdb_id': '1234', 'tvmaze_id': '1234'})
         assert task.find_entry(alternate_name=['SER1', 'SER2'])
+        assert task.find_entry(name_regexp=["^ser", "^series 1$"])
         assert task.find_entry(qualities=['720p', '1080p'])
         assert task.find_entry(timeframe='2 days')
         assert task.find_entry(upgrade=True)
         assert task.find_entry(propers=True)
+        assert task.find_entry(specials=True)
         assert task.find_entry(tracking='backfill')
+        assert task.find_entry(identified_by='ep')
         assert not task.find_entry(not_a_real_attribute=True)

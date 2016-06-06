@@ -51,7 +51,6 @@ class SeriesListSeries(Base):
     title = Column(Unicode)
 
     # Internal series attributes
-    set = Column(Unicode)
     path = Column(Unicode)
     _alternate_name = Column('alternate_name', Unicode)
     alternate_name = json_synonym('_alternate_name')
@@ -107,16 +106,21 @@ class SeriesListSeries(Base):
                 return bool(value)
         return value
 
-    def to_entry(self, strip_year=False):
+    def to_entry(self):
         entry = Entry()
         entry['title'] = entry['series_name'] = self.title
         entry['url'] = 'mock://localhost/series_list/%d' % self.id
+        entry['set'] = {}
         for attribute in SERIES_ATTRIBUTES:
+            # `set` is not a real series attribute and is just a way to pass IDs in task.
+            if attribute == 'set':
+                continue
             if getattr(self, attribute):
                 # Maintain support for configure_series plugin expected format
                 entry['configure_series_' + attribute] = entry[attribute] = self.format_converter(attribute)
         for series_list_id in self.ids:
             entry[series_list_id.id_name] = series_list_id.id_value
+            entry['set'].update({series_list_id.id_name: series_list_id.id_value})
         return entry
 
     def to_dict(self):
@@ -195,12 +199,17 @@ class SeriesList(MutableSet):
             db_series.title = entry['title']
         # Setting series attributes
         for attribute in SERIES_ATTRIBUTES:
+            # `set` is not a real series attribute and is just a way to pass IDs in task.
+            if attribute == 'set':
+                continue
             if entry.get(attribute):
                 setattr(db_series, attribute, entry[attribute])
         # Get list of supported identifiers
         for id_name in SUPPORTED_IDS:
-            if entry.get(id_name):
-                db_series.ids.append(SeriesListID(id_name=id_name, id_value=entry[id_name]))
+            value = entry.get(id_name) or entry.get('set').get(id_name)
+            if value:
+                log.debug('found supported ID %s with value %s in entry, adding to series', id_name, value)
+                db_series.ids.append(SeriesListID(id_name=id_name, id_value=value))
         log.debug('adding entry %s', entry)
         db_list.series.append(db_series)
         session.commit()
