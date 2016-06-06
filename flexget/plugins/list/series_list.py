@@ -132,6 +132,8 @@ class SeriesListSeries(Base):
             'series_list_ids': [series_list_id.to_dict() for series_list_id in self.ids]
         }
         for attribute in SETTINGS_SCHEMA['properties']:
+            if attribute == 'set':
+                continue
             series_dict[attribute] = getattr(self, attribute) if getattr(self, attribute) else None
         return series_dict
 
@@ -206,7 +208,7 @@ class SeriesList(MutableSet):
                 setattr(db_series, attribute, entry[attribute])
         # Get list of supported identifiers
         for id_name in SUPPORTED_IDS:
-            value = entry.get(id_name) or entry.get('set').get(id_name)
+            value = entry.get(id_name) or entry.get('set').get(id_name) if entry.get('set') else None
             if value:
                 log.debug('found supported ID %s with value %s in entry, adding to series', id_name, value)
                 db_series.ids.append(SeriesListID(id_name=id_name, id_value=value))
