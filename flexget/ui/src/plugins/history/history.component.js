@@ -1,5 +1,6 @@
 (function () {
 	'use strict';
+	
 	angular
 		.module("plugins.history")
 		.component('historyView', {
@@ -8,20 +9,19 @@
 			controller: historyController,
 		});
 
-	function historyController($http) {
+	function historyController(historyService) {
 		var vm = this;
 
-		vm.title = 'History';
 		vm.$onInit = activate;
 
 		function activate() {
-			$http.get('/api/history/')
-				.success(function (data) {
-					vm.entries = data['entries'];
-				})
-				.error(function (data, status, headers, config) {
-					// log error
-				});
+			getHistory();
+		}
+
+		function getHistory() {
+			return historyService.getHistory().then(function (data) {
+				vm.entries = data.entries;
+			});
 		}
 	}
-});
+})();
