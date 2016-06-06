@@ -49,7 +49,7 @@ class TestSeriesList(object):
 
     def test_base_series_list(self, execute_task):
         task = execute_task('test_list_add')
-        assert len(task.entries) == 1
+        assert len(task.accepted) == 1
 
         task = execute_task('list_get')
         assert len(task.entries) == 1
@@ -57,15 +57,15 @@ class TestSeriesList(object):
 
     def test_base_configure_series_with_list(self, execute_task):
         task = execute_task('test_list_add')
-        assert len(task.entries) == 1
+        assert len(task.accepted) == 1
 
         task = execute_task('test_basic_configure_series')
-        assert len(task.entries) == 1
-        assert task.find_entry(series_name='series 1')
+        assert len(task.accepted) == 1
+        assert task.find_entry(category='accepted', series_name='series 1')
 
     def test_series_list_with_attributes(self, execute_task):
         task = execute_task('test_add_with_attributes')
-        assert len(task.entries) == 1
+        assert len(task.accepted) == 1
 
         task = execute_task('list_get')
         assert len(task.entries) == 1
