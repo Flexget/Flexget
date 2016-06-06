@@ -106,6 +106,8 @@ def loads(*args, **kwargs):
     :param bool decode_datetime: If `True`, dates in ISO8601 format will be deserialized to :class:`datetime.datetime`
       objects.
     """
+    if args[0] is None:
+        return
     if kwargs.pop('decode_datetime', False):
         kwargs['object_hook'] = _datetime_decoder
         kwargs['cls'] = DTDecoder
