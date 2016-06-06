@@ -16,8 +16,9 @@
 			'blocks.urlInterceptor',
 
 			'flexget.directives',
+			'flexget.components',
+			'flexget.plugins',
 			'flexget.services',
-			'flexget.components'
 		]);
 
 	function bootstrapApplication() {
