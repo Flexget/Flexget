@@ -23,7 +23,6 @@ module.exports = function(config) {
 	    'src/app.loading.js',
       'src/app.utils.js',
       'src/app.module.js',
-      'src/app.routes.js',
       'src/**/*.module.js',
       'src/**/*.js'
     ],
