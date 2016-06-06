@@ -19,7 +19,7 @@
             in_config: 'all',
             sort_by: 'show_name'
         }
-		
+
 		var params = {
 			forget: true
 		}
@@ -141,4 +141,4 @@
         getSeriesList();
     }
 
-})();
+});

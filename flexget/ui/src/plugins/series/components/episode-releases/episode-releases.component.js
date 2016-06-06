@@ -79,4 +79,4 @@
 			$mdDialog.cancel();
 		}
     }
-})();
+});
