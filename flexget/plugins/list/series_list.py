@@ -290,3 +290,28 @@ def get_series_lists(name=None, session=None):
         log.debug('filtering by name %s', name)
         query = query.filter(SeriesListList.name == name)
     return query.all()
+
+
+@with_session
+def get_list_by_id(list_id, session=None):
+    log.debug('fetching list with id %d', list_id)
+    return session.query(SeriesListList).filter(SeriesListList.id == list_id).one()
+
+
+@with_session
+def get_series_by_list_id(list_id, count=False, start=None, stop=None, order_by='added', descending=False,
+                          session=None):
+    query = session.query(SeriesListSeries).filter(SeriesListSeries.list_id == list_id)
+    if count:
+        return query.count()
+    query = query.slice(start, stop).from_self()
+    if descending:
+        query = query.order_by(getattr(SeriesListSeries, order_by).desc())
+    else:
+        query = query.order_by(getattr(SeriesListSeries, order_by))
+    return query.all()
+
+@with_session
+def get_list_by_exact_name(name, session=None):
+    log.debug('returning list with name %s', name)
+    return session.query(SeriesListList).filter(func.lower(SeriesListList.name) == name.lower()).one()
