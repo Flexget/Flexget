@@ -19,8 +19,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'test-helpers/**/*.js',
-	    'src/app.loading.js',
+      'tests-mock-data/**/*.js',
+	  'src/app.loading.js',
       'src/app.utils.js',
       'src/app.module.js',
       'src/**/*.module.js',
@@ -45,12 +45,12 @@ module.exports = function(config) {
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['dots', 'coverage'],
 
-    coverageReporter: {
+    /*coverageReporter: {
       type: 'lcovonly',
       dir: '../../',
       file: 'webui-coverage.info',
       subdir: '.'
-    },
+    },*/
 
     // web server port
     port: 9876,
