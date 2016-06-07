@@ -167,7 +167,7 @@ class SeriesListID(Base):
             'added_on': self.added,
             'id_name': self.id_name,
             'id_value': self.id_value,
-            'series_id': self.movie_id
+            'series_id': self.series_id
         }
 
 
@@ -326,7 +326,7 @@ class SeriesList(MutableSet):
 
         # Get list of supported identifiers
         for id_name in SUPPORTED_IDS:
-            value = entry.get(id_name) or entry.get('set').get(id_name) if entry.get('set') else None
+            value = entry.get(id_name)
             if value:
                 log.debug('found supported ID %s with value %s in entry, adding to series', id_name, value)
                 db_series.ids.append(SeriesListID(id_name=id_name, id_value=value))
@@ -424,11 +424,11 @@ def get_series_by_list_id(list_id, count=False, start=None, stop=None, order_by=
     query = session.query(SeriesListSeries).filter(SeriesListSeries.list_id == list_id)
     if count:
         return query.count()
-    query = query.slice(start, stop).from_self()
     if descending:
         query = query.order_by(getattr(SeriesListSeries, order_by).desc())
     else:
         query = query.order_by(getattr(SeriesListSeries, order_by))
+    query = query.slice(start, stop)
     return query.all()
 
 
