@@ -3,6 +3,7 @@
 
     angular
 		.module('plugins.schedule', [
+			'blocks.router'
 			//'schemaForm'
 		]);
 })();

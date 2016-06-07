@@ -2,11 +2,11 @@
 	'use strict';
 
 	angular
-		.module('flexget.plugins.seen')
+		.module('plugins.seen')
 		.component('seenView', {
-			templateUrl: 'plugins/seen/seen.tmpl.html',
-			controllerAs: 'vm',
-			controller: seenController,
+		//	templateUrl: 'plugins/seen/seen.tmpl.html',
+		//	controllerAs: 'vm',
+		//	controller: seenController,
 		});
 
 	function seenController($http) {
@@ -22,4 +22,4 @@
 				// log error
 			});
 	}
-});
+})();

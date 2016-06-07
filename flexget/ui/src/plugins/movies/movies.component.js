@@ -1,11 +1,11 @@
 (function () {
 	'use strict';
 	angular
-		.module("flexget.plugins.movies")
+		.module("plugins.movies")
 		.component('moviesView', {
-			templateUrl: 'plugins/movies/movies.tmpl.html',
-			controllerAs: 'vm',
-			controller: moviesController,
+			//	templateUrl: 'plugins/movies/movies.tmpl.html',
+			//	controllerAs: 'vm',
+			//	controller: moviesController,
 		});
 
 	function moviesController($http, $mdDialog, $scope, moviesService) {
@@ -107,4 +107,4 @@
 			});
 		}
 	}
-});
+})();

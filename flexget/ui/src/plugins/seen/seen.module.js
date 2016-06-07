@@ -3,6 +3,7 @@
 
 	angular
 		.module('plugins.seen',	[
+			'blocks.router'
 			//'schemaForm'
 		]);
 })();

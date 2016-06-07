@@ -2,5 +2,7 @@
     'use strict';
 
     angular
-		.module("plugins.movies", []);
+		.module("plugins.movies", [
+			'blocks.router'
+		]);
 })();
