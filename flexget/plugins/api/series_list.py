@@ -45,6 +45,8 @@ class objects_container(object):
 
     return_lists = {'type': 'array', 'items': list_object}
 
+
+
     return_series = {
         'type': 'object',
         'properties': {

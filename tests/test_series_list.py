@@ -30,9 +30,13 @@ class TestSeriesList(object):
             mock:
               - {title: 'series 1',
                  url: "http://mock.url/file1.torrent",
-                 set: {tvdb_id: "1234", tvmaze_id: "1234", not_valid_id: "1234"},
+                 tvdb_id: "1234",
+                 tvmaze_id: "1234",
+                 not_valid_id: "1234",
+                 trakt_show_id: "1234",
                  alternate_name: [SER1, SER2],
                  name_regexp: ["^ser", "^series 1$"],
+                 quality: 720p,
                  qualities: [720p, 1080p],
                  timeframe: '2 days',
                  upgrade: yes,
@@ -70,7 +74,10 @@ class TestSeriesList(object):
         task = execute_task('list_get')
         assert len(task.entries) == 1
         assert task.find_entry(title='series 1')
-        assert task.find_entry(set={'tvdb_id': '1234', 'tvmaze_id': '1234'})
+        assert task.find_entry(tvdb_id='1234')
+        assert task.find_entry(tvmaze_id='1234')
+        assert task.find_entry(trakt_show_id='1234')
+        assert task.find_entry(quality='720p')
         assert task.find_entry(alternate_name=['SER1', 'SER2'])
         assert task.find_entry(name_regexp=["^ser", "^series 1$"])
         assert task.find_entry(qualities=['720p', '1080p'])
