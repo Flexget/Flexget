@@ -8,17 +8,25 @@ from math import ceil
 from flask import jsonify
 from flask import request
 from sqlalchemy.orm.exc import NoResultFound
+from flexget import plugin
 from flexget.plugins.filter.series import FilterSeriesBase
 from flexget.api import api, APIResource
 from flexget.plugins.list import series_list as sl
 
-SUPPORTED_IDS = FilterSeriesBase().supported_ids
+
 SETTINGS_SCHEMA = FilterSeriesBase().settings_schema
 SERIES_ATTRIBUTES = SETTINGS_SCHEMA['properties']
 
 log = logging.getLogger('series_list_api')
 
 series_list_api = api.namespace('series_list', description='Series List operations')
+
+def supported_ids():
+    # Return a list of supported series identifier as registered via their plugins
+    ids = []
+    for plugin_ in plugin.get_plugins(group='series_metainfo'):
+        ids.append(plugin_.instance.series_identifier())
+    return ids
 
 
 class objects_container(object):
@@ -112,6 +120,10 @@ class objects_container(object):
         'additionalProperties': False
     }
 
+    edit_series_object = copy.deepcopy(input_series_object)
+    del edit_series_object['properties']['title']
+    del edit_series_object['required']
+
     return_series_object = copy.deepcopy(input_series_object)
     return_series_object['properties']['series_list_identifiers'] = {'type': 'array',
                                                                      'items': return_series_list_id_object}
@@ -122,7 +134,7 @@ class objects_container(object):
         'properties': {
             'series': {
                 'type': 'array',
-                'items': "string"
+                'items': return_series_object
             },
             'number_of_series': {'type': 'integer'},
             'total_number_of_series': {'type': 'integer'},
@@ -138,7 +150,8 @@ new_list_schema = api.schema('new_list', objects_container.list_input)
 list_object_schema = api.schema('list_object', objects_container.list_object)
 return_series_list_series_schema = api.schema('return_series', objects_container.return_series_list)
 input_series_schema = api.schema('input_series', objects_container.input_series_object)
-return_series_schema = api.schema('return_series', objects_container.return_series_object)
+return_series_schema = api.schema('return_series_list', objects_container.return_series_object)
+edit_series_schema = api.schema('edit_series', objects_container.edit_series_object)
 
 series_list_parser = api.parser()
 series_list_parser.add_argument('name', help='Filter results by list name')
@@ -211,8 +224,8 @@ series_parser.add_argument('order', choices=('desc', 'asc'), default='desc', hel
 series_parser.add_argument('page', type=int, default=1, help='Page number')
 series_parser.add_argument('page_size', type=int, default=10, help='Number of series per page')
 
-series_identifiers_doc = "Use movie identifier using the following format:\n[{'ID_NAME: 'ID_VALUE'}]." \
-                         " Has to be one of %s" % " ,".join(SUPPORTED_IDS)
+series_identifiers_doc = "Use series identifier using the following format:\n[{'ID_NAME: 'ID_VALUE'}]." \
+                         " Has to be one of %s" % " ,".join(supported_ids())
 
 
 @series_list_api.route('/<int:list_id>/series/')
@@ -264,7 +277,7 @@ class SeriesListSeriesAPI(APIResource):
     @api.response(404, description='List not found', model=default_error_schema)
     @api.response(500, description='Series already exist in list', model=default_error_schema)
     def post(self, list_id, session=None):
-        """ Add movies to list by ID """
+        """ Add series to list by ID """
         try:
             series_list = sl.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -282,3 +295,47 @@ class SeriesListSeriesAPI(APIResource):
         response = jsonify({'series': db_series.to_dict()})
         response.status_code = 201
         return response
+
+
+@series_list_api.route('/<int:list_id>/series/<int:series_id>/')
+@api.doc(params={'list_id': 'ID of the list', 'series_id': 'ID of the series'})
+@api.response(404, description='List or series not found', model=default_error_schema)
+class SeriesListSeriesAPI(APIResource):
+    @api.response(200, model=return_series_schema)
+    def get(self, list_id, series_id, session=None):
+        """ Get a series by list ID and series ID """
+        try:
+            series = sl.get_series_by_id(list_id=list_id, series_id=series_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'could not find series with id %d in list %d' % (series_id, list_id)}, 404
+        return jsonify(series.to_dict())
+
+    @api.response(200, model=empty_response)
+    def delete(self, list_id, series_id, session=None):
+        """ Delete a series by list ID and series ID """
+        try:
+            series = sl.get_series_by_id(list_id=list_id, series_id=series_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'could not find series with id %d in list %d' % (series_id, list_id)}, 404
+        log.debug('deleting series %d', series_id)
+        session.delete(series)
+        return {}
+
+    @api.validate(model=edit_series_schema, description=series_identifiers_doc)
+    @api.response(200, model=return_series_schema)
+    @api.doc(description='Sent series data will override any existing data that the series currently holds')
+    def put(self, list_id, series_id, session=None):
+        """ Edit series data """
+        try:
+            series = sl.get_series_by_id(list_id=list_id, series_id=series_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'could not find series with id %d in list %d' % (series_id, list_id)}, 404
+        title = series.title
+        data = request.json
+        data.update({'title': title})
+        series = sl.get_db_series(data)
+        session.commit()
+        return jsonify(series.to_dict())

@@ -69,21 +69,21 @@ class SeriesListSeries(Base):
     date_dayfirst = Column(Boolean)
     quality = relationship('SeriesListQuality', uselist=False, backref='series', cascade='all, delete, delete-orphan')
     qualities = relationship('SeriesListQualities', backref='series',
-                             cascade='all, delete, delete-orphan')  # Todo: enforce format
-    timeframe = Column(Unicode)  # Todo: enforce format
+                             cascade='all, delete, delete-orphan')
+    timeframe = Column(Unicode)
     upgrade = Column(Boolean)
-    target = Column(Unicode)  # Todo: enforce format
+    target = Column(Unicode)
     specials = Column(Boolean)
-    propers = Column(Unicode)  # Todo: enforce format
+    propers = Column(Unicode)
     identified_by = Column(String)
     exact = Column(Boolean)
-    begin = Column(Unicode)  # Todo: enforce format
+    begin = Column(Unicode)
     from_group = relationship('SeriesListFromGroup', backref='series', cascade='all, delete, delete-orphan')
     parse_only = Column(Boolean)
     special_ids = relationship('SeriesListSpecialID', backref='series', cascade='all, delete, delete-orphan')
     prefer_specials = Column(Boolean)
     assume_special = Column(Boolean)
-    tracking = Column(Unicode)  # Todo: enforce format
+    tracking = Column(Unicode)
 
     list_id = Column(Integer, ForeignKey(SeriesListList.id), nullable=False)
     ids = relationship('SeriesListSeriesExternalID', backref='series', cascade='all, delete, delete-orphan')
@@ -270,32 +270,55 @@ class SeriesListSpecialID(Base):
 def get_db_series(entry):
     title = entry.get('series_name') or entry['title']
     db_series = SeriesListSeries(title)
-    # Setting series attributes
-    db_series.alternate_name = [SeriesListAlternateName(name=name) for name in entry.get('alternate_name', [])]
-    db_series.name_regexp = [SeriesListNameRegexp(regexp=regexp) for regexp in entry.get('name_regexp', [])]
-    db_series.ep_regexp = [SeriesListEpRegexp(regexp=regexp) for regexp in entry.get('ep_regexp', [])]
-    db_series.date_regexp = [SeriesListDateRegexp(regexp=regexp) for regexp in entry.get('date_regexp', [])]
-    db_series.sequence_regexp = [SeriesListSequenceRegexp(regexp=regexp) for regexp in
-                                 entry.get('sequence_regexp', [])]
-    db_series.id_regexp = [SeriesListIDRegexp(regexp=regexp) for regexp in entry.get('id_regexp', [])]
-    db_series.date_dayfirst = entry.get('date_dayfirst')
-    db_series.date_dayfirst = entry.get('date_dayfirst')
-    db_series.quality = SeriesListQuality(quality=entry.get('quality')) if entry.get('quality') else None
-    db_series.qualities = [SeriesListQualities(quality=quality) for quality in entry.get('qualities', [])]
-    db_series.timeframe = entry.get('timeframe')
-    db_series.upgrade = entry.get('upgrade')
-    db_series.target = entry.get('target')
-    db_series.specials = entry.get('specials')
-    db_series.propers = entry.get('propers')
-    db_series.identified_by = entry.get('identified_by')
-    db_series.exact = entry.get('exact')
-    db_series.begin = entry.get('begin')
-    db_series.from_group = [SeriesListFromGroup(group_name=name) for name in entry.get('from_group', [])]
-    db_series.parse_only = entry.get('parse_only')
-    db_series.special_ids = [SeriesListSpecialID(id_name=name) for name in entry.get('special_ids', [])]
-    db_series.prefer_specials = entry.get('prefer_specials')
-    db_series.assume_special = entry.get('assume_special')
-    db_series.tracking = entry.get('tracking')
+    # Setting series attributes only for received data
+    if entry.get('alternate_name'):
+        db_series.alternate_name = [SeriesListAlternateName(name=name) for name in entry.get('alternate_name')]
+    if entry.get('name_regexp'):
+        db_series.name_regexp = [SeriesListNameRegexp(regexp=regexp) for regexp in entry.get('name_regexp')]
+    if entry.get('ep_regexp'):
+        db_series.ep_regexp = [SeriesListEpRegexp(regexp=regexp) for regexp in entry.get('ep_regexp')]
+    if entry.get('date_regexp'):
+        db_series.date_regexp = [SeriesListDateRegexp(regexp=regexp) for regexp in entry.get('date_regexp')]
+    if entry.get('sequence_regexp'):
+        db_series.sequence_regexp = [SeriesListSequenceRegexp(regexp=regexp) for regexp in entry.get('sequence_regexp')]
+    if entry.get('id_regexp'):
+        db_series.id_regexp = [SeriesListIDRegexp(regexp=regexp) for regexp in entry.get('id_regexp')]
+    if entry.get('date_dayfirst'):
+        db_series.date_dayfirst = entry.get('date_dayfirst')
+    if entry.get('date_dayfirst'):
+        db_series.date_dayfirst = entry.get('date_dayfirst')
+    if entry.get('quality'):
+        db_series.quality = SeriesListQuality(quality=entry.get('quality'))
+    if entry.get('qualities'):
+        db_series.qualities = [SeriesListQualities(quality=quality) for quality in entry.get('qualities')]
+    if entry.get('timeframe'):
+        db_series.timeframe = entry.get('timeframe')
+    if entry.get('upgrade'):
+        db_series.upgrade = entry.get('upgrade')
+    if entry.get('target'):
+        db_series.target = entry.get('target')
+    if entry.get('specials'):
+        db_series.specials = entry.get('specials')
+    if entry.get('propers'):
+        db_series.propers = entry.get('propers')
+    if entry.get('identified_by'):
+        db_series.identified_by = entry.get('identified_by')
+    if entry.get('exact'):
+        db_series.exact = entry.get('exact')
+    if entry.get('begin'):
+        db_series.begin = entry.get('begin')
+    if entry.get('from_group'):
+        db_series.from_group = [SeriesListFromGroup(group_name=name) for name in entry.get('from_group')]
+    if entry.get('parse_only'):
+        db_series.parse_only = entry.get('parse_only')
+    if entry.get('special_ids'):
+        db_series.special_ids = [SeriesListSpecialID(id_name=name) for name in entry.get('special_ids')]
+    if entry.get('prefer_specials'):
+        db_series.prefer_specials = entry.get('prefer_specials')
+    if entry.get('assume_special'):
+        db_series.assume_special = entry.get('assume_special')
+    if entry.get('tracking'):
+        db_series.tracking = entry.get('tracking')
 
     # Get list of supported identifiers
     for id_name in supported_ids():
@@ -458,3 +481,10 @@ def get_series_by_title(list_id, title, session=None):
                 func.lower(SeriesListSeries.title) == title.lower(),
                 SeriesListSeries.list_id == list_id)
         ).first()
+
+
+@with_session
+def get_series_by_id(list_id, series_id, session=None):
+    log.debug('fetching series with id %d from list id %d', series_id, list_id)
+    return session.query(SeriesListSeries).filter(
+        and_(SeriesListSeries.id == series_id, SeriesListSeries.list_id == list_id)).one()
