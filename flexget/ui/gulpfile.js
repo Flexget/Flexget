@@ -7,7 +7,7 @@ gulp.paths = {
   dist: 'app',
   tmp: '.tmp',
   specs: '.',
-  spechelpers: 'test-helpers'
+  spechelpers: 'tests-mock-data'
 };
 
 require('require-dir')('./gulp');
