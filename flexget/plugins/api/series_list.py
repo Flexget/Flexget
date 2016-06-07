@@ -129,10 +129,8 @@ class SeriesListListAPI(APIResource):
         session.delete(series_list)
         return {}
 
-choices = sorted([attribute for attribute in SERIES_ATTRIBUTES if attribute != 'set'])
-
 series_parser = api.parser()
-series_parser.add_argument('sort_by', choices=(choices), default='title',
+series_parser.add_argument('sort_by', choices=('title', 'added'), default='title',
                            help='Sort by attribute')
 series_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
 series_parser.add_argument('page', type=int, default=1, help='Page number')
