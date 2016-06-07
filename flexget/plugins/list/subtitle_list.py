@@ -8,7 +8,6 @@ from datetime import datetime, date, time
 
 from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime, and_
 from sqlalchemy.orm import relationship
-from sqlalchemy.schema import Table
 from babelfish import Language
 
 from flexget import plugin
@@ -16,6 +15,7 @@ from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.tools import parse_timedelta
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('subtitle_list')
 Base = versioned_base('subtitle_list', 1)
@@ -94,7 +94,21 @@ class SubtitleList(MutableSet):
             'list': {'type': 'string'},
             'languages': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
             'check_subtitles': {'type': 'boolean', 'default': True},
-            'remove_after': {'type': 'string', 'format': 'interval'}
+            'remove_after': {'type': 'string', 'format': 'interval'},
+            'path': {
+                'oneOf': [
+                    {
+                        'type': 'object',
+                        'properties': {
+                            'from_field': {'type': 'string'},
+                        },
+                        'required': ['from_field']
+                    },
+                    {'type': 'string'}
+                ]
+            },
+            'allow_dir': {'type': 'boolean', 'default': False},
+            'check_file_existence': {'type': 'boolean', 'default': True}
         },
         'required': ['list'],
         'additionalProperties': False
@@ -122,8 +136,38 @@ class SubtitleList(MutableSet):
     def __len__(self, session=None):
         return self._db_list(session).files.count()
 
+    def _extract_path(self, entry):
+        path = ''
+        if isinstance(self.config.get('path'), dict):
+            try:
+                path = entry.render(entry.get(self.config['path']['from_field']))
+            except RenderError as e:
+                log.error(e)
+        elif isinstance(self.config.get('path'), basestring):
+            try:
+                path = entry.render(self.config['path'])
+            except RenderError as e:
+                log.error(e)
+        else:
+            path = entry.get('location')
+        return path
+
     @with_session
     def add(self, entry, session=None):
+        path = self._extract_path(entry)
+
+        if not path:
+            log.error('Entry %s does not represent a local file/dir.')
+            return
+
+        path_exists = os.path.exists(path)
+        if not self.config['check_file_existence'] and not path_exists:
+            log.error('Path %s does not exist. Not adding to list.', path)
+            return
+        elif path_exists and not self.config['allow_dir'] and os.path.isdir(path):
+            log.error('Path %s is a directory and "allow_dir"=%s.', path, self.config['allow_dir'])
+            return
+
         # Check if this is already in the list, refresh info if so
         db_list = self._db_list(session=session)
         db_file = self._find_entry(entry, session=session)
@@ -132,7 +176,7 @@ class SubtitleList(MutableSet):
             session.delete(db_file)
         db_file = SubtitleListFile()
         db_file.title = entry['title']
-        db_file.location = entry['location']
+        db_file.location = path
         db_file.languages = []
         db_file.remove_after = self.config.get('remove_after')
         db_file.languages = []
@@ -160,7 +204,7 @@ class SubtitleList(MutableSet):
     @with_session
     def _find_entry(self, entry, session=None):
         """Finds `SubtitleListFile` corresponding to this entry, if it exists."""
-        res = self._db_list(session).files.filter(SubtitleListFile.location == entry.get('location', '')).first()
+        res = self._db_list(session).files.filter(SubtitleListFile.location == self._extract_path(entry)).first()
         return res
 
     @with_session
@@ -197,23 +241,36 @@ class PluginSubtitleList(object):
     def on_task_input(self, task, config):
         subtitle_list = SubtitleList(config)
         if config['check_subtitles']:
-            for file in subtitle_list:
-                if not os.path.isfile(file['location']):
-                    log.error('File %s does not exist. Removing from list.', file['location'])
-                    subtitle_list.discard(file)
-                elif self._expired(file, config):
-                    log.verbose('File %s has been in the list for %s. Removing from list.', file['location'],
-                                file['remove_after'] or config['remove_after'])
-                    subtitle_list.discard(file)
+            for item in subtitle_list:
+                if not config['allow_dir'] and os.path.isdir(item['location']):
+                    log.error('Path %s is a directory. If you wish to allow directories, change your config.',
+                              item['location'])
+                    continue
+                elif not config['check_file_existence'] and not os.path.exists(item['location']):
+                    log.error('File %s does not exist. Skipping.', item['location'])
+                elif not os.path.exists(item['location']):
+                    log.error('File %s does not exist. Removing from list.', item['location'])
+                    subtitle_list.discard(item)
+                elif self._expired(item, config):
+                    log.info('File %s has been in the list for %s. Removing from list.', item['location'],
+                             item['remove_after'] or config['remove_after'])
+                    subtitle_list.discard(item)
                 else:
                     try:
                         import subliminal
-                        existing_subtitles = set(subliminal.core.search_external_subtitles(file['location']).values())
-                        wanted_languages = set(file['subtitle_languages']) or set(config.get('languages', []))
-                        if wanted_languages and len(wanted_languages - existing_subtitles) == 0:
-                            log.verbose('Local subtitle(s) already exists for %s. Removing from list.',
-                                        file['location'])
-                            subtitle_list.discard(file)
+                        if os.path.isdir(item['location']):
+                            files = [os.path.join(item['location'], file) for file in os.listdir(item['location'])]
+                        else:
+                            files = [item['location']]
+                        number_of_files = len(files)
+                        for file in files:
+                            existing_subtitles = set(subliminal.core.search_external_subtitles(file).values())
+                            wanted_languages = set(item['subtitle_languages']) or set(config.get('languages', []))
+                            if wanted_languages and len(wanted_languages - existing_subtitles) == 0:
+                                log.info('Local subtitle(s) already exists for %s.', item['location'])
+                                number_of_files -= 1
+                        if number_of_files == 0:
+                            subtitle_list.discard(item)
                     except ImportError:
                         log.warning('Subliminal not found. Unable to check for local subtitles.')
 
