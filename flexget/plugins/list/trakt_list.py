@@ -321,11 +321,6 @@ class TraktList(object):
     def on_task_input(self, task, config):
         return list(TraktSet(config))
 
-    @staticmethod
-    def series_identifier():
-        """Returns the plugin main identifier type"""
-        return 'trakt_show_id'
-
 
 class TraktAdd(object):
     """Add all accepted elements in your trakt.tv watchlist/library/seen or custom list."""
@@ -355,6 +350,6 @@ class TraktRemove(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TraktList, 'trakt_list', api_ver=2, groups=['list', 'series_metainfo'])
+    plugin.register(TraktList, 'trakt_list', api_ver=2, groups=['list'])
     plugin.register(TraktAdd, 'trakt_add', api_ver=2)
     plugin.register(TraktRemove, 'trakt_remove', api_ver=2)

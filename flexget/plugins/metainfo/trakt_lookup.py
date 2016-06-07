@@ -76,7 +76,7 @@ class PluginTraktLookup(object):
         'imdb_id': 'imdb_id',
         'tvdb_id': 'tvdb_id',
         'tmdb_id': 'tmdb_id',
-        'trakt_id': 'id',
+        'trakt_show_id': 'id',
         'trakt_slug': 'slug',
         'tvrage_id': 'tvrage_id',
         'trakt_trailer': 'trailer',
@@ -132,7 +132,7 @@ class PluginTraktLookup(object):
         'movie_year': 'year',
         'trakt_name': 'title',
         'trakt_year': 'year',
-        'trakt_id': 'id',
+        'trakt_movie_id': 'id',
         'trakt_slug': 'slug',
         'imdb_id': 'imdb_id',
         'tmdb_id': 'tmdb_id',
@@ -364,7 +364,7 @@ class PluginTraktLookup(object):
     @staticmethod
     def series_identifier():
         """Returns the plugin main identifier type"""
-        return 'trakt_id'
+        return 'trakt_show_id'
 
 
 @event('plugin.register')
