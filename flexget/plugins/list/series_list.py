@@ -13,10 +13,9 @@ from sqlalchemy.sql.elements import and_
 from flexget.plugins.filter.series import FilterSeriesBase
 from flexget import plugin
 from flexget.db_schema import versioned_base
-from flexget.utils.database import json_synonym, with_session
+from flexget.utils.database import with_session
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('series_list')
 Base = versioned_base('series_list', 0)
@@ -34,7 +33,7 @@ class SeriesListList(Base):
     series = relationship('SeriesListSeries', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
 
     def __repr__(self):
-        return '<SeriesListList name=%d>' % (self.id)
+        return '<SeriesListList name=%d>' % self.id
 
     def to_dict(self):
         return {
