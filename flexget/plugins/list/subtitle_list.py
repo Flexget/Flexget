@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *
+from past.builtins import basestring
 
 import logging
 import os
@@ -23,6 +24,10 @@ Base = versioned_base('subtitle_list', 1)
 
 def normalize_language(language):
     return str(Language.fromietf(language))
+
+
+def normalize_path(path):
+    return os.path.normpath(os.path.abspath(path)) if path else None
 
 
 class SubtitleListList(Base):
@@ -150,7 +155,7 @@ class SubtitleList(MutableSet):
                 log.error(e)
         else:
             path = entry.get('location')
-        return path
+        return normalize_path(path)
 
     @with_session
     def add(self, entry, session=None):
@@ -204,7 +209,11 @@ class SubtitleList(MutableSet):
     @with_session
     def _find_entry(self, entry, session=None):
         """Finds `SubtitleListFile` corresponding to this entry, if it exists."""
-        res = self._db_list(session).files.filter(SubtitleListFile.location == self._extract_path(entry)).first()
+        path = self._extract_path(entry)
+        res = self._db_list(session).files.filter(SubtitleListFile.location == path).first()
+        if not res:
+            path = os.path.dirname(path)
+            res = self._db_list(session).files.filter(SubtitleListFile.location == path).first()
         return res
 
     @with_session
