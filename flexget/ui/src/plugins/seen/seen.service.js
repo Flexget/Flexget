@@ -16,8 +16,8 @@
             getSeen: getSeen
         }
 
-        function getSeen(params) {
-            return $http.get('/api/seen/', { cache: seenCache, params: params })
+        function getSeen() {
+            return $http.get('/api/seen/', { cache: seenCache })
                 .then(getSeenComplete)
                 .catch(callFailed);
 

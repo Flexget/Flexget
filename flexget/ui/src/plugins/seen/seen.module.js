@@ -3,7 +3,9 @@
 
 	angular
 		.module('plugins.seen',	[
-			'blocks.router'
+			'blocks.router',
+			'blocks.exception',
+			'angular-cache'
 			//'schemaForm'
 		]);
 })();

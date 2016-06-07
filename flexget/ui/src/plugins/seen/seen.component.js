@@ -14,16 +14,12 @@
 
 		vm.$onInit = activate;
 
-		var params = {
-			max: 20
-		}
-
 		function activate() {
 			getSeen();
 		}
 
 		function getSeen() {
-			return seenService.getSeen(params).then(function (data) {
+			return seenService.getSeen().then(function (data) {
 				vm.entries = data.seen_entries;
 			});
 		}
