@@ -125,9 +125,10 @@ class SeriesListSeries(Base):
             # `set` is not a real series attribute and is just a way to pass IDs in task.
             if attribute == 'set':
                 continue
-            if getattr(self, attribute):
+            result = self.format_converter(attribute)
+            if result:
                 # Maintain support for configure_series plugin expected format
-                entry['configure_series_' + attribute] = entry[attribute] = self.format_converter(attribute)
+                entry['configure_series_' + attribute] = entry[attribute] = result
         for series_list_id in self.ids:
             entry[series_list_id.id_name] = series_list_id.id_value
             entry['set'].update({series_list_id.id_name: series_list_id.id_value})
@@ -142,6 +143,7 @@ class SeriesListSeries(Base):
             'series_list_ids': [series_list_id.to_dict() for series_list_id in self.ids]
         }
         for attribute in SETTINGS_SCHEMA['properties']:
+            # `set` is not a real series attribute and is just a way to pass IDs in task.
             if attribute == 'set':
                 continue
             series_dict[attribute] = self.format_converter(attribute)
