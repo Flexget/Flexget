@@ -4,22 +4,28 @@
 	angular
 		.module('plugins.seen')
 		.component('seenView', {
-		//	templateUrl: 'plugins/seen/seen.tmpl.html',
-		//	controllerAs: 'vm',
-		//	controller: seenController,
+			templateUrl: 'plugins/seen/seen.tmpl.html',
+			controllerAs: 'vm',
+			controller: seenController,
 		});
 
-	function seenController($http) {
+	function seenController(seenService) {
 		var vm = this;
 
-		vm.title = 'Seen';
+		vm.$onInit = activate;
 
-		$http.get('/api/seen/', { params: { max: 20 } })
-			.success(function handleSeen(data) {
+		var params = {
+			max: 20
+		}
+
+		function activate() {
+			getSeen();
+		}
+
+		function getSeen() {
+			return seenService.getSeen(params).then(function (data) {
 				vm.entries = data.seen_entries;
-			})
-			.error(function handlerSeenError(data) {
-				// log error
 			});
+		}
 	}
 })();
