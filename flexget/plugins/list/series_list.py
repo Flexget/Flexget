@@ -226,7 +226,7 @@ class SeriesListIDRegexp(Base):
 
 
 class SeriesListQuality(Base):
-    __tablename__ = 'series_list_id_quality'
+    __tablename__ = 'series_list_quality'
 
     id = Column(Integer, primary_key=True)
     quality = Column(Unicode)
@@ -235,7 +235,7 @@ class SeriesListQuality(Base):
 
 
 class SeriesListQualities(Base):
-    __tablename__ = 'series_list_id_qualities'
+    __tablename__ = 'series_list_qualities'
 
     id = Column(Integer, primary_key=True)
     quality = Column(Unicode)
