@@ -2,11 +2,11 @@
 	'use strict';
 
 	angular
-		.module('flexget.plugins.log')
+		.module('plugins.log')
 		.component('logView', {
-			templateUrl: 'plugins/log/log.tmpl.html',
-			controllerAs: 'vm',
-			controller: logController
+			//templateUrl: 'plugins/log/log.tmpl.html',
+			//controllerAs: 'vm',
+			//controller: logController
 		});
 
 	function logController($scope) {
@@ -107,4 +107,4 @@
 		});
 	}
 
-});
+})();

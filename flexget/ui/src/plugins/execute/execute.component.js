@@ -1,17 +1,17 @@
 (function () {
-	  'use strict';
+	'use strict';
 
-	  angular
-		odule('flexget.plugins.execute')
-		    .component('executeView', {
-			plateUrl: 'plugins/execute/execute.tmpl.html',
-			trollerAs: 'vm',
-			troller: executeController,
-				});
+	angular
+		.module('plugins.execute')
+		.component('executeView', {
+			//templateUrl: 'plugins/execute/execute.tmpl.html',
+			//controllerAs: 'vm',
+			//controller: executeController,
+		});
 				
-			function executeController($scope, $interval, $q, tasks, $filter) {
-			  var vm = this,
-		        allTasks = [];
+	function executeController($scope, $interval, $q, tasks, $filter) {
+		var vm = this,
+			allTasks = [];
 
         vm.stream = { running: false, tasks: [] };
         vm.options = {
@@ -152,4 +152,4 @@
         });
     }
 
-});
+})();

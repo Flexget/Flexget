@@ -2,5 +2,7 @@
     'use strict';
 
     angular
-		.module('plugins.series', []);
+		.module('plugins.series', [
+			'blocks.router'
+		]);
 })();

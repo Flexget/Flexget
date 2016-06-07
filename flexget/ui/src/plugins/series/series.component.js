@@ -3,11 +3,11 @@
     'use strict';
 
     angular
-        .module('flexget.plugins.series')
+        .module('plugins.series')
         .component('seriesView', {
-            templateUrl: 'plugins/series/series.tmpl.html',
-            controllerAs: 'vm',
-            controller: seriesController,
+          //  templateUrl: 'plugins/series/series.tmpl.html',
+         //   controllerAs: 'vm',
+         //   controller: seriesController,
         });
 
     function seriesController($http, $mdDialog, seriesService, $timeout, $mdMedia) {
@@ -141,4 +141,4 @@
         getSeriesList();
     }
 
-});
+})();

@@ -2,11 +2,11 @@
     'use strict';
 
     angular
-        .module('flexget.plugins.schedule')
+        .module('plugins.schedule')
         .component('scheduleView', {
-            templateUrl: 'plugins/schedule/schedule.tmpl.html',
-            controllerAs: 'vm',
-            controller: scheduleController
+        //    templateUrl: 'plugins/schedule/schedule.tmpl.html',
+       //     controllerAs: 'vm',
+        //    controller: scheduleController
         });
 
     function scheduleController($http, schema) {
@@ -45,4 +45,4 @@
         });
     }
 
-});
+})();
