@@ -361,7 +361,12 @@ class PluginTraktLookup(object):
                     entry.register_lazy_func(collected_lookup, ['trakt_collected'])
                     entry.register_lazy_func(watched_lookup, ['trakt_watched'])
 
+    @staticmethod
+    def series_identifier():
+        """Returns the plugin main identifier type"""
+        return 'trakt_id'
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=3)
+    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=3, groups=['series_metainfo'])
