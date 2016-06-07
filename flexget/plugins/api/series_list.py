@@ -45,9 +45,79 @@ class objects_container(object):
 
     return_lists = {'type': 'array', 'items': list_object}
 
+    input_series_list_id_object = {
+        'type': 'array',
+        'items': {
+            'type': 'object',
+            'minProperties': 1,
+            'additionalProperties': True
+        }
+    }
 
+    return_series_list_id_object = copy.deepcopy(input_series_list_id_object)
+    return_series_list_id_object.update(
+        {'properties': {
+            'id': {'type': 'integer'},
+            'added_on': {'type': 'string'},
+            'series_id': {'type': 'integer'}
+        }})
 
-    return_series = {
+    input_series_object = {
+        'type': 'object',
+        'properties': {
+            'title': {'type': 'string'},
+            'path': {'type': 'string'},
+            'alternate_name': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
+            'name_regexp': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
+            'ep_regexp': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
+            'date_regexp': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
+            'sequence_regexp': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
+            'id_regexp': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
+            'date_yearfirst': {'type': 'boolean'},
+            'date_dayfirst': {'type': 'boolean'},
+            'quality': {'type': 'string', 'format': 'quality_requirements'},
+            'qualities': {'type': 'array', 'items': {'type': 'string', 'format': 'quality_requirements'}},
+            'timeframe': {'type': 'string', 'format': 'interval'},
+            'upgrade': {'type': 'boolean'},
+            'target': {'type': 'string', 'format': 'quality_requirements'},
+            # Specials
+            'specials': {'type': 'boolean'},
+            # Propers (can be boolean, or an interval string)
+            'propers': {'type': ['boolean', 'string'], 'format': 'interval'},
+            # Identified by
+            'identified_by': {
+                'type': 'string', 'enum': ['ep', 'date', 'sequence', 'id', 'auto']
+            },
+            # Strict naming
+            'exact': {'type': 'boolean'},
+            # Begin takes an ep, sequence or date identifier
+            'begin': {
+                'oneOf': [
+                    {'name': 'ep identifier', 'type': 'string', 'pattern': r'(?i)^S\d{2,4}E\d{2,3}$',
+                     'error_pattern': 'episode identifiers should be in the form `SxxEyy`'},
+                    {'name': 'date identifier', 'type': 'string', 'pattern': r'^\d{4}-\d{2}-\d{2}$',
+                     'error_pattern': 'date identifiers must be in the form `YYYY-MM-DD`'},
+                    {'name': 'sequence identifier', 'type': 'integer', 'minimum': 0}
+                ]
+            },
+            'from_group': {'type': 'array', 'items': {'type': 'string'}},
+            'parse_only': {'type': 'boolean'},
+            'special_ids': {'type': 'array', 'items': {'type': 'string'}},
+            'prefer_specials': {'type': 'boolean'},
+            'assume_special': {'type': 'boolean'},
+            'tracking': {'type': ['boolean', 'string'], 'enum': [True, False, 'backfill']},
+            'series_list_identifiers': input_series_list_id_object
+        },
+        'required': ['title'],
+        'additionalProperties': False
+    }
+
+    return_series_object = copy.deepcopy(input_series_object)
+    return_series_object['properties']['series_list_identifiers'] = {'type': 'array',
+                                                                     'items': return_series_list_id_object}
+    return_series_object['properties'].update({'added_on': {'type': 'string', 'format': 'date-time'}})
+
+    return_series_list = {
         'type': 'object',
         'properties': {
             'series': {
@@ -66,7 +136,9 @@ default_error_schema = api.schema('default_error_schema', objects_container.defa
 return_lists_schema = api.schema('return_lists', objects_container.return_lists)
 new_list_schema = api.schema('new_list', objects_container.list_input)
 list_object_schema = api.schema('list_object', objects_container.list_object)
-return_series_schema = api.schema('return_series', objects_container.return_series)
+return_series_list_series_schema = api.schema('return_series', objects_container.return_series_list)
+input_series_schema = api.schema('input_series', objects_container.input_series_object)
+return_series_schema = api.schema('return_series', objects_container.return_series_object)
 
 series_list_parser = api.parser()
 series_list_parser.add_argument('name', help='Filter results by list name')
@@ -131,6 +203,7 @@ class SeriesListListAPI(APIResource):
         session.delete(series_list)
         return {}
 
+
 series_parser = api.parser()
 series_parser.add_argument('sort_by', choices=('title', 'added'), default='title',
                            help='Sort by attribute')
@@ -138,11 +211,14 @@ series_parser.add_argument('order', choices=('desc', 'asc'), default='desc', hel
 series_parser.add_argument('page', type=int, default=1, help='Page number')
 series_parser.add_argument('page_size', type=int, default=10, help='Number of series per page')
 
+series_identifiers_doc = "Use movie identifier using the following format:\n[{'ID_NAME: 'ID_VALUE'}]." \
+                         " Has to be one of %s" % " ,".join(SUPPORTED_IDS)
+
 
 @series_list_api.route('/<int:list_id>/series/')
 class SeriesListSeriesAPI(APIResource):
     @api.response(404, model=default_error_schema)
-    @api.response(200, model=return_series_schema)
+    @api.response(200, model=return_series_list_series_schema)
     @api.doc(params={'list_id': 'ID of the list'}, parser=series_parser)
     def get(self, list_id, session=None):
         """ Get series by list ID """
@@ -182,3 +258,27 @@ class SeriesListSeriesAPI(APIResource):
                         'total_number_of_series': count,
                         'page': page,
                         'total_number_of_pages': pages})
+
+    @api.validate(model=input_series_schema, description=series_identifiers_doc)
+    @api.response(201, model=return_series_schema)
+    @api.response(404, description='List not found', model=default_error_schema)
+    @api.response(500, description='Series already exist in list', model=default_error_schema)
+    def post(self, list_id, session=None):
+        """ Add movies to list by ID """
+        try:
+            series_list = sl.get_list_by_id(list_id=list_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'list_id %d does not exist' % list_id}, 404
+        data = request.json
+        title = data.get('title')
+        series = sl.get_series_by_title(list_id=list_id, title=title, session=session)
+        if series:
+            return {'status': 'error',
+                    'message': 'series with name "%s" already exist in list %d' % (title, list_id)}, 500
+        db_series = sl.get_db_series(data)
+        series_list.series.append(db_series)
+        session.commit()
+        response = jsonify({'series': db_series.to_dict()})
+        response.status_code = 201
+        return response

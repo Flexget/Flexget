@@ -139,7 +139,7 @@ class SeriesListSeries(Base):
             'added_on': self.added,
             'title': self.title,
             'list_id': self.list_id,
-            'series_list_ids': [series_list_id.to_dict() for series_list_id in self.ids]
+            'series_list_identifiers': [series_list_id.to_dict() for series_list_id in self.ids]
         }
         for attribute in SETTINGS_SCHEMA['properties']:
             # `set` is not a real series attribute and is just a way to pass IDs in task.
@@ -260,6 +260,45 @@ class SeriesListSpecialID(Base):
     series_id = Column(Integer, ForeignKey(SeriesListSeries.id))
 
 
+def get_db_series(entry):
+    title = entry.get('series_name') or entry['title']
+    db_series = SeriesListSeries(title)
+    # Setting series attributes
+    db_series.alternate_name = [SeriesListAlternateName(name=name) for name in entry.get('alternate_name', [])]
+    db_series.name_regexp = [SeriesListNameRegexp(regexp=regexp) for regexp in entry.get('name_regexp', [])]
+    db_series.ep_regexp = [SeriesListEpRegexp(regexp=regexp) for regexp in entry.get('ep_regexp', [])]
+    db_series.date_regexp = [SeriesListDateRegexp(regexp=regexp) for regexp in entry.get('date_regexp', [])]
+    db_series.sequence_regexp = [SeriesListSequenceRegexp(regexp=regexp) for regexp in
+                                 entry.get('sequence_regexp', [])]
+    db_series.id_regexp = [SeriesListIDRegexp(regexp=regexp) for regexp in entry.get('id_regexp', [])]
+    db_series.date_dayfirst = entry.get('date_dayfirst')
+    db_series.date_dayfirst = entry.get('date_dayfirst')
+    db_series.quality = SeriesListQuality(quality=entry.get('quality')) if entry.get('quality') else None
+    db_series.qualities = [SeriesListQualities(quality=quality) for quality in entry.get('qualities', [])]
+    db_series.timeframe = entry.get('timeframe')
+    db_series.upgrade = entry.get('upgrade')
+    db_series.target = entry.get('target')
+    db_series.specials = entry.get('specials')
+    db_series.propers = entry.get('propers')
+    db_series.identified_by = entry.get('identified_by')
+    db_series.exact = entry.get('exact')
+    db_series.begin = entry.get('begin')
+    db_series.from_group = [SeriesListFromGroup(group_name=name) for name in entry.get('from_group', [])]
+    db_series.parse_only = entry.get('parse_only')
+    db_series.special_ids = [SeriesListSpecialID(id_name=name) for name in entry.get('special_ids', [])]
+    db_series.prefer_specials = entry.get('prefer_specials')
+    db_series.assume_special = entry.get('assume_special')
+    db_series.tracking = entry.get('tracking')
+
+    # Get list of supported identifiers
+    for id_name in SUPPORTED_IDS:
+        value = entry.get(id_name)
+        if value:
+            log.debug('found supported ID %s with value %s in entry, adding to series', id_name, value)
+            db_series.ids.append(SeriesListSeriesExternalID(id_name=id_name, id_value=value))
+    return db_series
+
+
 class SeriesList(MutableSet):
     def _db_list(self, session):
         return session.query(SeriesListList).filter(SeriesListList.name == self.list_name).first()
@@ -294,42 +333,7 @@ class SeriesList(MutableSet):
         # Just delete and re-create to refresh
         if db_series:
             session.delete(db_series)
-        title = entry.get('series_name') or entry['title']
-        db_series = SeriesListSeries(title)
-        # Setting series attributes
-        db_series.alternate_name = [SeriesListAlternateName(name=name) for name in entry.get('alternate_name', [])]
-        db_series.name_regexp = [SeriesListNameRegexp(regexp=regexp) for regexp in entry.get('name_regexp', [])]
-        db_series.ep_regexp = [SeriesListEpRegexp(regexp=regexp) for regexp in entry.get('ep_regexp', [])]
-        db_series.date_regexp = [SeriesListDateRegexp(regexp=regexp) for regexp in entry.get('date_regexp', [])]
-        db_series.sequence_regexp = [SeriesListSequenceRegexp(regexp=regexp) for regexp in
-                                     entry.get('sequence_regexp', [])]
-        db_series.id_regexp = [SeriesListIDRegexp(regexp=regexp) for regexp in entry.get('id_regexp', [])]
-        db_series.date_dayfirst = entry.get('date_dayfirst')
-        db_series.date_dayfirst = entry.get('date_dayfirst')
-        db_series.quality = SeriesListQuality(quality=entry.get('quality')) if entry.get('quality') else None
-        db_series.qualities = [SeriesListQualities(quality=quality) for quality in entry.get('qualities', [])]
-        db_series.timeframe = entry.get('timeframe')
-        db_series.upgrade = entry.get('upgrade')
-        db_series.target = entry.get('target')
-        db_series.specials = entry.get('specials')
-        db_series.propers = entry.get('propers')
-        db_series.identified_by = entry.get('identified_by')
-        db_series.exact = entry.get('exact')
-        db_series.begin = entry.get('begin')
-        db_series.from_group = [SeriesListFromGroup(group_name=name) for name in entry.get('from_group', [])]
-        db_series.parse_only = entry.get('parse_only')
-        db_series.special_ids = [SeriesListSpecialID(id_name=name) for name in entry.get('special_ids', [])]
-        db_series.prefer_specials = entry.get('prefer_specials')
-        db_series.assume_special = entry.get('assume_special')
-        db_series.tracking = entry.get('tracking')
-
-        # Get list of supported identifiers
-        for id_name in SUPPORTED_IDS:
-            value = entry.get(id_name)
-            if value:
-                log.debug('found supported ID %s with value %s in entry, adding to series', id_name, value)
-                db_series.ids.append(SeriesListSeriesExternalID(id_name=id_name, id_value=value))
-        log.debug('adding entry %s', entry)
+        db_series = get_db_series(entry)
         db_list.series.append(db_series)
         session.commit()
         return db_series.to_entry()
@@ -435,3 +439,15 @@ def get_series_by_list_id(list_id, count=False, start=None, stop=None, order_by=
 def get_list_by_exact_name(name, session=None):
     log.debug('returning list with name %s', name)
     return session.query(SeriesListList).filter(func.lower(SeriesListList.name) == name.lower()).one()
+
+
+@with_session
+def get_series_by_title(list_id, title, session=None):
+    series_list = get_list_by_id(list_id=list_id, session=session)
+    if series_list:
+        log.debug('searching for series %s in list %d', title, list_id)
+        return session.query(SeriesListSeries).filter(
+            and_(
+                func.lower(SeriesListSeries.title) == title.lower(),
+                SeriesListSeries.list_id == list_id)
+        ).first()
