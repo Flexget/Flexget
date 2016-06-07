@@ -7,6 +7,7 @@ from datetime import datetime
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from sqlalchemy import Column, Unicode, Integer, ForeignKey, Boolean, DateTime, String, func
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.collections import InstrumentedList
 from sqlalchemy.sql.elements import and_
 
 from flexget.plugins.filter.series import FilterSeriesBase
@@ -52,23 +53,17 @@ class SeriesListSeries(Base):
 
     # Internal series attributes
     path = Column(Unicode)
-    _alternate_name = Column('alternate_name', Unicode)
-    alternate_name = json_synonym('_alternate_name')
-    _name_regexp = Column('name_regexp', Unicode)
-    name_regexp = json_synonym('_name_regexp')
-    _ep_regexp = Column('ep_regexp', Unicode)
-    ep_regexp = json_synonym('_ep_regexp')
-    _date_regexp = Column('date_regexp', Unicode)
-    date_regexp = json_synonym('_date_regexp')
-    _sequence_regexp = Column('sequence_regexp', Unicode)
-    sequence_regexp = json_synonym('_sequence_regexp')
-    _id_regexp = Column('id_regexp', Unicode)
-    id_regexp = json_synonym('_id_regexp')
+    alternate_name = relationship('SeriesListAlternateName', backref='series', cascade='all, delete, delete-orphan')
+    name_regexp = relationship('SeriesListNameRegexp', backref='series', cascade='all, delete, delete-orphan')
+    ep_regexp = relationship('SeriesListEpRegexp', backref='series', cascade='all, delete, delete-orphan')
+    date_regexp = relationship('SeriesListDateRegexp', backref='series', cascade='all, delete, delete-orphan')
+    sequence_regexp = relationship('SeriesListSequenceRegexp', backref='series', cascade='all, delete, delete-orphan')
+    id_regexp = relationship('SeriesListIDRegexp', backref='series', cascade='all, delete, delete-orphan')
     date_yearfirst = Column(Boolean)
     date_dayfirst = Column(Boolean)
-    quality = Column(Unicode)  # Todo: enforce format
-    _qualities = Column('qualities', Unicode)
-    qualities = json_synonym('_qualities')  # Todo: enforce format
+    quality = relationship('SeriesListQuality', uselist=False, backref='series', cascade='all, delete, delete-orphan')
+    qualities = relationship('SeriesListQualities', backref='series',
+                             cascade='all, delete, delete-orphan')  # Todo: enforce format
     timeframe = Column(Unicode)  # Todo: enforce format
     upgrade = Column(Boolean)
     target = Column(Unicode)  # Todo: enforce format
@@ -77,11 +72,9 @@ class SeriesListSeries(Base):
     identified_by = Column(String)
     exact = Column(Boolean)
     begin = Column(Unicode)  # Todo: enforce format
-    _from_group = Column('from_group', Unicode)
-    from_group = json_synonym('_from_group')
+    from_group = relationship('SeriesListFromGroup', backref='series', cascade='all, delete, delete-orphan')
     parse_only = Column(Boolean)
-    _special_ids = Column('special_ids', Unicode)
-    special_ids = json_synonym('_special_ids')
+    special_ids = relationship('SeriesListSpecialID', backref='series', cascade='all, delete, delete-orphan')
     prefer_specials = Column(Boolean)
     assume_special = Column(Boolean)
     tracking = Column(Unicode)  # Todo: enforce format
@@ -89,21 +82,37 @@ class SeriesListSeries(Base):
     list_id = Column(Integer, ForeignKey(SeriesListList.id), nullable=False)
     ids = relationship('SeriesListID', backref='series', cascade='all, delete, delete-orphan')
 
+    def __init__(self, title):
+        self.title = title
+
     def __repr__(self):
         return '<SeriesListSeries title=%s,list_id=%d>' % (self.title, self.list_id)
 
     def format_converter(self, attribute):
         """
         Return correct attribute format, based on schema. This is needed to maintain consistency with multi
-        type schema formats
+        type schema formats, and convert instrumented lists on the fly
         """
         value = getattr(self, attribute)
         if not value:
             return
+        if isinstance(value, InstrumentedList):
+            if attribute.endswith('regexp'):
+                return [regexp.regexp for regexp in value]
+            elif attribute == 'alternate_name':
+                return [alternate_name.name for alternate_name in value]
+            elif attribute == 'qualities':
+                return [quality.quality for quality in value]
+            elif attribute == 'from_group':
+                return [group.group_name for group in value]
+            elif attribute == 'special_ids':
+                return [special_id.id_name for special_id in value]
         if attribute in ['propers', 'tracking']:
             # Value can be either bool or unicode
             if value in ['0', '1']:
                 return bool(value)
+        if attribute == 'quality':
+            return value.quality
         return value
 
     def to_entry(self):
@@ -111,6 +120,7 @@ class SeriesListSeries(Base):
         entry['title'] = entry['series_name'] = self.title
         entry['url'] = 'mock://localhost/series_list/%d' % self.id
         entry['set'] = {}
+
         for attribute in SERIES_ATTRIBUTES:
             # `set` is not a real series attribute and is just a way to pass IDs in task.
             if attribute == 'set':
@@ -134,7 +144,7 @@ class SeriesListSeries(Base):
         for attribute in SETTINGS_SCHEMA['properties']:
             if attribute == 'set':
                 continue
-            series_dict[attribute] = getattr(self, attribute) if getattr(self, attribute) else None
+            series_dict[attribute] = self.format_converter(attribute)
         return series_dict
 
 
@@ -157,6 +167,96 @@ class SeriesListID(Base):
             'id_value': self.id_value,
             'series_id': self.movie_id
         }
+
+
+class SeriesListAlternateName(Base):
+    __tablename__ = 'series_list_alternate_names'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode)
+    added = Column(DateTime, default=datetime.now)
+    series_id = Column(Integer, ForeignKey(SeriesListSeries.id))
+
+
+class SeriesListNameRegexp(Base):
+    __tablename__ = 'series_list_name_regexps'
+
+    id = Column(Integer, primary_key=True)
+    regexp = Column(Unicode)
+    added = Column(DateTime, default=datetime.now)
+    series_id = Column(Integer, ForeignKey(SeriesListSeries.id))
+
+
+class SeriesListEpRegexp(Base):
+    __tablename__ = 'series_list_ep_regexps'
+
+    id = Column(Integer, primary_key=True)
+    regexp = Column(Unicode)
+    added = Column(DateTime, default=datetime.now)
+    series_id = Column(Integer, ForeignKey(SeriesListSeries.id))
+
+
+class SeriesListDateRegexp(Base):
+    __tablename__ = 'series_list_date_regexps'
+
+    id = Column(Integer, primary_key=True)
+    regexp = Column(Unicode)
+    added = Column(DateTime, default=datetime.now)
+    series_id = Column(Integer, ForeignKey(SeriesListSeries.id))
+
+
+class SeriesListSequenceRegexp(Base):
+    __tablename__ = 'series_list_sequence_regexps'
+
+    id = Column(Integer, primary_key=True)
+    regexp = Column(Unicode)
+    added = Column(DateTime, default=datetime.now)
+    series_id = Column(Integer, ForeignKey(SeriesListSeries.id))
+
+
+class SeriesListIDRegexp(Base):
+    __tablename__ = 'series_list_id_regexps'
+
+    id = Column(Integer, primary_key=True)
+    regexp = Column(Unicode)
+    added = Column(DateTime, default=datetime.now)
+    series_id = Column(Integer, ForeignKey(SeriesListSeries.id))
+
+
+class SeriesListQuality(Base):
+    __tablename__ = 'series_list_id_quality'
+
+    id = Column(Integer, primary_key=True)
+    quality = Column(Unicode)
+    added = Column(DateTime, default=datetime.now)
+    series_id = Column(Integer, ForeignKey(SeriesListSeries.id))
+
+
+class SeriesListQualities(Base):
+    __tablename__ = 'series_list_id_qualities'
+
+    id = Column(Integer, primary_key=True)
+    quality = Column(Unicode)
+    added = Column(DateTime, default=datetime.now)
+    series_id = Column(Integer, ForeignKey(SeriesListSeries.id))
+
+
+class SeriesListFromGroup(Base):
+    __tablename__ = 'series_list_from_groups'
+
+    id = Column(Integer, primary_key=True)
+    group_name = Column(Unicode)
+    added = Column(DateTime, default=datetime.now)
+    series_id = Column(Integer, ForeignKey(SeriesListSeries.id))
+
+
+class SeriesListSpecialID(Base):
+    __tablename__ = 'series_list_special_ids'
+
+    id = Column(Integer, primary_key=True)
+    id_name = Column(Unicode)
+    added = Column(DateTime, default=datetime.now)
+    series_id = Column(Integer, ForeignKey(SeriesListSeries.id))
 
 
 class SeriesList(MutableSet):
@@ -193,19 +293,35 @@ class SeriesList(MutableSet):
         # Just delete and re-create to refresh
         if db_series:
             session.delete(db_series)
-        db_series = SeriesListSeries()
-        # Setting series title
-        if 'series_name' in entry:
-            db_series.title = entry['series_name']
-        else:
-            db_series.title = entry['title']
+        title = entry.get('series_name') or entry['title']
+        db_series = SeriesListSeries(title)
         # Setting series attributes
-        for attribute in SERIES_ATTRIBUTES:
-            # `set` is not a real series attribute and is just a way to pass IDs in task.
-            if attribute == 'set':
-                continue
-            if entry.get(attribute):
-                setattr(db_series, attribute, entry[attribute])
+        db_series.alternate_name = [SeriesListAlternateName(name=name) for name in entry.get('alternate_name', [])]
+        db_series.name_regexp = [SeriesListNameRegexp(regexp=regexp) for regexp in entry.get('name_regexp', [])]
+        db_series.ep_regexp = [SeriesListEpRegexp(regexp=regexp) for regexp in entry.get('ep_regexp', [])]
+        db_series.date_regexp = [SeriesListDateRegexp(regexp=regexp) for regexp in entry.get('date_regexp', [])]
+        db_series.sequence_regexp = [SeriesListSequenceRegexp(regexp=regexp) for regexp in
+                                     entry.get('sequence_regexp', [])]
+        db_series.id_regexp = [SeriesListIDRegexp(regexp=regexp) for regexp in entry.get('id_regexp', [])]
+        db_series.date_dayfirst = entry.get('date_dayfirst')
+        db_series.date_dayfirst = entry.get('date_dayfirst')
+        db_series.quality = SeriesListQuality(quality=entry.get('quality')) if entry.get('quality') else None
+        db_series.qualities = [SeriesListQualities(quality=quality) for quality in entry.get('qualities', [])]
+        db_series.timeframe = entry.get('timeframe')
+        db_series.upgrade = entry.get('upgrade')
+        db_series.target = entry.get('target')
+        db_series.specials = entry.get('specials')
+        db_series.propers = entry.get('propers')
+        db_series.identified_by = entry.get('identified_by')
+        db_series.exact = entry.get('exact')
+        db_series.begin = entry.get('begin')
+        db_series.from_group = [SeriesListFromGroup(group_name=name) for name in entry.get('from_group', [])]
+        db_series.parse_only = entry.get('parse_only')
+        db_series.special_ids = [SeriesListSpecialID(id_name=name) for name in entry.get('special_ids', [])]
+        db_series.prefer_specials = entry.get('prefer_specials')
+        db_series.assume_special = entry.get('assume_special')
+        db_series.tracking = entry.get('tracking')
+
         # Get list of supported identifiers
         for id_name in SUPPORTED_IDS:
             value = entry.get(id_name) or entry.get('set').get(id_name) if entry.get('set') else None
@@ -312,6 +428,7 @@ def get_series_by_list_id(list_id, count=False, start=None, stop=None, order_by=
     else:
         query = query.order_by(getattr(SeriesListSeries, order_by))
     return query.all()
+
 
 @with_session
 def get_list_by_exact_name(name, session=None):
