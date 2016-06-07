@@ -80,7 +80,7 @@ class SeriesListSeries(Base):
     tracking = Column(Unicode)  # Todo: enforce format
 
     list_id = Column(Integer, ForeignKey(SeriesListList.id), nullable=False)
-    ids = relationship('SeriesListID', backref='series', cascade='all, delete, delete-orphan')
+    ids = relationship('SeriesListSeriesExternalID', backref='series', cascade='all, delete, delete-orphan')
 
     def __init__(self, title):
         self.title = title
@@ -150,8 +150,8 @@ class SeriesListSeries(Base):
         return series_dict
 
 
-class SeriesListID(Base):
-    __tablename__ = 'series_list_ids'
+class SeriesListSeriesExternalID(Base):
+    __tablename__ = 'series_list_series_external_ids'
     id = Column(Integer, primary_key=True)
     added = Column(DateTime, default=datetime.now)
     id_name = Column(Unicode)
@@ -329,7 +329,7 @@ class SeriesList(MutableSet):
             value = entry.get(id_name)
             if value:
                 log.debug('found supported ID %s with value %s in entry, adding to series', id_name, value)
-                db_series.ids.append(SeriesListID(id_name=id_name, id_value=value))
+                db_series.ids.append(SeriesListSeriesExternalID(id_name=id_name, id_value=value))
         log.debug('adding entry %s', entry)
         db_list.series.append(db_series)
         session.commit()
@@ -353,8 +353,8 @@ class SeriesList(MutableSet):
                 log.debug('trying to match series based off id %s: %s', id_name, entry[id_name])
                 res = (self._db_list(session).series.join(SeriesListSeries.ids).filter(
                     and_(
-                        SeriesListID.id_name == id_name,
-                        SeriesListID.id_value == entry[id_name]))
+                        SeriesListSeriesExternalID.id_name == id_name,
+                        SeriesListSeriesExternalID.id_value == entry[id_name]))
                        .first())
                 if res:
                     log.debug('found series %s', res)
