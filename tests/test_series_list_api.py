@@ -10,7 +10,7 @@ from flexget.utils import json
 class TestSeriesListAPI(object):
     config = 'tasks: {}'
 
-    def test_series_list_list(self, api_client):
+    def test_series_list_lists(self, api_client):
         rsp = api_client.get('/series_list/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
@@ -18,11 +18,21 @@ class TestSeriesListAPI(object):
         rsp = api_client.get('/series_list/?name=name')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        data = {'name': 'test'}
+        test1 = {'name': 'test1'}
+        test2 = {'name': 'test2'}
 
         # Create list
-        rsp = api_client.json_post('/series_list/', data=json.dumps(data))
+        rsp = api_client.json_post('/series_list/', data=json.dumps(test1))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        assert json.loads(rsp.get_data(as_text=True)).get('name') == 'test1'
+
+        rsp = api_client.json_post('/series_list/', data=json.dumps(test2))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        assert json.loads(rsp.get_data(as_text=True)).get('name') == 'test2'
+
+        rsp = api_client.get('/series_list/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert len(json.loads(rsp.get_data(as_text=True)).get('series_lists')) == 2
 
     def test_series_list_list_id(self, api_client):
         payload = {'name': 'name'}

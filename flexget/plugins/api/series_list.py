@@ -41,7 +41,12 @@ class objects_container(object):
     del list_input['properties']['id']
     del list_input['properties']['added_on']
 
-    return_lists = {'type': 'array', 'items': list_object}
+    return_lists = {
+        'type': 'object',
+        'properties': {
+            'series_lists': {'type': 'array', 'items': list_object}
+        }
+    }
 
     input_series_list_id_object = {
         'type': 'array',
@@ -156,7 +161,7 @@ class SeriesListAPI(APIResource):
         name = args.get('name')
         series_lists = [series_list.to_dict() for series_list in
                         sl.SeriesListDBContainer.get_series_lists(name=name, session=session)]
-        return jsonify(series_lists)
+        return jsonify({'series_lists': series_lists})
 
     @api.validate(new_list_schema)
     @api.response(201, model=list_object_schema)
