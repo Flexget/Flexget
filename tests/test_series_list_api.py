@@ -85,3 +85,29 @@ class TestSeriesListAPI(object):
         response = json.loads(rsp.get_data(as_text=True))
         for attribute in series:
             assert series[attribute] == response[attribute]
+
+    def test_series_list_series_with_identifiers(self, api_client):
+        # Get non existent list
+        rsp = api_client.get('/series_list/1/series/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+        payload = {'name': 'name'}
+
+        # Create list
+        rsp = api_client.json_post('/series_list/', data=json.dumps(payload))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+
+        series = {'title': 'title',
+                  'tvmaze_id': 1234,
+                  'trakt_show_id': 555,
+                  'tvdb_id': 666,
+                  'unknown': 999}
+
+        # Add series to list
+        rsp = api_client.json_post('/series_list/1/series/', data=json.dumps(series))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        response = json.loads(rsp.get_data(as_text=True))
+        for identifier in response.get('series_list_identifiers'):
+            # Only recognized series identifiers will be added
+            assert not identifier['id_name'] == 'unknown'
+            assert series[identifier['id_name']] == identifier['id_value']

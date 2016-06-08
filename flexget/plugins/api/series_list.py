@@ -103,11 +103,10 @@ class objects_container(object):
             'special_ids': {'type': 'array', 'items': {'type': 'string'}},
             'prefer_specials': {'type': 'boolean'},
             'assume_special': {'type': 'boolean'},
-            'tracking': {'type': ['boolean', 'string'], 'enum': [True, False, 'backfill']},
-            'series_list_identifiers': input_series_list_id_object
+            'tracking': {'type': ['boolean', 'string'], 'enum': [True, False, 'backfill']}
         },
         'required': ['title'],
-        'additionalProperties': False
+        'additionalProperties': True
     }
 
     edit_series_object = copy.deepcopy(input_series_object)
@@ -215,8 +214,8 @@ series_parser.add_argument('order', choices=('desc', 'asc'), default='desc', hel
 series_parser.add_argument('page', type=int, default=1, help='Page number')
 series_parser.add_argument('page_size', type=int, default=10, help='Number of series per page')
 
-series_identifiers_doc = "Use series identifier using the following format:\n[{'ID_NAME: 'ID_VALUE'}]." \
-                         " Has to be one of %s" % " ,".join(supported_ids)
+series_identifiers_doc = "Any recognized series identifiers that are part of the payload will be added ot series. Add" \
+                         "them to the root of the payload."
 
 
 @series_list_api.route('/<int:list_id>/series/')
