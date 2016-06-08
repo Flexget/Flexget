@@ -283,7 +283,7 @@ class SeriesListSeriesAPI(APIResource):
         db_series = sl.get_db_series(data)
         series_list.series.append(db_series)
         session.commit()
-        response = jsonify({'series': db_series.to_dict()})
+        response = jsonify(db_series.to_dict())
         response.status_code = 201
         return response
 
