@@ -100,7 +100,7 @@ class SeriesListSeries(Base):
         type schema formats, and convert instrumented lists on the fly
         """
         value = getattr(self, attribute)
-        if not value:
+        if value is None:
             return
         if isinstance(value, InstrumentedList):
             if attribute.endswith('regexp'):
@@ -275,8 +275,8 @@ def get_db_series(entry):
                          'identified_by', 'exact', 'begin', 'parse_only', 'prefer_specials', 'assume_special',
                          'tracking']
     for attribute in single_attributes:
-        if entry.get(attribute):
-            setattr(db_series, attribute, entry.get(attribute))
+        if entry.get(attribute) is not None:
+            setattr(db_series, attribute, entry[attribute])
     if entry.get('alternate_name'):
         db_series.alternate_name = [SeriesListAlternateName(name=name) for name in entry.get('alternate_name')]
     if entry.get('name_regexp'):

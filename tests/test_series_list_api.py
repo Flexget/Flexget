@@ -56,3 +56,32 @@ class TestSeriesListAPI(object):
         rsp = api_client.json_post('/series_list/1/series/', data=json.dumps(series))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
         assert json.loads(rsp.get_data(as_text=True)).get('title') == 'title'
+
+        series = {'title': 'series 1',
+                  'alternate_name': ['SER1', 'SER2'],
+                  'name_regexp': ["^ser", "^series 1$"],
+                  'ep_regexp': ["^ser", "^series 1$"],
+                  'date_regexp': ["^ser", "^series 1$"],
+                  'sequence_regexp': ["^ser", "^series 1$"],
+                  'id_regexp': ["^ser", "^series 1$"],
+                  'date_yearfirst': True,
+                  'date_dayfirst': True,
+                  'quality': '720p',
+                  'qualities': ['720p', '1080p'],
+                  'timeframe': '2 days',
+                  'upgrade': True,
+                  'target': '1080p',
+                  'propers': True,
+                  'specials': True,
+                  'tracking': False,
+                  'identified_by': "ep",
+                  'exact': True,
+                  'begin': 's01e01',
+                  'from_group': ['group1', 'group2'],
+                  'parse_only': True}
+
+        rsp = api_client.json_post('/series_list/1/series/', data=json.dumps(series))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        response = json.loads(rsp.get_data(as_text=True))
+        for attribute in series:
+            assert series[attribute] == response[attribute]
