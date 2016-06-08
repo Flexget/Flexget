@@ -22,7 +22,14 @@ Base = versioned_base('series_list', 0)
 
 SETTINGS_SCHEMA = FilterSeriesBase().settings_schema
 SERIES_ATTRIBUTES = SETTINGS_SCHEMA['properties']
-supported_ids = FilterSeriesBase().supported_ids()
+
+
+def supported_ids():
+    # Return a list of supported series identifier as registered via their plugins
+    ids = []
+    for p in plugin.get_plugins(group='series_metainfo'):
+        ids.append(p.instance.series_identifier())
+    return ids
 
 
 class SeriesListList(Base):
@@ -292,7 +299,7 @@ def get_db_series(entry):
         db_series.special_ids = [SeriesListSpecialID(id_name=name) for name in entry.get('special_ids')]
 
     # Get list of supported identifiers
-    for id_name in supported_ids:
+    for id_name in supported_ids():
         value = entry.get(id_name)
         if value:
             log.debug('found supported ID %s with value %s in entry, adding to series', id_name, value)
@@ -352,7 +359,7 @@ class SeriesList(MutableSet):
     @with_session
     def _find_entry(self, entry, session=None):
         """Finds `SeriesListSeries` corresponding to this entry, if it exists."""
-        for id_name in supported_ids:
+        for id_name in supported_ids():
             if entry.get(id_name):
                 log.debug('trying to match series based off id %s: %s', id_name, entry[id_name])
                 res = (self._db_list(session).series.join(SeriesListSeries.ids).filter(
