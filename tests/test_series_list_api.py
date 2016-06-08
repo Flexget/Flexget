@@ -50,15 +50,16 @@ class TestSeriesListAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
     def test_series_list_series(self, api_client):
-        # Get non existent list
-        rsp = api_client.get('/series_list/1/series/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
-
+        # Create list
         payload = {'name': 'name'}
 
-        # Create list
         rsp = api_client.json_post('/series_list/', data=json.dumps(payload))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+
+        # Get non existent list
+        rsp = api_client.get('/series_list/1/series/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert json.loads(rsp.get_data(as_text=True)).get('series') == []
 
         series = {'title': 'title'}
 
@@ -96,6 +97,10 @@ class TestSeriesListAPI(object):
         for attribute in series:
             assert series[attribute] == response[attribute]
 
+        rsp = api_client.get('/series_list/1/series/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert len(json.loads(rsp.get_data(as_text=True)).get('series')) == 2
+
     def test_series_list_series_with_identifiers(self, api_client):
         # Get non existent list
         rsp = api_client.get('/series_list/1/series/')
@@ -121,3 +126,29 @@ class TestSeriesListAPI(object):
             # Only recognized series identifiers will be added
             assert not identifier['id_name'] == 'unknown'
             assert series[identifier['id_name']] == identifier['id_value']
+
+    def test_series_list_series_id(self, api_client):
+        payload = {'name': 'name'}
+
+        # Create list
+        rsp = api_client.json_post('/series_list/', data=json.dumps(payload))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+
+        rsp = api_client.get('/series_list/1/series/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+        series = {'title': 'title'}
+
+        # Add series to list
+        rsp = api_client.json_post('/series_list/1/series/', data=json.dumps(series))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        assert json.loads(rsp.get_data(as_text=True)).get('title') == 'title'
+
+        rsp = api_client.get('/series_list/1/series/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        rsp = api_client.delete('/series_list/1/series/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        rsp = api_client.get('/series_list/1/series/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
