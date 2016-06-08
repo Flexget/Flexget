@@ -423,61 +423,65 @@ class PluginSeriesList(object):
         return list(SeriesList(config))
 
 
+class SeriesListDBContainer(object):
+    """ A container class to hold DB methods for this plugin"""
+
+    @staticmethod
+    @with_session
+    def get_series_lists(name=None, session=None):
+        log.debug('retrieving series lists')
+        query = session.query(SeriesListList)
+        if name:
+            log.debug('filtering by name %s', name)
+            query = query.filter(SeriesListList.name == name)
+        return query.all()
+
+    @staticmethod
+    @with_session
+    def get_list_by_id(self, list_id, session=None):
+        log.debug('fetching list with id %d', list_id)
+        return session.query(SeriesListList).filter(SeriesListList.id == list_id).one()
+
+    @staticmethod
+    @with_session
+    def get_series_by_list_id(list_id, count=False, start=None, stop=None, order_by='added', descending=False,
+                              session=None):
+        query = session.query(SeriesListSeries).filter(SeriesListSeries.list_id == list_id)
+        if count:
+            return query.count()
+        if descending:
+            query = query.order_by(getattr(SeriesListSeries, order_by).desc())
+        else:
+            query = query.order_by(getattr(SeriesListSeries, order_by))
+        query = query.slice(start, stop)
+        return query.all()
+
+    @staticmethod
+    @with_session
+    def get_list_by_exact_name(name, session=None):
+        log.debug('returning list with name %s', name)
+        return session.query(SeriesListList).filter(func.lower(SeriesListList.name) == name.lower()).one()
+
+    @staticmethod
+    @with_session
+    def get_series_by_title(list_id, title, session=None):
+        series_list = SeriesListDBContainer.get_list_by_id(list_id=list_id, session=session)
+        if series_list:
+            log.debug('searching for series %s in list %d', title, list_id)
+            return session.query(SeriesListSeries).filter(
+                and_(
+                    func.lower(SeriesListSeries.title) == title.lower(),
+                    SeriesListSeries.list_id == list_id)
+            ).first()
+
+    @staticmethod
+    @with_session
+    def get_series_by_id(list_id, series_id, session=None):
+        log.debug('fetching series with id %d from list id %d', series_id, list_id)
+        return session.query(SeriesListSeries).filter(
+            and_(SeriesListSeries.id == series_id, SeriesListSeries.list_id == list_id)).one()
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginSeriesList, 'series_list', api_ver=2, groups=['list'])
-
-
-@with_session
-def get_series_lists(name=None, session=None):
-    log.debug('retrieving series lists')
-    query = session.query(SeriesListList)
-    if name:
-        log.debug('filtering by name %s', name)
-        query = query.filter(SeriesListList.name == name)
-    return query.all()
-
-
-@with_session
-def get_list_by_id(list_id, session=None):
-    log.debug('fetching list with id %d', list_id)
-    return session.query(SeriesListList).filter(SeriesListList.id == list_id).one()
-
-
-@with_session
-def get_series_by_list_id(list_id, count=False, start=None, stop=None, order_by='added', descending=False,
-                          session=None):
-    query = session.query(SeriesListSeries).filter(SeriesListSeries.list_id == list_id)
-    if count:
-        return query.count()
-    if descending:
-        query = query.order_by(getattr(SeriesListSeries, order_by).desc())
-    else:
-        query = query.order_by(getattr(SeriesListSeries, order_by))
-    query = query.slice(start, stop)
-    return query.all()
-
-
-@with_session
-def get_list_by_exact_name(name, session=None):
-    log.debug('returning list with name %s', name)
-    return session.query(SeriesListList).filter(func.lower(SeriesListList.name) == name.lower()).one()
-
-
-@with_session
-def get_series_by_title(list_id, title, session=None):
-    series_list = get_list_by_id(list_id=list_id, session=session)
-    if series_list:
-        log.debug('searching for series %s in list %d', title, list_id)
-        return session.query(SeriesListSeries).filter(
-            and_(
-                func.lower(SeriesListSeries.title) == title.lower(),
-                SeriesListSeries.list_id == list_id)
-        ).first()
-
-
-@with_session
-def get_series_by_id(list_id, series_id, session=None):
-    log.debug('fetching series with id %d from list id %d', series_id, list_id)
-    return session.query(SeriesListSeries).filter(
-        and_(SeriesListSeries.id == series_id, SeriesListSeries.list_id == list_id)).one()
