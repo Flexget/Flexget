@@ -4,18 +4,17 @@
     angular
         .module('plugins.schedule')
         .component('scheduleView', {
-        //    templateUrl: 'plugins/schedule/schedule.tmpl.html',
-       //     controllerAs: 'vm',
-        //    controller: scheduleController
+            templateUrl: 'plugins/schedule/schedule.tmpl.html',
+            controllerAs: 'vm',
+			controller: scheduleController
         });
 
-    function scheduleController($http, schema) {
+    function scheduleController(schedulesService) {
         var vm = this;
 
-        vm.title = 'Schedules';
-        vm.description = 'Task execution';
+		vm.$onInit = activate;
 
-        vm.form = [
+        /*vm.form = [
             '*',
             {
                 type: 'submit',
@@ -32,17 +31,20 @@
                 alert('test');
                 // ... do whatever you need to do with your data.
             }
-        };
+        };*/
 
-        schema.get('config/schedules').then(function (schema) {
+        /*schema.get('config/schedules').then(function (schema) {
             vm.schema = { type: 'object', 'properties': { 'schedules': schema }, required: ['schedules'] };
-        });
+        });*/
+		
+		function activate() {
+			getSchedules();
+		}
 
-        $http.get('/api/schedules/').success(function (data, status, headers, config) {
-            vm.models = [data];
-        }).error(function (data, status, headers, config) {
-            // log error
-        });
+		function getSchedules() {
+			schedulesService.getSchedules().then(function (data) {
+				vm.models = data;
+			});
+		}
     }
-
 })();
