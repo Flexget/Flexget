@@ -23,6 +23,10 @@ describe("Plugin: History.component", function () {
 			controller.$onInit();
 			$rootScope.$apply();
 		});
+
+		it('should have called the history service', function () {
+			expect(historyService.getHistory).to.have.been.calledOnce;
+		})
 		
 		it("should have entries", function () {
 			expect(controller.entries).to.not.be.empty;

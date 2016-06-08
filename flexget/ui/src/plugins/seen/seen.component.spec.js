@@ -23,6 +23,10 @@ describe("Plugin: Seen.component", function () {
 			controller.$onInit();
 			$rootScope.$apply();
 		});
+
+		it('should have called the seen service', function () {
+			expect(seenService.getSeen).to.have.been.calledOnce;
+		});
 		
 		it("should have entries", function () {
 			expect(controller.entries).to.not.be.empty;
