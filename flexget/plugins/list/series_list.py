@@ -423,7 +423,7 @@ class SeriesListDBContainer(object):
 
     @staticmethod
     @with_session
-    def get_list_by_id(self, list_id, session=None):
+    def get_list_by_id(list_id, session=None):
         log.debug('fetching list with id %d', list_id)
         return session.query(SeriesListList).filter(SeriesListList.id == list_id).one()
 
