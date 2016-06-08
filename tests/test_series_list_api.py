@@ -152,3 +152,51 @@ class TestSeriesListAPI(object):
 
         rsp = api_client.get('/series_list/1/series/1/')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+    def test_series_list_edit_series_id(self, api_client):
+        payload = {'name': 'name'}
+
+        # Create list
+        rsp = api_client.json_post('/series_list/', data=json.dumps(payload))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+
+        series = {'title': 'test_series'}
+
+        # Add series to list
+        rsp = api_client.json_post('/series_list/1/series/', data=json.dumps(series))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        assert json.loads(rsp.get_data(as_text=True)).get('title') == 'test_series'
+
+        new_data = {'alternate_name': ['SER1', 'SER2'],
+                    'name_regexp': ["^ser", "^series 1$"],
+                    'ep_regexp': ["^ser", "^series 1$"],
+                    'date_regexp': ["^ser", "^series 1$"],
+                    'sequence_regexp': ["^ser", "^series 1$"],
+                    'id_regexp': ["^ser", "^series 1$"],
+                    'date_yearfirst': True,
+                    'date_dayfirst': True,
+                    'quality': '720p',
+                    'qualities': ['720p', '1080p'],
+                    'timeframe': '2 days',
+                    'upgrade': True,
+                    'target': '1080p',
+                    'propers': True,
+                    'specials': True,
+                    'tracking': False,
+                    'identified_by': "ep",
+                    'exact': True,
+                    'begin': 's01e01',
+                    'from_group': ['group1', 'group2'],
+                    'parse_only': True}
+
+        rsp = api_client.json_put('/series_list/1/series/1/', data=json.dumps(new_data))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        response1 = json.loads(rsp.get_data(as_text=True))
+        assert response1.get('title') == 'title'
+        for attribute in new_data:
+            assert new_data[attribute] == response1[attribute]
+
+            # rsp = api_client.get('/series_list/1/series/1/')
+            # assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+            # response2 = json.loads(rsp.get_data(as_text=True))
+            # assert response1 == response2
