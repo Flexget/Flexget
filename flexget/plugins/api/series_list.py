@@ -8,25 +8,15 @@ from math import ceil
 from flask import jsonify
 from flask import request
 from sqlalchemy.orm.exc import NoResultFound
-from flexget import plugin
 from flexget.plugins.filter.series import FilterSeriesBase
 from flexget.api import api, APIResource
 from flexget.plugins.list import series_list as sl
 
-
-SETTINGS_SCHEMA = FilterSeriesBase().settings_schema
-SERIES_ATTRIBUTES = SETTINGS_SCHEMA['properties']
+supported_ids = FilterSeriesBase().supported_ids()
 
 log = logging.getLogger('series_list_api')
 
 series_list_api = api.namespace('series_list', description='Series List operations')
-
-def supported_ids():
-    # Return a list of supported series identifier as registered via their plugins
-    ids = []
-    for plugin_ in plugin.get_plugins(group='series_metainfo'):
-        ids.append(plugin_.instance.series_identifier())
-    return ids
 
 
 class objects_container(object):
@@ -225,7 +215,7 @@ series_parser.add_argument('page', type=int, default=1, help='Page number')
 series_parser.add_argument('page_size', type=int, default=10, help='Number of series per page')
 
 series_identifiers_doc = "Use series identifier using the following format:\n[{'ID_NAME: 'ID_VALUE'}]." \
-                         " Has to be one of %s" % " ,".join(supported_ids())
+                         " Has to be one of %s" % " ,".join(supported_ids)
 
 
 @series_list_api.route('/<int:list_id>/series/')
