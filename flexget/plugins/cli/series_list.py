@@ -177,74 +177,80 @@ def register_parser_arguments():
     list_name_parser.add_argument('list_name', nargs='?', default='series',
                                   help='Name of series list to operate on. Default is `series`')
 
+    series_attributes_parser = ArgumentParser(add_help=False)
+    series_attributes_parser.add_argument('--path', help='Set path field for this series')
+    series_attributes_parser.add_argument('--alternate-name', nargs='+', help='Alternate series name(s)')
+    series_attributes_parser.add_argument('--name-regexp', nargs='+', type=SeriesListType.regex_type,
+                                          help='Manually specify regexp(s) that matches to series name')
+    series_attributes_parser.add_argument('--ep-regexp', nargs='+', type=SeriesListType.regex_type,
+                                          help='Manually specify regexp(s) that matches to episode, season numbering')
+    series_attributes_parser.add_argument('--date-regexp', nargs='+', type=SeriesListType.regex_type,
+                                          help='Date regexp')
+    series_attributes_parser.add_argument('--sequence-regexp', nargs='+', type=SeriesListType.regex_type,
+                                          help='Sequence regexp')
+    series_attributes_parser.add_argument('--id-regexp', nargs='+', type=SeriesListType.regex_type,
+                                          help='Manually specify regexp(s) that matches to series identifier '
+                                               '(numbering)')
+    series_attributes_parser.add_argument('--date-yearfirst', type=bool, help='Parse year first')
+    series_attributes_parser.add_argument('--date-dayfirst', type=bool, help='Parse date first')
+    series_attributes_parser.add_argument('--quality', type=SeriesListType.quality_req_type, help='Required quality')
+    series_attributes_parser.add_argument('--qualities', type=SeriesListType.quality_req_type, nargs='+',
+                                          help='Download all listed qualities when they become available')
+    series_attributes_parser.add_argument('--timeframe', type=SeriesListType.interval_type,
+                                          help='Wait given amount of time for specified quality to become available, '
+                                               'after that fall back to best so far')
+    series_attributes_parser.add_argument('--upgrade', type=bool,
+                                          help='Keeps getting the better qualities as they become available.')
+    series_attributes_parser.add_argument('--target', type=SeriesListType.quality_req_type,
+                                          help='The target quality that should be downloaded without waiting'
+                                               ' for `timeframe` to complete')
+    series_attributes_parser.add_argument('--specials', type=bool,
+                                          help='Turn off specials support for series. On by default',
+                                          default=True)
+    series_attributes_parser.add_argument('--no-propers', dest="propers", action='store_false',
+                                          help='Turn off propers for the series')
+    series_attributes_parser.add_argument('--allow-propers', dest="propers", action='store_true',
+                                          help='Turn on propers for the series')
+    series_attributes_parser.add_argument('--propers-interval', dest="propers", type=SeriesListType.interval_type,
+                                          help='Set propers interval.')
+    series_attributes_parser.add_argument('--identified-by', choices=('ep', 'date', 'sequence', 'id', 'auto'),
+                                          help='Configure how episode numbering is detected. Uses `auto` mode as '
+                                               'default', default='auto')
+    series_attributes_parser.add_argument('--exact', type=bool, help='Enable strict name matching')
+    series_attributes_parser.add_argument('--begin-ep', type=SeriesListType.episode_identifier, dest="begin",
+                                          help='Manually specify first episode to start series on. Should conform to '
+                                               '`SxxEyy` format')
+    series_attributes_parser.add_argument('--begin-date', type=SeriesListType.date_identifier, dest="begin",
+                                          help='Manually specify first episode to start series on. Should conform to '
+                                               '`YYYY-MM-DD` format')
+    series_attributes_parser.add_argument('--begin-sequence', type=SeriesListType.sequence_identifier, dest="begin",
+                                          help='Manually specify first episode to start series on. Should be higher an'
+                                               ' integer than 0')
+    series_attributes_parser.add_argument('--from-group', nargs='+', help='Accept series only from given groups')
+    series_attributes_parser.add_argument('--parse-only', type=bool,
+                                          help='Series plugin will not accept or reject any entries, merely fill in all'
+                                               ' metadata fields.')
+    series_attributes_parser.add_argument('--special-ids', nargs='+',
+                                          help='Defines other IDs which will cause entries to be flagged as specials')
+    series_attributes_parser.add_argument('--prefer-specials', type=bool,
+                                          help='Flag entries matching both special and a normal ID type as specials')
+    series_attributes_parser.add_argument('--assume-special', type=bool,
+                                          help='Assume any entry with no series numbering detected is a special and '
+                                               'treat it accordingly')
+    series_attributes_parser.add_argument('--no-tracking', dest="tracking", action='store_false',
+                                          help='Turn off tracking for the series')
+    series_attributes_parser.add_argument('--allow-tracking', dest="tracking", action='store_true',
+                                          help='Turn on tracking for the series')
+    series_attributes_parser.add_argument('--tracking', choices=('backfill',), help='Put into backfill mode')
+    series_attributes_parser.add_argument('-i', '--identifiers', metavar='<identifiers>', nargs='+',
+                                          type=SeriesListType.series_list_keyword_type,
+                                          help='Can be a string or a list of string with the format tvdb_id=XXX,'
+                                               ' trakt_show_id=XXX, etc')
+
     parser = options.register_command('series-list', do_cli, help='View and manage series lists')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='list_action')
     subparsers.add_parser('all', help='Shows all existing series lists')
     subparsers.add_parser('list', parents=[list_name_parser], help='List movies from a list')
-    add_subparser = subparsers.add_parser('add', parents=[list_name_parser, series_parser],
-                                          help='Add a series to a list')
-    add_subparser.add_argument('--path', help='Set path field for this series')
-    add_subparser.add_argument('--alternate-name', nargs='+', help='Alternate series name(s)')
-    add_subparser.add_argument('--name-regexp', nargs='+', type=SeriesListType.regex_type,
-                               help='Manually specify regexp(s) that matches to series name')
-    add_subparser.add_argument('--ep-regexp', nargs='+', type=SeriesListType.regex_type,
-                               help='Manually specify regexp(s) that matches to episode, season numbering')
-    add_subparser.add_argument('--date-regexp', nargs='+', type=SeriesListType.regex_type, help='Date regexp')
-    add_subparser.add_argument('--sequence-regexp', nargs='+', type=SeriesListType.regex_type, help='Sequence regexp')
-    add_subparser.add_argument('--id-regexp', nargs='+', type=SeriesListType.regex_type,
-                               help='Manually specify regexp(s) that matches to series identifier (numbering)')
-    add_subparser.add_argument('--date-yearfirst', type=bool, help='Parse year first')
-    add_subparser.add_argument('--date-dayfirst', type=bool, help='Parse date first')
-    add_subparser.add_argument('--quality', type=SeriesListType.quality_req_type, help='Required quality')
-    add_subparser.add_argument('--qualities', type=SeriesListType.quality_req_type, nargs='+',
-                               help='Download all listed qualities when they become available')
-    add_subparser.add_argument('--timeframe', type=SeriesListType.interval_type,
-                               help='Wait given amount of time for specified quality to become available, '
-                                    'after that fall back to best so far')
-    add_subparser.add_argument('--upgrade', type=bool,
-                               help='Keeps getting the better qualities as they become available.')
-    add_subparser.add_argument('--target', type=SeriesListType.quality_req_type,
-                               help='The target quality that should be downloaded without waiting for `timeframe` '
-                                    'to complete')
-    add_subparser.add_argument('--specials', type=bool, help='Turn off specials support for series. On by default',
-                               default=True)
-    add_subparser.add_argument('--no-propers', dest="propers", action='store_false',
-                               help='Turn off propers for the series')
-    add_subparser.add_argument('--allow-propers', dest="propers", action='store_true',
-                               help='Turn on propers for the series')
-    add_subparser.add_argument('--propers-interval', dest="propers", type=SeriesListType.interval_type,
-                               help='Set propers interval.')
-    add_subparser.add_argument('--identified-by', choices=('ep', 'date', 'sequence', 'id', 'auto'),
-                               help='Configure how episode numbering is detected. Uses `auto` mode as default',
-                               default='auto')
-    add_subparser.add_argument('--exact', type=bool, help='Enable strict name matching')
-    add_subparser.add_argument('--begin-ep', type=SeriesListType.episode_identifier, dest="begin",
-                               help='Manually specify first episode to start series on. Should conform to '
-                                    '`SxxEyy` format')
-    add_subparser.add_argument('--begin-date', type=SeriesListType.date_identifier, dest="begin",
-                               help='Manually specify first episode to start series on. Should conform to '
-                                    '`YYYY-MM-DD` format')
-    add_subparser.add_argument('--begin-sequence', type=SeriesListType.sequence_identifier, dest="begin",
-                               help='Manually specify first episode to start series on. Should be higher an'
-                                    ' integer than 0')
-    add_subparser.add_argument('--from-group', nargs='+', help='Accept series only from given groups')
-    add_subparser.add_argument('--parse-only', type=bool,
-                               help='Series plugin will not accept or reject any entries, merely fill in all'
-                                    ' metadata fields.')
-    add_subparser.add_argument('--special-ids', nargs='+',
-                               help='Defines other IDs which will cause entries to be flagged as specials')
-    add_subparser.add_argument('--prefer-specials', type=bool,
-                               help='Flag entries matching both special and a normal ID type as specials')
-    add_subparser.add_argument('--assume-special', type=bool,
-                               help='Assume any entry with no series numbering detected is a special and treat it'
-                                    ' accordingly')
-    add_subparser.add_argument('--no-tracking', dest="tracking", action='store_false',
-                               help='Turn off tracking for the series')
-    add_subparser.add_argument('--allow-tracking', dest="tracking", action='store_true',
-                               help='Turn on tracking for the series')
-    add_subparser.add_argument('--tracking', choices=('backfill',), help='Put into backfill mode')
-    add_subparser.add_argument('-i', '--identifiers', metavar='<identifiers>', nargs='+',
-                               type=SeriesListType.series_list_keyword_type,
-                               help='Can be a string or a list of string with the format tvdb_id=XXX,'
-                                    ' trakt_show_id=XXX, etc')
+    subparsers.add_parser('add', parents=[list_name_parser, series_parser, series_attributes_parser],
+                          help='Add a series to a list')
