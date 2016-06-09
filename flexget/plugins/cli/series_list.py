@@ -29,6 +29,7 @@ def supported_ids():
 class SeriesListType(object):
     """ Container class that hold several custom argparse types"""
 
+    @staticmethod
     def regex_type(value):
         """ Custom argparse type that validates regex"""
         try:
@@ -37,6 +38,7 @@ class SeriesListType(object):
             raise ArgumentTypeError('value {} is not a valid regexp'.format(value))
         return value
 
+    @staticmethod
     def quality_req_type(value):
         """ Custom argparse type that validates Quality"""
         try:
@@ -45,6 +47,7 @@ class SeriesListType(object):
             raise ArgumentTypeError(e)
         return value
 
+    @staticmethod
     def interval_type(value):
         """ Custom argparse type that validates Interval"""
         try:
@@ -53,18 +56,21 @@ class SeriesListType(object):
             raise ArgumentTypeError(e)
         return value
 
+    @staticmethod
     def episode_identifier(value):
         result = re.match(r'(?i)^S\d{2,4}E\d{2,3}$', value)
         if not result:
             raise ArgumentTypeError('Value {} does not match identifier format of `SxxEyy`'.format(value))
         return value
 
+    @staticmethod
     def date_identifier(value):
         result = re.match(r'^\d{4}-\d{2}-\d{2}$', value)
         if not result:
             raise ArgumentTypeError('Value {} does not match identifier format of `YYYY-MM-DD`'.format(value))
         return value
 
+    @staticmethod
     def sequence_identifier(value):
         try:
             if int(value) < 0:
@@ -73,6 +79,7 @@ class SeriesListType(object):
             raise ArgumentTypeError('Value {} must be an integer higher than 0'.format(value))
         return value
 
+    @staticmethod
     def series_list_keyword_type(identifier):
         if identifier.count('=') != 1:
             raise ArgumentTypeError('Received identifier in wrong format: %s, '
@@ -86,7 +93,7 @@ class SeriesListType(object):
 
 def build_data_dict(options):
     """ Converts options to a recognizable data type for series adding/matching"""
-    data = {'title': options.series_title}
+    data = {'series_name': options.series_title}
     for attribute in SERIES_ATTRIBUTES:
         if attribute == 'set':
             continue
@@ -152,10 +159,11 @@ def series_list_add(options):
         data = build_data_dict(options)
         series = SeriesList(options.list_name, session=session).find_entry(data, session=session)
         if series:
-            console('Series with title {} already exist, creating'.format(options.series_title))
+            console('Series with title {} already exist'.format(options.series_title))
             return
         series = get_db_series(data)
-        series_list.series.append(series)
+        series.list_id = series_list.id
+        session.add(series)
         console('Successfully added series {} to list {}'.format(series.title, series_list.name))
 
 

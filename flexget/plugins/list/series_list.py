@@ -40,7 +40,7 @@ class SeriesListList(Base):
     series = relationship('SeriesListSeries', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
 
     def __repr__(self):
-        return '<SeriesListList name=%d>' % self.id
+        return '<SeriesListList id=%d,name=%s>' % (self.id, self.name)
 
     def to_dict(self):
         return {
@@ -330,6 +330,7 @@ class SeriesList(MutableSet):
         self.list_name = config.get('list_name')
         db_list = self._db_list(session)
         if not db_list:
+            log.debug('series list with name %s not found, adding', self.list_name)
             session.add(SeriesListList(name=self.list_name))
 
     @with_session
