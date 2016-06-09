@@ -137,7 +137,7 @@ def series_list_add(options):
 @event('options.register')
 def register_parser_arguments():
     series_parser = ArgumentParser(add_help=False)
-    series_parser.add_argument('series_title', help="Title of the series. Should include country code if relevant")
+    series_parser.add_argument('series-title', help="Title of the series. Should include country code if relevant")
 
     list_name_parser = ArgumentParser(add_help=False)
     list_name_parser.add_argument('list_name', nargs='?', default='series',
