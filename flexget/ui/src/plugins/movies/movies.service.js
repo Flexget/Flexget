@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('flexget.services')
+    angular.module('plugins.movies')
         .factory('moviesService', moviesService);
 
     function moviesService($http, CacheFactory, exception) {
@@ -17,7 +17,8 @@
             deleteList: deleteList,
             getListMovies: getListMovies,
             deleteMovie: deleteMovie,
-            createList: createList
+            createList: createList,
+			getMovieMetadata: getMovieMetadata
         }
 
         function getLists() {
@@ -71,6 +72,19 @@
                 return response.data;
             };
         };
+
+		function getMovieMetadata(title, params) {
+			return $http.get('/api/trakt/movies/' + title + '/', {
+				params: params,
+				cache: true
+			})
+				.then(getMovieMetadataComplete)
+				.catch(callFailed);
+
+			function getMovieMetadataComplete(response) {
+                return response.data;
+            };
+		};
 
         function callFailed(error) {
 			return exception.catcher(error);
