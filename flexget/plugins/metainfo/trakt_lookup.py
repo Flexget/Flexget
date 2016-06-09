@@ -284,10 +284,10 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         if style == 'show' or style == 'episode':
             lookup = lookup_series
-            trakt_id = entry.get('trakt_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_show_id', eval_lazy=True)
         else:
             lookup = lookup_movie
-            trakt_id = entry.get('trakt_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_movie_id', eval_lazy=True)
         with Session() as session:
             lookupargs = {'trakt_id': trakt_id,
                           'session': session}
@@ -307,10 +307,10 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         if style == 'show' or style == 'episode':
             lookup = lookup_series
-            trakt_id = entry.get('trakt_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_show_id', eval_lazy=True)
         else:
             lookup = lookup_movie
-            trakt_id = entry.get('trakt_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_movie_id', eval_lazy=True)
         with Session() as session:
             lookupargs = {'trakt_id': trakt_id,
                           'session': session}
