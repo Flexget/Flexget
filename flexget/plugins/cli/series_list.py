@@ -83,12 +83,19 @@ class SeriesListType(object):
     def series_list_keyword_type(identifier):
         if identifier.count('=') != 1:
             raise ArgumentTypeError('Received identifier in wrong format: %s, '
-                                    ' should be in keyword format like `tvdb_id=1234567`' % identifier)
+                                    ' should be in keyword format like `tvdb_id=1234567`'.format(identifier))
         name, value = identifier.split('=', 2)
         if name not in supported_ids():
             raise ArgumentTypeError(
-                'Received unsupported identifier ID %s. Should be one of %s' % (identifier, ' ,'.join(supported_ids())))
+                'Received unsupported identifier ID %s. Should be one of %s'.format(identifier,
+                                                                                    ' ,'.join(supported_ids())))
         return {name: value}
+
+    @staticmethod
+    def exiting_attribute(value):
+        if value not in SERIES_ATTRIBUTES:
+            raise ArgumentTypeError('Value {} is not a valid series attribute'.format(value))
+        return value
 
 
 def build_data_dict(options):
@@ -122,6 +129,10 @@ def do_cli(manager, options):
 
     if options.list_action == 'show':
         series_list_show(options)
+        return
+
+    if options.list_action == 'update':
+        series_list_update(options)
         return
 
 
@@ -201,6 +212,39 @@ def series_list_show(options):
             console('{}: {}'.format(attribute.capitalize(), series.format_converter(attribute)))
 
 
+def series_list_update(options):
+    with Session() as session:
+        try:
+            series_list = slDb.get_list_by_exact_name(options.list_name)
+        except NoResultFound:
+            console('Could not find series list with name {}'.format(options.list_name))
+            return
+
+        try:
+            series = slDb.get_series_by_id(series_list.id, int(options.series), session=session)
+        except NoResultFound:
+            console(
+                'Could not find matching series with ID {} in list `{}`'.format(int(options.series), options.list_name))
+            return
+        except ValueError:
+            series = slDb.get_series_by_title(series_list.id, options.series, session=session)
+            if not series:
+                console(
+                    'Could not find matching series with title `{}` in list `{}`'.format(options.series,
+                                                                                         options.list_name))
+
+        console('Updating series #{}: {}'.format(series.id, series.title))
+        if options.clear:
+            for attribute in options.clear:
+                console('Resetting attribute {}'.format(attribute))
+                setattr(series, attribute, None)
+            return
+        data = build_data_dict(options)
+        series = get_db_series(data, series)
+        session.commit()
+        console('Successfully updated series  #{}: {}'.format(series.id, series.title))
+
+
 @event('options.register')
 def register_parser_arguments():
     series_parser = ArgumentParser(add_help=False)
@@ -210,6 +254,9 @@ def register_parser_arguments():
     list_name_parser = ArgumentParser(add_help=False)
     list_name_parser.add_argument('list_name', nargs='?', default='series',
                                   help='Name of series list to operate on. Default is `series`')
+
+    series_id_parser = ArgumentParser(add_help=False)
+    series_id_parser.add_argument('series', help="Series title or ID")
 
     series_attributes_parser = ArgumentParser(add_help=False)
     series_attributes_parser.add_argument('--path', help='Set path field for this series')
@@ -289,5 +336,9 @@ def register_parser_arguments():
     subparsers.add_parser('list', parents=[list_name_parser], help='List movies from a list')
     subparsers.add_parser('add', parents=[list_name_parser, series_parser, series_attributes_parser],
                           help='Add a series to a list')
-    show_parser = subparsers.add_parser('show', parents=[list_name_parser], help='Display series attributes')
-    show_parser.add_argument('series', help="Series title or ID")
+    subparsers.add_parser('show', parents=[list_name_parser, series_id_parser], help='Display series attributes')
+    update_parser = subparsers.add_parser('update',
+                                          parents=[list_name_parser, series_id_parser, series_attributes_parser],
+                                          help='Update series attributes')
+    update_parser.add_argument('--clear', nargs='+', type=SeriesListType.exiting_attribute,
+                               help="Clears a series attribute")
