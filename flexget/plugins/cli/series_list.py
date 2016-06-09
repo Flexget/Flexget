@@ -141,6 +141,7 @@ def series_list_list(options):
 
 
 def series_list_add(options):
+    """ Add series to the series list """
     with Session() as session:
         try:
             series_list = slDb.get_list_by_exact_name(options.list_name)
@@ -210,13 +211,13 @@ def register_parser_arguments():
                                help='Configure how episode numbering is detected. Uses `auto` mode as default',
                                default='auto')
     add_subparser.add_argument('--exact', type=bool, help='Enable strict name matching')
-    add_subparser.add_argument('--begin-ep-identifier', type=SeriesListType.episode_identifier, dest="begin",
+    add_subparser.add_argument('--begin-ep', type=SeriesListType.episode_identifier, dest="begin",
                                help='Manually specify first episode to start series on. Should conform to '
                                     '`SxxEyy` format')
-    add_subparser.add_argument('--begin-date-identifier', type=SeriesListType.date_identifier, dest="begin",
+    add_subparser.add_argument('--begin-date', type=SeriesListType.date_identifier, dest="begin",
                                help='Manually specify first episode to start series on. Should conform to '
                                     '`YYYY-MM-DD` format')
-    add_subparser.add_argument('--begin-sequence-identifier', type=SeriesListType.sequence_identifier, dest="begin",
+    add_subparser.add_argument('--begin-sequence', type=SeriesListType.sequence_identifier, dest="begin",
                                help='Manually specify first episode to start series on. Should be higher an'
                                     ' integer than 0')
     add_subparser.add_argument('--from-group', nargs='+', help='Accept series only from given groups')
