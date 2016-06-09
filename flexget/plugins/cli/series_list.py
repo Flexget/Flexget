@@ -120,6 +120,10 @@ def do_cli(manager, options):
         series_list_add(options)
         return
 
+    if options.list_action == 'show':
+        series_list_show(options)
+        return
+
 
 def series_list_lists(options):
     """ Show all series lists """
@@ -141,7 +145,7 @@ def series_list_list(options):
         console('Series for list {}:'.format(options.list_name))
         console('-' * 79)
         for series in slDb.get_series_by_list_id(series_list.id, descending=True, session=session):
-            title_string = '{} '.format(series.title)
+            title_string = '{:2d}: {} '.format(series.id, series.title)
             identifiers = '[' + ', '.join(
                 '{}={}'.format(identifier.id_name, identifier.id_value) for identifier in series.ids) + ']'
             console(title_string + identifiers)
@@ -167,6 +171,36 @@ def series_list_add(options):
         console('Successfully added series {} to list {}'.format(series.title, series_list.name))
 
 
+def series_list_show(options):
+    """ Shows a series in list with detail """
+    with Session() as session:
+        try:
+            series_list = slDb.get_list_by_exact_name(options.list_name)
+        except NoResultFound:
+            console('Could not find series list with name {}'.format(options.list_name))
+            return
+
+        try:
+            series = slDb.get_series_by_id(series_list.id, int(options.series), session=session)
+        except NoResultFound:
+            console(
+                'Could not find matching series with ID {} in list `{}`'.format(int(options.series), options.list_name))
+            return
+        except ValueError:
+            series = slDb.get_series_by_title(series_list.id, options.series, session=session)
+            if not series:
+                console(
+                    'Could not find matching series with title `{}` in list `{}`'.format(options.series,
+                                                                                         options.list_name))
+                return
+        console('Showing fields for series #{}: {}'.format(series.id, series.title))
+        console('-' * 79)
+        for attribute in SERIES_ATTRIBUTES:
+            if attribute == 'set':
+                continue
+            console('{}: {}'.format(attribute.capitalize(), series.format_converter(attribute)))
+
+
 @event('options.register')
 def register_parser_arguments():
     series_parser = ArgumentParser(add_help=False)
@@ -179,7 +213,7 @@ def register_parser_arguments():
 
     series_attributes_parser = ArgumentParser(add_help=False)
     series_attributes_parser.add_argument('--path', help='Set path field for this series')
-    series_attributes_parser.add_argument('--alternate-name', nargs='+', help='Alternate series name(s)')
+    series_attributes_parser.add_argument('-a', '--alternate-name', nargs='+', help='Alternate series name(s)')
     series_attributes_parser.add_argument('--name-regexp', nargs='+', type=SeriesListType.regex_type,
                                           help='Manually specify regexp(s) that matches to series name')
     series_attributes_parser.add_argument('--ep-regexp', nargs='+', type=SeriesListType.regex_type,
@@ -193,7 +227,8 @@ def register_parser_arguments():
                                                '(numbering)')
     series_attributes_parser.add_argument('--date-yearfirst', type=bool, help='Parse year first')
     series_attributes_parser.add_argument('--date-dayfirst', type=bool, help='Parse date first')
-    series_attributes_parser.add_argument('--quality', type=SeriesListType.quality_req_type, help='Required quality')
+    series_attributes_parser.add_argument('-q', '--quality', type=SeriesListType.quality_req_type,
+                                          help='Required quality')
     series_attributes_parser.add_argument('--qualities', type=SeriesListType.quality_req_type, nargs='+',
                                           help='Download all listed qualities when they become available')
     series_attributes_parser.add_argument('--timeframe', type=SeriesListType.interval_type,
@@ -254,3 +289,5 @@ def register_parser_arguments():
     subparsers.add_parser('list', parents=[list_name_parser], help='List movies from a list')
     subparsers.add_parser('add', parents=[list_name_parser, series_parser, series_attributes_parser],
                           help='Add a series to a list')
+    show_parser = subparsers.add_parser('show', parents=[list_name_parser], help='Display series attributes')
+    show_parser.add_argument('series', help="Series title or ID")
