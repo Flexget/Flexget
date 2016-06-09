@@ -485,33 +485,9 @@ def plugin_schemas(**kwargs):
 config_schema.register_schema('/schema/plugins', plugin_schemas)
 
 
-def get_plugins_by_phase(phase):
-    """
-    .. deprecated:: 1.0.3328
-       Use :func:`get_plugins` instead
-
-    Return an iterator over all plugins that hook :phase:
-    """
-    warnings.warn('Deprecated API', DeprecationWarning, stacklevel=2)
-    if phase not in phase_methods:
-        raise Exception('Unknown phase %s' % phase)
-    return get_plugins(phase=phase)
-
-
 def get_phases_by_plugin(name):
     """Return all phases plugin :name: hooks"""
     return list(get_plugin_by_name(name).phase_handlers)
-
-
-def get_plugins_by_group(group):
-    """
-    .. deprecated:: 1.0.3328
-       Use :func:`get_plugins` instead
-
-    Return an iterator over all plugins with in specified group.
-    """
-    warnings.warn('Deprecated API', DeprecationWarning, stacklevel=2)
-    return get_plugins(group=group)
 
 
 def get_plugin_keywords():
