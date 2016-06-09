@@ -11,7 +11,11 @@ from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.config_schema import parse_interval
-from flexget.plugins.list.series_list import SeriesListList, SeriesListDBContainer as slDb
+from flexget.plugins.list.series_list import SeriesListList, SeriesListDBContainer as slDb, SeriesList, get_db_series
+from flexget.plugins.filter.series import FilterSeriesBase
+
+SETTINGS_SCHEMA = FilterSeriesBase().settings_schema
+SERIES_ATTRIBUTES = SETTINGS_SCHEMA['properties']
 
 
 def supported_ids():
@@ -22,65 +26,77 @@ def supported_ids():
     return ids
 
 
-def regex_type(value):
-    """ Custom argparse type that validates regex"""
-    try:
-        re.compile(value)
-    except re.error:
-        raise ArgumentTypeError('value {} is not a valid regexp'.format(value))
-    return value
+class SeriesListType(object):
+    """ Container class that hold several custom argparse types"""
+
+    def regex_type(value):
+        """ Custom argparse type that validates regex"""
+        try:
+            re.compile(value)
+        except re.error:
+            raise ArgumentTypeError('value {} is not a valid regexp'.format(value))
+        return value
+
+    def quality_req_type(value):
+        """ Custom argparse type that validates Quality"""
+        try:
+            qualities.Requirements(value)
+        except ValueError as e:
+            raise ArgumentTypeError(e)
+        return value
+
+    def interval_type(value):
+        """ Custom argparse type that validates Interval"""
+        try:
+            parse_interval(value)
+        except (ValueError, TypeError) as e:
+            raise ArgumentTypeError(e)
+        return value
+
+    def episode_identifier(value):
+        result = re.match(r'(?i)^S\d{2,4}E\d{2,3}$', value)
+        if not result:
+            raise ArgumentTypeError('Value {} does not match identifier format of `SxxEyy`'.format(value))
+        return value
+
+    def date_identifier(value):
+        result = re.match(r'^\d{4}-\d{2}-\d{2}$', value)
+        if not result:
+            raise ArgumentTypeError('Value {} does not match identifier format of `YYYY-MM-DD`'.format(value))
+        return value
+
+    def sequence_identifier(value):
+        try:
+            if int(value) < 0:
+                ArgumentTypeError('Value {} must be an integer higher than 0'.format(value))
+        except ValueError:
+            raise ArgumentTypeError('Value {} must be an integer higher than 0'.format(value))
+        return value
+
+    def series_list_keyword_type(identifier):
+        if identifier.count('=') != 1:
+            raise ArgumentTypeError('Received identifier in wrong format: %s, '
+                                    ' should be in keyword format like `tvdb_id=1234567`' % identifier)
+        name, value = identifier.split('=', 2)
+        if name not in supported_ids():
+            raise ArgumentTypeError(
+                'Received unsupported identifier ID %s. Should be one of %s' % (identifier, ' ,'.join(supported_ids())))
+        return {name: value}
 
 
-def quality_req_type(value):
-    """ Custom argparse type that validates Quality"""
-    try:
-        qualities.Requirements(value)
-    except ValueError as e:
-        raise ArgumentTypeError(e)
-    return value
-
-
-def interval_type(value):
-    """ Custom argparse type that validates Interval"""
-    try:
-        parse_interval(value)
-    except (ValueError, TypeError) as e:
-        raise ArgumentTypeError(e)
-    return value
-
-
-def episode_identifier(value):
-    result = re.match(r'(?i)^S\d{2,4}E\d{2,3}$', value)
-    if not result:
-        raise ArgumentTypeError('Value {} does not match identifier format of `SxxEyy`'.format(value))
-    return value
-
-
-def date_identifier(value):
-    result = re.match(r'^\d{4}-\d{2}-\d{2}$', value)
-    if not result:
-        raise ArgumentTypeError('Value {} does not match identifier format of `YYYY-MM-DD`'.format(value))
-    return value
-
-
-def sequence_identifier(value):
-    try:
-        if int(value) < 0:
-            ArgumentTypeError('Value {} must be an integer higher than 0'.format(value))
-    except ValueError:
-        raise ArgumentTypeError('Value {} must be an integer higher than 0'.format(value))
-    return value
-
-
-def series_list_keyword_type(identifier):
-    if identifier.count('=') != 1:
-        raise ArgumentTypeError('Received identifier in wrong format: %s, '
-                                ' should be in keyword format like `tvdb_id=1234567`' % identifier)
-    name, value = identifier.split('=', 2)
-    if name not in supported_ids():
-        raise ArgumentTypeError(
-            'Received unsupported identifier ID %s. Should be one of %s' % (identifier, ' ,'.join(supported_ids())))
-    return {name: value}
+def build_data_dict(options):
+    """ Converts options to a recognizable data type for series adding/matching"""
+    data = {'title': options.series_title}
+    for attribute in SERIES_ATTRIBUTES:
+        if attribute == 'set':
+            continue
+        data[attribute] = getattr(options, attribute)
+    if options.identifiers:
+        for identifier in options.identifiers:
+            if identifier in supported_ids():
+                for k, v in identifier.items():
+                    data[k] = v
+    return data
 
 
 def do_cli(manager, options):
@@ -132,12 +148,21 @@ def series_list_add(options):
             console('Could not find series list with name {}, creating'.format(options.list_name))
             series_list = SeriesListList(name=options.list_name)
         session.merge(series_list)
+        data = build_data_dict(options)
+        series = SeriesList(options.list_name, session=session).find_entry(data, session=session)
+        if series:
+            console('Series with title {} already exist, creating'.format(options.series_title))
+            return
+        series = get_db_series(data)
+        series_list.series.append(series)
+        console('Successfully added series {} to list {}'.format(series.title, series_list.name))
 
 
 @event('options.register')
 def register_parser_arguments():
     series_parser = ArgumentParser(add_help=False)
-    series_parser.add_argument('series-title', help="Title of the series. Should include country code if relevant")
+    series_parser.add_argument('series_title', metavar='series-title',
+                               help="Title of the series. Should include country code if relevant")
 
     list_name_parser = ArgumentParser(add_help=False)
     list_name_parser.add_argument('list_name', nargs='?', default='series',
@@ -150,50 +175,55 @@ def register_parser_arguments():
     subparsers.add_parser('list', parents=[list_name_parser], help='List movies from a list')
     add_subparser = subparsers.add_parser('add', parents=[list_name_parser, series_parser],
                                           help='Add a series to a list')
+    add_subparser.add_argument('--path', help='Set path field for this series')
     add_subparser.add_argument('--alternate-name', nargs='+', help='Alternate series name(s)')
-    add_subparser.add_argument('--name-regexp', nargs='+', type=regex_type,
-                               help='Manually specify regexp(s) that matches to series name.')
-    add_subparser.add_argument('--ep-regexp', nargs='+', type=regex_type,
-                               help='Manually specify regexp(s) that matches to episode, season numbering.')
-    add_subparser.add_argument('--date-regexp', nargs='+', type=regex_type, help='Date regexp')
-    add_subparser.add_argument('--sequence-regexp', nargs='+', type=regex_type, help='Sequence regexp')
-    add_subparser.add_argument('--id-regexp', nargs='+', type=regex_type,
-                               help='Manually specify regexp(s) that matches to series identifier (numbering).')
+    add_subparser.add_argument('--name-regexp', nargs='+', type=SeriesListType.regex_type,
+                               help='Manually specify regexp(s) that matches to series name')
+    add_subparser.add_argument('--ep-regexp', nargs='+', type=SeriesListType.regex_type,
+                               help='Manually specify regexp(s) that matches to episode, season numbering')
+    add_subparser.add_argument('--date-regexp', nargs='+', type=SeriesListType.regex_type, help='Date regexp')
+    add_subparser.add_argument('--sequence-regexp', nargs='+', type=SeriesListType.regex_type, help='Sequence regexp')
+    add_subparser.add_argument('--id-regexp', nargs='+', type=SeriesListType.regex_type,
+                               help='Manually specify regexp(s) that matches to series identifier (numbering)')
     add_subparser.add_argument('--date-yearfirst', type=bool, help='Parse year first')
     add_subparser.add_argument('--date-dayfirst', type=bool, help='Parse date first')
-    add_subparser.add_argument('--quality', type=quality_req_type, help='Required quality')
-    add_subparser.add_argument('--qualities', type=quality_req_type, nargs='+',
-                               help='Download all listed qualities when they become available.')
+    add_subparser.add_argument('--quality', type=SeriesListType.quality_req_type, help='Required quality')
+    add_subparser.add_argument('--qualities', type=SeriesListType.quality_req_type, nargs='+',
+                               help='Download all listed qualities when they become available')
+    add_subparser.add_argument('--timeframe', type=SeriesListType.interval_type,
+                               help='Wait given amount of time for specified quality to become available, '
+                                    'after that fall back to best so far')
     add_subparser.add_argument('--upgrade', type=bool,
                                help='Keeps getting the better qualities as they become available.')
-    add_subparser.add_argument('--target', type=quality_req_type,
+    add_subparser.add_argument('--target', type=SeriesListType.quality_req_type,
                                help='The target quality that should be downloaded without waiting for `timeframe` '
-                                    'to complete.')
+                                    'to complete')
     add_subparser.add_argument('--specials', type=bool, help='Turn off specials support for series. On by default',
                                default=True)
     add_subparser.add_argument('--no-propers', dest="propers", action='store_false',
-                               help='Turn off propers for the series.')
+                               help='Turn off propers for the series')
     add_subparser.add_argument('--allow-propers', dest="propers", action='store_true',
-                               help='Turn on propers for the series.')
-    add_subparser.add_argument('--propers-interval', dest="propers", type=interval_type, help='Set propers interval.')
+                               help='Turn on propers for the series')
+    add_subparser.add_argument('--propers-interval', dest="propers", type=SeriesListType.interval_type,
+                               help='Set propers interval.')
     add_subparser.add_argument('--identified-by', choices=('ep', 'date', 'sequence', 'id', 'auto'),
                                help='Configure how episode numbering is detected. Uses `auto` mode as default',
                                default='auto')
     add_subparser.add_argument('--exact', type=bool, help='Enable strict name matching')
-    add_subparser.add_argument('--begin-ep-identifier', type=episode_identifier, dest="begin",
+    add_subparser.add_argument('--begin-ep-identifier', type=SeriesListType.episode_identifier, dest="begin",
                                help='Manually specify first episode to start series on. Should conform to '
                                     '`SxxEyy` format')
-    add_subparser.add_argument('--begin-date-identifier', type=date_identifier, dest="begin",
+    add_subparser.add_argument('--begin-date-identifier', type=SeriesListType.date_identifier, dest="begin",
                                help='Manually specify first episode to start series on. Should conform to '
                                     '`YYYY-MM-DD` format')
-    add_subparser.add_argument('--begin-sequence-identifier', type=sequence_identifier, dest="begin",
+    add_subparser.add_argument('--begin-sequence-identifier', type=SeriesListType.sequence_identifier, dest="begin",
                                help='Manually specify first episode to start series on. Should be higher an'
                                     ' integer than 0')
     add_subparser.add_argument('--from-group', nargs='+', help='Accept series only from given groups')
     add_subparser.add_argument('--parse-only', type=bool,
                                help='Series plugin will not accept or reject any entries, merely fill in all'
                                     ' metadata fields.')
-    add_subparser.add_argument('--specials-ids', nargs='+',
+    add_subparser.add_argument('--special-ids', nargs='+',
                                help='Defines other IDs which will cause entries to be flagged as specials')
     add_subparser.add_argument('--prefer-specials', type=bool,
                                help='Flag entries matching both special and a normal ID type as specials')
@@ -201,11 +231,11 @@ def register_parser_arguments():
                                help='Assume any entry with no series numbering detected is a special and treat it'
                                     ' accordingly')
     add_subparser.add_argument('--no-tracking', dest="tracking", action='store_false',
-                               help='Turn off tracking for the series.')
+                               help='Turn off tracking for the series')
     add_subparser.add_argument('--allow-tracking', dest="tracking", action='store_true',
-                               help='Turn on tracking for the series.')
+                               help='Turn on tracking for the series')
     add_subparser.add_argument('--tracking', choices=('backfill',), help='Put into backfill mode')
     add_subparser.add_argument('-i', '--identifiers', metavar='<identifiers>', nargs='+',
-                               type=series_list_keyword_type,
+                               type=SeriesListType.series_list_keyword_type,
                                help='Can be a string or a list of string with the format tvdb_id=XXX,'
                                     ' trakt_show_id=XXX, etc')

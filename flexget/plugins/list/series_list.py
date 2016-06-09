@@ -344,7 +344,7 @@ class SeriesList(MutableSet):
     def add(self, entry, session=None):
         # Check if this is already in the list, refresh info if so
         db_list = self._db_list(session=session)
-        db_series = self._find_entry(entry, session=session)
+        db_series = self.find_entry(entry, session=session)
         # Just delete and re-create to refresh
         if db_series:
             session.delete(db_series)
@@ -355,16 +355,16 @@ class SeriesList(MutableSet):
 
     @with_session
     def discard(self, entry, session=None):
-        db_series = self._find_entry(entry, session=session)
+        db_series = self.find_entry(entry, session=session)
         if db_series:
             log.debug('deleting series %s', db_series)
             session.delete(db_series)
 
     def __contains__(self, entry):
-        return self._find_entry(entry) is not None
+        return self.find_entry(entry) is not None
 
     @with_session
-    def _find_entry(self, entry, session=None):
+    def find_entry(self, entry, session=None):
         """Finds `SeriesListSeries` corresponding to this entry, if it exists."""
         for id_name in supported_ids():
             if entry.get(id_name):
@@ -400,7 +400,7 @@ class SeriesList(MutableSet):
 
     @with_session
     def get(self, entry, session):
-        match = self._find_entry(entry=entry, session=session)
+        match = self.find_entry(entry=entry, session=session)
         return match.to_entry() if match else None
 
 
