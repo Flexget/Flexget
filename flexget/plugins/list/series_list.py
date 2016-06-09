@@ -115,8 +115,7 @@ class SeriesListSeries(Base):
                 return [special_id.id_name for special_id in value]
         if attribute in ['propers', 'tracking']:
             # Value can be either bool or unicode
-            if value in ['0', '1']:
-                return bool(int(value))
+            return bool(int(value)) if value in ['0', '1'] else value
         if attribute == 'quality':
             return value.quality
         return value
