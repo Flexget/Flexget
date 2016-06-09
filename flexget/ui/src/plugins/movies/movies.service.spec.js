@@ -1,6 +1,6 @@
 describe("Service: Movies", function () {
 	beforeEach(function () {
-		bard.appModule('flexget.services');
+		bard.appModule('plugins.movies');
 
 		bard.inject('$httpBackend', 'moviesService', 'exception');
 
