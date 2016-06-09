@@ -1,9 +1,10 @@
 <div layout="column" flex>
 <md-content flex layout-margin ng-if="vm.lists">
-    <md-tabs md-dynamic-height md-border-bottom md-selected="vm.selectedList" class="movie-tabs">
+    <md-tabs md-dynamic-height md-border-bottom class="movie-tabs">
 		<movie-list ng-repeat="list in vm.lists" 
 			list="::list" 
-			delete-movie-list="vm.deleteMovieList(list)">
+			delete-movie-list="vm.deleteMovieList(list)"
+			tab-index="$index">
 		</movie-list>
         <md-tab class="test">
 			<md-tab-label layout-fill>

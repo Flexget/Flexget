@@ -24,8 +24,8 @@ describe("Blocks: Error", function () {
 		beforeEach(function () {
 			controller = $componentController('errorDialog', null,
 				{
-				error: mockError	
-			});
+					error: mockError
+				});
 		});
 
 		it("should exist", function () {

@@ -4,7 +4,9 @@
     angular
 		.module("plugins.movies", [
 			'blocks.router',
+			'blocks.exception',
 			'ngMaterial',
-			'ngSanitize'
+			'ngSanitize',
+			'angular-cache'
 		]);
 })();
