@@ -9,7 +9,8 @@
 			controllerAs: 'vm',
 			bindings: {
 				list: '<',
-				deleteMovieList: '&'
+				deleteMovieList: '&',
+				tabIndex: '<'
 			},
 		});
 
@@ -17,6 +18,7 @@
 	function movieListController(moviesService, $mdDialog) {
 		var vm = this;
 
+		vm.$onInit = activate;
 		vm.loadMovies = loadMovies;
 		vm.deleteList = deleteList;
 		vm.deleteMovie = deleteMovie;
@@ -26,6 +28,13 @@
 			page_size: 10
 		}
 		
+		function activate() {
+			//Hack to make the movies from the first tab load (md-on-select not firing for initial tab)
+			if (vm.tabIndex == 0) {
+				loadMovies();
+			}
+		}
+
 		function deleteList($event) {
 			$event.preventDefault();
 			$event.stopPropagation();
