@@ -331,6 +331,6 @@ class SeriesListSeriesAPI(APIResource):
         title = series.title
         data = request.json
         data.update({'title': title})
-        series = sl.get_db_series(data)
+        series = sl.get_db_series(data, series)
         session.commit()
         return jsonify(series.to_dict())

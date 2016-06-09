@@ -192,11 +192,11 @@ class TestSeriesListAPI(object):
         rsp = api_client.json_put('/series_list/1/series/1/', data=json.dumps(new_data))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         response1 = json.loads(rsp.get_data(as_text=True))
-        assert response1.get('title') == 'title'
+        assert response1.get('title') == 'test_series'
         for attribute in new_data:
             assert new_data[attribute] == response1[attribute]
 
-            # rsp = api_client.get('/series_list/1/series/1/')
-            # assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-            # response2 = json.loads(rsp.get_data(as_text=True))
-            # assert response1 == response2
+        rsp = api_client.get('/series_list/1/series/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        response2 = json.loads(rsp.get_data(as_text=True))
+        assert response1 == response2
