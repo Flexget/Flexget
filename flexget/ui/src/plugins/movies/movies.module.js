@@ -3,6 +3,8 @@
 
     angular
 		.module("plugins.movies", [
-			'blocks.router'
+			'blocks.router',
+			'ngMaterial',
+			'ngSanitize'
 		]);
 })();

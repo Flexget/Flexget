@@ -2,7 +2,7 @@
 	'use strict';
 
 	angular
-		.module('flexget.plugins.movies')
+		.module('plugins.movies')
 		.component('movieEntry', {
 			templateUrl: 'plugins/movies/components/movie-entry/movie-entry.tmpl.html',
 			controller: movieEntryController,
@@ -13,16 +13,16 @@
 			},
 		});
 
-
-	function movieEntryController($http) {
-
+	function movieEntryController(moviesService) {
 		var vm = this;
 
-		getMetadata();
-
+		vm.$onInit = activate;
+		
+		function activate() {
+			getMetadata();
+		}
 
 		function getMetadata() {
-
 			var params = {
 				year: vm.movie.year
 			}
@@ -33,22 +33,9 @@
 				params = $.extend(params, newid);
 			})
 
-
-			$http.get('/api/trakt/movies/' + vm.movie.title + '/', {
-				params: params,
-				cache: true
-			})
-				.success(function (data) {
-
-					vm.metadata = data;
-
-
-				}).error(function (err) {
-					console.error(err);
-				})
+			moviesService.getMovieMetadata(vm.movie.title, params).then(function (data) {
+				vm.metadata = data;
+			});
 		}
 	}
-
-
-
-});
+})();

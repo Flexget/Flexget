@@ -3,94 +3,30 @@
 	angular
 		.module("plugins.movies")
 		.component('moviesView', {
-			//	templateUrl: 'plugins/movies/movies.tmpl.html',
-			//	controllerAs: 'vm',
-			//	controller: moviesController,
+			templateUrl: 'plugins/movies/movies.tmpl.html',
+			controllerAs: 'vm',
+			controller: moviesController,
 		});
 
 	function moviesController($http, $mdDialog, $scope, moviesService) {
 		var vm = this;
 
-		var options = {
-			page: 1,
-			page_size: 10
+		vm.lists = [];
+		vm.$onInit = activate;
+		vm.deleteMovieList = deleteMovieList;
+		vm.newList = newList;
+		
+		function activate() {
+			getMovieLists();
 		}
 
-		moviesService.getLists().then(function (data) {
-			vm.lists = data.movie_lists;
-		});
-
-		//Call from the pagination to update the page to the selected page
-		vm.updateListPage = function (index) {
-			options.page = index;
-
-			loadMovies();
-		}
-
-		$scope.$watch(function () {
-			return vm.selectedList;
-		}, function (newValue, oldValue) {
-			if (newValue != oldValue) {
-				loadMovies();
-			}
-		});
-
-		function loadMovies() {
-			if (vm.selectedList == vm.lists.length) {
-				$mdDialog.show({
-					controller: 'newListController',
-					controllerAs: 'vm',
-					templateUrl: 'plugins/movies/components/new-list/new-list.tmpl.html'
-				}).then(function (newList) {
-					vm.lists.push(newList);
-					//TODO: Select newly inserted list
-				});
-			} else {
-
-				var listId = vm.lists[vm.selectedList].id;
-
-				moviesService.getListMovies(listId, options)
-					.then(function (data) {
-						vm.movies = data.movies;
-
-						vm.currentPage = data.page;
-						vm.totalMovies = data.total_number_of_movies;
-						vm.pageSize = data.number_of_movies;
-					});
-			}
-		};
-
-
-		function showDialog(params) {
-			return $mdDialog.show({
-				controller: 'seriesUpdateController',
-				controllerAs: 'vm',
-				templateUrl: 'plugins/series/components/series-update/series-update.tmpl.html',
-				locals: {
-					showId: vm.show.show_id,
-					params: params
-				}
+		function getMovieLists() {
+			moviesService.getLists().then(function (data) {
+				vm.lists = data.movie_lists;
 			});
 		}
 
-
-		vm.deleteMovie = function (list, movie) {
-			var confirm = $mdDialog.confirm()
-				.title('Confirm deleting movie from list.')
-				.htmlContent("Are you sure you want to delete the movie <b>" + movie.title + "</b> from list <b>" + list.name + "?")
-				.ok("Forget")
-				.cancel("No");
-
-			$mdDialog.show(confirm).then(function () {
-				moviesService.deleteMovie(list.id, movie.id)
-					.then(function () {
-						var index = vm.movies.indexOf(movie);
-						vm.movies.splice(index, 1);
-					});
-			});
-		}
-
-		vm.deleteList = function (list) {
+		function deleteMovieList(list) {
 			var confirm = $mdDialog.confirm()
 				.title('Confirm deleting movie list.')
 				.htmlContent("Are you sure you want to delete the movie list <b>" + list.name + "</b>?")
@@ -106,5 +42,30 @@
 					});
 			});
 		}
+
+		function newList($event) {
+			$event.preventDefault();
+			$event.stopPropagation();
+		
+			var dialog = {
+				template: '<new-list></new-list>',
+				bindToController: true,
+				controllerAs: 'vm',
+				controller: function () { }
+			};
+
+			$mdDialog.show(dialog).then(function (newList) {
+				vm.lists.push(newList);
+			});
+		}
+
+		//TODO: pagination
+				
+		//Call from the pagination to update the page to the selected page
+		/*vm.updateListPage = function (index) {
+			options.page = index;
+
+			loadMovies();
+		}*/
 	}
 })();
