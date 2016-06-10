@@ -147,7 +147,9 @@ class SearchMoreThanTV(object):
                 raise plugin.PluginError('MoreThanTV login cookie is invalid. Login page received?')
             self.errors = True
             # try again
-            self.get(url, params, username, password, force=True)
+            response = self.get(url, params, username, password, force=True)
+        
+        return response
 
     def get_login_cookie(self, username, password, force=False):
         """
