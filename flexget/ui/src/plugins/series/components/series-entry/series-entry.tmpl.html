@@ -15,7 +15,7 @@
             <span class="md-subhead second-subhead">Begin Episode: {{ (vm.show.begin_episode.episode_identifier ? vm.show.begin_episode.episode_identifier : 'No begin set')
             }}</span>
             <md-divider></md-divider>
-            <md-chips ng-model="vm.metadata.genres" readonly="true">
+            <md-chips ng-model="vm.show.metadata.genres" readonly="true">
                 <md-chip-template>
                     {{ $chip }}
                 </md-chip-template>
@@ -23,10 +23,11 @@
         </md-card-title-text>
     </md-card-title>
     <md-card-content flex layout-gt-xs="row" layout-xs="column" class="custom-card">
-        <p>{{ ::vm.metadata.overview }}</p>
+        <p>{{ ::vm.show.metadata.overview }}</p>
     </md-card-content>
-
-
+	<md-card-actions layout="row" layout-align="start center">
+		<md-button class="md-primary md-raised" ng-click="vm.showEpisodes(show)">Episodes</md-button>
+	</md-card-actions>
     <md-fab-speed-dial md-direction="left" class="md-scale more-btn">
         <md-fab-trigger>
             <md-button aria-label="More" class="md-fab md-mini">
@@ -45,6 +46,5 @@
             </md-button>
         </md-fab-actions>
     </md-fab-speed-dial>
-
-    <ng-transclude></ng-transclude>
+	<ng-transclude></ng-transclude>
 </md-card>

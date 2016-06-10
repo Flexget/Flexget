@@ -3,6 +3,9 @@
 
     angular
 		.module('plugins.series', [
-			'blocks.router'
+			'blocks.router',
+			'blocks.exception',
+			'angular-cache',
+			'ngMaterial'
 		]);
 })();
