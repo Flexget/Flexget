@@ -29,7 +29,7 @@ describe("Plugin: Series-Entry.Component", function () {
 			expect(seriesService.getShowMetadata).to.have.been.calledOnce;
 		});
 
-		it('should set the show\'s metdata', function () {
+		it('should set the show\'s metadata', function () {
 			expect(component.show.metadata).to.exist;
 			expect(component.show.metadata).not.to.be.empty;
 		});

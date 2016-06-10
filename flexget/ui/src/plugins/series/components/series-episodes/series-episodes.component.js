@@ -2,9 +2,9 @@
     'use strict';
 
     angular
-		.module('flexget.plugins.series')
+		.module('plugins.series')
 		.component('seriesEpisodesView', {
-			templateUrl: 'plugins/series/series-episodes.tmpl.html',
+			templateUrl: 'plugins/series/components/series-episodes/series-episodes.tmpl.html',
 			controllerAs: 'vm',
 			controller: episodesController,
 			bindings: {
@@ -16,6 +16,9 @@
     function episodesController($http, $mdDialog, seriesService) {
         var vm = this;
 
+		vm.$onInit = activate;
+		vm.deleteEpisode = deleteEpisode;
+		vm.resetReleases = resetReleases;
 
         var options = {
             page: 1,
@@ -26,6 +29,10 @@
 			forget: true
 		};
 
+		function activate() {
+			getEpisodesList();
+		}
+		
         //Call from the pagination directive, which triggers other episodes to load
         vm.updateListPage = function (index) {
             options.page = index;
@@ -38,26 +45,19 @@
             seriesService.getEpisodes(vm.show, options)
 				.then(function (data) {
 					//Set the episodes in the vm scope to the loaded episodes
-					vm.show.episodes = data.episodes;
+					vm.episodes = data.episodes;
 
 
 					//set vars for the pagination
 					vm.currentPage = data.page;
-					vm.show.totalEpisodes = data.total_number_of_episodes;
+					vm.totalEpisodes = data.total_number_of_episodes;
 					vm.pageSize = options.page_size;
 
-				})
-				.catch(function (error) {
-					//TODO: Error handling
-					console.log(error);
 				});
-        }
-
-        //Load initial episodes
-        getEpisodesList();
+        };
 
         //action called from the series-episode component
-        vm.deleteEpisode = function (episode) {
+        function deleteEpisode(episode) {
             var confirm = $mdDialog.confirm()
 				.title('Confirm forgetting episode.')
 				.htmlContent("Are you sure you want to forget episode <b>" + episode.episode_identifier + "</b> from show <b>" + vm.show.show_name + "</b>?<br /> This also removes all downloaded releases for this episode!")
@@ -68,22 +68,15 @@
                 seriesService.deleteEpisode(vm.show, episode, params)
 					.then(function (data) {
 						//Find the index of the episode in the data
-						var index = vm.show.episodes.indexOf(episode);
+						var index = vm.episodes.indexOf(episode);
 						//Remove the episode from the list, based on the index
-						vm.show.episodes.splice(index, 1);
-					}, function (error) {
-						var errorDialog = $mdDialog.alert()
-							.title("Something went wrong")
-							.htmlContent("Oops, something went wrong when trying to forget <b>" + episode.episode_identifier + "</b> from show " + vm.show.show_name + ":\n" + error.message)
-							.ok("Ok");
-
-						$mdDialog.show(errorDialog);
+						vm.episodes.splice(index, 1);
 					});
             });
-        }
+        };
 
         //action called from the series-episode components
-        vm.resetReleases = function (episode) {
+        function resetReleases (episode) {
             var confirm = $mdDialog.confirm()
 				.title('Confirm resetting releases.')
 				.htmlContent("Are you sure you want to reset downloaded releases for <b>" + episode.episode_identifier + "</b> from show <b>" + vm.show.show_name + "</b>?<br /> This does not remove seen entries but will clear the quality to be downloaded again.")
@@ -93,17 +86,8 @@
             $mdDialog.show(confirm).then(function () {
                 seriesService.resetReleases(vm.show, episode)
 					.then(function (data) {
-						//TODO: Handle reset releases, remove them from view if they are showm
-					}, function (error) {
-						var errorDialog = $mdDialog.alert()
-							.title("Something went wrong")
-							.htmlContent("Oops, something went wrong when trying to reset downloaded releases for <b>" + episode.episode_identifier + "</b> from show " + vm.show.show_name + ":<br />" + error.message)
-							.ok("Ok");
-
-						$mdDialog.show(errorDialog);
 					});
             });
         }
     }
-
-});
+})();

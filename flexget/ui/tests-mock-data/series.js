@@ -2,7 +2,9 @@ var mockSeriesData = (function () {
 	return {
 		getShows: getShows,
 		getShow: getShow,
-		getShowMetadata: getShowMetadata
+		getShowMetadata: getShowMetadata,
+		getEpisodes: getEpisodes,
+		getEpisode: getEpisode
 	};
 
 	function getShows() {
@@ -153,6 +155,147 @@ var mockSeriesData = (function () {
 			"status": "Continuing",
 			"tvdb_id": 281470,
 			"zap2it_id": "EP01922973"
+		}
+	};
+
+	function getEpisodes() {
+		return {
+			"episodes": [
+				{
+					"episode_first_seen": "Wed, 25 May 2016 15:29:52 GMT",
+					"episode_id": 752,
+					"episode_identified_by": "ep",
+					"episode_identifier": "S05E24",
+					"episode_number": 24,
+					"episode_number_of_releases": 9,
+					"episode_premiere_type": false,
+					"episode_season": 5,
+					"episode_series_id": 1
+				},
+				{
+					"episode_first_seen": "Wed, 25 May 2016 07:29:09 GMT",
+					"episode_id": 751,
+					"episode_identified_by": "ep",
+					"episode_identifier": "S05E23",
+					"episode_number": 23,
+					"episode_number_of_releases": 9,
+					"episode_premiere_type": false,
+					"episode_season": 5,
+					"episode_series_id": 1
+				},
+				{
+					"episode_first_seen": "Wed, 18 May 2016 05:29:16 GMT",
+					"episode_id": 746,
+					"episode_identified_by": "ep",
+					"episode_identifier": "S05E22",
+					"episode_number": 22,
+					"episode_number_of_releases": 5,
+					"episode_premiere_type": false,
+					"episode_season": 5,
+					"episode_series_id": 1
+				},
+				{
+					"episode_first_seen": "Wed, 11 May 2016 05:29:39 GMT",
+					"episode_id": 739,
+					"episode_identified_by": "ep",
+					"episode_identifier": "S05E21",
+					"episode_number": 21,
+					"episode_number_of_releases": 7,
+					"episode_premiere_type": false,
+					"episode_season": 5,
+					"episode_series_id": 1
+				},
+				{
+					"episode_first_seen": "Wed, 04 May 2016 07:29:10 GMT",
+					"episode_id": 727,
+					"episode_identified_by": "ep",
+					"episode_identifier": "S05E20",
+					"episode_number": 20,
+					"episode_number_of_releases": 6,
+					"episode_premiere_type": false,
+					"episode_season": 5,
+					"episode_series_id": 1
+				},
+				{
+					"episode_first_seen": "Wed, 27 Apr 2016 07:29:14 GMT",
+					"episode_id": 705,
+					"episode_identified_by": "ep",
+					"episode_identifier": "S05E19",
+					"episode_number": 19,
+					"episode_number_of_releases": 8,
+					"episode_premiere_type": false,
+					"episode_season": 5,
+					"episode_series_id": 1
+				},
+				{
+					"episode_first_seen": "Wed, 20 Apr 2016 07:29:14 GMT",
+					"episode_id": 689,
+					"episode_identified_by": "ep",
+					"episode_identifier": "S05E18",
+					"episode_number": 18,
+					"episode_number_of_releases": 4,
+					"episode_premiere_type": false,
+					"episode_season": 5,
+					"episode_series_id": 1
+				},
+				{
+					"episode_first_seen": "Wed, 13 Apr 2016 11:29:26 GMT",
+					"episode_id": 673,
+					"episode_identified_by": "ep",
+					"episode_identifier": "S05E17",
+					"episode_number": 17,
+					"episode_number_of_releases": 3,
+					"episode_premiere_type": false,
+					"episode_season": 5,
+					"episode_series_id": 1
+				},
+				{
+					"episode_first_seen": "Wed, 06 Apr 2016 04:51:03 GMT",
+					"episode_id": 633,
+					"episode_identified_by": "ep",
+					"episode_identifier": "S05E16",
+					"episode_number": 16,
+					"episode_number_of_releases": 6,
+					"episode_premiere_type": false,
+					"episode_season": 5,
+					"episode_series_id": 1
+				},
+				{
+					"episode_first_seen": "Fri, 01 Apr 2016 15:11:25 GMT",
+					"episode_id": 623,
+					"episode_identified_by": "ep",
+					"episode_identifier": "S05E15",
+					"episode_number": 15,
+					"episode_number_of_releases": 9,
+					"episode_premiere_type": false,
+					"episode_season": 5,
+					"episode_series_id": 1
+				}
+			],
+			"number_of_episodes": 10,
+			"page": 1,
+			"show": "Awkward.",
+			"show_id": 1,
+			"total_number_of_episodes": 18,
+			"total_number_of_pages": 2
+		}
+	}
+
+	function getEpisode() {
+		return {
+			"episode": {
+				"episode_first_seen": "Wed, 25 May 2016 15:29:52 GMT",
+				"episode_id": 752,
+				"episode_identified_by": "ep",
+				"episode_identifier": "S05E24",
+				"episode_number": 24,
+				"episode_number_of_releases": 9,
+				"episode_premiere_type": false,
+				"episode_season": 5,
+				"episode_series_id": 1
+			},
+			"show": "Awkward.",
+			"show_id": 1
 		}
 	}
 })();
