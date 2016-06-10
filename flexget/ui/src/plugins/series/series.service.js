@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('flexget.services')
+    angular.module('plugins.series')
     .factory('seriesService', seriesService);
 
     function seriesService($http, CacheFactory, exception) {
