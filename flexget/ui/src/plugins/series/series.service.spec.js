@@ -1,6 +1,6 @@
 describe("Service: Series", function () {
 	beforeEach(function () {
-		bard.appModule('flexget.services');
+		bard.appModule('plugins.series');
 
 		bard.inject('$httpBackend', 'seriesService', 'exception', 'CacheFactory', '$q');
 
