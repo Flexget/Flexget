@@ -16,6 +16,13 @@ class Duplicates(object):
       duplicates: 
         field: <field name>
         action: [accept|reject]
+
+    Reject the second+ instance of every movie:
+
+      duplicates:
+        field: imdb_id
+        action: reject
+        first: true # Allow first instance
     """
 
     schema = {
@@ -23,25 +30,47 @@ class Duplicates(object):
         'properties': {
             'field': {'type': 'string'},
             'action': {'enum': ['accept', 'reject']},
+            'first': {'type': 'boolean'},
         },
         'required': ['field', 'action'],
         'additionalProperties': False
     }
 
+    def prepare_config(self, config):
+        if config is None:
+            config = {}
+        config.setdefault('first', True)
+        return config
+
     def on_task_filter(self, task, config):
+        config = self.prepare_config(config)
         field = config['field']
         action = config['action']
-        for entry in task.entries:
-            for prospect in task.entries:
-                if entry == prospect:
-                    continue
+        entries = list(task.entries)
+        entry_len = len(entries)
+        for i in range(entry_len):
+            entry = entries[i]
+            # Ignore rejected entires
+            if entry.rejected:
+                continue
+            for j in range(i+1, entry_len):
+                prospect = entries[j]
+                # Ignore rejected entires
+                if prospect.rejected: continue
                 if entry[field] == prospect[field] and entry[field] is not None:
                     msg = 'Field {} value {} equals on {} and {}'.format(
                         field, entry[field], entry['title'], prospect['title'])
+                    # Only process first if intended
+                    if config['first']:
+                        if action == 'accept':
+                            entry.accept(msg)
+                        else:
+                            entry.reject(msg)
+                    # Definitely act on second item
                     if action == 'accept':
-                        entry.accept(msg)
+                        prospect.accept(msg)
                     else:
-                        entry.reject(msg)
+                        prospect.reject(msg)
 
 
 @event('plugin.register')
