@@ -10,7 +10,7 @@
 			bindings: {
 				show: '<',
 				forgetShow: '&',
-				showEpisodes: '&'
+				toggleEpisodes: '&'
 			},
 			transclude: true
 		});

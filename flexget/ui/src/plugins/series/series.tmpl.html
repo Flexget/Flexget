@@ -11,12 +11,12 @@
     <md-content layout="row" layout-wrap layout-padding>
         <series-entry show="show" 
 			forget-show="vm.forgetShow(show)" 
-			show-episodes="vm.showEpisodes(show)"
+			toggle-episodes="vm.toggleEpisodes(show)"
 			 layout="row" flex="100" flex-gt-md="50" flex-gt-lg="33" ng-repeat-start="show in vm.series">
             <span class="show-indicator" ng-if="show == vm.selectedShow"></span>
         </series-entry>
         <series-episodes-view ng-repeat-end ng-if="vm.areEpisodesOnShowRow(vm.selectedShow, $index)" show="vm.selectedShow" class="series-episodes">
-            <md-button class="md-fab md-mini hide-episodes-button" ng-click="vm.hideEpisodes()" aria-label="hide the episodes"><i class="fa fa-times" aria-hidden="true"></i></md-button>
+            <md-button class="md-fab md-mini hide-episodes-button" ng-click="vm.toggleEpisodes(show)" aria-label="hide the episodes"><i class="fa fa-times" aria-hidden="true"></i></md-button>
         </series-episodes-view>
     </md-content>
     <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalShows" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>

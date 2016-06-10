@@ -29,7 +29,7 @@
 		vm.$onInit = activate;
 		vm.forgetShow = forgetShow;
 		vm.search = search;
-		vm.showEpisodes = showEpisodes;
+		vm.toggleEpisodes = toggleEpisodes;
 
 		function activate() {
         	getSeriesList();
@@ -80,14 +80,10 @@
                 options.page = 1;
                 getSeriesList();
             }
-        }
+        };
 
-        function showEpisodes(show) {
+        function toggleEpisodes(show) {
 			vm.selectedShow = (show == vm.selectedShow) ? null : show;
-        }
-
-        vm.hideEpisodes = function () {
-            vm.selectedShow = null;
         }
 
         vm.areEpisodesOnShowRow = function (show, index) {

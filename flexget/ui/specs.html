@@ -83,14 +83,16 @@
   <script src="/tests-mock-data/movie_list.js"></script>
   <script src="/tests-mock-data/schedules.js"></script>
   <script src="/tests-mock-data/seen.js"></script>
+  <script src="/tests-mock-data/series.js"></script>
   <script src="/tests-mock-data/states.js"></script>
   <!-- endinject -->
 
   <!--<script src="/src/app.utils.js"></script>-->
   <!-- inject:js -->
   <script src="/src/plugins/series/components/series-update/series-update.controller.js"></script>
-  <script src="/src/plugins/series/components/series-show/series-show.component.js"></script>
   <script src="/src/plugins/series/components/series-episode/series-episode.component.js"></script>
+  <script src="/src/plugins/series/series.module.js"></script>
+  <script src="/src/plugins/series/components/series-entry/series-entry.component.js"></script>
   <script src="/src/plugins/series/components/episode-releases/episode-releases.component.js"></script>
   <script src="/src/plugins/seen/components/seen-field/seen-field.component.js"></script>
   <script src="/src/plugins/seen/seen.module.js"></script>
@@ -105,8 +107,7 @@
   <script src="/src/services/server/server.service.js"></script>
   <script src="/src/services/server/server.config.js"></script>
   <script src="/src/services/modal/modal.service.js"></script>
-  <script src="/src/services/data-services/series.service.js"></script>
-  <script src="/src/plugins/series/series.module.js"></script>
+  <script src="/src/plugins/series/series.service.js"></script>
   <script src="/src/plugins/series/series.route.js"></script>
   <script src="/src/plugins/series/series.component.js"></script>
   <script src="/src/plugins/series/series-episodes.component.js"></script>
@@ -196,7 +197,7 @@
   <script src="/src/plugins/history/history.route.spec.js"></script>
   <script src="/src/plugins/history/history.service.spec.js"></script>
   <script src="/src/plugins/log/log.route.spec.js"></script>
-  <script src="/src/plugins/movies/movie-entry.component.spec.js"></script>
+  <script src="/src/plugins/movies/movies.component.spec.js"></script>
   <script src="/src/plugins/movies/movies.route.spec.js"></script>
   <script src="/src/plugins/movies/movies.service.spec.js"></script>
   <script src="/src/plugins/schedule/schedule.component.spec.js"></script>
@@ -205,8 +206,9 @@
   <script src="/src/plugins/seen/seen.component.spec.js"></script>
   <script src="/src/plugins/seen/seen.route.spec.js"></script>
   <script src="/src/plugins/seen/seen.service.spec.js"></script>
+  <script src="/src/plugins/series/series.component.spec.js"></script>
   <script src="/src/plugins/series/series.route.spec.js"></script>
-  <script src="/src/services/data-services/series.service.spec.js"></script>
+  <script src="/src/plugins/series/series.service.spec.js"></script>
   <script src="/src/plugins/movies/components/movie-entry/movie-entry.component.spec.js"></script>
   <script src="/src/plugins/movies/components/movie-list/movie-list.component.spec.js"></script>
   <script src="/src/plugins/movies/components/new-list/new-list.component.spec.js"></script>
