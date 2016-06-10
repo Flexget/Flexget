@@ -1,7 +1,8 @@
 var mockSeriesData = (function () {
 	return {
 		getShows: getShows,
-		getShow: getShow
+		getShow: getShow,
+		getShowMetadata: getShowMetadata
 	};
 
 	function getShows() {
@@ -115,6 +116,43 @@ var mockSeriesData = (function () {
 			},
 			"show_id": 1,
 			"show_name": "Awkward."
+		}
+	}
+
+	function getShowMetadata() {
+		return {
+			"airs_dayofweek": "Tuesday",
+			"airs_time": "9:00 PM",
+			"aliases": [],
+			"banner": "http://thetvdb.com/banners/graphical/281470-g5.jpg",
+			"content_rating": "TV-14",
+			"expired": false,
+			"first_aired": "Tue, 17 Mar 2015 00:00:00 GMT",
+			"genres": [
+				"Action",
+				"Comedy",
+				"Crime",
+				"Drama",
+				"Horror"
+			],
+			"imdb_id": "tt3501584",
+			"language": "en",
+			"last_updated": "2016-06-09 11:14:09",
+			"network": "The CW",
+			"overview": "Olivia “Liv” Moore was a rosy-cheeked, disciplined, over-achieving medical resident who had her life path completely mapped out…until the night she attended a party that unexpectedly turned into a zombie feeding frenzy. Now a med sudent-turned-zombie, she takes a job in the coroner's office to gain acces to the brains she must reluctantly eat to maintain her humanity, but with each brain she consumes, she inherits the corpse's memories. With the help of her medical examiner boss and a police detective, she solves homicide cases in order to quiet the disturbing voices in her head. ",
+			"posters": [
+				"http://thetvdb.com/banners/posters/281470-2.jpg",
+				"http://thetvdb.com/banners/posters/281470-1.jpg",
+				"http://thetvdb.com/banners/posters/281470-3.jpg",
+				"http://thetvdb.com/banners/posters/281470-5.jpg",
+				"http://thetvdb.com/banners/posters/281470-4.jpg"
+			],
+			"rating": 8.4,
+			"runtime": 45,
+			"series_name": "iZombie",
+			"status": "Continuing",
+			"tvdb_id": 281470,
+			"zap2it_id": "EP01922973"
 		}
 	}
 })();
