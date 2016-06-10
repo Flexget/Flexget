@@ -2,9 +2,9 @@ describe("Service: Seen", function () {
 	beforeEach(function () {
 		bard.appModule('plugins.seen');
 
-		bard.inject('$httpBackend', 'seenService', 'exception', 'CacheFactory');
+		bard.inject('$httpBackend', 'seenService', 'exception', 'CacheFactory', '$q');
 
-		sinon.stub(exception, 'catcher');
+		sinon.stub(exception, 'catcher').returns($q.reject({ message: "Request failed" }));
 		
 		CacheFactory.clearAll();
 	});
@@ -23,11 +23,9 @@ describe("Service: Seen", function () {
 		});
 
 		it("should report an error if request fails", function () {
-			$httpBackend.expect('GET', '/api/seen/').respond(500, {
-				message: "Request failed"
-			});
+			$httpBackend.expect('GET', '/api/seen/').respond(500);
 			seenService.getSeen().catch(function (error) {
-				expect(error.data.message).to.equal("Request failed");
+				expect(error.message).to.equal("Request failed");
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
 			$httpBackend.flush();

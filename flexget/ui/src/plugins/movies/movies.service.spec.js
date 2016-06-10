@@ -2,9 +2,9 @@ describe("Service: Movies", function () {
 	beforeEach(function () {
 		bard.appModule('plugins.movies');
 
-		bard.inject('$httpBackend', 'moviesService', 'exception');
+		bard.inject('$httpBackend', 'moviesService', 'exception', '$q');
 
-		sinon.stub(exception, 'catcher');
+		sinon.stub(exception, 'catcher').returns($q.reject({ message: "Request failed" }));
 	});
 
 	it("should exist", function () {
@@ -21,11 +21,9 @@ describe("Service: Movies", function () {
 		});
 
 		it("should report an error if request fails", function () {
-			$httpBackend.expect('GET', '/api/movie_list/').respond(500, {
-				message: "Request failed"
-			});
+			$httpBackend.expect('GET', '/api/movie_list/').respond(500);
 			moviesService.getLists().catch(function (error) {
-				expect(error.data.message).to.equal("Request failed");
+				expect(error.message).to.equal("Request failed");
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
 			$httpBackend.flush();
@@ -42,11 +40,9 @@ describe("Service: Movies", function () {
 		});
 
 		it("should report an error if request fails", function () {
-			$httpBackend.expect('DELETE', '/api/movie_list/1/').respond(500, {
-				message: "Request failed"
-			});
+			$httpBackend.expect('DELETE', '/api/movie_list/1/').respond(500);
 			moviesService.deleteList(1).catch(function (error) {
-				expect(error.data.message).to.equal("Request failed");
+				expect(error.message).to.equal("Request failed");
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
 			$httpBackend.flush();
@@ -63,11 +59,9 @@ describe("Service: Movies", function () {
 		});
 
 		it('should report an error if request fails', function () {
-			$httpBackend.expect('GET', '/api/movie_list/1/movies/').respond(500, {
-				message: "Request failed"
-			});
+			$httpBackend.expect('GET', '/api/movie_list/1/movies/').respond(500);
 			moviesService.getListMovies(1).catch(function (error) {
-				expect(error.data.message).to.equal("Request failed");
+				expect(error.message).to.equal("Request failed");
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
 			$httpBackend.flush();
@@ -84,11 +78,9 @@ describe("Service: Movies", function () {
 		});
 
 		it('should report an error if request fails', function () {
-			$httpBackend.expect('DELETE', '/api/movie_list/1/movies/1/').respond(500, {
-				message: "Request failed"
-			});
+			$httpBackend.expect('DELETE', '/api/movie_list/1/movies/1/').respond(500);
 			moviesService.deleteMovie(1, 1).catch(function (error) {
-				expect(error.data.message).to.equal("Request failed");
+				expect(error.message).to.equal("Request failed");
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
 			$httpBackend.flush();
@@ -105,11 +97,28 @@ describe("Service: Movies", function () {
 		});
 
 		it('should report an error if request fails', function () {
-			$httpBackend.expect('POST', '/api/movie_list/').respond(500, {
-				message: "Request failed"
-			});
+			$httpBackend.expect('POST', '/api/movie_list/').respond(500);
 			moviesService.createList("New List").catch(function (error) {
-				expect(error.data.message).to.equal("Request failed");
+				expect(error.message).to.equal("Request failed");
+				expect(exception.catcher).to.have.been.calledOnce;
+			});
+			$httpBackend.flush();
+		});
+	});
+
+	describe('getMovieMetadata()', function () {
+		it('should issue a GET /api/trakt/movies/:title/ request', function () {
+			$httpBackend.expect('GET', '/api/trakt/movies/Warcraft/').respond(200, {});
+			moviesService.getMovieMetadata("Warcraft").then(function (data) {
+				expect(data).to.exist;
+			});
+			$httpBackend.flush();
+		});
+
+		it('should report an error if request fails', function () {
+			$httpBackend.expect('GET', '/api/trakt/movies/Warcraft/').respond(500);
+			moviesService.getMovieMetadata("Warcraft").catch(function (error) {
+				expect(error.message).to.equal("Request failed");
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
 			$httpBackend.flush();

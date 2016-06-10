@@ -25,7 +25,7 @@ describe("Blocks: Exception", function () {
 			sinon.stub(errorService, 'showToast');
 
 			exception.catcher(mockErrorResponse).catch(function (err) {
-				expect(err).to.equal(mockErrorResponse);
+				expect(err).to.equal(mockErrorResponse.data);
 			});
 
 			$rootScope.$apply();

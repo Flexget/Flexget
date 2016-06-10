@@ -25,7 +25,7 @@
 			e.data.description = newMessage;*/
 
 			errorService.showToast(error.data);
-			return $q.reject(error);
+			return $q.reject(error.data);
 			//};
 		}
 	}
