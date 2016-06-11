@@ -25,21 +25,19 @@
 			forget: true
 		}
 
+		var dialog = {
+			template: '<episode-releases show="vm.show" episode="vm.episode"></episode-releases>',
+			bindToController: true,
+			locals: {
+				show: vm.show,
+				episode: vm.episode
+			},
+			controllerAs: 'vm',
+			controller: function () { }
+		}
+
         function showReleases() {
-            var dialog = {
-                template: '<episode-releases show="vm.show" episode="vm.episode" releases="vm.releases"></episode-releases>',
-                locals: {
-                    show: vm.show,
-                    episode: vm.episode,
-                    releases: vm.releases
-                },
-                bindToController: true,
-                controllerAs: 'vm',
-                controller: function () { }
-            }
-
-            $mdDialog.show(dialog);
-
+			$mdDialog.show(dialog);
         }
 
 		//action called from the series-episode components
@@ -67,7 +65,6 @@
 				seriesService.deleteReleases(vm.show, vm.episode, params)
 					.then(function () {
 						vm.episode.episode_number_of_releases = 0;
-						vm.releases = undefined;
 					});
             });
         }

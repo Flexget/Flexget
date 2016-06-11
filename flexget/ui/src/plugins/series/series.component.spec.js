@@ -5,7 +5,7 @@ describe("Plugin: Series.Component", function () {
 
 	beforeEach(function () {
 		bard.appModule('plugins.series');
-		bard.inject('$componentController', '$q', 'seriesService', '$rootScope', '$mdDialog');
+		bard.inject('$componentController', '$q', 'seriesService', '$rootScope', '$mdDialog', '$timeout');
 
 		sinon.stub(seriesService, 'getShows').returns($q.when(shows));
 	});
@@ -88,6 +88,8 @@ describe("Plugin: Series.Component", function () {
 		it('should set the selectedShow to the clicked show', function () {
 			component.toggleEpisodes(show);
 
+			$timeout.flush();
+
 			expect(component.selectedShow).to.exist;
 			expect(component.selectedShow).to.equal(show);
 		});
@@ -106,6 +108,8 @@ describe("Plugin: Series.Component", function () {
 			}
 
 			component.toggleEpisodes(show);
+
+			$timeout.flush();
 
 			expect(component.selectedShow).to.exist;
 			expect(component.selectedShow).to.equal(show);
