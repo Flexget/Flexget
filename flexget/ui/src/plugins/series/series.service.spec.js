@@ -212,4 +212,23 @@ describe("Service: Series", function () {
 			$httpBackend.flush();
 		});
 	});
+
+	describe('deleteReleases()', function () {
+		it("should issue a DELETE /api/series/:sid/episodes/:eid/releases/ request", function () {
+			$httpBackend.expect('DELETE', '/api/series/1/episodes/1/releases/').respond(200, {});
+			seriesService.deleteReleases({ show_id: 1 }, { episode_id: 1 }).then(function () {
+				expect(true).to.be.true;
+			});
+			$httpBackend.flush();
+		});
+
+		it("should report an error if request fails", function () {
+			$httpBackend.expect('DELETE', '/api/series/1/episodes/1/releases/').respond(500);
+			seriesService.deleteReleases({ show_id: 1 }, { episode_id: 1 }).catch(function (error) {
+				expect(error.message).to.equal("Request failed");
+				expect(exception.catcher).to.have.been.calledOnce;
+			});
+			$httpBackend.flush();
+		});
+	});
 });

@@ -18,7 +18,6 @@
 
 		vm.$onInit = activate;
 		vm.deleteEpisode = deleteEpisode;
-		vm.resetReleases = resetReleases;
 
         var options = {
             page: 1,
@@ -74,20 +73,5 @@
 					});
             });
         };
-
-        //action called from the series-episode components
-        function resetReleases (episode) {
-            var confirm = $mdDialog.confirm()
-				.title('Confirm resetting releases.')
-				.htmlContent("Are you sure you want to reset downloaded releases for <b>" + episode.episode_identifier + "</b> from show <b>" + vm.show.show_name + "</b>?<br /> This does not remove seen entries but will clear the quality to be downloaded again.")
-				.ok("Forget")
-				.cancel("No");
-
-            $mdDialog.show(confirm).then(function () {
-                seriesService.resetReleases(vm.show, episode)
-					.then(function (data) {
-					});
-            });
-        }
     }
 })();

@@ -82,37 +82,4 @@ describe("Plugin: Series-Episodes.Component", function () {
 			});
 		});
 	});
-
-	describe('resetReleases()', function () {
-		beforeEach(function () {
-			component.show = angular.copy(show);
-
-			deferred = $q.defer();
-			sinon.stub(seriesService, 'resetReleases').returns(deferred.promise);
-		});
-		it('should exist', function () {
-			expect(component.resetReleases).to.exist;
-			expect(component.resetReleases).to.be.a('function');
-		});
-
-		it('should call the dialog show function', function () {
-			sinon.spy($mdDialog, 'show');
-
-			component.resetReleases(episode);
-
-			expect($mdDialog.show).to.have.been.calledOnce;
-		});
-
-		describe('confirmation', function () {
-			it('should call the series service', function () {
-				sinon.stub($mdDialog, 'show').returns($q.resolve());
-
-				component.resetReleases(episode);
-
-				$rootScope.$apply();
-
-				expect(seriesService.resetReleases).to.have.been.calledOnce;
-			});
-		});
-	});
 });
