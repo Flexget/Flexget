@@ -4,7 +4,8 @@ var mockSeriesData = (function () {
 		getShow: getShow,
 		getShowMetadata: getShowMetadata,
 		getEpisodes: getEpisodes,
-		getEpisode: getEpisode
+		getEpisode: getEpisode,
+		getReleases: getReleases
 	};
 
 	function getShows() {
@@ -295,6 +296,70 @@ var mockSeriesData = (function () {
 				"episode_series_id": 1
 			},
 			"show": "Awkward.",
+			"show_id": 1
+		}
+	}
+
+	function getReleases() {
+		return {
+			"episode_id": 633,
+			"number_of_releases": 6,
+			"releases": [
+				{
+					"release_downloaded": false,
+					"release_episode_id": 633,
+					"release_first_seen": "Wed, 06 Apr 2016 04:51:03 GMT",
+					"release_id": 5277,
+					"release_proper_count": 0,
+					"release_quality": "hdtv h264",
+					"release_title": "Awkward S05E16 HDTV x264 FLEET rartv"
+				},
+				{
+					"release_downloaded": false,
+					"release_episode_id": 633,
+					"release_first_seen": "Wed, 06 Apr 2016 04:51:03 GMT",
+					"release_id": 5278,
+					"release_proper_count": 0,
+					"release_quality": "720p hdtv h264",
+					"release_title": "Awkward S05E16 720p HDTV x264 AVS rartv"
+				},
+				{
+					"release_downloaded": false,
+					"release_episode_id": 633,
+					"release_first_seen": "Wed, 06 Apr 2016 04:51:03 GMT",
+					"release_id": 5279,
+					"release_proper_count": 0,
+					"release_quality": "hdtv h264",
+					"release_title": "Awkward S05E16 HDTV x264-FLEET[rartv]"
+				},
+				{
+					"release_downloaded": false,
+					"release_episode_id": 633,
+					"release_first_seen": "Wed, 06 Apr 2016 04:51:03 GMT",
+					"release_id": 5280,
+					"release_proper_count": 0,
+					"release_quality": "720p hdtv h264",
+					"release_title": "Awkward S05E16 720p HDTV x264-AVS[rartv]"
+				},
+				{
+					"release_downloaded": false,
+					"release_episode_id": 633,
+					"release_first_seen": "Wed, 06 Apr 2016 08:50:39 GMT",
+					"release_id": 5295,
+					"release_proper_count": 0,
+					"release_quality": "480p h264",
+					"release_title": "Awkward S05E16 480p x264-mSD"
+				},
+				{
+					"release_downloaded": true,
+					"release_episode_id": 633,
+					"release_first_seen": "Wed, 06 Apr 2016 08:50:39 GMT",
+					"release_id": 5296,
+					"release_proper_count": 0,
+					"release_quality": "720p hdtv h265",
+					"release_title": "Awkward S05E16 720p HDTV HEVC x265-RMTeam [720P][HEVC]"
+				}
+			],
 			"show_id": 1
 		}
 	}

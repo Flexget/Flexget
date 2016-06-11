@@ -2,31 +2,35 @@
     'use strict';
 
     angular
-		.module('flexget.plugins.series')
+		.module('plugins.series')
 		.component('episodeReleases', {
 			templateUrl: 'plugins/series/components/episode-releases/episode-releases.tmpl.html',
 			controllerAs: 'vm',
 			controller: episodesReleasesController,
 			bindings: {
 				show: '<',
-				episode: '<',
-				releases: '<'
+				episode: '<'
 			},
 		});
 
-
     function episodesReleasesController($http, $filter, $mdDialog, seriesService) {
         var vm = this;
+
+		vm.$onInit = activate;
 		vm.cancel = cancel;
+		vm.resetRelease = resetRelease;
+		vm.forgetRelease = forgetRelease;
 
 		var params = {
 			forget: true
 		};
 
-        loadReleases();
+		function activate() {
+			loadReleases();
+		}
 
         //Call from a release item, to reset the release
-        vm.resetRelease = function (release) {
+        function resetRelease(release) {
 
             var confirm = $mdDialog.confirm()
 				.title('Confirm resetting a release')
@@ -44,7 +48,7 @@
         }
 
         //Call from a release item, to forget the release
-        vm.forgetRelease = function (release) {
+        function forgetRelease(release) {
             var confirm = $mdDialog.confirm()
 				.title('Confirm forgetting a release')
 				.htmlContent("Are you sure you want to delete the release <b>" + release.release_title + "</b>?")
@@ -66,17 +70,13 @@
         }
 
         function loadReleases() {
-            $http.get('/api/series/' + vm.show.show_id + '/episodes/' + vm.episode.episode_id + '/releases')
-				.success(function (data) {
-					vm.releases = data.releases;
-
-				}).error(function (error) {
-					console.log(error);
-				});
+			seriesService.loadReleases(vm.show, vm.episode).then(function (data) {
+				vm.releases = data.releases;
+			});
         }
 
 		function cancel() {
 			$mdDialog.cancel();
 		}
     }
-});
+})();										
