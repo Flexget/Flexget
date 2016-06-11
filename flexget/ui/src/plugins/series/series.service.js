@@ -22,7 +22,8 @@
             resetReleases: resetReleases,
             forgetRelease: forgetRelease,
             resetRelease: resetRelease,
-			deleteReleases: deleteReleases
+			deleteReleases: deleteReleases,
+			loadReleases: loadReleases
         }
 
         function getShows(options) {
@@ -135,6 +136,16 @@
 				return;
 			};
 		}
+
+		function loadReleases(show, episode, params) {
+            return $http.get('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/releases/')
+				.then(loadReleasesComplete)
+				.catch(callFailed);
+			
+			function loadReleasesComplete(response) {
+				return response.data;
+			}
+        }
 
 		function callFailed(error) {
 			return exception.catcher(error);
