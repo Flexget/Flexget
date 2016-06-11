@@ -4,6 +4,6 @@
     angular
         .module("components.login", [
 			'blocks.router',
-			'flexget.services'
+			'blocks.exception'
 		]);
 })();
