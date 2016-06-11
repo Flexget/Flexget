@@ -5,7 +5,8 @@ var mockSeriesData = (function () {
 		getShowMetadata: getShowMetadata,
 		getEpisodes: getEpisodes,
 		getEpisode: getEpisode,
-		getReleases: getReleases
+		getReleases: getReleases,
+		getRelease: getRelease
 	};
 
 	function getShows() {
@@ -361,6 +362,18 @@ var mockSeriesData = (function () {
 				}
 			],
 			"show_id": 1
+		}
+	}
+
+	function getRelease() {
+		return {
+			"release_downloaded": false,
+			"release_episode_id": 633,
+			"release_first_seen": "Wed, 06 Apr 2016 04:51:03 GMT",
+			"release_id": 5277,
+			"release_proper_count": 0,
+			"release_quality": "hdtv h264",
+			"release_title": "Awkward S05E16 HDTV x264 FLEET rartv"
 		}
 	}
 })();

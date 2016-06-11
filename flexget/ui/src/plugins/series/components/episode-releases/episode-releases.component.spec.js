@@ -38,166 +38,18 @@ describe("Plugin: Episode-Releases.Component", function () {
 		});
 	});
 
-	describe('resetRelease()', function () {
+	describe('cancel()', function () {
 		it('should exist', function () {
-			expect(component.resetRelease).to.exist;
-			expect(component.resetRelease).to.be.a('function');
+			expect(component.cancel).to.exist;
+			expect(component.cancel).to.be.a('function');
 		});
 
-		it('should open a dialog', function () {
-			sinon.spy($mdDialog, 'show');
+		it('should close the dialog', function () {
+			sinon.stub($mdDialog, 'cancel');
 
-			component.resetRelease();
+			component.cancel();
 
-			expect($mdDialog.show).to.have.been.calledOnce;
-		});
-
-		describe('confirmation', function () {
-			it('should call the series service', function () {
-				sinon.stub($mdDialog, 'show').returns($q.resolve());
-
-				component.deleteEpisode(episode);
-
-				$rootScope.$apply();
-
-				expect(seriesService.deleteEpisode).to.have.been.calledOnce;
-			});
-
-			it('should remove the episode from all episodes', function () {
-				sinon.stub($mdDialog, 'show').returns($q.resolve());
-
-				deferred.resolve();
-
-				component.episodes = angular.copy(episodes.episodes);
-
-				component.deleteEpisode(episode);
-
-				$rootScope.$apply();
-
-				expect(component.episodes.length).to.equal(episodes.episodes.length - 1);
-			});
+			expect($mdDialog.cancel).to.have.been.calledOnce;
 		});
 	});
-
-	describe('resetRelease()', function () {
-		beforeEach(function () {
-			deferred = $q.defer();
-			sinon.stub(seriesService, 'deleteEpisode').returns(deferred.promise);
-			
-		});
-		it('should exist', function () {
-			expect(component.deleteEpisode).to.exist;
-			expect(component.deleteEpisode).to.be.a('function');
-		});
-
-		it('should call the dialog show function', function () {
-			sinon.spy($mdDialog, 'show');
-
-			component.deleteEpisode(episode);
-
-			expect($mdDialog.show).to.have.been.calledOnce;
-		});
-
-		describe('confirmation', function () {
-			it('should call the series service', function () {
-				sinon.stub($mdDialog, 'show').returns($q.resolve());
-
-				component.deleteEpisode(episode);
-
-				$rootScope.$apply();
-
-				expect(seriesService.deleteEpisode).to.have.been.calledOnce;
-			});
-
-			it('should remove the episode from all episodes', function () {
-				sinon.stub($mdDialog, 'show').returns($q.resolve());
-
-				deferred.resolve();
-
-				component.episodes = angular.copy(episodes.episodes);
-
-				component.deleteEpisode(episode);
-
-				$rootScope.$apply();
-
-				expect(component.episodes.length).to.equal(episodes.episodes.length - 1);
-			});
-		});
-	});
-
-	/*describe('deleteReleases()', function () {
-		beforeEach(function () {
-			deferred = $q.defer();
-			sinon.stub(seriesService, 'deleteReleases').returns(deferred.promise);
-			
-		});
-		it('should exist', function () {
-			expect(component.deleteReleases).to.exist;
-			expect(component.deleteReleases).to.be.a('function');
-		});
-
-		it('should call the dialog show function', function () {
-			sinon.spy($mdDialog, 'show');
-
-			component.deleteReleases();
-
-			expect($mdDialog.show).to.have.been.calledOnce;
-		});
-
-		describe('confirmation', function () {
-			it('should call the series service', function () {
-				sinon.stub($mdDialog, 'show').returns($q.resolve());
-
-				component.deleteReleases();
-
-				$rootScope.$apply();
-
-				expect(seriesService.deleteReleases).to.have.been.calledOnce;
-			});
-
-			it('should remove the episode from all episodes', function () {
-				sinon.stub($mdDialog, 'show').returns($q.resolve());
-
-				deferred.resolve();
-
-				component.deleteReleases();
-
-				$rootScope.$apply();
-
-				expect(component.releases).not.to.exist;
-				expect(component.episode.episode_number_of_releases).to.equal(0);
-			});
-		});
-	});
-
-	describe('resetReleases()', function () {
-		beforeEach(function () {
-			deferred = $q.defer();
-			sinon.stub(seriesService, 'resetReleases').returns(deferred.promise);
-		});
-		it('should exist', function () {
-			expect(component.resetReleases).to.exist;
-			expect(component.resetReleases).to.be.a('function');
-		});
-
-		it('should call the dialog show function', function () {
-			sinon.spy($mdDialog, 'show');
-
-			component.resetReleases(episode);
-
-			expect($mdDialog.show).to.have.been.calledOnce;
-		});
-
-		describe('confirmation', function () {
-			it('should call the series service', function () {
-				sinon.stub($mdDialog, 'show').returns($q.resolve());
-
-				component.resetReleases(episode);
-
-				$rootScope.$apply();
-
-				expect(seriesService.resetReleases).to.have.been.calledOnce;
-			});
-		});
-	});*/
-}); 
+});
