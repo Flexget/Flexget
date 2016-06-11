@@ -8,7 +8,7 @@
 			controller: loginController
 		});
 
-	function loginController($stateParams, authService, $state) {
+	function loginController($stateParams, loginService, $state) {
 		var vm = this;
 
 		vm.timeout = $stateParams.timeout;
@@ -16,7 +16,7 @@
 		vm.credentials = {};
 
 		function login() {
-            authService.login(vm.credentials, vm.remember)
+            loginService.login(vm.credentials, vm.remember)
 				.then(function () {
 					//TODO: Route to previous requested route
 					$state.go('flexget.home');

@@ -1,10 +1,10 @@
 (function () {
     'use strict';
 
-    angular.module('flexget.services')
-        .factory('authService', authService);
+    angular.module('components.login')
+        .factory('loginService', loginService);
 
-    function authService($state, $http, $q) {
+    function loginService($state, $http, $q) {
         var isLoggedIn, prevState, prevParams;
 
         isLoggedIn = false;
