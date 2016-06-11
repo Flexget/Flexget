@@ -231,4 +231,23 @@ describe("Service: Series", function () {
 			$httpBackend.flush();
 		});
 	});
+
+	describe('loadReleases()', function () {
+		it("should issue a GET /api/series/:sid/episodes/:eid/releases/ request", function () {
+			$httpBackend.expect('GET', '/api/series/1/episodes/1/releases/').respond(200, {});
+			seriesService.loadReleases({ show_id: 1 }, { episode_id: 1 }).then(function (data) {
+				expect(data).to.exist;
+			});
+			$httpBackend.flush();
+		});
+
+		it("should report an error if request fails", function () {
+			$httpBackend.expect('GET', '/api/series/1/episodes/1/releases/').respond(500);
+			seriesService.loadReleases({ show_id: 1 }, { episode_id: 1 }).catch(function (error) {
+				expect(error.message).to.equal("Request failed");
+				expect(exception.catcher).to.have.been.calledOnce;
+			});
+			$httpBackend.flush();
+		});
+	});
 });
