@@ -20,7 +20,9 @@ class Duplicates(object):
     Reject the second+ instance of every movie:
 
       duplicates:
-        field: imdb_id
+        field:
+          - imdb_id
+          - movie_name
         action: reject
         first: true # Allow first instance
     """
@@ -28,7 +30,12 @@ class Duplicates(object):
     schema = {
         'type': 'object',
         'properties': {
-            'field': {'type': 'string'},
+            'field': {
+                'oneOf': [
+                    {'type': 'string'},
+                    {'type': 'array'},
+                ]
+            },
             'action': {'enum': ['accept', 'reject']},
             'first': {'type': 'boolean'},
         },
@@ -42,24 +49,38 @@ class Duplicates(object):
         config.setdefault('first', True)
         return config
 
+    def extract_fields(self, entry, field_names):
+        ret = []
+        for field in field_names:
+            if field in entry:
+                ret.append(entry[field])
+            else:
+                ret.append(None)
+        return ret
+
     def on_task_filter(self, task, config):
         config = self.prepare_config(config)
-        field = config['field']
+        field_names = config['field']
+        # Convert to list
+        if not isinstance(field_names, list):
+            field_names = [field_names]
         action = config['action']
         entries = list(task.entries)
         entry_len = len(entries)
         for i in range(entry_len):
             entry = entries[i]
+            entry_fields = self.extract_fields(entry,field_names)
             # Ignore rejected entires
             if entry.rejected:
                 continue
             for j in range(i+1, entry_len):
                 prospect = entries[j]
+                prospect_fields = self.extract_fields(prospect,field_names)
                 # Ignore rejected entires
                 if prospect.rejected: continue
-                if entry[field] == prospect[field] and entry[field] is not None:
+                if entry_fields == prospect_fields and any(entry_fields):
                     msg = 'Field {} value {} equals on {} and {}'.format(
-                        field, entry[field], entry['title'], prospect['title'])
+                        field_names, entry_fields, entry['title'], prospect['title'])
                     # Only process first if intended
                     if config['first']:
                         if action == 'accept':
