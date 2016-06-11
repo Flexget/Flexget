@@ -83,7 +83,18 @@
         };
 
         function toggleEpisodes(show) {
-			vm.selectedShow = (show == vm.selectedShow) ? null : show;
+			show == vm.selectedShow ? clearShow() : setSelectedShow();
+
+			function clearShow() {
+				vm.selectedShow = null;
+			};
+
+			function setSelectedShow() {
+				vm.selectedShow = null;
+				$timeout(function () {
+					vm.selectedShow = show;
+				});
+			}
         }
 
         vm.areEpisodesOnShowRow = function (show, index) {
