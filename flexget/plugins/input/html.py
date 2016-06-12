@@ -152,8 +152,6 @@ class InputHtml(object):
     def _title_from_url(self, url):
         parts = parse.urlsplit(url)
         title = parse.unquote_plus(posixpath.basename(parts.path))
-        #parts = parse.splitquery(url[url.rfind('/') + 1:])
-        #title = parse.unquote_plus(parts[0])
         return title
 
     def create_entries(self, page_url, soup, config):
