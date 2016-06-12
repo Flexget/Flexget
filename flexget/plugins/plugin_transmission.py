@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 from future.moves.urllib.parse import urlparse
+from future.utils import text_to_native_str
 
 import os
 import logging
@@ -319,7 +320,7 @@ class PluginTransmission(TransmissionBase):
         if opt_dic.get('path'):
             try:
                 path = os.path.expanduser(entry.render(opt_dic['path']))
-                add['download_dir'] = pathscrub(path).encode('utf-8')
+                add['download_dir'] = text_to_native_str(pathscrub(path))
             except RenderError as e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
         if 'bandwidthpriority' in opt_dic:
@@ -418,8 +419,8 @@ class PluginTransmission(TransmissionBase):
 
                 def _filter_list(list):
                     for item in list:
-                            if not isinstance(item, basestring):
-                                list.remove(item)
+                        if not isinstance(item, basestring):
+                            list.remove(item)
                     return list
 
                 def _find_matches(name, list):
