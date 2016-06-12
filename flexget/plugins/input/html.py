@@ -4,6 +4,7 @@ from past.builtins import basestring
 from future.moves.urllib import parse
 
 import logging
+import posixpath
 import zlib
 import re
 from jinja2 import Template
@@ -149,8 +150,10 @@ class InputHtml(object):
         return title or None
 
     def _title_from_url(self, url):
-        parts = parse.splitquery(url[url.rfind('/') + 1:])
-        title = parse.unquote_plus(parts[0])
+        parts = parse.urlsplit(url)
+        title = parse.unquote_plus(posixpath.basename(parts.path))
+        #parts = parse.splitquery(url[url.rfind('/') + 1:])
+        #title = parse.unquote_plus(parts[0])
         return title
 
     def create_entries(self, page_url, soup, config):
