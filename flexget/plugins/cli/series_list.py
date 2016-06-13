@@ -74,12 +74,12 @@ class SeriesListType(object):
     @staticmethod
     def series_list_keyword_type(identifier):
         if identifier.count('=') != 1:
-            raise ArgumentTypeError('Received identifier in wrong format: %s, '
-                                    ' should be in keyword format like `tvdb_id=1234567`'.format(identifier))
+            raise ArgumentTypeError('Received identifier in wrong format: {}, '
+                                    'should be in keyword format like `tvdb_id=1234567`'.format(identifier))
         name, value = identifier.split('=', 2)
         if name not in FilterSeriesBase().supported_ids():
             raise ArgumentTypeError(
-                'Received unsupported identifier ID %s. Should be one of %s'.format(identifier,
+                'Received unsupported identifier ID {}. Should be one of {}'.format(identifier,
                                                                                     ' ,'.join(
                                                                                         FilterSeriesBase().supported_ids())))
         return {name: value}
@@ -87,8 +87,8 @@ class SeriesListType(object):
     @staticmethod
     def keyword_type(identifier):
         if identifier.count('=') != 1:
-            raise ArgumentTypeError('Received identifier in wrong format: %s, '
-                                    ' should be in keyword format like `movedone=/a/random/path`'.format(identifier))
+            raise ArgumentTypeError('Received identifier in wrong format: {}, '
+                                    'should be in keyword format like `movedone=/a/random/path`'.format(identifier))
         name, value = identifier.split('=', 2)
         return {name: value}
 
@@ -285,7 +285,7 @@ def series_list_purge(options):
         except NoResultFound:
             console('Could not find series list with name {}'.format(options.list_name))
             return
-        console('Deleting list %s' % options.list_name)
+        console('Deleting list {}'.format(options.list_name))
         session.delete(series_list)
 
 
