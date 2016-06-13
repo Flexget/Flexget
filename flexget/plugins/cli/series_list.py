@@ -11,7 +11,7 @@ from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.config_schema import parse_interval
-from flexget.plugins.list.series_list import SeriesListList, SeriesListDBContainer as slDb, SeriesList, get_db_series
+from flexget.plugins.list.series_list import SeriesListList, SeriesListDB as slDb, SeriesList, get_db_series
 from flexget.plugins.filter.series import FilterSeriesBase
 
 SETTINGS_SCHEMA = FilterSeriesBase().settings_schema
@@ -85,6 +85,14 @@ class SeriesListType(object):
         return {name: value}
 
     @staticmethod
+    def keyword_type(identifier):
+        if identifier.count('=') != 1:
+            raise ArgumentTypeError('Received identifier in wrong format: %s, '
+                                    ' should be in keyword format like `movedone=/a/random/path`'.format(identifier))
+        name, value = identifier.split('=', 2)
+        return {name: value}
+
+    @staticmethod
     def exiting_attribute(value):
         if value not in SERIES_ATTRIBUTES:
             raise ArgumentTypeError('Value {} is not a valid series attribute'.format(value))
@@ -95,8 +103,6 @@ def build_data_dict(options):
     """ Converts options to a recognizable data type for series adding/matching"""
     data = {'series_name': options.series_title}
     for attribute in SERIES_ATTRIBUTES:
-        if attribute == 'set':
-            continue
         data[attribute] = getattr(options, attribute)
     if options.identifiers:
         for identifier in options.identifiers:
@@ -172,6 +178,7 @@ def series_list_add(options):
             console('Could not find series list with name {}, creating'.format(options.list_name))
             series_list = SeriesListList(name=options.list_name)
         session.merge(series_list)
+        session.commit()
         data = build_data_dict(options)
         series = SeriesList(options.list_name, session=session).find_entry(data, session=session)
         if series:
@@ -209,8 +216,6 @@ def series_list_show(options):
         console('Showing fields for series #{}: {}'.format(series.id, series.title))
         console('-' * 79)
         for attribute in SERIES_ATTRIBUTES:
-            if attribute == 'set':
-                continue
             console('{}: {}'.format(attribute.capitalize(), series.format_converter(attribute)))
 
 
@@ -299,6 +304,8 @@ def register_parser_arguments():
                                   help='Name of series list to operate on. Default is `series`')
 
     series_attributes_parser = ArgumentParser(add_help=False)
+    series_attributes_parser.add_argument('--set', type=SeriesListType.keyword_type, nargs='+',
+                                          help='Use set plugin to set any fields for this series')
     series_attributes_parser.add_argument('--path', help='Set path field for this series')
     series_attributes_parser.add_argument('-a', '--alternate-name', nargs='+', help='Alternate series name(s)')
     series_attributes_parser.add_argument('--name-regexp', nargs='+', type=SeriesListType.regex_type,

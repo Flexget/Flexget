@@ -111,7 +111,7 @@ class SeriesListAPI(APIResource):
         args = series_list_parser.parse_args()
         name = args.get('name')
         series_lists = [series_list.to_dict() for series_list in
-                        sl.SeriesListDBContainer.get_series_lists(name=name, session=session)]
+                        sl.SeriesListDB.get_series_lists(name=name, session=session)]
         return jsonify({'series_lists': series_lists})
 
     @api.validate(new_list_schema)
@@ -122,7 +122,7 @@ class SeriesListAPI(APIResource):
         data = request.json
         name = data.get('name')
         try:
-            series_list = sl.SeriesListDBContainer.get_list_by_exact_name(name=name, session=session)
+            series_list = sl.SeriesListDB.get_list_by_exact_name(name=name, session=session)
         except NoResultFound:
             series_list = None
         if series_list:
@@ -144,7 +144,7 @@ class SeriesListListAPI(APIResource):
     def get(self, list_id, session=None):
         """ Get list by ID """
         try:
-            series_list = sl.SeriesListDBContainer.get_list_by_id(list_id=list_id, session=session)
+            series_list = sl.SeriesListDB.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
@@ -155,7 +155,7 @@ class SeriesListListAPI(APIResource):
     def delete(self, list_id, session=None):
         """ Delete list by ID """
         try:
-            series_list = sl.SeriesListDBContainer.get_list_by_id(list_id=list_id, session=session)
+            series_list = sl.SeriesListDB.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
@@ -202,12 +202,12 @@ class SeriesListSeriesAPI(APIResource):
             'session': session
         }
         try:
-            sl.SeriesListDBContainer.get_list_by_id(list_id=list_id, session=session)
+            sl.SeriesListDB.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
-        count = sl.SeriesListDBContainer.get_series_by_list_id(count=True, **kwargs)
-        series = [series.to_dict() for series in sl.SeriesListDBContainer.get_series_by_list_id(**kwargs)]
+        count = sl.SeriesListDB.get_series_by_list_id(count=True, **kwargs)
+        series = [series.to_dict() for series in sl.SeriesListDB.get_series_by_list_id(**kwargs)]
         pages = int(ceil(count / float(page_size)))
 
         number_of_series = min(page_size, count)
@@ -225,13 +225,13 @@ class SeriesListSeriesAPI(APIResource):
     def post(self, list_id, session=None):
         """ Add series to list by ID """
         try:
-            series_list = sl.SeriesListDBContainer.get_list_by_id(list_id=list_id, session=session)
+            series_list = sl.SeriesListDB.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
         data = request.json
         title = data.get('title')
-        series = sl.SeriesListDBContainer.get_series_by_title(list_id=list_id, title=title, session=session)
+        series = sl.SeriesListDB.get_series_by_title(list_id=list_id, title=title, session=session)
         if series:
             return {'status': 'error',
                     'message': 'series with name "%s" already exist in list %d' % (title, list_id)}, 500
@@ -251,7 +251,7 @@ class SeriesListSeriesAPI(APIResource):
     def get(self, list_id, series_id, session=None):
         """ Get a series by list ID and series ID """
         try:
-            series = sl.SeriesListDBContainer.get_series_by_id(list_id=list_id, series_id=series_id, session=session)
+            series = sl.SeriesListDB.get_series_by_id(list_id=list_id, series_id=series_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'could not find series with id %d in list %d' % (series_id, list_id)}, 404
@@ -261,7 +261,7 @@ class SeriesListSeriesAPI(APIResource):
     def delete(self, list_id, series_id, session=None):
         """ Delete a series by list ID and series ID """
         try:
-            series = sl.SeriesListDBContainer.get_series_by_id(list_id=list_id, series_id=series_id, session=session)
+            series = sl.SeriesListDB.get_series_by_id(list_id=list_id, series_id=series_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'could not find series with id %d in list %d' % (series_id, list_id)}, 404
@@ -275,7 +275,7 @@ class SeriesListSeriesAPI(APIResource):
     def put(self, list_id, series_id, session=None):
         """ Edit series data """
         try:
-            series = sl.SeriesListDBContainer.get_series_by_id(list_id=list_id, series_id=series_id, session=session)
+            series = sl.SeriesListDB.get_series_by_id(list_id=list_id, series_id=series_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'could not find series with id %d in list %d' % (series_id, list_id)}, 404

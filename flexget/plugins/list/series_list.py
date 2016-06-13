@@ -407,7 +407,7 @@ class PluginSeriesList(object):
         return list(SeriesList(config))
 
 
-class SeriesListDBContainer(object):
+class SeriesListDB(object):
     """ A container class to hold DB methods for this plugin"""
 
     @staticmethod
@@ -449,7 +449,7 @@ class SeriesListDBContainer(object):
     @staticmethod
     @with_session
     def get_series_by_title(list_id, title, session=None):
-        series_list = SeriesListDBContainer.get_list_by_id(list_id=list_id, session=session)
+        series_list = SeriesListDB.get_list_by_id(list_id=list_id, session=session)
         if series_list:
             log.debug('searching for series %s in list %d', title, list_id)
             return session.query(SeriesListSeries).filter(
