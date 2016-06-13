@@ -81,14 +81,14 @@ class TestSeriesList(object):
         assert entry['set']['tvdb_id'] == '1234'
         assert entry['set']['tvmaze_id'] == '1234'
         assert entry['set']['trakt_show_id'] == '1234'
-        assert entry['quality'] == '720p'
-        assert entry['alternate_name'] == ['SER1', 'SER2']
-        assert entry['name_regexp'] == ["^ser", "^series 1$"]
-        assert entry['qualities'] == ['720p', '1080p']
-        assert entry['timeframe'] == '2 days'
-        assert entry['upgrade'] == True
-        assert entry['propers'] == True
-        assert entry['specials'] == True
-        assert entry['tracking'] == 'backfill'
-        assert entry['identified_by'] == 'ep'
+        assert entry['configure_series_quality'] == entry['quality'] == '720p'
+        assert entry['configure_series_alternate_name'] == entry['alternate_name'] == ['SER1', 'SER2']
+        assert entry['configure_series_name_regexp'] == entry['name_regexp'] == ["^ser", "^series 1$"]
+        assert entry['configure_series_qualities'] == entry['qualities'] == ['720p', '1080p']
+        assert entry['configure_series_timeframe'] == entry['timeframe'] == '2 days'
+        assert entry['configure_series_upgrade'] == entry['upgrade'] == True
+        assert entry['configure_series_propers'] == entry['propers'] == True
+        assert entry['configure_series_specials'] == entry['specials'] == True
+        assert entry['configure_series_tracking'] == entry['tracking'] == 'backfill'
+        assert entry['configure_series_identified_by'] == entry['identified_by'] == 'ep'
         assert not entry.get('not_a_real_attribute')
