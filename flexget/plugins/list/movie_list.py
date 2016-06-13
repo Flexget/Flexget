@@ -55,6 +55,7 @@ class MovieListMovie(Base):
         entry = Entry()
         entry['title'] = entry['movie_name'] = self.title
         entry['url'] = 'mock://localhost/movie_list/%d' % self.id
+        entry['added'] = self.added
         if self.year:
             if strip_year is False:
                 entry['title'] += ' (%d)' % self.year
