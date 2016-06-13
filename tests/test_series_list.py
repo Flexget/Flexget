@@ -12,6 +12,9 @@ class TestSeriesList(object):
           list_get:
             series_list: test_list
 
+          list_get_2:
+            series_list: test_list 2
+
           test_list_add:
             mock:
               - {title: 'series 1', url: "http://mock.url/file1.torrent"}
@@ -54,8 +57,23 @@ class TestSeriesList(object):
             mock:
               - {title: 'series 1.s01e01.720p.HDTV-flexget', url: "http://mock.url/file1.torrent"}
             accept_all: yes
+            metainfo_series: yes
             list_accept:
               - series_list: test_list
+
+          test_list_remove:
+            mock:
+              - {title: 'series 1.s01e01.720p.HDTV-flexget', url: "http://mock.url/file1.torrent"}
+            accept_all: yes
+            metainfo_series: yes
+            list_remove:
+              - series_list: test_list
+
+          test_list_to_list:
+            series_list: test_list
+            accept_all: yes
+            list_add:
+              - series_list: test_list 2
 
     """
 
@@ -109,3 +127,27 @@ class TestSeriesList(object):
 
         task = execute_task('list_get')
         assert len(task.entries) == 0
+
+    def test_list_remove(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.accepted) == 1
+
+        task = execute_task('test_list_remove')
+        assert len(task.accepted) == 1
+
+        task = execute_task('list_get')
+        assert len(task.entries) == 0
+
+    def test_list_to_list(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.accepted) == 1
+
+        task = execute_task('test_list_to_list')
+        assert len(task.accepted) == 1
+
+        task1 = execute_task('list_get')
+        task_1_entries = task1.entries
+
+        task2 = execute_task('list_get_2')
+        task_2_entries = task2.entries
+        assert len(task_1_entries) == len(task_2_entries) == 1
