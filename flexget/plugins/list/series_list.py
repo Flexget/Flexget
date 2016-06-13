@@ -123,8 +123,11 @@ class SeriesListSeries(Base):
         for attribute in SERIES_ATTRIBUTES:
             result = self.format_converter(attribute)
             if result:
-                # Maintain support for configure_series plugin expected format
-                entry['configure_series_' + attribute] = entry[attribute] = result
+                if attribute == 'set':
+                    entry['set'].update(result)
+                else:
+                    # Maintain support for configure_series plugin expected format
+                    entry['configure_series_' + attribute] = entry[attribute] = result
         for series_list_id in self.ids:
             entry[series_list_id.id_name] = series_list_id.id_value
             entry['set'].update({series_list_id.id_name: series_list_id.id_value})
@@ -268,7 +271,7 @@ def get_db_series(data, db_series=None):
     # Setting series attributes only for received data
     single_attributes = ['date_dayfirst', 'date_yearfirst', 'timeframe', 'upgrade', 'target', 'specials', 'propers',
                          'identified_by', 'exact', 'begin', 'parse_only', 'prefer_specials', 'assume_special',
-                         'tracking']
+                         'tracking', 'set']
     for attribute in single_attributes:
         if data.get(attribute) is not None:
             setattr(db_series, attribute, data[attribute])

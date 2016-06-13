@@ -74,19 +74,21 @@ class TestSeriesList(object):
 
         task = execute_task('list_get')
         assert len(task.entries) == 1
-        assert task.find_entry(title='series 1')
-        assert task.find_entry(set={'movedone': "/random/path"})
-        assert task.find_entry(tvdb_id='1234')
-        assert task.find_entry(tvmaze_id='1234')
-        assert task.find_entry(trakt_show_id='1234')
-        assert task.find_entry(quality='720p')
-        assert task.find_entry(alternate_name=['SER1', 'SER2'])
-        assert task.find_entry(name_regexp=["^ser", "^series 1$"])
-        assert task.find_entry(qualities=['720p', '1080p'])
-        assert task.find_entry(timeframe='2 days')
-        assert task.find_entry(upgrade=True)
-        assert task.find_entry(propers=True)
-        assert task.find_entry(specials=True)
-        assert task.find_entry(tracking='backfill')
-        assert task.find_entry(identified_by='ep')
-        assert not task.find_entry(not_a_real_attribute=True)
+        entry = task.find_entry(title='series 1')
+        assert entry
+
+        assert entry['set']['movedone'] == '/random/path'
+        assert entry['set']['tvdb_id'] == '1234'
+        assert entry['set']['tvmaze_id'] == '1234'
+        assert entry['set']['trakt_show_id'] == '1234'
+        assert entry['quality'] == '720p'
+        assert entry['alternate_name'] == ['SER1', 'SER2']
+        assert entry['name_regexp'] == ["^ser", "^series 1$"]
+        assert entry['qualities'] == ['720p', '1080p']
+        assert entry['timeframe'] == '2 days'
+        assert entry['upgrade'] == True
+        assert entry['propers'] == True
+        assert entry['specials'] == True
+        assert entry['tracking'] == 'backfill'
+        assert entry['identified_by'] == 'ep'
+        assert not entry.get('not_a_real_attribute')
