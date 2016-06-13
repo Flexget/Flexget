@@ -132,6 +132,10 @@ def do_cli(manager, options):
         series_list_del(options)
         return
 
+    if options.list_action == 'purge':
+        series_list_purge(options)
+        return
+
 
 def series_list_lists(options):
     """ Show all series lists """
@@ -269,6 +273,17 @@ def series_list_del(options):
         console('Successfully deleted series {} from series list {}'.format(options.series_title, options.list_name))
 
 
+def series_list_purge(options):
+    with Session() as session:
+        try:
+            series_list = slDb.get_list_by_exact_name(options.list_name)
+        except NoResultFound:
+            console('Could not find series list with name {}'.format(options.list_name))
+            return
+        console('Deleting list %s' % options.list_name)
+        session.delete(series_list)
+
+
 @event('options.register')
 def register_parser_arguments():
     series_parser = ArgumentParser(add_help=False)
@@ -368,3 +383,4 @@ def register_parser_arguments():
     update_parser.add_argument('--clear', nargs='+', type=SeriesListType.exiting_attribute,
                                help="Clears a series attribute")
     subparsers.add_parser('delete', parents=[list_name_parser, series_id_parser], help='Delete series from series list')
+    subparsers.add_parser('purge', parents=[list_name_parser], help='Removes an entire series list. Use with caution.')
