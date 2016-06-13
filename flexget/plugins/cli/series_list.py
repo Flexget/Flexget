@@ -128,6 +128,10 @@ def do_cli(manager, options):
         series_list_update(options)
         return
 
+    if options.list_action == 'delete':
+        series_list_del(options)
+        return
+
 
 def series_list_lists(options):
     """ Show all series lists """
@@ -188,7 +192,8 @@ def series_list_show(options):
             series = slDb.get_series_by_id(series_list.id, int(options.series_title), session=session)
         except NoResultFound:
             console(
-                'Could not find matching series with ID {} in list `{}`'.format(int(options.series_title), options.list_name))
+                'Could not find matching series with ID {} in list `{}`'.format(int(options.series_title),
+                                                                                options.list_name))
             return
         except ValueError:
             series = slDb.get_series_by_title(series_list.id, options.series_title, session=session)
@@ -217,7 +222,8 @@ def series_list_update(options):
             series = slDb.get_series_by_id(series_list.id, int(options.series_title), session=session)
         except NoResultFound:
             console(
-                'Could not find matching series with ID {} in list `{}`'.format(int(options.series_title), options.list_name))
+                'Could not find matching series with ID {} in list `{}`'.format(int(options.series_title),
+                                                                                options.list_name))
             return
         except ValueError:
             series = slDb.get_series_by_title(series_list.id, options.series_title, session=session)
@@ -236,6 +242,31 @@ def series_list_update(options):
         series = get_db_series(data, series)
         session.commit()
         console('Successfully updated series #{}: {}'.format(series.id, series.title))
+
+
+def series_list_del(options):
+    with Session() as session:
+        try:
+            series_list = slDb.get_list_by_exact_name(options.list_name)
+        except NoResultFound:
+            console('Could not find series list with name {}'.format(options.list_name))
+            return
+
+        try:
+            series = slDb.get_series_by_id(series_list.id, int(options.series_title), session=session)
+        except NoResultFound:
+            console(
+                'Could not find matching series with ID {} in list `{}`'.format(int(options.series_title),
+                                                                                options.list_name))
+            return
+        except ValueError:
+            series = slDb.get_series_by_title(series_list.id, options.series_title, session=session)
+            if not series:
+                console(
+                    'Could not find matching series with title `{}` in list `{}`'.format(options.series_title,
+                                                                                         options.list_name))
+        session.delete(series)
+        console('Successfully deleted series {} from series list {}'.format(options.series_title, options.list_name))
 
 
 @event('options.register')
@@ -336,3 +367,4 @@ def register_parser_arguments():
                                           help='Update series attributes')
     update_parser.add_argument('--clear', nargs='+', type=SeriesListType.exiting_attribute,
                                help="Clears a series attribute")
+    subparsers.add_parser('delete', parents=[list_name_parser, series_id_parser], help='Delete series from series list')
