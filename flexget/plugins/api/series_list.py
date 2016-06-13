@@ -69,6 +69,12 @@ class objects_container(object):
 
     edit_series_object = FilterSeriesBase().settings_schema
 
+    edit_global_series_object = FilterSeriesBase().settings_schema
+    for attribute in FilterSeriesBase().settings_schema:
+        if attribute.endswith('_regexp'):
+            del edit_global_series_object['properties'][attribute]
+    del edit_global_series_object['properties']['alternate_name']
+
     return_series_object = copy.deepcopy(input_series_object)
     return_series_object['properties']['series_list_identifiers'] = {'type': 'array',
                                                                      'items': return_series_list_id_object}
@@ -97,6 +103,7 @@ return_series_list_series_schema = api.schema('return_series', objects_container
 input_series_schema = api.schema('input_series', objects_container.input_series_object)
 return_series_schema = api.schema('return_series_list', objects_container.return_series_object)
 edit_series_schema = api.schema('edit_series', objects_container.edit_series_object)
+edit_global_series_schema = api.schema('edit_series_list', objects_container.edit_global_series_object)
 
 series_list_parser = api.parser()
 series_list_parser.add_argument('name', help='Filter results by list name')
@@ -161,6 +168,24 @@ class SeriesListListAPI(APIResource):
                     'message': 'list_id %d does not exist' % list_id}, 404
         session.delete(series_list)
         return {}
+
+    @api.response(404, model=default_error_schema)
+    @api.response(200, model=list_object_schema)
+    @api.validate(edit_global_series_schema)
+    def put(self, list_id, session=None):
+        """ Delete list by ID """
+        data = request.json
+        updates_series = []
+        try:
+            series_list = sl.SeriesListDB.get_list_by_id(list_id=list_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'list_id %d does not exist' % list_id}, 404
+        for series in series_list.series:
+            updates_series.append(sl.SeriesListDB.get_db_series(data, series))
+        series_list.series = updates_series
+        session.commit()
+        return jsonify({'series': [series.to_dict() for series in updates_series]})
 
 
 series_parser = api.parser()

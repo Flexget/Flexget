@@ -201,3 +201,48 @@ class TestSeriesListAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         response2 = json.loads(rsp.get_data(as_text=True))
         assert response1 == response2
+
+    def test_global_list_settings(self, api_client):
+        payload = {'name': 'test_list'}
+
+        # Create list
+        rsp = api_client.json_post('/series_list/', data=json.dumps(payload))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+
+        series_1 = {'title': 'test_series_1'}
+        series_2 = {'title': 'test_series_2'}
+
+        # Add series to list
+        rsp = api_client.json_post('/series_list/1/series/', data=json.dumps(series_1))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        assert json.loads(rsp.get_data(as_text=True)).get('title') == 'test_series_1'
+
+        rsp = api_client.json_post('/series_list/1/series/', data=json.dumps(series_2))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        assert json.loads(rsp.get_data(as_text=True)).get('title') == 'test_series_2'
+
+        new_data = {'quality': '720p',
+                    'qualities': ['720p', '1080p'],
+                    'timeframe': '2 days',
+                    'upgrade': True,
+                    'target': '1080p',
+                    'propers': True,
+                    'specials': True,
+                    'tracking': False,
+                    'identified_by': "ep",
+                    'exact': True,
+                    'begin': 's01e01',
+                    'from_group': ['group1', 'group2'],
+                    'parse_only': True}
+
+        rsp = api_client.json_put('/series_list/1/', data=json.dumps(new_data))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        rsp = api_client.get('/series_list/1/series/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        response = json.loads(rsp.get_data(as_text=True))
+        assert len(response.get('series')) == 2
+
+        for series in response.get('series'):
+            for attribute in new_data:
+                assert series[attribute] == new_data[attribute]
