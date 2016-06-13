@@ -11,7 +11,7 @@ from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.config_schema import parse_interval
-from flexget.plugins.list.series_list import SeriesListList, SeriesListDB as slDb, SeriesList, get_db_series
+from flexget.plugins.list.series_list import SeriesListList, SeriesListDB as slDb, SeriesList
 from flexget.plugins.filter.series import FilterSeriesBase
 
 SETTINGS_SCHEMA = FilterSeriesBase().settings_schema
@@ -184,7 +184,7 @@ def series_list_add(options):
         if series:
             console('Series with title {} already exist'.format(options.series_title))
             return
-        series = get_db_series(data)
+        series = slDb.get_db_series(data)
         series.list_id = series_list.id
         session.add(series)
         console('Successfully added series {} to list {}'.format(series.title, series_list.name))
@@ -248,7 +248,7 @@ def series_list_update(options):
                 setattr(series, attribute, None)
             return
         data = build_data_dict(options)
-        series = get_db_series(data, series)
+        series = slDb.get_db_series(data, series)
         session.commit()
         console('Successfully updated series #{}: {}'.format(series.id, series.title))
 

@@ -235,7 +235,7 @@ class SeriesListSeriesAPI(APIResource):
         if series:
             return {'status': 'error',
                     'message': 'series with name "%s" already exist in list %d' % (title, list_id)}, 500
-        db_series = sl.get_db_series(data)
+        db_series = sl.SeriesListDB.get_db_series(data)
         series_list.series.append(db_series)
         session.commit()
         response = jsonify(db_series.to_dict())
@@ -282,6 +282,6 @@ class SeriesListSeriesAPI(APIResource):
         title = series.title
         data = request.json
         data.update({'title': title})
-        series = sl.get_db_series(data, series)
+        series = sl.SeriesListDB.get_db_series(data, series)
         session.commit()
         return jsonify(series.to_dict())

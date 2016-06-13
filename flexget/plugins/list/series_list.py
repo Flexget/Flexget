@@ -258,53 +258,6 @@ class SeriesListSpecialID(Base):
     series_id = Column(Integer, ForeignKey(SeriesListSeries.id))
 
 
-def get_db_series(data, db_series=None):
-    """
-    This method creates of edits a db SeriesListSeries object based on passed data
-    :param data: Dict or entry with the relevant data
-    :param db_series: If passed, this method will update the given attributes of a series object.
-    :return: A SeriesListSeries object
-    """
-    if not db_series:
-        title = data.get('series_name') or data['title']
-        db_series = SeriesListSeries(title)
-    # Setting series attributes only for received data
-    single_attributes = ['date_dayfirst', 'date_yearfirst', 'timeframe', 'upgrade', 'target', 'specials', 'propers',
-                         'identified_by', 'exact', 'begin', 'parse_only', 'prefer_specials', 'assume_special',
-                         'tracking', 'set']
-    for attribute in single_attributes:
-        if data.get(attribute) is not None:
-            setattr(db_series, attribute, data[attribute])
-    if data.get('alternate_name'):
-        db_series.alternate_name = [SeriesListAlternateName(name=name) for name in data.get('alternate_name')]
-    if data.get('name_regexp'):
-        db_series.name_regexp = [SeriesListNameRegexp(regexp=regexp) for regexp in data.get('name_regexp')]
-    if data.get('ep_regexp'):
-        db_series.ep_regexp = [SeriesListEpRegexp(regexp=regexp) for regexp in data.get('ep_regexp')]
-    if data.get('date_regexp'):
-        db_series.date_regexp = [SeriesListDateRegexp(regexp=regexp) for regexp in data.get('date_regexp')]
-    if data.get('sequence_regexp'):
-        db_series.sequence_regexp = [SeriesListSequenceRegexp(regexp=regexp) for regexp in data.get('sequence_regexp')]
-    if data.get('id_regexp'):
-        db_series.id_regexp = [SeriesListIDRegexp(regexp=regexp) for regexp in data.get('id_regexp')]
-    if data.get('quality'):
-        db_series.quality = SeriesListQuality(quality=data.get('quality'))
-    if data.get('qualities'):
-        db_series.qualities = [SeriesListQualities(quality=quality) for quality in data.get('qualities')]
-    if data.get('from_group'):
-        db_series.from_group = [SeriesListFromGroup(group_name=name) for name in data.get('from_group')]
-    if data.get('special_ids'):
-        db_series.special_ids = [SeriesListSpecialID(id_name=name) for name in data.get('special_ids')]
-
-    # Get list of supported identifiers
-    for id_name in FilterSeriesBase().supported_ids():
-        value = data.get(id_name)
-        if value:
-            log.debug('found supported ID %s with value %s in entry, adding to series', id_name, value)
-            db_series.ids.append(SeriesListSeriesExternalID(id_name=id_name, id_value=value))
-    return db_series
-
-
 class SeriesList(MutableSet):
     def _db_list(self, session):
         return session.query(SeriesListList).filter(SeriesListList.name == self.list_name).first()
@@ -340,7 +293,7 @@ class SeriesList(MutableSet):
         # Just delete and re-create to refresh
         if db_series:
             session.delete(db_series)
-        db_series = get_db_series(entry)
+        db_series = SeriesListDB.get_db_series(entry)
         db_list.series.append(db_series)
         session.commit()
         return db_series.to_entry()
@@ -464,6 +417,54 @@ class SeriesListDB(object):
         log.debug('fetching series with id %d from list id %d', series_id, list_id)
         return session.query(SeriesListSeries).filter(
             and_(SeriesListSeries.id == series_id, SeriesListSeries.list_id == list_id)).one()
+
+    @staticmethod
+    def get_db_series(data, db_series=None):
+        """
+        This method creates of edits a db SeriesListSeries object based on passed data
+        :param data: Dict or entry with the relevant data
+        :param db_series: If passed, this method will update the given attributes of a series object.
+        :return: A SeriesListSeries object
+        """
+        if not db_series:
+            title = data.get('series_name') or data['title']
+            db_series = SeriesListSeries(title)
+        # Setting series attributes only for received data
+        single_attributes = ['date_dayfirst', 'date_yearfirst', 'timeframe', 'upgrade', 'target', 'specials', 'propers',
+                             'identified_by', 'exact', 'begin', 'parse_only', 'prefer_specials', 'assume_special',
+                             'tracking', 'set']
+        for attribute in single_attributes:
+            if data.get(attribute) is not None:
+                setattr(db_series, attribute, data[attribute])
+        if data.get('alternate_name'):
+            db_series.alternate_name = [SeriesListAlternateName(name=name) for name in data.get('alternate_name')]
+        if data.get('name_regexp'):
+            db_series.name_regexp = [SeriesListNameRegexp(regexp=regexp) for regexp in data.get('name_regexp')]
+        if data.get('ep_regexp'):
+            db_series.ep_regexp = [SeriesListEpRegexp(regexp=regexp) for regexp in data.get('ep_regexp')]
+        if data.get('date_regexp'):
+            db_series.date_regexp = [SeriesListDateRegexp(regexp=regexp) for regexp in data.get('date_regexp')]
+        if data.get('sequence_regexp'):
+            db_series.sequence_regexp = [SeriesListSequenceRegexp(regexp=regexp) for regexp in
+                                         data.get('sequence_regexp')]
+        if data.get('id_regexp'):
+            db_series.id_regexp = [SeriesListIDRegexp(regexp=regexp) for regexp in data.get('id_regexp')]
+        if data.get('quality'):
+            db_series.quality = SeriesListQuality(quality=data.get('quality'))
+        if data.get('qualities'):
+            db_series.qualities = [SeriesListQualities(quality=quality) for quality in data.get('qualities')]
+        if data.get('from_group'):
+            db_series.from_group = [SeriesListFromGroup(group_name=name) for name in data.get('from_group')]
+        if data.get('special_ids'):
+            db_series.special_ids = [SeriesListSpecialID(id_name=name) for name in data.get('special_ids')]
+
+        # Get list of supported identifiers
+        for id_name in FilterSeriesBase().supported_ids():
+            value = data.get(id_name)
+            if value:
+                log.debug('found supported ID %s with value %s in entry, adding to series', id_name, value)
+                db_series.ids.append(SeriesListSeriesExternalID(id_name=id_name, id_value=value))
+        return db_series
 
 
 @event('plugin.register')
