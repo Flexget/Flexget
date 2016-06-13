@@ -69,6 +69,7 @@ class TestSeriesListAPI(object):
         assert json.loads(rsp.get_data(as_text=True)).get('title') == 'title'
 
         series = {'title': 'series 1',
+                  'set': {'movedone': '/a/random/path'},
                   'alternate_name': ['SER1', 'SER2'],
                   'name_regexp': ["^ser", "^series 1$"],
                   'ep_regexp': ["^ser", "^series 1$"],

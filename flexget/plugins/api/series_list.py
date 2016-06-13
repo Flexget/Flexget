@@ -62,59 +62,12 @@ class objects_container(object):
             'added_on': {'type': 'string'},
             'series_id': {'type': 'integer'}
         }})
+    input_series_object = FilterSeriesBase().settings_schema
+    input_series_object['properties'].update({'title': {'type': 'string'}})
+    input_series_object['required'] = ['title']
+    input_series_object['additionalProperties'] = True
 
-    input_series_object = {
-        'type': 'object',
-        'properties': {
-            'title': {'type': 'string'},
-            'path': {'type': 'string'},
-            'alternate_name': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
-            'name_regexp': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
-            'ep_regexp': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
-            'date_regexp': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
-            'sequence_regexp': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
-            'id_regexp': {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}},
-            'date_yearfirst': {'type': 'boolean'},
-            'date_dayfirst': {'type': 'boolean'},
-            'quality': {'type': 'string', 'format': 'quality_requirements'},
-            'qualities': {'type': 'array', 'items': {'type': 'string', 'format': 'quality_requirements'}},
-            'timeframe': {'type': 'string', 'format': 'interval'},
-            'upgrade': {'type': 'boolean'},
-            'target': {'type': 'string', 'format': 'quality_requirements'},
-            # Specials
-            'specials': {'type': 'boolean'},
-            # Propers (can be boolean, or an interval string)
-            'propers': {'type': ['boolean', 'string'], 'format': 'interval'},
-            # Identified by
-            'identified_by': {
-                'type': 'string', 'enum': ['ep', 'date', 'sequence', 'id', 'auto']
-            },
-            # Strict naming
-            'exact': {'type': 'boolean'},
-            # Begin takes an ep, sequence or date identifier
-            'begin': {
-                'oneOf': [
-                    {'name': 'ep identifier', 'type': 'string', 'pattern': r'(?i)^S\d{2,4}E\d{2,3}$',
-                     'error_pattern': 'episode identifiers should be in the form `SxxEyy`'},
-                    {'name': 'date identifier', 'type': 'string', 'pattern': r'^\d{4}-\d{2}-\d{2}$',
-                     'error_pattern': 'date identifiers must be in the form `YYYY-MM-DD`'},
-                    {'name': 'sequence identifier', 'type': 'integer', 'minimum': 0}
-                ]
-            },
-            'from_group': {'type': 'array', 'items': {'type': 'string'}},
-            'parse_only': {'type': 'boolean'},
-            'special_ids': {'type': 'array', 'items': {'type': 'string'}},
-            'prefer_specials': {'type': 'boolean'},
-            'assume_special': {'type': 'boolean'},
-            'tracking': {'type': ['boolean', 'string'], 'enum': [True, False, 'backfill']}
-        },
-        'required': ['title'],
-        'additionalProperties': True
-    }
-
-    edit_series_object = copy.deepcopy(input_series_object)
-    del edit_series_object['properties']['title']
-    del edit_series_object['required']
+    edit_series_object = FilterSeriesBase().settings_schema
 
     return_series_object = copy.deepcopy(input_series_object)
     return_series_object['properties']['series_list_identifiers'] = {'type': 'array',
