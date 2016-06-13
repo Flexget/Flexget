@@ -50,6 +50,13 @@ class TestSeriesList(object):
             list_add:
               - series_list: test_list
 
+          test_list_accept:
+            mock:
+              - {title: 'series 1.s01e01.720p.HDTV-flexget', url: "http://mock.url/file1.torrent"}
+            accept_all: yes
+            list_accept:
+              - series_list: test_list
+
     """
 
     def test_base_series_list(self, execute_task):
@@ -92,3 +99,13 @@ class TestSeriesList(object):
         assert entry['configure_series_tracking'] == entry['tracking'] == 'backfill'
         assert entry['configure_series_identified_by'] == entry['identified_by'] == 'ep'
         assert not entry.get('not_a_real_attribute')
+
+    def test_list_accept(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.accepted) == 1
+
+        task = execute_task('test_list_accept')
+        assert len(task.accepted) == 1
+
+        task = execute_task('list_get')
+        assert len(task.entries) == 0
