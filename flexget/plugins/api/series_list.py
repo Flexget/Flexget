@@ -12,8 +12,6 @@ from flexget.plugins.filter.series import FilterSeriesBase
 from flexget.api import api, APIResource
 from flexget.plugins.list import series_list as sl
 
-supported_ids = FilterSeriesBase().supported_ids()
-
 log = logging.getLogger('series_list_api')
 
 series_list_api = api.namespace('series_list', description='Series List operations')

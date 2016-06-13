@@ -18,14 +18,6 @@ SETTINGS_SCHEMA = FilterSeriesBase().settings_schema
 SERIES_ATTRIBUTES = SETTINGS_SCHEMA['properties']
 
 
-def supported_ids():
-    # Return a list of supported series identifier as registered via their plugins
-    ids = []
-    for p in plugin.get_plugins(group='series_metainfo'):
-        ids.append(p.instance.series_identifier())
-    return ids
-
-
 class SeriesListType(object):
     """ Container class that hold several custom argparse types"""
 
@@ -85,10 +77,11 @@ class SeriesListType(object):
             raise ArgumentTypeError('Received identifier in wrong format: %s, '
                                     ' should be in keyword format like `tvdb_id=1234567`'.format(identifier))
         name, value = identifier.split('=', 2)
-        if name not in supported_ids():
+        if name not in FilterSeriesBase().supported_ids():
             raise ArgumentTypeError(
                 'Received unsupported identifier ID %s. Should be one of %s'.format(identifier,
-                                                                                    ' ,'.join(supported_ids())))
+                                                                                    ' ,'.join(
+                                                                                        FilterSeriesBase().supported_ids())))
         return {name: value}
 
     @staticmethod
@@ -107,7 +100,7 @@ def build_data_dict(options):
         data[attribute] = getattr(options, attribute)
     if options.identifiers:
         for identifier in options.identifiers:
-            if identifier in supported_ids():
+            if identifier in FilterSeriesBase().supported_ids():
                 for k, v in identifier.items():
                     data[k] = v
     return data

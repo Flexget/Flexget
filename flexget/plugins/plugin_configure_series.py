@@ -16,8 +16,6 @@ from flexget.plugins.filter.series import FilterSeriesBase
 log = logging.getLogger('configure_series')
 Base = db_schema.versioned_base('import_series', 0)
 
-supported_ids = FilterSeriesBase().supported_ids()
-
 
 class LastHash(Base):
     __tablename__ = 'import_series_last_hash'
@@ -79,7 +77,7 @@ class ConfigureSeries(FilterSeriesBase):
 
             for entry in result:
                 s = series.setdefault(entry['title'], {})
-                for supported_id in supported_ids:
+                for supported_id in FilterSeriesBase().supported_ids():
                     if entry.get(supported_id):
                         s['set'] = {supported_id: entry[supported_id]}
 
