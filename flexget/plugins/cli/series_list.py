@@ -185,13 +185,13 @@ def series_list_show(options):
             return
 
         try:
-            series = slDb.get_series_by_id(series_list.id, int(options.series), session=session)
+            series = slDb.get_series_by_id(series_list.id, int(options.series_title), session=session)
         except NoResultFound:
             console(
-                'Could not find matching series with ID {} in list `{}`'.format(int(options.series), options.list_name))
+                'Could not find matching series with ID {} in list `{}`'.format(int(options.series_title), options.list_name))
             return
         except ValueError:
-            series = slDb.get_series_by_title(series_list.id, options.series, session=session)
+            series = slDb.get_series_by_title(series_list.id, options.series_title, session=session)
             if not series:
                 console(
                     'Could not find matching series with title `{}` in list `{}`'.format(options.series,
@@ -214,16 +214,16 @@ def series_list_update(options):
             return
 
         try:
-            series = slDb.get_series_by_id(series_list.id, int(options.series), session=session)
+            series = slDb.get_series_by_id(series_list.id, int(options.series_title), session=session)
         except NoResultFound:
             console(
-                'Could not find matching series with ID {} in list `{}`'.format(int(options.series), options.list_name))
+                'Could not find matching series with ID {} in list `{}`'.format(int(options.series_title), options.list_name))
             return
         except ValueError:
-            series = slDb.get_series_by_title(series_list.id, options.series, session=session)
+            series = slDb.get_series_by_title(series_list.id, options.series_title, session=session)
             if not series:
                 console(
-                    'Could not find matching series with title `{}` in list `{}`'.format(options.series,
+                    'Could not find matching series with title `{}` in list `{}`'.format(options.series_title,
                                                                                          options.list_name))
 
         console('Updating series #{}: {}'.format(series.id, series.title))
@@ -235,7 +235,7 @@ def series_list_update(options):
         data = build_data_dict(options)
         series = get_db_series(data, series)
         session.commit()
-        console('Successfully updated series  #{}: {}'.format(series.id, series.title))
+        console('Successfully updated series #{}: {}'.format(series.id, series.title))
 
 
 @event('options.register')
@@ -244,12 +244,13 @@ def register_parser_arguments():
     series_parser.add_argument('series_title', metavar='series-title',
                                help="Title of the series. Should include country code if relevant")
 
+    # This parser will be used when series ID can be used
+    series_id_parser = ArgumentParser(add_help=False)
+    series_id_parser.add_argument('series_title', metavar='series-title', help="Series title or ID")
+
     list_name_parser = ArgumentParser(add_help=False)
     list_name_parser.add_argument('list_name', nargs='?', default='series',
                                   help='Name of series list to operate on. Default is `series`')
-
-    series_id_parser = ArgumentParser(add_help=False)
-    series_id_parser.add_argument('series', help="Series title or ID")
 
     series_attributes_parser = ArgumentParser(add_help=False)
     series_attributes_parser.add_argument('--path', help='Set path field for this series')
