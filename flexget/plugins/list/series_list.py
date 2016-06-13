@@ -13,7 +13,7 @@ from sqlalchemy.sql.elements import and_
 from flexget.plugins.filter.series import FilterSeriesBase
 from flexget import plugin
 from flexget.db_schema import versioned_base
-from flexget.utils.database import with_session
+from flexget.utils.database import with_session, json_synonym
 from flexget.entry import Entry
 from flexget.event import event
 
@@ -50,6 +50,8 @@ class SeriesListSeries(Base):
     title = Column(Unicode)
 
     # Internal series attributes
+    _set = Column('set', Unicode)
+    set = json_synonym('_set')
     path = Column(Unicode)
     alternate_name = relationship('SeriesListAlternateName', backref='series', cascade='all, delete, delete-orphan')
     name_regexp = relationship('SeriesListNameRegexp', backref='series', cascade='all, delete, delete-orphan')
@@ -119,9 +121,6 @@ class SeriesListSeries(Base):
         entry['set'] = {}
 
         for attribute in SERIES_ATTRIBUTES:
-            # `set` is not a real series attribute and is just a way to pass IDs in task.
-            if attribute == 'set':
-                continue
             result = self.format_converter(attribute)
             if result:
                 # Maintain support for configure_series plugin expected format
@@ -140,9 +139,6 @@ class SeriesListSeries(Base):
             'series_list_identifiers': [series_list_id.to_dict() for series_list_id in self.ids]
         }
         for attribute in SETTINGS_SCHEMA['properties']:
-            # `set` is not a real series attribute and is just a way to pass IDs in task.
-            if attribute == 'set':
-                continue
             series_dict[attribute] = self.format_converter(attribute)
         return series_dict
 

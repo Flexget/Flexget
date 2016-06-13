@@ -29,6 +29,7 @@ class TestSeriesList(object):
           test_add_with_attributes:
             mock:
               - {title: 'series 1',
+                 set: {movedone: "/random/path"},
                  url: "http://mock.url/file1.torrent",
                  tvdb_id: "1234",
                  tvmaze_id: "1234",
@@ -74,6 +75,7 @@ class TestSeriesList(object):
         task = execute_task('list_get')
         assert len(task.entries) == 1
         assert task.find_entry(title='series 1')
+        assert task.find_entry(set={'movedone': "/random/path"})
         assert task.find_entry(tvdb_id='1234')
         assert task.find_entry(tvmaze_id='1234')
         assert task.find_entry(trakt_show_id='1234')
