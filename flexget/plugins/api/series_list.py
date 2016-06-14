@@ -173,7 +173,7 @@ class SeriesListListAPI(APIResource):
     @api.response(200, model=list_object_schema)
     @api.validate(edit_global_series_schema)
     def put(self, list_id, session=None):
-        """ Delete list by ID """
+        """ Edit list by ID """
         data = request.json
         updated_series_list = []
         try:
