@@ -70,26 +70,36 @@ class objects_container(object):
     edit_series_object = FilterSeriesBase().settings_schema
 
     edit_global_series_object = FilterSeriesBase().settings_schema
-    for attribute in FilterSeriesBase().settings_schema:
+    for attribute in FilterSeriesBase().settings_schema['properties']:
         if attribute.endswith('_regexp'):
             del edit_global_series_object['properties'][attribute]
     del edit_global_series_object['properties']['alternate_name']
+    del edit_global_series_object['properties']['date_yearfirst']
+    del edit_global_series_object['properties']['date_dayfirst']
+    del edit_global_series_object['properties']['identified_by']
+    del edit_global_series_object['title']
 
     return_series_object = copy.deepcopy(input_series_object)
     return_series_object['properties']['series_list_identifiers'] = {'type': 'array',
                                                                      'items': return_series_list_id_object}
     return_series_object['properties'].update({'added_on': {'type': 'string', 'format': 'date-time'}})
 
+    series_array_object = {'type': 'array', 'items': return_series_object}
+
     return_series_list = {
         'type': 'object',
         'properties': {
-            'series': {
-                'type': 'array',
-                'items': return_series_object
-            },
+            'series': series_array_object,
             'number_of_series': {'type': 'integer'},
             'total_number_of_series': {'type': 'integer'},
             'page_number': {'type': 'integer'}
+        }
+    }
+
+    return_series_list_edit = {
+        'type': 'object',
+        'properties': {
+            'series': series_array_object
         }
     }
 
@@ -104,6 +114,7 @@ input_series_schema = api.schema('input_series', objects_container.input_series_
 return_series_schema = api.schema('return_series_list', objects_container.return_series_object)
 edit_series_schema = api.schema('edit_series', objects_container.edit_series_object)
 edit_global_series_schema = api.schema('edit_series_list', objects_container.edit_global_series_object)
+return_series_list_edit_schema = api.schema('return_series_list', objects_container.return_series_list_edit)
 
 series_list_parser = api.parser()
 series_list_parser.add_argument('name', help='Filter results by list name')
@@ -170,7 +181,7 @@ class SeriesListListAPI(APIResource):
         return {}
 
     @api.response(404, model=default_error_schema)
-    @api.response(200, model=list_object_schema)
+    @api.response(200, model=return_series_list_edit_schema)
     @api.validate(edit_global_series_schema)
     def put(self, list_id, session=None):
         """ Edit list by ID """

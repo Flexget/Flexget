@@ -108,8 +108,6 @@ class SeriesListType(object):
 
 
 def tracking_attributes(attributes_list):
-    del attributes_list['path']
-    del attributes_list['set']
     del attributes_list['alternate_name']
     del attributes_list['name_regexp']
     del attributes_list['ep_regexp']
