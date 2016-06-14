@@ -229,7 +229,6 @@ class TestSeriesListAPI(object):
                     'propers': True,
                     'specials': True,
                     'tracking': False,
-                    'identified_by': "ep",
                     'exact': True,
                     'begin': 's01e01',
                     'from_group': ['group1', 'group2'],
