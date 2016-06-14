@@ -175,17 +175,17 @@ class SeriesListListAPI(APIResource):
     def put(self, list_id, session=None):
         """ Delete list by ID """
         data = request.json
-        updates_series = []
+        updated_series_list = []
         try:
             series_list = sl.SeriesListDB.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
         for series in series_list.series:
-            updates_series.append(sl.SeriesListDB.get_db_series(data, series))
-        series_list.series = updates_series
+            updated_series_list.append(sl.SeriesListDB.get_db_series(data, series))
+        series_list.series = updated_series_list
         session.commit()
-        return jsonify({'series': [series.to_dict() for series in updates_series]})
+        return jsonify({'series': [series.to_dict() for series in updated_series_list]})
 
 
 series_parser = api.parser()
