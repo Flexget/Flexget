@@ -14,8 +14,7 @@ from flexget.config_schema import parse_interval
 from flexget.plugins.list.series_list import SeriesListList, SeriesListDB as slDb, SeriesList
 from flexget.plugins.filter.series import FilterSeriesBase
 
-SETTINGS_SCHEMA = FilterSeriesBase().settings_schema
-SERIES_ATTRIBUTES = SETTINGS_SCHEMA['properties']
+SERIES_ATTRIBUTES = FilterSeriesBase().settings_schema['properties']
 
 
 class SeriesListType(object):
