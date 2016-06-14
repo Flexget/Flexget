@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.utils import old_div
-from future.moves.urllib.parse import urlencode
+from future.moves.urllib.parse import urlencode, quote
 
 import logging
 
@@ -103,9 +103,11 @@ class Newznab(object):
         # normally this should be used with emit_series who has provided season and episodenumber
         if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
             return []
-        tvrage_id = '&rid=%s' % arg_entry.get('tvrage_id') if arg_entry.get('tvrage_id') else ''
-        url = (
-        config['url'] + tvrage_id + '&season=%s&ep=%s' % (arg_entry['series_season'], arg_entry['series_episode']))
+        if arg_entry.get('tvrage_id'):
+            lookup = '&rid=%s' % arg_entry.get('tvrage_id')
+        else:
+            lookup = '&q=%s' % quote(arg_entry['series_name'])
+        url = config['url'] + lookup + '&season=%s&ep=%s' % (arg_entry['series_season'], arg_entry['series_episode'])
         return self.fill_entries_for_url(url, task)
 
     def do_search_movie(self, arg_entry, task, config=None):
