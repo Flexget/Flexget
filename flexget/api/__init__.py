@@ -257,7 +257,7 @@ class ValidationError(ApiError):
             if isinstance(getattr(error, attr), deque):
                 error_dict[attr] = list(getattr(error, attr))
             else:
-                error_dict[attr] = getattr(error, attr)
+                error_dict[attr] = str(getattr(error, attr))
         return error_dict
 
 
