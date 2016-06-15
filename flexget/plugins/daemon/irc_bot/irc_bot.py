@@ -16,7 +16,7 @@ import socket
 import threading
 import uuid
 
-from flexget.utils.irc.numeric_replies import REPLY_CODES
+from flexget.plugins.daemon.irc_bot.numeric_replies import REPLY_CODES
 
 log = logging.getLogger('irc_bot')
 

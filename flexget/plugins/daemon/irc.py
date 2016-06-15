@@ -19,7 +19,7 @@ from flexget.config_schema import register_config_key
 from flexget.event import event
 from flexget.manager import manager
 from flexget.config_schema import one_or_more
-from flexget.utils.irc import irc_bot
+from flexget.plugins.daemon.irc_bot import irc_bot
 
 log = logging.getLogger('irc')
 
