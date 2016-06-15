@@ -39,7 +39,7 @@ def event(command=None, msg=None):
 
     def decorator(func):
         log.debug('Adding event handler %s for (command=%s, msg=%s)', func.__name__, command, msg)
-        hash = hashlib.md5('.'.join(sorted(command) + sorted(msg)))
+        hash = hashlib.md5('.'.join(sorted(command) + sorted(msg)).encode('utf-8'))
         event_handlers[hash] = EventHandler(func, command, msg)
         return func
     return decorator
@@ -271,6 +271,10 @@ class IRCBot(asynchat.async_chat):
         if self.real_nickname == msg.arguments[1]:
             self.real_nickname += '_'
             self.write('NICK %s' % self.real_nickname)
+
+    @event('ERRNOSUCHNICK')
+    def on_nosuchnick(self, msg):
+        log.error('%s: %s', msg.arguments[2], msg.arguments[1])
 
     def send_privmsg(self, to, msg):
         self.write('PRIVMSG %s :%s' % (to, msg))
