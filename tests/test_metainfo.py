@@ -5,7 +5,6 @@ import pytest
 
 
 class TestMetainfo(object):
-
     config = """
         tasks:
           test_content_size:
@@ -24,7 +23,6 @@ class TestMetainfo(object):
 
 
 class TestMetainfoImdb(object):
-
     config = """
         tasks:
           test:
@@ -49,7 +47,6 @@ class TestMetainfoImdb(object):
 
 
 class TestMetainfoQuality(object):
-
     config = """
         tasks:
           test:
@@ -141,3 +138,27 @@ class TestMetainfoSeries(object):
             assert 'series_name' not in entry, error
             assert 'series_guessed' not in entry, error
             assert 'series_parser' not in entry, error
+
+
+class TestMetainfoMovie(object):
+    config = """
+        templates:
+          global:
+            metainfo_movie: yes
+        tasks:
+          test:
+            mock:
+              - {title: 'FlexGet.720p.HDTV.xvid-TheName'}
+              - {title: 'FlexGet2 (1999).720p.HDTV.xvid-TheName'}
+              - {title: 'FlexGet3 (2004).PROPER.1080p.BluRay.xvid-TheName'}
+
+
+    """
+
+    def test_metainfo_movie(self, execute_task):
+        task = execute_task('test')
+        assert task.find_entry(movie_name='Flexget', quality='720p hdtv xvid'), 'Failed to parse movie info'
+        assert task.find_entry(movie_name='Flexget2', movie_year=1999,
+                               quality='720p hdtv xvid'), 'Failed to parse movie info'
+        assert task.find_entry(movie_name='Flexget3', movie_year=2004, proper=True,
+                               quality='1080p BluRay xvid'), 'Failed to parse movie info'
