@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from future.utils import native_str
+from future.utils import python_2_unicode_compatible
 # -*- coding: utf-8 -*-
 
 import asynchat
@@ -57,9 +57,12 @@ def handle_event(msg, obj):
             for m in _event.msg:
                 m = m.rstrip('$') + '$'
                 if re.match(m, msg.raw, re.IGNORECASE):
-                    log.error('pls')
                     if callable(getattr(obj, _event.func)):
                         getattr(obj, _event.func)(msg)
+
+
+def printable_unicode_list(unicode_list):
+    return '[{}]'.format(', '.join(str(x) for x in unicode_list))
 
 
 class QueuedCommand(object):
@@ -157,7 +160,7 @@ class IRCBot(asynchat.async_chat):
 
     def handle_error(self):
         exc_info = sys.exc_info()
-        raise exc_info[0], exc_info[1], exc_info[2]
+        log.error(exc_info[0], exc_info[1], exc_info[2])
         delay = min(self.connection_attempts ** 2, self.max_connection_delay)
         log.error('Unknown error occurred. Attempting to restart connection in %s seconds.', delay)
         self.schedule.queue_command(delay, functools.partial(self.reconnect), 'reconnect')
@@ -191,15 +194,13 @@ class IRCBot(asynchat.async_chat):
 
     def collect_incoming_data(self, data):
         """Buffer the data"""
-        #import chardet
-        #print(data.encode('utf-8').decode('utf-8'))
-        self.buffer += data
+        self.buffer += data.decode('utf-8')
 
     def _process_message(self, msg):
         return IRCMessage(msg)
 
     def parse_message(self, lines):
-        log.debug('Received: %s', lines)
+        log.debug('Received: %s', printable_unicode_list(lines))
         for line in lines:
             handle_event(line, self)
 
@@ -327,6 +328,7 @@ class IRCBot(asynchat.async_chat):
         self.schedule.queue_command(5, functools.partial(self.join, self.channels), 'join')
 
 
+@python_2_unicode_compatible
 class IRCMessage(object):
 
     def __init__(self, msg):
@@ -352,12 +354,13 @@ class IRCMessage(object):
         return self.__str__()
 
     def __str__(self):
+        printable_arguments = printable_unicode_list(self.arguments)
         tmpl = (
-            "command: {command}, "
-            "prefix: {prefix}, "
-            "tags: {tags}, "
-            "arguments: {arguments}, "
-            "from_nick: {from_nick}, "
-            "raw: {raw}"
+            "command: {}, "
+            "prefix: {}, "
+            "tags: {}, "
+            "arguments: {}, "
+            "from_nick: {}, "
+            "raw: {}"
         )
-        return tmpl.format(**vars(self))
+        return tmpl.format(self.command, self.prefix, self.tags, printable_arguments, self.from_nick, self.raw)
