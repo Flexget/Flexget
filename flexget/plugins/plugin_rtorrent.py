@@ -399,7 +399,8 @@ class RTorrentPluginBase(object):
 
     def on_task_start(self, task, config):
         try:
-            client = RTorrent(config['uri'], username=config.get('username'),
+            client = RTorrent(os.path.expanduser(config['uri']),
+                              username=config.get('username'),
                               password=config.get('password'))
             if client.version < [0, 9, 2]:
                 log.error('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
@@ -449,7 +450,8 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
     def on_task_output(self, task, config):
-        client = RTorrent(config['uri'], username=config.get('username'),
+        client = RTorrent(os.path.expanduser(config['uri']),
+                          username=config.get('username'),
                           password=config.get('password'))
 
         for entry in task.accepted:
@@ -617,7 +619,8 @@ class RTorrentInputPlugin(RTorrentPluginBase):
     }
 
     def on_task_input(self, task, config):
-        client = RTorrent(config['uri'], username=config.get('username'),
+        client = RTorrent(os.path.expanduser(config['uri']),
+                          username=config.get('username'),
                           password=config.get('password'))
 
         fields = config.get('fields')
@@ -633,7 +636,8 @@ class RTorrentInputPlugin(RTorrentPluginBase):
         for torrent in torrents:
             entry = Entry(
                 title=torrent['name'],
-                url='%s/%s' % (config['uri'], torrent['hash']),
+                url='%s/%s' % (os.path.expanduser(config['uri']),
+                torrent['hash']),
                 path=torrent['base_path'],
                 torrent_info_hash=torrent['hash'],
             )
