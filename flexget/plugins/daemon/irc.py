@@ -278,7 +278,7 @@ class IRCConnection(irc_bot.IRCBot):
                     if isinstance(config, dict):
                         config = [config]
                     for c in config:
-                        if re.search(c['regexp'], entry.get(c['field'])):
+                        if re.search(c['regexp'], entry.get(c['field'], '')):
                             matched = True
                             if not tasks_entry_map.get(task):
                                 tasks_entry_map[task] = []
@@ -549,9 +549,9 @@ class IRCConnection(irc_bot.IRCBot):
             self.line_cache[channel][nickname] = []
         self.line_cache[channel][nickname].append(msg.arguments[1])
         if len(self.line_cache[channel][nickname]) == 1:
-            log.error('wtf')
             # Schedule a parse of the message in 1 second (for multilines)
-            self.schedule.queue_command(1, functools.partial(self.process_message, nickname, channel))
+            self.schedule.queue_command(1, functools.partial(self.process_message, nickname, channel),
+                                        'process_message')
 
     def process_message(self, nickname, channel):
         """

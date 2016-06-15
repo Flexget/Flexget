@@ -160,7 +160,7 @@ class IRCBot(asynchat.async_chat):
 
     def handle_error(self):
         exc_info = sys.exc_info()
-        log.error(exc_info[0], exc_info[1], exc_info[2])
+        raise exc_info[0], exc_info[1], exc_info[2]
         delay = min(self.connection_attempts ** 2, self.max_connection_delay)
         log.error('Unknown error occurred. Attempting to restart connection in %s seconds.', delay)
         self.schedule.queue_command(delay, functools.partial(self.reconnect), 'reconnect')
