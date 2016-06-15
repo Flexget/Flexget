@@ -189,8 +189,8 @@ class cached(object):
                     self.cache[cache_name] = copy.deepcopy(response)
                 except TypeError:
                     # might be caused because of backlog restoring some idiotic stuff, so not neccessarily a bug
-                    log.critical('Unable to save task content into cache,\
- if problem persists longer than a day please report this as a bug')
+                    log.critical('Unable to save task content into cache, '
+                                 'if problem persists longer than a day please report this as a bug')
                 if self.persist:
                     # Store to database
                     log.debug('Storing cache %s to database.' % cache_name)
