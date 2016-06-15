@@ -7,6 +7,7 @@ from flexget.plugins.parsers.parser_common import normalize_name, remove_dirt
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import get_plugin_by_name
+from flexget.plugins.parsers.parser_guessit import GuessitParsedEntry
 
 log = logging.getLogger('metainfo_movie')
 
@@ -25,6 +26,10 @@ class MetainfoMovie(object):
         entry['movie_year'] = parsed.year
         entry['proper'] = parsed.proper
         entry['proper_count'] = parsed.proper_count
+        # TODO: is this correct behaviour?
+        if isinstance(parsed, GuessitParsedEntry):
+            entry['release_group'] = parsed.parsed_group
+
         entry['movie_guessed'] = True
 
     def on_task_metainfo(self, task, config):

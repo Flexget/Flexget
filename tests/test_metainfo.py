@@ -151,6 +151,13 @@ class TestMetainfoMovie(object):
               - {title: 'FlexGet.720p.HDTV.xvid-TheName'}
               - {title: 'FlexGet2 (1999).720p.HDTV.xvid-TheName'}
               - {title: 'FlexGet3 (2004).PROPER.1080p.BluRay.xvid-TheName'}
+          test_guessit:
+            parsing:
+              movie: guessit
+            mock:
+              - {title: 'FlexGet.720p.HDTV.xvid-TheName'}
+              - {title: 'FlexGet2 (1999).720p.HDTV.xvid-TheName'}
+              - {title: 'FlexGet3 (2004).PROPER.1080p.BluRay.xvid-TheName'}
 
 
     """
@@ -162,3 +169,8 @@ class TestMetainfoMovie(object):
                                quality='720p hdtv xvid'), 'Failed to parse movie info'
         assert task.find_entry(movie_name='Flexget3', movie_year=2004, proper=True,
                                quality='1080p BluRay xvid'), 'Failed to parse movie info'
+
+    def test_metainfo_movie_with_guessit(self, execute_task):
+        task = execute_task('test_guessit')
+        assert task.find_entry(movie_name='Flexget', quality='720p hdtv xvid',
+                               release_group='TheName'), 'Failed to parse movie info'
