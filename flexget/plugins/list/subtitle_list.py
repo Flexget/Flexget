@@ -305,8 +305,6 @@ class PluginSubtitleList(object):
                 if number_of_files == 0:
                     subtitle_list.discard(item)
 
-        for item in subtitle_list:
-            log.error(item)
         return list((set(subtitle_list) | temp_items_from_dir) - temp_discarded_items)
 
     @classmethod
