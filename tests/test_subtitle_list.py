@@ -57,7 +57,7 @@ class TestSubtitleList(object):
                - subtitle_list:
                    list: test
              rerun: 0
-           subtitle_success:
+           subtitle_simulate_success:
              template: no_global
              subtitle_list:
                list: test
@@ -188,7 +188,16 @@ class TestSubtitleList(object):
         task = execute_task('subtitle_add_another_local_file')
         assert len(task.entries) == 1, 'Task should have accepted jessica jones file'
 
-        task = execute_task('subtitle_success')
+        with open('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt', 'a'):
+            os.utime('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt', None)
+
+        with open('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt', 'a'):
+            os.utime('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt', None)
+
+        with open('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt', 'a'):
+            os.utime('subtitle_list_test_dir/Marvels.Jessica.Jones.S01E02-FlexGet.en.srt', None)
+
+        task = execute_task('subtitle_simulate_success')
         assert len(task.failed) == 1, 'Should have found both languages for walking dead but not for jessica jones'
 
         task = execute_task('subtitle_emit')
