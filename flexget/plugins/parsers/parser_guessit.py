@@ -200,25 +200,6 @@ class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
             'audio_profile': self.quality2.audio_profile
         }
 
-    def populate_entry_fields(self, entry):
-        """ Populates entry fields based on parser data"""
-        entry['movie_parser'] = self
-        entry['movie_name'] = self.name
-        entry['movie_year'] = self.year
-        entry['proper'] = self.proper
-        entry['proper_count'] = self.proper_count
-        entry['release_group'] = self.parsed_group
-        entry['is_3d'] = self.is_3d
-        entry['subtitle_languages'] = self.subtitle_languages
-        entry['languages'] = self.languages
-        entry['video_codec'] = self.quality2.video_codec
-        entry['format'] = self.quality2.format
-        entry['audio_codec'] = self.quality2.audio_codec
-        entry['video_profile'] = self.quality2.video_profile
-        entry['screen_size'] = self.quality2.screen_size
-        entry['audio_channels'] = self.quality2.audio_channels
-        entry['audio_profile'] = self.quality2.audio_profile
-
 
 class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
     part_re = re.compile('part\\s?(\\d+)', re.IGNORECASE)
