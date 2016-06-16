@@ -11,6 +11,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
 from flexget.plugins.list import movie_list as ml
+from flexget.plugins.list.movie_list import MovieListBase
 from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('movie_list')
@@ -28,8 +29,6 @@ empty_response = api.schema('empty', {'type': 'object'})
 
 default_error_schema = api.schema('default_error_schema', default_error_schema)
 empty_response = api.schema('empty_response', empty_response)
-
-allowed_ids = ml.SUPPORTED_IDS
 
 input_movie_list_id_object = {
     'type': 'array',
@@ -182,7 +181,7 @@ class MovieListListAPI(APIResource):
 
 
 movie_identifiers_doc = "Use movie identifier using the following format:\n[{'ID_NAME: 'ID_VALUE'}]." \
-                        " Has to be one of %s" % " ,".join(allowed_ids)
+                        " Has to be one of %s" % " ,".join(MovieListBase().supported_ids)
 
 movies_parser = api.parser()
 movies_parser.add_argument('sort_by', choices=('id', 'added', 'title', 'year'), default='title',
@@ -253,7 +252,7 @@ class MovieListMoviesAPI(APIResource):
         # Validates ID type based on allowed ID
         # TODO pass this to json schema validation
         for id_name in data.get('movie_identifiers'):
-            if set(id_name.keys()) & set(allowed_ids) == set([]):
+            if set(id_name.keys()) & set(MovieListBase().supported_ids) == set([]):
                 return {'status': 'error',
                         'message': 'movie identifier %s is not allowed' % id_name}, 501
         if 'movie_name' in data:
@@ -316,9 +315,9 @@ class MovieListMovieAPI(APIResource):
         data = request.json
 
         # Validates ID type based on allowed ID
-        # TODO pass this to json shcema validation
+        # TODO pass this to json schema validation
         for id_name in data:
-            if set(id_name.keys()) & set(allowed_ids) == set([]):
+            if set(id_name.keys()) & set(MovieListBase().supported_ids) == set([]):
                 return {'status': 'error',
                         'message': 'movie identifier %s is not allowed' % id_name}, 501
         movie.ids[:] = ml.get_db_movie_identifiers(identifier_list=data, movie_id=movie_id, session=session)

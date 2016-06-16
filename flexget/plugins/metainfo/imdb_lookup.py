@@ -441,7 +441,12 @@ class ImdbLookup(object):
         session.add(movie)
         return movie
 
+    @property
+    def movie_identifier(self):
+        """Returns the plugin main identifier type"""
+        return 'imdb_id'
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ImdbLookup, 'imdb_lookup', api_ver=2)
+    plugin.register(ImdbLookup, 'imdb_lookup', api_ver=2, groups=['movie_metainfo'])

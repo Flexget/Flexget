@@ -11,7 +11,7 @@ from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
-    get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, SUPPORTED_IDS
+    get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase
 from flexget.plugins.metainfo.imdb_lookup import ImdbLookup
 from flexget.plugins.metainfo.tmdb_lookup import PluginTmdbLookup
 from flexget.utils.tools import split_title_year
@@ -39,9 +39,10 @@ def movie_list_keyword_type(identifier):
         raise ArgumentTypeError('Received identifier in wrong format: %s, '
                                 ' should be in keyword format like `imdb_id=tt1234567`' % identifier)
     name, value = identifier.split('=', 2)
-    if name not in SUPPORTED_IDS:
+    if name not in MovieListBase().supported_ids:
         raise ArgumentTypeError(
-            'Received unsupported identifier ID %s. Should be one of %s' % (identifier, ' ,'.join(SUPPORTED_IDS)))
+            'Received unsupported identifier ID %s. Should be one of %s' % (
+                identifier, ' ,'.join(MovieListBase().supported_ids)))
     return {name: value}
 
 
@@ -120,7 +121,7 @@ def movie_list_add(options):
         if options.identifiers:
             id_list = options.identifiers
         else:
-            for _id in SUPPORTED_IDS:
+            for _id in MovieListBase().supported_ids:
                 if entry.get(_id):
                     id_list.append({_id: entry.get(_id)})
         if id_list:
