@@ -205,7 +205,7 @@ class MovieList(MutableSet):
         parser = get_plugin_by_name('parsing').instance.parse_movie(data=entry['title'])
         if parser and parser.valid:
             parser.name = normalize_name(remove_dirt(parser.name))
-            parser.populate_entry_fields(entry)
+            entry.update(parser.fields)
 
     @property
     def immutable(self):
