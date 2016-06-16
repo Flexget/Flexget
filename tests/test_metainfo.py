@@ -156,21 +156,51 @@ class TestMetainfoMovie(object):
               movie: guessit
             mock:
               - {title: 'FlexGet.720p.HDTV.xvid-TheName'}
-              - {title: 'FlexGet2 (1999).720p.HDTV.xvid-TheName'}
               - {title: 'FlexGet3 (2004).PROPER.1080p.BluRay.xvid-TheName'}
-
-
+              - {title: 'The.Flexget.2000.BluRay.Remux.1080p.AVC.TrueHD.5.1-FQ'}
+              - {title: 'The.Flexget.Winters.War.2016.1080p.WEB-DL.H264.AC3-FlexO'}
     """
 
     def test_metainfo_movie(self, execute_task):
         task = execute_task('test')
-        assert task.find_entry(movie_name='Flexget', quality='720p hdtv xvid'), 'Failed to parse movie info'
-        assert task.find_entry(movie_name='Flexget2', movie_year=1999,
-                               quality='720p hdtv xvid'), 'Failed to parse movie info'
-        assert task.find_entry(movie_name='Flexget3', movie_year=2004, proper=True,
-                               quality='1080p BluRay xvid'), 'Failed to parse movie info'
+        assert task.find_entry(movie_name='Flexget',
+                               quality='720p hdtv xvid')
+        assert task.find_entry(movie_name='Flexget2',
+                               movie_year=1999,
+                               quality='720p hdtv xvid')
+        assert task.find_entry(movie_name='Flexget3',
+                               movie_year=2004,
+                               proper=True,
+                               quality='1080p BluRay xvid')
 
     def test_metainfo_movie_with_guessit(self, execute_task):
         task = execute_task('test_guessit')
-        assert task.find_entry(movie_name='Flexget', quality='720p hdtv xvid',
-                               release_group='TheName'), 'Failed to parse movie info'
+        assert task.find_entry(movie_name='Flexget',
+                               format='HDTV',
+                               screen_size='720p',
+                               video_codec='XviD',
+                               release_group='TheName')
+
+        assert task.find_entry(movie_name='Flexget3',
+                               movie_year=2004,
+                               proper=True,
+                               format='BluRay',
+                               screen_size='1080p',
+                               video_codec='XviD',
+                               release_group='TheName')
+
+        assert task.find_entry(movie_name='The Flexget',
+                               audio_channels='5.1',
+                               audio_codec='TrueHD',
+                               movie_year=2000,
+                               format='BluRay',
+                               screen_size='1080p',
+                               release_group='FQ')
+
+        assert task.find_entry(movie_name='The Flexget Winters War',
+                               audio_codec='AC3',
+                               movie_year=2016,
+                               format='WEB-DL',
+                               screen_size='1080p',
+                               video_codec='h264',
+                               release_group='FlexO')

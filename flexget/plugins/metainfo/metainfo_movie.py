@@ -26,9 +26,19 @@ class MetainfoMovie(object):
         entry['movie_year'] = parsed.year
         entry['proper'] = parsed.proper
         entry['proper_count'] = parsed.proper_count
-        # TODO: is this correct behaviour?
+
         if isinstance(parsed, GuessitParsedEntry):
             entry['release_group'] = parsed.parsed_group
+            entry['is_3d'] = parsed.is_3d
+            entry['subtitle_languages'] = parsed.subtitle_languages
+            entry['languages'] = parsed.languages
+            entry['video_codec'] = parsed.quality2.video_codec
+            entry['format'] = parsed.quality2.format
+            entry['audio_codec'] = parsed.quality2.audio_codec
+            entry['video_profile'] = parsed.quality2.video_profile
+            entry['screen_size'] = parsed.quality2.screen_size
+            entry['audio_channels'] = parsed.quality2.audio_channels
+            entry['audio_profile'] = parsed.quality2.audio_profile
 
         entry['movie_guessed'] = True
 
