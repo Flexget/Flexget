@@ -138,7 +138,7 @@ class PluginSubliminal(object):
                         hash_scores = movie_scores['hash']
                     log.info('Name computed for %s was %s', entry['location'], title)
                     msc = hash_scores if config['exact_match'] else 0
-                    if entry_languages & existing_subtitles:
+                    if entry_languages == existing_subtitles:
                         log.debug('All preferred languages already exist for "%s"', entry['title'])
                         entry['subtitles_missing'] = set()
                         continue  # subs for preferred lang(s) already exists
