@@ -475,10 +475,18 @@ class Task(object):
             self.manager.crash_report()
             self.abort(msg)
 
-    def rerun(self):
-        """Immediately re-run the task after execute has completed,
-        task can be re-run up to :attr:`.max_reruns` times."""
-        msg = 'Plugin %s has requested task to be ran again after execution has completed.' % self.current_plugin
+    def rerun(self, plugin=None, reason=None):
+        """
+        Immediately re-run the task after execute has completed,
+        task can be re-run up to :attr:`.max_reruns` times.
+
+        :param str plugin: Plugin name
+        :param str reason: Why the rerun is done
+        """
+        msg = 'Plugin {0} has requested task to be ran again after execution has completed.'.format(
+            self.current_plugin if plugin is None else plugin)
+        if reason:
+            msg += ' Reason: {0}'.format(reason)
         # Only print the first request for a rerun to the info log
         log.debug(msg) if self._rerun else log.info(msg)
         self._rerun = True

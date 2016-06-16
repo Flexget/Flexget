@@ -183,7 +183,7 @@ class EmitSeries(object):
                                                             entry['series_season'],
                                                             entry['series_episode'] + 1,
                                                             task))
-                task.rerun()
+                task.rerun(plugin='emit_series', reason='Look for next episode')
             elif db_release:
                 # There are know releases of this episode, but none were accepted
                 return
@@ -193,7 +193,7 @@ class EmitSeries(object):
                 self.rerun_entries.append(self.search_entry(series, latest.season + 1, 1, task))
                 log.debug('%s %s not found, rerunning to look for next season' %
                           (entry['series_name'], entry['series_id']))
-                task.rerun()
+                task.rerun(plugin='emit_series', reason='Look for next season')
 
 
 @event('plugin.register')

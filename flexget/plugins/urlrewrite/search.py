@@ -71,6 +71,8 @@ class PluginSearch(object):
                             log.debug('Found url: %s', result['url'])
                             entry['url'] = result['url']
                             break
+                        else:
+                            log.debug('Match %s is not close enough', result['title'])
                     else:
                         continue
                     break

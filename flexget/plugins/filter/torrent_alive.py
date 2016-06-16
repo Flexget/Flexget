@@ -251,7 +251,7 @@ class TorrentAlive(object):
                     entry.reject(reason='Tracker(s) had < %s required seeds. (%s)' % (min_seeds, seeds),
                                  remember_time=config['reject_for'])
                     # Maybe there is better match that has enough seeds
-                    task.rerun()
+                    task.rerun(plugin='torrent_alive', reason='Not enough seeds')
                 else:
                     log.debug('Found %i seeds from trackers' % seeds)
 
