@@ -18,7 +18,6 @@ from flexget.utils import qualities
 from .parser_common import old_assume_quality
 from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie
 
-
 log = logging.getLogger('parser_guessit')
 
 logging.getLogger('rebulk').setLevel(logging.WARNING)
@@ -177,6 +176,25 @@ class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
     def title(self):
         return self._guess_result.get('title')
 
+    def populate_entry_fields(self, entry):
+        """ Populates entry fields based on parser data"""
+        entry['movie_parser'] = self
+        entry['movie_name'] = self.name
+        entry['movie_year'] = self.year
+        entry['proper'] = self.proper
+        entry['proper_count'] = self.proper_count
+        entry['release_group'] = self.parsed_group
+        entry['is_3d'] = self.is_3d
+        entry['subtitle_languages'] = self.subtitle_languages
+        entry['languages'] = self.languages
+        entry['video_codec'] = self.quality2.video_codec
+        entry['format'] = self.quality2.format
+        entry['audio_codec'] = self.quality2.audio_codec
+        entry['video_profile'] = self.quality2.video_profile
+        entry['screen_size'] = self.quality2.screen_size
+        entry['audio_channels'] = self.quality2.audio_channels
+        entry['audio_profile'] = self.quality2.audio_profile
+
 
 class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
     part_re = re.compile('part\\s?(\\d+)', re.IGNORECASE)
@@ -260,6 +278,7 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
     def valid_strict(self):
         return True
 
+
 def _id_regexps_function(input_string, context):
     ret = []
     for regexp in context.get('id_regexps'):
@@ -267,9 +286,12 @@ def _id_regexps_function(input_string, context):
             ret.append(match.span)
     return ret
 
-_id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId', disabled=lambda context: not context.get('id_regexps'))
+
+_id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId',
+                                  disabled=lambda context: not context.get('id_regexps'))
 
 guessit_api = GuessItApi(rebulk_builder().rebulk(_id_regexps))
+
 
 class ParserGuessit(object):
     def _guessit_options(self, options):

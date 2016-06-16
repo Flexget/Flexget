@@ -19,29 +19,6 @@ class MetainfoMovie(object):
 
     schema = {'type': 'boolean'}
 
-    @staticmethod
-    def populate_entry_fields(entry, parsed):
-        entry['movie_parser'] = parsed
-        entry['movie_name'] = parsed.name
-        entry['movie_year'] = parsed.year
-        entry['proper'] = parsed.proper
-        entry['proper_count'] = parsed.proper_count
-
-        if isinstance(parsed, GuessitParsedEntry):
-            entry['release_group'] = parsed.parsed_group
-            entry['is_3d'] = parsed.is_3d
-            entry['subtitle_languages'] = parsed.subtitle_languages
-            entry['languages'] = parsed.languages
-            entry['video_codec'] = parsed.quality2.video_codec
-            entry['format'] = parsed.quality2.format
-            entry['audio_codec'] = parsed.quality2.audio_codec
-            entry['video_profile'] = parsed.quality2.video_profile
-            entry['screen_size'] = parsed.quality2.screen_size
-            entry['audio_channels'] = parsed.quality2.audio_channels
-            entry['audio_profile'] = parsed.quality2.audio_profile
-
-        entry['movie_guessed'] = True
-
     def on_task_metainfo(self, task, config):
         # Don't run if we are disabled
         if config is False:
@@ -58,13 +35,13 @@ class MetainfoMovie(object):
         :param entry: Entry that's being processed
         :return: True for successful parse
         """
-        if entry.get('movie_parser') and entry['movie_parser'].valid:
+        if entry.get('movie_guessed'):
             # Return true if we already parsed this
             return True
-        parsed = get_plugin_by_name('parsing').instance.parse_movie(data=entry['title'])
-        if parsed and parsed.valid:
-            parsed.name = normalize_name(remove_dirt(parsed.name))
-            self.populate_entry_fields(entry, parsed)
+        parser = get_plugin_by_name('parsing').instance.parse_movie(data=entry['title'])
+        if parser and parser.valid:
+            parser.name = normalize_name(remove_dirt(parser.name))
+            parser.populate_entry_fields(entry)
             return True
         return False
 
