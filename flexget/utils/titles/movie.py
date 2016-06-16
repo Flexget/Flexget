@@ -26,13 +26,18 @@ class MovieParser(TitleParser):
         self.reset()
         TitleParser.__init__(self)
 
-    def populate_entry_fields(self, entry):
-        """ Populates entry fields based on parser data"""
-        entry['movie_parser'] = self
-        entry['movie_name'] = self.name
-        entry['movie_year'] = self.year
-        entry['proper'] = self.proper
-        entry['proper_count'] = self.proper_count
+    @property
+    def fields(self):
+        """
+        Return a dict of all parser fields
+        """
+        return {
+            'movie_parser': self,
+            'movie_name': self.name,
+            'movie_year': self.year,
+            'proper': self.proper,
+            'proper_count': self.proper_count
+        }
 
     @property
     def valid(self):

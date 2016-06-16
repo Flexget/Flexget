@@ -176,6 +176,30 @@ class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
     def title(self):
         return self._guess_result.get('title')
 
+    @property
+    def fields(self):
+        """
+        Return a dict of all parser fields
+        """
+        return {
+            'movie_parser': self,
+            'movie_name': self.name,
+            'movie_year': self.year,
+            'proper': self.proper,
+            'proper_count': self.proper_count,
+            'release_group': self.parsed_group,
+            'is_3d': self.is_3d,
+            'subtitle_languages': self.subtitle_languages,
+            'languages': self.languages,
+            'video_codec': self.quality2.video_codec,
+            'format': self.quality2.format,
+            'audio_codec': self.quality2.audio_codec,
+            'video_profile': self.quality2.video_profile,
+            'screen_size': self.quality2.screen_size,
+            'audio_channels': self.quality2.audio_channels,
+            'audio_profile': self.quality2.audio_profile
+        }
+
     def populate_entry_fields(self, entry):
         """ Populates entry fields based on parser data"""
         entry['movie_parser'] = self
