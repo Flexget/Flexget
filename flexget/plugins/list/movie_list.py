@@ -13,6 +13,8 @@ from flexget import plugin
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.plugin import get_plugin_by_name
+from flexget.plugins.parsers.parser_common import normalize_name, remove_dirt
 from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('movie_list')
@@ -161,29 +163,36 @@ class MovieList(MutableSet):
         """Finds `MovieListMovie` corresponding to this entry, if it exists."""
         for id_name in SUPPORTED_IDS:
             if entry.get(id_name):
-                log.debug('trying to match movie based off id %s: %s', id_name, entry[id_name])
+                log.verbose('trying to match movie based off id %s: %s', id_name, entry[id_name])
                 res = (self._db_list(session).movies.join(MovieListMovie.ids).filter(
                     and_(
                         MovieListID.id_name == id_name,
                         MovieListID.id_value == entry[id_name]))
                        .first())
                 if res:
-                    log.debug('found movie %s', res)
+                    log.verbose('found movie %s', res)
                     return res
         # Fall back to title/year match
-        if entry.get('movie_name') and entry.get('movie_year'):
+        if not entry.get('movie_name'):
+            self._parse_title(entry)
+        if entry.get('movie_name'):
             name, year = entry['movie_name'], entry['movie_year']
         else:
-            name, year = split_title_year(entry['title'])
-        if not name:
-            log.verbose('no movie name to match, skipping')
+            log.warning('Could not get a movie name, skipping')
             return
-        log.debug('trying to match movie based of name: %s and year: %s', name, year)
+        log.verbose('trying to match movie based of name: %s and year: %s', name, year)
         res = (self._db_list(session).movies.filter(func.lower(MovieListMovie.title) == name.lower())
                .filter(MovieListMovie.year == year).first())
         if res:
-            log.debug('found movie %s', res)
+            log.verbose('found movie %s', res)
         return res
+
+    @staticmethod
+    def _parse_title(entry):
+        parser = get_plugin_by_name('parsing').instance.parse_movie(data=entry['title'])
+        if parser and parser.valid:
+            parser.name = normalize_name(remove_dirt(parser.name))
+            parser.populate_entry_fields(entry)
 
     @property
     def immutable(self):

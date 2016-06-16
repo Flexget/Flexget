@@ -114,6 +114,12 @@ class TestListInterface(object):
             accept_all: yes
             list_add:
               - movie_list: test_list
+
+          test_list_accept_for_real_title:
+            mock:
+              - {title: 'title.1.720p.BluRay.x264-Group'}
+            list_accept:
+              - movie_list: test_list
     """
 
     def test_list_add(self, execute_task):
@@ -239,6 +245,13 @@ class TestListInterface(object):
 
         task = execute_task('test_list_reject')
         assert len(task.rejected) == 1
+
+    def test_list_accept_for_real_title(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 2
+
+        task = execute_task('test_list_accept_for_real_title')
+        assert len(task.accepted) == 1
 
 
 class TestMovieListStripYearInterface(object):
