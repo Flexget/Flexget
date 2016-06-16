@@ -76,7 +76,7 @@ class PluginTraktLookup(object):
         'imdb_id': 'imdb_id',
         'tvdb_id': 'tvdb_id',
         'tmdb_id': 'tmdb_id',
-        'trakt_id': 'id',
+        'trakt_show_id': 'id',
         'trakt_slug': 'slug',
         'tvrage_id': 'tvrage_id',
         'trakt_trailer': 'trailer',
@@ -130,9 +130,9 @@ class PluginTraktLookup(object):
     movie_map = {
         'movie_name': 'title',
         'movie_year': 'year',
-        'trakt_name': 'title',
-        'trakt_year': 'year',
-        'trakt_id': 'id',
+        'trakt_movie_name': 'title',
+        'trakt_movie_year': 'year',
+        'trakt_movie_id': 'id',
         'trakt_slug': 'slug',
         'imdb_id': 'imdb_id',
         'tmdb_id': 'tmdb_id',
@@ -284,10 +284,10 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         if style == 'show' or style == 'episode':
             lookup = lookup_series
-            trakt_id = entry.get('trakt_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_show_id', eval_lazy=True)
         else:
             lookup = lookup_movie
-            trakt_id = entry.get('trakt_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_movie_id', eval_lazy=True)
         with Session() as session:
             lookupargs = {'trakt_id': trakt_id,
                           'session': session}
@@ -307,10 +307,10 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         if style == 'show' or style == 'episode':
             lookup = lookup_series
-            trakt_id = entry.get('trakt_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_show_id', eval_lazy=True)
         else:
             lookup = lookup_movie
-            trakt_id = entry.get('trakt_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_movie_id', eval_lazy=True)
         with Session() as session:
             lookupargs = {'trakt_id': trakt_id,
                           'session': session}
@@ -361,7 +361,17 @@ class PluginTraktLookup(object):
                     entry.register_lazy_func(collected_lookup, ['trakt_collected'])
                     entry.register_lazy_func(watched_lookup, ['trakt_watched'])
 
+    @property
+    def series_identifier(self):
+        """Returns the plugin main identifier type"""
+        return 'trakt_show_id'
+
+    @property
+    def movie_identifier(self):
+        """Returns the plugin main identifier type"""
+        return 'trakt_show_id'
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=3)
+    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=3, groups=['series_metainfo', 'movie_metainfo'])
