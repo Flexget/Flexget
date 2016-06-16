@@ -442,6 +442,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 sleep(0.5)
         raise
 
+    @plugin.priority(120)
     def on_task_download(self, task, config):
         # If the download plugin is not enabled, we need to call it to get
         # our temp .torrent files
@@ -449,6 +450,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             download = plugin.get_plugin_by_name('download')
             download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
+    @plugin.priority(135)
     def on_task_output(self, task, config):
         client = RTorrent(os.path.expanduser(config['uri']),
                           username=config.get('username'),
@@ -541,13 +543,11 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         else:
             # Check that file is downloaded
             if 'file' not in entry:
-                entry.fail('file missing?')
-                return
+                raise plugin.PluginError('Temporary download file is missing from entry')
 
             # Verify the temp file exists
             if not os.path.exists(entry['file']):
-                entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
-                return
+                raise plugin.PluginError('Temporary download file is missing from disk')
 
             # Verify valid torrent file
             if not is_torrent_file(entry['file']):
