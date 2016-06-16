@@ -168,7 +168,12 @@ class PluginTVMazeLookup(object):
                 if ('series_season' in entry and 'series_episode' in entry) or ('series_date' in entry):
                     entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
 
+    @staticmethod
+    def series_identifier():
+        """Returns the plugin main identifier type"""
+        return 'tvmaze_id'
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTVMazeLookup, 'tvmaze_lookup', api_ver=3)
+    plugin.register(PluginTVMazeLookup, 'tvmaze_lookup', api_ver=3, groups=['series_metainfo'])

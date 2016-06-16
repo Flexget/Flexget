@@ -949,6 +949,14 @@ class FilterSeriesBase(object):
             'additionalProperties': False
         }
 
+    @staticmethod
+    def supported_ids():
+        # Return a list of supported series identifier as registered via their plugins
+        ids = []
+        for p in plugin.get_plugins(group='series_metainfo'):
+            ids.append(p.instance.series_identifier())
+        return ids
+
     def make_grouped_config(self, config):
         """Turns a simple series list into grouped format with a empty settings dict"""
         if not isinstance(config, dict):

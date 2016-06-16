@@ -175,7 +175,7 @@ and avoid acceptance duplication during filter phase.
 
     @with_session
     def get(self, entry, session):
-        match = self._find_entry(entry=entry, session=session)
+        match = self.find_entry(entry=entry, session=session)
         return match.to_entry() if match else None
 
 

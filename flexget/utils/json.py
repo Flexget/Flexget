@@ -23,7 +23,6 @@ except ImportError:
         except ImportError:
             raise DependencyError(missing='simplejson')
 
-
 DATE_FMT = '%Y-%m-%d'
 ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 
@@ -32,6 +31,9 @@ class DTDecoder(json.JSONDecoder):
     def decode(self, obj, **kwargs):
         # The built-in `json` library will `unicode` strings, except for empty strings. patch this for
         # consistency so that `unicode` is always returned.
+        if obj is None:
+            return
+
         if obj == b'':
             return ''
 
@@ -104,6 +106,9 @@ def loads(*args, **kwargs):
     :param bool decode_datetime: If `True`, dates in ISO8601 format will be deserialized to :class:`datetime.datetime`
       objects.
     """
+    if args[0] is None:
+        return
+
     if kwargs.pop('decode_datetime', False):
         kwargs['object_hook'] = _datetime_decoder
         kwargs['cls'] = DTDecoder

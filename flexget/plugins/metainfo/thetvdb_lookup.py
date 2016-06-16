@@ -164,7 +164,12 @@ class PluginThetvdbLookup(object):
                 if entry.get('series_id_type') in ('ep', 'sequence', 'date'):
                     entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
 
+    @staticmethod
+    def series_identifier():
+        """Returns the plugin main identifier type"""
+        return 'tvdb_id'
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2)
+    plugin.register(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2, groups=['series_metainfo'])
