@@ -110,18 +110,7 @@ class SubtitleList(MutableSet):
             'languages': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
             'check_subtitles': {'type': 'boolean', 'default': True},
             'remove_after': {'type': 'string', 'format': 'interval'},
-            'path': {
-                'oneOf': [
-                    {
-                        'type': 'object',
-                        'properties': {
-                            'from_field': {'type': 'string'},
-                        },
-                        'required': ['from_field']
-                    },
-                    {'type': 'string'}
-                ]
-            },
+            'path': {'type': 'string'},
             'allow_dir': {'type': 'boolean', 'default': False},
             'force_file_existence': {'type': 'boolean', 'default': True}
         },
@@ -153,12 +142,7 @@ class SubtitleList(MutableSet):
 
     def _extract_path(self, entry):
         path = ''
-        if isinstance(self.config.get('path'), dict):
-            try:
-                path = entry.render(entry.get(self.config['path']['from_field']))
-            except RenderError as e:
-                log.error(e)
-        elif isinstance(self.config.get('path'), basestring):
+        if isinstance(self.config.get('path'), basestring):
             try:
                 path = entry.render(self.config['path'])
             except RenderError as e:

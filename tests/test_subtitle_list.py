@@ -8,7 +8,7 @@ import sys
 import pytest
 
 from flexget.manager import Session
-from flexget.plugins.list.subtitle_list import SubtitleListFile, SubtitleListLanguage
+from flexget.plugins.list.subtitle_list import SubtitleListFile, SubtitleListLanguage, normalize_path
 
 try:
     import babelfish
@@ -183,6 +183,27 @@ class TestSubtitleList(object):
              subtitle_list:
                list: test
                force_file_existence: no
+           subtitle_path:
+             disable: builtins
+             template: no_global
+             mock:
+               - {title: "The.Walking.Dead.S06E08-FlexGet",
+                  output: 'subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4'}
+             list_add:
+               - subtitle_list:
+                   list: test
+                   path: '{{ output }}'
+             accept_all: yes
+           subtitle_path_relative:
+             disable: builtins
+             template: no_global
+             mock:
+               - {title: "The.Walking.Dead.S06E08-FlexGet"}
+             list_add:
+               - subtitle_list:
+                   list: test
+                   path: 'subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4'
+             accept_all: yes
     """
 
     def test_subtitle_list_del(self, execute_task):
@@ -388,3 +409,21 @@ class TestSubtitleList(object):
         with Session() as session:
             s = session.query(SubtitleListFile).first()
             assert s is None, 'The file should have been removed from the list since it does not exist'
+
+    def test_subtitle_list_path(self, execute_task):
+        task = execute_task('subtitle_path')
+
+        with Session() as session:
+            s = session.query(SubtitleListFile).first()
+            assert s, 'The file should have been added to the list'
+            assert s.location == normalize_path('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4'), \
+                'location should be what the output field was set to'
+
+    def test_subtitle_list_relative_path(self, execute_task):
+        task = execute_task('subtitle_path_relative')
+
+        with Session() as session:
+            s = session.query(SubtitleListFile).first()
+            assert s, 'The file should have been added to the list'
+            assert s.location == normalize_path('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4'), \
+                'location should be what the output field was set to'
