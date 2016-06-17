@@ -344,11 +344,12 @@ class TestSubtitleList(object):
             os.utime('subtitle_list_test_dir/The.Big.Bang.Theory.S09E09-FlexGet.ja.srt', None)
 
         task = execute_task('subtitle_simulate_success_no_check')
-        assert len(task.accepted) == 1, 'All files have subtitles, but list_queue can only accept one'
+        assert len(task.all_entries) == 3, '"My Videos" should have been deleted'
+        assert len(task.accepted) == 3, 'All files have all subtitles'
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
-            assert s is None, '"My Videos" should have been deleted from the list'
+            assert s is None, '"My Videos" and contained files should have been deleted from the list'
 
         try:
             os.remove('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.ja.srt')

@@ -33,6 +33,8 @@ VIDEO_EXTENSIONS = ('.3g2', '.3gp', '.3gp2', '.3gpp', '.60d', '.ajp', '.asf', '.
 
 
 def normalize_language(language):
+    if isinstance(language, Language):
+        return str(language)
     return str(Language.fromietf(language))
 
 
@@ -111,7 +113,17 @@ class SubtitleList(MutableSet):
             'check_subtitles': {'type': 'boolean', 'default': True},
             'remove_after': {'type': 'string', 'format': 'interval'},
             'path': {'type': 'string'},
-            'allow_dir': {'type': 'boolean', 'default': False},
+            'allow_dir': {
+                'oneOf': [
+                    {'type': 'boolean', 'default': False},
+                    {
+                        'type': 'object',
+                        'properties': {
+                            'recursion_depth': {'type': 'integer', 'default': 1}
+                        }
+                    }
+                ]
+            },
             'force_file_existence': {'type': 'boolean', 'default': True}
         },
         'required': ['list'],
@@ -163,7 +175,7 @@ class SubtitleList(MutableSet):
         if self.config['force_file_existence'] and not path_exists:
             log.error('Path %s does not exist. Not adding to list.', path)
             return
-        elif path_exists and not self.config['allow_dir'] and os.path.isdir(path):
+        elif path_exists and not self.config.get('allow_dir') and os.path.isdir(path):
             log.error('Path %s is a directory and "allow_dir"=%s.', path, self.config['allow_dir'])
             return
 
@@ -182,10 +194,9 @@ class SubtitleList(MutableSet):
         normalized_languages = {normalize_language(subtitle_language) for subtitle_language in
                                 self.config.get('languages', [])}
         for subtitle_language in normalized_languages:
-            normalized_language = normalize_language(subtitle_language)
-            language = SubtitleListLanguage(language=normalized_language)
+            language = SubtitleListLanguage(language=subtitle_language)
             db_file.languages.append(language)
-        log.debug('adding entry %s', entry)
+        log.debug('adding entry %s with languages %s', entry, normalized_languages)
         db_list.files.append(db_file)
         session.commit()
         return db_file.to_entry()
@@ -198,14 +209,14 @@ class SubtitleList(MutableSet):
             session.delete(db_file)
 
     def __contains__(self, entry):
-        return self._find_entry(entry) is not None
+        return self._find_entry(entry, match_file_to_dir=True) is not None
 
     @with_session
-    def _find_entry(self, entry, session=None):
+    def _find_entry(self, entry, match_file_to_dir=False, session=None):
         """Finds `SubtitleListFile` corresponding to this entry, if it exists."""
         path = self._extract_path(entry)
         res = self._db_list(session).files.filter(SubtitleListFile.location == path).first()
-        if not res:
+        if not res and match_file_to_dir:
             path = os.path.dirname(path)
             res = self._db_list(session).files.filter(SubtitleListFile.location == path).first()
         return res
@@ -241,12 +252,26 @@ class PluginSubtitleList(object):
     def get_list(config):
         return SubtitleList(config)
 
+    def all_subtitles_exist(self, file, wanted_languages):
+        try:
+            import subliminal
+            existing_subtitles = set(subliminal.core.search_external_subtitles(file).values())
+            if wanted_languages and len(wanted_languages - existing_subtitles) == 0:
+                log.info('Local subtitle(s) already exists for %s.', file)
+                return True
+            return False
+        except ImportError:
+            log.warning('Subliminal not found. Unable to check for local subtitles.')
+
     def on_task_input(self, task, config):
         subtitle_list = SubtitleList(config)
+        if config.get('allow_dir') and isinstance(config['allow_dir'], dict):
+            recursion_depth = config['allow_dir']['recursion_depth']
+        else:
+            recursion_depth = 1
         temp_discarded_items = set()
-        temp_items_from_dir = set()
         for item in subtitle_list:
-            if not config['allow_dir'] and os.path.isdir(item['location']):
+            if not config.get('allow_dir') and os.path.isdir(item['location']):
                 log.error('Path %s is a directory. If you wish to allow directories, change your config.',
                           item['location'])
                 temp_discarded_items.add(item)
@@ -261,35 +286,36 @@ class PluginSubtitleList(object):
                          item['remove_after'] or config['remove_after'])
                 subtitle_list.discard(item)
             else:
+                languages = set(item['subtitle_languages']) or set(config.get('languages', []))
+                subtitle_list_languages = set(subtitle_list.config.get('languages', []))
+                num_potential_files = 0
+                num_added_files = 0
                 if os.path.isdir(item['location']):
-                    files = [os.path.join(item['location'], file) for file in os.listdir(item['location'])]
-                    temp_discarded_items.add(item)
-                else:
-                    files = [item['location']]
-                number_of_files = len(files)
-                for file in files:
-                    if os.path.splitext(file)[1] not in VIDEO_EXTENSIONS:
-                        log.debug('File %s is not a video file. Skipping', file)
-                        number_of_files -= 1
-                        continue
-                    if config['check_subtitles']:
-                        try:
-                            import subliminal
-                            existing_subtitles = set(subliminal.core.search_external_subtitles(file).values())
-                            wanted_languages = set(item['subtitle_languages']) or set(config.get('languages', []))
-                            if wanted_languages and len(wanted_languages - existing_subtitles) == 0:
-                                log.info('Local subtitle(s) already exists for %s.', file)
-                                number_of_files -= 1
+                    base_depth = len(normalize_path(item['location']).split(os.sep))
+                    max_depth = base_depth + recursion_depth
+                    for root, dirs, files in os.walk(item['location']):
+                        current_depth = len(root.split(os.sep))
+                        if current_depth > max_depth:
+                            break
+                        for file in files:
+                            if os.path.splitext(file)[1] not in VIDEO_EXTENSIONS:
+                                log.debug('File %s is not a video file. Skipping', file)
                                 continue
-                        except ImportError:
-                            log.warning('Subliminal not found. Unable to check for local subtitles.')
-                    if os.path.isdir(item['location']):
-                        temp_items_from_dir.add(Entry(title=os.path.splitext(os.path.basename(file))[0],
-                                                      url='file://' + file, location=file))
-                if number_of_files == 0:
-                    subtitle_list.discard(item)
+                            num_potential_files += 1
+                            file_path = normalize_path(os.path.join(root, file))
+                            if not config['check_subtitles'] or not self.all_subtitles_exist(file_path, languages):
+                                subtitle_list.config['languages'] = languages
+                                subtitle_list.add(Entry(title=os.path.splitext(os.path.basename(file_path))[0],
+                                                        url='file://' + file_path, location=file_path))
+                                num_added_files += 1
+                                subtitle_list.config['languages'] = subtitle_list_languages
+                    if num_added_files or num_potential_files:
+                        subtitle_list.discard(item)
+                else:
+                    if config['check_subtitles'] and self.all_subtitles_exist(item['location'], languages):
+                        subtitle_list.discard(item)
 
-        return list((set(subtitle_list) | temp_items_from_dir) - temp_discarded_items)
+        return list(set(subtitle_list) - temp_discarded_items)
 
     @classmethod
     def _expired(cls, file, config):
