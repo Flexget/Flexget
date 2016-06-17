@@ -195,7 +195,7 @@ class IRCBot(asynchat.async_chat):
 
     def collect_incoming_data(self, data):
         """Buffer the data"""
-        self.buffer += data.decode('utf-8')
+        self.buffer += re.sub('[\x02\x0F\x16\x1D\x1F]|\x03(\d{,2}(,\d{,2})?)?', '', data.decode('utf-8'))
 
     def _process_message(self, msg):
         return IRCMessage(msg)
