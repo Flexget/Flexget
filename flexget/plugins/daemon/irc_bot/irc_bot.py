@@ -159,9 +159,10 @@ class IRCBot(asynchat.async_chat):
         self.nick(self.real_nickname)
 
     def handle_error(self):
-        exc_info = sys.exc_info()
-        if exc_info:
-            raise exc_info[1].with_traceback(exc_info[2])
+        if sys.version_info[0] == 2:
+            exc_info = sys.exc_info()
+            if exc_info:
+                raise exc_info[0], exc_info[1], exc_info[2]
         delay = min(self.connection_attempts ** 2, self.max_connection_delay)
         log.error('Unknown error occurred. Attempting to restart connection in %s seconds.', delay)
         self.schedule.queue_command(delay, functools.partial(self.reconnect), 'reconnect')
@@ -193,9 +194,28 @@ class IRCBot(asynchat.async_chat):
         self.buffer = ''
         self.parse_message(lines)
 
+    def strip_irc_colors(self, data):
+        return re.sub('[\x02\x0F\x16\x1D\x1F]|\x03(\d{1,2}(,\d{1,2})?)?', '', data)
+
+    def strip_invisible(self, data):
+        """Strip stupid characters that have been colored 'invisible'"""
+        stripped_data = ''
+        i = 0
+        while i < len(data):
+            c = data[i]
+            if c == '\x03':
+                match = re.match('^(\x03(?:(\d{1,2})(?:,(\d{1,2}))(.?)?)?)', data[i:])
+                # if the colors match eg. \x031,1a, then "a" has same foreground and background color -> invisible
+                if match and match.group(2) == match.group(3) and ord(match.group(4)) > 31:
+                    c = match.group(0)[:-1] + ' '
+                    i += len(c) - 1
+            i += 1
+            stripped_data += c
+        return stripped_data
+
     def collect_incoming_data(self, data):
         """Buffer the data"""
-        self.buffer += re.sub('[\x02\x0F\x16\x1D\x1F]|\x03(\d{,2}(,\d{,2})?)?', '', data.decode('utf-8'))
+        self.buffer += self.strip_irc_colors(self.strip_invisible(data.decode('utf-8')))
 
     def _process_message(self, msg):
         return IRCMessage(msg)
