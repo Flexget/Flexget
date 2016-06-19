@@ -647,7 +647,7 @@ class IRCConnectionManager(object):
                     if conn.throttled:
                         log.error('Server has throttled the connection. Adding 30s to reconnection delay.')
                         self.restart_log[conn_name]['delay'] += 30
-                    conn.start_thread()
+                    irc_connections[conn_name] = IRCConnection(conn.config, conn_name)
 
                 if self.restart_log[conn_name]['delay'] > 0:
                     # reduce delay with 0.2 seconds. This is not meant to be precise, merely to avoid throttling.
@@ -683,12 +683,6 @@ class IRCConnectionManager(object):
             conn.stop(wait)
             conn.thread.join(1)
         irc_connections = {}
-
-    def restart_connection(self, conn_name):
-        global irc_connections
-
-        if not irc_connections[conn_name].is_alive():
-            irc_connections[conn_name][0].start_thread()
 
     def stop(self, wait):
         self.wait = wait

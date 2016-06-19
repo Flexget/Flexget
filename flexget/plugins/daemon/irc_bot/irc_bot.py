@@ -116,6 +116,31 @@ def is_channel(string):
     return string and string[0] in "#&+!"
 
 
+def strip_irc_colors(data):
+    """Strip mirc colors from string. Expects data to be decoded."""
+    return re.sub('[\x02\x0F\x16\x1D\x1F]|\x03(\d{1,2}(,\d{1,2})?)?', '', data)
+
+
+def strip_invisible(data):
+    """Strip stupid characters that have been colored 'invisible'. Assumes data has been decoded"""
+    stripped_data = ''
+    i = 0
+    while i < len(data):
+        c = data[i]
+        if c == '\x03':
+            match = re.match('^(\x03(?:(\d{1,2})(?:,(\d{1,2}))(.?)?)?)', data[i:])
+            # if the colors match eg. \x031,1a, then "a" has same foreground and background color -> invisible
+            if match and match.group(2) == match.group(3):
+                if match.group(4) and ord(match.group(4)) > 31:
+                    c = match.group(0)[:-1] + ' '
+                else:
+                    c = match.group(0)
+                i += len(c) - 1
+        i += 1
+        stripped_data += c
+    return stripped_data
+
+
 class IRCBot(asynchat.async_chat):
     ac_in_buffer_size = 8192
     ac_out_buffer_size = 8192
@@ -194,25 +219,6 @@ class IRCBot(asynchat.async_chat):
         self.buffer = ''
         self.parse_message(lines)
 
-    def strip_irc_colors(self, data):
-        return re.sub('[\x02\x0F\x16\x1D\x1F]|\x03(\d{1,2}(,\d{1,2})?)?', '', data)
-
-    def strip_invisible(self, data):
-        """Strip stupid characters that have been colored 'invisible'"""
-        stripped_data = ''
-        i = 0
-        while i < len(data):
-            c = data[i]
-            if c == '\x03':
-                match = re.match('^(\x03(?:(\d{1,2})(?:,(\d{1,2}))(.?)?)?)', data[i:])
-                # if the colors match eg. \x031,1a, then "a" has same foreground and background color -> invisible
-                if match and match.group(2) == match.group(3) and ord(match.group(4)) > 31:
-                    c = match.group(0)[:-1] + ' '
-                    i += len(c) - 1
-            i += 1
-            stripped_data += c
-        return stripped_data
-
     def collect_incoming_data(self, data):
         """Buffer the data"""
         try:
@@ -221,7 +227,7 @@ class IRCBot(asynchat.async_chat):
             log.warning('%s. Will attempt to use latin-1 decoding instead.', e)
             data = data.decode('latin-1')
 
-        self.buffer += self.strip_irc_colors(self.strip_invisible(data))
+        self.buffer += strip_irc_colors(strip_invisible(data))
 
     def _process_message(self, msg):
         return IRCMessage(msg)
