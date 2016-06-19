@@ -8,9 +8,9 @@ interactions:
       method: GET
       uri: https://api-v2launch.trakt.tv/search?type=show&query=House
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":50.13566,\"show\":{\"title\":\"\
-          House\",\"overview\":\"Go deeper into the medical mysteries of House, TV's\
-          \ most compelling drama. Hugh Laurie stars as the brilliant but sarcastic\
+      body: {string: "[{\"type\":\"show\",\"score\":53.453842,\"show\":{\"title\"\
+          :\"House\",\"overview\":\"Go deeper into the medical mysteries of House,\
+          \ TV's most compelling drama. Hugh Laurie stars as the brilliant but sarcastic\
           \ Dr. Gregory House, a maverick physician who is devoid of bedside manner.\
           \ While his behavior can border on antisocial, Dr. House thrives on the\
           \ challenge of solving the medical puzzles that other doctors give up on.\
@@ -24,7 +24,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg\"\
           }},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"\
           tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\"\
-          :40.515728,\"show\":{\"title\":\"House vs. House\",\"overview\":\"House\
+          :43.197227,\"show\":{\"title\":\"House vs. House\",\"overview\":\"House\
           \ vs. House is a new home makeover competition series where amateur and\
           \ experienced renovation teams compete for the chance to win $10,000 by\
           \ proving they can create the better DIY projects in their home. From painting\
@@ -36,7 +36,7 @@ interactions:
           poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\"\
           :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\"\
           :\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"\
-          tvrage\":null}}},{\"type\":\"show\",\"score\":35.811184,\"show\":{\"title\"\
+          tvrage\":null}}},{\"type\":\"show\",\"score\":38.181316,\"show\":{\"title\"\
           :\"Full House\",\"overview\":\"Full House is an American sitcom created\
           \ by Jeff Franklin for ABC. The show chronicles a widowed father, who enlists\
           \ his best friend and his brother-in-law to help raise his three daughters.\
@@ -50,7 +50,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/thumb/98635a003a.jpg\"\
           }},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"\
           imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\"\
-          ,\"score\":35.811184,\"show\":{\"title\":\"House Hunters\",\"overview\"\
+          ,\"score\":38.181316,\"show\":{\"title\":\"House Hunters\",\"overview\"\
           :\"House Hunters takes viewers behind the scenes as individuals, couples\
           \ and families learn what to look for and decide whether or not a home is\
           \ meant for them. Focusing on the emotional experience of finding and purchasing\
@@ -64,7 +64,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/thumb/36bdbe2817.jpg\"\
           }},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"\
           imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":35.811184,\"show\":{\"title\":\"Fuller House\",\"overview\":\"\
+          ,\"score\":38.181316,\"show\":{\"title\":\"Fuller House\",\"overview\":\"\
           Recently widowed D.J. Tanner-Fuller gets help from her sister Stephanie\
           \ and best friend Kimmy when the women move in with their families to help\
           \ D.J. raise her children in this spin-off series.\",\"year\":2016,\"status\"\
@@ -76,7 +76,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/thumb/37bbde27f6.jpg\"\
           }},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"\
           imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\"\
-          ,\"score\":35.811184,\"show\":{\"title\":\"Alpha House\",\"overview\":\"\
+          ,\"score\":38.181316,\"show\":{\"title\":\"Alpha House\",\"overview\":\"\
           Alpha House follows four senators who live together in a rented house in\
           \ Washington DC.Re-election battles, looming indictments, parties, their\
           \ Party... these senators need a drink. And a new housemate.\",\"year\"\
@@ -89,7 +89,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/thumb/e477e76c44.jpg\"\
           }},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"\
           imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\"\
-          ,\"score\":35.811184,\"show\":{\"title\":\"Playing House\",\"overview\"\
+          ,\"score\":38.181316,\"show\":{\"title\":\"Playing House\",\"overview\"\
           :\"A single-camera buddy comedy about what happens when two best friends\
           \ come back together, just when they need each other most.Inspired by the\
           \ ultra-close friendship between the series' creators and stars, \\\"Playing\
@@ -104,7 +104,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/thumb/49c78c5d22.jpg\"\
           }},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"\
           imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":35.811184,\"show\":{\"title\":\"House Husbands\",\"overview\"\
+          ,\"score\":38.181316,\"show\":{\"title\":\"House Husbands\",\"overview\"\
           :\"House Husbands centres around four families with one thing in common,\
           \ the husbands stay home to raise the children.\",\"year\":2012,\"status\"\
           :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/posters/original/8d6ef762b1.jpg\"\
@@ -115,7 +115,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/thumb/632ffeb8be.jpg\"\
           }},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"\
           imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":35.811184,\"show\":{\"title\":\"Bleak House\",\"overview\":\"\
+          ,\"score\":38.181316,\"show\":{\"title\":\"Bleak House\",\"overview\":\"\
           In this star-studded adaptation of a literary classic, acclaimed writer\
           \ Andrew Davies turns his talents to one of Charles Dickens' most brilliant\
           \ novels \u2014 arguably the greatest-ever depiction of Victorian London.\
@@ -138,7 +138,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/002/474/fanarts/thumb/4d61afbe9b.jpg\"\
           }},\"ids\":{\"trakt\":2474,\"slug\":\"bleak-house\",\"tvdb\":73558,\"imdb\"\
           :\"tt0442632\",\"tmdb\":2489,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :35.811184,\"show\":{\"title\":\"Full House\",\"overview\":\"Han Ji Eun\
+          :38.181316,\"show\":{\"title\":\"Full House\",\"overview\":\"Han Ji Eun\
           \ is a naive writer who got swindled out of everything she owned including\
           \ her house by her best friends. Stranded in China, She managed to borrow\
           \ money from an actor Lee Young Jae to return to Korea. On her return, she\
@@ -157,32 +157,32 @@ interactions:
           :\"tt0464625\",\"tmdb\":3504,\"tvrage\":null}}}]"}
       headers:
         CF-Cache-Status: [HIT]
-        CF-RAY: [29de2383c1520106-DFW]
+        CF-RAY: [2b5576e2cba00899-FRA]
         Cache-Control: ['public, max-age=14400']
         Connection: [keep-alive]
         Content-Type: [application/json; charset=utf-8]
-        Date: ['Wed, 04 May 2016 18:50:30 GMT']
-        ETag: [W/"938b0cd6657ea1be2f33342706e73598"]
-        Expires: ['Wed, 04 May 2016 22:50:30 GMT']
+        Date: ['Sun, 19 Jun 2016 08:03:25 GMT']
+        ETag: [W/"9ecd8304e0fcbfd2e9c1e7b28cfeaa47"]
+        Expires: ['Sun, 19 Jun 2016 12:03:25 GMT']
         Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=dd9b46c79416338aed275304a33496c531462387830; expires=Thu,
-            04-May-17 18:50:30 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Set-Cookie: ['__cfduid=d45c5cd23d645275296626f5e5792434f1466323405; expires=Mon,
+            19-Jun-17 08:03:25 GMT; path=/; domain=.trakt.tv; HttpOnly']
         Vary: [Accept-Encoding]
         X-Content-Type-Options: [nosniff]
         X-Frame-Options: [SAMEORIGIN]
-        X-Pagination-Item-Count: ['1568']
+        X-Pagination-Item-Count: ['1583']
         X-Pagination-Limit: ['10']
         X-Pagination-Page: ['1']
-        X-Pagination-Page-Count: ['157']
-        X-Request-Id: [316c43ad-8175-4953-829c-d9b650edec69]
-        X-Runtime: ['0.045017']
+        X-Pagination-Page-Count: ['159']
+        X-Request-Id: [0edc3a5b-57e7-4f86-a0d8-7a28cab3333e]
+        X-Runtime: ['0.024993']
         X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=dd9b46c79416338aed275304a33496c531462387830]
+        Cookie: [__cfduid=d45c5cd23d645275296626f5e5792434f1466323405]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -195,24 +195,24 @@ interactions:
           on antisocial, Dr. House thrives on the challenge of solving the medical
           puzzles that other doctors give up on. Together with his hand-picked team
           of young medical experts, he''ll do whatever it takes in the race against
-          the clock to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":44,"certification":"TV-14","network":"FOX
-          (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.8017,"votes":16369,"updated_at":"2016-04-27T09:52:29.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es","ro","cs","bs","lt","uk"],"genres":["comedy","drama","mystery"],"aired_episodes":176,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/001/399/fanarts/original/c628f24771.jpg","medium":"https://walter.trakt.us/images/shows/000/001/399/fanarts/medium/c628f24771.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/001/399/posters/original/76fae8b69b.jpg","medium":"https://walter.trakt.us/images/shows/000/001/399/posters/medium/76fae8b69b.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/399/posters/thumb/76fae8b69b.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/001/399/logos/original/2a5748f5d7.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/001/399/cleararts/original/6a9b6f6448.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/001/399/banners/original/5395bb01d7.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/001/399/thumbs/original/ed951f1f59.jpg"}}}'}
+          the clock to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
+          (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.80022,"votes":16538,"updated_at":"2016-06-06T11:52:38.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es","ro","cs","bs","lt","uk"],"genres":["comedy","drama","mystery"],"aired_episodes":176,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/001/399/fanarts/original/c628f24771.jpg","medium":"https://walter.trakt.us/images/shows/000/001/399/fanarts/medium/c628f24771.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/001/399/posters/original/76fae8b69b.jpg","medium":"https://walter.trakt.us/images/shows/000/001/399/posters/medium/76fae8b69b.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/399/posters/thumb/76fae8b69b.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/001/399/logos/original/2a5748f5d7.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/001/399/cleararts/original/6a9b6f6448.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/001/399/banners/original/5395bb01d7.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/001/399/thumbs/original/ed951f1f59.jpg"}}}'}
       headers:
         CF-Cache-Status: [HIT]
-        CF-RAY: [29de238461700106-DFW]
+        CF-RAY: [2b5576e41bab0899-FRA]
         Cache-Control: ['public, max-age=14400']
         Connection: [keep-alive]
         Content-Type: [application/json; charset=utf-8]
-        Date: ['Wed, 04 May 2016 18:50:30 GMT']
-        ETag: [W/"1c7e7c5d16e8e9a8275505bae9057491"]
-        Expires: ['Wed, 04 May 2016 22:50:30 GMT']
-        Last-Modified: ['Wed, 27 Apr 2016 09:52:29 GMT']
+        Date: ['Sun, 19 Jun 2016 08:03:25 GMT']
+        ETag: [W/"a1abc7cc66486eda40ca37af065c238c"]
+        Expires: ['Sun, 19 Jun 2016 12:03:25 GMT']
+        Last-Modified: ['Mon, 06 Jun 2016 11:52:38 GMT']
         Server: [cloudflare-nginx]
         Vary: [Accept-Encoding]
         X-Content-Type-Options: [nosniff]
         X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [4a74dc27-1b99-41d1-94a5-5fb0d6898ddc]
-        X-Runtime: ['0.019536']
+        X-Request-Id: [37ab9e60-dd4b-42f0-a9b3-5f8bc050e906]
+        X-Runtime: ['0.009414']
         X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -328,10 +328,12 @@ interactions:
           tmdb\":31514,\"tvrage\":4259},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/418/546/headshots/original/bb74d7b744.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/people/000/418/546/headshots/medium/bb74d7b744.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/people/000/418/546/headshots/thumb/bb74d7b744.jpg\"\
-          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
-          :\"From Wikipedia, the free encyclopedia\\n\\nPeter S. Jacobson (born March\
-          \ 24, 1965) is an American film and television actor.\",\"birthday\":\"\
-          1965-03-24\",\"death\":null,\"birthplace\":\"Chicago - Illinois - USA\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/418/546/fanarts/original/ff50099f40.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/418/546/fanarts/medium/ff50099f40.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/418/546/fanarts/thumb/ff50099f40.jpg\"\
+          }},\"biography\":\"From Wikipedia, the free encyclopedia\\n\\nPeter S. Jacobson\
+          \ (born March 24, 1965) is an American film and television actor.\",\"birthday\"\
+          :\"1965-03-24\",\"death\":null,\"birthplace\":\"Chicago - Illinois - USA\"\
           ,\"homepage\":\"\"}},{\"character\":\"Lawrence Kutner\",\"person\":{\"name\"\
           :\"Kal Penn\",\"ids\":{\"trakt\":415949,\"slug\":\"kal-penn\",\"imdb\":\"\
           nm0671980\",\"tmdb\":53493,\"tvrage\":11806},\"images\":{\"headshot\":{\"\
@@ -362,9 +364,9 @@ interactions:
           \ New Jersey, USA\",\"homepage\":\"\"}},{\"character\":\"Thirteen\",\"person\"\
           :{\"name\":\"Olivia Wilde\",\"ids\":{\"trakt\":421662,\"slug\":\"olivia-wilde\"\
           ,\"imdb\":\"nm1312575\",\"tmdb\":59315,\"tvrage\":51856},\"images\":{\"\
-          headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/421/662/headshots/original/44e5e551ec.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/people/000/421/662/headshots/medium/44e5e551ec.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/people/000/421/662/headshots/thumb/44e5e551ec.jpg\"\
+          headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/421/662/headshots/original/2f11c13bfe.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/people/000/421/662/headshots/medium/2f11c13bfe.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/people/000/421/662/headshots/thumb/2f11c13bfe.jpg\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/421/662/fanarts/original/de7fdeabc3.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/people/000/421/662/fanarts/medium/de7fdeabc3.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/people/000/421/662/fanarts/thumb/de7fdeabc3.jpg\"\
@@ -375,12 +377,11 @@ interactions:
           \ Dr. Remy \\\"Thirteen\\\" Hadley in the TV drama House, and in 2010 starred\
           \ as Quorra in Tron: Legacy.\\n\\nDescription above from the Wikipedia article\
           \ Olivia Wilde, licensed under CC-BY-SA, full list of contributors on Wikipedia.\"\
-          ,\"birthday\":\"1984-03-10\",\"death\":null,\"birthplace\":\"New York City\
-          \ - New York - USA\",\"homepage\":\"http://www.oliviawildefan.com/\"}},{\"\
-          character\":\"Jessica Adams\",\"person\":{\"name\":\"Odette Annable\",\"\
-          ids\":{\"trakt\":421384,\"slug\":\"odette-annable\",\"imdb\":\"nm0951148\"\
-          ,\"tmdb\":51992,\"tvrage\":57233},\"images\":{\"headshot\":{\"full\":\"\
-          https://walter.trakt.us/images/people/000/421/384/headshots/original/b29b737b94.jpg\"\
+          ,\"birthday\":\"1984-03-10\",\"death\":null,\"birthplace\":\"New York City,\
+          \ New York, USA\",\"homepage\":\"\"}},{\"character\":\"Jessica Adams\",\"\
+          person\":{\"name\":\"Odette Annable\",\"ids\":{\"trakt\":421384,\"slug\"\
+          :\"odette-annable\",\"imdb\":\"nm0951148\",\"tmdb\":51992,\"tvrage\":57233},\"\
+          images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/421/384/headshots/original/b29b737b94.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/people/000/421/384/headshots/medium/b29b737b94.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/people/000/421/384/headshots/thumb/b29b737b94.jpg\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/421/384/fanarts/original/b115dc69fb.jpg\"\
@@ -464,15 +465,40 @@ interactions:
           tmdb\":1224001,\"tvrage\":null},\"images\":{\"headshot\":{\"full\":null,\"\
           medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
           thumb\":null}},\"biography\":null,\"birthday\":null,\"death\":null,\"birthplace\"\
-          :null,\"homepage\":null}}],\"crew\":{\"production\":[{\"job\":\"Casting\"\
-          ,\"person\":{\"name\":\"Amy Lippens\",\"ids\":{\"trakt\":1995,\"slug\":\"\
-          amy-lippens\",\"imdb\":\"nm0513591\",\"tmdb\":2151,\"tvrage\":null},\"images\"\
-          :{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
-          :{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"birthday\"\
-          :null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"job\":\"\
-          Executive Producer\",\"person\":{\"name\":\"Paul Attanasio\",\"ids\":{\"\
-          trakt\":2009,\"slug\":\"paul-attanasio\",\"imdb\":\"nm0001921\",\"tmdb\"\
-          :45543,\"tvrage\":71428},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/002/009/headshots/original/3171617932.jpg\"\
+          :null,\"homepage\":null}},{\"character\":\"Additional\",\"person\":{\"name\"\
+          :\"Patrick Bradford\",\"ids\":{\"trakt\":600866,\"slug\":\"patrick-bradford\"\
+          ,\"imdb\":null,\"tmdb\":1599580,\"tvrage\":null},\"images\":{\"headshot\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"biography\":\"Patrick Bradford was born\
+          \ Patrick Jole Bradford on June 15th, 1987 in  New York City, New York.\
+          \ His father, Dean Bradford, worked at the New  York Health Hospital, which\
+          \ was sadly closed in 1984. After his father's  first wife died of a sad\
+          \ illness, his father remarried to Sarah Goulman  in 1976, and, 3 years\
+          \ later, had Patrick. He grew up with a brother  from the previous marriage,\
+          \ Rookie, and enjoyed filming with him.\\n\\nWhen  Patrick was about 12\
+          \ years of age, and Rookie had already gone to  College, Patrick's parents\
+          \ moved to Sarah's parents' ranch, and Patrick  enjoyed alot of his time\
+          \ helping with small projects. There in Colorado,  Patrick met a friend,\
+          \ named Mc Jones. Together, they practiced filming  small comedy shows with\
+          \ each other. Then, Patrick attended Lington  College, while his father\
+          \ was away a lot.\\n\\nWhen Patrick was about  14 years old, he began attending\
+          \ small theater plays in school. Then, a  big producer happened to see Patrick\
+          \ in one of his small plays, and  invited him to join a cast of a play called\
+          \ Always Fair Weather, which  took place on Broadway in 2004. Patrick did\
+          \ a wonderful job and wast  cast again by the same producer as a bigger\
+          \ role in a stage play called  The Dragon, The Sword, and The Hero. After\
+          \ that, Patrick began getting  cast in small roles for big TV-series.\"\
+          ,\"birthday\":\"1987-06-15\",\"death\":null,\"birthplace\":\"New York City,\
+          \ New York,\",\"homepage\":\"\"}}],\"crew\":{\"production\":[{\"job\":\"\
+          Casting\",\"person\":{\"name\":\"Amy Lippens\",\"ids\":{\"trakt\":1995,\"\
+          slug\":\"amy-lippens\",\"imdb\":\"nm0513591\",\"tmdb\":2151,\"tvrage\":null},\"\
+          images\":{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null},\"\
+          fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\":null,\"\
+          birthday\":null,\"death\":null,\"birthplace\":null,\"homepage\":null}},{\"\
+          job\":\"Executive Producer\",\"person\":{\"name\":\"Paul Attanasio\",\"\
+          ids\":{\"trakt\":2009,\"slug\":\"paul-attanasio\",\"imdb\":\"nm0001921\"\
+          ,\"tmdb\":45543,\"tvrage\":71428},\"images\":{\"headshot\":{\"full\":\"\
+          https://walter.trakt.us/images/people/000/002/009/headshots/original/3171617932.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/people/000/002/009/headshots/medium/3171617932.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/people/000/002/009/headshots/thumb/3171617932.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"biography\"\
@@ -570,21 +596,21 @@ interactions:
           homepage\":null}}]}}"}
       headers:
         CF-Cache-Status: [HIT]
-        CF-RAY: [29de2385500a0103-DFW]
+        CF-RAY: [2b5576e6c15a26cc-FRA]
         Cache-Control: ['public, max-age=14400']
         Connection: [keep-alive]
         Content-Type: [application/json; charset=utf-8]
-        Date: ['Wed, 04 May 2016 18:50:30 GMT']
-        ETag: [W/"2b833db2b1890f2cf339ed977a32b48f"]
-        Expires: ['Wed, 04 May 2016 22:50:30 GMT']
+        Date: ['Sun, 19 Jun 2016 08:03:25 GMT']
+        ETag: [W/"c22245571ded14cdb76b582d98f7be56"]
+        Expires: ['Sun, 19 Jun 2016 12:03:25 GMT']
         Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=d50a16f4659513b83563eff8a148aeb131462387830; expires=Thu,
-            04-May-17 18:50:30 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Set-Cookie: ['__cfduid=d58e7c1f9f55ef0604f459d7a8a660e601466323405; expires=Mon,
+            19-Jun-17 08:03:25 GMT; path=/; domain=.trakt.tv; HttpOnly']
         Vary: [Accept-Encoding]
         X-Content-Type-Options: [nosniff]
         X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [95a8fd68-7f26-425c-b354-28027442d10b]
-        X-Runtime: ['0.074176']
+        X-Request-Id: [9ffc041d-63f8-4f83-b53f-7d88289d26b2]
+        X-Runtime: ['0.061052']
         X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1
