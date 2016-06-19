@@ -215,7 +215,13 @@ class IRCBot(asynchat.async_chat):
 
     def collect_incoming_data(self, data):
         """Buffer the data"""
-        self.buffer += self.strip_irc_colors(self.strip_invisible(data.decode('utf-8')))
+        try:
+            data = data.decode('utf-8')
+        except UnicodeDecodeError as e:
+            log.warning('%s. Will attempt to use latin-1 decoding instead.', e)
+            data = data.decode('latin-1')
+
+        self.buffer += self.strip_irc_colors(self.strip_invisible(data))
 
     def _process_message(self, msg):
         return IRCMessage(msg)
