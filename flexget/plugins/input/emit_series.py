@@ -12,10 +12,10 @@ from flexget.entry import Entry
 from flexget.manager import Session
 from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release
 
-log = logging.getLogger('emit_series')
+log = logging.getLogger('next_series_episodes')
 
 
-class EmitSeries(object):
+class NextSeriesEpisodes(object):
     """
     Emit next episode number from all series configured in this task.
 
@@ -183,7 +183,7 @@ class EmitSeries(object):
                                                             entry['series_season'],
                                                             entry['series_episode'] + 1,
                                                             task))
-                task.rerun(plugin='emit_series', reason='Look for next episode')
+                task.rerun(plugin='next_series_episodes', reason='Look for next episode')
             elif db_release:
                 # There are know releases of this episode, but none were accepted
                 return
@@ -193,9 +193,9 @@ class EmitSeries(object):
                 self.rerun_entries.append(self.search_entry(series, latest.season + 1, 1, task))
                 log.debug('%s %s not found, rerunning to look for next season' %
                           (entry['series_name'], entry['series_id']))
-                task.rerun(plugin='emit_series', reason='Look for next season')
+                task.rerun(plugin='next_series_episodes', reason='Look for next season')
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EmitSeries, 'emit_series', api_ver=2)
+    plugin.register(NextSeriesEpisodes, 'next_series_episodes', api_ver=2)
