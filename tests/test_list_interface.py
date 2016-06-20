@@ -55,38 +55,40 @@ class TestListInterface(object):
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
               - {title: 'title 2', url: "http://mock.url/file2.torrent"}
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
-            list_accept:
-              - entry_list: test_list
+            list_match:
+              from:
+                - entry_list: test_list
 
           test_list_accept_without_remove:
             mock:
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
               - {title: 'title 2', url: "http://mock.url/file2.torrent"}
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
-            list_accept:
-              lists:
+            list_match:
+              from:
                 - entry_list: test_list
-              remove_on_accept: no
+              remove_on_match: no
 
           test_multiple_list_accept_with_remove:
             mock:
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
               - {title: 'title 2', url: "http://mock.url/file2.torrent"}
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
-            list_accept:
-              - entry_list: list 1
-              - entry_list: list 2
+            list_match:
+              from:
+                - entry_list: list 1
+                - entry_list: list 2
 
           test_multiple_list_accept_without_remove:
             mock:
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
               - {title: 'title 2', url: "http://mock.url/file2.torrent"}
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
-            list_accept:
-              lists:
+            list_match:
+              from:
                 - entry_list: list 1
                 - entry_list: list 2
-              remove_on_accept: no
+              remove_on_match: no
 
           test_list_remove:
             mock:
@@ -99,8 +101,10 @@ class TestListInterface(object):
             mock:
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
-            list_reject:
-              - entry_list: test_list
+            list_match:
+              from:
+                - entry_list: test_list
+              action: reject
 
           add_for_list_queue:
             mock:
@@ -115,8 +119,10 @@ class TestListInterface(object):
               - {title: 'Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD', url: "http://mock.url/Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent", imdb_id: "tt0303933"}
               - {title: 'Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD', url: "http://mock.url/Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent", imdb_id: "tt0303933"}
               - {title: 'Drumline 2002 DVDRip x264-FuzerHD', url: "http://mock.url/Drumline 2002 DVDRip x264-FuzerHD.torrent", imdb_id: "tt0303933"}
-            list_queue:
-              - movie_list: test_list_queue
+            list_match:
+              from:
+                - movie_list: test_list_queue
+              single_match: yes
 
           get_for_list_queue:
              movie_list: test_list_queue

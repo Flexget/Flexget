@@ -29,7 +29,7 @@ class ListMatch(object):
                      },
             'action': {'type': 'string', 'enum': ['accept', 'reject'], 'default': 'accept'},
             'remove_on_match': {'type': 'boolean', 'default': True},
-            'single_match': {'type': 'boolean', 'default': True},
+            'single_match': {'type': 'boolean', 'default': False},
         }
     }
 
@@ -45,9 +45,12 @@ class ListMatch(object):
                     result = thelist.get(entry)
                     if result:
                         if config['action'] == 'accept':
-                            if config['single_match'] and result not in cached_items:
-                                cached_items.append(result)
-                            entry.accept()
+                            if config['single_match']:
+                                if result not in cached_items:
+                                    cached_items.append(result)
+                                    entry.accept()
+                            else:
+                                entry.accept()
                         elif config['action'] == 'reject':
                             entry.reject()
 
