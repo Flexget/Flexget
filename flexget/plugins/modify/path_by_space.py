@@ -12,7 +12,7 @@ from flexget.event import event
 from flexget.config_schema import parse_size, parse_percent
 from flexget.config_schema import one_or_more
 
-log = logging.getLogger('path_select')
+log = logging.getLogger('path_by_space')
 
 
 disk_stats_tuple = namedtuple(
@@ -42,7 +42,6 @@ def os_disk_stats(folder):
 
 
 def disk_stats(folder):
-
     free_bytes, total_bytes = os_disk_stats(folder)
     used_bytes = total_bytes - free_bytes
     free_percent = 0.0 if total_bytes == 0 else 100 * free_bytes / total_bytes
@@ -92,14 +91,14 @@ selector_map = {
 }
 
 
-class PluginPathSelect(object):
+class PluginPathBySpace(object):
     """Allows setting a field to a folder based on it's space
 
     Path will be selected at random if multiple paths match the within
 
     Example:
 
-    path_select:
+    path_by_space:
       select: most_free_percent # or most_free, most_used, most_used_percent, has_free
       within: 9000 # within in MB or percent.
       paths:
@@ -127,7 +126,6 @@ class PluginPathSelect(object):
 
     @plugin.priority(250)  # run before other plugins
     def on_task_metainfo(self, task, config):
-
         selector = selector_map[config['select']]
 
         # Convert within to bytes (int) or percent (float)
@@ -151,4 +149,4 @@ class PluginPathSelect(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginPathSelect, 'path_select', api_ver=2)
+    plugin.register(PluginPathBySpace, 'path_by_space', api_ver=2)

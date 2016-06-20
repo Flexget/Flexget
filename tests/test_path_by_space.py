@@ -20,7 +20,7 @@ def mock_os_disk_stats(folder):
     return free_bytes, total_bytes
 
 
-@mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
+@mock.patch('flexget.plugins.modify.path_by_space.os_disk_stats', side_effect=mock_os_disk_stats)
 class TestPathSelect(object):
 
     config = """
@@ -28,7 +28,7 @@ class TestPathSelect(object):
           test_most_free:
             mock:
               - {title: 'Existence.2012'}
-            path_select:
+            path_by_space:
               to_field: path
               within: 0G
               select: most_free
@@ -39,7 +39,7 @@ class TestPathSelect(object):
           test_most_free_within:
             mock:
               - {title: 'Existence.2012'}
-            path_select:
+            path_by_space:
               to_field: path
               within: 1G
               select: most_free
@@ -52,7 +52,7 @@ class TestPathSelect(object):
           test_most_used:
             mock:
               - {title: 'Existence.2012'}
-            path_select:
+            path_by_space:
               to_field: path
               within: 1G
               select: most_used
@@ -64,7 +64,7 @@ class TestPathSelect(object):
           test_most_free_percent:
             mock:
               - {title: 'Existence.2012'}
-            path_select:
+            path_by_space:
               to_field: path
               within: 2%
               select: most_free_percent
@@ -76,7 +76,7 @@ class TestPathSelect(object):
           test_most_free_percent_within:
             mock:
               - {title: 'Existence.2012'}
-            path_select:
+            path_by_space:
               to_field: path
               within: 2%
               select: most_free_percent
@@ -89,7 +89,7 @@ class TestPathSelect(object):
           test_most_used_percent:
             mock:
               - {title: 'Existence.2012'}
-            path_select:
+            path_by_space:
               to_field: path
               within: 2%
               select: most_used_percent
