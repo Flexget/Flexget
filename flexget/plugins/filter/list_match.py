@@ -27,6 +27,7 @@ class ListMatch(object):
         }
     }
 
+    @plugin.priority(0)
     def on_task_filter(self, task, config):
         for item in config['from']:
             for plugin_name, plugin_config in item.items():
