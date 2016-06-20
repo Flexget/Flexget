@@ -320,7 +320,7 @@ class PluginTransmission(TransmissionBase):
         if opt_dic.get('path'):
             try:
                 path = os.path.expanduser(entry.render(opt_dic['path']))
-                add['download_dir'] = text_to_native_str(pathscrub(path))
+                add['download_dir'] = text_to_native_str(pathscrub(path), 'utf-8')
             except RenderError as e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
         if 'bandwidthpriority' in opt_dic:
