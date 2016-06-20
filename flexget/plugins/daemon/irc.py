@@ -20,6 +20,7 @@ from flexget.event import event
 from flexget.manager import manager
 from flexget.config_schema import one_or_more
 from flexget.plugins.daemon.irc_bot import irc_bot
+from flexget import plugin
 
 log = logging.getLogger('irc')
 
@@ -61,6 +62,7 @@ schema = {
                         })
                     },
                     'queue_size': {'type': 'integer', 'default': 1},
+                    'use_ssl': {'type': 'boolean', 'default': False},
                 },
                 'anyOf': [
                     {'required': ['server', 'channels']},
@@ -224,7 +226,8 @@ class IRCConnection(irc_bot.IRCBot):
                          'nickname': config.get('nickname', 'Flexget-%s' % str(uuid4())),
                          'invite_nickname': config.get('invite_nickname'),
                          'invite_message': config.get('invite_message'),
-                         'nickserv_password': config.get('nickserv_password')}
+                         'nickserv_password': config.get('nickserv_password'),
+                         'use_ssl': config.get('use_ssl')}
         irc_bot.IRCBot.__init__(self, ircbot_config)
 
         self.inject_before_shutdown = False
@@ -639,7 +642,7 @@ class IRCConnectionManager(object):
                 if not conn and self.config.get(conn_name):
                     new_conn = IRCConnection(self.config[conn_name], conn_name)
                     irc_connections[conn_name] = new_conn
-                elif not conn.is_alive() and self.restart_log[conn_name]['delay'] <= 0:
+                elif not conn.is_alive() and self.restart_log[conn_name]['delay'] <= 0 and not conn.clean_exit:
                     log.error('IRC connection for %s has died unexpectedly. Restarting it.', conn_name)
                     self.restart_log[conn_name]['attempts'] += 1
                     self.restart_log[conn_name]['delay'] = min(pow(2, self.restart_log[conn_name]['attempts']),

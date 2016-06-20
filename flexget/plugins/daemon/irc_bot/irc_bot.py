@@ -18,8 +18,7 @@ import threading
 import uuid
 
 from flexget.plugins.daemon.irc_bot.numeric_replies import REPLY_CODES
-
-import tlslite
+from flexget import plugin
 
 log = logging.getLogger('irc_bot')
 
@@ -157,6 +156,7 @@ class IRCBot(asynchat.async_chat):
         self.invite_nickname = config.get('invite_nickname')
         self.invite_message = config.get('invite_message')
         self.nickserv_password = config.get('nickserv_password')
+        self.use_ssl = config.get('use_ssl', False)
 
         self.connected_channels = []
         self.autojoin_channels = []
@@ -170,6 +170,7 @@ class IRCBot(asynchat.async_chat):
         self.max_connection_delay = 300  # 5 minutes
         self.throttled = False
         self.schedule = Schedule()
+        self.clean_exit = False
 
     def handle_expt_event(self):
         error = self.socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
@@ -185,7 +186,7 @@ class IRCBot(asynchat.async_chat):
         while True:
             try:
                 self.socket.do_handshake()
-            except ssl.SSLError:
+            except (ssl.SSLWantReadError, ssl.SSLWantWriteError):
                 pass
             else:
                 break
@@ -193,18 +194,24 @@ class IRCBot(asynchat.async_chat):
     def handle_read(self):
         try:
             asynchat.async_chat.handle_read(self)
-        except ssl.SSLError as e:
+        except (ssl.SSLWantReadError, ssl.SSLWantWriteError) as e:
             log.warning(e)
             self._handshake()
 
     def handle_connect(self):
-        try:
-            self.socket.setblocking(True)
-            self.socket = ssl.wrap_socket(self.socket)
+        if self.use_ssl:
+            try:
+                self.socket.setblocking(True)
+                self.socket = ssl.wrap_socket(self.socket)
+            except (ssl.SSLWantReadError, ssl.SSLWantWriteError) as e:
+                log.debug(e)
+                self._handshake()
+            except ssl.SSLError as e:
+                log.error(e)
+                self.exit()
+                return
             self.socket.setblocking(False)
-        except ssl.SSLError as e:
-            log.debug(e)
-            self._handshake()
+
         log.info('Connected to server %s', self.server)
         self.write('USER %s %s %s :%s' % (self.real_nickname, '8', '*', self.real_nickname))
         self.nick(self.real_nickname)
@@ -224,6 +231,8 @@ class IRCBot(asynchat.async_chat):
             self.handle_error()
 
     def exit(self):
+        log.info('Shutting down connection to %s:%s', self.server, self.port)
+        self.clean_exit = True
         self.shutdown_event.set()
         self.close()
 
