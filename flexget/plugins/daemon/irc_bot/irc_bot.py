@@ -12,11 +12,14 @@ import functools
 import hashlib
 import logging
 import re
+import ssl
 import socket
 import threading
 import uuid
 
 from flexget.plugins.daemon.irc_bot.numeric_replies import REPLY_CODES
+
+import tlslite
 
 log = logging.getLogger('irc_bot')
 
@@ -178,7 +181,30 @@ class IRCBot(asynchat.async_chat):
             log.error('Connection timed out.')
         self.handle_error()
 
+    def _handshake(self):
+        while True:
+            try:
+                self.socket.do_handshake()
+            except ssl.SSLError:
+                pass
+            else:
+                break
+
+    def handle_read(self):
+        try:
+            asynchat.async_chat.handle_read(self)
+        except ssl.SSLError as e:
+            log.warning(e)
+            self._handshake()
+
     def handle_connect(self):
+        try:
+            self.socket.setblocking(True)
+            self.socket = ssl.wrap_socket(self.socket)
+            self.socket.setblocking(False)
+        except ssl.SSLError as e:
+            log.debug(e)
+            self._handshake()
         log.info('Connected to server %s', self.server)
         self.write('USER %s %s %s :%s' % (self.real_nickname, '8', '*', self.real_nickname))
         self.nick(self.real_nickname)
@@ -244,7 +270,7 @@ class IRCBot(asynchat.async_chat):
     @event('ERROR')
     def on_error(self, msg):
         log.error('Received error message from %s: %s', self.server, msg.arguments[0])
-        if 'throttled' in msg or 'throttling' in msg:
+        if 'throttled' in msg.raw or 'throttling' in msg.raw:
             self.throttled = True
 
     @event('PING')
