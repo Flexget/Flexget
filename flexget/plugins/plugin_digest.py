@@ -88,7 +88,7 @@ class OutputDigest(object):
                 session.add(DigestEntry(list=config['list'], entry=entry))
 
 
-class NextDigest(object):
+class FromDigest(object):
     schema = {
         'type': 'object',
         'properties': {
@@ -134,4 +134,4 @@ class NextDigest(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(OutputDigest, 'digest', api_ver=2)
-    plugin.register(NextDigest, 'next_digest', api_ver=2)
+    plugin.register(FromDigest, 'from_digest', api_ver=2)
