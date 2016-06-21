@@ -676,8 +676,8 @@ class TraktShow(Base):
                     'trailer', 'homepage']:
             setattr(self, col, trakt_show.get(col))
 
-        self.genres[:] = get_db_genres(trakt_show.get('genres', []), session)
-        self.translations[:] = get_db_trans(trakt_show.get('available_translations', []), session)
+        self.genres[:] = get_db_genres(trakt_show.get('genres') or [], session)
+        self.translations[:] = get_db_trans(trakt_show.get('available_translations') or [], session)
         self.cached_at = datetime.now()
 
     def get_episode(self, season, number, session, only_cached=False):
