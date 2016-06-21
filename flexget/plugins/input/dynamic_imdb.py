@@ -13,10 +13,10 @@ from flexget.event import event
 from flexget.entry import Entry
 from flexget.utils.cached_input import cached
 
-log = logging.getLogger('dynamic_imdb')
+log = logging.getLogger('from_imdb')
 
 
-class DynamicIMDB(object):
+class FromIMDB(object):
     """
     This plugin enables generating entries based on an entity, an entity being a person, character or company.
     It's based on IMDBpy which is required (pip install imdbpy). The basic config required just an IMDB ID of the
@@ -24,7 +24,7 @@ class DynamicIMDB(object):
 
     For example:
 
-        dynamic_imdb: ch0001354
+        from_imdb: ch0001354
 
     Schema description:
     Other than ID, all other properties are meant to filter the full list that the entity generates.
@@ -37,7 +37,7 @@ class DynamicIMDB(object):
 
     Advanced config example:
         dynamic_movie_queue:
-            dynamic_imdb:
+            from_imdb:
               id: co0051941
               job_types:
                 - actor
@@ -254,7 +254,7 @@ class DynamicIMDB(object):
         """
         return company.get('production companies')
 
-    @cached('dynamic_imdb', persist='2 hours')
+    @cached('from_imdb', persist='2 hours')
     def on_task_input(self, task, config):
         try:
             from imdb import IMDb
@@ -296,4 +296,4 @@ class DynamicIMDB(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(DynamicIMDB, 'dynamic_imdb', api_ver=2)
+    plugin.register(FromIMDB, 'from_imdb', api_ver=2)
