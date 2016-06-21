@@ -29,7 +29,7 @@ def load_uoccin_data(path):
     return udata
 
 
-class NextUoccin(object):
+class FromUoccin(object):
 
     schema = {
         'type': 'object',
@@ -49,7 +49,7 @@ class NextUoccin(object):
         
         Example::
             
-            next_uoccin:
+            from_uoccin:
               path: /path/to/gdrive/uoccin
               type: series
               tags: [ 'favorite', 'hires' ]
@@ -144,4 +144,4 @@ class NextUoccin(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(NextUoccin, 'next_uoccin', api_ver=2)
+    plugin.register(FromUoccin, 'from_uoccin', api_ver=2)
