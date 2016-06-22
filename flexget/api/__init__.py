@@ -185,9 +185,8 @@ api = Api(
 
 
 class ApiError(Exception):
-    code = 500
     description = 'server error'
-
+    code = 500
     response_model = api.schema('error', {
         'type': 'object',
         'properties': {
@@ -197,9 +196,10 @@ class ApiError(Exception):
         'required': ['code', 'error']
     })
 
-    def __init__(self, message, payload=None):
+    def __init__(self, message, code=500, payload=None):
         self.message = message
         self.payload = payload
+        self.code = code
 
     def to_dict(self):
         rv = self.payload or {}
