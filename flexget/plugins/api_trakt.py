@@ -802,7 +802,7 @@ class TraktMovie(Base):
         for col in ['title', 'overview', 'runtime', 'rating', 'votes',
                     'language', 'tagline', 'year', 'trailer', 'homepage']:
             setattr(self, col, trakt_movie.get(col))
-        if self.released:
+        if trakt_movie.get('released'):
             self.released = dateutil_parse(trakt_movie.get('released'), ignoretz=True)
         self.updated_at = dateutil_parse(trakt_movie.get('updated_at'), ignoretz=True)
         self.genres[:] = get_db_genres(trakt_movie.get('genres', []), session)
