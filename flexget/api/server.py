@@ -84,9 +84,19 @@ class ServerConfigAPI(APIResource):
         return self.manager.config
 
 
+raw_config_object = {
+    'type': 'object',
+    'properties': {
+        'raw_config': {'type': 'string'}
+    }
+}
+raw_config_schema = api.schema('raw_config', raw_config_object)
+
+
 @server_api.route('/raw_config/')
 class ServerConfigAPI(APIResource):
-    @api.response(200, description='Flexget raw YAML config file')
+    @api.doc(description='Return config file encoded in Base64')
+    @api.response(200, model=raw_config_schema, description='Flexget raw YAML config file')
     def get(self, session=None):
         """ Get raw YAML config file """
         with open(self.manager.config_path, 'r', encoding='utf-8') as f:
