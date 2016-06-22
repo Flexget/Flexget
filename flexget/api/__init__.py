@@ -196,10 +196,9 @@ class ApiError(Exception):
         'required': ['code', 'error']
     })
 
-    def __init__(self, message, code=500, payload=None):
+    def __init__(self, message, payload=None):
         self.message = message
         self.payload = payload
-        self.code = code
 
     def to_dict(self):
         rv = self.payload or {}
