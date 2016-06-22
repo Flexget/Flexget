@@ -10,7 +10,7 @@
 		<div layout="column" flex="30">
 			<md-input-container class="md-block">
 				<label>Theme</label>
-				<md-select ng-model="vm.aceOptions.theme">
+				<md-select ng-model="vm.aceOptions.theme" ng-change="vm.updateTheme()">
 					<md-option ng-repeat="theme in vm.themes" value="{{ theme.name }}">{{ theme.caption }}</md-option>
 				</md-select>
 			</md-input-container>

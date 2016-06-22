@@ -8,13 +8,30 @@
 			controller: configController,
 		});
 
-	function configController($http, base64, $mdDialog) {
+	function configController($http, base64, $mdDialog, CacheFactory) {
 		var vm = this;
+
+		if (!CacheFactory.get('aceThemeCache')) {
+			CacheFactory('aceThemeCache', {
+				storageMode: 'localStorage'
+			});
+		}
+
+		var aceThemeCache = CacheFactory.get('aceThemeCache');
 		
 		vm.aceOptions = {
 			mode: 'yaml',
-			theme: 'chrome'
+			theme: getTheme()
 		};
+
+		function getTheme() {
+			return aceThemeCache.get('theme') ? aceThemeCache.get('theme') : 'chrome';
+		}
+
+		vm.updateTheme = function () {
+			console.log(aceThemeCache);
+			aceThemeCache.put('theme', vm.aceOptions.theme);
+		}
 
 		var themelist = ace.require('ace/ext/themelist');
 		vm.themes = themelist.themes;

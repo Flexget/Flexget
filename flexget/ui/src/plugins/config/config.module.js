@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    var configModule = angular.module("flexget.plugins.config", ['ui.ace', 'ab-base64']);
+    var configModule = angular.module("flexget.plugins.config", ['ui.ace', 'ab-base64', 'angular-cache']);
 
     registerPlugin(configModule);
 
