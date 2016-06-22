@@ -187,7 +187,7 @@ class ServerConfigAPI(APIResource):
                                'config_path': er.json_pointer})
             raise ApiError(code=502, message='Error loading config: %s' % e.args[0], payload={'errors': errors})
         with open(self.manager.config_path, 'w', encoding='utf-8') as f:
-            f.write(str(raw_config.strip('\n')))
+            f.write(str(raw_config.replace('\r\n', '\n')))
 
         return {'status': 'success',
                 'message': 'config successfully updated to file'}
