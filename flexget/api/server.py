@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import base64
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import os
@@ -10,7 +12,7 @@ import traceback
 from time import sleep
 
 import cherrypy
-from flask import Response
+from flask import Response, jsonify
 from flask_restplus import inputs
 from pyparsing import Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, \
     Combine
@@ -80,6 +82,16 @@ class ServerConfigAPI(APIResource):
     def get(self, session=None):
         """ Get Flexget Config """
         return self.manager.config
+
+
+@server_api.route('/raw_config/')
+class ServerConfigAPI(APIResource):
+    @api.response(200, description='Flexget raw YAML config file')
+    def get(self, session=None):
+        """ Get raw YAML config file """
+        with open(self.manager.config_path, 'r', encoding='utf-8') as f:
+            raw_config = base64.b64encode(f.read())
+        return jsonify({'raw_config': raw_config})
 
 
 version_schema = api.schema('server.version', {
