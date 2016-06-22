@@ -910,7 +910,7 @@ class TestTraktMovieLookupAPI(object):
             "imdb_id": "tt0133093",
             "language": "en",
             "overview": "Thomas A. Anderson is a man living two lives. By day he is an average computer programmer and by night a malevolent hacker known as Neo, who finds himself targeted by the police when he is contacted by Morpheus, a legendary computer hacker, who reveals the shocking truth about our reality.",
-            "released": None,
+            "released": 'Tue, 30 Mar 1999 00:00:00 GMT',
             "runtime": 136,
             "slug": "the-matrix-1999",
             "tagline": "Welcome to the Real World.",
