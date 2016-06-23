@@ -1,13 +1,16 @@
 (function () {
     'use strict';
 
-    angular.module('flexget.components')
-        .factory('sideNav', sideNavService);
+    angular.module('components.sidenav')
+        .factory('sideNavService', sideNavService);
 
     function sideNavService($rootScope, $mdSidenav, $mdMedia) {
-        var items = [];
+		return {
+            toggle: toggle,
+            close: close
+        };
 
-        var toggle = function () {
+        function toggle() {
             if ($mdSidenav('left').isLockedOpen()) {
                 $rootScope.menuMini = !$rootScope.menuMini;
             } else {
@@ -16,23 +19,10 @@
             }
         };
 
-        var close = function () {
+        function close() {
             if (!$mdMedia('gt-lg')) {
                 $mdSidenav('left').close();
             }
         };
-
-        return {
-            toggle: toggle,
-            close: close,
-            register: function (href, caption, icon, order) {
-                href = '#' + href;
-                items.push({href: href, caption: caption, icon: icon, order: order})
-            },
-            items: items
-        }
-    }
-
+	};
 })();
-
-

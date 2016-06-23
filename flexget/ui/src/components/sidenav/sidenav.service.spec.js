@@ -1,0 +1,29 @@
+describe("Sidenav Service:", function () {
+	var mdMediaLgSize;
+
+	beforeEach(function () {
+		bard.appModule('components.sidenav');
+
+		bard.inject('sideNavService')
+	});
+
+	it("should exist", function () {
+		expect(sideNavService).to.exist;
+	});
+
+	describe('toggle()', function () {
+		it("should exist", function () {
+			expect(sideNavService.toggle).to.exist;
+		});
+		
+		//TODO: test funcionalities, check how to mock $mdMedia and $mdSidenav etc
+	});
+
+	describe('close()', function () {
+		it('should exist', function () {
+			expect(sideNavService.close).to.exist;
+		});
+
+		//TODO: test funcionalities, check how to mock $mdMedia and $mdSidenav etc
+	});
+});

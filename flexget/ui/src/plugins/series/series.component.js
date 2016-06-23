@@ -3,14 +3,14 @@
     'use strict';
 
     angular
-        .module('flexget.plugins.series')
+        .module('plugins.series')
         .component('seriesView', {
             templateUrl: 'plugins/series/series.tmpl.html',
             controllerAs: 'vm',
             controller: seriesController,
         });
 
-    function seriesController($http, $mdDialog, seriesService, $timeout, $mdMedia) {
+    function seriesController($mdDialog, seriesService, $timeout, $mdMedia) {
         var vm = this;
 
         var options = {
@@ -20,7 +20,20 @@
             sort_by: 'show_name'
         }
 
+		var params = {
+			forget: true
+		}
+
         vm.searchTerm = "";
+
+		vm.$onInit = activate;
+		vm.forgetShow = forgetShow;
+		vm.search = search;
+		vm.toggleEpisodes = toggleEpisodes;
+
+		function activate() {
+        	getSeriesList();
+		}
 
         function getSeriesList() {
             seriesService.getShows(options).then(function (data) {
@@ -32,7 +45,7 @@
             });
         }
 
-        vm.forgetShow = function (show) {
+    	function forgetShow(show) {
 			var confirm = $mdDialog.confirm()
                 .title('Confirm forgetting show.')
                 .htmlContent("Are you sure you want to completely forget <b>" + show.show_name + "</b>?<br /> This will also forget all downloaded releases.")
@@ -40,41 +53,11 @@
                 .cancel("No");
 
 			$mdDialog.show(confirm).then(function () {
-				seriesService.deleteShow(show).then(function (data) {
+				seriesService.deleteShow(show, params).then(function (data) {
 					getSeriesList();
 				});
 			});
 		};
-
-
-        /*vm.forgetShow = function (show) {
-            //Construct the confirmation dialog
-            var confirm = $mdDialog.confirm()
-                .title('Confirm forgetting show.')
-                .htmlContent("Are you sure you want to completely forget <b>" + show.show_name + "</b>?<br /> This will also forget all downloaded releases.")
-                .ok("Forget")
-                .cancel("No");
-
-            //Actually show the confirmation dialog and place a call to DELETE when confirmed
-            $mdDialog.show(confirm).then(function () {
-                $http.delete('/api/series/' + show.show_id, { params: { forget: true } })
-                    .success(function (data) {
-                        var index = vm.series.indexOf(show);
-                        vm.series.splice(index, 1);
-                    })
-                    .error(function (error) {
-
-                        //Show a dialog when something went wrong, this will change in the future to more generic error handling
-                        var errorDialog = $mdDialog.alert()
-                            .title("Something went wrong")
-                            .htmlContent("Oops, something went wrong when trying to forget <b>" + show.show_name + "</b>:\n" + error.message)
-                            .ok("Ok");
-
-                        $mdDialog.show(errorDialog);
-                    })
-            });
-        }*/
-
 
         //Call from the pagination to update the page to the selected page
         vm.updateListPage = function (index) {
@@ -84,28 +67,34 @@
         }
 
 
-        vm.search = function () {
-            if (vm.searchTerm) {
+        function search() {
+			vm.searchTerm ? searchShows() : emptySearch();
+
+			function searchShows() {
                 seriesService.searchShows(vm.searchTerm).then(function (data) {
                     vm.series = data.shows;
                 });
-            } else {
+			};
+
+			function emptySearch() {
                 options.page = 1;
                 getSeriesList();
             }
-        }
+        };
 
-        vm.showEpisodes = function (show) {
-            if (show !== vm.selectedShow) {
-                $timeout(function () {
-                    vm.selectedShow = show;
-                }, 10);
-            };
-			vm.selectedShow = null;
-        }
+        function toggleEpisodes(show) {
+			show == vm.selectedShow ? clearShow() : setSelectedShow();
 
-        vm.hideEpisodes = function () {
-            vm.selectedShow = null;
+			function clearShow() {
+				vm.selectedShow = null;
+			};
+
+			function setSelectedShow() {
+				vm.selectedShow = null;
+				$timeout(function () {
+					vm.selectedShow = show;
+				});
+			}
         }
 
         vm.areEpisodesOnShowRow = function (show, index) {
@@ -132,9 +121,6 @@
 
             return isOnRightRow;
         }
-
-        //Load initial list of series
-        getSeriesList();
     }
 
 })();

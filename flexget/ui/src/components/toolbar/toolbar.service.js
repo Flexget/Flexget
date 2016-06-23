@@ -1,8 +1,8 @@
 (function () {
     'use strict';
 
-    angular.module('flexget.components')
-        .factory('toolBar', toolbarService);
+    angular.module('components.toolbar')
+        .factory('toolBarService', toolbarService);
 
     function toolbarService() {
         // Add default Manage (cog) menu
@@ -58,5 +58,3 @@
     }
 
 })();
-
-

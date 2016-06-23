@@ -1,25 +1,27 @@
 (function () {
-  'use strict';
+	'use strict';
 
-  angular
-    .module('flexget.plugins.seen')
-    .component('seenView', {
-      templateUrl: 'plugins/seen/seen.tmpl.html',
-      controllerAs: 'vm',
-      controller: seenController,
-    });
+	angular
+		.module('plugins.seen')
+		.component('seenView', {
+			templateUrl: 'plugins/seen/seen.tmpl.html',
+			controllerAs: 'vm',
+			controller: seenController,
+		});
 
-  function seenController($http) {
-    var vm = this;
+	function seenController(seenService) {
+		var vm = this;
 
-    vm.title = 'Seen';
+		vm.$onInit = activate;
 
-    $http.get('/api/seen/', {params: {max: 20}})
-      .success(function handleSeen(data) {
-        vm.entries = data.seen_entries;
-      })
-      .error(function handlerSeenError(data) {
-        // log error
-      });
-  }
+		function activate() {
+			getSeen();
+		}
+
+		function getSeen() {
+			return seenService.getSeen().then(function (data) {
+				vm.entries = data.seen_entries;
+			});
+		}
+	}
 })();
