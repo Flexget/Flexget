@@ -67,6 +67,7 @@ def bump_version(bump_type):
 
 @cli.command()
 def build_webui():
+    """Build webui for release packaging"""
     cwd = os.path.join('flexget', 'ui')
 
     # Cleanup previous builds
@@ -87,15 +88,6 @@ def build_webui():
     # Build the ui
     click.echo('running `gulp buildapp`')
     subprocess.check_call('gulp buildapp', cwd=cwd, shell=True)
-
-
-@cli.command()
-def upgrade_deps():
-    try:
-        import pip
-    except ImportError:
-        raise click.ClickException('FATAL: Unable to import pip, please install it and run this again!')
-    pip.main(['install', '--upgrade', '-r', 'requirements.txt'])
 
 
 if __name__ == '__main__':
