@@ -39,7 +39,9 @@
     "ace-builds": {
       "main": [
         "src-min-noconflict/ace.js",
-        "src-min-noconflict/ext-themelist.js"
+        "src-min-noconflict/ext-themelist.js",
+        "src-min-noconflict/mode-yaml.js",
+        "src-min-noconflict/theme*"
       ]
     }
   }

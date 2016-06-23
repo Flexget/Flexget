@@ -29,7 +29,6 @@
 		}
 
 		vm.updateTheme = function () {
-			console.log(aceThemeCache);
 			aceThemeCache.put('theme', vm.aceOptions.theme);
 		}
 
