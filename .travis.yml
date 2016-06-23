@@ -21,6 +21,8 @@ install:
   - pip install --upgrade pip
   - pip install .
   - pip install -r dev-requirements.txt
+  - npm install ./flexget/ui  --prefix ./flexget/ui
+  - ./flexget/ui/node_modules/bower/bin/bower install --config.cwd=./flexget/ui
   - pip install -r dev-requirements-extras.txt
   - npm install ./flexget/ui  --prefix ./flexget/ui
   - ./flexget/ui/node_modules/bower/bin/bower install --config.cwd=./flexget/ui
