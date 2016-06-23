@@ -4,10 +4,11 @@
     angular.module('plugins.execute')
 		.factory('executeService', executeService);
 
-    function executeService($http, exception) {
+    function executeService($http, exception, $q) {
         return {
             getTasks: getTasks,
-			getQueue: getQueue
+			getQueue: getQueue,
+			executeTasks: executeTasks
         }
 
         function getTasks() {
@@ -29,40 +30,11 @@
 			}
         };
 
-        function callFailed(error) {
-			return exception.catcher(error);
-        }
-    }
-})();
-	
-
-
-        /*.service('executeService', executeService);
-
-    function executeService($rootScope, $http, $q) {
-        // List tasks
-        this.list = function () {
-            return $http.get('/api/tasks/')
-                .then(
-				function (response) {
-					var tasks = [];
-					angular.forEach(response.data.tasks, function (task) {
-						this.push(task.name);
-					}, tasks);
-					return tasks
-				},
-				function (httpError) {
-					throw httpError.status + " : " + httpError.data;
-				});
-        };
-
-        // Execute task(s), return stream log etc
-        this.execute = function (task_names, options) {
+		function executeTasks(task_names, options) {
             var deferred = $q.defer();
 
-            console.log(options);
-
             options.tasks = task_names;
+			
             var on = function (event, pattern, callback) {
                 var wrappedCallback = function () {
                     var args = arguments;
@@ -116,31 +88,8 @@
             return deferred.promise;
         };
 
-        this.queue = function () {
-            var defer = $q.defer();
-
-            $http.get('/api/tasks/queue/', { ignoreLoadingBar: true }).then(function (response) {
-                defer.resolve(response.data.tasks);
-            }, function (response) {
-                defer.reject(response);
-            });
-
-            return defer.promise;
-        };
-
-        // Update task config
-        this.update = function () {
-
-        };
-
-        // add task
-        this.add = function () {
-
-        };
-
-        // Delete task
-        this.delete = function () {
-
+        function callFailed(error) {
+			return exception.catcher(error);
         }
     }
-})();*/
+})();
