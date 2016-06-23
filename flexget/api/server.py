@@ -149,8 +149,8 @@ class ServerConfigAPI(APIResource):
     def get(self, session=None):
         """ Get raw YAML config file """
         with open(self.manager.config_path, 'r', encoding='utf-8') as f:
-            raw_config = base64.b64encode(f.read())
-        return jsonify({'raw_config': raw_config})
+            raw_config = base64.b64encode(bytes(f.read(), "utf-8"))
+        return jsonify(raw_config=raw_config.decode('utf-8'))
 
     @api.validate(raw_config_schema)
     @api.response(200, description='Successfully updated config')
