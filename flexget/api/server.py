@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import base64
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import os
@@ -10,11 +12,13 @@ import traceback
 from time import sleep
 
 import cherrypy
-from flask import Response
+import yaml
+from flask import Response, jsonify, request
 from flask_restplus import inputs
 from pyparsing import Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, \
     Combine
 from pyparsing import nums, alphanums, printables
+from yaml.error import YAMLError
 
 from flexget._version import __version__
 from flexget.api import api, APIResource, ApiError, __version__ as __api_version__
@@ -23,18 +27,65 @@ log = logging.getLogger('api.server')
 
 server_api = api.namespace('server', description='Manage Daemon')
 
+yaml_error_response = {
+    'type': 'object',
+    'properties': {
+        'code': {'type': 'integer'},
+        'column': {'type': 'integer'},
+        'line': {'type': 'integer'},
+        'message': {'type': 'string'},
+        'reason': {'type': 'string'}
+    }
+}
+
+config_error = {
+    'type': 'object',
+    'properties': {
+        'error': {'type': 'string'},
+        'config_path': {'type': 'string'}
+    }
+}
+
+config_validation_error = {
+    'type': 'object',
+    'properties': {
+        'code': {'type': 'integer'},
+        'error': {'type': 'array', 'items': config_error},
+        'message': {'type': 'string'},
+
+    }
+}
+
+yaml_error_schema = api.schema('yaml_error_schema', yaml_error_response)
+config_validation_schema = api.schema('config_validation_schema', config_validation_error)
+
 
 @server_api.route('/reload/')
 class ServerReloadAPI(APIResource):
-    @api.response(ApiError, description='Error loading the config')
+    @api.response(501, model=yaml_error_schema, description='YAML syntax error')
+    @api.response(502, model=config_validation_schema, description='Config validation error')
     @api.response(200, description='Newly reloaded config')
     def get(self, session=None):
         """ Reload Flexget config """
         log.info('Reloading config from disk.')
         try:
-            self.manager.load_config()
+            self.manager.load_config(output_to_console=False)
+        except YAMLError as e:
+            if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
+                error = {}
+                if e.problem is not None:
+                    error.update({'reason': e.problem})
+                if e.context_mark is not None:
+                    error.update({'line': e.context_mark.line, 'column': e.context_mark.column})
+                if e.problem_mark is not None:
+                    error.update({'line': e.problem_mark.line, 'column': e.problem_mark.column})
+            raise ApiError(code=501, message='Invalid YAML syntax', payload=error)
         except ValueError as e:
-            raise ApiError('Error loading config: %s' % e.args[0])
+            errors = []
+            for er in e.errors:
+                errors.append({'error': er.message,
+                               'config_path': er.json_pointer})
+            raise ApiError(code=502, message='Error loading config: %s' % e.args[0], payload={'errors': errors})
 
         log.info('Config successfully reloaded from disk.')
         return {}
@@ -80,6 +131,66 @@ class ServerConfigAPI(APIResource):
     def get(self, session=None):
         """ Get Flexget Config """
         return self.manager.config
+
+
+raw_config_object = {
+    'type': 'object',
+    'properties': {
+        'raw_config': {'type': 'string'}
+    }
+}
+raw_config_schema = api.schema('raw_config', raw_config_object)
+
+
+@server_api.route('/raw_config/')
+class ServerConfigAPI(APIResource):
+    @api.doc(description='Return config file encoded in Base64')
+    @api.response(200, model=raw_config_schema, description='Flexget raw YAML config file')
+    def get(self, session=None):
+        """ Get raw YAML config file """
+        with open(self.manager.config_path, 'r', encoding='utf-8') as f:
+            raw_config = base64.b64encode(f.read())
+        return jsonify({'raw_config': raw_config})
+
+    @api.validate(raw_config_schema)
+    @api.response(200, description='Successfully updated config')
+    @api.response(501, model=yaml_error_schema, description='YAML syntax error')
+    @api.response(502, model=config_validation_schema, description='Config validation error')
+    def post(self, session=None):
+        """ Update config """
+        data = request.json
+        try:
+            raw_config = base64.b64decode(data['raw_config'])
+        except TypeError:
+            return {'status': 'error',
+                    'message': 'payload was not a valid base64 encoded string'}, 500
+
+        try:
+            config = yaml.safe_load(raw_config)
+        except YAMLError as e:
+            if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
+                error = {}
+                if e.problem is not None:
+                    error.update({'reason': e.problem})
+                if e.context_mark is not None:
+                    error.update({'line': e.context_mark.line, 'column': e.context_mark.column})
+                if e.problem_mark is not None:
+                    error.update({'line': e.problem_mark.line, 'column': e.problem_mark.column})
+                raise ApiError(code=501, message='Invalid YAML syntax', payload=error)
+
+        try:
+            self.manager.validate_config(config)
+        except ValueError as e:
+            errors = []
+            for er in e.errors:
+                errors.append({'error': er.message,
+                               'config_path': er.json_pointer})
+            raise ApiError(code=502, message='Error loading config: %s' % e.args[0], payload={'errors': errors})
+        with open(self.manager.config_path, 'w', encoding='utf-8') as f:
+            f.write(str(raw_config.replace('\r\n', '\n')))
+
+        return {'status': 'success',
+                'message': 'config successfully updated to file'}
 
 
 version_schema = api.schema('server.version', {

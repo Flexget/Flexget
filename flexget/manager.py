@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
+
 native_int = int
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
@@ -518,7 +519,7 @@ class Manager(object):
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
 
-    def load_config(self):
+    def load_config(self, output_to_console=True):
         """
         Loads the config file from disk, validates and activates it.
 
@@ -537,41 +538,44 @@ class Manager(object):
             msg = str(e).replace('\n', ' ')
             msg = ' '.join(msg.split())
             log.critical(msg, exc_info=False)
-            print('')
-            print('-' * 79)
-            print(' Malformed configuration file (check messages above). Common reasons:')
-            print('-' * 79)
-            print('')
-            print(' o Indentation error')
-            print(' o Missing : from end of the line')
-            print(' o Non ASCII characters (use UTF8)')
-            print(' o If text contains any of :[]{}% characters it must be single-quoted '
-                  '(eg. value{1} should be \'value{1}\')\n')
+            if output_to_console:
+                print('')
+                print('-' * 79)
+                print(' Malformed configuration file (check messages above). Common reasons:')
+                print('-' * 79)
+                print('')
+                print(' o Indentation error')
+                print(' o Missing : from end of the line')
+                print(' o Non ASCII characters (use UTF8)')
+                print(' o If text contains any of :[]{}% characters it must be single-quoted '
+                      '(eg. value{1} should be \'value{1}\')\n')
 
-            # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
-            # At least: ReaderError, YmlScannerError (or something like that)
-            if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
-                lines = 0
-                if e.problem is not None:
-                    print(' Reason: %s\n' % e.problem)
-                    if e.problem == 'mapping values are not allowed here':
-                        print(' ----> MOST LIKELY REASON: Missing : from end of the line!')
+                # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
+                # At least: ReaderError, YmlScannerError (or something like that)
+                if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
+                    lines = 0
+                    if e.problem is not None:
+                        print(' Reason: %s\n' % e.problem)
+                        if e.problem == 'mapping values are not allowed here':
+                            print(' ----> MOST LIKELY REASON: Missing : from end of the line!')
+                            print('')
+                    if e.context_mark is not None:
+                        print(' Check configuration near line %s, column %s' % (
+                        e.context_mark.line, e.context_mark.column))
+                        lines += 1
+                    if e.problem_mark is not None:
+                        print(' Check configuration near line %s, column %s' % (
+                        e.problem_mark.line, e.problem_mark.column))
+                        lines += 1
+                    if lines:
                         print('')
-                if e.context_mark is not None:
-                    print(' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column))
-                    lines += 1
-                if e.problem_mark is not None:
-                    print(' Check configuration near line %s, column %s' % (e.problem_mark.line, e.problem_mark.column))
-                    lines += 1
-                if lines:
-                    print('')
-                if lines == 1:
-                    print(' Fault is almost always in this or previous line\n')
-                if lines == 2:
-                    print(' Fault is almost always in one of these lines or previous ones\n')
+                    if lines == 1:
+                        print(' Fault is almost always in this or previous line\n')
+                    if lines == 2:
+                        print(' Fault is almost always in one of these lines or previous ones\n')
 
             # When --debug escalate to full stacktrace
-            if self.options.debug:
+            if self.options.debug or not output_to_console:
                 raise
             raise ValueError('Config file is not valid YAML')
 

@@ -185,9 +185,8 @@ api = Api(
 
 
 class ApiError(Exception):
-    code = 500
     description = 'server error'
-
+    code = 500
     response_model = api.schema('error', {
         'type': 'object',
         'properties': {

@@ -18,7 +18,9 @@
     "animate.css-scss": "~3.1.0",
     "angular-messages": "^1.5.1",
     "angular-cache": "^4.5.0",
-	"jquery": "^2.2.4"
+    "jquery": "^2.2.4",
+    "angular-ui-ace": "^0.2.3",
+    "angular-utf8-base64": "^0.0.5"
   },
   "resolutions": {
     "angular": "~1.5.6"
@@ -32,6 +34,12 @@
       "main": [
         "css/font-awesome.css",
         "fonts/*"
+      ]
+    },
+    "ace-builds": {
+      "main": [
+        "src-min-noconflict/ace.js",
+        "src-min-noconflict/ext-themelist.js"
       ]
     }
   }

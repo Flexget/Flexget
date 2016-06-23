@@ -1,0 +1,33 @@
+<md-content layout="column" flex layout-fill>
+	<div layout="row" layout-padding>
+		<div layout="row" flex>
+			<div layout="column" flex="25" layout-align="center start">
+				<md-button class="md-raised md-primary" ng-click="vm.save()" ng-disabled="vm.config == vm.origConfig">
+					Save
+				</md-button>
+			</div>
+		</div>
+		<div layout="column" flex="30">
+			<md-input-container class="md-block">
+				<label>Theme</label>
+				<md-select ng-model="vm.aceOptions.theme" ng-change="vm.updateTheme()">
+					<md-option ng-repeat="theme in vm.themes" value="{{ theme.name }}">{{ theme.caption }}</md-option>
+				</md-select>
+			</md-input-container>
+		</div>
+	</div>
+	<div layout="row" ng-if="vm.errors">
+		<md-list flex>
+			<md-list-item class="md-2-line" ng-repeat="error in vm.errors">
+				<div class="md-list-item-text">
+					<h3><b>Path:</b> {{ error.config_path }}</h3>
+					<h4><b>Message:</b> {{ error.error }}</h4>
+				</div>
+				<md-divider ng-if="!$last"></md-divider>
+			</md-list-item>
+		</md-list>
+	</div>
+	<div layout="row" flex>
+    	<div ui-ace='vm.aceOptions' flex ng-model="vm.config"></div>
+	</div>
+</md-content>
