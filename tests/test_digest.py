@@ -44,16 +44,16 @@ class TestDigest(object):
               list: aoeu
               state: ['accepted', 'rejected']
           emit digest:
-            emit_digest:
+            from_digest:
               list: aoeu
             seen: local
           emit state:
-            emit_digest:
+            from_digest:
               list: aoeu
               restore_state: yes
             seen: local
           emit limit:
-            emit_digest:
+            from_digest:
               list: aoeu
               limit: 3
             seen: local

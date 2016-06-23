@@ -41,10 +41,10 @@ input Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`emit_series` Module
+:mod:`next_series_episodes` Module
 -------------------------
 
-.. automodule:: flexget.plugins.input.emit_series
+.. automodule:: flexget.plugins.input.next_series_episodes
     :members:
     :undoc-members:
     :show-inheritance:

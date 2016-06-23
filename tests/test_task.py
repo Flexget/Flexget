@@ -16,7 +16,7 @@ class TestTemplate(object):
         tasks:
           test:
             template: test_series
-            emit_series:
+            next_series_episodes:
               from_start: yes
             rerun: 0
     """

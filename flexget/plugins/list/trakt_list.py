@@ -322,34 +322,6 @@ class TraktList(object):
         return list(TraktSet(config))
 
 
-class TraktAdd(object):
-    """Add all accepted elements in your trakt.tv watchlist/library/seen or custom list."""
-    schema = dict(TraktList.schema, deprecated='trakt_add is deprecated, use list_add instead')
-
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
-        if task.manager.options.test:
-            log.info('Not submitting to trakt.tv because of test mode.')
-            return
-        thelist = TraktSet(config)
-        thelist |= task.accepted
-
-
-class TraktRemove(object):
-    """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
-    schema = dict(TraktList.schema, deprecated='trakt_remove is deprecated, use list_remove instead')
-
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
-        if task.manager.options.test:
-            log.info('Not submitting to trakt.tv because of test mode.')
-            return
-        thelist = TraktSet(config)
-        thelist -= task.accepted
-
-
 @event('plugin.register')
 def register_plugin():
     plugin.register(TraktList, 'trakt_list', api_ver=2, groups=['list'])
-    plugin.register(TraktAdd, 'trakt_add', api_ver=2)
-    plugin.register(TraktRemove, 'trakt_remove', api_ver=2)

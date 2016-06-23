@@ -22,7 +22,7 @@ except ImportError:
 
 _MIN_TELEGRAM_VER = '3.4'
 
-_PLUGIN_NAME = 'send_telegram'
+_PLUGIN_NAME = 'telegram'
 
 _PARSERS = ['markdown', 'html']
 
@@ -77,7 +77,7 @@ class SendTelegram(object):
     Configuration example::
 
     my-task:
-      send_telegram:
+      telegram:
         bot_token: token
         template: {{title}}
         use_markdown: no
@@ -91,9 +91,9 @@ class SendTelegram(object):
 
     Bootstrapping and testing the bot::
 
-    * Execute: `flexget send_telegram bootstrap`.
+    * Execute: `flexget telegram bootstrap`.
       Look at the console output and make sure that the operation was successful.
-    * Execute: `flexget send_telegram test-msg`.
+    * Execute: `flexget telegram test-msg`.
       This will send a test message for every recipient you've configured.
 
 

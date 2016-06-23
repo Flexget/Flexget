@@ -55,38 +55,40 @@ class TestListInterface(object):
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
               - {title: 'title 2', url: "http://mock.url/file2.torrent"}
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
-            list_accept:
-              - movie_list: test_list
+            list_match:
+              from:
+                - movie_list: test_list
 
           test_list_accept_without_remove:
             mock:
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
               - {title: 'title 2', url: "http://mock.url/file2.torrent"}
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
-            list_accept:
-              lists:
+            list_match:
+              from:
                 - movie_list: test_list
-              remove_on_accept: no
+              remove_on_match: no
 
           test_multiple_list_accept_with_remove:
             mock:
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
               - {title: 'title 2', url: "http://mock.url/file2.torrent"}
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
-            list_accept:
-              - movie_list: list 1
-              - movie_list: list 2
+            list_match:
+              from:
+                - movie_list: list 1
+                - movie_list: list 2
 
           test_multiple_list_accept_without_remove:
             mock:
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
               - {title: 'title 2', url: "http://mock.url/file2.torrent"}
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
-            list_accept:
-              lists:
+            list_match:
+              from:
                 - movie_list: list 1
                 - movie_list: list 2
-              remove_on_accept: no
+              remove_on_match: no
 
           test_list_remove:
             mock:
@@ -99,8 +101,10 @@ class TestListInterface(object):
             mock:
               - {title: 'title 1', url: "http://mock.url/file1.torrent"}
               - {title: 'title 3', url: "http://mock.url/file3.torrent"}
-            list_reject:
-              - movie_list: test_list
+            list_match:
+              from:
+                - movie_list: test_list
+              action: reject
 
           test_allowed_identifiers:
             mock:
@@ -118,8 +122,9 @@ class TestListInterface(object):
           test_list_accept_for_real_title:
             mock:
               - {title: 'title.1.720p.BluRay.x264-Group'}
-            list_accept:
-              - movie_list: test_list
+            list_match:
+              from:
+                - movie_list: test_list
     """
 
     def test_list_add(self, execute_task):

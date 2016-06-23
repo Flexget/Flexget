@@ -11,17 +11,17 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.api_trakt import get_session, make_list_slug, get_api_url
 
-log = logging.getLogger('trakt_emit')
+log = logging.getLogger('next_trakt_episodes')
 
 
-class TraktEmit(object):
+class NextTraktEpisodes(object):
     """
     Creates an entry for the latest or the next item in your watched or collected
     episodes in your trakt account.
 
     Syntax:
 
-    trakt_emit:
+    next_trakt_episodes:
       account: <value>
       username: <value>
       position: <last|next>
@@ -87,7 +87,7 @@ class TraktEmit(object):
             try:
                 data = session.get(url).json()
             except RequestException as e:
-                raise plugin.PluginError('An error has occured looking up: Trakt_id: %s Error: %s' % (trakt_id, e))
+                raise plugin.PluginError('An error has occurred looking up: Trakt_id: %s Error: %s' % (trakt_id, e))
             if config['position'] == 'next' and data.get('next_episode'):
                 # If the next episode is already in the trakt database, we'll get it here
                 eps = data['next_episode']['season']
@@ -124,7 +124,8 @@ class TraktEmit(object):
                 entries.append(entry)
         return entries
 
-    def make_entry(self, fields, season, episode):
+    @staticmethod
+    def make_entry(fields, season, episode):
         entry = Entry()
         entry.update(fields)
         entry['series_season'] = season
@@ -138,4 +139,4 @@ class TraktEmit(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TraktEmit, 'trakt_emit', api_ver=2)
+    plugin.register(NextTraktEpisodes, 'next_trakt_episodes', api_ver=2)

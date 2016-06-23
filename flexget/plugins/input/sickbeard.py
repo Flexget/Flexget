@@ -73,7 +73,7 @@ class Sickbeard(object):
                 api_key: MYAPIKEY1123
           discover:
             what:
-              - emit_series: yes
+              - next_series_episodes: yes
             from:
               torrentz: any
           download:

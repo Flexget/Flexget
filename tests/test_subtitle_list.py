@@ -26,17 +26,20 @@ class TestSubtitleList(object):
                - {title: 'Series', location: 'series.mkv'}
              accept_all: yes
              seen: local
+
          tasks:
            subtitle_add:
              list_add:
                - subtitle_list:
                    list: test
+
            subtitle_emit:
              disable: builtins
              template: no_global
              subtitle_list:
                list: test
                languages: [en]
+
            subtitle_remove:
              #subtitle_list:
              #  list: test
@@ -44,6 +47,7 @@ class TestSubtitleList(object):
              list_remove:
                - subtitle_list:
                    list: test
+
            subtitle_fail:
              template: no_global
              subtitle_list:
@@ -53,10 +57,13 @@ class TestSubtitleList(object):
                exact_match: no
                providers:
                  - opensubtitles
-             list_queue:
-               - subtitle_list:
-                   list: test
+             list_match:
+               from:
+                 - subtitle_list:
+                     list: test
+               single_match: yes
              rerun: 0
+
            subtitle_simulate_success:
              template: no_global
              subtitle_list:
@@ -66,10 +73,13 @@ class TestSubtitleList(object):
                exact_match: no
                providers:
                  - opensubtitles
-             list_queue:
-               - subtitle_list:
-                   list: test
+             list_match:
+               from:
+                 - subtitle_list:
+                     list: test
+               single_match: yes
              rerun: 0
+
            subtitle_add_with_languages:
              list_add:
                - subtitle_list:
@@ -77,6 +87,7 @@ class TestSubtitleList(object):
                    languages:
                      - en
                      - eng
+
            subtitle_add_local_file:
              disable: seen
              template: no_global
@@ -88,6 +99,7 @@ class TestSubtitleList(object):
                - subtitle_list:
                    list: test
                    languages: [en, ja]
+
            subtitle_add_another_local_file:
              disable: seen
              template: no_global
@@ -99,6 +111,7 @@ class TestSubtitleList(object):
                - subtitle_list:
                    list: test
                    languages: [en, ja]
+
            subtitle_add_a_third_local_file:
              disable: seen
              template: no_global
@@ -109,6 +122,7 @@ class TestSubtitleList(object):
              list_add:
                - subtitle_list:
                    list: test
+
            subtitle_test_expiration_add:
              disable: builtins
              template: no_global
@@ -120,6 +134,7 @@ class TestSubtitleList(object):
                - subtitle_list:
                    list: test
                    remove_after: 7 days
+
            subtitle_add_local_dir:
              disable: builtins
              template: no_global
@@ -131,6 +146,7 @@ class TestSubtitleList(object):
                    allow_dir: yes
                    languages: ['ja']
              accept_all: yes
+
            subtitle_emit_dir:
              disable: builtins
              template: no_global
@@ -138,6 +154,7 @@ class TestSubtitleList(object):
                list: test
                allow_dir: yes
                languages: [en]
+
            subtitle_simulate_success_no_check:
              template: no_global
              subtitle_list:
@@ -149,10 +166,13 @@ class TestSubtitleList(object):
                exact_match: no
                providers:
                  - opensubtitles
-             list_queue:
-               - subtitle_list:
-                   list: test
-                   allow_dir: yes
+             list_match:
+               from:
+                 - subtitle_list:
+                     list: test
+                     allow_dir: yes
+               single_match: yes
+
            subtitle_add_force_file:
              disable: builtins
              template: no_global
@@ -165,6 +185,7 @@ class TestSubtitleList(object):
                    allow_dir: yes
                    languages: ['ja']
              accept_all: yes
+
            subtitle_add_force_file_no:
              disable: builtins
              template: no_global
@@ -177,12 +198,14 @@ class TestSubtitleList(object):
                    languages: ['ja']
                    force_file_existence: no
              accept_all: yes
+
            subtitle_emit_force_no:
              disable: builtins
              template: no_global
              subtitle_list:
                list: test
                force_file_existence: no
+
            subtitle_path:
              disable: builtins
              template: no_global
@@ -194,6 +217,7 @@ class TestSubtitleList(object):
                    list: test
                    path: '{{ output }}'
              accept_all: yes
+
            subtitle_path_relative:
              disable: builtins
              template: no_global

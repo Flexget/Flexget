@@ -11,11 +11,10 @@ from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 
-log = logging.getLogger('sonarr_emit')
+log = logging.getLogger('next_sonarr_episodes')
 
 
-class SonarrEmit(object):
-
+class NextSonarrEpisodes(object):
     """
     This plugin return the 1st missing episode of every show configures in Sonarr.
     This can be used with the discover plugin or set_series_begin plugin to
@@ -23,7 +22,7 @@ class SonarrEmit(object):
 
     Syntax:
 
-    sonarr_emit:
+    next_sonarr_episodes:
       base_url=<value> (Required)
       port=<value> (Default is 80)
       api_key=<value> (Required)
@@ -41,7 +40,7 @@ class SonarrEmit(object):
     discover_from_sonarr_task:
       discover:
         what:
-          - sonarr_emit:
+          - next_sonarr_episodes:
               base_url: '{{ secrets.credentials.sonarr.url }}'
               port: 8989
               api_key: '{{ secrets.credentials.sonarr.api_key }}'
@@ -55,7 +54,7 @@ class SonarrEmit(object):
     Usage: (Example with set_series_begin)
 
     set-series-begin-from-sonarr:
-      sonarr_emit:
+      next_sonarr_episodes:
         base_url: '{{ secrets.credentials.sonarr.url }}'
         port: 8989
         api_key: '{{ secrets.credentials.sonarr.api_key }}'
@@ -127,4 +126,4 @@ class SonarrEmit(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SonarrEmit, 'sonarr_emit', api_ver=2)
+    plugin.register(NextSonarrEpisodes, 'next_sonarr_episodes', api_ver=2)

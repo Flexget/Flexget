@@ -53,7 +53,7 @@ class Discover(object):
 
       discover:
         what:
-          - emit_series: yes
+          - next_series_episodes: yes
         from:
           - piratebay
         interval: [1 hours|days|weeks]

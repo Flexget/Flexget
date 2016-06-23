@@ -100,7 +100,7 @@ class Newznab(object):
 
     def do_search_tvsearch(self, arg_entry, task, config=None):
         log.info('Searching for %s' % (arg_entry['title']))
-        # normally this should be used with emit_series who has provided season and episodenumber
+        # normally this should be used with next_series_episodes who has provided season and episodenumber
         if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
             return []
         if arg_entry.get('tvrage_id'):

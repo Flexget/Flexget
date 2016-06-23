@@ -68,11 +68,11 @@ class TestDiscover(object):
                 - title: Foo
               from:
               - test_search: yes
-          test_emit_series:
+          test_next_series_episodes:
             discover:
               release_estimations: ignore
               what:
-              - emit_series:
+              - next_series_episodes:
                   from_start: yes
               from:
               - test_search: yes
@@ -80,11 +80,11 @@ class TestDiscover(object):
             - My Show:
                 identified_by: ep
             rerun: 0
-          test_emit_series_with_bad_search:
+          test_next_series_episodes_with_bad_search:
             discover:
               release_estimations: ignore
               what:
-              - emit_series:
+              - next_series_episodes:
                   from_start: yes
               from:
               - test_search: fail
@@ -131,12 +131,12 @@ class TestDiscover(object):
         task = execute_task('test_estimates')
         assert len(task.entries) == 1
 
-    def test_emit_series(self, execute_task):
-        task = execute_task('test_emit_series')
+    def test_next_series_episodes(self, execute_task):
+        task = execute_task('test_next_series_episodes')
         assert task.find_entry(title='My Show S01E01')
 
-    def test_emit_series_with_bad_search(self, execute_task):
-        task = execute_task('test_emit_series_with_bad_search')
+    def test_next_series_episodes_with_bad_search(self, execute_task):
+        task = execute_task('test_next_series_episodes_with_bad_search')
         for epnum in range(1, 5):
             title = 'My Show S01E0%d' % epnum
             assert any(e['title'] == title for e in task.mock_output), '%s not accepted' % title
@@ -150,11 +150,11 @@ class TestEmitSeriesInDiscover(object):
           inject_series:
             series:
               - My Show 2
-          test_emit_series_backfill:
+          test_next_series_episodes_backfill:
             discover:
               release_estimations: ignore
               what:
-              - emit_series:
+              - next_series_episodes:
                   backfill: yes
               from:
               - test_search: yes
@@ -165,8 +165,8 @@ class TestEmitSeriesInDiscover(object):
             rerun: 0
     """
 
-    def test_emit_series_backfill(self, execute_task):
+    def test_next_series_episodes_backfill(self, execute_task):
         execute_task('inject_series', options = {'inject': [Entry(title='My Show 2 S02E01', url='')]})
-        task = execute_task('test_emit_series_backfill')
+        task = execute_task('test_next_series_episodes_backfill')
         assert task.find_entry(title='My Show 2 S01E01')
         assert task.find_entry(title='My Show 2 S02E02')
