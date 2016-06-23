@@ -79,13 +79,13 @@ class ServerReloadAPI(APIResource):
                     error.update({'line': e.context_mark.line, 'column': e.context_mark.column})
                 if e.problem_mark is not None:
                     error.update({'line': e.problem_mark.line, 'column': e.problem_mark.column})
-            raise ApiError(code=501, message='Invalid YAML syntax', payload=error)
+                raise ApiError(message='Invalid YAML syntax', payload=error)
         except ValueError as e:
             errors = []
             for er in e.errors:
                 errors.append({'error': er.message,
                                'config_path': er.json_pointer})
-            raise ApiError(code=502, message='Error loading config: %s' % e.args[0], payload={'errors': errors})
+            raise ApiError('Error loading config: %s' % e.args[0], payload={'errors': errors})
 
         log.info('Config successfully reloaded from disk.')
         return {}
@@ -176,7 +176,7 @@ class ServerConfigAPI(APIResource):
                     error.update({'line': e.context_mark.line, 'column': e.context_mark.column})
                 if e.problem_mark is not None:
                     error.update({'line': e.problem_mark.line, 'column': e.problem_mark.column})
-                raise ApiError(code=501, message='Invalid YAML syntax', payload=error)
+                raise ApiError(message='Invalid YAML syntax', payload=error)
 
         try:
             self.manager.validate_config(config)
@@ -185,7 +185,7 @@ class ServerConfigAPI(APIResource):
             for er in e.errors:
                 errors.append({'error': er.message,
                                'config_path': er.json_pointer})
-            raise ApiError(code=502, message='Error loading config: %s' % e.args[0], payload={'errors': errors})
+            raise ApiError(message='Error loading config: %s' % e.args[0], payload={'errors': errors})
         with open(self.manager.config_path, 'w', encoding='utf-8') as f:
             f.write(str(raw_config.replace('\r\n', '\n')))
 
