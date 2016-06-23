@@ -143,7 +143,7 @@ class Api(RestPlusAPI):
 
         return decorator
 
-    def response(self, code_or_apierror, description=None, model=None, **kwargs):
+    def response(self, code_or_apierror, description='Success', model=None, **kwargs):
         """
         Extends :meth:`flask_restplus.Api.response` to allow passing an :class:`ApiError` class instead of
         response code. If an `ApiError` is used, the response code, and expected response model, is automatically
