@@ -13,7 +13,10 @@
 		var vm = this;
 
 		vm.$onInit = activate;
+		vm.$onDestroy = destroy;
 		vm.execute = execute;
+		vm.stopStream = stopStream;
+		vm.streaming = false;
 
 		var taskInterval = $interval(getRunning, 3000);
 
@@ -28,68 +31,19 @@
         };
 
 		function execute(options, tasks) {
-			console.log(options, tasks);
+			options.tasks = tasks;
+
+			vm.options = options;
+			vm.streaming = true;
 		}
-	
-		$scope.$on('$destroy', function () {
+
+		function stopStream() {
+			delete vm.options;
+			vm.streaming = false
+		}
+
+		function destroy() {
 			$interval.cancel(taskInterval);
-		});
+		};
 	}
 })();
-		
-
-		//allTasks = [];
-
-       // vm.stream = { running: false, tasks: [] };
-       /*
-        vm.clear = function () {
-            vm.stream.tasks = [];
-            vm.stream.running = false;
-            vm.options.tasks = [];
-        };
-
-        vm.execute = function () {
-            vm.stream.running = true;
-            vm.stream.tasks = [];
-
-            angular.forEach(vm.tasksInput.tasks, function (task) {
-                vm.stream.tasks.push({
-                    status: 'pending',
-                    name: task,
-                    entries: [],
-                    percent: 0
-                });
-            });
-
-            var updateProgress = function () {
-                var totalPercent = 0;
-                for (var i = 0; i < vm.stream.tasks.length; i++) {
-                    totalPercent = totalPercent + vm.stream.tasks[i].percent;
-                }
-                vm.stream.percent = totalPercent / vm.stream.tasks.length;
-            };
-
-            var options = {};
-            angular.copy(vm.options.settings, options);
-            executeService.execute(vm.tasksInput.tasks, options)
-                .log(function (log) {
-                    console.log(log);
-                })
-                .progress(function (update) {
-                    var filtered = $filter('filter')(vm.stream.tasks, { status: '!complete' });
-                    angular.extend(filtered[0], update);
-                    updateProgress();
-                })
-                .summary(function (update) {
-                    var filtered = $filter('filter')(vm.stream.tasks, { status: 'complete' });
-                    angular.extend(filtered[filtered.length - 1], update);
-                    updateProgress();
-                })
-                .entry_dump(function (entries) {
-                    var filtered = $filter('filter')(vm.stream.tasks, { status: 'complete' });
-                    angular.extend(filtered[filtered.length - 1], { entries: entries });
-                });
-        };
- //   }
-
-//})();*/

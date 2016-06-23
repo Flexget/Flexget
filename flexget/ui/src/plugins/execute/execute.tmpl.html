@@ -1,6 +1,6 @@
-<md-content layout="column" layout-padding flex class="execute" ng-hide="vm.stream.tasks.length" class="log">
+<md-content layout="column" layout-padding flex class="execute" ng-if="!vm.streaming" class="log">
   <execute-input running="vm.running" execute="vm.execute"></execute-input>
 </md-content>
-<md-content layout="column" layout-fill flex ng-show="vm.stream.tasks.length">
-  <execute-stream stream="vm.stream" running="vm.running" clear="vm.clear"></execute-stream>
+<md-content layout="column" layout-fill ng-if="vm.streaming" flex>
+  <execute-stream options="vm.options" stream="vm.stream" running="vm.running" stop-stream="vm.stopStream"></execute-stream>
 </md-content>
