@@ -1,4 +1,4 @@
-<md-content layout="column" layout-padding flex class="execute" ng-hide="vm.stream.tasks.length" class="log">
+<md-content layout="column" layout-fill flex class="execute" ng-hide="vm.stream.tasks.length" class="log">
   <execute-input options="vm.options" running="vm.running" execute="vm.execute" tasks-input="vm.tasksInput" add-task='vm.addTask'></execute-input>
 </md-content>
 <md-content layout="column" layout-fill flex ng-show="vm.stream.tasks.length">
