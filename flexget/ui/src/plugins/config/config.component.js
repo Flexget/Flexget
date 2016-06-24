@@ -21,11 +21,16 @@
 		
 		vm.aceOptions = {
 			mode: 'yaml',
-			theme: getTheme()
+			theme: getTheme,
+			onLoad: aceLoaded
 		};
 
 		function getTheme() {
 			return aceThemeCache.get('theme') ? aceThemeCache.get('theme') : 'chrome';
+		}
+
+		function aceLoaded(_editor) {
+			_editor.commands.removeCommand('find');
 		}
 
 		vm.updateTheme = function () {

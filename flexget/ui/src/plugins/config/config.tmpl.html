@@ -1,9 +1,14 @@
 <md-content layout="column" flex layout-fill>
+	<md-toolbar layout="md-tall md-accent">
+		<p class="md-toolbar-tools">
+      		<span>This page is still pretty much in beta. Please take a backup before trying to save a new config.</span>
+   		</p>
+	</md-toolbar>
 	<div layout="row" layout-padding>
 		<div layout="row" flex>
 			<div layout="column" flex="25" layout-align="center start">
 				<md-button class="md-raised md-primary" ng-click="vm.save()" ng-disabled="vm.config == vm.origConfig">
-					Save
+					Save and load
 				</md-button>
 			</div>
 		</div>
