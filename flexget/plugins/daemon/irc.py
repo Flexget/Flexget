@@ -63,6 +63,7 @@ schema = {
                     },
                     'queue_size': {'type': 'integer', 'default': 1},
                     'use_ssl': {'type': 'boolean', 'default': False},
+                    'task_delay': {'type': 'integer'},
                 },
                 'anyOf': [
                     {'required': ['server', 'channels']},
@@ -293,6 +294,8 @@ class IRCConnection(irc_bot.IRCBot):
                 log.info('Injecting %d entries into task "%s"', len(entries), task)
                 manager.execute(options={'tasks': [task], 'cron': True, 'inject': entries}, priority=5)
 
+        self.entry_queue = []
+
     def queue_entry(self, entry):
         """
         Stores an entry in the connection entry queue, if the queue is over the size limit then submit them
@@ -302,8 +305,10 @@ class IRCConnection(irc_bot.IRCBot):
         self.entry_queue.append(entry)
         log.debug('Entry: %s', entry)
         if len(self.entry_queue) >= self.config['queue_size']:
-            self.run_tasks()
-            self.entry_queue = []
+            if self.config.get('task_delay'):
+                self.schedule.queue_command(self.config['task_delay'], self.run_tasks, 'run_tasks')
+            else:
+                self.run_tasks()
 
     def parse_privmsg(self, nickname, channel, message):
         """
