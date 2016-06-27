@@ -11,21 +11,20 @@
 				running: '<',
 				stopStream: '<',
 				options: '<'
-				//stream: '<',
-				//clear: '<'
 			},
 		});
 	
-	function executeStreamController(executeService) {
+	function executeStreamController(executeService, $filter) {
 		var vm = this;
 
 		vm.$onInit = activate;
 		vm.clear = clear;
+		vm.streamTasks = [];
+		vm.streamProgress = 0;
 
 		function activate() {
 			setupTaskProperties();
-			console.log('activate');
-			//TODO: Start stream
+			startStream();
 		}
 
 		function setupTaskProperties() {
@@ -37,7 +36,41 @@
 					status: 'pending'
 				}
 
-				vm.options.tasks[i] = task;
+				vm.streamTasks.push(task);
+			}
+		}
+
+		function startStream() {
+			vm.options.progress = true;
+			vm.options.summary = true;
+			vm.options.log = true;
+			vm.options.entry_dump = true;
+
+			executeService.executeTasks(vm.options)
+				.log(logNode)
+				.progress(progressNode)
+				.summary(summaryNode)
+				.entry_dump(entryDumpNode);
+			
+			function progressNode(progress) {
+				var filtered = $filter('filter')(vm.streamTasks, { status: '!complete' });
+				angular.extend(filtered[0], progress);
+				updateProgress();
+			}
+
+			function summaryNode(summary) {
+				var filtered = $filter('filter')(vm.streamTasks, { status: 'complete' });
+				angular.extend(filtered[filtered.length - 1], summary);
+				updateProgress();
+			}
+
+			function entryDumpNode(entries) {
+				var filtered = $filter('filter')(vm.streamTasks, { status: 'complete' });
+				angular.extend(filtered[filtered.length - 1], { entries: entries });
+			}
+
+			function logNode(log) {
+				console.log(log);
 			}
 		}
 
@@ -47,29 +80,10 @@
 
 		function updateProgress() {
 			var totalPercent = 0;
-			for (var i = 0; i < vm.stream.tasks.length; i++) {
-				totalPercent = totalPercent + vm.stream.tasks[i].percent;
+			for (var i = 0; i < vm.streamTasks.length; i++) {
+				totalPercent = totalPercent + vm.streamTasks[i].percent;
 			}
-			vm.stream.percent = totalPercent / vm.stream.tasks.length;
+			vm.streamProgress = totalPercent / vm.streamTasks.length;
 		};
- 
-		/*executeService.execute(vm.tasksInput.tasks, options)
-			.log(function (log) {
-				console.log(log);
-			})
-			.progress(function (update) {
-				var filtered = $filter('filter')(vm.stream.tasks, { status: '!complete' });
-				angular.extend(filtered[0], update);
-				updateProgress();
-			})
-			.summary(function (update) {
-				var filtered = $filter('filter')(vm.stream.tasks, { status: 'complete' });
-				angular.extend(filtered[filtered.length - 1], update);
-				updateProgress();
-			})
-			.entry_dump(function (entries) {
-				var filtered = $filter('filter')(vm.stream.tasks, { status: 'complete' });
-				angular.extend(filtered[filtered.length - 1], { entries: entries });
-			});*/
 	}
 })();

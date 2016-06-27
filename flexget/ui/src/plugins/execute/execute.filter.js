@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    angular.module('flexget.plugins.execute')
+    angular
+		.module('plugins.execute')
         .filter('executePhaseFilter', executePhaseFilter);
 
     function executePhaseFilter() {
@@ -24,4 +25,4 @@
         };
     }
 
-});
+})();

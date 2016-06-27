@@ -30,26 +30,8 @@
 			}
         };
 
-		function executeTasks(task_names, options) {
+		function executeTasks(options) {
             var deferred = $q.defer();
-
-            options.tasks = task_names;
-			
-            var on = function (event, pattern, callback) {
-                var wrappedCallback = function () {
-                    var args = arguments;
-
-                    return $rootScope.$evalAsync(function () {
-                        return callback.apply(stream, args);
-                    });
-                };
-
-                if (pattern) {
-                    stream.on(event, pattern, wrappedCallback);
-                } else {
-                    stream.on(event, wrappedCallback)
-                }
-            };
 
             var stream = oboe({
                 url: '/api/tasks/execute/',
@@ -62,22 +44,22 @@
             });
 
             deferred.promise.log = function (callback) {
-                on('node', 'log', callback);
+                stream.on('node', 'log', callback);
                 return deferred.promise;
             };
 
             deferred.promise.progress = function (callback) {
-                on('node', 'progress', callback);
+                stream.on('node', 'progress', callback);
                 return deferred.promise;
             };
 
             deferred.promise.summary = function (callback) {
-                on('node', 'summary', callback);
+                stream.on('node', 'summary', callback);
                 return deferred.promise;
             };
 
             deferred.promise.entry_dump = function (callback) {
-                on('node', 'entry_dump', callback);
+                stream.on('node', 'entry_dump', callback);
                 return deferred.promise;
             };
 
