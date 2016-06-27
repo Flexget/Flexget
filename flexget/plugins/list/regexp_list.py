@@ -23,7 +23,7 @@ class RegexpListList(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, unique=True)
     added = Column(DateTime, default=datetime.now)
-    regexps = relationship('RegexpListFile', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
+    regexps = relationship('RegexListRegexp', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
 
     def __repr__(self):
         return '<RegexpListList name=%s,id=%d>' % (self.name, self.id)
@@ -36,15 +36,15 @@ class RegexpListList(Base):
         }
 
 
-class RegexpListFile(Base):
-    __tablename__ = 'regexp_list_files'
+class RegexListRegexp(Base):
+    __tablename__ = 'regexp_list_regexps'
     id = Column(Integer, primary_key=True)
     added = Column(DateTime, default=datetime.now)
     regexp = Column(Unicode)
     list_id = Column(Integer, ForeignKey(RegexpListList.id), nullable=False)
 
     def __repr__(self):
-        return '<RegexpListFile regexp=%s,list_name=%s>' % (self.regexp, self.list.name)
+        return '<RegexListRegexp regexp=%s,list_name=%s>' % (self.regexp, self.list.name)
 
     def to_entry(self):
         entry = Entry()
@@ -93,7 +93,7 @@ class RegexpList(MutableSet):
         # Just delete and re-create to refresh
         if db_regexp:
             session.delete(db_regexp)
-        db_regexp = RegexpListFile()
+        db_regexp = RegexListRegexp()
         db_regexp.regexp = entry['title']
         db_list.regexps.append(db_regexp)
         session.commit()
@@ -118,7 +118,7 @@ class RegexpList(MutableSet):
                 if re.search(regexp.regexp, entry['title'], re.IGNORECASE):
                     res = regexp
         else:
-            res = self._db_list(session).regexps.filter(RegexpListFile.regexp ==
+            res = self._db_list(session).regexps.filter(RegexListRegexp.regexp ==
                                                         entry.get('regexp', entry['title'])).first()
         return res
 
