@@ -94,7 +94,7 @@ class RegexpList(MutableSet):
         if db_regexp:
             session.delete(db_regexp)
         db_regexp = RegexListRegexp()
-        db_regexp.regexp = entry['title']
+        db_regexp.regexp = entry.get('regexp', entry['title'])
         db_list.regexps.append(db_regexp)
         session.commit()
         return db_regexp.to_entry()
