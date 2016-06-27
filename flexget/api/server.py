@@ -202,7 +202,7 @@ class ServerConfigAPI(APIResource):
                            payload={'reason': str(e), 'backup_path': backup_path})
 
         return {'status': 'success',
-                'message': 'config successfully updated to file'}
+                'message': 'new config loaded and successfully updated to file'}
 
 
 version_schema = api.schema('server.version', {
