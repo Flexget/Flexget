@@ -526,7 +526,7 @@ class Task(object):
                 if isinstance(templates, basestring) or isinstance(templates, list) and template in templates:
                     task_templates.update({template: value})
             hashable_config = list(self.config.items()) + list(task_templates.items())
-            config_hash = hashlib.md5(str(sorted(hashable_config)).encode('utf-8')).hexdigest()
+            config_hash = hashlib.md5(str(sorted(hashable_config, key=lambda x: x[0])).encode('utf-8')).hexdigest()
             last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
             if self.is_rerun:
                 # Restore the config to state right after start phase
