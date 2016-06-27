@@ -414,7 +414,7 @@ class TestExecuteMultipleTasks(object):
 
     def test_execute_multiple_tasks(self, api_client, manager):
         rsp = api_client.json_post('/tasks/execute/', data=json.dumps({}))
-        assert rsp.status_code == 400
+        assert rsp.status_code == 422
 
         payload = {'tasks': ['non_existing_test_task']}
         rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
