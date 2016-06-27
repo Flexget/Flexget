@@ -11,6 +11,7 @@ import threading
 import traceback
 from time import sleep
 
+import binascii
 import cherrypy
 import yaml
 from flask import Response, jsonify, request
@@ -149,7 +150,7 @@ class ServerConfigAPI(APIResource):
     def get(self, session=None):
         """ Get raw YAML config file """
         with open(self.manager.config_path, 'r', encoding='utf-8') as f:
-            raw_config = base64.b64encode(bytes(f.read(), "utf-8"))
+            raw_config = base64.b64encode(f.read().encode("utf-8"))
         return jsonify(raw_config=raw_config.decode('utf-8'))
 
     @api.validate(raw_config_schema)
@@ -161,9 +162,9 @@ class ServerConfigAPI(APIResource):
         data = request.json
         try:
             raw_config = base64.b64decode(data['raw_config'])
-        except TypeError:
+        except (TypeError, binascii.Error):
             return {'status': 'error',
-                    'message': 'payload was not a valid base64 encoded string'}, 500
+                    'message': 'payload was not a valid base64 encoded string'}, 400
 
         try:
             config = yaml.safe_load(raw_config)
@@ -179,15 +180,26 @@ class ServerConfigAPI(APIResource):
                 raise ApiError(message='Invalid YAML syntax', payload=error)
 
         try:
-            self.manager.validate_config(config)
+            backup_path = self.manager.update_config(config)
         except ValueError as e:
             errors = []
             for er in e.errors:
                 errors.append({'error': er.message,
                                'config_path': er.json_pointer})
             raise ApiError(message='Error loading config: %s' % e.args[0], payload={'errors': errors})
-        with open(self.manager.config_path, 'w', encoding='utf-8') as f:
-            f.write(str(raw_config.replace('\r\n', '\n')))
+
+        try:
+            self.manager.backup_config()
+        except Exception as e:
+            raise ApiError(message='Failed to create config backup, config updated but NOT written to file',
+                           payload={'reason': str(e)})
+
+        try:
+            with open(self.manager.config_path, 'w', encoding='utf-8') as f:
+                f.write(raw_config.decode('utf-8').replace('\r\n', '\n'))
+        except Exception as e:
+            raise ApiError(message='Failed to write new config to file, please load from backup',
+                           payload={'reason': str(e), 'backup_path': backup_path})
 
         return {'status': 'success',
                 'message': 'config successfully updated to file'}

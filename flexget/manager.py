@@ -561,11 +561,11 @@ class Manager(object):
                             print('')
                     if e.context_mark is not None:
                         print(' Check configuration near line %s, column %s' % (
-                        e.context_mark.line, e.context_mark.column))
+                            e.context_mark.line, e.context_mark.column))
                         lines += 1
                     if e.problem_mark is not None:
                         print(' Check configuration near line %s, column %s' % (
-                        e.problem_mark.line, e.problem_mark.column))
+                            e.problem_mark.line, e.problem_mark.column))
                         lines += 1
                     if lines:
                         print('')
@@ -605,15 +605,27 @@ class Manager(object):
         self.user_config = copy.deepcopy(new_user_config)
         fire_event('manager.config_updated', self)
 
+    def backup_config(self):
+        backup_path = os.path.join(self.config_base,
+                                   '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')))
+
+        log.debug('backing up old config to %s before new save' % backup_path)
+        try:
+            shutil.copy(self.config_path, backup_path)
+        except (OSError, IOError) as e:
+            log.warning('Config backup creation failed: %s', str(e))
+            raise
+        return backup_path
+
     def save_config(self):
         """Dumps current config to yaml config file"""
         # TODO: Only keep x number of backups..
 
         # Back up the user's current config before overwriting
-        backup_path = os.path.join(self.config_base,
-                                   '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')))
-        log.debug('backing up old config to %s before new save' % backup_path)
-        shutil.copy(self.config_path, backup_path)
+        try:
+            self.backup_config()
+        except (OSError, IOError):
+            return
         with open(self.config_path, 'w') as config_file:
             config_file.write(yaml.dump(self.user_config, default_flow_style=False))
 
