@@ -89,22 +89,22 @@ class RegexpList(MutableSet):
     def add(self, entry, session=None):
         # Check if this is already in the list, refresh info if so
         db_list = self._db_list(session=session)
-        db_file = self._find_entry(entry, session=session)
+        db_regexp = self._find_entry(entry, session=session)
         # Just delete and re-create to refresh
-        if db_file:
-            session.delete(db_file)
-        db_file = RegexpListFile()
-        db_file.regexp = entry['title']
-        db_list.regexps.append(db_file)
+        if db_regexp:
+            session.delete(db_regexp)
+        db_regexp = RegexpListFile()
+        db_regexp.regexp = entry['title']
+        db_list.regexps.append(db_regexp)
         session.commit()
-        return db_file.to_entry()
+        return db_regexp.to_entry()
 
     @with_session
     def discard(self, entry, session=None):
-        db_file = self._find_entry(entry, session=session)
-        if db_file:
-            log.debug('deleting file %s', db_file)
-            session.delete(db_file)
+        db_regexp = self._find_entry(entry, session=session)
+        if db_regexp:
+            log.debug('deleting file %s', db_regexp)
+            session.delete(db_regexp)
 
     def __contains__(self, entry):
         return self._find_entry(entry, match_regexp=True) is not None
@@ -118,7 +118,8 @@ class RegexpList(MutableSet):
                 if re.search(regexp.regexp, entry['title'], re.IGNORECASE):
                     res = regexp
         else:
-            res = self._db_list(session).regexps.filter(RegexpListFile.regexp == entry.get('regexp')).first()
+            res = self._db_list(session).regexps.filter(RegexpListFile.regexp ==
+                                                        entry.get('regexp', entry['title'])).first()
         return res
 
     @property
