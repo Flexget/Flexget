@@ -69,6 +69,45 @@
   <script src="bower_components/angular-spinkit/build/angular-spinkit.js"></script>
   <script src="bower_components/angular-loading-bar/build/loading-bar.js"></script>
   <script src="bower_components/ui-grid-auto-scroll/js/auto-scroll.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/ext-themelist.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/mode-yaml.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-ambiance.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-chaos.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-chrome.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-clouds_midnight.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-clouds.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-cobalt.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-crimson_editor.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-dawn.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-dreamweaver.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-eclipse.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-github.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-idle_fingers.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-iplastic.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-katzenmilch.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-kr_theme.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-kuroir.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-merbivore_soft.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-merbivore.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-mono_industrial.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-monokai.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-pastel_on_dark.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-solarized_dark.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-solarized_light.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-sqlserver.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-terminal.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-textmate.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-tomorrow_night_blue.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-tomorrow_night_bright.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-tomorrow_night_eighties.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-tomorrow_night.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-tomorrow.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-twilight.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-vibrant_ink.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/theme-xcode.js"></script>
+  <script src="bower_components/angular-ui-ace/ui-ace.js"></script>
+  <script src="bower_components/angular-utf8-base64/angular-utf8-base64.js"></script>
   <script src="bower_components/angular-cache/dist/angular-cache.js"></script>
   <script src="bower_components/clipboard/dist/clipboard.js"></script>
   <script src="bower_components/ngclipboard/dist/ngclipboard.js"></script>
@@ -79,6 +118,7 @@
   <!-- endbower -->
 
   <!-- inject:spechelpers:js -->
+  <script src="/tests-mock-data/execute.js"></script>
   <script src="/tests-mock-data/history.js"></script>
   <script src="/tests-mock-data/movie_list.js"></script>
   <script src="/tests-mock-data/schedules.js"></script>
@@ -96,13 +136,14 @@
   <script src="/src/plugins/series/components/series-entry/series-entry.component.js"></script>
   <script src="/src/plugins/series/components/episode-releases/episode-releases.component.js"></script>
   <script src="/src/plugins/series/components/episode-release/episode-release.component.js"></script>
-  <script src="/src/plugins/seen/components/seen-field/seen-field.component.js"></script>
   <script src="/src/plugins/seen/seen.module.js"></script>
   <script src="/src/plugins/seen/components/seen-entry/seen-entry.component.js"></script>
+  <script src="/src/plugins/seen/components/seen-field/seen-field.component.js"></script>
   <script src="/src/plugins/movies/movies.module.js"></script>
   <script src="/src/plugins/movies/components/new-list/new-list.component.js"></script>
   <script src="/src/plugins/movies/components/movie-list/movie-list.component.js"></script>
   <script src="/src/plugins/movies/components/movie-entry/movie-entry.component.js"></script>
+  <script src="/src/plugins/execute/execute.module.js"></script>
   <script src="/src/plugins/execute/components/execute-stream/execute-stream.component.js"></script>
   <script src="/src/plugins/execute/components/execute-input/execute-input.component.js"></script>
   <script src="/src/services/services.module.js"></script>
@@ -130,10 +171,12 @@
   <script src="/src/plugins/history/history.service.js"></script>
   <script src="/src/plugins/history/history.route.js"></script>
   <script src="/src/plugins/history/history.component.js"></script>
-  <script src="/src/plugins/execute/execute.module.js"></script>
+  <script src="/src/plugins/execute/execute.service.js"></script>
   <script src="/src/plugins/execute/execute.route.js"></script>
   <script src="/src/plugins/execute/execute.filter.js"></script>
   <script src="/src/plugins/execute/execute.component.js"></script>
+  <script src="/src/plugins/config/config.module.js"></script>
+  <script src="/src/plugins/config/config.component.js"></script>
   <script src="/src/directives/directives.module.js"></script>
   <script src="/src/directives/palette-background/palette-background.directive.js"></script>
   <script src="/src/directives/material-pagination/material-pagination.directive.js"></script>
@@ -171,7 +214,6 @@
   <script src="/src/blocks/error/error-toast.controller.js"></script>
   <script src="/src/blocks/error/error-toast.component.js"></script>
   <script src="/src/blocks/error/error-dialog.component.js"></script>
-  <script src="/src/services/tasks.service.js"></script>
   <script src="/src/services/schema.service.js"></script>
   <script src="/src/plugins/plugins.module.js"></script>
   <!-- endinject -->
@@ -194,7 +236,10 @@
   <script src="/src/components/sidenav/sidenav.component.spec.js"></script>
   <script src="/src/components/sidenav/sidenav.service.spec.js"></script>
   <script src="/src/components/toolbar/toolbar.component.spec.js"></script>
+  <script src="/src/plugins/execute/execute.component.spec.js"></script>
+  <script src="/src/plugins/execute/execute.filter.spec.js"></script>
   <script src="/src/plugins/execute/execute.route.spec.js"></script>
+  <script src="/src/plugins/execute/execute.service.spec.js"></script>
   <script src="/src/plugins/history/history.component.spec.js"></script>
   <script src="/src/plugins/history/history.route.spec.js"></script>
   <script src="/src/plugins/history/history.service.spec.js"></script>

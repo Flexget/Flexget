@@ -18,10 +18,12 @@
 		vm.stopStream = stopStream;
 		vm.streaming = false;
 
-		var taskInterval = $interval(getRunning, 3000);
+		var taskInterval;
 
 		function activate() {
 			getRunning();
+			
+			taskInterval = $interval(getRunning, 3000);
 		}
 
 		function getRunning() {

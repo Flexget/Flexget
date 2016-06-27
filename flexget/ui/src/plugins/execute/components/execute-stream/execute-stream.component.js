@@ -75,6 +75,7 @@
 		}
 
 		function clear() {
+			//TODO: Stop stream if running
 			vm.stopStream();
 		}
 
