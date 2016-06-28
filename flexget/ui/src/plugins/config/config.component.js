@@ -60,6 +60,7 @@
 						.textContent("Your config file has been successfully updated")
 
 					$mdDialog.show(dialog);
+					vm.origConfig = angular.copy(vm.config);
 				}, function (error) {
 					vm.errors = error.data.errors;
 				});
