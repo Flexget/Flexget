@@ -8,7 +8,6 @@
 			controllerAs: 'vm',
 			controller: executeStreamController,
 			bindings: {
-				running: '<',
 				stopStream: '<',
 				options: '<'
 			},
@@ -21,6 +20,8 @@
 		vm.clear = clear;
 		vm.streamTasks = [];
 		vm.streamProgress = 0;
+
+		var stream;
 
 		function activate() {
 			setupTaskProperties();
@@ -46,7 +47,7 @@
 			vm.options.log = true;
 			vm.options.entry_dump = true;
 
-			executeService.executeTasks(vm.options)
+			stream = executeService.executeTasks(vm.options)
 				.log(logNode)
 				.progress(progressNode)
 				.summary(summaryNode)
@@ -75,7 +76,9 @@
 		}
 
 		function clear() {
-			//TODO: Stop stream if running
+			if (stream) {
+				stream.abort();
+			}	
 			vm.stopStream();
 		}
 
