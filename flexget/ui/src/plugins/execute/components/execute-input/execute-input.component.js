@@ -90,9 +90,9 @@
 
 		function startExecute() {
 			var opts = {};
-			for (var i = 0; i < options.length; i++) {
-				opts[options[i].name] = options[i].value
-			}
+			vm.options.map(function (option) {
+				opts[option.name] = option.value;
+			});
 			vm.execute(opts, vm.selectedTasks);
 		}
 	}
