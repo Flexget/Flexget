@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 	angular
-		.module("flexget.plugins.config")
+		.module("plugins.config")
 		.component('configView', {
 			templateUrl: 'plugins/config/config.tmpl.html',
 			controllerAs: 'vm',
@@ -11,41 +11,62 @@
 	function configController($http, base64, $mdDialog, CacheFactory) {
 		var vm = this;
 
-		if (!CacheFactory.get('aceThemeCache')) {
-			CacheFactory('aceThemeCache', {
-				storageMode: 'localStorage'
-			});
-		}
+		vm.$onInit = activate;
+		vm.updateTheme = updateTheme;
+		vm.saveConfig = saveConfig;
 
-		var aceThemeCache = CacheFactory.get('aceThemeCache');
-		
-		vm.aceOptions = {
-			mode: 'yaml',
-			theme: getTheme()
+		var aceThemeCache;
+
+		function activate() {
+			loadConfig();
+			initCache();
+
+			setupAceOptions();
 		};
 
-		function getTheme() {
-			return aceThemeCache.get('theme') ? aceThemeCache.get('theme') : 'chrome';
+		function initCache() {
+			if (!CacheFactory.get('aceThemeCache')) {
+				CacheFactory('aceThemeCache', {
+					storageMode: 'localStorage'
+				});
+			}
+
+			aceThemeCache = CacheFactory.get('aceThemeCache');
 		}
 
-		vm.updateTheme = function () {
+		function loadConfig() {
+			//TODO: Load config from service here
+			$http.get('/api/server/raw_config')
+				.then(function (response) {
+					var encoded = response.data.raw_config;
+					vm.config = base64.decode(encoded);
+					vm.origConfig = angular.copy(vm.config);
+				}, function (error) {
+					// log error
+					console.log(error);
+				});
+		}
+
+		function setupAceOptions() {
+			vm.aceOptions = {
+				mode: 'yaml',
+				theme: getTheme()
+			}
+
+			var themelist = ace.require('ace/ext/themelist');
+			vm.themes = themelist.themes;
+		}
+
+		function getTheme() {
+			var theme = aceThemeCache.get('theme');
+			return theme ? theme : 'chrome';
+		}
+
+		function updateTheme() {
 			aceThemeCache.put('theme', vm.aceOptions.theme);
 		}
 
-		var themelist = ace.require('ace/ext/themelist');
-		vm.themes = themelist.themes;
-
-		$http.get('/api/server/raw_config')
-			.then(function (response) {
-				var encoded = response.data.raw_config;
-				vm.config = base64.decode(encoded);
-				vm.origConfig = angular.copy(vm.config);
-			}, function (error) {
-				// log error
-				console.log(error);
-			});
-
-		vm.save = function () {
+		function saveConfig() {
 			var encoded = base64.encode(vm.config);
 			$http.post('/api/server/raw_config', { raw_config: encoded })
 				.then(function (data) {
@@ -60,5 +81,4 @@
 				});
 		}
 	};
-
 })();

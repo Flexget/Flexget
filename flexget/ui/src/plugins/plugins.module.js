@@ -3,6 +3,7 @@
 
     angular
         .module('flexget.plugins', [
+			'plugins.config',
 			'plugins.execute',
 			'plugins.history',
 			'plugins.log',
