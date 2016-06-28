@@ -21,7 +21,7 @@
 		
 		vm.aceOptions = {
 			mode: 'yaml',
-			theme: getTheme,
+			theme: getTheme(),
 			onLoad: aceLoaded
 		};
 
