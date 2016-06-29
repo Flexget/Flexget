@@ -30,7 +30,7 @@
 		}
 
 		function aceLoaded(_editor) {
-			//_editor.commands.removeCommand('find');
+			_editor.setShowPrintMargin(false);
 		}
 
 		vm.updateTheme = function () {
