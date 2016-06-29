@@ -8,7 +8,7 @@
 			controller: configController,
 		});
 
-	function configController($http, base64, $mdDialog, CacheFactory) {
+	function configController($http, base64, $mdDialog, CacheFactory, configService) {
 		var vm = this;
 
 		vm.$onInit = activate;
@@ -35,16 +35,15 @@
 		}
 
 		function loadConfig() {
-			//TODO: Load config from service here
-			$http.get('/api/server/raw_config')
-				.then(function (response) {
-					var encoded = response.data.raw_config;
-					vm.config = base64.decode(encoded);
-					vm.origConfig = angular.copy(vm.config);
-				}, function (error) {
-					// log error
-					console.log(error);
-				});
+			configService.getRawConfig().then(function (data) {
+				var encoded = data.raw_config;
+				vm.config = base64.decode(encoded);
+				saveOriginalConfig();
+			});
+		}
+
+		function saveOriginalConfig() {
+			vm.origConfig = angular.copy(vm.config);
 		}
 
 		function setupAceOptions() {
@@ -81,7 +80,7 @@
 						.textContent("Your config file has been successfully updated")
 
 					$mdDialog.show(dialog);
-					vm.origConfig = angular.copy(vm.config);
+					saveOriginalConfig();
 				}, function (error) {
 					vm.errors = error.data.errors;
 				});

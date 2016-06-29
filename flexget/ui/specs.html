@@ -71,6 +71,7 @@
   <script src="bower_components/ui-grid-auto-scroll/js/auto-scroll.js"></script>
   <script src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
   <script src="bower_components/ace-builds/src-min-noconflict/ext-themelist.js"></script>
+  <script src="bower_components/ace-builds/src-min-noconflict/ext-searchbox.js"></script>
   <script src="bower_components/ace-builds/src-min-noconflict/mode-yaml.js"></script>
   <script src="bower_components/ace-builds/src-min-noconflict/theme-ambiance.js"></script>
   <script src="bower_components/ace-builds/src-min-noconflict/theme-chaos.js"></script>
@@ -118,6 +119,7 @@
   <!-- endbower -->
 
   <!-- inject:spechelpers:js -->
+  <script src="/tests-mock-data/config.js"></script>
   <script src="/tests-mock-data/execute.js"></script>
   <script src="/tests-mock-data/history.js"></script>
   <script src="/tests-mock-data/movie_list.js"></script>
@@ -136,9 +138,9 @@
   <script src="/src/plugins/series/components/series-entry/series-entry.component.js"></script>
   <script src="/src/plugins/series/components/episode-releases/episode-releases.component.js"></script>
   <script src="/src/plugins/series/components/episode-release/episode-release.component.js"></script>
+  <script src="/src/plugins/seen/components/seen-field/seen-field.component.js"></script>
   <script src="/src/plugins/seen/seen.module.js"></script>
   <script src="/src/plugins/seen/components/seen-entry/seen-entry.component.js"></script>
-  <script src="/src/plugins/seen/components/seen-field/seen-field.component.js"></script>
   <script src="/src/plugins/movies/movies.module.js"></script>
   <script src="/src/plugins/movies/components/new-list/new-list.component.js"></script>
   <script src="/src/plugins/movies/components/movie-list/movie-list.component.js"></script>
@@ -168,6 +170,8 @@
   <script src="/src/plugins/log/log.route.js"></script>
   <script src="/src/plugins/log/log.component.js"></script>
   <script src="/src/plugins/config/config.module.js"></script>
+  <script src="/src/plugins/config/config.service.js"></script>
+  <script src="/src/plugins/config/config.route.js"></script>
   <script src="/src/plugins/config/config.component.js"></script>
   <script src="/src/plugins/history/history.module.js"></script>
   <script src="/src/plugins/history/history.service.js"></script>
@@ -205,10 +209,10 @@
   <script src="/src/components/404/404.component.js"></script>
   <script src="/src/blocks/url-interceptor/url-interceptor.module.js"></script>
   <script src="/src/blocks/url-interceptor/url-interceptor.service.js"></script>
-  <script src="/src/blocks/exception/exception.module.js"></script>
-  <script src="/src/blocks/exception/exception.service.js"></script>
   <script src="/src/blocks/router/router-helper.module.js"></script>
   <script src="/src/blocks/router/router-helper.provider.js"></script>
+  <script src="/src/blocks/exception/exception.module.js"></script>
+  <script src="/src/blocks/exception/exception.service.js"></script>
   <script src="/src/blocks/error/error.module.js"></script>
   <script src="/src/blocks/error/error.service.js"></script>
   <script src="/src/blocks/error/error-toast.controller.js"></script>
@@ -222,8 +226,8 @@
   <script src="/src/blocks/error/error-dialog.component.spec.js"></script>
   <script src="/src/blocks/error/error-toast.controller.spec.js"></script>
   <script src="/src/blocks/error/error.service.spec.js"></script>
-  <script src="/src/blocks/router/router-helper.provider.spec.js"></script>
   <script src="/src/blocks/exception/exception.service.spec.js"></script>
+  <script src="/src/blocks/router/router-helper.provider.spec.js"></script>
   <script src="/src/blocks/url-interceptor/url-interceptor.service.spec.js"></script>
   <script src="/src/components/404/404.component.spec.js"></script>
   <script src="/src/components/404/404.route.spec.js"></script>
@@ -243,6 +247,8 @@
   <script src="/src/plugins/history/history.component.spec.js"></script>
   <script src="/src/plugins/history/history.route.spec.js"></script>
   <script src="/src/plugins/history/history.service.spec.js"></script>
+  <script src="/src/plugins/config/config.component.spec.js"></script>
+  <script src="/src/plugins/config/config.route.spec.js"></script>
   <script src="/src/plugins/log/log.route.spec.js"></script>
   <script src="/src/plugins/movies/movies.component.spec.js"></script>
   <script src="/src/plugins/movies/movies.route.spec.js"></script>
@@ -257,6 +263,7 @@
   <script src="/src/plugins/series/series.route.spec.js"></script>
   <script src="/src/plugins/series/series.service.spec.js"></script>
   <script src="/src/plugins/execute/components/execute-input/execute-input.component.spec.js"></script>
+  <script src="/src/plugins/execute/components/execute-stream/execute-stream.component.spec.js"></script>
   <script src="/src/plugins/movies/components/movie-entry/movie-entry.component.spec.js"></script>
   <script src="/src/plugins/movies/components/movie-list/movie-list.component.spec.js"></script>
   <script src="/src/plugins/movies/components/new-list/new-list.component.spec.js"></script>
