@@ -56,7 +56,7 @@ class TheTVDBSet(MutableSet):
             try:
                 req = TVDBRequest(username=self.config['username'], account_id=self.config['account_id']).get(
                     'user/favorites')
-                series_ids = [int(f_id) for f_id in req['favorites']]
+                series_ids = [int(f_id) for f_id in req['favorites'] if f_id != '']
             except RequestException as e:
                 raise PluginError('Error retrieving favorites from thetvdb: %s' % str(e))
             self._items = []
@@ -73,7 +73,7 @@ class TheTVDBSet(MutableSet):
                         series_name, series_year = split_title_year(series_name)
                     entry = Entry()
                     entry['title'] = entry['series_name'] = series_name
-                    entry['tvdb_id'] = series.id
+                    entry['tvdb_id'] = str(series.id)
                     self._items.append(entry)
         return self._items
 
