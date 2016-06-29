@@ -70,7 +70,8 @@ class PluginThetvdbLookup(object):
         'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
         'imdb_id': 'imdb_id',
         'zap2it_id': 'zap2it_id',
-        'tvdb_id': 'id'
+        'tvdb_id': 'id',
+        'tvdb_url': lambda series: 'http://thetvdb.com/index.php?tab=series&id=%s' % str(series.id)
     }
 
     series_actor_map = {

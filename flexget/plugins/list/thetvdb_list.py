@@ -9,6 +9,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.plugins.api_tvdb import TVDBRequest, lookup_series
+from flexget.utils.imdb import make_url
 from flexget.utils.requests import RequestException
 from flexget.utils.tools import split_title_year
 
@@ -73,6 +74,7 @@ class TheTVDBSet(MutableSet):
                         series_name, series_year = split_title_year(series_name)
                     entry = Entry()
                     entry['title'] = entry['series_name'] = series_name
+                    entry['url'] = 'http://thetvdb.com/index.php?tab=series&id={}'.format(str(series.id))
                     entry['tvdb_id'] = str(series.id)
                     self._items.append(entry)
         return self._items
@@ -126,6 +128,32 @@ class TheTVDBList(object):
         return list(TheTVDBSet(config))
 
 
+class TheTVDBAdd(object):
+    schema = dict(TheTVDBSet.schema, deprecated='thetvdb_add is deprecated, use list_add instead')
+
+    @plugin.priority(-255)
+    def on_task_output(self, task, config):
+        if task.manager.options.test:
+            log.info('Not submitting to thetvdb because of test mode.')
+            return
+        thelist = TheTVDBSet(config)
+        thelist |= task.accepted
+
+
+class TheTVDBRemove(object):
+    schema = dict(TheTVDBSet.schema, deprecated='thetvdb_remove is deprecated, use list_remove instead')
+
+    @plugin.priority(-255)
+    def on_task_output(self, task, config):
+        if task.manager.options.test:
+            log.info('Not submitting to thetvdb because of test mode.')
+            return
+        thelist = TheTVDBSet(config)
+        thelist -= task.accepted
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(TheTVDBList, 'thetvdb_list', api_ver=2, groups=['list'])
+    plugin.register(TheTVDBAdd, 'thetvdb_add', api_ver=2, groups=['list'])
+    plugin.register(TheTVDBRemove, 'thetvdb_remove', api_ver=2, groups=['list'])
