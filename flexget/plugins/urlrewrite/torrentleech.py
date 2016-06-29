@@ -5,10 +5,13 @@ from future.moves.urllib.parse import quote
 import re
 import logging
 
+from requests.exceptions import RequestException
+
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.plugin import PluginError
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
@@ -102,12 +105,15 @@ class UrlRewriteTorrentleech(object):
         # build the form request:
         data = {'username': config['username'], 'password': config['password'], 'remember_me': 'on', 'submit': 'submit'}
         # POST the login form:
-        login = requests.post('https://torrentleech.org/', data=data)
+        try:
+            login = requests.post('https://torrentleech.org/', data=data)
+        except RequestException as e:
+            raise PluginError('Could not connect to torrentleech: %s', str(e))
 
         if not isinstance(config, dict):
             config = {}
-        # sort = SORT.get(config.get('sort_by', 'seeds'))
-        # if config.get('sort_reverse'):
+            # sort = SORT.get(config.get('sort_by', 'seeds'))
+            # if config.get('sort_reverse'):
             # sort += 1
         categories = config.get('category', 'all')
         # Make sure categories is a list

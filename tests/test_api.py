@@ -26,9 +26,9 @@ class TestValidator(object):
 
         rsp = api_client.json_post('/tasks/', data=json.dumps(new_task))
 
-        assert rsp.status_code == 400
+        assert rsp.status_code == 422
         data = json.loads(rsp.get_data(as_text=True))
-        assert data.get('code') == 400
+        assert data.get('code') == 422
         assert data.get('message') == 'validation error'
         assert data.get('validation_errors')
         assert 'The keys' in data['validation_errors'][0]['message']
@@ -414,7 +414,7 @@ class TestExecuteMultipleTasks(object):
 
     def test_execute_multiple_tasks(self, api_client, manager):
         rsp = api_client.json_post('/tasks/execute/', data=json.dumps({}))
-        assert rsp.status_code == 400
+        assert rsp.status_code == 422
 
         payload = {'tasks': ['non_existing_test_task']}
         rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))

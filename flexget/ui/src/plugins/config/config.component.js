@@ -50,11 +50,16 @@
 		function setupAceOptions() {
 			vm.aceOptions = {
 				mode: 'yaml',
-				theme: getTheme()
+				theme: getTheme(),
+				onLoad: aceLoaded
 			}
 
 			var themelist = ace.require('ace/ext/themelist');
 			vm.themes = themelist.themes;
+		}
+
+		function aceLoaded(_editor) {
+			_editor.setShowPrintMargin(false);
 		}
 
 		function getTheme() {
@@ -76,6 +81,7 @@
 						.textContent("Your config file has been successfully updated")
 
 					$mdDialog.show(dialog);
+					vm.origConfig = angular.copy(vm.config);
 				}, function (error) {
 					vm.errors = error.data.errors;
 				});

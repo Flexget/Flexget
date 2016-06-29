@@ -152,14 +152,12 @@ class TestSubtitleList(object):
              template: no_global
              subtitle_list:
                list: test
-               allow_dir: yes
                languages: [en]
 
            subtitle_simulate_success_no_check:
              template: no_global
              subtitle_list:
                list: test
-               allow_dir: yes
                check_subtitles: no
              subliminal:
                languages: [ja]
@@ -170,7 +168,6 @@ class TestSubtitleList(object):
                from:
                  - subtitle_list:
                      list: test
-                     allow_dir: yes
                single_match: yes
 
            subtitle_add_force_file:
@@ -345,13 +342,6 @@ class TestSubtitleList(object):
         task = execute_task('subtitle_emit_dir')
 
         assert len(task.entries) == 3, 'Should have found 3 video files and the containing dir should not be included.'
-
-    def test_subtitle_list_local_disallow_dir(self, execute_task):
-        task = execute_task('subtitle_add_local_dir')
-
-        task = execute_task('subtitle_emit')
-
-        assert len(task.entries) == 0, 'Dirs are not allowed'
 
     # Skip if subliminal is not installed or if python version <2.7
     @pytest.mark.skipif(sys.version_info < (2, 7), reason='requires python2.7')

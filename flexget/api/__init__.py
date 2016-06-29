@@ -151,7 +151,7 @@ class Api(RestPlusAPI):
         """
         try:
             if issubclass(code_or_apierror, ApiError):
-                description = description or code_or_apierror.description
+                description = code_or_apierror.description or description
                 return self.doc(responses={code_or_apierror.code: (description, code_or_apierror.response_model)})
         except TypeError:
             # If first argument isn't a class this happens
@@ -215,8 +215,13 @@ class NotFoundError(ApiError):
     description = 'not found'
 
 
-class ValidationError(ApiError):
+class BadRequest(ApiError):
     code = 400
+    description = 'bad request'
+
+
+class ValidationError(ApiError):
+    code = 422
     description = 'validation error'
 
     response_model = api.inherit('validation_error', ApiError.response_model, {
@@ -263,6 +268,7 @@ class ValidationError(ApiError):
 @api.errorhandler(ApiError)
 @api.errorhandler(NotFoundError)
 @api.errorhandler(ValidationError)
+@api.errorhandler(BadRequest)
 def api_errors(error):
     return error.to_dict(), error.code
 

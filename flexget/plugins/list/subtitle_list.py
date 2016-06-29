@@ -113,17 +113,8 @@ class SubtitleList(MutableSet):
             'check_subtitles': {'type': 'boolean', 'default': True},
             'remove_after': {'type': 'string', 'format': 'interval'},
             'path': {'type': 'string'},
-            'allow_dir': {
-                'oneOf': [
-                    {'type': 'boolean', 'default': False},
-                    {
-                        'type': 'object',
-                        'properties': {
-                            'recursion_depth': {'type': 'integer', 'default': 1}
-                        }
-                    }
-                ]
-            },
+            'allow_dir': {'type': 'boolean', 'default': False},
+            'recursion_depth': {'type': 'integer', 'default': 1},
             'force_file_existence': {'type': 'boolean', 'default': True}
         },
         'required': ['list'],
@@ -265,17 +256,10 @@ class PluginSubtitleList(object):
 
     def on_task_input(self, task, config):
         subtitle_list = SubtitleList(config)
-        if config.get('allow_dir') and isinstance(config['allow_dir'], dict):
-            recursion_depth = config['allow_dir']['recursion_depth']
-        else:
-            recursion_depth = 1
+        recursion_depth = config['recursion_depth']
         temp_discarded_items = set()
         for item in subtitle_list:
-            if not config.get('allow_dir') and os.path.isdir(item['location']):
-                log.error('Path %s is a directory. If you wish to allow directories, change your config.',
-                          item['location'])
-                temp_discarded_items.add(item)
-            elif not config['force_file_existence'] and not os.path.exists(item['location']):
+            if not config['force_file_existence'] and not os.path.exists(item['location']):
                 log.error('File %s does not exist. Skipping.', item['location'])
                 temp_discarded_items.add(item)
             elif not os.path.exists(item['location']):
@@ -309,7 +293,10 @@ class PluginSubtitleList(object):
                                                         url='file://' + file_path, location=file_path))
                                 num_added_files += 1
                                 subtitle_list.config['languages'] = subtitle_list_languages
+                    # delete the original dir if it contains any video files
                     if num_added_files or num_potential_files:
+                        log.debug('Added %s files from %s to subtitle list %s', num_added_files, item['location'],
+                                  config['list'])
                         subtitle_list.discard(item)
                 else:
                     if config['check_subtitles'] and self.all_subtitles_exist(item['location'], languages):

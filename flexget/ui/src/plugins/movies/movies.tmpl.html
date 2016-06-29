@@ -1,19 +1,19 @@
 <div layout="column" flex>
-<md-content flex layout-margin ng-if="vm.lists">
-    <md-tabs md-dynamic-height md-border-bottom class="movie-tabs">
-		<movie-list ng-repeat="list in vm.lists" 
-			list="::list" 
-			delete-movie-list="vm.deleteMovieList(list)"
-			tab-index="$index">
-		</movie-list>
-        <md-tab class="test">
-			<md-tab-label layout-fill>
-				<section ng-click="vm.newList($event)">
-                <md-icon md-font-icon="fa-plus-circle" class="fa tab-icon-plus fa-lg"></md-icon>
-				</section>
-            </md-tab-label>
-        </md-tab>
-    </md-tabs>
-</md-content>
-<fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalMovies" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
+	<md-content flex layout-margin ng-if="vm.lists">
+		<md-tabs md-dynamic-height md-border-bottom class="movie-tabs">
+			<movie-list ng-repeat="list in vm.lists" 
+				list="::list" 
+				delete-movie-list="vm.deleteMovieList(list)"
+				tab-index="$index">
+			</movie-list>
+			<md-tab class="test">
+				<md-tab-label layout-fill>
+					<section ng-click="vm.newList($event)">
+						<md-icon md-font-icon="fa-plus-circle" class="fa tab-icon-plus fa-lg"></md-icon>
+					</section>
+				</md-tab-label>
+			</md-tab>
+		</md-tabs>
+	</md-content>
+	<fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalMovies" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
 </div>

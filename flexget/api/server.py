@@ -11,6 +11,7 @@ import threading
 import traceback
 from time import sleep
 
+import binascii
 import cherrypy
 import yaml
 from flask import Response, jsonify, request
@@ -21,7 +22,7 @@ from pyparsing import nums, alphanums, printables
 from yaml.error import YAMLError
 
 from flexget._version import __version__
-from flexget.api import api, APIResource, ApiError, __version__ as __api_version__
+from flexget.api import api, APIResource, ApiError, __version__ as __api_version__, BadRequest
 
 log = logging.getLogger('api.server')
 
@@ -149,21 +150,22 @@ class ServerConfigAPI(APIResource):
     def get(self, session=None):
         """ Get raw YAML config file """
         with open(self.manager.config_path, 'r', encoding='utf-8') as f:
-            raw_config = base64.b64encode(bytes(f.read(), "utf-8"))
+            raw_config = base64.b64encode(f.read().encode("utf-8"))
         return jsonify(raw_config=raw_config.decode('utf-8'))
 
     @api.validate(raw_config_schema)
     @api.response(200, description='Successfully updated config')
-    @api.response(501, model=yaml_error_schema, description='YAML syntax error')
-    @api.response(502, model=config_validation_schema, description='Config validation error')
+    @api.response(BadRequest)
+    @api.response(ApiError)
+    @api.doc(description='Config file must be base64 encoded. A backup will be created, and if successful config will'
+                         ' be loaded and saved to original file.')
     def post(self, session=None):
         """ Update config """
         data = request.json
         try:
             raw_config = base64.b64decode(data['raw_config'])
-        except TypeError:
-            return {'status': 'error',
-                    'message': 'payload was not a valid base64 encoded string'}, 500
+        except (TypeError, binascii.Error):
+            raise BadRequest(message='payload was not a valid base64 encoded string')
 
         try:
             config = yaml.safe_load(raw_config)
@@ -176,21 +178,32 @@ class ServerConfigAPI(APIResource):
                     error.update({'line': e.context_mark.line, 'column': e.context_mark.column})
                 if e.problem_mark is not None:
                     error.update({'line': e.problem_mark.line, 'column': e.problem_mark.column})
-                raise ApiError(message='Invalid YAML syntax', payload=error)
+                raise BadRequest(message='Invalid YAML syntax', payload=error)
 
         try:
-            self.manager.validate_config(config)
+            backup_path = self.manager.update_config(config)
         except ValueError as e:
             errors = []
             for er in e.errors:
                 errors.append({'error': er.message,
                                'config_path': er.json_pointer})
-            raise ApiError(message='Error loading config: %s' % e.args[0], payload={'errors': errors})
-        with open(self.manager.config_path, 'w', encoding='utf-8') as f:
-            f.write(str(raw_config.replace('\r\n', '\n')))
+            raise BadRequest(message='Error loading config: %s' % e.args[0], payload={'errors': errors})
+
+        try:
+            self.manager.backup_config()
+        except Exception as e:
+            raise ApiError(message='Failed to create config backup, config updated but NOT written to file',
+                           payload={'reason': str(e)})
+
+        try:
+            with open(self.manager.config_path, 'w', encoding='utf-8') as f:
+                f.write(raw_config.decode('utf-8').replace('\r\n', '\n'))
+        except Exception as e:
+            raise ApiError(message='Failed to write new config to file, please load from backup',
+                           payload={'reason': str(e), 'backup_path': backup_path})
 
         return {'status': 'success',
-                'message': 'config successfully updated to file'}
+                'message': 'new config loaded and successfully updated to file'}
 
 
 version_schema = api.schema('server.version', {
