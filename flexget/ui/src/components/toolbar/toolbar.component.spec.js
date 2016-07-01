@@ -16,6 +16,17 @@ describe("Toolbar Component:", function () {
 		expect(component).to.exist;
 	});
 
+	describe("activation", function () {
+		beforeEach(function () {
+			component.$onInit();
+		});
+
+		it("should have items", function () {
+			expect(component.toolBarItems).to.exist;
+			expect(component.toolBarItems).to.have.length.above(0);
+		});
+	});
+
 	describe('toggle', function () {
 		it('should exist', function () {
 			expect(component.toggle).to.exist;

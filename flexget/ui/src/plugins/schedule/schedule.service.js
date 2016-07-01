@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    angular.module('plugins.schedule')
+    angular
+		.module('plugins.schedule')
         .factory('schedulesService', schedulesService);
 
     function schedulesService($http, CacheFactory, exception) {

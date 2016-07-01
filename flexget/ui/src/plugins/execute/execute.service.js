@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    angular.module('plugins.execute')
+    angular
+		.module('plugins.execute')
 		.factory('executeService', executeService);
 
     function executeService($http, exception, $q) {

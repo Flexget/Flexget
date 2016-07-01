@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    angular.module('components.user', []);
+    angular
+		.module('components.user', []);
 	//TODO: user component
  /*       .run(userConfig);
 

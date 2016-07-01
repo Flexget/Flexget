@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    angular.module('plugins.seen')
+    angular
+		.module('plugins.seen')
         .factory('seenService', historyService);
 
     function historyService($http, CacheFactory, exception) {

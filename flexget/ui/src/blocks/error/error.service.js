@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    angular.module('blocks.error')
+    angular
+		.module('blocks.error')
         .factory('errorService', errorService);
 
     function errorService($mdToast) {

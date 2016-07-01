@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    angular.module('plugins.movies')
+    angular
+		.module('plugins.movies')
         .factory('moviesService', moviesService);
 
     function moviesService($http, CacheFactory, exception) {

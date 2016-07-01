@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    angular.module('plugins.series')
+    angular
+		.module('plugins.series')
 		.factory('seriesService', seriesService);
 
     function seriesService($http, CacheFactory, exception) {

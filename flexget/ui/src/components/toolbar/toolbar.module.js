@@ -4,7 +4,6 @@
     angular
         .module("components.toolbar", [
 			'ngMaterial',
-			'blocks.router',
 			'components.sidenav'
 		]);
 })();

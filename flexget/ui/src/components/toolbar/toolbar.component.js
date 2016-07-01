@@ -1,18 +1,23 @@
 (function () {
     'use strict';
 
-    angular.module('components.toolbar')
+    angular
+		.module('components.toolbar')
         .component('toolBar', {
             templateUrl: 'components/toolbar/toolbar.tmpl.html',
             controllerAs: 'vm',
             controller: toolbarController
         });
 
-    function toolbarController(sideNavService) {
+    function toolbarController(sideNavService, toolBarService) {
         var vm = this;
         
+		vm.$onInit = activate;
         vm.toggle = sideNavService.toggle;
-       // vm.toolBarItems = toolBar.items;
+
+		function activate() {
+			vm.toolBarItems = toolBarService.items;
+		}
     }
 
 })();

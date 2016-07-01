@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    angular.module('plugins.config')
+    angular
+		.module('plugins.config')
         .factory('configService', configService);
 
     function configService($http, exception) {

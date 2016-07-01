@@ -1,18 +1,40 @@
 (function () {
     'use strict';
 
-    angular.module('components.toolbar')
-        .factory('toolBarService', toolbarService);
+    angular
+		.module('components.toolbar')
+        .factory('toolBarService', toolBarService);
 
-    function toolbarService() {
-        // Add default Manage (cog) menu
-        var items = [
-            {type: 'menu', label: 'Manage', cssClass: 'fa fa-cog', items: [], width: 2, order: 255}
-        ];
+    function toolBarService() {
+		var items = [];
+		var defaultOrder = 128;
+		return {
+			items: items,
+            registerItem: registerItem,
+            close: close
+        };
 
-        var defaultOrder = 128;
+		function registerItem(item) {
+			console.log(item);
+			switch (item.type) {
+				case "menu":
+					registerMenu(item);
+					break;
 
-        var getMenu = function (menu) {
+				case "menuItem":
+					registerMenuItem(item);
+					break;
+
+				case "button":
+					registerButton(item);
+					break;
+
+				default:
+					throw "Unknown toolbar item type found: " + item.type;
+			}
+		}
+
+        function getMenu(menu) {
             for (var i = 0, len = items.length; i < len; i++) {
                 var item = items[i];
                 if (item.type == 'menu' && item.label == menu) {
@@ -21,40 +43,37 @@
             }
         };
 
-        return {
-            items: items,
-            registerButton: function (label, cssClass, action, order) {
-                if (!order) {
-                    order = defaultOrder;
-                }
-                items.push({type: 'button', label: label, cssClass: cssClass, action: action, order: order});
-            },
-            registerMenu: function (label, cssClass, width, order) {
-                // Ignore if menu already registered
-                var existingMenu = getMenu(label);
-                if (!existingMenu) {
-                    if (!order) {
-                        order = defaultOrder;
-                    }
-                    if (!width) {
-                        width = 2;
-                    }
-                    items.push({type: 'menu', label: label, cssClass: cssClass, items: [], width: 2, order: order});
-                }
-            },
-            registerMenuItem: function (menu, label, cssClass, action, order) {
-                if (!order) {
-                    order = defaultOrder;
-                }
+		function registerButton(item) {
+			if (!item.order) {
+				item.order = defaultOrder;
+			}
+			items.push(item);
+		};
 
-                menu = getMenu(menu);
-                if (menu) {
-                    menu.items.push({label: label, cssClass: cssClass, action: action, order: order});
-                } else {
-                    throw 'Unable to register menu item ' + label + ' as Menu ' + menu + ' was not found';
-                }
-            }
-        }
-    }
+		function registerMenu(item) {
+			// Ignore if menu already registered
+			var existingMenu = getMenu(item.label);
+			if (!existingMenu) {
+				if (!item.order) {
+					item.order = defaultOrder;
+				}
+				items.push(item);
+			} else {
+				throw(new Error("Menu " + item.label + " has already been registered"));
+			}
+		};
 
+		function registerMenuItem(item) {
+			if (!item.order) {
+				item.order = defaultOrder;
+			}
+
+			var menu = getMenu(item.menu);
+			if (menu) {
+				menu.items.push(item);
+			} else {
+				throw(new Error('Unable to register menu item ' + item.label + ' as Menu ' + item.menu + ' was not found'));
+			}
+		}
+	}
 })();
