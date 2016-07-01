@@ -1,10 +1,11 @@
 (function () {
     'use strict';
 
-    angular.module('components.login')
-        .factory('loginService', loginService);
+    angular
+		.module('components.auth')
+        .factory('authService', authService);
 
-    function loginService($state, $http, $q) {
+    function authService($state, $http, $q) {
         var isLoggedIn, prevState, prevParams;
 
         isLoggedIn = false;
@@ -17,7 +18,7 @@
 		};
 
 		//TODO: Delegate success and failure to functions
-		//TODO: test
+			//TODO: test
 		//TODO: Change state saving for new UI router system
 		function loggedIn() {
 			var def = $q.defer();
@@ -41,12 +42,21 @@
 				remember = false;
 			}
 
-			return $http.post('/api/auth/login/', credentials, { params: { remember: remember } })
+			return $http.post('/api/auth/login/', credentials,
+				{
+					params: { remember: remember }, 
+					ignoreAuthModule: true 
+				})
 				.then(loginComplete)
 				.catch(loginCallFailed);
 			
 			function loginComplete(response) {
 				isLoggedIn = true;
+				if(prevState) {
+					$state.go(prevState, prevParams);
+				} else {
+					$state.go('flexget.home');
+				}
 				return;
 			};
 
@@ -62,16 +72,17 @@
 
 			function logoutComplete(response) {
 				isLoggedIn = false;
+				$state.go('login');
 				return;
 			};
 		};
-
+		
 		function state(state, params) {
 			if (state.name != 'login') {
 				prevState = state;
 				prevParams = params;
 			}
-		}
+		};
 
 		function callFailed(error) {
 			console.log(error);

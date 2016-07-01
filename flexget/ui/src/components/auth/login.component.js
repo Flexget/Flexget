@@ -1,14 +1,15 @@
 (function () {
+	'use strict';
 
 	angular
-		.module('components.login')
+		.module('components.auth')
 		.component('login', {
-			templateUrl: 'components/login/login.tmpl.html',
+			templateUrl: 'components/auth/login.tmpl.html',
 			controllerAs: 'vm',
 			controller: loginController
 		});
 
-	function loginController($stateParams, loginService, $state) {
+	function loginController($stateParams, authService, $state) {
 		var vm = this;
 
 		vm.timeout = $stateParams.timeout;
@@ -16,11 +17,7 @@
 		vm.credentials = {};
 
 		function login() {
-            loginService.login(vm.credentials, vm.remember)
-				.then(function () {
-					//TODO: Route to previous requested route
-					$state.go('flexget.home');
-				})
+            authService.login(vm.credentials, vm.remember)
                 .catch(function (data) {
                     vm.credentials.password = '';
                     if (data.message) {
@@ -31,4 +28,4 @@
                 });
         };
 	};
-})();
+})();									

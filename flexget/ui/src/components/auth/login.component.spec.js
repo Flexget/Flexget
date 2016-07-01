@@ -2,8 +2,8 @@ describe('Login Component:', function () {
 	var component, deferred;
 
 	beforeEach(function () {
-		bard.appModule('components.login');
-		bard.inject('$componentController', 'loginService', '$state', '$q', '$rootScope');
+		bard.appModule('components.auth');
+		bard.inject('$componentController', 'authService', '$state', '$q', '$rootScope');
 		$state.go = sinon.stub();
 	});
 
@@ -19,7 +19,7 @@ describe('Login Component:', function () {
 		beforeEach(function () {
 			deferred = $q.defer();
 			
-			sinon.stub(loginService, 'login').returns(deferred.promise);
+			sinon.stub(authService, 'login').returns(deferred.promise);
 		})
 		it('should exist', function () {
 			expect(component.login).to.exist;

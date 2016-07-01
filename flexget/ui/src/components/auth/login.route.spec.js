@@ -1,6 +1,6 @@
 describe('Login Routes: ', function () {
     beforeEach(function () {
-		module('components.login');
+		module('components.auth');
 		bard.inject('$state', '$rootScope', '$location');
     });
 

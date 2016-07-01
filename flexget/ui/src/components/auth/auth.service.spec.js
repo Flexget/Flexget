@@ -1,20 +1,20 @@
 describe("Service: Login", function () {
 	beforeEach(function () {
-		bard.appModule('components.login');
+		bard.appModule('components.auth');
 
-		bard.inject('$httpBackend', 'loginService', 'exception', '$q');
+		bard.inject('$httpBackend', 'authService', 'exception', '$q');
 
 		sinon.stub(exception, 'catcher').returns($q.reject({ message: "Request failed" }));
 	});
 
 	it("should exist", function () {
-		expect(loginService).to.exist;
+		expect(authService).to.exist;
 	});
 
 	describe('getLists()', function () {
 		it("should issue a GET /api/auth/logout/ request", function () {
 			$httpBackend.expect('GET', '/api/auth/logout/').respond(200, {});
-			loginService.logout().then(function () {
+			authService.logout().then(function () {
 				expect(true).to.be.true;
 			});
 			$httpBackend.flush();
@@ -22,7 +22,7 @@ describe("Service: Login", function () {
 
 		it("should report an error if request fails", function () {
 			$httpBackend.expect('GET', '/api/auth/logout/').respond(500);
-			loginService.logout().catch(function (error) {
+			authService.logout().catch(function (error) {
 				expect(error.message).to.equal("Request failed");
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
@@ -39,7 +39,7 @@ describe("Service: Login", function () {
 				password: 'password'
 			};
 				
-			loginService.login().then(function (data) {
+			authService.login().then(function (data) {
 				expect(true).to.be.true;
 			});
 			$httpBackend.flush();
@@ -53,7 +53,7 @@ describe("Service: Login", function () {
 				password: 'password'
 			};
 				
-			loginService.login().catch(function (data) {
+			authService.login().catch(function (data) {
 				expect(data).to.exist;
 			});
 			$httpBackend.flush();
