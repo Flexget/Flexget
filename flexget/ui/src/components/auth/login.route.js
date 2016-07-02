@@ -13,12 +13,8 @@
 			type: 'menuItem',
 			label: 'Logout',
 			icon: 'sign-out',
-			action: logout,
+			action: authService.logout,
 			order: 256
-		}
-
-		function logout() {
-			authService.logout();
 		}
 
 		toolBarService.registerItem(logoutItem);
