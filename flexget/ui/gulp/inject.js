@@ -14,11 +14,10 @@ gulp.task('inject', ['styles'], function () {
   var injectStyles = gulp.src(paths.tmp + '/serve/**/*.css', { read: false });
   var injectScripts = gulp.src([
     paths.src + '/**/*.js',
-    '!' + paths.src + '/app.utils.js',
     '!' + paths.src + '/app.module.js',
     '!' + paths.src + '/app.loading.js',
     '!' + paths.src + '/**/*.spec.js'
-  ]).pipe($.angularFilesort());
+  ]).pipe($.angularFilesort()).pipe($.angularFilesort());
 
   var injectOptions = {
     ignorePath: [paths.src, paths.tmp + '/serve'],

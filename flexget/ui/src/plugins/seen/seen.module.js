@@ -8,4 +8,6 @@
 			'angular-cache'
 			//'schemaForm'
 		]);
+	
+	registerPlugin('plugins.seen');
 })();

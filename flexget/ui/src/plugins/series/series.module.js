@@ -8,4 +8,6 @@
 			'angular-cache',
 			'ngMaterial'
 		]);
+	
+	registerPlugin('plugins.series');
 })();

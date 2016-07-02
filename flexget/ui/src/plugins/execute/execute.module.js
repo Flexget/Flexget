@@ -9,4 +9,6 @@
 			//'ui.grid.autoResize',
 			//'angular-spinkit'
 		]);
+	
+	registerPlugin('plugins.execute');
 })();

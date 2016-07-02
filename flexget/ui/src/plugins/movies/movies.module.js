@@ -9,4 +9,6 @@
 			'ngSanitize',
 			'angular-cache'
 		]);
+	
+	registerPlugin('plugins.movies');
 })();

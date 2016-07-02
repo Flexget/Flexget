@@ -8,4 +8,6 @@
 			'angular.filter',
 			'angular-cache'
 		]);
+
+	registerPlugin('plugins.history');
 })();

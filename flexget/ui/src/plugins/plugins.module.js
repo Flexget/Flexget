@@ -2,14 +2,10 @@
     'use strict';
 
     angular
-        .module('flexget.plugins', [
-			'plugins.config',
-			'plugins.execute',
-			'plugins.history',
-			'plugins.log',
-			'plugins.movies',
-			'plugins.schedule',
-			'plugins.seen',
-			'plugins.series'
-		]);
+        .module('flexget.plugins', []);
 })();
+
+//Global function used to inject plugins as dependencies
+function registerPlugin(plugin) { // eslint-disable-line no-unused-vars
+	angular.module('flexget.plugins').requires.push(plugin);
+}

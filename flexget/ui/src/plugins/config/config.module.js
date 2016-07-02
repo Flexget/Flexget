@@ -11,4 +11,6 @@
 			'ab-base64',
 			'angular-cache'
 		]);
+	
+	registerPlugin('plugins.config');
 })();

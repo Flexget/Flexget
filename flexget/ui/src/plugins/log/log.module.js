@@ -9,4 +9,6 @@
 			//'ui.grid.autoResize',
 			//'ui.grid.autoScroll'
 		]);
+
+	registerPlugin('plugins.log');
 })();

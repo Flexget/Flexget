@@ -15,7 +15,6 @@
         };
 
 		function registerItem(item) {
-			console.log(item);
 			switch (item.type) {
 				case "menu":
 					registerMenu(item);
