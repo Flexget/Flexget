@@ -4,7 +4,6 @@ describe('Login Component:', function () {
 	beforeEach(function () {
 		bard.appModule('components.auth');
 		bard.inject('$componentController', 'authService', '$state', '$q', '$rootScope');
-		$state.go = sinon.stub();
 	});
 
 	beforeEach(function () {
@@ -23,17 +22,6 @@ describe('Login Component:', function () {
 		})
 		it('should exist', function () {
 			expect(component.login).to.exist;
-		});
-
-		it('should go to the home state after successful login', function () {
-			deferred.resolve();
-			
-			component.login();
-
-			$rootScope.$apply();
-
-			expect($state.go).to.have.been.calledOnce;
-			expect($state.go).to.have.been.calledWith('flexget.home');
 		});
 
 		it('should set the error variable to the error message when present', function () {

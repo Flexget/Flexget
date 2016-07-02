@@ -17,16 +17,19 @@
 			state: state
 		};
 
-		//TODO: Delegate success and failure to functions
-			//TODO: test
-		//TODO: Change state saving for new UI router system
+		//TODO: Implement idling system, that resets the isLoggedIn variable from the authservice
+
+
+		//TODO: Test this function
 		function loggedIn() {
 			var def = $q.defer();
 
 			if (isLoggedIn) {
 				def.resolve(isLoggedIn);
 			} else {
-				$http.get("/api/server/version/")
+				$http.get("/api/server/version/", {
+					ignoreAuthModule: true
+				})
 					.then(function () {
 						def.resolve();
 					}, function (error) {
@@ -72,6 +75,8 @@
 
 			function logoutComplete(response) {
 				isLoggedIn = false;
+				prevState = undefined;
+				prevParams = undefined;
 				$state.go('login');
 				return;
 			};
@@ -79,13 +84,12 @@
 		
 		function state(state, params) {
 			if (state.name != 'login') {
-				prevState = state;
+				prevState = state.name;
 				prevParams = params;
 			}
 		};
 
 		function callFailed(error) {
-			console.log(error);
 			return exception.catcher(error);
         }
 	};
