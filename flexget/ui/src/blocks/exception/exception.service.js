@@ -12,21 +12,25 @@
 		return service;
 
 		function catcher(error) {
-			$log.log(error.data.message);
+			//Don't show toast when request failed because of auth problems
+			if (error.status != 401 && error.status != 403) {
+				$log.log(error.data.message);
 
-			// return function(e) {
-			/*var thrownDescription;
-			var newMessage;
-			if (e.data && e.data.description) {
-			  thrownDescription = '\n' + e.data.description;
-			  newMessage = message + thrownDescription;
-			}
+				//TODO: Check if this needs to improve				
+				// return function(e) {
+				/*var thrownDescription;
+				var newMessage;
+				if (e.data && e.data.description) {
+				  thrownDescription = '\n' + e.data.description;
+				  newMessage = message + thrownDescription;
+				}
+	
+				e.data.description = newMessage;*/
 
-			e.data.description = newMessage;*/
+				errorService.showToast(error.data);
+			}	
 
-			errorService.showToast(error.data);
 			return $q.reject(error.data);
-			//};
 		}
 	}
 })();

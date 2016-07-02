@@ -32,5 +32,19 @@ describe("Blocks: Exception", function () {
 
 			expect(errorService.showToast).to.have.been.calledOnce;
 		});
+
+		it('should not open a toast when request failure is auth related', function () {
+			sinon.stub(errorService, 'showToast');
+
+			mockErrorResponse.status = 401;
+
+			exception.catcher(mockErrorResponse).catch(function (err) {
+				expect(err).to.equal(mockErrorResponse.data);
+			});
+
+			$rootScope.$apply();
+
+			expect(errorService.showToast).not.to.have.been.called;
+		})
 	});
 });
