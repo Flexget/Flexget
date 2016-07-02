@@ -15,10 +15,9 @@
 			hideDelay: 5000
 		};
 
-		var service = {
+		return {
 			showToast: showToast
 		};
-		return service;
 
 		function showToast(error) {
 			toast.locals = {

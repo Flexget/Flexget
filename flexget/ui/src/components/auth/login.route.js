@@ -14,7 +14,7 @@
 			label: 'Logout',
 			icon: 'sign-out',
 			action: authService.logout,
-			order: 256
+			order: 255
 		}
 
 		toolBarService.registerItem(logoutItem);

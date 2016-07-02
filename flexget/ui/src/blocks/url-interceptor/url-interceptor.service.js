@@ -11,10 +11,9 @@
 	};
 
 	function urlInterceptor($q, $log) {
-		var service = {
+		return {
 			request: request
 		};
-		return service;
 
 		function request(config) {
 			if (config.url.startsWith('/api/') && !config.url.endsWith('/')) {

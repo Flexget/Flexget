@@ -17,8 +17,7 @@
 
 			'flexget.directives',
 			'flexget.components',
-			'flexget.plugins',
-			'flexget.services',
+			'flexget.plugins'
 		]);
 
 	function bootstrapApplication() {

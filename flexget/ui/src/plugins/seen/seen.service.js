@@ -3,9 +3,9 @@
 
     angular
 		.module('plugins.seen')
-        .factory('seenService', historyService);
+        .factory('seenService', seenService);
 
-    function historyService($http, CacheFactory, exception) {
+    function seenService($http, CacheFactory, exception) {
         // If cache doesn't exist, create it
         if (!CacheFactory.get('seenCache')) {
             CacheFactory.createCache('seenCache');

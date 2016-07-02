@@ -6,10 +6,9 @@
 		.factory('exception', exception);
 
 	function exception($q, $log, errorService) {
-		var service = {
+		return {
 			catcher: catcher
 		};
-		return service;
 
 		function catcher(error) {
 			//Don't show toast when request failed because of auth problems

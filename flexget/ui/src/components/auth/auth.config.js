@@ -28,12 +28,10 @@
 
 	function authInterceptor($rootScope, $state, $q, $injector) {
 		/* Intercept 401/403 http return codes and redirect to login page */
-		var service = {
+		return {
 			responseError: responseError
-		}
-
-		return service;
-
+        }
+		
 		function loginRequired() {
 			var authService = $injector.get('authService');
 			authService.state($state.current, $state.params);
