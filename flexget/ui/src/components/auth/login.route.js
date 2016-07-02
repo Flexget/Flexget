@@ -31,7 +31,10 @@
                 config: {
                     url: '/login',
                     component: 'login',
-					root: true
+					root: true,
+					params: {
+						timeout: false
+					}
                 }
             }
         ]

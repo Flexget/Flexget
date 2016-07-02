@@ -3,7 +3,7 @@
     <form name="loginForm">
         <div layout="row" layout-align="center stretch">
             <md-card flex-xs="100" flex-sm="70" flex-md="50" flex-gt-md="30" layout-padding>
-                <p style="color: orange" class="text-success text-center" ng-if="vm.timeout == 'true'">Your session timed out</p>
+                <p style="color: orange" class="text-success text-center" ng-if="vm.timeout">Your session timed out</p>
 
                 <p style="color: red" class="text-center">{{ vm.error }}</p>
                 <md-input-container class="md-block">

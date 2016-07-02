@@ -4,6 +4,7 @@
 	angular
 		.module('components.auth')
 		.run(authenticationSetup)
+		.factory('authInterceptor', authInterceptor)
 		.config(authenticationConfig);
 
 	function authenticationSetup($rootScope, $state, $transitions, authService) {
@@ -16,37 +17,39 @@
 			authService.loggedIn()
 				.catch(function () {
 					authService.state($transition$.to(), $transition$.params());
-					$rootScope.$broadcast('event:auth-loginRequired', true);
+					$rootScope.$broadcast('event:auth-loginRequired', false);
 				});
 		});
 	}
 
-	function authenticationConfig($httpProvider, $stateProvider) {
+	function authenticationConfig($httpProvider) {
+		$httpProvider.interceptors.push('authInterceptor');
+	};
 
+	function authInterceptor($rootScope, $state, $q, $injector) {
 		/* Intercept 401/403 http return codes and redirect to login page */
-		$httpProvider
-			.interceptors.push(['$rootScope', '$state', '$q', '$injector', function ($rootScope,  $state, $q, $injector) {
-				var loginRequired = function () {
-					var authService = $injector.get('authService');
-					authService.state($state.current, $state.params);
-					$rootScope.$broadcast('event:auth-loginRequired', true);
-				};
+		var service = {
+			responseError: responseError
+		}
 
-				return {
-					responseError: function (rejection) {
-						if (!rejection.config.ignoreAuthModule) {
-							switch (rejection.status) {
-								case 401:
-								case 403:
-									loginRequired();
-									break;
-							}
-						}
+		return service;
 
-						// otherwise, default behaviour
-						return $q.reject(rejection);
-					},
-				};
-			}]);
+		function loginRequired() {
+			var authService = $injector.get('authService');
+			authService.state($state.current, $state.params);
+			$rootScope.$broadcast('event:auth-loginRequired', true);
+		}
+
+		function responseError(rejection) {
+			if (!rejection.config.ignoreAuthModule) {
+				switch (rejection.status) {
+					case 401:
+					case 403:
+						loginRequired();
+						break;
+				}
+			}
+			return $q.reject(rejection);
+		}
 	};
 })();
