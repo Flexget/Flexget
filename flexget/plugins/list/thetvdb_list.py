@@ -152,8 +152,13 @@ class TheTVDBRemove(object):
         thelist -= task.accepted
 
 
+TheTVDBFavs = TheTVDBList
+TheTVDBFavs.schema = dict(TheTVDBFavs.schema, deprecated='thetvdb_favorites is deprecated, use list_add instead')
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(TheTVDBList, 'thetvdb_list', api_ver=2, groups=['list'])
-    plugin.register(TheTVDBAdd, 'thetvdb_add', api_ver=2, groups=['list'])
-    plugin.register(TheTVDBRemove, 'thetvdb_remove', api_ver=2, groups=['list'])
+    plugin.register(TheTVDBFavs, 'thetvdb_favorites', api_ver=2, groups=['list'])
+    plugin.register(TheTVDBAdd, 'thetvdb_add', api_ver=2)
+    plugin.register(TheTVDBRemove, 'thetvdb_remove', api_ver=2)

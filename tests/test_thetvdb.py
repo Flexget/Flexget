@@ -265,7 +265,7 @@ class TestTVDBExpire(object):
 
 @mock.patch('flexget.plugins.api_tvdb.mark_expired')
 @pytest.mark.online
-class TestTVDBFavorites(object):
+class TestTVDBList(object):
     """
         Tests thetvdb list plugin with a test user at thetvdb.
         Test user info:
@@ -289,6 +289,60 @@ class TestTVDBFavorites(object):
                   account_id: 80FB8BD0720CA5EC
           test_strip_dates:
             thetvdb_list:
+              username: flexget
+              account_id: 80FB8BD0720CA5EC
+              strip_dates: yes
+    """
+
+    def test_favorites(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
+        task = execute_task('test')
+        assert task.find_entry('accepted', title='House.S01E02.HDTV.XViD-FlexGet'), \
+            'series House should have been accepted'
+        assert task.find_entry('accepted', title='Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'), \
+            'series Doctor Who 2005 should have been accepted'
+        assert task.find_entry('accepted', title='Breaking.Bad.S02E02.720p.x264'), \
+            'series Breaking Bad should have been accepted'
+        entry = task.find_entry(title='Lost.S03E02.720p-FlexGet')
+        assert entry, 'Entry not found?'
+        assert entry not in task.accepted, \
+            'series Lost should not have been accepted'
+
+    def test_strip_date(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
+        task = execute_task('test_strip_dates')
+        assert task.find_entry(title='Hawaii Five-0'), \
+            'series Hawaii Five-0 (2010) should have date stripped'
+
+
+@mock.patch('flexget.plugins.api_tvdb.mark_expired')
+@pytest.mark.online
+class TestTVDBFavorites(object):
+    """
+        Tests thetvdb list plugin with a test user at thetvdb.
+        Test user info:
+        username: flexget
+        password: flexget
+        Favorites: House, Doctor Who 2005, Penn & Teller: Bullshit, Hawaii Five-0 (2010)
+    """
+
+    config = """
+        tasks:
+          test:
+            mock:
+              - {title: 'House.S01E02.HDTV.XViD-FlexGet'}
+              - {title: 'Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'}
+              - {title: 'Lost.S03E02.720p-FlexGet'}
+              - {title: 'Breaking.Bad.S02E02.720p.x264'}
+            configure_series:
+              from:
+                thetvdb_favorites:
+                  username: flexget
+                  account_id: 80FB8BD0720CA5EC
+          test_strip_dates:
+            thetvdb_favorites:
               username: flexget
               account_id: 80FB8BD0720CA5EC
               strip_dates: yes
