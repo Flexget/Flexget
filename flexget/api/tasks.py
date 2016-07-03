@@ -328,8 +328,9 @@ class TaskExecutionAPI(APIResource):
             arg[0] in ['progress', 'summary', 'loglevel', 'entry_dump'] for arg in data.items() if arg[1]) else False
         loglevel = data.pop('loglevel', None)
 
-        # This emulates the CLI command of using `--now`
-        options = {'interval_ignore': data.pop('now', None)}
+        # This emulates the CLI command of using `--now` and `no-cache`
+        options = {'interval_ignore': data.pop('now', None),
+                   'nocache': data.pop('no_cache', None)}
 
         for option, value in data.items():
             options[option] = value
