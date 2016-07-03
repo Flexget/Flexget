@@ -31,12 +31,13 @@ class SearchKAT(object):
       books
       xxx
       other
+      anime
     """
 
     schema = {
         'type': 'object',
         'properties': {
-            'category': {'type': 'string', 'enum': ['all', 'movies', 'tv', 'music', 'books', 'xxx', 'other']},
+            'category': {'type': 'string', 'enum': ['all', 'movies', 'tv', 'music', 'books', 'xxx', 'other', 'anime']},
             'verified': {'type': 'boolean'}
         },
         'additionalProperties': False
