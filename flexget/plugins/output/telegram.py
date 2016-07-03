@@ -16,7 +16,7 @@ from flexget.utils.template import RenderError
 try:
     import telegram
     from telegram.error import TelegramError
-    from telegram.utils.request import URLError, SSLError
+    from telegram.utils.request import NetworkError
 except ImportError:
     telegram = None
 
@@ -272,9 +272,7 @@ class SendTelegram(object):
         except UnicodeDecodeError as e:
             self.log.trace('bot.getMe() raised: {!r}'.format(e))
             raise plugin.PluginWarning('invalid bot token')
-        except (URLError, SSLError) as e:
-            self.log.error('Could not connect Telegram servers at this time, please try again later: %s', e.args[0])
-        except TelegramError as e:
+        except (NetworkError, TelegramError) as e:
             self.log.error('Could not connect Telegram servers at this time, please try again later: %s', e.message)
 
     @staticmethod
