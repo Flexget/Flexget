@@ -67,6 +67,9 @@ class ApiSchemaModel(Model):
     def __nonzero__(self):
         return bool(self._schema)
 
+    def __bool__(self):
+        return self._schema is not None
+
     def __repr__(self):
         return '<ApiSchemaModel(%r)>' % self._schema
 
