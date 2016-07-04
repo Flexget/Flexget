@@ -8,8 +8,8 @@ import mock
 import pytest
 
 from flexget.manager import Session
-from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode, find_series_id
-from flexget.plugins.input.thetvdb_favorites import TVDBUserFavorite
+from flexget.plugins.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode, \
+    find_series_id
 
 
 @mock.patch('flexget.plugins.api_tvdb.mark_expired')
@@ -204,10 +204,10 @@ class TestTVDBExpire(object):
             # Ensure series is not marked as expired
             with Session() as session:
                 mark_expired(session)
-                ep = session.query(TVDBEpisode)\
-                    .filter(TVDBEpisode.series_id == 73255)\
-                    .filter(TVDBEpisode.episode_number == 2)\
-                    .filter(TVDBEpisode.season_number == 2)\
+                ep = session.query(TVDBEpisode) \
+                    .filter(TVDBEpisode.series_id == 73255) \
+                    .filter(TVDBEpisode.episode_number == 2) \
+                    .filter(TVDBEpisode.season_number == 2) \
                     .first()
                 assert not ep.expired
                 assert not ep.series.expired
@@ -242,10 +242,10 @@ class TestTVDBExpire(object):
         with mock.patch.object(TVDBRequest, 'get', side_effect=[expired_data]) as _:
             with Session() as session:
                 mark_expired(session)
-                ep = session.query(TVDBEpisode)\
-                    .filter(TVDBEpisode.series_id == 73255)\
-                    .filter(TVDBEpisode.episode_number == 2)\
-                    .filter(TVDBEpisode.season_number == 2)\
+                ep = session.query(TVDBEpisode) \
+                    .filter(TVDBEpisode.series_id == 73255) \
+                    .filter(TVDBEpisode.episode_number == 2) \
+                    .filter(TVDBEpisode.season_number == 2) \
                     .first()
                 assert ep.expired
                 assert ep.series.expired
@@ -254,10 +254,10 @@ class TestTVDBExpire(object):
         test_run()
 
         with Session() as session:
-            ep = session.query(TVDBEpisode)\
-                .filter(TVDBEpisode.series_id == 73255)\
-                .filter(TVDBEpisode.episode_number == 2)\
-                .filter(TVDBEpisode.season_number == 2)\
+            ep = session.query(TVDBEpisode) \
+                .filter(TVDBEpisode.series_id == 73255) \
+                .filter(TVDBEpisode.episode_number == 2) \
+                .filter(TVDBEpisode.season_number == 2) \
                 .first()
             assert not ep.expired
             assert not ep.series.expired
@@ -265,9 +265,63 @@ class TestTVDBExpire(object):
 
 @mock.patch('flexget.plugins.api_tvdb.mark_expired')
 @pytest.mark.online
+class TestTVDBList(object):
+    """
+        Tests thetvdb list plugin with a test user at thetvdb.
+        Test user info:
+        username: flexget
+        password: flexget
+        Favorites: House, Doctor Who 2005, Penn & Teller: Bullshit, Hawaii Five-0 (2010)
+    """
+
+    config = """
+        tasks:
+          test:
+            mock:
+              - {title: 'House.S01E02.HDTV.XViD-FlexGet'}
+              - {title: 'Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'}
+              - {title: 'Lost.S03E02.720p-FlexGet'}
+              - {title: 'Breaking.Bad.S02E02.720p.x264'}
+            configure_series:
+              from:
+                thetvdb_list:
+                  username: flexget
+                  account_id: 80FB8BD0720CA5EC
+          test_strip_dates:
+            thetvdb_list:
+              username: flexget
+              account_id: 80FB8BD0720CA5EC
+              strip_dates: yes
+    """
+
+    def test_favorites(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
+        task = execute_task('test')
+        assert task.find_entry('accepted', title='House.S01E02.HDTV.XViD-FlexGet'), \
+            'series House should have been accepted'
+        assert task.find_entry('accepted', title='Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'), \
+            'series Doctor Who 2005 should have been accepted'
+        assert task.find_entry('accepted', title='Breaking.Bad.S02E02.720p.x264'), \
+            'series Breaking Bad should have been accepted'
+        entry = task.find_entry(title='Lost.S03E02.720p-FlexGet')
+        assert entry, 'Entry not found?'
+        assert entry not in task.accepted, \
+            'series Lost should not have been accepted'
+
+    def test_strip_date(self, mocked_expired, execute_task):
+        persist['auth_tokens'] = {'default': None}
+
+        task = execute_task('test_strip_dates')
+        assert task.find_entry(title='Hawaii Five-0'), \
+            'series Hawaii Five-0 (2010) should have date stripped'
+
+
+@mock.patch('flexget.plugins.api_tvdb.mark_expired')
+@pytest.mark.online
 class TestTVDBFavorites(object):
     """
-        Tests thetvdb favorites plugin with a test user at thetvdb.
+        Tests thetvdb list plugin with a test user at thetvdb.
         Test user info:
         username: flexget
         password: flexget
@@ -308,12 +362,6 @@ class TestTVDBFavorites(object):
         assert entry, 'Entry not found?'
         assert entry not in task.accepted, \
             'series Lost should not have been accepted'
-
-        with Session() as session:
-            user = session.query(TVDBUserFavorite).filter(TVDBUserFavorite.username == 'flexget').first()
-            assert user
-            assert len(user.series_ids) > 0
-            assert user.series_ids == [78804, 84946, 164541, 73255, 81189]
 
     def test_strip_date(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
@@ -359,25 +407,10 @@ class TestTVDBSubmit(object):
         assert task
         assert task.accepted
 
-        with Session() as session:
-            user_favs = session.query(TVDBUserFavorite).filter(TVDBUserFavorite.username == 'flexget').first()
-            assert user_favs
-            assert 73255 in user_favs.series_ids
-
     def test_delete(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
-
-        with Session() as session:
-            user_favs = TVDBUserFavorite(username='flexget')
-            user_favs.series_ids = ['80379']
-            session.add(user_favs)
 
         task = execute_task('delete')
         task = task.find_entry(title='The.Big.Bang.Theory.S02E02.XVID-Flexget')
         assert task
         assert task.accepted
-
-        with Session() as session:
-            user_favs = session.query(TVDBUserFavorite).filter(TVDBUserFavorite.username == 'flexget').first()
-            assert user_favs
-            assert 80379 not in user_favs.series_ids
