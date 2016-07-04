@@ -1,14 +1,15 @@
-<div layout="column" flex>
-    <md-toolbar class="md-warn">
-        <span class="md-toolbar-tools" flex>
-            Please note that performed operations on this page might not be persistent. Depending on your config, settings might get overriden and data might be recreated.
-        </span>
-    </md-toolbar>
+<div layout="column">
+	<md-toolbar class="md-warn">
+    <span class="md-toolbar-tools" flex>
+    	Please note that performed operations on this page might not be persistent. Depending on your config, settings might get overriden and data might be recreated.
+    </span>
+</md-toolbar>
+<div layout="column" flex layout-margin>
     <md-input-container>
         <label>Search</label>
         <input ng-model="vm.searchTerm" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }">
     </md-input-container>
-    <md-content layout="row" layout-wrap layout-padding>
+    <div layout="row" layout-wrap>
         <series-entry show="show" 
 			forget-show="vm.forgetShow(show)" 
 			toggle-episodes="vm.toggleEpisodes(show)"
@@ -18,6 +19,7 @@
         <series-episodes-view ng-repeat-end ng-if="vm.areEpisodesOnShowRow(vm.selectedShow, $index)" show="vm.selectedShow" class="series-episodes">
             <md-button class="md-fab md-mini hide-episodes-button" ng-click="vm.toggleEpisodes(show)" aria-label="hide the episodes"><i class="fa fa-times" aria-hidden="true"></i></md-button>
         </series-episodes-view>
-    </md-content>
+    </div>
     <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalShows" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
+</div>
 </div>
