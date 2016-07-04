@@ -15,7 +15,7 @@
 				state: 'execute',
 				config: {
 					url: '/execute',
-					component: 'executeView',
+					component: 'execute-view',
 					settings: {
 						weight: 2,
 						icon: 'cog',

@@ -15,7 +15,7 @@
 				state: 'seen',
 				config: {
 					url: '/seen',
-					component: 'seenView',
+					component: 'seen-view',
 					settings: {
 						weight: 7,
 						icon: 'eye',

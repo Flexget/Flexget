@@ -29,7 +29,7 @@
 				state: 'log',
 				config: {
 					url: '/log',
-					component: 'logView',
+					component: 'log-view',
 					settings: {
 						weight: 1,
 						icon: 'file-text-o',

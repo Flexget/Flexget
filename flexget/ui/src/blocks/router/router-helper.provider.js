@@ -31,7 +31,12 @@
 
 			function configureStates(states, otherwisePath) {
 				states.forEach(function (state) {
-					$stateProvider.state(((state.config.root ||state.config.abstract) ? '' : 'flexget.') + state.state, state.config);
+					if (!state.config.root && !state.config.abstract) {
+						state.state = 'flexget.' + state.state;
+						state.config.template = '<' + state.config.component + ' flex layout="row"></' + state.config.component + '>';
+					}
+					delete state.config.component;
+					$stateProvider.state(state.state, state.config);
 
 					if (state.when) {
 						for (var i = 0; i < state.when.length; i++) {

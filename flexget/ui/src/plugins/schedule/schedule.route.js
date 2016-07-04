@@ -15,7 +15,7 @@
 				state: 'schedule',
 				config: {
 					url: '/schedule',
-					component: 'scheduleView',
+					component: 'schedule-view',
 					settings: {
 						weight: 6,
 						icon: 'calendar',

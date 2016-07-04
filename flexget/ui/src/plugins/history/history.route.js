@@ -15,7 +15,7 @@
 				state: 'history',
 				config: {
 					url: '/history',
-					component: 'historyView',
+					component: 'history-view',
 					settings: {
 						weight: 3,
 						icon: 'history',

@@ -29,7 +29,7 @@
 				state: 'config',
 				config: {
 					url: '/config',
-					component: 'configView',
+					component: 'config-view',
 					settings: {
 						weight: 3,
 						icon: 'pencil',

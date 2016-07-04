@@ -15,7 +15,7 @@
 				state: 'movies',
 				config: {
 					url: '/movies',
-					component: 'moviesView',
+					component: 'movies-view',
 					settings: {
 						weight: 5,
 						icon: 'film',

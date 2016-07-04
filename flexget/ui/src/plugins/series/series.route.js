@@ -15,7 +15,7 @@
 				state: 'series',
 				config: {
 					url: '/series',
-					component: 'seriesView',
+					component: 'series-view',
 					settings: {
 						weight: 4,
 						icon: 'tv',
