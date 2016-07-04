@@ -4,9 +4,9 @@
 	angular
 		.module('plugins.log', [
 			'blocks.router',
-			'components.toolbar'
-			//'ui.grid',
-			//'ui.grid.autoResize',
+			'components.toolbar',
+			'ui.grid',
+			'ui.grid.autoResize',
 			//'ui.grid.autoScroll'
 		]);
 

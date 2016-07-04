@@ -4,15 +4,19 @@
 	angular
 		.module('plugins.log')
 		.component('logView', {
-			//templateUrl: 'plugins/log/log.tmpl.html',
-			//controllerAs: 'vm',
-			//controller: logController
+			templateUrl: 'plugins/log/log.tmpl.html',
+			controllerAs: 'vm',
+			controller: logController
 		});
 
 	function logController($scope) {
 		var vm = this;
 
 		vm.logStream = false;
+		vm.toggle = toggle;
+		vm.clear = clear;
+		vm.refresh = refresh;
+		vm.$onDestroy = destroy;
 
 		vm.status = 'Connecting';
 
@@ -25,19 +29,19 @@
 			debounce: 1000
 		};
 
-		vm.toggle = function () {
+		function toggle() {
 			if (vm.status == 'Disconnected') {
 				vm.refresh();
 			} else {
-				vm.stop();
+				stop();
 			}
 		};
 
-		vm.clear = function () {
+		function clear() {
 			vm.gridOptions.data = [];
 		};
 
-		vm.stop = function () {
+		function stop() {
 			if (typeof vm.logStream !== 'undefined' && vm.logStream) {
 				vm.logStream.abort();
 				vm.logStream = false;
@@ -46,9 +50,9 @@
 
 		};
 
-		vm.refresh = function () {
+		function refresh() {
 			// Disconnect existing log streams
-			vm.stop();
+			stop();
 
 			vm.status = "Connecting";
 			vm.gridOptions.data = [];
@@ -76,13 +80,6 @@
 				})
 		};
 
-		var rowTemplate = '<div class="{{ row.entity.log_level | lowercase }}"' +
-			'ng-class="{summary: row.entity.message.startsWith(\'Summary\'), accepted: row.entity.message.startsWith(\'ACCEPTED\')}"><div ' +
-			'ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.uid" ' +
-			'class="ui-grid-cell" ' +
-			'ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader }"  ui-grid-cell>' +
-			'</div></div>';
-
 		vm.gridOptions = {
 			data: [],
 			enableSorting: true,
@@ -94,7 +91,7 @@
 				{ field: 'task', name: 'Task', enableSorting: false, width: 65, cellTooltip: true },
 				{ field: 'message', name: 'Message', enableSorting: false, minWidth: 400, cellTooltip: true }
 			],
-			rowTemplate: rowTemplate,
+			rowTemplate: "row-template.html",
 			onRegisterApi: function (gridApi) {
 				vm.gridApi = gridApi;
 				vm.refresh();
@@ -102,9 +99,9 @@
 		};
 
 		// Cancel timer and stop the stream when navigating away
-		$scope.$on("$destroy", function () {
-			vm.stop();
-		});
+		function destroy() {
+			stop();
+		};
 	}
 
 })();
