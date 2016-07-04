@@ -14,7 +14,7 @@ describe('Schedule Routes:', function () {
 		expect($state.href('flexget.schedule', {})).to.equal('#/schedule');
     });
 	
-	it("should map state to the 'schedule' component", function () {
+	it.skip("should map state to the 'schedule' component", function () {
 		expect($state.get('flexget.schedule').component).to.equal('scheduleView');
 	});
 	

@@ -14,7 +14,7 @@ describe('Execute Routes:', function () {
 		expect($state.href('flexget.execute', {})).to.equal('#/execute');
     });
 	
-	it("should map state to the 'execute' component", function () {
+	it.skip("should map state to the 'execute' component", function () {
 		expect($state.get('flexget.execute').component).to.equal('executeView');
 	});
 	

@@ -14,7 +14,7 @@ describe('History Routes:', function () {
 		expect($state.href('flexget.history', {})).to.equal('#/history');
     });
 	
-	it("should map state to the 'history' component", function () {
+	it.skip("should map state to the 'history' component", function () {
 		expect($state.get('flexget.history').component).to.equal('historyView');
 	});
 	

@@ -34,8 +34,8 @@
 					if (!state.config.root && !state.config.abstract) {
 						state.state = 'flexget.' + state.state;
 						state.config.template = '<' + state.config.component + ' flex layout="row"></' + state.config.component + '>';
+						delete state.config.component;
 					}
-					delete state.config.component;
 					$stateProvider.state(state.state, state.config);
 
 					if (state.when) {

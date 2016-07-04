@@ -14,7 +14,7 @@ describe('Seen Routes:', function () {
 		expect($state.href('flexget.seen', {})).to.equal('#/seen');
     });
 	
-	it("should map state to the 'seen' component", function () {
+	it.skip("should map state to the 'seen' component", function () {
 		expect($state.get('flexget.seen').component).to.equal('seenView');
 	});
 	
