@@ -338,7 +338,7 @@ class SendTelegram(object):
         self.log.debug('chat_ids={0}'.format(chat_ids))
 
         if not chat_ids:
-            self.log.warning('no chat id found')
+            self.log.warning('no chat id found, try manually sending the bot any message to initialize the chat')
         else:
             if usernames:
                 self.log.warning('no chat id found for usernames: {0}'.format(usernames))
