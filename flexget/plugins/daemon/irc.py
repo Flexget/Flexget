@@ -13,6 +13,7 @@ from uuid import uuid4
 import time
 import hashlib
 import functools
+import urllib
 
 from flexget.entry import Entry
 from flexget.config_schema import register_config_key
@@ -20,7 +21,7 @@ from flexget.event import event
 from flexget.manager import manager
 from flexget.config_schema import one_or_more
 from flexget.plugins.daemon.irc_bot import irc_bot
-from flexget import plugin
+from flexget.utils import requests
 
 log = logging.getLogger('irc')
 
@@ -38,7 +39,7 @@ schema = {
             'additionalProperties': {
                 'type': 'object',
                 'properties': {
-                    'tracker_file': {'type': 'string', 'format': 'file'},
+                    'tracker_file': {'type': 'string'},
                     'server': {'type': 'string'},
                     'port': {'type': 'integer'},
                     'nickname': {'type': 'string'},
@@ -128,6 +129,10 @@ class TrackerFileParseError(Exception):
     """Exception thrown when parsing the tracker file fails"""
 
 
+class TrackerFileError(Exception):
+    """Exception thrown when parsing the tracker file fails"""
+
+
 class MissingConfigOption(Exception):
     """Exception thrown when a config option specified in the tracker file is not on the irc config"""
 
@@ -146,18 +151,7 @@ class IRCConnection(irc_bot.IRCBot):
         # If we have a tracker config file, load it
         tracker_config_file = config.get('tracker_file')
         if tracker_config_file:
-            tracker_config_file = os.path.abspath(os.path.expanduser(tracker_config_file))
-            if not os.path.exists(tracker_config_file):
-                raise TrackerFileParseError('Unable to open tracker config file %s', tracker_config_file)
-            else:
-                with open(tracker_config_file, 'r') as f:
-                    try:
-                        tracker_config = fromstring(f.read())
-                    except Exception as e:
-                        raise TrackerFileParseError('Unable to parse tracker config file %s: %s',
-                                                    tracker_config_file, e)
-                    else:
-                        self.tracker_config = tracker_config
+            self.tracker_config = self.retrieve_tracker_config(tracker_config_file)
 
         channel_list = []
         if self.tracker_config is not None:
@@ -236,6 +230,44 @@ class IRCConnection(irc_bot.IRCBot):
         self.line_cache = {}
 
         self.start_thread()
+
+    @classmethod
+    def read_tracker_config(cls, tracker_config_file):
+        with open(tracker_config_file, 'r') as f:
+            try:
+                tracker_config = fromstring(f.read())
+            except Exception as e:
+                raise TrackerFileParseError('Unable to parse tracker config file %s: %s' % (tracker_config_file, e))
+            else:
+                return tracker_config
+
+    @classmethod
+    def retrieve_tracker_config(cls, tracker_config_file):
+        tracker_config_file = os.path.expanduser(tracker_config_file)
+        if os.path.exists(tracker_config_file):
+            return cls.read_tracker_config(tracker_config_file)
+        elif re.match('^(?![\\\/]).+\.tracker$', tracker_config_file):
+            tracker_basepath = os.path.abspath(os.path.join(manager.config_base, 'trackers'))
+            save_path = os.path.join(tracker_basepath, tracker_config_file)
+            log.error(save_path)
+            if not os.path.exists(tracker_basepath):
+                try:
+                    os.mkdir(tracker_basepath)
+                except IOError as e:
+                    raise TrackerFileError(e)
+            if not os.path.exists(save_path):
+                log.info('Tracker file not found on disk. Attempting to fetch tracker config file from Github.')
+                url = 'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/' + tracker_config_file
+                try:
+                    r = requests.get(url)
+                    with open(save_path, 'wb') as tracker_file:
+                        for chunk in r.iter_content(8192):
+                            tracker_file.write(chunk)
+                except (requests.RequestException, IOError) as e:
+                    raise TrackerFileError(e)
+            return cls.read_tracker_config(save_path)
+        else:
+            raise TrackerFileError('Unable to open tracker config file %s', tracker_config_file)
 
     def start_thread(self):
         self.thread = spawn_thread(self.connection_name, self)
@@ -352,7 +384,7 @@ class IRCConnection(irc_bot.IRCBot):
 
         # Generate the entry and process it through the linematched rules
         if self.tracker_config is not None and match_found:
-            self.process_tracker_config_rules(entry)
+            entry.update(self.process_tracker_config_rules(entry))
         elif self.tracker_config is not None:
             log.error('Failed to parse message. Skipping.')
             return None
@@ -405,6 +437,8 @@ class IRCConnection(irc_bot.IRCBot):
         :return:
         """
 
+        parsed_fields = {}
+
         if rules is None:
             rules = self.tracker_config.find('parseinfo/linematched')
 
@@ -435,7 +469,7 @@ class IRCConnection(irc_bot.IRCBot):
                 else:
                     # Only set the result if we processed all elements
                     log.debug('Result for rule %s: %s=%s', rule.tag, rule.get('name'), result)
-                    entry[irc_prefix(rule.get('name'))] = result
+                    parsed_fields[irc_prefix(rule.get('name'))] = result
 
             # Var Replace - replace text in a var
             elif rule.tag == 'varreplace':
@@ -444,8 +478,8 @@ class IRCConnection(irc_bot.IRCBot):
                 regex = rule.get('regex')
                 replace = rule.get('replace')
                 if source_var and target_var and regex is not None and replace is not None and source_var in entry:
-                    entry[target_var] = re.sub(regex, replace, entry[source_var])
-                    log.debug('varreplace: %s=%s', target_var, entry[target_var])
+                    parsed_fields[target_var] = re.sub(regex, replace, entry[source_var])
+                    log.debug('varreplace: %s=%s', target_var, parsed_fields[target_var])
                 else:
                     log.error('Invalid varreplace options, skipping rule')
 
@@ -464,7 +498,7 @@ class IRCConnection(irc_bot.IRCBot):
                 group_names = [irc_prefix(x.get('name')) for x in rule.find('vars') if x.tag == 'var']
                 match = re.search(regex, entry[source_var])
                 if match:
-                    entry.update(dict(zip(group_names, match.groups())))
+                    parsed_fields.update(dict(zip(group_names, match.groups())))
                 else:
                     log.debug('No match found for rule extract')
 
@@ -484,13 +518,13 @@ class IRCConnection(irc_bot.IRCBot):
                             for val in values:
                                 match = re.match(regex, val)
                                 if match:
-                                    entry[target_var] = val
+                                    parsed_fields[target_var] = val
                                     found_match = True
                             if not found_match:
                                 log.debug('No matches found for regex %s', regex)
                         elif value is not None and new_value is not None:
                             if value in values:
-                                entry[target_var] = new_value
+                                parsed_fields[target_var] = new_value
                             else:
                                 log.debug('No match found for value %s in %s', value, source_var)
                         else:
@@ -513,7 +547,7 @@ class IRCConnection(irc_bot.IRCBot):
                             continue
                         match = re.match(regex, entry.get(source_var, ''))
                         if match:
-                            entry.update(dict(zip(vars, match.groups())))
+                            parsed_fields.update(dict(zip(vars, match.groups())))
                         else:
                             log.debug('No match for extract with regex: %s', regex)
                     else:
@@ -527,7 +561,7 @@ class IRCConnection(irc_bot.IRCBot):
                 target_val = rule.get('newValue')
                 if source_var and regex and target_var and target_val:
                     if source_var in entry and re.match(regex, entry[source_var]):
-                        entry[target_var] = target_val
+                        parsed_fields[target_var] = target_val
                 else:
                     log.error('Option missing on setregex, skipping rule')
 
@@ -538,12 +572,14 @@ class IRCConnection(irc_bot.IRCBot):
 
                 if source_var and regex:
                     if source_var in entry and re.match(regex, entry[source_var]):
-                        self.process_tracker_config_rules(entry, rule)
+                        parsed_fields.update(self.process_tracker_config_rules(entry, rule))
                 else:
                     log.error('Option missing for if statement, skipping rule')
 
             else:
                 log.warning('Unsupported linematched tag: %s', rule.tag)
+
+        return parsed_fields
 
     def on_privmsg(self, msg):
         nickname = msg.from_nick
@@ -645,8 +681,7 @@ class IRCConnectionManager(object):
         while not self.shutdown_event.is_set():
             for conn_name, conn in irc_connections.items():
                 if not conn and self.config.get(conn_name):
-                    new_conn = IRCConnection(self.config[conn_name], conn_name)
-                    irc_connections[conn_name] = new_conn
+                    irc_connections[conn_name] = IRCConnection(self.config[conn_name], conn_name)
                 elif not conn.is_alive() and self.restart_log[conn_name]['delay'] <= 0 and not conn.clean_exit:
                     log.error('IRC connection for %s has died unexpectedly. Restarting it.', conn_name)
                     self.restart_log[conn_name]['attempts'] += 1
@@ -677,7 +712,7 @@ class IRCConnectionManager(object):
                 conn = IRCConnection(connection, conn_name)
                 irc_connections[conn_name] = conn
                 self.restart_log[conn_name] = {'attempts': 0, 'delay': 0}
-            except (MissingConfigOption, TrackerFileParseError) as e:
+            except (MissingConfigOption, TrackerFileParseError, TrackerFileError) as e:
                 log.error(e)
                 errors += 1
         if errors:
