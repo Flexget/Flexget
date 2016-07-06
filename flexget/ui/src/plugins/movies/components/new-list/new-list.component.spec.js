@@ -55,7 +55,7 @@ describe("Plugin: New-list.Component", function () {
 
 			component.saveList();
 
-			$rootScope.$apply();
+			$rootScope.$digest();
 
 			expect($mdDialog.hide).to.have.been.calledOnce;
 		});
@@ -67,7 +67,7 @@ describe("Plugin: New-list.Component", function () {
 
 			component.saveList();
 
-			$rootScope.$apply();
+			$rootScope.$digest();
 
 			expect($mdDialog.hide).to.have.been.calledWith(createdList);
 		});

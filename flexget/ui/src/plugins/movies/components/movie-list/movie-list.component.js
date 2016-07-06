@@ -11,7 +11,7 @@
 				list: '<',
 				deleteMovieList: '&',
 				tabIndex: '<'
-			},
+			}
 		});
 
 
@@ -51,7 +51,7 @@
 					vm.totalMovies = data.total_number_of_movies;
 					vm.pageSize = data.number_of_movies;
 				});
-		};
+		}
 
 		function deleteMovie(list, movie) {
 			var confirm = $mdDialog.confirm()
@@ -67,6 +67,6 @@
 						vm.movies.splice(index, 1);
 					});
 			});
-		};
+		}
 	}
 })();

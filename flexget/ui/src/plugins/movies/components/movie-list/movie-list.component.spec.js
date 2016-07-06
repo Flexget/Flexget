@@ -51,7 +51,7 @@ describe("Plugin: Movie-list.Component", function () {
 		it('should set variables', function () {
 			component.loadMovies();
 
-			$rootScope.$apply();
+			$rootScope.$digest();
 
 			expect(component.movies).not.to.be.empty;
 			expect(component.currentPage).to.exist;
@@ -100,7 +100,7 @@ describe("Plugin: Movie-list.Component", function () {
 				
 				component.deleteMovie(movieList, movie);
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(moviesService.deleteMovie).to.have.been.calledOnce;
 			});
@@ -114,7 +114,7 @@ describe("Plugin: Movie-list.Component", function () {
 
 				component.deleteMovie(movieList, movie);
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(component.movies.length).to.equal(movies.movies.length - 1);
 			});

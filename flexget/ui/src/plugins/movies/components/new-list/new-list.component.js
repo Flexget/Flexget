@@ -17,14 +17,12 @@
 
 		function cancel() {
 			$mdDialog.cancel();
-		};
+		}
 
 		function saveList() {
 			moviesService.createList(vm.listName).then(function (newList) {
 				$mdDialog.hide(newList);
 			});
 		}
-
-
-	};
+	}
 })();

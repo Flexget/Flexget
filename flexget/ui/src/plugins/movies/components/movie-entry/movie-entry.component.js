@@ -10,7 +10,7 @@
 			bindings: {
 				movie: '<',
 				deleteMovie: '&'
-			},
+			}
 		});
 
 	function movieEntryController(moviesService) {
@@ -30,7 +30,7 @@
 			vm.movie.movies_list_ids.forEach(function (id) {
 				var newid = {};
 				newid[id.id_name] = id.id_value;
-				params = $.extend(params, newid);
+				params = angular.extend(params, newid);
 			})
 
 			moviesService.getMovieMetadata(vm.movie.title, params).then(function (data) {

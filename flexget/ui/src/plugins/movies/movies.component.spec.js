@@ -21,7 +21,7 @@ describe("Plugin: Movies.Component", function () {
 	describe('activation', function () {
 		beforeEach(function () {
 			component.$onInit();
-			$rootScope.$apply();
+			$rootScope.$digest();
 		});
 
 		it('should call the movies service', function () {
@@ -60,7 +60,7 @@ describe("Plugin: Movies.Component", function () {
 				
 				component.deleteMovieList(list);
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(moviesService.deleteList).to.have.been.calledOnce;
 			});
@@ -74,7 +74,7 @@ describe("Plugin: Movies.Component", function () {
 
 				component.deleteMovieList(list);
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(component.lists.length).to.equal(lists.movie_lists.length - 1);
 			});
@@ -106,7 +106,7 @@ describe("Plugin: Movies.Component", function () {
 
 			component.newList(event);
 
-			$rootScope.$apply();
+			$rootScope.$digest();
 
 			expect(component.lists.length).to.equal(lists.movie_lists.length + 1);
 		})

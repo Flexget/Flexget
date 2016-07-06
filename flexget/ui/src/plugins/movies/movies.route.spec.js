@@ -21,13 +21,13 @@ describe('Movies Routes:', function () {
 	describe("Transitions", function() {
 		it("should work with $state.go", function () {
 			$state.go('flexget.movies');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.movies')).to.be.true;
 		});
 		
 		it("should work with 'movies' path", function() {
 			$location.path('movies');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.movies')).to.be.true;
 		});
 	});

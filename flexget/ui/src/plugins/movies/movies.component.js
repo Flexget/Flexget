@@ -6,7 +6,7 @@
 		.component('moviesView', {
 			templateUrl: 'plugins/movies/movies.tmpl.html',
 			controllerAs: 'vm',
-			controller: moviesController,
+			controller: moviesController
 		});
 
 	function moviesController($http, $mdDialog, $scope, moviesService) {

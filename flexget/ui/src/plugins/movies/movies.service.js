@@ -37,7 +37,7 @@
                 .then(deleteListComplete)
                 .catch(callFailed);
 
-            function deleteListComplete(response) {
+            function deleteListComplete() {
                 return;
             }
         }
@@ -71,8 +71,8 @@
 
             function createListComplete(response) {
                 return response.data;
-            };
-        };
+            }
+        }
 
 		function getMovieMetadata(title, params) {
 			return $http.get('/api/trakt/movies/' + title + '/', {
@@ -84,8 +84,8 @@
 
 			function getMovieMetadataComplete(response) {
                 return response.data;
-            };
-		};
+            }
+		}
 
         function callFailed(error) {
 			return exception.catcher(error);

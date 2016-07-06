@@ -24,7 +24,7 @@ describe("Plugin: Movie-Entry.Component", function () {
 	describe('activation', function () {
 		beforeEach(function () {
 			component.$onInit();
-			$rootScope.$apply();
+			$rootScope.$digest();
 		});
 
 		it('should call the movies service', function () {

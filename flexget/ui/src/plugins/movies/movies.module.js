@@ -3,11 +3,13 @@
 
     angular
 		.module("plugins.movies", [
-			'blocks.router',
-			'blocks.exception',
 			'ngMaterial',
 			'ngSanitize',
-			'angular-cache'
+
+			'angular-cache',
+			
+			'blocks.exception',
+			'blocks.router'
 		]);
 	
 	registerPlugin('plugins.movies');
