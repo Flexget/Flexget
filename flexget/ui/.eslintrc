@@ -1,4 +1,9 @@
 {
+	"extends": "eslint:recommended",
+	"globals": {
+		"angular": true,
+		"registerPlugin": true
+	},
 	"plugins": [
 		"angular"
 	],
@@ -29,7 +34,7 @@
 		"angular/component-name": 1,
 		"angular/controller-name": [1, "/[A-Z].*Controller$/"],
 		"angular/directive-name": 1,
-		"angular/file-name": 1,
+		"angular/file-name": 0,
 		"angular/filter-name": 1,
 		"angular/module-name": 1,
 		"angular/service-name": 1,
@@ -37,10 +42,10 @@
 		"angular/di-order": [1, false],
 		"angular/di": 2,
 		"angular/dumb-inject": 1,
-		"angular/function-type": 2,
+		"angular/function-type": [2, "named"],
 		"angular/module-dependency-order": 1,
 		"angular/no-service-method": 2,
-		"angular/one-dependency-per-line": 1,
+		"angular/one-dependency-per-line": 0,
 		"angular/rest-service": 1,
 		"angular/watchers-execution": 1,
 
