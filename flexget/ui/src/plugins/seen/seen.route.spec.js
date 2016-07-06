@@ -21,13 +21,13 @@ describe('Seen Routes:', function () {
 	describe("Transitions", function() {
 		it("should work with $state.go", function () {
 			$state.go('flexget.seen');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.seen')).to.be.true;
 		});
 		
 		it("should work with 'seen' path", function() {
 			$location.path('seen');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.seen')).to.be.true;
 		});
 	});

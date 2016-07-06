@@ -2,11 +2,11 @@
 	'use strict';
 
 	angular
-		.module('plugins.seen',	[
-			'blocks.router',
+		.module('plugins.seen', [
+			'angular-cache',
+
 			'blocks.exception',
-			'angular-cache'
-			//'schemaForm'
+			'blocks.router'
 		]);
 	
 	registerPlugin('plugins.seen');

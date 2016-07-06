@@ -21,13 +21,13 @@ describe('History Routes:', function () {
 	describe("Transitions", function() {
 		it("should work with $state.go", function () {
 			$state.go('flexget.history');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.history')).to.be.true;
 		});
 		
 		it("should work with 'history' path", function() {
 			$location.path('history');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.history')).to.be.true;
 		});
 	});

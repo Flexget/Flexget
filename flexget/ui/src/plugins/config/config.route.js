@@ -5,7 +5,7 @@
 		.module("plugins.config")
 		.run(appRun);
 
-	function appRun(routerHelper, toolBarService, $state) {
+	function appRun($state, routerHelper, toolBarService) {
 		routerHelper.configureStates(getStates());
 
 		var configButton = {
@@ -18,10 +18,10 @@
 
 		function goToRoute() {
 			$state.go('flexget.config');
-		};
+		}
 
 		toolBarService.registerItem(configButton);
-	};
+	}
 
 	function getStates() {
 		return [

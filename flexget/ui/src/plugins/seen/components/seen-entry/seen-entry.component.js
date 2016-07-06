@@ -7,7 +7,7 @@
 			templateUrl: 'plugins/seen/components/seen-entry/seen-entry.tmpl.html',
 			controllerAs: 'vm',
 			bindings: {
-				entry: '<',
-			},
+				entry: '<'
+			}
 		});
 })();

@@ -5,7 +5,7 @@
 		.module("plugins.server")
 		.run(appRun);
 
-	function appRun(toolBarService, serverService) {
+	function appRun(serverService, toolBarService) {
 		var reloadButton = {
 			menu: 'Manage',
 			type: 'menuItem',
@@ -26,5 +26,5 @@
 		
 		toolBarService.registerItem(reloadButton);
 		toolBarService.registerItem(shutdownButton);
-	};	
+	}
 })();

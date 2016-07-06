@@ -4,7 +4,7 @@
     angular.module('plugins.server')
         .factory('serverService', serverService);
 
-    function serverService($http, $mdDialog) {
+    function serverService($http, $mdDialog, $window) {
 		var dialog = {
 			template: '<loading-dialog title="vm.title" action="vm.action"></loading-dialog>',
 			bindToController: true,
@@ -25,7 +25,7 @@
 			dialog.locals.title = "Config Reloading";
 			dialog.locals.action = doReload;
 			$mdDialog.show(dialog);
-		};
+		}
 
 		function shutdown() {
 			$mdDialog.show(
@@ -46,7 +46,7 @@
 				.then(reloadSuccess)
 				.catch(reloadFailed);
 
-			function reloadSuccess(data) {
+			function reloadSuccess() {
 				var response = {
 					title: "Reload Success",
 					message: "Config has been successfully reloaded"
@@ -61,16 +61,16 @@
 				}
 				return response;
 			}
-        };
+        }
 
         function doShutdown() {
-			window.stop(); //Stop any http connections
+			$window.stop(); //Stop any http connections
 
             return $http.get('/api/server/shutdown/')
 				.then(shutdownSuccess)
 				.catch(shutdownFailed);
 
-			function shutdownSuccess(data) {
+			function shutdownSuccess() {
 				var response = {
 					title: "Shutdown Success",
 					message: "Flexget has been shutdown"
@@ -85,6 +85,6 @@
 				}
 				return response;
 			}
-        };
+        }
     }
 })();

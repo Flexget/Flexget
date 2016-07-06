@@ -6,7 +6,7 @@
 		.component('configView', {
 			templateUrl: 'plugins/config/config.tmpl.html',
 			controllerAs: 'vm',
-			controller: configController,
+			controller: configController
 		});
 
 	function configController($http, base64, $mdDialog, CacheFactory, configService) {
@@ -23,7 +23,7 @@
 			initCache();
 
 			setupAceOptions();
-		};
+		}
 
 		function initCache() {
 			if (!CacheFactory.get('aceThemeCache')) {
@@ -74,7 +74,7 @@
 		function saveConfig() {
 			var encoded = base64.encode(vm.config);
 			$http.post('/api/server/raw_config', { raw_config: encoded })
-				.then(function (data) {
+				.then(function () {
 					var dialog = $mdDialog.alert()
 						.title("Update success")
 						.ok("Ok")
@@ -86,5 +86,5 @@
 					vm.errors = error.data.errors;
 				});
 		}
-	};
+	}
 })();

@@ -21,7 +21,7 @@ describe("Plugin: Seen.component", function () {
 	describe("activation", function () {
 		beforeEach(function() {
 			controller.$onInit();
-			$rootScope.$apply();
+			$rootScope.$digest();
 		});
 
 		it('should have called the seen service', function () {

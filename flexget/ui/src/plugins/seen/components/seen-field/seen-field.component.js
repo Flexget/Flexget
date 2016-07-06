@@ -8,8 +8,8 @@
 			controllerAs: 'vm',
 			controller: seenFieldsController,
 			bindings: {
-				fields: '<',
-			},
+				fields: '<'
+			}
 		});
 
 	function seenFieldsController() {

@@ -6,7 +6,7 @@
 		.component('seenView', {
 			templateUrl: 'plugins/seen/seen.tmpl.html',
 			controllerAs: 'vm',
-			controller: seenController,
+			controller: seenController
 		});
 
 	function seenController(seenService) {

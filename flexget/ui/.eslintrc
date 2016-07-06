@@ -2,7 +2,8 @@
 	"extends": "eslint:recommended",
 	"globals": {
 		"angular": true,
-		"registerPlugin": true
+		"registerPlugin": true,
+		"ace": true
 	},
 	"plugins": [
 		"angular"

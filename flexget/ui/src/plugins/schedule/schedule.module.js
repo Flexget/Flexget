@@ -3,9 +3,10 @@
 
     angular
 		.module('plugins.schedule', [
-			'blocks.router',
+			'angular-cache',
+
 			'blocks.exception',
-			'angular-cache'
+			'blocks.router'
 			//'schemaForm'
 		]);
 	

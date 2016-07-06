@@ -21,13 +21,13 @@ describe('Config Routes:', function () {
 	describe("Transitions", function() {
 		it("should work with $state.go", function () {
 			$state.go('flexget.config');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.config')).to.be.true;
 		});
 		
 		it("should work with 'config' path", function() {
 			$location.path('config');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.config')).to.be.true;
 		});
 	});

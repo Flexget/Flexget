@@ -23,7 +23,7 @@ describe("Plugin: Config.component", function () {
 	describe("activation", function () {
 		beforeEach(function () {
 			controller.$onInit();
-			$rootScope.$apply();
+			$rootScope.$digest();
 		});
 
 		it('should have called the config service', function () {

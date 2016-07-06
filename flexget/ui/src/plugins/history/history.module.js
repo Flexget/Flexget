@@ -3,10 +3,11 @@
 
     angular
 		.module("plugins.history", [
-			'blocks.router',
-			'blocks.exception',
+			'angular-cache',
 			'angular.filter',
-			'angular-cache'
+
+			'blocks.exception',			
+			'blocks.router'
 		]);
 
 	registerPlugin('plugins.history');

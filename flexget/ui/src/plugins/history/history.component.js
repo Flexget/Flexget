@@ -6,7 +6,7 @@
 		.component('historyView', {
 			templateUrl: 'plugins/history/history.tmpl.html',
 			controllerAs: 'vm',
-			controller: historyController,
+			controller: historyController
 		});
 
 	function historyController(historyService) {

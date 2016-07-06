@@ -29,7 +29,7 @@
 			}).finally(function () {
 				vm.loading = false;
 			});
-		};
+		}
 
 		function setValues(obj) {
 			vm.title = obj.title;
@@ -38,6 +38,6 @@
 
 		function close() {
 			$mdDialog.hide();
-		};
-	};
+		}
+	}
 })();

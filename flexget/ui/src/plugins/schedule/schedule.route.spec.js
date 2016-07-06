@@ -21,13 +21,13 @@ describe('Schedule Routes:', function () {
 	describe("Transitions", function() {
 		it("should work with $state.go", function () {
 			$state.go('flexget.schedule');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.schedule')).to.be.true;
 		});
 		
 		it("should work with 'schedule' path", function() {
 			$location.path('schedule');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.schedule')).to.be.true;
 		});
 	});
