@@ -18,6 +18,6 @@
 		
 		function close() {
 			$mdDialog.hide();
-		};
-	};
+		}
+	}
 })();

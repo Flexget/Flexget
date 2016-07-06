@@ -28,7 +28,7 @@ describe("Blocks: Exception", function () {
 				expect(err).to.equal(mockErrorResponse.data);
 			});
 
-			$rootScope.$apply();
+			$rootScope.$digest();
 
 			expect(errorService.showToast).to.have.been.calledOnce;
 		});
@@ -42,7 +42,7 @@ describe("Blocks: Exception", function () {
 				expect(err).to.equal(mockErrorResponse.data);
 			});
 
-			$rootScope.$apply();
+			$rootScope.$digest();
 
 			expect(errorService.showToast).not.to.have.been.called;
 		})

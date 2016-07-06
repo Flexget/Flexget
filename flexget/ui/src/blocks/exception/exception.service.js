@@ -5,7 +5,7 @@
 		.module('blocks.exception')
 		.factory('exception', exception);
 
-	function exception($q, $log, errorService) {
+	function exception($log, $q, errorService) {
 		return {
 			catcher: catcher
 		};

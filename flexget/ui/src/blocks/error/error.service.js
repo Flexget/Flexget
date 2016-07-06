@@ -25,6 +25,6 @@
 			};
 			
 			$mdToast.show(toast);
-		};
-	};
+		}
+	}
 })();

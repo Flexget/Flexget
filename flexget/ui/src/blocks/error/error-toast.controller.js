@@ -22,6 +22,6 @@
 
 		function openDetails() {
 			$mdDialog.show(dialog);
-		};
-	};
+		}
+	}
 })();

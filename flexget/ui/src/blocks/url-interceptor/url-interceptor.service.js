@@ -3,14 +3,9 @@
 
 	angular
 		.module('blocks.urlInterceptor')
-		.factory('urlInterceptor', urlInterceptor)
-		.config(configInterceptor);
+		.factory('urlInterceptor', urlInterceptor);
 
-	function configInterceptor($httpProvider) {
-		$httpProvider.interceptors.push('urlInterceptor')
-	};
-
-	function urlInterceptor($q, $log) {
+	function urlInterceptor() {
 		return {
 			request: request
 		};

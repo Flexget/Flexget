@@ -5,9 +5,10 @@
 		.module('blocks.router')
 		.provider('routerHelper', routerHelperProvider);
 
-	function routerHelperProvider($locationProvider, $stateProvider, $urlRouterProvider) {
-		if (!(window.history && window.history.pushState)) {
-			window.location.hash = '/';
+	function routerHelperProvider($stateProvider, $urlRouterProvider, $windowProvider) {
+		var $window = $windowProvider.$get();
+		if (!($window.history && $window.history.pushState)) {
+			$window.location.hash = '/';
 		}
 
 		//TODO: Figure out if htlm5Mode is possible
@@ -17,7 +18,7 @@
 
 		this.$get = RouterHelper;
 
-		function RouterHelper($location, $rootScope, $state) {
+		function RouterHelper($location, $log, $rootScope, $state) {
 			var handlingStateChangeError = false;
 			var hasOtherwise = false;
 			var service = {
@@ -30,7 +31,7 @@
 			return service;
 
 			function configureStates(states, otherwisePath) {
-				states.forEach(function (state) {
+				angular.forEach(states, function (state) {
 					if (!state.config.root && !state.config.abstract) {
 						state.state = 'flexget.' + state.state;
 						state.config.template = '<' + state.config.component + ' flex layout="row"></' + state.config.component + '>';
@@ -44,11 +45,12 @@
 						}
 					}
 				});
+
 				if (otherwisePath && !hasOtherwise) {
 					hasOtherwise = true;
 					$urlRouterProvider.otherwise(otherwisePath);
-				};
-			};
+				}
+			}
 
 			function handleRoutingErrors() {
 				//TODO: Convert to UI-router v1 (using transition.start etc.)
@@ -65,7 +67,7 @@
 						(error.data || '') + '. <br/>' + (error.statusText || '') +
 						': ' + (error.status || '');
 
-					console.log(msg);
+					$log.log(msg);
 
 
 					handlingStateChangeError = true;
@@ -78,9 +80,11 @@
 
 			function init() {
 				handleRoutingErrors();
-			};
+			}
 
-			function getStates() { return $state.get(); }
-		};
-	};
+			function getStates() { 
+				return $state.get(); 
+			}
+		}
+	}
 })();
