@@ -561,22 +561,22 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
     query_params = {}
     episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id)
 
-    if absolute_number:
+    if absolute_number is not None:
         episode = episode.filter(TVDBEpisode.absolute_number == absolute_number)
         query_params['absoluteNumber'] = absolute_number
         ep_description = '%s absNo: %s' % (ep_description, absolute_number)
 
-    if season_number:
+    if season_number is not None:
         episode = episode.filter(TVDBEpisode.season_number == season_number)
         query_params['airedSeason'] = season_number
         ep_description = '%s s%s' % (ep_description, season_number)
 
-    if episode_number:
+    if episode_number is not None:
         episode = episode.filter(TVDBEpisode.episode_number == episode_number)
         query_params['airedEpisode'] = episode_number
         ep_description = '%s e%s' % (ep_description, episode_number)
 
-    if first_aired:
+    if first_aired is not None:
         episode = episode.filter(TVDBEpisode.first_aired == first_aired)
         query_params['firstAired'] = datetime.strftime(first_aired, '%Y-%m-%d')
         ep_description = '%s e%s' % (ep_description, first_aired)
