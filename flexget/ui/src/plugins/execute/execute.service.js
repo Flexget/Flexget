@@ -5,7 +5,7 @@
 		.module('plugins.execute')
 		.factory('executeService', executeService);
 
-    function executeService($http, exception, $q) {
+    function executeService($http, $q, exception) {
         return {
             getTasks: getTasks,
 			getQueue: getQueue,
@@ -21,6 +21,7 @@
                 return response.data;
             }
         }
+
 		function getQueue() {
             return $http.get('/api/tasks/queue/', { ignoreLoadingBar: true })
 				.then(getQueueComplete)
@@ -29,7 +30,7 @@
 			function getQueueComplete(response) {
 				return response.data;
 			}
-        };
+        }
 
 		function executeTasks(options) {
             var deferred = $q.defer();
@@ -69,7 +70,7 @@
             };
 
             return deferred.promise;
-        };
+        }
 
         function callFailed(error) {
 			return exception.catcher(error);

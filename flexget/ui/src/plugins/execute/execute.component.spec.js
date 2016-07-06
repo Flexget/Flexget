@@ -21,7 +21,7 @@ describe("Plugin: Execute.component", function () {
 	describe("activation", function () {
 		beforeEach(function() {
 			controller.$onInit();
-			$rootScope.$apply();
+			$rootScope.$digest();
 		});
 
 		it('should have called the execute service', function () {

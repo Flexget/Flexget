@@ -53,7 +53,7 @@
 					vm.pageSize = options.page_size;
 
 				});
-        };
+        }
 
         //action called from the series-episode component
         function deleteEpisode(episode) {
@@ -72,6 +72,6 @@
 						vm.episodes.splice(index, 1);
 					});
             });
-        };
+        }
     }
 })();

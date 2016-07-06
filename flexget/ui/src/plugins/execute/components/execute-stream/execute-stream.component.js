@@ -10,10 +10,10 @@
 			bindings: {
 				stopStream: '<',
 				options: '<'
-			},
+			}
 		});
 	
-	function executeStreamController(executeService, $filter) {
+	function executeStreamController($filter, $log, executeService) {
 		var vm = this;
 
 		vm.$onInit = activate;
@@ -71,7 +71,7 @@
 			}
 
 			function logNode(log) {
-				console.log(log);
+				$log.log(log);
 			}
 		}
 
@@ -88,6 +88,6 @@
 				totalPercent = totalPercent + vm.streamTasks[i].percent;
 			}
 			vm.streamProgress = totalPercent / vm.streamTasks.length;
-		};
+		}
 	}
 })();

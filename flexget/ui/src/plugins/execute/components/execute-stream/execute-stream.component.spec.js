@@ -26,7 +26,7 @@ describe("Plugin: Execute-stream.component", function () {
 	describe("activation", function () {
 		beforeEach(function () {
 			controller.$onInit();
-			$rootScope.$apply();
+			$rootScope.$digest();
 		});
 
 		it('should set the tasks based on the options', function () {

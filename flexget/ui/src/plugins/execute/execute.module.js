@@ -3,11 +3,8 @@
 
 	angular
 		.module("plugins.execute", [
-			'blocks.router',
-			'blocks.exception'
-			//'ui.grid',
-			//'ui.grid.autoResize',
-			//'angular-spinkit'
+			'blocks.exception',
+			'blocks.router'
 		]);
 	
 	registerPlugin('plugins.execute');

@@ -3,7 +3,8 @@
 	"globals": {
 		"angular": true,
 		"registerPlugin": true,
-		"ace": true
+		"ace": true,
+		"oboe": true
 	},
 	"plugins": [
 		"angular"

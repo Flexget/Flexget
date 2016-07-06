@@ -26,7 +26,7 @@
     "gulp-eslint": "^1.1.1",
     "gulp-filter": "~3.0.1",
     "gulp-flatten": "~0.2.0",
-    "gulp-if": "^2.0.0",
+    "gulp-if": "^2.0.1",
     "gulp-inject": "~3.0.0",
     "gulp-load-plugins": "~1.1.0",
     "gulp-match": "^1.0.0",

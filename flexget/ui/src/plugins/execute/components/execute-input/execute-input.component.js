@@ -10,7 +10,7 @@
 			bindings: {
 				running: '<',
 				execute: '<'
-			},
+			}
 		});
 	
 	function executeInputController(executeService) {

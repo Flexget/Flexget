@@ -6,10 +6,10 @@
 		.component('executeView', {
 			templateUrl: 'plugins/execute/execute.tmpl.html',
 			controllerAs: 'vm',
-			controller: executeController,
+			controller: executeController
 		});
 				
-	function executeController($scope, $interval, $q, executeService, $filter) {
+	function executeController($interval, executeService) {
 		var vm = this;
 
 		vm.$onInit = activate;
@@ -30,7 +30,7 @@
             executeService.getQueue().then(function (data) {
                 vm.running = data.tasks
             });
-        };
+        }
 
 		function execute(options, tasks) {
 			options.tasks = tasks;
@@ -46,6 +46,6 @@
 
 		function destroy() {
 			$interval.cancel(taskInterval);
-		};
+		}
 	}
 })();

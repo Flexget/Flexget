@@ -21,13 +21,13 @@ describe('Execute Routes:', function () {
 	describe("Transitions", function() {
 		it("should work with $state.go", function () {
 			$state.go('flexget.execute');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.execute')).to.be.true;
 		});
 		
 		it("should work with 'execute' path", function() {
 			$location.path('execute');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.execute')).to.be.true;
 		});
 	});

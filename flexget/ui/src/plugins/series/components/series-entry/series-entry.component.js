@@ -22,14 +22,14 @@
 
 		function activate() {
 			loadMetadata();
-		};
+		}
 
 		function loadMetadata() {
             seriesService.getShowMetadata(vm.show)
 				.then(function (data) {
 					vm.show.metadata = data;
 				});
-		};
+		}
 
 
         //Dialog for the update possibilities, such as begin and alternate names
