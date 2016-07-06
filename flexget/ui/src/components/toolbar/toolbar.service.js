@@ -8,10 +8,10 @@
     function toolBarService() {
 		var items = [];
 		var defaultOrder = 128;
+
 		return {
 			items: items,
-            registerItem: registerItem,
-            close: close
+            registerItem: registerItem
         };
 
 		function registerItem(item) {
@@ -40,14 +40,14 @@
                     return item;
                 }
             }
-        };
+        }
 
 		function registerButton(item) {
 			if (!item.order) {
 				item.order = defaultOrder;
 			}
 			items.push(item);
-		};
+		}
 
 		function registerMenu(item) {
 			// Ignore if menu already registered
@@ -60,7 +60,7 @@
 			} else {
 				throw(new Error("Menu " + item.label + " has already been registered"));
 			}
-		};
+		}
 
 		function registerMenuItem(item) {
 			if (!item.order) {

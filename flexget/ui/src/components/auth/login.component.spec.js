@@ -32,7 +32,7 @@ describe('Login Component:', function () {
 
 			component.login();
 
-			$rootScope.$apply();
+			$rootScope.$digest();
 
 			expect(component.error).to.equal('Invalid username or password');
 		});
@@ -42,7 +42,7 @@ describe('Login Component:', function () {
 
 			component.login();
 
-			$rootScope.$apply();
+			$rootScope.$digest();
 
 			expect(component.error).to.equal('Error during authentication');
 		});
@@ -56,7 +56,7 @@ describe('Login Component:', function () {
 
 			component.login();
 
-			$rootScope.$apply();
+			$rootScope.$digest();
 
 			expect(component.credentials.password).to.equal('');
 		})

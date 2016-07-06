@@ -5,7 +5,7 @@
 		.module('components.auth')
         .factory('authService', authService);
 
-    function authService($state, $http, $q) {
+    function authService($http, $q, $state, exception) {
         var isLoggedIn, prevState, prevParams;
 
         isLoggedIn = false;
@@ -32,13 +32,13 @@
 				})
 					.then(function () {
 						def.resolve();
-					}, function (error) {
+					}, function () {
 						def.reject()
 					});
 			}
 
 			return def.promise;
-		};
+		}
 
 		function login(credentials, remember) {
 			if (!remember) {
@@ -53,7 +53,7 @@
 				.then(loginComplete)
 				.catch(loginCallFailed);
 			
-			function loginComplete(response) {
+			function loginComplete() {
 				isLoggedIn = true;
 				if(prevState) {
 					$state.go(prevState, prevParams);
@@ -61,36 +61,36 @@
 					$state.go('flexget.home');
 				}
 				return;
-			};
+			}
 
 			function loginCallFailed(error) {
 				return $q.reject(error.data);
-			};
-		};
+			}
+		}
 
 		function logout() {
 			return $http.get('/api/auth/logout/')
 				.then(logoutComplete)
 				.catch(callFailed);
 
-			function logoutComplete(response) {
+			function logoutComplete() {
 				isLoggedIn = false;
 				prevState = undefined;
 				prevParams = undefined;
 				$state.go('login');
 				return;
-			};
-		};
+			}
+		}
 		
 		function state(state, params) {
 			if (state.name != 'login') {
 				prevState = state.name;
 				prevParams = params;
 			}
-		};
+		}
 
 		function callFailed(error) {
 			return exception.catcher(error);
         }
-	};
+	}
 })();

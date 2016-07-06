@@ -16,19 +16,19 @@ describe('404 Routes: ', function () {
 	describe("Transitions", function() {
 		it("should work with $state.go", function () {
 			$state.go('404');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('404')).to.be.true;
 		});
 		
 		it("should work with '/404' path", function() {
 			$location.path('/404');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('404')).to.be.true;
 		});
 		
 		it("should work with '/unkown' path", function() {
 			$location.path('/unkown');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('404')).to.be.true;
 		});
 	});

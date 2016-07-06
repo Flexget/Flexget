@@ -24,9 +24,9 @@
 
 	function authenticationConfig($httpProvider) {
 		$httpProvider.interceptors.push('authInterceptor');
-	};
+	}
 
-	function authInterceptor($rootScope, $state, $q, $injector) {
+	function authInterceptor($injector, $q, $rootScope, $state) {
 		/* Intercept 401/403 http return codes and redirect to login page */
 		return {
 			responseError: responseError
@@ -49,5 +49,5 @@
 			}
 			return $q.reject(rejection);
 		}
-	};
+	}
 })();

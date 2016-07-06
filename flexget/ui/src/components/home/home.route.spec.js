@@ -21,19 +21,19 @@ describe('Home Routes: ', function () {
 	describe("Transitions", function() {
 		it("should work with $state.go", function () {
 			$state.go('flexget.home');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.home')).to.be.true;
 		});
 		
 		it("should work with '' path", function() {
 			$location.path('');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.home')).to.be.true;
 		});
 		
 		it("should work with '/' path", function() {
 			$location.path('/');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.home')).to.be.true;
 		});
 	});

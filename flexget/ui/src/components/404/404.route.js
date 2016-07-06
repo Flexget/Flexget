@@ -7,7 +7,7 @@
 
     function appRun(routerHelper) {
         routerHelper.configureStates(getStates(), '/404');
-    };
+    }
 
     function getStates() {
         return [

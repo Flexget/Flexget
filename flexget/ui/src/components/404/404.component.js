@@ -16,5 +16,5 @@
 		function goHome() {
             $state.go('flexget.home');
 		}
-	};
+	}
 })();

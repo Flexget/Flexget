@@ -5,7 +5,7 @@
         .module("components.auth")
 		.run(appRun);
 
-    function appRun(routerHelper, toolBarService, authService) {
+    function appRun(authService, routerHelper, toolBarService) {
         routerHelper.configureStates(getStates());
 
 		var logoutItem = {
@@ -18,7 +18,7 @@
 		}
 
 		toolBarService.registerItem(logoutItem);
-    };
+    }
 
     function getStates() {
         return [

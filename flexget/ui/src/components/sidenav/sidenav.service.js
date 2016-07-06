@@ -4,7 +4,7 @@
     angular.module('components.sidenav')
         .factory('sideNavService', sideNavService);
 
-    function sideNavService($rootScope, $mdSidenav, $mdMedia) {
+    function sideNavService($mdMedia, $mdSidenav, $rootScope) {
 		return {
             toggle: toggle,
             close: close
@@ -17,12 +17,12 @@
                 $rootScope.menuMini = false;
                 $mdSidenav('left').toggle();
             }
-        };
+        }
 
         function close() {
             if (!$mdMedia('gt-lg')) {
                 $mdSidenav('left').close();
             }
-        };
-	};
+        }
+	}
 })();

@@ -3,8 +3,8 @@
 
     angular
         .module("components.auth", [
-			'blocks.router',
 			'blocks.exception',
+			'blocks.router',
 			'components.toolbar'
 		]);
 })();

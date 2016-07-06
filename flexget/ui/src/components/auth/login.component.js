@@ -9,7 +9,7 @@
 			controller: loginController
 		});
 
-	function loginController($stateParams, authService, $state) {
+	function loginController($stateParams, authService) {
 		var vm = this;
 
 		vm.timeout = $stateParams.timeout;
@@ -26,6 +26,6 @@
                         vm.error = 'Error during authentication';
                     }
                 });
-        };
-	};
+        }
+	}
 })();									

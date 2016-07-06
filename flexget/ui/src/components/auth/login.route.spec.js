@@ -15,13 +15,13 @@ describe('Login Routes: ', function () {
 	describe("Transitions", function() {
 		it("should work with $state.go", function () {
 			$state.go('login');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('login')).to.be.true;
 		});
 		
 		it("should work with '/login' path", function() {
 			$location.path('/login');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('login')).to.be.true;
 		});
 	});

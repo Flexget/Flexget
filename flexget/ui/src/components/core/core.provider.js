@@ -20,9 +20,9 @@
 					rgba: $mdThemingProvider._rgba,
 					palettes: $mdThemingProvider._PALETTES,
 					themes: $mdThemingProvider._THEMES,
-					parseRules: $mdThemingProvider._parseRules,
+					parseRules: $mdThemingProvider._parseRules
 				};
-			},
+			}
 		};
 	}
 })();
