@@ -22,7 +22,7 @@ describe("Plugin: Series-Entry.Component", function () {
 		beforeEach(function () {
 			component.show = angular.copy(show);
 			component.$onInit();
-			$rootScope.$apply();
+			$rootScope.$digest();
 		});
 
 		it('should call the series service', function () {

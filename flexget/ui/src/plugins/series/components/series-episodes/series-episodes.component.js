@@ -8,7 +8,7 @@
 			controllerAs: 'vm',
 			controller: episodesController,
 			bindings: {
-				show: '<',
+				show: '<'
 			},
 			transclude: true
 		});
@@ -65,7 +65,7 @@
 
             $mdDialog.show(confirm).then(function () {
                 seriesService.deleteEpisode(vm.show, episode, params)
-					.then(function (data) {
+					.then(function () {
 						//Find the index of the episode in the data
 						var index = vm.episodes.indexOf(episode);
 						//Remove the episode from the list, based on the index

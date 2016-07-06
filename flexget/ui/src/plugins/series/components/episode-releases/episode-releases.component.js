@@ -10,7 +10,7 @@
 			bindings: {
 				show: '<',
 				episode: '<'
-			},
+			}
 		});
 
     function episodesReleasesController($http, $filter, $mdDialog, seriesService) {
@@ -18,10 +18,6 @@
 
 		vm.$onInit = activate;
 		vm.cancel = cancel;
-
-		var params = {
-			forget: true
-		};
 
 		function activate() {
 			loadReleases();

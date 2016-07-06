@@ -22,7 +22,7 @@ describe("Plugin: Series-Episodes.Component", function () {
 	describe('activation', function () {
 		beforeEach(function () {
 			component.$onInit();
-			$rootScope.$apply();
+			$rootScope.$digest();
 		});
 
 		it('should call the series service', function () {
@@ -62,7 +62,7 @@ describe("Plugin: Series-Episodes.Component", function () {
 
 				component.deleteEpisode(episode);
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(seriesService.deleteEpisode).to.have.been.calledOnce;
 			});
@@ -76,7 +76,7 @@ describe("Plugin: Series-Episodes.Component", function () {
 
 				component.deleteEpisode(episode);
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(component.episodes.length).to.equal(episodes.episodes.length - 1);
 			});

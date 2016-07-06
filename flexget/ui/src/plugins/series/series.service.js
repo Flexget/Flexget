@@ -133,12 +133,12 @@
 				.then(deleteReleasesComplete)
 				.catch(callFailed);
 
-			function deleteReleasesComplete(response) {
+			function deleteReleasesComplete() {
 				return;
-			};
+			}
 		}
 
-		function loadReleases(show, episode, params) {
+		function loadReleases(show, episode) {
             return $http.get('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/releases/')
 				.then(loadReleasesComplete)
 				.catch(callFailed);

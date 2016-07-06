@@ -62,7 +62,7 @@ describe("Plugin: Series-Episode.Component", function () {
 
 				component.deleteReleases();
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(seriesService.deleteReleases).to.have.been.calledOnce;
 			});
@@ -74,7 +74,7 @@ describe("Plugin: Series-Episode.Component", function () {
 
 				component.deleteReleases();
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(component.releases).not.to.exist;
 				expect(component.episode.episode_number_of_releases).to.equal(0);
@@ -106,7 +106,7 @@ describe("Plugin: Series-Episode.Component", function () {
 
 				component.resetReleases(episode);
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(seriesService.resetReleases).to.have.been.calledOnce;
 			});

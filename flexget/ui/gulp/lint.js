@@ -14,7 +14,9 @@ gulp.task('lint', function () {
 		'!' + paths.src + '/**/*.spec.*']);
 
 	return files
-		.pipe($.eslint())
+		.pipe($.eslint({
+			fix: true
+		}))
 		.pipe($.eslint.format())
 		.pipe($.eslint.format('html', fs.createWriteStream('reports/lint.html')))
 		.pipe($.eslint.failAfterError());

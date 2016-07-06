@@ -62,7 +62,7 @@ describe("Plugin: Episode-Release.Component", function () {
 
 				component.resetRelease(episode);
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(seriesService.resetRelease).to.have.been.calledOnce;
 			});
@@ -95,7 +95,7 @@ describe("Plugin: Episode-Release.Component", function () {
 
 				component.forgetRelease();
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(seriesService.forgetRelease).to.have.been.calledOnce;
 			});

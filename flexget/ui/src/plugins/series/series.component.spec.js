@@ -21,7 +21,7 @@ describe("Plugin: Series.Component", function () {
 	describe('activation', function () {
 		beforeEach(function () {
 			component.$onInit();
-			$rootScope.$apply();
+			$rootScope.$digest();
 		});
 
 		it('should call the series service', function () {
@@ -60,7 +60,7 @@ describe("Plugin: Series.Component", function () {
 				
 				component.forgetShow(show);
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(seriesService.deleteShow).to.have.been.calledOnce;
 			});
@@ -72,7 +72,7 @@ describe("Plugin: Series.Component", function () {
 
 				component.forgetShow(show);
 
-				$rootScope.$apply();
+				$rootScope.$digest();
 
 				expect(seriesService.getShows).to.have.been.calledOnce;
 			});
@@ -139,7 +139,7 @@ describe("Plugin: Series.Component", function () {
 
 			component.search();
 
-			$rootScope.$apply();
+			$rootScope.$digest();
 
 			expect(component.series).to.exist;
 			expect(component.series).to.have.length.above(0);

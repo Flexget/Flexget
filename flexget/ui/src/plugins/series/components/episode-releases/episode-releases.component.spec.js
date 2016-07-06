@@ -25,7 +25,7 @@ describe("Plugin: Episode-Releases.Component", function () {
 	describe('activation', function () {
 		beforeEach(function () {
 			component.$onInit();
-			$rootScope.$apply();
+			$rootScope.$digest();
 		});
 
 		it('should call the series service', function () {

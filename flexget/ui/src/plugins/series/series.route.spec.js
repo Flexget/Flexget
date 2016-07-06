@@ -21,13 +21,13 @@ describe('Series Routes:', function () {
 	describe("Transitions", function() {
 		it("should work with $state.go", function () {
 			$state.go('flexget.series');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.series')).to.be.true;
 		});
 		
 		it("should work with 'series' path", function() {
 			$location.path('series');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.series')).to.be.true;
 		});
 	});

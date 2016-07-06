@@ -11,7 +11,7 @@
 				show: '<',
 				episode: '<',
 				release: '<'
-			},
+			}
 		});
 
     function episodesReleaseController($http, $filter, $mdDialog, seriesService) {

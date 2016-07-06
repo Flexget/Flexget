@@ -3,21 +3,23 @@
 
 	angular
 		.module('flexget', [
-			'ui.router',
-			'ngMaterial',
 			'ngCookies',
+			'ngMaterial',
 			'ngMessages',
-			'angular-loading-bar',
-			'angular-cache',
 
+			'angular-cache',
+			'angular-loading-bar',
+			
 			'blocks.error',
 			'blocks.exception',
 			'blocks.router',
 			'blocks.urlInterceptor',
 
-			'flexget.directives',
 			'flexget.components',
-			'flexget.plugins'
+			'flexget.directives',
+			'flexget.plugins',
+
+			'ui.router'
 		]);
 
 	function bootstrapApplication() {

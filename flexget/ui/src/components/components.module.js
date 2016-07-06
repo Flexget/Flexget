@@ -3,12 +3,12 @@
 
     angular
         .module('flexget.components', [
-			'components.toolbar',
-			'components.core',
 			'components.404',
-			'components.home',
 			'components.auth',
+			'components.core',
+			'components.home',
 			'components.sidenav',
+			'components.toolbar',
 			'components.user'
 		]);
 })();

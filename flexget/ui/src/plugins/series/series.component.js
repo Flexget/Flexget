@@ -6,7 +6,7 @@
         .component('seriesView', {
             templateUrl: 'plugins/series/series.tmpl.html',
             controllerAs: 'vm',
-            controller: seriesController,
+            controller: seriesController
         });
 
     function seriesController($mdDialog, seriesService, $timeout, $mdMedia) {
@@ -31,7 +31,7 @@
 		vm.toggleEpisodes = toggleEpisodes;
 
 		function activate() {
-        	getSeriesList();
+			getSeriesList();
 		}
 
         function getSeriesList() {
@@ -44,7 +44,7 @@
             });
         }
 
-    	function forgetShow(show) {
+		function forgetShow(show) {
 			var confirm = $mdDialog.confirm()
                 .title('Confirm forgetting show.')
                 .htmlContent("Are you sure you want to completely forget <b>" + show.show_name + "</b>?<br /> This will also forget all downloaded releases.")
@@ -52,11 +52,11 @@
                 .cancel("No");
 
 			$mdDialog.show(confirm).then(function () {
-				seriesService.deleteShow(show, params).then(function (data) {
+				seriesService.deleteShow(show, params).then(function () {
 					getSeriesList();
 				});
 			});
-		};
+		}
 
         //Call from the pagination to update the page to the selected page
         vm.updateListPage = function (index) {
@@ -73,20 +73,20 @@
                 seriesService.searchShows(vm.searchTerm).then(function (data) {
                     vm.series = data.shows;
                 });
-			};
+			}
 
 			function emptySearch() {
                 options.page = 1;
                 getSeriesList();
             }
-        };
+        }
 
         function toggleEpisodes(show) {
 			show == vm.selectedShow ? clearShow() : setSelectedShow();
 
 			function clearShow() {
 				vm.selectedShow = null;
-			};
+			}
 
 			function setSelectedShow() {
 				vm.selectedShow = null;

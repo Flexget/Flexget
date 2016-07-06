@@ -3,10 +3,12 @@
 
     angular
 		.module('plugins.series', [
-			'blocks.router',
-			'blocks.exception',
+			'ngMaterial',
+			
 			'angular-cache',
-			'ngMaterial'
+
+			'blocks.exception',
+			'blocks.router'
 		]);
 	
 	registerPlugin('plugins.series');
