@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import hashlib
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib.parse import quote
+from future.moves.urllib.parse import quote_plus
 
 import re
 import logging
@@ -8,11 +10,8 @@ import logging
 from requests.exceptions import RequestException
 
 from flexget import plugin
-from flexget.config_schema import one_or_more
-from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
@@ -53,105 +52,97 @@ class UrlRewriteFuzer(object):
         'properties': {
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'category': one_or_more({
+            'user_id': {'type': 'integer'},
+            'rss_key': {'type': 'string'},
+            'category': {
                 'oneOf': [
                     {'type': 'integer'},
                     {'type': 'string', 'enum': list(CATEGORIES)},
                 ]
-            }),
+            },
         },
-        'required': ['username', 'password'],
+        'required': ['username', 'password', 'user_id', 'rss_key'],
         'additionalProperties': False
     }
-
-    # urlrewriter API
-    def url_rewritable(self, task, entry):
-        url = entry['url']
-        if url.endswith('.torrent'):
-            return False
-        if url.startswith('http://www.fuzer.me/'):
-            return True
-        return False
-
-    # urlrewriter API
-    def url_rewrite(self, task, entry):
-        if 'url' not in entry:
-            log.error("Didn't actually get a URL...")
-        else:
-            log.debug("Got the URL: %s" % entry['url'])
-        if entry['url'].startswith('http://torrentleech.org/torrents/browse/index/query/'):
-            # use search
-            results = self.search(task, entry)
-            if not results:
-                raise UrlRewritingError("No search results found")
-            # TODO: Search doesn't enforce close match to title, be more picky
-            entry['url'] = results[0]['url']
 
     @plugin.internet(log)
     def search(self, task, entry, config=None):
         """
-        Search for name from torrentleech.
+        Search for name from fuzer.
         """
         rss_key = config['rss_key']
+        username = config['username']
+        password = hashlib.md5(config['password']).hexdigest()
 
         # build the form request:
-        data = {'username': config['username'], 'password': config['password'], 'remember_me': 'on', 'submit': 'submit'}
+        data = {'cookieuser': '1',
+                'do': 'login',
+                's': '',
+                'securitytoken': 'guest',
+                'vb_login_username': username,
+                'vb_login_password': '',
+                'vb_login_md5password': password,
+                'vb_login_md5password_utf': password
+                }
         # POST the login form:
         try:
-            login = requests.post('https://torrentleech.org/', data=data)
+            login = requests.post('https://www.fuzer.me/login.php?do=login', data=data)
         except RequestException as e:
-            raise PluginError('Could not connect to torrentleech: %s', str(e))
+            raise PluginError('Could not connect to fuzer: %s', str(e))
 
-        if not isinstance(config, dict):
-            config = {}
-            # sort = SORT.get(config.get('sort_by', 'seeds'))
-            # if config.get('sort_reverse'):
-            # sort += 1
-        categories = config.get('category', 'all')
+        category = config.get('category', 0)
         # Make sure categories is a list
-        if not isinstance(categories, list):
-            categories = [categories]
+
         # If there are any text categories, turn them into their id number
-        categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-        filter_url = '/categories/%s' % ','.join(str(c) for c in categories)
-        entries = set()
+        category = category if isinstance(category, int) else CATEGORIES[category]
+
+        entries = []
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string).replace(":", "")
-            # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = ('http://torrentleech.org/torrents/browse/index/query/' +
-                   quote(query.encode('utf-8')) + filter_url)
-            log.debug('Using %s as torrentleech search url' % url)
+            text = quote_plus(query.encode('windows-1255'))
+            url = 'https://www.fuzer.me/index.php?name=torrents&text={}&category={}&search=%E7%F4%F9'.format(text,
+                                                                                                             category)
+            log.debug('Using %s as fuzer search url' % url)
 
             page = requests.get(url, cookies=login.cookies).content
             soup = get_soup(page)
 
-            for tr in soup.find_all("tr", ["even", "odd"]):
-                # within each even or odd row, find the torrent names
-                link = tr.find("a", attrs={'href': re.compile('/torrent/\d+')})
-                log.debug('link phase: %s' % link.contents[0])
-                entry = Entry()
-                # extracts the contents of the <a>titlename/<a> tag
-                entry['title'] = link.contents[0]
+            table = soup.find('tbody', {'id': 'collapseobj_module_17'})
+            if not table:
+                log.debug('No search results were returned, continuing')
+                continue
+            for tr in table.find_all("tr"):
+                name = tr.find("a", {'href': re.compile('https:\/\/www.fuzer.me\/showthread\.php\?t=\d+')})
+                if not name:
+                    continue
+                result = re.search('\|\s(.*)', name.text)
+                title = result.group(1) if result else name.text
+                title = title.replace(' ', '.')
+                link = tr.find("a", attrs={'href': re.compile('attachmentid')}).get('href')
+                attachment_id = re.search('attachmentid\=(\d+)', link).group(1)
 
-                # find download link
-                torrent_url = tr.find("a", attrs={'href': re.compile('/download/\d+/.*')}).get('href')
-                # parse link and split along /download/12345 and /name.torrent
-                download_url = re.search('(/download/\d+)/(.+\.torrent)', torrent_url)
-                # change link to rss and splice in rss_key
-                torrent_url = 'http://torrentleech.org/rss' + download_url.group(1) + '/' \
-                              + rss_key + '/' + download_url.group(2)
-                log.debug('RSS-ified download link: %s' % torrent_url)
-                entry['url'] = torrent_url
+                entry['title'] = title
+                final_url = 'https://www.fuzer.me/rss/torrent.php/{}/{}/{}/{}.torrent'.format(attachment_id,
+                                                                                              config['user_id'],
+                                                                                              rss_key, title)
 
-                # us tr object for seeders/leechers
-                seeders, leechers = tr.find_all('td', ["seeders", "leechers"])
-                entry['torrent_seeds'] = int(seeders.contents[0])
-                entry['torrent_leeches'] = int(leechers.contents[0])
+                log.debug('RSS-ified download link: %s' % final_url)
+                entry['url'] = final_url
+
+                size_pos = 4 if 'stickytr' in tr.get('class', []) else 3
+                seeders_pos = 6 if 'stickytr' in tr.get('class', []) else 5
+                leechers_pos = 7 if 'stickytr' in tr.get('class', []) else 6
+
+                seeders = int(tr.find_all('td')[seeders_pos].find('div').text)
+                leechers = int(tr.find_all('td')[leechers_pos].find('div').text)
+
+                entry['torrent_seeds'] = seeders
+                entry['torrent_leeches'] = leechers
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
 
                 # use tr object for size
-                size = tr.find("td", text=re.compile('([\.\d]+) ([TGMK]?)B')).contents[0]
-                size = re.search('([\.\d]+) ([TGMK]?)B', size)
+                size_text = tr.find_all('td')[size_pos].find('div').text.strip()
+                size = re.search('(\d+.?\d+)([TGMK]?)B', size_text)
                 if size:
                     if size.group(2) == 'T':
                         entry['content_size'] = int(float(size.group(1)) * 1000 ** 4 / 1024 ** 2)
@@ -163,11 +154,11 @@ class UrlRewriteFuzer(object):
                         entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
                     else:
                         entry['content_size'] = int(float(size.group(1)) / 1024 ** 2)
-                entries.add(entry)
+                entries.append(entry)
 
         return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteFuzer, 'fuzer', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(UrlRewriteFuzer, 'fuzer', groups=['search'], api_ver=2)
