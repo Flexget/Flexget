@@ -10,6 +10,7 @@ import logging
 from requests.exceptions import RequestException
 
 from flexget import plugin
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils import requests
@@ -121,13 +122,14 @@ class UrlRewriteFuzer(object):
                 link = tr.find("a", attrs={'href': re.compile('attachmentid')}).get('href')
                 attachment_id = re.search('attachmentid\=(\d+)', link).group(1)
 
-                entry['title'] = title
+                e = Entry()
+                e['title'] = title
                 final_url = 'https://www.fuzer.me/rss/torrent.php/{}/{}/{}/{}.torrent'.format(attachment_id,
                                                                                               config['user_id'],
                                                                                               rss_key, title)
 
                 log.debug('RSS-ified download link: %s' % final_url)
-                entry['url'] = final_url
+                e['url'] = final_url
 
                 size_pos = 4 if 'stickytr' in tr.get('class', []) else 3
                 seeders_pos = 6 if 'stickytr' in tr.get('class', []) else 5
@@ -136,25 +138,25 @@ class UrlRewriteFuzer(object):
                 seeders = int(tr.find_all('td')[seeders_pos].find('div').text)
                 leechers = int(tr.find_all('td')[leechers_pos].find('div').text)
 
-                entry['torrent_seeds'] = seeders
-                entry['torrent_leeches'] = leechers
-                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                e['torrent_seeds'] = seeders
+                e['torrent_leeches'] = leechers
+                e['search_sort'] = torrent_availability(e['torrent_seeds'], e['torrent_leeches'])
 
                 # use tr object for size
                 size_text = tr.find_all('td')[size_pos].find('div').text.strip()
                 size = re.search('(\d+.?\d+)([TGMK]?)B', size_text)
                 if size:
                     if size.group(2) == 'T':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 ** 4 / 1024 ** 2)
+                        e['content_size'] = int(float(size.group(1)) * 1000 ** 4 / 1024 ** 2)
                     elif size.group(2) == 'G':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)
+                        e['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)
                     elif size.group(2) == 'M':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 ** 2 / 1024 ** 2)
+                        e['content_size'] = int(float(size.group(1)) * 1000 ** 2 / 1024 ** 2)
                     elif size.group(2) == 'K':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
+                        e['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
                     else:
-                        entry['content_size'] = int(float(size.group(1)) / 1024 ** 2)
-                entries.add(entry)
+                        e['content_size'] = int(float(size.group(1)) / 1024 ** 2)
+                entries.add(e)
 
         return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
 
