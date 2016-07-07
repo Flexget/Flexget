@@ -10,6 +10,7 @@ import logging
 from requests.exceptions import RequestException
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
@@ -20,8 +21,6 @@ from flexget.utils.search import torrent_availability, normalize_unicode
 log = logging.getLogger('fuzer')
 
 CATEGORIES = {
-    'all': 0,
-
     # Movies
     'HD Movies': 9,
     'XviD': 7,
@@ -55,12 +54,7 @@ class UrlRewriteFuzer(object):
             'password': {'type': 'string'},
             'user_id': {'type': 'integer'},
             'rss_key': {'type': 'string'},
-            'category': {
-                'oneOf': [
-                    {'type': 'integer'},
-                    {'type': 'string', 'enum': list(CATEGORIES)},
-                ]
-            },
+            'category': one_or_more({'type': 'string', 'enum': list(CATEGORIES)}),
         },
         'required': ['username', 'password', 'user_id', 'rss_key'],
         'additionalProperties': False
@@ -91,22 +85,29 @@ class UrlRewriteFuzer(object):
         except RequestException as e:
             raise PluginError('Could not connect to fuzer: %s', str(e))
 
-        category = config.get('category', 0)
+        category = config.get('category', [0])
         # Make sure categories is a list
+        if not isinstance(category, list):
+            category = [category]
 
         # If there are any text categories, turn them into their id number
-        category = category if isinstance(category, int) else CATEGORIES[category]
+        categories = [c if isinstance(c, int) else CATEGORIES[c] for c in category]
+        params = {'name': 'torrents',
+                  'category': '0',
+                  'search': '%E7%F4%F9'}
+
+        for i in range(len(categories)):
+            params.update({"c{}".format(i + 1): categories[i]})
 
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string).replace(":", "")
             text = quote_plus(query.encode('windows-1255'))
-            url = 'https://www.fuzer.me/index.php?name=torrents&text={}&category={}&search=%E7%F4%F9'.format(text,
-                                                                                                             category)
-            log.debug('Using %s as fuzer search url' % url)
 
-            page = requests.get(url, cookies=login.cookies).content
-            soup = get_soup(page)
+            page = requests.get('https://www.fuzer.me/index.php?text={}'.format(text), params=params,
+                                cookies=login.cookies)
+            log.debug('Using %s as fuzer search url' % page.url)
+            soup = get_soup(page.content)
 
             table = soup.find('tbody', {'id': 'collapseobj_module_17'})
             if not table:
