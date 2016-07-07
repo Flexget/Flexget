@@ -96,7 +96,7 @@ class UrlRewriteFuzer(object):
         # If there are any text categories, turn them into their id number
         category = category if isinstance(category, int) else CATEGORIES[category]
 
-        entries = []
+        entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string).replace(":", "")
             text = quote_plus(query.encode('windows-1255'))
@@ -154,7 +154,7 @@ class UrlRewriteFuzer(object):
                         entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
                     else:
                         entry['content_size'] = int(float(size.group(1)) / 1024 ** 2)
-                entries.append(entry)
+                entries.add(entry)
 
         return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
 
