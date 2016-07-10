@@ -54,7 +54,11 @@ class UrlRewriteFuzer(object):
             'password': {'type': 'string'},
             'user_id': {'type': 'integer'},
             'rss_key': {'type': 'string'},
-            'category': one_or_more({'type': 'string', 'enum': list(CATEGORIES)}),
+            'category': one_or_more(
+                {'oneOf': [
+                    {'type': 'string', 'enum': list(CATEGORIES)},
+                    {'type': 'integer'}
+                ]}),
         },
         'required': ['username', 'password', 'user_id', 'rss_key'],
         'additionalProperties': False
