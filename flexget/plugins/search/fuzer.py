@@ -54,7 +54,6 @@ class UrlRewriteFuzer(object):
         'properties': {
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'user_id': {'type': 'integer'},
             'rss_key': {'type': 'string'},
             'category': one_or_more(
                 {'oneOf': [
@@ -62,7 +61,7 @@ class UrlRewriteFuzer(object):
                     {'type': 'integer'}
                 ]}),
         },
-        'required': ['username', 'password', 'user_id', 'rss_key'],
+        'required': ['username', 'password', 'rss_key'],
         'additionalProperties': False
     }
 
@@ -105,6 +104,7 @@ class UrlRewriteFuzer(object):
         if not cookies:
             requests.cache_cookies(self.login(config), 'fuzer', username)
 
+        user_id = requests.cookies.get('fzr2userid')
         category = config.get('category', [0])
         # Make sure categories is a list
         if not isinstance(category, list):
@@ -145,7 +145,7 @@ class UrlRewriteFuzer(object):
                 e = Entry()
                 e['title'] = title
                 final_url = 'https://www.fuzer.me/rss/torrent.php/{}/{}/{}/{}.torrent'.format(attachment_id,
-                                                                                              config['user_id'],
+                                                                                              user_id,
                                                                                               rss_key, title)
 
                 log.debug('RSS-ified download link: %s' % final_url)
