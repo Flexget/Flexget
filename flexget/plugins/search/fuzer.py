@@ -14,11 +14,13 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.utils import requests
+from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('fuzer')
+
+requests = RequestSession()
 
 CATEGORIES = {
     # Movies
@@ -64,12 +66,12 @@ class UrlRewriteFuzer(object):
         'additionalProperties': False
     }
 
-    @plugin.internet(log)
-    def search(self, task, entry, config=None):
+    def login(self, config):
         """
-        Search for name from fuzer.
+        Login method for plugin. Should return request.cookies to be used and cached
+        :param config: Plugin config
+        :return: request.cookies
         """
-        rss_key = config['rss_key']
         username = config['username']
         password = hashlib.md5(config['password']).hexdigest()
 
@@ -88,6 +90,20 @@ class UrlRewriteFuzer(object):
             login = requests.post('https://www.fuzer.me/login.php?do=login', data=data)
         except RequestException as e:
             raise PluginError('Could not connect to fuzer: %s', str(e))
+        # Todo handle failed login
+        return login.cookies
+
+    @plugin.internet(log)
+    def search(self, task, entry, config=None):
+        """
+        Search for name from fuzer.
+        """
+        rss_key = config['rss_key']
+        username = config['username']
+
+        cookies = requests.cached_cookies('fuzer', username)
+        if not cookies:
+            requests.cache_cookies(self.login(config), 'fuzer', username)
 
         category = config.get('category', [0])
         # Make sure categories is a list
@@ -108,8 +124,7 @@ class UrlRewriteFuzer(object):
             query = normalize_unicode(search_string).replace(":", "")
             text = quote_plus(query.encode('windows-1255'))
 
-            page = requests.get('https://www.fuzer.me/index.php?text={}'.format(text), params=params,
-                                cookies=login.cookies)
+            page = requests.get('https://www.fuzer.me/index.php?text={}'.format(text), params=params)
             log.debug('Using %s as fuzer search url' % page.url)
             soup = get_soup(page.content)
 
