@@ -18,11 +18,17 @@ import threading
 import uuid
 
 from flexget.plugins.daemon.irc_bot.numeric_replies import REPLY_CODES
-from flexget import plugin
 
 log = logging.getLogger('irc_bot')
 
 event_handlers = {}
+
+
+def partial(func, *args, **kwargs):
+    """helper function to make sure __name__ is set"""
+    f = functools.partial(func, *args, **kwargs)
+    functools.update_wrapper(f, func)
+    return f
 
 
 class EventHandler(object):
@@ -34,6 +40,7 @@ class EventHandler(object):
 
 
 def event(command=None, msg=None):
+    """Decorator used for assigning functions to specific IRC messages."""
     if not isinstance(command, list):
         command = [command] if command else []
     if not isinstance(msg, list):
@@ -48,6 +55,7 @@ def event(command=None, msg=None):
 
 
 def handle_event(msg, obj):
+    """Call the proper function that has been set to handle the input message type eg. RPLMOTD"""
     for regexp, _event in event_handlers.items():
         if _event.command:
             for cmd in _event.command:
@@ -68,8 +76,7 @@ def printable_unicode_list(unicode_list):
 
 
 class QueuedCommand(object):
-    def __init__(self, after, scheduled_time, command, name, persists=False):
-        self.name = name
+    def __init__(self, after, scheduled_time, command, persists=False):
         self.after = after
         self.scheduled_time = scheduled_time
         self.command = command
@@ -77,9 +84,6 @@ class QueuedCommand(object):
 
     def __lt__(self, other):
         return self.scheduled_time < other.scheduled_time
-
-    def __eq__(self, other):
-        return self.name == other.name
 
 
 class Schedule(object):
@@ -90,25 +94,19 @@ class Schedule(object):
     def execute(self):
         for queued_cmd in self.queue:
             if datetime.datetime.now() >= queued_cmd.scheduled_time:
-                log.debug('Executing scheduled command %s', queued_cmd.name)
+                log.debug('Executing scheduled command %s', queued_cmd.command.__name__)
                 queued_cmd.command()
                 self.queue.pop(0)
                 if queued_cmd.persists:
-                    self.queue_command(queued_cmd.after, queued_cmd.command, queued_cmd.name, queued_cmd.persists)
+                    self.queue_command(queued_cmd.after, queued_cmd.command, queued_cmd.persists)
             else:
                 break
 
-    def queue_command(self, after, cmd, name, persists=False):
+    def queue_command(self, after, cmd, persists=False):
+        log.debug('Queueing command "%s" to execute in %s second(s)', cmd.__name__, after)
         timestamp = datetime.datetime.now() + datetime.timedelta(seconds=after)
-        queued_command = QueuedCommand(after, timestamp, cmd, name, persists)
-        if queued_command not in self.queue:
-            bisect.insort(self.queue, queued_command)
-
-    def remove(self, name):
-        try:
-            self.queue.remove(name)
-        except ValueError:
-            pass
+        queued_command = QueuedCommand(after, timestamp, cmd, persists)
+        bisect.insort(self.queue, queued_command)
 
 
 def is_channel(string):
@@ -159,7 +157,6 @@ class IRCBot(asynchat.async_chat):
         self.use_ssl = config.get('use_ssl', False)
 
         self.connected_channels = []
-        self.autojoin_channels = []
         self.real_nickname = self.nickname
         self.set_terminator(b'\r\n')
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -170,7 +167,8 @@ class IRCBot(asynchat.async_chat):
         self.max_connection_delay = 300  # 5 minutes
         self.throttled = False
         self.schedule = Schedule()
-        self.clean_exit = False
+        self.running = True
+        self.connecting_to_channels = True
 
     def handle_expt_event(self):
         error = self.socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
@@ -217,23 +215,18 @@ class IRCBot(asynchat.async_chat):
         self.nick(self.real_nickname)
 
     def handle_error(self):
-        if sys.version_info[0] == 2:
-            exc_info = sys.exc_info()
-            if exc_info:
-                raise exc_info[0], exc_info[1], exc_info[2]
         delay = min(self.connection_attempts ** 2, self.max_connection_delay)
         log.error('Unknown error occurred. Attempting to restart connection in %s seconds.', delay)
-        self.schedule.queue_command(delay, functools.partial(self.reconnect), 'reconnect')
+        self.schedule.queue_command(delay, partial(self.reconnect))
 
     def handle_close(self):
         # only handle close event if we're not actually just shutting down
-        if not self.shutdown_event.is_set():
+        if self.running:
             self.handle_error()
 
     def exit(self):
         log.info('Shutting down connection to %s:%s', self.server, self.port)
-        self.clean_exit = True
-        self.shutdown_event.set()
+        self.running = False
         self.close()
 
     def reconnect(self):
@@ -246,11 +239,14 @@ class IRCBot(asynchat.async_chat):
 
     def join(self, channels):
         for channel in channels:
+            if channel in self.connected_channels:
+                continue
             log.info('Joining channel: %s', channel)
             self.write('JOIN %s' % channel)
+        self.connecting_to_channels = False
 
     def found_terminator(self):
-        lines = [self._process_message(self.buffer)]
+        lines = self._process_message(self.buffer)
         self.buffer = ''
         self.parse_message(lines)
 
@@ -265,7 +261,10 @@ class IRCBot(asynchat.async_chat):
         self.buffer += strip_irc_colors(strip_invisible(data))
 
     def _process_message(self, msg):
-        return IRCMessage(msg)
+        messages = []
+        for m in msg.split('\r\n'):
+            messages.append(IRCMessage(m))
+        return messages
 
     def parse_message(self, lines):
         log.debug('Received: %s', printable_unicode_list(lines))
@@ -274,7 +273,7 @@ class IRCBot(asynchat.async_chat):
 
     @event('ERRINVITEONLYCHAN')
     def on_inviteonly(self, msg):
-        self.schedule.queue_command(5, functools.partial(self.join, self.channels), 'join')
+        self.schedule.queue_command(5, partial(self.join, self.channels))
 
     @event('ERROR')
     def on_error(self, msg):
@@ -309,7 +308,6 @@ class IRCBot(asynchat.async_chat):
         if msg.from_nick == self.real_nickname:
             log.info('Joined channel %s', msg.arguments[0])
             self.connected_channels.append(msg.arguments[0])
-            self.autojoin_channels.append(msg.arguments[0])
 
     @event('KICK')
     def on_kick(self, msg):
@@ -322,7 +320,6 @@ class IRCBot(asynchat.async_chat):
         log.error('Banned from channel %s', msg.arguments[1])
         try:
             self.channels.remove(msg.arguments[1])
-            self.autojoin_channels.remove(msg.arguments[1])
         except ValueError:
             pass
     
@@ -332,7 +329,7 @@ class IRCBot(asynchat.async_chat):
         self.real_nickname = msg.arguments[0]
         self.throttled = False
         # Queue the heartbeat
-        self.schedule.queue_command(2 * 60, self.keepalive, 'keepalive', persists=True)
+        self.schedule.queue_command(2 * 60, self.keepalive, persists=True)
     
     @event('ERRNICKNAMEINUSE')
     def on_nickinuse(self, msg):
@@ -359,16 +356,11 @@ class IRCBot(asynchat.async_chat):
         self.exit()
 
     def start(self):
-        self.shutdown_event = threading.Event()
-        while not self.shutdown_event.is_set():
+        while self.running:
             self.schedule.execute()
             asyncore.poll(timeout=1, map={self.socket: self})
-            self.reconnect_channels()
-
-    def reconnect_channels(self):
-        disconnected_channels = list(set(self.autojoin_channels) - set(self.connected_channels))
-        if disconnected_channels:
-            self.schedule.queue_command(5, functools.partial(self.join, disconnected_channels), 'join')
+            if set(self.channels) - set(self.connected_channels) and not self.connecting_to_channels:
+                self.schedule.queue_command(5, partial(self.join, self.channels))
 
     def identify_with_nickserv(self):
         """
@@ -386,9 +378,9 @@ class IRCBot(asynchat.async_chat):
             log.info('Identifying with NickServ as %s', self.nickname)
             self.send_privmsg('NickServ', 'IDENTIFY %s' % self.nickserv_password)
         if self.invite_nickname:
-            self.schedule.queue_command(5, self.request_channel_invite, 'request_channel_invite')
+            self.schedule.queue_command(5, self.request_channel_invite)
         else:
-            self.schedule.queue_command(5, functools.partial(self.join, self.channels), 'join')
+            self.schedule.queue_command(5, partial(self.join, self.channels))
 
     def request_channel_invite(self):
         """
@@ -397,7 +389,7 @@ class IRCBot(asynchat.async_chat):
         """
         log.info('Requesting an invite to channels %s from %s', self.channels, self.invite_nickname)
         self.send_privmsg(self.invite_nickname, self.invite_message)
-        self.schedule.queue_command(5, functools.partial(self.join, self.channels), 'join')
+        self.schedule.queue_command(5, partial(self.join, self.channels))
 
 
 @python_2_unicode_compatible

@@ -8,12 +8,12 @@ import threading
 import logging
 from random import choice
 from xml.etree.ElementTree import fromstring
-import urllib
+import io
 from uuid import uuid4
 import time
 import hashlib
-import functools
 import urllib
+from datetime import datetime, timedelta
 
 from flexget.entry import Entry
 from flexget.config_schema import register_config_key
@@ -21,6 +21,7 @@ from flexget.event import event
 from flexget.manager import manager
 from flexget.config_schema import one_or_more
 from flexget.plugins.daemon.irc_bot import irc_bot
+from flexget.plugins.daemon.irc_bot.irc_bot import partial
 from flexget.utils import requests
 
 log = logging.getLogger('irc')
@@ -229,27 +230,37 @@ class IRCConnection(irc_bot.IRCBot):
         self.entry_queue = []
         self.line_cache = {}
 
-        self.start_thread()
+    def start_connection(self):
+        self.thread = spawn_thread(self.connection_name, self)
 
     @classmethod
-    def read_tracker_config(cls, tracker_config_file):
-        with open(tracker_config_file, 'r') as f:
+    def read_tracker_config(cls, path):
+        """
+        Attempts to open and parse the .tracker file specified in path
+        :param path: path to .tracker file
+        :return: the parsed XML
+        """
+        with io.open(path, 'r') as f:
             try:
                 tracker_config = fromstring(f.read())
             except Exception as e:
-                raise TrackerFileParseError('Unable to parse tracker config file %s: %s' % (tracker_config_file, e))
+                raise TrackerFileParseError('Unable to parse tracker config file %s: %s' % (path, e))
             else:
                 return tracker_config
 
     @classmethod
     def retrieve_tracker_config(cls, tracker_config_file):
+        """
+        Will attempt to retrieve the .tracker file from disk or github. Returns the parsed XML.
+        :param tracker_config_file: URL or path to .tracker file
+        :return: parsed XML
+        """
         tracker_config_file = os.path.expanduser(tracker_config_file)
         if os.path.exists(tracker_config_file):
             return cls.read_tracker_config(tracker_config_file)
         elif re.match('^(?![\\\/]).+\.tracker$', tracker_config_file):
             tracker_basepath = os.path.abspath(os.path.join(manager.config_base, 'trackers'))
             save_path = os.path.join(tracker_basepath, tracker_config_file)
-            log.error(save_path)
             if not os.path.exists(tracker_basepath):
                 try:
                     os.mkdir(tracker_basepath)
@@ -260,7 +271,7 @@ class IRCConnection(irc_bot.IRCBot):
                 url = 'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/' + tracker_config_file
                 try:
                     r = requests.get(url)
-                    with open(save_path, 'wb') as tracker_file:
+                    with io.open(save_path, 'wb') as tracker_file:
                         for chunk in r.iter_content(8192):
                             tracker_file.write(chunk)
                 except (requests.RequestException, IOError) as e:
@@ -269,13 +280,15 @@ class IRCConnection(irc_bot.IRCBot):
         else:
             raise TrackerFileError('Unable to open tracker config file %s', tracker_config_file)
 
-    def start_thread(self):
-        self.thread = spawn_thread(self.connection_name, self)
-
     def is_alive(self):
         return self.thread and self.thread.is_alive()
 
     def parse_patterns(self, patterns):
+        """
+        Parses the patterns and creates a tuple with the compiled regex pattern and the variables it produces
+        :param patterns: list of regex patterns as .tracker XML
+        :return: list of (regex, variables)-pairs
+        """
         result = []
         for pattern in patterns:
             rx = re.compile(pattern.find('regex').get('value'), re.UNICODE | re.MULTILINE)
@@ -294,8 +307,7 @@ class IRCConnection(irc_bot.IRCBot):
 
     def run_tasks(self):
         """
-        Passes entries to the target task configured for this connection
-        :param entries:
+        Passes entries to the target task(s) configured for this connection
         :return:
         """
         tasks = self.config.get('task')
@@ -338,7 +350,7 @@ class IRCConnection(irc_bot.IRCBot):
         log.debug('Entry: %s', entry)
         if len(self.entry_queue) >= self.config['queue_size']:
             if self.config.get('task_delay'):
-                self.schedule.queue_command(self.config['task_delay'], self.run_tasks, 'run_tasks')
+                self.schedule.queue_command(self.config['task_delay'], self.run_tasks)
             else:
                 self.run_tasks()
 
@@ -414,6 +426,13 @@ class IRCConnection(irc_bot.IRCBot):
         return entry
 
     def match_message_patterns(self, patterns, msg, multiline=False):
+        """
+        Tries to match the message to the list of patterns. Supports multiline messages.
+        :param patterns: list of (regex, variable)-pairs
+        :param msg: The parsed IRC message
+        :param multiline: True if msg is multiline
+        :return: A dict of the variables and their extracted values
+        """
         result = {}
         for rx, vals in patterns:
             log.debug('Using pattern %s to parse message vars', rx.pattern)
@@ -582,6 +601,12 @@ class IRCConnection(irc_bot.IRCBot):
         return parsed_fields
 
     def on_privmsg(self, msg):
+        """
+        Appends messages for the specific channel in the line cache. Schedules a message processing after 1s to
+        handle multiline announcements. Might fail since 1s delay is arbitrarily chosen
+        :param msg: IRCMessage object
+        :return:
+        """
         nickname = msg.from_nick
         channel = msg.arguments[0]
         if not irc_bot.is_channel(channel):
@@ -594,8 +619,7 @@ class IRCConnection(irc_bot.IRCBot):
         self.line_cache[channel][nickname].append(msg.arguments[1])
         if len(self.line_cache[channel][nickname]) == 1:
             # Schedule a parse of the message in 1 second (for multilines)
-            self.schedule.queue_command(1, functools.partial(self.process_message, nickname, channel),
-                                        'process_message')
+            self.schedule.queue_command(1, partial(self.process_message, nickname, channel))
 
     def process_message(self, nickname, channel):
         """
@@ -636,6 +660,7 @@ def irc_update_config(manager):
 
     config = manager.config.get('irc')
 
+    # TODO this hashing doesn't quite work for nested dicts
     new_config_hash = hashlib.md5(str(sorted(list(config.items()))).encode('utf-8')).hexdigest()
     if config_hash == new_config_hash:
         log.debug('IRC config has not been changed. Not reloading the connections.')
@@ -660,7 +685,6 @@ class IRCConnectionManager(object):
         self.config = config
         self.shutdown_event = threading.Event()
         self.wait = False
-        self.restart_log = {}
         self.warning_delay = 30
         self.max_delay = 300  # 5 minutes
         self.thread = spawn_thread('irc_manager', self)
@@ -670,54 +694,78 @@ class IRCConnectionManager(object):
 
     def start(self):
         """
-        Checks for dead threads and attempts to restart them. Uses a pseudo exponential backoff strategy for
-        reconnecting to avoid being throttled by the IRC server(s).
+        Checks for dead threads and attempts to restart them. If the connection appears to be throttled, it won't
+        attempt to reconnect for 30s.
         :return:
         """
         global irc_connections
 
         self.start_connections()
 
+        schedule = {}  # used to keep track of reconnection schedules
+
         while not self.shutdown_event.is_set():
             for conn_name, conn in irc_connections.items():
-                if not conn and self.config.get(conn_name):
-                    irc_connections[conn_name] = IRCConnection(self.config[conn_name], conn_name)
-                elif not conn.is_alive() and self.restart_log[conn_name]['delay'] <= 0 and not conn.clean_exit:
-                    log.error('IRC connection for %s has died unexpectedly. Restarting it.', conn_name)
-                    self.restart_log[conn_name]['attempts'] += 1
-                    self.restart_log[conn_name]['delay'] = min(pow(2, self.restart_log[conn_name]['attempts']),
-                                                               self.max_delay)
-                    if conn.throttled:
-                        log.error('Server has throttled the connection. Adding 30s to reconnection delay.')
-                        self.restart_log[conn_name]['delay'] += 30
-                    irc_connections[conn_name] = IRCConnection(conn.config, conn_name)
+                # Don't want to revive if connection was closed cleanly
+                if not conn.running:
+                    del irc_connections[conn_name]
+                    continue
 
-                if self.restart_log[conn_name]['delay'] > 0:
-                    # reduce delay with 0.2 seconds. This is not meant to be precise, merely to avoid throttling.
-                    self.restart_log[conn_name]['delay'] -= 0.2
-                elif self.restart_log[conn_name]['attempts'] > 0:
-                    log.info('IRC connection for %s has been successfully restarted.', conn_name)
-                    self.restart_log[conn_name] = {'attempts': 0, 'delay': 0}
-            time.sleep(0.2)
+                now = datetime.now()
+                # Attempt to revive the thread if it has died. conn.running will be True if it died unexpectedly.
+                if not conn and self.config.get(conn_name):
+                    try:
+                        irc_connections[conn_name] = IRCConnection(self.config[conn_name], conn_name)
+                    except IOError as e:
+                        log.error(e)
+                        del irc_connections[conn_name]
+                elif not conn.is_alive() and conn.running:
+                    if conn_name not in schedule:
+                        schedule[conn_name] = now + timedelta(seconds=5)
+                    # add extra time if throttled
+                    if conn.throttled:
+                        schedule[conn_name] += timedelta(seconds=30)
+
+                    # is it time yet?
+                    if schedule[conn_name] <= now:
+                        log.error('IRC connection for %s has died unexpectedly. Restarting it.', conn_name)
+                        try:
+                            irc_connections[conn_name] = IRCConnection(conn.config, conn_name)
+                            # remove it from the schedule
+                            del schedule[conn_name]
+                        except IOError as e:
+                            log.error(e)
+                            del irc_connections[conn_name]
+
+            time.sleep(1)
 
         self.stop_connections(self.wait)
 
     def start_connections(self):
+        """
+        Start all the irc connections. Stop the daemon if there are failures.
+        :return:
+        """
         global irc_connections
 
+        # First we validate the config for all connections including their .tracker files
         errors = 0
         for conn_name, connection in self.config.items():
             try:
                 log.info('Starting IRC connection for %s', conn_name)
                 conn = IRCConnection(connection, conn_name)
                 irc_connections[conn_name] = conn
-                self.restart_log[conn_name] = {'attempts': 0, 'delay': 0}
-            except (MissingConfigOption, TrackerFileParseError, TrackerFileError) as e:
+            except (MissingConfigOption, TrackerFileParseError, TrackerFileError, IOError) as e:
                 log.error(e)
                 errors += 1
         if errors:
             from flexget.manager import manager
             manager.shutdown(finish_queue=False)
+            return
+
+        # Now we can start
+        for conn_name, connection in irc_connections.items():
+            connection.start_connection()
 
     def stop_connections(self, wait):
         global irc_connections
