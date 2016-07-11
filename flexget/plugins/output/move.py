@@ -244,6 +244,8 @@ class TransformingOps(BaseFileOps):
                 except Exception as err:
                     self.log.warning(str(err))
         entry['output'] = dst
+        entry['old_location'] = entry['location']
+        entry['location'] = dst
         if self.move and not src_isdir:
             self.clean_source(task, config, entry)
 

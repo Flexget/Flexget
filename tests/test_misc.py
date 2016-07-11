@@ -140,8 +140,8 @@ class TestDownload(object):
         tmp_umask = os.umask(curr_umask)
         # executes task and downloads the file
         task = execute_task('test')
-        assert task.entries[0]['output'], 'output missing?'
-        testfile = task.entries[0]['output']
+        assert task.entries[0]['location'], 'location missing?'
+        testfile = task.entries[0]['location']
         assert os.path.exists(testfile), 'download file does not exists'
         testfile_stat = os.stat(testfile)
         modes_equal = 0o666 - curr_umask == stat.S_IMODE(testfile_stat.st_mode)
