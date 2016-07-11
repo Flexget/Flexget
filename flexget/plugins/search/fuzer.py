@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
 
 import hashlib
@@ -14,11 +15,13 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.utils import requests
+from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('fuzer')
+
+requests = RequestSession()
 
 CATEGORIES = {
     # Movies
@@ -87,6 +90,10 @@ class UrlRewriteFuzer(object):
             login = requests.post('https://www.fuzer.me/login.php?do=login', data=data)
         except RequestException as e:
             raise PluginError('Could not connect to fuzer: %s', str(e))
+
+        login_check_phrases = ['ההתחברות נכשלה', 'banned']
+        if any(phrase in login.text for phrase in login_check_phrases):
+            raise PluginError('Login to Fuzer failed, check credentials')
 
         user_id = requests.cookies.get('fzr2userid')
         category = config.get('category', [0])
