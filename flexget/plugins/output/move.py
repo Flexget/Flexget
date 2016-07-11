@@ -243,6 +243,7 @@ class TransformingOps(BaseFileOps):
                     self.log.info('`%s` has been %s to `%s` as well.' % (s, funct_done, d))
                 except Exception as err:
                     self.log.warning(str(err))
+        entry['output'] = dst
         entry['old_location'] = entry['location']
         entry['location'] = dst
         if self.move and not src_isdir:
