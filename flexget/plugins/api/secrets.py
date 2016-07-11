@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import codecs
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
@@ -25,7 +27,7 @@ class SecretsAPI(APIResource):
         if not secret_file:
             raise NotFoundError('No secret file defined in configuration')
         secret_file_path = os.path.join(self.manager.config_base, secret_file)
-        with open(secret_file_path, 'r', encoding='utf-8') as f:
+        with codecs.open(secret_file_path, 'rb', 'utf-8') as f:
             secrets = yaml.load(f)
             return secrets
 
@@ -38,6 +40,6 @@ class SecretsAPI(APIResource):
         if not secret_file:
             raise NotFoundError('No secret file defined in configuration')
         secret_file_path = os.path.join(self.manager.config_base, secret_file)
-        with open(secret_file_path, 'w', encoding='utf-8') as f:
+        with codecs.open(secret_file_path, 'w', 'utf-8') as f:
             f.write(yaml.safe_dump(data, default_flow_style=False).decode('utf-8'))
             return data, 201
