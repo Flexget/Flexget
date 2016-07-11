@@ -73,7 +73,7 @@ class UrlRewriteFuzer(object):
         """
         rss_key = config['rss_key']
         username = config['username']
-        password = hashlib.md5(config['password']).hexdigest()
+        password = hashlib.md5(config['password'].encode('utf-8')).hexdigest()
 
         # build the form request:
         data = {'cookieuser': '1',
