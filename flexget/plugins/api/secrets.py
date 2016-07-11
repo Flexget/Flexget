@@ -1,14 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
-
-import os
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
+import os
 
 import yaml
 from flask import request
 
-from flexget.api import api, APIResource, NotFoundError, ApiError
+from flexget.api import api, APIResource, NotFoundError
 
 log = logging.getLogger('secrets')
 
@@ -42,5 +41,3 @@ class SecretsAPI(APIResource):
         with open(secret_file_path, 'w', encoding='utf-8') as f:
             f.write(yaml.safe_dump(data, default_flow_style=False).decode('utf-8'))
             return data, 201
-
-
