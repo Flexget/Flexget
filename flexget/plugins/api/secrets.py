@@ -18,7 +18,6 @@ empty_object = api.schema('empty_object', {'type': 'object'})
 
 
 @secrets_api.route('/')
-@api.doc(description='Note that changing the secret file may change its structure')
 class SecretsAPI(APIResource):
     @api.response(200)
     @api.response(NotFoundError)
