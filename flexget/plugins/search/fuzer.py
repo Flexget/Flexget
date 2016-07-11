@@ -144,8 +144,7 @@ class UrlRewriteFuzer(object):
 
                 e = Entry()
                 e['title'] = title
-                final_url = 'https://www.fuzer.me/rss/torrent.php/{}/{}/{}/{}.torrent'.format(attachment_id,
-                                                                                              user_id,
+                final_url = 'https://www.fuzer.me/rss/torrent.php/{}/{}/{}/{}.torrent'.format(attachment_id, user_id,
                                                                                               rss_key, title)
 
                 log.debug('RSS-ified download link: %s' % final_url)
