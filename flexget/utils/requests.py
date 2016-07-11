@@ -16,7 +16,7 @@ import warnings
 from requests import RequestException
 from sqlalchemy.orm import relation
 from sqlalchemy.sql.schema import ForeignKey
-from sqlalchemy.sql.sqltypes import Unicode, Boolean, DateTime, String
+from sqlalchemy.sql.sqltypes import Unicode, Boolean, DateTime
 
 from flexget import db_schema, __version__ as version
 from flexget.utils.database import with_session
@@ -55,10 +55,6 @@ class CachedCookieJar(Base):
 
     @property
     def cookiejar(self):
-        """
-        Return a CookieJar object of cached cookies. If any of the cached cookies is expired, return None
-        :return: CookieJar or None
-        """
         if not self.cached_cookies:
             log.debug('no cached cookies for plugin %s with identifier %s' % (self.plugin_name, self.identifier))
             return
@@ -66,7 +62,7 @@ class CachedCookieJar(Base):
         for cookie in self.cached_cookies:
             ck = cookies.create_cookie(**cookie.to_dict())
             if ck.is_expired():
-                log.debug('cached cookie is expired, returning None')
+                log.debug('cached cookie is expired')
                 return
             cj.set_cookie(ck)
         return cj
@@ -82,14 +78,14 @@ class CachedCookies(Base):
     comment = Column(Unicode)
     comment_url = Column(Unicode)
     discard = Column(Boolean)
-    domain = Column(String)
+    domain = Column(Unicode)
     expires = Column(Integer)
-    name = Column(String)
-    path = Column(String)
+    name = Column(Unicode)
+    path = Column(Unicode)
     port = Column(Unicode)
     rfc2109 = Column(Boolean)
     secure = Column(Boolean)
-    value = Column(String)
+    value = Column(Unicode)
     version = Column(Integer)
 
     def __init__(self, cookie):
@@ -339,19 +335,9 @@ class Session(requests.Session):
 
     @with_session
     def cached_cookies(self, plugin_name, identifier, session=None):
-        """
-        Tries to load cached CookieJar from DB based on plugin name and identifier (username for example).
-        Loads CookieJar to Session if found.
-        :param plugin_name: Name of plugin to cache
-        :param identifier: identifier to use with said plugin, allows caching multiple CookieJars per plugin with
-         different user names
-        :param session: DB Session
-        :return: Return found CookieJar or None
-        """
         ccj = session.query(CachedCookieJar).filter(CachedCookieJar.plugin_name == plugin_name,
                                                     CachedCookieJar.identifier == identifier).first()
         if ccj is None or ccj.cookiejar is None:
-            log.debug('no cached cookies have been found for plugin %s with identifier %s', plugin_name, identifier)
             return
         log.debug('found cached cookiejar, adding to Session')
         self.add_cookiejar(ccj.cookiejar)
@@ -359,15 +345,6 @@ class Session(requests.Session):
 
     @with_session
     def cache_cookies(self, cookiejar, plugin_name, identifier, session=None):
-        """
-        Caches CookieJar to DB
-        :param cookiejar: CookieJar to cache
-        :param plugin_name: Name of plugin to cache
-        :param identifier: identifier to use with said plugin, allows caching multiple CookieJars per plugin with
-         different user names
-        :param session: DB Session
-        :return: None, loads cached CookieJar to session
-        """
         cj = CachedCookieJar(plugin_name, identifier)
         cached_cookies = []
         for cookie in cookiejar:
@@ -376,7 +353,7 @@ class Session(requests.Session):
         cj.cached_cookies = cached_cookies
         session.merge(cj)
         self.add_cookiejar(cookiejar)
-        log.debug('cookies have been successfully cached and loaded to Session')
+        log.debug('cookies have been cached and loaded to Session')
 
 
 # Define some module level functions that use our Session, so this module can be used like main requests module
