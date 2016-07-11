@@ -1,27 +1,19 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-
 from future.moves.urllib.request import urlopen
 from future.moves.urllib.parse import urlparse
-from http.cookiejar import CookieJar
 
 import time
 import logging
 from datetime import timedelta, datetime
 
 import requests
-from requests import cookies
 # Allow some request objects to be imported from here instead of requests
 import warnings
-from requests import RequestException
-from sqlalchemy.orm import relation
-from sqlalchemy.sql.schema import ForeignKey
-from sqlalchemy.sql.sqltypes import Unicode, Boolean, DateTime
+from requests import RequestException, HTTPError
 
-from flexget import db_schema, __version__ as version
-from flexget.utils.database import with_session
+from flexget import __version__ as version
 from flexget.utils.tools import parse_timedelta, TimedDict, timedelta_total_seconds
-from sqlalchemy import Column, Integer
 
 # If we use just 'requests' here, we'll get the logger created by requests, rather than our own
 log = logging.getLogger('utils.requests')
@@ -35,88 +27,6 @@ logging.getLogger('urllib3').setLevel(logging.WARNING)
 WAIT_TIME = timedelta(seconds=60)
 # Remembers sites that have timed out
 unresponsive_hosts = TimedDict(WAIT_TIME)
-
-DB_VERSION = 0
-Base = db_schema.versioned_base('cookies', DB_VERSION)
-
-
-class CachedCookieJar(Base):
-    __tablename__ = 'cached_cookiejar'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    plugin_name = Column(Unicode, nullable=False)
-    identifier = Column(Unicode)
-    cached_cookies = relation('CachedCookies', cascade='all, delete, delete-orphan', backref='cookiejar')
-    added = Column(DateTime, default=datetime.now)
-
-    def __init__(self, plugin_name, identifier):
-        self.plugin_name = plugin_name
-        self.identifier = identifier
-
-    @property
-    def cookiejar(self):
-        if not self.cached_cookies:
-            log.debug('no cached cookies for plugin %s with identifier %s' % (self.plugin_name, self.identifier))
-            return
-        cj = CookieJar()
-        for cookie in self.cached_cookies:
-            ck = cookies.create_cookie(**cookie.to_dict())
-            if ck.is_expired():
-                log.debug('cached cookie is expired')
-                return
-            cj.set_cookie(ck)
-        return cj
-
-
-class CachedCookies(Base):
-    __tablename__ = 'cached_cookies'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    cookiejar_id = Column(Integer, ForeignKey('cached_cookiejar.id'))
-    added = Column(DateTime, default=datetime.now)
-
-    comment = Column(Unicode)
-    comment_url = Column(Unicode)
-    discard = Column(Boolean)
-    domain = Column(Unicode)
-    expires = Column(Integer)
-    name = Column(Unicode)
-    path = Column(Unicode)
-    port = Column(Unicode)
-    rfc2109 = Column(Boolean)
-    secure = Column(Boolean)
-    value = Column(Unicode)
-    version = Column(Integer)
-
-    def __init__(self, cookie):
-        self.comment = cookie.comment
-        self.comment_url = cookie.comment_url
-        self.discard = cookie.discard
-        self.domain = cookie.domain
-        self.expires = cookie.expires
-        self.name = cookie.name
-        self.path = cookie.path
-        self.port = cookie.port
-        self.rfc2109 = cookie.rfc2109
-        self.secure = cookie.secure
-        self.value = cookie.value
-        self.version = cookie.version
-
-    def to_dict(self):
-        return {
-            'comment': self.comment,
-            'comment_url': self.comment_url,
-            'discard': self.discard,
-            'domain': self.domain,
-            'expires': self.expires,
-            'name': self.name,
-            'path': self.path,
-            'port': self.port,
-            'rfc2109': self.rfc2109,
-            'secure': self.secure,
-            'value': self.value,
-            'version': self.version
-        }
 
 
 def is_unresponsive(url):
@@ -162,7 +72,7 @@ class TokenBucketLimiter(DomainLimiter):
     # This is just an in memory cache right now, it works for the daemon, and across tasks in a single execution
     # but not for multiple executions via cron. Do we need to store this to db?
     state_cache = {}
-
+    
     def __init__(self, domain, tokens, rate, wait=True):
         """
         :param int tokens: Size of bucket
@@ -210,7 +120,6 @@ class TokenBucketLimiter(DomainLimiter):
 
 class TimedLimiter(TokenBucketLimiter):
     """Enforces a minimum interval between requests to a given domain."""
-
     def __init__(self, domain, interval):
         super(TimedLimiter, self).__init__(domain, 1, interval)
 
@@ -287,7 +196,7 @@ class Session(requests.Session):
         """
         warnings.warn('set_domain_delay is deprecated, use add_domain_limiter', DeprecationWarning, stacklevel=2)
         self.domain_limiters[domain] = TimedLimiter(domain, delay)
-
+            
     def add_domain_limiter(self, limiter):
         """
         Add a limiter to throttle requests to a specific domain.
@@ -307,7 +216,7 @@ class Session(requests.Session):
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
             raise requests.Timeout('Requests to this site (%s) have timed out recently. Waiting before trying again.' %
-                                   urlparse(url).hostname)
+                urlparse(url).hostname)
 
         # Run domain limiters for this url
         limit_domains(url, self.domain_limiters)
@@ -332,28 +241,6 @@ class Session(requests.Session):
             result.raise_for_status()
 
         return result
-
-    @with_session
-    def cached_cookies(self, plugin_name, identifier, session=None):
-        ccj = session.query(CachedCookieJar).filter(CachedCookieJar.plugin_name == plugin_name,
-                                                    CachedCookieJar.identifier == identifier).first()
-        if ccj is None or ccj.cookiejar is None:
-            return
-        log.debug('found cached cookiejar, adding to Session')
-        self.add_cookiejar(ccj.cookiejar)
-        return cookies
-
-    @with_session
-    def cache_cookies(self, cookiejar, plugin_name, identifier, session=None):
-        cj = CachedCookieJar(plugin_name, identifier)
-        cached_cookies = []
-        for cookie in cookiejar:
-            ck = CachedCookies(cookie)
-            cached_cookies.append(ck)
-        cj.cached_cookies = cached_cookies
-        session.merge(cj)
-        self.add_cookiejar(cookiejar)
-        log.debug('cookies have been cached and loaded to Session')
 
 
 # Define some module level functions that use our Session, so this module can be used like main requests module
