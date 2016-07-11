@@ -368,18 +368,13 @@ class Session(requests.Session):
         :param session: DB Session
         :return: None, loads cached CookieJar to session
         """
-        ccj = session.query(CachedCookieJar).filter(CachedCookieJar.plugin_name == plugin_name,
-                                                    CachedCookieJar.identifier == identifier).first()
-        if ccj:
-            log.debug('found existing cookie jar, removing')
-            session.delete(ccj)
-        ccj = CachedCookieJar(plugin_name, identifier)
+        cj = CachedCookieJar(plugin_name, identifier)
         cached_cookies = []
         for cookie in cookiejar:
             ck = CachedCookies(cookie)
             cached_cookies.append(ck)
-        ccj.cached_cookies = cached_cookies
-        session.add(ccj)
+        cj.cached_cookies = cached_cookies
+        session.merge(cj)
         self.add_cookiejar(cookiejar)
         log.debug('cookies have been successfully cached and loaded to Session')
 
