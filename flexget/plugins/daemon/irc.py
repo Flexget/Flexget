@@ -229,6 +229,7 @@ class IRCConnection(irc_bot.IRCBot):
         self.inject_before_shutdown = False
         self.entry_queue = []
         self.line_cache = {}
+        self.thread = None
 
     def start_connection(self):
         self.thread = spawn_thread(self.connection_name, self)
@@ -350,7 +351,7 @@ class IRCConnection(irc_bot.IRCBot):
         log.debug('Entry: %s', entry)
         if len(self.entry_queue) >= self.config['queue_size']:
             if self.config.get('task_delay'):
-                self.schedule.queue_command(self.config['task_delay'], self.run_tasks)
+                self.schedule.queue_command(self.config['task_delay'], self.run_tasks, unique=False)
             else:
                 self.run_tasks()
 

@@ -14,7 +14,7 @@ import logging
 import re
 import ssl
 import socket
-import threading
+import sys
 import uuid
 
 from flexget.plugins.daemon.irc_bot.numeric_replies import REPLY_CODES
@@ -85,6 +85,13 @@ class QueuedCommand(object):
     def __lt__(self, other):
         return self.scheduled_time < other.scheduled_time
 
+    def __eq__(self, other):
+        commands_match = self.command.__name__ == other.command.__name__
+        if hasattr(self.command, 'args') and hasattr(other.command, 'args'):
+            return commands_match and set(self.command.args) == set(other.command.args)
+        else:
+            return commands_match
+
 
 class Schedule(object):
 
@@ -102,11 +109,12 @@ class Schedule(object):
             else:
                 break
 
-    def queue_command(self, after, cmd, persists=False):
+    def queue_command(self, after, cmd, persists=False, unique=True):
         log.debug('Queueing command "%s" to execute in %s second(s)', cmd.__name__, after)
         timestamp = datetime.datetime.now() + datetime.timedelta(seconds=after)
         queued_command = QueuedCommand(after, timestamp, cmd, persists)
-        bisect.insort(self.queue, queued_command)
+        if not unique or queued_command not in self.queue:
+            bisect.insort(self.queue, queued_command)
 
 
 def is_channel(string):
@@ -243,7 +251,6 @@ class IRCBot(asynchat.async_chat):
                 continue
             log.info('Joining channel: %s', channel)
             self.write('JOIN %s' % channel)
-        self.connecting_to_channels = False
 
     def found_terminator(self):
         lines = self._process_message(self.buffer)
@@ -308,6 +315,8 @@ class IRCBot(asynchat.async_chat):
         if msg.from_nick == self.real_nickname:
             log.info('Joined channel %s', msg.arguments[0])
             self.connected_channels.append(msg.arguments[0])
+        if not set(self.channels) - set(self.connected_channels):
+            self.connecting_to_channels = False
 
     @event('KICK')
     def on_kick(self, msg):
@@ -349,7 +358,8 @@ class IRCBot(asynchat.async_chat):
 
     def write(self, msg):
         log.debug('SENT: %s', msg)
-        self.send(msg + '\r\n')
+        unencoded_msg = msg + '\r\n'
+        self.send(unencoded_msg.encode())
 
     def quit(self):
         self.write('QUIT :I\'m outta here!')
