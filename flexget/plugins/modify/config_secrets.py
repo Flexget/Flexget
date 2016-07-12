@@ -58,6 +58,15 @@ def secrets_from_db():
             return {}
 
 
+def secrets_to_db(secrets_dict):
+    with Session() as session:
+        secrets = session.query(Secrets).first()
+        if not secrets:
+            secrets = Secrets()
+        secrets.secrets = secrets_dict
+        session.merge(secrets)
+
+
 @event('manager.before_config_validate')
 def process_secrets(config, manager):
     """Adds the secrets to the jinja environment globals and attempt to render all string elements of the config."""
@@ -71,6 +80,8 @@ def process_secrets(config, manager):
     else:
         log.debug('trying to load secrets from file')
         secrets = secrets_from_file(manager.config_base, config['secrets'])
+        log.debug('updating DB with secret file contents')
+        secrets_to_db(secrets)
     environment.globals['secrets'] = secrets
     _process(config, environment)
     return config
