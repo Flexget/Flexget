@@ -93,7 +93,7 @@ irc_manager = None
 config_hash = None
 
 
-def spawn_thread(name, conn):
+def create_thread(name, conn):
     """
     Creates a new thread and starts it
     :param conn: IRCConnection or IRCConnectionManager object
@@ -101,7 +101,6 @@ def spawn_thread(name, conn):
     """
     thread = threading.Thread(target=conn.start, name=name)
     thread.setDaemon(True)
-    thread.start()
     return thread
 
 
@@ -229,10 +228,7 @@ class IRCConnection(irc_bot.IRCBot):
         self.inject_before_shutdown = False
         self.entry_queue = []
         self.line_cache = {}
-        self.thread = None
-
-    def start_connection(self):
-        self.thread = spawn_thread(self.connection_name, self)
+        self.thread = create_thread(self.connection_name, self)
 
     @classmethod
     def read_tracker_config(cls, path):
@@ -458,6 +454,7 @@ class IRCConnection(irc_bot.IRCBot):
         """
 
         parsed_fields = {}
+        ignore_optionals = []
 
         if rules is None:
             rules = self.tracker_config.find('parseinfo/linematched')
@@ -509,6 +506,7 @@ class IRCConnection(irc_bot.IRCBot):
                 if source_var not in entry:
                     if rule.get('optional', 'false') == 'false':
                         log.error('Error processing extract rule, non-optional value %s missing!', source_var)
+                    ignore_optionals.append(source_var)
                     continue
                 if rule.find('regex') is not None:
                     regex = rule.find('regex').get('value')
@@ -526,6 +524,8 @@ class IRCConnection(irc_bot.IRCBot):
             elif rule.tag == 'extracttags':
                 source_var = irc_prefix(rule.get('srcvar'))
                 split = rule.get('split')
+                if source_var in ignore_optionals:
+                    continue
                 values = [strip_whitespace(x) for x in entry[source_var].split(split)]
                 for element in rule:
                     if element.tag == 'setvarif':
@@ -688,7 +688,8 @@ class IRCConnectionManager(object):
         self.wait = False
         self.warning_delay = 30
         self.max_delay = 300  # 5 minutes
-        self.thread = spawn_thread('irc_manager', self)
+        self.thread = create_thread('irc_manager', self)
+        self.thread.start()
 
     def is_alive(self):
         return self.thread and self.thread.is_alive()
@@ -717,6 +718,7 @@ class IRCConnectionManager(object):
                 if not conn and self.config.get(conn_name):
                     try:
                         irc_connections[conn_name] = IRCConnection(self.config[conn_name], conn_name)
+                        irc_connections[conn_name].thread.start()
                     except IOError as e:
                         log.error(e)
                         del irc_connections[conn_name]
@@ -731,7 +733,9 @@ class IRCConnectionManager(object):
                     if schedule[conn_name] <= now:
                         log.error('IRC connection for %s has died unexpectedly. Restarting it.', conn_name)
                         try:
+                            irc_connections[conn_name].close()  # close connection if it's still alive
                             irc_connections[conn_name] = IRCConnection(conn.config, conn_name)
+                            irc_connections[conn_name].thread.start()
                             # remove it from the schedule
                             del schedule[conn_name]
                         except IOError as e:
@@ -766,7 +770,7 @@ class IRCConnectionManager(object):
 
         # Now we can start
         for conn_name, connection in irc_connections.items():
-            connection.start_connection()
+            connection.thread.start()
 
     def stop_connections(self, wait):
         global irc_connections
