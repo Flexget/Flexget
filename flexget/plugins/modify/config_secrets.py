@@ -36,12 +36,11 @@ class Secrets(Base):
     added = Column(DateTime, default=datetime.now)
 
 
-def secrets_from_file(config_base, filename):
-    secret_file = os.path.join(config_base, filename)
-    if not os.path.exists(secret_file):
-        raise PluginError('File %s does not exist!' % secret_file)
+def secrets_from_file(file_path):
+    if not os.path.exists(file_path):
+        raise PluginError('File %s does not exist!' % file_path)
     try:
-        with codecs.open(secret_file, 'rb', 'utf-8') as f:
+        with codecs.open(file_path, 'rb', 'utf-8') as f:
             raw_secrets = f.read()
             secrets_dict = yaml.safe_load(raw_secrets)
     except yaml.YAMLError as e:
@@ -79,7 +78,8 @@ def process_secrets(config, manager):
         secrets = secrets_from_db()
     else:
         log.debug('trying to load secrets from file')
-        secrets = secrets_from_file(manager.config_base, config['secrets'])
+        secret_file_path = os.path.join(manager.config_base, config['secrets'])
+        secrets = secrets_from_file(secret_file_path)
         log.debug('updating DB with secret file contents')
         secrets_to_db(secrets)
     environment.globals['secrets'] = secrets
