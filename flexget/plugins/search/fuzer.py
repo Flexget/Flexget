@@ -89,7 +89,7 @@ class UrlRewriteFuzer(object):
         try:
             login = requests.post('https://www.fuzer.me/login.php?do=login', data=data)
         except RequestException as e:
-            raise PluginError('Could not connect to fuzer: %s', str(e))
+            raise PluginError('Could not connect to fuzer: %s' % str(e))
 
         login_check_phrases = ['ההתחברות נכשלה', 'banned']
         if any(phrase in login.text for phrase in login_check_phrases):
