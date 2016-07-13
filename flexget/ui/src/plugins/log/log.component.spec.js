@@ -68,7 +68,7 @@ describe("Plugin: Log.component", function () {
 	});
 
 	//TODO: TEST	
-	describe('stop()', function () {
+	/*describe('stop()', function () {
 		it('should set', function () {
 			controller.stream = true;
 			
@@ -79,14 +79,14 @@ describe("Plugin: Log.component", function () {
 				vm.stream = false;
 				vm.status = "Disconnected";
 			}
-*/
+
 
 			expect(true).to.be.true;
 
 
 
 		});
-	});
+	});*/
 
 	//TODO: TEST	
 	describe('start()', function () {
