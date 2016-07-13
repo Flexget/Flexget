@@ -41,8 +41,7 @@ def secrets_from_file(file_path):
         raise PluginError('File %s does not exist!' % file_path)
     try:
         with codecs.open(file_path, 'rb', 'utf-8') as f:
-            raw_secrets = f.read()
-            secrets_dict = yaml.safe_load(raw_secrets)
+            secrets_dict = yaml.safe_load(f.read())
     except yaml.YAMLError as e:
         raise PluginError('Invalid secrets file: %s' % e)
     return secrets_dict or {}
