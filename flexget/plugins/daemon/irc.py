@@ -660,6 +660,11 @@ def irc_update_config(manager):
         return
 
     config = manager.config.get('irc')
+    # No config, no connections
+    if not config:
+        log.info('No irc connections defined in the config')
+        stop_irc(manager)
+        return
 
     # TODO this hashing doesn't quite work for nested dicts
     new_config_hash = hashlib.md5(str(sorted(list(config.items()))).encode('utf-8')).hexdigest()
@@ -671,11 +676,6 @@ def irc_update_config(manager):
 
     # Config for IRC has been removed, shutdown all instances
     stop_irc(manager)
-
-    # No config, no connections
-    if not config:
-        log.info('No irc connections defined in the config')
-        return
 
     irc_manager = IRCConnectionManager(config)
 
