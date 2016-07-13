@@ -9,16 +9,16 @@
 			controller: logController
 		});
 
-	function logController($scope) {
+	function logController($scope, logService) {
 		var vm = this;
 
-		vm.logStream = false;
-		vm.toggle = toggle;
+		vm.$onInit = activate;
+		vm.start = start;
 		vm.clear = clear;
+		vm.toggle = toggle;
 		vm.refresh = refresh;
 		vm.$onDestroy = destroy;
-
-		vm.status = 'Connecting';
+		vm.stop = stop;
 
 		vm.filter = {
 			lines: 400,
@@ -29,31 +29,38 @@
 			debounce: 1000
 		};
 
+		function activate() {
+			vm.start();
+		}
+
 		function toggle() {
 			if (vm.status == 'Disconnected') {
-				vm.refresh();
+				vm.start();
 			} else {
-				stop();
+				vm.stop();
 			}
-		};
+		}
 
 		function clear() {
 			vm.gridOptions.data = [];
-		};
+		}
 
 		function stop() {
-			if (typeof vm.logStream !== 'undefined' && vm.logStream) {
-				vm.logStream.abort();
-				vm.logStream = false;
+			if (typeof vm.stream !== 'undefined' && vm.stream) {
+				vm.stream.abort();
+				vm.stream = false;
 				vm.status = "Disconnected";
 			}
-
-		};
+		}
 
 		function refresh() {
 			// Disconnect existing log streams
-			stop();
+			vm.stop();
 
+			vm.start();
+		}
+
+		function start() {
 			vm.status = "Connecting";
 			vm.gridOptions.data = [];
 
@@ -62,23 +69,23 @@
 				queryParams = queryParams + '&search=' + vm.filter.search;
 			}
 
-			vm.logStream = oboe({ url: '/api/server/log/' + queryParams })
-				.start(function () {
-					$scope.$applyAsync(function () {
-						vm.status = "Streaming";
-					});
-				})
-				.node('{message}', function (node) {
-					$scope.$applyAsync(function () {
-						vm.gridOptions.data.push(node);
-					});
-				})
-				.fail(function (test) {
-					$scope.$applyAsync(function () {
-						vm.status = "Disconnected";
-					});
-				})
-		};
+			vm.stream = logService.startLogStream(queryParams)
+				.start(startFunction)
+				.message(messageFunction)
+				.catch(failFunction);
+			
+			function startFunction() {
+				vm.status = "Streaming";
+			}
+
+			function messageFunction(message) {
+				vm.gridOptions.data.push(message);
+			}
+
+			function failFunction() {
+				vm.status = "Disconnected";
+			}
+		}
 
 		vm.gridOptions = {
 			data: [],
@@ -91,17 +98,13 @@
 				{ field: 'task', name: 'Task', enableSorting: false, width: 65, cellTooltip: true },
 				{ field: 'message', name: 'Message', enableSorting: false, minWidth: 400, cellTooltip: true }
 			],
-			rowTemplate: "row-template.html",
-			onRegisterApi: function (gridApi) {
-				vm.gridApi = gridApi;
-				vm.refresh();
-			}
+			rowTemplate: "row-template.html"
 		};
 
 		// Cancel timer and stop the stream when navigating away
 		function destroy() {
-			stop();
-		};
+			vm.stop();
+		}
 	}
 
 })();

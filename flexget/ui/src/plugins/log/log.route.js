@@ -18,10 +18,10 @@
 
 		function goToRoute() {
 			$state.go('flexget.log');
-		};
+		}
 
 		toolBarService.registerItem(logButton);
-	};
+	}
 
 	function getStates() {
 		return [

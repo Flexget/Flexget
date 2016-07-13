@@ -21,13 +21,13 @@ describe('Log Routes:', function () {
 	describe("Transitions", function() {
 		it("should work with $state.go", function () {
 			$state.go('flexget.log');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.log')).to.be.true;
 		});
 		
 		it("should work with 'log' path", function() {
 			$location.path('log');
-			$rootScope.$apply();
+			$rootScope.$digest();
 			expect($state.is('flexget.log')).to.be.true;
 		});
 	});
