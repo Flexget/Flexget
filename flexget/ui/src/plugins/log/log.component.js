@@ -69,8 +69,9 @@
 				queryParams = queryParams + '&search=' + vm.filter.search;
 			}
 
-			vm.stream = logService.startLogStream(queryParams)
-				.start(startFunction)
+			vm.stream = logService.startLogStream(queryParams);
+
+			vm.stream.start(startFunction)
 				.message(messageFunction)
 				.catch(failFunction);
 			

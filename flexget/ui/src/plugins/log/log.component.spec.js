@@ -4,7 +4,7 @@ describe("Plugin: Log.component", function () {
 	beforeEach(function () {
 		bard.appModule('plugins.log');
 
-		bard.inject('$componentController', '$q', '$rootScope');
+		bard.inject('$componentController', '$q', '$rootScope', 'logService');
 	});
 
 	beforeEach(function () {
@@ -68,25 +68,14 @@ describe("Plugin: Log.component", function () {
 	});
 
 	//TODO: TEST	
-	/*describe('stop()', function () {
-		it('should set', function () {
-			controller.stream = true;
-			
-			sinon.stub(controller, 'stream.abort')
-			
-		/*	if (typeof vm.stream !== 'undefined' && vm.stream) {
-				vm.stream.abort();
-				vm.stream = false;
-				vm.status = "Disconnected";
-			}
-
-
+	describe('stop()', function () {
+		it('should get tested', function () {
 			expect(true).to.be.true;
-
-
-
+			/*controller.stream = true;
+			
+			sinon.stub(logService.startLogStream, 'abort');*/
 		});
-	});*/
+	});
 
 	//TODO: TEST	
 	describe('start()', function () {

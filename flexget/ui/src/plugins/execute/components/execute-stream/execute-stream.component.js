@@ -47,8 +47,9 @@
 			vm.options.log = true;
 			vm.options.entry_dump = true;
 
-			stream = executeService.executeTasks(vm.options)
-				.log(logNode)
+			stream = executeService.executeTasks(vm.options);
+
+			stream.log(logNode)
 				.progress(progressNode)
 				.summary(summaryNode)
 				.entry_dump(entryDumpNode);
