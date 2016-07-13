@@ -171,12 +171,13 @@ class IRCBot(asynchat.async_chat):
         log.info('Connecting to %s', (self.server, self.port))
         self.connect((self.server, self.port))
         self.buffer = ''
-        self.connection_attempts = 0
+        self.connection_attempts = 1
         self.max_connection_delay = 300  # 5 minutes
         self.throttled = False
         self.schedule = Schedule()
         self.running = True
         self.connecting_to_channels = True
+        self.reconnecting = False
 
     def handle_expt_event(self):
         error = self.socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
@@ -189,20 +190,19 @@ class IRCBot(asynchat.async_chat):
         self.handle_error()
 
     def _handshake(self):
-        while True:
-            try:
-                self.socket.do_handshake()
-            except (ssl.SSLWantReadError, ssl.SSLWantWriteError):
-                pass
-            else:
-                break
+        try:
+            self.socket.do_handshake(block=True)
+        except (ssl.SSLWantReadError, ssl.SSLWantWriteError):
+            pass
 
     def handle_read(self):
-        try:
-            asynchat.async_chat.handle_read(self)
-        except (ssl.SSLWantReadError, ssl.SSLWantWriteError) as e:
-            log.warning(e)
-            self._handshake()
+        while True:
+            try:
+                asynchat.async_chat.handle_read(self)
+            except (ssl.SSLWantReadError, ssl.SSLWantWriteError):
+                self._handshake()
+            else:
+                break
 
     def handle_connect(self):
         if self.use_ssl:
@@ -218,14 +218,17 @@ class IRCBot(asynchat.async_chat):
                 return
             self.socket.setblocking(False)
 
+        self.reconnecting = False
         log.info('Connected to server %s', self.server)
         self.write('USER %s %s %s :%s' % (self.real_nickname, '8', '*', self.real_nickname))
         self.nick(self.real_nickname)
 
     def handle_error(self):
-        delay = min(self.connection_attempts ** 2, self.max_connection_delay)
-        log.error('Unknown error occurred. Attempting to restart connection in %s seconds.', delay)
-        self.schedule.queue_command(delay, partial(self.reconnect))
+        if not self.reconnecting:
+            self.reconnecting = True
+            delay = min(self.connection_attempts ** 2, self.max_connection_delay)
+            log.error('Unknown error occurred. Attempting to restart connection in %s seconds.', delay)
+            self.schedule.queue_command(delay, partial(self.reconnect))
 
     def handle_close(self):
         # only handle close event if we're not actually just shutting down
@@ -238,6 +241,7 @@ class IRCBot(asynchat.async_chat):
         self.close()
 
     def reconnect(self):
+        self.reconnecting = False
         self.connection_attempts += 1
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connect((self.server, self.port))
@@ -277,6 +281,11 @@ class IRCBot(asynchat.async_chat):
         log.debug('Received: %s', printable_unicode_list(lines))
         for line in lines:
             handle_event(line, self)
+
+    @event('ERRNICKNOTREGISTERED')
+    def on_nicknotregistered(self, msg):
+        log.error(msg.arguments[2])
+        self.quit()
 
     @event('ERRINVITEONLYCHAN')
     def on_inviteonly(self, msg):
