@@ -5,26 +5,41 @@
 		.module('blocks.error')
         .factory('errorService', errorService);
 
-    function errorService($mdToast) {
-		//TODO: Check if later on this can be converted to a component, right now this is not possible with ngMaterial
-		var toast = {
-			templateUrl: "blocks/error/error-toast.tmpl.html",
-			position: "bottom right",
-			controller: 'errorToastController',
+    function errorService($mdToast, $mdDialog) {
+		var toast = $mdToast.simple()
+			.textContent("Well, this is awkward...")
+			.action("Details")
+			.highlightAction(true)
+			.position("bottom right")
+			.hideDelay(5000);
+
+		//TODO: Would be good if ngMaterial supports opening components by name: https://github.com/angular/material/issues/8409#issuecomment-220759188
+		var dialog = {
+			template: "<error-dialog error='vm.error'></error-dialog>",
+			bindToController: true,
 			controllerAs: 'vm',
-			hideDelay: 5000
-		};
+			controller: function () { }
+		}
 
 		return {
-			showToast: showToast
+			showToast: showToast,
+			showDialog: showDialog
 		};
 
 		function showToast(error) {
-			toast.locals = {
+			$mdToast.show(toast).then(function (response) {
+				if (response == 'ok') {
+					showDialog(error);
+				}
+			});
+		}
+
+		function showDialog(error) {
+			dialog.locals = {
 				error: error
-			};
-			
-			$mdToast.show(toast);
+			}
+
+			$mdDialog.show(dialog);
 		}
 	}
 })();
