@@ -21,7 +21,7 @@
       <md-button ng-click="vm.cancel()" class="md-default md-raised">
         Cancel
       </md-button>
-      <md-button type="submit" ng-disabled="newListForm.$invalid" class="md-primary md-raised">
+      <md-button type="submit" ng-disabled="newListForm.$invalid || vm.lists.indexOf(vm.listName) != -1" class="md-primary md-raised">
         Save
       </md-button>
     </md-dialog-actions>

@@ -6,12 +6,15 @@
 		.component('newList', {
 			templateUrl: 'plugins/movies/components/new-list/new-list.tmpl.html',
 			controller: newListController,
-			controllerAs: 'vm'
+			controllerAs: 'vm',
+			bindings: {
+				lists: '<'
+			}
 		});
 
 	function newListController($mdDialog, moviesService) {
 		var vm = this;
-		
+
 		vm.cancel = cancel;
 		vm.saveList = saveList;
 

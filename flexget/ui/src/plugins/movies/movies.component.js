@@ -47,16 +47,25 @@
 		function newList($event) {
 			$event.preventDefault();
 			$event.stopPropagation();
+
+			var listNames = vm.lists.map(function (list) {
+				return list.name;
+			});
 		
 			var dialog = {
-				template: '<new-list></new-list>',
+				template: '<new-list lists="vm.lists"></new-list>',
+				locals: {
+					lists: listNames
+				},
 				bindToController: true,
 				controllerAs: 'vm',
 				controller: function () { }
 			};
 
 			$mdDialog.show(dialog).then(function (newList) {
-				vm.lists.push(newList);
+				if (newList) {
+					vm.lists.push(newList);
+				}
 			});
 		}
 
