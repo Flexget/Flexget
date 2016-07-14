@@ -34,6 +34,7 @@
 			});
 		}
 
+		//TODO: Test		
 		function showDialog(error) {
 			dialog.locals = {
 				error: error

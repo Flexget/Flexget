@@ -24,7 +24,8 @@
             forgetRelease: forgetRelease,
             resetRelease: resetRelease,
 			deleteReleases: deleteReleases,
-			loadReleases: loadReleases
+			loadReleases: loadReleases,
+			updateShow: updateShow
         }
 
         function getShows(options) {
@@ -53,7 +54,6 @@
         }
 
         function deleteShow(show, params) {
-
             return $http.delete('/api/series/' + show.show_id + '/',
 				{
 					params: params
@@ -67,6 +67,17 @@
                 return;
             }
         }
+
+		//TODO: Test		
+		function updateShow(show, params) {
+			return $http.put('/api/series/' + show.show_id + '/', params)
+				.then(updateShowComplete)
+				.catch(callFailed);
+			
+			function updateShowComplete(response) {
+				return response.data;
+			}
+		}
 
         function searchShows(searchTerm) {
             return $http.get('/api/series/search/' + searchTerm + '/')

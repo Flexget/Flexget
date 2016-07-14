@@ -19,6 +19,14 @@
         var vm = this;
 
 		vm.$onInit = activate;
+		vm.setBegin = setBegin;
+
+		var dialog = {
+			template: "<series-begin-dialog begin='vm.begin' show='vm.show'></series-begin>",
+			bindToController: true,
+			controllerAs: 'vm',
+			controller: function () { }
+		}
 
 		function activate() {
 			loadMetadata();
@@ -29,6 +37,18 @@
 				.then(function (data) {
 					vm.show.metadata = data;
 				});
+		}
+
+		function setBegin() {
+			dialog.locals = {
+				show: vm.show
+			}
+
+			$mdDialog.show(dialog).then(function (begin) {
+				if (begin) {
+					vm.show.begin_episode.episode_identifier = begin;
+				}	
+			});
 		}
 
 
@@ -59,32 +79,5 @@
                 console.log(err);
             });
         }*/
-
-
-        //Cat from the page, to open a dialog to set the begin
-       /* vm.setBegin = function (ev) {
-            var params = {
-                episode_identifier: vm.show.begin_episode.episode_identifier
-            }
-
-            showDialog(params).then(function (data) {
-                if (data) vm.show.begin_episode = data.begin_episode;
-            }, function (err) {
-                console.log(err);
-            });*/
-
-            /*$mdDialog.show({
-            controller: 'seriesBeginController',
-            controllerAs: 'vm',
-            templateUrl: 'plugins/series/components/series-begin/series-begin.tmpl.html',
-            locals: {
-            showId: vm.show.show_id
-        }
-			}).then(function(data) {
-			vm.show.begin_episode = data;
-		}, function(err) {
-		console.log(err);
-		});*/
-		
 	}
 })();
