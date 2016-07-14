@@ -14,14 +14,11 @@ import logging
 import re
 import ssl
 import socket
-import sys
 import uuid
 
 from flexget.plugins.daemon.irc_bot.numeric_replies import REPLY_CODES
 
 log = logging.getLogger('irc_bot')
-
-event_handlers = {}
 
 
 def partial(func, *args, **kwargs):
@@ -32,43 +29,10 @@ def partial(func, *args, **kwargs):
 
 
 class EventHandler(object):
-
     def __init__(self, func, command=None, msg=None):
-        self.func = func.__name__
+        self.func = func
         self.command = command
         self.msg = msg
-
-
-def event(command=None, msg=None):
-    """Decorator used for assigning functions to specific IRC messages."""
-    if not isinstance(command, list):
-        command = [command] if command else []
-    if not isinstance(msg, list):
-        msg = [msg] if msg else []
-
-    def decorator(func):
-        log.debug('Adding event handler %s for (command=%s, msg=%s)', func.__name__, command, msg)
-        hash = hashlib.md5('.'.join(sorted(command) + sorted(msg)).encode('utf-8'))
-        event_handlers[hash] = EventHandler(func, command, msg)
-        return func
-    return decorator
-
-
-def handle_event(msg, obj):
-    """Call the proper function that has been set to handle the input message type eg. RPLMOTD"""
-    for regexp, _event in event_handlers.items():
-        if _event.command:
-            for cmd in _event.command:
-                cmd = cmd.rstrip('$') + '$'
-                if re.match(cmd, msg.command, re.IGNORECASE):
-                    if callable(getattr(obj, _event.func)):
-                        getattr(obj, _event.func)(msg)
-        elif _event.msg:
-            for m in _event.msg:
-                m = m.rstrip('$') + '$'
-                if re.match(m, msg.raw, re.IGNORECASE):
-                    if callable(getattr(obj, _event.func)):
-                        getattr(obj, _event.func)(msg)
 
 
 def printable_unicode_list(unicode_list):
@@ -178,6 +142,22 @@ class IRCBot(asynchat.async_chat):
         self.running = True
         self.connecting_to_channels = True
         self.reconnecting = False
+        self.event_handlers = {}
+
+        # add event handlers
+        self.add_event_handler(self.on_nicknotregistered, 'ERRNICKNOTREGISTERED')
+        self.add_event_handler(self.on_inviteonly, 'ERRINVITEONLYCHAN')
+        self.add_event_handler(self.on_error, 'ERROR')
+        self.add_event_handler(self.on_ping, 'PING')
+        self.add_event_handler(self.on_invite, 'INVITE')
+        self.add_event_handler(self.on_rplmotdend, ['RPLMOTDEND', 'ERRNOMOTD'])
+        self.add_event_handler(self.on_privmsg, 'PRIVMSG')
+        self.add_event_handler(self.on_join, 'JOIN')
+        self.add_event_handler(self.on_kick, 'KICK')
+        self.add_event_handler(self.on_banned, 'ERRBANNEDFROMCHAN')
+        self.add_event_handler(self.on_welcome, 'RPLWELCOME')
+        self.add_event_handler(self.on_nickinuse, 'ERRNICKNAMEINUSE')
+        self.add_event_handler(self.on_nosuchnick, 'ERRNOSUCHNICK')
 
     def handle_expt_event(self):
         error = self.socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
@@ -280,38 +260,31 @@ class IRCBot(asynchat.async_chat):
     def parse_message(self, lines):
         log.debug('Received: %s', printable_unicode_list(lines))
         for line in lines:
-            handle_event(line, self)
+            self.handle_event(line)
 
-    @event('ERRNICKNOTREGISTERED')
     def on_nicknotregistered(self, msg):
         log.error(msg.arguments[2])
         self.quit()
 
-    @event('ERRINVITEONLYCHAN')
     def on_inviteonly(self, msg):
         self.schedule.queue_command(5, partial(self.join, self.channels))
 
-    @event('ERROR')
     def on_error(self, msg):
         log.error('Received error message from %s: %s', self.server, msg.arguments[0])
         if 'throttled' in msg.raw or 'throttling' in msg.raw:
             self.throttled = True
 
-    @event('PING')
     def on_ping(self, msg):
         self.write('PONG :%s' % msg.arguments[0])
 
-    @event('INVITE')
     def on_invite(self, msg):
         if self.nickname == msg.arguments[0]:
             self.join([msg.arguments[1]])
 
-    @event(['RPLMOTDEND', 'ERRNOMOTD'])
     def on_rplmotdend(self, msg):
         log.debug('Successfully connected to %s', self.server)
         self.identify_with_nickserv()
 
-    @event('PRIVMSG')
     def on_privmsg(self, msg):
         if is_channel(msg.arguments[0]):
             log.debug('Public message in channel %s received', msg.arguments[0])
@@ -319,7 +292,6 @@ class IRCBot(asynchat.async_chat):
             log.debug('Private message from %s received', msg.from_nick)
         raise NotImplementedError()
 
-    @event('JOIN')
     def on_join(self, msg):
         if msg.from_nick == self.real_nickname:
             log.info('Joined channel %s', msg.arguments[0])
@@ -327,13 +299,11 @@ class IRCBot(asynchat.async_chat):
         if not set(self.channels) - set(self.connected_channels):
             self.connecting_to_channels = False
 
-    @event('KICK')
     def on_kick(self, msg):
         if msg.arguments[1] == self.real_nickname:
             log.error('Kicked from channel %s by %s', msg.arguments[0], msg.from_nick)
             self.connected_channels.remove(msg.arguments[0])
 
-    @event('ERRBANNEDFROMCHAN')
     def on_banned(self, msg):
         log.error('Banned from channel %s', msg.arguments[1])
         try:
@@ -341,7 +311,6 @@ class IRCBot(asynchat.async_chat):
         except ValueError:
             pass
     
-    @event('RPLWELCOME')
     def on_welcome(self, msg):
         # Save the nick from server as it may have changed it
         self.real_nickname = msg.arguments[0]
@@ -349,13 +318,11 @@ class IRCBot(asynchat.async_chat):
         # Queue the heartbeat
         self.schedule.queue_command(2 * 60, self.keepalive, persists=True)
     
-    @event('ERRNICKNAMEINUSE')
     def on_nickinuse(self, msg):
         if self.real_nickname == msg.arguments[1]:
             self.real_nickname += '_'
             self.write('NICK %s' % self.real_nickname)
 
-    @event('ERRNOSUCHNICK')
     def on_nosuchnick(self, msg):
         log.error('%s: %s', msg.arguments[2], msg.arguments[1])
 
@@ -409,6 +376,30 @@ class IRCBot(asynchat.async_chat):
         log.info('Requesting an invite to channels %s from %s', self.channels, self.invite_nickname)
         self.send_privmsg(self.invite_nickname, self.invite_message)
         self.schedule.queue_command(5, partial(self.join, self.channels))
+
+    def add_event_handler(self, func, command=None, msg=None):
+        if not isinstance(command, list):
+            command = [command] if command else []
+        if not isinstance(msg, list):
+            msg = [msg] if msg else []
+
+        log.debug('Adding event handler %s for (command=%s, msg=%s)', func.__name__, command, msg)
+        hash = hashlib.md5('.'.join(sorted(command) + sorted(msg)).encode('utf-8'))
+        self.event_handlers[hash] = EventHandler(func, command, msg)
+
+    def handle_event(self, msg):
+        """Call the proper function that has been set to handle the input message type eg. RPLMOTD"""
+        for regexp, event in self.event_handlers.items():
+            if event.command:
+                for cmd in event.command:
+                    cmd = cmd.rstrip('$') + '$'
+                    if re.match(cmd, msg.command, re.IGNORECASE):
+                        event.func(msg)
+            elif event.msg:
+                for m in event.msg:
+                    m = m.rstrip('$') + '$'
+                    if re.match(m, msg.raw, re.IGNORECASE):
+                        event.func(msg)
 
 
 @python_2_unicode_compatible

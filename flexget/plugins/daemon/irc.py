@@ -662,7 +662,7 @@ def irc_update_config(manager):
     config = manager.config.get('irc')
     # No config, no connections
     if not config:
-        log.info('No irc connections defined in the config')
+        log.debug('No irc connections defined in the config')
         stop_irc(manager)
         return
 
