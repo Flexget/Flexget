@@ -28,4 +28,6 @@ class SecretsAPI(APIResource):
     def put(self, session=None):
         data = request.json
         secrets_to_db(data)
+        # This will trigger reloading the secrets file
+        self.manager.validate_config()
         return secrets_from_db(), 201
