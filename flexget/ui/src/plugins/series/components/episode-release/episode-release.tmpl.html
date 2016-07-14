@@ -1,8 +1,8 @@
 <md-list-item class="md-2-line episode-release">
 	<div class="md-list-item-text">
-		<h3 class="release-title">
+		<h6 class="release-title md-subhead">
 			<i ng-if="vm.release.release_downloaded" class="fa fa-download"></i> {{ ::vm.release.release_title }}
-		</h3>
+		</h6>
 		<p>{{ ::vm.release.release_quality }}</p>
 	</div>
 	<md-button ng-click="vm.resetRelease()" ng-if="vm.release.release_downloaded" class="md-icon-button" aria-label="reset the release">
