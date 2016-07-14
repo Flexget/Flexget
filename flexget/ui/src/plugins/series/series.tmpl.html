@@ -9,7 +9,7 @@
         <label>Search</label>
         <input ng-model="vm.searchTerm" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }">
     </md-input-container>
-    <div layout="row" layout-wrap>
+    <div layout="row" layout-wrap layout-padding>
         <series-entry show="show" 
 			forget-show="vm.forgetShow(show)" 
 			toggle-episodes="vm.toggleEpisodes(show)"
