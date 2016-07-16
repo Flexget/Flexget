@@ -278,7 +278,7 @@ class IRCBot(asynchat.async_chat):
         self.write('PONG :%s' % msg.arguments[0])
 
     def on_invite(self, msg):
-        if self.nickname == msg.arguments[0]:
+        if self.nickname == msg.arguments[0] and msg.arguments[1] in self.channels:
             self.join([msg.arguments[1]])
 
     def on_rplmotdend(self, msg):
