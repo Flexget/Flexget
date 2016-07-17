@@ -68,14 +68,5 @@
 				}
 			});
 		}
-
-		//TODO: pagination
-				
-		//Call from the pagination to update the page to the selected page
-		/*vm.updateListPage = function (index) {
-			options.page = index;
-
-			loadMovies();
-		}*/
 	}
 })();

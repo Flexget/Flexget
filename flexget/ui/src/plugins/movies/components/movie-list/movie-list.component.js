@@ -22,6 +22,7 @@
 		vm.loadMovies = loadMovies;
 		vm.deleteList = deleteList;
 		vm.deleteMovie = deleteMovie;
+		vm.updateListPage = updateListPage;
 		
 		var options = {
 			page: 1,
@@ -67,6 +68,13 @@
 						vm.movies.splice(index, 1);
 					});
 			});
+		}
+
+		//Call from the pagination to update the page to the selected page
+		function updateListPage (index) {
+			options.page = index;
+
+			loadMovies();
 		}
 	}
 })();
