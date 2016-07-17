@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+import time
 
 import pytest
 
@@ -28,6 +29,7 @@ class TestIMDBList(object):
         assert entry not in imdb_set
         imdb_set.add(entry)
 
+        time.sleep(5)
         assert entry in imdb_set
 
     def test_imdb_list_remove(self):
@@ -40,8 +42,10 @@ class TestIMDBList(object):
         assert entry not in imdb_set
         imdb_set.add(entry)
 
+        time.sleep(5)
         assert entry in imdb_set
 
+        time.sleep(5)
         imdb_set.remove(entry)
         assert entry not in imdb_set
 

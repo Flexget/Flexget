@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+import time
+
 import pytest
 
 from flexget.entry import Entry
@@ -102,6 +104,7 @@ class TestTraktList(object):
         assert entry not in trakt_set
 
         trakt_set.add(entry)
+        time.sleep(5)
         assert entry in trakt_set
 
     def test_trakt_remove(self):
@@ -114,8 +117,10 @@ class TestTraktList(object):
         assert entry not in trakt_set
 
         trakt_set.add(entry)
+        time.sleep(5)
         assert entry in trakt_set
 
         trakt_set.remove(entry)
+        time.sleep(5)
         assert entry not in trakt_set
 
