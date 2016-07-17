@@ -17,7 +17,7 @@ from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, clean_symbols
+from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('fuzer')
 
@@ -104,60 +104,51 @@ class UrlRewriteFuzer(object):
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in category]
 
-        # A variable fuzer need to run the search
-        search_phrase = quote_plus(u'חפש'.encode('windows-1255'))
-
-        params = {'name': 'torrents', 'category': '0'}
-
-        for i in range(len(categories)):
-            params.update({"c{}".format(i + 1): categories[i]})
+        params = {'matchquery': 'any'}
+        c_list = []
+        for c in categories:
+            c_list.append('c{}={}'.format(quote_plus('[]'),c))
 
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            query = clean_symbols(search_string).replace(":", "")
+            query = normalize_unicode(search_string).replace(":", "")
             text = quote_plus(query.encode('windows-1255'))
 
-            page = requests.get('https://www.fuzer.me/index.php?text={}&search={}'.format(text, search_phrase),
-                                params=params)
+            page = requests.get(
+                'https://www.fuzer.me/browse.php?ref_=advanced&query={}&{}'.format(text, '&'.join(c_list), params=params),
+                params=params)
             log.debug('Using %s as fuzer search url' % page.url)
             soup = get_soup(page.content)
 
-            table = soup.find('tbody', {'id': 'collapseobj_module_17'})
-            if not table:
+            table = soup.find('div', {'id': 'main_table'}).find('table', {'class': 'table_info'})
+            if len(table.find_all('tr')) == 1:
                 log.debug('No search results were returned, continuing')
                 continue
             for tr in table.find_all("tr"):
-                name = tr.find("a", {'href': re.compile('https:\/\/www.fuzer.me\/showthread\.php\?t=\d+')})
-                if not name:
+                if 'colhead_dark' in tr.get('class'):
                     continue
-                result = re.search('\|\s(.*)', name.text)
-                title = result.group(1) if result else name.text
-                title = title.replace(' ', '.')
-                link = tr.find("a", attrs={'href': re.compile('attachmentid')}).get('href')
-                attachment_id = re.search('attachmentid\=(\d+)', link).group(1)
+                name = tr.find('div', {'class': 'main_title'}).find('a').text
+                torrent_name = re.search('\\r\\n(.*)',
+                                         tr.find('div', {'id': 'attachment_dl'}).find('a')['title']).group(1)
+                attachment_link = tr.find('div', {'id': 'attachment_dl'}).find('a')['href']
+                attachment_id = re.search('attachmentid\=(\d+)', attachment_link).group(1)
+                raw_size = tr.find_all('td', {'class': 'inline_info'})[0].text.strip()
+                seeders = int(tr.find_all('td', {'class': 'inline_info'})[2].text)
+                leechers = int(tr.find_all('td', {'class': 'inline_info'})[3].text)
 
                 e = Entry()
-                e['title'] = title
-                final_url = 'https://www.fuzer.me/rss/torrent.php/{}/{}/{}/{}.torrent'.format(attachment_id, user_id,
-                                                                                              rss_key, title)
+                e['title'] = name
+                final_url = 'https://www.fuzer.me/rss/torrent.php/{}/{}/{}/{}'.format(attachment_id, user_id,
+                                                                                      rss_key, torrent_name)
 
                 log.debug('RSS-ified download link: %s' % final_url)
                 e['url'] = final_url
-
-                size_pos = 4 if 'stickytr' in tr.get('class', []) else 3
-                seeders_pos = 6 if 'stickytr' in tr.get('class', []) else 5
-                leechers_pos = 7 if 'stickytr' in tr.get('class', []) else 6
-
-                seeders = int(tr.find_all('td')[seeders_pos].find('div').text)
-                leechers = int(tr.find_all('td')[leechers_pos].find('div').text)
 
                 e['torrent_seeds'] = seeders
                 e['torrent_leeches'] = leechers
                 e['search_sort'] = torrent_availability(e['torrent_seeds'], e['torrent_leeches'])
 
-                # use tr object for size
-                size_text = tr.find_all('td')[size_pos].find('div').text.strip()
-                size = re.search('(\d+.?\d+)([TGMK]?)B', size_text)
+                size = re.search('(\d+.?\d+)([TGMK]?)B', raw_size)
                 if size:
                     if size.group(2) == 'T':
                         e['content_size'] = int(float(size.group(1)) * 1000 ** 4 / 1024 ** 2)
