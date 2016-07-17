@@ -153,8 +153,8 @@ class TheTVDBRemove(object):
         thelist -= task.accepted
 
 
-TheTVDBFavs = TheTVDBList
-TheTVDBFavs.schema = dict(TheTVDBFavs.schema, deprecated='thetvdb_favorites is deprecated, use thetvdb_list instead')
+class TheTVDBFavs(TheTVDBList):
+    schema = dict(TheTVDBList.schema, deprecated='thetvdb_favorites is deprecated, use thetvdb_list instead')
 
 
 @event('plugin.register')
