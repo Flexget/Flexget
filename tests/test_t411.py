@@ -103,6 +103,7 @@ class MockRestClient(object):
         return MockRestClient.details_result
 
 
+@pytest.skip
 class TestRestClient(object):
     credentials = {'username': 'set', 'password': 'this'}
     api_token = 'you must set this value for online test'
