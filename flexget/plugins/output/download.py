@@ -430,6 +430,7 @@ class PluginDownload(object):
             if config.get('filename'):
                 try:
                     entry['filename'] = entry.render(config['filename'])
+                    log.debug('set filename from config %s' % entry['filename'])
                 except RenderError as e:
                     entry.fail('Could not set filename. Error during string replacement: %s' % e)
                     return
