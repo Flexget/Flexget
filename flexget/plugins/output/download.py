@@ -468,7 +468,7 @@ class PluginDownload(object):
                     log.debug("Overwriting already existing file %s", destfile)
                 else:
                     log.info('File `%s` already exists and is not identical, download failed.', destfile)
-                    entry.fail('File `%s` already exists and is not identical.', destfile)
+                    entry.fail('File `%s` already exists and is not identical.' % destfile)
                     return
             else:
                 # move temp file
@@ -480,7 +480,7 @@ class PluginDownload(object):
                     # ignore permission errors, see ticket #555
                     import errno
                     if not os.path.exists(destfile):
-                        raise plugin.PluginError('Unable to write %s', destfile)
+                        raise plugin.PluginError('Unable to write %s' % destfile)
                     if err.errno != errno.EPERM:
                         raise
 
