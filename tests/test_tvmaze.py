@@ -24,10 +24,10 @@ class TestTVMazeShowLookup(object):
           test:
             mock:
               - {title: 'House.MD.S01E02.HDTV.XViD-FlexGet'}
-              - {title: 'Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'}
+              - {title: 'Doctor.Who.S02E03.PDTV.XViD-FlexGet'}
             series:
               - House MD
-              - Doctor Who 2005
+              - Doctor Who
           test_unknown_series:
             mock:
               - {title: 'Aoeu.Htns.S01E01.htvd'}
@@ -142,7 +142,7 @@ class TestTVMazeShowLookup(object):
                 entry['title'], entry['tvmaze_episode_name'])
         assert entry['tvmaze_series_status'] == 'Ended', \
             'status for %s is %s, should be "ended"' % (entry['title'], entry['tvmaze_series_status'])
-        assert entry['afield'] == '73255PaternityHouse M.D.', \
+        assert entry['afield'] == '73255PaternityHouse', \
             'afield was not set correctly, expected 73255PaternityHouse M.D., got %s' % entry['afield']
         assert task.find_entry(tvmaze_episode_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
