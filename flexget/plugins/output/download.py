@@ -64,7 +64,8 @@ class PluginDownload(object):
                     'path': {'type': 'string', 'format': 'path'},
                     'fail_html': {'type': 'boolean', 'default': True},
                     'overwrite': {'type': 'boolean', 'default': False},
-                    'temp': {'type': 'string', 'format': 'path'}
+                    'temp': {'type': 'string', 'format': 'path'},
+                    'filename': {'type': 'string'}
                 },
                 'additionalProperties': False
             },
@@ -426,8 +427,14 @@ class PluginDownload(object):
                 log.debug('entry: %s' % entry)
                 raise plugin.PluginWarning('Downloaded temp file `%s` doesn\'t exist!?' % entry['file'])
 
+            if config.get('filename'):
+                try:
+                    entry['filename'] = entry.render(config['filename'])
+                except RenderError as e:
+                    entry.fail('Could not set filename. Error during string replacement: %s' % e)
+                    return
             # if we still don't have a filename, try making one from title (last resort)
-            if not entry.get('filename'):
+            elif not entry.get('filename'):
                 entry['filename'] = entry['title']
                 log.debug('set filename from title %s' % entry['filename'])
                 if 'mime-type' not in entry:
