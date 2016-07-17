@@ -17,7 +17,7 @@ from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.search import torrent_availability, clean_symbols
 
 log = logging.getLogger('fuzer')
 
@@ -103,20 +103,22 @@ class UrlRewriteFuzer(object):
 
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in category]
-        params = {'name': 'torrents',
-                  'category': '0',
-                  'search': '%E7%F4%F9'}
+
+        # A variable fuzer need to run the search
+        search_phrase = quote_plus(u'חפש'.encode('windows-1255'))
+
+        params = {'name': 'torrents', 'category': '0'}
 
         for i in range(len(categories)):
             params.update({"c{}".format(i + 1): categories[i]})
 
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            query = normalize_unicode(search_string).replace(":", "")
+            query = clean_symbols(search_string).replace(":", "")
             text = quote_plus(query.encode('windows-1255'))
 
-            page = requests.get('https://www.fuzer.me/index.php?text={}'.format(text), params=params,
-                                cookies=login.cookies)
+            page = requests.get('https://www.fuzer.me/index.php?text={}&search={}'.format(text, search_phrase),
+                                params=params)
             log.debug('Using %s as fuzer search url' % page.url)
             soup = get_soup(page.content)
 
