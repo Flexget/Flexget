@@ -101,14 +101,14 @@ def device_auth():
                 interval += 1
         raise plugin.PluginError('User code has expired. Please try again.')
     except requests.RequestException as e:
-        raise plugin.PluginError('Device authorization with Trakt.tv failed: {0}'.format(e.args[0]))
+        raise plugin.PluginError('Device authorization with Trakt.tv failed: {0}'.format(e))
 
 
 def token_auth(data):
     try:
         return requests.post(get_api_url('oauth/token'), data=data).json()
     except requests.RequestException as e:
-        raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e.args[0]))
+        raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e))
 
 
 def get_access_token(account, token=None, refresh=False, re_auth=False, called_from_cli=False):
@@ -163,7 +163,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
                     session.add(acc)
                 return access_token
             except requests.RequestException as e:
-                raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e.args[0]))
+                raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e))
 
 
 def make_list_slug(name):
@@ -450,7 +450,7 @@ def get_db_images(image, session):
             images.append(im)
         return images
     except TypeError as e:
-        log.debug('Error has Occured during images: %s' % e.args[0])
+        log.debug('Error has Occured during images: %s', e)
         return
 
 
