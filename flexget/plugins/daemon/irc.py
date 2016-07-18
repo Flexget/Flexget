@@ -20,9 +20,15 @@ from flexget.config_schema import register_config_key
 from flexget.event import event
 from flexget.manager import manager
 from flexget.config_schema import one_or_more
-from flexget.plugins.daemon.irc_bot import irc_bot
-from flexget.plugins.daemon.irc_bot.irc_bot import partial
 from flexget.utils import requests
+
+try:
+    from irc_bot.irc_bot import IRCBot
+    from irc_bot.irc_bot import partial
+    from irc_bot import irc_bot
+except ImportError as e:
+    irc_bot = None
+    IRCBot = object
 
 log = logging.getLogger('irc')
 
@@ -137,7 +143,7 @@ class MissingConfigOption(Exception):
     """Exception thrown when a config option specified in the tracker file is not on the irc config"""
 
 
-class IRCConnection(irc_bot.IRCBot):
+class IRCConnection(IRCBot):
 
     def __init__(self, config, config_name):
         self.config = config
@@ -223,7 +229,7 @@ class IRCConnection(irc_bot.IRCBot):
                          'invite_message': config.get('invite_message'),
                          'nickserv_password': config.get('nickserv_password'),
                          'use_ssl': config.get('use_ssl')}
-        irc_bot.IRCBot.__init__(self, ircbot_config)
+        IRCBot.__init__(self, ircbot_config)
 
         self.inject_before_shutdown = False
         self.entry_queue = []
@@ -300,7 +306,7 @@ class IRCConnection(irc_bot.IRCBot):
         """
         if self.inject_before_shutdown and self.entry_queue:
             self.run_tasks()
-        irc_bot.IRCBot.quit(self)
+        IRCBot.quit(self)
 
     def run_tasks(self):
         """
@@ -664,6 +670,13 @@ def irc_update_config(manager):
     if not config:
         log.debug('No irc connections defined in the config')
         stop_irc(manager)
+        return
+
+    if irc_bot is None:
+        log.error('ImportError: irc_bot module not found. Shutting down daemon.')
+        stop_irc(manager)
+        from flexget.manager import manager
+        manager.shutdown(finish_queue=False)
         return
 
     # TODO this hashing doesn't quite work for nested dicts
