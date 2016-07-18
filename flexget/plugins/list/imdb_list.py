@@ -240,6 +240,10 @@ class ImdbEntrySet(MutableSet):
     def __iter__(self):
         return iter(self.items)
 
+    def __repr__(self):
+        entries = ','.join(map(str, self))
+        return '<ImdbEntrySet[%s]>' % entries
+
     def discard(self, entry):
         if self.config['list'] in IMMUTABLE_LISTS:
             raise plugin.PluginError('%s lists are not modifiable' % ' and '.join(IMMUTABLE_LISTS))
