@@ -1,9 +1,5 @@
 language: python
-cache: 
-  pip: true
-  directories:
-  - ./flexget/ui/node_modules
-  - ./flexget/ui/bower_components
+cache: pip
 sudo: false
 python:
   - "2.7"
@@ -21,19 +17,11 @@ install:
   - pip install --upgrade pip
   - pip install .
   - pip install -r dev-requirements.txt
-  - npm install ./flexget/ui  --prefix ./flexget/ui
-  - ./flexget/ui/node_modules/bower/bin/bower install --config.cwd=./flexget/ui
   - pip install -r dev-requirements-extras.txt
-  - npm install ./flexget/ui  --prefix ./flexget/ui
-  - ./flexget/ui/node_modules/bower/bin/bower install --config.cwd=./flexget/ui
 # command to run tests, e.g. python setup.py test
-script:
-  - ./flexget/ui/node_modules/karma/bin/karma start ./flexget/ui/karma.conf.js
- # - py.test --cov flexget --cov-report xml -n 3
+script: py.test --cov flexget --cov-report xml -n 3
 after_success:
-  #- python-codacy-coverage -r coverage.xml
-  - cat webui-coverage.info | ./flexget/ui/node_modules/.bin/codacy-coverage
-  #- node-codacy-coverage  -r web-ui coverage.info
+  - python-codacy-coverage -r coverage.xml
 env: VCR_RECORD_MODE=none
 notifications:
   email: false
