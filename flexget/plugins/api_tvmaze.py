@@ -10,6 +10,7 @@ from requests.exceptions import HTTPError
 from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, func, Table, or_, \
     and_
 from sqlalchemy.orm import relation
+from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import db_schema, plugin
 from flexget.event import event
@@ -409,15 +410,18 @@ class APITVMaze(object):
 
         # See if episode already exists in cache
         log.debug('searching for episode of show {0} in cache'.format(series.name))
-        episode = session.query(TVMazeEpisodes).filter(
-            or_(
-                and_(TVMazeEpisodes.series_id == series.tvmaze_id,
-                     TVMazeEpisodes.season_number == season_number,
-                     TVMazeEpisodes.number == episode_number),
-                and_(TVMazeEpisodes.series_id == series.tvmaze_id,
-                     TVMazeEpisodes.airdate == episode_date)
-            )
-        ).first()
+        try:
+            episode = session.query(TVMazeEpisodes).filter(
+                or_(
+                    and_(TVMazeEpisodes.series_id == series.tvmaze_id,
+                         TVMazeEpisodes.season_number == season_number,
+                         TVMazeEpisodes.number == episode_number),
+                    and_(TVMazeEpisodes.series_id == series.tvmaze_id,
+                         TVMazeEpisodes.airdate == episode_date)
+                )
+            ).one()
+        except NoResultFound:
+            episode = None
 
         # Logic for cache only mode
         if only_cached:
@@ -448,15 +452,18 @@ class APITVMaze(object):
                                                                                       season_number,
                                                                                       series.tvmaze_id))
             tvmaze_episode = get_episode(series.tvmaze_id, season=season_number, number=episode_number)
-        # See if episode exists in DB
-        episode = session.query(TVMazeEpisodes).filter(
-            or_(TVMazeEpisodes.tvmaze_id == tvmaze_episode['id'],
-                and_(
-                    TVMazeEpisodes.number == tvmaze_episode['number'],
-                    TVMazeEpisodes.season_number == tvmaze_episode['season'],
-                    TVMazeEpisodes.series_id == series.tvmaze_id)
-                )
-        ).first()
+        try:
+            # See if episode exists in DB
+            episode = session.query(TVMazeEpisodes).filter(
+                or_(TVMazeEpisodes.tvmaze_id == tvmaze_episode['id'],
+                    and_(
+                        TVMazeEpisodes.number == tvmaze_episode['number'],
+                        TVMazeEpisodes.season_number == tvmaze_episode['season'],
+                        TVMazeEpisodes.series_id == series.tvmaze_id)
+                    )
+            ).one()
+        except NoResultFound:
+            episode = None
 
         if episode:
             log.debug('found expired episode {0} in cache, refreshing data.'.format(episode.tvmaze_id))
