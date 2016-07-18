@@ -1,15 +1,16 @@
 (function () {
-  'use strict';
+	'use strict';
 
-  var logModule = angular.module('flexget.plugins.log', ['ui.grid', 'ui.grid.autoResize', 'ui.grid.autoScroll']);
-  registerPlugin(logModule);
+	angular
+		.module('plugins.log', [
+			'blocks.exception',
+			'blocks.router',
+			
+			'components.toolbar',
+			'ui.grid',
+			'ui.grid.autoResize',
+			//'ui.grid.autoScroll'
+		]);
 
-  logModule.run(function ($state, route, sideNav, toolBar) {
-    route.register('log', '/log', 'log-view');
-    sideNav.register('/log', 'Log', 'fa fa-file-text-o', 10);
-    toolBar.registerButton('Log', 'fa fa-file-text-o', function () {
-      $state.go('flexget.log')
-    });
-  });
-
+	registerPlugin('plugins.log');
 })();

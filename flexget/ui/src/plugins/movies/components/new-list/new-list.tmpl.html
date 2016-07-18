@@ -1,4 +1,3 @@
-<md-dialog aria-label="Series Begin" ng-cloak>
 	<md-toolbar>
 		<div class="md-toolbar-tools">
 			<h2>New Movie List</h2>
@@ -11,6 +10,7 @@
 	<form name="newListForm" ng-submit="vm.saveList()">
 		<md-dialog-content>
 			<div class="md-dialog-content">
+				<!-- TODO: Add a unique validator to the input, checking the DB if the name already exists -->
 				<md-input-container>
 					<label>Name</label>
 					<input type="text" ng-model="vm.listName" required>
@@ -21,9 +21,8 @@
       <md-button ng-click="vm.cancel()" class="md-default md-raised">
         Cancel
       </md-button>
-      <md-button type="submit" ng-disabled="newListForm.$invalid" class="md-primary md-raised">
+      <md-button type="submit" ng-disabled="newListForm.$invalid || vm.lists.indexOf(vm.listName) != -1" class="md-primary md-raised">
         Save
       </md-button>
     </md-dialog-actions>
 	</form>
-</md-dialog>

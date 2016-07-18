@@ -40,7 +40,7 @@ class Manipulate(object):
         bundle.reject_keys(['from', 'extract', 'replace', 'phase'],
             'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
         edit = bundle.accept_any_key('dict')
-        edit.accept('choice', key='phase').accept_choices(['metainfo', 'filter'], ignore_case=True)
+        edit.accept('choice', key='phase').accept_choices(['metainfo', 'filter', 'modify'], ignore_case=True)
         edit.accept('text', key='from')
         edit.accept('regexp', key='extract')
         edit.accept('text', key='separator')
@@ -55,7 +55,7 @@ class Manipulate(object):
         Separates the config into a dict with a list of jobs per phase.
         Allows us to skip phases without any jobs in them.
         """
-        self.phase_jobs = {'filter': [], 'metainfo': []}
+        self.phase_jobs = {'filter': [], 'metainfo': [], 'modify': []}
         for item in config:
             for item_config in item.values():
                 # Get the phase specified for this item, or use default of metainfo
@@ -76,6 +76,14 @@ class Manipulate(object):
             # return if no jobs for this phase
             return
         modified = sum(self.process(entry, self.phase_jobs['filter']) for entry in task.entries + task.rejected)
+        log.verbose('Modified %d entries.' % modified)
+
+    @plugin.priority(255)
+    def on_task_modify(self, task, config):
+        if not self.phase_jobs['modify']:
+            # return if no jobs for this phase
+            return
+        modified = sum(self.process(entry, self.phase_jobs['modify']) for entry in task.entries + task.rejected)
         log.verbose('Modified %d entries.' % modified)
 
     def process(self, entry, jobs):

@@ -11,7 +11,3 @@ if (typeof String.prototype.endsWith !== 'function') {
         return this.indexOf(suffix, this.length - suffix.length) !== -1;
     };
 }
-
-function registerPlugin(plugin) { // eslint-disable-line no-unused-vars
-    angular.module('flexget').requires.push(plugin.name);
-}

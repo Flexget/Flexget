@@ -29,9 +29,9 @@ class TestTraktList(object):
     def db_auth(self, manager):
         kwargs = {
             'account': 'flexget_list_test',
-            'access_token': '60a093e80b670a254ec40b7a0d2d7535119b3bcc61859b052ae641c3009dd75b',
-            'refresh_token': '006c4813fc0bd8e02219c2ce4b0295228f2ce651419adea1bfb0aded352b59d2',
-            'created': 1458488839.44,
+            'access_token': '00b06077e9946af0a268e6e17e62f7a6982c43fad93cc04c407d1d05ca6565be',
+            'refresh_token': '44f8fd49366546cc481cd6d24d0df44b4f8d6c95508b9a62b9ba820b90915fa7',
+            'created': 1468748861.44,
             'expires': 7776000
         }
         # Creates the trakt token in db
@@ -93,8 +93,8 @@ class TestTraktList(object):
         assert set(titles) == set(('The Walking Dead', 'Deadpool', 'Castle S08E15 Fidelis Ad Mortem'))
 
     def test_trakt_add(self):
-        trakt_set = TraktSet(self.trakt_config)
         # Initialize trakt set
+        trakt_set = TraktSet(self.trakt_config)
         trakt_set.clear()
 
         entry = Entry(title='White collar', series_name='White Collar (2009)')
@@ -103,6 +103,21 @@ class TestTraktList(object):
 
         trakt_set.add(entry)
         assert entry in trakt_set
+
+    def test_trakt_add_episode(self):
+        episode_config = self.trakt_config.copy()
+        episode_config['type'] = 'episodes'
+        trakt_set = TraktSet(episode_config)
+        # Initialize trakt set
+        trakt_set.clear()
+
+        entry = Entry(**{u'trakt_show_slug': u'game-of-thrones', u'original_url': u'http://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5', u'url': u'http://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5', u'series_season': 4, u'tvdb_id': 121361, u'series_name': u'Game of Thrones (2011)', u'imdb_id': u'tt0944947', u'series_id': u'S04E05', u'series_episode': 5, u'trakt_episode_id': 73674, u'title': u'Game of Thrones (2011) S04E05 First of His Name', u'trakt_show_id': 1390, u'trakt_ep_name': u'First of His Name', u'tvrage_id': 24493})
+
+        assert entry not in trakt_set
+
+        trakt_set.add(entry)
+        assert entry in trakt_set
+
 
     def test_trakt_remove(self):
         trakt_set = TraktSet(self.trakt_config)

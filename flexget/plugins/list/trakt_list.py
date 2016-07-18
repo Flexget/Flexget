@@ -234,22 +234,28 @@ class TraktSet(MutableSet):
         """Submits movies or episodes to trakt api."""
         found = {}
         for entry in entries:
-            if self.config['type'] in ['auto', 'shows', 'seasons', 'episodes'] and entry.get('series_name') is not None:
+            if self.config['type'] in ['auto', 'episodes'] and (
+                    entry.get('trakt_episode_id') or
+                    entry.get('tvdb_id') or
+                    entry.get('imdb_id') or
+                    entry.get('tmdb_id') or
+                    entry.get('tvrage_id')
+                ):
+                episode = {'ids':{}}
+                if entry.get('trakt_episode_id'): episode['ids']['trakt'] = entry['trakt_episode_id']
+                if entry.get('tvdb_id'): episode['ids']['tvdb'] = entry['tvdb_id']
+                if entry.get('imdb_id'): episode['ids']['imdb'] = entry['imdb_id']
+                if entry.get('tmdb_id'): episode['ids']['tmdb'] = entry['tmdb_id']
+                if entry.get('tvrage_id'): episode['ids']['tvrage'] = entry['tvrage_id']
+                if not episode['ids']:
+                    log.debug('Not submitting `%s`, no episode identifier found.' % entry['title'])
+                    continue
+                found.setdefault('episodes', []).append(episode)
+            elif self.config['type'] in ['auto', 'shows', 'seasons'] and entry.get('series_name') is not None:
                 show_name, show_year = split_title_year(entry['series_name'])
                 show = {'title': show_name, 'ids': get_entry_ids(entry)}
                 if show_year:
                     show['year'] = show_year
-                if self.config['type'] in ['auto', 'seasons', 'episodes'] and entry.get('series_season') is not None:
-                    season = {'number': entry['series_season']}
-                    if self.config['type'] in ['auto', 'episodes'] and entry.get('series_episode') is not None:
-                        season['episodes'] = [{'number': entry['series_episode']}]
-                    show['seasons'] = [season]
-                if self.config['type'] in ['seasons', 'episodes'] and 'seasons' not in show:
-                    log.debug('Not submitting `%s`, no season found.' % entry['title'])
-                    continue
-                if self.config['type'] == 'episodes' and 'episodes' not in show:
-                    log.debug('Not submitting `%s`, no episode number found.' % entry['title'])
-                    continue
                 found.setdefault('shows', []).append(show)
             elif self.config['type'] in ['auto', 'movies']:
                 movie = {'ids': get_entry_ids(entry)}
@@ -262,7 +268,7 @@ class TraktSet(MutableSet):
                         continue
                 found.setdefault('movies', []).append(movie)
 
-        if not (found.get('shows') or found.get('movies')):
+        if not (found.get('episodes') or found.get('shows') or found.get('movies')):
             log.debug('Nothing to submit to trakt.')
             return
 

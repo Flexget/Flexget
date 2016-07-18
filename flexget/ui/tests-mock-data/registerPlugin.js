@@ -1,0 +1,1 @@
+registerPlugin = sinon.stub();

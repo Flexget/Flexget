@@ -1,13 +1,16 @@
 (function () {
     'use strict';
 
-    var moviesModule = angular.module("flexget.plugins.movies", []);
+    angular
+		.module("plugins.movies", [
+			'ngMaterial',
+			'ngSanitize',
 
-    registerPlugin(moviesModule);
-
-    moviesModule.run(function (route, sideNav) {
-        route.register('movies', '/movies', 'movies-view');
-        sideNav.register('/movies', 'Movies', 'fa fa-film', 50);
-    });
-
+			'angular-cache',
+			
+			'blocks.exception',
+			'blocks.router'
+		]);
+	
+	registerPlugin('plugins.movies');
 })();
