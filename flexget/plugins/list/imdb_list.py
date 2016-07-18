@@ -182,6 +182,7 @@ class ImdbEntrySet(MutableSet):
     @property
     def items(self):
         if self._items is None:
+            log.debug('fetching items from IMDB')
             try:
                 r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
                                      (self.list_id, self.user_id), cookies=self.cookies)
@@ -227,9 +228,11 @@ class ImdbEntrySet(MutableSet):
         return set(it)
 
     def _find_movie(self, entry):
+        log.debug('trying to match %s to existing list items', entry['imdb_id'])
         for e in self.items:
             if e['imdb_id'] == entry['imdb_id']:
                 return e
+        log.debug('could not match %s to existing list items', entry['imdb_id'])
 
     def __contains__(self, entry):
         if not entry.get('imdb_id'):
@@ -239,10 +242,6 @@ class ImdbEntrySet(MutableSet):
 
     def __iter__(self):
         return iter(self.items)
-
-    def __repr__(self):
-        entries = ','.join(map(str, self))
-        return '<ImdbEntrySet[%s]>' % entries
 
     def discard(self, entry):
         if self.config['list'] in IMMUTABLE_LISTS:
