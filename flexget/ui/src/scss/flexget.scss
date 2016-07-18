@@ -4,7 +4,8 @@
 @import "loading-bar";
 // Components
 @import "../components/sidenav/sidenav";
-@import "../components/authentication/authentication";
+@import "../components/auth/login";
+@import "../blocks/error/error-dialog";
 
 
 body {

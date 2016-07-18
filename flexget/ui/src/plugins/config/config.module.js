@@ -1,13 +1,19 @@
 (function () {
     'use strict';
 
-    var configModule = angular.module("flexget.plugins.config", ['ui.ace', 'ab-base64', 'angular-cache']);
+    angular
+		.module("plugins.config", [
+			'ngMaterial',
 
-    registerPlugin(configModule);
+			'ab-base64',
+			'angular-cache',
 
-    configModule.run(function (route, sideNav) {
-        route.register('config', '/config', 'config-view');
-        sideNav.register('/config', 'Config', 'fa fa-pencil', 15);
-    });
+			'blocks.exception',
+			'blocks.router',
+			'components.toolbar',
 
+			'ui.ace'
+		]);
+	
+	registerPlugin('plugins.config');
 })();

@@ -2,65 +2,71 @@
     'use strict';
 
     angular
-    .module('flexget.plugins.series')
-    .component('seriesEpisode', {
-        templateUrl: 'plugins/series/components/series-episode/series-episode.tmpl.html',
-        controllerAs: 'vm',
-        controller: seriesEpisodeController,
-        bindings: {
-            episode: '<',
-            show: '<',
-            deleteEpisode: '&',
-            resetReleases: '&'
-        },
-    });
+		.module('plugins.series')
+		.component('seriesEpisode', {
+			templateUrl: 'plugins/series/components/series-episode/series-episode.tmpl.html',
+			controllerAs: 'vm',
+			controller: seriesEpisodeController,
+			bindings: {
+				episode: '<',
+				show: '<',
+				deleteEpisode: '&'
+			}
+		});
 
-    function seriesEpisodeController($mdDialog, $http, $stateParams, $filter){
+    function seriesEpisodeController($mdDialog, $http, seriesService) {
         var vm = this;
 
+		vm.showReleases = showReleases;
+		vm.resetReleases = resetReleases;
+		vm.deleteReleases = deleteReleases;
 
-        vm.showReleases = function () {
+		var params = {
+			forget: true
+		}
 
-            var dialog = {
-                template: '<episode-releases show="vm.show" episode="vm.episode" releases="vm.releases"></episode-releases>',
-                locals: {
-                    show: vm.show,
-                    episode: vm.episode,
-                    releases: vm.releases
-                },
-                bindToController: true,
-                controllerAs: 'vm',
-                controller: function () {}
-            }
+		var dialog = {
+			template: '<episode-releases show="vm.show" episode="vm.episode"></episode-releases>',
+			bindToController: true,
+			locals: {
+				show: vm.show,
+				episode: vm.episode
+			},
+			controllerAs: 'vm',
+			controller: function () { }
+		}
 
-            $mdDialog.show(dialog);
-
+        function showReleases() {
+			$mdDialog.show(dialog);
         }
 
-        //Call from the page, to delete all releases
-        vm.deleteReleases = function() {
+		//action called from the series-episode components
+        function resetReleases() {
             var confirm = $mdDialog.confirm()
-            .title('Confirm deleting releases.')
-            .htmlContent("Are you sure you want to delete all releases for <b>" + vm.episode.episode_identifier + "</b> from show <b>" + vm.show.show_name + "</b>?<br /> This also removes all seen releases for this episode!")
-            .ok("Forget")
-            .cancel("No");
+				.title('Confirm resetting releases.')
+				.htmlContent("Are you sure you want to reset downloaded releases for <b>" + vm.episode.episode_identifier + "</b> from show <b>" + vm.show.show_name + "</b>?<br /> This does not remove seen entries but will clear the quality to be downloaded again.")
+				.ok("Forget")
+				.cancel("No");
 
-            $mdDialog.show(confirm).then(function() {
-                $http.delete('/api/series/' + vm.show.show_id + '/episodes/' + vm.episode.episode_id + '/releases', { params: { forget: true}})
-                .success(function(data) {
-                    //Remove all loaded releases from the page and set variables for the accordion
-                    vm.releases = undefined;
-                })
-                .error(function(error) {
-                    var errorDialog = $mdDialog.alert()
-                    .title("Something went wrong")
-                    .htmlContent("Oops, something went wrong when trying to forget <b>" + vm.episode.episode_identifier + "</b> from show " + vm.show.show_name + ":<br />" + error.message)
-                    .ok("Ok");
-
-                    $mdDialog.show(errorDialog);
-                });
+            $mdDialog.show(confirm).then(function () {
+                seriesService.resetReleases(vm.show, vm.episode);
             });
         }
 
+        //Call from the page, to delete all releases
+		function deleteReleases() {
+            var confirm = $mdDialog.confirm()
+				.title('Confirm deleting releases.')
+				.htmlContent("Are you sure you want to delete all releases for <b>" + vm.episode.episode_identifier + "</b> from show <b>" + vm.show.show_name + "</b>?<br /> This also removes all seen releases for this episode!")
+				.ok("Forget")
+				.cancel("No");
+
+            $mdDialog.show(confirm).then(function () {
+				seriesService.deleteReleases(vm.show, vm.episode, params)
+					.then(function () {
+						vm.episode.episode_number_of_releases = 0;
+					});
+            });
+        }
     }
 })();

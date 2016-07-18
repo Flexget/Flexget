@@ -3,6 +3,12 @@
 
     angular
         .module('flexget.components', [
-		'flexget.components.requestInterceptor']);
-
+			'components.404',
+			'components.auth',
+			'components.core',
+			'components.home',
+			'components.sidenav',
+			'components.toolbar',
+			'components.user'
+		]);
 })();
