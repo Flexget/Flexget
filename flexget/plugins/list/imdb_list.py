@@ -293,7 +293,8 @@ class ImdbEntrySet(MutableSet):
             'ref_tag': 'title'
         }
         log.debug('adding title %s with ID %s to imdb %s', entry['title'], entry['imdb_id'], self.list_id)
-        self.session.post('http://www.imdb.com/list/_ajax/edit', data=data, cookies=self.cookies)
+        resp = self.session.post('http://www.imdb.com/list/_ajax/edit', data=data, cookies=self.cookies)
+        log.debug('imdb response" %s, status code: %s', resp.content, resp.status_code)
         # Invalidate cache so that new movie info will be grabbed
         self.invalidate_cache()
 
