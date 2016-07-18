@@ -453,7 +453,8 @@ class APITVMaze(object):
             or_(TVMazeEpisodes.tvmaze_id == tvmaze_episode['id'],
                 and_(
                     TVMazeEpisodes.number == tvmaze_episode['number'],
-                    TVMazeEpisodes.season_number == tvmaze_episode['season'])
+                    TVMazeEpisodes.season_number == tvmaze_episode['season'],
+                    TVMazeEpisodes.series_id == series.tvmaze_id)
                 )
         ).first()
 
