@@ -58,7 +58,25 @@
 			vm.themes = themelist.themes;
 		}
 
-		function aceLoaded(_editor) {
+		function aceLoaded(_editor) {			
+			//Get all commands, but keep the find command
+			var commandsToRemove = [
+				"transposeletters",
+				"gotoline"
+			]
+
+			_editor.commands.removeCommands(commandsToRemove);
+
+			_editor.commands.addCommand({
+				name: 'saveConfig',
+				bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
+				exec: function (editor) {
+					if (vm.config != vm.origConfig) {
+						saveConfig();
+					}
+				}
+			});
+
 			_editor.setShowPrintMargin(false);
 		}
 
