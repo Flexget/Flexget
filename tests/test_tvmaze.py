@@ -7,7 +7,7 @@ import pytest
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget.manager import Session
-from flexget.plugins.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries
+from flexget.plugins.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries, TVMazeEpisodes
 
 lookup_series = APITVMaze.series_lookup
 
@@ -124,6 +124,11 @@ class TestTVMazeShowLookup(object):
               - {title: 'The.Flash.2014.S02E04.HDTV.x264-FlexGet', imdb_id: 'tt3107288'}
             series:
               - The Flash
+          test_ep_mixup_error:
+            mock:
+              - {title: 'The.Flash.2014.S02E02.HDTV.x264-FlexGet'}
+              - {title: 'The.Arrow.S02E02.HDTV.x264-FlexGet'}
+            metainfo_series: yes
     """
 
     def test_lookup_name(self, execute_task):
@@ -368,6 +373,17 @@ class TestTVMazeShowLookup(object):
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 284974, 'episode id should be 284974, instead its %s' % entry[
             'tvmaze_episode_id']
+
+    def test_ep_mixup_error(self, execute_task):
+        task = execute_task('test_ep_mixup_error')
+
+        # force episode lookup
+        for entry in task.entries:
+            value = entry['tvmaze_episode_season']
+
+        with Session() as session:
+            episodes = session.query(TVMazeEpisodes).all()
+            assert len(episodes) == 2, 'should have two episodes in db, one for Flash and one for Arrow'
 
 
 @pytest.mark.online
