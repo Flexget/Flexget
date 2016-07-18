@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+import time
 
 import pytest
 
@@ -28,6 +29,12 @@ class TestIMDBList(object):
         assert entry not in imdb_set
         imdb_set.add(entry)
 
+        # pls no caching
+        imdb_set.session.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        imdb_set.session.headers['Pragma'] = 'no-cache'
+        imdb_set.session.headers['Expires'] = '0'
+
+        time.sleep(5)
         assert entry in imdb_set
 
     def test_imdb_list_remove(self):
@@ -40,8 +47,16 @@ class TestIMDBList(object):
         assert entry not in imdb_set
         imdb_set.add(entry)
 
+        # pls no caching
+        imdb_set.session.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        imdb_set.session.headers['Pragma'] = 'no-cache'
+        imdb_set.session.headers['Expires'] = '0'
+
+        time.sleep(5)
         assert entry in imdb_set
 
         imdb_set.remove(entry)
+
+        time.sleep(5)
         assert entry not in imdb_set
 
