@@ -1,15 +1,13 @@
 (function () {
-  'use strict';
+	'use strict';
 
-  var seenModule = angular.module(
-    'flexget.plugins.seen',
-    ['schemaForm']
-  );
+	angular
+		.module('plugins.seen', [
+			'angular-cache',
 
-  registerPlugin(seenModule);
-
-  seenModule.run(function run(route, sideNav) {
-    route.register('seen', '/seen', 'seen-view');
-    sideNav.register('/seen', 'Seen', 'fa fa-eye', 228);
-  });
+			'blocks.exception',
+			'blocks.router'
+		]);
+	
+	registerPlugin('plugins.seen');
 })();

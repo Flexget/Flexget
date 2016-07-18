@@ -1,24 +1,24 @@
-<md-content layout="column" flex layout-fill>
-	<md-toolbar class="md-warn">
+<div layout="column" layout-fill>
+	<md-toolbar class="md-warn" layout="row">
 		<p class="md-toolbar-tools">
-      		<span>This page is still pretty much in beta. Please take a backup before trying to save a new config.</span>
-   		</p>
+			<span>This page is still pretty much in beta. Please take a backup before trying to save a new config.</span>
+		</p>
 	</md-toolbar>
-	<div layout="row" layout-padding>
-		<div layout="row" flex>
-			<div layout="column" flex="25" layout-align="center start">
-				<md-button class="md-raised md-primary" ng-click="vm.save()" ng-disabled="vm.config == vm.origConfig">
+	<div layout="column">
+		<div layout="row">
+			<div flex="25" layout-align="center start">
+				<md-button class="md-raised md-primary" ng-click="vm.saveConfig()" ng-disabled="vm.config == vm.origConfig">
 					Save and apply
 				</md-button>
 			</div>
-		</div>
-		<div layout="column" flex="30">
-			<md-input-container class="md-block">
-				<label>Theme</label>
-				<md-select ng-model="vm.aceOptions.theme" ng-change="vm.updateTheme()">
-					<md-option ng-repeat="theme in vm.themes" value="{{ theme.name }}">{{ theme.caption }}</md-option>
-				</md-select>
-			</md-input-container>
+			<div flex="30" flex-offset="45">
+				<md-input-container class="md-block">
+					<label>Theme</label>
+					<md-select ng-model="vm.aceOptions.theme" ng-change="vm.updateTheme()">
+						<md-option ng-repeat="theme in ::vm.themes | orderBy: 'caption'" value="{{ theme.name }}">{{ theme.caption }}</md-option>
+					</md-select>
+				</md-input-container>
+			</div>
 		</div>
 	</div>
 	<div layout="row" ng-if="vm.errors">
@@ -33,6 +33,6 @@
 		</md-list>
 	</div>
 	<div layout="row" flex>
-    	<div ui-ace='vm.aceOptions' flex ng-model="vm.config"></div>
+		<div flex ui-ace='vm.aceOptions' ng-model="vm.config"></div>
 	</div>
-</md-content>
+</div>
