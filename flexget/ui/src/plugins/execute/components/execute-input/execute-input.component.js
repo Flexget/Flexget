@@ -96,4 +96,4 @@
 			vm.execute(opts, vm.selectedTasks);
 		}
 	}
-})();
+}());

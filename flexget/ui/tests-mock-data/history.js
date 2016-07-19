@@ -37,4 +37,4 @@ var mockHistoryData = (function () {
 			"pages": 114
 		}
 	}
-})();
+}());

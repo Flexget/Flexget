@@ -17,4 +17,4 @@
 		//Register default Manage menu		
 		toolBarService.registerItem(manageMenu);
 	}
-})();
+}());

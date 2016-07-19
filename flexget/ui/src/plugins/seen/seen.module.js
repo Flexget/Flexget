@@ -10,4 +10,4 @@
 		]);
 	
 	registerPlugin('plugins.seen');
-})();
+}());

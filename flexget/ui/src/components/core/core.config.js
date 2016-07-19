@@ -16,4 +16,4 @@
 			.warnPalette('amber');
 	}
 
-})();
+}());

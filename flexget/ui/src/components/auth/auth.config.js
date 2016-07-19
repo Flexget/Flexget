@@ -50,4 +50,4 @@
 			return $q.reject(rejection);
 		}
 	}
-})();
+}());

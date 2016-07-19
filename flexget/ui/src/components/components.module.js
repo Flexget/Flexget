@@ -11,4 +11,4 @@
 			'components.toolbar',
 			'components.user'
 		]);
-})();
+}());

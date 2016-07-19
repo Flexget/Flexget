@@ -43,4 +43,4 @@
 			$mdDialog.show(dialog);
 		}
 	}
-})();
+}());

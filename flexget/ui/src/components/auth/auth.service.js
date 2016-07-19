@@ -93,4 +93,4 @@
 			return exception.catcher(error);
         }
 	}
-})();
+}());

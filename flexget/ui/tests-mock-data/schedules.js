@@ -26,4 +26,4 @@ var mockSchedulesData = (function () {
 			]
 		}
 	}
-})();
+}());

@@ -43,4 +43,4 @@
 			return exception.catcher(error);
         }
     }
-})();
+}());

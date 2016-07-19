@@ -6,4 +6,4 @@
 			'ngMaterial',
 			'components.sidenav'
 		]);
-})();
+}());

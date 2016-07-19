@@ -7,4 +7,4 @@
 		]);
 	
 	registerPlugin('plugins.server');
-})();
+}());
