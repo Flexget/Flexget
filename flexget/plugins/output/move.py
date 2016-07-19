@@ -72,7 +72,7 @@ class BaseFileOps(object):
         min_size = entry.get('clean_source', config.get('clean_source', -1))
         if min_size < 0:
             return 
-        base_path = os.path.split(entry['location'])[0]
+        base_path = os.path.split(entry['old_location'])[0]
         # everything here happens after a successful execution of the main action: the entry has been moved in a 
         # different location, or it does not exists anymore. so from here we can just log warnings and move on.
         if not os.path.isdir(base_path):
