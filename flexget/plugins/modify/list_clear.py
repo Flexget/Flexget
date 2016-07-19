@@ -37,7 +37,7 @@ class ListClear(object):
                 if thelist.immutable:
                     raise plugin.PluginError(thelist.immutable)
                 if config['phase'] == task.current_phase:
-                    if task.manager.options.test:
+                    if task.manager.options.test and thelist.online:
                         log.info('would have cleared all items from %s - %s', plugin_name, plugin_config)
                         continue
                     log.verbose('clearing all items from %s - %s', plugin_name, plugin_config)
