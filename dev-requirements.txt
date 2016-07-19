@@ -9,10 +9,10 @@ vcrpy>=1.7.4
 virtualenv
 boto3
 wheel
-pytest >= 2.7
+pytest>=2.7
 pytest-capturelog
 pytest-xdist
 pytest-runner
 pytest-cov
 gitpython
-codacy-coverage
+codacy-coverage>=1.2.18
