@@ -206,14 +206,22 @@ class ImdbEntrySet(MutableSet):
                     'imdb_list_modified': datetime.strptime(row[3], '%a %b %d %H:%M:%S %Y') if row[3] else None,
                     'imdb_list_description': row[4],
                     'imdb_name': row[5],
-                    'movie_name': row[5],
                     'imdb_year': int(row[11]) if row[11] != '????' else None,
-                    'movie_year': int(row[11]) if row[11] != '????' else None,
                     'imdb_score': float(row[9]) if row[9] else None,
                     'imdb_user_score': float(row[8]) if row[8] else None,
                     'imdb_votes': int(row[13]) if row[13] else None,
                     'imdb_genres': [genre.strip() for genre in row[12].split(',')]
                 })
+                item_type = row[6].lower()
+                if item_type == 'feature film':
+                    entry['movie_name'] = row[5]
+                    entry['movie_year'] = int(row[11]) if row[11] != '????' else None
+                elif item_type == 'tv series':
+                    entry['series_name'] = row[5]
+                    entry['series_year'] = int(row[11]) if row[11] != '????' else None
+                else:
+                    log.verbose('Unknown IMDB type entry received: %s. Skipping', item_type)
+                    continue
                 self._items.append(entry)
         return self._items
 

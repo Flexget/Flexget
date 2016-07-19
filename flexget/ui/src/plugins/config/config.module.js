@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-		.module("plugins.config", [
+		.module('plugins.config', [
 			'ngMaterial',
 
 			'ab-base64',
