@@ -2,13 +2,13 @@ interactions:
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=game+of+thrones&type=show
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":58.460648,\"show\":{\"title\"\
+      body: {string: "[{\"type\":\"show\",\"score\":58.480095,\"show\":{\"title\"\
           :\"Game of Thrones\",\"overview\":\"Seven noble families fight for control\
           \ of the mythical land of Westeros. Friction between the houses leads to\
           \ full-scale war. All while a very ancient evil awakens in the farthest\
@@ -23,26 +23,26 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/390/fanarts/thumb/76d5df8aed.jpg\"\
           }},\"ids\":{\"trakt\":1390,\"slug\":\"game-of-thrones\",\"tvdb\":121361,\"\
           imdb\":\"tt0944947\",\"tmdb\":1399,\"tvrage\":24493}}},{\"type\":\"show\"\
-          ,\"score\":51.153065,\"show\":{\"title\":\"Game of Thrones Talk\",\"year\"\
+          ,\"score\":51.170086,\"show\":{\"title\":\"Game of Thrones Talk\",\"year\"\
           :2015,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"\
           medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
           thumb\":null}},\"ids\":{\"trakt\":97709,\"slug\":\"game-of-thrones-talk\"\
           ,\"tvdb\":293887,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\"\
-          :\"show\",\"score\":44.155136,\"show\":{\"title\":\"Gay of Thrones\",\"\
+          :\"show\",\"score\":44.280987,\"show\":{\"title\":\"Gay of Thrones\",\"\
           overview\":\"Hairstylist extraordinaire Jonathan Van Ness recaps new episodes\
           \ of Game of Thrones using his unique brand of panache, flair, and fabulousness.\"\
           ,\"year\":2013,\"status\":\"returning series\",\"images\":{\"poster\":{\"\
           full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
           medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":108159,\"slug\":\"gay-of-thrones\"\
           ,\"tvdb\":312618,\"imdb\":\"tt2946308\",\"tmdb\":null,\"tvrage\":null}}},{\"\
-          type\":\"show\",\"score\":43.845486,\"show\":{\"title\":\"Game of Thrones:\
+          type\":\"show\",\"score\":43.860073,\"show\":{\"title\":\"Game of Thrones:\
           \ Cartoon Parody\",\"overview\":\"A spoof/parody Based on HBO's hit series\
           \ \\\"A Game of Thrones\\\" and George RR Martin's A Song of Ice and Fire\"\
           ,\"year\":2011,\"status\":\"returning series\",\"images\":{\"poster\":{\"\
           full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
           medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":107818,\"slug\":\"game-of-thrones-cartoon-parody\"\
           ,\"tvdb\":311939,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\"\
-          :\"show\",\"score\":43.845486,\"show\":{\"title\":\"Game of Thrones The\
+          :\"show\",\"score\":43.860073,\"show\":{\"title\":\"Game of Thrones The\
           \ Podcast\",\"overview\":\"The Gods of Tits and Wine, Jim and A.Ron, review\
           \ each week\u2019s episode of HBO\u2019s Game of Thrones and your feedback.\"\
           ,\"year\":2015,\"status\":\"returning series\",\"images\":{\"poster\":{\"\
@@ -52,7 +52,7 @@ interactions:
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":98164,\"slug\":\"game-of-thrones-the-podcast\",\"tvdb\":294436,\"\
           imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :38.211193,\"show\":{\"title\":\"After the Thrones\",\"overview\":\"Weekly\
+          :38.3317,\"show\":{\"title\":\"After the Thrones\",\"overview\":\"Weekly\
           \ show that takes a lively, humorous and sophisticated look at Game of Thrones.\
           \ Each week, the show will recap the latest episode, explaining the different\
           \ events, exploring the complicated politics and history, and offering theories\
@@ -65,8 +65,8 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/106/908/fanarts/thumb/435559e2c1.jpg\"\
           }},\"ids\":{\"trakt\":106908,\"slug\":\"after-the-thrones\",\"tvdb\":309875,\"\
           imdb\":\"tt5665732\",\"tmdb\":66346,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":0.7042501,\"show\":{\"title\":\"Thronecast\",\"overview\":\"\
-          A companion series to Game of Thrones; each 10 minute show features interviews\
+          ,\"score\":0.703431,\"show\":{\"title\":\"Thronecast\",\"overview\":\"A\
+          \ companion series to Game of Thrones; each 10 minute show features interviews\
           \ with members of the cast and crew, as well as with fans of the books and\
           \ television series, alongside a review of the previous episode of Game\
           \ of Thrones.From the second series, a duo of fans called Elio and Linda\
@@ -80,7 +80,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/077/077/fanarts/thumb/780ca960d1.jpg\"\
           }},\"ids\":{\"trakt\":77077,\"slug\":\"thronecast\",\"tvdb\":280340,\"imdb\"\
           :\"tt4215716\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :0.63287854,\"show\":{\"title\":\"Britain's Bloodiest Dynasty\",\"overview\"\
+          :0.6322212,\"show\":{\"title\":\"Britain's Bloodiest Dynasty\",\"overview\"\
           :\"Out of the chaos, darkness and violence of the Middle Ages, one family\
           \ rose to seize control of England  - The Plantaganets. Acclaimed historian\
           \ Dan Jones tells the story of the dynasty who ruled England and much of\
@@ -94,7 +94,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/094/423/fanarts/thumb/dc5395086e.jpg\"\
           }},\"ids\":{\"trakt\":94423,\"slug\":\"britain-s-bloodiest-dynasty\",\"\
           tvdb\":289549,\"imdb\":\"tt4195344\",\"tmdb\":64302,\"tvrage\":null}}},{\"\
-          type\":\"show\",\"score\":0.6186335,\"show\":{\"title\":\"Doraleous and\
+          type\":\"show\",\"score\":0.61824536,\"show\":{\"title\":\"Doraleous and\
           \ Associates: The Series\",\"overview\":\"The adventures of Doraleous and\
           \ his associates as they set out to save Nudonia.An animated medieval fantasy\
           \ comedy exploring a world filled with knights, elves, wizards and dwarfs.If\
@@ -106,7 +106,7 @@ interactions:
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":76745,\"slug\":\"doraleous-and-associates-the-series\",\"tvdb\"\
           :262387,\"imdb\":\"tt2292210\",\"tmdb\":null,\"tvrage\":null}}},{\"type\"\
-          :\"show\",\"score\":0.61014175,\"show\":{\"title\":\"Film Theory\",\"overview\"\
+          :\"show\",\"score\":0.60991406,\"show\":{\"title\":\"Film Theory\",\"overview\"\
           :\"In each episode of Film Theorists\u2019 main series, Patrick dives into\
           \ a specific work and sheds light on elements that less careful consumers\
           \ may have missed. Despite the channel\u2019s title, it isn\u2019t limited\
@@ -117,68 +117,68 @@ interactions:
           ids\":{\"trakt\":100395,\"slug\":\"film-theory\",\"tvdb\":298055,\"imdb\"\
           :null,\"tmdb\":null,\"tvrage\":null}}}]"}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [2c3e2c46eb063c9b-CPH]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Sun, 17 Jul 2016 13:52:11 GMT']
-        etag: [W/"b2ea157e5ead484c9e2eaf8ad9b42617"]
-        expires: ['Sun, 17 Jul 2016 17:52:11 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dc1c7271582d244ae0e4e8b3c41e082ce1468763531; expires=Mon,
-            17-Jul-17 13:52:11 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['13']
-        x-pagination-limit: ['10']
-        x-pagination-page: ['1']
-        x-pagination-page-count: ['2']
-        x-request-id: [bcb98522-c8ed-4d4f-993c-30eb2f9587b3]
-        x-runtime: ['0.015962']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [2c4c2a5b476519c8-SYD]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Tue, 19 Jul 2016 06:37:33 GMT']
+        ETag: [W/"27afcf61d67969e89439e46ec1cd0d57"]
+        Expires: ['Tue, 19 Jul 2016 10:37:33 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=d51a121ca7a92b46fb89894356b9d7cd91468910253; expires=Wed,
+            19-Jul-17 06:37:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['13']
+        X-Pagination-Limit: ['10']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['2']
+        X-Request-Id: [74b9cce1-20d2-44f3-9aac-2277e580fca5]
+        X-Runtime: ['0.020839']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        Cookie: [__cfduid=dc1c7271582d244ae0e4e8b3c41e082ce1468763531]
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        Cookie: [__cfduid=d51a121ca7a92b46fb89894356b9d7cd91468910253]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/shows/1390?extended=full%2Cimages
     response:
-      body: {string: !!python/unicode '{"title":"Game of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493},"overview":"Seven
+      body: {string: '{"title":"Game of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493},"overview":"Seven
           noble families fight for control of the mythical land of Westeros. Friction
           between the houses leads to full-scale war. All while a very ancient evil
           awakens in the farthest north. Amidst the war, a neglected military order
           of misfits, the Night''s Watch, is all that stands between the realms of
-          men and the icy horrors beyond.","first_aired":"2011-04-17T07:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":55,"certification":"TV-MA","network":"HBO","country":"us","trailer":"http://youtube.com/watch?v=BpJYNVhGf1s","homepage":"http://www.hbo.com/game-of-thrones","status":"returning
-          series","rating":9.38553,"votes":48839,"updated_at":"2016-07-17T10:40:17.000Z","language":"en","available_translations":["en","fr","it","de","es","ru","hu","el","cs","pt","sk","nl","bg","sv","zh","pl","fa","da","tr","he","ro","fi","th","ko","uk","is","lt","hr","bs","ar","id","tw","lb","vi"],"genres":["drama","fantasy","science-fiction","action","adventure"],"aired_episodes":60,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/001/390/fanarts/original/76d5df8aed.jpg","medium":"https://walter.trakt.us/images/shows/000/001/390/fanarts/medium/76d5df8aed.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/390/fanarts/thumb/76d5df8aed.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/001/390/posters/original/93df9cd612.jpg","medium":"https://walter.trakt.us/images/shows/000/001/390/posters/medium/93df9cd612.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/390/posters/thumb/93df9cd612.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/001/390/logos/original/13b614ad43.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/001/390/cleararts/original/5cbde9e647.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/001/390/banners/original/9fefff703d.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/001/390/thumbs/original/7beccbd5a1.jpg"}}}'}
+          men and the icy horrors beyond.","first_aired":"2011-04-18T01:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":60,"certification":"TV-MA","network":"HBO","country":"us","trailer":"http://youtube.com/watch?v=BpJYNVhGf1s","homepage":"http://www.hbo.com/game-of-thrones","status":"returning
+          series","rating":9.38568,"votes":48883,"updated_at":"2016-07-18T10:57:05.000Z","language":"en","available_translations":["en","fr","it","de","es","ru","hu","el","cs","pt","sk","nl","bg","sv","zh","pl","fa","da","tr","he","ro","fi","th","ko","uk","is","lt","hr","bs","ar","id","tw","lb","vi"],"genres":["drama","fantasy","science-fiction","action","adventure"],"aired_episodes":60,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/001/390/fanarts/original/76d5df8aed.jpg","medium":"https://walter.trakt.us/images/shows/000/001/390/fanarts/medium/76d5df8aed.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/390/fanarts/thumb/76d5df8aed.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/001/390/posters/original/93df9cd612.jpg","medium":"https://walter.trakt.us/images/shows/000/001/390/posters/medium/93df9cd612.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/390/posters/thumb/93df9cd612.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/001/390/logos/original/13b614ad43.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/001/390/cleararts/original/5cbde9e647.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/001/390/banners/original/9fefff703d.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/001/390/thumbs/original/7beccbd5a1.jpg"}}}'}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [2c3e2c470b083c9b-CPH]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Sun, 17 Jul 2016 13:52:11 GMT']
-        etag: [W/"012538e8b2075529eddf64ba6b4a9d43"]
-        expires: ['Sun, 17 Jul 2016 17:52:11 GMT']
-        last-modified: ['Sun, 17 Jul 2016 10:40:17 GMT']
-        server: [cloudflare-nginx]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [78ff3653-3087-4471-abc6-b2ffb643725f]
-        x-runtime: ['0.012234']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [2c4c2a5b676719c8-SYD]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Tue, 19 Jul 2016 06:37:33 GMT']
+        ETag: [W/"489e41420a89316d7c96e3dc4940f89a"]
+        Expires: ['Tue, 19 Jul 2016 10:37:33 GMT']
+        Last-Modified: ['Mon, 18 Jul 2016 10:57:05 GMT']
+        Server: [cloudflare-nginx]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [eed89c89-dd66-487e-9c8e-aa09ad28f342]
+        X-Runtime: ['0.010050']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/shows/1390/translations?extended=full%2Cimages
@@ -676,22 +676,22 @@ interactions:
           ,\"overview\":\"\",\"language\":\"lb\"},{\"title\":\"Game of Thrones\",\"\
           overview\":\"\",\"language\":\"vi\"}]"}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [2c3e2c47a3e33d37-CPH]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Sun, 17 Jul 2016 13:52:11 GMT']
-        etag: [W/"f95c3dd4a0f85cf0b719de4a5b58a29e"]
-        expires: ['Sun, 17 Jul 2016 17:52:11 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d99cd74b6bd28a2b1b52a28525cca75741468763531; expires=Mon,
-            17-Jul-17 13:52:11 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [57e2bf7e-2de1-4295-b202-ee848f3f0a43]
-        x-runtime: ['0.022307']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [2c4c2a5caea80b1a-SYD]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Tue, 19 Jul 2016 06:37:33 GMT']
+        ETag: [W/"f95c3dd4a0f85cf0b719de4a5b58a29e"]
+        Expires: ['Tue, 19 Jul 2016 10:37:33 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=df8e8c5bbbeb1ea9954bc52c904b7ca3f1468910253; expires=Wed,
+            19-Jul-17 06:37:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [0e36ed3a-3f90-456d-9743-d4ab92c048e6]
+        X-Runtime: ['0.030045']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

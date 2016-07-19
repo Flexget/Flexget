@@ -2,14 +2,14 @@ interactions:
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":82.07084,\"show\":{\"title\":\"\
-          The X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI\
+      body: {string: "[{\"type\":\"show\",\"score\":83.553276,\"show\":{\"title\"\
+          :\"The X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI\
           \ Agents Fox Mulder, Dana Scully, John Doggett and Monica Reyes and their\
           \ investigations into the paranormal. From genetic mutants and killer insects\
           \ to a global conspiracy concerning the colonization of Earth by an alien\
@@ -24,7 +24,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg\"\
           }},\"ids\":{\"trakt\":4063,\"slug\":\"the-x-files\",\"tvdb\":77398,\"imdb\"\
           :\"tt0106179\",\"tmdb\":4087,\"tvrage\":6312}}},{\"type\":\"show\",\"score\"\
-          :79.43787,\"show\":{\"title\":\"NASA's X-Files\",\"overview\":\"Soar beyond\
+          :80.89894,\"show\":{\"title\":\"NASA's X-Files\",\"overview\":\"Soar beyond\
           \ the horizon and into the future of aviation with unprecedented behind\
           \ the scenes access to NASA's Dryden Flight Research Center. Experience\
           \ never-before-seen test flight footage, from the first supersonic X-1 to\
@@ -32,7 +32,7 @@ interactions:
           :\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"\
           thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"\
           ids\":{\"trakt\":21742,\"slug\":\"nasa-s-x-files\",\"tvdb\":150181,\"imdb\"\
-          :\"\",\"tmdb\":21843,\"tvrage\":19772}}},{\"type\":\"show\",\"score\":79.43731,\"\
+          :\"\",\"tmdb\":21843,\"tvrage\":19772}}},{\"type\":\"show\",\"score\":80.89839,\"\
           show\":{\"title\":\"Ancient X-Files\",\"overview\":\"Ancient X Files travels\
           \ around the world to solve some intriguing riddles. Each story is a piece\
           \ of detective work by an expert trying to make sense of some puzzling ancient\
@@ -52,7 +52,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/061/075/posters/thumb/6eb48ec869.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":61075,\"slug\":\"ancient-x-files\",\"tvdb\":214961,\"imdb\":\"tt1734568\"\
-          ,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":59.582935,\"\
+          ,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":60.678684,\"\
           show\":{\"title\":\"National Geographic Wild X Files\",\"overview\":\"From\
           \ the odd and amusing to the downright creepy, mysteries found in nature\
           \ are no less weird than anything found in popular science fiction!In a\
@@ -71,7 +71,7 @@ interactions:
           fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\"\
           :67848,\"slug\":\"national-geographic-wild-x-files\",\"tvdb\":262652,\"\
           imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :59.563457,\"show\":{\"title\":\"Joseon X-Files: Mystery Investigation Record\"\
+          :60.659443,\"show\":{\"title\":\"Joseon X-Files: Mystery Investigation Record\"\
           ,\"overview\":\"Joseon X-Files is based on cases detailed in the Annals\
           \ of Joseon History with a bizarre twist; these incidents incorporate mysterious,\
           \ supernatural elements that cannot be explained through science. Kim Hyung\
@@ -86,7 +86,7 @@ interactions:
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":62570,\"slug\":\"joseon-x-files-mystery-investigation-record\",\"\
           tvdb\":204501,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"\
-          show\",\"score\":4.590576,\"show\":{\"title\":\"The After\",\"overview\"\
+          show\",\"score\":4.6396394,\"show\":{\"title\":\"The After\",\"overview\"\
           :\"An Amazon Original Pilot: From Chris Carter, creator of The X-Files.\
           \ Eight strangers are thrown together by mysterious forces and must help\
           \ each other survive in a violent world that defies explanation.\",\"year\"\
@@ -94,7 +94,7 @@ interactions:
           medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
           thumb\":null}},\"ids\":{\"trakt\":96230,\"slug\":\"the-after-2014\",\"tvdb\"\
           :292193,\"imdb\":\"tt3145422\",\"tmdb\":null,\"tvrage\":null}}},{\"type\"\
-          :\"show\",\"score\":3.7326574,\"show\":{\"title\":\"Poltergeist: The Legacy\"\
+          :\"show\",\"score\":3.7730274,\"show\":{\"title\":\"Poltergeist: The Legacy\"\
           ,\"overview\":\"'Since the beginning of time mankind has existed between\
           \ the world of light and the world of darkness. This journal chronicles\
           \ the work of our secret society, known as The Legacy. Created to protect\
@@ -112,7 +112,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/thumb/f5295c0053.jpg\"\
           }},\"ids\":{\"trakt\":11131,\"slug\":\"poltergeist-the-legacy\",\"tvdb\"\
           :77952,\"imdb\":\"tt0115317\",\"tmdb\":11183,\"tvrage\":null}}},{\"type\"\
-          :\"show\",\"score\":3.3003268,\"show\":{\"title\":\"The Lone Gunmen\",\"\
+          :\"show\",\"score\":3.3326561,\"show\":{\"title\":\"The Lone Gunmen\",\"\
           overview\":\"Spin-off of The X-Files featuring the trio of computer-hacking\
           \ conspiracy geeks popularly known as The Lone Gunmen. Never ones to stray\
           \ far from the center of corporate and government intrigue, the threesome\
@@ -135,8 +135,8 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/thumb/4cbf0c5a4b.jpg\"\
           }},\"ids\":{\"trakt\":5686,\"slug\":\"the-lone-gunmen\",\"tvdb\":76245,\"\
           imdb\":\"tt0243069\",\"tmdb\":5715,\"tvrage\":5939}}},{\"type\":\"show\"\
-          ,\"score\":2.5062566,\"show\":{\"title\":\"The Imaginatively Titled Punt\
-          \ & Dennis Show\",\"overview\":\"The Imaginatively Titled Punt and Dennis\
+          ,\"score\":2.53108,\"show\":{\"title\":\"The Imaginatively Titled Punt &\
+          \ Dennis Show\",\"overview\":\"The Imaginatively Titled Punt and Dennis\
           \ show featured Steve Punt and Hugh Dennis in a vast array of studio gags,\
           \ filmed sketches and parodies of famous TV dramas such as the X-Files,\
           \ Baywatch and ER. Each show would focus on a theme, be it crime, holidays,\
@@ -154,7 +154,7 @@ interactions:
           medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
           thumb\":null}},\"ids\":{\"trakt\":9082,\"slug\":\"the-imaginatively-titled-punt-dennis-show\"\
           ,\"tvdb\":78570,\"imdb\":\"\",\"tmdb\":9129,\"tvrage\":5867}}},{\"type\"\
-          :\"show\",\"score\":0.9059598,\"show\":{\"title\":\"Kumail Nanjiani\",\"\
+          :\"show\",\"score\":0.92165494,\"show\":{\"title\":\"Kumail Nanjiani\",\"\
           overview\":\"Kumail Nanjiani; born 21 February 1978) is a Pakistani-American\
           \ stand-up comedian, actor and podcast host. He starred on the TNT series\
           \ Franklin & Bash and co-hosts the show The Meltdown with Jonah and Kumail.\
@@ -170,39 +170,39 @@ interactions:
           }},\"ids\":{\"trakt\":75141,\"slug\":\"kumail-nanjiani\",\"tvdb\":276450,\"\
           imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [2c3e21feab763d0d-CPH]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Sun, 17 Jul 2016 13:45:10 GMT']
-        etag: [W/"262ce6f2afec0edea73393bde5b303fe"]
-        expires: ['Sun, 17 Jul 2016 17:45:10 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d2e090a36be33ee8e4fe0b320f1a70ad31468763110; expires=Mon,
-            17-Jul-17 13:45:10 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['15']
-        x-pagination-limit: ['10']
-        x-pagination-page: ['1']
-        x-pagination-page-count: ['2']
-        x-request-id: [cea63fd4-1678-4988-bfe6-fce3933c64eb]
-        x-runtime: ['0.019071']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [2c4c2a5532ca04c2-SYD]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Tue, 19 Jul 2016 06:37:32 GMT']
+        ETag: [W/"4f2c7e9ac3662918fb8324aea7f6572f"]
+        Expires: ['Tue, 19 Jul 2016 10:37:32 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=d177177b71bd8d1bc451c6636f5fbf8641468910252; expires=Wed,
+            19-Jul-17 06:37:32 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['15']
+        X-Pagination-Limit: ['10']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['2']
+        X-Request-Id: [441b5d7f-318d-4327-9ecf-68cf0c6244b8]
+        X-Runtime: ['0.020362']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        Cookie: [__cfduid=d2e090a36be33ee8e4fe0b320f1a70ad31468763110]
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        Cookie: [__cfduid=d177177b71bd8d1bc451c6636f5fbf8641468910252]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
     response:
-      body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
+      body: {string: '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
           X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
           Doggett and Monica Reyes and their investigations into the paranormal. From
           genetic mutants and killer insects to a global conspiracy concerning the
@@ -213,28 +213,28 @@ interactions:
           (US)","country":"us","trailer":"http://youtube.com/watch?v=rsBX-8vWgCc","homepage":"http://www.fox.com/the-x-files","status":"returning
           series","rating":8.80334,"votes":6280,"updated_at":"2016-07-14T10:41:47.000Z","language":"en","available_translations":["en","hu","ru","pt","es","bg","nl","it","el","fr","he","de","ar","ja","ro","uk","bs","cs","tr","da","fi","ko","pl","zh"],"genres":["drama","mystery","science-fiction","fantasy"],"aired_episodes":208,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/004/063/fanarts/original/1f0b461052.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/004/063/posters/original/034cc070a9.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/004/063/logos/original/ba7ac727c2.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/004/063/cleararts/original/a4a0db2c8d.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/004/063/banners/original/0927751ec8.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/004/063/thumbs/original/74d4f3d798.jpg"}}}'}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [2c3e21fedb783d0d-CPH]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Sun, 17 Jul 2016 13:45:10 GMT']
-        etag: [W/"faa04f686917eaf5bfe956f7985f77ac"]
-        expires: ['Sun, 17 Jul 2016 17:45:10 GMT']
-        last-modified: ['Thu, 14 Jul 2016 10:41:47 GMT']
-        server: [cloudflare-nginx]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [6a2dbade-e3f3-4634-807b-1e1128bdc682]
-        x-runtime: ['0.012837']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [2c4c2a5572d304c2-SYD]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Tue, 19 Jul 2016 06:37:32 GMT']
+        ETag: [W/"faa04f686917eaf5bfe956f7985f77ac"]
+        Expires: ['Tue, 19 Jul 2016 10:37:32 GMT']
+        Last-Modified: ['Thu, 14 Jul 2016 10:41:47 GMT']
+        Server: [cloudflare-nginx]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [4edfee1d-55a9-42c2-9f2b-4578f09517ce]
+        X-Runtime: ['0.014491']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/shows/4063/people?extended=full%2Cimages
@@ -355,22 +355,22 @@ interactions:
           \ 2008 film, Flash of Genius.\",\"birthday\":\"1952-04-05\",\"death\":null,\"\
           birthplace\":\"Portland - Oregon - USA\",\"homepage\":\"\"}}]}"}
       headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [2c3e21ff736d3d0d-CPH]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Sun, 17 Jul 2016 13:45:10 GMT']
-        etag: [W/"04d3f674020a5d06f188545ebe8f7daf"]
-        expires: ['Sun, 17 Jul 2016 17:45:10 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d2e090a36be33ee8e4fe0b320f1a70ad31468763110; expires=Mon,
-            17-Jul-17 13:45:10 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [e4c80746-27cc-4163-906a-a33325531406]
-        x-runtime: ['0.020342']
-        x-xss-protection: [1; mode=block]
+        CF-Cache-Status: [HIT]
+        CF-RAY: [2c4c2a5740bc19c8-SYD]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Tue, 19 Jul 2016 06:37:32 GMT']
+        ETag: [W/"e3667c248c31d9cc8aca7cfcd1751a1f"]
+        Expires: ['Tue, 19 Jul 2016 10:37:32 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=d4642e78638a56808c84332397e519a921468910252; expires=Wed,
+            19-Jul-17 06:37:32 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [c80c9a28-06dc-458b-a518-8755f1f82e15]
+        X-Runtime: ['0.031093']
+        X-XSS-Protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1
