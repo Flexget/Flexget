@@ -1,6 +1,5 @@
 FeedParser>=5.2.1
-# There is a bug in sqlalchemy 0.9.0, see gh#127
-SQLAlchemy >=0.7.5, !=0.9.0, <1.999
+SQLAlchemy >=1.0.9, <1.999
 PyYAML
 # There is a bug in beautifulsoup 4.2.0 that breaks imdb parsing, see http://flexget.com/ticket/2091
 beautifulsoup4>=4.1, !=4.2.0, <4.5
