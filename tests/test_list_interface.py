@@ -126,6 +126,18 @@ class TestListInterface(object):
 
           get_for_list_queue:
              movie_list: test_list_queue
+
+          test_list_clear_start:
+            entry_list: test_list
+            list_clear:
+              what:
+                - entry_list: test_list
+              phase: start
+          test_list_clear_exit:
+            entry_list: test_list
+            list_clear:
+              what:
+                - entry_list: test_list
     """
 
     def test_list_add(self, execute_task):
@@ -253,3 +265,20 @@ class TestListInterface(object):
 
         task = execute_task('get_for_list_queue')
         assert len(task.entries) == 1
+
+    def test_list_clear_start(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 2
+
+        task = execute_task('test_list_clear_start')
+        assert len(task.entries) == 0
+
+    def test_list_clear_exit(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 2
+
+        task = execute_task('test_list_clear_exit')
+        assert len(task.entries) == 2
+
+        task = execute_task('list_get')
+        assert len(task.entries) == 0
