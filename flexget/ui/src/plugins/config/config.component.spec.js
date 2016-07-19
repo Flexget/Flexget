@@ -1,4 +1,4 @@
-describe("Plugin: Config.component", function () {
+describe('Plugin: Config.component', function () {
 	var controller;
 	var rawConfig = mockConfigData.getMockRawConfig();
 
@@ -16,11 +16,11 @@ describe("Plugin: Config.component", function () {
 		controller = $componentController('configView');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(controller).to.exist;
 	});
 
-	describe("activation", function () {
+	describe('activation', function () {
 		beforeEach(function () {
 			controller.$onInit();
 			$rootScope.$digest();
@@ -34,7 +34,7 @@ describe("Plugin: Config.component", function () {
 			expect(CacheFactory.get('aceThemeCache')).to.exist;
 		})
 		
-		it("should set the aceOptions and themes", function () {
+		it('should set the aceOptions and themes', function () {
 			expect(controller.aceOptions).to.exist;
 			
 			expect(controller.themes).to.exist;

@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-		.module("plugins.config")
+		.module('plugins.config')
 		.run(appRun);
 
 	function appRun($state, routerHelper, toolBarService) {
