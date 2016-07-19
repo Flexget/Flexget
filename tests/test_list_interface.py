@@ -138,6 +138,12 @@ class TestListInterface(object):
             list_clear:
               what:
                 - entry_list: test_list
+          test_list_clear_input:
+            entry_list: test_list
+            list_clear:
+              what:
+                - entry_list: test_list
+              phase: input
     """
 
     def test_list_add(self, execute_task):
@@ -281,4 +287,11 @@ class TestListInterface(object):
         assert len(task.entries) == 2
 
         task = execute_task('list_get')
+        assert len(task.entries) == 0
+
+    def test_list_clear_input(self, execute_task):
+        task = execute_task('test_list_add')
+        assert len(task.entries) == 2
+
+        task = execute_task('test_list_clear_input')
         assert len(task.entries) == 0

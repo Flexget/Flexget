@@ -26,6 +26,7 @@ class ListClear(object):
         'required': ['what']
     }
 
+    @plugin.priority(255)
     def on_task_start(self, task, config):
         for item in config['what']:
             for plugin_name, plugin_config in item.items():
