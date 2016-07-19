@@ -255,4 +255,4 @@ var mockMovieListData = (function () {
 			"year": 2016
 		}
 	}
-})();
+}());

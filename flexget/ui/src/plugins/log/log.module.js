@@ -13,4 +13,4 @@
 		]);
 
 	registerPlugin('plugins.log');
-})();
+}());

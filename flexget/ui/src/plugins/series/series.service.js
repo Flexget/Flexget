@@ -163,4 +163,4 @@
 			return exception.catcher(error);
 		}
     }
-})();
+}());

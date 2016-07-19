@@ -91,4 +91,4 @@
 			vm.streamProgress = totalPercent / vm.streamTasks.length;
 		}
 	}
-})();
+}());

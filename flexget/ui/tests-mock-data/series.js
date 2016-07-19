@@ -376,4 +376,4 @@ var mockSeriesData = (function () {
 			"release_title": "Awkward S05E16 HDTV x264 FLEET rartv"
 		}
 	}
-})();
+}());

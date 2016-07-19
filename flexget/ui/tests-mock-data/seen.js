@@ -143,4 +143,4 @@ var mockSeenData = (function () {
 			"total_number_of_seen_entries": 3986
 		}
 	}
-})();
+}());

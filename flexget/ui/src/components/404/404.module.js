@@ -5,4 +5,4 @@
         .module("components.404", [
 			'blocks.router'
 		]);
-})();
+}());

@@ -5,4 +5,4 @@
         .module("blocks.exception", [
 			'blocks.error'
 		]);
-})();
+}());

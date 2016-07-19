@@ -48,4 +48,4 @@
 			$interval.cancel(taskInterval);
 		}
 	}
-})();
+}());

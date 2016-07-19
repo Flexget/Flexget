@@ -33,4 +33,4 @@ var mockStatesData = (function () {
 			}
 		]
 	}
-})();
+}());

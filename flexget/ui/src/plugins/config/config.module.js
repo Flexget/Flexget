@@ -16,4 +16,4 @@
 		]);
 	
 	registerPlugin('plugins.config');
-})();
+}());

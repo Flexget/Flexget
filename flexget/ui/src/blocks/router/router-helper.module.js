@@ -5,4 +5,4 @@
 		.module('blocks.router', [
 		'ui.router'
 	]);
-})();
+}());

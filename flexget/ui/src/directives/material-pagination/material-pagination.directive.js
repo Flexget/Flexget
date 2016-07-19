@@ -126,4 +126,4 @@
     setPrevNext(scope, pageCount, 'next');
   }
 
-})();
+}());

@@ -12,4 +12,4 @@
 		]);
 	
 	registerPlugin('plugins.series');
-})();
+}());

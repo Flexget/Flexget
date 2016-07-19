@@ -27,4 +27,4 @@
 		toolBarService.registerItem(reloadButton);
 		toolBarService.registerItem(shutdownButton);
 	}
-})();
+}());
