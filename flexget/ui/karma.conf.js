@@ -48,7 +48,8 @@ module.exports = function(config) {
     coverageReporter: {
       type: 'lcovonly',
       dir: '.',
-      file: 'webui-coverage.info'
+      file: 'webui-coverage.info',
+      subdir: '.'
     },
 
     // web server port
