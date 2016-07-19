@@ -9,7 +9,7 @@
 			'components.toolbar',
 			'ui.grid',
 			'ui.grid.autoResize',
-			//'ui.grid.autoScroll'
+			'ui.grid.autoScroll'
 		]);
 
 	registerPlugin('plugins.log');
