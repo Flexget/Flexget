@@ -21,13 +21,18 @@ class ListClear(object):
                      'error_maxProperties': 'Plugin options within list_clear plugin must be indented '
                                             '2 more spaces than the first letter of the plugin name.',
                      'minProperties': 1}]}},
-            'phase': {'type': 'string', 'enum': plugin.task_phases, 'default': 'exit'}
+            'phase': {'type': 'string', 'enum': plugin.task_phases, 'default': 'start'}
         },
         'required': ['what']
     }
 
+    def __getattr__(self, phase):
+        # enable plugin in regular task phases
+        if phase.replace('on_task_', '') in plugin.task_phases:
+            return self.clear
+
     @plugin.priority(255)
-    def on_task_start(self, task, config):
+    def clear(self, task, config):
         for item in config['what']:
             for plugin_name, plugin_config in item.items():
                 try:
@@ -42,15 +47,6 @@ class ListClear(object):
                         continue
                     log.verbose('clearing all items from %s - %s', plugin_name, plugin_config)
                     thelist.clear()
-
-    on_task_input = on_task_start
-    on_task_metainfo = on_task_start
-    on_task_filter = on_task_start
-    on_task_download = on_task_start
-    on_task_modify = on_task_start
-    on_task_output = on_task_start
-    on_task_learn = on_task_start
-    on_task_exit = on_task_start
 
 
 @event('plugin.register')

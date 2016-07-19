@@ -132,12 +132,12 @@ class TestListInterface(object):
             list_clear:
               what:
                 - entry_list: test_list
-              phase: start
           test_list_clear_exit:
             entry_list: test_list
             list_clear:
               what:
                 - entry_list: test_list
+              phase: exit
           test_list_clear_input:
             entry_list: test_list
             list_clear:
