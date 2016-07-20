@@ -1,3 +1,4 @@
+/* global bard */
 describe('Blocks: UrlInterceptor', function () {
 	var httpProvider;
 	beforeEach(function () {
@@ -6,6 +7,7 @@ describe('Blocks: UrlInterceptor', function () {
 				httpProvider = $httpProvider;
 			});
 
+		/* global urlInterceptor */
 		bard.inject('urlInterceptor');
 	});
 

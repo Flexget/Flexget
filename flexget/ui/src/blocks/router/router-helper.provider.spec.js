@@ -1,6 +1,9 @@
+/* global bard */
 describe('Blocks: Router', function () {
 	beforeEach(function () {
 		bard.appModule('blocks.router');
+
+		/* global routerHelper */
 		bard.inject('routerHelper');
 	});
 
