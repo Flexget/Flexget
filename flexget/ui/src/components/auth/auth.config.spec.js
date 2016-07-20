@@ -1,3 +1,4 @@
+/* global bard */
 describe('Login Config: ', function () {
 	var httpProvider;
 	beforeEach(function () {
@@ -6,6 +7,7 @@ describe('Login Config: ', function () {
 				httpProvider = $httpProvider;
 			});
 
+		/* global authInterceptor, authService, $rootScope */
 		bard.inject('authInterceptor', 'authService', '$rootScope');
 	});
 

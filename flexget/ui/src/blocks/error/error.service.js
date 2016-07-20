@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -34,7 +35,7 @@
 			});
 		}
 
-		//TODO: Test		
+		//TODO: Test
 		function showDialog(error) {
 			dialog.locals = {
 				error: error

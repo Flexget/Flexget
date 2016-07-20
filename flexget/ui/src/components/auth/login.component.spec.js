@@ -1,8 +1,11 @@
+/* global bard */
 describe('Login Component:', function () {
 	var component, deferred;
 
 	beforeEach(function () {
 		bard.appModule('components.auth');
+
+		/* global $componentController, authService, $state, $q, $rootScope */
 		bard.inject('$componentController', 'authService', '$state', '$q', '$rootScope');
 	});
 
@@ -17,7 +20,7 @@ describe('Login Component:', function () {
 	describe('login()', function () {
 		beforeEach(function () {
 			deferred = $q.defer();
-			
+
 			sinon.stub(authService, 'login').returns(deferred.promise);
 		});
 		it('should exist', function () {

@@ -1,3 +1,4 @@
+/* global angular*/
 (function () {
 	'use strict';
 
@@ -31,7 +32,7 @@
 		return {
 			responseError: responseError
         };
-		
+
 		function loginRequired() {
 			var authService = $injector.get('authService');
 			authService.state($state.current, $state.params);

@@ -1,3 +1,4 @@
+/* angular */
 (function () {
     'use strict';
 

@@ -1,7 +1,8 @@
+/* global bard */
 describe('Blocks: Error', function () {
 	describe('Error-dialog.component', function () {
 		var controller;
-		
+
 		var mockError = {
 			'code': 500,
 			'message': 'Server error',
@@ -18,6 +19,8 @@ describe('Blocks: Error', function () {
 
 		beforeEach(function () {
 			bard.appModule('blocks.error');
+
+			/* global $componentController, $mdDialog */
 			bard.inject('$componentController', '$mdDialog');
 		});
 
@@ -41,7 +44,7 @@ describe('Blocks: Error', function () {
 				expect(controller.close).to.exist;
 				expect(controller.close).to.be.a('function');
 			});
-			
+
 			it('should close the dialog', function () {
 				sinon.spy($mdDialog, 'hide');
 
