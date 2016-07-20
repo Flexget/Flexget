@@ -6,7 +6,7 @@ import copy
 from flask import request, jsonify
 
 from flexget.manager import manager
-from flexget.plugins.daemon.scheduler import schedule_schema, main_schema, scheduler, scheduler_job_map
+from flexget.plugins.daemon.scheduler import schedule_schema, scheduler, scheduler_job_map
 from flexget.api import api, APIResource
 
 schedule_api = api.namespace('schedules', description='Task Scheduler')
