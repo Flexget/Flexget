@@ -548,13 +548,6 @@ def complex_test():
         series.accept('text')
         series.accept('number')
         bundle = series.accept('dict')
-        # prevent invalid indentation level
-        """
-        bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp',
-            'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality',
-            'max_quality', 'qualities', 'exact', 'from_group'],
-            'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
-        """
         bundle.accept_any_key('path')
         options = bundle.accept_any_key('dict')
         build_options_validator(options)
