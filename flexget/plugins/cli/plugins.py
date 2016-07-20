@@ -34,7 +34,7 @@ def plugins_summary(manager, options):
             flags.append('debug')
         handlers = plugin.phase_handlers
         roles = ', '.join('%s(%s)' % (phase, handlers[phase].priority) for phase in handlers)
-        tab = '|'
+
         if options.porcelain:
             console('%-30s%-s%-30s%-s%s' % (plugin.name, '|', roles, '|', ', '.join(flags)))
         else:

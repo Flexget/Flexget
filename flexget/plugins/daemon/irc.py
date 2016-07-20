@@ -775,7 +775,7 @@ class IRCConnectionManager(object):
     def stop_connections(self, wait):
         global irc_connections
 
-        for conn_name, conn in irc_connections.items():
+        for _, conn in irc_connections.items():
             conn.stop(wait)
             conn.thread.join(1)
         irc_connections = {}

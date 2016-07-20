@@ -348,7 +348,7 @@ class TimedDict(MutableMapping):
 
     def _prune(self):
         """Prune all expired keys."""
-        for key, (add_time, value) in list(self._store.items()):
+        for key, (add_time, _) in list(self._store.items()):
             if add_time < datetime.now() - self.cache_time:
                 del self._store[key]
         self._last_prune = datetime.now()

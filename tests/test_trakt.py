@@ -666,7 +666,7 @@ class TestTraktUnicodeLookup(object):
             assert len(r) == 1, 'Should have added a search result'
             assert r[0].search == '\u0417\u0435\u0440\u043a\u0430\u043b\u0430 Mirrors 2008'.lower(), \
                 'The search result should be lower case'
-        task = execute_task('test_unicode')
+        execute_task('test_unicode')
         with Session() as session:
             r = session.query(TraktMovieSearchResult).all()
             assert len(r) == 1, 'Should not have added a new row'

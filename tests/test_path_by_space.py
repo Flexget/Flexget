@@ -125,7 +125,7 @@ class TestPathSelect(object):
             ], "path %s not in list" % task.entries[0].get('path')
 
     def test_most_free_percent_within(self, disk_static_func, no_path_validation, execute_task):
-        for i in range(0, 2):
+        for _ in range(0, 2):
             task = execute_task('test_most_free_percent_within')
             assert task.entries[0].get('path') in [
                 '/data/50G,100G',
@@ -134,7 +134,7 @@ class TestPathSelect(object):
             ], "path %s not in list" % task.entries[0].get('path')
 
     def test_most_used_percent(self, disk_static_func, no_path_validation, execute_task):
-        for i in range(0, 2):
+        for _ in range(0, 2):
             task = execute_task('test_most_used_percent')
             assert task.entries[0].get('path') in [
                 '/data/99G,100G',
@@ -142,7 +142,7 @@ class TestPathSelect(object):
             ], "path %s not in list" % task.entries[0].get('path')
 
     def test_most_used(self, disk_static_func, no_path_validation, execute_task):
-        for i in range(0, 2):
+        for _ in range(0, 2):
             task = execute_task('test_most_used')
             assert task.entries[0].get('path') in [
                 '/data/90G,100G',

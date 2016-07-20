@@ -32,7 +32,7 @@ class UrlRewriteNewzleech(object):
             'Connection': 'keep-alive',
         }
         nzbs = set()
-        for search_string in entry.get('search_strings', [entry['title']]):
+        for _ in entry.get('search_strings', [entry['title']]):
             query = entry['title']
             url = u'http://newzleech.com/?%s' % str(urlencode({'q': query.encode('latin1'),
                                                                'm': 'search', 'group': '', 'min': 'min',

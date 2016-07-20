@@ -63,10 +63,10 @@ def imdb_query(session):
             filter(Movie.url == url).first()
 
         # access it's members so they're loaded
-        var = [x.name for x in movie.genres]
-        var = [x.name for x in movie.directors]
-        var = [x.name for x in movie.actors]
-        var = [x.name for x in movie.languages]
+        [x.name for x in movie.genres]
+        [x.name for x in movie.directors]
+        [x.name for x in movie.actors]
+        [x.name for x in movie.languages]
 
     log_query_count('test')
     took = time.time() - start_time

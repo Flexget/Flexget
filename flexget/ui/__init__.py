@@ -48,7 +48,7 @@ def root():
 
 def _find(path, f):
     matches = []
-    for root_dir, dir_names, file_names in os.walk(path):
+    for root_dir, _, file_names in os.walk(path):
         for filename in fnmatch.filter(file_names, f):
             matches.append(os.path.join(root_dir, filename))
     return matches

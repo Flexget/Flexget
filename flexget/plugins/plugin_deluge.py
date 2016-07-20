@@ -683,7 +683,7 @@ class OutputDeluge(DelugePlugin):
                 @defer.inlineCallbacks
                 def _wait_for_metadata(torrent_id, timeout):
                     log.verbose('Waiting %d seconds for "%s" to magnetize' % (timeout, entry['title']))
-                    for i in range(timeout):
+                    for _ in range(timeout):
                         time.sleep(1)
                         try:
                             status = yield client.core.get_torrent_status(torrent_id, ['files'])

@@ -136,7 +136,7 @@ class Manager(object):
             # TODO: This is a bit hacky, but we can't call parse on real arguments when --help is used because it will
             # cause a system exit before plugins are loaded and print incomplete help. This will get us a default
             # options object and we'll parse the real args later, or send them to daemon. #2807
-            self.options, extra = CoreArgumentParser().parse_known_args(['execute'])
+            self.options, _ = CoreArgumentParser().parse_known_args(['execute'])
         else:
             try:
                 self.options, extra = CoreArgumentParser().parse_known_args(args)
@@ -360,7 +360,7 @@ class Manager(object):
                                            loglevel=logger.get_capture_loglevel())
             if not options.cron:
                 # Wait until execution of all tasks has finished
-                for task_id, task_name, event in finished_events:
+                for _, task_name, event in finished_events:
                     event.wait()
         else:
             self.task_queue.start()

@@ -54,7 +54,7 @@ def upgrade(ver, session):
                 p = pickle.loads(row['entry'])
                 session.execute(table.update().where(table.c.id == row['id']).values(
                     json=json.dumps(p, encode_datetime=True)))
-            except (KeyError, ImportError) as e:
+            except (KeyError, ImportError):
                 failures += 1
         if failures > 0:
             log.error('Error upgrading %s pickle objects. Some delay information has been lost.' % failures)

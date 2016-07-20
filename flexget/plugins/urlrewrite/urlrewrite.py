@@ -49,7 +49,7 @@ class UrlRewrite(object):
     def url_rewritable(self, task, entry):
         log.trace('running url_rewritable')
         log.trace(self.resolves)
-        for name, config in self.resolves.get(task.name, {}).items():
+        for _, config in self.resolves.get(task.name, {}).items():
             regexp = config['regexp_compiled']
             log.trace('testing %s' % config['regexp'])
             if regexp.search(entry['url']):

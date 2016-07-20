@@ -1541,7 +1541,7 @@ class FilterSeries(FilterSeriesBase):
 
             hours, remainder = divmod(diff.seconds, 3600)
             hours += diff.days * 24
-            minutes, seconds = divmod(remainder, 60)
+            minutes, _ = divmod(remainder, 60)
 
             log.info('Timeframe waiting %s for %sh:%smin, currently best is %s' %
                      (episode.series.name, hours, minutes, best['title']))

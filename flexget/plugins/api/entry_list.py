@@ -186,7 +186,7 @@ class EntryListEntriesAPI(APIResource):
         }
 
         try:
-            list = el.get_list_by_id(list_id=list_id, session=session)
+            el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
