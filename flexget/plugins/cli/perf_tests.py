@@ -37,7 +37,7 @@ def imdb_query(session):
 
     log.info('Getting imdb_urls ...')
     # query so that we avoid loading whole object (maybe cached?)
-    for id, url in session.execute(select([Movie.id, Movie.url])):
+    for _, url in session.execute(select([Movie.id, Movie.url])):
         imdb_urls.append(url)
     log.info('Got %i urls from database' % len(imdb_urls))
     if not imdb_urls:

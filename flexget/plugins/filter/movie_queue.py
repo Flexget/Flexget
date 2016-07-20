@@ -37,7 +37,7 @@ def migrate_imdb_queue(manager):
             for row in session.execute(old_table.select()):
                 try:
                     queue_add(imdb_id=row['imdb_id'], quality=row['quality'], session=session)
-                except QueueError as e:
+                except QueueError:
                     log.error('Unable to migrate %s from imdb_queue to movie_queue' % row['title'])
             old_table.drop()
             session.commit()
@@ -362,7 +362,7 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
         title = item.title
         session.delete(item)
         return title
-    except NoResultFound as e:
+    except NoResultFound:
         raise QueueError(
             'title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue %s' % (
                 title, imdb_id, tmdb_id, movie_id, queue_name))

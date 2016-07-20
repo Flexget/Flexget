@@ -706,7 +706,7 @@ class SeriesReleasesAPI(APIResource):
     def get(self, show_id, ep_id, session):
         """ Get all episodes releases by show ID and episode ID """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id

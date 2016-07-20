@@ -427,7 +427,7 @@ def find_series_id(name):
 
         for n in s['names']:
             # Exact matching by stripping our the year
-            title, year = split_title_year(n)
+            title = split_title_year(n)[0]
             if title not in s['names']:
                 s['names'].append(title)
 

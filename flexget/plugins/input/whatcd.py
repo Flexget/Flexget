@@ -243,7 +243,7 @@ class InputWhatCD(object):
                 raise PluginError("What.cd gave a failure response: "
                                   "'{}'".format(error))
             return json_response['response']
-        except (ValueError, TypeError, KeyError) as e:
+        except (ValueError, TypeError, KeyError):
             raise PluginError("What.cd returned an invalid response")
 
     def _search_results(self, config):

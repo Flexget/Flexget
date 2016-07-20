@@ -71,7 +71,7 @@ class TheTVDBSet(MutableSet):
                     series_name = series.name
                     if self.config.get('strip_dates'):
                         # Remove year from end of series name if present
-                        series_name, series_year = split_title_year(series_name)
+                        series_name, _ = split_title_year(series_name)
                     entry = Entry()
                     entry['title'] = entry['series_name'] = series_name
                     entry['url'] = 'http://thetvdb.com/index.php?tab=series&id={}'.format(str(series.id))
@@ -87,7 +87,7 @@ class TheTVDBSet(MutableSet):
             log.verbose('entry does not have `tvdb_id`, cannot add to list. Consider using a lookup plugin`')
             return
         try:
-            req = TVDBRequest(username=self.config['username'], account_id=self.config['account_id']).put(
+            TVDBRequest(username=self.config['username'], account_id=self.config['account_id']).put(
                 'user/favorites/{}'.format(entry['tvdb_id']))
         except RequestException as e:
             log.error('Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e))
@@ -98,7 +98,7 @@ class TheTVDBSet(MutableSet):
             log.verbose('entry does not have `tvdb_id`, cannot remove from list. Consider using a lookup plugin`')
             return
         try:
-            req = TVDBRequest(username=self.config['username'], account_id=self.config['account_id']).delete(
+            TVDBRequest(username=self.config['username'], account_id=self.config['account_id']).delete(
                 'user/favorites/{}'.format(entry['tvdb_id']))
         except RequestException as e:
             log.error('Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e))

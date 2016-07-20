@@ -49,11 +49,11 @@ class TestPluginApi(object):
 
         assert 'test_plugin' not in plugin.plugins
 
-        @event('plugin.register')
         def rp():
             plugin.register(TestPlugin, api_ver=2)
             plugin.register(Oneword, api_ver=2)
             plugin.register(TestHTML, api_ver=2)
+        plugin.register(rp)
 
         # Call load_plugins again to register our new plugins
         plugin.load_plugins()
