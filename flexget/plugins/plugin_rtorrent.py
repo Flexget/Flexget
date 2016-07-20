@@ -436,12 +436,13 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
     }
 
     def _verify_load(self, client, info_hash):
-        for i in range(0, 5):
+        e = IOError()
+        for __ in range(0, 5):
             try:
                 return client.torrent(info_hash, fields=['hash'])
-            except (IOError, xmlrpc_client.Error):
+            except (IOError, xmlrpc_client.Error) as e:
                 sleep(0.5)
-        raise
+        raise e
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
