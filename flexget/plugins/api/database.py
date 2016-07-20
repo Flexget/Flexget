@@ -4,7 +4,6 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 
 from flask import jsonify
-from flask_restplus import inputs
 
 from flexget.db_schema import reset_schema, plugin_schemas
 from flexget.api import api, APIResource
@@ -35,10 +34,6 @@ class DBVacuum(APIResource):
                 'message': 'DB VACUUM triggered'}, 200
 
 
-reset_parser = api.parser()
-reset_parser.add_argument('sure', type=inputs.boolean, default='false', required=True,
-                          help='You must use this flag to indicate you REALLY want to do this')
-
 plugin_parser = api.parser()
 plugin_parser.add_argument('plugin_name', required=True, help='Name of plugin to reset')
 
@@ -46,7 +41,7 @@ plugin_parser.add_argument('plugin_name', required=True, help='Name of plugin to
 @db_api.route('/reset_plugin/')
 class DBPluginReset(APIResource):
     @api.response(200, 'Plugin DB reset triggered')
-    @api.response(500, 'The plugin has no stored schema to reset')
+    @api.response(400, 'The plugin has no stored schema to reset')
     @api.doc(parser=plugin_parser)
     def get(self, session=None):
         """ Reset the DB of a specific plugin """
