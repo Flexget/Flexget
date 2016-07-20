@@ -1,9 +1,10 @@
+/* global bard */
 describe("Plugin: Execute.Filter", function () {
-	var controller;
-
 	beforeEach(function () {
+
 		bard.appModule('plugins.execute');
 
+		/* global $filter */
 		bard.inject('$filter');
 	});
 
