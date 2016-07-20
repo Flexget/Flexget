@@ -1,8 +1,11 @@
+/* global bard */
 describe('404 Component:', function () {
 	var component;
 
 	beforeEach(function () {
 		bard.appModule('components.404');
+
+		/* global $state, $componentController */
 		bard.inject('$state', '$componentController');
 		$state.go = sinon.spy();
 	});
@@ -11,11 +14,11 @@ describe('404 Component:', function () {
 		component = $componentController('notFound');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 
-	describe("goHome()", function () {
+	describe('goHome()', function () {
 		it('should exist', function () {
 			expect(component.goHome).to.exist;
 		});

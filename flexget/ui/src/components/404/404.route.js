@@ -1,8 +1,9 @@
+/* global angular */
 (function () {
     'use strict';
 
     angular
-        .module("components.404")
+        .module('components.404')
 		.run(appRun);
 
     function appRun(routerHelper) {
@@ -19,6 +20,6 @@
 					root: true
                 }
             }
-        ]
+        ];
     }
 }());
