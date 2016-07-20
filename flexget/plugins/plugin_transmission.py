@@ -411,8 +411,7 @@ class PluginTransmission(TransmissionBase):
                     # we need to set paused to false so the magnetization begins immediately
                     options['add']['paused'] = False
                     r = cli.add_torrent(entry['url'], timeout=30, **options['add'])
-                if r:
-                    torrent = r
+
                 log.info('"%s" torrent added to transmission' % (entry['title']))
 
                 total_size = cli.get_torrent(r.id, ['id', 'totalSize']).totalSize

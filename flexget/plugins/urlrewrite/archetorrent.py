@@ -22,7 +22,6 @@ class UrlRewriteArchetorrent(object):
         if 'url' not in entry:
             log.error("Didn't actually get a URL...")
         else:
-            url = entry['url']
             log.debug("Got the URL: %s" % entry['url'])
             entry['url'] = entry['url'].replace('torrents-details', 'download')
             entry['url'] = entry['url'].replace('&hit=1', '')
