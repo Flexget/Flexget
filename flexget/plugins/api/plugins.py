@@ -6,7 +6,7 @@ import logging
 from flask_restplus import inputs
 
 from flexget.plugin import get_plugins, get_plugin_by_name, DependencyError
-from flexget.api import api, APIResource, ApiError
+from flexget.api import api, APIResource, BadRequest
 
 log = logging.getLogger('plugins')
 
@@ -57,7 +57,7 @@ plugins_parser.add_argument('phase', help='Show plugins that act on this phase')
 @plugins_api.route('/')
 class PluginsAPI(APIResource):
     @api.response(200, model=plugin_list_reply_schema)
-    @api.response(500, 'Unknown phase')
+    @api.response(BadRequest)
     @api.doc(parser=plugins_parser)
     def get(self, session=None):
         """ Get list of registered plugins """
@@ -70,14 +70,14 @@ class PluginsAPI(APIResource):
                     p['schema'] = plugin.schema
                 plugin_list.append(p)
         except ValueError as e:
-            raise ApiError(str(e))
+            raise BadRequest(str(e))
         return {'plugin_list': plugin_list,
                 'number_of_plugins': len(plugin_list)}
 
 
 @plugins_api.route('/<string:plugin_name>/')
 class PluginAPI(APIResource):
-    @api.response(400, 'Unknown plugin name')
+    @api.response(BadRequest)
     @api.response(200, model=plugin_schema)
     @api.doc(parser=plugin_parser, params={'plugin_name': 'Name of the plugin to return'})
     def get(self, plugin_name, session=None):
@@ -86,8 +86,7 @@ class PluginAPI(APIResource):
         try:
             plugin = get_plugin_by_name(plugin_name, issued_by='plugins API')
         except DependencyError as e:
-            return {'status': 'error',
-                    'message': e.message}
+            raise BadRequest(e.message)
         p = plugin.to_dict()
         if args['include_schema']:
             p['schema'] = plugin.schema
