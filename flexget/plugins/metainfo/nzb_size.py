@@ -14,7 +14,6 @@ mimetypes.add_type('application/x-nzb', '.nzb')
 
 
 class NzbSize(object):
-
     """
     Provides entry size information when dealing with nzb files
     """

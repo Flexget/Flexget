@@ -12,12 +12,12 @@ log = logging.getLogger("archetorrent")
 class UrlRewriteArchetorrent(object):
     """Archetorrent urlrewriter."""
 
-#   urlrewriter API
+    #   urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
         return url.startswith('https://www.archetorrent.com') and url.find('download') == -1
 
-#   urlrewriter API
+    #   urlrewriter API
     def url_rewrite(self, task, entry):
         if 'url' not in entry:
             log.error("Didn't actually get a URL...")
@@ -27,6 +27,7 @@ class UrlRewriteArchetorrent(object):
             entry['url'] = entry['url'].replace('torrents-details', 'download')
             entry['url'] = entry['url'].replace('&hit=1', '')
             log.debug("New URL: %s" % entry['url'])
+
 
 @event('plugin.register')
 def register_plugin():

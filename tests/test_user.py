@@ -5,7 +5,6 @@ from flexget.utils import json
 
 
 class TestUserAPI(object):
-
     config = 'tasks: {}'
 
     def test_change_password(self, execute_task, api_client):

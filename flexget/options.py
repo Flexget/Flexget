@@ -9,7 +9,6 @@ from argparse import ArgumentParser as ArgParser
 from argparse import (_VersionAction, Action, ArgumentError, Namespace, PARSER, REMAINDER, SUPPRESS,
                       _SubParsersAction)
 
-
 import flexget
 from flexget.entry import Entry
 from flexget.event import fire_event
@@ -57,16 +56,19 @@ def register_command(command, callback, **kwargs):
 
 def required_length(nmin, nmax):
     """Generates a custom Action to validate an arbitrary range of arguments."""
+
     class RequiredLength(Action):
         def __call__(self, parser, args, values, option_string=None):
             if not nmin <= len(values) <= nmax:
                 raise ArgumentError(self, 'requires between %s and %s arguments' % (nmin, nmax))
             setattr(args, self.dest, values)
+
     return RequiredLength
 
 
 class VersionAction(_VersionAction):
     """Action to print the current version. Also checks latest release revision."""
+
     def __call__(self, parser, namespace, values, option_string=None):
         # Print the version number
         console('%s' % self.version)
@@ -124,6 +126,7 @@ class InjectAction(Action):
 
 class ParseExtrasAction(Action):
     """This action will take extra arguments, and parser them with a different parser."""
+
     def __init__(self, option_strings, parser, help=None, metavar=None, dest=None, required=False):
         if metavar is None:
             metavar = '<%s arguments>' % parser.prog
@@ -407,6 +410,7 @@ class CoreArgumentParser(ArgumentParser):
     Warning: Only gets plugin arguments if instantiated after plugins have been loaded.
 
     """
+
     def __init__(self, **kwargs):
         kwargs.setdefault('parents', [manager_parser])
         kwargs.setdefault('prog', 'flexget')

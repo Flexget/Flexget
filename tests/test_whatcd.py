@@ -6,7 +6,6 @@ import pytest
 
 @pytest.mark.online
 class TestWhatCDOnline(object):
-
     config = """
         tasks:
           badlogin:

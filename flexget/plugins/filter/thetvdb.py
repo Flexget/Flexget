@@ -106,7 +106,7 @@ class FilterTvdb(object):
         'additionalProperties': False
     }
 
-    def is_in_set(self, config, configkey, entryitem,):
+    def is_in_set(self, config, configkey, entryitem, ):
         '''
         this takes the config object, config key (to a list), and entry
         item so it can return True if the object matches,
@@ -191,7 +191,7 @@ class FilterTvdb(object):
 
             if reasons and not force_accept:
                 msg = 'Skipping %s because of rule(s) %s' % \
-                    (entry.get('series_name_thetvdb', None) or entry['title'], ', '.join(reasons))
+                      (entry.get('series_name_thetvdb', None) or entry['title'], ', '.join(reasons))
                 if task.options.debug:
                     log.debug(msg)
                 else:

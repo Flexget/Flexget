@@ -57,11 +57,10 @@ class DependencyError(Exception):
 
     def __str__(self):
         return '<DependencyError(issued_by=%r,missing=%r,message=%r,silent=%r)>' % \
-            (self.issued_by, self.missing, self.message, self.silent)
+               (self.issued_by, self.missing, self.message, self.silent)
 
 
 class RegisterException(Exception):
-
     def __init__(self, value):
         super(RegisterException, self).__init__()
         self.value = value
@@ -72,7 +71,6 @@ class RegisterException(Exception):
 
 @python_2_unicode_compatible
 class PluginWarning(Warning):
-
     def __init__(self, value, logger=log, **kwargs):
         super(PluginWarning, self).__init__()
         self.value = value
@@ -85,7 +83,6 @@ class PluginWarning(Warning):
 
 @python_2_unicode_compatible
 class PluginError(Exception):
-
     def __init__(self, value, logger=log, **kwargs):
         super(PluginError, self).__init__()
         # Value is expected to be a string
@@ -139,6 +136,7 @@ class internet(object):
                 elif hasattr(e, 'code'):
                     raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % e.code, self.log)
                 raise PluginError('IOError when connecting to server: %s' % e, self.log)
+
         return wrapped_func
 
 
@@ -148,7 +146,9 @@ def priority(value):
     def decorator(target):
         target.priority = value
         return target
+
     return decorator
+
 
 DEFAULT_PRIORITY = 128
 
@@ -332,13 +332,13 @@ class PluginInfo(dict):
 
     def __str__(self):
         return '<PluginInfo(name=%s)>' % self.name
-        
+
     def _is_valid_operand(self, other):
         return hasattr(other, 'name')
 
     def __eq__(self, other):
         return self.name == other.name
-    
+
     def __lt__(self, other):
         return self.name < other.name
 
@@ -454,6 +454,7 @@ def get_plugins(phase=None, group=None, context=None, category=None, name=None, 
     :return: List of PluginInfo instances.
     :rtype: list
     """
+
     def matches(plugin):
         if phase is not None and phase not in phase_methods:
             raise ValueError('Unknown phase %s' % phase)
@@ -470,6 +471,7 @@ def get_plugins(phase=None, group=None, context=None, category=None, name=None, 
         if min_api is not None and plugin.api_ver < min_api:
             return False
         return True
+
     return filter(matches, iter(plugins.values()))
 
 

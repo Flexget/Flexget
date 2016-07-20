@@ -12,7 +12,6 @@ log = logging.getLogger('verbose')
 
 
 class Verbose(object):
-
     """
     Verbose entry accept, reject and failure
     """

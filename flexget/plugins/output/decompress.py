@@ -12,12 +12,14 @@ from flexget.utils import archive
 
 log = logging.getLogger('decompress')
 
+
 def fail_entry_with_error(entry, error):
     """
     Log error message at error level and fail the entry
     """
     log.error(error)
     entry.fail(error)
+
 
 def open_archive_entry(entry):
     """
@@ -39,6 +41,7 @@ def open_archive_entry(entry):
 
     return arch
 
+
 def get_destination_path(path, to, keep_dirs):
     """
     Generate the destination path for a given file
@@ -50,7 +53,8 @@ def get_destination_path(path, to, keep_dirs):
     else:
         path_suffix = filename
 
-    return  os.path.join(to, path_suffix)
+    return os.path.join(to, path_suffix)
+
 
 def is_dir(info):
     """
@@ -68,6 +72,7 @@ def makepath(path):
     if not os.path.exists(path):
         log.debug('Creating path: %s', path)
         os.makedirs(path)
+
 
 class Decompress(object):
     r"""
@@ -208,7 +213,7 @@ class Decompress(object):
                 error_message = 'OS error while creating file: %s (%s)' % (destination, error)
             except archive.ArchiveError as error:
                 error_message = 'Failed to extract file: %s in %s (%s)' % (info.filename, \
-                    archive_path, error)
+                                                                           archive_path, error)
 
             if error_message:
                 log.error(error_message)
@@ -243,4 +248,3 @@ class Decompress(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(Decompress, 'decompress', api_ver=2)
-

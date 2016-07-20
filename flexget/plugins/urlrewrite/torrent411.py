@@ -25,12 +25,10 @@ from datetime import datetime, timedelta
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy import Column, Unicode, Integer, DateTime
 
-
 __author__ = 'blAStcodeM'
 
 log = logging.getLogger('torrent411')
 Base = versioned_base('torrent411', 0)
-
 
 CATEGORIES = {
 
@@ -57,21 +55,21 @@ SUB_CATEGORIES = {
     'Multi-Quebecois': [51, 1213],
     'VFQ': [51, 1214],
     'VFSTFR': [51, 1215],
-    'VOASTA': [51, 1217], # new
+    'VOASTA': [51, 1217],  # new
     'VOSTFR': [51, 1216],
 
     # deprecated    'NTSC': [8, 20],
     # deprecated    'PAL': [8, 21],
 
-    'BDrip-BRrip-SD': [7, 8], # new: replaces BDrip-SD and BRrip-SD
-    'BDrip-SD': [7, 8], # deprecated: replaced by 'BDrip-BRrip-SD'
+    'BDrip-BRrip-SD': [7, 8],  # new: replaces BDrip-SD and BRrip-SD
+    'BDrip-SD': [7, 8],  # deprecated: replaced by 'BDrip-BRrip-SD'
     'Bluray-4K': [7, 1171],
     'Bluray-Full-Remux': [7, 17],
-    'BRrip-SD': [7, 8], # deprecated: was 9, replaced by 'BDrip-BRrip-SD'
+    'BRrip-SD': [7, 8],  # deprecated: was 9, replaced by 'BDrip-BRrip-SD'
     'DVD-R-5': [7, 13],
     'DVD-R-9': [7, 14],
     'DVDrip': [7, 10],
-    'HDlight-1080p': [7, 1208], # new
+    'HDlight-1080p': [7, 1208],  # new
     'HDlight-720p': [7, 1218],  # new
     'HDrip-1080p': [7, 16],
     'HDrip-720p': [7, 15],
@@ -187,8 +185,8 @@ EPISODES = {
     60: [46, 1117],
 }
 
-class JSONEncodedDict(TypeDecorator):
 
+class JSONEncodedDict(TypeDecorator):
     """Represents an immutable structure as a json-encoded string.
 
     Usage:
@@ -222,7 +220,7 @@ class torrent411Account(Base):
 class t411Auth(AuthBase):
     USER_AGENT = 'Mozilla/5.0'
 
-#   RETREIVING LOGIN COOKIES ONLY ONCE A DAY
+    #   RETREIVING LOGIN COOKIES ONLY ONCE A DAY
     def get_login_cookies(self, username, password):
         url_auth = 'http://www.t411.ch/users/login'
         db_session = Session()
@@ -238,9 +236,9 @@ class t411Auth(AuthBase):
             log.debug("Getting login cookies from : %s " % url_auth)
             params = {'login': username, 'password': password, 'remember': '1'}
             cj = http.cookiejar.CookieJar()
-#           WE NEED A COOKIE HOOK HERE TO AVOID REDIRECT COOKIES
+            #           WE NEED A COOKIE HOOK HERE TO AVOID REDIRECT COOKIES
             opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
-#           NEED TO BE SAME USER_AGENT THAN DOWNLOAD LINK
+            #           NEED TO BE SAME USER_AGENT THAN DOWNLOAD LINK
             opener.addheaders = [('User-agent', self.USER_AGENT)]
             login_output = None
             try:
@@ -266,8 +264,8 @@ class t411Auth(AuthBase):
                         password = cookie.value
 
                 if authKey is not None and \
-                   uid is not None and \
-                   password is not None:
+                                uid is not None and \
+                                password is not None:
                     authCookie = {'uid': uid,
                                   'password': password,
                                   'authKey': authKey
@@ -397,15 +395,14 @@ class UrlRewriteTorrent411(object):
         'additionalProperties': False
     }
 
-
-#   urlrewriter API
+    #   urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
         if re.match(r'^(https?://)?(www\.)?t411\.ch/torrents/(?!download/)[-A-Za-z0-9+&@#/%|?=~_|!:,.;]+', url):
             return True
         return False
 
-#   urlrewriter API
+    #   urlrewriter API
     def url_rewrite(self, task, entry):
         if 'url' not in entry:
             log.error("Didn't actually get a URL...")
@@ -457,7 +454,7 @@ class UrlRewriteTorrent411(object):
             if sub_categories[0] is not None:
                 sub_categories = [SUB_CATEGORIES[c] for c in sub_categories]
                 filter_url = filter_url + '&' + '&'.join([urllib.parse.quote_plus('term[%s][]' % c[0]).
-                                                          encode('utf-8') + '=' + str(c[1])
+                                                         encode('utf-8') + '=' + str(c[1])
                                                           for c in sub_categories])
 
         if 'series_season' in entry and 'series_episode' in entry:

@@ -30,7 +30,6 @@ def load_uoccin_data(path):
 
 
 class FromUoccin(object):
-
     schema = {
         'type': 'object',
         'properties': {
@@ -43,7 +42,7 @@ class FromUoccin(object):
         'required': ['path', 'type'],
         'additionalProperties': False
     }
-    
+
     def on_task_input(self, task, config):
         """Creates an entry for each item in your uoccin watchlist.
         

@@ -5,7 +5,6 @@ import sys
 
 
 class TestExec(object):
-
     __tmp__ = True
     config = """
         templates:

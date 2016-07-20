@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-
 import pytest
 
 from flexget.utils.imdb import ImdbParser
@@ -33,12 +32,13 @@ class TestImdbParser(object):
         assert len(set(parser.genres).intersection([u'crime', u'drama', u'mystery', u'thriller'])) == \
                len([u'crime', u'drama', u'mystery', u'thriller']), 'Genres not parsed correctly'
         assert parser.imdb_id == 'tt0114814', 'ID not parsed correctly'
-        assert len(set(parser.languages).intersection(['english', 'hungarian', 'spanish', 'french'])) == 4 , 'Languages not parsed correctly'
+        assert len(set(parser.languages).intersection(
+            ['english', 'hungarian', 'spanish', 'french'])) == 4, 'Languages not parsed correctly'
         assert parser.mpaa_rating == 'R', 'Rating not parsed correctly'
         assert parser.name == 'The Usual Suspects', 'Name not parsed correctly'
         assert (parser.photo ==
                 'http://ia.media-imdb.com/images/M/MV5BMzI1MjI5MDQyOV5BMl5BanBnXkFtZTcwNzE4Mjg3NA@@._V1_UX182_CR0,0,182,268_AL_.jpg'
-        ), 'Photo not parsed correctly'
+                ), 'Photo not parsed correctly'
         assert parser.plot_outline == (
             'Following a truck hijack in New York, five conmen are arrested and brought together for questioning. '
             'As none of them are guilty, they plan a revenge operation against the police. The operation goes well, '

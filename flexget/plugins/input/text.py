@@ -16,7 +16,6 @@ log = logging.getLogger('text')
 
 
 class Text(object):
-
     """
     Parse any text for entries using regular expression.
 

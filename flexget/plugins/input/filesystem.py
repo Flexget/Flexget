@@ -170,15 +170,16 @@ class Filesystem(object):
                 try:
                     path_object.exists()
                 except UnicodeError:
-                    log.error('File %s not decodable with filesystem encoding: %s' % (path_object, sys.getfilesystemencoding()))
+                    log.error('File %s not decodable with filesystem encoding: %s' % (
+                        path_object, sys.getfilesystemencoding()))
                     continue
                 entry = None
                 object_depth = len(path_object.splitall())
                 if object_depth <= max_depth:
                     if match(path_object):
                         if (path_object.isdir() and get_dirs) or (
-                                path_object.islink() and get_symlinks) or (
-                                path_object.isfile() and not path_object.islink() and get_files):
+                                    path_object.islink() and get_symlinks) or (
+                                        path_object.isfile() and not path_object.islink() and get_files):
                             entry = self.create_entry(path_object, test_mode)
                         else:
                             log.debug("Path object's %s type doesn't match requested object types." % path_object)

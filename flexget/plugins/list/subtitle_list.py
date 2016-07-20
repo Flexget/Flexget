@@ -21,7 +21,6 @@ from flexget.utils.template import RenderError
 log = logging.getLogger('subtitle_list')
 Base = versioned_base('subtitle_list', 1)
 
-
 #: Video extensions stolen from https://github.com/Diaoul/subliminal/blob/master/subliminal/video.py
 VIDEO_EXTENSIONS = ('.3g2', '.3gp', '.3gp2', '.3gpp', '.60d', '.ajp', '.asf', '.asx', '.avchd', '.avi', '.bik',
                     '.bix', '.box', '.cam', '.dat', '.divx', '.dmf', '.dv', '.dvr-ms', '.evo', '.flc', '.fli',

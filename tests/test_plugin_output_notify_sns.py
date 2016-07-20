@@ -8,7 +8,6 @@ from flexget.plugins.output import notify_sns
 
 
 class TestNotifySNS(object):
-
     @patch('boto3.Session')
     def test_emitter_build_session_from_empty_config(self, Session):
         e = notify_sns.SNSNotificationEmitter({'aws_region': 'test'})

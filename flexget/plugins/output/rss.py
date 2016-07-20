@@ -37,7 +37,6 @@ def upgrade(ver, session):
 
 
 class RSSEntry(Base):
-
     __tablename__ = 'make_rss'
 
     id = Column(Integer, primary_key=True)
@@ -210,7 +209,7 @@ class OutputRSS(object):
         if task.options.learn:
             return
 
-        db_items = task.session.query(RSSEntry).filter(RSSEntry.file == config['file']).\
+        db_items = task.session.query(RSSEntry).filter(RSSEntry.file == config['file']). \
             order_by(RSSEntry.published.desc()).all()
 
         # make items

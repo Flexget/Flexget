@@ -20,7 +20,6 @@ from requests import Session as RSession
 from requests.auth import AuthBase
 from requests.utils import dict_from_cookiejar
 
-
 __author__ = 'asm0dey'
 
 log = logging.getLogger('rutracker_auth')
@@ -28,7 +27,6 @@ Base = versioned_base('rutracker_auth', 0)
 
 
 class JSONEncodedDict(TypeDecorator):
-
     """Represents an immutable structure as a json-encoded string.
 
     Usage:
@@ -60,7 +58,6 @@ class RutrackerAccount(Base):
 
 
 class RutrackerAuth(AuthBase):
-
     """Supports downloading of torrents from 'rutracker' tracker
        if you pass cookies (CookieJar) to constructor then authentication will be bypassed and cookies will be just set
     """
@@ -113,7 +110,6 @@ class RutrackerAuth(AuthBase):
 
 
 class RutrackerModify(object):
-
     """Usage:
 
     rutracker_auth:

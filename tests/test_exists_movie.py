@@ -6,7 +6,6 @@ from jinja2 import Template
 
 
 class TestExistsMovie(object):
-
     _config = """
         templates:
           global:
@@ -84,8 +83,8 @@ class TestExistsMovie(object):
             exists_movie: __tmp__
     """
 
-    test_files = [ 'Downloaded.2013.mkv', 'Invalid.jpg' ]
-    test_dirs = [ 'Existence.2012', 'Quality.of.Life.720p', 'Subs']
+    test_files = ['Downloaded.2013.mkv', 'Invalid.jpg']
+    test_dirs = ['Existence.2012', 'Quality.of.Life.720p', 'Subs']
 
     @pytest.fixture(params=['internal', 'guessit'], ids=['internal', 'guessit'])
     def config(self, request, tmpdir):
@@ -145,6 +144,7 @@ class TestExistsMovie(object):
         task = execute_task('test_diff_qualities_upgrade')
         assert task.find_entry('accepted', title='Quality.of.Life.1080p'), \
             'Quality.of.Life.1080p should have been accepted'
+
 
 '''
     def test_propers(self, execute_task):

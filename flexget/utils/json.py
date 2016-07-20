@@ -23,7 +23,6 @@ except ImportError:
         except ImportError:
             raise DependencyError(missing='simplejson')
 
-
 DATE_FMT = '%Y-%m-%d'
 ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 

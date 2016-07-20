@@ -10,7 +10,6 @@ from flexget.webserver import change_password, generate_token, WeakPassword, get
 
 @with_session
 def do_cli(manager, options, session=None):
-
     if options.action == 'passwd':
         try:
             change_password(password=options.password, session=session)

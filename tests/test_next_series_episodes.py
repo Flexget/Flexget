@@ -181,7 +181,7 @@ class TestNextSeriesEpisodes(object):
         assert task._rerun_count == 1
         assert task.find_entry(title='Test Series 6 S03E03')
         assert len(task.all_entries) == 1
-        assert len(task.mock_output) == 2 # Should have S03E02 and S03E03
+        assert len(task.mock_output) == 2  # Should have S03E02 and S03E03
 
     def test_next_series_episodes_backfill_advancement(self, execute_task):
         self.inject_series(execute_task, 'Test Series 7 S02E01')
@@ -219,4 +219,3 @@ class TestNextSeriesEpisodes(object):
         task = execute_task('test_next_series_episodes_alternate_name')
         s2 = len(task.mock_output[0].get('search_strings'))
         assert s2 > s1, 'Alternate names did not create sufficient search strings.'
-

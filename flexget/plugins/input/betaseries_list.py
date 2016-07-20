@@ -11,7 +11,6 @@ from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.cached_input import cached
 
-
 log = logging.getLogger('betaseries_list')
 
 API_URL_PREFIX = 'http://api.betaseries.com/'

@@ -58,7 +58,6 @@ class QueuedCommand(object):
 
 
 class Schedule(object):
-
     def __init__(self):
         self.queue = []
 
@@ -310,14 +309,14 @@ class IRCBot(asynchat.async_chat):
             self.channels.remove(msg.arguments[1])
         except ValueError:
             pass
-    
+
     def on_welcome(self, msg):
         # Save the nick from server as it may have changed it
         self.real_nickname = msg.arguments[0]
         self.throttled = False
         # Queue the heartbeat
         self.schedule.queue_command(2 * 60, self.keepalive, persists=True)
-    
+
     def on_nickinuse(self, msg):
         if self.real_nickname == msg.arguments[1]:
             self.real_nickname += '_'
@@ -404,7 +403,6 @@ class IRCBot(asynchat.async_chat):
 
 @python_2_unicode_compatible
 class IRCMessage(object):
-
     def __init__(self, msg):
         rfc_1459 = "^(@(?P<tags>[^ ]*) )?(:(?P<prefix>[^ ]+) +)?(?P<command>[^ ]+)( *(?P<arguments> .+))?"
         msg_contents = re.match(rfc_1459, msg)

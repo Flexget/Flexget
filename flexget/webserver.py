@@ -152,8 +152,8 @@ def setup_server(manager, session=None):
         return
 
     web_server = WebServer(
-            bind=web_server_config['bind'],
-            port=web_server_config['port'],
+        bind=web_server_config['bind'],
+        port=web_server_config['port'],
     )
 
     _default_app.secret_key = get_secret()
@@ -161,7 +161,7 @@ def setup_server(manager, session=None):
     user = get_user()
     if not user or not user.password:
         log.warning('No password set for web server, create one by using'
-                 ' `flexget web passwd <password>`')
+                    ' `flexget web passwd <password>`')
 
     if web_server.is_alive():
         web_server.stop()

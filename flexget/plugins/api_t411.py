@@ -152,6 +152,7 @@ T411_VIDEO_QUALITY_MAP = {
     19: qualities.get("webdl")
 }
 
+
 def auth_required(func):
     """
     Decorator for ensuring rest client is authenticated
@@ -175,6 +176,7 @@ class ApiError(Exception):
     Exception raise when RestClient received a business error
     from T411 server.
     """
+
     def __init__(self, code, description):
         self.description = description
         self.code = code
@@ -485,6 +487,7 @@ class T411Proxy(object):
     A T411 proxy service. This proxy interact both with
     T411 Rest Client and T411 local database.
     """
+
     def __init__(self, session=None):
         """
         :param session: flexget.manager.Session

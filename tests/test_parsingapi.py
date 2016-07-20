@@ -27,6 +27,7 @@ class TestTaskParsing(object):
               movie: guessit
               series: guessit
     """
+
     def test_selected_parser_cleared(self, manager, execute_task):
         # make sure when a non-default parser is installed on a task, it doesn't affect other tasks
         execute_task('explicit_parser')

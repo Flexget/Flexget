@@ -10,7 +10,6 @@ log = logging.getLogger('urlrewriter')
 
 
 class UrlRewritingError(Exception):
-
     def __init__(self, value):
         self.value = value
 

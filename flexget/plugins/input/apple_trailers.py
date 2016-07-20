@@ -168,7 +168,6 @@ class AppleTrailers(object):
 
 
 class AppleTrailersHeader(AuthBase):
-
     def __call__(self, request):
         request.headers['User-Agent'] = 'QuickTime/7.7'
         return request

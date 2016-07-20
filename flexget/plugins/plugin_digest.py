@@ -18,7 +18,6 @@ from flexget.utils.database import entry_synonym
 from flexget.utils.tools import parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
-
 log = logging.getLogger('digest')
 Base = versioned_base('digest', 1)
 

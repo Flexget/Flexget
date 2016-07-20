@@ -36,7 +36,6 @@ class FilterArchives(object):
         ]
     }
 
-
     def prepare_config(self, config):
         """
         Prepare config for processing
@@ -67,6 +66,7 @@ class FilterArchives(object):
                 entry.accept()
             else:
                 entry.reject()
+
 
 @event('plugin.register')
 def register_plugin():

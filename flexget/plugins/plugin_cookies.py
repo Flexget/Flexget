@@ -59,7 +59,7 @@ class PluginCookies(object):
             from pysqlite2 import dbapi2 as sqlite
         except ImportError:
             try:
-                from sqlite3 import dbapi2 as sqlite # try the 2.5+ stdlib
+                from sqlite3 import dbapi2 as sqlite  # try the 2.5+ stdlib
             except ImportError:
                 raise plugin.PluginWarning('Unable to use sqlite3 or pysqlite2', log)
 

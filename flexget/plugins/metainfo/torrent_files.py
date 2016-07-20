@@ -12,6 +12,7 @@ log = logging.getLogger('torrent_files')
 
 class TorrentFiles(object):
     """Provides content files information when dealing with torrents."""
+
     @plugin.priority(200)
     def on_task_modify(self, task, config):
         for entry in task.entries:

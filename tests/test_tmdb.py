@@ -6,9 +6,9 @@ import pytest
 from flexget.manager import Session
 from flexget.plugins.api_tmdb import TMDBSearchResult
 
+
 @pytest.mark.online
 class TestTmdbLookup(object):
-
     config = """
         tasks:
           test:

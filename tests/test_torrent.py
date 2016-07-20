@@ -10,7 +10,6 @@ from flexget.utils.bittorrent import Torrent
 
 
 class TestInfoHash(object):
-
     config = """
         tasks:
           test:
@@ -41,7 +40,6 @@ class TestInfoHash(object):
 
 @pytest.mark.usefixtures('tmpdir')
 class TestSeenInfoHash(object):
-
     config = """
         tasks:
           test:
@@ -75,7 +73,6 @@ class TestSeenInfoHash(object):
 
 @pytest.mark.usefixtures('tmpdir')
 class TestModifyTrackers(object):
-
     config = """
         templates:
           global:
@@ -146,7 +143,6 @@ class TestModifyTrackers(object):
 
 
 class TestPrivateTorrents(object):
-
     config = """
         tasks:
           test:
@@ -292,7 +288,7 @@ class TestTorrentAlive(object):
         task = execute_task('test_torrent_alive_fail')
         assert not task.accepted, 'Torrent should not have met seed requirement.'
         assert task._rerun_count == 1, ('Task should have been rerun 1 time. Was rerun %s times.' %
-                                             task._rerun_count)
+                                        task._rerun_count)
 
         # Run it again to make sure remember_rejected prevents a rerun from occurring
         task = execute_task('test_torrent_alive_fail')
@@ -307,13 +303,13 @@ class TestTorrentAlive(object):
 
     def test_torrent_alive_udp_invalid_port(self):
         from flexget.plugins.filter.torrent_alive import get_udp_seeds
-        assert get_udp_seeds('udp://[2001::1]/announce','HASH') == 0
-        assert get_udp_seeds('udp://[::1]/announce','HASH') == 0
+        assert get_udp_seeds('udp://[2001::1]/announce', 'HASH') == 0
+        assert get_udp_seeds('udp://[::1]/announce', 'HASH') == 0
         assert get_udp_seeds('udp://["2100::1"]:-1/announce', 'HASH') == 0
-        assert get_udp_seeds('udp://127.0.0.1/announce','HASH') == 0
-        assert get_udp_seeds('udp://127.0.0.1:-1/announce','HASH') == 0
-        assert get_udp_seeds('udp://127.0.0.1:PORT/announce','HASH') == 0
-        assert get_udp_seeds('udp://127.0.0.1:65536/announce','HASH') == 0
+        assert get_udp_seeds('udp://127.0.0.1/announce', 'HASH') == 0
+        assert get_udp_seeds('udp://127.0.0.1:-1/announce', 'HASH') == 0
+        assert get_udp_seeds('udp://127.0.0.1:PORT/announce', 'HASH') == 0
+        assert get_udp_seeds('udp://127.0.0.1:65536/announce', 'HASH') == 0
 
 
 class TestRtorrentMagnet(object):
@@ -327,7 +323,6 @@ class TestRtorrentMagnet(object):
             rtorrent_magnet: __tmp__
             accept_all: yes
     """
-
 
     def test_rtorrent_magnet(self, execute_task, tmpdir):
         execute_task('test')

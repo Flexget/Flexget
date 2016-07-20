@@ -243,7 +243,7 @@ class InputRSS(object):
                 content = response.content
             except RequestException as e:
                 raise plugin.PluginError('Unable to download the RSS for task %s (%s): %s' %
-                                  (task.name, config['url'], e))
+                                         (task.name, config['url'], e))
             if config.get('ascii'):
                 # convert content to ascii (cleanup), can also help with parsing problems on malformed feeds
                 content = response.text.encode('ascii', 'ignore')
@@ -323,7 +323,7 @@ class InputRSS(object):
                     # all other bozo errors
                     self.process_invalid_content(task, content, config['url'])
                     raise plugin.PluginError('Unhandled bozo_exception. Type: %s (task: %s)' %
-                                      (ex.__class__.__name__, task.name), log)
+                                             (ex.__class__.__name__, task.name), log)
 
         log.debug('encoding %s', rss.encoding)
 

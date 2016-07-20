@@ -54,7 +54,6 @@ class UrlRewriteGoogleCse(object):
 
 
 class UrlRewriteGoogle(object):
-
     # urlrewriter API
     def url_rewritable(self, task, entry):
         if entry['url'].startswith('https://www.google.com/search?q='):

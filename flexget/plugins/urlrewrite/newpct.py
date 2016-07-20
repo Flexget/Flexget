@@ -64,6 +64,7 @@ class UrlRewriteNewPCT(object):
             torrent_id = torrent_id_prog.search(torrent_ids[0]).group(1)
             return 'http://www.newpct.com/torrents/{:0>6}.torrent'.format(torrent_id)
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(UrlRewriteNewPCT, 'newpct', groups=['urlrewriter'], api_ver=2)

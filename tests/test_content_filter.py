@@ -7,7 +7,6 @@ import pytest
 @pytest.mark.usefixtures('tmpdir')
 @pytest.mark.filecopy('test.torrent', '__tmp__/')
 class TestContentFilter(object):
-
     config = """
         tasks:
           test_reject1:

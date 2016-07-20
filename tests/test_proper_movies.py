@@ -6,7 +6,6 @@ from jinja2 import Template
 
 
 class TestProperMovies(object):
-
     _config = """
         templates:
           global:

@@ -34,7 +34,7 @@ CATEGORIES = {
 }
 
 SORT = {
-    'default': 99, # This is piratebay default, not flexget default.
+    'default': 99,  # This is piratebay default, not flexget default.
     'date': 3,
     'size': 5,
     'seeds': 7,

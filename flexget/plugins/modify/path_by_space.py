@@ -14,7 +14,6 @@ from flexget.config_schema import one_or_more
 
 log = logging.getLogger('path_by_space')
 
-
 disk_stats_tuple = namedtuple(
     'disk_stats', [
         'path', 'free_bytes', 'used_bytes', 'total_bytes', 'free_percent', 'used_percent'
@@ -60,9 +59,9 @@ def _path_selector(paths, within, stat_attr):
 
     if within > 0:
         valid_paths.extend([
-            path_stat.path for path_stat in paths_stats[1:]
-            if abs(getattr(path_stat, stat_attr) - getattr(paths_stats[0], stat_attr)) <= within
-        ])
+                               path_stat.path for path_stat in paths_stats[1:]
+                               if abs(getattr(path_stat, stat_attr) - getattr(paths_stats[0], stat_attr)) <= within
+                               ])
 
     return random.choice(valid_paths)
 

@@ -14,6 +14,7 @@ from socket import error as socket_error
 
 log = logging.getLogger('aria2')
 
+
 # TODO: stop using torrent_info_hash[0:16] as the GID
 
 # for RENAME_CONTENT_FILES:
@@ -21,7 +22,6 @@ log = logging.getLogger('aria2')
 
 
 class OutputAria2(object):
-
     """
     aria2 output plugin
     Version 1.0.0
@@ -189,7 +189,7 @@ class OutputAria2(object):
             elif 'torrent_info_hash' in entry:
                 config['aria_config']['gid'] = entry['torrent_info_hash'][0:16]
             elif 'gid' in config['aria_config']:
-                del(config['aria_config']['gid'])
+                del (config['aria_config']['gid'])
 
             if 'content_files' not in entry:
                 if entry['url']:
@@ -225,10 +225,10 @@ class OutputAria2(object):
                     if len(entry['content_files']) > 99:
                         # sorry not sorry if you have more than 999 files
                         config['aria_config']['gid'] = ''.join([config['aria_config']['gid'][0:-3],
-                                                               strCounter.rjust(3, str('0'))])
+                                                                strCounter.rjust(3, str('0'))])
                     else:
                         config['aria_config']['gid'] = ''.join([config['aria_config']['gid'][0:-2],
-                                                               strCounter.rjust(2, str('0'))])
+                                                                strCounter.rjust(2, str('0'))])
 
                 if config['exclude_samples'] == True:
                     # remove sample files from download list
@@ -252,14 +252,14 @@ class OutputAria2(object):
                             log.verbose(entry['series_name'])
                             if re.search(r'\d{4}', entry['series_name'][-4:]) is not None and config['fix_year']:
                                 entry['series_name'] = ''.join([entry['series_name'][0:-4], '(',
-                                                               entry['series_name'][-4:], ')'])
+                                                                entry['series_name'][-4:], ')'])
                                 log.verbose(entry['series_name'])
                             parser.data = cur_filename
                             parser.parse
                             log.debug(parser.id_type)
                             if parser.id_type == 'ep':
                                 entry['series_id'] = ''.join(['S', str(parser.season).rjust(2, str('0')), 'E',
-                                                             str(parser.episode).rjust(2, str('0'))])
+                                                              str(parser.episode).rjust(2, str('0'))])
                             elif parser.id_type == 'sequence':
                                 entry['series_id'] = parser.episode
                             elif parser.id_type and parser.id:
@@ -302,7 +302,7 @@ class OutputAria2(object):
                             log.error('Could not rename file %s: %s. Try enabling imdb_lookup in this task'
                                       ' to assist.' % (cur_filename, e))
                             continue
-                elif 'torrent_info_hash' not in entry: 
+                elif 'torrent_info_hash' not in entry:
                     config['aria_config']['out'] = cur_filename
 
                 if config['do'] == 'add-new':

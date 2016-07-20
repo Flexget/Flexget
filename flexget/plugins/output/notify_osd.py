@@ -11,7 +11,6 @@ log = logging.getLogger('notify_osd')
 
 
 class OutputNotifyOsd(object):
-
     schema = {
         'oneOf': [
             {'type': 'boolean'},

@@ -56,15 +56,15 @@ class UoccinProcess(object):
       1431198108547|series|272135.2.5|collected|true
       1431198108565|series|272135.2.5|subtitles|eng,ita
     """
-    
+
     def __init__(self):
         self.reset(None)
-    
+
     def reset(self, folder):
         self.log = logging.getLogger('uoccin_process')
         self.folder = folder
         self.changes = []
-    
+
     def load(self, filename):
         with open(filename, 'r') as f:
             lines = f.read().splitlines()
@@ -73,7 +73,7 @@ class UoccinProcess(object):
             self.changes.extend(lines)
         else:
             self.log.debug('no changes found in %s' % filename)
-    
+
     def process(self):
         imdb_lookup = plugin.get_plugin_by_name('imdb_lookup').instance
         self.changes.sort()
@@ -87,8 +87,9 @@ class UoccinProcess(object):
             self.log.verbose('processing: type=%s, target=%s, field=%s, value=%s' % (typ, tid, fld, val))
             if typ == 'movie':
                 # default
-                mov = udata['movies'].setdefault(tid, 
-                    {'name':'N/A', 'watchlist':False, 'collected':False, 'watched':False})
+                mov = udata['movies'].setdefault(tid,
+                                                 {'name': 'N/A', 'watchlist': False, 'collected': False,
+                                                  'watched': False})
                 # movie title is unknown at this time
                 fake = Entry()
                 fake['url'] = 'http://www.imdb.com/title/' + tid
@@ -121,7 +122,8 @@ class UoccinProcess(object):
                 sno = tmp[1] if len(tmp) > 2 else None
                 eno = tmp[2] if len(tmp) > 2 else None
                 # default
-                ser = udata['series'].setdefault(sid, {'name':'N/A', 'watchlist':False, 'collected':{}, 'watched':{}})
+                ser = udata['series'].setdefault(sid,
+                                                 {'name': 'N/A', 'watchlist': False, 'collected': {}, 'watched': {}})
                 # series name is unknown at this time
                 try:
                     series = lookup_series(tvdb_id=sid)
@@ -177,7 +179,6 @@ class UoccinProcess(object):
 
 
 class UoccinReader(object):
-    
     schema = {
         'type': 'object',
         'properties': {
@@ -187,15 +188,15 @@ class UoccinReader(object):
         'required': ['uuid', 'path'],
         'additionalProperties': False
     }
-    
+
     processor = UoccinProcess()
-    
+
     def on_task_start(self, task, config):
         UoccinReader.processor.reset(config['path'])
-    
+
     def on_task_exit(self, task, config):
         UoccinReader.processor.process()
-    
+
     def on_task_output(self, task, config):
         """Process incoming diff to update the uoccin.json file. Requires the location field.
         
@@ -227,19 +228,18 @@ class UoccinReader(object):
 
 
 class UoccinWriter(object):
-    
     out_queue = ''
-    
+
     def on_task_start(self, task, config):
         # create the local device folder if not exists
         my_folder = os.path.join(config['path'], 'device.' + config['uuid'])
         if not os.path.exists(my_folder):
             os.makedirs(my_folder)
         # define the filename for the outgoing diff file
-        ts = int(time.time()*1000)
+        ts = int(time.time() * 1000)
         fn = '%d.%s.diff' % (ts, config['uuid'])
         UoccinWriter.out_queue = os.path.join(my_folder, fn)
-    
+
     def on_task_exit(self, task, config):
         if os.path.exists(UoccinWriter.out_queue):
             # update uoccin.json
@@ -254,19 +254,18 @@ class UoccinWriter(object):
                     self.log.verbose('%s copied in %s' % (UoccinWriter.out_queue, fld))
             # delete the diff file in the local device folder
             os.remove(UoccinWriter.out_queue)
-    
+
     def append_command(self, target, title, field, value):
-        ts = int(time.time()*1000)
+        ts = int(time.time() * 1000)
         line = '%d|%s|%s|%s|%s\n' % (ts, target, title, field, value)
         with open(UoccinWriter.out_queue, 'a') as f:
             f.write(line)
 
 
 class UoccinWatchlist(UoccinWriter):
-    
     # Defined by subclasses
     set_true = None
-    
+
     def on_task_output(self, task, config):
         """Add or remove in the uoccin.json file watchlist the accepted series and/or movies.
         Requires tvdb_id for series and imdb_id for movies.
@@ -334,7 +333,6 @@ class UoccinWlstDel(UoccinWatchlist):
 
 
 class UoccinCollection(UoccinWriter):
-
     schema = {
         'type': 'object',
         'properties': {
@@ -344,10 +342,10 @@ class UoccinCollection(UoccinWriter):
         'required': ['uuid', 'path'],
         'additionalProperties': False
     }
-    
+
     # Defined by subclasses
     set_true = None
-    
+
     def on_task_output(self, task, config):
         """Set the accepted episodes and/or movies as collected (or not) in the uoccin.json file.
         Requires tvdb_id, series_season and series_episode fields for episodes, or imdb_id for movies.
@@ -390,7 +388,6 @@ class UoccinCollDel(UoccinCollection):
 
 
 class UoccinWatched(UoccinWriter):
-
     schema = {
         'type': 'object',
         'properties': {
@@ -400,10 +397,10 @@ class UoccinWatched(UoccinWriter):
         'required': ['uuid', 'path'],
         'additionalProperties': False
     }
-    
+
     # Defined by subclasses
     set_true = None
-    
+
     def on_task_output(self, task, config):
         """Set the accepted episodes and/or movies as watched (or not) in the uoccin.json file.
         Requires tvdb_id, series_season and series_episode fields for episodes, or imdb_id for movies.
@@ -444,7 +441,6 @@ class UoccinSeenDel(UoccinWatched):
 
 
 class UoccinSubtitles(UoccinWriter):
-
     schema = {
         'type': 'object',
         'properties': {
@@ -454,7 +450,7 @@ class UoccinSubtitles(UoccinWriter):
         'required': ['uuid', 'path'],
         'additionalProperties': False
     }
-    
+
     def on_task_output(self, task, config):
         """Set subtitles info for accepted episodes and/or movies in the uoccin.json file.
         Requires the subtitles field (set by subtitles_check plugin), plus tvdb_id, series_season and series_episode 

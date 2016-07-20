@@ -13,7 +13,6 @@ log = logging.getLogger('pogcal')
 
 
 class InputPogDesign(object):
-
     schema = {
         'type': 'object',
         'properties': {
@@ -43,7 +42,7 @@ class InputPogDesign(object):
 
             # Get name
             t = row.find('strong')
-            
+
             # Remove <span> tags
             spantags = t.find_all('span')
             for s in spantags:
@@ -61,8 +60,8 @@ class InputPogDesign(object):
 
             e = Entry()
             e['title'] = t
-            #url = row.find_next('a', {'class': 'slink'})
-            #e['url'] = 'http://www.pogdesign.co.uk' + url['href']
+            # url = row.find_next('a', {'class': 'slink'})
+            # e['url'] = 'http://www.pogdesign.co.uk' + url['href']
             entries.append(e)
 
         return entries

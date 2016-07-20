@@ -6,7 +6,6 @@ import pytest
 
 @pytest.mark.online
 class TestRottenTomatoesLookup(object):
-
     config = """
         tasks:
           test:
@@ -35,7 +34,7 @@ class TestRottenTomatoesLookup(object):
         assert task.find_entry(rt_name='The Matrix', rt_year=1999, rt_id=12897, imdb_id='tt0133093'), \
             'Didn\'t populate RT info for The Matrix'
         assert task.find_entry(rt_name='Star Wars: Episode I - The Phantom Menace',
-                                    rt_year=1999, rt_id=10008), \
+                               rt_year=1999, rt_id=10008), \
             'Didn\'t populate RT info for Star Wars: Episode I - The Phantom Menace (in 3D)'
         assert task.find_entry(rt_name='Taken', rt_year=2008, rt_id=770680780), \
             'Didn\'t populate RT info for Taken'

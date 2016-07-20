@@ -58,7 +58,6 @@ def config_changed(task=None, session=None):
 
 
 def use_task_logging(func):
-
     @wraps(func)
     def wrapper(self, *args, **kw):
         # Set the task name in the logger and capture output
@@ -149,7 +148,6 @@ class TaskAbort(Exception):
 
 @total_ordering
 class Task(object):
-
     """
     Represents one task in the configuration.
 

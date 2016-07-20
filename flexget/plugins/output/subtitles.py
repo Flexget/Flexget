@@ -43,6 +43,7 @@ TODO:
 
 log = logging.getLogger('subtitles')
 
+
 # movie hash, won't work here though
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes#Python
 
@@ -100,7 +101,7 @@ class Subtitles(object):
         # configuration
         languages = config['languages']
         min_sub_rating = config['min_sub_rating']
-        match_limit = config['match_limit'] # no need to change this, but it should be configurable
+        match_limit = config['match_limit']  # no need to change this, but it should be configurable
 
         # loop through the entries
         for entry in entries:

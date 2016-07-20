@@ -23,9 +23,8 @@ def load_uoccin_data(path):
 
 
 class UoccinLookup(object):
+    schema = {'type': 'string', 'format': 'path'}
 
-    schema = { 'type': 'string', 'format': 'path' }
-    
     # Run after metainfo_series / thetvdb_lookup / imdb_lookup
     @plugin.priority(100)
     def on_task_metainfo(self, task, config):

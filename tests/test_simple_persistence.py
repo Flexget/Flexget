@@ -5,7 +5,6 @@ from flexget.utils.simple_persistence import SimplePersistence
 
 
 class TestSimplePersistence(object):
-
     config = """
         tasks:
           test:

@@ -27,7 +27,6 @@ class TailPosition(Base):
 
 
 class InputTail(object):
-
     """
     Parse any text for entries using regular expression.
 

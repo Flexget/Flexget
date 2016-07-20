@@ -81,7 +81,7 @@ class TestConfigureSeriesBetaSeriesList(object):
         execute_task('test_with_one_members')
 
         assert_series_count_in_db(3)
-        assert_mock_calls([mock.call('api_key_foo', 'user_foo', 'passwd_foo')],  create_token_mock)
+        assert_mock_calls([mock.call('api_key_foo', 'user_foo', 'passwd_foo')], create_token_mock)
         assert_mock_calls([mock.call('api_key_foo', 'token_foo', 'other_member_1')], query_series_mock)
 
     def test_with_two_members(self, execute_task, create_token_mock, query_series_mock):

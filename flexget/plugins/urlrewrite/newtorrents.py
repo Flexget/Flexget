@@ -14,7 +14,6 @@ from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 from flexget.utils import requests
 
-
 timeout = 10
 socket.setdefaulttimeout(timeout)
 
@@ -38,7 +37,7 @@ class NewTorrents(object):
     def url_rewrite(self, task, entry):
         url = entry['url']
         if (url.startswith('http://www.newtorrents.info/?q=') or
-           url.startswith('http://www.newtorrents.info/search')):
+                url.startswith('http://www.newtorrents.info/search')):
             results = self.entries_from_search(entry['title'], url=url)
             if not results:
                 raise UrlRewritingError("No matches for %s" % entry['title'])

@@ -27,7 +27,6 @@ from flexget.webserver import User
 from flexget.manager import Session
 from flexget.api import app
 
-
 log = logging.getLogger('tests')
 
 VCR_CASSETTE_DIR = os.path.join(os.path.dirname(__file__), 'cassettes')
@@ -141,14 +140,15 @@ def api_client(manager):
             session.commit()
         return APIClient(user.token)
 
+
 # --- End Public Fixtures ---
 
 
 def pytest_configure(config):
     # register the filecopy marker
     config.addinivalue_line('markers',
-        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.'
-        'online: mark a test that goes online. VCR will automatically be used.')
+                            'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.'
+                            'online: mark a test that goes online. VCR will automatically be used.')
 
 
 def pytest_runtest_setup(item):

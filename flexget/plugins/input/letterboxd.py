@@ -53,7 +53,6 @@ SORT_BY = {
 
 
 class Letterboxd(object):
-
     schema = {
         'type': 'object',
         'properties': {

@@ -19,9 +19,9 @@ class SetSeriesBegin(object):
       set_series_begin: yes
     
     """
-    
+
     schema = {'type': 'boolean'}
-    
+
     def on_task_output(self, task, config):
         if not (config and task.accepted):
             return

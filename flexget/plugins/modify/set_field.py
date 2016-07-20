@@ -15,7 +15,6 @@ UNSET = object()
 
 
 class ModifySet(object):
-
     """Allows adding information to a task entry for use later.
 
     Example:

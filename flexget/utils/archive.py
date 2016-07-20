@@ -18,27 +18,38 @@ try:
 except ImportError:
     rarfile = None
 
-
 log = logging.getLogger('archive')
+
 
 class ArchiveError(Exception):
     """Base exception for archive"""
     pass
+
+
 class NeedRarFile(ArchiveError):
     """Exception to be raised when rarfile module is missing"""
     pass
+
+
 class BadArchive(ArchiveError):
     """Wrapper exception for BadZipFile and BadRarFile"""
     pass
+
+
 class NeedFirstVolume(ArchiveError):
     """Wrapper exception for rarfile.NeedFirstVolume"""
     pass
+
+
 class PathError(ArchiveError):
     """Exception to be raised when an archive file doesn't exist"""
     pass
+
+
 class FSError(ArchiveError):
     """Exception to be raised on OS/IO exceptions"""
     pass
+
 
 def rarfile_set_tool_path(config):
     """
@@ -54,6 +65,7 @@ def rarfile_set_tool_path(config):
             rarfile.UNRAR_TOOL = unrar_tool
             log.debug('Set RarFile.unrar_tool to: %s', unrar_tool)
 
+
 def rarfile_set_path_sep(separator):
     """
     Set the path separator on rarfile module
@@ -61,11 +73,13 @@ def rarfile_set_path_sep(separator):
     if rarfile:
         rarfile.PATH_SEP = separator
 
+
 class Archive(object):
     """
     Base archive class. Assumes an interface similar to
     zipfile.ZipFile or rarfile.RarFile
     """
+
     def __init__(self, archive_object, path):
         self.path = path
 
@@ -86,7 +100,6 @@ class Archive(object):
                 log.verbose('Deleted archive: %s', volume)
         except (IOError, os.error) as error:
             raise FSError(error)
-
 
     def volumes(self):
         """Returns the list of volumes that comprise this archive"""
@@ -110,6 +123,7 @@ class Archive(object):
             raise FSError(error)
 
         log.verbose('Extracted: %s', member)
+
 
 class RarArchive(Archive):
     """
@@ -139,6 +153,7 @@ class RarArchive(Archive):
             return super(RarArchive, self).open(member)
         except rarfile.Error as error:
             raise ArchiveError(error)
+
 
 class ZipArchive(Archive):
     """
@@ -180,6 +195,7 @@ def open_archive(archive_path):
             log.warning('Rarfile module not installed; unable to handle RAR archives.')
 
     return archive
+
 
 def is_archive(path):
     """

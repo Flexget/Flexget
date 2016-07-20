@@ -57,9 +57,9 @@ def imdb_query(session):
         # movie = session.query(Movie).filter(Movie.url == url).first()
         # movie = session.query(Movie).options(subqueryload(Movie.genres)).filter(Movie.url == url).one()
 
-        movie = session.query(Movie).\
+        movie = session.query(Movie). \
             options(joinedload_all(Movie.genres, Movie.languages,
-            Movie.actors, Movie.directors)).\
+                                   Movie.actors, Movie.directors)). \
             filter(Movie.url == url).first()
 
         # access it's members so they're loaded

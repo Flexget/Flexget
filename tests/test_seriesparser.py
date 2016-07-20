@@ -13,8 +13,10 @@ class TestSeriesParser(object):
     @pytest.fixture(scope='class', params=(ParserInternal, ParserGuessit), ids=['internal', 'guessit'])
     def parse(self, request):
         p = request.param()
+
         def parse(data, name=None, **kwargs):
             return p.parse_series(data, name=name, **kwargs)
+
         return parse
 
     @pytest.fixture(scope='class')
@@ -23,6 +25,7 @@ class TestSeriesParser(object):
             """Makes sure either ParseWarning is raised, or return is invalid."""
             r = parse(name, data, **kwargs)
             assert not r.valid, '{data} should not be valid'.format(data=data)
+
         return parse_invalid
 
     def test_proper(self, parse):
@@ -250,7 +253,7 @@ class TestSeriesParser(object):
 
     def test_ignore_seasonpacks(self, parse, parse_invalid):
         """SeriesParser: ignoring season packs"""
-        #parse_invalid(name='The Foo', data='The.Foo.S04.1080p.FlexGet.5.1')
+        # parse_invalid(name='The Foo', data='The.Foo.S04.1080p.FlexGet.5.1')
         parse_invalid(name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet')
         parse_invalid(name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet')
         parse_invalid(name='Something', data='Something S02 Pack 720p WEB-DL-FlexGet')
@@ -267,7 +270,6 @@ class TestSeriesParser(object):
         parse_invalid(name='Something', data='Something_ DISC_1_OF_2 MANofKENT INVICTA RG')
         # Make sure no false positives
         assert parse(name='Something', data='Something S01E03 Full Throttle').valid
-
 
     def test_similar(self, parse):
         s = parse(name='Foo Bar', data='Foo.Bar:Doppelganger.S02E04.HDTV.FlexGet', strict_name=True)
@@ -291,7 +293,7 @@ class TestSeriesParser(object):
     def test_idiotic_invalid(self, parse):
         """SeriesParser: idiotic confused by invalid"""
         s = parse('Test.Revealed.WS.PDTV.XviD-aAF.5190458.TPB.torrent', name='test', identified_by='ep')
-        #assert_raises(ParseWarning, s.parse)
+        # assert_raises(ParseWarning, s.parse)
         assert not s.season == 5, 'confused, got season'
         assert not s.season == 4, 'confused, got season'
         assert not s.episode == 19, 'confused, got episode'
@@ -324,7 +326,7 @@ class TestSeriesParser(object):
         assert not s.valid, 'Red Tomato (US) should not match Red Tomato in exact mode'
 
     def test_name_word_boundries(self, parse):
-        name='test'
+        name = 'test'
         s = parse('Test.S01E02.720p-FlexGet', name=name)
         assert s.valid, 'normal failed'
         # In non-exact mode these should match
@@ -341,14 +343,14 @@ class TestSeriesParser(object):
         from flexget.utils import qualities
         for quality in qualities.all_components():
             s = parse('FooBar %s XviD-FlexGet' % quality.name, name='FooBar')
-            #assert_raises(ParseWarning, s.parse)
+            # assert_raises(ParseWarning, s.parse)
 
     def test_sound_as_ep(self, parse):
         """SeriesParser: test that sound infos are not picked as ep"""
         sounds = ['AC3', 'DD5.1', 'DTS']
         for sound in sounds:
-            s = parse(data = 'FooBar %s XViD-FlexGet' % sound, name = 'FooBar')
-            #assert_raises(ParseWarning, s.parse)
+            s = parse(data='FooBar %s XViD-FlexGet' % sound, name='FooBar')
+            # assert_raises(ParseWarning, s.parse)
 
     def test_ep_as_quality(self, parse):
         """SeriesParser: test that eps are not picked as qualities"""
@@ -381,22 +383,22 @@ class TestSeriesParser(object):
 
                 s = parse('FooBar - %s %s-FlexGet' % (mock_ep1, quality2.name), name='FooBar')
                 assert s.episode == int(mock_ep1), "confused episode %s with quality %s" % \
-                                                  (mock_ep1, quality2.name)
+                                                   (mock_ep1, quality2.name)
 
                 # Also test with reversed relative order of episode and quality
                 s = parse('[%s] FooBar - %s [FlexGet]' % (quality2.name, mock_ep1), name='FooBar')
                 assert s.episode == int(mock_ep1), "confused episode %s with quality %s" % \
-                                                  (mock_ep1, quality2.name)
+                                                   (mock_ep1, quality2.name)
 
     def test_name_with_number(self, parse):
         """SeriesParser: test number in a name"""
         s = parse('Storage 13 no ep number', name='Storage 13')
-        #assert_raises(ParseWarning, s.parse)
+        # assert_raises(ParseWarning, s.parse)
 
     def test_name_uncorrupted(self, parse):
         """SeriesParser: test name doesn't get corrupted when cleaned"""
         s = parse(name='The New Adventures of Old Christine',
-                       data='The.New.Adventures.of.Old.Christine.S05E16.HDTV.XviD-FlexGet')
+                  data='The.New.Adventures.of.Old.Christine.S05E16.HDTV.XviD-FlexGet')
         assert s.name == 'The New Adventures of Old Christine'
         assert s.season == 5
         assert s.episode == 16
@@ -404,12 +406,12 @@ class TestSeriesParser(object):
 
     def test_from_groups(self, parse):
         """SeriesParser: test from groups"""
-        s = parse('Test.S01E01-Group', name='Test', allow_groups = ['xxxx', 'group'])
+        s = parse('Test.S01E01-Group', name='Test', allow_groups=['xxxx', 'group'])
         assert s.group == 'group', 'did not get group'
 
     def test_group_dashes(self, parse):
         """SeriesParser: group name around extra dashes"""
-        s = parse('Test.S01E01-FooBar-Group', name='Test', allow_groups = ['xxxx', 'group'])
+        s = parse('Test.S01E01-FooBar-Group', name='Test', allow_groups=['xxxx', 'group'])
         assert s.group == 'group', 'did not get group with extra dashes'
 
     def test_id_and_hash(self, parse):
@@ -555,7 +557,7 @@ class TestSeriesParser(object):
         assert not s.valid
 
     def test_id_regexps(self, parse):
-        id_regexps=['(dog)?e(cat)?']
+        id_regexps = ['(dog)?e(cat)?']
         s = parse('The Show dogecat', name='The Show', id_regexps=id_regexps)
         assert s.valid
         assert s.id == 'dog-cat'
@@ -565,7 +567,7 @@ class TestSeriesParser(object):
         s = parse('The Show ecat', name='The Show', id_regexps=id_regexps)
         assert s.valid
         assert s.id == 'cat'
-        #assert_raises(ParseWarning, s.parse, 'The Show e')
+        # assert_raises(ParseWarning, s.parse, 'The Show e')
 
     def test_apostrophe(self, parse):
         s = parse(name=u"FlexGet's show", data=u"FlexGet's show s01e01")

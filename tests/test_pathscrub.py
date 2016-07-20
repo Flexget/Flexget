@@ -58,4 +58,3 @@ class TestPathscrub(object):
         test = ['c:\\ aoeu \\aoeu /aoeu ', 'c:\\aoeu\\aoeu/aoeu']
         result = pathscrub(test[0], os='windows', filename=False)
         assert result == test[1], '%s != %s' % (result, test[1])
-

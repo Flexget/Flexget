@@ -57,7 +57,7 @@ class TestExtract(object):
     rar_name = 'test_rar.rar'
     zip_name = 'test_zip.zip'
     out_file = 'hooray.txt'
-    
+
     # Directories
     source_dir = 'archives'
     out_dir = 'directory'
@@ -65,7 +65,6 @@ class TestExtract(object):
     # Paths
     rar_path = os.path.join(source_dir, rar_name)
     zip_path = os.path.join(source_dir, zip_name)
-
 
     @pytest.mark.skipif(rarfile is None, reason='rarfile module required')
     @pytest.mark.filecopy(rar_path, '__tmp__')
