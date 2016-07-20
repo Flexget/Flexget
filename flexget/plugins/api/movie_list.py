@@ -240,7 +240,7 @@ class MovieListMoviesAPI(APIResource):
     def post(self, list_id, session=None):
         """ Add movies to list by ID """
         try:
-            movie_list = ml.get_list_by_id(list_id=list_id, session=session)
+            ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
