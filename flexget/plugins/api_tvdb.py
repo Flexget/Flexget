@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, or_, and_
+from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
