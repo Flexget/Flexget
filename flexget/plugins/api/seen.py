@@ -230,7 +230,7 @@ class SeenSearchAPI(APIResource):
         """ Delete seen entry by ID """
         try:
             seen.forget_by_id(seen_entry_id)
-        except ValueError as e:
+        except ValueError:
             return {'status': 'error',
                     'message': 'Could not delete entry ID {0}'.format(seen_entry_id)}, 500
         return {}
