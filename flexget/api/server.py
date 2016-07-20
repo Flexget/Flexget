@@ -148,8 +148,7 @@ raw_config_schema = api.schema('raw_config', raw_config_object)
 
 
 @server_api.route('/raw_config/')
-class ServerConfigAPI(APIResource):
-
+class ServerRawConfigAPI(APIResource):
     @api.doc(description='Return config file encoded in Base64')
     @api.response(200, model=raw_config_schema, description='Flexget raw YAML config file')
     def get(self, session=None):
