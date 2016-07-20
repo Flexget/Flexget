@@ -1,7 +1,9 @@
+/* global bard, sinon */
 describe('Service: Series', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.series');
 
+		/* global $httpBackend, seriesService, exception, CacheFactory, $q */
 		bard.inject('$httpBackend', 'seriesService', 'exception', 'CacheFactory', '$q');
 
 		sinon.stub(exception, 'catcher').returns($q.reject({ message: 'Request failed' }));

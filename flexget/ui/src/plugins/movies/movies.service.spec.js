@@ -1,7 +1,9 @@
+/* global bard, sinon */
 describe('Service: Movies', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.movies');
 
+		/* global $httpBackend, moviesService, exception, $q */
 		bard.inject('$httpBackend', 'moviesService', 'exception', '$q');
 
 		sinon.stub(exception, 'catcher').returns($q.reject({ message: 'Request failed' }));

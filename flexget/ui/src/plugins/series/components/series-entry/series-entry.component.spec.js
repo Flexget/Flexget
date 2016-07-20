@@ -1,3 +1,4 @@
+/* global bard, sinon, mockSeriesData */
 describe('Plugin: Series-Entry.Component', function () {
 	var component, deferred;
 	var metadata = mockSeriesData.getShowMetadata();
@@ -5,6 +6,8 @@ describe('Plugin: Series-Entry.Component', function () {
 
 	beforeEach(function () {
 		bard.appModule('plugins.series');
+
+		/* global $componentController, $q, seriesService, $rootScope, $mdDialog */
 		bard.inject('$componentController', '$q', 'seriesService', '$rootScope', '$mdDialog');
 
 		sinon.stub(seriesService, 'getShowMetadata').returns($q.when(metadata));

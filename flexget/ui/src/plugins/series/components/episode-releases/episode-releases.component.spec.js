@@ -1,3 +1,4 @@
+/* global bard, sinon, mockSeriesData */
 describe('Plugin: Episode-Releases.Component', function () {
 	var component, deferred;
 	var releases = mockSeriesData.getReleases();
@@ -6,6 +7,8 @@ describe('Plugin: Episode-Releases.Component', function () {
 
 	beforeEach(function () {
 		bard.appModule('plugins.series');
+
+		/* global $componentController, $q, seriesService, $rootScope, $mdDialog */
 		bard.inject('$componentController', '$q', 'seriesService', '$rootScope', '$mdDialog');
 
 		sinon.stub(seriesService, 'loadReleases').returns($q.when(releases));

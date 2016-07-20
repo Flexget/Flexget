@@ -1,3 +1,4 @@
+/* global bard, sinon, mockMovieListData */
 describe('Plugin: Movies.Component', function () {
 	var component, deferred;
 	var lists = mockMovieListData.getMovieLists();
@@ -5,6 +6,8 @@ describe('Plugin: Movies.Component', function () {
 
 	beforeEach(function () {
 		bard.appModule('plugins.movies');
+
+		/* global $componentController, $q, moviesService, $rootScope, $mdDialog */
 		bard.inject('$componentController', '$q', 'moviesService', '$rootScope', '$mdDialog');
 
 		sinon.stub(moviesService, 'getLists').returns($q.when(lists));
@@ -57,7 +60,7 @@ describe('Plugin: Movies.Component', function () {
 		describe('confirmation', function () {
 			it('should call the movies service', function () {
 				sinon.stub($mdDialog, 'show').returns($q.resolve());
-				
+
 				component.deleteMovieList(list);
 
 				$rootScope.$digest();

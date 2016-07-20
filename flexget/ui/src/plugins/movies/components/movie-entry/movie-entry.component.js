@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -17,7 +18,7 @@
 		var vm = this;
 
 		vm.$onInit = activate;
-		
+
 		function activate() {
 			getMetadata();
 		}

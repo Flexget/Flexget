@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -68,12 +69,12 @@
             }
         }
 
-		//TODO: Test		
+		//TODO: Test
 		function updateShow(show, params) {
 			return $http.put('/api/series/' + show.show_id + '/', params)
 				.then(updateShowComplete)
 				.catch(callFailed);
-			
+
 			function updateShowComplete(response) {
 				return response.data;
 			}
@@ -153,7 +154,7 @@
             return $http.get('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/releases/')
 				.then(loadReleasesComplete)
 				.catch(callFailed);
-			
+
 			function loadReleasesComplete(response) {
 				return response.data;
 			}

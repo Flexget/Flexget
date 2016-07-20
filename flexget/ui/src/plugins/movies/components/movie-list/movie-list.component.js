@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -23,15 +24,15 @@
 		vm.deleteList = deleteList;
 		vm.deleteMovie = deleteMovie;
 		vm.updateListPage = updateListPage;
-		
+
 		var options = {
 			page: 1,
 			page_size: 10
 		};
-		
+
 		function activate() {
 			//Hack to make the movies from the first tab load (md-on-select not firing for initial tab)
-			if (vm.tabIndex == 0) {
+			if (vm.tabIndex === 0) {
 				loadMovies();
 			}
 		}

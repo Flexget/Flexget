@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -31,7 +32,7 @@
 		function activate() {
 			getEpisodesList();
 		}
-		
+
         //Call from the pagination directive, which triggers other episodes to load
         vm.updateListPage = function (index) {
             options.page = index;

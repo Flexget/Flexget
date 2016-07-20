@@ -1,3 +1,4 @@
+/* global angular, registerPlugin */
 (function () {
     'use strict';
 
@@ -7,10 +8,10 @@
 			'ngSanitize',
 
 			'angular-cache',
-			
+
 			'blocks.exception',
 			'blocks.router'
 		]);
-	
+
 	registerPlugin('plugins.movies');
 }());
