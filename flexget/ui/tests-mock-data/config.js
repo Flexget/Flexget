@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 var mockConfigData = (function () {
 	return {
 		getMockRawConfig: getMockRawConfig

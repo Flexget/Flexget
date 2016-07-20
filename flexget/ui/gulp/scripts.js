@@ -5,8 +5,6 @@ var gulp = require('gulp');
 
 var paths = gulp.paths;
 
-var browserSync = require('browser-sync');
-
 var $ = require('gulp-load-plugins')();
 
 gulp.task('scripts', function () {

@@ -23,7 +23,7 @@
   }
 
   function pagingLink(scope, element, attributes) {
-    scope.$watch('[page,total]', function(newValue, oldValue) {
+    scope.$watch('[page,total]', function(newValue) {
       if(newValue) {
         updateButtons(scope, attributes);
       }

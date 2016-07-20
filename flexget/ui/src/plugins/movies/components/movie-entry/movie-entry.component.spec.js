@@ -1,6 +1,6 @@
 /* global bard, sinon, mockMovieListData */
 describe('Plugin: Movie-Entry.Component', function () {
-	var component, deferred;
+	var component;
 	var movie = mockMovieListData.getMovieListMovieById();
 	var metadata = mockMovieListData.getMovieMetadata();
 

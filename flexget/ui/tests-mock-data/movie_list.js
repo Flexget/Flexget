@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 var mockMovieListData = (function () {
 	return {
 		getMovieLists: getMovieLists,
@@ -196,7 +197,7 @@ var mockMovieListData = (function () {
 			'year': 2016
 		};
 	}
-	
+
 	function createMovieList() {
 		return {
 			'added_on': 'Mon, 09 Jun 2016 09:32:42 GMT',

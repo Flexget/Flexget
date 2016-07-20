@@ -4,8 +4,8 @@ describe('404 Routes: ', function () {
 	beforeEach(function () {
 		module('components.404');
 
-		/* global $state, $templateCache, $rootScope, $location */
-		bard.inject('$state', '$templateCache', '$rootScope', '$location');
+		/* global $state, $rootScope, $location */
+		bard.inject('$state', '$rootScope', '$location');
 	});
 
 	it('should map state \'flexget.404\' to url #/', function () {
