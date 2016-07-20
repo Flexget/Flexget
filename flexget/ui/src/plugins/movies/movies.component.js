@@ -2,7 +2,7 @@
 	'use strict';
 	
 	angular
-		.module("plugins.movies")
+		.module('plugins.movies')
 		.component('moviesView', {
 			templateUrl: 'plugins/movies/movies.tmpl.html',
 			controllerAs: 'vm',
@@ -30,9 +30,9 @@
 		function deleteMovieList(list) {
 			var confirm = $mdDialog.confirm()
 				.title('Confirm deleting movie list.')
-				.htmlContent("Are you sure you want to delete the movie list <b>" + list.name + "</b>?")
-				.ok("Forget")
-				.cancel("No");
+				.htmlContent('Are you sure you want to delete the movie list <b>' + list.name + '</b>?')
+				.ok('Forget')
+				.cancel('No');
 
 			//Actually show the confirmation dialog and place a call to DELETE when confirmed
 			$mdDialog.show(confirm).then(function () {

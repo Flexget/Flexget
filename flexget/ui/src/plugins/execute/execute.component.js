@@ -28,7 +28,7 @@
 
 		function getRunning() {
             executeService.getQueue().then(function (data) {
-                vm.running = data.tasks
+                vm.running = data.tasks;
             });
         }
 
@@ -41,7 +41,7 @@
 
 		function stopStream() {
 			delete vm.options;
-			vm.streaming = false
+			vm.streaming = false;
 		}
 
 		function destroy() {

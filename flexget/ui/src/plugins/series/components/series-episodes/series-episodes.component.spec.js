@@ -1,4 +1,4 @@
-describe("Plugin: Series-Episodes.Component", function () {
+describe('Plugin: Series-Episodes.Component', function () {
 	var component, deferred;
 	var episodes = mockSeriesData.getEpisodes();
 	var episode = mockSeriesData.getEpisode();
@@ -15,7 +15,7 @@ describe("Plugin: Series-Episodes.Component", function () {
 		component = $componentController('seriesEpisodesView');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 

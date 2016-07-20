@@ -1,10 +1,10 @@
-describe("Blocks: Router", function () {
+describe('Blocks: Router', function () {
 	beforeEach(function () {
 		bard.appModule('blocks.router');
 		bard.inject('routerHelper');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(routerHelper).to.exist;
 	});
 

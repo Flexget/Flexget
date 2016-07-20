@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-		.module("plugins.schedule")
+		.module('plugins.schedule')
 		.run(appRun);
 
 	function appRun(routerHelper) {
@@ -23,6 +23,6 @@
 					}
 				}
 			}
-		]
+		];
 	}
 }());

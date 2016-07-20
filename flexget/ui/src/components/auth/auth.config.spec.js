@@ -9,7 +9,7 @@ describe('Login Config: ', function () {
 		bard.inject('authInterceptor', 'authService', '$rootScope');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(authInterceptor).to.exist;
 	});
 
@@ -25,7 +25,7 @@ describe('Login Config: ', function () {
 			sinon.stub($rootScope, '$broadcast');
 		});
 
-		it("should exist", function () {
+		it('should exist', function () {
 			expect(authInterceptor.responseError).to.exist;
 			expect(authInterceptor.responseError).to.be.a('function');
 		});
@@ -34,12 +34,12 @@ describe('Login Config: ', function () {
 			var rejection = {
 				status: 401,
 				config: {}
-			}
+			};
 
 			authInterceptor.responseError(rejection);
 
 			expect($rootScope.$broadcast).to.have.been.calledOnce;
-			expect($rootScope.$broadcast).to.have.been.calledWith("event:auth-loginRequired", true);
+			expect($rootScope.$broadcast).to.have.been.calledWith('event:auth-loginRequired', true);
 		});
 
 		it('should not broadcast when ignoreAuthModule is true', function () {
@@ -48,7 +48,7 @@ describe('Login Config: ', function () {
 				config: {
 					ignoreAuthModule: true
 				}
-			}
+			};
 
 			authInterceptor.responseError(rejection);
 

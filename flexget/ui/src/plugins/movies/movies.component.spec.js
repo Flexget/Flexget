@@ -1,4 +1,4 @@
-describe("Plugin: Movies.Component", function () {
+describe('Plugin: Movies.Component', function () {
 	var component, deferred;
 	var lists = mockMovieListData.getMovieLists();
 	var list = mockMovieListData.getMovieListById();
@@ -14,7 +14,7 @@ describe("Plugin: Movies.Component", function () {
 		component = $componentController('moviesView');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 
@@ -109,6 +109,6 @@ describe("Plugin: Movies.Component", function () {
 			$rootScope.$digest();
 
 			expect(component.lists.length).to.equal(lists.movie_lists.length + 1);
-		})
+		});
 	});
 });

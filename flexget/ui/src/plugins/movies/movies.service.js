@@ -20,7 +20,7 @@
             deleteMovie: deleteMovie,
             createList: createList,
 			getMovieMetadata: getMovieMetadata
-        }
+        };
 
         function getLists() {
             return $http.get('/api/movie_list/')

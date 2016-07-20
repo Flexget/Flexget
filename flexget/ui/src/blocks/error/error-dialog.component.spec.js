@@ -1,17 +1,17 @@
-describe("Blocks: Error", function () {
-	describe("Error-dialog.component", function () {
+describe('Blocks: Error', function () {
+	describe('Error-dialog.component', function () {
 		var controller;
 		
 		var mockError = {
-			"code": 500,
-			"message": "Server error",
-			"validation_errors": [
+			'code': 500,
+			'message': 'Server error',
+			'validation_errors': [
 				{
-					"message": "Something went wrong here",
-					"path": "Something went wrong here as well",
-					"schema_path": "Something went wrong here as well, it's also a long text",
-					"validator": "string",
-					"validator_value": "string"
+					'message': 'Something went wrong here',
+					'path': 'Something went wrong here as well',
+					'schema_path': 'Something went wrong here as well, it\'s also a long text',
+					'validator': 'string',
+					'validator_value': 'string'
 				}
 			]
 		};
@@ -28,11 +28,11 @@ describe("Blocks: Error", function () {
 				});
 		});
 
-		it("should exist", function () {
+		it('should exist', function () {
 			expect(controller).to.exist;
 		});
 
-		it("should have an error object", function () {
+		it('should have an error object', function () {
 			expect(controller.error).to.exist;
 		});
 
@@ -42,7 +42,7 @@ describe("Blocks: Error", function () {
 				expect(controller.close).to.be.a('function');
 			});
 			
-			it("should close the dialog", function () {
+			it('should close the dialog', function () {
 				sinon.spy($mdDialog, 'hide');
 
 				controller.close();

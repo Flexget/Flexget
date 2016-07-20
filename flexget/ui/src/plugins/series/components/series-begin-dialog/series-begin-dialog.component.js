@@ -31,7 +31,7 @@
 			//TODO: Error handling
 			var params = {
 				episode_identifier: vm.begin
-			}
+			};
 
 			seriesService.updateShow(vm.show, params).then(function (data) {
 				$mdDialog.hide(vm.begin);

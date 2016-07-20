@@ -1,4 +1,4 @@
-describe("Plugin: Episode-Release.Component", function () {
+describe('Plugin: Episode-Release.Component', function () {
 	var component, deferred;
 	var release = mockSeriesData.getRelease();
 	var episode = mockSeriesData.getEpisode();
@@ -17,7 +17,7 @@ describe("Plugin: Episode-Release.Component", function () {
 		});
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 

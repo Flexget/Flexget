@@ -1,4 +1,4 @@
-describe("Plugin: Execute-input.component", function () {
+describe('Plugin: Execute-input.component', function () {
 	var controller;
 	var tasks = mockExecuteData.getMockTasks();
 
@@ -16,11 +16,11 @@ describe("Plugin: Execute-input.component", function () {
 		});
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(controller).to.exist;
 	});
 
-	describe("activation", function () {
+	describe('activation', function () {
 		beforeEach(function () {
 			controller.$onInit();
 			$rootScope.$digest();
@@ -28,9 +28,9 @@ describe("Plugin: Execute-input.component", function () {
 
 		it('should have called the execute service', function () {
 			expect(executeService.getTasks).to.have.been.calledOnce;
-		})
+		});
 		
-		it("should have tasks", function () {
+		it('should have tasks', function () {
 			expect(controller.tasks).to.not.be.empty;
 		});
 
@@ -67,7 +67,7 @@ describe("Plugin: Execute-input.component", function () {
 			var opts = {
 				learn: false,
 				no_cache: true
-			}
+			};
 
 			controller.startExecute();
 
@@ -82,7 +82,7 @@ describe("Plugin: Execute-input.component", function () {
 		});
 
 		it('should return an empty array when no searchterm is specified', function () {
-			controller.searchTerm = "";
+			controller.searchTerm = '';
 
 			var result = controller.searchTask();
 
@@ -92,7 +92,7 @@ describe("Plugin: Execute-input.component", function () {
 
 		it('should return an array of tasks based on searchterm', function () {
 			controller.tasks = ['TestingTask', 'OtherTask'];
-			controller.searchTerm = "Testing";
+			controller.searchTerm = 'Testing';
 
 			var result = controller.searchTask();
 

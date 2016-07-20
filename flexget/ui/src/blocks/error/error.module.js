@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module("blocks.error", [
+        .module('blocks.error', [
 			'ngMaterial',
 			'ngclipboard'
 		]);

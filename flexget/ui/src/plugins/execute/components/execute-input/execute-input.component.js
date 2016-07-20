@@ -20,7 +20,7 @@
 		vm.searchTask = searchTask;
 		vm.startExecute = startExecute;
 
-		vm.searchTerm = "";
+		vm.searchTerm = '';
 		vm.tasks = [];
 		vm.selectedTasks = [];
 

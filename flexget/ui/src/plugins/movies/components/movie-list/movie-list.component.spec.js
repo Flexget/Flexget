@@ -1,4 +1,4 @@
-describe("Plugin: Movie-list.Component", function () {
+describe('Plugin: Movie-list.Component', function () {
 	var component, deferred;
 	var movieList = mockMovieListData.getMovieListById();
 	var movies = mockMovieListData.getMovieListMovies();
@@ -20,7 +20,7 @@ describe("Plugin: Movie-list.Component", function () {
 			});
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 

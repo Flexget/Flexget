@@ -1,4 +1,4 @@
-describe("Plugin: Series.Component", function () {
+describe('Plugin: Series.Component', function () {
 	var component, deferred;
 	var shows = mockSeriesData.getShows();
 	var show = mockSeriesData.getShow();
@@ -14,7 +14,7 @@ describe("Plugin: Series.Component", function () {
 		component = $componentController('seriesView');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 
@@ -104,8 +104,8 @@ describe("Plugin: Series.Component", function () {
 
 		it('should set the selectedShow to a different show', function () {
 			component.selectedShow = {
-				name: "Testing"
-			}
+				name: 'Testing'
+			};
 
 			component.toggleEpisodes(show);
 
@@ -127,7 +127,7 @@ describe("Plugin: Series.Component", function () {
 		});
 
 		it('should call the series service', function () {
-			component.searchTerm = "iZom";
+			component.searchTerm = 'iZom';
 
 			component.search();
 
@@ -135,7 +135,7 @@ describe("Plugin: Series.Component", function () {
 		});
 
 		it('should set the series list', function () {
-			component.searchTerm = "iZom";
+			component.searchTerm = 'iZom';
 
 			component.search();
 
@@ -152,11 +152,11 @@ describe("Plugin: Series.Component", function () {
 		});
 
 		it('should call the complete list after a search term has been removed', function () {
-			component.searchTerm = "iZom";
+			component.searchTerm = 'iZom';
 
 			component.search();
 
-			component.searchTerm = "";
+			component.searchTerm = '';
 
 			component.search();
 

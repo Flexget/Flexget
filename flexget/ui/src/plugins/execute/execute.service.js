@@ -10,7 +10,7 @@
             getTasks: getTasks,
 			getQueue: getQueue,
 			executeTasks: executeTasks
-        }
+        };
 
         function getTasks() {
             return $http.get('/api/tasks/')
@@ -40,9 +40,9 @@
                 body: options,
                 method: 'POST'
             }).done(function () {
-                deferred.resolve("finished stream");
+                deferred.resolve('finished stream');
             }).fail(function (error) {
-                deferred.reject(error)
+                deferred.reject(error);
             });
 
             deferred.promise.log = function (callback) {

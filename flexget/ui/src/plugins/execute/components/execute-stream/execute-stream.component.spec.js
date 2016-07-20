@@ -1,4 +1,4 @@
-describe("Plugin: Execute-stream.component", function () {
+describe('Plugin: Execute-stream.component', function () {
 	var controller;
 	var tasks = mockExecuteData.getMockTasks();
 
@@ -8,7 +8,7 @@ describe("Plugin: Execute-stream.component", function () {
 		bard.inject('$componentController', 'executeService', '$q', '$rootScope');
 
 		sinon.spy(executeService, 'executeTasks');		
-	})
+	});
 
 	beforeEach(function () {
 		controller = $componentController('executeStream', null, {
@@ -19,11 +19,11 @@ describe("Plugin: Execute-stream.component", function () {
 		});
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(controller).to.exist;
 	});
 
-	describe("activation", function () {
+	describe('activation', function () {
 		beforeEach(function () {
 			controller.$onInit();
 			$rootScope.$digest();

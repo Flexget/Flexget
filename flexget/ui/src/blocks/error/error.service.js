@@ -38,7 +38,7 @@
 		function showDialog(error) {
 			dialog.locals = {
 				error: error
-			}
+			};
 
 			$mdDialog.show(dialog);
 		}

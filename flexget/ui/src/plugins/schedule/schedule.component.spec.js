@@ -1,4 +1,4 @@
-describe("Plugin: Schedule.component", function () {
+describe('Plugin: Schedule.component', function () {
 	var controller;
 	var schedules = mockSchedulesData.getMockSchedules();
 
@@ -14,11 +14,11 @@ describe("Plugin: Schedule.component", function () {
 		controller = $componentController('scheduleView');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(controller).to.exist;
 	});
 
-	describe("activation", function () {
+	describe('activation', function () {
 		beforeEach(function() {
 			controller.$onInit();
 			$rootScope.$digest();
@@ -28,7 +28,7 @@ describe("Plugin: Schedule.component", function () {
 			expect(schedulesService.getSchedules).to.have.been.calledOnce;
 		});
 		
-		it("should have entries", function () {
+		it('should have entries', function () {
 			expect(controller.models).to.not.be.empty;
 		});
 	});

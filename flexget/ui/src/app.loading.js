@@ -1,7 +1,7 @@
 'use strict';
 
 window.loadingScreen = window.pleaseWait({
-        logo: "assets/images/header.png",
+        logo: 'assets/images/header.png',
         backgroundColor: '#FFFFFF',
         loadingHtml: '' +
         '<p class="text-primary text-bold">Loading</p>' +

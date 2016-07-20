@@ -1,10 +1,10 @@
-describe("Blocks: Exception", function () {
+describe('Blocks: Exception', function () {
 	var mockErrorResponse = {
 		status: 500,
 		data: {
-			message: "Failure"
+			message: 'Failure'
 		}
-	}
+	};
 	
 	beforeEach(function () {
 		bard.appModule('blocks.exception');
@@ -12,7 +12,7 @@ describe("Blocks: Exception", function () {
 		bard.inject('exception', 'errorService', '$rootScope');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(exception).to.exist;
 	});
 	
@@ -45,6 +45,6 @@ describe("Blocks: Exception", function () {
 			$rootScope.$digest();
 
 			expect(errorService.showToast).not.to.have.been.called;
-		})
+		});
 	});
 });

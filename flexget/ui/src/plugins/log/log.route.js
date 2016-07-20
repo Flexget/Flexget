@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-		.module("plugins.log")
+		.module('plugins.log')
 		.run(appRun);
 
 	function appRun(routerHelper, toolBarService, $state) {
@@ -14,7 +14,7 @@
 			icon: 'file-text-o',
 			action: goToRoute,
 			order: 1
-		}
+		};
 
 		function goToRoute() {
 			$state.go('flexget.log');
@@ -37,7 +37,7 @@
 					}
 				}
 			}
-		]
+		];
 	}
 
 	
