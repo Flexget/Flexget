@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -14,7 +15,7 @@
 			icon: 'pencil',
 			action: goToRoute,
 			order: 1
-		}
+		};
 
 		function goToRoute() {
 			$state.go('flexget.config');
@@ -37,6 +38,6 @@
 					}
 				}
 			}
-		]
+		];
 	}
 }());

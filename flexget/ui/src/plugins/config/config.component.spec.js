@@ -1,3 +1,4 @@
+/* global bard, sinon */
 describe('Plugin: Config.component', function () {
 	var controller;
 	var rawConfig = mockConfigData.getMockRawConfig();
@@ -5,8 +6,9 @@ describe('Plugin: Config.component', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.config');
 
+		/* global $componentController, $q, $rootScope, configService, CacheFactory */
 		bard.inject('$componentController', '$q', '$rootScope', 'configService', 'CacheFactory');
-		
+
 		sinon.stub(configService, 'getRawConfig').returns($q.when(rawConfig));
 
 		CacheFactory.clearAll();
@@ -32,11 +34,11 @@ describe('Plugin: Config.component', function () {
 
 		it('should setup the cache', function () {
 			expect(CacheFactory.get('aceThemeCache')).to.exist;
-		})
-		
+		});
+
 		it('should set the aceOptions and themes', function () {
 			expect(controller.aceOptions).to.exist;
-			
+
 			expect(controller.themes).to.exist;
 			expect(controller.themes).not.to.be.empty;
 		});

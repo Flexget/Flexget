@@ -1,6 +1,7 @@
+/* global angular, ace */
 (function () {
 	'use strict';
-	
+
 	angular
 		.module('plugins.config')
 		.component('configView', {
@@ -58,7 +59,7 @@
 			vm.themes = themelist.themes;
 		}
 
-		function aceLoaded(_editor) {			
+		function aceLoaded(_editor) {
 			//Get all commands, but keep the find command
 			var commandsToRemove = [
 				'transposeletters',
@@ -100,7 +101,7 @@
 
 					$mdDialog.show(dialog);
 
-					delete vm.errorMessage;				
+					delete vm.errorMessage;
 					delete vm.errors;
 
 					saveOriginalConfig();
