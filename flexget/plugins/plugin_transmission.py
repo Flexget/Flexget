@@ -130,7 +130,7 @@ class TransmissionBase(object):
             raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required.', log)
         if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 11]:
             raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required, please upgrade', log)
-        """ 
+        """
         Mark rpc client for garbage collector so every task can start 
         a fresh new according its own config - fix to bug #2804
         """
@@ -355,7 +355,7 @@ class PluginTransmission(TransmissionBase):
             change['queuePosition'] = opt_dic['queue_position']
 
         post = options['post']
-        # set to modify paused status after 
+        # set to modify paused status after
         if 'addpaused' in opt_dic:
             post['paused'] = opt_dic['addpaused']
         if 'main_file_only' in opt_dic:

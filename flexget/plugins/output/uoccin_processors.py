@@ -453,7 +453,7 @@ class UoccinSubtitles(UoccinWriter):
 
     def on_task_output(self, task, config):
         """Set subtitles info for accepted episodes and/or movies in the uoccin.json file.
-        Requires the subtitles field (set by subtitles_check plugin), plus tvdb_id, series_season and series_episode 
+        Requires the subtitles field (set by subtitles_check plugin), plus tvdb_id, series_season and series_episode
         for episodes, or imdb_id for movies.
 
         Example::

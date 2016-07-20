@@ -70,7 +70,7 @@ def sftp_connect(conf):
 
 def sftp_from_config(config):
     """
-    Creates an SFTP connection from a Flexget config object 
+    Creates an SFTP connection from a Flexget config object
     """
     host = config['host']
     port = config['port']
@@ -144,7 +144,7 @@ class SftpList(object):
           recursive: False
           get_size: True
           files_only: False
-          dirs: 
+          dirs:
               - '/path/to/list/'
               - '/another/path/'
     """
@@ -276,7 +276,7 @@ class SftpList(object):
 
 class SftpDownload(object):
     """
-    Download files from a SFTP server. This plugin requires the pysftp Python module and its 
+    Download files from a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.
 
     Configuration:
@@ -470,7 +470,7 @@ class SftpDownload(object):
 
 class SftpUpload(object):
     """
-    Upload files to a SFTP server. This plugin requires the pysftp Python module and its 
+    Upload files to a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.
 
     host:                 Host to connect to
