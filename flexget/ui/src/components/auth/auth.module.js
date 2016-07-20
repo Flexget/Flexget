@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module("components.auth", [
+        .module('components.auth', [
 			'blocks.exception',
 			'blocks.router',
 			'components.toolbar'

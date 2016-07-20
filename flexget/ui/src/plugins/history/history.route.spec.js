@@ -10,22 +10,22 @@ describe('History Routes:', function () {
 		bard.inject('$state', '$rootScope', '$location');
     });
 
-    it("should map state 'flexget.history' to url #/history", function () {
+    it('should map state \'flexget.history\' to url #/history', function () {
 		expect($state.href('flexget.history', {})).to.equal('#/history');
     });
 	
-	it.skip("should map state to the 'history' component", function () {
+	it.skip('should map state to the \'history\' component', function () {
 		expect($state.get('flexget.history').component).to.equal('historyView');
 	});
 	
-	describe("Transitions", function() {
-		it("should work with $state.go", function () {
+	describe('Transitions', function() {
+		it('should work with $state.go', function () {
 			$state.go('flexget.history');
 			$rootScope.$digest();
 			expect($state.is('flexget.history')).to.be.true;
 		});
 		
-		it("should work with 'history' path", function() {
+		it('should work with \'history\' path', function() {
 			$location.path('history');
 			$rootScope.$digest();
 			expect($state.is('flexget.history')).to.be.true;

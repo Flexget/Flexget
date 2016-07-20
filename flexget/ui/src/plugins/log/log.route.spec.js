@@ -10,22 +10,22 @@ describe('Log Routes:', function () {
 		bard.inject('$state', '$rootScope', '$location');
     });
 
-    it("should map state 'flexget.log' to url #/log", function () {
+    it('should map state \'flexget.log\' to url #/log', function () {
 		expect($state.href('flexget.log', {})).to.equal('#/log');
     });
 	
-	it.skip("should map state to the 'log' component", function () {
+	it.skip('should map state to the \'log\' component', function () {
 		expect($state.get('flexget.log').component).to.equal('logView');
 	});
 	
-	describe("Transitions", function() {
-		it("should work with $state.go", function () {
+	describe('Transitions', function() {
+		it('should work with $state.go', function () {
 			$state.go('flexget.log');
 			$rootScope.$digest();
 			expect($state.is('flexget.log')).to.be.true;
 		});
 		
-		it("should work with 'log' path", function() {
+		it('should work with \'log\' path', function() {
 			$location.path('log');
 			$rootScope.$digest();
 			expect($state.is('flexget.log')).to.be.true;
