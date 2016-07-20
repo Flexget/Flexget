@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
+
 from datetime import datetime, timedelta
 
 from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, func, or_
@@ -10,13 +11,16 @@ from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
 from flexget import db_schema, plugin
+from flexget import options
 from flexget.event import event
+from flexget.logger import console
+from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, year_property, with_session
 
 log = logging.getLogger('api_tmdb')
-Base = db_schema.versioned_base('api_tmdb', 1)
+Base = db_schema.versioned_base('api_tmdb', 2)
 
 # This is a FlexGet API key
 API_KEY = 'bdfc018dbdb7c243dc7cb1454ff74b95'
@@ -29,14 +33,20 @@ def get_tmdb_config():
     """Gets and caches tmdb config on first call."""
     global _tmdb_config
     if not _tmdb_config:
-        _tmdb_config = tmdb_request('configuration')
+        _tmdb_config = tmdb_request('configuration').json()
     return _tmdb_config
+
+
+def tmdb_post(endpoint, **params):
+    params.setdefault('api_key', API_KEY)
+    full_url = BASE_URL + endpoint
+    return requests.post(full_url, params=params)
 
 
 def tmdb_request(endpoint, **params):
     params.setdefault('api_key', API_KEY)
     full_url = BASE_URL + endpoint
-    return requests.get(full_url, params=params).json()
+    return requests.get(full_url, params=params)
 
 
 @db_schema.upgrade('api_tmdb')
@@ -89,7 +99,7 @@ class TMDBMovie(Base):
         """
         self.id = id
         try:
-            movie = tmdb_request('movie/{}'.format(self.id), append_to_response='alternative_titles,images')
+            movie = tmdb_request('movie/{}'.format(self.id), append_to_response='alternative_titles,images').json()
         except requests.RequestException as e:
             raise LookupError('Error updating data from tmdb: %s' % e)
         self.imdb_id = movie['imdb_id']
@@ -242,7 +252,7 @@ class ApiTmdb(object):
             log.verbose('Searching from TMDb %s', id_str)
             if imdb_id and not tmdb_id:
                 try:
-                    result = tmdb_request('find/{}'.format(imdb_id), external_source='imdb_id')
+                    result = tmdb_request('find/{}'.format(imdb_id), external_source='imdb_id').json()
                 except requests.RequestException as e:
                     raise LookupError('Error searching imdb id on tmdb: {}'.format(e))
                 if result['movie_results']:
@@ -253,7 +263,7 @@ class ApiTmdb(object):
                 if year:
                     searchparams['year'] = year
                 try:
-                    results = tmdb_request('search/movie', **searchparams)
+                    results = tmdb_request('search/movie', **searchparams).json()
                 except requests.RequestException as e:
                     raise LookupError('Error searching for tmdb item {}: {}'.format(search_string, e))
                 if not results['results']:
@@ -267,6 +277,132 @@ class ApiTmdb(object):
                 raise LookupError('Unable to find movie on tmdb: {}'.format(id_str))
 
         return movie
+
+
+# Oauth account authentication
+class TmdbUserAuth(Base):
+    __tablename__ = 'tmdb_user_auth'
+
+    account = Column(Unicode, primary_key=True)
+    session_id = Column(Unicode)
+    created = Column(DateTime)
+
+    def __init__(self, account, session_id, created=datetime.utcnow()):
+        self.account = account
+        self.session_id = session_id
+        self.created = created
+
+
+def authenticate(account):
+    """Authenticates a session with TMDB, and grabs any IDs needed for getting/modifying list."""
+    try:
+        r = tmdb_request('authentication/token/new')
+        url = r.headers['Authentication-Callback']
+        body = r.json()
+        request_token = body['request_token']
+        expires_at = body['expires_at']
+
+        console('Please visit {0} and authorize Flexget. Your token expires {1}.'.format(url, expires_at))
+        input('Press `Enter` when the token has been authorized...')
+
+        sr = tmdb_request('authentication/session/new', request_token=request_token).json()
+        session_id = sr['session_id']
+
+        console(session_id)
+        return session_id
+    except requests.RequestException as e:
+        raise plugin.PluginError('Device authorization with themoviedb.org failed: {0}'.format(e.args[0]))
+
+
+def delete_account(account):
+    with Session() as session:
+        acc = session.query(TmdbUserAuth).filter(TmdbUserAuth.account == account).first()
+        if not acc:
+            raise plugin.PluginError('Account %s not found.' % account)
+        session.delete(acc)
+
+
+def get_session_id(account, called_from_cli=False):
+    """
+    Gets authorization info from a pin or refresh token.
+    :param account: Arbitrary account name to attach authorization to.
+    :raises RequestException: If there is a network error while authorizing.
+    """
+    with Session() as session:
+        acc = session.query(TmdbUserAuth).filter(TmdbUserAuth.account == account).first()
+        if acc:
+            return acc.session_id
+        elif called_from_cli:
+            log.debug('Attempting to authorize FlexGet for account %s.', account)
+            session_id = authenticate(account)
+            acc = TmdbUserAuth(account, session_id)
+            session.add(acc)
+            return session_id
+        else:
+            raise plugin.PluginError('Account %s has not been authorized. See `flexget tmdb auth -h` on how to.' %
+                                     account)
+
+
+def do_cli(manager, options):
+    if options.action == 'auth':
+        if not (options.account):
+            console('You must specify an account (local identifier) so we know where to save your access token!')
+            return
+        try:
+            get_session_id(options.account, called_from_cli=True)
+            console('Successfully authorized Flexget app on themoviedb.org. Enjoy!')
+            return
+        except plugin.PluginError as e:
+            console('Authorization failed: %s' % e)
+    elif options.action == 'show':
+        with Session() as session:
+            if not options.account:
+                # Print all accounts
+                accounts = session.query(TmdbUserAuth).all()
+                if not accounts:
+                    console('No tmdb authorizations stored in database.')
+                    return
+                console('{:-^21}|{:-^40}|{:-^28}'.format('Account', 'Session Id', 'Created'))
+                for auth in accounts:
+                    console('{:<21}|{:>40}|{:>28}'.format(
+                        auth.account, auth.session_id, auth.created.strftime('%Y-%m-%d')))
+                return
+            # Show a specific account
+            acc = session.query(TmdbUserAuth).filter(TmdbUserAuth.account == options.account).first()
+            if acc:
+                console('Session Id is %s' % acc.session_id)
+            else:
+                console('Flexget has not been authorized to access your account.')
+    elif options.action == 'delete':
+        if not options.account:
+            console('Please specify an account')
+            return
+        try:
+            delete_account(options.account)
+            console('Successfully deleted your access token.')
+            return
+        except plugin.PluginError as e:
+            console('Deletion failed: %s' % e)
+
+
+@event('options.register')
+def register_parser_arguments():
+    acc_text = 'local identifier which should be used in your config to refer these credentials'
+    # Register subcommand
+    parser = options.register_command('tmdb', do_cli, help='view and manage tmdb authentication.')
+    # Set up our subparsers
+    subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='action')
+    auth_parser = subparsers.add_parser('auth', help='authorize Flexget to access your themoviedb.org account')
+
+    auth_parser.add_argument('account', metavar='<account>', help=acc_text)
+
+    show_parser = subparsers.add_parser('show', help='show session id for flexget authorisation(s)')
+
+    show_parser.add_argument('account', metavar='<account>', nargs='?', help=acc_text)
+
+    delete_parser = subparsers.add_parser('delete', help='delete the specified <account> name from local database')
+
+    delete_parser.add_argument('account', metavar='<account>', help=acc_text)
 
 
 @event('plugin.register')
