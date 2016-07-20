@@ -88,9 +88,6 @@ class OutputSMSru(object):
             # Make the request
             response = task.requests.get(sms_send_url, params=send_params, raise_status=False)
 
-            # Get resul code from sms.ru backend returned in body
-            result_text = response.text
-
             # Check if it succeeded
             if response.text.find("100") == 0:
                 log.debug("SMS notification for %s sent" % phonenumber)

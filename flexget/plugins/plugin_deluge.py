@@ -116,7 +116,7 @@ def install_pausing_reactor():
     # Configure twisted to use the PausingReactor.
     installReactor(PausingReactor())
 
-    @event('manager.shutdown')
+    @event('manager.shutdown')  # pylint: disable=unused-variable
     def stop_reactor(manager):
         """Shut down the twisted reactor after all tasks have run."""
         if not reactor._stopped:

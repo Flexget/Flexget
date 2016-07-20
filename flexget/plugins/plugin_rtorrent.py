@@ -92,7 +92,7 @@ class SCGITransport(xmlrpc_client.Transport):
             log.info('body: %s', repr(response_body))
 
         # Remove SCGI headers from the response.
-        response_header, response_body = re.split(r'\n\s*?\n', response_body, maxsplit=1)
+        _, response_body = re.split(r'\n\s*?\n', response_body, maxsplit=1)
         p.feed(response_body)
         p.close()
 

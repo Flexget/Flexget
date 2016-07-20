@@ -52,7 +52,7 @@ class PluginUtorrent(object):
         # our temp .torrent files
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
-            for entry in task.accepted:
+            for _ in task.accepted:
                 download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
     @plugin.priority(135)
