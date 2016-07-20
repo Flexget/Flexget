@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import cgi
@@ -6,7 +7,6 @@ import copy
 from datetime import datetime
 from json import JSONEncoder
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify, Response
 from flask import request
 from queue import Queue, Empty
