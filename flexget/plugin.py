@@ -61,7 +61,6 @@ class DependencyError(Exception):
 
 
 class RegisterException(Exception):
-
     def __init__(self, value):
         super(RegisterException, self).__init__()
         self.value = value
@@ -72,7 +71,6 @@ class RegisterException(Exception):
 
 @python_2_unicode_compatible
 class PluginWarning(Warning):
-
     def __init__(self, value, logger=log, **kwargs):
         super(PluginWarning, self).__init__()
         self.value = value
@@ -85,7 +83,6 @@ class PluginWarning(Warning):
 
 @python_2_unicode_compatible
 class PluginError(Exception):
-
     def __init__(self, value, logger=log, **kwargs):
         super(PluginError, self).__init__()
         # Value is expected to be a string
@@ -346,6 +343,19 @@ class PluginInfo(dict):
         return self.name < other.name
 
     __repr__ = __str__
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'api_ver': self.api_ver,
+            'builtin': self.builtin,
+            'category': self.category,
+            'contexts': self.contexts,
+            'debug': self.debug,
+            'groups': self.groups,
+            'phase_handlers': [dict(phase=handler, priority=event.priority) for handler, event in
+                               self.phase_handlers.items()]
+        }
 
 
 register = PluginInfo
