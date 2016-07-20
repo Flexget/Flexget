@@ -5,7 +5,7 @@ import logging
 
 from flask_restplus import inputs
 
-from flexget.plugin import get_plugins
+from flexget.plugin import get_plugins, get_plugin_by_name
 from flexget.api import api, APIResource, ApiError
 
 log = logging.getLogger('plugins')
@@ -41,7 +41,7 @@ plugin_list_reply = {
         'number_of_plugins': {'type': 'integer'}
     }
 }
-
+plugin_schema = api.schema('plugin_object', plugin_object)
 plugin_list_reply_schema = api.schema('plugin_list_reply', plugin_list_reply)
 
 plugins_parser = api.parser()
@@ -62,16 +62,7 @@ class PluginsAPI(APIResource):
         plugin_list = []
         try:
             for plugin in get_plugins(phase=args['phase'], group=args['group']):
-                p = {'name': plugin.name,
-                     'api_ver': plugin.api_ver,
-                     'builtin': plugin.builtin,
-                     'category': plugin.category,
-                     'contexts': plugin.contexts,
-                     'debug': plugin.debug,
-                     'groups': plugin.groups}
-                p['phase_handlers'] = [dict(phase=handler, priority=event.priority) for handler, event in
-                                       plugin.phase_handlers.items()]
-
+                p = plugin.to_dict()
                 if args['include_schema']:
                     p['schema'] = plugin.schema
                 plugin_list.append(p)
@@ -79,3 +70,9 @@ class PluginsAPI(APIResource):
             raise ApiError(str(e))
         return {'plugin_list': plugin_list,
                 'number_of_plugins': len(plugin_list)}
+
+
+# @plugins_api.route('/<string:plugin_name>/')
+# class PluginAPI(APIResource):
+#     def get(self, plugin_name, session=None):
+#         """ Return plugin data by name"""
