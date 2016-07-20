@@ -27,7 +27,7 @@ class DBCleanup(APIResource):
 
 @db_api.route('/vacuum/')
 @api.doc(description='Running vacuum can increase performance and decrease database size')
-class DBCleanup(APIResource):
+class DBVacuum(APIResource):
     @api.response(200, 'DB VACUUM triggered')
     def get(self, session=None):
         session.execute('VACUUM')
@@ -40,30 +40,12 @@ reset_parser = api.parser()
 reset_parser.add_argument('sure', type=inputs.boolean, default='false', required=True,
                           help='You must use this flag to indicate you REALLY want to do this')
 
-
-@db_api.route('/reset/')
-@api.doc(description='Reset the entire DB. BE CAREFUL WITH THIS. Also, this could take a while.')
-class DBCleanup(APIResource):
-    @api.response(200, 'DB reset triggered')
-    @api.response(400, '"sure" flag was not set to true')
-    @api.doc(parser=reset_parser)
-    def get(self, session=None):
-        args = reset_parser.parse_args()
-        if not args['sure']:
-            return {'status': 'error',
-                    'message': '"sure" flag was not set to true'}, 400
-        Base.metadata.drop_all(bind=self.manager.engine)
-        Base.metadata.create_all(bind=self.manager.engine)
-        return {'status': 'success',
-                'message': 'DB reset was successful'}, 200
-
-
 plugin_parser = api.parser()
 plugin_parser.add_argument('plugin_name', required=True, help='Name of plugin to reset')
 
 
 @db_api.route('/reset_plugin/')
-class DBCleanup(APIResource):
+class DBPluginReset(APIResource):
     @api.response(200, 'Plugin DB reset triggered')
     @api.response(500, 'The plugin has no stored schema to reset')
     @api.doc(parser=plugin_parser)
