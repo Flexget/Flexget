@@ -85,7 +85,7 @@ class OutputAria2(object):
                 "Parent folder" for any options to be passed directly to aria.
                 Any command line option listed at
                 http://aria2.sourceforge.net/manual/en/html/aria2c.html#options
-                can be used by removing the two dashes (--) in front of the 
+                can be used by removing the two dashes (--) in front of the
                 command name, and changing key=value to key: value. All
                 options will be treated as jinja2 templates and rendered prior
                 to passing to aria2. default ''

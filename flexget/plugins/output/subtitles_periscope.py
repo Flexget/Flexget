@@ -13,14 +13,14 @@ log = logging.getLogger('subtitles')
 
 class PluginPeriscope(object):
     """
-    Search and download subtitles using Periscope by Patrick Dessalle 
+    Search and download subtitles using Periscope by Patrick Dessalle
     (http://code.google.com/p/periscope/).
 
     Example (complete task)::
 
       subs:
         find:
-          path: 
+          path:
             - d:\media\incoming
           regexp: '.*\.(avi|mkv|mp4)$'
           recursive: yes
@@ -65,7 +65,7 @@ class PluginPeriscope(object):
                 languages: List of languages in order of preference (at least one is required).
                 alternatives: List of second-choice languages; subs will be downloaded but entries rejected.
                 overwrite: If yes it will try to download even for videos that are already subbed. Default: no.
-                subexts: List of subtitles file extensions to check (only useful with overwrite=no). 
+                subexts: List of subtitles file extensions to check (only useful with overwrite=no).
                     Default: srt, stp, sub, stl, ssa.
         """
         if not task.accepted:
@@ -96,7 +96,7 @@ class PluginPeriscope(object):
                     else:
                         entry.fail('cannot find any subtitles for now.')
                 except Exception as err:
-                    # don't want to abort the entire task for errors in a  
+                    # don't want to abort the entire task for errors in a
                     # single video file or for occasional network timeouts
                     entry.fail(err.message)
 
