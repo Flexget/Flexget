@@ -1,3 +1,4 @@
+/* global angular, registerPlugin */
 (function () {
     'use strict';
 
@@ -9,6 +10,6 @@
 			'blocks.router'
 			//'schemaForm'
 		]);
-	
+
 	registerPlugin('plugins.schedule');
 }());

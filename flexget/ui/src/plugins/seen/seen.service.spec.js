@@ -1,11 +1,13 @@
+/* global bard, sinon */
 describe('Service: Seen', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.seen');
 
+		/* global $httpBackend, seenService, exception, CacheFactory, $q */
 		bard.inject('$httpBackend', 'seenService', 'exception', 'CacheFactory', '$q');
 
 		sinon.stub(exception, 'catcher').returns($q.reject({ message: 'Request failed' }));
-		
+
 		CacheFactory.clearAll();
 	});
 

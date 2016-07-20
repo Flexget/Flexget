@@ -1,3 +1,4 @@
+/* global bard, sinon, mockSchedulesData */
 describe('Plugin: Schedule.component', function () {
 	var controller;
 	var schedules = mockSchedulesData.getMockSchedules();
@@ -5,8 +6,9 @@ describe('Plugin: Schedule.component', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.schedule');
 
+		/* global $componentController, schedulesService, $q, $rootScope */
 		bard.inject('$componentController', 'schedulesService', '$q', '$rootScope');
-		
+
 		sinon.stub(schedulesService, 'getSchedules').returns($q.when(schedules));
 	});
 
@@ -27,7 +29,7 @@ describe('Plugin: Schedule.component', function () {
 		it('should have called the schedules service', function () {
 			expect(schedulesService.getSchedules).to.have.been.calledOnce;
 		});
-		
+
 		it('should have entries', function () {
 			expect(controller.models).to.not.be.empty;
 		});

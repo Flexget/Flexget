@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -36,7 +37,7 @@
         /*schema.get('config/schedules').then(function (schema) {
             vm.schema = { type: 'object', 'properties': { 'schedules': schema }, required: ['schedules'] };
         });*/
-		
+
 		function activate() {
 			getSchedules();
 		}
