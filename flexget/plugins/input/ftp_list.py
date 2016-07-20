@@ -137,8 +137,8 @@ class FTPList(object):
             raise PluginError('Could not connect to FTP: {}'.format(e.args[0]))
 
         entries = []
-        for dir in directories:
-            for content in self.get_content(dir, recursion, recursion_depth, content_types):
+        for d in directories:
+            for content in self.get_content(d, recursion, recursion_depth, content_types):
                 entries.append(self._to_entry(content))
         return entries
 
