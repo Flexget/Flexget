@@ -1,3 +1,4 @@
+/* global angular, registerPlugin */
 (function () {
     'use strict';
 
@@ -14,6 +15,6 @@
 
 			'ui.ace'
 		]);
-	
+
 	registerPlugin('plugins.config');
 }());

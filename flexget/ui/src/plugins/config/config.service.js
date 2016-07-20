@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -27,7 +28,7 @@
 			})
 				.then(saveRawConfigComplete)
 				.catch(saveRawConfigFailed);
-			
+
 			function saveRawConfigComplete() {
 				return;
 			}
