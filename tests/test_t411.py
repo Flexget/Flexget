@@ -20,50 +20,50 @@ class MockRestClient(object):
         "offset": 0,
         "limit": 10,
         "torrents": [{
-                         "id": 123123,
-                         "name": "Mickey vs Donald S01E01 1080p dd5.1 10bit",
-                         "category": "14",
-                         "seeders": "11",
-                         "leechers": "2",
-                         "comments": "8",
-                         "isVerified": "1",
-                         "added": "2013-01-15 16:14:14",
-                         "size": "2670809119",
-                         "times_completed": "1256",
-                         "owner": "7589510",
-                         "categoryname": "Animation",
-                         "categoryimage": "t411-animation.png",
-                         "username": "MegaUsername",
-                         "privacy": "normal"
-                     }]
+            "id": 123123,
+            "name": "Mickey vs Donald S01E01 1080p dd5.1 10bit",
+            "category": "14",
+            "seeders": "11",
+            "leechers": "2",
+            "comments": "8",
+            "isVerified": "1",
+            "added": "2013-01-15 16:14:14",
+            "size": "2670809119",
+            "times_completed": "1256",
+            "owner": "7589510",
+            "categoryname": "Animation",
+            "categoryimage": "t411-animation.png",
+            "username": "MegaUsername",
+            "privacy": "normal"
+        }]
     }
 
     cat_result = {
         "12": {  # Category ID index
-                 "id": "12",  # Category ID
-                 "pid": "0",  # Parent's catogory ID
-                 "name": "video",
-                 "cats": {  # Subcategories
-                            "13": {"id": "13", "pid": "12", "name": "films"},
-                            "14": {"id": "14", "pid": "12", "name": "cartoons"}
-                 }
+            "id": "12",  # Category ID
+            "pid": "0",  # Parent's catogory ID
+            "name": "video",
+            "cats": {  # Subcategories
+                "13": {"id": "13", "pid": "12", "name": "films"},
+                "14": {"id": "14", "pid": "12", "name": "cartoons"}
+            }
         }
     }
 
     term_result = {
         "14": {  # Category ID
-                 "11": {  # Term type ID
-                          "type": "Application - Genre",  # Term type definition
-                          "mode": "single",
-                          "terms": {  # Terms of the term type
-                                      "123": "Antivirus",
-                                      "345": "Torrent clients"
-                          }
-                 }, "7": {
-                        "type": "Vidéo - Qualité",
-                        "mode": "single",
-                        "terms": {"12": "TVripHD 720 [Rip HD depuis Source HD]"}
+            "11": {  # Term type ID
+                "type": "Application - Genre",  # Term type definition
+                "mode": "single",
+                "terms": {  # Terms of the term type
+                    "123": "Antivirus",
+                    "345": "Torrent clients"
                 }
+            }, "7": {
+                "type": "Vidéo - Qualité",
+                "mode": "single",
+                "terms": {"12": "TVripHD 720 [Rip HD depuis Source HD]"}
+            }
         }
     }
 
@@ -184,7 +184,6 @@ class TestRestClient(object):
 
 
 class TestObjectMapper(object):
-
     def test_map_category(self):
         category = T411ObjectMapper().map_category({
             u'pid': u'0',
@@ -250,7 +249,6 @@ class TestObjectMapper(object):
 
 
 class TestProxy(object):
-
     def test_offline_proxy(self):
         proxy = T411Proxy()
         proxy.rest_client = MockRestClient()
@@ -263,7 +261,7 @@ class TestProxy(object):
         query.category_name = "cartoons"
         query.term_names.append("Antivirus")
         assert proxy.search(query)[0]['t411_torrent_id'] == 123123
-        assert (11,123) in proxy.rest_client.last_query['terms']
+        assert (11, 123) in proxy.rest_client.last_query['terms']
         assert proxy.rest_client.last_query['category_id'] == 14
         assert proxy.rest_client.last_query['expression'] == 'Mickey'
 

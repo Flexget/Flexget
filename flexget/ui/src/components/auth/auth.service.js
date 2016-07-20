@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -27,13 +28,13 @@
 			if (isLoggedIn) {
 				def.resolve(isLoggedIn);
 			} else {
-				$http.get("/api/server/version/", {
+				$http.get('/api/server/version/', {
 					ignoreAuthModule: true
 				})
 					.then(function () {
 						def.resolve();
 					}, function () {
-						def.reject()
+						def.reject();
 					});
 			}
 
@@ -47,12 +48,12 @@
 
 			return $http.post('/api/auth/login/', credentials,
 				{
-					params: { remember: remember }, 
-					ignoreAuthModule: true 
+					params: { remember: remember },
+					ignoreAuthModule: true
 				})
 				.then(loginComplete)
 				.catch(loginCallFailed);
-			
+
 			function loginComplete() {
 				isLoggedIn = true;
 				if(prevState) {
@@ -81,7 +82,7 @@
 				return;
 			}
 		}
-		
+
 		function state(state, params) {
 			if (state.name != 'login') {
 				prevState = state.name;
@@ -93,4 +94,4 @@
 			return exception.catcher(error);
         }
 	}
-})();
+}());

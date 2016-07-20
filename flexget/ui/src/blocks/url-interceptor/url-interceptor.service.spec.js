@@ -1,4 +1,5 @@
-describe("Blocks: UrlInterceptor", function () {
+/* global bard */
+describe('Blocks: UrlInterceptor', function () {
 	var httpProvider;
 	beforeEach(function () {
 		bard.appModule('blocks.urlInterceptor',
@@ -6,10 +7,11 @@ describe("Blocks: UrlInterceptor", function () {
 				httpProvider = $httpProvider;
 			});
 
+		/* global urlInterceptor */
 		bard.inject('urlInterceptor');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(urlInterceptor).to.exist;
 	});
 
@@ -20,7 +22,7 @@ describe("Blocks: UrlInterceptor", function () {
 	});
 
 	describe('request()', function () {
-		it("should exist", function () {
+		it('should exist', function () {
 			expect(urlInterceptor.request).to.exist;
 		});
 

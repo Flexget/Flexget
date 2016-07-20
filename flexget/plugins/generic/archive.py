@@ -47,7 +47,7 @@ class ArchiveEntry(Base):
     title = Column(Unicode, index=True)
     url = Column(Unicode, index=True)
     description = Column(Unicode)
-    task = Column('feed', Unicode) # DEPRECATED, but SQLite does not support drop column
+    task = Column('feed', Unicode)  # DEPRECATED, but SQLite does not support drop column
     added = Column(DateTime, index=True)
 
     tags = relationship("ArchiveTag", secondary=archive_tags_table)
@@ -57,7 +57,7 @@ class ArchiveEntry(Base):
         self.added = datetime.now()
 
     def __str__(self):
-        return '<ArchiveEntry(title=%s,url=%s,task=%s,added=%s)>' %\
+        return '<ArchiveEntry(title=%s,url=%s,task=%s,added=%s)>' % \
                (self.title, self.url, self.task, self.added.strftime('%Y-%m-%d %H:%M'))
 
 
@@ -179,8 +179,8 @@ class Archive(object):
             else:
                 processed.append(entry)
 
-            ae = task.session.query(ArchiveEntry).\
-                filter(ArchiveEntry.title == entry['title']).\
+            ae = task.session.query(ArchiveEntry). \
+                filter(ArchiveEntry.title == entry['title']). \
                 filter(ArchiveEntry.url == entry['url']).first()
             if ae:
                 # add (missing) sources
@@ -300,9 +300,9 @@ def consolidate():
             # remove task, deprecated .. well, let's still keep it ..
             # orig.task = None
 
-            for dupe in session.query(ArchiveEntry).\
-                filter(ArchiveEntry.id != orig.id).\
-                filter(ArchiveEntry.title == orig.title).\
+            for dupe in session.query(ArchiveEntry). \
+                    filter(ArchiveEntry.id != orig.id). \
+                    filter(ArchiveEntry.title == orig.title). \
                     filter(ArchiveEntry.url == orig.url).all():
                 orig.sources.append(get_source(dupe.task, session))
                 duplicates.append(dupe.id)
@@ -349,7 +349,7 @@ def tag_source(source_name, tag_names=None):
 
         # tag 'em
         log.verbose('Please wait while adding tags %s ...' % (', '.join(tag_names)))
-        for a in session.query(ArchiveEntry).\
+        for a in session.query(ArchiveEntry). \
                 filter(ArchiveEntry.sources.any(name=source_name)).yield_per(5):
             a.tags.extend(tags)
     finally:

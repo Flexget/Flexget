@@ -42,7 +42,6 @@ def upgrade(ver, session):
 
 
 class InputCache(Base):
-
     __tablename__ = 'input_cache'
 
     id = Column(Integer, primary_key=True)
@@ -54,7 +53,6 @@ class InputCache(Base):
 
 
 class InputCacheEntry(Base):
-
     __tablename__ = 'input_cache_entry'
 
     id = Column(Integer, primary_key=True)
@@ -146,9 +144,9 @@ class cached(object):
                 if self.persist and not task.options.nocache:
                     # Check database cache
                     with Session() as session:
-                        db_cache = session.query(InputCache).filter(InputCache.name == self.name).\
-                            filter(InputCache.hash == hash).\
-                            filter(InputCache.added > datetime.now() - self.persist).\
+                        db_cache = session.query(InputCache).filter(InputCache.name == self.name). \
+                            filter(InputCache.hash == hash). \
+                            filter(InputCache.added > datetime.now() - self.persist). \
                             first()
                         if db_cache:
                             entries = [e.entry for e in db_cache.entries]
@@ -166,11 +164,11 @@ class cached(object):
                     # If there was an error producing entries, but we have valid entries in the db cache, return those.
                     if self.persist and not task.options.nocache:
                         with Session() as session:
-                            db_cache = session.query(InputCache).filter(InputCache.name == self.name).\
+                            db_cache = session.query(InputCache).filter(InputCache.name == self.name). \
                                 filter(InputCache.hash == hash).first()
                             if db_cache and db_cache.entries:
                                 log.error('There was an error during %s input (%s), using cache instead.' %
-                                        (self.name, e))
+                                          (self.name, e))
                                 entries = [e.entry for e in db_cache.entries]
                                 log.verbose('Restored %s entries from db cache' % len(entries))
                                 # Store to in memory cache
@@ -195,7 +193,7 @@ class cached(object):
                     # Store to database
                     log.debug('Storing cache %s to database.' % cache_name)
                     with Session() as session:
-                        db_cache = session.query(InputCache).filter(InputCache.name == self.name).\
+                        db_cache = session.query(InputCache).filter(InputCache.name == self.name). \
                             filter(InputCache.hash == hash).first()
                         if not db_cache:
                             db_cache = InputCache(name=self.name, hash=hash)

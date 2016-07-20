@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -22,11 +23,11 @@
 		vm.setBegin = setBegin;
 
 		var dialog = {
-			template: "<series-begin-dialog begin='vm.begin' show='vm.show'></series-begin>",
+			template: '<series-begin-dialog begin=\'vm.begin\' show=\'vm.show\'></series-begin>',
 			bindToController: true,
 			controllerAs: 'vm',
 			controller: function () { }
-		}
+		};
 
 		function activate() {
 			loadMetadata();
@@ -42,12 +43,12 @@
 		function setBegin() {
 			dialog.locals = {
 				show: vm.show
-			}
+			};
 
 			$mdDialog.show(dialog).then(function (begin) {
 				if (begin) {
 					vm.show.begin_episode.episode_identifier = begin;
-				}	
+				}
 			});
 		}
 
@@ -65,7 +66,7 @@
             });
         }*/
 
-        
+
 
         /*//Call from the page, to open a dialog with alternate names
         vm.alternateName = function (ev) {
@@ -80,4 +81,4 @@
             });
         }*/
 	}
-})();
+}());

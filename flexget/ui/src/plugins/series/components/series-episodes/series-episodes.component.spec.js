@@ -1,4 +1,5 @@
-describe("Plugin: Series-Episodes.Component", function () {
+/* global bard, sinon, mockSeriesData */
+describe('Plugin: Series-Episodes.Component', function () {
 	var component, deferred;
 	var episodes = mockSeriesData.getEpisodes();
 	var episode = mockSeriesData.getEpisode();
@@ -6,6 +7,8 @@ describe("Plugin: Series-Episodes.Component", function () {
 
 	beforeEach(function () {
 		bard.appModule('plugins.series');
+
+		/* global $componentController, $q, seriesService, $rootScope, $mdDialog */
 		bard.inject('$componentController', '$q', 'seriesService', '$rootScope', '$mdDialog');
 
 		sinon.stub(seriesService, 'getEpisodes').returns($q.when(episodes));
@@ -15,7 +18,7 @@ describe("Plugin: Series-Episodes.Component", function () {
 		component = $componentController('seriesEpisodesView');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 
@@ -41,7 +44,7 @@ describe("Plugin: Series-Episodes.Component", function () {
 
 			deferred = $q.defer();
 			sinon.stub(seriesService, 'deleteEpisode').returns(deferred.promise);
-			
+
 		});
 		it('should exist', function () {
 			expect(component.deleteEpisode).to.exist;

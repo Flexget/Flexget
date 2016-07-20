@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -82,9 +83,9 @@
 				handleRoutingErrors();
 			}
 
-			function getStates() { 
-				return $state.get(); 
+			function getStates() {
+				return $state.get();
 			}
 		}
 	}
-})();
+}());

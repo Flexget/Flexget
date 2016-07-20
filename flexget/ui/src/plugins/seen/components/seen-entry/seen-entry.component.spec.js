@@ -1,4 +1,4 @@
-describe("Plugin: Seen-entry.component", function () {
+describe('Plugin: Seen-entry.component', function () {
 	var controller;
 
 	beforeEach(function () {
@@ -11,7 +11,7 @@ describe("Plugin: Seen-entry.component", function () {
 		controller = $componentController('seenEntry');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(controller).to.exist;
 	});
 });

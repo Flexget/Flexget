@@ -8,7 +8,7 @@
     function logService($http, exception, $q) {
         return {
             startLogStream: startLogStream
-        }
+        };
 
 		function startLogStream(query) {
             var deferred = $q.defer();
@@ -17,9 +17,9 @@
                 url: '/api/server/log/' + query,
                 method: 'GET'
             }).done(function () {
-                deferred.resolve("finished stream");
+                deferred.resolve('finished stream');
             }).fail(function (error) {
-                deferred.reject(error)
+                deferred.reject(error);
 			});
 			
 			deferred.promise.start = function (callback) {
@@ -43,4 +43,4 @@
 			return exception.catcher(error);
         }
     }
-})();
+}());

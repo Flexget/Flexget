@@ -2,10 +2,10 @@
 	'use strict';
 
 	angular
-		.module("plugins.execute", [
+		.module('plugins.execute', [
 			'blocks.exception',
 			'blocks.router'
 		]);
 	
 	registerPlugin('plugins.execute');
-})();
+}());

@@ -5,7 +5,6 @@ from flexget.utils.soup import get_soup
 
 
 class TestHtml5Lib(object):
-
     config = 'tasks: {}'
 
     def test_parse_broken(self, execute_task):

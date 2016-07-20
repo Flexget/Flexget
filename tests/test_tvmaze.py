@@ -7,7 +7,7 @@ import pytest
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget.manager import Session
-from flexget.plugins.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries
+from flexget.plugins.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries, TVMazeEpisodes
 
 lookup_series = APITVMaze.series_lookup
 
@@ -124,6 +124,11 @@ class TestTVMazeShowLookup(object):
               - {title: 'The.Flash.2014.S02E04.HDTV.x264-FlexGet', imdb_id: 'tt3107288'}
             series:
               - The Flash
+          test_ep_mixup_error:
+            mock:
+              - {title: 'The.Flash.2014.S02E02.HDTV.x264-FlexGet'}
+              - {title: 'The.Arrow.S02E02.HDTV.x264-FlexGet'}
+            metainfo_series: yes
     """
 
     def test_lookup_name(self, execute_task):
@@ -369,6 +374,17 @@ class TestTVMazeShowLookup(object):
         assert entry['tvmaze_episode_id'] == 284974, 'episode id should be 284974, instead its %s' % entry[
             'tvmaze_episode_id']
 
+    def test_ep_mixup_error(self, execute_task):
+        task = execute_task('test_ep_mixup_error')
+
+        # force episode lookup
+        for entry in task.entries:
+            entry['tvmaze_episode_season']
+
+        with Session() as session:
+            episodes = session.query(TVMazeEpisodes).all()
+            assert len(episodes) == 2, 'should have two episodes in db, one for Flash and one for Arrow'
+
 
 @pytest.mark.online
 class TestTVMazeUnicodeLookup(object):
@@ -388,12 +404,12 @@ class TestTVMazeUnicodeLookup(object):
 
     @pytest.mark.xfail(reason='VCR attempts to compare str to unicode')
     def test_unicode(self, execute_task):
-        task = execute_task('test_unicode')
+        execute_task('test_unicode')
         with Session() as session:
             r = session.query(TVMazeLookup).all()
             assert len(r) == 1, 'Should have added a search result'
             assert r[0].search_name == 'kr\xf8niken 2004', 'The search result should be lower case'
-        task = execute_task('test_unicode')
+        execute_task('test_unicode')
         with Session() as session:
             r = session.query(TVMazeLookup).all()
             assert len(r) == 1, 'Should not have added a new row'

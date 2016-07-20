@@ -11,7 +11,6 @@ config_utf8 = os.path.join(os.path.dirname(__file__), 'config_utf8.yml')
 
 
 class TestConfig(object):
-
     config = 'tasks: {}'
 
     @pytest.fixture

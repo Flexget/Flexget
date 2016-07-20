@@ -48,7 +48,7 @@ class UrlRewriteNyaa(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             name = normalize_unicode(search_string)
             url = 'http://www.nyaa.eu/?page=rss&cats=%s&filter=%s&term=%s' % (
-                  CATEGORIES[config['category']], FILTERS.index(config['filter']), quote(name.encode('utf-8')))
+                CATEGORIES[config['category']], FILTERS.index(config['filter']), quote(name.encode('utf-8')))
 
             log.debug('requesting: %s' % url)
             rss = feedparser.parse(url)
@@ -65,7 +65,6 @@ class UrlRewriteNyaa(object):
                 continue
 
             for item in rss.entries:
-
                 entry = Entry()
                 entry['title'] = item.title
                 entry['url'] = item.link

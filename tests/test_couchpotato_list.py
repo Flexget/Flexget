@@ -104,4 +104,3 @@ class TestCouchpotatoWithQuality(object):
 
         for entry in task._all_entries:
             self.quality_assertion(entry)
-

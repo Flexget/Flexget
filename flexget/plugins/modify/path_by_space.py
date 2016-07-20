@@ -14,7 +14,6 @@ from flexget.config_schema import one_or_more
 
 log = logging.getLogger('path_by_space')
 
-
 disk_stats_tuple = namedtuple(
     'disk_stats', [
         'path', 'free_bytes', 'used_bytes', 'total_bytes', 'free_percent', 'used_percent'

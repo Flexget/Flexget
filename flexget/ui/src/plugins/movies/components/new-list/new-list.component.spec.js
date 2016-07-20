@@ -1,9 +1,12 @@
-describe("Plugin: New-list.Component", function () {
+/* global bard, mockMovieListData */
+describe('Plugin: New-list.Component', function () {
 	var component, deferred;
 	var createdList = mockMovieListData.createMovieList();
 
 	beforeEach(function () {
 		bard.appModule('plugins.movies');
+
+		/* global $componentController, $mdDialog, $q, moviesService, $rootScope */
 		bard.inject('$componentController', '$mdDialog', '$q', 'moviesService', '$rootScope');
 	});
 
@@ -11,7 +14,7 @@ describe("Plugin: New-list.Component", function () {
 		component = $componentController('newList');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 
@@ -20,8 +23,8 @@ describe("Plugin: New-list.Component", function () {
 			expect(component.cancel).to.exist;
 			expect(component.cancel).to.be.a('function');
 		});
-			
-		it("should close the dialog", function () {
+
+		it('should close the dialog', function () {
 			sinon.spy($mdDialog, 'cancel');
 
 			component.cancel();
@@ -33,7 +36,7 @@ describe("Plugin: New-list.Component", function () {
 	describe('saveList()', function () {
 		beforeEach(function () {
 			deferred = $q.defer();
-			
+
 			sinon.stub(moviesService, 'createList').returns(deferred.promise);
 		});
 

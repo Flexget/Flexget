@@ -32,4 +32,4 @@
 			return $q.reject(error.data);
 		}
 	}
-})();
+}());

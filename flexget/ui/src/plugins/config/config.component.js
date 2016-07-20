@@ -1,8 +1,9 @@
+/* global angular, ace */
 (function () {
 	'use strict';
-	
+
 	angular
-		.module("plugins.config")
+		.module('plugins.config')
 		.component('configView', {
 			templateUrl: 'plugins/config/config.tmpl.html',
 			controllerAs: 'vm',
@@ -52,13 +53,31 @@
 				mode: 'yaml',
 				theme: getTheme(),
 				onLoad: aceLoaded
-			}
+			};
 
 			var themelist = ace.require('ace/ext/themelist');
 			vm.themes = themelist.themes;
 		}
 
 		function aceLoaded(_editor) {
+			//Get all commands, but keep the find command
+			var commandsToRemove = [
+				'transposeletters',
+				'gotoline'
+			];
+
+			_editor.commands.removeCommands(commandsToRemove);
+
+			_editor.commands.addCommand({
+				name: 'saveConfig',
+				bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
+				exec: function () {
+					if (vm.config !== vm.origConfig) {
+						saveConfig();
+					}
+				}
+			});
+
 			_editor.setShowPrintMargin(false);
 		}
 
@@ -73,18 +92,22 @@
 
 		function saveConfig() {
 			var encoded = base64.encode(vm.config);
-			$http.post('/api/server/raw_config', { raw_config: encoded })
+			configService.saveRawConfig(encoded)
 				.then(function () {
 					var dialog = $mdDialog.alert()
-						.title("Update success")
-						.ok("Ok")
-						.textContent("Your config file has been successfully updated")
+						.title('Update success')
+						.ok('Ok')
+						.textContent('Your config file has been successfully updated');
 
 					$mdDialog.show(dialog);
+
+					delete vm.errorMessage;
+					delete vm.errors;
+
 					saveOriginalConfig();
 				}, function (error) {
-					vm.errors = error.data.errors;
+					vm.errors = error.errors;
 				});
 		}
 	}
-})();
+}());

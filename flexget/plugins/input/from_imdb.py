@@ -230,7 +230,7 @@ class FromIMDB(object):
             else
             self.items_by_content_type(person, job_type, content_type)
             for content_type in content_types
-            ]
+        ]
         return [_f for _f in items if _f]
 
     def items_by_character(self, character, content_types, match_type):

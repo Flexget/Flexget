@@ -135,7 +135,7 @@ class NextSeriesEpisodes(object):
                             episodes_this_season = episodes_this_season.filter(Episode.number >= start_at_ep)
                         latest_ep_this_season = episodes_this_season.order_by(desc(Episode.number)).first()
                         downloaded_this_season = (episodes_this_season.join(Episode.releases).
-                                                filter(Release.downloaded == True).all())
+                                                  filter(Release.downloaded == True).all())
                         # Calculate the episodes we still need to get from this season
                         if series.begin and series.begin.season == season:
                             start_at_ep = max(start_at_ep, series.begin.number)
@@ -172,9 +172,9 @@ class NextSeriesEpisodes(object):
             series = session.query(Series).filter(Series.name == entry['series_name']).first()
             latest = get_latest_release(series)
             db_release = (session.query(Release).join(Release.episode).join(Episode.series).
-                       filter(Series.name == entry['series_name']).
-                       filter(Episode.season == entry['series_season']).
-                       filter(Episode.number == entry['series_episode']).first())
+                          filter(Series.name == entry['series_name']).
+                          filter(Episode.season == entry['series_season']).
+                          filter(Episode.number == entry['series_episode']).first())
 
             if entry.accepted:
                 log.debug('%s %s was accepted, rerunning to look for next ep.' %

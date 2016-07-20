@@ -35,6 +35,7 @@ def str_to_int(string):
     except ValueError:
         return None
 
+
 if PY2:
     def native_str_to_text(string, **kwargs):
         if 'encoding' not in kwargs:
@@ -67,6 +68,7 @@ def convert_bytes(bytes):
 
 
 class MergeException(Exception):
+
     def __init__(self, value):
         self.value = value
 
@@ -161,7 +163,7 @@ def merge_dict_from_to(d1, d2):
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
             elif (isinstance(v, (basestring, bool, int, float, type(None))) and
-                      isinstance(d2[k], (basestring, bool, int, float, type(None)))):
+                  isinstance(d2[k], (basestring, bool, int, float, type(None)))):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
@@ -172,6 +174,7 @@ def merge_dict_from_to(d1, d2):
 
 
 class SmartRedirectHandler(request.HTTPRedirectHandler):
+
     def http_error_301(self, req, fp, code, msg, headers):
         result = request.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
         result.status = code
@@ -345,7 +348,7 @@ class TimedDict(MutableMapping):
 
     def _prune(self):
         """Prune all expired keys."""
-        for key, (add_time, value) in list(self._store.items()):
+        for key, (add_time, _) in list(self._store.items()):
             if add_time < datetime.now() - self.cache_time:
                 del self._store[key]
         self._last_prune = datetime.now()
@@ -375,7 +378,8 @@ class TimedDict(MutableMapping):
         return len(list(self.__iter__()))
 
     def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__, dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))))
+        return '%s(%r)' % (
+            self.__class__.__name__, dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))))
 
 
 class BufferQueue(queue.Queue):

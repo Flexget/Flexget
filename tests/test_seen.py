@@ -133,14 +133,14 @@ class TestFilterSeenMovies(object):
     def test_seen_movies(self, execute_task):
         task = execute_task('test_1')
         assert not (task.find_entry(title='Seen movie title 1') and task.find_entry(
-                title='Seen movie title 2')), 'Movie accepted twice in one run'
+            title='Seen movie title 2')), 'Movie accepted twice in one run'
 
         # execute again
         task.execute()
         assert not task.find_entry(
-                title='Seen movie title 1'), 'Test movie entry 1 should be rejected in second execution'
+            title='Seen movie title 1'), 'Test movie entry 1 should be rejected in second execution'
         assert not task.find_entry(
-                title='Seen movie title 2'), 'Test movie entry 2 should be rejected in second execution'
+            title='Seen movie title 2'), 'Test movie entry 2 should be rejected in second execution'
 
         # execute another task
         task = execute_task('test_2')
@@ -161,7 +161,9 @@ class TestFilterSeenMovies(object):
         assert task.find_entry('accepted', title='Seen movie title 11'), 'local should have passed movie 11'
         # execute again
         task.execute()
-        assert task.find_entry('rejected', title='Seen movie title 12'), 'Test movie entry 12 should be rejected in second execution'
+        assert task.find_entry('rejected',
+                               title='Seen movie title 12'), 'Test movie entry 12 should be rejected in second execution'
         # test a global scope after
         task = execute_task('test_2')
-        assert not task.find_entry('rejected', title='Seen movie title 13'), 'Changing scope should not have rejected Seen movie title 13'
+        assert not task.find_entry('rejected',
+                                   title='Seen movie title 13'), 'Changing scope should not have rejected Seen movie title 13'

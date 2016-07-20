@@ -24,6 +24,7 @@ class SearchPlugin(object):
             raise plugin.PluginError('search plugin failure')
         return [Entry(entry)]
 
+
 plugin.register(SearchPlugin, 'test_search', groups=['search'], api_ver=2)
 
 
@@ -32,6 +33,7 @@ class EstRelease(object):
 
     def estimate(self, entry):
         return entry.get('est_release')
+
 
 plugin.register(EstRelease, 'test_release', groups=['estimate_release'], api_ver=2)
 
@@ -166,7 +168,7 @@ class TestEmitSeriesInDiscover(object):
     """
 
     def test_next_series_episodes_backfill(self, execute_task):
-        execute_task('inject_series', options = {'inject': [Entry(title='My Show 2 S02E01', url='')]})
+        execute_task('inject_series', options={'inject': [Entry(title='My Show 2 S02E01', url='')]})
         task = execute_task('test_next_series_episodes_backfill')
         assert task.find_entry(title='My Show 2 S01E01')
         assert task.find_entry(title='My Show 2 S02E02')

@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -23,15 +24,15 @@
 		vm.deleteList = deleteList;
 		vm.deleteMovie = deleteMovie;
 		vm.updateListPage = updateListPage;
-		
+
 		var options = {
 			page: 1,
 			page_size: 10
-		}
-		
+		};
+
 		function activate() {
 			//Hack to make the movies from the first tab load (md-on-select not firing for initial tab)
-			if (vm.tabIndex == 0) {
+			if (vm.tabIndex === 0) {
 				loadMovies();
 			}
 		}
@@ -57,9 +58,9 @@
 		function deleteMovie(list, movie) {
 			var confirm = $mdDialog.confirm()
 				.title('Confirm deleting movie from list.')
-				.htmlContent("Are you sure you want to delete the movie <b>" + movie.title + "</b> from list <b>" + list.name + "?")
-				.ok("Forget")
-				.cancel("No");
+				.htmlContent('Are you sure you want to delete the movie <b>' + movie.title + '</b> from list <b>' + list.name + '?')
+				.ok('Forget')
+				.cancel('No');
 
 			$mdDialog.show(confirm).then(function () {
 				moviesService.deleteMovie(list.id, movie.id)
@@ -77,4 +78,4 @@
 			loadMovies();
 		}
 	}
-})();
+}());

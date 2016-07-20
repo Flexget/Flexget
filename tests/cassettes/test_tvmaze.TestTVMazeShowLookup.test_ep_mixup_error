@@ -1,0 +1,122 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.1.16.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Flash
+    response:
+      body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
+          Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":9,"network":{"id":5,"name":"The
+          CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/63/158168.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/63/158168.jpg"},"summary":"<p>After
+          a particle accelerator causes a freak storm, CSI Investigator Barry Allen
+          is struck by lightning and falls into a coma. Months later he awakens with
+          the power of super speed, granting him the ability to move through Central
+          City like an unseen guardian angel. Though initially excited by his newfound
+          powers, Barry is shocked to discover he is not the only \"meta-human\" who
+          was created in the wake of the accelerator explosion -- and not everyone
+          is using their new powers for good. Barry partners with S.T.A.R. Labs and
+          dedicates his life to protect the innocent. For now, only a few close friends
+          and associates know that Barry is literally the fastest man alive, but it
+          won''t be long before the world learns what Barry Allen has become...<em>The
+          Flash</em>.</p>","updated":1468328738,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647397"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/816120"}}}'}
+      headers:
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [keep-alive]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Mon, 18 Jul 2016 20:02:12 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.1.16.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=2
+    response:
+      body: {string: !!python/unicode '{"id":211206,"url":"http://www.tvmaze.com/episodes/211206/the-flash-2x02-flash-of-two-worlds","name":"Flash
+          of Two Worlds","season":2,"number":2,"airdate":"2015-10-13","airtime":"20:00","airstamp":"2015-10-13T20:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/23/59298.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/23/59298.jpg"},"summary":"<p>The
+          team''s visitor, Jay Garrick, explains that he comes from a parallel world
+          and was a speedster there, but lost his powers transitioning over. Now he
+          insists that Barry needs his help fighting a new metahuman, Sand Demon,
+          who came from Jay''s world. Meanwhile, Officer Patty Spivot tries to join
+          Joe''s Metahuman Taskforce.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/211206"}}}'}
+      headers:
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [keep-alive]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Mon, 18 Jul 2016 20:02:12 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.1.16.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Arrow
+    response:
+      body: {string: !!python/unicode '{"id":4,"url":"http://www.tvmaze.com/shows/4/arrow","name":"Arrow","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2012-10-10","schedule":{"time":"20:00","days":["Wednesday"]},"rating":{"average":7.9},"weight":5,"network":{"id":5,"name":"The
+          CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":30715,"thetvdb":257655,"imdb":"tt2193021"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/5/14628.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/5/14628.jpg"},"summary":"<p>After
+          a violent shipwreck, billionaire playboy Oliver Queen was missing and presumed
+          dead for five years before being discovered alive on a remote island in
+          the Pacific. He returned home to Starling City, welcomed by his devoted
+          mother Moira, beloved sister Thea and former flame Laurel Lance. With the
+          aid of his trusted chauffeur/bodyguard John Diggle, the computer-hacking
+          skills of Felicity Smoak and the occasional, reluctant assistance of former
+          police detective, now beat cop, Quentin Lance, Oliver has been waging a
+          one-man war on crime.</p>","updated":1468829442,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647412"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/836110"}}}'}
+      headers:
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [keep-alive]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Mon, 18 Jul 2016 20:02:12 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.1.16.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.tvmaze.com/shows/4/episodebynumber?season=2&number=2
+    response:
+      body: {string: "{\"id\":137,\"url\":\"http://www.tvmaze.com/episodes/137/arrow-2x02-identity\"\
+          ,\"name\":\"Identity\",\"season\":2,\"number\":2,\"airdate\":\"2013-10-16\"\
+          ,\"airtime\":\"20:00\",\"airstamp\":\"2013-10-16T20:00:00-04:00\",\"runtime\"\
+          :60,\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_landscape/1/4152.jpg\"\
+          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/1/4152.jpg\"\
+          },\"summary\":\"<p>Oliver  finds out the medicine that is being sent to\
+          \ Glades Memorial is being hijacked by thieves.  Without an influx of supplies,\
+          \ the hospital will close.  Roy  attempts to stop the thieves, but he fails\
+          \ and is arrested by Officer Lance.  Oliver gets into a heated battle with\
+          \ China White  and her new partner, Ben Turner, AKA the Bronze Tiger, over\
+          \ the supplies.  Meanwhile, Laurel  makes plans to catch the Arrow, and\
+          \ Thea  gives Roy an ultimatum.\_ </p>\",\"_links\":{\"self\":{\"href\"\
+          :\"http://api.tvmaze.com/episodes/137\"}}}"}
+      headers:
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [keep-alive]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Mon, 18 Jul 2016 20:02:12 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+      status: {code: 200, message: OK}
+version: 1

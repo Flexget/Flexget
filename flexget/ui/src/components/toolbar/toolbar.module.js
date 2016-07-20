@@ -1,9 +1,10 @@
+/* global angular */
 (function () {
     'use strict';
 
     angular
-        .module("components.toolbar", [
+        .module('components.toolbar', [
 			'ngMaterial',
 			'components.sidenav'
 		]);
-})();
+}());

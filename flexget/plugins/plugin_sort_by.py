@@ -11,7 +11,6 @@ log = logging.getLogger('sort_by')
 
 
 class PluginSortBy(object):
-
     """
     Sort task entries based on a field
 

@@ -13,7 +13,7 @@ class Duplicates(object):
 
     Example::
 
-      duplicates: 
+      duplicates:
         field: <field name>
         action: [accept|reject]
     """

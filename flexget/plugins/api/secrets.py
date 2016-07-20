@@ -16,6 +16,7 @@ empty_object = api.schema('empty_object', {'type': 'object'})
 
 @secrets_api.route('/')
 class SecretsAPI(APIResource):
+
     @api.response(200)
     @api.response(NotFoundError)
     def get(self, session=None):

@@ -1,8 +1,9 @@
+/* angular */
 (function () {
     'use strict';
 
     angular
-        .module("components.auth")
+        .module('components.auth')
 		.run(appRun);
 
     function appRun(authService, routerHelper, toolBarService) {
@@ -15,7 +16,7 @@
 			icon: 'sign-out',
 			action: authService.logout,
 			order: 255
-		}
+		};
 
 		toolBarService.registerItem(logoutItem);
     }
@@ -33,6 +34,6 @@
 					}
                 }
             }
-        ]
+        ];
     }
-})();
+}());

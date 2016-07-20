@@ -7,7 +7,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from dateutil import parser
 from future.utils import native
 from requests.exceptions import HTTPError
-from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, func, Table, or_, \
+from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, Table, or_, \
     and_
 from sqlalchemy.orm import relation
 
@@ -309,7 +309,7 @@ def prepare_lookup_for_tvmaze(**lookup_params):
     title = None
     series_name = lookup_params.get('series_name') or lookup_params.get('show_name') or lookup_params.get('title')
     if series_name:
-        title, year_match = split_title_year(series_name)
+        title, _ = split_title_year(series_name)
     # Support for when title is just a number
     if not title:
         title = series_name
@@ -325,6 +325,7 @@ def prepare_lookup_for_tvmaze(**lookup_params):
 
 
 class APITVMaze(object):
+
     @staticmethod
     @with_session
     def series_lookup(session=None, only_cached=False, **lookup_params):
@@ -417,7 +418,7 @@ class APITVMaze(object):
                 and_(TVMazeEpisodes.series_id == series.tvmaze_id,
                      TVMazeEpisodes.airdate == episode_date)
             )
-        ).first()
+        ).one_or_none()
 
         # Logic for cache only mode
         if only_cached:
@@ -453,9 +454,10 @@ class APITVMaze(object):
             or_(TVMazeEpisodes.tvmaze_id == tvmaze_episode['id'],
                 and_(
                     TVMazeEpisodes.number == tvmaze_episode['number'],
-                    TVMazeEpisodes.season_number == tvmaze_episode['season'])
+                    TVMazeEpisodes.season_number == tvmaze_episode['season'],
+                    TVMazeEpisodes.series_id == series.tvmaze_id)
                 )
-        ).first()
+        ).one_or_none()
 
         if episode:
             log.debug('found expired episode {0} in cache, refreshing data.'.format(episode.tvmaze_id))

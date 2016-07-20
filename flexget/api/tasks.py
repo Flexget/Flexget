@@ -55,6 +55,7 @@ task_api_desc = 'Task config schema too large to display, you can view the schem
 @tasks_api.route('/')
 @api.doc(description=task_api_desc)
 class TasksAPI(APIResource):
+
     @api.response(200, model=tasks_list_api_schema)
     def get(self, session=None):
         """ List all tasks """
@@ -97,6 +98,7 @@ class TasksAPI(APIResource):
 @tasks_api.route('/<task>/')
 @api.doc(params={'task': 'task name'}, description=task_api_desc)
 class TaskAPI(APIResource):
+
     @api.response(200, model=task_api_schema)
     @api.response(NotFoundError, description='task not found')
     @api.response(ApiError, description='unable to read config')
@@ -269,6 +271,7 @@ task_execution_schema = api.schema('task_execution_input', task_execution_input)
 
 @tasks_api.route('/queue/')
 class TaskQueueAPI(APIResource):
+
     @api.response(200, model=task_api_queue_schema)
     def get(self, session=None):
         """ List task(s) in queue for execution """
@@ -311,6 +314,7 @@ inject_api = api.namespace('inject', description='Entry injection API')
 @tasks_api.route('/execute/')
 @api.doc(description=execution_doc)
 class TaskExecutionAPI(APIResource):
+
     @api.response(404, description='Task not found')
     @api.response(500, description='Could not resolve title from URL')
     @api.response(200, model=task_api_execute_schema)
@@ -411,6 +415,7 @@ def setup_params(mgr):
 
 
 class EntryDecoder(JSONEncoder):
+
     def default(self, o):
         if isinstance(o, LazyLookup):
             return '<LazyField>'

@@ -1,3 +1,5 @@
+/* global angular */
+
 (function () {
     'use strict';
 
@@ -12,4 +14,4 @@
         }, 100);
     }
 */
-})();
+}());

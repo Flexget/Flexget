@@ -28,6 +28,7 @@ class RemoteStream(object):
     Used as a filelike to stream text to remote client. If client disconnects while this is in use, an error will be
     logged, but no exception raised.
     """
+
     def __init__(self, writer):
         """
         :param writer: A function which writes a line of text to remote client.
@@ -90,6 +91,7 @@ class DaemonService(rpyc.Service):
 
 
 class ClientService(rpyc.Service):
+
     def on_connect(self):
         """Make sure the client version matches our own."""
         daemon_version = self._conn.root.version()
@@ -105,6 +107,7 @@ class ClientService(rpyc.Service):
 
 
 class IPCServer(threading.Thread):
+
     def __init__(self, manager, port=None):
         super(IPCServer, self).__init__(name='ipc_server')
         self.daemon = True
@@ -143,6 +146,7 @@ class IPCServer(threading.Thread):
 
 
 class IPCClient(object):
+
     def __init__(self, port, password):
         channel = rpyc.Channel(rpyc.SocketStream.connect('127.0.0.1', port))
         channel.send(password.encode('utf-8'))

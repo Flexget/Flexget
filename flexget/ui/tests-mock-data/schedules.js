@@ -5,25 +5,25 @@ var mockSchedulesData = (function () {
 
 	function getMockSchedules() {
 		return {
-			"schedules": [
+			'schedules': [
 				{
-					"id": 104536512,
-					"interval": {
-						"hours": 1
+					'id': 104536512,
+					'interval': {
+						'hours': 1
 					},
-					"tasks": [
-						"DownloadSeries"
+					'tasks': [
+						'DownloadSeries'
 					]
 				},
 				{
-					"id": 104729024,
-					"schedule": {
-						"hour": 12,
-						"minute": 30
+					'id': 104729024,
+					'schedule': {
+						'hour': 12,
+						'minute': 30
 					},
-					"tasks": "FillMovieQueue"
+					'tasks': 'FillMovieQueue'
 				}
 			]
-		}
+		};
 	}
-})();
+}());

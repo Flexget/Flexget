@@ -11,12 +11,12 @@ from flexget.utils.titles.movie import MovieParser
 from flexget.utils.titles.series import SeriesParser
 from .parser_common import ParseWarning
 
-
 log = logging.getLogger('parser_internal')
 
 
 class ParserInternal(object):
     # movie_parser API
+
     @plugin.priority(1)
     def parse_movie(self, data, **kwargs):
         log.debug('Parsing movie: `%s` kwargs: %s', data, kwargs)

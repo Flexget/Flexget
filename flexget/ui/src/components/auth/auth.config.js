@@ -1,3 +1,4 @@
+/* global angular*/
 (function () {
 	'use strict';
 
@@ -30,8 +31,8 @@
 		/* Intercept 401/403 http return codes and redirect to login page */
 		return {
 			responseError: responseError
-        }
-		
+        };
+
 		function loginRequired() {
 			var authService = $injector.get('authService');
 			authService.state($state.current, $state.params);
@@ -50,4 +51,4 @@
 			return $q.reject(rejection);
 		}
 	}
-})();
+}());

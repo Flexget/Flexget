@@ -1,14 +1,15 @@
+/* global angular, registerPlugin */
 (function () {
     'use strict';
 
     angular
-		.module("plugins.history", [
+		.module('plugins.history', [
 			'angular-cache',
 			'angular.filter',
 
-			'blocks.exception',			
+			'blocks.exception',
 			'blocks.router'
 		]);
 
 	registerPlugin('plugins.history');
-})();
+}());

@@ -1,4 +1,4 @@
-describe("Plugin: Execute.component", function () {
+describe('Plugin: Execute.component', function () {
 	var controller;
 	var queue = mockExecuteData.getMockQueue();
 
@@ -14,11 +14,11 @@ describe("Plugin: Execute.component", function () {
 		controller = $componentController('executeView');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(controller).to.exist;
 	});
 
-	describe("activation", function () {
+	describe('activation', function () {
 		beforeEach(function() {
 			controller.$onInit();
 			$rootScope.$digest();
@@ -26,9 +26,9 @@ describe("Plugin: Execute.component", function () {
 
 		it('should have called the execute service', function () {
 			expect(executeService.getQueue).to.have.been.calledOnce;
-		})
+		});
 		
-		it("should have entries", function () {
+		it('should have entries', function () {
 			expect(controller.running).to.not.be.empty;
 		});
 
@@ -47,7 +47,7 @@ describe("Plugin: Execute.component", function () {
 
 		it('should clear the options', function () {
 			controller.options = {
-				Test: "Testing"
+				Test: 'Testing'
 			};
 
 			controller.stopStream();
@@ -81,7 +81,7 @@ describe("Plugin: Execute.component", function () {
 		it('should set the options variable', function () {
 			var options = {
 				test: true
-			}
+			};
 
 			var tasks = ['TestingTask', 'OtherTask'];
 
@@ -101,6 +101,6 @@ describe("Plugin: Execute.component", function () {
 
 		it('should stop the interval timer', function () {
 			expect($interval.cancel).to.have.been.calledOnce;
-		})
+		});
 	});
 });

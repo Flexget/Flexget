@@ -11,7 +11,6 @@ from flexget.manager import Session
 from flexget.plugins.list.subtitle_list import SubtitleListFile, SubtitleListLanguage, normalize_path
 
 try:
-    import babelfish
     import subliminal
 except ImportError:
     subliminal = babelfish = None
@@ -237,7 +236,7 @@ class TestSubtitleList(object):
         assert len(task.entries) == 0
 
     def test_subtitle_list_unique_lang(self, execute_task):
-        task = execute_task('subtitle_add_with_languages')
+        execute_task('subtitle_add_with_languages')
 
         with Session() as session:
             s = session.query(SubtitleListLanguage).all()
@@ -427,7 +426,7 @@ class TestSubtitleList(object):
             assert s is None, 'The file should have been removed from the list since it does not exist'
 
     def test_subtitle_list_path(self, execute_task):
-        task = execute_task('subtitle_path')
+        execute_task('subtitle_path')
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()
@@ -436,7 +435,7 @@ class TestSubtitleList(object):
                 'location should be what the output field was set to'
 
     def test_subtitle_list_relative_path(self, execute_task):
-        task = execute_task('subtitle_path_relative')
+        execute_task('subtitle_path_relative')
 
         with Session() as session:
             s = session.query(SubtitleListFile).first()

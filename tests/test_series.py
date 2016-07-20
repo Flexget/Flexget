@@ -348,7 +348,7 @@ class TestFilterSeries(object):
         entry2 = task.find_entry('accepted', title='other show season 2 episode 2')
         # Make sure case is normalized so series are marked with the same name no matter the case in the title
         assert entry.get('series_name') == entry2.get(
-                'series_name') == 'Other Show', 'Series names should be in title case'
+            'series_name') == 'Other Show', 'Series names should be in title case'
         entry = task.find_entry('accepted', title='Date.Show.03-29-2012.HDTV.XViD-FlexGet')
         assert entry.get('series_guessed')
         assert entry.get('series_name') == 'Date Show'
@@ -1039,7 +1039,6 @@ class TestQualities(object):
         assert task.find_entry('accepted', title='Food.S06E11.720p'), 'Should upgrade to `target`'
 
 
-
 class TestIdioticNumbering(object):
     config = """
         templates:
@@ -1600,8 +1599,8 @@ class TestSeriesPremiere(object):
         """Test series premiere"""
         task = execute_task('test')
         assert task.find_entry('accepted', title='Foobar.S01E01.PDTV-FlexGet',
-                                    series_name='Foobar', series_season=1,
-                                    series_episode=1), 'Series premiere should have been accepted'
+                               series_name='Foobar', series_season=1,
+                               series_episode=1), 'Series premiere should have been accepted'
         assert len(task.accepted) == 1
         # TODO: Add more tests, test interaction with series plugin and series_exists
 

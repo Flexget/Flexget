@@ -14,7 +14,6 @@ log = logging.getLogger(PLUGIN_NAME)
 
 
 class OutputHtml(object):
-
     schema = {
         'type': 'object',
         'properties': {

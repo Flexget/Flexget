@@ -5,7 +5,6 @@ from past.builtins import basestring
 import logging
 import subprocess
 
-
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event

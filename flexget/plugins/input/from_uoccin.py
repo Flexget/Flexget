@@ -30,7 +30,6 @@ def load_uoccin_data(path):
 
 
 class FromUoccin(object):
-
     schema = {
         'type': 'object',
         'properties': {
@@ -43,23 +42,23 @@ class FromUoccin(object):
         'required': ['path', 'type'],
         'additionalProperties': False
     }
-    
+
     def on_task_input(self, task, config):
         """Creates an entry for each item in your uoccin watchlist.
-        
+
         Example::
-            
+
             from_uoccin:
               path: /path/to/gdrive/uoccin
               type: series
               tags: [ 'favorite', 'hires' ]
               check_tags: all
-        
+
         Options path and type are required while the others are for filtering:
         - 'any' will include all the items marked with one or more tags in the list
         - 'all' will only include the items marked with all the listed tags
         - 'none' will only include the items not marked with any of the listed tags.
-        
+
         The entries created will have a valid imdb/tvdb url and id.
         """
         imdb_lookup = plugin.get_plugin_by_name('imdb_lookup').instance

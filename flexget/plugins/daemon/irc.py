@@ -713,8 +713,6 @@ class IRCConnectionManager(object):
         attempt to reconnect for 30s.
         :return:
         """
-        global irc_connections
-
         self.start_connections()
 
         schedule = {}  # used to keep track of reconnection schedules
@@ -777,7 +775,6 @@ class IRCConnectionManager(object):
                 log.error(e)
                 errors += 1
         if errors:
-            from flexget.manager import manager
             manager.shutdown(finish_queue=False)
             return
 
@@ -788,7 +785,7 @@ class IRCConnectionManager(object):
     def stop_connections(self, wait):
         global irc_connections
 
-        for conn_name, conn in irc_connections.items():
+        for _, conn in irc_connections.items():
             conn.stop(wait)
             conn.thread.join(1)
         irc_connections = {}
@@ -805,8 +802,6 @@ def shutdown_requested(manager):
 
 @event('manager.shutdown')
 def stop_irc(manager, wait=False):
-    global irc_manager
-
     if irc_manager is not None and irc_manager.is_alive():
         log.info('Shutting down IRC.')
         irc_manager.stop(wait)

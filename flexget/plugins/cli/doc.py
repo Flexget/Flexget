@@ -9,7 +9,6 @@ from flexget.event import event
 from flexget.logger import console
 from flexget.plugin import plugins
 
-
 log = logging.getLogger('doc')
 
 

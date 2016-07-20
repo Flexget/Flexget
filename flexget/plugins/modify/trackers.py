@@ -11,7 +11,6 @@ log = logging.getLogger('modify_torrents')
 
 
 class AddTrackers(object):
-
     """
         Adds tracker URL to torrent files.
 
@@ -38,7 +37,6 @@ class AddTrackers(object):
 
 
 class RemoveTrackers(object):
-
     """
         Removes trackers from torrent files using regexp matching.
 
@@ -71,7 +69,6 @@ class RemoveTrackers(object):
 
 
 class ModifyTrackers(object):
-
     """
     Modify tracker URL to torrent files.
 

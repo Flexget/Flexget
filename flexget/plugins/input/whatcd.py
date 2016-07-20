@@ -243,9 +243,8 @@ class InputWhatCD(object):
                 raise PluginError("What.cd gave a failure response: "
                                   "'{}'".format(error))
             return json_response['response']
-        except (ValueError, TypeError, KeyError) as e:
+        except (ValueError, TypeError, KeyError):
             raise PluginError("What.cd returned an invalid response")
-
 
     def _search_results(self, config):
         """Generator that yields search results"""
@@ -284,7 +283,7 @@ class InputWhatCD(object):
                     torrent_seeds=tor['seeders'],
                     torrent_leeches=tor['leechers'],
                     # Size is returned in bytes, convert to MB for compat with the content_size plugin
-                    content_size=math.floor(tor['size'] / (1024**2))
+                    content_size=math.floor(tor['size'] / (1024 ** 2))
                 )
 
     @cached('whatcd')

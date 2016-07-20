@@ -53,7 +53,7 @@ class RegexExtract(object):
 
         # Check the regex
         try:
-            for rx in self.regex_list:
+            for _ in self.regex_list:
                 pass
         except re.error as e:
             raise plugin.PluginError('Error compiling regex: %s' % str(e))

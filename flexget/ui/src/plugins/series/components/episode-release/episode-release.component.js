@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -29,12 +30,12 @@
         function resetRelease() {
             var confirm = $mdDialog.confirm()
 				.title('Confirm resetting a release')
-				.htmlContent("Are you sure you want to reset the release <b>" + vm.release.release_title + "</b>?")
-				.ok("reset")
-				.cancel("No");
+				.htmlContent('Are you sure you want to reset the release <b>' + vm.release.release_title + '</b>?')
+				.ok('reset')
+				.cancel('No');
 
             $mdDialog.show(confirm).then(function () {
-                seriesService.resetRelease(vm.show, vm.episode, vm.release)
+                seriesService.resetRelease(vm.show, vm.episode, vm.release);
             });
         }
 
@@ -42,12 +43,12 @@
         function forgetRelease() {
             var confirm = $mdDialog.confirm()
 				.title('Confirm forgetting a release')
-				.htmlContent("Are you sure you want to delete the release <b>" + vm.release.release_title + "</b>?")
-				.ok("Forget")
-				.cancel("No");
+				.htmlContent('Are you sure you want to delete the release <b>' + vm.release.release_title + '</b>?')
+				.ok('Forget')
+				.cancel('No');
 
             $mdDialog.show(confirm).then(function () {
-                seriesService.forgetRelease(vm.show, vm.episode, vm.release, params)
+                seriesService.forgetRelease(vm.show, vm.episode, vm.release, params);
             });
         }
 
@@ -55,4 +56,4 @@
 			$mdDialog.cancel();
 		}
     }
-})();										
+}());

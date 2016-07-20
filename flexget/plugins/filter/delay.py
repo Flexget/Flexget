@@ -19,7 +19,6 @@ Base = db_schema.versioned_base('delay', 2)
 
 
 class DelayedEntry(Base):
-
     __tablename__ = 'delay'
 
     id = Column(Integer, primary_key=True)
@@ -32,7 +31,10 @@ class DelayedEntry(Base):
     def __repr__(self):
         return '<DelayedEntry(title=%s)>' % self.title
 
+
 Index('delay_feed_title', DelayedEntry.task, DelayedEntry.title)
+
+
 # TODO: index "expire, task"
 
 
@@ -52,7 +54,7 @@ def upgrade(ver, session):
                 p = pickle.loads(row['entry'])
                 session.execute(table.update().where(table.c.id == row['id']).values(
                     json=json.dumps(p, encode_datetime=True)))
-            except (KeyError, ImportError) as e:
+            except (KeyError, ImportError):
                 failures += 1
         if failures > 0:
             log.error('Error upgrading %s pickle objects. Some delay information has been lost.' % failures)
@@ -93,8 +95,8 @@ class FilterDelay(object):
         for entry in task.entries:
             log.debug('Delaying %s' % entry['title'])
             # check if already in queue
-            if not task.session.query(DelayedEntry).\
-                filter(DelayedEntry.title == entry['title']).\
+            if not task.session.query(DelayedEntry). \
+                    filter(DelayedEntry.title == entry['title']). \
                     filter(DelayedEntry.task == task.name).first():
                 delay_entry = DelayedEntry()
                 delay_entry.title = entry['title']
@@ -107,8 +109,8 @@ class FilterDelay(object):
         task.all_entries[:] = []
 
         # Generate the list of entries whose delay has passed
-        passed_delay = task.session.query(DelayedEntry).\
-            filter(datetime.now() > DelayedEntry.expire).\
+        passed_delay = task.session.query(DelayedEntry). \
+            filter(datetime.now() > DelayedEntry.expire). \
             filter(DelayedEntry.task == task.name)
         delayed_entries = [item.entry for item in passed_delay.all()]
         for entry in delayed_entries:

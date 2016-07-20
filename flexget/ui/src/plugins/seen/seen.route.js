@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-		.module("plugins.seen")
+		.module('plugins.seen')
 		.run(appRun);
 
 	function appRun(routerHelper) {
@@ -23,6 +23,6 @@
 					}
 				}
 			}
-		]
+		];
 	}
-})();
+}());

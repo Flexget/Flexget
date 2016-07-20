@@ -1,8 +1,9 @@
+/* global angular */
 (function () {
     'use strict';
 
     angular
-		.module("plugins.config")
+		.module('plugins.config')
 		.run(appRun);
 
 	function appRun($state, routerHelper, toolBarService) {
@@ -14,7 +15,7 @@
 			icon: 'pencil',
 			action: goToRoute,
 			order: 1
-		}
+		};
 
 		function goToRoute() {
 			$state.go('flexget.config');
@@ -37,6 +38,6 @@
 					}
 				}
 			}
-		]
+		];
 	}
-})();
+}());

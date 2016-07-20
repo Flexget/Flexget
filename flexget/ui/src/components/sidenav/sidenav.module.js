@@ -1,9 +1,10 @@
+/* global angular */
 (function () {
     'use strict';
 
     angular
-        .module("components.sidenav", [
+        .module('components.sidenav', [
 			'ngMaterial',
 			'blocks.router'
 		]);
-})();
+}());

@@ -18,7 +18,7 @@ def get_directory_size(directory):
     :return: Size in bytes (recursively)
     """
     dir_size = 0
-    for (path, dirs, files) in os.walk(directory):
+    for (path, _, files) in os.walk(directory):
         for file in files:
             filename = os.path.join(path, file)
             dir_size += os.path.getsize(filename)
@@ -26,20 +26,19 @@ def get_directory_size(directory):
 
 
 class BaseFileOps(object):
-    
     # Defined by subclasses
     log = None
-    
+
     def on_task_output(self, task, config):
         if config is True:
             config = {}
         elif config is False:
             return
-        
+
         sexts = []
         if 'along' in config:
             sexts = [('.' + s).replace('..', '.').lower() for s in config['along']]
-        
+
         for entry in task.accepted:
             if 'location' not in entry:
                 self.log.verbose('Cannot handle %s because it does not have the field location.' % entry['title'])
@@ -67,13 +66,13 @@ class BaseFileOps(object):
             except Exception as err:
                 entry.fail(str(err))
                 continue
-    
+
     def clean_source(self, task, config, entry):
         min_size = entry.get('clean_source', config.get('clean_source', -1))
         if min_size < 0:
-            return 
-        base_path = os.path.split(entry['location'])[0]
-        # everything here happens after a successful execution of the main action: the entry has been moved in a 
+            return
+        base_path = os.path.split(entry.get('old_location', entry['location']))[0]
+        # everything here happens after a successful execution of the main action: the entry has been moved in a
         # different location, or it does not exists anymore. so from here we can just log warnings and move on.
         if not os.path.isdir(base_path):
             self.log.warning('Cannot delete path `%s` because it does not exists (anymore).' % base_path)
@@ -109,9 +108,9 @@ class DeleteFiles(BaseFileOps):
             }
         ]
     }
-    
+
     log = logging.getLogger('delete')
-    
+
     def handle_entry(self, task, config, entry, siblings):
         src = entry['location']
         src_isdir = os.path.isdir(src)
@@ -142,16 +141,15 @@ class DeleteFiles(BaseFileOps):
 
 
 class TransformingOps(BaseFileOps):
-    
     # Defined by subclasses
     move = None
     destination_field = None
-    
+
     def handle_entry(self, task, config, entry, siblings):
         src = entry['location']
         src_isdir = os.path.isdir(src)
         src_path, src_name = os.path.split(src)
-        
+
         # get the proper path and name in order of: entry, config, above split
         dst_path = entry.get(self.destination_field, config.get('to', src_path))
         if entry.get('filename') and entry['filename'] != src_name:
@@ -160,7 +158,7 @@ class TransformingOps(BaseFileOps):
             dst_name = entry['filename']
         else:
             dst_name = config.get('filename', src_name)
-        
+
         try:
             dst_path = entry.render(dst_path)
         except RenderError as err:
@@ -169,16 +167,16 @@ class TransformingOps(BaseFileOps):
             dst_name = entry.render(dst_name)
         except RenderError as err:
             raise plugin.PluginWarning('Filename value replacement `%s` failed: %s' % (dst_name, err.args[0]))
-        
+
         # Clean invalid characters with pathscrub plugin
         dst_path = pathscrub(os.path.expanduser(dst_path))
         dst_name = pathscrub(dst_name, filename=True)
-        
+
         # Join path and filename
         dst = os.path.join(dst_path, dst_name)
         if dst == entry['location']:
             raise plugin.PluginWarning('source and destination are the same.')
-        
+
         if not os.path.exists(dst_path):
             if task.options.test:
                 self.log.info('Would create `%s`' % dst_path)
@@ -187,7 +185,7 @@ class TransformingOps(BaseFileOps):
                 os.makedirs(dst_path)
         if not os.path.isdir(dst_path) and not task.options.test:
             raise plugin.PluginWarning('destination `%s` is not a directory.' % dst_path)
-        
+
         # unpack_safety
         if config.get('unpack_safety', entry.get('unpack_safety', True)):
             count = 0
@@ -203,19 +201,19 @@ class TransformingOps(BaseFileOps):
                 else:
                     break
                 count += 1
-        
+
         src_file, src_ext = os.path.splitext(src)
         dst_file, dst_ext = os.path.splitext(dst)
-        
+
         # Check dst contains src_ext
         if config.get('keep_extension', entry.get('keep_extension', True)):
             if not src_isdir and dst_ext != src_ext:
                 self.log.verbose('Adding extension `%s` to dst `%s`' % (src_ext, dst))
                 dst += src_ext
-            
+
         funct_name = 'move' if self.move else 'copy'
         funct_done = 'moved' if self.move else 'copied'
-        
+
         if task.options.test:
             self.log.info('Would %s `%s` to `%s`' % (funct_name, src, dst))
             for s in siblings:
@@ -269,7 +267,7 @@ class CopyFiles(TransformingOps):
             }
         ]
     }
-    
+
     move = False
     destination_field = 'copy_to'
     log = logging.getLogger('copy')
@@ -296,7 +294,7 @@ class MoveFiles(TransformingOps):
             }
         ]
     }
-    
+
     move = True
     destination_field = 'move_to'
     log = logging.getLogger('move')

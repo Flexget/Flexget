@@ -55,6 +55,7 @@ def set_unresponsive(url):
 
 
 class DomainLimiter(object):
+
     def __init__(self, domain):
         self.domain = domain
 
@@ -66,13 +67,13 @@ class DomainLimiter(object):
 class TokenBucketLimiter(DomainLimiter):
     """
     A token bucket rate limiter for domains.
-    
+
     New instances for the same domain will restore previous values.
     """
     # This is just an in memory cache right now, it works for the daemon, and across tasks in a single execution
     # but not for multiple executions via cron. Do we need to store this to db?
     state_cache = {}
-    
+
     def __init__(self, domain, tokens, rate, wait=True):
         """
         :param int tokens: Size of bucket
@@ -120,6 +121,7 @@ class TokenBucketLimiter(DomainLimiter):
 
 class TimedLimiter(TokenBucketLimiter):
     """Enforces a minimum interval between requests to a given domain."""
+
     def __init__(self, domain, interval):
         super(TimedLimiter, self).__init__(domain, 1, interval)
 
@@ -196,7 +198,7 @@ class Session(requests.Session):
         """
         warnings.warn('set_domain_delay is deprecated, use add_domain_limiter', DeprecationWarning, stacklevel=2)
         self.domain_limiters[domain] = TimedLimiter(domain, delay)
-            
+
     def add_domain_limiter(self, limiter):
         """
         Add a limiter to throttle requests to a specific domain.
@@ -216,7 +218,7 @@ class Session(requests.Session):
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
             raise requests.Timeout('Requests to this site (%s) have timed out recently. Waiting before trying again.' %
-                urlparse(url).hostname)
+                                   urlparse(url).hostname)
 
         # Run domain limiters for this url
         limit_domains(url, self.domain_limiters)

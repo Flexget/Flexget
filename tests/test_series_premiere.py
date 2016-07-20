@@ -12,7 +12,6 @@ def config(request):
 
 
 class TestSeriesPremiere(object):
-
     config = """
         templates:
           global:

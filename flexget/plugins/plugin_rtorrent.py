@@ -24,6 +24,7 @@ log = logging.getLogger('rtorrent')
 class _Method(object):
     # some magic to bind an XML-RPC method to an RPC server.
     # supports "nested" methods (e.g. examples.getStateName)
+
     def __init__(self, send, name):
         self.__send = send
         self.__name = name
@@ -91,7 +92,7 @@ class SCGITransport(xmlrpc_client.Transport):
             log.info('body: %s', repr(response_body))
 
         # Remove SCGI headers from the response.
-        response_header, response_body = re.split(r'\n\s*?\n', response_body, maxsplit=1)
+        _, response_body = re.split(r'\n\s*?\n', response_body, maxsplit=1)
         p.feed(response_body)
         p.close()
 
@@ -435,12 +436,13 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
     }
 
     def _verify_load(self, client, info_hash):
-        for i in range(0, 5):
+        e = IOError()
+        for _ in range(0, 5):
             try:
                 return client.torrent(info_hash, fields=['hash'])
-            except (IOError, xmlrpc_client.Error):
+            except (IOError, xmlrpc_client.Error) as e:
                 sleep(0.5)
-        raise
+        raise e
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
@@ -637,7 +639,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
             entry = Entry(
                 title=torrent['name'],
                 url='%s/%s' % (os.path.expanduser(config['uri']),
-                torrent['hash']),
+                               torrent['hash']),
                 path=torrent['base_path'],
                 torrent_info_hash=torrent['hash'],
             )

@@ -16,6 +16,7 @@ log = getLogger('pyload')
 
 
 class PyloadApi(object):
+
     def __init__(self, requests, url):
         self.requests = requests
         self.url = url
@@ -90,23 +91,23 @@ class PluginPyLoad(object):
         'oneOf': [
             {'type': 'boolean'},
             {'type': 'object',
-                'properties': {
-                    'api': {'type': 'string'},
-                    'username': {'type': 'string'},
-                    'password': {'type': 'string'},
-                    'folder': {'type': 'string'},
-                    'package': {'type': 'string'},
-                    'package_password': {'type': 'string'},
-                    'queue': {'type': 'boolean'},
-                    'parse_url': {'type': 'boolean'},
-                    'multiple_hoster': {'type': 'boolean'},
-                    'hoster': one_or_more({'type': 'string'}),
-                    'preferred_hoster_only': {'type': 'boolean'},
-                    'handle_no_url_as_failure': {'type': 'boolean'},
-                    'enabled': {'type': 'boolean'},
+             'properties': {
+                 'api': {'type': 'string'},
+                 'username': {'type': 'string'},
+                 'password': {'type': 'string'},
+                 'folder': {'type': 'string'},
+                 'package': {'type': 'string'},
+                 'package_password': {'type': 'string'},
+                 'queue': {'type': 'boolean'},
+                 'parse_url': {'type': 'boolean'},
+                 'multiple_hoster': {'type': 'boolean'},
+                 'hoster': one_or_more({'type': 'string'}),
+                 'preferred_hoster_only': {'type': 'boolean'},
+                 'handle_no_url_as_failure': {'type': 'boolean'},
+                 'enabled': {'type': 'boolean'},
 
-                },
-                'additionalProperties': False
+             },
+             'additionalProperties': False
              }
         ]
     }
@@ -213,7 +214,7 @@ class PluginPyLoad(object):
                     # set folder with api
                     data = json.dumps({'folder': folder})
                     api.query("setPackageData", {'pid': pid, 'data': data, 'session': session})
-                
+
                 # Set Package Password
                 package_password = config.get('package_password')
                 if package_password:

@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -22,7 +23,7 @@
         var options = {
             page: 1,
             page_size: 10
-        }
+        };
 
 		var params = {
 			forget: true
@@ -31,13 +32,13 @@
 		function activate() {
 			getEpisodesList();
 		}
-		
+
         //Call from the pagination directive, which triggers other episodes to load
         vm.updateListPage = function (index) {
             options.page = index;
 
             getEpisodesList();
-        }
+        };
 
         //Cal the episodes based on the options
         function getEpisodesList() {
@@ -59,9 +60,9 @@
         function deleteEpisode(episode) {
             var confirm = $mdDialog.confirm()
 				.title('Confirm forgetting episode.')
-				.htmlContent("Are you sure you want to forget episode <b>" + episode.episode_identifier + "</b> from show <b>" + vm.show.show_name + "</b>?<br /> This also removes all downloaded releases for this episode!")
-				.ok("Forget")
-				.cancel("No");
+				.htmlContent('Are you sure you want to forget episode <b>' + episode.episode_identifier + '</b> from show <b>' + vm.show.show_name + '</b>?<br /> This also removes all downloaded releases for this episode!')
+				.ok('Forget')
+				.cancel('No');
 
             $mdDialog.show(confirm).then(function () {
                 seriesService.deleteEpisode(vm.show, episode, params)
@@ -74,4 +75,4 @@
             });
         }
     }
-})();
+}());

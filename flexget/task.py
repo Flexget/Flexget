@@ -58,7 +58,6 @@ def config_changed(task=None, session=None):
 
 
 def use_task_logging(func):
-
     @wraps(func)
     def wrapper(self, *args, **kw):
         # Set the task name in the logger and capture output
@@ -139,6 +138,7 @@ class EntryContainer(list):
 
 
 class TaskAbort(Exception):
+
     def __init__(self, reason, silent=False):
         self.reason = reason
         self.silent = silent
@@ -149,7 +149,6 @@ class TaskAbort(Exception):
 
 @total_ordering
 class Task(object):
-
     """
     Represents one task in the configuration.
 
@@ -516,7 +515,7 @@ class Task(object):
         if self.options.inject:
             # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')
-            self.all_entries.extend(self.options.inject)
+            self.all_entries.extend(copy.deepcopy(self.options.inject))
 
         # Save current config hash and set config_modidied flag
         with Session() as session:

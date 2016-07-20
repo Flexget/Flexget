@@ -113,14 +113,14 @@ class TestMovieQueue(object):
 
     def test_movie_queue_forget(self, execute_task):
         queue_add(title=u'MovieInQueue', imdb_id=u'tt1931533', tmdb_id=603)
-        task = execute_task('movie_queue_accept')
+        execute_task('movie_queue_accept')
         assert len(queue_get(downloaded=True)) == 1
-        task = execute_task('movie_queue_forget')
+        execute_task('movie_queue_forget')
         assert not queue_get(downloaded=True)
         assert len(queue_get()) == 1
 
     def test_movie_queue_different_queue_add(self, execute_task):
-        task = execute_task('movie_queue_different_queue_add')
+        execute_task('movie_queue_different_queue_add')
         queue = queue_get()
         assert len(queue) == 0
         queue = queue_get(queue_name='A new queue')
@@ -170,15 +170,14 @@ class TestMovieQueue(object):
 
     def test_movie_queue_different_queue_forget(self, execute_task):
         queue_add(title=u'MovieInQueue', imdb_id=u'tt1931533', tmdb_id=603, queue_name='A new queue')
-        task = execute_task('movie_queue_different_queue_accept')
+        execute_task('movie_queue_different_queue_accept')
         assert len(queue_get(downloaded=True, queue_name='A new queue')) == 1
-        task = execute_task('movie_queue_different_queue_forget')
+        execute_task('movie_queue_different_queue_forget')
         assert not queue_get(downloaded=True, queue_name='A new queue')
         assert len(queue_get(queue_name='a New queue')) == 1
 
 
 class TestMovieQueueAPI(object):
-
     config = 'tasks: {}'
 
     mock_return_movie = {u'added': datetime.datetime(2015, 12, 30, 12, 32, 10, 688000),

@@ -1,8 +1,9 @@
+/* global angular */
 (function () {
     'use strict';
 
     angular
-        .module("components.core")
+        .module('components.core')
 		.provider('flexTheme', flexTheme);
 
 	function flexTheme($mdThemingProvider) {
@@ -25,4 +26,4 @@
 			}
 		};
 	}
-})();
+}());

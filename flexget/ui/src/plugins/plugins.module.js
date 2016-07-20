@@ -3,7 +3,7 @@
 
     angular
         .module('flexget.plugins', []);
-})();
+}());
 
 //Global function used to inject plugins as dependencies
 function registerPlugin(plugin) { // eslint-disable-line no-unused-vars

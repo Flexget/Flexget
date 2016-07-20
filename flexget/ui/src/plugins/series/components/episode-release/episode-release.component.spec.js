@@ -1,4 +1,5 @@
-describe("Plugin: Episode-Release.Component", function () {
+/* global bard, mockSeriesData */
+describe('Plugin: Episode-Release.Component', function () {
 	var component, deferred;
 	var release = mockSeriesData.getRelease();
 	var episode = mockSeriesData.getEpisode();
@@ -6,6 +7,8 @@ describe("Plugin: Episode-Release.Component", function () {
 
 	beforeEach(function () {
 		bard.appModule('plugins.series');
+
+		/* global $componentController, $q, seriesService, $rootScope, $mdDialog */
 		bard.inject('$componentController', '$q', 'seriesService', '$rootScope', '$mdDialog');
 	});
 
@@ -17,7 +20,7 @@ describe("Plugin: Episode-Release.Component", function () {
 		});
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 
@@ -40,7 +43,7 @@ describe("Plugin: Episode-Release.Component", function () {
 		beforeEach(function () {
 			deferred = $q.defer();
 			sinon.stub(seriesService, 'resetRelease').returns(deferred.promise);
-			
+
 		});
 
 		it('should exist', function () {
@@ -73,7 +76,7 @@ describe("Plugin: Episode-Release.Component", function () {
 		beforeEach(function () {
 			deferred = $q.defer();
 			sinon.stub(seriesService, 'forgetRelease').returns(deferred.promise);
-			
+
 		});
 
 		it('should exist', function () {

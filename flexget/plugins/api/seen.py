@@ -122,10 +122,7 @@ class SeenSearchAPI(APIResource):
             page_size = 100
 
         # Handles default if it explicitly called
-        if order == 'desc':
-            order = True
-        else:
-            order = False
+        descending = bool(order == 'desc')
 
         # Unquotes and prepares value for DB lookup
         if value:
@@ -141,7 +138,7 @@ class SeenSearchAPI(APIResource):
             'stop': stop,
             'start': start,
             'order_by': sort_by,
-            'descending': order,
+            'descending': descending,
             'session': session
         }
         count = seen.search(count=True, **kwargs)
@@ -218,7 +215,7 @@ class SeenSearchAPI(APIResource):
         for entry in seen_entries_list:
             try:
                 seen.forget_by_id(entry.id)
-            except ValueError as e:
+            except ValueError:
                 return {'status': 'error',
                         'message': 'Could not delete entry ID {0}'.format(entry.id)}, 500
         return {}
@@ -228,12 +225,12 @@ class SeenSearchAPI(APIResource):
 @api.doc(params={'seen_entry_id': 'ID of seen entry'}, description='Delete a specific seen entry via its ID')
 @api.response(500, 'Delete process failed', model=default_error_schema)
 @api.response(200, 'Successfully deleted entry', empty_response)
-class SeenSearchAPI(APIResource):
+class SeenSearchIDAPI(APIResource):
     def delete(self, seen_entry_id, session):
         """ Delete seen entry by ID """
         try:
             seen.forget_by_id(seen_entry_id)
-        except ValueError as e:
+        except ValueError:
             return {'status': 'error',
                     'message': 'Could not delete entry ID {0}'.format(seen_entry_id)}, 500
         return {}

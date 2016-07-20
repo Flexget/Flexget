@@ -8,7 +8,7 @@ from flexget.utils.simple_persistence import SimplePersistence
 from flexget.event import event
 
 log = logging.getLogger('db_vacuum')
-VACUUM_INTERVAL = timedelta(weeks=24) # 6 months
+VACUUM_INTERVAL = timedelta(weeks=24)  # 6 months
 
 
 # Run after the cleanup is actually finished, but before analyze

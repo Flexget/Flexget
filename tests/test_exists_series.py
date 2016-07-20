@@ -7,7 +7,6 @@ import pytest
 
 
 class TestExistsSeries(object):
-
     _config = """
         templates:
           global:
@@ -145,7 +144,7 @@ class TestExistsSeries(object):
     def test_invalid(self, execute_task):
         """Exists_series plugin: no episode numbering on the disk"""
         # shouldn't raise anything
-        task = execute_task('test_invalid')
+        execute_task('test_invalid')
 
     def test_with_metainfo_series(self, execute_task):
         """Tests that exists_series works with series data from metainfo_series"""

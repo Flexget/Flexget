@@ -1,8 +1,9 @@
+/* global angular, registerPlugin */
 (function () {
     'use strict';
 
     angular
-		.module("plugins.config", [
+		.module('plugins.config', [
 			'ngMaterial',
 
 			'ab-base64',
@@ -14,6 +15,6 @@
 
 			'ui.ace'
 		]);
-	
+
 	registerPlugin('plugins.config');
-})();
+}());

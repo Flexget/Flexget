@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -26,7 +27,7 @@
 			deleteReleases: deleteReleases,
 			loadReleases: loadReleases,
 			updateShow: updateShow
-        }
+        };
 
         function getShows(options) {
             return $http.get('/api/series/',
@@ -59,7 +60,7 @@
 					params: params
 				})
 				.then(deleteShowComplete)
-				.catch(callFailed)
+				.catch(callFailed);
 
             function deleteShowComplete() {
                 // remove all shows from cache, since order might have changed
@@ -68,12 +69,12 @@
             }
         }
 
-		//TODO: Test		
+		//TODO: Test
 		function updateShow(show, params) {
 			return $http.put('/api/series/' + show.show_id + '/', params)
 				.then(updateShowComplete)
 				.catch(callFailed);
-			
+
 			function updateShowComplete(response) {
 				return response.data;
 			}
@@ -102,7 +103,7 @@
         function deleteEpisode(show, episode, params) {
             return $http.delete('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/', { params: params })
 				.then(deleteEpisodeComplete)
-				.catch(callFailed)
+				.catch(callFailed);
 
             function deleteEpisodeComplete(res) {
                 return res.data;
@@ -112,7 +113,7 @@
         function resetReleases(show, episode) {
             return $http.put('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/releases/')
 				.then(resetReleasesComplete)
-				.catch(callFailed)
+				.catch(callFailed);
 
             function resetReleasesComplete(res) {
                 return res.data;
@@ -153,7 +154,7 @@
             return $http.get('/api/series/' + show.show_id + '/episodes/' + episode.episode_id + '/releases/')
 				.then(loadReleasesComplete)
 				.catch(callFailed);
-			
+
 			function loadReleasesComplete(response) {
 				return response.data;
 			}
@@ -163,4 +164,4 @@
 			return exception.catcher(error);
 		}
     }
-})();
+}());

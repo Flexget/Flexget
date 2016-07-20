@@ -1,10 +1,13 @@
-describe("Plugin: Movie-Entry.Component", function () {
+/* global bard, sinon, mockMovieListData */
+describe('Plugin: Movie-Entry.Component', function () {
 	var component, deferred;
 	var movie = mockMovieListData.getMovieListMovieById();
 	var metadata = mockMovieListData.getMovieMetadata();
 
 	beforeEach(function () {
 		bard.appModule('plugins.movies');
+
+		/* global $componentController, $q, moviesService, $rootScope */
 		bard.inject('$componentController', '$q', 'moviesService', '$rootScope');
 
 		sinon.stub(moviesService, 'getMovieMetadata').returns($q.when(metadata));
@@ -17,7 +20,7 @@ describe("Plugin: Movie-Entry.Component", function () {
 			});
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 

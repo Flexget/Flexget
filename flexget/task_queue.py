@@ -19,6 +19,7 @@ class TaskQueue(object):
     Task processing thread.
     Only executes one task at a time, if more are requested they are queued up and run in turn.
     """
+
     def __init__(self):
         self.run_queue = queue.PriorityQueue()
         self._shutdown_now = False

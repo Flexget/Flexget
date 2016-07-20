@@ -20,8 +20,8 @@ DEFAULT_TEMPLATE_VALUE = json.dumps({
     'task': '{{task}}',
 })
 
-class SNSNotification(object):
 
+class SNSNotification(object):
     """
     Emits SNS notifications of entries
 
@@ -53,7 +53,7 @@ class SNSNotification(object):
         'additionalProperties': False,
     }
 
-    def on_task_start(self, task ,config):
+    def on_task_start(self, task, config):
         # verify that we actually support Boto 3
         try:
             import boto3
@@ -70,6 +70,7 @@ class SNSNotification(object):
 
 
 class SNSNotificationEmitter(object):
+
     def __init__(self, config):
         self.config = config
         import boto3

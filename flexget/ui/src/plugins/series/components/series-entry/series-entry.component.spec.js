@@ -1,10 +1,13 @@
-describe("Plugin: Series-Entry.Component", function () {
+/* global bard, sinon, mockSeriesData */
+describe('Plugin: Series-Entry.Component', function () {
 	var component, deferred;
 	var metadata = mockSeriesData.getShowMetadata();
 	var show = mockSeriesData.getShow();
 
 	beforeEach(function () {
 		bard.appModule('plugins.series');
+
+		/* global $componentController, $q, seriesService, $rootScope, $mdDialog */
 		bard.inject('$componentController', '$q', 'seriesService', '$rootScope', '$mdDialog');
 
 		sinon.stub(seriesService, 'getShowMetadata').returns($q.when(metadata));
@@ -14,7 +17,7 @@ describe("Plugin: Series-Entry.Component", function () {
 		component = $componentController('seriesEntry');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 

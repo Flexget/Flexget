@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -17,4 +18,4 @@
 			return config;
 		}
 	}
-})();
+}());

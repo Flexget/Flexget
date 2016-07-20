@@ -45,12 +45,12 @@ module.exports = function(config) {
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['dots', 'coverage'],
 
-    /*coverageReporter: {
+    coverageReporter: {
       type: 'lcovonly',
-      dir: '../../',
+      dir: '.',
       file: 'webui-coverage.info',
       subdir: '.'
-    },*/
+    },
 
     // web server port
     port: 9876,

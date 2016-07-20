@@ -5,9 +5,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import pytest
 
 from flexget.manager import Session
-from flexget.plugins.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow, \
-    get_session
-from future.utils import native
+from flexget.plugins.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow
 
 lookup_series = ApiTrakt.lookup_series
 
@@ -660,13 +658,13 @@ class TestTraktUnicodeLookup(object):
 
     @pytest.mark.xfail(reason='VCR attempts to compare str to unicode')
     def test_unicode(self, execute_task):
-        task = execute_task('test_unicode')
+        execute_task('test_unicode')
         with Session() as session:
             r = session.query(TraktMovieSearchResult).all()
             assert len(r) == 1, 'Should have added a search result'
             assert r[0].search == '\u0417\u0435\u0440\u043a\u0430\u043b\u0430 Mirrors 2008'.lower(), \
                 'The search result should be lower case'
-        task = execute_task('test_unicode')
+        execute_task('test_unicode')
         with Session() as session:
             r = session.query(TraktMovieSearchResult).all()
             assert len(r) == 1, 'Should not have added a new row'

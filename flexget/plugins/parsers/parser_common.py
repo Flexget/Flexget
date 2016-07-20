@@ -10,7 +10,6 @@ from string import capwords
 
 from flexget.utils.tools import ReList
 
-
 log = logging.getLogger('parser')
 
 SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
@@ -36,6 +35,7 @@ def clean_value(name):
 
 
 class ParseWarning(Warning):
+
     def __init__(self, parsed, value, **kwargs):
         self.value = value
         self.parsed = parsed
@@ -310,6 +310,7 @@ class ParsedVideo(ABCMeta(native_str('ParsedVideoABCMeta'), (ParsedEntry,), {}))
 
 
 class ParsedVideoQuality(ABCMeta(native_str('ParsedVideoQualityABCMeta'), (object,), {})):
+
     @abstractproperty
     def screen_size(self):
         raise NotImplementedError
@@ -352,6 +353,7 @@ class ParsedVideoQuality(ABCMeta(native_str('ParsedVideoQualityABCMeta'), (objec
 
 
 class ParsedMovie(ABCMeta(native_str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
+
     @property
     def parsed_name(self):
         return self.title

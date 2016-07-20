@@ -42,7 +42,6 @@ def upgrade(ver, session):
 
 
 class RememberTask(Base):
-
     __tablename__ = 'remember_rejected_feeds'
 
     id = Column(Integer, primary_key=True)
@@ -52,7 +51,6 @@ class RememberTask(Base):
 
 
 class RememberEntry(Base):
-
     __tablename__ = 'remember_rejected_entry'
 
     id = Column(Integer, primary_key=True)
@@ -64,6 +62,7 @@ class RememberEntry(Base):
     reason = Column(String)
 
     task_id = Column('feed_id', Integer, ForeignKey('remember_rejected_feeds.id'), nullable=False)
+
 
 Index('remember_feed_title_url', RememberEntry.task_id, RememberEntry.title, RememberEntry.url)
 
@@ -93,7 +92,7 @@ class FilterRememberRejected(object):
                 session.add(RememberTask(name=task.name))
             elif not task.is_rerun:
                 # Delete expired items if this is not a rerun
-                deleted = session.query(RememberEntry).filter(RememberEntry.task_id == old_task.id).\
+                deleted = session.query(RememberEntry).filter(RememberEntry.task_id == old_task.id). \
                     filter(RememberEntry.expires < datetime.now()).delete()
                 if deleted:
                     log.debug('%s entries have expired from remember_rejected table.' % deleted)
@@ -120,7 +119,7 @@ class FilterRememberRejected(object):
                                                               RememberEntry.url == entry['original_url'])).first()
                     if reject_entry:
                         entry.reject('Rejected on behalf of %s plugin: %s' %
-                            (reject_entry.rejected_by, reject_entry.reason))
+                                     (reject_entry.rejected_by, reject_entry.reason))
 
     def on_entry_reject(self, entry, remember=None, remember_time=None, **kwargs):
         # We only remember rejections that specify the remember keyword argument

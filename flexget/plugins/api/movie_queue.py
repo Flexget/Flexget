@@ -102,9 +102,11 @@ movie_edit_input_schema = {
 
 movie_edit_input_schema = api.schema('movie_edit_input_schema', movie_edit_input_schema)
 
+
 @api.deprecated
 @movie_queue_api.route('/')
 class MovieQueueAPI(APIResource):
+
     @api.response(404, 'Page does not exist', model=default_error_schema)
     @api.response(code_or_apierror=200, model=movie_queue_schema)
     @api.doc(parser=movie_queue_parser, description="Get flexget's queued movies")
@@ -174,18 +176,20 @@ class MovieQueueAPI(APIResource):
         reply.status_code = 201
         return reply
 
+
 @api.deprecated
 @api.response(404, 'ID not found', model=default_error_schema)
 @movie_queue_api.route('/<id>/')
 @api.doc(params={'id': 'ID of Queued Movie'})
 class MovieQueueManageAPI(APIResource):
+
     @api.response(200, 'Movie successfully retrieved', movie_object_schema)
     @api.doc(description="Get a specific movie")
     def get(self, id, session=None):
         """ Returns a movie from queue by ID """
         try:
             movie = mq.get_movie_by_id(movie_id=id)
-        except NoResultFound as e:
+        except NoResultFound:
             return {'status': 'error',
                     'message': 'movie with ID {0} was not found'.format(id)}, 404
         return jsonify(movie)

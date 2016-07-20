@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-
 import logging
 from collections import MutableMapping
 
@@ -52,6 +51,7 @@ class LazyLookup(object):
 
 
 class LazyDict(MutableMapping):
+
     def __init__(self, *args, **kwargs):
         self.store = dict(*args, **kwargs)
 

@@ -14,14 +14,13 @@ from flexget.logger import console
 
 log = logging.getLogger('win32_service')
 
-
 try:
     import servicemanager
     import win32event
     import win32service
     import win32serviceutil
 
-    class AppServerSvc (win32serviceutil.ServiceFramework):
+    class AppServerSvc(win32serviceutil.ServiceFramework):
         _svc_name_ = 'FlexGet'
         _svc_display_name_ = 'FlexGet Daemon'
         _svc_description_ = 'Runs FlexGet tasks according to defined schedules'

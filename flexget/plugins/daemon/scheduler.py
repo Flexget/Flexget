@@ -79,7 +79,6 @@ schedule_schema = {
     'additionalProperties': False
 }
 
-
 main_schema = {
     'oneOf': [
         {
@@ -95,7 +94,6 @@ main_schema = {
     ]
 }
 
-
 scheduler = None
 scheduler_job_map = {}
 
@@ -109,7 +107,7 @@ def run_job(tasks):
     """Add the execution to the queue and waits until it is finished"""
     log.debug('executing tasks: %s', tasks)
     finished_events = manager.execute(options={'tasks': tasks, 'cron': True}, priority=5)
-    for task_id, task_name, event in finished_events:
+    for _, task_name, event in finished_events:
         log.debug('task finished executing: %s', task_name)
         event.wait()
     log.debug('all tasks in schedule finished executing')
@@ -207,4 +205,3 @@ def stop_scheduler(manager):
 def register_config():
     register_config_key('schedules', main_schema)
     register_schema('/schema/config/schedule', schedule_schema)
-

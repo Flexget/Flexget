@@ -31,6 +31,6 @@ var mockStatesData = (function () {
 				}
 
 			}
-		]
+		];
 	}
-})();
+}());

@@ -1,9 +1,12 @@
-describe("Sidenav Component:", function () {
+/* global bard, sinon, mockStatesData */
+describe('Sidenav Component:', function () {
 	var component;
 	var mockStates = mockStatesData.getStates();
 
 	beforeEach(function () {
 		bard.appModule('components.sidenav');
+
+		/* global $componentController, routerHelper, sideNav, $rootScope */
 		bard.inject('$componentController', 'routerHelper', 'sideNavService', '$rootScope');
 
 		sinon.stub(routerHelper, 'getStates').returns(mockStates);
@@ -14,26 +17,26 @@ describe("Sidenav Component:", function () {
 		component = $componentController('sideNav');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 
-	describe("after activation", function () {
+	describe('after activation', function () {
 		beforeEach(function () {
 			component.$onInit();
 		});
 
-		it("should have items", function () {
+		it('should have items', function () {
 			expect(component.navItems).to.exist;
 			expect(component.navItems).to.have.length.above(0);
 		});
 
-		it("should filter the sidebar items correctly", function () {
+		it('should filter the sidebar items correctly', function () {
 			expect(component.navItems).to.have.length(mockStates.length - 1);
 		});
 	});
-	
-	describe("close()", function() {	
+
+	describe('close()', function() {
 		it('should exist', function () {
 			expect(component.close).to.exist;
 		});

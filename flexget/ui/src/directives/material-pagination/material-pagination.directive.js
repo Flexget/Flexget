@@ -18,7 +18,7 @@
       },
       link: pagingLink,
       templateUrl: 'directives/material-pagination/material-pagination.tmpl.html'
-    }
+    };
     return directive;
   }
 
@@ -27,7 +27,7 @@
       if(newValue) {
         updateButtons(scope, attributes);
       }
-    }, true)
+    }, true);
   }
 
   function addRange(start, end, scope) {
@@ -39,7 +39,7 @@
         action: function() {
           internalAction(scope, this.value);
         }
-      })
+      });
     }
   }
 
@@ -68,7 +68,7 @@
               internalAction(scope, prevPage);
             }
           }
-        }
+        };
         break;
 
       case 'next':
@@ -83,7 +83,7 @@
               internalAction(scope, nextPage);
             }
           }
-        }
+        };
         break;
     }
 
@@ -126,4 +126,4 @@
     setPrevNext(scope, pageCount, 'next');
   }
 
-})();
+}());

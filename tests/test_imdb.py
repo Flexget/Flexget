@@ -16,7 +16,6 @@ import pytest
 
 @pytest.mark.online
 class TestImdb(object):
-
     config = """
         tasks:
           test:
@@ -245,7 +244,6 @@ class TestImdb(object):
 
 @pytest.mark.online
 class TestImdbRequired(object):
-
     config = """
         tasks:
           test:
@@ -265,7 +263,6 @@ class TestImdbRequired(object):
 
 @pytest.mark.online
 class TestImdbLookup(object):
-
     config = """
         tasks:
           invalid url:

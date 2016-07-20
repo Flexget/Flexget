@@ -10,22 +10,22 @@ describe('Execute Routes:', function () {
 		bard.inject('$state', '$rootScope', '$location');
     });
 
-    it("should map state 'flexget.execute' to url #/execute", function () {
+    it('should map state \'flexget.execute\' to url #/execute', function () {
 		expect($state.href('flexget.execute', {})).to.equal('#/execute');
     });
 	
-	it.skip("should map state to the 'execute' component", function () {
+	it.skip('should map state to the \'execute\' component', function () {
 		expect($state.get('flexget.execute').component).to.equal('executeView');
 	});
 	
-	describe("Transitions", function() {
-		it("should work with $state.go", function () {
+	describe('Transitions', function() {
+		it('should work with $state.go', function () {
 			$state.go('flexget.execute');
 			$rootScope.$digest();
 			expect($state.is('flexget.execute')).to.be.true;
 		});
 		
-		it("should work with 'execute' path", function() {
+		it('should work with \'execute\' path', function() {
 			$location.path('execute');
 			$rootScope.$digest();
 			expect($state.is('flexget.execute')).to.be.true;

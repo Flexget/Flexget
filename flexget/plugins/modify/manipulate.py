@@ -38,7 +38,7 @@ class Manipulate(object):
         bundle = root.accept('list').accept('dict')
         # prevent invalid indentation level
         bundle.reject_keys(['from', 'extract', 'replace', 'phase'],
-            'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
+                           'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
         edit = bundle.accept_any_key('dict')
         edit.accept('choice', key='phase').accept_choices(['metainfo', 'filter', 'modify'], ignore_case=True)
         edit.accept('text', key='from')

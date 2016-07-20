@@ -34,6 +34,7 @@ class DiscoverEntry(Base):
     def __str__(self):
         return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (self.title, self.task, self.last_execution)
 
+
 Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
 
 
@@ -109,7 +110,7 @@ class Discover(object):
                         continue
 
                     if entry['title'] in entry_titles:
-                        log.verbose('Ignored duplicate title `%s`' % entry['title'])    # TODO: should combine?
+                        log.verbose('Ignored duplicate title `%s`' % entry['title'])  # TODO: should combine?
                         continue
 
                     entries.append(entry)
@@ -226,8 +227,8 @@ class Discover(object):
         interval_count = 0
         with Session() as session:
             for entry in entries:
-                de = session.query(DiscoverEntry).\
-                    filter(DiscoverEntry.title == entry['title']).\
+                de = session.query(DiscoverEntry). \
+                    filter(DiscoverEntry.title == entry['title']). \
                     filter(DiscoverEntry.task == task.name).first()
 
                 if not de:

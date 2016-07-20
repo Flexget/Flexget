@@ -31,7 +31,6 @@ except ImportError:
 log = logging.getLogger('subtitle_queue')
 Base = db_schema.versioned_base('subtitle_queue', 0)
 
-
 #: Video extensions stolen from https://github.com/Diaoul/subliminal/blob/master/subliminal/video.py
 VIDEO_EXTENSIONS = ('.3g2', '.3gp', '.3gp2', '.3gpp', '.60d', '.ajp', '.asf', '.asx', '.avchd', '.avi', '.bik',
                     '.bix', '.box', '.cam', '.dat', '.divx', '.dmf', '.dv', '.dvr-ms', '.evo', '.flc', '.fli',
@@ -41,9 +40,7 @@ VIDEO_EXTENSIONS = ('.3g2', '.3gp', '.3gp2', '.3gpp', '.60d', '.ajp', '.asf', '.
                     '.qt', '.ram', '.rm', '.rmvb', '.swf', '.ts', '.vfw', '.vid', '.video', '.viv', '.vivo', '.vob',
                     '.vro', '.wm', '.wmv', '.wmx', '.wrap', '.wvx', '.wx', '.x264', '.xvid')
 
-
 SUBTITLE_EXTENSIONS = ('.srt', '.sub', '.smi', '.txt', '.ssa', '.ass', '.mpl')  # Borrowed from Subliminal
-
 
 association_table = Table('association', Base.metadata,
                           Column('sub_queue_id', Integer, ForeignKey('subtitle_queue.id')),
@@ -69,7 +66,6 @@ class SubtitleLanguages(Base):
 
 
 class QueuedSubtitle(Base):
-
     __tablename__ = 'subtitle_queue'
 
     id = Column(Integer, primary_key=True)
@@ -163,7 +159,8 @@ class SubtitleQueue(object):
                 elif sub_item.alternate_path and os.path.exists(sub_item.alternate_path):
                     path = sub_item.alternate_path
                 elif not config['remove_not_found'] and \
-                        sub_item.added + parse_timedelta('24 hours') > datetime.combine(date.today(), time()):
+                    sub_item.added + parse_timedelta('24 hours') > datetime.combine(date.today(),
+                                                                                time()):
                     log.warning('File %s was not found. Deleting after %s.' %
                                 (sub_item.path, str(sub_item.added + parse_timedelta('24 hours'))))
                     continue

@@ -12,7 +12,6 @@ log = logging.getLogger('content_size')
 
 
 class FilterContentSize(object):
-
     schema = {
         'type': 'object',
         'properties': {

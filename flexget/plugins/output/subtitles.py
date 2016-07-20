@@ -10,8 +10,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-"""
-
+'''
 DRAFT
 
 class SubtitleQueue(Base):
@@ -38,10 +37,10 @@ TODO:
  * consume queue (look up by task name), configuration is available from task
  * remove successful downloads
  * remove queue items that are part retry: n days
-
-"""
+'''
 
 log = logging.getLogger('subtitles')
+
 
 # movie hash, won't work here though
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes#Python
@@ -100,7 +99,7 @@ class Subtitles(object):
         # configuration
         languages = config['languages']
         min_sub_rating = config['min_sub_rating']
-        match_limit = config['match_limit'] # no need to change this, but it should be configurable
+        match_limit = config['match_limit']  # no need to change this, but it should be configurable
 
         # loop through the entries
         for entry in entries:

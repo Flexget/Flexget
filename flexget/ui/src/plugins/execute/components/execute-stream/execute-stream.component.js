@@ -35,7 +35,7 @@
 					percent: 0,
 					entries: [],
 					status: 'pending'
-				}
+				};
 
 				vm.streamTasks.push(task);
 			}
@@ -91,4 +91,4 @@
 			vm.streamProgress = totalPercent / vm.streamTasks.length;
 		}
 	}
-})();
+}());

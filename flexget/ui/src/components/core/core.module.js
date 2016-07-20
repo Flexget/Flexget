@@ -1,10 +1,11 @@
+/* global angular */
 (function () {
     'use strict';
 
     angular
-        .module("components.core", [
+        .module('components.core', [
 			'ngMaterial',
 
 			'blocks.router'
 		]);
-})();
+}());

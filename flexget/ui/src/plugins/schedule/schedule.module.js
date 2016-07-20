@@ -11,4 +11,4 @@
 		]);
 	
 	registerPlugin('plugins.schedule');
-})();
+}());

@@ -1,8 +1,11 @@
+/* global bard */
 describe('Login Component:', function () {
 	var component, deferred;
 
 	beforeEach(function () {
 		bard.appModule('components.auth');
+
+		/* global $componentController, authService, $state, $q, $rootScope */
 		bard.inject('$componentController', 'authService', '$state', '$q', '$rootScope');
 	});
 
@@ -10,24 +13,24 @@ describe('Login Component:', function () {
 		component = $componentController('login');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 
-	describe("login()", function () {
+	describe('login()', function () {
 		beforeEach(function () {
 			deferred = $q.defer();
-			
+
 			sinon.stub(authService, 'login').returns(deferred.promise);
-		})
+		});
 		it('should exist', function () {
 			expect(component.login).to.exist;
 		});
 
 		it('should set the error variable to the error message when present', function () {
 			deferred.reject({
-				"message": "Invalid username or password",
-				"status": "failed"
+				'message': 'Invalid username or password',
+				'status': 'failed'
 			});
 
 			component.login();
@@ -59,6 +62,6 @@ describe('Login Component:', function () {
 			$rootScope.$digest();
 
 			expect(component.credentials.password).to.equal('');
-		})
+		});
 	});
 });

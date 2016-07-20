@@ -163,7 +163,7 @@ class OutputFtp(object):
         try:
             ftp.sendcmd("TYPE I")
             file_size = ftp.size(file_name)
-        except Exception as e:
+        except Exception:
             file_size = 1
 
         max_attempts = 5

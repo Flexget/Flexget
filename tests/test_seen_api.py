@@ -10,7 +10,6 @@ from flexget.utils import json
 
 
 class TestSeenAPI(object):
-
     config = 'tasks: {}'
 
     @patch.object(seen, 'search')

@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -6,6 +7,6 @@
 		.config(configInterceptor);
 
 	function configInterceptor($httpProvider) {
-		$httpProvider.interceptors.push('urlInterceptor')
+		$httpProvider.interceptors.push('urlInterceptor');
 	}
-})();
+}());

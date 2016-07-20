@@ -10,7 +10,6 @@ log = logging.getLogger('extension')
 
 
 class ModifyExtension(object):
-
     """
         Allows specifying file extension explicitly when all other built-in detection mechanisms fail.
 

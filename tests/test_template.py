@@ -60,7 +60,6 @@ class TestTemplate(object):
 
 
 class TestTemplateMerge(object):
-
     config = """
         templates:
           movies:

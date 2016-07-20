@@ -134,7 +134,7 @@ class SearchRarBG(object):
             # error code 20 just means no results were found
             if r.get('error_code') == 20:
                 searched_string = params.get('search_string') or 'imdb={0}'.format(params.get('search_imdb')) or \
-                                  'tvdb={0}'.format(params.get('tvdb_id'))
+                    'tvdb={0}'.format(params.get('tvdb_id'))
                 log.debug('No results found for %s', searched_string)
                 continue
             elif r.get('error'):

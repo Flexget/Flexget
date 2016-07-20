@@ -139,7 +139,7 @@ def movie_list_del(options):
         except NoResultFound:
             console('Could not find movie list with name {}'.format(options.list_name))
             return
-        title, year = split_title_year(options.movie_title)
+        title = split_title_year(options.movie_title)[0]
         movie_exist = get_movie_by_title(list_id=movie_list.id, title=title, session=session)
         if movie_exist:
             console('Removing movie %s from list %s' % (options.movie_title, options.list_name))

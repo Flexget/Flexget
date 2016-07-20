@@ -22,6 +22,7 @@ log = logging.getLogger('ftp_list')
 
 
 class FTPList(object):
+
     def __init__(self):
         self.username = None
         self.password = None
@@ -105,8 +106,8 @@ class FTPList(object):
                 for _object in ftp.listdir(path):
                     content = ftp.path.join('./', path, _object)
                     if ('files' in content_types and ftp.path.isfile(content)) or (
-                                    'dirs' in content_types and ftp.path.isdir(content)) or (
-                                    'symlinks' in content_types and ftp.path.islink(content)):
+                            'dirs' in content_types and ftp.path.isdir(content)) or (
+                            'symlinks' in content_types and ftp.path.islink(content)):
                         log.debug('type match successful for object %s, trying to create entry', content)
                         content_list.append(content)
         return content_list
@@ -136,8 +137,8 @@ class FTPList(object):
             raise PluginError('Could not connect to FTP: {}'.format(e.args[0]))
 
         entries = []
-        for dir in directories:
-            for content in self.get_content(dir, recursion, recursion_depth, content_types):
+        for d in directories:
+            for content in self.get_content(d, recursion, recursion_depth, content_types):
                 entries.append(self._to_entry(content))
         return entries
 

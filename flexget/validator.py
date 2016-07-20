@@ -42,7 +42,7 @@ class Errors(object):
         """Removes level from path by depth number"""
         if self.path_level is None:
             raise Exception('no path level')
-        del(self.path[self.path_level])
+        del (self.path[self.path_level])
         self.path_level -= 1
 
     def path_update_value(self, value):
@@ -50,6 +50,7 @@ class Errors(object):
         if self.path_level is None:
             raise Exception('no path level')
         self.path[self.path_level] = value
+
 
 # A registry mapping validator names to their class
 registry = {}
@@ -493,6 +494,7 @@ class QualityRequirementsValidator(TextValidator):
     def _schema(self):
         return {'type': 'string', 'format': 'qualityRequirements'}
 
+
 # ---- TESTING ----
 
 
@@ -541,19 +543,11 @@ def build_options_validator(options):
 
 
 def complex_test():
-
     def build_list(series):
         """Build series list to series."""
         series.accept('text')
         series.accept('number')
         bundle = series.accept('dict')
-        # prevent invalid indentation level
-        """
-        bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp',
-            'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality',
-            'max_quality', 'qualities', 'exact', 'from_group'],
-            'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
-        """
         bundle.accept_any_key('path')
         options = bundle.accept_any_key('dict')
         build_options_validator(options)
@@ -588,6 +582,7 @@ def complex_test():
 
 if __name__ == '__main__':
     from flexget.plugins.input.rss import InputRSS
+
     # v = complex_test()
     v = InputRSS().validator()
     schema = v.schema()

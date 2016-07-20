@@ -1,8 +1,9 @@
+/* global angular */
 (function () {
     'use strict';
 
     angular
-        .module("components.core")
+        .module('components.core')
         .config(themesConfig);
 
 	function themesConfig($mdThemingProvider) {
@@ -16,4 +17,4 @@
 			.warnPalette('amber');
 	}
 
-})();
+}());

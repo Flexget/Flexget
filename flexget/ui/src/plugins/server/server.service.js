@@ -1,18 +1,20 @@
+/* global angular */
 (function () {
     'use strict';
 
-    angular.module('plugins.server')
+    angular
+		.module('plugins.server')
         .factory('serverService', serverService);
 
     function serverService($http, $mdDialog, $window) {
 		var dialog = {
-			template: '<loading-dialog title="vm.title" action="vm.action"></loading-dialog>',
+			template: '<loading-dialog title=\'vm.title\' action=\'vm.action\'></loading-dialog>',
 			bindToController: true,
 			controllerAs: 'vm',
 			controller: function () { },
 			locals: {
-				title: "No title",
-				action: undefined
+				title: 'No title',
+				action: null
 			}
 		};
 
@@ -22,7 +24,7 @@
 		};
 
 		function reload() {
-			dialog.locals.title = "Config Reloading";
+			dialog.locals.title = 'Config Reloading';
 			dialog.locals.action = doReload;
 			$mdDialog.show(dialog);
 		}
@@ -35,7 +37,7 @@
 					.ok('Shutdown')
 					.cancel('Cancel')
 			).then(function () {
-				dialog.locals.title = "Shutting Down";
+				dialog.locals.title = 'Shutting Down';
 				dialog.locals.action = doShutdown;
 				$mdDialog.show(dialog);
 			});
@@ -48,17 +50,17 @@
 
 			function reloadSuccess() {
 				var response = {
-					title: "Reload Success",
-					message: "Config has been successfully reloaded"
-				}
+					title: 'Reload Success',
+					message: 'Config has been successfully reloaded'
+				};
 				return response;
 			}
-			
+
 			function reloadFailed(error) {
 				var response = {
-					title: "Reload Failed",
+					title: 'Reload Failed',
 					message: error.data.message
-				}
+				};
 				return response;
 			}
         }
@@ -72,19 +74,19 @@
 
 			function shutdownSuccess() {
 				var response = {
-					title: "Shutdown Success",
-					message: "Flexget has been shutdown"
-				}
+					title: 'Shutdown Success',
+					message: 'Flexget has been shutdown'
+				};
 				return response;
 			}
-			
+
 			function shutdownFailed(error) {
 				var response = {
-					title: "Shutdown Failed",
+					title: 'Shutdown Failed',
 					message: error.data.message
-				}
+				};
 				return response;
 			}
         }
     }
-})();
+}());

@@ -554,10 +554,7 @@ class SeriesEpisodesAPI(APIResource):
 
         order = args['order']
         # In case the default 'desc' order was received
-        if order == 'desc':
-            order = True
-        else:
-            order = False
+        descending = bool(order == 'desc')
 
         start = page_size * (page - 1)
         stop = start + page_size
@@ -565,7 +562,7 @@ class SeriesEpisodesAPI(APIResource):
         kwargs = {
             'start': start,
             'stop': stop,
-            'descending': order,
+            'descending': descending,
             'session': session
         }
 
@@ -700,7 +697,7 @@ class SeriesReleasesAPI(APIResource):
     def get(self, show_id, ep_id, session):
         """ Get all episodes releases by show ID and episode ID """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
@@ -735,7 +732,7 @@ class SeriesReleasesAPI(APIResource):
     def delete(self, show_id, ep_id, session):
         """ Deletes all episodes releases by show ID and episode ID """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
@@ -769,7 +766,7 @@ class SeriesReleasesAPI(APIResource):
     def put(self, show_id, ep_id, session):
         """ Marks all downloaded releases as not downloaded """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
@@ -810,7 +807,7 @@ class SeriesReleaseAPI(APIResource):
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = series.episode_by_id(ep_id, session)
+            series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
@@ -841,13 +838,13 @@ class SeriesReleaseAPI(APIResource):
     def delete(self, show_id, ep_id, rel_id, session):
         ''' Delete episode release by show ID, episode ID and release ID '''
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = series.episode_by_id(ep_id, session)
+            series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
@@ -877,13 +874,13 @@ class SeriesReleaseAPI(APIResource):
     def put(self, show_id, ep_id, rel_id, session):
         """ Resets a downloaded release status """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = series.episode_by_id(ep_id, session)
+            series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id

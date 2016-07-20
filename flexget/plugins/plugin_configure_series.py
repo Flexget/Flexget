@@ -26,7 +26,6 @@ class LastHash(Base):
 
 
 class ConfigureSeries(FilterSeriesBase):
-
     """Generates series configuration from any input (supporting API version 2, soon all)
 
     Configuration::

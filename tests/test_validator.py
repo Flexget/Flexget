@@ -9,7 +9,6 @@ from flexget import validator
 
 
 class TestValidator(object):
-
     def test_default(self):
         root = validator.factory()
         assert root.name == 'root', 'expected root'

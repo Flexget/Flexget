@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 
 	angular
@@ -13,11 +14,11 @@
 
 	function seriesBeginDialogController($mdDialog, seriesService) {
 		var vm = this;
-		
+
 		vm.cancel = cancel;
 		vm.$onInit = activate;
 		vm.saveBegin = saveBegin;
-		
+
 		function activate() {
 			vm.begin = vm.show.begin_episode.episode_identifier;
 			vm.originalBegin = angular.copy(vm.begin);
@@ -31,11 +32,11 @@
 			//TODO: Error handling
 			var params = {
 				episode_identifier: vm.begin
-			}
+			};
 
-			seriesService.updateShow(vm.show, params).then(function (data) {
+			seriesService.updateShow(vm.show, params).then(function () {
 				$mdDialog.hide(vm.begin);
 			});
 		}
 	}
-})();
+}());

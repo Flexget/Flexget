@@ -104,6 +104,7 @@ lookup_parser.add_argument('include_translations', type=inputs.boolean, help='In
 @trakt_api.route('/series/<string:title>/')
 @api.doc(params={'title': 'Series name'})
 class TraktSeriesSearchApi(APIResource):
+
     @api.response(200, 'Successfully found show', series_return_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.doc(parser=lookup_parser)
@@ -130,6 +131,7 @@ class TraktSeriesSearchApi(APIResource):
 @trakt_api.route('/movies/<string:title>/')
 @api.doc(params={'title': 'Movie name'})
 class TraktMovieSearchApi(APIResource):
+
     @api.response(200, 'Successfully found show', movie_return_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.doc(parser=lookup_parser)

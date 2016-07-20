@@ -21,7 +21,6 @@ from flexget.utils.template import RenderError
 log = logging.getLogger('subtitle_list')
 Base = versioned_base('subtitle_list', 1)
 
-
 #: Video extensions stolen from https://github.com/Diaoul/subliminal/blob/master/subliminal/video.py
 VIDEO_EXTENSIONS = ('.3g2', '.3gp', '.3gp2', '.3gpp', '.60d', '.ajp', '.asf', '.asx', '.avchd', '.avi', '.bik',
                     '.bix', '.box', '.cam', '.dat', '.divx', '.dmf', '.dv', '.dvr-ms', '.evo', '.flc', '.fli',
@@ -277,8 +276,8 @@ class PluginSubtitleList(object):
                 if os.path.isdir(item['location']):
                     base_depth = len(normalize_path(item['location']).split(os.sep))
                     max_depth = base_depth + recursion_depth
-                    for root, dirs, files in os.walk(item['location']):
-                        current_depth = len(root.split(os.sep))
+                    for root_dir, _, files in os.walk(item['location']):
+                        current_depth = len(root_dir.split(os.sep))
                         if current_depth > max_depth:
                             break
                         for file in files:
@@ -286,7 +285,7 @@ class PluginSubtitleList(object):
                                 log.debug('File %s is not a video file. Skipping', file)
                                 continue
                             num_potential_files += 1
-                            file_path = normalize_path(os.path.join(root, file))
+                            file_path = normalize_path(os.path.join(root_dir, file))
                             if not config['check_subtitles'] or not self.all_subtitles_exist(file_path, languages):
                                 subtitle_list.config['languages'] = languages
                                 subtitle_list.add(Entry(title=os.path.splitext(os.path.basename(file_path))[0],
