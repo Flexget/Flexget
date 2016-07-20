@@ -225,7 +225,7 @@ class SeenSearchAPI(APIResource):
 @api.doc(params={'seen_entry_id': 'ID of seen entry'}, description='Delete a specific seen entry via its ID')
 @api.response(500, 'Delete process failed', model=default_error_schema)
 @api.response(200, 'Successfully deleted entry', empty_response)
-class SeenSearchAPI(APIResource):
+class SeenSearchIDAPI(APIResource):
     def delete(self, seen_entry_id, session):
         """ Delete seen entry by ID """
         try:
