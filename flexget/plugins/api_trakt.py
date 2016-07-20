@@ -20,7 +20,7 @@ from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
-from flexget.utils import requests, json
+from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.tools import TimedDict
