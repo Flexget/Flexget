@@ -1,8 +1,9 @@
+/* global angular */
 (function () {
     'use strict';
 
     angular
-		.module("plugins.server")
+		.module('plugins.server')
 		.run(appRun);
 
 	function appRun(serverService, toolBarService) {
@@ -13,7 +14,7 @@
 			icon: 'refresh',
 			action: serverService.reload,
 			order: 127
-		}
+		};
 
 		var shutdownButton = {
 			menu: 'Manage',
@@ -22,8 +23,8 @@
 			icon: 'power-off',
 			action: serverService.shutdown,
 			order: 128
-        }
-		
+        };
+
 		toolBarService.registerItem(reloadButton);
 		toolBarService.registerItem(shutdownButton);
 	}
