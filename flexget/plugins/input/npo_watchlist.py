@@ -21,7 +21,7 @@ class NPOWatchlist(object):
     """
         Produces entries for every episode on the user's npo.nl watchlist (Dutch public television).
         Entries can be downloaded using https://bitbucket.org/Carpetsmoker/download-npo
-        
+
         If 'remove_accepted' is set to 'yes', the plugin will delete accepted entries from the watchlist after download
         is complete.
         
@@ -34,7 +34,7 @@ class NPOWatchlist(object):
             exec:
               fail_entries: yes
               auto_escape: yes
-              on_output: 
+              on_output:
                 for_accepted:
                   - download-npo -o "path/to/directory/{{series_name_plain}}" -f "{serie_titel} - {datum} {aflevering_titel} ({episode_id})" -t {{url}}
         """

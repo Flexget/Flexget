@@ -29,7 +29,7 @@ class UoccinLookup(object):
     @plugin.priority(100)
     def on_task_metainfo(self, task, config):
         """Retrieves all the information found in the uoccin.json file for the entries.
-        
+
         Example::
             
             uoccin_lookup: /path/to/gdrive/uoccin

@@ -14,9 +14,9 @@ log = logging.getLogger('check_subtitles')
 class MetainfoSubs(object):
     """
     Set 'subtitles' field for entries, if they are local video files with subs.
-    The field is a list of language codes (3-letter ISO-639-3) for each subtitles 
+    The field is a list of language codes (3-letter ISO-639-3) for each subtitles
     file found on disk and/or subs track found inside video (for MKVs).
-    Special "und" code is for unidentified language (i.e. files without language 
+    Special "und" code is for unidentified language (i.e. files without language
     code before extension).
     """
 

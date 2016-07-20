@@ -45,7 +45,7 @@ class FromUoccin(object):
 
     def on_task_input(self, task, config):
         """Creates an entry for each item in your uoccin watchlist.
-        
+
         Example::
             
             from_uoccin:
