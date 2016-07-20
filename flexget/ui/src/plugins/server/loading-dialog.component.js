@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -15,7 +16,7 @@
 
 	function loadingDialogController($mdDialog) {
 		var vm = this;
-		
+
 		vm.$onInit = activate;
 		vm.close = close;
 
