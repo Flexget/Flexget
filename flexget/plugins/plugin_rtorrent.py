@@ -637,7 +637,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
             entry = Entry(
                 title=torrent['name'],
                 url='%s/%s' % (os.path.expanduser(config['uri']),
-                torrent['hash']),
+                               torrent['hash']),
                 path=torrent['base_path'],
                 torrent_info_hash=torrent['hash'],
             )

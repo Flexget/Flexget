@@ -36,7 +36,6 @@ class Matcher(object):
 
 @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpc_client.ServerProxy')
 class TestRTorrentClient(object):
-
     def test_version(self, mocked_proxy):
         mocked_client = mocked_proxy()
         mocked_client.system.client_version.return_value = '0.9.4'
@@ -209,7 +208,6 @@ class TestRTorrentClient(object):
 
 @mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
 class TestRTorrentOutputPlugin(object):
-
     config = """
         tasks:
           test_add_torrent:
@@ -349,7 +347,6 @@ class TestRTorrentOutputPlugin(object):
 
 @mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
 class TestRTorrentInputPlugin(object):
-
     config = """
         tasks:
           test_input:

@@ -122,7 +122,6 @@ def send_email(subject, content, config):
 
 
 class OutputEmail(object):
-
     """
     Send an e-mail with the list of all succeeded (downloaded) entries.
 

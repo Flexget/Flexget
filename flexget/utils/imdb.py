@@ -52,7 +52,6 @@ def make_url(imdb_id):
 
 
 class ImdbSearch(object):
-
     def __init__(self):
         # de-prioritize aka matches a bit
         self.aka_weight = 0.95

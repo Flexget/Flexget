@@ -153,7 +153,6 @@ class TestSchemaValidator(object):
 
 
 class TestSchemaFormats(object):
-
     def _test_format(self, format, items, invalid=False):
         failures = []
         for item in items:
@@ -182,7 +181,7 @@ class TestSchemaFormats(object):
             '20GB',
             '2TiB',
             '2TB',
-            ]
+        ]
 
         invalid_sizes = [
             '1AiB',
@@ -235,7 +234,6 @@ class TestSchemaFormats(object):
 
 
 class TestFormatParsers(object):
-
     def _test_parser(self, parser, items):
         failures = []
         for item in items:
@@ -260,7 +258,7 @@ class TestFormatParsers(object):
             ('20GB', 21474836480),
             ('2TiB', 2199023255552),
             ('2TB', 2199023255552),
-            ]
+        ]
 
         failures = self._test_parser(config_schema.parse_size, size_tests)
 

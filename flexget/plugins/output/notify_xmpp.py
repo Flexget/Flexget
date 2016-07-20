@@ -10,12 +10,12 @@ from flexget.config_schema import one_or_more
 
 log = logging.getLogger('notify_xmpp')
 
-
 try:
     import sleekxmpp
-    
+
+
     class SendMsgBot(sleekxmpp.ClientXMPP):
-    
+
         def __init__(self, jid, password, recipients, message):
             sleekxmpp.ClientXMPP.__init__(self, jid, password)
             self.recipients = recipients
@@ -23,7 +23,7 @@ try:
             self.add_event_handler("session_start", self.start, threaded=True)
             self.register_plugin('xep_0030')  # Service Discovery
             self.register_plugin('xep_0199')  # XMPP Ping
-    
+
         def start(self, xmpp_event):
             for recipient in self.recipients:
                 self.send_presence(pto=recipient)
@@ -33,10 +33,9 @@ try:
 except ImportError:
     # If sleekxmpp is not found, errors will be shown later
     pass
-        
+
 
 class OutputNotifyXmpp(object):
-    
     schema = {
         'type': 'object',
         'properties': {
@@ -49,7 +48,7 @@ class OutputNotifyXmpp(object):
         'required': ['sender', 'password', 'recipients'],
         'additionalProperties': False
     }
-    
+
     __version__ = '0.1'
 
     def on_task_start(self, task, config):
@@ -68,7 +67,7 @@ class OutputNotifyXmpp(object):
                 raise plugin.DependencyError('notify_xmpp',
                                              'dnspython',
                                              'dnspython module required. ImportError: %s' % e)
-    
+
     def on_task_output(self, task, config):
         """
         Configuration::
@@ -78,7 +77,7 @@ class OutputNotifyXmpp(object):
         """
         if not config or not task.accepted:
             return
-        
+
         title = config['title']
         try:
             title = render_from_task(title, task)
@@ -92,7 +91,7 @@ class OutputNotifyXmpp(object):
             except RenderError as e:
                 log.error('Error setting text message: %s' % e)
         text = '%s\n%s' % (title, '\n'.join(items))
-        
+
         log.verbose('Send XMPP notification about: %s', ' - '.join(items))
         logging.getLogger('sleekxmpp').setLevel(logging.CRITICAL)
 

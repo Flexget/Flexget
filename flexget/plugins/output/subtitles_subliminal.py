@@ -45,7 +45,7 @@ class PluginSubliminal(object):
           single: no
           directory: /disk/subtitles
     """
-    
+
     schema = {
         'type': 'object',
         'properties': {
@@ -73,7 +73,7 @@ class PluginSubliminal(object):
         except ImportError as e:
             log.debug('Error importing Subliminal: %s', e)
             raise plugin.DependencyError('subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e)
-    
+
     def on_task_output(self, task, config):
         """
         Configuration::

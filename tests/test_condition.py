@@ -3,7 +3,6 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 
 class TestCondition(object):
-
     config = """
         templates:
           global:
@@ -70,7 +69,6 @@ class TestCondition(object):
 
 
 class TestQualityCondition(object):
-
     config = """
         templates:
           global:

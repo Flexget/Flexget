@@ -22,13 +22,13 @@ class InputPersist(object):
         self.hasrun = True
         return [Entry(title='Test', url='http://test.com')]
 
+
 plugin.register(InputPersist, 'test_input', api_ver=2)
 
 
 @pytest.mark.filecopy('rss.xml', '__tmp__/cached.xml')
 @pytest.mark.usefixtures('tmpdir')
 class TestInputCache(object):
-
     config = """
         tasks:
           test_memory:

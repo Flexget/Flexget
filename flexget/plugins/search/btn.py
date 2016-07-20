@@ -39,14 +39,13 @@ class SearchBTN(object):
                 if entry.get('series_id_type') == 'sequence':
                     search['name'] = 'S01E%02d' % entry['series_id']
                 else:
-                    search['name'] = entry['series_id'] + '%' # added wildcard search for better results.
+                    search['name'] = entry['series_id'] + '%'  # added wildcard search for better results.
             searches = [search]
             # If searching by series name ending in a parenthetical, try again without it if there are no results.
             if search.get('series') and search['series'].endswith(')'):
                 match = re.match('(.+)\([^\(\)]+\)$', search['series'])
                 if match:
                     searches.append(dict(search, series=match.group(1).strip()))
-
 
         results = set()
         for search in searches:

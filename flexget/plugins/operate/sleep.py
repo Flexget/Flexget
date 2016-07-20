@@ -12,7 +12,7 @@ log = logging.getLogger('sleep')
 
 class PluginSleep(object):
     """Causes a pause to occur during the specified phase of a task"""
-    
+
     schema = {
         'oneOf': [
             {

@@ -35,6 +35,7 @@ def str_to_int(string):
     except ValueError:
         return None
 
+
 if PY2:
     def native_str_to_text(string, **kwargs):
         if 'encoding' not in kwargs:
@@ -375,7 +376,8 @@ class TimedDict(MutableMapping):
         return len(list(self.__iter__()))
 
     def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__, dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))))
+        return '%s(%r)' % (
+            self.__class__.__name__, dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))))
 
 
 class BufferQueue(queue.Queue):

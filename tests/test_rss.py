@@ -6,7 +6,6 @@ import yaml
 
 
 class TestInputRSS(object):
-
     config = """
         tasks:
           _:
@@ -55,18 +54,18 @@ class TestInputRSS(object):
 
         # normal entry
         assert task.find_entry(title='Normal', url='http://localhost/normal',
-                                    description='Description, normal'), \
+                               description='Description, normal'), \
             'RSS entry missing: normal'
 
         # multiple enclosures
         assert task.find_entry(title='Multiple enclosures', url='http://localhost/enclosure1',
-                                    filename='enclosure1', description='Description, multiple'), \
+                               filename='enclosure1', description='Description, multiple'), \
             'RSS entry missing: enclosure1'
         assert task.find_entry(title='Multiple enclosures', url='http://localhost/enclosure2',
-                                    filename='enclosure2', description='Description, multiple'), \
+                               filename='enclosure2', description='Description, multiple'), \
             'RSS entry missing: enclosure2'
         assert task.find_entry(title='Multiple enclosures', url='http://localhost/enclosure3',
-                                    filename='enclosure3', description='Description, multiple'), \
+                               filename='enclosure3', description='Description, multiple'), \
             'RSS entry missing: enclosure3'
 
         # zero sized enclosure should not pick up filename (some idiotic sites)
@@ -83,8 +82,8 @@ class TestInputRSS(object):
 
         # pick link from guid
         assert task.find_entry(title='Guid link', url='http://localhost/guid',
-                                    description='Description, guid'), \
-                                    'RSS entry missing: guid'
+                               description='Description, guid'), \
+            'RSS entry missing: guid'
 
         # empty title, should be skipped
         assert not task.find_entry(description='Description, empty title'), \
@@ -120,7 +119,7 @@ class TestInputRSS(object):
     def test_multiple_links(self, execute_task):
         task = execute_task('test_multiple_links')
         entry = task.find_entry(title='Guid link', url='http://localhost/guid',
-                                    description='Description, guid')
+                                description='Description, guid')
         assert entry['urls'] == ['http://localhost/guid', 'http://localhost/otherlink'], \
             'Failed to set urls with both links'
 
@@ -149,7 +148,6 @@ class TestInputRSS(object):
 
 @pytest.mark.online
 class TestRssOnline(object):
-
     config = """
         tasks:
           normal:

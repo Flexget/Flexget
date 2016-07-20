@@ -16,7 +16,6 @@ log = logging.getLogger('regexp')
 
 
 class FilterRegexp(object):
-
     """
         All possible forms.
 

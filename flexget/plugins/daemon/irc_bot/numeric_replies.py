@@ -1,4 +1,3 @@
-
 REPLY_CODES = {
     '0': 'RPLNONE',
     # INITIAL

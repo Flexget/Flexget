@@ -42,7 +42,7 @@ class Errors(object):
         """Removes level from path by depth number"""
         if self.path_level is None:
             raise Exception('no path level')
-        del(self.path[self.path_level])
+        del (self.path[self.path_level])
         self.path_level -= 1
 
     def path_update_value(self, value):
@@ -50,6 +50,7 @@ class Errors(object):
         if self.path_level is None:
             raise Exception('no path level')
         self.path[self.path_level] = value
+
 
 # A registry mapping validator names to their class
 registry = {}
@@ -493,6 +494,7 @@ class QualityRequirementsValidator(TextValidator):
     def _schema(self):
         return {'type': 'string', 'format': 'qualityRequirements'}
 
+
 # ---- TESTING ----
 
 
@@ -541,7 +543,6 @@ def build_options_validator(options):
 
 
 def complex_test():
-
     def build_list(series):
         """Build series list to series."""
         series.accept('text')
@@ -588,6 +589,7 @@ def complex_test():
 
 if __name__ == '__main__':
     from flexget.plugins.input.rss import InputRSS
+
     # v = complex_test()
     v = InputRSS().validator()
     schema = v.schema()

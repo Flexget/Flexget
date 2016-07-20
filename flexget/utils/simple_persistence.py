@@ -167,7 +167,6 @@ class SimplePersistence(MutableMapping):
 
 
 class SimpleTaskPersistence(SimplePersistence):
-
     def __init__(self, task):
         self.task = task
         self.taskname = task.name

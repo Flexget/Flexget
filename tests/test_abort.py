@@ -16,7 +16,6 @@ def register():
 
 
 class TestAbort(object):
-
     config = """
         tasks:
           test:

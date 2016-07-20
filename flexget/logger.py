@@ -122,6 +122,7 @@ def console(text, *args, **kwargs):
 
 class RollingBuffer(collections.deque):
     """File-like that keeps a certain number of lines of text in memory."""
+
     def write(self, line):
         self.append(line)
 

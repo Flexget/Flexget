@@ -26,7 +26,6 @@ class PogcalShow(Base):
 
 
 class PogcalAcquired(object):
-
     schema = {
         'type': 'object',
         'properties': {

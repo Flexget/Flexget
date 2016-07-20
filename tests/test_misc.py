@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-
 import os
 import stat
 
@@ -47,7 +46,6 @@ class TestDisableBuiltins(object):
 
 @pytest.mark.online
 class TestInputHtml(object):
-
     config = """
         tasks:
           test:
@@ -60,7 +58,6 @@ class TestInputHtml(object):
 
 
 class TestPriority(object):
-
     config = """
         tasks:
           test:
@@ -96,7 +93,6 @@ class TestPriority(object):
 
 
 class TestImmortal(object):
-
     config = """
         tasks:
           test:
@@ -116,7 +112,6 @@ class TestImmortal(object):
 
 @pytest.mark.online
 class TestDownload(object):
-
     config = """
         tasks:
           test:
@@ -149,7 +144,6 @@ class TestDownload(object):
 
 
 class TestEntryUnicodeError(object):
-
     def test_encoding(self):
         e = Entry('title', 'url')
         with pytest.raises(EntryUnicodeError):
@@ -157,7 +151,6 @@ class TestEntryUnicodeError(object):
 
 
 class TestFilterRequireField(object):
-
     config = """
         tasks:
           test:
@@ -187,7 +180,6 @@ class TestFilterRequireField(object):
 
 
 class TestHtmlUtils(object):
-
     def test_decode_html(self):
         """utils decode_html"""
         from flexget.utils.tools import decode_html
@@ -205,7 +197,6 @@ class TestHtmlUtils(object):
 
 
 class TestSetPlugin(object):
-
     config = """
         templates:
           global:
@@ -257,8 +248,8 @@ class TestSetPlugin(object):
         assert entry['otherfield'] == ''
         assert entry['alu'] == 'alu'
         entry = task.find_entry('entries', title='Entry 2')
-        assert entry['field'] is None,\
-                '`field` should be None when jinja rendering fails'
+        assert entry['field'] is None, \
+            '`field` should be None when jinja rendering fails'
         assert entry['otherfield'] == 'no series'
 
     def test_non_string(self, execute_task):

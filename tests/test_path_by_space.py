@@ -10,7 +10,6 @@ from flexget.config_schema import parse_size
 
 
 def mock_os_disk_stats(folder):
-
     used, total = os.path.basename(folder).split(',')
 
     used_bytes = parse_size(used)
@@ -22,7 +21,6 @@ def mock_os_disk_stats(folder):
 
 @mock.patch('flexget.plugins.modify.path_by_space.os_disk_stats', side_effect=mock_os_disk_stats)
 class TestPathSelect(object):
-
     config = """
         tasks:
           test_most_free:
@@ -105,7 +103,7 @@ class TestPathSelect(object):
         from flexget.config_schema import format_checker
         monkeypatch.delitem(format_checker.checkers, 'path')
 
-    def test_most_free(self, disk_static_fun, no_path_validation,  execute_task):
+    def test_most_free(self, disk_static_fun, no_path_validation, execute_task):
         task = execute_task('test_most_free')
         assert task.entries[0].get('path') == "/data/1G,100G"
 
@@ -150,4 +148,3 @@ class TestPathSelect(object):
                 '/data/90G,100G',
                 '/data/90.5G,100G',
             ], "path %s not in list" % task.entries[0].get('path')
-

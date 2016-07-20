@@ -19,7 +19,6 @@ log = logging.getLogger('proper_movies')
 
 
 class ProperMovie(Base):
-
     __tablename__ = 'proper_movies'
 
     id = Column(Integer, primary_key=True)
@@ -35,7 +34,7 @@ class ProperMovie(Base):
 
     def __repr__(self):
         return '<ProperMovie(title=%s,task=%s,imdb_id=%s,quality=%s,proper_count=%s,added=%s)>' % \
-            (self.title, self.task, self.imdb_id, self.quality, self.proper_count, self.added)
+               (self.title, self.task, self.imdb_id, self.quality, self.proper_count, self.added)
 
 
 # create index
@@ -108,9 +107,9 @@ class FilterProperMovies(object):
             log.debug('imdb_id: %s' % entry['imdb_id'])
             log.debug('current proper count: %s' % parser.proper_count)
 
-            proper_movie = task.session.query(ProperMovie).\
-                filter(ProperMovie.imdb_id == entry['imdb_id']).\
-                filter(ProperMovie.quality == quality).\
+            proper_movie = task.session.query(ProperMovie). \
+                filter(ProperMovie.imdb_id == entry['imdb_id']). \
+                filter(ProperMovie.quality == quality). \
                 order_by(desc(ProperMovie.proper_count)).first()
 
             if not proper_movie:
@@ -159,9 +158,9 @@ class FilterProperMovies(object):
             log.debug('imdb_id: %s' % entry['imdb_id'])
             log.debug('proper count: %s' % parser.proper_count)
 
-            proper_movie = task.session.query(ProperMovie).\
-                filter(ProperMovie.imdb_id == entry['imdb_id']).\
-                filter(ProperMovie.quality == quality).\
+            proper_movie = task.session.query(ProperMovie). \
+                filter(ProperMovie.imdb_id == entry['imdb_id']). \
+                filter(ProperMovie.quality == quality). \
                 filter(ProperMovie.proper_count == parser.proper_count).first()
 
             if not proper_movie:

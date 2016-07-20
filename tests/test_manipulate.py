@@ -3,7 +3,6 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 
 class TestManipulate(object):
-
     config = """
         tasks:
 

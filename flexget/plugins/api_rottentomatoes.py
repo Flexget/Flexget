@@ -56,21 +56,21 @@ def upgrade(ver, session):
 
 # association tables
 genres_table = Table('rottentomatoes_movie_genres', Base.metadata,
-    Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
-    Column('genre_id', Integer, ForeignKey('rottentomatoes_genres.id')),
-    Index('ix_rottentomatoes_movie_genres', 'movie_id', 'genre_id'))
+                     Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
+                     Column('genre_id', Integer, ForeignKey('rottentomatoes_genres.id')),
+                     Index('ix_rottentomatoes_movie_genres', 'movie_id', 'genre_id'))
 Base.register_table(genres_table)
 
 actors_table = Table('rottentomatoes_movie_actors', Base.metadata,
-    Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
-    Column('actor_id', Integer, ForeignKey('rottentomatoes_actors.id')),
-    Index('ix_rottentomatoes_movie_actors', 'movie_id', 'actor_id'))
+                     Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
+                     Column('actor_id', Integer, ForeignKey('rottentomatoes_actors.id')),
+                     Index('ix_rottentomatoes_movie_actors', 'movie_id', 'actor_id'))
 Base.register_table(actors_table)
 
 directors_table = Table('rottentomatoes_movie_directors', Base.metadata,
-    Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
-    Column('director_id', Integer, ForeignKey('rottentomatoes_directors.id')),
-    Index('ix_rottentomatoes_movie_directors', 'movie_id', 'director_id'))
+                        Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
+                        Column('director_id', Integer, ForeignKey('rottentomatoes_directors.id')),
+                        Index('ix_rottentomatoes_movie_directors', 'movie_id', 'director_id'))
 Base.register_table(directors_table)
 
 
@@ -90,7 +90,6 @@ class RottenTomatoesContainer(object):
 
 
 class RottenTomatoesMovie(RottenTomatoesContainer, Base):
-
     __tablename__ = 'rottentomatoes_movies'
 
     id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
@@ -138,7 +137,6 @@ class RottenTomatoesMovie(RottenTomatoesContainer, Base):
 
 
 class RottenTomatoesGenre(Base):
-
     __tablename__ = 'rottentomatoes_genres'
 
     id = Column(Integer, primary_key=True)
@@ -149,7 +147,6 @@ class RottenTomatoesGenre(Base):
 
 
 class ReleaseDate(Base):
-
     __tablename__ = 'rottentomatoes_releasedates'
 
     db_id = Column(Integer, primary_key=True)
@@ -164,7 +161,6 @@ class ReleaseDate(Base):
 
 
 class RottenTomatoesPoster(Base):
-
     __tablename__ = 'rottentomatoes_posters'
 
     db_id = Column(Integer, primary_key=True)
@@ -178,7 +174,6 @@ class RottenTomatoesPoster(Base):
 
 
 class RottenTomatoesActor(Base):
-
     __tablename__ = 'rottentomatoes_actors'
 
     id = Column(Integer, primary_key=True)
@@ -191,7 +186,6 @@ class RottenTomatoesActor(Base):
 
 
 class RottenTomatoesDirector(Base):
-
     __tablename__ = 'rottentomatoes_directors'
 
     id = Column(Integer, primary_key=True)
@@ -202,7 +196,6 @@ class RottenTomatoesDirector(Base):
 
 
 class RottenTomatoesAlternateId(Base):
-
     __tablename__ = 'rottentomatoes_alternate_ids'
 
     db_id = Column(Integer, primary_key=True)
@@ -216,7 +209,6 @@ class RottenTomatoesAlternateId(Base):
 
 
 class RottenTomatoesLink(Base):
-
     __tablename__ = 'rottentomatoes_links'
 
     db_id = Column(Integer, primary_key=True)
@@ -230,7 +222,6 @@ class RottenTomatoesLink(Base):
 
 
 class RottenTomatoesSearchResult(Base):
-
     __tablename__ = 'rottentomatoes_search_results'
 
     id = Column(Integer, primary_key=True)
@@ -286,7 +277,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None
 
     # Try to lookup from cache
     if rottentomatoes_id:
-        movie = session.query(RottenTomatoesMovie).\
+        movie = session.query(RottenTomatoesMovie). \
             filter(RottenTomatoesMovie.id == rottentomatoes_id).first()
     if not movie and title:
         movie_filter = session.query(RottenTomatoesMovie).filter(func.lower(RottenTomatoesMovie.title) == title.lower())
@@ -295,7 +286,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None
         movie = movie_filter.first()
         if not movie:
             log.debug('No matches in movie cache found, checking search cache.')
-            found = session.query(RottenTomatoesSearchResult).\
+            found = session.query(RottenTomatoesSearchResult). \
                 filter(func.lower(RottenTomatoesSearchResult.search) == search_string).first()
             if found and found.movie:
                 log.debug('Movie found in search cache.')

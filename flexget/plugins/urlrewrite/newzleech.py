@@ -35,9 +35,9 @@ class UrlRewriteNewzleech(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             query = entry['title']
             url = u'http://newzleech.com/?%s' % str(urlencode({'q': query.encode('latin1'),
-                                                                      'm': 'search', 'group': '', 'min': 'min',
-                                                                      'max': 'max', 'age': '', 'minage': '',
-                                                                      'adv': ''}))
+                                                               'm': 'search', 'group': '', 'min': 'min',
+                                                               'max': 'max', 'age': '', 'minage': '',
+                                                               'adv': ''}))
             # log.debug('Search url: %s' % url)
 
             page = task.requests.get(url, headers=txheaders)

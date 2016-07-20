@@ -10,7 +10,6 @@ log = logging.getLogger('details')
 
 
 class PluginDetails(object):
-
     def on_task_start(self, task, config):
         # Make a flag for tasks to declare if it is ok not to produce entries
         task.no_entries_ok = False
@@ -31,8 +30,8 @@ class PluginDetails(object):
         # Needs to happen as the first in download, so it runs after urlrewrites
         # and IMDB queue acceptance.
         log.verbose('Summary - Accepted: %s (Rejected: %s Undecided: %s Failed: %s)' %
-            (len(task.accepted), len(task.rejected),
-            len(task.entries) - len(task.accepted), len(task.failed)))
+                    (len(task.accepted), len(task.rejected),
+                     len(task.entries) - len(task.accepted), len(task.failed)))
 
 
 class NoEntriesOk(object):

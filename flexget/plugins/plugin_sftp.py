@@ -60,7 +60,7 @@ def sftp_connect(conf):
             else:
                 log.debug('Caught exception: %s' % e)
                 log.warning('Failed to connect to %s; waiting %d seconds before retrying.' %
-                         (conf.host, retry_interval))
+                            (conf.host, retry_interval))
                 time.sleep(retry_interval)
                 tries -= 1
                 retry_interval += RETRY_STEP

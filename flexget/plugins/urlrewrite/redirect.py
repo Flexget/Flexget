@@ -11,6 +11,7 @@ log = logging.getLogger('redirect_url')
 
 class UrlRewriteRedirect(object):
     """Rewrites urls which actually redirect somewhere else."""
+
     def __init__(self):
         self.processed = set()
 

@@ -69,6 +69,7 @@ class FilterSeenMovies(FilterSeen):
         # call super
         super(FilterSeenMovies, self).on_task_learn(task, config.get('scope', True))
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterSeenMovies, 'seen_movies', api_ver=2)

@@ -48,8 +48,8 @@ def upgrade(ver, session):
 
 # association tables
 genres_table = Table('tmdb_movie_genres', Base.metadata,
-    Column('movie_id', Integer, ForeignKey('tmdb_movies.id')),
-    Column('genre_id', Integer, ForeignKey('tmdb_genres.id')))
+                     Column('movie_id', Integer, ForeignKey('tmdb_movies.id')),
+                     Column('genre_id', Integer, ForeignKey('tmdb_genres.id')))
 Base.register_table(genres_table)
 
 
@@ -119,7 +119,6 @@ class TMDBMovie(Base):
 
 
 class TMDBGenre(Base):
-
     __tablename__ = 'tmdb_genres'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
@@ -127,7 +126,6 @@ class TMDBGenre(Base):
 
 
 class TMDBPoster(Base):
-
     __tablename__ = 'tmdb_posters'
 
     id = Column(Integer, primary_key=True)
@@ -146,7 +144,6 @@ class TMDBPoster(Base):
 
 
 class TMDBSearchResult(Base):
-
     __tablename__ = 'tmdb_search_results'
 
     search = Column(Unicode, primary_key=True)

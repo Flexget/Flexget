@@ -32,7 +32,7 @@ class PluginPeriscope(object):
             - en
           overwrite: yes
     """
-    
+
     schema = {
         'type': 'object',
         'properties': {
@@ -49,15 +49,15 @@ class PluginPeriscope(object):
             import periscope
         except ImportError as e:
             log.debug('Error importing Periscope: %s' % e)
-            raise plugin.DependencyError('periscope', 'periscope', 
-                                  'Periscope module required. ImportError: %s' % e)
-    
+            raise plugin.DependencyError('periscope', 'periscope',
+                                         'Periscope module required. ImportError: %s' % e)
+
     def subbed(self, filename):
         for ext in self.exts:
             if os.path.exists(os.path.splitext(filename)[0] + ext):
                 return True
         return False
-    
+
     def on_task_output(self, task, config):
         """
         Configuration::

@@ -3,7 +3,6 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 
 class TestBacklog(object):
-
     config = """
         tasks:
           test:
@@ -27,13 +26,13 @@ class TestBacklog(object):
         assert entry['description'] == 'I'
         assert entry['laterfield'] == 'something'
         # Simulate entry leaving the task, make sure backlog injects it
-        del(manager.config['tasks']['test']['mock'])
+        del (manager.config['tasks']['test']['mock'])
         task = execute_task('test')
         entry = task.find_entry(title='Test.S01E01.hdtv-FlexGet')
         assert entry['description'] == 'I'
         assert entry['laterfield'] == 'something'
         # This time take away the set plugin too, to make sure data is being restored at it's state from input
-        del(manager.config['tasks']['test']['set'])
+        del (manager.config['tasks']['test']['set'])
         task = execute_task('test')
         entry = task.find_entry(title='Test.S01E01.hdtv-FlexGet')
         assert entry['description'] == ''

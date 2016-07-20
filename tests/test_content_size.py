@@ -6,7 +6,6 @@ import pytest
 
 @pytest.mark.usefixtures('tmpdir')
 class TestTorrentSize(object):
-
     config = """
         tasks:
           test_min:

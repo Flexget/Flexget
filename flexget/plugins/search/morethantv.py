@@ -148,7 +148,7 @@ class SearchMoreThanTV(object):
             self.errors = True
             # try again
             response = self.get(url, params, username, password, force=True)
-        
+
         return response
 
     def get_login_cookie(self, username, password, force=False):

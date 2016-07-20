@@ -178,7 +178,6 @@ class TestMovieQueue(object):
 
 
 class TestMovieQueueAPI(object):
-
     config = 'tasks: {}'
 
     mock_return_movie = {u'added': datetime.datetime(2015, 12, 30, 12, 32, 10, 688000),

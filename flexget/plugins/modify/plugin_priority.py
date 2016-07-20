@@ -10,7 +10,6 @@ log = logging.getLogger('p_priority')
 
 
 class PluginPriority(object):
-
     """
         Allows modifying plugin priorities from default values.
 

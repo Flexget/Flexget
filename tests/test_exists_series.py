@@ -7,7 +7,6 @@ import pytest
 
 
 class TestExistsSeries(object):
-
     _config = """
         templates:
           global:

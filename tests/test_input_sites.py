@@ -6,7 +6,6 @@ import pytest
 
 @pytest.mark.online
 class TestInputSites(object):
-
     config = """
         templates:
           global:

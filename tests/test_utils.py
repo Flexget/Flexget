@@ -7,7 +7,6 @@ from flexget.utils import json
 
 
 class TestJson(object):
-
     def test_json_encode_dt(self):
         date_str = '2016-03-11T17:12:17Z'
         dt = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')

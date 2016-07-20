@@ -102,6 +102,7 @@ movie_edit_input_schema = {
 
 movie_edit_input_schema = api.schema('movie_edit_input_schema', movie_edit_input_schema)
 
+
 @api.deprecated
 @movie_queue_api.route('/')
 class MovieQueueAPI(APIResource):
@@ -173,6 +174,7 @@ class MovieQueueAPI(APIResource):
         reply = jsonify(movie)
         reply.status_code = 201
         return reply
+
 
 @api.deprecated
 @api.response(404, 'ID not found', model=default_error_schema)

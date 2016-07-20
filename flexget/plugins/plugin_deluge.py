@@ -42,6 +42,7 @@ def add_deluge_windows_install_dir_to_sys_path():
         if item.endswith(('.egg', '.zip')):
             sys.path.append(os.path.join(deluge_dir, item))
 
+
 add_deluge_windows_install_dir_to_sys_path()
 
 
@@ -155,7 +156,8 @@ class DelugePlugin(object):
         except ImportError as e:
             log.debug('Error importing deluge: %s' % e)
             raise plugin.DependencyError('deluge', 'deluge',
-                                  'Deluge >=1.2 module and it\'s dependencies required. ImportError: %s' % e, log)
+                                         'Deluge >=1.2 module and it\'s dependencies required. ImportError: %s' % e,
+                                         log)
         try:
             from twisted.internet import reactor
         except:
@@ -313,6 +315,7 @@ class InputDeluge(DelugePlugin):
                     entry[flexget_key] = value
                 self.entries.append(entry)
             client.disconnect()
+
         filter = config.get('filter', {})
         # deluge client lib chokes on future's newlist, make sure we have a native python list here
         client.core.get_torrents_status(filter, native(list(self.settings_map.keys()))).addCallback(
@@ -421,7 +424,7 @@ class OutputDeluge(DelugePlugin):
             for entry in task.accepted + task.failed:
                 if os.path.exists(entry.get('file', '')):
                     os.remove(entry['file'])
-                    del(entry['file'])
+                    del (entry['file'])
 
     def on_connect_success(self, result, task, config):
         """Gets called when successfully connected to a daemon."""
@@ -468,7 +471,6 @@ class OutputDeluge(DelugePlugin):
                 dlist.append(client.core.set_torrent_move_completed_path(torrent_id, opts['movedone']))
                 log.debug('%s move on complete set to %s' % (entry['title'], opts['movedone']))
             if opts.get('label'):
-
                 def apply_label(result, torrent_id, label):
                     """Gets called after labels and torrent were added to deluge."""
                     return client.label.set_torrent(torrent_id, label)
@@ -572,15 +574,15 @@ class OutputDeluge(DelugePlugin):
                         if opts.get('content_filename'):
                             # rename the main file
                             big_file_name = (top_files_dir +
-                                            os.path.basename(opts['content_filename']) +
-                                            os.path.splitext(main_file['path'])[1])
+                                             os.path.basename(opts['content_filename']) +
+                                             os.path.splitext(main_file['path'])[1])
                             big_file_name = unused_name(big_file_name)
                             rename(main_file, big_file_name)
 
                             # rename subs along with the main file
                             if sub_file is not None and keep_subs:
                                 sub_file_name = (os.path.splitext(big_file_name)[0] +
-                                                os.path.splitext(sub_file['path'])[1])
+                                                 os.path.splitext(sub_file['path'])[1])
                                 rename(sub_file, sub_file_name)
 
                         if opts.get('main_file_only'):
@@ -595,10 +597,10 @@ class OutputDeluge(DelugePlugin):
                                 # http://dev.deluge-torrent.org/ticket/1827
                                 # Made sparse files behave better with deluge http://flexget.com/ticket/2881
                                 sparse_files = [f for f in status['files']
-                                               if f != main_file and (f != sub_file or (not keep_subs))]
+                                                if f != main_file and (f != sub_file or (not keep_subs))]
                                 rename_pairs = [(f['index'],
-                                               top_files_dir + ".sparse_files/" + os.path.basename(f['path']))
-                                               for f in sparse_files]
+                                                 top_files_dir + ".sparse_files/" + os.path.basename(f['path']))
+                                                for f in sparse_files]
                                 main_file_dlist.append(client.core.rename_files(torrent_id, rename_pairs))
                     else:
                         log.warning('No files in "%s" are > %d%% of content size, no files renamed.' % (
@@ -705,7 +707,7 @@ class OutputDeluge(DelugePlugin):
                     else:
                         if not os.path.exists(entry['file']):
                             entry.fail('Downloaded temp file \'%s\' doesn\'t exist!' % entry['file'])
-                            del(entry['file'])
+                            del (entry['file'])
                             return
                         with open(entry['file'], 'rb') as f:
                             filedump = base64.encodestring(f.read())
@@ -766,11 +768,13 @@ class OutputDeluge(DelugePlugin):
                     dlist.append(add_entry(entry, add_opts).addCallbacks(
                         set_torrent_options, on_fail, callbackArgs=(entry, modify_opts), errbackArgs=(task, entry)))
             return defer.DeferredList(dlist)
+
         dlist.append(client.core.get_session_state().addCallback(on_get_session_state))
 
         def on_complete(result):
             """Gets called when all of our tasks for deluge daemon are complete."""
             client.disconnect()
+
         tasks = defer.DeferredList(dlist).addBoth(on_complete)
 
         def on_timeout(result):

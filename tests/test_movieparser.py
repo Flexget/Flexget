@@ -11,8 +11,10 @@ class TestParser(object):
     @pytest.fixture(scope='class', params=(ParserInternal, ParserGuessit), ids=['internal', 'guessit'])
     def parse(self, request):
         p = request.param()
+
         def parse(data, name=None, **kwargs):
             return p.parse_movie(data, name=name, **kwargs)
+
         return parse
 
     def test_parsing(self, parse):

@@ -79,7 +79,6 @@ schedule_schema = {
     'additionalProperties': False
 }
 
-
 main_schema = {
     'oneOf': [
         {
@@ -94,7 +93,6 @@ main_schema = {
         }
     ]
 }
-
 
 scheduler = None
 scheduler_job_map = {}
@@ -207,4 +205,3 @@ def stop_scheduler(manager):
 def register_config():
     register_config_key('schedules', main_schema)
     register_schema('/schema/config/schedule', schedule_schema)
-

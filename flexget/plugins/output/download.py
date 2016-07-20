@@ -27,7 +27,6 @@ log = logging.getLogger('download')
 
 
 class PluginDownload(object):
-
     """
     Downloads content from entry url and writes it into a file.
 
@@ -505,7 +504,7 @@ class PluginDownload(object):
                 log.debug('removing temp file %s from %s', entry['file'], entry['title'])
                 os.remove(entry['file'])
             shutil.rmtree(os.path.dirname(entry['file']))
-            del(entry['file'])
+            del (entry['file'])
 
     def cleanup_temp_files(self, task):
         """Checks all entries for leftover temp files and deletes them."""

@@ -10,7 +10,6 @@ from flask import send_from_directory, Flask
 from flexget.webserver import register_app, register_home
 from flask_compress import Compress
 
-
 log = logging.getLogger('webui')
 
 manager = None
@@ -46,6 +45,7 @@ def root():
 
     return send_from_directory(app_base, 'app.html')
 
+
 def _find(path, f):
     matches = []
     for root_dir, dir_names, file_names in os.walk(path):
@@ -69,7 +69,7 @@ def register_web_ui(mgr):
         app_base = os.path.join(ui_base, '.tmp', 'serve')
         if not os.path.exists(app_base):
             log.warning('Unable to start web ui in debug mode. To enable debug mode please run the debug build, '
-                     'see http://flexget.com/wiki/Web-UI for instructions')
+                        'see http://flexget.com/wiki/Web-UI for instructions')
             log.warning('Attempting to serve web ui from complied directory')
             app_base = None
 

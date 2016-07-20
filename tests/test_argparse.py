@@ -44,7 +44,6 @@ def test_subparser_parent_defaults():
 
 
 def test_post_defaults():
-
     class CustomAction(Action):
         def __call__(self, parser, namespace, values, option_string=None):
             if not hasattr(namespace, 'post_set'):
@@ -63,5 +62,3 @@ def test_post_defaults():
     # Custom action should be allowed to set default
     result = p.parse_args(['--custom'])
     assert result.post_set == 'custom'
-
-

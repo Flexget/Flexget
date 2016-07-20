@@ -11,6 +11,7 @@ log = logging.getLogger('utils.qualities')
 
 class QualityComponent(object):
     """"""
+
     def __init__(self, type, value, name, regexp=None, modifier=None, defaults=None):
         """
         :param type: Type of quality component. (resolution, source, codec, or audio)
@@ -115,6 +116,7 @@ class QualityComponent(object):
         # No mutable attributes, return a regular copy
         return copy.copy(self)
 
+
 _resolutions = [
     QualityComponent('resolution', 10, '360p'),
     QualityComponent('resolution', 20, '368p', '368p?'),
@@ -181,7 +183,6 @@ _UNKNOWNS = {
         print '- ' + item.name
     print '}}}'
 '''
-
 
 _registry = {}
 for items in (_resolutions, _sources, _codecs, _audios):
@@ -411,6 +412,7 @@ class RequirementComponent(object):
 
 class Requirements(object):
     """Represents requirements for allowable qualities. Can determine whether a given Quality passes requirements."""
+
     def __init__(self, req=''):
         self.text = ''
         self.resolution = RequirementComponent('resolution')
