@@ -1,3 +1,4 @@
+/* global bard, sinon, mockExecuteData */
 describe('Plugin: Execute.component', function () {
 	var controller;
 	var queue = mockExecuteData.getMockQueue();
@@ -6,7 +7,7 @@ describe('Plugin: Execute.component', function () {
 		bard.appModule('plugins.execute');
 
 		bard.inject('$componentController', 'executeService', '$q', '$rootScope','$interval');
-		
+
 		sinon.stub(executeService, 'getQueue').returns($q.when(queue));
 	});
 
@@ -27,7 +28,7 @@ describe('Plugin: Execute.component', function () {
 		it('should have called the execute service', function () {
 			expect(executeService.getQueue).to.have.been.calledOnce;
 		});
-		
+
 		it('should have entries', function () {
 			expect(controller.running).to.not.be.empty;
 		});
@@ -95,7 +96,7 @@ describe('Plugin: Execute.component', function () {
 	describe('destroy', function () {
 		beforeEach(function () {
 			sinon.stub($interval, 'cancel');
-			
+
 			controller.$onDestroy();
 		});
 

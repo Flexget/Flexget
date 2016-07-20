@@ -1,3 +1,4 @@
+/* global angular, registerPlugin */
 (function () {
 	'use strict';
 
@@ -5,7 +6,7 @@
 		.module('plugins.log', [
 			'blocks.exception',
 			'blocks.router',
-			
+
 			'components.toolbar',
 			'ui.grid',
 			'ui.grid.autoResize',

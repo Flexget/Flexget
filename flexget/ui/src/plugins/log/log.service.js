@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -21,7 +22,7 @@
             }).fail(function (error) {
                 deferred.reject(error);
 			});
-			
+
 			deferred.promise.start = function (callback) {
                 stream.on('start', callback);
                 return deferred.promise;
