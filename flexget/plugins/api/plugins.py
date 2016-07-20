@@ -3,7 +3,6 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
-from flask import jsonify
 from flask_restplus import inputs
 
 from flexget.plugin import get_plugins
@@ -12,6 +11,38 @@ from flexget.api import api, APIResource, ApiError
 log = logging.getLogger('plugins')
 
 plugins_api = api.namespace('plugins', description='Get Flexget plugins')
+
+phase_object = {
+    'type': 'object',
+    'properties': {
+        'phase': {'type': 'string'},
+        'priority': {'type': 'integer'}
+    }
+}
+
+plugin_object = {
+    'type': 'object',
+    'properties': {
+        'name': {'type': 'string'},
+        'api_ver': {'type': 'integer'},
+        'builtin': {'type': 'boolean'},
+        'category': {'type': 'string'},
+        'contexts': {'type': 'array', 'items': {'type': 'string'}},
+        'debug': {'type': 'boolean'},
+        'groups': {'type': 'array', 'items': {'type': 'string'}},
+        'phase_handlers': {'type': 'array', 'items': phase_object}
+    }
+}
+
+plugin_list_reply = {
+    'type': 'object',
+    'properties': {
+        'plugin_list': {'type': 'array', 'items': plugin_object},
+        'number_of_plugins': {'type': 'integer'}
+    }
+}
+
+plugin_list_reply_schema = api.schema('plugin_list_reply', plugin_list_reply)
 
 plugins_parser = api.parser()
 plugins_parser.add_argument('group', help='Show plugins belonging to this group')
@@ -22,11 +53,11 @@ plugins_parser.add_argument('include_schema', type=inputs.boolean, default=False
 
 @plugins_api.route('/')
 class PluginsAPI(APIResource):
-    @api.response(200, 'Successfully retrieved plugin list')
+    @api.response(200, model=plugin_list_reply_schema)
     @api.response(500, 'Unknown phase')
     @api.doc(parser=plugins_parser)
     def get(self, session=None):
-        """ Get list of plugins """
+        """ Get list of registered plugins """
         args = plugins_parser.parse_args()
         plugin_list = []
         try:
@@ -46,4 +77,5 @@ class PluginsAPI(APIResource):
                 plugin_list.append(p)
         except ValueError as e:
             raise ApiError(str(e))
-        return jsonify(plugin_list)
+        return {'plugin_list': plugin_list,
+                'number_of_plugins': len(plugin_list)}
