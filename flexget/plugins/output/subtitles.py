@@ -10,8 +10,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-"""
-
+'''
 DRAFT
 
 class SubtitleQueue(Base):
@@ -38,8 +37,7 @@ TODO:
  * consume queue (look up by task name), configuration is available from task
  * remove successful downloads
  * remove queue items that are part retry: n days
-
-"""
+'''
 
 log = logging.getLogger('subtitles')
 
