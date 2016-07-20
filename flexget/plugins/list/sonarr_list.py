@@ -203,7 +203,7 @@ class SonarrSet(MutableSet):
         delete_series_url, delete_series_headers = self.request_builder(self.config.get('base_url'), 'series',
                                                                         self.config.get('port'), self.config['api_key'])
         delete_series_url += '/%s' % show.get('sonarr_id')
-        response = requests.delete(delete_series_url, headers=delete_series_headers)
+        requests.delete(delete_series_url, headers=delete_series_headers)
 
     @property
     def shows(self):

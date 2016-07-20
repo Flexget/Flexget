@@ -741,7 +741,7 @@ class SeriesReleasesAPI(APIResource):
     def delete(self, show_id, ep_id, session):
         """ Deletes all episodes releases by show ID and episode ID """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
@@ -817,7 +817,7 @@ class SeriesReleaseAPI(APIResource):
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = series.episode_by_id(ep_id, session)
+            series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id

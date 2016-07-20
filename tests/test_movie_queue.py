@@ -120,7 +120,7 @@ class TestMovieQueue(object):
         assert len(queue_get()) == 1
 
     def test_movie_queue_different_queue_add(self, execute_task):
-        task = execute_task('movie_queue_different_queue_add')
+        execute_task('movie_queue_different_queue_add')
         queue = queue_get()
         assert len(queue) == 0
         queue = queue_get(queue_name='A new queue')

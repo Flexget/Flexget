@@ -478,7 +478,6 @@ class PluginTransmission(TransmissionBase):
                         main_ratio = options['post']['main_file_ratio']
 
                     if 'include_files' in options['post']:
-                        include_files = True
                         options['post']['include_files'] = _filter_list(options['post']['include_files'])
 
                     for f in fl[r.id]:

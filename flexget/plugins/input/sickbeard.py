@@ -93,7 +93,7 @@ class Sickbeard(object):
             raise plugin.PluginError('Unable to connect to Sickbeard at %s://%s:%s%s. Error: %s'
                                      % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e))
         entries = []
-        for id, show in list(json['data'].items()):
+        for _, show in list(json['data'].items()):
             fg_qualities = ''  # Initializes the quality parameter
             if show['paused'] and config.get('only_monitored'):
                 continue

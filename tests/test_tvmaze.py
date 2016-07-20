@@ -404,12 +404,12 @@ class TestTVMazeUnicodeLookup(object):
 
     @pytest.mark.xfail(reason='VCR attempts to compare str to unicode')
     def test_unicode(self, execute_task):
-        task = execute_task('test_unicode')
+        execute_task('test_unicode')
         with Session() as session:
             r = session.query(TVMazeLookup).all()
             assert len(r) == 1, 'Should have added a search result'
             assert r[0].search_name == 'kr\xf8niken 2004', 'The search result should be lower case'
-        task = execute_task('test_unicode')
+        execute_task('test_unicode')
         with Session() as session:
             r = session.query(TVMazeLookup).all()
             assert len(r) == 1, 'Should not have added a new row'

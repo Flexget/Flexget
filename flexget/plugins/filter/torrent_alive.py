@@ -69,7 +69,7 @@ def get_udp_seeds(url, info_hash):
     parsed_url = urlparse(url)
     try:
         port = parsed_url.port
-    except ValueError as ve:
+    except ValueError:
         log.error('UDP Port Error, url was %s' % url)
         return 0
 

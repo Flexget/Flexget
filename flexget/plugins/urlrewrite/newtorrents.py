@@ -64,7 +64,7 @@ class NewTorrents(object):
         try:
             page = requests.get(url)
             data = page.text
-        except Exception as e:
+        except Exception:
             raise UrlRewritingError('URLerror when retrieving page')
         p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)
         f = p.search(data)

@@ -116,7 +116,7 @@ def decode_item(next, token):
         # Strings in torrent file are defined as utf-8 encoded
         try:
             data = data.decode('utf-8')
-        except UnicodeDecodeError as e:
+        except UnicodeDecodeError:
             # The pieces field is a byte string, and should be left as such.
             pass
     elif token == b'l' or token == b'd':

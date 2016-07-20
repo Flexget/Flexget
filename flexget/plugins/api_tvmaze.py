@@ -309,7 +309,7 @@ def prepare_lookup_for_tvmaze(**lookup_params):
     title = None
     series_name = lookup_params.get('series_name') or lookup_params.get('show_name') or lookup_params.get('title')
     if series_name:
-        title, year_match = split_title_year(series_name)
+        title, _ = split_title_year(series_name)
     # Support for when title is just a number
     if not title:
         title = series_name
