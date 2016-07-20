@@ -5,7 +5,7 @@ import logging
 
 from flask_restplus import inputs
 
-from flexget.plugin import get_plugins, get_plugin_by_name
+from flexget.plugin import get_plugins, get_plugin_by_name, DependencyError
 from flexget.api import api, APIResource, ApiError
 
 log = logging.getLogger('plugins')
@@ -44,11 +44,14 @@ plugin_list_reply = {
 plugin_schema = api.schema('plugin_object', plugin_object)
 plugin_list_reply_schema = api.schema('plugin_list_reply', plugin_list_reply)
 
-plugins_parser = api.parser()
+plugin_parser = api.parser()
+plugin_parser.add_argument('include_schema', type=inputs.boolean, default=False,
+                           help='Include plugin schema. This will increase response size')
+
+plugins_parser = plugin_parser.copy()
+
 plugins_parser.add_argument('group', help='Show plugins belonging to this group')
 plugins_parser.add_argument('phase', help='Show plugins that act on this phase')
-plugins_parser.add_argument('include_schema', type=inputs.boolean, default=False,
-                            help='Include plugin schema. This will increase response size')
 
 
 @plugins_api.route('/')
@@ -72,7 +75,20 @@ class PluginsAPI(APIResource):
                 'number_of_plugins': len(plugin_list)}
 
 
-# @plugins_api.route('/<string:plugin_name>/')
-# class PluginAPI(APIResource):
-#     def get(self, plugin_name, session=None):
-#         """ Return plugin data by name"""
+@plugins_api.route('/<string:plugin_name>/')
+class PluginAPI(APIResource):
+    @api.response(400, 'Unknown plugin name')
+    @api.response(200, model=plugin_schema)
+    @api.doc(parser=plugin_parser, params={'plugin_name': 'Name of the plugin to return'})
+    def get(self, plugin_name, session=None):
+        """ Return plugin data by name"""
+        args = plugin_parser.parse_args()
+        try:
+            plugin = get_plugin_by_name(plugin_name, issued_by='plugins API')
+        except DependencyError as e:
+            return {'status': 'error',
+                    'message': e.message}
+        p = plugin.to_dict()
+        if args['include_schema']:
+            p['schema'] = plugin.schema
+        return p
