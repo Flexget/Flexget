@@ -61,7 +61,7 @@ class RetryFailed(APIResource):
 
 @retry_failed_api.route('/<int:failed_entry_id>/')
 @api.response(404, 'No failed entry found')
-class RetryFailed(APIResource):
+class RetryFailedID(APIResource):
 
     @api.doc(params={'failed_entry_id': 'ID of the failed entry'})
     @api.response(200, model=retry_failed_entry_schema)
