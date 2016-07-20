@@ -515,7 +515,7 @@ class Task(object):
         if self.options.inject:
             # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')
-            self.all_entries.extend(self.options.inject)
+            self.all_entries.extend(copy.deepcopy(self.options.inject))
 
         # Save current config hash and set config_modidied flag
         with Session() as session:
