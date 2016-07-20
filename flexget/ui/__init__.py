@@ -46,12 +46,11 @@ def root():
 
     return send_from_directory(app_base, 'app.html')
 
-
 def _find(path, f):
     matches = []
-    for root, dir_names, file_names in os.walk(path):
+    for root_dir, dir_names, file_names in os.walk(path):
         for filename in fnmatch.filter(file_names, f):
-            matches.append(os.path.join(root, filename))
+            matches.append(os.path.join(root_dir, filename))
     return matches
 
 
