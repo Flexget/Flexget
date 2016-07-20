@@ -324,7 +324,6 @@ ep_identifier_doc = "'episode_identifier' should be one of SxxExx, integer or da
 
 @series_api.route('/')
 class SeriesListAPI(APIResource):
-
     @api.response(404, 'Page does not exist', default_error_schema)
     @api.response(200, 'Series list retrieved successfully', series_list_schema)
     @api.doc(parser=series_list_parser, description="Get a  list of Flexget's shows in DB")
@@ -429,7 +428,6 @@ class SeriesListAPI(APIResource):
 @series_api.route('/search/<string:name>/')
 @api.doc(description='Searches for a show in the DB via its name. Returns a list of matching shows.')
 class SeriesGetShowsAPI(APIResource):
-
     @api.response(200, 'Show list retrieved successfully', shows_schema)
     @api.doc(params={'name': 'Name of the show(s) to search'})
     def get(self, name, session):
@@ -456,7 +454,6 @@ delete_parser.add_argument('forget', type=inputs.boolean, default=False,
 @series_api.route('/<int:show_id>/')
 @api.doc(params={'show_id': 'ID of the show'})
 class SeriesShowAPI(APIResource):
-
     @api.response(404, 'Show ID not found', default_error_schema)
     @api.response(200, 'Show information retrieved successfully', show_details_schema)
     @api.doc(description='Get a specific show using its ID')
@@ -542,7 +539,6 @@ episode_parser.add_argument('order', choices=('desc', 'asc'), default='desc', he
 @series_api.route('/<int:show_id>/episodes/')
 @api.doc(params={'show_id': 'ID of the show'})
 class SeriesEpisodesAPI(APIResource):
-
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
     @api.response(405, 'Page does not exists', model=default_error_schema)
     @api.doc(description='Get all show episodes via its ID', parser=episode_parser)
@@ -558,10 +554,7 @@ class SeriesEpisodesAPI(APIResource):
 
         order = args['order']
         # In case the default 'desc' order was received
-        if order == 'desc':
-            order = True
-        else:
-            order = False
+        descending = bool(order == 'desc')
 
         start = page_size * (page - 1)
         stop = start + page_size
@@ -569,7 +562,7 @@ class SeriesEpisodesAPI(APIResource):
         kwargs = {
             'start': start,
             'stop': stop,
-            'descending': order,
+            'descending': descending,
             'session': session
         }
 
@@ -625,7 +618,6 @@ class SeriesEpisodesAPI(APIResource):
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
 class SeriesEpisodeAPI(APIResource):
-
     @api.response(200, 'Episode retrieved successfully for show', episode_schema)
     @api.doc(description='Get a specific episode via its ID and show ID')
     def get(self, show_id, ep_id, session):
@@ -699,7 +691,6 @@ release_delete_parser.add_argument('forget', type=inputs.boolean, default=False,
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
          description='Releases are any seen entries that match the episode. ')
 class SeriesReleasesAPI(APIResource):
-
     @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
     @api.doc(description='Get all matching releases for a specific episode of a specific show.',
              parser=release_list_parser)
@@ -805,7 +796,6 @@ class SeriesReleasesAPI(APIResource):
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/<int:rel_id>/')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'})
 class SeriesReleaseAPI(APIResource):
-
     @api.response(200, 'Release retrieved successfully for episode', release_schema)
     @api.doc(description='Get a specific downloaded release for a specific episode of a specific show')
     def get(self, show_id, ep_id, rel_id, session):
