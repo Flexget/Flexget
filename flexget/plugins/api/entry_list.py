@@ -171,10 +171,7 @@ class EntryListEntriesAPI(APIResource):
 
         start = page_size * (page - 1)
         stop = start + page_size
-        if args.get('order') == 'desc':
-            descending = True
-        else:
-            descending = False
+        descending = bool(args.get('order') == 'desc')
 
         kwargs = {
             'start': start,
