@@ -64,7 +64,7 @@ user_token_response_schema = api.schema('user_token_response', user_token_respon
 
 @user_api.route('/token/')
 @api.doc('Change user token')
-class UserManagementAPI(APIResource):
+class UserManagementTokenAPI(APIResource):
 
     @api.response(200, 'Successfully changed user token', user_token_response_schema)
     @api.doc(description='Get new user token')
