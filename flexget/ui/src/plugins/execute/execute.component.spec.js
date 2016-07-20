@@ -6,6 +6,7 @@ describe('Plugin: Execute.component', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.execute');
 
+		/* global $componentController, executeService, $q, $rootScope, $interval */
 		bard.inject('$componentController', 'executeService', '$q', '$rootScope','$interval');
 
 		sinon.stub(executeService, 'getQueue').returns($q.when(queue));

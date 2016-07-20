@@ -1,4 +1,4 @@
-/* global bard */
+/* global bard, sinon */
 describe('Blocks: Error', function () {
 	describe('Error.service', function () {
 		beforeEach(function () {

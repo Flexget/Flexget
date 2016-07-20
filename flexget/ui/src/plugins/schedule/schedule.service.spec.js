@@ -1,11 +1,13 @@
+/* global bard, sinon */
 describe('Service: Schedule', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.schedule');
 
+		/* global $httpBackend, schedulesService, exception, CacheFactory, $q*/
 		bard.inject('$httpBackend', 'schedulesService', 'exception', 'CacheFactory', '$q');
 
 		sinon.stub(exception, 'catcher').returns($q.reject({ message: 'Request failed' }));
-		
+
 		CacheFactory.clearAll();
 	});
 
