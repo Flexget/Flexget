@@ -138,14 +138,13 @@ _sources = [
     QualityComponent('source', 90, 'tvrip', 'tv[\W_]?rip'),
     QualityComponent('source', 100, 'dsr', 'dsr|ds[\W_]?rip'),
     QualityComponent('source', 110, 'sdtv', '(?:[sp]dtv|dvb)(?:[\W_]?rip)?'),
-    QualityComponent('source', 120, 'webrip', 'web[\W_]?rip'),
-    QualityComponent('source', 130, 'dvdscr', '(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
-    QualityComponent('source', 140, 'bdscr', 'bdscr(?:eener)?'),
-    QualityComponent('source', 150, 'hdtv', 'a?hdtv(?:[\W_]?rip)?'),
-    QualityComponent('source', 160, 'webdl', 'web(?:[\W_]?(dl|hd))'),
-    QualityComponent('source', 170, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
-    QualityComponent('source', 175, 'remux'),
-    QualityComponent('source', 180, 'bluray', '(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)')
+    QualityComponent('source', 120, 'dvdscr', '(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
+    QualityComponent('source', 130, 'bdscr', 'bdscr(?:eener)?'),
+    QualityComponent('source', 140, 'hdtv', 'a?hdtv(?:[\W_]?rip)?'),
+    QualityComponent('source', 150, 'webdl', 'web|web(?:[\W_]?(dl|hd|rip))'),
+    QualityComponent('source', 160, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
+    QualityComponent('source', 165, 'remux'),
+    QualityComponent('source', 170, 'bluray', '(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)')
 ]
 _codecs = [
     QualityComponent('codec', 10, 'divx'),
