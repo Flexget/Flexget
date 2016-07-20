@@ -4,8 +4,6 @@ var gulp = require('gulp');
 
 var paths = gulp.paths;
 
-var util = require('util');
-
 var browserSync = require('browser-sync');
 
 var middleware = require('./proxy');

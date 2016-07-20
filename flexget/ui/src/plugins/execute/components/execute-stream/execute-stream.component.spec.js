@@ -1,7 +1,6 @@
-/* global bard, sinon, mockExecuteData */
+/* global bard, sinon */
 describe('Plugin: Execute-stream.component', function () {
 	var controller;
-	var tasks = mockExecuteData.getMockTasks();
 
 	beforeEach(function () {
 		bard.appModule('plugins.execute');

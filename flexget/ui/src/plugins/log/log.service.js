@@ -6,7 +6,7 @@
 		.module('plugins.log')
 		.factory('logService', logService);
 
-    function logService($http, exception, $q) {
+    function logService($q) {
         return {
             startLogStream: startLogStream
         };
@@ -38,10 +38,6 @@
             };
 
             return deferred.promise;
-        }
-
-        function callFailed(error) {
-			return exception.catcher(error);
         }
     }
 }());

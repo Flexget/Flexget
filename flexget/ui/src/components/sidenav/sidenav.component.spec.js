@@ -6,7 +6,7 @@ describe('Sidenav Component:', function () {
 	beforeEach(function () {
 		bard.appModule('components.sidenav');
 
-		/* global $componentController, routerHelper, sideNav, $rootScope */
+		/* global $componentController, routerHelper, sideNavService, $rootScope */
 		bard.inject('$componentController', 'routerHelper', 'sideNavService', '$rootScope');
 
 		sinon.stub(routerHelper, 'getStates').returns(mockStates);

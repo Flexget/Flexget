@@ -78,10 +78,10 @@
 				});
 			}
 
-
-			function init() {
+			//TODO: Check if needed to be re-enabled
+			/*function init() {
 				handleRoutingErrors();
-			}
+			}*/
 
 			function getStates() {
 				return $state.get();

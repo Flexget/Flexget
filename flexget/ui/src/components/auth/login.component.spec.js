@@ -5,8 +5,8 @@ describe('Login Component:', function () {
 	beforeEach(function () {
 		bard.appModule('components.auth');
 
-		/* global $componentController, authService, $state, $q, $rootScope */
-		bard.inject('$componentController', 'authService', '$state', '$q', '$rootScope');
+		/* global $componentController, authService, $q, $rootScope */
+		bard.inject('$componentController', 'authService', '$q', '$rootScope');
 	});
 
 	beforeEach(function () {

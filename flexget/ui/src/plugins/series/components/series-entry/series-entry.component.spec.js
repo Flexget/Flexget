@@ -1,6 +1,6 @@
 /* global bard, sinon, mockSeriesData */
 describe('Plugin: Series-Entry.Component', function () {
-	var component, deferred;
+	var component;
 	var metadata = mockSeriesData.getShowMetadata();
 	var show = mockSeriesData.getShow();
 
