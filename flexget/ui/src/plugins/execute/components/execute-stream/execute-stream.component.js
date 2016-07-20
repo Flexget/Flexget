@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -12,7 +13,7 @@
 				options: '<'
 			}
 		});
-	
+
 	function executeStreamController($filter, $log, executeService) {
 		var vm = this;
 
@@ -53,7 +54,7 @@
 				.progress(progressNode)
 				.summary(summaryNode)
 				.entry_dump(entryDumpNode);
-			
+
 			function progressNode(progress) {
 				var filtered = $filter('filter')(vm.streamTasks, { status: '!complete' });
 				angular.extend(filtered[0], progress);
@@ -79,7 +80,7 @@
 		function clear() {
 			if (stream) {
 				stream.abort();
-			}	
+			}
 			vm.stopStream();
 		}
 

@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -12,7 +13,7 @@
 				execute: '<'
 			}
 		});
-	
+
 	function executeInputController(executeService) {
 		var vm = this;
 
@@ -75,7 +76,7 @@
 				}
 			});
 		}
-		
+
 		function searchTask() {
 			var filter = function () {
 				var lowercaseQuery = angular.lowercase(vm.searchTerm);

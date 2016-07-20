@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -26,7 +27,7 @@
             return $http.get('/api/tasks/queue/', { ignoreLoadingBar: true })
 				.then(getQueueComplete)
                 .catch(callFailed);
-			
+
 			function getQueueComplete(response) {
 				return response.data;
 			}

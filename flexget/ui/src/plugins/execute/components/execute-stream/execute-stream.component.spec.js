@@ -1,3 +1,4 @@
+/* global bard, sinon, mockExecuteData */
 describe('Plugin: Execute-stream.component', function () {
 	var controller;
 	var tasks = mockExecuteData.getMockTasks();
@@ -5,9 +6,10 @@ describe('Plugin: Execute-stream.component', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.execute');
 
+		/* global $componentController, executeService, $q, $rootScope */
 		bard.inject('$componentController', 'executeService', '$q', '$rootScope');
 
-		sinon.spy(executeService, 'executeTasks');		
+		sinon.spy(executeService, 'executeTasks');
 	});
 
 	beforeEach(function () {

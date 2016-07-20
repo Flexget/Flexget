@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -74,7 +75,7 @@
 			vm.stream.start(startFunction)
 				.message(messageFunction)
 				.catch(failFunction);
-			
+
 			function startFunction() {
 				vm.status = 'Streaming';
 			}

@@ -1,7 +1,9 @@
+/* global bard, sinon */
 describe('Service: Execute', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.execute');
 
+		/* global $httpBackend, executeService, exception, $q */
 		bard.inject('$httpBackend', 'executeService', 'exception', '$q');
 
 		sinon.stub(exception, 'catcher').returns($q.reject({ message: 'Request failed' }));
