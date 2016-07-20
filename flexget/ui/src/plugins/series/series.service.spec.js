@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 describe("Service: Series", function () {
 	beforeEach(function () {
 		bard.appModule('plugins.series');
