@@ -198,7 +198,7 @@ class PluginDownload(object):
                     log.info('Downloading: %s', entry['title'])
                 self.download_entry(task, entry, url, tmp_path)
         except RequestException as e:
-            log.warning('RequestException %s, while downloading %s', (e, url))
+            log.warning('RequestException %s, while downloading %s', e, url)
             return 'Network error during request: %s' % e
         except BadStatusLine as e:
             log.warning('Failed to reach server. Reason: %s', getattr(e, 'message', 'N/A'))

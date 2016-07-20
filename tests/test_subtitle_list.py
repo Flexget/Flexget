@@ -11,7 +11,6 @@ from flexget.manager import Session
 from flexget.plugins.list.subtitle_list import SubtitleListFile, SubtitleListLanguage, normalize_path
 
 try:
-    import babelfish
     import subliminal
 except ImportError:
     subliminal = babelfish = None
