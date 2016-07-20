@@ -344,19 +344,6 @@ class PluginInfo(dict):
 
     __repr__ = __str__
 
-    def to_dict(self):
-        return {
-            'name': self.name,
-            'api_ver': self.api_ver,
-            'builtin': self.builtin,
-            'category': self.category,
-            'contexts': self.contexts,
-            'debug': self.debug,
-            'groups': self.groups,
-            'phase_handlers': [dict(phase=handler, priority=event.priority) for handler, event in
-                               self.phase_handlers.items()]
-        }
-
 
 register = PluginInfo
 
