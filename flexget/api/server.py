@@ -63,6 +63,7 @@ config_validation_schema = api.schema('config_validation_schema', config_validat
 
 @server_api.route('/reload/')
 class ServerReloadAPI(APIResource):
+
     @api.response(501, model=yaml_error_schema, description='YAML syntax error')
     @api.response(502, model=config_validation_schema, description='Config validation error')
     @api.response(200, description='Newly reloaded config')
@@ -104,6 +105,7 @@ pid_schema = api.schema('server.pid', {
 
 @server_api.route('/pid/')
 class ServerPIDAPI(APIResource):
+
     @api.response(200, description='Reloaded config', model=pid_schema)
     def get(self, session=None):
         """ Get server PID """
@@ -117,6 +119,7 @@ shutdown_parser.add_argument('force', type=inputs.boolean, required=False, defau
 
 @server_api.route('/shutdown/')
 class ServerShutdownAPI(APIResource):
+
     @api.doc(parser=shutdown_parser)
     @api.response(200, 'Shutdown requested')
     def get(self, session=None):
@@ -128,6 +131,7 @@ class ServerShutdownAPI(APIResource):
 
 @server_api.route('/config/')
 class ServerConfigAPI(APIResource):
+
     @api.response(200, description='Flexget config')
     def get(self, session=None):
         """ Get Flexget Config """
@@ -145,6 +149,7 @@ raw_config_schema = api.schema('raw_config', raw_config_object)
 
 @server_api.route('/raw_config/')
 class ServerConfigAPI(APIResource):
+
     @api.doc(description='Return config file encoded in Base64')
     @api.response(200, model=raw_config_schema, description='Flexget raw YAML config file')
     def get(self, session=None):
@@ -217,6 +222,7 @@ version_schema = api.schema('server.version', {
 
 @server_api.route('/version/')
 class ServerVersionAPI(APIResource):
+
     @api.response(200, description='Flexget version', model=version_schema)
     def get(self, session=None):
         """ Flexget Version """
@@ -246,6 +252,7 @@ dump_threads_schema = api.schema('server.dump_threads', {
 
 @server_api.route('/dump_threads/')
 class ServerDumpThreads(APIResource):
+
     @api.response(200, description='Flexget threads dump', model=dump_threads_schema)
     def get(self, session=None):
         """ Dump Server threads for debugging """
@@ -321,6 +328,7 @@ def file_inode(filename):
 
 @server_api.route('/log/')
 class ServerLogAPI(APIResource):
+
     @api.doc(parser=server_log_parser)
     @api.response(200, description='Streams as line delimited JSON')
     def get(self, session=None):

@@ -106,6 +106,7 @@ class Credential(Base):
 
 
 class FriendlySearchQuery(object):
+
     def __init__(self):
         self.expression = None
         self.category_name = None
@@ -740,6 +741,7 @@ class T411Proxy(object):
 
 
 class T411BindAuth(AuthBase):
+
     def __init__(self, api_token):
         self.api_token = api_token
 

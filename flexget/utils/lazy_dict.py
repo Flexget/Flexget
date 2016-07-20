@@ -51,6 +51,7 @@ class LazyLookup(object):
 
 
 class LazyDict(MutableMapping):
+
     def __init__(self, *args, **kwargs):
         self.store = dict(*args, **kwargs)
 

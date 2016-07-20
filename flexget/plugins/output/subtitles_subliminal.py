@@ -25,7 +25,7 @@ class PluginSubliminal(object):
     """
     Search and download subtitles using Subliminal by Antoine Bertin
     (https://pypi.python.org/pypi/subliminal).
-    
+
     Example (complete task)::
 
       subs:

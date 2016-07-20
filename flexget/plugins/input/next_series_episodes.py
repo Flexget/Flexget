@@ -188,7 +188,7 @@ class NextSeriesEpisodes(object):
                 # There are know releases of this episode, but none were accepted
                 return
             elif latest and identified_by == 'ep' and (
-                            entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
+                    entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
                 # We searched for next predicted episode of this season unsuccessfully, try the next season
                 self.rerun_entries.append(self.search_entry(series, latest.season + 1, 1, task))
                 log.debug('%s %s not found, rerunning to look for next season' %

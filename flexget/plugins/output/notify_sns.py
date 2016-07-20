@@ -70,6 +70,7 @@ class SNSNotification(object):
 
 
 class SNSNotificationEmitter(object):
+
     def __init__(self, config):
         self.config = config
         import boto3

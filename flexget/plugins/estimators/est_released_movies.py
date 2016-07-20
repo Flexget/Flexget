@@ -11,6 +11,7 @@ log = logging.getLogger('est_movies')
 
 
 class EstimatesReleasedMovies(object):
+
     def estimate(self, entry):
         if 'tmdb_released' in entry:
             log.verbose('Querying release estimation for %s' % entry['title'])

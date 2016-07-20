@@ -199,9 +199,9 @@ class UoccinReader(object):
 
     def on_task_output(self, task, config):
         """Process incoming diff to update the uoccin.json file. Requires the location field.
-        
+
         Example::
-        
+
           uoccin_sync_task:
             seen: local
             find:
@@ -212,7 +212,7 @@ class UoccinReader(object):
             uoccin_reader:
               uuid: '{{ secrets.uoccin.uuid }}'
               path: '{{ secrets.uoccin.path }}'
-        
+
         Note::
         - the uoccin.json file will be created if not exists.
         - the uuid must be a filename-safe text.
@@ -269,18 +269,18 @@ class UoccinWatchlist(UoccinWriter):
     def on_task_output(self, task, config):
         """Add or remove in the uoccin.json file watchlist the accepted series and/or movies.
         Requires tvdb_id for series and imdb_id for movies.
-        
+
         Examples::
-            
+
             uoccin_watchlist_add:
               uuid: flexget_server_home
               path: /path/to/gdrive/uoccin
               tags: [ 'discovered', 'evaluate', 'bazinga' ]
-            
+
             uoccin_watchlist_remove:
               uuid: flexget_server_home
               path: /path/to/gdrive/uoccin
-        
+
         Note::
         - the uoccin.json file will be created if not exists.
         - the uuid must be a filename-safe text.
@@ -349,13 +349,13 @@ class UoccinCollection(UoccinWriter):
     def on_task_output(self, task, config):
         """Set the accepted episodes and/or movies as collected (or not) in the uoccin.json file.
         Requires tvdb_id, series_season and series_episode fields for episodes, or imdb_id for movies.
-        
+
         Example::
-            
+
             uoccin_collection_remove:
               uuid: flexget_server_home
               path: /path/to/gdrive/uoccin
-        
+
         Note::
         - the uoccin.json file will be created if not exists.
         - the uuid must be a filename-safe text.
@@ -404,13 +404,13 @@ class UoccinWatched(UoccinWriter):
     def on_task_output(self, task, config):
         """Set the accepted episodes and/or movies as watched (or not) in the uoccin.json file.
         Requires tvdb_id, series_season and series_episode fields for episodes, or imdb_id for movies.
-        
+
         Example::
-            
+
             uoccin_watched_true:
               uuid: flexget_server_home
               path: /path/to/gdrive/uoccin
-        
+
         Note::
         - the uoccin.json file will be created if not exists.
         - the uuid must be a filename-safe text.
@@ -455,13 +455,13 @@ class UoccinSubtitles(UoccinWriter):
         """Set subtitles info for accepted episodes and/or movies in the uoccin.json file.
         Requires the subtitles field (set by subtitles_check plugin), plus tvdb_id, series_season and series_episode 
         for episodes, or imdb_id for movies.
-        
+
         Example::
-            
+
             uoccin_subtitles:
               uuid: flexget_server_home
               path: /path/to/gdrive/uoccin
-        
+
         Note::
         - the uoccin.json file will be created if not exists.
         - the uuid must be a filename-safe text.

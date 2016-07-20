@@ -25,7 +25,7 @@ class OutputAria2(object):
     """
     aria2 output plugin
     Version 1.0.0
-    
+
     Configuration:
     server:     Where aria2 daemon is running. default 'localhost'
     port:       Port of that server. default '6800'

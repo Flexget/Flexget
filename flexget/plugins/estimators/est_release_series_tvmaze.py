@@ -19,6 +19,7 @@ log = logging.getLogger('est_series_tvmaze')
 
 
 class EstimatesSeriesTVMaze(object):
+
     @plugin.priority(2)
     def estimate(self, entry):
         if not all(field in entry for field in ['series_name', 'series_season', 'series_episode']):

@@ -212,7 +212,7 @@ class Decompress(object):
             except archive.FSError as error:
                 error_message = 'OS error while creating file: %s (%s)' % (destination, error)
             except archive.ArchiveError as error:
-                error_message = 'Failed to extract file: %s in %s (%s)' % (info.filename, \
+                error_message = 'Failed to extract file: %s in %s (%s)' % (info.filename,
                                                                            archive_path, error)
 
             if error_message:

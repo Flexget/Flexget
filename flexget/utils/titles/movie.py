@@ -21,6 +21,7 @@ def diff_pos(string1, string2):
 
 
 class MovieParser(TitleParser):
+
     def __init__(self):
         self.data = None
         self.reset()

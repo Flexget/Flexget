@@ -56,6 +56,7 @@ field_maps = {
 
 
 class TraktSet(MutableSet):
+
     @property
     def immutable(self):
         if self.config['list'] in IMMUTABLE_LISTS:
@@ -226,7 +227,7 @@ class TraktSet(MutableSet):
                ['trakt_movie_id', 'imdb_id', 'tmdb_id']):
             return True
         if entry1.get('movie_name') and ((entry1.get('movie_name'), entry1.get('movie_year')) ==
-                                             (entry2.get('movie_name'), entry2.get('movie_year'))):
+                                         (entry2.get('movie_name'), entry2.get('movie_year'))):
             return True
         return False
 
@@ -235,18 +236,23 @@ class TraktSet(MutableSet):
         found = {}
         for entry in entries:
             if self.config['type'] in ['auto', 'episodes'] and (
-                                    entry.get('trakt_episode_id') or
-                                    entry.get('tvdb_id') or
-                                entry.get('imdb_id') or
-                            entry.get('tmdb_id') or
-                        entry.get('tvrage_id')
+                entry.get('trakt_episode_id') or
+                entry.get('tvdb_id') or
+                entry.get('imdb_id') or
+                entry.get('tmdb_id') or
+                entry.get('tvrage_id')
             ):
                 episode = {'ids': {}}
-                if entry.get('trakt_episode_id'): episode['ids']['trakt'] = entry['trakt_episode_id']
-                if entry.get('tvdb_id'): episode['ids']['tvdb'] = entry['tvdb_id']
-                if entry.get('imdb_id'): episode['ids']['imdb'] = entry['imdb_id']
-                if entry.get('tmdb_id'): episode['ids']['tmdb'] = entry['tmdb_id']
-                if entry.get('tvrage_id'): episode['ids']['tvrage'] = entry['tvrage_id']
+                if entry.get('trakt_episode_id'):
+                    episode['ids']['trakt'] = entry['trakt_episode_id']
+                if entry.get('tvdb_id'):
+                    episode['ids']['tvdb'] = entry['tvdb_id']
+                if entry.get('imdb_id'):
+                    episode['ids']['imdb'] = entry['imdb_id']
+                if entry.get('tmdb_id'):
+                    episode['ids']['tmdb'] = entry['tmdb_id']
+                if entry.get('tvrage_id'):
+                    episode['ids']['tvrage'] = entry['tvrage_id']
                 if not episode['ids']:
                     log.debug('Not submitting `%s`, no episode identifier found.' % entry['title'])
                     continue

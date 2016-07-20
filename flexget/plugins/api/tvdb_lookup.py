@@ -98,6 +98,7 @@ series_parser.add_argument('include_actors', type=inputs.boolean, help='Include 
 @tvdb_api.route('/series/<string:title>/')
 @api.doc(params={'title': 'TV Show name or TVDB ID'}, parser=series_parser)
 class TVDBSeriesSearchApi(APIResource):
+
     @api.response(200, 'Successfully found show', tvdb_series_schema)
     @api.response(404, 'No show found', default_error_schema)
     def get(self, title, session=None):
@@ -131,6 +132,7 @@ episode_parser.add_argument('absolute_number', type=int, help='Absolute episode 
 @tvdb_api.route('/episode/<int:tvdb_id>/')
 @api.doc(params={'tvdb_id': 'TVDB ID of show'}, parser=episode_parser)
 class TVDBEpisodeSearchAPI(APIResource):
+
     @api.response(200, 'Successfully found episode', tvdb_episode_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.response(500, 'Not enough parameters for lookup', default_error_schema)
@@ -174,6 +176,7 @@ search_parser.add_argument('force_search', type=inputs.boolean,
 @tvdb_api.route('/search/')
 @api.doc(parser=search_parser)
 class TVDBSeriesSearchAPI(APIResource):
+
     @api.response(200, 'Successfully got results', search_results_schema)
     @api.response(404, 'No results found', default_error_schema)
     @api.response(400, 'Not enough parameters for lookup', default_error_schema)

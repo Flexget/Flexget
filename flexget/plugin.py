@@ -61,6 +61,7 @@ class DependencyError(Exception):
 
 
 class RegisterException(Exception):
+
     def __init__(self, value):
         super(RegisterException, self).__init__()
         self.value = value
@@ -71,6 +72,7 @@ class RegisterException(Exception):
 
 @python_2_unicode_compatible
 class PluginWarning(Warning):
+
     def __init__(self, value, logger=log, **kwargs):
         super(PluginWarning, self).__init__()
         self.value = value
@@ -83,6 +85,7 @@ class PluginWarning(Warning):
 
 @python_2_unicode_compatible
 class PluginError(Exception):
+
     def __init__(self, value, logger=log, **kwargs):
         super(PluginError, self).__init__()
         # Value is expected to be a string

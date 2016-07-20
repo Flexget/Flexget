@@ -93,6 +93,7 @@ tvmaze_episode_schema = api.schema('tvmaze_episode_schema', tvmaze_episode_objec
 @tvmaze_api.route('/series/<string:title>/')
 @api.doc(params={'title': 'TV Show name or TVMaze ID'})
 class TVDBSeriesSearchApi(APIResource):
+
     @api.response(200, 'Successfully found show', model=tvmaze_series_schema)
     @api.response(404, 'No show found', default_error_schema)
     def get(self, title, session=None):
@@ -124,6 +125,7 @@ episode_parser.add_argument('air_date', type=inputs.date_from_iso8601, help="Air
 @api.doc(params={'tvmaze_id': 'TVMaze ID of show'})
 @api.doc(parser=episode_parser)
 class TVDBEpisodeSearchAPI(APIResource):
+
     @api.response(200, 'Successfully found episode', tvmaze_episode_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.response(500, 'Not enough parameters for lookup', default_error_schema)

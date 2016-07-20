@@ -57,6 +57,7 @@ history_parser.add_argument('task', type=str, required=False, default=None, help
 @history_api.route('/')
 @api.doc(parser=history_parser)
 class HistoryAPI(APIResource):
+
     @api.response(404, description='Page does not exist', model=default_error_schema)
     @api.response(200, model=history_api_schema)
     def get(self, session=None):

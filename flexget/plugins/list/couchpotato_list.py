@@ -16,6 +16,7 @@ log = logging.getLogger('couchpotato_list')
 
 
 class CouchPotatoBase(object):
+
     @staticmethod
     def movie_list_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)

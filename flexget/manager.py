@@ -142,7 +142,8 @@ class Manager(object):
                 self.options, extra = CoreArgumentParser().parse_known_args(args)
             except ParserError:
                 try:
-                    # If a non-built-in command was used, we need to parse with a parser that doesn't define the subparsers
+                    # If a non-built-in command was used, we need to parse with a parser that
+                    # doesn't define the subparsers
                     self.options, extra = manager_parser.parse_known_args(args)
                 except ParserError as e:
                     manager_parser.print_help()

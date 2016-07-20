@@ -24,6 +24,7 @@ log = logging.getLogger('rtorrent')
 class _Method(object):
     # some magic to bind an XML-RPC method to an RPC server.
     # supports "nested" methods (e.g. examples.getStateName)
+
     def __init__(self, send, name):
         self.__send = send
         self.__name = name

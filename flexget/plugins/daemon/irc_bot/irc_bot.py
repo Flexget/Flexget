@@ -29,6 +29,7 @@ def partial(func, *args, **kwargs):
 
 
 class EventHandler(object):
+
     def __init__(self, func, command=None, msg=None):
         self.func = func
         self.command = command
@@ -40,6 +41,7 @@ def printable_unicode_list(unicode_list):
 
 
 class QueuedCommand(object):
+
     def __init__(self, after, scheduled_time, command, persists=False):
         self.after = after
         self.scheduled_time = scheduled_time
@@ -58,6 +60,7 @@ class QueuedCommand(object):
 
 
 class Schedule(object):
+
     def __init__(self):
         self.queue = []
 
@@ -403,6 +406,7 @@ class IRCBot(asynchat.async_chat):
 
 @python_2_unicode_compatible
 class IRCMessage(object):
+
     def __init__(self, msg):
         rfc_1459 = "^(@(?P<tags>[^ ]*) )?(:(?P<prefix>[^ ]+) +)?(?P<command>[^ ]+)( *(?P<arguments> .+))?"
         msg_contents = re.match(rfc_1459, msg)
