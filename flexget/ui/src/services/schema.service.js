@@ -14,19 +14,19 @@
             return $http.get('/api/schema/' + path)
                 .then(
 				function (response) {
-					return response.data
+					return response.data;
 				},
 				function (httpError) {
-					throw httpError.status + " : " + httpError.data;
+					throw httpError.status + ' : ' + httpError.data;
 				});
         };
 
         this.config = function (name) {
-            return this.get('config/' + name)
+            return this.get('config/' + name);
         };
 
         this.plugin = function (name) {
-            return this.get('config/' + name)
+            return this.get('config/' + name);
         };
     }
 

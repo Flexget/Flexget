@@ -49,7 +49,7 @@
 			if (typeof vm.stream !== 'undefined' && vm.stream) {
 				vm.stream.abort();
 				vm.stream = false;
-				vm.status = "Disconnected";
+				vm.status = 'Disconnected';
 			}
 		}
 
@@ -61,7 +61,7 @@
 		}
 
 		function start() {
-			vm.status = "Connecting";
+			vm.status = 'Connecting';
 			vm.gridOptions.data = [];
 
 			var queryParams = '?lines=' + vm.filter.lines;
@@ -76,7 +76,7 @@
 				.catch(failFunction);
 			
 			function startFunction() {
-				vm.status = "Streaming";
+				vm.status = 'Streaming';
 			}
 
 			function messageFunction(message) {
@@ -84,7 +84,7 @@
 			}
 
 			function failFunction() {
-				vm.status = "Disconnected";
+				vm.status = 'Disconnected';
 			}
 		}
 
@@ -99,7 +99,7 @@
 				{ field: 'task', name: 'Task', enableSorting: false, width: 65, cellTooltip: true },
 				{ field: 'message', name: 'Message', enableSorting: false, minWidth: 400, cellTooltip: true }
 			],
-			rowTemplate: "row-template.html"
+			rowTemplate: 'row-template.html'
 		};
 
 		// Cancel timer and stop the stream when navigating away

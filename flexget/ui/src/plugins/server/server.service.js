@@ -76,7 +76,7 @@
 				var response = {
 					title: 'Shutdown Success',
 					message: 'Flexget has been shutdown'
-				}
+				};
 				return response;
 			}
 
@@ -84,7 +84,7 @@
 				var response = {
 					title: 'Shutdown Failed',
 					message: error.data.message
-				}
+				};
 				return response;
 			}
         }

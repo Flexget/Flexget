@@ -10,22 +10,22 @@ describe('Series Routes:', function () {
 		bard.inject('$state', '$rootScope', '$location');
     });
 
-    it("should map state 'flexget.series' to url #/series", function () {
+    it('should map state \'flexget.series\' to url #/series', function () {
 		expect($state.href('flexget.series', {})).to.equal('#/series');
     });
 	
-	it.skip("should map state to the 'series' component", function () {
+	it.skip('should map state to the \'series\' component', function () {
 		expect($state.get('flexget.series').component).to.equal('seriesView');
 	});
 	
-	describe("Transitions", function() {
-		it("should work with $state.go", function () {
+	describe('Transitions', function() {
+		it('should work with $state.go', function () {
 			$state.go('flexget.series');
 			$rootScope.$digest();
 			expect($state.is('flexget.series')).to.be.true;
 		});
 		
-		it("should work with 'series' path", function() {
+		it('should work with \'series\' path', function() {
 			$location.path('series');
 			$rootScope.$digest();
 			expect($state.is('flexget.series')).to.be.true;

@@ -1,4 +1,4 @@
-describe("Plugin: Series-Entry.Component", function () {
+describe('Plugin: Series-Entry.Component', function () {
 	var component, deferred;
 	var metadata = mockSeriesData.getShowMetadata();
 	var show = mockSeriesData.getShow();
@@ -14,7 +14,7 @@ describe("Plugin: Series-Entry.Component", function () {
 		component = $componentController('seriesEntry');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(component).to.exist;
 	});
 

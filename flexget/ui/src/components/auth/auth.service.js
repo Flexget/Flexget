@@ -27,13 +27,13 @@
 			if (isLoggedIn) {
 				def.resolve(isLoggedIn);
 			} else {
-				$http.get("/api/server/version/", {
+				$http.get('/api/server/version/', {
 					ignoreAuthModule: true
 				})
 					.then(function () {
 						def.resolve();
 					}, function () {
-						def.reject()
+						def.reject();
 					});
 			}
 

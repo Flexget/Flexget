@@ -17,13 +17,13 @@
             page_size: 10,
             in_config: 'all',
             sort_by: 'show_name'
-        }
+        };
 
 		var params = {
 			forget: true
-		}
+		};
 
-        vm.searchTerm = "";
+        vm.searchTerm = '';
 
 		vm.$onInit = activate;
 		vm.forgetShow = forgetShow;
@@ -47,9 +47,9 @@
 		function forgetShow(show) {
 			var confirm = $mdDialog.confirm()
                 .title('Confirm forgetting show.')
-                .htmlContent("Are you sure you want to completely forget <b>" + show.show_name + "</b>?<br /> This will also forget all downloaded releases.")
-                .ok("Forget")
-                .cancel("No");
+                .htmlContent('Are you sure you want to completely forget <b>' + show.show_name + '</b>?<br /> This will also forget all downloaded releases.')
+                .ok('Forget')
+                .cancel('No');
 
 			$mdDialog.show(confirm).then(function () {
 				seriesService.deleteShow(show, params).then(function () {
@@ -63,7 +63,7 @@
             options.page = index;
 
             getSeriesList();
-        }
+        };
 
 
         function search() {
@@ -119,7 +119,7 @@
             if (showIndex === index && index === (vm.series.length - 1)) isOnRightRow = true;
 
             return isOnRightRow;
-        }
+        };
     }
 
 }());

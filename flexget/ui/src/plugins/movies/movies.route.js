@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-		.module("plugins.movies")
+		.module('plugins.movies')
 		.run(appRun);
 
 	function appRun(routerHelper) {
@@ -23,6 +23,6 @@
 					}
 				}
 			}
-		]
+		];
 	}
 }());

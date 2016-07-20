@@ -15,7 +15,7 @@
 
         return {
             getSchedules: getSchedules
-        }
+        };
 
         function getSchedules() {
             return $http.get('/api/schedules/', { cache: scheduleCache })

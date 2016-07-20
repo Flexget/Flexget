@@ -1,4 +1,4 @@
-describe("Plugin: Log.component", function () {
+describe('Plugin: Log.component', function () {
 	var controller;
 
 	beforeEach(function () {
@@ -11,17 +11,17 @@ describe("Plugin: Log.component", function () {
 		controller = $componentController('logView');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(controller).to.exist;
 	});
 
-	describe("activation", function () {
+	describe('activation', function () {
 		beforeEach(function () {
 			sinon.stub(controller, 'start');
 			controller.$onInit();
 		});
 		
-		it("should call the start function", function () {
+		it('should call the start function', function () {
 			expect(controller.start).to.have.been.calledOnce;
 		});
 	});
@@ -29,7 +29,7 @@ describe("Plugin: Log.component", function () {
 	describe('clear()', function () {
 		it('should clear the gridOptions data', function () {
 			controller.gridOptions.data = [
-				{ row: "Test" }
+				{ row: 'Test' }
 			];
 
 			controller.clear();
@@ -47,7 +47,7 @@ describe("Plugin: Log.component", function () {
 		});
 	});
 
-	describe("toggle()", function () {
+	describe('toggle()', function () {
 		it('should set call the stop function', function () {
 			sinon.stub(controller, 'stop');
 
@@ -59,7 +59,7 @@ describe("Plugin: Log.component", function () {
 		it('should set call the start function', function () {
 			sinon.stub(controller, 'start');
 
-			controller.status = "Disconnected";
+			controller.status = 'Disconnected';
 
 			controller.toggle();
 
@@ -81,8 +81,8 @@ describe("Plugin: Log.component", function () {
 	describe('start()', function () {
 		it('should get tested', function () {
 			expect(true).to.be.true;
-		})
-	})
+		});
+	});
 
 	describe('refresh()', function () {
 		it('should call the stop and start functions', function () {

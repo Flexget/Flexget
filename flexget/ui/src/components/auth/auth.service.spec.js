@@ -1,19 +1,19 @@
-describe("Service: Auth", function () {
+describe('Service: Auth', function () {
 	beforeEach(function () {
 		bard.appModule('components.auth');
 		bard.inject('$httpBackend', 'authService', 'exception', '$q', '$state');
 
-		sinon.stub(exception, 'catcher').returns($q.reject({ message: "Request failed" }));
+		sinon.stub(exception, 'catcher').returns($q.reject({ message: 'Request failed' }));
 		
 		$state.go = sinon.stub();
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(authService).to.exist;
 	});
 
 	describe('logout()', function () {
-		it("should issue a GET /api/auth/logout/ request", function () {
+		it('should issue a GET /api/auth/logout/ request', function () {
 			$httpBackend.expect('GET', '/api/auth/logout/').respond(200, {});
 			
 			authService.logout();
@@ -23,14 +23,14 @@ describe("Service: Auth", function () {
 			$httpBackend.verifyNoOutstandingRequest();
 		});
 
-		describe("successful logout", function () {
+		describe('successful logout', function () {
 			beforeEach(function () {
 				$httpBackend.expect('GET', '/api/auth/logout/').respond(200, {});
 
 				authService.logout();
 			});
 
-			it("should go to the login state after successful logout", function () {
+			it('should go to the login state after successful logout', function () {
 				$httpBackend.flush();
 
 				expect($state.go).to.have.been.calledOnce;
@@ -52,13 +52,13 @@ describe("Service: Auth", function () {
 
 				expect($state.go).to.have.been.calledOnce;
 				expect($state.go).to.have.been.calledWith('flexget.home');
-			})
+			});
 		});	
 
-		it("should report an error if request fails", function () {
+		it('should report an error if request fails', function () {
 			$httpBackend.expect('GET', '/api/auth/logout/').respond(500);
 			authService.logout().catch(function (error) {
-				expect(error.message).to.equal("Request failed");
+				expect(error.message).to.equal('Request failed');
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
 			$httpBackend.flush();

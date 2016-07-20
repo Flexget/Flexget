@@ -15,7 +15,7 @@
 
         return {
             getSeen: getSeen
-        }
+        };
 
         function getSeen() {
             return $http.get('/api/seen/', { cache: seenCache })
