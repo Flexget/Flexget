@@ -1,7 +1,9 @@
+/* global angular */
 (function () {
     'use strict';
 
-    angular.module('components.sidenav')
+    angular
+		.module('components.sidenav')
         .factory('sideNavService', sideNavService);
 
     function sideNavService($mdMedia, $mdSidenav, $rootScope) {

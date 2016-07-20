@@ -1,21 +1,21 @@
-describe("Sidenav Service:", function () {
-	var mdMediaLgSize;
-
+/* global bard */
+describe('Sidenav Service:', function () {
 	beforeEach(function () {
 		bard.appModule('components.sidenav');
 
-		bard.inject('sideNavService')
+		/* global sideNavService */
+		bard.inject('sideNavService');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(sideNavService).to.exist;
 	});
 
 	describe('toggle()', function () {
-		it("should exist", function () {
+		it('should exist', function () {
 			expect(sideNavService.toggle).to.exist;
 		});
-		
+
 		//TODO: test funcionalities, check how to mock $mdMedia and $mdSidenav etc
 	});
 
