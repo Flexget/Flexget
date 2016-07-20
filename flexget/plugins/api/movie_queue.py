@@ -189,7 +189,7 @@ class MovieQueueManageAPI(APIResource):
         """ Returns a movie from queue by ID """
         try:
             movie = mq.get_movie_by_id(movie_id=id)
-        except NoResultFound as e:
+        except NoResultFound:
             return {'status': 'error',
                     'message': 'movie with ID {0} was not found'.format(id)}, 404
         return jsonify(movie)

@@ -342,15 +342,13 @@ class TestSeriesParser(object):
         """SeriesParser: test that qualities are not picked as ep"""
         from flexget.utils import qualities
         for quality in qualities.all_components():
-            s = parse('FooBar %s XviD-FlexGet' % quality.name, name='FooBar')
-            # assert_raises(ParseWarning, s.parse)
+            parse('FooBar %s XviD-FlexGet' % quality.name, name='FooBar')
 
     def test_sound_as_ep(self, parse):
         """SeriesParser: test that sound infos are not picked as ep"""
         sounds = ['AC3', 'DD5.1', 'DTS']
         for sound in sounds:
-            s = parse(data='FooBar %s XViD-FlexGet' % sound, name='FooBar')
-            # assert_raises(ParseWarning, s.parse)
+            parse(data='FooBar %s XViD-FlexGet' % sound, name='FooBar')
 
     def test_ep_as_quality(self, parse):
         """SeriesParser: test that eps are not picked as qualities"""

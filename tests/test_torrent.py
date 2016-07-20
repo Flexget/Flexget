@@ -131,7 +131,7 @@ class TestModifyTrackers(object):
 
     @pytest.mark.filecopy('test.torrent', '__tmp__/test.torrent')
     def test_modify_trackers(self, execute_task, tmpdir):
-        task = execute_task('test_modify_trackers')
+        execute_task('test_modify_trackers')
         torrent = self.load_torrent(os.path.join(tmpdir.strpath, 'test.torrent'))
         assert 'http://torrent.replaced.com:6969/announce' in torrent.trackers, \
             'ubuntu tracker should have been added'
@@ -256,7 +256,7 @@ class TestTorrentScrub(object):
 
     @pytest.mark.filecopy(test_files, '__tmp__')
     def test_torrent_scrub_off(self, execute_task, tmpdir):
-        task = execute_task('test_off')
+        execute_task('test_off')
 
         for filename in self.test_files:
             osize = os.path.getsize(filename)

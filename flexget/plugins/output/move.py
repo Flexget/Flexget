@@ -18,7 +18,7 @@ def get_directory_size(directory):
     :return: Size in bytes (recursively)
     """
     dir_size = 0
-    for (path, dirs, files) in os.walk(directory):
+    for (path, _, files) in os.walk(directory):
         for file in files:
             filename = os.path.join(path, file)
             dir_size += os.path.getsize(filename)

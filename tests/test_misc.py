@@ -132,7 +132,7 @@ class TestDownload(object):
         # A little convoluted, but you have to set the umask in order to have
         # the current value returned to you
         curr_umask = os.umask(0)
-        tmp_umask = os.umask(curr_umask)
+        os.umask(curr_umask)
         # executes task and downloads the file
         task = execute_task('test')
         assert task.entries[0]['location'], 'location missing?'
