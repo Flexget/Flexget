@@ -1,8 +1,9 @@
+/* global angular */
 (function () {
     'use strict';
 
     angular
-        .module("components.core")
+        .module('components.core')
         .run(appRun);
 
     function appRun(routerHelper) {
@@ -18,6 +19,6 @@
 					templateUrl: 'layout.tmpl.html'
 				}
 			}
-        ]
+        ];
     }
 }());
