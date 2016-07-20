@@ -1,6 +1,7 @@
+/* global angular */
 (function () {
 	'use strict';
-	
+
 	angular
 		.module('plugins.movies')
 		.component('moviesView', {
@@ -16,7 +17,7 @@
 		vm.$onInit = activate;
 		vm.deleteMovieList = deleteMovieList;
 		vm.newList = newList;
-		
+
 		function activate() {
 			getMovieLists();
 		}
@@ -51,7 +52,7 @@
 			var listNames = vm.lists.map(function (list) {
 				return list.name;
 			});
-		
+
 			var dialog = {
 				template: '<new-list lists="vm.lists"></new-list>',
 				locals: {

@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -55,4 +56,4 @@
 			$mdDialog.cancel();
 		}
     }
-}());										
+}());

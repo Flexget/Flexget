@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -47,7 +48,7 @@
 			$mdDialog.show(dialog).then(function (begin) {
 				if (begin) {
 					vm.show.begin_episode.episode_identifier = begin;
-				}	
+				}
 			});
 		}
 
@@ -65,7 +66,7 @@
             });
         }*/
 
-        
+
 
         /*//Call from the page, to open a dialog with alternate names
         vm.alternateName = function (ev) {

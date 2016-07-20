@@ -1,3 +1,4 @@
+/* global bard, sinon, mockMovieListData */
 describe('Plugin: Movie-Entry.Component', function () {
 	var component, deferred;
 	var movie = mockMovieListData.getMovieListMovieById();
@@ -5,6 +6,8 @@ describe('Plugin: Movie-Entry.Component', function () {
 
 	beforeEach(function () {
 		bard.appModule('plugins.movies');
+
+		/* global $componentController, $q, moviesService, $rootScope */
 		bard.inject('$componentController', '$q', 'moviesService', '$rootScope');
 
 		sinon.stub(moviesService, 'getMovieMetadata').returns($q.when(metadata));

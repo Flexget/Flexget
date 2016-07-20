@@ -1,3 +1,4 @@
+/* global bard, sinon, mockSeriesData */
 describe('Plugin: Series.Component', function () {
 	var component, deferred;
 	var shows = mockSeriesData.getShows();
@@ -5,6 +6,8 @@ describe('Plugin: Series.Component', function () {
 
 	beforeEach(function () {
 		bard.appModule('plugins.series');
+
+		/* global $componentController, $q, seriesService, $rootScope, $mdDialog, $timeout */
 		bard.inject('$componentController', '$q', 'seriesService', '$rootScope', '$mdDialog', '$timeout');
 
 		sinon.stub(seriesService, 'getShows').returns($q.when(shows));
@@ -57,7 +60,7 @@ describe('Plugin: Series.Component', function () {
 		describe('confirmation', function () {
 			it('should call the series service', function () {
 				sinon.stub($mdDialog, 'show').returns($q.resolve());
-				
+
 				component.forgetShow(show);
 
 				$rootScope.$digest();
