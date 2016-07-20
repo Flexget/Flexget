@@ -35,6 +35,7 @@ log = logging.getLogger('transmission')
 
 
 class TransmissionBase(object):
+
     def __init__(self):
         self.client = None
         self.opener = None
@@ -146,6 +147,7 @@ class TransmissionBase(object):
 
 
 class PluginTransmissionInput(TransmissionBase):
+
     def validator(self):
         """Return config validator"""
         root = validator.factory()
@@ -180,9 +182,9 @@ class PluginTransmissionInput(TransmissionBase):
             downloaded, bigfella = self.torrent_info(torrent, config)
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             if not config['onlycomplete'] or (downloaded and
-                                                  ((
-                                                                       torrent.status == 'stopped' and seed_ratio_ok is None and idle_limit_ok is None) or
-                                                       (seed_ratio_ok is True or idle_limit_ok is True))):
+                                              ((
+                                                  torrent.status == 'stopped' and seed_ratio_ok is None and idle_limit_ok is None) or
+                                               (seed_ratio_ok is True or idle_limit_ok is True))):
                 entry = Entry(title=torrent.name,
                               url='file://%s' % torrent.torrentFile,
                               torrent_info_hash=torrent.hashString,
@@ -448,13 +450,13 @@ class PluginTransmission(TransmissionBase):
                 main_id = None
                 # We need to index the files if any of the following are defined
                 if ('main_file_only' in options['post'] and options['post']['main_file_only'] == True or
-                            'content_filename' in options['post'] or skip_files):
+                        'content_filename' in options['post'] or skip_files):
                     fl = cli.get_files(r.id)
 
                     if ('magnetization_timeout' in options['post'] and
-                                options['post']['magnetization_timeout'] > 0 and
+                        options['post']['magnetization_timeout'] > 0 and
                             not downloaded and
-                                len(fl[r.id]) == 0):
+                            len(fl[r.id]) == 0):
                         log.debug('Waiting %d seconds for "%s" to magnetize' % (
                             options['post']['magnetization_timeout'],
                             entry['title']))
@@ -489,7 +491,7 @@ class PluginTransmission(TransmissionBase):
                             if _find_matches(fl[r.id][f]['name'], options['post']['include_files']):
                                 dl_list.append(f)
                             elif ('include_subs' in options['post'] and options['post']['include_subs'] == True and
-                                      _find_matches(fl[r.id][f]['name'], ext_list)):
+                                  _find_matches(fl[r.id][f]['name'], ext_list)):
                                 dl_list.append(f)
 
                         if skip_files:
@@ -550,16 +552,16 @@ class PluginTransmission(TransmissionBase):
                                 log.error('content_filename only supported with transmission 2.8+')
 
                     if ('main_file_only' in options['post'] and options['post']['main_file_only'] == True and
-                                main_id is not None):
+                            main_id is not None):
                         # Set Unwanted Files
                         options['change']['files_unwanted'] = [x for x in full_list if x not in dl_list]
                         options['change']['files_wanted'] = dl_list
                         log.debug('Downloading %s of %s files in torrent.' %
                                   (len(options['change']['files_wanted']), len(full_list)))
                     elif (('main_file_only' not in options['post'] or
-                                   options['post']['main_file_only'] == False or
-                                   main_id is None) and
-                              skip_files):
+                           options['post']['main_file_only'] == False or
+                           main_id is None) and
+                          skip_files):
                         # If no main file and we want to skip files
 
                         if len(skip_list) >= len(full_list):
@@ -578,7 +580,7 @@ class PluginTransmission(TransmissionBase):
                 # if addpaused was defined and set to False start the torrent;
                 # prevents downloading data before we set what files we want
                 if ('paused' in options['post'] and options['post']['paused'] == False or
-                                'paused' not in options['post'] and cli.get_session().start_added_torrents == True):
+                        'paused' not in options['post'] and cli.get_session().start_added_torrents == True):
                     cli.start_torrent(r.id)
                 elif ('paused' in options['post'] and options['post']['paused'] == True):
                     log.debug('sleeping 5s to stop the torrent...')
@@ -606,26 +608,26 @@ class PluginTransmission(TransmissionBase):
 class PluginTransmissionClean(TransmissionBase):
     """
     Remove completed torrents from Transmission.
-    
+
     Examples::
-      
+
       clean_transmission: yes  # ignore both time and ratio
 
       clean_transmission:      # uses transmission's internal limits for idle time and seed ratio ( if defined )
         transmission_seed_limits: yes
-      
+
       clean_transmission:      # matches time only
         finished_for: 2 hours
-      
+
       clean_transmission:      # matches ratio only
         min_ratio: 0.5
-      
+
       clean_transmission:      # matches time OR ratio
         finished_for: 2 hours
         min_ratio: 0.5
-    
+
     Default values for the config elements::
-    
+
       clean_transmission:
         host: localhost
         port: 9091
@@ -681,13 +683,13 @@ class PluginTransmissionClean(TransmissionBase):
             is_directories_matching = not directories_re or any(
                 re.compile(directory, re.IGNORECASE).search(torrent.downloadDir) for directory in directories_re)
             if (downloaded and (is_clean_all or
-                                    is_transmission_seedlimit_unset or
-                                    is_transmission_seedlimit_reached or
-                                    is_transmission_idlelimit_reached or
-                                    is_minratio_reached or
-                                    (is_torrent_seed_only and is_torrent_idlelimit_since_added_reached) or
-                                    (not is_torrent_seed_only and is_torrent_idlelimit_since_finished_reached))
-                and is_tracker_matching and is_directories_matching):
+                                is_transmission_seedlimit_unset or
+                                is_transmission_seedlimit_reached or
+                                is_transmission_idlelimit_reached or
+                                is_minratio_reached or
+                                (is_torrent_seed_only and is_torrent_idlelimit_since_added_reached) or
+                                (not is_torrent_seed_only and is_torrent_idlelimit_since_finished_reached))
+                    and is_tracker_matching and is_directories_matching):
                 if task.options.test:
                     log.info('Would remove finished torrent `%s` from transmission' % torrent.name)
                     continue

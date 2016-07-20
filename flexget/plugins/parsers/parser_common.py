@@ -35,6 +35,7 @@ def clean_value(name):
 
 
 class ParseWarning(Warning):
+
     def __init__(self, parsed, value, **kwargs):
         self.value = value
         self.parsed = parsed
@@ -309,6 +310,7 @@ class ParsedVideo(ABCMeta(native_str('ParsedVideoABCMeta'), (ParsedEntry,), {}))
 
 
 class ParsedVideoQuality(ABCMeta(native_str('ParsedVideoQualityABCMeta'), (object,), {})):
+
     @abstractproperty
     def screen_size(self):
         raise NotImplementedError
@@ -351,6 +353,7 @@ class ParsedVideoQuality(ABCMeta(native_str('ParsedVideoQualityABCMeta'), (objec
 
 
 class ParsedMovie(ABCMeta(native_str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
+
     @property
     def parsed_name(self):
         return self.title
@@ -464,14 +467,14 @@ class ParsedSerie(ABCMeta(native_str('ParsedSerieABCMeta'), (ParsedVideo,), {}))
             if self.identified_by != 'auto' and self.identified_by != self.id_type:
                 return False
             if self.complete or (self.identified_by in ['auto', 'ep'] and
-                                         self.season is not None and self.episode is None):
+                                 self.season is not None and self.episode is None):
                 return False
             if self.identified_by in ['auto', 'ep'] and self.episodes > 3:
                 return False
             if self.identified_by in ['ep', 'sequence'] and self.episode is None:
                 return False
             if self.identified_by == 'ep' and (self.episode is None or (self.season is None and
-                                                                            not self.allow_seasonless)):
+                                                                        not self.allow_seasonless)):
                 return False
             if self.identified_by == 'date' and not self.date:
                 return False

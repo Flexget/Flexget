@@ -71,8 +71,8 @@ class FilterSeriesPremiere(FilterSeriesBase):
         for entry in task.entries:
             for series in guessed_series.values():
                 if entry.get('series_name') == series and not (
-                                entry.get('series_season') == 1 and
-                                entry.get('series_episode') in desired_eps):
+                        entry.get('series_season') == 1 and
+                        entry.get('series_episode') in desired_eps):
                     entry.reject('Non premiere episode in a premiere series')
         # Since we are running after task start phase, make sure not to merge into the config multiple times on reruns
         if not task.is_rerun:

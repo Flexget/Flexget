@@ -13,7 +13,6 @@ log = logging.getLogger('notify_xmpp')
 try:
     import sleekxmpp
 
-
     class SendMsgBot(sleekxmpp.ClientXMPP):
 
         def __init__(self, jid, password, recipients, message):

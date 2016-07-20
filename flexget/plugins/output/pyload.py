@@ -16,6 +16,7 @@ log = getLogger('pyload')
 
 
 class PyloadApi(object):
+
     def __init__(self, requests, url):
         self.requests = requests
         self.url = url

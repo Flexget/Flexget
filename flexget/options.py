@@ -58,6 +58,7 @@ def required_length(nmin, nmax):
     """Generates a custom Action to validate an arbitrary range of arguments."""
 
     class RequiredLength(Action):
+
         def __call__(self, parser, args, values, option_string=None):
             if not nmin <= len(values) <= nmax:
                 raise ArgumentError(self, 'requires between %s and %s arguments' % (nmin, nmax))
@@ -87,12 +88,14 @@ class VersionAction(_VersionAction):
 
 
 class DebugAction(Action):
+
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, True)
         namespace.loglevel = 'debug'
 
 
 class DebugTraceAction(Action):
+
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, True)
         namespace.debug = True
@@ -100,6 +103,7 @@ class DebugTraceAction(Action):
 
 
 class CronAction(Action):
+
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, True)
         # Only set loglevel if it has not already explicitly been set
@@ -109,6 +113,7 @@ class CronAction(Action):
 
 # This makes the old --inject form forwards compatible
 class InjectAction(Action):
+
     def __call__(self, parser, namespace, values, option_string=None):
         kwargs = {'title': values.pop(0)}
         if values:
@@ -143,6 +148,7 @@ class ParseExtrasAction(Action):
 
 
 class ScopedNamespace(Namespace):
+
     def __init__(self, **kwargs):
         super(ScopedNamespace, self).__init__(**kwargs)
         self.__parent__ = None
@@ -182,6 +188,7 @@ class ScopedNamespace(Namespace):
 
 
 class NestedSubparserAction(_SubParsersAction):
+
     def __init__(self, *args, **kwargs):
         self.nested_namespaces = kwargs.pop('nested_namespaces', False)
         self.parent_defaults = {}
@@ -211,6 +218,7 @@ class NestedSubparserAction(_SubParsersAction):
 
 
 class ParserError(Exception):
+
     def __init__(self, message, parser):
         self.message = message
         self.parser = parser

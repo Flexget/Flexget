@@ -20,7 +20,6 @@ try:
     import win32service
     import win32serviceutil
 
-
     class AppServerSvc(win32serviceutil.ServiceFramework):
         _svc_name_ = 'FlexGet'
         _svc_display_name_ = 'FlexGet Daemon'

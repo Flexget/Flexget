@@ -68,6 +68,7 @@ def convert_bytes(bytes):
 
 
 class MergeException(Exception):
+
     def __init__(self, value):
         self.value = value
 
@@ -162,7 +163,7 @@ def merge_dict_from_to(d1, d2):
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
             elif (isinstance(v, (basestring, bool, int, float, type(None))) and
-                      isinstance(d2[k], (basestring, bool, int, float, type(None)))):
+                  isinstance(d2[k], (basestring, bool, int, float, type(None)))):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
@@ -173,6 +174,7 @@ def merge_dict_from_to(d1, d2):
 
 
 class SmartRedirectHandler(request.HTTPRedirectHandler):
+
     def http_error_301(self, req, fp, code, msg, headers):
         result = request.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
         result.status = code

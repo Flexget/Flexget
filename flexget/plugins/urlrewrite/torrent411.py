@@ -264,8 +264,8 @@ class t411Auth(AuthBase):
                         password = cookie.value
 
                 if authKey is not None and \
-                                uid is not None and \
-                                password is not None:
+                        uid is not None and \
+                        password is not None:
                     authCookie = {'uid': uid,
                                   'password': password,
                                   'authKey': authKey

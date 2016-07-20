@@ -55,6 +55,7 @@ def set_unresponsive(url):
 
 
 class DomainLimiter(object):
+
     def __init__(self, domain):
         self.domain = domain
 
@@ -66,7 +67,7 @@ class DomainLimiter(object):
 class TokenBucketLimiter(DomainLimiter):
     """
     A token bucket rate limiter for domains.
-    
+
     New instances for the same domain will restore previous values.
     """
     # This is just an in memory cache right now, it works for the daemon, and across tasks in a single execution

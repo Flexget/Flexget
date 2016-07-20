@@ -24,7 +24,7 @@ class NPOWatchlist(object):
 
         If 'remove_accepted' is set to 'yes', the plugin will delete accepted entries from the watchlist after download
         is complete.
-        
+
         For example:
             npo_watchlist:
               email: aaaa@bbb.nl

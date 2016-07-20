@@ -159,8 +159,8 @@ class SubtitleQueue(object):
                 elif sub_item.alternate_path and os.path.exists(sub_item.alternate_path):
                     path = sub_item.alternate_path
                 elif not config['remove_not_found'] and \
-                                        sub_item.added + parse_timedelta('24 hours') > datetime.combine(date.today(),
-                                                                                                        time()):
+                    sub_item.added + parse_timedelta('24 hours') > datetime.combine(date.today(),
+                                                                                time()):
                     log.warning('File %s was not found. Deleting after %s.' %
                                 (sub_item.path, str(sub_item.added + parse_timedelta('24 hours'))))
                     continue
@@ -214,7 +214,7 @@ class SubtitleQueue(object):
                             files = [item.lower() for item in files]
                             for lang in primary:
                                 if not any('%s.%s' % (path_no_ext, lang) and
-                                                   f.lower().endswith(SUBTITLE_EXTENSIONS) for f in files):
+                                           f.lower().endswith(SUBTITLE_EXTENSIONS) for f in files):
                                     break
                             else:
                                 log.debug('All subtitles already fetched for %s.' % entry['title'])

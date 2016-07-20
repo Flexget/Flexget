@@ -10,6 +10,7 @@ log = logging.getLogger('details')
 
 
 class PluginDetails(object):
+
     def on_task_start(self, task, config):
         # Make a flag for tasks to declare if it is ok not to produce entries
         task.no_entries_ok = False

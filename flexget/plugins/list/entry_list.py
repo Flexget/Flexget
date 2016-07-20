@@ -91,6 +91,7 @@ class EntryListEntry(Base):
 
 
 class DBEntrySet(MutableSet):
+
     def _db_list(self, session):
         return session.query(EntryListList).filter(EntryListList.name == self.config).first()
 

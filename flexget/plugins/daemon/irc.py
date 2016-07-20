@@ -138,6 +138,7 @@ class MissingConfigOption(Exception):
 
 
 class IRCConnection(irc_bot.IRCBot):
+
     def __init__(self, config, config_name):
         self.config = config
         self.connection_name = config_name
@@ -680,6 +681,7 @@ def irc_update_config(manager):
 
 
 class IRCConnectionManager(object):
+
     def __init__(self, config):
         self.config = config
         self.shutdown_event = threading.Event()

@@ -138,6 +138,7 @@ class EntryContainer(list):
 
 
 class TaskAbort(Exception):
+
     def __init__(self, reason, silent=False):
         self.reason = reason
         self.silent = silent

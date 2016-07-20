@@ -25,6 +25,7 @@ logging.getLogger('guessit').setLevel(logging.WARNING)
 
 
 class GuessitParsedEntry(ParsedEntry):
+
     def __init__(self, data, name, guess_result, **kwargs):
         ParsedEntry.__init__(self, data, name, **kwargs)
         self._guess_result = guess_result
@@ -60,6 +61,7 @@ class GuessitParsedEntry(ParsedEntry):
 
 
 class GuessitParsedVideoQuality(ParsedVideoQuality):
+
     def __init__(self, guess_result):
         self._guess_result = guess_result
 
@@ -141,6 +143,7 @@ class GuessitParsedVideoQuality(ParsedVideoQuality):
 
 
 class GuessitParsedVideo(GuessitParsedEntry, ParsedVideo):
+
     def __init__(self, data, name, guess_result, **kwargs):
         GuessitParsedEntry.__init__(self, data, name, guess_result, **kwargs)
         self._quality = None
@@ -169,6 +172,7 @@ class GuessitParsedVideo(GuessitParsedEntry, ParsedVideo):
 
 
 class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
+
     def __init__(self, data, name, guess_result, **kwargs):
         GuessitParsedVideo.__init__(self, data, name, guess_result, **kwargs)
 
@@ -299,6 +303,7 @@ guessit_api = GuessItApi(rebulk_builder().rebulk(_id_regexps))
 
 
 class ParserGuessit(object):
+
     def _guessit_options(self, options):
         settings = {'name_only': True, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
         # 'clean_function': clean_value

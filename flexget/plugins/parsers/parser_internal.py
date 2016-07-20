@@ -16,6 +16,7 @@ log = logging.getLogger('parser_internal')
 
 class ParserInternal(object):
     # movie_parser API
+
     @plugin.priority(1)
     def parse_movie(self, data, **kwargs):
         log.debug('Parsing movie: `%s` kwargs: %s', data, kwargs)

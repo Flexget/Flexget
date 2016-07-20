@@ -42,6 +42,7 @@ schedule_desc = "Schedule ID changes upon daemon restart. The schedules object s
 @schedule_api.route('/')
 @api.doc(description=schedule_desc)
 class SchedulesAPI(APIResource):
+
     @api.response(200, model=api_schedules_list_schema)
     def get(self, session=None):
         """ List schedules """
@@ -83,6 +84,7 @@ class SchedulesAPI(APIResource):
 @api.doc(params={'schedule_id': 'ID of Schedule'})
 @api.doc(description=schedule_desc)
 class ScheduleAPI(APIResource):
+
     @api.response(200, model=api_schedule_schema)
     @api.response(404, description='Schedule not found')
     def get(self, schedule_id, session=None):

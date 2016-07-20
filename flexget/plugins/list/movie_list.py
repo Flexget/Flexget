@@ -113,6 +113,7 @@ class MovieListID(Base):
 
 
 class MovieList(MutableSet):
+
     def _db_list(self, session):
         return session.query(MovieListList).filter(MovieListList.name == self.list_name).first()
 

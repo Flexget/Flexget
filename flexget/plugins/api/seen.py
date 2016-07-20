@@ -104,6 +104,7 @@ seen_delete_parser.add_argument('is_seen_local', type=inputs.boolean, default=No
 
 @seen_api.route('/')
 class SeenSearchAPI(APIResource):
+
     @api.response(404, 'Page does not exist', model=default_error_schema)
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
     @api.doc(parser=seen_search_parser, description='Get seen entries')
@@ -229,6 +230,7 @@ class SeenSearchAPI(APIResource):
 @api.response(500, 'Delete process failed', model=default_error_schema)
 @api.response(200, 'Successfully deleted entry', empty_response)
 class SeenSearchAPI(APIResource):
+
     def delete(self, seen_entry_id, session):
         """ Delete seen entry by ID """
         try:

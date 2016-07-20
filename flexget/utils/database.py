@@ -186,6 +186,7 @@ def quality_property(text_attr):
             setattr(self, text_attr, value.name)
 
     class QualComparator(Comparator):
+
         def operate(self, op, other):
             if isinstance(other, qualities.Quality):
                 other = other.name
