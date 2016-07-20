@@ -54,6 +54,24 @@ plugins_parser.add_argument('group', help='Show plugins belonging to this group'
 plugins_parser.add_argument('phase', help='Show plugins that act on this phase')
 
 
+def plugin_to_dict(plugin):
+    """ Returns a dict for API usage from a PluginInfo object
+    :param plugin: PluginInfo instance
+    :return: Dict
+    """
+    return {
+        'name': plugin.name,
+        'api_ver': plugin.api_ver,
+        'builtin': plugin.builtin,
+        'category': plugin.category,
+        'contexts': plugin.contexts,
+        'debug': plugin.debug,
+        'groups': plugin.groups,
+        'phase_handlers': [dict(phase=handler, priority=event.priority) for handler, event in
+                           plugin.phase_handlers.items()]
+    }
+
+
 @plugins_api.route('/')
 class PluginsAPI(APIResource):
     @api.response(200, model=plugin_list_reply_schema)
@@ -65,7 +83,7 @@ class PluginsAPI(APIResource):
         plugin_list = []
         try:
             for plugin in get_plugins(phase=args['phase'], group=args['group']):
-                p = plugin.to_dict()
+                p = plugin_to_dict(plugin)
                 if args['include_schema']:
                     p['schema'] = plugin.schema
                 plugin_list.append(p)
@@ -87,7 +105,7 @@ class PluginAPI(APIResource):
             plugin = get_plugin_by_name(plugin_name, issued_by='plugins API')
         except DependencyError as e:
             raise BadRequest(e.message)
-        p = plugin.to_dict()
+        p = plugin_to_dict(plugin)
         if args['include_schema']:
             p['schema'] = plugin.schema
         return p
