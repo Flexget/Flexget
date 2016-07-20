@@ -130,10 +130,9 @@ class TransmissionBase(object):
             raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required.', log)
         if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 11]:
             raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required, please upgrade', log)
-        """
-        Mark rpc client for garbage collector so every task can start 
-        a fresh new according its own config - fix to bug #2804
-        """
+
+        # Mark rpc client for garbage collector so every task can start
+        # a fresh new according its own config - fix to bug #2804
         self.client = None
         config = self.prepare_config(config)
         if config['enabled']:
