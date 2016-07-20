@@ -77,10 +77,7 @@ class VersionChecker(object):
             log.debug('dev version detected, skipping check')
             return
 
-        if config.get('lookup') == 'always':
-            always_check = True
-        else:
-            always_check = False
+        always_check = bool(config.get('lookup') == 'always')
         interval = config.get('interval')
 
         session = Session()
