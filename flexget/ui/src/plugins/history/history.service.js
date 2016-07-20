@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -15,7 +16,7 @@
 
         return {
             getHistory: getHistory
-        }
+        };
 
         function getHistory() {
             return $http.get('/api/history/', { cache: historyCache })

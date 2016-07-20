@@ -1,8 +1,9 @@
+/* global angular */
 (function () {
     'use strict';
 
     angular
-		.module("plugins.history")
+		.module('plugins.history')
 		.run(appRun);
 
 	function appRun(routerHelper) {
@@ -23,6 +24,6 @@
 					}
 				}
 			}
-		]
+		];
 	}
 }());

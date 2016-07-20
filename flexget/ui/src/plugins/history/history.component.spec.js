@@ -1,12 +1,14 @@
-describe("Plugin: History.component", function () {
+/* global bard, sinon, mockHistoryData */
+describe('Plugin: History.component', function () {
 	var controller;
 	var history = mockHistoryData.getMockHistory();
 
 	beforeEach(function () {
 		bard.appModule('plugins.history');
 
+		/* global $componentController, history, $q, $rootScope */
 		bard.inject('$componentController', 'historyService', '$q', '$rootScope');
-		
+
 		sinon.stub(historyService, 'getHistory').returns($q.when(history));
 	});
 
@@ -14,11 +16,11 @@ describe("Plugin: History.component", function () {
 		controller = $componentController('historyView');
 	});
 
-	it("should exist", function () {
+	it('should exist', function () {
 		expect(controller).to.exist;
 	});
 
-	describe("activation", function () {
+	describe('activation', function () {
 		beforeEach(function() {
 			controller.$onInit();
 			$rootScope.$digest();
@@ -26,9 +28,9 @@ describe("Plugin: History.component", function () {
 
 		it('should have called the history service', function () {
 			expect(historyService.getHistory).to.have.been.calledOnce;
-		})
-		
-		it("should have entries", function () {
+		});
+
+		it('should have entries', function () {
 			expect(controller.entries).to.not.be.empty;
 		});
 	});

@@ -13,11 +13,11 @@ describe('Config Routes:', function () {
 		bard.inject('$state', '$rootScope', '$location');
     });
 
-    it('should map state "flexget.config" to url #/config', function () {
+    it('should map state \'flexget.config\' to url #/config', function () {
 		expect($state.href('flexget.config', {})).to.equal('#/config');
     });
 
-	it.skip('should map state to the "config" component', function () {
+	it.skip('should map state to the \'config\' component', function () {
 		expect($state.get('flexget.config').component).to.equal('configView');
 	});
 
@@ -28,7 +28,7 @@ describe('Config Routes:', function () {
 			expect($state.is('flexget.config')).to.be.true;
 		});
 
-		it('should work with "config" path', function() {
+		it('should work with \'config\' path', function() {
 			$location.path('config');
 			$rootScope.$digest();
 			expect($state.is('flexget.config')).to.be.true;
