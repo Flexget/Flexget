@@ -1,8 +1,9 @@
+/* global angular */
 (function () {
 	'use strict';
-	
+
 	angular
-		.module("plugins.history")
+		.module('plugins.history')
 		.component('historyView', {
 			templateUrl: 'plugins/history/history.tmpl.html',
 			controllerAs: 'vm',
