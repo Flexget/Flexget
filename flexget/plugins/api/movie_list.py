@@ -122,7 +122,6 @@ movie_list_parser.add_argument('name', help='Filter results by list name')
 
 @movie_list_api.route('/')
 class MovieListAPI(APIResource):
-
     @api.response(200, model=return_lists_schema)
     @api.doc(parser=movie_list_parser)
     def get(self, session=None):
@@ -157,7 +156,6 @@ class MovieListAPI(APIResource):
 @movie_list_api.route('/<int:list_id>/')
 @api.doc(params={'list_id': 'ID of the list'})
 class MovieListListAPI(APIResource):
-
     @api.response(404, model=default_error_schema)
     @api.response(200, model=list_object_schema)
     def get(self, list_id, session=None):
@@ -195,7 +193,6 @@ movies_parser.add_argument('page_size', type=int, default=10, help='Number of mo
 
 @movie_list_api.route('/<int:list_id>/movies/')
 class MovieListMoviesAPI(APIResource):
-
     @api.response(404, model=default_error_schema)
     @api.response(200, model=return_movies_schema)
     @api.doc(params={'list_id': 'ID of the list'}, parser=movies_parser)
@@ -208,10 +205,7 @@ class MovieListMoviesAPI(APIResource):
 
         start = page_size * (page - 1)
         stop = start + page_size
-        if args.get('order') == 'desc':
-            descending = True
-        else:
-            descending = False
+        descending = bool(args.get('order') == 'desc')
 
         kwargs = {
             'start': start,
@@ -282,7 +276,6 @@ class MovieListMoviesAPI(APIResource):
 @api.doc(params={'list_id': 'ID of the list', 'movie_id': 'ID of the movie'})
 @api.response(404, description='List or movie not found', model=default_error_schema)
 class MovieListMovieAPI(APIResource):
-
     @api.response(200, model=movie_list_object_schema)
     def get(self, list_id, movie_id, session=None):
         """ Get a movie by list ID and movie ID """
