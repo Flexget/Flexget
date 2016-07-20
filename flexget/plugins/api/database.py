@@ -3,12 +3,11 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
-from flask import request
+from flask import jsonify
 from flask_restplus import inputs
 
-from flexget.manager import Base
-from flexget.db_schema import reset_schema
-from flexget.api import api, APIResource, NotFoundError, ApiError
+from flexget.db_schema import reset_schema, plugin_schemas
+from flexget.api import api, APIResource
 
 log = logging.getLogger('database')
 
@@ -16,20 +15,20 @@ db_api = api.namespace('database', description='Manage Flexget DB')
 
 
 @db_api.route('/cleanup/')
-@api.doc(description='Make all plugins clean un-needed data from the database')
 class DBCleanup(APIResource):
     @api.response(200, 'DB Cleanup triggered')
     def get(self, session=None):
+        """ Make all plugins clean un-needed data from the database """
         self.manager.db_cleanup(force=True)
         return {'status': 'success',
                 'message': 'DB Cleanup triggered'}, 200
 
 
 @db_api.route('/vacuum/')
-@api.doc(description='Running vacuum can increase performance and decrease database size')
 class DBVacuum(APIResource):
     @api.response(200, 'DB VACUUM triggered')
     def get(self, session=None):
+        """ Potentially increase performance and decrease database size"""
         session.execute('VACUUM')
         session.commit()
         return {'status': 'success',
@@ -50,6 +49,7 @@ class DBPluginReset(APIResource):
     @api.response(500, 'The plugin has no stored schema to reset')
     @api.doc(parser=plugin_parser)
     def get(self, session=None):
+        """ Reset the DB of a specific plugin """
         args = plugin_parser.parse_args()
         plugin = args['plugin_name']
         try:
@@ -59,3 +59,10 @@ class DBPluginReset(APIResource):
                     'message': 'The plugin {} has no stored schema to reset'.format(plugin)}, 400
         return {'status': 'success',
                 'message': 'Plugin {} DB reset was successful'.format(plugin)}, 200
+
+
+@db_api.route('/plugins/')
+class DBPluginsSchemas(APIResource):
+    def get(self, session=None):
+        """ Get a list of plugin names available to reset """
+        return jsonify(plugin_schemas.keys())
