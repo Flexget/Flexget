@@ -1,9 +1,10 @@
+/* global angular */
 (function () {
 	'use strict';
 
 	angular
 		.module('components.toolbar')
-		.run(toolbarSetup)
+		.run(toolbarSetup);
 
 	function toolbarSetup(toolBarService) {
 		var manageMenu = {
@@ -14,7 +15,7 @@
 			order: 255
 		};
 
-		//Register default Manage menu		
+		//Register default Manage menu
 		toolBarService.registerItem(manageMenu);
 	}
 }());

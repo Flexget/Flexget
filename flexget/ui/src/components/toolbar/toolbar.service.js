@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -16,27 +17,27 @@
 
 		function registerItem(item) {
 			switch (item.type) {
-				case "menu":
+				case 'menu':
 					registerMenu(item);
 					break;
 
-				case "menuItem":
+				case 'menuItem':
 					registerMenuItem(item);
 					break;
 
-				case "button":
+				case 'button':
 					registerButton(item);
 					break;
 
 				default:
-					throw "Unknown toolbar item type found: " + item.type;
+					throw 'Unknown toolbar item type found: ' + item.type;
 			}
 		}
 
         function getMenu(menu) {
             for (var i = 0, len = items.length; i < len; i++) {
                 var item = items[i];
-                if (item.type == 'menu' && item.label == menu) {
+                if (item.type === 'menu' && item.label === menu) {
                     return item;
                 }
             }
@@ -58,7 +59,7 @@
 				}
 				items.push(item);
 			} else {
-				throw(new Error("Menu " + item.label + " has already been registered"));
+				throw(new Error('Menu ' + item.label + ' has already been registered'));
 			}
 		}
 
