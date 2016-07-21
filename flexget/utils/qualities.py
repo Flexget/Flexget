@@ -144,7 +144,7 @@ _sources = [
     QualityComponent('source', 130, 'dvdscr', '(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
     QualityComponent('source', 140, 'bdscr', 'bdscr(?:eener)?'),
     QualityComponent('source', 150, 'hdtv', 'a?hdtv(?:[\W_]?rip)?'),
-    QualityComponent('source', 160, 'webdl', 'web(?:[\W_]?(dl|hd))'),
+    QualityComponent('source', 160, 'webdl', 'web(?:[\W_]?(dl|hd))?'),
     QualityComponent('source', 170, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
     QualityComponent('source', 175, 'remux'),
     QualityComponent('source', 180, 'bluray', '(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)')
