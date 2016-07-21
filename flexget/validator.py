@@ -179,7 +179,7 @@ class ChoiceValidator(Validator):
         self.valid_ic = []
         Validator.__init__(self, parent, **kwargs)
 
-    def accept(self, value, ignore_case=False):
+    def accept(self, value, ignore_case=False):  # pylint: disable=W0221
         """
         :param value: accepted text, int or boolean
         :param bool ignore_case: Whether case matters for text values
