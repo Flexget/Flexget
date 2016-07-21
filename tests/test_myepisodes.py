@@ -19,10 +19,8 @@ class TestMyEpisodes(object):
               password: flexget
     """
 
+    @pytest.mark.skip(reason="Test myepisodes (DISABLED) -- account locked?")
     def test_myepisodes_id(self, execute_task):
-        """Test myepisodes (DISABLED) -- account locked?"""
-        return
-
         task = execute_task('test')
         entry = task.find_entry('accepted', title='the.simpsons.S10E10.hdtv')
         assert entry, 'entry not present'
