@@ -142,33 +142,33 @@ class MovieList(MutableSet):
         with Session() as session:
             return len(self._db_list(session).movies)
 
-    @with_session
-    def add(self, entry, session=None):
-        # Check if this is already in the list, refresh info if so
-        db_list = self._db_list(session=session)
-        db_movie = self._find_entry(entry, session=session)
-        # Just delete and re-create to refresh
-        if db_movie:
-            session.delete(db_movie)
-        db_movie = MovieListMovie()
-        if 'movie_name' in entry:
-            db_movie.title, db_movie.year = entry['movie_name'], entry.get('movie_year')
-        else:
-            db_movie.title, db_movie.year = split_title_year(entry['title'])
-        for id_name in MovieListBase().supported_ids:
-            if id_name in entry:
-                db_movie.ids.append(MovieListID(id_name=id_name, id_value=entry[id_name]))
-        log.debug('adding entry %s', entry)
-        db_list.movies.append(db_movie)
-        session.commit()
-        return db_movie.to_entry()
+    def add(self, entry):
+        with Session() as session:
+            # Check if this is already in the list, refresh info if so
+            db_list = self._db_list(session=session)
+            db_movie = self._find_entry(entry, session=session)
+            # Just delete and re-create to refresh
+            if db_movie:
+                session.delete(db_movie)
+            db_movie = MovieListMovie()
+            if 'movie_name' in entry:
+                db_movie.title, db_movie.year = entry['movie_name'], entry.get('movie_year')
+            else:
+                db_movie.title, db_movie.year = split_title_year(entry['title'])
+            for id_name in MovieListBase().supported_ids:
+                if id_name in entry:
+                    db_movie.ids.append(MovieListID(id_name=id_name, id_value=entry[id_name]))
+            log.debug('adding entry %s', entry)
+            db_list.movies.append(db_movie)
+            session.commit()
+            return db_movie.to_entry()
 
-    @with_session
-    def discard(self, entry, session=None):
-        db_movie = self._find_entry(entry, session=session)
-        if db_movie:
-            log.debug('deleting movie %s', db_movie)
-            session.delete(db_movie)
+    def discard(self, entry):
+        with Session() as session:
+            db_movie = self._find_entry(entry, session=session)
+            if db_movie:
+                log.debug('deleting movie %s', db_movie)
+                session.delete(db_movie)
 
     def __contains__(self, entry):
         return self._find_entry(entry) is not None
