@@ -17,9 +17,9 @@ class TestOnlyTask(object):
               - {title: 'nodownload', url: 'http://localhost/nodownload'}
     """
 
+    @pytest.mark.skip(reason="1.2 we need to test this with execute command")
     def test_manual_with_onlytask(self, execute_task):
         # TODO: 1.2 we need to test this with execute command
-        return
         # Pretend we have been run with --task test
         # This task should run normally, as we specified it as onlytask
         task = execute_task('test', options=dict(tasks=['test']))
