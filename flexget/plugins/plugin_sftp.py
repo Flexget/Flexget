@@ -553,18 +553,18 @@ class SftpUpload(object):
 
         if not sftp.isdir(to):
             log.error('Not a directory: %s' % to)
-            entry.fail
+            entry.fail('Not a directory: %s' % to)
             return
 
         try:
             sftp.put(localpath=location, remotepath=destination)
             log.verbose('Successfully uploaded %s to %s' % (location, destination_url))
+        except OSError as e:
+            log.warning('File no longer exists: %s', location)
+            return
         except IOError as e:
             log.error('Remote directory does not exist: %s (%s)' % to)
             entry.fail
-            return
-        except OSError as e:
-            log.warning('File no longer exists: %s', location)
             return
         except Exception as e:
             log.error('Failed to upload %s (%s)' % (location, e))

@@ -487,7 +487,10 @@ class Task(object):
         if reason:
             msg += ' Reason: {0}'.format(reason)
         # Only print the first request for a rerun to the info log
-        log.debug(msg) if self._rerun else log.info(msg)
+        if self._rerun:
+            log.debug(msg)
+        else:
+            log.info(msg)
         self._rerun = True
 
     def config_changed(self):

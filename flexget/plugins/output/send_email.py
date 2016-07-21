@@ -99,12 +99,9 @@ def send_email(subject, content, config):
                     mailServer.ehlo()
                     mailServer.starttls()
                     mailServer.ehlo()
-        except OSError as e:
+        except (socket.error, OSError) as e:
             # Ticket #1133
             log.warning('Unable to send email: %s' % e)
-            return
-        except socket.error as e:
-            log.warning('Socket error: %s' % e)
             return
 
         try:
