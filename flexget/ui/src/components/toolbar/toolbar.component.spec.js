@@ -5,8 +5,8 @@ describe('Toolbar Component:', function () {
 	beforeEach(function () {
 		bard.appModule('components.toolbar');
 
-		/* global $componentController, sideNavService, $rootScope */
-		bard.inject('$componentController', 'sideNavService', '$rootScope');
+		/* global $componentController, sideNavService */
+		bard.inject('$componentController', 'sideNavService');
 
 		sinon.stub(sideNavService, 'toggle');
 	});

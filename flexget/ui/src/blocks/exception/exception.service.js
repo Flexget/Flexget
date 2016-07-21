@@ -13,7 +13,7 @@
 
 		function catcher(error) {
 			//Don't show toast when request failed because of auth problems
-			if (error.status != 401 && error.status != 403) {
+			if (error.status !== 401 && error.status !== 403) {
 				$log.log(error.data.message);
 
 				//TODO: Check if this needs to improve

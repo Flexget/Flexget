@@ -35,7 +35,7 @@
 		}
 
 		function toggle() {
-			if (vm.status == 'Disconnected') {
+			if (vm.status === 'Disconnected') {
 				vm.start();
 			} else {
 				vm.stop();

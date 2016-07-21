@@ -3,8 +3,8 @@ describe('Core Routes:', function () {
     beforeEach(function () {
 		module('components.core');
 
-		/* global $state, $rootScope, $location */
-		bard.inject('$state', '$rootScope', '$location');
+		/* global $state */
+		bard.inject('$state');
     });
 
     it('Abstract parent state \'flexget\' should be present in all states', function () {

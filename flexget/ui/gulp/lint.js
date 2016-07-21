@@ -23,5 +23,5 @@ gulp.task('lint', function () {
 		.pipe($.eslint.format())
 		.pipe($.eslint.format('html', fs.createWriteStream('reports/lint.html')))
 		.pipe($.if(isFixed, gulp.dest(paths.src)))
-		.pipe($.eslint.failAfterError())
+		.pipe($.eslint.failAfterError());
 });

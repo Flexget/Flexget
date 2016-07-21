@@ -28,7 +28,7 @@
 
 		function initCache() {
 			if (!CacheFactory.get('aceThemeCache')) {
-				CacheFactory('aceThemeCache', {
+				CacheFactory.createCache('aceThemeCache', {
 					storageMode: 'localStorage'
 				});
 			}
