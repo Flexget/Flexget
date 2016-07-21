@@ -138,7 +138,6 @@ class MissingConfigOption(Exception):
 
 
 class IRCConnection(irc_bot.IRCBot):
-
     def __init__(self, config, config_name):
         self.config = config
         self.connection_name = config_name
@@ -313,7 +312,8 @@ class IRCConnection(irc_bot.IRCBot):
             if isinstance(tasks, basestring):
                 tasks = [tasks]
             log.info('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
-            manager.execute(options={'tasks': tasks, 'cron': True, 'inject': self.entry_queue}, priority=5)
+            manager.execute(options={'tasks': tasks, 'cron': True, 'inject': self.entry_queue}, priority=5,
+                            allow_manual=True)
 
         if tasks_re:
             tasks_entry_map = {}
@@ -681,7 +681,6 @@ def irc_update_config(manager):
 
 
 class IRCConnectionManager(object):
-
     def __init__(self, config):
         self.config = config
         self.shutdown_event = threading.Event()
