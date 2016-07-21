@@ -78,7 +78,7 @@ class LazyDict(MutableMapping):
 
     copy = __copy__
 
-    def get(self, key, default=None, eval_lazy=True):
+    def get(self, key, default=None, eval_lazy=True):  # pylint: disable=W0221
         """
         Adds the `eval_lazy` keyword argument to the normal :func:`dict.get` method.
 

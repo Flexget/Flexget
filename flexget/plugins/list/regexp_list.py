@@ -86,26 +86,26 @@ class RegexpList(MutableSet):
         with Session() as session:
             return self._db_list(session).regexps.count()
 
-    @with_session
-    def add(self, entry, session=None):
-        # Check if this is already in the list, refresh info if so
-        db_list = self._db_list(session=session)
-        db_regexp = self._find_entry(entry, session=session)
-        # Just delete and re-create to refresh
-        if db_regexp:
-            session.delete(db_regexp)
-        db_regexp = RegexListRegexp()
-        db_regexp.regexp = entry.get('regexp', entry['title'])
-        db_list.regexps.append(db_regexp)
-        session.commit()
-        return db_regexp.to_entry()
+    def add(self, entry):
+        with Session() as session:
+            # Check if this is already in the list, refresh info if so
+            db_list = self._db_list(session=session)
+            db_regexp = self._find_entry(entry, session=session)
+            # Just delete and re-create to refresh
+            if db_regexp:
+                session.delete(db_regexp)
+            db_regexp = RegexListRegexp()
+            db_regexp.regexp = entry.get('regexp', entry['title'])
+            db_list.regexps.append(db_regexp)
+            session.commit()
+            return db_regexp.to_entry()
 
-    @with_session
-    def discard(self, entry, session=None):
-        db_regexp = self._find_entry(entry, session=session)
-        if db_regexp:
-            log.debug('deleting file %s', db_regexp)
-            session.delete(db_regexp)
+    def discard(self, entry):
+        with Session() as session:
+            db_regexp = self._find_entry(entry, session=session)
+            if db_regexp:
+                log.debug('deleting file %s', db_regexp)
+                session.delete(db_regexp)
 
     def __contains__(self, entry):
         return self._find_entry(entry, match_regexp=True) is not None
