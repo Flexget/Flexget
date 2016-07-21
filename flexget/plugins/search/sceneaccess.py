@@ -216,7 +216,8 @@ class SceneAccessSearch(object):
                     cat_id = category
                 finally:
                     if isinstance(cat_id, list):
-                        [cat_id_list.append(l) for l in cat_id]
+                        for l in cat_id:
+                            cat_id_list.append(l)
                     else:
                         cat_id_list.append(cat_id)
 

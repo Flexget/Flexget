@@ -1967,7 +1967,7 @@ class TestAlternateNames(object):
         from flexget.manager import Session
         from flexget.plugins.filter.series import AlternateNames
         with Session() as session:
-            task = execute_task('alternate_name')
+            execute_task('alternate_name')
             # test the current state of alternate names
             assert len(session.query(AlternateNames).all()) == 1, 'There should be one alternate name present.'
             assert session.query(AlternateNames).first().alt_name == 'Other Show', \
