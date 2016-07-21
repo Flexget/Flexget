@@ -1,4 +1,4 @@
-/* angular */
+/* global angular */
 (function () {
     'use strict';
 

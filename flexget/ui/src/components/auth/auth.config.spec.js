@@ -1,4 +1,4 @@
-/* global bard */
+/* global bard, sinon */
 describe('Login Config: ', function () {
 	var httpProvider;
 	beforeEach(function () {

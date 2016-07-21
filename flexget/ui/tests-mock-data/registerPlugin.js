@@ -1,2 +1,2 @@
 /* eslint-disable no-unused-vars */
-registerPlugin = sinon.stub();
+var registerPlugin = sinon.stub();

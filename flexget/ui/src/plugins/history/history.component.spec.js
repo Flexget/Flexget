@@ -6,7 +6,7 @@ describe('Plugin: History.component', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.history');
 
-		/* global $componentController, history, $q, $rootScope */
+		/* global $componentController, historyService, $q, $rootScope */
 		bard.inject('$componentController', 'historyService', '$q', '$rootScope');
 
 		sinon.stub(historyService, 'getHistory').returns($q.when(history));

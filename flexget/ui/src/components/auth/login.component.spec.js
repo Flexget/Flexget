@@ -1,4 +1,4 @@
-/* global bard */
+/* global bard, sinon */
 describe('Login Component:', function () {
 	var component, deferred;
 

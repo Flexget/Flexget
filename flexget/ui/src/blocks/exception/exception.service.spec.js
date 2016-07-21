@@ -1,4 +1,4 @@
-/* global bard */
+/* global bard, sinon */
 describe('Blocks: Exception', function () {
 	var mockErrorResponse = {
 		status: 500,
