@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import pickle
 from collections import MutableSet
 from datetime import datetime
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from sqlalchemy import Column, Unicode, select, Integer, DateTime, or_, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
