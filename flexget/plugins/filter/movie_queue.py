@@ -439,7 +439,7 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None,
         item.quality = quality
         session.commit()
         return item.to_dict()
-    except NoResultFound as e:
+    except NoResultFound:
         raise QueueError(
             'imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue %s' % (imdb_id, tmdb_id, movie_id, queue_name))
 
