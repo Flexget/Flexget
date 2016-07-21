@@ -12,13 +12,13 @@ log = logging.getLogger('log_start')
 
 
 @event('manager.startup')
-def log_start(manager):
+def log_on_start(manager):
     if manager.options.log_start:
         log.info('FlexGet started (PID: %s)' % os.getpid())
 
 
 @event('manager.shutdown')
-def log_start(manager):
+def log_on_shutdown(manager):
     if manager.options.log_start:
         log.info('FlexGet stopped (PID: %s)' % os.getpid())
 
