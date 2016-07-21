@@ -305,7 +305,7 @@ class ArgumentParser(ArgParser):
     def error(self, msg):
         raise ParserError(msg, self)
 
-    def parse_args(self, args=None, namespace=None, raise_errors=False, file=None):
+    def parse_args(self, args=None, namespace=None, raise_errors=False, file=None):  # pylint: disable=W0221
         """
         :param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit
         """
