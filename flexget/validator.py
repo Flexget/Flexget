@@ -347,7 +347,7 @@ class PathValidator(TextValidator):
     def __init__(self, parent=None, allow_replacement=False, allow_missing=False, **kwargs):
         self.allow_replacement = allow_replacement
         self.allow_missing = allow_missing
-        Validator.__init__(self, parent, **kwargs)
+        TextValidator.__init__(self, parent, **kwargs)
 
     def _schema(self):
         if self.allow_missing:
