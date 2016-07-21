@@ -363,7 +363,7 @@ class UrlValidator(TextValidator):
             self.protocols = protocols
         else:
             self.protocols = ['ftp', 'http', 'https', 'file']
-        Validator.__init__(self, parent, **kwargs)
+            TextValidator.__init__(self, parent, **kwargs)
 
     def _schema(self):
         return {'type': 'string', 'format': 'url'}
