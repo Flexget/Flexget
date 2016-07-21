@@ -23,6 +23,7 @@ describe('Plugin: Series-Entry.Component', function () {
 
 	describe('activation', function () {
 		beforeEach(function () {
+			/* global angular */
 			component.show = angular.copy(show);
 			component.$onInit();
 			$rootScope.$digest();

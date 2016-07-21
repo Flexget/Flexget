@@ -1,4 +1,4 @@
-/* global bard */
+/* global bard, sinon */
 describe('Plugin: Log.component', function () {
 	var controller;
 

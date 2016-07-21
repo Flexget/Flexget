@@ -113,6 +113,7 @@ describe('Plugin: Movie-list.Component', function () {
 
 				deferred.resolve();
 
+				/* global angular */				
 				component.movies = angular.copy(movies.movies);
 
 				component.deleteMovie(movieList, movie);

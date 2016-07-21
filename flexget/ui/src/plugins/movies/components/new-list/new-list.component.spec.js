@@ -1,4 +1,4 @@
-/* global bard, mockMovieListData */
+/* global bard, sinon, mockMovieListData */
 describe('Plugin: New-list.Component', function () {
 	var component, deferred;
 	var createdList = mockMovieListData.createMovieList();
