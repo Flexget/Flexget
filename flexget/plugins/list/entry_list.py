@@ -111,10 +111,10 @@ class DBEntrySet(MutableSet):
 
         return db_entry
 
-    @with_session
-    def __iter__(self, session=None):
-        return (e.entry for e in
-                self._db_list(session).entries.order_by(EntryListEntry.added.desc()).all())
+    def __iter__(self):
+        with Session() as session:
+            for e in self._db_list(session).entries.order_by(EntryListEntry.added.desc()).all():
+                yield e.entry
 
     def __contains__(self, entry):
         with Session() as session:
@@ -124,26 +124,27 @@ class DBEntrySet(MutableSet):
         with Session() as session:
             return self._db_list(session).entries.count()
 
-    @with_session
-    def discard(self, entry, session=None):
-        db_entry = self._entry_query(session=session, entry=entry)
-        if db_entry:
-            log.debug('deleting entry %s', db_entry)
-            session.delete(db_entry)
+    def discard(self, entry):
+        with Session() as session:
+            db_entry = self._entry_query(session=session, entry=entry)
+            if db_entry:
+                log.debug('deleting entry %s', db_entry)
+                session.delete(db_entry)
 
-    @with_session
-    def add(self, entry, session=None):
+    def add(self, entry):
         # Evaluate all lazy fields so that no db access occurs during our db session
         entry.values()
-        stored_entry = self._entry_query(session, entry)
-        if stored_entry:
-            # Refresh all the fields if we already have this entry
-            log.debug('refreshing entry %s', entry)
-            stored_entry.entry = entry
-        else:
-            log.debug('adding entry %s to list %s', entry, self._db_list(session).name)
-            stored_entry = EntryListEntry(entry=entry, entry_list_id=self._db_list(session).id)
-        session.add(stored_entry)
+
+        with Session() as session:
+            stored_entry = self._entry_query(session, entry)
+            if stored_entry:
+                # Refresh all the fields if we already have this entry
+                log.debug('refreshing entry %s', entry)
+                stored_entry.entry = entry
+            else:
+                log.debug('adding entry %s to list %s', entry, self._db_list(session).name)
+                stored_entry = EntryListEntry(entry=entry, entry_list_id=self._db_list(session).id)
+            session.add(stored_entry)
 
     def __ior__(self, other):
         # Optimization to only open one session when adding multiple items
@@ -169,10 +170,10 @@ class DBEntrySet(MutableSet):
         like test mode"""
         return False
 
-    @with_session
-    def get(self, entry, session=None):
-        match = self._entry_query(session=session, entry=entry)
-        return Entry(match.entry) if match else None
+    def get(self, entry):
+        with Session() as session:
+            match = self._entry_query(session=session, entry=entry)
+            return Entry(match.entry) if match else None
 
 
 class EntryList(object):
