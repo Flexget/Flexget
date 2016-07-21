@@ -18,6 +18,7 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.database import entry_synonym, with_session
+from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('entry_list')
@@ -91,7 +92,6 @@ class EntryListEntry(Base):
 
 
 class DBEntrySet(MutableSet):
-
     def _db_list(self, session):
         return session.query(EntryListList).filter(EntryListList.name == self.config).first()
 
@@ -112,18 +112,18 @@ class DBEntrySet(MutableSet):
 
         return db_entry
 
-    @with_session
-    def __iter__(self, session=None):
-        return (Entry(e.entry) for e in
-                self._db_list(session).entries.order_by(EntryListEntry.added.desc()).all())
+    def __iter__(self):
+        with Session() as session:
+            return (Entry(e.entry) for e in
+                    self._db_list(session).entries.order_by(EntryListEntry.added.desc()).all())
 
-    @with_session
-    def __contains__(self, entry, session=None):
-        return self._entry_query(session, entry) is not None
+    def __contains__(self, entry):
+        with Session() as session:
+            return self._entry_query(session, entry) is not None
 
-    @with_session
-    def __len__(self, session=None):
-        return self._db_list(session).entries.count()
+    def __len__(self):
+        with Session() as session:
+            return self._db_list(session).entries.count()
 
     @with_session
     def discard(self, entry, session=None):

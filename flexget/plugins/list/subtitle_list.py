@@ -12,6 +12,7 @@ from sqlalchemy.orm import relationship
 from babelfish import Language
 
 from flexget import plugin
+from flexget.manager import Session
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 from flexget.event import event
@@ -134,13 +135,13 @@ class SubtitleList(MutableSet):
         if not db_list:
             session.add(SubtitleListList(name=self.config['list']))
 
-    @with_session
-    def __iter__(self, session=None):
-        return iter([file.to_entry() for file in self._db_list(session).files])
+    def __iter__(self):
+        with Session() as session:
+            return iter([file.to_entry() for file in self._db_list(session).files])
 
-    @with_session
-    def __len__(self, session=None):
-        return self._db_list(session).files.count()
+    def __len__(self):
+        with Session() as session:
+            return self._db_list(session).files.count()
 
     def _extract_path(self, entry):
         path = ''

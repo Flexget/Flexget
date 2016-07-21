@@ -10,6 +10,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 
 from flexget import plugin
+from flexget.manager import Session
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 from flexget.event import event
@@ -133,13 +134,13 @@ class MovieList(MutableSet):
         if not db_list:
             session.add(MovieListList(name=self.list_name))
 
-    @with_session
-    def __iter__(self, session=None):
-        return iter([movie.to_entry(self.strip_year) for movie in self._db_list(session).movies])
+    def __iter__(self):
+        with Session() as session:
+            return iter([movie.to_entry(self.strip_year) for movie in self._db_list(session).movies])
 
-    @with_session
-    def __len__(self, session=None):
-        return len(self._db_list(session).movies)
+    def __len__(self):
+        with Session() as session:
+            return len(self._db_list(session).movies)
 
     @with_session
     def add(self, entry, session=None):
