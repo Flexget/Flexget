@@ -41,7 +41,7 @@ class FilterSeenMovies(FilterSeen):
 
     # We run last (-255) to make sure we don't reject duplicates before all the other plugins get a chance to reject.
     @plugin.priority(-255)
-    def on_task_filter(self, task, config):
+    def on_task_filter(self, task, config):  # pylint: disable=W0221
         if not isinstance(config, dict):
             config = {'matching': config}
         # Reject all entries without
