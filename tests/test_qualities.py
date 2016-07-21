@@ -29,6 +29,9 @@ class TestQualityParser(object):
             return ParserGuessit
 
     @pytest.mark.parametrize("test_quality", [
+        ('Test.File 1080p.web', '1080p webdl'),
+        ('Test.File.1080.web-random', '1080p webdl'),
+        ('Test.File.1080.webrandom', '1080p'),
         ('Test.File 1080p.web-dl', '1080p webdl'),
         ('Test.File.web-dl.1080p', '1080p webdl'),
         ('Test.File.WebHD.720p', '720p webdl'),
@@ -48,11 +51,13 @@ class TestQualityParser(object):
         ('Test.File.1080p.10bit', '1080p 10bit'),
         ('Test.File.1080p.bluray.10bit', '1080p bluray 10bit'),
 
+        ('Test.File.720p.web', '720p webdl'),
         ('Test.File.720p.webdl', '720p webdl'),
         ('Test.File.1280x720_web dl', '720p webdl'),
         ('Test.File.720p.h264.web.dl', '720p webdl h264'),
         ('Test.File.1080p.webhd.x264', '1080p webdl h264'),
         ('Test.File.480.hdtv.x265', '480p hdtv h265'),
+        ('Test.File.web', 'webdl'),
         ('Test.File.web-dl', 'webdl'),
         ('Test.File.720P', '720p'),
         ('Test.File.1920x1080', '1080p'),
