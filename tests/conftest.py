@@ -269,7 +269,7 @@ class MockManager(Manager):
         """
         self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))
 
-    def load_config(self):
+    def load_config(self, *args, **kwargs):
         """
         Just load our config from the text passed in on init
         """
