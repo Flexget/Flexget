@@ -111,10 +111,10 @@ class DBEntrySet(MutableSet):
 
         return db_entry
 
-    def __iter__(self):
-        with Session() as session:
-            return (Entry(e.entry) for e in
-                    self._db_list(session).entries.order_by(EntryListEntry.added.desc()).all())
+    @with_session
+    def __iter__(self, session=None):
+        return (e.entry for e in
+                self._db_list(session).entries.order_by(EntryListEntry.added.desc()).all())
 
     def __contains__(self, entry):
         with Session() as session:
