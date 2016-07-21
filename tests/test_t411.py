@@ -185,7 +185,6 @@ class TestRestClient(object):
         except ApiError as e:
             exception_was_raised = True
             assert e.code == 202
-            pass
         assert exception_was_raised
 
 
