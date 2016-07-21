@@ -121,7 +121,7 @@ def get_udp_seeds(url, info_hash):
         return 0
 
     # first 8 bytes are followed by seeders, completed and leechers for requested torrent
-    seeders, completed, leechers = struct.unpack(b">LLL", res[8:20])
+    seeders, completed, _ = struct.unpack(b">LLL", res[8:20])
     log.debug('get_udp_seeds is returning: %s', seeders)
     clisocket.close()
     return seeders
