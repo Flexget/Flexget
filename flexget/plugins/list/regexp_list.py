@@ -10,6 +10,7 @@ from sqlalchemy import Column, Unicode, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from flexget import plugin
+from flexget.manager import Session
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 from flexget.event import event
@@ -77,13 +78,13 @@ class RegexpList(MutableSet):
         if not db_list:
             session.add(RegexpListList(name=self.config))
 
-    @with_session
-    def __iter__(self, session=None):
-        return iter([regexp.to_entry() for regexp in self._db_list(session).regexps])
+    def __iter__(self):
+        with Session() as session:
+            return iter([regexp.to_entry() for regexp in self._db_list(session).regexps])
 
-    @with_session
-    def __len__(self, session=None):
-        return self._db_list(session).regexps.count()
+    def __len__(self):
+        with Session() as session:
+            return self._db_list(session).regexps.count()
 
     @with_session
     def add(self, entry, session=None):
