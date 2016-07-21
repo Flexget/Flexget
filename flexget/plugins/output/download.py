@@ -348,7 +348,7 @@ class PluginDownload(object):
         """Tries to set filename extension from mime-type"""
         extensions = mimetypes.guess_all_extensions(entry['mime-type'], strict=False)
         if extensions:
-            log.debug('Mimetype guess for %s is %s ', (entry['mime-type'], extensions))
+            log.debug('Mimetype guess for %s is %s ', entry['mime-type'], extensions)
             if entry.get('filename'):
                 if any(entry['filename'].endswith(extension) for extension in extensions):
                     log.debug('Filename %s extension matches to mime-type', entry['filename'])
