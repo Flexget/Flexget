@@ -18,7 +18,6 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.database import entry_synonym, with_session
-from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('entry_list')
