@@ -34,7 +34,7 @@ Session = sessionmaker(class_=ContextSession)
 from flexget import config_schema, db_schema, logger, plugin  # noqa
 from flexget.event import fire_event  # noqa
 from flexget.ipc import IPCClient, IPCServer  # noqa
-from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv # noqa
+from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.utils.tools import pid_exists, get_current_flexget_version  # noqa
@@ -242,7 +242,6 @@ class Manager(object):
             options_namespace.__dict__.update(options)
             options = options_namespace
         task_names = self.tasks
-        setattr(options, 'allow_manual', allow_manual)
         # Handle --tasks
         if options.tasks:
             # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
@@ -267,7 +266,8 @@ class Manager(object):
 
         finished_events = []
         for task_name in task_names:
-            task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority)
+            task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority,
+                        allow_manual=allow_manual)
             self.task_queue.put(task)
             finished_events.append((task.id, task.name, task.finished_event))
         return finished_events

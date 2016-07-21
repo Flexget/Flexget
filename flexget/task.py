@@ -138,7 +138,6 @@ class EntryContainer(list):
 
 
 class TaskAbort(Exception):
-
     def __init__(self, reason, silent=False):
         self.reason = reason
         self.silent = silent
@@ -183,7 +182,8 @@ class Task(object):
     # Used to determine task order, when priority is the same
     _counter = itertools.count()
 
-    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None):
+    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None,
+                 allow_manual=False):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
@@ -208,6 +208,7 @@ class Task(object):
             options_namespace = copy.copy(self.manager.options.execute)
             options_namespace.__dict__.update(options)
             options = options_namespace
+        setattr(options, 'allow_manual', allow_manual)
         self.options = options
         self.output = output
         self.loglevel = loglevel

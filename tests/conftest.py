@@ -76,7 +76,7 @@ def execute_task(manager):
     A function that can be used to execute and return a named task in `config` argument.
     """
 
-    def execute(task_name, abort=False, options=None):
+    def execute(task_name, abort=False, options=None, allow_manual=None):
         """
         Use to execute one test task from config.
 
@@ -84,7 +84,7 @@ def execute_task(manager):
         """
         log.info('********** Running task: %s ********** ' % task_name)
         config = manager.config['tasks'][task_name]
-        task = Task(manager, task_name, config=config, options=options)
+        task = Task(manager, task_name, config=config, options=options, allow_manual=allow_manual)
 
         try:
             if abort:
