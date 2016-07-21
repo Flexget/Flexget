@@ -310,13 +310,14 @@ class FilterSeen(object):
 
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
+    # TODO: Look into this, is it still valid?
     log.debug('TODO: Disabled because of ticket #1321')
     return
 
     # Remove seen fields over a year old
-    result = session.query(SeenField).filter(SeenField.added < datetime.now() - timedelta(days=365)).delete()
-    if result:
-        log.verbose('Removed %d seen fields older than 1 year.' % result)
+    # result = session.query(SeenField).filter(SeenField.added < datetime.now() - timedelta(days=365)).delete()
+    # if result:
+    #    log.verbose('Removed %d seen fields older than 1 year.' % result)
 
 
 @with_session
