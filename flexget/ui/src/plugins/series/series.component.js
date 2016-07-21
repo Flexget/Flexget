@@ -83,7 +83,7 @@
         }
 
         function toggleEpisodes(show) {
-			show == vm.selectedShow ? clearShow() : setSelectedShow();
+			show === vm.selectedShow ? clearShow() : setSelectedShow();
 
 			function clearShow() {
 				vm.selectedShow = null;

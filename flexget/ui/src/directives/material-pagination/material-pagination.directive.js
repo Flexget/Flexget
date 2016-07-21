@@ -36,7 +36,7 @@
     for(i = start; i <= end; i++) {
       scope.stepList.push({
         value: i,
-        activeClass: scope.page == i ? scope.activeClass : '',
+        activeClass: scope.page === i ? scope.activeClass : '',
         action: function() {
           internalAction(scope, this.value);
         }
@@ -45,7 +45,7 @@
   }
 
   function internalAction(scope, page) {
-    if(scope.page == page) {
+    if(scope.page === page) {
       return;
     }
 

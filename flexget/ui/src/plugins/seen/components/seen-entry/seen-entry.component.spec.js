@@ -5,8 +5,8 @@ describe('Plugin: Seen-entry.component', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.seen');
 
-		/* global $componentController, $rootScope */
-		bard.inject('$componentController', '$rootScope');
+		/* global $componentController */
+		bard.inject('$componentController');
 	});
 
 	beforeEach(function () {

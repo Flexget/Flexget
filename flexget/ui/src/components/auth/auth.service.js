@@ -76,15 +76,15 @@
 
 			function logoutComplete() {
 				isLoggedIn = false;
-				prevState = undefined;
-				prevParams = undefined;
+				prevState = null;
+				prevParams = null;
 				$state.go('login');
 				return;
 			}
 		}
 
 		function state(state, params) {
-			if (state.name != 'login') {
+			if (state.name !== 'login') {
 				prevState = state.name;
 				prevParams = params;
 			}

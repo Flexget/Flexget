@@ -5,8 +5,8 @@ describe('Plugin: Execute-stream.component', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.execute');
 
-		/* global $componentController, executeService, $q, $rootScope */
-		bard.inject('$componentController', 'executeService', '$q', '$rootScope');
+		/* global $componentController, executeService, $rootScope */
+		bard.inject('$componentController', 'executeService', '$rootScope');
 
 		sinon.spy(executeService, 'executeTasks');
 	});

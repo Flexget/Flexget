@@ -4,7 +4,6 @@ describe('Plugin: Movie-list.Component', function () {
 	var movieList = mockMovieListData.getMovieListById();
 	var movies = mockMovieListData.getMovieListMovies();
 	var movie = mockMovieListData.getMovieListMovieById();
-	var deferred;
 
 	beforeEach(function () {
 		bard.appModule('plugins.movies');

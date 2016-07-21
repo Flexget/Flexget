@@ -7,8 +7,8 @@ describe('Plugin: Series-Entry.Component', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.series');
 
-		/* global $componentController, $q, seriesService, $rootScope, $mdDialog */
-		bard.inject('$componentController', '$q', 'seriesService', '$rootScope', '$mdDialog');
+		/* global $componentController, $q, seriesService, $rootScope */
+		bard.inject('$componentController', '$q', 'seriesService', '$rootScope');
 
 		sinon.stub(seriesService, 'getShowMetadata').returns($q.when(metadata));
 	});

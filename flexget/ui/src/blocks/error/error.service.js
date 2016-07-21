@@ -23,13 +23,13 @@
 		};
 
 		return {
-			showToast: showToast,
-			showDialog: showDialog
+			showToast,
+			showDialog
 		};
 
 		function showToast(error) {
 			$mdToast.show(toast).then(function (response) {
-				if (response == 'ok') {
+				if (response === 'ok') {
 					showDialog(error);
 				}
 			});
