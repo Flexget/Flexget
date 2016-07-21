@@ -191,7 +191,7 @@ class InputRSS(object):
         if 'length' in enclosure:
             try:
                 entry['size'] = int(enclosure['length'])
-            except:
+            except ValueError:
                 entry['size'] = 0
         if 'type' in enclosure:
             entry['type'] = enclosure['type']
