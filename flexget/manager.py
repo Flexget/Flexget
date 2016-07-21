@@ -34,8 +34,7 @@ Session = sessionmaker(class_=ContextSession)
 from flexget import config_schema, db_schema, logger, plugin  # noqa
 from flexget.event import fire_event  # noqa
 from flexget.ipc import IPCClient, IPCServer  # noqa
-from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv, \
-    ScopedNamespace  # noqa
+from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.utils.tools import pid_exists, get_current_flexget_version  # noqa
