@@ -112,7 +112,6 @@ class T411LookupPlugin(object):
         string_torrent_id = entry.get('t411_torrent_id')
         if string_torrent_id is None:
             log.warning('Looking up T411 for entry pass, no t411_torrent_id found.')
-            pass
 
         torrent_id = int(string_torrent_id)
         proxy = T411Proxy()

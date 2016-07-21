@@ -62,7 +62,6 @@ def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEF
 
 @with_session
 def get_secret(session=None):
-    pass
     """ Generate a secret key for flask applications and store it in the database. """
     web_secret = session.query(WebSecret).first()
     if not web_secret:
