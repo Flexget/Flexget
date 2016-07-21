@@ -64,7 +64,10 @@ def after_end(session, transaction):
             return
         open_time = time.time() - open_transactions[transaction][0]
         msg = 'Transaction 0x%08X closed %s (open time %s)' % (id(transaction), caller_info, open_time)
-        log.warning(msg) if open_time > 2 else log.debug(msg)
+        if open_time > 2:
+            log.warning(msg)
+        else:
+            log.debug(msg)
         del open_transactions[transaction]
 
 
