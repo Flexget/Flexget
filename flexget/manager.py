@@ -34,7 +34,8 @@ Session = sessionmaker(class_=ContextSession)
 from flexget import config_schema, db_schema, logger, plugin  # noqa
 from flexget.event import fire_event  # noqa
 from flexget.ipc import IPCClient, IPCServer  # noqa
-from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv  # noqa
+from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv, \
+    ScopedNamespace  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.utils.tools import pid_exists, get_current_flexget_version  # noqa
@@ -222,7 +223,7 @@ class Manager(object):
     def has_lock(self):
         return self._has_lock
 
-    def execute(self, options=None, output=None, loglevel=None, priority=1):
+    def execute(self, options=None, output=None, loglevel=None, priority=1, allow_manual=False):
         """
         Run all (can be limited with options) tasks from the config.
 
@@ -231,6 +232,7 @@ class Manager(object):
             written to it.
         :param priority: If there are other executions waiting to be run, they will be run in priority order,
             lowest first.
+        :param allow_manual: A flag whether to allow execution of tasks that have enabled manual plugin
         :returns: a list of :class:`threading.Event` instances which will be
             set when each respective task has finished running
         """
@@ -241,6 +243,7 @@ class Manager(object):
             options_namespace.__dict__.update(options)
             options = options_namespace
         task_names = self.tasks
+        setattr(options, 'allow_manual', allow_manual)
         # Handle --tasks
         if options.tasks:
             # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
@@ -365,7 +368,7 @@ class Manager(object):
         else:
             self.task_queue.start()
             self.ipc_server.start()
-            self.execute(options)
+            self.execute(options, allow_manual=True)
             self.shutdown(finish_queue=True)
             self.task_queue.wait()
         fire_event('manager.execute.completed', self, options)
