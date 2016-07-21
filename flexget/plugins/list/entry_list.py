@@ -151,9 +151,8 @@ class DBEntrySet(MutableSet):
         # Make sure lazy lookups are done before opening our session to prevent db locks
         for value in other:
             value.values()
-        with Session() as session:
-            for value in other:
-                self.add(value, session=session)
+        for value in other:
+            self.add(value)
         return self
 
     @property
