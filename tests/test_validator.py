@@ -31,10 +31,6 @@ class TestValidator(object):
         result = dv.validate({3: {}})
         assert not dv.errors.messages, 'should have passed 3'
         assert result, 'invalid result for key 3'
-        # Json schema cannot do key validation
-        """result = dv.validate({'three': {}})
-        assert dv.errors.messages, 'should not have passed three'
-        assert not result, 'should have an invalid result for 3'"""
 
     def test_regexp_match(self):
         re_match = validator.factory('regexp_match')

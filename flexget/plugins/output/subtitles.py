@@ -10,37 +10,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-'''
-DRAFT
-
-class SubtitleQueue(Base):
-
-    __tablename__ = 'subtitle_queue'
-
-    id = Column(Integer, primary_key=True)
-    task = Column(String)
-    imdb_id = Column(String)
-    added = Column(DateTime)
-
-    def __init__(self, task, imdb_id):
-        self.task = task
-        self.imdb_id = imdb_id
-        self.added = datetime.now()
-
-    def __str__(self):
-        return '<SubtitleQueue(%s=%s)>' % (self.task, self.imdb_id)
-
-TODO:
-
- * add new option, retry: [n] days
- * add everything into queue using above class
- * consume queue (look up by task name), configuration is available from task
- * remove successful downloads
- * remove queue items that are part retry: n days
-'''
-
 log = logging.getLogger('subtitles')
-
 
 # movie hash, won't work here though
 # http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes#Python
