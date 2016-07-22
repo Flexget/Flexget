@@ -79,7 +79,7 @@ def strip_html(text):
     try:
         text = ' '.join(BeautifulSoup(text).find_all(text=True))
         return ' '.join(text.split())
-    except:
+    except Exception:
         return text
 
 

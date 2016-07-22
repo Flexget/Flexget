@@ -55,7 +55,7 @@ class OutputNzbget(object):
                                  params["top"],
                                  entry["url"])
                 log.info("Added `%s` to nzbget" % entry["title"])
-            except:
+            except Exception:
                 log.critical("rpc call to nzbget failed")
                 entry.fail("could not call appendurl via RPC")
 

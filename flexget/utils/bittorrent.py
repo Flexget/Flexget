@@ -311,7 +311,7 @@ class Torrent(object):
                 # if no trackers left in list, remove whole list
                 if not tl:
                     self.content['announce-list'].remove(tl)
-            except:
+            except (AttributeError, ValueError):
                 pass
 
     def add_multitracker(self, tracker):

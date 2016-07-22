@@ -98,5 +98,5 @@ try:
                 found_deprecated = True
                 break
 
-except:
+except Exception:
     pass

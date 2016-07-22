@@ -72,7 +72,7 @@ class PluginCookies(object):
         cur = con.cursor()
         try:
             cur.execute('select host, path, isSecure, expiry, name, value from moz_cookies')
-        except:
+        except sqlite.Error:
             raise plugin.PluginError('%s does not appear to be a valid Firefox 3 cookies file' % filename, log)
 
         ftstr = ['FALSE', 'TRUE']
