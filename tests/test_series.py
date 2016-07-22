@@ -1974,7 +1974,7 @@ class TestAlternateNames(object):
                 'Alternate name should have been Other Show.'
 
             # run another task that overwrites the alternate names
-            task = execute_task('another_alternate_name')
+            execute_task('another_alternate_name')
             assert len(session.query(AlternateNames).all()) == 1, \
                 'The old alternate name should have been removed from the database.'
             assert session.query(AlternateNames).first().alt_name == 'Good Show', \

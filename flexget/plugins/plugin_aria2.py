@@ -399,7 +399,7 @@ class OutputAria2(object):
                         else:
                             raise plugin.PluginError('aria2 response to status request: %s' % err.faultString, log)
                     except socket_error as e:
-                        (error, msg) = e.args
+                        _, msg = e.args
                         raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                                  % (baseurl, msg), log)
 
