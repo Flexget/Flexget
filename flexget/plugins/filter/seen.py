@@ -12,7 +12,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from sqlalchemy import Column, Integer, DateTime, Unicode, Boolean, or_, select, update, Index
 from sqlalchemy.orm import relation
