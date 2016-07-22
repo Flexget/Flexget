@@ -390,7 +390,7 @@ class TestSeriesParser(object):
     def test_name_with_number(self, parse):
         """SeriesParser: test number in a name"""
         parse('Storage 13 no ep number', name='Storage 13')
-        
+
     def test_name_uncorrupted(self, parse):
         """SeriesParser: test name doesn't get corrupted when cleaned"""
         s = parse(name='The New Adventures of Old Christine',
