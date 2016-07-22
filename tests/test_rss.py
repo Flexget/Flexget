@@ -154,7 +154,7 @@ class TestRssOnline(object):
             rss: http://labs.silverorange.com/local/solabs/rsstest/rss_plain.xml
 
           ssl_no_http_auth:
-            rss: https://secure3.silverorange.com/rsstest/rss_with_ssl.xml
+            rss: https://www.nasa.gov/rss/dyn/breaking_news.rss
 
           auth_no_ssl:
             rss:
@@ -162,11 +162,12 @@ class TestRssOnline(object):
               username: testuser
               password: testpass
 
-          ssl_auth:
-            rss:
-              url: https://secure3.silverorange.com/rsstest/httpauth/rss_with_ssl_and_auth.xml
-              username: testuser
-              password: testpass
+          # This test fails because their SSL certificate has expired (dumbasses). Should be safe to ignore.
+          #ssl_auth:
+          #  rss:
+          #    url: https://secure3.silverorange.com/rsstest/httpauth/rss_with_ssl_and_auth.xml
+          #    username: testuser
+          #    password: testpass
 
     """
 
