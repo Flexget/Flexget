@@ -23,8 +23,8 @@
 			//var handlingStateChangeError = false;
 			var hasOtherwise = false;
 			return {
-				configureStates,
-				getStates
+				configureStates: configureStates,
+				getStates: getStates
 			};
 
 			//init();
