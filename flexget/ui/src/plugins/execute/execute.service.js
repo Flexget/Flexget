@@ -61,7 +61,7 @@
                 return deferred.promise;
             };
 
-            deferred.promise.entry_dump = function (callback) {
+            deferred.promise.entryDump = function (callback) {
                 stream.on('node', 'entry_dump', callback);
                 return deferred.promise;
             };

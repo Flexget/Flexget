@@ -20,7 +20,7 @@
 		vm.saveBegin = saveBegin;
 
 		function activate() {
-			vm.begin = vm.show.begin_episode.episode_identifier;
+			vm.begin = vm.show['begin_episode']['episode_identifier'];
 			vm.originalBegin = angular.copy(vm.begin);
 		}
 

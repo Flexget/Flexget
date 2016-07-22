@@ -24,7 +24,7 @@
 
 		function saveRawConfig(encoded) {
 			return $http.post('/api/server/raw_config', {
-				raw_config: encoded
+				'raw_config': encoded
 			})
 				.then(saveRawConfigComplete)
 				.catch(saveRawConfigFailed);

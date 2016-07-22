@@ -22,7 +22,7 @@
 
         var options = {
             page: 1,
-            page_size: 10
+            'page_size': 10
         };
 
 		var params = {
