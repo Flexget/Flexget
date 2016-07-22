@@ -159,7 +159,7 @@ class TestExistsMovie(object):
     def test_invalid(self, execute_task):
         """exists_movie plugin: no episode numbering on the disk"""
         # shouldn't raise anything
-        task = execute_task('test_invalid')
+        execute_task('test_invalid')
 
     @pytest.mark.skip(reason='test is broken')
     def test_with_metainfo_series(self, execute_task):
