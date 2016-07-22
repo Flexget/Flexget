@@ -23,10 +23,7 @@ import flexget
 
 
 def str_to_boolean(string):
-    if string.lower() in ['true', '1', 't', 'y', 'yes']:
-        return True
-    else:
-        return False
+    return string.lower() in ['true', '1', 't', 'y', 'yes']
 
 
 def str_to_int(string):
