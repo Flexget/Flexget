@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.utils import native_str
 
-import sys
 from distutils.version import LooseVersion
 
 from sqlalchemy import Column, Integer, String
@@ -10,7 +9,6 @@ from sqlalchemy import Column, Integer, String
 from flexget import db_schema, plugin, options
 from flexget.event import event
 from flexget.logger import console
-from flexget.utils.database import with_session
 from flexget.utils.template import RenderError
 
 try:

@@ -9,7 +9,6 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import zipfile
 import os
-import re
 import shutil
 import logging
 

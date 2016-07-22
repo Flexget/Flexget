@@ -7,7 +7,6 @@ import socket
 import sys
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from smtplib import SMTPException
 from email.utils import formatdate
 
 from flexget import config_schema, manager, plugin
