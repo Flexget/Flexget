@@ -167,7 +167,7 @@ class UrlRewriteSerienjunkies(object):
         # Cut additional Subtitles
         try:
             languages = languages[:languages.index("+")]
-        except:
+        except IndexError:
             pass
 
         language_list = re.split(r'[,&]', languages)

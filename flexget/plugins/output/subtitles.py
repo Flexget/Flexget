@@ -85,7 +85,7 @@ class Subtitles(object):
         try:
             s = ServerProxy("http://api.opensubtitles.org/xml-rpc")
             res = s.LogIn("", "", "en", "FlexGet")
-        except:
+        except Exception:
             log.warning('Error connecting to opensubtitles.org')
             return
 

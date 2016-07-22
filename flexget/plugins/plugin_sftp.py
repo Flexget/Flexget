@@ -35,7 +35,7 @@ try:
     import pysftp
 
     logging.getLogger("paramiko").setLevel(logging.ERROR)
-except:
+except ImportError:
     pysftp = None
 
 

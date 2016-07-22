@@ -80,7 +80,7 @@ def install_pausing_reactor():
                     log.debug('Got GeneratorExit, stopping reactor.', exc_info=True)
                     self.paused = False
                     self.stop()
-                except:
+                except Exception:
                     twisted_log.msg("Unexpected error in main loop.")
                     twisted_log.err()
                 else:
