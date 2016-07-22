@@ -47,7 +47,6 @@ class TestInputCache(object):
         task = execute_task('test_memory')
         assert task.entries, 'should have created entries from the cache'
         # Turn the cache time down and run again to make sure the entries are not created again
-        from flexget.utils.cached_input import cached
         cached.cache.cache_time = timedelta(minutes=0)
         task = execute_task('test_memory')
         assert not task.entries, 'cache should have been expired'
