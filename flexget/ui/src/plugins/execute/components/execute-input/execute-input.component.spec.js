@@ -68,7 +68,7 @@ describe('Plugin: Execute-input.component', function () {
 
 			var opts = {
 				learn: false,
-				no_cache: true
+				'no_cache': true
 			};
 
 			controller.startExecute();

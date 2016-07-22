@@ -63,7 +63,7 @@ describe('Service: Series', function () {
 	describe('getShowMetadata()', function () {
 		it('should issue a GET /api/tvdb/series/:name/ request', function () {
 			$httpBackend.expect('GET', '/api/tvdb/series/iZombie/').respond(200, {});
-			seriesService.getShowMetadata({ show_name: 'iZombie' }).then(function (data) {
+			seriesService.getShowMetadata({ 'show_name': 'iZombie' }).then(function (data) {
 				expect(data).to.exist;
 			});
 			$httpBackend.flush();
@@ -71,7 +71,7 @@ describe('Service: Series', function () {
 
 		it('should report an error if request fails', function () {
 			$httpBackend.expect('GET', '/api/tvdb/series/iZombie/').respond(500);
-			seriesService.getShowMetadata({ show_name: 'iZombie' }).catch(function (error) {
+			seriesService.getShowMetadata({ 'show_name': 'iZombie' }).catch(function (error) {
 				expect(error.message).to.equal('Request failed');
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
@@ -82,7 +82,7 @@ describe('Service: Series', function () {
 	describe('deleteShow()', function () {
 		it('should issue a DELETE /api/series/:id/ request', function () {
 			$httpBackend.expect('DELETE', '/api/series/1/').respond(200, {});
-			seriesService.deleteShow({ show_id: 1 }).then(function (data) {
+			seriesService.deleteShow({ 'show_id': 1 }).then(function (data) {
 				expect(data).not.to.exist;
 			});
 			$httpBackend.flush();
@@ -90,7 +90,7 @@ describe('Service: Series', function () {
 
 		it('should report an error if request fails', function () {
 			$httpBackend.expect('DELETE', '/api/series/1/').respond(500);
-			seriesService.deleteShow({ show_id: 1 }).catch(function (error) {
+			seriesService.deleteShow({ 'show_id': 1 }).catch(function (error) {
 				expect(error.message).to.equal('Request failed');
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
@@ -123,7 +123,7 @@ describe('Service: Series', function () {
 	describe('getEpisodes()', function () {
 		it('should issue a GET /api/series/:id/episodes/ request', function () {
 			$httpBackend.expect('GET', '/api/series/1/episodes/').respond(200, {});
-			seriesService.getEpisodes({ show_id: 1 }).then(function (data) {
+			seriesService.getEpisodes({ 'show_id': 1 }).then(function (data) {
 				expect(data).to.exist;
 			});
 			$httpBackend.flush();
@@ -131,7 +131,7 @@ describe('Service: Series', function () {
 
 		it('should report an error if request fails', function () {
 			$httpBackend.expect('GET', '/api/series/1/episodes/').respond(500);
-			seriesService.getEpisodes({ show_id: 1 }).catch(function (error) {
+			seriesService.getEpisodes({ 'show_id': 1 }).catch(function (error) {
 				expect(error.message).to.equal('Request failed');
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
@@ -142,7 +142,7 @@ describe('Service: Series', function () {
 	describe('deleteEpisode()', function () {
 		it('should issue a DELETE /api/series/:sid/episodes/:eid/ request', function () {
 			$httpBackend.expect('DELETE', '/api/series/1/episodes/1/').respond(200, {});
-			seriesService.deleteEpisode({ show_id: 1 }, { episode_id: 1 }).then(function (data) {
+			seriesService.deleteEpisode({ 'show_id': 1 }, { episode_id: 1 }).then(function (data) {
 				expect(data).to.exist;
 			});
 			$httpBackend.flush();
@@ -150,7 +150,7 @@ describe('Service: Series', function () {
 
 		it('should report an error if request fails', function () {
 			$httpBackend.expect('DELETE', '/api/series/1/episodes/1/').respond(500);
-			seriesService.deleteEpisode({ show_id: 1 }, { episode_id: 1 }).catch(function (error) {
+			seriesService.deleteEpisode({ 'show_id': 1 }, { episode_id: 1 }).catch(function (error) {
 				expect(error.message).to.equal('Request failed');
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
@@ -161,7 +161,7 @@ describe('Service: Series', function () {
 	describe('resetReleases()', function () {
 		it('should issue a PUT /api/series/:sid/episodes/:eid/releases/ request', function () {
 			$httpBackend.expect('PUT', '/api/series/1/episodes/1/releases/').respond(200, {});
-			seriesService.resetReleases({ show_id: 1 }, { episode_id: 1 }).then(function (data) {
+			seriesService.resetReleases({ 'show_id': 1 }, { episode_id: 1 }).then(function (data) {
 				expect(data).to.exist;
 			});
 			$httpBackend.flush();
@@ -169,7 +169,7 @@ describe('Service: Series', function () {
 
 		it('should report an error if request fails', function () {
 			$httpBackend.expect('PUT', '/api/series/1/episodes/1/releases/').respond(500);
-			seriesService.resetReleases({ show_id: 1 }, { episode_id: 1 }).catch(function (error) {
+			seriesService.resetReleases({ 'show_id': 1 }, { episode_id: 1 }).catch(function (error) {
 				expect(error.message).to.equal('Request failed');
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
@@ -180,7 +180,7 @@ describe('Service: Series', function () {
 	describe('forgetRelease()', function () {
 		it('should issue a DELETE /api/series/:sid/episodes/:eid/releases/:rid/ request', function () {
 			$httpBackend.expect('DELETE', '/api/series/1/episodes/1/releases/1/').respond(200, {});
-			seriesService.forgetRelease({ show_id: 1 }, { episode_id: 1 }, { release_id: 1 }).then(function (data) {
+			seriesService.forgetRelease({ 'show_id': 1 }, { episode_id: 1 }, { release_id: 1 }).then(function (data) {
 				expect(data).to.exist;
 			});
 			$httpBackend.flush();
@@ -188,7 +188,7 @@ describe('Service: Series', function () {
 
 		it('should report an error if request fails', function () {
 			$httpBackend.expect('DELETE', '/api/series/1/episodes/1/releases/1/').respond(500);
-			seriesService.forgetRelease({ show_id: 1 }, { episode_id: 1 }, { release_id: 1 }).catch(function (error) {
+			seriesService.forgetRelease({ 'show_id': 1 }, { episode_id: 1 }, { release_id: 1 }).catch(function (error) {
 				expect(error.message).to.equal('Request failed');
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
@@ -199,7 +199,7 @@ describe('Service: Series', function () {
 	describe('resetRelease()', function () {
 		it('should issue a PUT /api/series/:sid/episodes/:eid/releases/:rid/ request', function () {
 			$httpBackend.expect('PUT', '/api/series/1/episodes/1/releases/1/').respond(200, {});
-			seriesService.resetRelease({ show_id: 1 }, { episode_id: 1 }, { release_id: 1 }).then(function (data) {
+			seriesService.resetRelease({ 'show_id': 1 }, { episode_id: 1 }, { release_id: 1 }).then(function (data) {
 				expect(data).to.exist;
 			});
 			$httpBackend.flush();
@@ -207,7 +207,7 @@ describe('Service: Series', function () {
 
 		it('should report an error if request fails', function () {
 			$httpBackend.expect('PUT', '/api/series/1/episodes/1/releases/1/').respond(500);
-			seriesService.resetRelease({ show_id: 1 }, { episode_id: 1 }, { release_id: 1 }).catch(function (error) {
+			seriesService.resetRelease({ 'show_id': 1 }, { episode_id: 1 }, { release_id: 1 }).catch(function (error) {
 				expect(error.message).to.equal('Request failed');
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
@@ -218,7 +218,7 @@ describe('Service: Series', function () {
 	describe('deleteReleases()', function () {
 		it('should issue a DELETE /api/series/:sid/episodes/:eid/releases/ request', function () {
 			$httpBackend.expect('DELETE', '/api/series/1/episodes/1/releases/').respond(200, {});
-			seriesService.deleteReleases({ show_id: 1 }, { episode_id: 1 }).then(function () {
+			seriesService.deleteReleases({ 'show_id': 1 }, { episode_id: 1 }).then(function () {
 				expect(true).to.be.true;
 			});
 			$httpBackend.flush();
@@ -226,7 +226,7 @@ describe('Service: Series', function () {
 
 		it('should report an error if request fails', function () {
 			$httpBackend.expect('DELETE', '/api/series/1/episodes/1/releases/').respond(500);
-			seriesService.deleteReleases({ show_id: 1 }, { episode_id: 1 }).catch(function (error) {
+			seriesService.deleteReleases({ 'show_id': 1 }, { episode_id: 1 }).catch(function (error) {
 				expect(error.message).to.equal('Request failed');
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
@@ -237,7 +237,7 @@ describe('Service: Series', function () {
 	describe('loadReleases()', function () {
 		it('should issue a GET /api/series/:sid/episodes/:eid/releases/ request', function () {
 			$httpBackend.expect('GET', '/api/series/1/episodes/1/releases/').respond(200, {});
-			seriesService.loadReleases({ show_id: 1 }, { episode_id: 1 }).then(function (data) {
+			seriesService.loadReleases({ 'show_id': 1 }, { episode_id: 1 }).then(function (data) {
 				expect(data).to.exist;
 			});
 			$httpBackend.flush();
@@ -245,7 +245,7 @@ describe('Service: Series', function () {
 
 		it('should report an error if request fails', function () {
 			$httpBackend.expect('GET', '/api/series/1/episodes/1/releases/').respond(500);
-			seriesService.loadReleases({ show_id: 1 }, { episode_id: 1 }).catch(function (error) {
+			seriesService.loadReleases({ 'show_id': 1 }, { episode_id: 1 }).catch(function (error) {
 				expect(error.message).to.equal('Request failed');
 				expect(exception.catcher).to.have.been.calledOnce;
 			});

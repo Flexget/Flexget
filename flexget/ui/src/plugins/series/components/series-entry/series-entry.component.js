@@ -47,7 +47,7 @@
 
 			$mdDialog.show(dialog).then(function (begin) {
 				if (begin) {
-					vm.show.begin_episode.episode_identifier = begin;
+					vm.show['begin_episode']['episode_identifier'] = begin;
 				}
 			});
 		}

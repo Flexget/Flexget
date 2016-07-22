@@ -15,9 +15,9 @@
 
         var options = {
             page: 1,
-            page_size: 10,
-            in_config: 'all',
-            sort_by: 'show_name'
+            'page_size': 10,
+            'in_config': 'all',
+            'sort_by': 'show_name'
         };
 
 		var params = {
@@ -41,15 +41,15 @@
                 vm.series = data.shows;
 
                 vm.currentPage = data.page;
-                vm.totalShows = data.total_number_of_shows;
-                vm.pageSize = data.page_size;
+                vm.totalShows = data['total_number_of_shows'];
+                vm.pageSize = data['page_size'];
             });
         }
 
 		function forgetShow(show) {
 			var confirm = $mdDialog.confirm()
                 .title('Confirm forgetting show.')
-                .htmlContent('Are you sure you want to completely forget <b>' + show.show_name + '</b>?<br /> This will also forget all downloaded releases.')
+                .htmlContent('Are you sure you want to completely forget <b>' + show['show_name'] + '</b>?<br /> This will also forget all downloaded releases.')
                 .ok('Forget')
                 .cancel('No');
 
