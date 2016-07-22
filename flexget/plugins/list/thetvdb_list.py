@@ -102,6 +102,7 @@ class TheTVDBSet(MutableSet):
                 'user/favorites/{}'.format(entry['tvdb_id']))
         except RequestException as e:
             log.error('Could not add tvdb_id {} to favourites list: {}'.format(entry['tvdb_id'], e))
+        self.invalidate_cache()
 
     def _find_entry(self, entry):
         if not entry.get('tvdb_id'):
