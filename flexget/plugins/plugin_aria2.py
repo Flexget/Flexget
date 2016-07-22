@@ -255,7 +255,6 @@ class OutputAria2(object):
                                                                 entry['series_name'][-4:], ')'])
                                 log.verbose(entry['series_name'])
                             parser.data = cur_filename
-                            parser.parse
                             log.debug(parser.id_type)
                             if parser.id_type == 'ep':
                                 entry['series_id'] = ''.join(['S', str(parser.season).rjust(2, str('0')), 'E',

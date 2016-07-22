@@ -575,12 +575,9 @@ if __name__ == '__main__':
 
     print(json.dumps(schema, sort_keys=True, indent=4))
 
-    """
-    root = factory()
-    list = root.accept('list')
-    list.accept('text')
-    list.accept('regexp')
-    list.accept('choice').accept_choices(['foo', 'bar'])
-
-    print root.schema()
-    """
+    # root = factory()
+    # list = root.accept('list')
+    # list.accept('text')
+    # list.accept('regexp')
+    # list.accept('choice').accept_choices(['foo', 'bar'])
+    # print root.schema()
