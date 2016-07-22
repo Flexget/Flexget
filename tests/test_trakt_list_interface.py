@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+import time
+
 import pytest
 
 from flexget.entry import Entry
@@ -102,6 +104,27 @@ class TestTraktList(object):
         assert entry not in trakt_set
 
         trakt_set.add(entry)
+        time.sleep(5)
+        assert entry in trakt_set
+
+    def test_trakt_add_episode(self):
+        episode_config = self.trakt_config.copy()
+        episode_config['type'] = 'episodes'
+        trakt_set = TraktSet(episode_config)
+        # Initialize trakt set
+        trakt_set.clear()
+
+        entry = Entry(**{u'trakt_show_slug': u'game-of-thrones',
+                         u'original_url': u'http://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5',
+                         u'url': u'http://trakt.tv/shows/game-of-thrones/seasons/4/episodes/5', u'series_season': 4,
+                         u'tvdb_id': 121361, u'series_name': u'Game of Thrones (2011)', u'imdb_id': u'tt0944947',
+                         u'series_id': u'S04E05', u'series_episode': 5, u'trakt_episode_id': 73674,
+                         u'title': u'Game of Thrones (2011) S04E05 First of His Name', u'trakt_show_id': 1390,
+                         u'trakt_ep_name': u'First of His Name', u'tvrage_id': 24493})
+
+        assert entry not in trakt_set
+
+        trakt_set.add(entry)
         assert entry in trakt_set
 
     def test_trakt_add_episode(self):
@@ -134,7 +157,9 @@ class TestTraktList(object):
         assert entry not in trakt_set
 
         trakt_set.add(entry)
+        time.sleep(5)
         assert entry in trakt_set
 
         trakt_set.remove(entry)
+        time.sleep(5)
         assert entry not in trakt_set

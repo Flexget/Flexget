@@ -182,6 +182,7 @@ class ImdbEntrySet(MutableSet):
     @property
     def items(self):
         if self._items is None:
+            log.debug('fetching items from IMDB')
             try:
                 r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
                                      (self.list_id, self.user_id), cookies=self.cookies)
@@ -235,9 +236,11 @@ class ImdbEntrySet(MutableSet):
         return set(it)
 
     def _find_movie(self, entry):
+        log.debug('trying to match %s to existing list items', entry['imdb_id'])
         for e in self.items:
             if e['imdb_id'] == entry['imdb_id']:
                 return e
+        log.debug('could not match %s to existing list items', entry['imdb_id'])
 
     def __contains__(self, entry):
         if not entry.get('imdb_id'):
@@ -298,7 +301,8 @@ class ImdbEntrySet(MutableSet):
             'ref_tag': 'title'
         }
         log.debug('adding title %s with ID %s to imdb %s', entry['title'], entry['imdb_id'], self.list_id)
-        self.session.post('http://www.imdb.com/list/_ajax/edit', data=data, cookies=self.cookies)
+        resp = self.session.post('http://www.imdb.com/list/_ajax/edit', data=data, cookies=self.cookies)
+        log.debug('imdb response" %s, status code: %s', resp.content, resp.status_code)
         # Invalidate cache so that new movie info will be grabbed
         self.invalidate_cache()
 

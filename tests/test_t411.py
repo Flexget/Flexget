@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
+import os
 
 import mock
 import pytest
@@ -107,6 +108,11 @@ class TestRestClient(object):
     credentials = {'username': 'set', 'password': 'this'}
     api_token = 'you must set this value for online test'
 
+    @pytest.fixture(scope='class')
+    def playback_only(self):
+        if os.environ.get('VCR_RECORD_MODE') == 'off':
+            pytest.skip('Cannot run this test online')
+
     def build_unauthenticated_client(self):
         client = T411RestClient()
         client.credentials = TestRestClient.credentials
@@ -124,13 +130,13 @@ class TestRestClient(object):
         assert not client.is_authenticated()
 
     @pytest.mark.online
-    def test_auth(self):
+    def test_auth(self, playback_only):
         client = self.build_unauthenticated_client()
         client.auth()
         assert client.is_authenticated(), 'Client is not authenticated (are you using mocked credentials online?)'
 
     @pytest.mark.online
-    def test_retrieve_categories(self):
+    def test_retrieve_categories(self, playback_only):
         client = self.build_authenticated_client()
         json_tree_categories = client.retrieve_category_tree()
         json_category = json_tree_categories.get('210')
@@ -145,7 +151,7 @@ class TestRestClient(object):
         assert json_sub_category.get('name') == 'Film'
 
     @pytest.mark.online
-    def test_retrieve_terms(self):
+    def test_retrieve_terms(self, playback_only):
         client = self.build_authenticated_client()
         json_terms = client.retrieve_terms_tree()
         assert json_terms is not None
@@ -156,7 +162,7 @@ class TestRestClient(object):
         assert term_type.get('mode') == 'single'
 
     @pytest.mark.online
-    def test_malformed_search_response(self):
+    def test_malformed_search_response(self, playback_only):
         """
         Search without expression produces server response
         that contains some error messages. This test check
@@ -169,7 +175,7 @@ class TestRestClient(object):
         assert search_result.get('limit') == 10
 
     @pytest.mark.online
-    def test_error_message_handler(self):
+    def test_error_message_handler(self, playback_only):
         exception_was_raised = False
         client = T411RestClient()
         client.set_api_token('LEAVE:THIS:TOKEN:FALSE')

@@ -27,6 +27,11 @@ class TestIMDBList(object):
         assert entry not in imdb_set
         imdb_set.add(entry)
 
+        # pls no caching
+        imdb_set.session.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        imdb_set.session.headers['Pragma'] = 'no-cache'
+        imdb_set.session.headers['Expires'] = '0'
+
         assert entry in imdb_set
 
     def test_imdb_list_remove(self):
@@ -39,9 +44,15 @@ class TestIMDBList(object):
         assert entry not in imdb_set
         imdb_set.add(entry)
 
+        # pls no caching
+        imdb_set.session.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        imdb_set.session.headers['Pragma'] = 'no-cache'
+        imdb_set.session.headers['Expires'] = '0'
+
         assert entry in imdb_set
 
         imdb_set.remove(entry)
+
         assert entry not in imdb_set
 
 
