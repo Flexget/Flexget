@@ -747,8 +747,6 @@ class IRCConnectionManager(object):
         Start all the irc connections. Stop the daemon if there are failures.
         :return:
         """
-        global irc_connections
-
         # First we validate the config for all connections including their .tracker files
         errors = 0
         for conn_name, connection in self.config.items():

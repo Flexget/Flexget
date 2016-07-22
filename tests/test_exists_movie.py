@@ -145,8 +145,8 @@ class TestExistsMovie(object):
         assert task.find_entry('accepted', title='Quality.of.Life.1080p'), \
             'Quality.of.Life.1080p should have been accepted'
 
-
-'''
+    # TODO: Fix tests
+    @pytest.mark.skip(reason='test is broken')
     def test_propers(self, execute_task):
         """exists_movie plugin: new proper & proper already exists"""
         task = execute_task('test_propers')
@@ -155,11 +155,13 @@ class TestExistsMovie(object):
         assert task.find_entry('rejected', title='Test.S01E01'), \
             'pre-existin proper should have caused reject'
 
+    @pytest.mark.skip(reason='test is broken')
     def test_invalid(self, execute_task):
         """exists_movie plugin: no episode numbering on the disk"""
         # shouldn't raise anything
         task = execute_task('test_invalid')
 
+    @pytest.mark.skip(reason='test is broken')
     def test_with_metainfo_series(self, execute_task):
         """Tests that exists_movie works with series data from metainfo_series"""
         task = execute_task('test_with_metainfo_series')
@@ -167,4 +169,3 @@ class TestExistsMovie(object):
             'Foo.Bar.S01E02.XViD should have been rejected(exists)'
         assert not task.find_entry('rejected', title='Foo.Bar.S01E03.XViD'), \
             'Foo.Bar.S01E03.XViD should not have been rejected'
-'''
