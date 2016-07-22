@@ -10,12 +10,6 @@ import threading
 import uuid
 import warnings
 
-# Support order in python 2.7 and 3
-try:
-    from collections import OrderedDict
-except ImportError:
-    pass
-
 from flexget import __version__
 from flexget.utils.tools import io_encoding
 
