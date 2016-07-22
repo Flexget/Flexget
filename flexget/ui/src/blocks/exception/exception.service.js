@@ -8,7 +8,7 @@
 
 	function exception($log, $q, errorService) {
 		return {
-			catcher: catcher
+			catcher
 		};
 
 		function catcher(error) {
