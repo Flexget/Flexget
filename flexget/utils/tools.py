@@ -210,8 +210,8 @@ class ReList(list):
         return item
 
     def __iter__(self):
-        for _, value in enumerate(self):
-            yield value
+        for i in range(len(self)):
+            yield self[i]
 
 
 # Determine the encoding for io
