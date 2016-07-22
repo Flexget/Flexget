@@ -561,22 +561,6 @@ def complex_test():
     simple = root.accept('list')
     build_list(simple)
 
-    # advanced format:
-    #   settings:
-    #     group: {...}
-    #   group:
-    #     {...}
-
-    """
-    advanced = root.accept('dict')
-    settings = advanced.accept('dict', key='settings')
-    settings_group = settings.accept_any_key('dict')
-    build_options_validator(settings_group)
-
-    group = advanced.accept_any_key('list')
-    build_list(group)
-    """
-
     return root
 
 

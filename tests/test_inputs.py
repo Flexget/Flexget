@@ -37,9 +37,3 @@ class TestInputs(object):
         assert len(task.entries) == 2, 'Should only have created 2 entries'
         assert task.find_entry(title='title1a'), 'title1a should be in entries'
         assert task.find_entry(title='title2'), 'title2 should be in entries'
-
-    """def test_no_url(self, execute_task):
-        # Oops, this test doesn't do anything, as the mock plugin adds a fake url to entries
-        # TODO: fix this
-        task = execute_task('test_no_url')
-        assert len(task.entries) == 2, 'Should have created 2 entries'"""
