@@ -61,6 +61,7 @@ class TestIMDBList(object):
 
 
 @pytest.mark.online
+@pytest.mark.skip(reason='IMDB Tests are far too unreliable')
 class TestIMDBListTypes(object):
     imdb_config = {'login': 'siysbijz@sharklasers.com',
                    'password': 'flexget16',
