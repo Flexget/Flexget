@@ -30,7 +30,7 @@ class PluginSubliminal(object):
 
       subs:
         find:
-          path: 
+          path:
             - d:\media\incoming
           regexp: '.*\.(avi|mkv|mp4)$'
           recursive: yes
