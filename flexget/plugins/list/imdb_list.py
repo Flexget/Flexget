@@ -186,6 +186,7 @@ class ImdbEntrySet(MutableSet):
             try:
                 r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
                                      (self.list_id, self.user_id), cookies=self.cookies)
+
             except RequestException as e:
                 raise PluginError(e.args[0])
             lines = r.iter_lines(decode_unicode=True)
@@ -302,7 +303,6 @@ class ImdbEntrySet(MutableSet):
         }
         log.debug('adding title %s with ID %s to imdb %s', entry['title'], entry['imdb_id'], self.list_id)
         resp = self.session.post('http://www.imdb.com/list/_ajax/edit', data=data, cookies=self.cookies)
-        log.debug('imdb response" %s, status code: %s', resp.content, resp.status_code)
         # Invalidate cache so that new movie info will be grabbed
         self.invalidate_cache()
 
