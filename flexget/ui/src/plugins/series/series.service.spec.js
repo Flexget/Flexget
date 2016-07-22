@@ -180,7 +180,7 @@ describe('Service: Series', function () {
 	describe('forgetRelease()', function () {
 		it('should issue a DELETE /api/series/:sid/episodes/:eid/releases/:rid/ request', function () {
 			$httpBackend.expect('DELETE', '/api/series/1/episodes/1/releases/1/').respond(200, {});
-			seriesService.forgetRelease({ 'show_id': 1 }, { 'episode_id': 1 }, { release_id: 1 }).then(function (data) {
+			seriesService.forgetRelease({ 'show_id': 1 }, { 'episode_id': 1 }, { 'release_id': 1 }).then(function (data) {
 				expect(data).to.exist;
 			});
 			$httpBackend.flush();
@@ -188,7 +188,7 @@ describe('Service: Series', function () {
 
 		it('should report an error if request fails', function () {
 			$httpBackend.expect('DELETE', '/api/series/1/episodes/1/releases/1/').respond(500);
-			seriesService.forgetRelease({ 'show_id': 1 }, { 'episode_id': 1 }, { release_id: 1 }).catch(function (error) {
+			seriesService.forgetRelease({ 'show_id': 1 }, { 'episode_id': 1 }, { 'release_id': 1 }).catch(function (error) {
 				expect(error.message).to.equal('Request failed');
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
@@ -199,7 +199,7 @@ describe('Service: Series', function () {
 	describe('resetRelease()', function () {
 		it('should issue a PUT /api/series/:sid/episodes/:eid/releases/:rid/ request', function () {
 			$httpBackend.expect('PUT', '/api/series/1/episodes/1/releases/1/').respond(200, {});
-			seriesService.resetRelease({ 'show_id': 1 }, { 'episode_id': 1 }, { release_id: 1 }).then(function (data) {
+			seriesService.resetRelease({ 'show_id': 1 }, { 'episode_id': 1 }, { 'release_id': 1 }).then(function (data) {
 				expect(data).to.exist;
 			});
 			$httpBackend.flush();
@@ -207,7 +207,7 @@ describe('Service: Series', function () {
 
 		it('should report an error if request fails', function () {
 			$httpBackend.expect('PUT', '/api/series/1/episodes/1/releases/1/').respond(500);
-			seriesService.resetRelease({ 'show_id': 1 }, { 'episode_id': 1 }, { release_id: 1 }).catch(function (error) {
+			seriesService.resetRelease({ 'show_id': 1 }, { 'episode_id': 1 }, { 'release_id': 1 }).catch(function (error) {
 				expect(error.message).to.equal('Request failed');
 				expect(exception.catcher).to.have.been.calledOnce;
 			});
