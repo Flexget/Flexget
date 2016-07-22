@@ -30,6 +30,7 @@
 		vm.forgetShow = forgetShow;
 		vm.search = search;
 		vm.toggleEpisodes = toggleEpisodes;
+		vm.areEpisodesOnShowRow = areEpisodesOnShowRow;
 
 		function activate() {
 			getSeriesList();
@@ -97,13 +98,18 @@
 			}
         }
 
-        vm.areEpisodesOnShowRow = function (show, index) {
-            if (!show) return false;
+        function areEpisodesOnShowRow(show, index) {
+            if (!show) {
+				return false;
+			}
 
             var numberOfColumns = 1;
 
-            if ($mdMedia('gt-md')) numberOfColumns = 2;
-            if ($mdMedia('gt-lg')) numberOfColumns = 3;
+            if ($mdMedia('gt-lg')) {
+				numberOfColumns = 3;
+			} else if ($mdMedia('gt-lg')) {
+				numberOfColumns = 2;
+			}
 
             var isOnRightRow = true;
 
@@ -115,12 +121,19 @@
             var showColumn = showIndex % numberOfColumns;
             var showRow = (showIndex - showColumn) / numberOfColumns;
 
-            if (row !== showRow) isOnRightRow = false;
-            if (column !== numberOfColumns - 1) isOnRightRow = false;
-            if (showIndex === index && index === (vm.series.length - 1)) isOnRightRow = true;
+            if (row !== showRow) {
+				isOnRightRow = false;
+			}
+
+            if (column !== numberOfColumns - 1) {
+				isOnRightRow = false;
+			}
+
+            if (showIndex === index && index === (vm.series.length - 1)) {
+				isOnRightRow = true;
+			}
 
             return isOnRightRow;
         };
     }
-
 }());
