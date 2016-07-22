@@ -18,7 +18,7 @@ with open(torrent_file, 'rb') as tor_file:
 
 def compare_binary(obj1, obj2):
     # Used to compare xmlrpclib.binary objects within a mocked call
-    if not type(obj1) == type(obj2):
+    if isinstance(obj1, type(obj2)):
         return False
     if obj1.data != obj2.data:
         return False
