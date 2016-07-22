@@ -10,7 +10,7 @@ from datetime import timedelta, datetime
 import requests
 # Allow some request objects to be imported from here instead of requests
 import warnings
-from requests import RequestException, HTTPError
+from requests import RequestException
 
 from flexget import __version__ as version
 from flexget.utils.tools import parse_timedelta, TimedDict, timedelta_total_seconds

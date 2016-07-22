@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import logging
@@ -7,7 +8,6 @@ import time
 from copy import copy
 from datetime import datetime, timedelta
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
