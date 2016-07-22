@@ -8,7 +8,7 @@
 
 	function urlInterceptor() {
 		return {
-			request: request
+			request
 		};
 
 		function request(config) {

@@ -20,16 +20,14 @@
 		this.$get = RouterHelper;
 
 		function RouterHelper($location, $log, $rootScope, $state) {
-			var handlingStateChangeError = false;
+			//var handlingStateChangeError = false;
 			var hasOtherwise = false;
-			var service = {
-				configureStates: configureStates,
-				getStates: getStates
+			return {
+				configureStates,
+				getStates
 			};
 
 			//init();
-
-			return service;
 
 			function configureStates(states, otherwisePath) {
 				angular.forEach(states, function (state) {

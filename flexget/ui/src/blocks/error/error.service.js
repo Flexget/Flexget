@@ -23,8 +23,8 @@
 		};
 
 		return {
-			showToast: showToast,
-			showDialog: showDialog
+			showToast,
+			showDialog
 		};
 
 		function showToast(error) {
