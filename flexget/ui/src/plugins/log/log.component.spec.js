@@ -5,8 +5,8 @@ describe('Plugin: Log.component', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.log');
 
-		/* global $componentController, logService */
-		bard.inject('$componentController', 'logService');
+		/* global $componentController */
+		bard.inject('$componentController');
 	});
 
 	beforeEach(function () {
