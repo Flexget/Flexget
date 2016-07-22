@@ -86,10 +86,10 @@ def entry_synonym(name):
     """Use json to serialize python objects for db storage."""
 
     def only_builtins(item):
-        supported_types = [str, unicode, int, float, long, bool, datetime]
+        supported_types = (str, unicode, int, float, long, bool, datetime)
         # dict, list, tuple and set are also supported, but handled separately
 
-        if type(item) in supported_types:
+        if isinstance(item, supported_types):
             return item
         elif isinstance(item, Mapping):
             result = {}
