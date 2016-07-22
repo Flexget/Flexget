@@ -57,7 +57,7 @@
     function setPrevNext(scope, pageCount, mode) {
         var disabled, item;
         
-        if (mode == 'prev') {
+        if (mode === 'prev') {
             disabled = scope.page - 1 <= 0;
             var prevPage = scope.page - 1 <= 0 ? 1 : scope.page - 1;
             
@@ -70,9 +70,7 @@
                     }
                 }
             };
-        }
-        
-        if (mode == 'next') {
+        } else {
             disabled = scope.page >= pageCount;
             var nextPage = scope.page + 1 >= pageCount ? pageCount : scope.page + 1;
             
