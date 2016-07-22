@@ -120,10 +120,7 @@ class MovieQueueAPI(APIResource):
         order = args['order']
         queue_name = args['queue_name']
         # Handles default if it explicitly called
-        if order == 'desc':
-            order = True
-        else:
-            order = False
+        order = order == 'desc'
 
         raw_movie_queue = mq.queue_get(session=session, downloaded=downloaded, queue_name=queue_name)
         converted_movie_queue = [movie.to_dict() for movie in raw_movie_queue]
