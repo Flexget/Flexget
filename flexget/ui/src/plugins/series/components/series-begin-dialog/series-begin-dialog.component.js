@@ -31,7 +31,7 @@
 		function saveBegin() {
 			//TODO: Error handling
 			var params = {
-				episode_identifier: vm.begin
+				'episode_identifier': vm.begin
 			};
 
 			seriesService.updateShow(vm.show, params).then(function () {
