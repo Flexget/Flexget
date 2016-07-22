@@ -379,7 +379,7 @@ class TestTVMazeShowLookup(object):
 
         # force episode lookup
         for entry in task.entries:
-            getattr(entry, 'tvmaze_episode_season')
+            entry.get('tvmaze_episode_season')
 
         with Session() as session:
             episodes = session.query(TVMazeEpisodes).all()
