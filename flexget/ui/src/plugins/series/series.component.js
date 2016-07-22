@@ -134,6 +134,6 @@
 			}
 
             return isOnRightRow;
-        };
+        }
     }
 }());
