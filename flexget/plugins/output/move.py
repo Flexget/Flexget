@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
 
 import os
 import shutil
@@ -8,6 +9,7 @@ import time
 
 from flexget import plugin
 from flexget.event import event
+from flexget.config_schema import one_or_more
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
 
@@ -25,6 +27,10 @@ def get_directory_size(directory):
     return dir_size
 
 
+def make_ext(ext):
+    return ('.' + ext).replace('..', '.')
+
+
 class BaseFileOps(object):
     # Defined by subclasses
     log = None
@@ -34,10 +40,6 @@ class BaseFileOps(object):
             config = {}
         elif config is False:
             return
-
-        sexts = []
-        if 'along' in config:
-            sexts = [('.' + s).replace('..', '.').lower() for s in config['along']]
 
         for entry in task.accepted:
             if 'location' not in entry:
@@ -55,15 +57,28 @@ class BaseFileOps(object):
                 elif not os.path.isfile(src):
                     raise plugin.PluginWarning('location `%s` is not a file.' % src)
                 # search for namesakes
-                siblings = []
+                siblings = {}
                 if not src_isdir and 'along' in config:
                     src_file, src_ext = os.path.splitext(src)
-                    for ext in sexts:
-                        if ext != src_ext.lower() and os.path.exists(src_file + ext):
-                            siblings.append(src_file + ext)
+                    filename_no_ext = os.path.splitext(os.path.basename(src))[0]
+                    for item in config['along']:
+                        if isinstance(item, basestring):
+                            ext = make_ext(item)
+                            sibling = os.path.join(src_file, ext)
+                            if os.path.exists(sibling):
+                                siblings[sibling] = ext
+                        else:
+                            parent = os.path.dirname(src)
+                            for subdir, s in item.items():
+                                abs_subdir = os.path.join(parent, subdir)
+                                if os.path.isdir(abs_subdir):
+                                    ext = make_ext(s)
+                                    sibling = os.path.join(abs_subdir, filename_no_ext + ext)
+                                    if os.path.exists(sibling):
+                                        siblings[sibling] = ext
                 # execute action in subclasses
                 self.handle_entry(task, config, entry, siblings)
-            except Exception as err:
+            except OSError as err:
                 entry.fail(str(err))
                 continue
 
@@ -89,6 +104,9 @@ class BaseFileOps(object):
             self.log.info('Path `%s` has been deleted because was less than clean_source safe value.' % base_path)
         except Exception as err:
             self.log.warning('Unable to delete path `%s`: %s' % (base_path, err))
+
+    def handle_entry(self, task, config, entry, siblings):
+        raise NotImplementedError()
 
 
 class DeleteFiles(BaseFileOps):
@@ -119,7 +137,7 @@ class DeleteFiles(BaseFileOps):
                 self.log.info('Would delete `%s` and all its content.' % src)
             else:
                 self.log.info('Would delete `%s`' % src)
-                for s in siblings:
+                for s, _ in siblings.items():
                     self.log.info('Would also delete `%s`' % s)
             return
         # IO errors will have the entry mark failed in the base class
@@ -130,7 +148,7 @@ class DeleteFiles(BaseFileOps):
             os.remove(src)
             self.log.info('`%s` has been deleted.' % src)
         # further errors will not have any effect (the entry does not exists anymore)
-        for s in siblings:
+        for s, _ in siblings.items():
             try:
                 os.remove(s)
                 self.log.info('`%s` has been deleted as well.' % s)
@@ -216,9 +234,9 @@ class TransformingOps(BaseFileOps):
 
         if task.options.test:
             self.log.info('Would %s `%s` to `%s`' % (funct_name, src, dst))
-            for s in siblings:
+            for s, ext in siblings.items():
                 # we cannot rely on splitext for extensions here (subtitles may have the language code)
-                d = dst_file + s[len(src_file):]
+                d = dst_file + ext
                 self.log.info('Would also %s `%s` to `%s`' % (funct_name, s, d))
         else:
             # IO errors will have the entry mark failed in the base class
@@ -230,9 +248,9 @@ class TransformingOps(BaseFileOps):
                 shutil.copy(src, dst)
             self.log.info('`%s` has been %s to `%s`' % (src, funct_done, dst))
             # further errors will not have any effect (the entry has been successfully moved or copied out)
-            for s in siblings:
+            for s, ext in siblings.items():
                 # we cannot rely on splitext for extensions here (subtitles may have the language code)
-                d = dst_file + s[len(src_file):]
+                d = dst_file + ext
                 try:
                     if self.move:
                         shutil.move(s, d)
@@ -288,7 +306,16 @@ class MoveFiles(TransformingOps):
                     'allow_dir': {'type': 'boolean'},
                     'unpack_safety': {'type': 'boolean'},
                     'keep_extension': {'type': 'boolean'},
-                    'along': {'type': 'array', 'items': {'type': 'string'}},
+                    'along': {'type': 'array', 'items':
+                        {
+                            'oneOf': [
+                                {
+                                    'type': 'object',
+                                    'additionalProperties': one_or_more({'type': 'string'})
+                                },
+                                {'type': 'string'}
+                            ]
+                        }},
                     'clean_source': {'type': 'number'}
                 },
                 'additionalProperties': False
