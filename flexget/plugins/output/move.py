@@ -280,7 +280,16 @@ class CopyFiles(TransformingOps):
                     'allow_dir': {'type': 'boolean'},
                     'unpack_safety': {'type': 'boolean'},
                     'keep_extension': {'type': 'boolean'},
-                    'along': {'type': 'array', 'items': {'type': 'string'}}
+                    'along': {'type': 'array', 'items':
+                        {
+                            'oneOf': [
+                                {
+                                    'type': 'object',
+                                    'additionalProperties': one_or_more({'type': 'string'})
+                                },
+                                {'type': 'string'}
+                            ]
+                        }},
                 },
                 'additionalProperties': False
             }
