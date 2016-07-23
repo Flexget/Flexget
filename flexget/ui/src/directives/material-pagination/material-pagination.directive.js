@@ -55,35 +55,39 @@
     }
     
     function setPrevNext(scope, pageCount, mode) {
-        var disabled, item;
+        var item;
         
-        if (mode === 'prev') {
-            disabled = scope.page - 1 <= 0;
-            var prevPage = scope.page - 1 <= 0 ? 1 : scope.page - 1;
+		switch (mode) {
+			case 'prev':
+				var disabled = scope.page - 1 <= 0;
+				var prevPage = scope.page - 1 <= 0 ? 1 : scope.page - 1;
             
-            item = {
-                value: '<',
-                disabled: disabled,
-                action: function () {
-                    if (!disabled) {
-                        internalAction(scope, prevPage);
-                    }
-                }
-            };
-        } else {
-            disabled = scope.page >= pageCount;
-            var nextPage = scope.page + 1 >= pageCount ? pageCount : scope.page + 1;
+				item = {
+					value: '<',
+					disabled: disabled,
+					action: function () {
+						if (!disabled) {
+							internalAction(scope, prevPage);
+						}
+					}
+				};
+				break;
+				
+			case 'next':
+				var disabled = scope.page >= pageCount;
+				var nextPage = scope.page + 1 >= pageCount ? pageCount : scope.page + 1;
             
-            item = {
-                value: '>',
-                disabled: disabled,
-                action: function () {
-                    if (!disabled) {
-                        internalAction(scope, nextPage);
-                    }
-                }
-            };
-        }
+				item = {
+					value: '>',
+					disabled: disabled,
+					action: function () {
+						if (!disabled) {
+							internalAction(scope, nextPage);
+						}
+					}
+				};
+				break;
+		}	
         
         if (item) {
             scope.stepList.push(item);
