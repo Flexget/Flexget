@@ -330,7 +330,8 @@ class TaskExecutionAPI(APIResource):
 
         # This emulates the CLI command of using `--now` and `no-cache`
         options = {'interval_ignore': data.pop('now', None),
-                   'nocache': data.pop('no_cache', None)}
+                   'nocache': data.pop('no_cache', None),
+                   'allow_manual': True}
 
         for option, value in data.items():
             options[option] = value
@@ -359,7 +360,7 @@ class TaskExecutionAPI(APIResource):
                 entries.append(entry)
             options['inject'] = entries
 
-        executed_tasks = self.manager.execute(options=options, output=output, loglevel=loglevel, allow_manual=True)
+        executed_tasks = self.manager.execute(options=options, output=output, loglevel=loglevel)
 
         tasks_queued = []
 

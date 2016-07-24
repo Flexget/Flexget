@@ -312,8 +312,8 @@ class IRCConnection(irc_bot.IRCBot):
             if isinstance(tasks, basestring):
                 tasks = [tasks]
             log.info('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
-            manager.execute(options={'tasks': tasks, 'cron': True, 'inject': self.entry_queue}, priority=5,
-                            allow_manual=True)
+            manager.execute(options={'tasks': tasks, 'cron': True, 'inject': self.entry_queue, 'allow_manual': True},
+                            priority=5)
 
         if tasks_re:
             tasks_entry_map = {}
@@ -333,7 +333,8 @@ class IRCConnection(irc_bot.IRCBot):
 
             for task, entries in tasks_entry_map.items():
                 log.info('Injecting %d entries into task "%s"', len(entries), task)
-                manager.execute(options={'tasks': [task], 'cron': True, 'inject': entries}, priority=5)
+                manager.execute(options={'tasks': [task], 'cron': True, 'inject': entries, 'allow_manual': True},
+                                priority=5)
 
         self.entry_queue = []
 
