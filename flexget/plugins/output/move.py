@@ -104,11 +104,13 @@ class BaseFileOps(object):
                 if not src_isdir and 'along' in config:
                     parent = os.path.dirname(src)
                     filename_no_ext = os.path.splitext(os.path.basename(src))[0]
-                    for ext in config['along']['files']:
-                        siblings.update(get_siblings(ext, src, filename_no_ext, parent))
-                    for subdir in config['along'].get('subdirs', []):
-                        # use glob to get a list of matching dirs
-                        abs_subdirs = glob.glob(os.path.join(parent, os.path.normpath(subdir)))
+                    subdirs = [parent] + config['along'].get('subdirs', [])
+                    for subdir in subdirs:
+                        if subdir == parent:
+                            abs_subdirs = [subdir]
+                        else:
+                            # use glob to get a list of matching dirs
+                            abs_subdirs = glob.glob(os.path.join(parent, os.path.normpath(subdir)))
                         # iterate over every dir returned by glob looking for matching ext
                         for abs_subdir in abs_subdirs:
                             if os.path.isdir(abs_subdir):
