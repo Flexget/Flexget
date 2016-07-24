@@ -34,6 +34,17 @@ def make_ext(ext):
 class BaseFileOps(object):
     # Defined by subclasses
     log = None
+    along = {
+        'type': 'object',
+        'properties': {
+            'files': one_or_more({'type': 'string'}),
+            'subdirs': {
+                'type': 'object',
+                'additionalProperties': one_or_more({'type': 'string'})
+            }
+        },
+        'additionalProperties': False
+    }
 
     def on_task_output(self, task, config):
         if config is True:
@@ -59,23 +70,24 @@ class BaseFileOps(object):
                 # search for namesakes
                 siblings = {}
                 if not src_isdir and 'along' in config:
+                    parent = os.path.dirname(src)
                     src_file, src_ext = os.path.splitext(src)
                     filename_no_ext = os.path.splitext(os.path.basename(src))[0]
-                    for item in config['along']:
-                        if isinstance(item, basestring):
-                            ext = make_ext(item)
-                            sibling = os.path.join(src_file, ext)
-                            if os.path.exists(sibling):
-                                siblings[sibling] = ext
-                        else:
-                            parent = os.path.dirname(src)
-                            for subdir, s in item.items():
-                                abs_subdir = os.path.join(parent, subdir)
-                                if os.path.isdir(abs_subdir):
-                                    ext = make_ext(s)
-                                    sibling = os.path.join(abs_subdir, filename_no_ext + ext)
-                                    if os.path.exists(sibling):
-                                        siblings[sibling] = ext
+                    for ext in config['along'].get('files', {}):
+                        normalized_ext = make_ext(ext)
+                        sibling = os.path.join(src_file, normalized_ext)
+                        if os.path.exists(sibling):
+                            siblings[sibling] = normalized_ext
+                    for subdir, exts in config['along'].get('subdirs', {}).items():
+                        abs_subdir = os.path.join(parent, os.path.normpath(subdir))
+                        if not isinstance(exts, list):
+                            exts = [exts]
+                        for ext in exts:
+                            if os.path.isdir(abs_subdir):
+                                normalized_ext = make_ext(ext)
+                                sibling = os.path.join(abs_subdir, filename_no_ext + normalized_ext)
+                                if os.path.exists(sibling):
+                                    siblings[sibling] = normalized_ext
                 # execute action in subclasses
                 self.handle_entry(task, config, entry, siblings)
             except OSError as err:
@@ -119,7 +131,7 @@ class DeleteFiles(BaseFileOps):
                 'type': 'object',
                 'properties': {
                     'allow_dir': {'type': 'boolean'},
-                    'along': {'type': 'array', 'items': {'type': 'string'}},
+                    'along': BaseFileOps.along,
                     'clean_source': {'type': 'number'}
                 },
                 'additionalProperties': False
@@ -280,16 +292,7 @@ class CopyFiles(TransformingOps):
                     'allow_dir': {'type': 'boolean'},
                     'unpack_safety': {'type': 'boolean'},
                     'keep_extension': {'type': 'boolean'},
-                    'along': {'type': 'array', 'items':
-                        {
-                            'oneOf': [
-                                {
-                                    'type': 'object',
-                                    'additionalProperties': one_or_more({'type': 'string'})
-                                },
-                                {'type': 'string'}
-                            ]
-                        }},
+                    'along': TransformingOps.along
                 },
                 'additionalProperties': False
             }
@@ -315,16 +318,7 @@ class MoveFiles(TransformingOps):
                     'allow_dir': {'type': 'boolean'},
                     'unpack_safety': {'type': 'boolean'},
                     'keep_extension': {'type': 'boolean'},
-                    'along': {'type': 'array', 'items':
-                        {
-                            'oneOf': [
-                                {
-                                    'type': 'object',
-                                    'additionalProperties': one_or_more({'type': 'string'})
-                                },
-                                {'type': 'string'}
-                            ]
-                        }},
+                    'along': TransformingOps.along,
                     'clean_source': {'type': 'number'}
                 },
                 'additionalProperties': False
