@@ -64,5 +64,5 @@ class TestManualOnlytask(object):
 
     def test_manual_with_onlytask(self, execute_task):
         # Pretend we have been run with --task test2
-        task = execute_task('test2', options=dict(tasks=['test2']), allow_manual=True)
+        task = execute_task('test2', options=dict(tasks=['test2'], allow_manual=True))
         assert task.find_entry(title='download'), 'Manual tasks failed to download on manual run'

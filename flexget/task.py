@@ -182,8 +182,7 @@ class Task(object):
     # Used to determine task order, when priority is the same
     _counter = itertools.count()
 
-    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None,
-                 allow_manual=False):
+    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
@@ -208,7 +207,8 @@ class Task(object):
             options_namespace = copy.copy(self.manager.options.execute)
             options_namespace.__dict__.update(options)
             options = options_namespace
-        setattr(options, 'allow_manual', allow_manual)
+        if not hasattr(options, 'allow_manual'):
+          setattr(options, 'allow_manual', False)
         self.options = options
         self.output = output
         self.loglevel = loglevel

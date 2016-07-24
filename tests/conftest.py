@@ -84,7 +84,7 @@ def execute_task(manager):
         """
         log.info('********** Running task: %s ********** ' % task_name)
         config = manager.config['tasks'][task_name]
-        task = Task(manager, task_name, config=config, options=options, allow_manual=allow_manual)
+        task = Task(manager, task_name, config=config, options=options)
 
         try:
             if abort:
