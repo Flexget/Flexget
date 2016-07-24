@@ -207,6 +207,7 @@ class Task(object):
             options_namespace = copy.copy(self.manager.options.execute)
             options_namespace.__dict__.update(options)
             options = options_namespace
+        # If execution hasn't specifically set the `allow_manual` flag, set it to False by default
         if not hasattr(options, 'allow_manual'):
           setattr(options, 'allow_manual', False)
         self.options = options
