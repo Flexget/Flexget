@@ -304,10 +304,30 @@ class ImdbEntrySet(MutableSet):
         log.debug('adding title %s with ID %s to imdb %s', entry['title'], entry['imdb_id'], self.list_id)
         self.session.post('http://www.imdb.com/list/_ajax/edit', data=data, cookies=self.cookies)
         # Invalidate cache so that new movie info will be grabbed
-        self.invalidate_cache()
+
 
     def __len__(self):
         return len(self.items)
+
+    def __ior__(self, entries):
+        for entry in entries:
+            self.add(entry)
+        self.invalidate_cache()
+        return self
+
+    def __isub__(self, entries):
+        for entry in entries:
+            self.discard(entry)
+        self.invalidate_cache()
+        return self
+
+    def clear(self):
+        try:
+            while True:
+                self.pop()
+        except KeyError:
+            self.invalidate_cache()
+
 
     @property
     def online(self):
