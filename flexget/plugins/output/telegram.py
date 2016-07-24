@@ -200,10 +200,6 @@ class SendTelegram(object):
                 self._groups.append(i[_GROUP_ATTR])
 
     def on_task_output(self, task, config):
-        """makes this plugin count as output (stops warnings about missing outputs)"""
-        pass
-
-    def on_task_exit(self, task, config):
         """Send telegram message(s) at exit"""
         session = task.session
         chat_ids = self._real_init(session, config)
