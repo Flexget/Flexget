@@ -7,7 +7,6 @@ import socket
 import sys
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from smtplib import SMTPException
 from email.utils import formatdate
 
 from flexget import config_schema, manager, plugin
@@ -99,10 +98,7 @@ def send_email(subject, content, config):
                     mailServer.ehlo()
                     mailServer.starttls()
                     mailServer.ehlo()
-        except socket.error as e:
-            log.warning('Socket error: %s' % e)
-            return
-        except OSError as e:
+        except (socket.error, OSError) as e:
             # Ticket #1133
             log.warning('Unable to send email: %s' % e)
             return

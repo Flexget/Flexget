@@ -62,7 +62,7 @@ class FormLogin(object):
                     loginform[userfield] = username
                     loginform[passfield] = password
                     break
-                except Exception as e:
+                except Exception:
                     pass
             else:
                 received = os.path.join(task.manager.config_base, 'received')

@@ -139,12 +139,12 @@ class Manager(object):
             self.options, _ = CoreArgumentParser().parse_known_args(['execute'])
         else:
             try:
-                self.options, extra = CoreArgumentParser().parse_known_args(args)
+                self.options, _ = CoreArgumentParser().parse_known_args(args)
             except ParserError:
                 try:
                     # If a non-built-in command was used, we need to parse with a parser that
                     # doesn't define the subparsers
-                    self.options, extra = manager_parser.parse_known_args(args)
+                    self.options, _ = manager_parser.parse_known_args(args)
                 except ParserError as e:
                     manager_parser.print_help()
                     print('\nError: %s' % e.message)
@@ -231,7 +231,7 @@ class Manager(object):
             written to it.
         :param priority: If there are other executions waiting to be run, they will be run in priority order,
             lowest first.
-        :returns: a list of :class:`threading.Event` instances which will be
+         :returns: a list of :class:`threading.Event` instances which will be
             set when each respective task has finished running
         """
         if options is None:
@@ -360,7 +360,7 @@ class Manager(object):
                                            loglevel=logger.get_capture_loglevel())
             if not options.cron:
                 # Wait until execution of all tasks has finished
-                for _, task_name, event in finished_events:
+                for _, _, event in finished_events:
                     event.wait()
         else:
             self.task_queue.start()

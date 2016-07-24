@@ -9,8 +9,8 @@ describe('Home Routes: ', function () {
 		});
 		module('components.home');
 
-		/* global $state, $templateCache, $rootScope, $location */
-		bard.inject('$state', '$templateCache', '$rootScope', '$location');
+		/* global $state, $rootScope, $location */
+		bard.inject('$state', '$rootScope', '$location');
     });
 
     it('should map state \'flexget.home\' to url #/', function () {

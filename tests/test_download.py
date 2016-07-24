@@ -46,7 +46,11 @@ class TestDownload(object):
         assert not task.aborted, 'Task should not have aborted'
 
 
+
+# TODO: Fix this test
 @pytest.mark.usefixtures('tmpdir')
+@pytest.mark.skip(reason='TODO: These are really just config validation tests, and I have config validation turned off'
+                         ' at the moment for unit tests due to some problems')
 class TestDownloadTemp(object):
     config = """
         tasks:
@@ -75,10 +79,6 @@ class TestDownloadTemp(object):
               temp:
         """
 
-
-# TODO: These are really just config validation tests, and I have config validation turned off at the moment for unit
-# tests due to some problems
-'''
     def test_wrong_permission(self, execute_task):
         """Download plugin: Temp directory has wrong permissions"""
         if sys.platform.startswith('win'):
@@ -105,4 +105,3 @@ class TestDownloadTemp(object):
         """Download plugin: Temp directory config error [3of3]"""
         task = execute_task('temp_empty', abort_ok=True)
         assert task.aborted
-'''

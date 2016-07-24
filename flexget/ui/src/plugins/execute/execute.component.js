@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -8,7 +9,7 @@
 			controllerAs: 'vm',
 			controller: executeController
 		});
-				
+
 	function executeController($interval, executeService) {
 		var vm = this;
 
@@ -22,7 +23,7 @@
 
 		function activate() {
 			getRunning();
-			
+
 			taskInterval = $interval(getRunning, 3000);
 		}
 

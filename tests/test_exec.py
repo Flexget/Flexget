@@ -3,6 +3,8 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import sys
 
+import pytest
+
 
 class TestExec(object):
     __tmp__ = True
@@ -53,7 +55,7 @@ class TestExec(object):
                 assert line == '/a hybrid/path/with spaces', '%s != /a hybrid/path/with spaces' % line
 
     # TODO: This doesn't work on linux.
-    """
+    @pytest.mark.skip(reason='This doesn\'t work on linux')
     def test_auto_escape(self, execute_task):
         task = execute_task('test_auto_escape')
         for entry in task.accepted:
@@ -64,4 +66,3 @@ class TestExec(object):
                 assert line == '/start/single \' double\"', '%s != /start/single \' double\"' % line
                 line = infile.readline().rstrip('\n')
                 assert line == '% a $a! ` *', '%s != % a $a! ` *' % line
-    """

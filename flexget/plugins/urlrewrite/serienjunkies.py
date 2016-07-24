@@ -167,7 +167,7 @@ class UrlRewriteSerienjunkies(object):
         # Cut additional Subtitles
         try:
             languages = languages[:languages.index("+")]
-        except:
+        except IndexError:
             pass
 
         language_list = re.split(r'[,&]', languages)
@@ -186,7 +186,7 @@ class UrlRewriteSerienjunkies(object):
             elif self.config['language'] == 'dual':
                 if len(language_list) > 1 and not regex_is_subtitle.search(language_list[1]):
                     return True
-        except:
+        except (KeyError, re.error):
             pass
 
         return False

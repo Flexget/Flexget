@@ -121,7 +121,7 @@ if __name__ == '__main__':
                 verfile = repo.tree('HEAD')['flexget/_version.py'].data_stream.read()
                 __version__ = None
                 try:
-                    exec(verfile)
+                    exec(verfile)  # pylint: disable=W0122
                 except Exception:
                     pass
                 cur_ver.version_header = '## {0} (unreleased)\n'.format(__version__)

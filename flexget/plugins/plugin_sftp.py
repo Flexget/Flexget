@@ -35,7 +35,7 @@ try:
     import pysftp
 
     logging.getLogger("paramiko").setLevel(logging.ERROR)
-except:
+except ImportError:
     pysftp = None
 
 
@@ -553,22 +553,19 @@ class SftpUpload(object):
 
         if not sftp.isdir(to):
             log.error('Not a directory: %s' % to)
-            entry.fail
+            entry.fail('Not a directory: %s' % to)
             return
 
         try:
             sftp.put(localpath=location, remotepath=destination)
             log.verbose('Successfully uploaded %s to %s' % (location, destination_url))
-        except OSError as e:
-            log.warning('File no longer exists: %s', location)
-            return
         except IOError as e:
             log.error('Remote directory does not exist: %s (%s)' % to)
-            entry.fail
+            entry.fail('Remote directory does not exist: %s (%s)' % to)
             return
         except Exception as e:
             log.error('Failed to upload %s (%s)' % (location, e))
-            entry.fail
+            entry.fail('Failed to upload %s (%s)' % (location, e))
             return
 
         if config['delete_origin']:
@@ -591,7 +588,7 @@ class SftpUpload(object):
                 self.handle_entry(entry, sftp, config, url_prefix)
             else:
                 log.debug('SFTP connection failed; failing entry: %s' % entry)
-                entry.fail
+                entry.fail('SFTP connection failed; failing entry: %s' % entry)
 
 
 @event('plugin.register')

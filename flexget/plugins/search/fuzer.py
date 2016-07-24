@@ -167,6 +167,9 @@ class UrlRewriteFuzer(object):
             log.debug('imdb_id {} detected, using in search.'.format(entry['imdb_id']))
             soup = self.get_fuzer_soup(entry['imdb_id'], c_list)
             entries = self.extract_entry_from_soup(soup)
+            if entries:
+                for e in list(entries):
+                    e['imdb_id'] = entry.get('imdb_id')
         else:
             for search_string in entry.get('search_strings', [entry['title']]):
                 query = normalize_unicode(search_string).replace(":", "")

@@ -1,10 +1,12 @@
+/* global bard */
 describe('Plugin: Seen-entry.component', function () {
 	var controller;
 
 	beforeEach(function () {
 		bard.appModule('plugins.seen');
 
-		bard.inject('$componentController', '$rootScope');
+		/* global $componentController */
+		bard.inject('$componentController');
 	});
 
 	beforeEach(function () {

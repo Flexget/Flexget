@@ -1,10 +1,12 @@
+/* global bard, sinon */
 describe('Plugin: Log.component', function () {
 	var controller;
 
 	beforeEach(function () {
 		bard.appModule('plugins.log');
 
-		bard.inject('$componentController', '$q', '$rootScope', 'logService');
+		/* global $componentController */
+		bard.inject('$componentController');
 	});
 
 	beforeEach(function () {
@@ -20,7 +22,7 @@ describe('Plugin: Log.component', function () {
 			sinon.stub(controller, 'start');
 			controller.$onInit();
 		});
-		
+
 		it('should call the start function', function () {
 			expect(controller.start).to.have.been.calledOnce;
 		});
@@ -67,17 +69,17 @@ describe('Plugin: Log.component', function () {
 		});
 	});
 
-	//TODO: TEST	
+	//TODO: TEST
 	describe('stop()', function () {
 		it('should get tested', function () {
 			expect(true).to.be.true;
 			/*controller.stream = true;
-			
+
 			sinon.stub(logService.startLogStream, 'abort');*/
 		});
 	});
 
-	//TODO: TEST	
+	//TODO: TEST
 	describe('start()', function () {
 		it('should get tested', function () {
 			expect(true).to.be.true;

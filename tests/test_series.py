@@ -1967,14 +1967,14 @@ class TestAlternateNames(object):
         from flexget.manager import Session
         from flexget.plugins.filter.series import AlternateNames
         with Session() as session:
-            task = execute_task('alternate_name')
+            execute_task('alternate_name')
             # test the current state of alternate names
             assert len(session.query(AlternateNames).all()) == 1, 'There should be one alternate name present.'
             assert session.query(AlternateNames).first().alt_name == 'Other Show', \
                 'Alternate name should have been Other Show.'
 
             # run another task that overwrites the alternate names
-            task = execute_task('another_alternate_name')
+            execute_task('another_alternate_name')
             assert len(session.query(AlternateNames).all()) == 1, \
                 'The old alternate name should have been removed from the database.'
             assert session.query(AlternateNames).first().alt_name == 'Good Show', \

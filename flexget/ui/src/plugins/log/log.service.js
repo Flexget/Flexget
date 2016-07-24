@@ -1,3 +1,4 @@
+/* global angular, oboe */
 (function () {
     'use strict';
 
@@ -5,7 +6,7 @@
 		.module('plugins.log')
 		.factory('logService', logService);
 
-    function logService($http, exception, $q) {
+    function logService($q) {
         return {
             startLogStream: startLogStream
         };
@@ -21,7 +22,7 @@
             }).fail(function (error) {
                 deferred.reject(error);
 			});
-			
+
 			deferred.promise.start = function (callback) {
                 stream.on('start', callback);
                 return deferred.promise;
@@ -37,10 +38,6 @@
             };
 
             return deferred.promise;
-        }
-
-        function callFailed(error) {
-			return exception.catcher(error);
         }
     }
 }());

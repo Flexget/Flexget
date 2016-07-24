@@ -54,7 +54,7 @@ class RottenTomatoesList(object):
         entries = []
         api_key = config.get('api_key', None)
         for l_type, l_names in list(config.items()):
-            if type(l_names) is not list:
+            if not isinstance(l_names, list):
                 continue
 
             for l_name in l_names:

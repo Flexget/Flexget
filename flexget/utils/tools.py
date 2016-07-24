@@ -23,10 +23,7 @@ import flexget
 
 
 def str_to_boolean(string):
-    if string.lower() in ['true', '1', 't', 'y', 'yes']:
-        return True
-    else:
-        return False
+    return string.lower() in ['true', '1', 't', 'y', 'yes']
 
 
 def str_to_int(string):
@@ -82,7 +79,7 @@ def strip_html(text):
     try:
         text = ' '.join(BeautifulSoup(text).find_all(text=True))
         return ' '.join(text.split())
-    except:
+    except Exception:
         return text
 
 
@@ -94,7 +91,7 @@ charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
 def _htmldecode(text):
     """Decode HTML entities in the given text."""
     # From screpe.py - licensed under apache 2.0 .. should not be a problem for a MIT afaik
-    if type(text) is str:
+    if isinstance(text, str):
         uchr = chr
     else:
         uchr = lambda value: value > 127 and chr(value) or chr(value)
@@ -153,7 +150,7 @@ def merge_dict_from_to(d1, d2):
     """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
     for k, v in list(d1.items()):
         if k in d2:
-            if type(v) == type(d2[k]):
+            if isinstance(v, type(d2[k])):
                 if isinstance(v, dict):
                     merge_dict_from_to(d1[k], d2[k])
                 elif isinstance(v, list):

@@ -149,7 +149,7 @@ class TestTVDBEpisodeLookupAPI(object):
             "first_aired": "Mon, 22 Feb 2016 00:00:00 GMT",
             "id": 5313345,
             "image": "http://thetvdb.com/banners/episodes/77398/5313345.jpg",
-            "last_update": 1456573658,
+            "last_update": 1468411932,
             "overview": "The investigations that Mulder and Scully began with Tad O’Malley have awakened powerful "
                         "enemies. A panic begins as people all over the country suddenly start falling ill, "
                         "and Scully looks for a cure. Mulder confronts the man whom he believes to be behind it all,"
@@ -175,9 +175,9 @@ class TestTVDBEpisodeLookupAPI(object):
             "first_aired": "Tue, 24 May 2016 00:00:00 GMT",
             "id": 5598674,
             "image": "http://thetvdb.com/banners/episodes/279121/5598674.jpg",
-            "last_update": 1463604393,
+            "last_update": 1466154212,
             "overview": "Barry vows to stop Zoom after learning Zoom's true plans.",
-            "rating": 0,
+            "rating": 8,
             "season_number": 2,
             "series_id": 279121
         }
@@ -198,7 +198,7 @@ class TestTVDBSearchLookupAPI(object):
                                                   u'overview': u'Two brothers follow their father\'s footsteps as "hunters" fighting evil supernatural beings of many kinds including monsters, demons, and gods that roam the earth.',
                                                   u'tvdb_id': 78901, u'series_name': u'Supernatural',
                                                   u'first_aired': u'Tue, 13 Sep 2005 00:00:00 GMT',
-                                                  u'banner': u'http://thetvdb.com/banners/graphical/78901-g46.jpg',
+                                                  u'banner': u'http://thetvdb.com/banners/graphical/78901-g45.jpg',
                                                   u'aliases': []}, {u'status': u'Ended', u'network': u'The CW',
                                                                     u'overview': u'Supernatural the Animation will not only remake the best episodes from the live-action version, but also depict original episodes. These original episodes will include prologues of the Winchester brothers\u2019 childhood, anime-only enemies, and episodes featuring secondary characters from the original series.',
                                                                     u'tvdb_id': 197001,
@@ -274,7 +274,7 @@ class TestTVDBSearchLookupAPI(object):
                  u'tvdb_id': 121361,
                  u'series_name': u'Game of Thrones',
                  u'first_aired': u'Sun, 17 Apr 2011 00:00:00 GMT',
-                 u'banner': u'http://thetvdb.com/banners/graphical/121361-g19.jpg',
+                 u'banner': u'http://thetvdb.com/banners/graphical/121361-g22.jpg',
                  u'aliases': []}]}
         rsp = api_client.get('/tvdb/search/?imdb_id=tt0944947')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code

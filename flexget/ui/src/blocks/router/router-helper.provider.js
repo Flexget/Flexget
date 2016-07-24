@@ -20,16 +20,14 @@
 		this.$get = RouterHelper;
 
 		function RouterHelper($location, $log, $rootScope, $state) {
-			var handlingStateChangeError = false;
+			//var handlingStateChangeError = false;
 			var hasOtherwise = false;
-			var service = {
+			return {
 				configureStates: configureStates,
 				getStates: getStates
 			};
 
 			//init();
-
-			return service;
 
 			function configureStates(states, otherwisePath) {
 				angular.forEach(states, function (state) {
@@ -53,7 +51,7 @@
 				}
 			}
 
-			function handleRoutingErrors() {
+			/*function handleRoutingErrors() {
 				//TODO: Convert to UI-router v1 (using transition.start etc.)
 				$rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
 					if (handlingStateChangeError) {
@@ -76,12 +74,12 @@
 
 					//TODO: Maybe add some logging here to indicate the routing failed
 				});
-			}
+			}*/
 
-
-			function init() {
+			//TODO: Check if needed to be re-enabled
+			/*function init() {
 				handleRoutingErrors();
-			}
+			}*/
 
 			function getStates() {
 				return $state.get();

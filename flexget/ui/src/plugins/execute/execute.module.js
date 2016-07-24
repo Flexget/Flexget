@@ -1,3 +1,4 @@
+/* global angular registerPlugin */
 (function () {
 	'use strict';
 
@@ -6,6 +7,6 @@
 			'blocks.exception',
 			'blocks.router'
 		]);
-	
+
 	registerPlugin('plugins.execute');
 }());

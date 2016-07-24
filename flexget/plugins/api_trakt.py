@@ -294,7 +294,7 @@ def get_translation(ident, style):
                 translations.append(translate)
         return translations
     except requests.RequestException as e:
-        log.debug('Error adding translations to trakt id %s : %s'.format(ident, e))
+        log.debug('Error adding translations to trakt id {} : {}'.format(ident, e))
 
 
 trans_show_table = Table('show_trans', Base.metadata,

@@ -136,11 +136,6 @@ class TestModifyTrackers(object):
         assert 'http://torrent.replaced.com:6969/announce' in torrent.trackers, \
             'ubuntu tracker should have been added'
 
-        # TODO: due implementation this bugs! Torrent class needs to be fixed ...
-        return
-        assert 'http://torrent.ubuntu.com:6969/announce' not in torrent.trackers, \
-            'ubuntu tracker should have been removed'
-
 
 class TestPrivateTorrents(object):
     config = """

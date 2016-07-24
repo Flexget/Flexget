@@ -305,7 +305,7 @@ class ArgumentParser(ArgParser):
     def error(self, msg):
         raise ParserError(msg, self)
 
-    def parse_args(self, args=None, namespace=None, raise_errors=False, file=None):
+    def parse_args(self, args=None, namespace=None, raise_errors=False, file=None):  # pylint: disable=W0221
         """
         :param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit
         """
@@ -470,4 +470,6 @@ class CoreArgumentParser(ArgumentParser):
             if hasattr(result, 'execute'):
                 exec_options.__dict__.update(result.execute.__dict__)
             result.execute = exec_options
+        # Set the 'allow_manual' flag to True for any usage of the CLI
+        setattr(result, 'allow_manual', True)
         return result

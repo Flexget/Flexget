@@ -13,7 +13,7 @@ from time import mktime
 
 import jinja2.filters
 from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, Template,
-                    TemplateNotFound, TemplateSyntaxError, Undefined)
+                    TemplateNotFound, TemplateSyntaxError)
 
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict

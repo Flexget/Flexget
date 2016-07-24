@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -12,7 +13,7 @@
 				options: '<'
 			}
 		});
-	
+
 	function executeStreamController($filter, $log, executeService) {
 		var vm = this;
 
@@ -45,15 +46,15 @@
 			vm.options.progress = true;
 			vm.options.summary = true;
 			vm.options.log = true;
-			vm.options.entry_dump = true;
+			vm.options['entry_dump'] = true;
 
 			stream = executeService.executeTasks(vm.options);
 
 			stream.log(logNode)
 				.progress(progressNode)
 				.summary(summaryNode)
-				.entry_dump(entryDumpNode);
-			
+				.entryDump(entryDumpNode);
+
 			function progressNode(progress) {
 				var filtered = $filter('filter')(vm.streamTasks, { status: '!complete' });
 				angular.extend(filtered[0], progress);
@@ -79,7 +80,7 @@
 		function clear() {
 			if (stream) {
 				stream.abort();
-			}	
+			}
 			vm.stopStream();
 		}
 

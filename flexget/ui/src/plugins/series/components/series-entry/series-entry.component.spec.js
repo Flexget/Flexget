@@ -1,14 +1,14 @@
 /* global bard, sinon, mockSeriesData */
 describe('Plugin: Series-Entry.Component', function () {
-	var component, deferred;
+	var component;
 	var metadata = mockSeriesData.getShowMetadata();
 	var show = mockSeriesData.getShow();
 
 	beforeEach(function () {
 		bard.appModule('plugins.series');
 
-		/* global $componentController, $q, seriesService, $rootScope, $mdDialog */
-		bard.inject('$componentController', '$q', 'seriesService', '$rootScope', '$mdDialog');
+		/* global $componentController, $q, seriesService, $rootScope */
+		bard.inject('$componentController', '$q', 'seriesService', '$rootScope');
 
 		sinon.stub(seriesService, 'getShowMetadata').returns($q.when(metadata));
 	});
@@ -23,6 +23,7 @@ describe('Plugin: Series-Entry.Component', function () {
 
 	describe('activation', function () {
 		beforeEach(function () {
+			/* global angular */
 			component.show = angular.copy(show);
 			component.$onInit();
 			$rootScope.$digest();

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -12,6 +12,7 @@ from sqlalchemy.orm import relationship
 from babelfish import Language
 
 from flexget import plugin
+from flexget.manager import Session
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 from flexget.event import event
@@ -134,13 +135,13 @@ class SubtitleList(MutableSet):
         if not db_list:
             session.add(SubtitleListList(name=self.config['list']))
 
-    @with_session
-    def __iter__(self, session=None):
-        return iter([file.to_entry() for file in self._db_list(session).files])
+    def __iter__(self):
+        with Session() as session:
+            return iter([file.to_entry() for file in self._db_list(session).files])
 
-    @with_session
-    def __len__(self, session=None):
-        return self._db_list(session).files.count()
+    def __len__(self):
+        with Session() as session:
+            return self._db_list(session).files.count()
 
     def _extract_path(self, entry):
         path = ''
@@ -153,50 +154,50 @@ class SubtitleList(MutableSet):
             path = entry.get('location')
         return normalize_path(path)
 
-    @with_session
-    def add(self, entry, session=None):
-        path = self._extract_path(entry)
+    def add(self, entry):
+        with Session() as session:
+            path = self._extract_path(entry)
 
-        if not path:
-            log.error('Entry %s does not represent a local file/dir.')
-            return
+            if not path:
+                log.error('Entry %s does not represent a local file/dir.')
+                return
 
-        path_exists = os.path.exists(path)
-        if self.config['force_file_existence'] and not path_exists:
-            log.error('Path %s does not exist. Not adding to list.', path)
-            return
-        elif path_exists and not self.config.get('allow_dir') and os.path.isdir(path):
-            log.error('Path %s is a directory and "allow_dir"=%s.', path, self.config['allow_dir'])
-            return
+            path_exists = os.path.exists(path)
+            if self.config['force_file_existence'] and not path_exists:
+                log.error('Path %s does not exist. Not adding to list.', path)
+                return
+            elif path_exists and not self.config.get('allow_dir') and os.path.isdir(path):
+                log.error('Path %s is a directory and "allow_dir"=%s.', path, self.config['allow_dir'])
+                return
 
-        # Check if this is already in the list, refresh info if so
-        db_list = self._db_list(session=session)
-        db_file = self._find_entry(entry, session=session)
-        # Just delete and re-create to refresh
-        if db_file:
-            session.delete(db_file)
-        db_file = SubtitleListFile()
-        db_file.title = entry['title']
-        db_file.location = path
-        db_file.languages = []
-        db_file.remove_after = self.config.get('remove_after')
-        db_file.languages = []
-        normalized_languages = {normalize_language(subtitle_language) for subtitle_language in
-                                self.config.get('languages', [])}
-        for subtitle_language in normalized_languages:
-            language = SubtitleListLanguage(language=subtitle_language)
-            db_file.languages.append(language)
-        log.debug('adding entry %s with languages %s', entry, normalized_languages)
-        db_list.files.append(db_file)
-        session.commit()
-        return db_file.to_entry()
+            # Check if this is already in the list, refresh info if so
+            db_list = self._db_list(session=session)
+            db_file = self._find_entry(entry, session=session)
+            # Just delete and re-create to refresh
+            if db_file:
+                session.delete(db_file)
+            db_file = SubtitleListFile()
+            db_file.title = entry['title']
+            db_file.location = path
+            db_file.languages = []
+            db_file.remove_after = self.config.get('remove_after')
+            db_file.languages = []
+            normalized_languages = {normalize_language(subtitle_language) for subtitle_language in
+                                    self.config.get('languages', [])}
+            for subtitle_language in normalized_languages:
+                language = SubtitleListLanguage(language=subtitle_language)
+                db_file.languages.append(language)
+            log.debug('adding entry %s with languages %s', entry, normalized_languages)
+            db_list.files.append(db_file)
+            session.commit()
+            return db_file.to_entry()
 
-    @with_session
-    def discard(self, entry, session=None):
-        db_file = self._find_entry(entry, session=session)
-        if db_file:
-            log.debug('deleting file %s', db_file)
-            session.delete(db_file)
+    def discard(self, entry):
+        with Session() as session:
+            db_file = self._find_entry(entry, session=session)
+            if db_file:
+                log.debug('deleting file %s', db_file)
+                session.delete(db_file)
 
     def __contains__(self, entry):
         return self._find_entry(entry, match_file_to_dir=True) is not None

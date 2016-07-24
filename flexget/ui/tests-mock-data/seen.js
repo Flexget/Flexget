@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 var mockSeenData = (function () {
 	return {
 		getMockSeen: getMockSeen

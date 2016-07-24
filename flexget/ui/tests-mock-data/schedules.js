@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 var mockSchedulesData = (function () {
 	return {
 		getMockSchedules: getMockSchedules

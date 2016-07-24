@@ -1,4 +1,4 @@
-/* global bard, sinon, mockMovieListData */
+/* global bard, sinon, angular, mockMovieListData */
 describe('Plugin: Movies.Component', function () {
 	var component, deferred;
 	var lists = mockMovieListData.getMovieLists();
@@ -72,7 +72,7 @@ describe('Plugin: Movies.Component', function () {
 				sinon.stub($mdDialog, 'show').returns($q.resolve());
 
 				deferred.resolve();
-
+							
 				component.lists = angular.copy(lists.movie_lists);
 
 				component.deleteMovieList(list);

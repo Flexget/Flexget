@@ -194,7 +194,7 @@ class Discover(object):
                 else:
                     result.append(entry)
                 continue
-            if type(est_date) == datetime.date:
+            if isinstance(est_date, datetime.date):
                 # If we just got a date, add a time so we can compare it to now()
                 est_date = datetime.datetime.combine(est_date, datetime.time())
             if datetime.datetime.now() >= est_date:

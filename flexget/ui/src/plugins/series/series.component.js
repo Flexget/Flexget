@@ -15,9 +15,9 @@
 
         var options = {
             page: 1,
-            page_size: 10,
-            in_config: 'all',
-            sort_by: 'show_name'
+            'page_size': 10,
+            'in_config': 'all',
+            'sort_by': 'show_name'
         };
 
 		var params = {
@@ -30,6 +30,7 @@
 		vm.forgetShow = forgetShow;
 		vm.search = search;
 		vm.toggleEpisodes = toggleEpisodes;
+		vm.areEpisodesOnShowRow = areEpisodesOnShowRow;
 
 		function activate() {
 			getSeriesList();
@@ -40,15 +41,15 @@
                 vm.series = data.shows;
 
                 vm.currentPage = data.page;
-                vm.totalShows = data.total_number_of_shows;
-                vm.pageSize = data.page_size;
+                vm.totalShows = data['total_number_of_shows'];
+                vm.pageSize = data['page_size'];
             });
         }
 
 		function forgetShow(show) {
 			var confirm = $mdDialog.confirm()
                 .title('Confirm forgetting show.')
-                .htmlContent('Are you sure you want to completely forget <b>' + show.show_name + '</b>?<br /> This will also forget all downloaded releases.')
+                .htmlContent('Are you sure you want to completely forget <b>' + show['show_name'] + '</b>?<br /> This will also forget all downloaded releases.')
                 .ok('Forget')
                 .cancel('No');
 
@@ -83,7 +84,7 @@
         }
 
         function toggleEpisodes(show) {
-			show == vm.selectedShow ? clearShow() : setSelectedShow();
+			show === vm.selectedShow ? clearShow() : setSelectedShow();
 
 			function clearShow() {
 				vm.selectedShow = null;
@@ -97,13 +98,18 @@
 			}
         }
 
-        vm.areEpisodesOnShowRow = function (show, index) {
-            if (!show) return false;
+        function areEpisodesOnShowRow(show, index) {
+            if (!show) {
+				return false;
+			}
 
             var numberOfColumns = 1;
 
-            if ($mdMedia('gt-md')) numberOfColumns = 2;
-            if ($mdMedia('gt-lg')) numberOfColumns = 3;
+            if ($mdMedia('gt-lg')) {
+				numberOfColumns = 3;
+			} else if ($mdMedia('gt-lg')) {
+				numberOfColumns = 2;
+			}
 
             var isOnRightRow = true;
 
@@ -115,12 +121,19 @@
             var showColumn = showIndex % numberOfColumns;
             var showRow = (showIndex - showColumn) / numberOfColumns;
 
-            if (row !== showRow) isOnRightRow = false;
-            if (column !== numberOfColumns - 1) isOnRightRow = false;
-            if (showIndex === index && index === (vm.series.length - 1)) isOnRightRow = true;
+            if (row !== showRow) {
+				isOnRightRow = false;
+			}
+
+            if (column !== numberOfColumns - 1) {
+				isOnRightRow = false;
+			}
+
+            if (showIndex === index && index === (vm.series.length - 1)) {
+				isOnRightRow = true;
+			}
 
             return isOnRightRow;
-        };
+        }
     }
-
 }());

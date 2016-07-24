@@ -179,7 +179,7 @@ class ChoiceValidator(Validator):
         self.valid_ic = []
         Validator.__init__(self, parent, **kwargs)
 
-    def accept(self, value, ignore_case=False):
+    def accept(self, value, ignore_case=False):  # pylint: disable=W0221
         """
         :param value: accepted text, int or boolean
         :param bool ignore_case: Whether case matters for text values
@@ -347,7 +347,7 @@ class PathValidator(TextValidator):
     def __init__(self, parent=None, allow_replacement=False, allow_missing=False, **kwargs):
         self.allow_replacement = allow_replacement
         self.allow_missing = allow_missing
-        Validator.__init__(self, parent, **kwargs)
+        TextValidator.__init__(self, parent, **kwargs)
 
     def _schema(self):
         if self.allow_missing:
@@ -363,7 +363,7 @@ class UrlValidator(TextValidator):
             self.protocols = protocols
         else:
             self.protocols = ['ftp', 'http', 'https', 'file']
-        Validator.__init__(self, parent, **kwargs)
+            TextValidator.__init__(self, parent, **kwargs)
 
     def _schema(self):
         return {'type': 'string', 'format': 'url'}
@@ -561,22 +561,6 @@ def complex_test():
     simple = root.accept('list')
     build_list(simple)
 
-    # advanced format:
-    #   settings:
-    #     group: {...}
-    #   group:
-    #     {...}
-
-    """
-    advanced = root.accept('dict')
-    settings = advanced.accept('dict', key='settings')
-    settings_group = settings.accept_any_key('dict')
-    build_options_validator(settings_group)
-
-    group = advanced.accept_any_key('list')
-    build_list(group)
-    """
-
     return root
 
 
@@ -591,12 +575,9 @@ if __name__ == '__main__':
 
     print(json.dumps(schema, sort_keys=True, indent=4))
 
-    """
-    root = factory()
-    list = root.accept('list')
-    list.accept('text')
-    list.accept('regexp')
-    list.accept('choice').accept_choices(['foo', 'bar'])
-
-    print root.schema()
-    """
+    # root = factory()
+    # list = root.accept('list')
+    # list.accept('text')
+    # list.accept('regexp')
+    # list.accept('choice').accept_choices(['foo', 'bar'])
+    # print root.schema()

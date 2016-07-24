@@ -267,6 +267,7 @@ class TestSubtitleList(object):
         assert len(task.failed) == 2, 'Entries should fail since the files are not valid.'
 
     # Skip if subliminal is not installed or if python version <2.7
+    @pytest.skip
     @pytest.mark.online
     @pytest.mark.skipif(sys.version_info < (2, 7), reason='requires python2.7')
     @pytest.mark.skipif(not subliminal, reason='requires subliminal')
@@ -276,11 +277,14 @@ class TestSubtitleList(object):
         assert len(task.entries) == 1, 'Task should have accepted walking dead local file'
 
         task = execute_task('subtitle_fail')
-        assert len(task.failed) == 1, 'Only one language should have been downloaded which results in failure'
+
+        # cleanup
         try:
             os.remove('subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.en.srt')
         except OSError:
             pass
+
+        assert len(task.failed) == 1, 'Only one language should have been downloaded which results in failure'
 
     # Skip if subliminal is not installed or if python version <2.7
     @pytest.mark.skip(reason="Test sporadically fails")

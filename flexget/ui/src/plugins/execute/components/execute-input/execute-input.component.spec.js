@@ -1,3 +1,4 @@
+/* global bard, sinon, mockExecuteData */
 describe('Plugin: Execute-input.component', function () {
 	var controller;
 	var tasks = mockExecuteData.getMockTasks();
@@ -5,8 +6,9 @@ describe('Plugin: Execute-input.component', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.execute');
 
+		/* global $componentController, executeService, $q, $rootScope */
 		bard.inject('$componentController', 'executeService', '$q', '$rootScope');
-		
+
 		sinon.stub(executeService, 'getTasks').returns($q.when(tasks));
 	});
 
@@ -29,7 +31,7 @@ describe('Plugin: Execute-input.component', function () {
 		it('should have called the execute service', function () {
 			expect(executeService.getTasks).to.have.been.calledOnce;
 		});
-		
+
 		it('should have tasks', function () {
 			expect(controller.tasks).to.not.be.empty;
 		});
@@ -66,7 +68,7 @@ describe('Plugin: Execute-input.component', function () {
 
 			var opts = {
 				learn: false,
-				no_cache: true
+				'no_cache': true
 			};
 
 			controller.startExecute();
@@ -103,7 +105,7 @@ describe('Plugin: Execute-input.component', function () {
 		it('should ignore lower/uppercase', function () {
 			controller.tasks = ['TestingTask', 'OtherTask'];
 			controller.searchTerm = 'oThEr';
-			
+
 			var result = controller.searchTask();
 
 			expect(result).to.exist;

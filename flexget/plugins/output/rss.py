@@ -21,7 +21,7 @@ Base = db_schema.versioned_base('make_rss', 0)
 rss2gen = True
 try:
     import PyRSS2Gen
-except:
+except ImportError:
     rss2gen = False
 
 

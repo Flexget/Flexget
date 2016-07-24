@@ -1,4 +1,4 @@
-/* global bard */
+/* global bard, sinon */
 describe('404 Component:', function () {
 	var component;
 

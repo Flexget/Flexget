@@ -1,4 +1,4 @@
-/* global bard, sinon */
+/* global bard, sinon, mockConfigData */
 describe('Plugin: Config.component', function () {
 	var controller;
 	var rawConfig = mockConfigData.getMockRawConfig();

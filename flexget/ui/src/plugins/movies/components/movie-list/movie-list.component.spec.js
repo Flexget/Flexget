@@ -4,7 +4,6 @@ describe('Plugin: Movie-list.Component', function () {
 	var movieList = mockMovieListData.getMovieListById();
 	var movies = mockMovieListData.getMovieListMovies();
 	var movie = mockMovieListData.getMovieListMovieById();
-	var deferred;
 
 	beforeEach(function () {
 		bard.appModule('plugins.movies');
@@ -113,6 +112,7 @@ describe('Plugin: Movie-list.Component', function () {
 
 				deferred.resolve();
 
+				/* global angular */				
 				component.movies = angular.copy(movies.movies);
 
 				component.deleteMovie(movieList, movie);

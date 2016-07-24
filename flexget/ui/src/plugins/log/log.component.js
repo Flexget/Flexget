@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
 	'use strict';
 
@@ -34,7 +35,7 @@
 		}
 
 		function toggle() {
-			if (vm.status == 'Disconnected') {
+			if (vm.status === 'Disconnected') {
 				vm.start();
 			} else {
 				vm.stop();
@@ -74,7 +75,7 @@
 			vm.stream.start(startFunction)
 				.message(messageFunction)
 				.catch(failFunction);
-			
+
 			function startFunction() {
 				vm.status = 'Streaming';
 			}

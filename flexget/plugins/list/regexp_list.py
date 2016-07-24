@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -10,6 +10,7 @@ from sqlalchemy import Column, Unicode, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from flexget import plugin
+from flexget.manager import Session
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 from flexget.event import event
@@ -77,34 +78,34 @@ class RegexpList(MutableSet):
         if not db_list:
             session.add(RegexpListList(name=self.config))
 
-    @with_session
-    def __iter__(self, session=None):
-        return iter([regexp.to_entry() for regexp in self._db_list(session).regexps])
+    def __iter__(self):
+        with Session() as session:
+            return iter([regexp.to_entry() for regexp in self._db_list(session).regexps])
 
-    @with_session
-    def __len__(self, session=None):
-        return self._db_list(session).regexps.count()
+    def __len__(self):
+        with Session() as session:
+            return self._db_list(session).regexps.count()
 
-    @with_session
-    def add(self, entry, session=None):
-        # Check if this is already in the list, refresh info if so
-        db_list = self._db_list(session=session)
-        db_regexp = self._find_entry(entry, session=session)
-        # Just delete and re-create to refresh
-        if db_regexp:
-            session.delete(db_regexp)
-        db_regexp = RegexListRegexp()
-        db_regexp.regexp = entry.get('regexp', entry['title'])
-        db_list.regexps.append(db_regexp)
-        session.commit()
-        return db_regexp.to_entry()
+    def add(self, entry):
+        with Session() as session:
+            # Check if this is already in the list, refresh info if so
+            db_list = self._db_list(session=session)
+            db_regexp = self._find_entry(entry, session=session)
+            # Just delete and re-create to refresh
+            if db_regexp:
+                session.delete(db_regexp)
+            db_regexp = RegexListRegexp()
+            db_regexp.regexp = entry.get('regexp', entry['title'])
+            db_list.regexps.append(db_regexp)
+            session.commit()
+            return db_regexp.to_entry()
 
-    @with_session
-    def discard(self, entry, session=None):
-        db_regexp = self._find_entry(entry, session=session)
-        if db_regexp:
-            log.debug('deleting file %s', db_regexp)
-            session.delete(db_regexp)
+    def discard(self, entry):
+        with Session() as session:
+            db_regexp = self._find_entry(entry, session=session)
+            if db_regexp:
+                log.debug('deleting file %s', db_regexp)
+                session.delete(db_regexp)
 
     def __contains__(self, entry):
         return self._find_entry(entry, match_regexp=True) is not None

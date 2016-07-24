@@ -1,4 +1,4 @@
-/* global bard, sinon, mockSeriesData */
+/* global bard, sinon, angular, mockSeriesData */
 describe('Plugin: Series-Episodes.Component', function () {
 	var component, deferred;
 	var episodes = mockSeriesData.getEpisodes();

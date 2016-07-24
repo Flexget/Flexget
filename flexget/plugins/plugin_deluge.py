@@ -80,7 +80,7 @@ def install_pausing_reactor():
                     log.debug('Got GeneratorExit, stopping reactor.', exc_info=True)
                     self.paused = False
                     self.stop()
-                except:
+                except Exception:
                     twisted_log.msg("Unexpected error in main loop.")
                     twisted_log.err()
                 else:
@@ -116,7 +116,7 @@ def install_pausing_reactor():
     # Configure twisted to use the PausingReactor.
     installReactor(PausingReactor())
 
-    @event('manager.shutdown')  # pylint: disable=unused-variable
+    @event('manager.shutdown')
     def stop_reactor(manager):
         """Shut down the twisted reactor after all tasks have run."""
         if not reactor._stopped:

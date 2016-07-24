@@ -1,4 +1,4 @@
-/* global bard */
+/* global bard, sinon */
 describe('Service: History', function () {
 	beforeEach(function () {
 		bard.appModule('plugins.history');

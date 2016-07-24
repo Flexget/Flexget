@@ -138,7 +138,6 @@ class EntryContainer(list):
 
 
 class TaskAbort(Exception):
-
     def __init__(self, reason, silent=False):
         self.reason = reason
         self.silent = silent
@@ -208,6 +207,9 @@ class Task(object):
             options_namespace = copy.copy(self.manager.options.execute)
             options_namespace.__dict__.update(options)
             options = options_namespace
+        # If execution hasn't specifically set the `allow_manual` flag, set it to False by default
+        if not hasattr(options, 'allow_manual'):
+          setattr(options, 'allow_manual', False)
         self.options = options
         self.output = output
         self.loglevel = loglevel
@@ -487,7 +489,10 @@ class Task(object):
         if reason:
             msg += ' Reason: {0}'.format(reason)
         # Only print the first request for a rerun to the info log
-        log.debug(msg) if self._rerun else log.info(msg)
+        if self._rerun:
+            log.debug(msg)
+        else:
+            log.info(msg)
         self._rerun = True
 
     def config_changed(self):

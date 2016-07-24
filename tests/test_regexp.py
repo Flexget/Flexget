@@ -129,7 +129,7 @@ class TestRegexp(object):
         assert task.find_entry('rejected', title='regexp7'), '\'regexp7\' should have been rejected'
         assert task.find_entry('accepted', title='regexp5'), '\'regexp5\' should have been accepted'
 
-    def test_multiple_excluding(self, execute_task):
+    def test_complicated(self, execute_task):
         task = execute_task('test_complicated')
         assert task.find_entry('accepted', title='regular'), '\'regular\' should have been accepted'
         assert task.find_entry('accepted', title='expression'), '\'expression\' should have been accepted'

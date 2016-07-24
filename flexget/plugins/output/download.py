@@ -348,7 +348,7 @@ class PluginDownload(object):
         """Tries to set filename extension from mime-type"""
         extensions = mimetypes.guess_all_extensions(entry['mime-type'], strict=False)
         if extensions:
-            log.debug('Mimetype guess for %s is %s ', (entry['mime-type'], extensions))
+            log.debug('Mimetype guess for %s is %s ', entry['mime-type'], extensions)
             if entry.get('filename'):
                 if any(entry['filename'].endswith(extension) for extension in extensions):
                     log.debug('Filename %s extension matches to mime-type', entry['filename'])
@@ -356,7 +356,7 @@ class PluginDownload(object):
                     # mimetypes library has no concept of a 'prefered' extension when there are multiple possibilites
                     # this causes the first to be used which is not always desirable, e.g. 'ksh' for 'text/plain'
                     extension = mimetypes.guess_extension(entry['mime-type'], strict=False)
-                    log.debug('Adding mime-type extension %s to %s', (extension, entry['filename']))
+                    log.debug('Adding mime-type extension %s to %s', extension, entry['filename'])
                     entry['filename'] = entry['filename'] + extension
         else:
             log.debug('Python doesn\'t know extension for mime-type: %s', entry['mime-type'])

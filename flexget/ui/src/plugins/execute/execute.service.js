@@ -1,3 +1,4 @@
+/* global angular, oboe */
 (function () {
     'use strict';
 
@@ -26,7 +27,7 @@
             return $http.get('/api/tasks/queue/', { ignoreLoadingBar: true })
 				.then(getQueueComplete)
                 .catch(callFailed);
-			
+
 			function getQueueComplete(response) {
 				return response.data;
 			}
@@ -60,7 +61,7 @@
                 return deferred.promise;
             };
 
-            deferred.promise.entry_dump = function (callback) {
+            deferred.promise.entryDump = function (callback) {
                 stream.on('node', 'entry_dump', callback);
                 return deferred.promise;
             };

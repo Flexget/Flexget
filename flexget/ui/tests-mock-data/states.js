@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 var mockStatesData = (function () {
 	return {
 		getStates: getStates

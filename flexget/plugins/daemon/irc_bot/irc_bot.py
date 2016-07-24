@@ -391,7 +391,7 @@ class IRCBot(asynchat.async_chat):
 
     def handle_event(self, msg):
         """Call the proper function that has been set to handle the input message type eg. RPLMOTD"""
-        for regexp, event in self.event_handlers.items():
+        for _, event in self.event_handlers.items():
             if event.command:
                 for cmd in event.command:
                     cmd = cmd.rstrip('$') + '$'

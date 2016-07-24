@@ -150,7 +150,7 @@ T411_VIDEO_QUALITY_MAP = {
     1174: qualities.get("webdl 1080p"),
     1182: qualities.get("webdl"),
     1175: qualities.get("webdl 720p"),
-    19: qualities.get("webdl")
+    19: qualities.get("webrip")
 }
 
 

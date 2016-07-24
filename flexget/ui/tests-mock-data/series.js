@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 var mockSeriesData = (function () {
 	return {
 		getShows: getShows,

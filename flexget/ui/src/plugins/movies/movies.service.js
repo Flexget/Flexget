@@ -8,11 +8,13 @@
 
     function moviesService($http, CacheFactory, exception) {
         // If cache doesn't exist, create it
-        if (!CacheFactory.get('moviesCache')) {
+
+		//TODO: Enable cache
+        /*if (!CacheFactory.get('moviesCache')) {
             CacheFactory.createCache('moviesCache');
         }
 
-        var moviesCache = CacheFactory.get('moviesCache');
+        var moviesCache = CacheFactory.get('moviesCache');*/
 
         return {
             getLists: getLists,

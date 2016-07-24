@@ -255,7 +255,6 @@ class OutputAria2(object):
                                                                 entry['series_name'][-4:], ')'])
                                 log.verbose(entry['series_name'])
                             parser.data = cur_filename
-                            parser.parse
                             log.debug(parser.id_type)
                             if parser.id_type == 'ep':
                                 entry['series_id'] = ''.join(['S', str(parser.season).rjust(2, str('0')), 'E',
@@ -365,7 +364,7 @@ class OutputAria2(object):
                         except xmlrpc.client.Fault as err:
                             raise plugin.PluginError('aria2 response to add URI request: %s' % err.faultString, log)
                         except socket_error as e:
-                            (error, msg) = e.args
+                            _, msg = e.args
                             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                                      % (baseurl, msg), log)
                         except RenderError as e:
@@ -386,7 +385,7 @@ class OutputAria2(object):
                                     raise plugin.PluginError('aria2 response to remove request: %s'
                                                              % err.faultString, log)
                                 except socket_error as e:
-                                    (error, msg) = e.args
+                                    _, msg = e.args
                                     raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                                              % (baseurl, msg), log)
                         else:
@@ -399,7 +398,7 @@ class OutputAria2(object):
                         else:
                             raise plugin.PluginError('aria2 response to status request: %s' % err.faultString, log)
                     except socket_error as e:
-                        (error, msg) = e.args
+                        _, msg = e.args
                         raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                                  % (baseurl, msg), log)
 
