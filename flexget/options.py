@@ -470,4 +470,6 @@ class CoreArgumentParser(ArgumentParser):
             if hasattr(result, 'execute'):
                 exec_options.__dict__.update(result.execute.__dict__)
             result.execute = exec_options
+        # Set the 'allow_manual' flag to True for any usage of the CLI
+        setattr(result, 'allow_manual', True)
         return result

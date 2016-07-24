@@ -231,7 +231,7 @@ class Manager(object):
             written to it.
         :param priority: If there are other executions waiting to be run, they will be run in priority order,
             lowest first.
-        :returns: a list of :class:`threading.Event` instances which will be
+         :returns: a list of :class:`threading.Event` instances which will be
             set when each respective task has finished running
         """
         if options is None:
