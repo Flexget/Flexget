@@ -1,8 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from past.builtins import basestring
 
 import os
+import glob
 import shutil
 import logging
 import time
@@ -68,7 +68,7 @@ class BaseFileOps(object):
                 elif not os.path.isfile(src):
                     raise plugin.PluginWarning('location `%s` is not a file.' % src)
                 # search for namesakes
-                siblings = {}
+                siblings = {}  # dict of (path=ext) pairs
                 if not src_isdir and 'along' in config:
                     parent = os.path.dirname(src)
                     src_file, src_ext = os.path.splitext(src)
@@ -79,15 +79,24 @@ class BaseFileOps(object):
                         if os.path.exists(sibling):
                             siblings[sibling] = normalized_ext
                     for subdir, exts in config['along'].get('subdirs', {}).items():
-                        abs_subdir = os.path.join(parent, os.path.normpath(subdir))
+                        # use glob to get a list of matching dirs
+                        abs_subdirs = glob.glob(os.path.join(parent, os.path.normpath(subdir)))
                         if not isinstance(exts, list):
                             exts = [exts]
-                        for ext in exts:
+                        # iterate over every dir returned by glob looking for matching ext
+                        for abs_subdir in abs_subdirs:
                             if os.path.isdir(abs_subdir):
-                                normalized_ext = make_ext(ext)
-                                sibling = os.path.join(abs_subdir, filename_no_ext + normalized_ext)
-                                if os.path.exists(sibling):
-                                    siblings[sibling] = normalized_ext
+                                for ext in exts:
+                                    normalized_ext = make_ext(ext)
+                                    # use glob to get a list of matching files
+                                    files = glob.glob(os.path.join(abs_subdir, filename_no_ext + normalized_ext))
+                                    for file in files:
+                                        # we have to use the length of the main file (no ext) to extract the real
+                                        # extension of the sibling file because of language codes etc.
+                                        filename = os.path.basename(file)
+                                        glob_ext = filename[len(filename_no_ext):]
+                                        if os.path.exists(file):
+                                            siblings[file] = glob_ext
                 # execute action in subclasses
                 self.handle_entry(task, config, entry, siblings)
             except OSError as err:
