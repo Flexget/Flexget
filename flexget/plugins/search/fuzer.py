@@ -79,8 +79,8 @@ class UrlRewriteFuzer(object):
         table = soup.find('div', {'id': 'main_table'}).find('table', {'class': 'table_info'})
         if len(table.find_all('tr')) == 1:
             log.debug('No search results were returned, continuing')
-            return
-        entries = set()
+            return []
+        entries = []
         for tr in table.find_all("tr"):
             if 'colhead_dark' in tr.get('class'):
                 continue
@@ -117,7 +117,7 @@ class UrlRewriteFuzer(object):
                     e['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
                 else:
                     e['content_size'] = int(float(size.group(1)) / 1024 ** 2)
-            entries.add(e)
+            entries.append(e)
         return entries
 
     @plugin.internet(log)
@@ -162,7 +162,7 @@ class UrlRewriteFuzer(object):
         for c in categories:
             c_list.append('c{}={}'.format(quote_plus('[]'), c))
 
-        entries = set()
+        entries = []
         if entry.get('imdb_id'):
             log.debug('imdb_id {} detected, using in search.'.format(entry['imdb_id']))
             soup = self.get_fuzer_soup(entry['imdb_id'], c_list)
@@ -175,7 +175,7 @@ class UrlRewriteFuzer(object):
                 query = normalize_unicode(search_string).replace(":", "")
                 text = quote_plus(query.encode('windows-1255'))
                 soup = self.get_fuzer_soup(text, c_list)
-                entries = self.extract_entry_from_soup(soup)
+                entries += self.extract_entry_from_soup(soup)
         return sorted(entries, reverse=True, key=lambda x: x.get('search_sort')) if entries else []
 
 
