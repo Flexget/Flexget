@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:other="http://localhost/flexget">
+<rss version="2.0" xmlns:other="http://localhost/flexget" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>FlexGet RSS test</title>
     <ttl>15</ttl>
@@ -22,6 +22,17 @@
       <enclosure url="http://localhost/enclosure1"/>
       <enclosure url="http://localhost/enclosure2"/>
       <enclosure url="http://localhost/enclosure3"/>
+    </item>
+
+    <item>
+      <title>Alternate links</title>
+      <link>http://localhost/alternate_links</link>
+      <pubDate>Sun, 28 Dec 2008 14:00:00 -0200</pubDate>
+      <description>Description, alternate_links</description>
+      <atom:link rel="alternate" type="text/html" href="http://localhost/alternate_1_html"/>
+      <atom:link rel="alternate" type="image/png" href="http://localhost/alternate_2_png"/>
+      <atom:link rel="alternate" type="application/x-bittorrent" href="http://localhost/alternate_3_bittorrent"/>
+      <atom:link rel="alternate" type="text/plain" href="http://localhost/alternate_4_plain"/>
     </item>
 
     <item>

@@ -428,17 +428,48 @@ class InputRSS(object):
             e = Entry()
 
             if not isinstance(config.get('link'), list):
-                # If the link field is not a list, search for first valid url
+                # If the link field is not a list, search for preferred valid url
                 if config['link'] == 'auto':
                     # Auto mode, check for a single enclosure url first
                     if len(entry.get('enclosures', [])) == 1 and entry['enclosures'][0].get('href'):
                         self.add_enclosure_info(e, entry['enclosures'][0], config.get('filename', True))
                     else:
-                        # If there is no enclosure url, check link, then guid field for urls
-                        for field in ['link', 'guid']:
-                            if entry.get(field):
-                                e['url'] = entry[field]
-                                break
+                        # If there is no single enclosure url, check all links and the GUID,
+                        # choose highest scoring of them
+                        # Give a score boost to particular mime types and link relations
+                        boost_types = {
+                            'application/x-bittorrent': 3,
+                            'application/x-nzb': 3,
+                        }
+                        boost_relations = {
+                            'enclosure': -100, # For backwards compatibility, don't consider these
+                            'alternate': 2,
+                        }
+                        best_score = -1
+
+                        # If there is a GUID, use it with a score of 0
+                        if entry.get('guid'):
+                            log.debug("Entry URL from GUID '%s' has score 0", entry.get('guid'))
+                            e['url'] = entry.get('guid')
+                            best_score = 0
+
+                        # Loop over links and assign scores to them; use that with the best score
+                        for link in entry.get('links', []):
+                            if 'href' not in link:
+                                continue
+                            score = 0
+                            if 'type' in link and link['type'] in boost_types:
+                                score += boost_types[link['type']]
+                            if 'rel' in link and link['rel'] in boost_relations:
+                                score += boost_relations[link['rel']]
+                            log.debug("Link of relation %s, type %s, '%s' has score %d",
+                                    link['rel'] if 'rel' in link else '[none]',
+                                    link['type'] if 'type' in link else '[none]',
+                                    link['href'],
+                                    score)
+                            if score > best_score:
+                                e['url'] = link['href']
+                                best_score = score
                 else:
                     if entry.get(config['link']):
                         e['url'] = entry[config['link']]
