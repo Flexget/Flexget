@@ -748,7 +748,8 @@ class IRCConnectionManager(object):
                             irc_connections[conn_name].thread.start()
                         except IOError as e:
                             log.error(e)
-                            del irc_connections[conn_name]
+                        # remove it from the schedule
+                        del schedule[conn_name]
 
             time.sleep(1)
 
