@@ -15,7 +15,7 @@ class TestRegexp(object):
               - {title: 'regexp6', 'imdb_score': 5}
               - {title: 'regexp7', 'imdb_score': 5}
               - {title: 'regexp8', 'imdb_score': 5}
-              - {title: 'regexp9', 'imdb_score': 5}
+              - {title: 'regexp9', 'imdb_score': 46}
               - {title: 'regular', otherfield: 'genre1', genre: ['genre2', 'genre3']}
               - {title: 'expression', genre: ['genre1', 'genre2']}
             seen: false
@@ -82,6 +82,12 @@ class TestRegexp(object):
                 - exp5
               rest: reject
 
+          test_numeric:
+            regexp:
+              accept:
+                - 6:
+                    from: imdb_score
+
           test_match_in_list:
             regexp:
               # Also tests global from option
@@ -135,6 +141,11 @@ class TestRegexp(object):
         assert task.find_entry('accepted', title='expression'), '\'expression\' should have been accepted'
         assert task.find_entry('accepted', title='regexp9'), '\'regexp9\' should have been accepted'
         assert task.find_entry('rejected', title='regexp5'), '\'regexp5\' should have been rejected'
+
+    def test_numeric(self, execute_task):
+        task = execute_task('test_numeric')
+        assert task.find_entry('accepted', title = 'regexp9'), '\'regexp9\' should have been accepted because of score regexp'
+        assert not task.find_entry('accepted', title = 'regexp8'), '\'regexp8\' should NOT have been accepted because of score regexp'
 
     def test_match_in_list(self, execute_task):
         task = execute_task('test_match_in_list')

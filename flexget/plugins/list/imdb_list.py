@@ -288,7 +288,8 @@ class ImdbEntrySet(MutableSet):
             # We don't need to invalidate our cache if we remove the item
             self._items = [i for i in self._items if i['imdb_id'] != entry['imdb_id']] if self._items else None
 
-    def add(self, entry):
+    def _add(self, entry):
+        """Submit a new movie to imdb. (does not update cache)"""
         if self.config['list'] in IMMUTABLE_LISTS:
             raise plugin.PluginError('%s lists are not modifiable' % ' and '.join(IMMUTABLE_LISTS))
         if 'imdb_id' not in entry:
@@ -303,8 +304,17 @@ class ImdbEntrySet(MutableSet):
         }
         log.debug('adding title %s with ID %s to imdb %s', entry['title'], entry['imdb_id'], self.list_id)
         self.session.post('http://www.imdb.com/list/_ajax/edit', data=data, cookies=self.cookies)
-        # Invalidate cache so that new movie info will be grabbed
+
+    def add(self, entry):
+        self._add(entry)
+        # Invalidate the cache so that we get the canonical entry from the imdb list
         self.invalidate_cache()
+
+    def __ior__(self, entries):
+        for entry in entries:
+            self._add(entry)
+        self.invalidate_cache()
+        return self
 
     def __len__(self):
         return len(self.items)
