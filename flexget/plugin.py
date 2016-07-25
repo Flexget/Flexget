@@ -8,6 +8,7 @@ import os
 import re
 import time
 import warnings
+import pkg_resources
 from functools import total_ordering
 from http.client import BadStatusLine
 
@@ -367,6 +368,12 @@ def _get_standard_plugins_path():
     return paths
 
 
+def _check_phase_queue():
+    if _new_phase_queue:
+        for phase, args in _new_phase_queue.items():
+            log.error('Plugin %s requested new phase %s, but it could not be created at requested '
+                      'point (before, after). Plugin is not working properly.', args[0], phase)
+
 def _load_plugins_from_dirs(dirs):
     """
     :param list dirs: Directories from where plugins are loaded from
@@ -389,28 +396,47 @@ def _load_plugins_from_dirs(dirs):
                 if e.has_message():
                     msg = e.message
                 else:
-                    msg = 'Plugin `%s` requires `%s` to load.' % (e.issued_by or module_name, e.missing or 'N/A')
+                    msg = 'Plugin `%s` requires `%s` to load.', e.issued_by or module_name, e.missing or 'N/A'
                 if not e.silent:
                     log.warning(msg)
                 else:
                     log.debug(msg)
             except ImportError as e:
-                log.critical('Plugin `%s` failed to import dependencies' % module_name)
-                log.exception(e)
+                log.critical('Plugin `%s` failed to import dependencies', module_name, exc_info=True)
             except ValueError as e:
                 # Debugging #2755
                 log.error('ValueError attempting to import `%s` (from %s): %s', module_name, plugin_path, e)
             except Exception as e:
-                log.critical('Exception while loading plugin %s' % module_name)
-                log.exception(e)
+                log.critical('Exception while loading plugin %s', module_name, exc_info=True)
                 raise
             else:
-                log.trace('Loaded module %s from %s' % (module_name, plugin_path))
+                log.trace('Loaded module %s from %s', module_name, plugin_path)
+    _check_phase_queue()
+                      
 
-    if _new_phase_queue:
-        for phase, args in _new_phase_queue.items():
-            log.error('Plugin %s requested new phase %s, but it could not be created at requested '
-                      'point (before, after). Plugin is not working properly.' % (args[0], phase))
+def _load_plugins_from_packages():
+    """Load plugins installed via PIP"""
+    for entrypoint in pkg_resources.iter_entry_points('FlexGet.plugins'):
+        try:
+            plugin_module = entrypoint.load()
+        except DependencyError as e:
+            if e.has_message():
+                msg = e.message
+            else:
+                msg = 'Plugin `%s` requires `%s` to load.', e.issued_by or module_name, e.missing or 'N/A'
+            if not e.silent:
+                log.warning(msg)
+            else:
+                log.debug(msg)
+        except ImportError as e:
+            log.critical('Plugin `%s` failed to import dependencies', module_name, exc_info=True)
+        except Exception as e:
+            log.critical('Exception while loading plugin %s', module_name, exc_info=True)
+            raise
+        else:
+            log.trace('Loaded packaged module %s from %s', entrypoint.module_name, plugin_module.__file__)
+    _check_phase_queue()
+
 
 
 def load_plugins(extra_dirs=None):
@@ -429,6 +455,7 @@ def load_plugins(extra_dirs=None):
     start_time = time.time()
     # Import all the plugins
     _load_plugins_from_dirs(extra_dirs)
+    _load_plugins_from_packages()
     # Register them
     fire_event('plugin.register')
     # Plugins should only be registered once, remove their handlers after
