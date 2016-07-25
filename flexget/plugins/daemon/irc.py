@@ -144,7 +144,6 @@ class MissingConfigOption(Exception):
 
 
 class IRCConnection(IRCBot):
-
     def __init__(self, config, config_name):
         self.config = config
         self.connection_name = config_name
@@ -319,7 +318,8 @@ class IRCConnection(IRCBot):
             if isinstance(tasks, basestring):
                 tasks = [tasks]
             log.info('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
-            manager.execute(options={'tasks': tasks, 'cron': True, 'inject': self.entry_queue}, priority=5)
+            manager.execute(options={'tasks': tasks, 'cron': True, 'inject': self.entry_queue, 'allow_manual': True},
+                            priority=5)
 
         if tasks_re:
             tasks_entry_map = {}
@@ -339,7 +339,8 @@ class IRCConnection(IRCBot):
 
             for task, entries in tasks_entry_map.items():
                 log.info('Injecting %d entries into task "%s"', len(entries), task)
-                manager.execute(options={'tasks': [task], 'cron': True, 'inject': entries}, priority=5)
+                manager.execute(options={'tasks': [task], 'cron': True, 'inject': entries, 'allow_manual': True},
+                                priority=5)
 
         self.entry_queue = []
 
@@ -694,7 +695,6 @@ def irc_update_config(manager):
 
 
 class IRCConnectionManager(object):
-
     def __init__(self, config):
         self.config = config
         self.shutdown_event = threading.Event()
@@ -732,7 +732,6 @@ class IRCConnectionManager(object):
                         irc_connections[conn_name].thread.start()
                     except IOError as e:
                         log.error(e)
-                        del irc_connections[conn_name]
                 elif not conn.is_alive() and conn.running:
                     if conn_name not in schedule:
                         schedule[conn_name] = now + timedelta(seconds=5)
@@ -747,8 +746,6 @@ class IRCConnectionManager(object):
                             irc_connections[conn_name].close()  # close connection if it's still alive
                             irc_connections[conn_name] = IRCConnection(conn.config, conn_name)
                             irc_connections[conn_name].thread.start()
-                            # remove it from the schedule
-                            del schedule[conn_name]
                         except IOError as e:
                             log.error(e)
                             del irc_connections[conn_name]
@@ -762,7 +759,6 @@ class IRCConnectionManager(object):
         Start all the irc connections. Stop the daemon if there are failures.
         :return:
         """
-        global irc_connections
 
         # First we validate the config for all connections including their .tracker files
         errors = 0
