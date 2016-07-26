@@ -50,8 +50,8 @@ plugin_parser.add_argument('include_schema', type=inputs.boolean, default=False,
 
 plugins_parser = plugin_parser.copy()
 
-plugins_parser.add_argument('group', help='Show plugins belonging to this group')
-plugins_parser.add_argument('phase', help='Show plugins that act on this phase')
+plugins_parser.add_argument('group', case_sensitive=False, help='Show plugins belonging to this group')
+plugins_parser.add_argument('phase', case_sensitive=False, help='Show plugins that act on this phase')
 
 
 def plugin_to_dict(plugin):
