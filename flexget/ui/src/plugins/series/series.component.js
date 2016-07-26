@@ -98,7 +98,9 @@
 			}
         }
 
-        function areEpisodesOnShowRow(show, index) {
+        function areEpisodesOnShowRow(index) {
+			var show = vm.selectedShow;
+
             if (!show) {
 				return false;
 			}
@@ -111,29 +113,23 @@
 				numberOfColumns = 2;
 			}
 
-            var isOnRightRow = true;
-
             var column = index % numberOfColumns;
             var row = (index - column) / numberOfColumns;
-
 
             var showIndex = vm.series.indexOf(show);
             var showColumn = showIndex % numberOfColumns;
             var showRow = (showIndex - showColumn) / numberOfColumns;
 
             if (row !== showRow) {
-				isOnRightRow = false;
+				return false;
 			}
 
-            if (column !== numberOfColumns - 1) {
-				isOnRightRow = false;
+			//Check if not last series, since it doesn't work correctly with the matrix here
+            if (index !== vm.series.length - 1 && column !== numberOfColumns - 1) {
+				return false;
 			}
 
-            if (showIndex === index && index === (vm.series.length - 1)) {
-				isOnRightRow = true;
-			}
-
-            return isOnRightRow;
+            return true;
         }
     }
 }());
