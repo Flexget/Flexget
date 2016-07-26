@@ -11,7 +11,7 @@ from flexget.utils import json
 
 
 @pytest.mark.online
-class TestTVDBSeriesoLookupAPI(object):
+class TestTVDBSeriesLookupAPI(object):
     config = 'tasks: {}'
 
     series_schema = {
