@@ -11,11 +11,12 @@ log = logging.getLogger('reject_all')
 
 class FilterRejectAll(object):
     """
-        Rejects all entries. Use for dev purposes
+        Rejects all entries. Use for dev purposes.
+        Sets expiration to 1 hour.
 
         Example::
 
-          reject_all: true
+          reject_all: yes
     """
 
     schema = {'type': 'boolean'}
@@ -23,7 +24,7 @@ class FilterRejectAll(object):
     def on_task_filter(self, task, config):
         if config:
             for entry in task.entries:
-                entry.reject(remember='test')
+                entry.reject(remember_time='1 hour')
 
 
 @event('plugin.register')
