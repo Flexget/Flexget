@@ -107,7 +107,7 @@
 
             if ($mdMedia('gt-lg')) {
 				numberOfColumns = 3;
-			} else if ($mdMedia('gt-lg')) {
+			} else if ($mdMedia('gt-md')) {
 				numberOfColumns = 2;
 			}
 
