@@ -267,6 +267,8 @@ class ValidationError(ApiError):
                 error_dict[attr] = str(getattr(error, attr))
         return error_dict
 
+empty_response = api.schema('empty', {'type': 'object'})
+
 
 @api.errorhandler(ApiError)
 @api.errorhandler(NotFoundError)

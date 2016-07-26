@@ -1,0 +1,69 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
+import logging
+
+from flask import jsonify
+
+from flexget.api import api, APIResource
+from flexget.plugins.filter.remember_rejected import RememberEntry
+
+log = logging.getLogger('rejected')
+
+rejected_api = api.namespace('rejected', description='View and manage rejected entries')
+
+
+def rejected_entry_to_dict(entry):
+    return {
+        'id': entry.id,
+        'added': entry.added,
+        'expires': entry.expires,
+        'title': entry.title,
+        'url': entry.url,
+        'rejected_by': entry.rejected.by,
+        'reason': entry.reason
+    }
+
+
+rejected_entry_object = {
+    'type': 'object',
+    'properties': {
+        'id': {'type': 'integer'},
+        'title': {'type': 'string'},
+        'url': {'type': 'string'},
+        'added': {'type': 'string', 'format': 'date-time'},
+        'reason': {'type': 'string'},
+        'expires': {'type': 'string', 'format': 'date-time'},
+        'rejected_by': {'type': 'string'}
+    }
+}
+rejected_entries_list_object = {
+    'type': 'object',
+    'properties': {
+        'rejected_entries': {'type': 'array', 'items': rejected_entry_object},
+        'number_of_rejected_entries': {'type': 'integer'}
+    }
+}
+
+rejected_failed_entry_schema = api.schema('rejected_failed_entry_schema', rejected_entry_object)
+rejected_entries_list_schema = api.schema('rejected_entries_list_schema', rejected_entries_list_object)
+
+
+@rejected_api.route('/')
+class Rejected(APIResource):
+    @api.response(200, model=rejected_entries_list_schema)
+    def get(self, session=None):
+        """ List all rejected entries """
+        entries = session.query(RememberEntry).all()
+        return jsonify(rejected_entries=[rejected_entry_to_dict(e) for e in entries],
+                       number_of_rejected_entries=len(entries))
+
+    @api.response(200)
+    def delete(self, session=None):
+        """ Clears all rejected entries"""
+        entries = session.query(RememberEntry).delete()
+        session.commit()
+        if entries:
+            self.manager.config_changed()
+        return {'status': 'success',
+                'message': 'successfully deleted %i rejected entries' % entries}
