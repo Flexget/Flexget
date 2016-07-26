@@ -268,8 +268,9 @@ class PluginInfo(dict):
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
-            log.critical('Error while registering plugin %s. A plugin with the same name is already registered' %
-                         self.name)
+            raise Exception('already %s' % self.name)
+            log.critical('Error while registering plugin %s. '
+                         'A plugin with the same name is already registered', self.name)
         else:
             plugins[self.name] = self
 
@@ -465,7 +466,7 @@ def load_plugins(extra_dirs=None):
         plugin.initialize()
     took = time.time() - start_time
     plugins_loaded = True
-    log.debug('Plugins took %.2f seconds to load' % took)
+    log.debug('Plugins took %.2f seconds to load. %s plugins in registry.', took, len(plugins.keys()))
 
 
 def get_plugins(phase=None, group=None, context=None, category=None, name=None, min_api=None):

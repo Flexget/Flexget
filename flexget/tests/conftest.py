@@ -243,12 +243,23 @@ def no_requests(monkeypatch):
 
 @pytest.fixture(scope='session', autouse=True)
 def setup_once(pytestconfig, request):
-    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'tests'))
+#    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'flexget', 'tests'))
     flexget.logger.initialize(True)
     m = MockManager('tasks: {}', 'init')  # This makes sure our template environment is set up before any tests are run
     m.shutdown()
     logging.getLogger().setLevel(logging.DEBUG)
     load_plugins()
+    
+
+@pytest.fixture(autouse=True)
+def chdir(pytestconfig, request):
+    """
+    By marking test with chdir flag we will change current working directory
+    to that module location. Task configuration can then assume this being
+    location for relative paths
+    """
+    if 'chdir' in request.funcargnames:
+        os.chdir(os.path.dirname(request.module.__file__))
 
 
 @pytest.fixture(autouse=True)
