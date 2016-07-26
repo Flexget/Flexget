@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import jsonschema
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.utils import PY2
 from future.backports.http import client as backport_client
@@ -139,6 +141,20 @@ def api_client(manager):
             session.add(user)
             session.commit()
         return APIClient(user.token)
+
+
+@pytest.fixture()
+def schema_match(manager):
+    """
+    This fixture enables verifying JSON Schema. Return a list of validation error dicts. List is empty if no errors
+    occurred.
+    """
+    def match(schema, response):
+        validator = jsonschema.Draft4Validator(schema)
+        errors = list(validator.iter_errors(response))
+        return [dict(value=list(e.path), message=e.message) for e in errors]
+
+    return match
 
 
 # --- End Public Fixtures ---
