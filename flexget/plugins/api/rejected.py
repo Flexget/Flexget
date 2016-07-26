@@ -21,7 +21,7 @@ def rejected_entry_to_dict(entry):
         'expires': entry.expires,
         'title': entry.title,
         'url': entry.url,
-        'rejected_by': entry.rejected.by,
+        'rejected_by': entry.rejected_by,
         'reason': entry.reason
     }
 
@@ -64,6 +64,7 @@ class Rejected(APIResource):
         """ Clears all rejected entries"""
         entries = session.query(RememberEntry).delete()
         if entries:
+            session.commit()
             self.manager.config_changed()
         return {'status': 'success',
                 'message': 'successfully deleted %i rejected entries' % entries}
@@ -79,7 +80,7 @@ class RejectedEntry(APIResource):
             entry = session.query(RememberEntry).filter(RememberEntry.id == rejected_entry_id).one()
         except NoResultFound:
             raise BadRequest('rejected entry ID %d not found' % rejected_entry_id)
-        return rejected_entry_to_dict(entry)
+        return jsonify(rejected_entry_to_dict(entry))
 
     def delete(self, rejected_entry_id, session=None):
         """ Deletes a rejected entry """
