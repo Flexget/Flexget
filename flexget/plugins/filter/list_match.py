@@ -24,7 +24,8 @@ class ListMatch(object):
             'action': {'type': 'string', 'enum': ['accept', 'reject'], 'default': 'accept'},
             'remove_on_match': {'type': 'boolean', 'default': True},
             'single_match': {'type': 'boolean', 'default': True},
-        }
+        },
+        'additionalProperties': False
     }
 
     @plugin.priority(0)
