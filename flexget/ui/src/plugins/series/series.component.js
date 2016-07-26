@@ -98,20 +98,23 @@
 			}
         }
 
+		function getNumberOfColumns() {
+			if ($mdMedia('gt-lg')) {
+				return 3;
+			} else if ($mdMedia('gt-md')) {
+				return 2;
+			}
+			return 1;
+		}
+
         function areEpisodesOnShowRow(index) {
 			var show = vm.selectedShow;
 
             if (!show) {
 				return false;
 			}
-
-            var numberOfColumns = 1;
-
-            if ($mdMedia('gt-lg')) {
-				numberOfColumns = 3;
-			} else if ($mdMedia('gt-md')) {
-				numberOfColumns = 2;
-			}
+			
+			var numberOfColumns = getNumberOfColumns();
 
             var column = index % numberOfColumns;
             var row = (index - column) / numberOfColumns;
