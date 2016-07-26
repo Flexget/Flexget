@@ -4,8 +4,9 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 
 from flask import jsonify
+from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import api, APIResource, BadRequest
 from flexget.plugins.filter.remember_rejected import RememberEntry
 
 log = logging.getLogger('rejected')
@@ -45,7 +46,7 @@ rejected_entries_list_object = {
     }
 }
 
-rejected_failed_entry_schema = api.schema('rejected_failed_entry_schema', rejected_entry_object)
+rejected_entry_schema = api.schema('rejected_failed_entry_schema', rejected_entry_object)
 rejected_entries_list_schema = api.schema('rejected_entries_list_schema', rejected_entries_list_object)
 
 
@@ -62,8 +63,30 @@ class Rejected(APIResource):
     def delete(self, session=None):
         """ Clears all rejected entries"""
         entries = session.query(RememberEntry).delete()
-        session.commit()
         if entries:
             self.manager.config_changed()
         return {'status': 'success',
                 'message': 'successfully deleted %i rejected entries' % entries}
+
+
+@rejected_api.route('/<int:rejected_entry_id>/')
+class RejectedEntry(APIResource):
+    @api.response(200, model=rejected_entry_schema)
+    @api.response(BadRequest)
+    def get(self, rejected_entry_id, session=None):
+        """ Returns a rejected entry """
+        try:
+            entry = session.query(RememberEntry).filter(RememberEntry.id == rejected_entry_id).one()
+        except NoResultFound:
+            raise BadRequest('rejected entry ID %d not found' % rejected_entry_id)
+        return rejected_entry_to_dict(entry)
+
+    def delete(self, rejected_entry_id, session=None):
+        """ Deletes a rejected entry """
+        try:
+            entry = session.query(RememberEntry).filter(RememberEntry.id == rejected_entry_id).one()
+        except NoResultFound:
+            raise BadRequest('rejected entry ID %d not found' % rejected_entry_id)
+        session.delete(entry)
+        return {'status': 'success',
+                'message': 'successfully deleted rejected entry %i ' % rejected_entry_id}
