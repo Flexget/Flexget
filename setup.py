@@ -32,7 +32,7 @@ setup(
     license='MIT',
     url='http://flexget.com',
     download_url='http://download.flexget.com',
-    packages=find_packages(exclude=['tests']),
+    packages=find_packages(exclude=['flexget/tests']),
     include_package_data=True,
     zip_safe=False,
     install_requires=load_requirements('requirements.txt'),

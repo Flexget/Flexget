@@ -66,7 +66,7 @@ class TestTVMazeShowLookup(object):
           test_show_is_number:
             mock:
               - {title: '1992.S01E02.720p.HDTV.XViD-FlexGet'}
-              - {title: '24 S09E12 HDTV x264-FlexGet'}
+              - {title: '24 S01E01 HDTV x264-FlexGet'}
             series:
               - 1992
               - 24
@@ -271,9 +271,9 @@ class TestTVMazeShowLookup(object):
             'tvmaze_episode_id']
         entry = task.find_entry(series_name='24')
         assert entry['tvmaze_series_name'] == '24'.lower(), 'lookup failed'
-        assert entry['tvmaze_series_id'] == 167, 'series id should be 167, instead its %s' % entry[
+        assert entry['tvmaze_series_id'] == 6353, 'series id should be 167, instead its %s' % entry[
             'tvmaze_series_id']
-        assert entry['tvmaze_episode_id'] == 12094, 'episode id should be 12094, instead its %s' % entry[
+        assert entry['tvmaze_episode_id'] == 377246, 'episode id should be 12094, instead its %s' % entry[
             'tvmaze_episode_id']
 
     def test_show_contain_number(self, execute_task):

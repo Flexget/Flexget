@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import jsonschema
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.utils import PY2
 from future.backports.http import client as backport_client
@@ -141,6 +143,20 @@ def api_client(manager):
         return APIClient(user.token)
 
 
+@pytest.fixture()
+def schema_match(manager):
+    """
+    This fixture enables verifying JSON Schema. Return a list of validation error dicts. List is empty if no errors
+    occurred.
+    """
+    def match(schema, response):
+        validator = jsonschema.Draft4Validator(schema)
+        errors = list(validator.iter_errors(response))
+        return [dict(value=list(e.path), message=e.message) for e in errors]
+
+    return match
+
+
 # --- End Public Fixtures ---
 
 
@@ -227,12 +243,23 @@ def no_requests(monkeypatch):
 
 @pytest.fixture(scope='session', autouse=True)
 def setup_once(pytestconfig, request):
-    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'tests'))
+#    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'flexget', 'tests'))
     flexget.logger.initialize(True)
     m = MockManager('tasks: {}', 'init')  # This makes sure our template environment is set up before any tests are run
     m.shutdown()
     logging.getLogger().setLevel(logging.DEBUG)
     load_plugins()
+    
+
+@pytest.fixture(autouse=True)
+def chdir(pytestconfig, request):
+    """
+    By marking test with chdir flag we will change current working directory
+    to that module location. Task configuration can then assume this being
+    location for relative paths
+    """
+    if 'chdir' in request.funcargnames:
+        os.chdir(os.path.dirname(request.module.__file__))
 
 
 @pytest.fixture(autouse=True)
