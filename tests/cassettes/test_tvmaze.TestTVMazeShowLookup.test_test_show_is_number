@@ -99,4 +99,354 @@ interactions:
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.16]
     status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=1992
+  response:
+    body: {string: !!python/unicode '{"id":4879,"url":"http://www.tvmaze.com/shows/4879/1992","name":"1992","type":"Scripted","language":"Italian","genres":["Drama","Crime","History"],"status":"Ended","runtime":50,"premiered":"2015-03-24","schedule":{"time":"21:00","days":["Tuesday"]},"rating":{"average":9},"weight":0,"network":{"id":370,"name":"Sky
+        Cinema","country":{"name":"Italy","code":"IT","timezone":"Europe/Rome"}},"webChannel":null,"externals":{"tvrage":47669,"thetvdb":292192,"imdb":"tt2983290"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/53426.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/53426.jpg"},"summary":"<p>Set
+        in early nineties Italy when there was a nationwide judicial investigation
+        into corruption. This resulted in the break down of many political parties
+        as well as the arrest and conviction of some high profile political figures.
+        The story will follow six people whose lives are intertwined with the rapidly
+        changing political landscape, exposing the far-reaching impact of the greed
+        and corruption.</p>","updated":1466951790,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4879"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/308495"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:52:26 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/4879/episodebynumber?season=1&number=2
+  response:
+    body: {string: !!python/unicode '{"id":308487,"url":"http://www.tvmaze.com/episodes/308487/1992-1x02-episode-2","name":"Episode
+        2","season":1,"number":2,"airdate":"2015-03-24","airtime":"22:00","airstamp":"2015-03-24T22:00:00+01:00","runtime":50,"image":null,"summary":"<p>Leonardo
+        Notte attempts to hide his murky past as a radical left activist, while Luca
+        Pastore takes care of some personal business. </p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/308487"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:52:26 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=24
+  response:
+    body: {string: !!python/unicode '{"id":6353,"url":"http://www.tvmaze.com/shows/6353/24","name":"24","type":"Scripted","language":"Hindi","genres":["Drama"],"status":"Running","runtime":60,"premiered":"2013-10-04","schedule":{"time":"20:00","days":["Saturday","Sunday"]},"rating":{"average":9},"weight":1,"network":{"id":438,"name":"Colors","country":{"name":"India","code":"IN","timezone":"Asia/Kolkata"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":273614,"imdb":"tt2792284"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/24/60878.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/24/60878.jpg"},"summary":"<p>This
+        thriller series focuses on an anti-terrorist unit agent named Jai Singh Rathod
+        who has twenty-four hours to save the country from a major terrorist attack.</p>","updated":1469314293,"_links":{"self":{"href":"http://api.tvmaze.com/shows/6353"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/869841"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/869842"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:52:26 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=1992
+  response:
+    body: {string: !!python/unicode '{"id":4879,"url":"http://www.tvmaze.com/shows/4879/1992","name":"1992","type":"Scripted","language":"Italian","genres":["Drama","Crime","History"],"status":"Ended","runtime":50,"premiered":"2015-03-24","schedule":{"time":"21:00","days":["Tuesday"]},"rating":{"average":9},"weight":0,"network":{"id":370,"name":"Sky
+        Cinema","country":{"name":"Italy","code":"IT","timezone":"Europe/Rome"}},"webChannel":null,"externals":{"tvrage":47669,"thetvdb":292192,"imdb":"tt2983290"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/53426.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/53426.jpg"},"summary":"<p>Set
+        in early nineties Italy when there was a nationwide judicial investigation
+        into corruption. This resulted in the break down of many political parties
+        as well as the arrest and conviction of some high profile political figures.
+        The story will follow six people whose lives are intertwined with the rapidly
+        changing political landscape, exposing the far-reaching impact of the greed
+        and corruption.</p>","updated":1466951790,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4879"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/308495"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:52:53 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/4879/episodebynumber?season=1&number=2
+  response:
+    body: {string: !!python/unicode '{"id":308487,"url":"http://www.tvmaze.com/episodes/308487/1992-1x02-episode-2","name":"Episode
+        2","season":1,"number":2,"airdate":"2015-03-24","airtime":"22:00","airstamp":"2015-03-24T22:00:00+01:00","runtime":50,"image":null,"summary":"<p>Leonardo
+        Notte attempts to hide his murky past as a radical left activist, while Luca
+        Pastore takes care of some personal business. </p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/308487"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:52:53 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=24
+  response:
+    body: {string: !!python/unicode '{"id":6353,"url":"http://www.tvmaze.com/shows/6353/24","name":"24","type":"Scripted","language":"Hindi","genres":["Drama"],"status":"Running","runtime":60,"premiered":"2013-10-04","schedule":{"time":"20:00","days":["Saturday","Sunday"]},"rating":{"average":9},"weight":1,"network":{"id":438,"name":"Colors","country":{"name":"India","code":"IN","timezone":"Asia/Kolkata"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":273614,"imdb":"tt2792284"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/24/60878.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/24/60878.jpg"},"summary":"<p>This
+        thriller series focuses on an anti-terrorist unit agent named Jai Singh Rathod
+        who has twenty-four hours to save the country from a major terrorist attack.</p>","updated":1469314293,"_links":{"self":{"href":"http://api.tvmaze.com/shows/6353"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/869841"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/869842"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:52:53 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/6353/episodebynumber?season=9&number=12
+  response:
+    body: {string: !!python/unicode '{"name":"Not Found","message":"Unknown episode","code":0,"status":404}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:52:53 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 404, message: Not Found}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=1992
+  response:
+    body: {string: !!python/unicode '{"id":4879,"url":"http://www.tvmaze.com/shows/4879/1992","name":"1992","type":"Scripted","language":"Italian","genres":["Drama","Crime","History"],"status":"Ended","runtime":50,"premiered":"2015-03-24","schedule":{"time":"21:00","days":["Tuesday"]},"rating":{"average":9},"weight":0,"network":{"id":370,"name":"Sky
+        Cinema","country":{"name":"Italy","code":"IT","timezone":"Europe/Rome"}},"webChannel":null,"externals":{"tvrage":47669,"thetvdb":292192,"imdb":"tt2983290"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/53426.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/53426.jpg"},"summary":"<p>Set
+        in early nineties Italy when there was a nationwide judicial investigation
+        into corruption. This resulted in the break down of many political parties
+        as well as the arrest and conviction of some high profile political figures.
+        The story will follow six people whose lives are intertwined with the rapidly
+        changing political landscape, exposing the far-reaching impact of the greed
+        and corruption.</p>","updated":1466951790,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4879"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/308495"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:53:28 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/4879/episodebynumber?season=1&number=2
+  response:
+    body: {string: !!python/unicode '{"id":308487,"url":"http://www.tvmaze.com/episodes/308487/1992-1x02-episode-2","name":"Episode
+        2","season":1,"number":2,"airdate":"2015-03-24","airtime":"22:00","airstamp":"2015-03-24T22:00:00+01:00","runtime":50,"image":null,"summary":"<p>Leonardo
+        Notte attempts to hide his murky past as a radical left activist, while Luca
+        Pastore takes care of some personal business. </p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/308487"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:53:28 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=24
+  response:
+    body: {string: !!python/unicode '{"id":6353,"url":"http://www.tvmaze.com/shows/6353/24","name":"24","type":"Scripted","language":"Hindi","genres":["Drama"],"status":"Running","runtime":60,"premiered":"2013-10-04","schedule":{"time":"20:00","days":["Saturday","Sunday"]},"rating":{"average":9},"weight":1,"network":{"id":438,"name":"Colors","country":{"name":"India","code":"IN","timezone":"Asia/Kolkata"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":273614,"imdb":"tt2792284"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/24/60878.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/24/60878.jpg"},"summary":"<p>This
+        thriller series focuses on an anti-terrorist unit agent named Jai Singh Rathod
+        who has twenty-four hours to save the country from a major terrorist attack.</p>","updated":1469314293,"_links":{"self":{"href":"http://api.tvmaze.com/shows/6353"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/869841"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/869842"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:53:29 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/6353/episodebynumber?season=1&number=1
+  response:
+    body: {string: !!python/unicode '{"id":377246,"url":"http://www.tvmaze.com/episodes/377246/24-1x01-day-1-1200-am-100-am","name":"Day
+        1: 12:00 AM - 1:00 AM","season":1,"number":1,"airdate":"2013-10-04","airtime":"22:00","airstamp":"2013-10-04T22:00:00+05:30","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/377246"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:53:29 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=1992
+  response:
+    body: {string: !!python/unicode '{"id":4879,"url":"http://www.tvmaze.com/shows/4879/1992","name":"1992","type":"Scripted","language":"Italian","genres":["Drama","Crime","History"],"status":"Ended","runtime":50,"premiered":"2015-03-24","schedule":{"time":"21:00","days":["Tuesday"]},"rating":{"average":9},"weight":0,"network":{"id":370,"name":"Sky
+        Cinema","country":{"name":"Italy","code":"IT","timezone":"Europe/Rome"}},"webChannel":null,"externals":{"tvrage":47669,"thetvdb":292192,"imdb":"tt2983290"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/53426.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/53426.jpg"},"summary":"<p>Set
+        in early nineties Italy when there was a nationwide judicial investigation
+        into corruption. This resulted in the break down of many political parties
+        as well as the arrest and conviction of some high profile political figures.
+        The story will follow six people whose lives are intertwined with the rapidly
+        changing political landscape, exposing the far-reaching impact of the greed
+        and corruption.</p>","updated":1466951790,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4879"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/308495"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:54:25 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/4879/episodebynumber?season=1&number=2
+  response:
+    body: {string: !!python/unicode '{"id":308487,"url":"http://www.tvmaze.com/episodes/308487/1992-1x02-episode-2","name":"Episode
+        2","season":1,"number":2,"airdate":"2015-03-24","airtime":"22:00","airstamp":"2015-03-24T22:00:00+01:00","runtime":50,"image":null,"summary":"<p>Leonardo
+        Notte attempts to hide his murky past as a radical left activist, while Luca
+        Pastore takes care of some personal business. </p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/308487"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:54:25 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=24
+  response:
+    body: {string: !!python/unicode '{"id":6353,"url":"http://www.tvmaze.com/shows/6353/24","name":"24","type":"Scripted","language":"Hindi","genres":["Drama"],"status":"Running","runtime":60,"premiered":"2013-10-04","schedule":{"time":"20:00","days":["Saturday","Sunday"]},"rating":{"average":9},"weight":1,"network":{"id":438,"name":"Colors","country":{"name":"India","code":"IN","timezone":"Asia/Kolkata"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":273614,"imdb":"tt2792284"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/24/60878.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/24/60878.jpg"},"summary":"<p>This
+        thriller series focuses on an anti-terrorist unit agent named Jai Singh Rathod
+        who has twenty-four hours to save the country from a major terrorist attack.</p>","updated":1469314293,"_links":{"self":{"href":"http://api.tvmaze.com/shows/6353"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/869841"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/869842"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:54:25 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/6353/episodebynumber?season=1&number=1
+  response:
+    body: {string: !!python/unicode '{"id":377246,"url":"http://www.tvmaze.com/episodes/377246/24-1x01-day-1-1200-am-100-am","name":"Day
+        1: 12:00 AM - 1:00 AM","season":1,"number":1,"airdate":"2013-10-04","airtime":"22:00","airstamp":"2013-10-04T22:00:00+05:30","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/377246"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 26 Jul 2016 12:54:25 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+    status: {code: 200, message: OK}
 version: 1
