@@ -60,3 +60,63 @@ class TestRejectedAPI(object):
 
         for field, value in values.items():
             assert data['rejected_entries'][0].get(field) == value
+
+    def test_rejected_delete_all(self, api_client, schema_match):
+        add_rejected_entry(self.entry)
+
+        rsp = api_client.get('/rejected/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(rejected_entry_object, data['rejected_entries'][0])
+        assert not errors
+
+        rsp = api_client.delete('/rejected/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data == {'status': 'success',
+                        'message': 'successfully deleted 1 rejected entries'}
+
+    def test_rejected_get_entry(self, api_client, schema_match):
+        add_rejected_entry(self.entry)
+
+        rsp = api_client.get('/rejected/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(rejected_entry_object, data)
+        assert not errors
+
+        values = {
+            'id': 1,
+            'title': self.entry['test_title'],
+            'url': self.entry['test_url'],
+            'rejected_by': self.entry['rejected_by'],
+            'reason': self.entry['reason']
+        }
+
+        for field, value in values.items():
+            assert data.get(field) == value
+
+    def test_rejected_delete_entry(self, api_client, schema_match):
+        add_rejected_entry(self.entry)
+
+        rsp = api_client.get('/rejected/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(rejected_entry_object, data)
+        assert not errors
+
+        rsp = api_client.delete('/rejected/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data == {'status': 'success',
+                        'message': 'successfully deleted rejected entry 1'}

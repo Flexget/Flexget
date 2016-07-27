@@ -90,4 +90,4 @@ class RejectedEntry(APIResource):
             raise BadRequest('rejected entry ID %d not found' % rejected_entry_id)
         session.delete(entry)
         return {'status': 'success',
-                'message': 'successfully deleted rejected entry %i ' % rejected_entry_id}
+                'message': 'successfully deleted rejected entry %i' % rejected_entry_id}
