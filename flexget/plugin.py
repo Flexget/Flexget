@@ -399,9 +399,9 @@ def _load_plugins_from_dirs(dirs):
                 else:
                     msg = 'Plugin `%s` requires `%s` to load.', e.issued_by or module_name, e.missing or 'N/A'
                 if not e.silent:
-                    log.warning(*msg)
+                    log.warning(msg)
                 else:
-                    log.debug(*msg)
+                    log.debug(msg)
             except ImportError as e:
                 log.critical('Plugin `%s` failed to import dependencies', module_name, exc_info=True)
             except ValueError as e:
