@@ -128,37 +128,6 @@ class TheTVDBList(object):
         return list(TheTVDBSet(config))
 
 
-class TheTVDBAdd(object):
-    schema = dict(TheTVDBSet.schema, deprecated='thetvdb_add is deprecated, use list_add instead')
-
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
-        if task.manager.options.test:
-            log.info('Not submitting to thetvdb because of test mode.')
-            return
-        thelist = TheTVDBSet(config)
-        thelist |= task.accepted
-
-
-class TheTVDBRemove(object):
-    schema = dict(TheTVDBSet.schema, deprecated='thetvdb_remove is deprecated, use list_remove instead')
-
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
-        if task.manager.options.test:
-            log.info('Not submitting to thetvdb because of test mode.')
-            return
-        thelist = TheTVDBSet(config)
-        thelist -= task.accepted
-
-
-class TheTVDBFavs(TheTVDBList):
-    schema = dict(TheTVDBList.schema, deprecated='thetvdb_favorites is deprecated, use thetvdb_list instead')
-
-
 @event('plugin.register')
 def register_plugin():
     plugin.register(TheTVDBList, 'thetvdb_list', api_ver=2, groups=['list'])
-    plugin.register(TheTVDBFavs, 'thetvdb_favorites', api_ver=2, groups=['list'])
-    plugin.register(TheTVDBAdd, 'thetvdb_add', api_ver=2)
-    plugin.register(TheTVDBRemove, 'thetvdb_remove', api_ver=2)

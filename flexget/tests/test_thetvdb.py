@@ -338,11 +338,11 @@ class TestTVDBFavorites(object):
               - {title: 'Breaking.Bad.S02E02.720p.x264'}
             configure_series:
               from:
-                thetvdb_favorites:
+                thetvdb_list:
                   username: flexget
                   account_id: 80FB8BD0720CA5EC
           test_strip_dates:
-            thetvdb_favorites:
+            thetvdb_list:
               username: flexget
               account_id: 80FB8BD0720CA5EC
               strip_dates: yes
@@ -369,48 +369,3 @@ class TestTVDBFavorites(object):
         task = execute_task('test_strip_dates')
         assert task.find_entry(title='Hawaii Five-0'), \
             'series Hawaii Five-0 (2010) should have date stripped'
-
-
-@mock.patch('flexget.plugins.api_tvdb.mark_expired')
-@pytest.mark.online
-class TestTVDBSubmit(object):
-    config = """
-        tasks:
-          add:
-            mock:
-              - {title: 'House.S01E02.HDTV.XViD-FlexGet'}
-            accept_all: true
-            thetvdb_lookup: yes
-            thetvdb_add:
-              username: flexget
-              account_id: 80FB8BD0720CA5EC
-            series:
-              - House
-          delete:
-            mock:
-              - {title: 'The.Big.Bang.Theory.S02E02.XVID-Flexget'}
-            accept_all: true
-            thetvdb_lookup: yes
-            thetvdb_remove:
-              username: flexget
-              account_id: 80FB8BD0720CA5EC
-            series:
-              - The Big Bang Theory
-
-    """
-
-    def test_add(self, mocked_expired, execute_task):
-        persist['auth_tokens'] = {'default': None}
-
-        task = execute_task('add')
-        task = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
-        assert task
-        assert task.accepted
-
-    def test_delete(self, mocked_expired, execute_task):
-        persist['auth_tokens'] = {'default': None}
-
-        task = execute_task('delete')
-        task = task.find_entry(title='The.Big.Bang.Theory.S02E02.XVID-Flexget')
-        assert task
-        assert task.accepted

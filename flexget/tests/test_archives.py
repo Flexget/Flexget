@@ -9,6 +9,7 @@ except ImportError:
     rarfile = None
 
 
+@pytest.mark.chdir
 class TestArchiveFilter(object):
     config = """
         tasks:

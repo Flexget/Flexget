@@ -20,9 +20,15 @@ from flexget.config_schema import register_config_key
 from flexget.event import event
 from flexget.manager import manager
 from flexget.config_schema import one_or_more
-from flexget.plugins.daemon.irc_bot import irc_bot
-from flexget.plugins.daemon.irc_bot.irc_bot import partial
 from flexget.utils import requests
+
+try:
+    from irc_bot.irc_bot import IRCBot
+    from irc_bot.irc_bot import partial
+    from irc_bot import irc_bot
+except ImportError as e:
+    irc_bot = None
+    IRCBot = object
 
 log = logging.getLogger('irc')
 
@@ -137,7 +143,7 @@ class MissingConfigOption(Exception):
     """Exception thrown when a config option specified in the tracker file is not on the irc config"""
 
 
-class IRCConnection(irc_bot.IRCBot):
+class IRCConnection(IRCBot):
     def __init__(self, config, config_name):
         self.config = config
         self.connection_name = config_name
@@ -222,7 +228,7 @@ class IRCConnection(irc_bot.IRCBot):
                          'invite_message': config.get('invite_message'),
                          'nickserv_password': config.get('nickserv_password'),
                          'use_ssl': config.get('use_ssl')}
-        irc_bot.IRCBot.__init__(self, ircbot_config)
+        IRCBot.__init__(self, ircbot_config)
 
         self.inject_before_shutdown = False
         self.entry_queue = []
@@ -299,7 +305,7 @@ class IRCConnection(irc_bot.IRCBot):
         """
         if self.inject_before_shutdown and self.entry_queue:
             self.run_tasks()
-        irc_bot.IRCBot.quit(self)
+        IRCBot.quit(self)
 
     def run_tasks(self):
         """
@@ -667,6 +673,12 @@ def irc_update_config(manager):
         stop_irc(manager)
         return
 
+    if irc_bot is None:
+        log.error('ImportError: irc_bot module not found. Shutting down daemon.')
+        stop_irc(manager)
+        manager.shutdown(finish_queue=False)
+        return
+
     # TODO this hashing doesn't quite work for nested dicts
     new_config_hash = hashlib.md5(str(sorted(list(config.items()))).encode('utf-8')).hexdigest()
     if config_hash == new_config_hash:
@@ -747,8 +759,8 @@ class IRCConnectionManager(object):
         Start all the irc connections. Stop the daemon if there are failures.
         :return:
         """
+
         # First we validate the config for all connections including their .tracker files
-        errors = 0
         for conn_name, connection in self.config.items():
             try:
                 log.info('Starting IRC connection for %s', conn_name)
@@ -756,10 +768,8 @@ class IRCConnectionManager(object):
                 irc_connections[conn_name] = conn
             except (MissingConfigOption, TrackerFileParseError, TrackerFileError, IOError) as e:
                 log.error(e)
-                errors += 1
-        if errors:
-            manager.shutdown(finish_queue=False)
-            return
+                if conn_name in irc_connections:
+                    del irc_connections[conn_name]  # remove it from the list of connections
 
         # Now we can start
         for conn_name, connection in irc_connections.items():

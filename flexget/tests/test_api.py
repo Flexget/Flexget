@@ -9,7 +9,7 @@ from mock import patch
 from flexget import __version__
 from flexget.api import __version__ as __api_version__
 from flexget.manager import Manager
-from tests.conftest import MockManager
+from .conftest import MockManager
 
 
 class TestValidator(object):
