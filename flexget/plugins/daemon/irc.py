@@ -6,7 +6,6 @@ import os
 import re
 import threading
 import logging
-from random import choice
 from xml.etree.ElementTree import fromstring
 import io
 from uuid import uuid4
@@ -222,7 +221,7 @@ class IRCConnection(IRCBot):
             log.debug('    Linepattern "%s" extracts %s', rx.pattern, vals)
 
         # Init the IRC Bot
-        ircbot_config = {'server': choice(self.server_list), 'port': config['port'], 'channels': channel_list,
+        ircbot_config = {'servers': self.server_list, 'port': config['port'], 'channels': channel_list,
                          'nickname': config.get('nickname', 'Flexget-%s' % str(uuid4())),
                          'invite_nickname': config.get('invite_nickname'),
                          'invite_message': config.get('invite_message'),
