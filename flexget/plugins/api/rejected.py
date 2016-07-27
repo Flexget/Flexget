@@ -11,7 +11,7 @@ from flexget.plugins.filter.remember_rejected import RememberEntry
 
 log = logging.getLogger('rejected')
 
-rejected_api = api.namespace('rejected', description='View and manage rejected entries')
+rejected_api = api.namespace('rejected', description='View and manage remembered rejected entries')
 
 
 def rejected_entry_to_dict(entry):
