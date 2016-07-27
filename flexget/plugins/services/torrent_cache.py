@@ -10,14 +10,28 @@ from flexget.event import event
 
 log = logging.getLogger('torrent_cache')
 
-MIRRORS = ['http://torrage.com/torrent/',
-           'https://torcache.net/torrent/',
-           'http://zoink.it/torrent/',
-           'http://itorrents.org/torrent/']
+MIRRORS = [
+    'https://thetorrent.org/',
+    'http://torrage.com/torrent/',
+    'http://zoink.it/torrent/',
+    'http://itorrents.org/torrent/',
+]
 
 
 class TorrentCache(object):
     """Adds urls to torrent cache sites to the urls list."""
+
+    def infohash_urls(self, info_hash):
+        """
+        Other plugins may use this to make downloadable URLs
+        from infohash.
+
+        :param str info_hash: Torrent infohash
+        :returns: shuffled urls from which infohash can be retrieved
+        """
+        urls = [host + info_hash.upper() + '.torrent' for host in MIRRORS]
+        random.shuffle(urls)
+        return urls
 
     @plugin.priority(120)
     def on_task_urlrewrite(self, task, config):
