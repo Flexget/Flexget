@@ -10,8 +10,22 @@ from flexget.utils import json
 from flexget.utils.tools import parse_timedelta
 
 
+def add_rejected_entry(entry):
+    with Session() as session:
+        task = RememberTask(name='rejected API test')
+        session.add(task)
+        session.commit()
+        expires = datetime.now() + parse_timedelta('1 hours')
+        session.add(
+            RememberEntry(title=entry['test_title'], url=entry['test_url'], task_id=task.id,
+                          rejected_by=entry['rejected_by'], reason=entry['reason'], expires=expires))
+        session.commit()
+
+
 class TestRejectedAPI(object):
     config = "{'tasks': {}}"
+
+    entry = dict(test_title='test_title', test_url='test_url', rejected_by='rejected API test', reason='test_reason')
 
     def test_rejected_get_all_empty(self, api_client, schema_match):
         rsp = api_client.get('/rejected/')
@@ -23,20 +37,7 @@ class TestRejectedAPI(object):
         assert not errors
 
     def test_rejected_get_all(self, api_client, schema_match):
-        test_title = 'test_title'
-        test_url = 'test_url'
-        rejected_by = 'rejected API test'
-        reason = 'test_reason'
-
-        with Session() as session:
-            task = RememberTask(name='rejected API test')
-            session.add(task)
-            session.commit()
-            expires = datetime.now() + parse_timedelta('1 hours')
-            session.add(
-                RememberEntry(title=test_title, url=test_url, task_id=task.id, rejected_by=rejected_by,
-                              reason=reason, expires=expires))
-            session.commit()
+        add_rejected_entry(self.entry)
 
         rsp = api_client.get('/rejected/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -51,13 +52,11 @@ class TestRejectedAPI(object):
 
         values = {
             'id': 1,
-            'title': test_title,
-            'url': test_url,
-            'rejected_by': rejected_by,
-            'reason': reason
+            'title': self.entry['test_title'],
+            'url': self.entry['test_url'],
+            'rejected_by': self.entry['rejected_by'],
+            'reason': self.entry['reason']
         }
 
         for field, value in values.items():
             assert data['rejected_entries'][0].get(field) == value
-
-
