@@ -424,15 +424,15 @@ def _load_plugins_from_packages():
             if e.has_message():
                 msg = e.message
             else:
-                msg = 'Plugin `%s` requires `%s` to load.', e.issued_by or module_name, e.missing or 'N/A'
+                msg = 'Plugin `%s` requires `%s` to load.', e.issued_by or entrypoint.module_name, e.missing or 'N/A'
             if not e.silent:
                 log.warning(msg)
             else:
                 log.debug(msg)
         except ImportError as e:
-            log.critical('Plugin `%s` failed to import dependencies', module_name, exc_info=True)
+            log.critical('Plugin `%s` failed to import dependencies', entrypoint.module_name, exc_info=True)
         except Exception as e:
-            log.critical('Exception while loading plugin %s', module_name, exc_info=True)
+            log.critical('Exception while loading plugin %s', entrypoint.module_name, exc_info=True)
             raise
         else:
             log.trace('Loaded packaged module %s from %s', entrypoint.module_name, plugin_module.__file__)
