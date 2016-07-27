@@ -2,12 +2,15 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import os
+import re
+import glob
 import shutil
 import logging
 import time
 
 from flexget import plugin
 from flexget.event import event
+from flexget.config_schema import one_or_more
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
 
@@ -25,19 +28,61 @@ def get_directory_size(directory):
     return dir_size
 
 
+def make_ext(ext):
+    return ('.' + ext).replace('..', '.')
+
+
+def escape(pathname):
+    """Escape all special characters. Taken from glob in py3.4+"""
+    # Escaping is done by wrapping any of "*?[" between square brackets.
+    # Metacharacters do not work in the drive part and shouldn't be escaped.
+
+    magic_check = re.compile('([*?[])')
+    magic_check_bytes = re.compile(b'([*?[])')
+    drive, pathname = os.path.splitdrive(pathname)
+    if isinstance(pathname, bytes):
+        pathname = magic_check_bytes.sub(br'[\1]', pathname)
+    else:
+        pathname = magic_check.sub(r'[\1]', pathname)
+    return drive + pathname
+
+
+def get_siblings(ext, main_file_path, main_file_no_ext, abs_path):
+    siblings = {}
+    normalized_ext = make_ext(ext)
+    # escape the filename to avoid special characters in main file confusing glob
+    escaped_filename = escape(main_file_no_ext)
+    # use glob to get a list of matching files
+    files = glob.glob(os.path.join(abs_path, escaped_filename + normalized_ext))
+
+    for f in files:
+        # we have to use the length of the main file (no ext) to extract the real
+        # extension of the sibling file because of language codes etc.
+        filename = os.path.basename(f)
+        glob_ext = filename[len(main_file_no_ext):]
+        if f != main_file_path and os.path.exists(f):
+            siblings[f] = glob_ext
+    return siblings
+
+
 class BaseFileOps(object):
     # Defined by subclasses
     log = None
+    along = {
+        'type': 'object',
+        'properties': {
+            'files': one_or_more({'type': 'string'}),
+            'subdirs': one_or_more({'type': 'string'})
+        },
+        'additionalProperties': False,
+        'required': ['files']
+    }
 
     def on_task_output(self, task, config):
         if config is True:
             config = {}
         elif config is False:
             return
-
-        sexts = []
-        if 'along' in config:
-            sexts = [('.' + s).replace('..', '.').lower() for s in config['along']]
 
         for entry in task.accepted:
             if 'location' not in entry:
@@ -55,15 +100,26 @@ class BaseFileOps(object):
                 elif not os.path.isfile(src):
                     raise plugin.PluginWarning('location `%s` is not a file.' % src)
                 # search for namesakes
-                siblings = []
+                siblings = {}  # dict of (path=ext) pairs
                 if not src_isdir and 'along' in config:
-                    src_file, src_ext = os.path.splitext(src)
-                    for ext in sexts:
-                        if ext != src_ext.lower() and os.path.exists(src_file + ext):
-                            siblings.append(src_file + ext)
+                    parent = os.path.dirname(src)
+                    filename_no_ext = os.path.splitext(os.path.basename(src))[0]
+                    subdirs = [parent] + config['along'].get('subdirs', [])
+                    for subdir in subdirs:
+                        if subdir == parent:
+                            abs_subdirs = [subdir]
+                        else:
+                            # use glob to get a list of matching dirs
+                            abs_subdirs = glob.glob(os.path.join(parent, os.path.normpath(subdir)))
+                        # iterate over every dir returned by glob looking for matching ext
+                        for abs_subdir in abs_subdirs:
+                            if os.path.isdir(abs_subdir):
+                                for ext in config['along']['files']:
+                                    siblings.update(get_siblings(ext, src, filename_no_ext, abs_subdir))
+
                 # execute action in subclasses
                 self.handle_entry(task, config, entry, siblings)
-            except Exception as err:
+            except OSError as err:
                 entry.fail(str(err))
                 continue
 
@@ -90,6 +146,9 @@ class BaseFileOps(object):
         except Exception as err:
             self.log.warning('Unable to delete path `%s`: %s' % (base_path, err))
 
+    def handle_entry(self, task, config, entry, siblings):
+        raise NotImplementedError()
+
 
 class DeleteFiles(BaseFileOps):
     """Delete all accepted files."""
@@ -101,7 +160,7 @@ class DeleteFiles(BaseFileOps):
                 'type': 'object',
                 'properties': {
                     'allow_dir': {'type': 'boolean'},
-                    'along': {'type': 'array', 'items': {'type': 'string'}},
+                    'along': BaseFileOps.along,
                     'clean_source': {'type': 'number'}
                 },
                 'additionalProperties': False
@@ -119,7 +178,7 @@ class DeleteFiles(BaseFileOps):
                 self.log.info('Would delete `%s` and all its content.' % src)
             else:
                 self.log.info('Would delete `%s`' % src)
-                for s in siblings:
+                for s, _ in siblings.items():
                     self.log.info('Would also delete `%s`' % s)
             return
         # IO errors will have the entry mark failed in the base class
@@ -130,7 +189,7 @@ class DeleteFiles(BaseFileOps):
             os.remove(src)
             self.log.info('`%s` has been deleted.' % src)
         # further errors will not have any effect (the entry does not exists anymore)
-        for s in siblings:
+        for s, _ in siblings.items():
             try:
                 os.remove(s)
                 self.log.info('`%s` has been deleted as well.' % s)
@@ -216,9 +275,9 @@ class TransformingOps(BaseFileOps):
 
         if task.options.test:
             self.log.info('Would %s `%s` to `%s`' % (funct_name, src, dst))
-            for s in siblings:
+            for s, ext in siblings.items():
                 # we cannot rely on splitext for extensions here (subtitles may have the language code)
-                d = dst_file + s[len(src_file):]
+                d = dst_file + ext
                 self.log.info('Would also %s `%s` to `%s`' % (funct_name, s, d))
         else:
             # IO errors will have the entry mark failed in the base class
@@ -230,9 +289,9 @@ class TransformingOps(BaseFileOps):
                 shutil.copy(src, dst)
             self.log.info('`%s` has been %s to `%s`' % (src, funct_done, dst))
             # further errors will not have any effect (the entry has been successfully moved or copied out)
-            for s in siblings:
+            for s, ext in siblings.items():
                 # we cannot rely on splitext for extensions here (subtitles may have the language code)
-                d = dst_file + s[len(src_file):]
+                d = dst_file + ext
                 try:
                     if self.move:
                         shutil.move(s, d)
@@ -261,7 +320,7 @@ class CopyFiles(TransformingOps):
                     'allow_dir': {'type': 'boolean'},
                     'unpack_safety': {'type': 'boolean'},
                     'keep_extension': {'type': 'boolean'},
-                    'along': {'type': 'array', 'items': {'type': 'string'}}
+                    'along': TransformingOps.along
                 },
                 'additionalProperties': False
             }
@@ -287,7 +346,7 @@ class MoveFiles(TransformingOps):
                     'allow_dir': {'type': 'boolean'},
                     'unpack_safety': {'type': 'boolean'},
                     'keep_extension': {'type': 'boolean'},
-                    'along': {'type': 'array', 'items': {'type': 'string'}},
+                    'along': TransformingOps.along,
                     'clean_source': {'type': 'number'}
                 },
                 'additionalProperties': False
