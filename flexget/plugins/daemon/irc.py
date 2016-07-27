@@ -676,7 +676,6 @@ def irc_update_config(manager):
     if irc_bot is None:
         log.error('ImportError: irc_bot module not found. Shutting down daemon.')
         stop_irc(manager)
-        from flexget.manager import manager
         manager.shutdown(finish_queue=False)
         return
 
@@ -762,7 +761,6 @@ class IRCConnectionManager(object):
         """
 
         # First we validate the config for all connections including their .tracker files
-        errors = 0
         for conn_name, connection in self.config.items():
             try:
                 log.info('Starting IRC connection for %s', conn_name)
@@ -770,10 +768,7 @@ class IRCConnectionManager(object):
                 irc_connections[conn_name] = conn
             except (MissingConfigOption, TrackerFileParseError, TrackerFileError, IOError) as e:
                 log.error(e)
-                errors += 1
-        if errors:
-            manager.shutdown(finish_queue=False)
-            return
+                del irc_connections[conn_name]  # remove it from the list of connections
 
         # Now we can start
         for conn_name, connection in irc_connections.items():
