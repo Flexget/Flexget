@@ -28,23 +28,11 @@
 
 		vm.refreshOpts = {
 			debounce: 1000
-		};
+        };
+
+        var gridApi;
 
         function activate() {
-            vm.gridOptions = {
-			data: [],
-			enableSorting: true,
-			rowHeight: 20,
-			columnDefs: [
-				{ field: 'timestamp', name: 'Time', cellFilter: 'date', enableSorting: true, width: 120 },
-				{ field: 'log_level', name: 'Level', enableSorting: false, width: 65 },
-				{ field: 'plugin', name: 'Plugin', enableSorting: false, width: 80, cellTooltip: true },
-				{ field: 'task', name: 'Task', enableSorting: false, width: 65, cellTooltip: true },
-				{ field: 'message', name: 'Message', enableSorting: false, minWidth: 400, cellTooltip: true }
-			],
-			rowTemplate: 'row-template.html'
-            };
-            
 			vm.start();
 		}
 
@@ -94,14 +82,32 @@
 				vm.status = 'Streaming';
 			}
 
-			function messageFunction(message) {
-				vm.gridOptions.data.push(message);
+            function messageFunction(message) {
+                vm.gridOptions.data.push(message);
+                gridApi.core.notifyDataChange('row');
 			}
 
 			function failFunction() {
 				vm.status = 'Disconnected';
 			}
-		}
+        }
+        
+        vm.gridOptions = {
+            data: [],
+            enableSorting: true,
+            rowHeight: 20,
+            columnDefs: [
+                { field: 'timestamp', name: 'Time', cellFilter: 'date', enableSorting: true, width: 120 },
+                { field: 'log_level', name: 'Level', enableSorting: false, width: 65 },
+                { field: 'plugin', name: 'Plugin', enableSorting: false, width: 80, cellTooltip: true },
+                { field: 'task', name: 'Task', enableSorting: false, width: 65, cellTooltip: true },
+                { field: 'message', name: 'Message', enableSorting: false, minWidth: 400, cellTooltip: true }
+            ],
+            rowTemplate: 'row-template.html',
+            onRegisterApi: function (api) {
+                gridApi = api;
+            }
+        };
 
 		// Cancel timer and stop the stream when navigating away
 		function destroy() {
