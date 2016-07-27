@@ -768,7 +768,8 @@ class IRCConnectionManager(object):
                 irc_connections[conn_name] = conn
             except (MissingConfigOption, TrackerFileParseError, TrackerFileError, IOError) as e:
                 log.error(e)
-                del irc_connections[conn_name]  # remove it from the list of connections
+                if conn_name in irc_connections:
+                    del irc_connections[conn_name]  # remove it from the list of connections
 
         # Now we can start
         for conn_name, connection in irc_connections.items():
