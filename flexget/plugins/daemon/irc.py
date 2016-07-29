@@ -652,53 +652,12 @@ class IRCConnection(IRCBot):
         self.quit()
 
 
-@event('manager.daemon.started')
-def irc_start(manager):
-    irc_update_config(manager)
-
-
-@event('manager.config_updated')
-def irc_update_config(manager):
-    global irc_manager, config_hash
-
-    # Exit if we're not running daemon mode
-    if not manager.is_daemon:
-        return
-
-    config = manager.config.get('irc')
-    # No config, no connections
-    if not config:
-        log.debug('No irc connections defined in the config')
-        stop_irc(manager)
-        return
-
-    if irc_bot is None:
-        log.error('ImportError: irc_bot module not found. Shutting down daemon.')
-        stop_irc(manager)
-        manager.shutdown(finish_queue=False)
-        return
-
-    # TODO this hashing doesn't quite work for nested dicts
-    new_config_hash = hashlib.md5(str(sorted(list(config.items()))).encode('utf-8')).hexdigest()
-    if config_hash == new_config_hash:
-        log.debug('IRC config has not been changed. Not reloading the connections.')
-        return
-
-    config_hash = new_config_hash
-
-    # Config for IRC has been removed, shutdown all instances
-    stop_irc(manager)
-
-    irc_manager = IRCConnectionManager(config)
-
-
 class IRCConnectionManager(object):
     def __init__(self, config):
         self.config = config
         self.shutdown_event = threading.Event()
         self.wait = False
-        self.warning_delay = 30
-        self.max_delay = 300  # 5 minutes
+        self.delay = 30
         self.thread = create_thread('irc_manager', self)
         self.thread.start()
 
@@ -735,7 +694,7 @@ class IRCConnectionManager(object):
                         schedule[conn_name] = now + timedelta(seconds=5)
                     # add extra time if throttled
                     if conn.throttled:
-                        schedule[conn_name] += timedelta(seconds=30)
+                        schedule[conn_name] += timedelta(seconds=self.delay)
 
                     # is it time yet?
                     if schedule[conn_name] <= now:
@@ -779,12 +738,52 @@ class IRCConnectionManager(object):
 
         for _, conn in irc_connections.items():
             conn.stop(wait)
-            conn.thread.join(1)
+            conn.thread.join(10)
         irc_connections = {}
 
     def stop(self, wait):
         self.wait = wait
         self.shutdown_event.set()
+
+
+@event('manager.daemon.started')
+def irc_start(manager):
+    irc_update_config(manager)
+
+
+@event('manager.config_updated')
+def irc_update_config(manager):
+    global irc_manager, config_hash
+
+    # Exit if we're not running daemon mode
+    if not manager.is_daemon:
+        return
+
+    config = manager.config.get('irc')
+    # No config, no connections
+    if not config:
+        log.debug('No irc connections defined in the config')
+        stop_irc(manager)
+        return
+
+    if irc_bot is None:
+        log.error('ImportError: irc_bot module not found. Shutting down daemon.')
+        stop_irc(manager)
+        manager.shutdown(finish_queue=False)
+        return
+
+    # TODO this hashing doesn't quite work for nested dicts
+    new_config_hash = hashlib.md5(str(sorted(list(config.items()))).encode('utf-8')).hexdigest()
+    if config_hash == new_config_hash:
+        log.debug('IRC config has not been changed. Not reloading the connections.')
+        return
+
+    config_hash = new_config_hash
+
+    # Config for IRC has been removed, shutdown all instances
+    stop_irc(manager)
+
+    irc_manager = IRCConnectionManager(config)
 
 
 @event('manager.shutdown_requested')
@@ -800,7 +799,7 @@ def stop_irc(manager, wait=False):
         # this check is necessary for when the irc manager is the one shutting down the daemon
         # a thread can't join itself
         if not threading.current_thread() == irc_manager.thread:
-            irc_manager.thread.join(1)
+            irc_manager.thread.join(60)
 
 
 @event('config.register')
