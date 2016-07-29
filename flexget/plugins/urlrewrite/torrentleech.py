@@ -139,7 +139,8 @@ class UrlRewriteTorrentleech(object):
                 log.debug('link phase: %s' % link.contents[0])
                 entry = Entry()
                 # extracts the contents of the <a>titlename/<a> tag
-                entry['title'] = link.contents[0]
+                # coerce to str to throw away the reference to the document tree
+                entry['title'] = str(link.contents[0])
 
                 # find download link
                 torrent_url = tr.find("a", attrs={'href': re.compile('/download/\d+/.*')}).get('href')
