@@ -328,7 +328,7 @@ class IRCConnection(IRCBot):
                     if isinstance(config, dict):
                         config = [config]
                     for c in config:
-                        if re.search(c['regexp'], entry.get(c['field'], '')):
+                        if re.search(c['regexp'], entry.get(c['field'], ''), re.IGNORECASE):
                             matched = True
                             if not tasks_entry_map.get(task):
                                 tasks_entry_map[task] = []
