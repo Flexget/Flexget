@@ -178,7 +178,7 @@ class MovieList(MutableSet):
         """Finds `MovieListMovie` corresponding to this entry, if it exists."""
         for id_name in MovieListBase().supported_ids:
             if entry.get(id_name):
-                log.verbose('trying to match movie based off id %s: %s', id_name, entry[id_name])
+                log.debug('trying to match movie based off id %s: %s', id_name, entry[id_name])
                 res = (self._db_list(session).movies.join(MovieListMovie.ids).filter(
                     and_(
                         MovieListID.id_name == id_name,
@@ -196,7 +196,7 @@ class MovieList(MutableSet):
         else:
             log.warning('Could not get a movie name, skipping')
             return
-        log.verbose('trying to match movie based of name: %s and year: %s', name, year)
+        log.debug('trying to match movie based of name: %s and year: %s', name, year)
         res = (self._db_list(session).movies.filter(func.lower(MovieListMovie.title) == name.lower())
                .filter(MovieListMovie.year == year).first())
         if res:
