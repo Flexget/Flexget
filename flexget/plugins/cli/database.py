@@ -89,5 +89,5 @@ def register_parser_arguments():
                               help='you must use this flag to indicate you REALLY want to do this')
     reset_plugin_parser = subparsers.add_parser('reset-plugin', help='reset the database for a specific plugin')
     reset_plugin_parser.add_argument('reset_plugin', metavar='<plugin>', nargs='?',
-                                 help='name of plugin to reset (if omitted, known plugins will be listed)')
+                                     help='name of plugin to reset (if omitted, known plugins will be listed)')
     reset_plugin_parser.add_argument('--porcelain', action='store_true', help='make the output parseable')

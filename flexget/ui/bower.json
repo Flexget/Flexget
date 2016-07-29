@@ -1,28 +1,35 @@
 {
   "name": "FlexgetUI",
   "dependencies": {
-    "angular": "angularjs#~1.5.3",
-    "angular-material": "^1.0.7",
-    "angular-ui-router": "ui-router#~0.2.15",
+    "angular": "^1.5.6",
+    "angular-material": "^1.0.9",
+    "angular-ui-router": "1.0.0-alpha.5",
     "angular-filter": "~0.5.8",
     "angular-schema-form": "~0.8.13",
-    "font-awesome": "~4.5.0",
+    "font-awesome": "^4.6.3",
     "angular-ui-grid": "~3.1.1",
     "bootstrap-sass": "bootstrap-sass-official#~3.3.5",
-    "angular-cookies": "~1.4.8",
+    "angular-cookies": "^1.5.6",
     "please-wait": "~0.0.5",
     "oboe": "~2.1.2",
-    "angular-spinkit": "~0.3.3",
-    "angular-loading-bar": "~0.8.0",
+    "angular-spinkit": "^0.3.4",
+    "angular-loading-bar": "^0.9.0",
     "ui-grid-auto-scroll": "~1.0.1",
     "animate.css-scss": "~3.1.0",
-    "angular-messages": "^1.5.1",
-    "angular-cache": "^4.5.0"
+    "jquery": "^2.2.4",
+    "angular-ui-ace": "^0.2.3",
+    "angular-utf8-base64": "^0.0.5",
+    "angular-messages": "^1.5.6",
+    "angular-cache": "^4.6.0",
+    "ngclipboard": "^1.1.1"
   },
   "resolutions": {
-    "angular": "1.5.5"
+    "angular": "~1.5.6"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "angular-mocks": "^1.5.5",
+    "bardjs": "^0.1.8"
+  },
   "overrides": {
     "please-wait": {
       "ignore": true
@@ -31,6 +38,15 @@
       "main": [
         "css/font-awesome.css",
         "fonts/*"
+      ]
+    },
+    "ace-builds": {
+      "main": [
+        "src-min-noconflict/ace.js",
+        "src-min-noconflict/ext-themelist.js",
+		"src-min-noconflict/ext-searchbox.js",
+        "src-min-noconflict/mode-yaml.js",
+        "src-min-noconflict/theme*"
       ]
     }
   }

@@ -18,7 +18,6 @@ from flexget.utils import qualities
 from .parser_common import old_assume_quality
 from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie
 
-
 log = logging.getLogger('parser_guessit')
 
 logging.getLogger('rebulk').setLevel(logging.WARNING)
@@ -26,6 +25,7 @@ logging.getLogger('guessit').setLevel(logging.WARNING)
 
 
 class GuessitParsedEntry(ParsedEntry):
+
     def __init__(self, data, name, guess_result, **kwargs):
         ParsedEntry.__init__(self, data, name, **kwargs)
         self._guess_result = guess_result
@@ -61,6 +61,7 @@ class GuessitParsedEntry(ParsedEntry):
 
 
 class GuessitParsedVideoQuality(ParsedVideoQuality):
+
     def __init__(self, guess_result):
         self._guess_result = guess_result
 
@@ -142,6 +143,7 @@ class GuessitParsedVideoQuality(ParsedVideoQuality):
 
 
 class GuessitParsedVideo(GuessitParsedEntry, ParsedVideo):
+
     def __init__(self, data, name, guess_result, **kwargs):
         GuessitParsedEntry.__init__(self, data, name, guess_result, **kwargs)
         self._quality = None
@@ -170,12 +172,37 @@ class GuessitParsedVideo(GuessitParsedEntry, ParsedVideo):
 
 
 class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
+
     def __init__(self, data, name, guess_result, **kwargs):
         GuessitParsedVideo.__init__(self, data, name, guess_result, **kwargs)
 
     @property
     def title(self):
         return self._guess_result.get('title')
+
+    @property
+    def fields(self):
+        """
+        Return a dict of all parser fields
+        """
+        return {
+            'movie_parser': self,
+            'movie_name': self.name,
+            'movie_year': self.year,
+            'proper': self.proper,
+            'proper_count': self.proper_count,
+            'release_group': self.parsed_group,
+            'is_3d': self.is_3d,
+            'subtitle_languages': self.subtitle_languages,
+            'languages': self.languages,
+            'video_codec': self.quality2.video_codec,
+            'format': self.quality2.format,
+            'audio_codec': self.quality2.audio_codec,
+            'video_profile': self.quality2.video_profile,
+            'screen_size': self.quality2.screen_size,
+            'audio_channels': self.quality2.audio_channels,
+            'audio_profile': self.quality2.audio_profile
+        }
 
 
 class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
@@ -260,6 +287,7 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
     def valid_strict(self):
         return True
 
+
 def _id_regexps_function(input_string, context):
     ret = []
     for regexp in context.get('id_regexps'):
@@ -267,11 +295,15 @@ def _id_regexps_function(input_string, context):
             ret.append(match.span)
     return ret
 
-_id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId', disabled=lambda context: not context.get('id_regexps'))
+
+_id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId',
+                                  disabled=lambda context: not context.get('id_regexps'))
 
 guessit_api = GuessItApi(rebulk_builder().rebulk(_id_regexps))
 
+
 class ParserGuessit(object):
+
     def _guessit_options(self, options):
         settings = {'name_only': True, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
         # 'clean_function': clean_value

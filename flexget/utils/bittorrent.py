@@ -18,7 +18,7 @@ TORRENT_RE = re.compile(br'^d\d{1,3}:')
 # See http://packages.python.org/pyrocore/apidocs/pyrocore.util.metafile-module.html#METAFILE_STD_KEYS
 METAFILE_STD_KEYS = [i.split('.') for i in (
     "announce",
-    "announce-list", # BEP-0012
+    "announce-list",  # BEP-0012
     "comment",
     "created by",
     "creation date",
@@ -116,7 +116,7 @@ def decode_item(next, token):
         # Strings in torrent file are defined as utf-8 encoded
         try:
             data = data.decode('utf-8')
-        except UnicodeDecodeError as e:
+        except UnicodeDecodeError:
             # The pieces field is a byte string, and should be left as such.
             pass
     elif token == b'l' or token == b'd':
@@ -137,7 +137,7 @@ def bdecode(text):
     try:
         src = tokenize(text)
         data = decode_item(functools.partial(next, src), next(src))  # pylint:disable=E1101
-        for token in src: # look for more tokens
+        for _ in src:  # look for more tokens
             raise SyntaxError("trailing junk")
     except (AttributeError, ValueError, StopIteration) as e:
         raise SyntaxError("syntax error: %s" % e)
@@ -213,10 +213,10 @@ class Torrent(object):
 
     def __repr__(self):
         return "%s(%s, %s)" % (self.__class__.__name__,
-            ", ".join("%s=%r" % (key, self.content["info"].get(key))
-               for key in ("name", "length", "private",)),
-            ", ".join("%s=%r" % (key, self.content.get(key))
-               for key in ("announce", "comment",)))
+                               ", ".join("%s=%r" % (key, self.content["info"].get(key))
+                                         for key in ("name", "length", "private",)),
+                               ", ".join("%s=%r" % (key, self.content.get(key))
+                                         for key in ("announce", "comment",)))
 
     def get_filelist(self):
         """Return array containing fileinfo dictionaries (name, length, path)"""
@@ -311,7 +311,7 @@ class Torrent(object):
                 # if no trackers left in list, remove whole list
                 if not tl:
                     self.content['announce-list'].remove(tl)
-            except:
+            except (AttributeError, ValueError):
                 pass
 
     def add_multitracker(self, tracker):

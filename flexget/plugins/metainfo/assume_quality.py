@@ -52,7 +52,7 @@ class AssumeQuality(object):
                 p += 4
             if component.none_of:
                 p += len(component.none_of)
-            # Still a long way from perfect, but probably good enough.
+                # Still a long way from perfect, but probably good enough.
         return p
 
     def assume(self, entry, quality):

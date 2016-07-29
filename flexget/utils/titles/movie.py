@@ -22,10 +22,24 @@ def diff_pos(string1, string2):
 
 
 class MovieParser(TitleParser):
+
     def __init__(self):
         self.data = None
         self.reset()
         TitleParser.__init__(self)
+
+    @property
+    def fields(self):
+        """
+        Return a dict of all parser fields
+        """
+        return {
+            'movie_parser': self,
+            'movie_name': self.name,
+            'movie_year': self.year,
+            'proper': self.proper,
+            'proper_count': self.proper_count
+        }
 
     @property
     def valid(self):

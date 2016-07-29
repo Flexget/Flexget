@@ -162,6 +162,7 @@ def parse_size(size_input):
 
 
 class RefResolver(jsonschema.RefResolver):
+
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('handlers', {'': resolve_ref})
         super(RefResolver, self).__init__(*args, **kwargs)

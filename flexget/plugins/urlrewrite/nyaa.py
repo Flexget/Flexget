@@ -25,15 +25,19 @@ FILTERS = ['all', 'filter remakes', 'trusted only', 'a+ only']
 class UrlRewriteNyaa(object):
     """Nyaa urlrewriter and search plugin."""
 
-    def validator(self):
-        from flexget import validator
-
-        root = validator.factory()
-        root.accept('choice').accept_choices(CATEGORIES)
-        advanced = root.accept('dict')
-        advanced.accept('choice', key='category').accept_choices(CATEGORIES)
-        advanced.accept('choice', key='filter').accept_choices(FILTERS)
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'string', 'enum': list(CATEGORIES)},
+            {
+                'type': 'object',
+                'properties': {
+                    'category': {'type': 'string', 'enum': list(CATEGORIES)},
+                    'filter': {'type': 'string', 'enum': list(FILTERS)}
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def search(self, task, entry, config):
         if not isinstance(config, dict):
@@ -44,7 +48,7 @@ class UrlRewriteNyaa(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             name = normalize_unicode(search_string)
             url = 'http://www.nyaa.eu/?page=rss&cats=%s&filter=%s&term=%s' % (
-                  CATEGORIES[config['category']], FILTERS.index(config['filter']), quote(name.encode('utf-8')))
+                CATEGORIES[config['category']], FILTERS.index(config['filter']), quote(name.encode('utf-8')))
 
             log.debug('requesting: %s' % url)
             rss = feedparser.parse(url)
@@ -61,7 +65,6 @@ class UrlRewriteNyaa(object):
                 continue
 
             for item in rss.entries:
-
                 entry = Entry()
                 entry['title'] = item.title
                 entry['url'] = item.link

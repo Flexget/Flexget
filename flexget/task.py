@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
 
 import copy
 import hashlib
@@ -57,7 +58,6 @@ def config_changed(task=None, session=None):
 
 
 def use_task_logging(func):
-
     @wraps(func)
     def wrapper(self, *args, **kw):
         # Set the task name in the logger and capture output
@@ -148,7 +148,6 @@ class TaskAbort(Exception):
 
 @total_ordering
 class Task(object):
-
     """
     Represents one task in the configuration.
 
@@ -208,6 +207,9 @@ class Task(object):
             options_namespace = copy.copy(self.manager.options.execute)
             options_namespace.__dict__.update(options)
             options = options_namespace
+        # If execution hasn't specifically set the `allow_manual` flag, set it to False by default
+        if not hasattr(options, 'allow_manual'):
+          setattr(options, 'allow_manual', False)
         self.options = options
         self.output = output
         self.loglevel = loglevel
@@ -474,12 +476,23 @@ class Task(object):
             self.manager.crash_report()
             self.abort(msg)
 
-    def rerun(self):
-        """Immediately re-run the task after execute has completed,
-        task can be re-run up to :attr:`.max_reruns` times."""
-        msg = 'Plugin %s has requested task to be ran again after execution has completed.' % self.current_plugin
+    def rerun(self, plugin=None, reason=None):
+        """
+        Immediately re-run the task after execute has completed,
+        task can be re-run up to :attr:`.max_reruns` times.
+
+        :param str plugin: Plugin name
+        :param str reason: Why the rerun is done
+        """
+        msg = 'Plugin {0} has requested task to be ran again after execution has completed.'.format(
+            self.current_plugin if plugin is None else plugin)
+        if reason:
+            msg += ' Reason: {0}'.format(reason)
         # Only print the first request for a rerun to the info log
-        log.debug(msg) if self._rerun else log.info(msg)
+        if self._rerun:
+            log.debug(msg)
+        else:
+            log.info(msg)
         self._rerun = True
 
     def config_changed(self):
@@ -507,11 +520,17 @@ class Task(object):
         if self.options.inject:
             # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')
-            self.all_entries.extend(self.options.inject)
+            self.all_entries.extend(copy.deepcopy(self.options.inject))
 
         # Save current config hash and set config_modidied flag
         with Session() as session:
-            config_hash = hashlib.md5(str(sorted(self.config.items())).encode('utf-8')).hexdigest()
+            task_templates = {}
+            templates = self.config.get('template', [])
+            for template, value in self.manager.config.get('templates', {}).items():
+                if isinstance(templates, basestring) or isinstance(templates, list) and template in templates:
+                    task_templates.update({template: value})
+            hashable_config = list(self.config.items()) + list(task_templates.items())
+            config_hash = hashlib.md5(str(sorted(hashable_config, key=lambda x: x[0])).encode('utf-8')).hexdigest()
             last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
             if self.is_rerun:
                 # Restore the config to state right after start phase

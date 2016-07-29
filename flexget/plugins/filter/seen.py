@@ -12,7 +12,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from sqlalchemy import Column, Integer, DateTime, Unicode, Boolean, or_, select, update, Index
 from sqlalchemy.orm import relation
@@ -294,7 +294,7 @@ class FilterSeen(object):
             remembered.append(entry[field])
             sf = SeenField(str(field), str(entry[field]))
             se.fields.append(sf)
-            log.debug("Learned '%s' (field: %s)" % (entry[field], field))
+            log.debug("Learned '%s' (field: %s, local: %d)" % (entry[field], field, local))
         # Only add the entry to the session if it has one of the required fields
         if se.fields:
             task.session.add(se)
@@ -310,13 +310,14 @@ class FilterSeen(object):
 
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
+    # TODO: Look into this, is it still valid?
     log.debug('TODO: Disabled because of ticket #1321')
     return
 
     # Remove seen fields over a year old
-    result = session.query(SeenField).filter(SeenField.added < datetime.now() - timedelta(days=365)).delete()
-    if result:
-        log.verbose('Removed %d seen fields older than 1 year.' % result)
+    # result = session.query(SeenField).filter(SeenField.added < datetime.now() - timedelta(days=365)).delete()
+    # if result:
+    #    log.verbose('Removed %d seen fields older than 1 year.' % result)
 
 
 @with_session

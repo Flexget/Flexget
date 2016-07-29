@@ -1,0 +1,21 @@
+<md-toolbar>
+	<div class="md-toolbar-tools">
+		<h2>Request failed</h2>
+		<span flex></span>
+		<md-button class="md-icon-button" ng-click="vm.close()">
+			<md-icon md-font-icon="fa-times" class="fa fa-lg" aria-label="close dialog"></md-icon>
+		</md-button>
+	</div>
+</md-toolbar>
+<md-dialog-content>
+	<div class="md-dialog-content" layout="row">
+		<div layout="column">
+			<pre class="custom-error-pre">{{ vm.error | json }}</pre>
+		</div>
+		<div layout="column">
+			<md-button class="md-icon-button" ngclipboard data-clipboard-text="{{ vm.error }}">
+				<md-icon md-font-icon="fa-clipboard" class="fa fa-lg" aria-label="copy to clipboard"></md-icon>
+			</md-button>
+		</div>
+	</div>
+</md-dialog-content>

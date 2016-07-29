@@ -34,7 +34,8 @@ class OutputQBitTorrent(object):
                     'host': {'type': 'string'},
                     'port': {'type': 'integer'},
                     'path': {'type': 'string'},
-                    'label': {'type': 'string'}
+                    'label': {'type': 'string'},
+                    'fail_html': {'type': 'boolean'}
                 },
                 'additionalProperties': False
             }
@@ -73,6 +74,7 @@ class OutputQBitTorrent(object):
         config.setdefault('host', 'localhost')
         config.setdefault('port', 8080)
         config.setdefault('label', '')
+        config.setdefault('fail_html', True)
         return config
 
     @plugin.priority(120)
@@ -86,7 +88,7 @@ class OutputQBitTorrent(object):
             return
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
-            download.instance.get_temp_files(task, handle_magnets=True)
+            download.instance.get_temp_files(task, handle_magnets=True, fail_html=config['fail_html'])
 
     @plugin.priority(135)
     def on_task_output(self, task, config):
@@ -96,8 +98,12 @@ class OutputQBitTorrent(object):
             self.connect(config)
         for entry in task.accepted:
             data = {}
-            data['savepath'] = entry.get('path', config.get('path'))
-            data['label'] = entry.get('label', config['label']).lower()
+            savepath = entry.get('path', config.get('path'))
+            if savepath:
+                data['savepath'] = savepath
+            label = entry.get('label', config['label']).lower()
+            if label:
+                data['label'] = label
             data['urls'] = entry.get('url')
             if task.manager.options.test:
                 log.info('Test mode.')

@@ -79,7 +79,6 @@ schedule_schema = {
     'additionalProperties': False
 }
 
-
 main_schema = {
     'oneOf': [
         {
@@ -95,7 +94,6 @@ main_schema = {
     ]
 }
 
-
 scheduler = None
 scheduler_job_map = {}
 
@@ -108,8 +106,8 @@ def job_id(conf):
 def run_job(tasks):
     """Add the execution to the queue and waits until it is finished"""
     log.debug('executing tasks: %s', tasks)
-    finished_events = manager.execute(options={'tasks': tasks, 'cron': True}, priority=5)
-    for task_id, task_name, event in finished_events:
+    finished_events = manager.execute(options={'tasks': tasks, 'cron': True, 'allow_manual': False}, priority=5)
+    for _, task_name, event in finished_events:
         log.debug('task finished executing: %s', task_name)
         event.wait()
     log.debug('all tasks in schedule finished executing')
@@ -137,7 +135,7 @@ def setup_scheduler(manager):
     if not timezone:
         # The default sqlalchemy jobstore does not work when there isn't a name for the local timezone.
         # Just fall back to utc in this case
-        # FlexGet #2741, upstream ticket https://bitbucket.org/agronholm/apscheduler/issue/59
+        # FlexGet #2741, upstream ticket https://github.com/agronholm/apscheduler/issues/59
         log.info('Local timezone name could not be determined. Scheduler will display times in UTC for any log'
                  'messages. To resolve this set up /etc/timezone with correct time zone name.')
         timezone = pytz.utc
@@ -164,6 +162,9 @@ def setup_jobs(manager):
             log.info('Shutting down scheduler')
             scheduler.shutdown()
         return
+    if not scheduler.running:
+        log.info('Starting scheduler')
+        scheduler.start(paused=True)
     existing_job_ids = [job.id for job in scheduler.get_jobs()]
     configured_job_ids = []
     for job_config in config:
@@ -185,9 +186,7 @@ def setup_jobs(manager):
     for jid in existing_job_ids:
         if jid not in configured_job_ids:
             scheduler.remove_job(jid)
-    if not scheduler.running:
-        log.info('Starting scheduler')
-        scheduler.start()
+    scheduler.resume()
 
 
 @event('manager.shutdown_requested')
@@ -206,4 +205,3 @@ def stop_scheduler(manager):
 def register_config():
     register_config_key('schedules', main_schema)
     register_schema('/schema/config/schedule', schedule_schema)
-

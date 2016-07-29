@@ -1,85 +1,73 @@
+/* global angular */
 (function () {
-  'use strict';
-  angular
-  .module("flexget.plugins.movies")
-  .component('moviesView', {
-    templateUrl: 'plugins/movies/movies.tmpl.html',
-    controllerAs: 'vm',
-    controller: moviesController,
-  });
+	'use strict';
 
-  function moviesController($http, $mdDialog, $scope, moviesService) {
-    var vm = this;
+	angular
+		.module('plugins.movies')
+		.component('moviesView', {
+			templateUrl: 'plugins/movies/movies.tmpl.html',
+			controllerAs: 'vm',
+			controller: moviesController
+		});
 
-    var options = {
-      page: 1,
-      page_size: 10
-    }
+	function moviesController($http, $mdDialog, $scope, moviesService) {
+		var vm = this;
 
-    moviesService.getLists().then(function(data)  {
-      vm.lists = data.movie_lists;
-    });
+		vm.lists = [];
+		vm.$onInit = activate;
+		vm.deleteMovieList = deleteMovieList;
+		vm.newList = newList;
 
-    //Call from the pagination to update the page to the selected page
-    vm.updateListPage = function(index) {
-      options.page = index;
+		function activate() {
+			getMovieLists();
+		}
 
-      loadMovies();
-    }
+		function getMovieLists() {
+			moviesService.getLists().then(function (data) {
+				vm.lists = data.movie_lists;
+			});
+		}
 
-    $scope.$watch(function() {
-      return vm.selectedList;
-    }, function(newValue, oldValue) {
-      if(newValue != oldValue) {
-        loadMovies();
-      }
-    });
+		function deleteMovieList(list) {
+			var confirm = $mdDialog.confirm()
+				.title('Confirm deleting movie list.')
+				.htmlContent('Are you sure you want to delete the movie list <b>' + list.name + '</b>?')
+				.ok('Forget')
+				.cancel('No');
 
-    function loadMovies() {
-      var listId = vm.lists[vm.selectedList].id;
+			//Actually show the confirmation dialog and place a call to DELETE when confirmed
+			$mdDialog.show(confirm).then(function () {
+				moviesService.deleteList(list.id)
+					.then(function () {
+						var index = vm.lists.indexOf(list);
+						vm.lists.splice(index, 1);
+					});
+			});
+		}
 
-      moviesService.getListMovies(listId, options)
-        .then(function(data) {
-          vm.movies = data.movies;
+		function newList($event) {
+			$event.preventDefault();
+			$event.stopPropagation();
 
-          vm.currentPage = data.page;
-          vm.totalMovies = data.total_number_of_movies;
-          vm.pageSize = data.number_of_movies;
-        });
-    }
+			var listNames = vm.lists.map(function (list) {
+				return list.name;
+			});
 
+			var dialog = {
+				template: '<new-list lists="vm.lists"></new-list>',
+				locals: {
+					lists: listNames
+				},
+				bindToController: true,
+				controllerAs: 'vm',
+				controller: function () { }
+			};
 
-    vm.deleteMovie = function(list, movie) {
-      var confirm = $mdDialog.confirm()
-      .title('Confirm deleting movie from list.')
-      .htmlContent("Are you sure you want to delete the movie <b>" + movie.title + "</b> from list <b>" + list.name + "?")
-      .ok("Forget")
-      .cancel("No");
-
-      $mdDialog.show(confirm).then(function() {
-        moviesService.deleteMovie(list.id, movie.id)
-          .then(function() {
-            var index = vm.movies.indexOf(movie);
-            vm.movies.splice(index, 1);
-          });
-      });
-    }
-
-    vm.deleteList = function(list) {
-      var confirm = $mdDialog.confirm()
-      .title('Confirm deleting movie list.')
-      .htmlContent("Are you sure you want to delete the movie list <b>" + list.name + "</b>?")
-      .ok("Forget")
-      .cancel("No");
-
-      //Actually show the confirmation dialog and place a call to DELETE when confirmed
-      $mdDialog.show(confirm).then(function() {
-       moviesService.deleteList(list.id)
-          .then(function() {
-            var index = vm.lists.indexOf(list);
-            vm.lists.splice(index, 1);
-          });
-      });
-    }
-  }
-})();
+			$mdDialog.show(dialog).then(function (newList) {
+				if (newList) {
+					vm.lists.push(newList);
+				}
+			});
+		}
+	}
+}());

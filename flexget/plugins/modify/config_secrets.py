@@ -3,14 +3,67 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import codecs
+import logging
 import os
+from datetime import datetime
+
 import yaml
 
 from jinja2 import TemplateError
 
+from sqlalchemy import Column
+from sqlalchemy.sql.sqltypes import Unicode, DateTime, Integer
+
+from flexget import db_schema
 from flexget.config_schema import register_config_key
 from flexget.event import event
+from flexget.manager import Session
 from flexget.plugin import PluginError
+from flexget.utils.database import json_synonym
+
+log = logging.getLogger('secrets')
+
+DB_VERSION = 0
+Base = db_schema.versioned_base('secrets', DB_VERSION)
+
+
+class Secrets(Base):
+    __tablename__ = 'secrets'
+
+    id = Column(Integer, primary_key=True)
+    _secrets = Column('secrets', Unicode)
+    secrets = json_synonym('_secrets')
+    added = Column(DateTime, default=datetime.now)
+
+
+def secrets_from_file(config_base, filename):
+    secret_file = os.path.join(config_base, filename)
+    if not os.path.exists(secret_file):
+        raise PluginError('File %s does not exist!' % secret_file)
+    try:
+        with codecs.open(secret_file, 'rb', 'utf-8') as f:
+            secrets_dict = yaml.safe_load(f.read())
+    except yaml.YAMLError as e:
+        raise PluginError('Invalid secrets file: %s' % e)
+    return secrets_dict or {}
+
+
+def secrets_from_db():
+    with Session() as session:
+        secrets = session.query(Secrets).first()
+        if secrets:
+            return secrets.secrets
+        else:
+            return {}
+
+
+def secrets_to_db(secrets_dict):
+    with Session() as session:
+        secrets = session.query(Secrets).first()
+        if not secrets:
+            secrets = Secrets()
+        secrets.secrets = secrets_dict
+        session.merge(secrets)
 
 
 @event('manager.before_config_validate')
@@ -18,17 +71,17 @@ def process_secrets(config, manager):
     """Adds the secrets to the jinja environment globals and attempt to render all string elements of the config."""
     # Environment isn't set up at import time, have to delay the import until here
     from flexget.utils.template import environment
-    if 'secrets' not in config:
+    if 'secrets' not in config or config.get('secrets') is False:
         return
-    secret_file = os.path.join(manager.config_base, config['secrets'])
-    if not os.path.exists(secret_file):
-        raise PluginError('File %s does not exist!' % secret_file)
-    try:
-        with codecs.open(secret_file, 'rb', 'utf-8') as f:
-            raw_secrets = f.read()
-        environment.globals['secrets'] = yaml.safe_load(raw_secrets) or {}
-    except yaml.YAMLError as e:
-        raise PluginError('Invalid secrets file: %s' % e)
+    if isinstance(config['secrets'], bool):
+        log.debug('trying to load secrets from DB')
+        secrets = secrets_from_db()
+    else:
+        log.debug('trying to load secrets from file')
+        secrets = secrets_from_file(manager.config_base, config['secrets'])
+        log.debug('updating DB with secret file contents')
+        secrets_to_db(secrets)
+    environment.globals['secrets'] = secrets
     _process(config, environment)
     return config
 
@@ -56,7 +109,7 @@ def _process(element, environment):
             return None
 
 
-secrets_config_schema = {'type': 'string'}
+secrets_config_schema = {'type': ['string', 'boolean']}
 
 
 @event('config.register')

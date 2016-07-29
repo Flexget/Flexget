@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import cgi
@@ -6,7 +7,6 @@ import copy
 from datetime import datetime
 from json import JSONEncoder
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify, Response
 from flask import request
 from queue import Queue, Empty
@@ -328,7 +328,11 @@ class TaskExecutionAPI(APIResource):
             arg[0] in ['progress', 'summary', 'loglevel', 'entry_dump'] for arg in data.items() if arg[1]) else False
         loglevel = data.pop('loglevel', None)
 
-        options = {}
+        # This emulates the CLI command of using `--now` and `no-cache`
+        options = {'interval_ignore': data.pop('now', None),
+                   'nocache': data.pop('no_cache', None),
+                   'allow_manual': True}
+
         for option, value in data.items():
             options[option] = value
 

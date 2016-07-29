@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import logging
@@ -7,7 +8,6 @@ import time
 from copy import copy
 from datetime import datetime, timedelta
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
@@ -222,6 +222,7 @@ def normalize_series_name(name):
 
 
 class NormalizedComparator(Comparator):
+
     def operate(self, op, other):
         return op(self.__clause_element__(), normalize_series_name(other))
 
@@ -1237,7 +1238,7 @@ class FilterSeries(FilterSeriesBase):
         for entry in entries:
             # skip processed entries
             if (entry.get('series_parser') and entry['series_parser'].valid and entry[
-                'series_parser'].name.lower() != series_name.lower()):
+                    'series_parser'].name.lower() != series_name.lower()):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
@@ -1423,7 +1424,7 @@ class FilterSeries(FilterSeriesBase):
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
             if (entry['quality'] in downloaded_qualities and entry['series_parser'].proper_count > downloaded_qualities[
-                entry['quality']]):
+                    entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
@@ -1486,7 +1487,7 @@ class FilterSeries(FilterSeriesBase):
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
             if (not backfill and (episode.season < latest.season or (
-                            episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
+                    episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
@@ -1540,7 +1541,7 @@ class FilterSeries(FilterSeriesBase):
 
             hours, remainder = divmod(diff.seconds, 3600)
             hours += diff.days * 24
-            minutes, seconds = divmod(remainder, 60)
+            minutes, _ = divmod(remainder, 60)
 
             log.info('Timeframe waiting %s for %sh:%smin, currently best is %s' %
                      (episode.series.name, hours, minutes, best['title']))

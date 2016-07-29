@@ -78,14 +78,17 @@ def do_cli(manager, options):
             query = query.filter(History.task.like('%' + options.task + '%'))
         query = query.order_by(desc(History.time)).limit(options.limit)
         for item in reversed(query.all()):
-            console(' Task    : %s' % item.task)
-            console(' Title   : %s' % item.title)
-            console(' Url     : %s' % item.url)
-            if item.filename:
-                console(' Stored  : %s' % item.filename)
-            console(' Time    : %s' % item.time.strftime("%c"))
-            console(' Details : %s' % item.details)
-            console('-' * 79)
+            if options.short:
+                console(' %-25s %s' % (item.time.strftime("%c"), item.title))
+            else:
+                console(' Task    : %s' % item.task)
+                console(' Title   : %s' % item.title)
+                console(' Url     : %s' % item.url)
+                if item.filename:
+                    console(' Stored  : %s' % item.filename)
+                console(' Time    : %s' % item.time.strftime("%c"))
+                console(' Details : %s' % item.details)
+                console('-' * 79)
     finally:
         session.close()
 
@@ -97,6 +100,7 @@ def register_parser_arguments():
                         help='limit to %(metavar)s results')
     parser.add_argument('--search', action='store', metavar='TERM', help='limit to results that contain %(metavar)s')
     parser.add_argument('--task', action='store', metavar='TASK', help='limit to results in specified %(metavar)s')
+    parser.add_argument('--short', '-s', action='store_true', dest='short', default=False, help='shorter output')
 
 
 @event('plugin.register')

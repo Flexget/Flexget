@@ -57,7 +57,7 @@ class PluginTryRegexp(object):
                     if match:
                         console('Title: %-40s URL: %-30s From: %s' % (entry['title'], entry['url'], field))
                         count += 1
-                except:
+                except re.error:
                     console('Invalid regular expression')
                     break
             console('%s of %s entries matched' % (count, len(task.entries)))

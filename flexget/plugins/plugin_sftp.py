@@ -35,7 +35,7 @@ try:
     import pysftp
 
     logging.getLogger("paramiko").setLevel(logging.ERROR)
-except:
+except ImportError:
     pysftp = None
 
 
@@ -60,7 +60,7 @@ def sftp_connect(conf):
             else:
                 log.debug('Caught exception: %s' % e)
                 log.warning('Failed to connect to %s; waiting %d seconds before retrying.' %
-                         (conf.host, retry_interval))
+                            (conf.host, retry_interval))
                 time.sleep(retry_interval)
                 tries -= 1
                 retry_interval += RETRY_STEP
@@ -70,7 +70,7 @@ def sftp_connect(conf):
 
 def sftp_from_config(config):
     """
-    Creates an SFTP connection from a Flexget config object 
+    Creates an SFTP connection from a Flexget config object
     """
     host = config['host']
     port = config['port']
@@ -144,7 +144,7 @@ class SftpList(object):
           recursive: False
           get_size: True
           files_only: False
-          dirs: 
+          dirs:
               - '/path/to/list/'
               - '/another/path/'
     """
@@ -276,7 +276,7 @@ class SftpList(object):
 
 class SftpDownload(object):
     """
-    Download files from a SFTP server. This plugin requires the pysftp Python module and its 
+    Download files from a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.
 
     Configuration:
@@ -470,7 +470,7 @@ class SftpDownload(object):
 
 class SftpUpload(object):
     """
-    Upload files to a SFTP server. This plugin requires the pysftp Python module and its 
+    Upload files to a SFTP server. This plugin requires the pysftp Python module and its
     dependencies.
 
     host:                 Host to connect to
@@ -553,22 +553,19 @@ class SftpUpload(object):
 
         if not sftp.isdir(to):
             log.error('Not a directory: %s' % to)
-            entry.fail
+            entry.fail('Not a directory: %s' % to)
             return
 
         try:
             sftp.put(localpath=location, remotepath=destination)
             log.verbose('Successfully uploaded %s to %s' % (location, destination_url))
-        except OSError as e:
-            log.warning('File no longer exists: %s', location)
-            return
         except IOError as e:
             log.error('Remote directory does not exist: %s (%s)' % to)
-            entry.fail
+            entry.fail('Remote directory does not exist: %s (%s)' % to)
             return
         except Exception as e:
             log.error('Failed to upload %s (%s)' % (location, e))
-            entry.fail
+            entry.fail('Failed to upload %s (%s)' % (location, e))
             return
 
         if config['delete_origin']:
@@ -591,7 +588,7 @@ class SftpUpload(object):
                 self.handle_entry(entry, sftp, config, url_prefix)
             else:
                 log.debug('SFTP connection failed; failing entry: %s' % entry)
-                entry.fail
+                entry.fail('SFTP connection failed; failing entry: %s' % entry)
 
 
 @event('plugin.register')

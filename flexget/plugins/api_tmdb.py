@@ -41,15 +41,15 @@ def tmdb_request(endpoint, **params):
 
 @db_schema.upgrade('api_tmdb')
 def upgrade(ver, session):
-    if ver is None or ver == 0:
+    if ver is None or ver <= 1:
         raise db_schema.UpgradeImpossible
     return ver
 
 
 # association tables
 genres_table = Table('tmdb_movie_genres', Base.metadata,
-    Column('movie_id', Integer, ForeignKey('tmdb_movies.id')),
-    Column('genre_id', Integer, ForeignKey('tmdb_genres.id')))
+                     Column('movie_id', Integer, ForeignKey('tmdb_movies.id')),
+                     Column('genre_id', Integer, ForeignKey('tmdb_genres.id')))
 Base.register_table(genres_table)
 
 
@@ -119,7 +119,6 @@ class TMDBMovie(Base):
 
 
 class TMDBGenre(Base):
-
     __tablename__ = 'tmdb_genres'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
@@ -127,7 +126,6 @@ class TMDBGenre(Base):
 
 
 class TMDBPoster(Base):
-
     __tablename__ = 'tmdb_posters'
 
     id = Column(Integer, primary_key=True)
@@ -146,12 +144,18 @@ class TMDBPoster(Base):
 
 
 class TMDBSearchResult(Base):
-
     __tablename__ = 'tmdb_search_results'
 
     search = Column(Unicode, primary_key=True)
     movie_id = Column(Integer, ForeignKey('tmdb_movies.id'), nullable=True)
     movie = relation(TMDBMovie)
+
+    def __init__(self, search, movie_id=None, movie=None):
+        self.search = search.lower()
+        if movie_id:
+            self.movie_id = movie_id
+        if movie:
+            self.movie = movie
 
 
 class ApiTmdb(object):
@@ -205,7 +209,7 @@ class ApiTmdb(object):
             if not movie:
                 search_string = title + ' ({})'.format(year) if year else ''
                 found = session.query(TMDBSearchResult). \
-                    filter(func.lower(TMDBSearchResult.search) == search_string.lower()).first()
+                    filter(TMDBSearchResult.search == search_string.lower()).first()
                 if found and found.movie:
                     movie = found.movie
         if movie:

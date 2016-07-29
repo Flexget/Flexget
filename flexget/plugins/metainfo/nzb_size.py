@@ -14,7 +14,6 @@ mimetypes.add_type('application/x-nzb', '.nzb')
 
 
 class NzbSize(object):
-
     """
     Provides entry size information when dealing with nzb files
     """
@@ -46,7 +45,7 @@ class NzbSize(object):
 
                 try:
                     nzbfiles = nzb_parser.parse(xmldata)
-                except:
+                except Exception:
                     log.debug('%s is not a valid nzb' % entry['title'])
                     continue
 

@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import base64
 
 from flask import request, jsonify, session as flask_session
-from flask.ext.login import login_user, LoginManager, current_user, current_app
+from flask_login import login_user, LoginManager, current_user, current_app
 from flask_restplus import inputs
 from werkzeug.security import check_password_hash
 
@@ -82,6 +82,7 @@ login_parser.add_argument('remember', type=inputs.boolean, required=False, defau
 
 @auth_api.route('/login/')
 class LoginAPI(APIResource):
+
     @api.expect((login_api_schema, 'Username and Password'))
     @api.response(401, 'Invalid username or password')
     @api.response(200, 'Login successful')
@@ -97,10 +98,10 @@ class LoginAPI(APIResource):
             if user:
                 if user_name == 'flexget' and not user.password:
                     return {
-                               'status': 'failed',
-                               'message': 'If this is your first time running the webui you need to set a password via'
-                                          ' the command line by running flexget web passwd <new_password>'
-                           }, 401
+                        'status': 'failed',
+                        'message': 'If this is your first time running the webui you need to set a password via'
+                        ' the command line by running flexget web passwd <new_password>'
+                    }, 401
 
                 if user.password and check_password_hash(user.password, password):
                     args = login_parser.parse_args()
@@ -112,6 +113,7 @@ class LoginAPI(APIResource):
 
 @auth_api.route('/logout/')
 class LogoutAPI(APIResource):
+
     @api.response(200, 'Logout successful')
     def get(self, session=None):
         """ Logout and clear session cookies """

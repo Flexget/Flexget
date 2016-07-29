@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flask import request
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from flexget.api import api, APIResource
 from flexget.webserver import change_password, generate_token, WeakPassword
@@ -33,6 +33,7 @@ empty_response = api.schema('empty', {'type': 'object'})
 @user_api.route('/')
 @api.doc('Change user password')
 class UserManagementAPI(APIResource):
+
     @api.validate(model=user_password_input_schema, description='Password change schema')
     @api.response(500, 'Password not strong enough', default_error_schema)
     @api.response(200, 'Success', empty_response)
@@ -63,7 +64,8 @@ user_token_response_schema = api.schema('user_token_response', user_token_respon
 
 @user_api.route('/token/')
 @api.doc('Change user token')
-class UserManagementAPI(APIResource):
+class UserManagementTokenAPI(APIResource):
+
     @api.response(200, 'Successfully changed user token', user_token_response_schema)
     @api.doc(description='Get new user token')
     def get(self, session=None):

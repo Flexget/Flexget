@@ -52,7 +52,7 @@ class Age(object):
             elif isinstance(field_value, str):
                 try:
                     field_date = dateutil_parse(entry[field])
-                except ValueError as e:
+                except ValueError:
                     log.warning('Entry %s ignored: %s is not a valid date', entry['title'], field_value)
                     continue
             else:

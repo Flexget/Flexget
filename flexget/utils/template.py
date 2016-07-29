@@ -13,7 +13,7 @@ from time import mktime
 
 import jinja2.filters
 from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, Template,
-                    TemplateNotFound, TemplateSyntaxError, Undefined)
+                    TemplateNotFound, TemplateSyntaxError)
 
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
@@ -118,13 +118,10 @@ def filter_to_date(date_time_val):
     return date_time_val.date()
 
 
-def now():
-    return datetime.now()
-
-
 # Override the built-in Jinja default filter to change the `boolean` param to True by default
 def filter_default(value, default_value='', boolean=True):
     return jinja2.filters.do_default(value, default_value, boolean)
+
 
 filter_d = filter_default
 
@@ -132,6 +129,7 @@ filter_d = filter_default
 # TODO: In Jinja 2.8 we will be able to override the Context class to be used explicitly
 class FlexGetTemplate(Template):
     """Adds lazy lookup support when rendering templates."""
+
     def new_context(self, vars=None, shared=False, locals=None):
         context = super(FlexGetTemplate, self).new_context(vars, shared, locals)
         context.parent = LazyDict(context.parent)
@@ -143,15 +141,13 @@ def make_environment(manager):
     """Create our environment and add our custom filters"""
     global environment
     environment = Environment(undefined=StrictUndefined,
-        loader=ChoiceLoader([PackageLoader('flexget'),
-                             FileSystemLoader(os.path.join(manager.config_base, 'templates'))]),
-        extensions=['jinja2.ext.loopcontrols'])
+                              loader=ChoiceLoader([PackageLoader('flexget'),
+                                                   FileSystemLoader(os.path.join(manager.config_base, 'templates'))]),
+                              extensions=['jinja2.ext.loopcontrols'])
     environment.template_class = FlexGetTemplate
     for name, filt in list(globals().items()):
         if name.startswith('filter_'):
             environment.filters[name.split('_', 1)[1]] = filt
-        elif name == 'now':
-            environment.globals['now'] = now
 
 
 # TODO: list_templates function

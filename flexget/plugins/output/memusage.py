@@ -14,7 +14,6 @@ except ImportError:
 
 log = logging.getLogger('mem_usage')
 
-
 """
 http://blog.mfabrik.com/2008/03/07/debugging-django-memory-leak-with-trackrefs-and-guppy/
 
@@ -63,4 +62,4 @@ def on_manager_shutdown(manager):
 @event('options.register')
 def register_parser_arguments():
     options.get_parser().add_argument('--mem-usage', action='store_true', dest='mem_usage', default=False,
-                                               help='display memory usage debug information')
+                                      help='display memory usage debug information')

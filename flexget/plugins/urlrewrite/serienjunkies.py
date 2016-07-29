@@ -24,7 +24,6 @@ regex_is_foreign = re.compile(
     r'englisc?h|französisch|japanisch|dänisch|norwegisch|niederländisch|ungarisch|italienisch|portugiesisch', re.I)
 regex_is_subtitle = re.compile(r'Untertitel|Subs?|UT', re.I)
 
-
 LANGUAGE = ['german', 'foreign', 'subtitle', 'dual']
 HOSTER = ['ul', 'cz', 'so', 'all']
 
@@ -33,7 +32,6 @@ DEFAULT_HOSTER = 'ul'
 
 
 class UrlRewriteSerienjunkies(object):
-
     """
     Serienjunkies urlrewriter
     Version 1.0.2
@@ -77,7 +75,7 @@ class UrlRewriteSerienjunkies(object):
         else:
             entry['url'] = download_urls[-1]
             entry['description'] = ", ".join(download_urls)
-            
+
         # Debug Information
         log.debug('TV Show URL: %s' % series_url)
         log.debug('Episode: %s' % search_title)
@@ -90,19 +88,19 @@ class UrlRewriteSerienjunkies(object):
             soup = get_soup(page)
         except Exception as e:
             raise UrlRewritingError(e)
-            
+
         urls = []
         # find all titles
         episode_titles = self.find_all_titles(search_title)
         if not episode_titles:
             raise UrlRewritingError('Unable to find episode')
-        
+
         for ep_title in episode_titles:
             # find matching download
             episode_title = soup.find('strong', text=re.compile(ep_title, re.I))
             if not episode_title:
                 continue
-                
+
             # find download container
             episode = episode_title.parent
             if not episode:
@@ -160,7 +158,7 @@ class UrlRewriteSerienjunkies(object):
                 season_end = int(s.group(2))
                 for i in range(season_start, season_end + 1):
                     search_titles.append(regex_season.sub('S' + str(i).zfill(2) + '[\\\\w\\\\.]*', search_title))
-        else: 
+        else:
             log.debug('Title seems to describe a single episode')
             search_titles.append(re.escape(search_title))
         return search_titles
@@ -169,28 +167,28 @@ class UrlRewriteSerienjunkies(object):
         # Cut additional Subtitles
         try:
             languages = languages[:languages.index("+")]
-        except:
+        except IndexError:
             pass
 
         language_list = re.split(r'[,&]', languages)
 
         try:
             if self.config['language'] == 'german':
-                if regex_is_german.search(language_list[0]):               
+                if regex_is_german.search(language_list[0]):
                     return True
             elif self.config['language'] == 'foreign':
                 if (regex_is_foreign.search(language_list[0]) and len(language_list) == 1) or \
-                   (len(language_list) > 1 and not regex_is_subtitle.search(language_list[1])):
+                        (len(language_list) > 1 and not regex_is_subtitle.search(language_list[1])):
                     return True
             elif self.config['language'] == 'subtitle':
-                if len(language_list) > 1 and regex_is_subtitle.search(language_list[1]): 
+                if len(language_list) > 1 and regex_is_subtitle.search(language_list[1]):
                     return True
             elif self.config['language'] == 'dual':
                 if len(language_list) > 1 and not regex_is_subtitle.search(language_list[1]):
                     return True
-        except:
+        except (KeyError, re.error):
             pass
-        
+
         return False
 
 

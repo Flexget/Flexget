@@ -106,6 +106,7 @@ class Credential(Base):
 
 
 class FriendlySearchQuery(object):
+
     def __init__(self):
         self.expression = None
         self.category_name = None
@@ -152,6 +153,7 @@ T411_VIDEO_QUALITY_MAP = {
     19: qualities.get("webrip")
 }
 
+
 def auth_required(func):
     """
     Decorator for ensuring rest client is authenticated
@@ -175,6 +177,7 @@ class ApiError(Exception):
     Exception raise when RestClient received a business error
     from T411 server.
     """
+
     def __init__(self, code, description):
         self.description = description
         self.code = code
@@ -311,7 +314,7 @@ class T411RestClient(object):
             url_params['offset'] = query['page_index']
         if query.get('terms') is not None:
             for (term_type_id, term_id) in query['terms']:
-                term_type_key_param = 'term[' + str(term_type_id) + '][]'
+                term_type_key_param = 'term[%s][]' % term_type_id
 
                 if url_params.get(term_type_key_param) is None:
                     url_params[term_type_key_param] = []
@@ -485,6 +488,7 @@ class T411Proxy(object):
     A T411 proxy service. This proxy interact both with
     T411 Rest Client and T411 local database.
     """
+
     def __init__(self, session=None):
         """
         :param session: flexget.manager.Session
@@ -737,6 +741,7 @@ class T411Proxy(object):
 
 
 class T411BindAuth(AuthBase):
+
     def __init__(self, api_token):
         self.api_token = api_token
 

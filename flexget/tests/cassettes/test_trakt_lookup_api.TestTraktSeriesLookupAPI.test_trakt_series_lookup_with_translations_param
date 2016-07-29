@@ -1,0 +1,697 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/search?query=game+of+thrones&type=show
+    response:
+      body: {string: "[{\"type\":\"show\",\"score\":58.480095,\"show\":{\"title\"\
+          :\"Game of Thrones\",\"overview\":\"Seven noble families fight for control\
+          \ of the mythical land of Westeros. Friction between the houses leads to\
+          \ full-scale war. All while a very ancient evil awakens in the farthest\
+          \ north. Amidst the war, a neglected military order of misfits, the Night's\
+          \ Watch, is all that stands between the realms of men and the icy horrors\
+          \ beyond.\",\"year\":2011,\"status\":\"returning series\",\"images\":{\"\
+          poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/390/posters/original/93df9cd612.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/390/posters/medium/93df9cd612.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/390/posters/thumb/93df9cd612.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/390/fanarts/original/76d5df8aed.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/390/fanarts/medium/76d5df8aed.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/390/fanarts/thumb/76d5df8aed.jpg\"\
+          }},\"ids\":{\"trakt\":1390,\"slug\":\"game-of-thrones\",\"tvdb\":121361,\"\
+          imdb\":\"tt0944947\",\"tmdb\":1399,\"tvrage\":24493}}},{\"type\":\"show\"\
+          ,\"score\":51.170086,\"show\":{\"title\":\"Game of Thrones Talk\",\"year\"\
+          :2015,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null}},\"ids\":{\"trakt\":97709,\"slug\":\"game-of-thrones-talk\"\
+          ,\"tvdb\":293887,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\"\
+          :\"show\",\"score\":44.280987,\"show\":{\"title\":\"Gay of Thrones\",\"\
+          overview\":\"Hairstylist extraordinaire Jonathan Van Ness recaps new episodes\
+          \ of Game of Thrones using his unique brand of panache, flair, and fabulousness.\"\
+          ,\"year\":2013,\"status\":\"returning series\",\"images\":{\"poster\":{\"\
+          full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":108159,\"slug\":\"gay-of-thrones\"\
+          ,\"tvdb\":312618,\"imdb\":\"tt2946308\",\"tmdb\":null,\"tvrage\":null}}},{\"\
+          type\":\"show\",\"score\":43.860073,\"show\":{\"title\":\"Game of Thrones:\
+          \ Cartoon Parody\",\"overview\":\"A spoof/parody Based on HBO's hit series\
+          \ \\\"A Game of Thrones\\\" and George RR Martin's A Song of Ice and Fire\"\
+          ,\"year\":2011,\"status\":\"returning series\",\"images\":{\"poster\":{\"\
+          full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":107818,\"slug\":\"game-of-thrones-cartoon-parody\"\
+          ,\"tvdb\":311939,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\"\
+          :\"show\",\"score\":43.860073,\"show\":{\"title\":\"Game of Thrones The\
+          \ Podcast\",\"overview\":\"The Gods of Tits and Wine, Jim and A.Ron, review\
+          \ each week\u2019s episode of HBO\u2019s Game of Thrones and your feedback.\"\
+          ,\"year\":2015,\"status\":\"returning series\",\"images\":{\"poster\":{\"\
+          full\":\"https://walter.trakt.us/images/shows/000/098/164/posters/original/e15121267d.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/098/164/posters/medium/e15121267d.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/098/164/posters/thumb/e15121267d.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
+          trakt\":98164,\"slug\":\"game-of-thrones-the-podcast\",\"tvdb\":294436,\"\
+          imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
+          :38.3317,\"show\":{\"title\":\"After the Thrones\",\"overview\":\"Weekly\
+          \ show that takes a lively, humorous and sophisticated look at Game of Thrones.\
+          \ Each week, the show will recap the latest episode, explaining the different\
+          \ events, exploring the complicated politics and history, and offering theories\
+          \ about future episodes. \",\"year\":2016,\"status\":\"returning series\"\
+          ,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/106/908/posters/original/c2c7b22901.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/106/908/posters/medium/c2c7b22901.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/106/908/posters/thumb/c2c7b22901.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/106/908/fanarts/original/435559e2c1.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/106/908/fanarts/medium/435559e2c1.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/106/908/fanarts/thumb/435559e2c1.jpg\"\
+          }},\"ids\":{\"trakt\":106908,\"slug\":\"after-the-thrones\",\"tvdb\":309875,\"\
+          imdb\":\"tt5665732\",\"tmdb\":66346,\"tvrage\":null}}},{\"type\":\"show\"\
+          ,\"score\":0.703431,\"show\":{\"title\":\"Thronecast\",\"overview\":\"A\
+          \ companion series to Game of Thrones; each 10 minute show features interviews\
+          \ with members of the cast and crew, as well as with fans of the books and\
+          \ television series, alongside a review of the previous episode of Game\
+          \ of Thrones.From the second series, a duo of fans called Elio and Linda\
+          \ are featured via satellite and give their thoughts on the episode.\",\"\
+          year\":2011,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\"\
+          :\"https://walter.trakt.us/images/shows/000/077/077/posters/original/2e3a37662b.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/077/077/posters/medium/2e3a37662b.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/077/077/posters/thumb/2e3a37662b.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/077/077/fanarts/original/780ca960d1.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/077/077/fanarts/medium/780ca960d1.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/077/077/fanarts/thumb/780ca960d1.jpg\"\
+          }},\"ids\":{\"trakt\":77077,\"slug\":\"thronecast\",\"tvdb\":280340,\"imdb\"\
+          :\"tt4215716\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
+          :0.6322212,\"show\":{\"title\":\"Britain's Bloodiest Dynasty\",\"overview\"\
+          :\"Out of the chaos, darkness and violence of the Middle Ages, one family\
+          \ rose to seize control of England  - The Plantaganets. Acclaimed historian\
+          \ Dan Jones tells the story of the dynasty who ruled England and much of\
+          \ France during the Middle Ages. More shocking, brutal and exhilarating\
+          \ than Game of Thrones, these events actually happened.\",\"year\":2014,\"\
+          status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/094/423/posters/original/a66a88f7b7.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/094/423/posters/medium/a66a88f7b7.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/094/423/posters/thumb/a66a88f7b7.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/094/423/fanarts/original/dc5395086e.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/094/423/fanarts/medium/dc5395086e.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/094/423/fanarts/thumb/dc5395086e.jpg\"\
+          }},\"ids\":{\"trakt\":94423,\"slug\":\"britain-s-bloodiest-dynasty\",\"\
+          tvdb\":289549,\"imdb\":\"tt4195344\",\"tmdb\":64302,\"tvrage\":null}}},{\"\
+          type\":\"show\",\"score\":0.61824536,\"show\":{\"title\":\"Doraleous and\
+          \ Associates: The Series\",\"overview\":\"The adventures of Doraleous and\
+          \ his associates as they set out to save Nudonia.An animated medieval fantasy\
+          \ comedy exploring a world filled with knights, elves, wizards and dwarfs.If\
+          \ you enjoy league of legends, game of thrones, world of warcraft, cosplay,\
+          \ or just a good laugh check out this animated comedy.\",\"year\":null,\"\
+          status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/076/745/posters/original/cd8afb87a5.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/076/745/posters/medium/cd8afb87a5.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/076/745/posters/thumb/cd8afb87a5.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
+          trakt\":76745,\"slug\":\"doraleous-and-associates-the-series\",\"tvdb\"\
+          :262387,\"imdb\":\"tt2292210\",\"tmdb\":null,\"tvrage\":null}}},{\"type\"\
+          :\"show\",\"score\":0.60991406,\"show\":{\"title\":\"Film Theory\",\"overview\"\
+          :\"In each episode of Film Theorists\u2019 main series, Patrick dives into\
+          \ a specific work and sheds light on elements that less careful consumers\
+          \ may have missed. Despite the channel\u2019s title, it isn\u2019t limited\
+          \ to movies; instead, Patrick is taking on all sorts of pop culture franchises,\
+          \ including Game of Thrones and Harry Potter.\",\"year\":2015,\"status\"\
+          :\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"\
+          ids\":{\"trakt\":100395,\"slug\":\"film-theory\",\"tvdb\":298055,\"imdb\"\
+          :null,\"tmdb\":null,\"tvrage\":null}}}]"}
+      headers:
+        CF-Cache-Status: [HIT]
+        CF-RAY: [2c4c2a5b476519c8-SYD]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Tue, 19 Jul 2016 06:37:33 GMT']
+        ETag: [W/"27afcf61d67969e89439e46ec1cd0d57"]
+        Expires: ['Tue, 19 Jul 2016 10:37:33 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=d51a121ca7a92b46fb89894356b9d7cd91468910253; expires=Wed,
+            19-Jul-17 06:37:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['13']
+        X-Pagination-Limit: ['10']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['2']
+        X-Request-Id: [74b9cce1-20d2-44f3-9aac-2277e580fca5]
+        X-Runtime: ['0.020839']
+        X-XSS-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        Cookie: [__cfduid=d51a121ca7a92b46fb89894356b9d7cd91468910253]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/shows/1390?extended=full%2Cimages
+    response:
+      body: {string: '{"title":"Game of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493},"overview":"Seven
+          noble families fight for control of the mythical land of Westeros. Friction
+          between the houses leads to full-scale war. All while a very ancient evil
+          awakens in the farthest north. Amidst the war, a neglected military order
+          of misfits, the Night''s Watch, is all that stands between the realms of
+          men and the icy horrors beyond.","first_aired":"2011-04-18T01:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":60,"certification":"TV-MA","network":"HBO","country":"us","trailer":"http://youtube.com/watch?v=BpJYNVhGf1s","homepage":"http://www.hbo.com/game-of-thrones","status":"returning
+          series","rating":9.38568,"votes":48883,"updated_at":"2016-07-18T10:57:05.000Z","language":"en","available_translations":["en","fr","it","de","es","ru","hu","el","cs","pt","sk","nl","bg","sv","zh","pl","fa","da","tr","he","ro","fi","th","ko","uk","is","lt","hr","bs","ar","id","tw","lb","vi"],"genres":["drama","fantasy","science-fiction","action","adventure"],"aired_episodes":60,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/001/390/fanarts/original/76d5df8aed.jpg","medium":"https://walter.trakt.us/images/shows/000/001/390/fanarts/medium/76d5df8aed.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/390/fanarts/thumb/76d5df8aed.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/001/390/posters/original/93df9cd612.jpg","medium":"https://walter.trakt.us/images/shows/000/001/390/posters/medium/93df9cd612.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/390/posters/thumb/93df9cd612.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/001/390/logos/original/13b614ad43.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/001/390/cleararts/original/5cbde9e647.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/001/390/banners/original/9fefff703d.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/001/390/thumbs/original/7beccbd5a1.jpg"}}}'}
+      headers:
+        CF-Cache-Status: [HIT]
+        CF-RAY: [2c4c2a5b676719c8-SYD]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Tue, 19 Jul 2016 06:37:33 GMT']
+        ETag: [W/"489e41420a89316d7c96e3dc4940f89a"]
+        Expires: ['Tue, 19 Jul 2016 10:37:33 GMT']
+        Last-Modified: ['Mon, 18 Jul 2016 10:57:05 GMT']
+        Server: [cloudflare-nginx]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [eed89c89-dd66-487e-9c8e-aa09ad28f342]
+        X-Runtime: ['0.010050']
+        X-XSS-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/shows/1390/translations?extended=full%2Cimages
+    response:
+      body: {string: "[{\"title\":\"Game of Thrones\",\"overview\":\"Seven noble families\
+          \ fight for control of the mythical land of Westeros. Friction between the\
+          \ houses leads to full-scale war. All while a very ancient evil awakens\
+          \ in the farthest north. Amidst the war, a neglected military order of misfits,\
+          \ the Night's Watch, is all that stands between the realms of men and icy\
+          \ horrors beyond.\",\"language\":\"en\"},{\"title\":\"Game of Thrones\"\
+          ,\"overview\":\"Il y a tr\xE8s longtemps, \xE0 une \xE9poque oubli\xE9e,\
+          \ une force a d\xE9truit l'\xE9quilibre des saisons. Dans un pays o\xF9\
+          \ l'\xE9t\xE9 peut durer plusieurs ann\xE9es et l'hiver toute une vie, des\
+          \ forces sinistres et surnaturelles se pressent aux portes du Royaume des\
+          \ Sept Couronnes. La confr\xE9rie de la Garde de Nuit, prot\xE9geant le\
+          \ Royaume de toute cr\xE9ature pouvant provenir d'au-del\xE0 du Mur protecteur,\
+          \ n'a plus les ressources n\xE9cessaires pour assurer la s\xE9curit\xE9\
+          \ de tous. Apr\xE8s un \xE9t\xE9 de dix ann\xE9es, un hiver rigoureux s'abat\
+          \ sur le Royaume avec la promesse d'un avenir des plus sombres. Pendant\
+          \ ce temps, complots et rivalit\xE9s se jouent sur le continent pour s'emparer\
+          \ du Tr\xF4ne de fer, le symbole du pouvoir absolu.\",\"language\":\"fr\"\
+          },{\"title\":\"Il Trono di Spade\",\"overview\":\"Il Trono di Spade (Game\
+          \ of Thrones) \xE8 una serie televisiva statunitense di genere fantasy creata\
+          \ da David Benioff e D.B. Weiss, che ha debuttato il 17 aprile 2011 sul\
+          \ canale via cavo HBO. \xC8 nata come trasposizione televisiva del ciclo\
+          \ di romanzi Cronache del ghiaccio e del fuoco (A Song of Ice and Fire)\
+          \ di George R. R. Martin.\\n\\nLa serie racconta le avventure di molti personaggi\
+          \ che vivono in un grande mondo immaginario costituito principalmente da\
+          \ due continenti. Il centro pi\xF9 grande e civilizzato del continente occidentale\
+          \ \xE8 la citt\xE0 capitale Approdo del Re, dove risiede il Trono di Spade.\
+          \ La lotta per la conquista del trono porta le pi\xF9 grandi famiglie del\
+          \ continente a scontrarsi o allearsi tra loro in un contorto gioco del potere.\
+          \ Ma oltre agli uomini, emergono anche altre forze oscure e magiche.\",\"\
+          language\":\"it\"},{\"title\":\"Game of Thrones\",\"overview\":\"Die Handlung\
+          \ ist in einer fiktiven Welt angesiedelt und spielt auf den Kontinenten\
+          \ Westeros (den Sieben K\xF6nigreichen sowie im Gebiet der \u201EMauer\u201C\
+          \ und jenseits davon im Norden) und Essos. In dieser Welt ist die L\xE4\
+          nge der Sommer und Winter unvorhersehbar und variabel; eine Jahreszeit kann\
+          \ Jahre oder sogar Jahrzehnte dauern. Der Handlungsort auf dem Kontinent\
+          \ Westeros in den Sieben K\xF6nigreichen \xE4hnelt dabei stark dem mittelalterlichen\
+          \ Europa. Die Geschichte spielt am Ende eines langen Sommers und wird in\
+          \ drei Handlungsstr\xE4ngen weitgehend parallel erz\xE4hlt. In den Sieben\
+          \ K\xF6nigreichen bauen sich zwischen den m\xE4chtigsten Adelsh\xE4usern\
+          \ des Reiches Spannungen auf, die schlie\xDFlich zum offenen Thronkampf\
+          \ f\xFChren. Gleichzeitig droht der Wintereinbruch und es zeichnet sich\
+          \ eine Gefahr durch eine fremde Rasse im hohen Norden von Westeros ab. Der\
+          \ dritte Handlungsstrang spielt auf dem Kontinent Essos, wo Daenerys Targaryen,\
+          \ Mitglied der vor Jahren abgesetzten K\xF6nigsfamilie, bestrebt ist, wieder\
+          \ an die Macht zu gelangen. Die komplexe Handlung umfasst zahlreiche Figuren\
+          \ und thematisiert unter anderem Politik und Machtk\xE4mpfe, Gesellschaftsverh\xE4\
+          ltnisse und Religion.\",\"language\":\"de\"},{\"title\":\"Juego de Tronos\"\
+          ,\"overview\":\"Juego de Tronos es una serie de televisi\xF3n de drama y\
+          \ fantas\xEDa creada para la HBO por David Benioff y D. B. Weiss. Es una\
+          \ adaptaci\xF3n de la saga de novelas de fantas\xEDa Canci\xF3n de Hielo\
+          \ y Fuego de George R. R. Martin. La primera de las novelas es la que da\
+          \ nombre a la serie.\\n\\nLa serie, ambientada en los continentes ficticios\
+          \ de Westeros y Essos al final de un verano de una decada de duraci\xF3\
+          n, entrelaza varias l\xEDneas argumentales. La primera sigue a los miembros\
+          \ de varias casas nobles inmersos en una guerra civil por conseguir el Trono\
+          \ de Hierro de los Siete Reinos. La segunda trata sobre la creciente amenaza\
+          \ de un inminente invierno y sobre las temibles criaturas del norte. La\
+          \ tercera relata los esfuerzos por reclamar el trono de los \xFAltimos miembros\
+          \ exiliados de una dinast\xEDa destronada. A pesar de sus personajes moralmente\
+          \ ambiguos, la serie profundiza en los problemas de la jerarqu\xEDa social,\
+          \ religi\xF3n, lealtad, corrupci\xF3n, sexo, guerra civil, crimen y castigo.\"\
+          ,\"language\":\"es\"},{\"title\":\"\u0418\u0433\u0440\u0430 \u043F\u0440\
+          \u0435\u0441\u0442\u043E\u043B\u043E\u0432\",\"overview\":\"\u041A \u043A\
+          \u043E\u043D\u0446\u0443 \u043F\u043E\u0434\u0445\u043E\u0434\u0438\u0442\
+          \ \u0432\u0440\u0435\u043C\u044F \u0431\u043B\u0430\u0433\u043E\u0434\u0435\
+          \u043D\u0441\u0442\u0432\u0438\u044F, \u0438 \u043B\u0435\u0442\u043E, \u0434\
+          \u043B\u0438\u0432\u0448\u0435\u0435\u0441\u044F \u043F\u043E\u0447\u0442\
+          \u0438 \u0434\u0435\u0441\u044F\u0442\u0438\u043B\u0435\u0442\u0438\u0435\
+          , \u0443\u0433\u0430\u0441\u0430\u0435\u0442. \u0412\u043E\u043A\u0440\u0443\
+          \u0433 \u0441\u0440\u0435\u0434\u043E\u0442\u043E\u0447\u0438\u044F \u0432\
+          \u043B\u0430\u0441\u0442\u0438 \u0421\u0435\u043C\u0438 \u043A\u043E\u0440\
+          \u043E\u043B\u0435\u0432\u0441\u0442\u0432, \u0416\u0435\u043B\u0435\u0437\
+          \u043D\u043E\u0433\u043E \u0442\u0440\u043E\u043D\u0430, \u0437\u0440\u0435\
+          \u0435\u0442 \u0437\u0430\u0433\u043E\u0432\u043E\u0440, \u0438 \u0432 \u044D\
+          \u0442\u043E \u043D\u0435\u043F\u0440\u043E\u0441\u0442\u043E\u0435 \u0432\
+          \u0440\u0435\u043C\u044F \u043A\u043E\u0440\u043E\u043B\u044C \u0440\u0435\
+          \u0448\u0430\u0435\u0442 \u0438\u0441\u043A\u0430\u0442\u044C \u043F\u043E\
+          \u0434\u0434\u0435\u0440\u0436\u043A\u0438 \u0443 \u0434\u0440\u0443\u0433\
+          \u0430 \u044E\u043D\u043E\u0441\u0442\u0438 \u042D\u0434\u0434\u0430\u0440\
+          \u0434\u0430 \u0421\u0442\u0430\u0440\u043A\u0430. \u0412 \u043C\u0438\u0440\
+          \u0435, \u0433\u0434\u0435 \u0432\u0441\u0435 \u2014 \u043E\u0442 \u043A\
+          \u043E\u0440\u043E\u043B\u044F \u0434\u043E \u043D\u0430\u0435\u043C\u043D\
+          \u0438\u043A\u0430 \u2014 \u0440\u0432\u0443\u0442\u0441\u044F \u043A \u0432\
+          \u043B\u0430\u0441\u0442\u0438, \u043F\u043B\u0435\u0442\u0443\u0442 \u0438\
+          \u043D\u0442\u0440\u0438\u0433\u0438 \u0438 \u0433\u043E\u0442\u043E\u0432\
+          \u044B \u0432\u043E\u043D\u0437\u0438\u0442\u044C \u043D\u043E\u0436 \u0432\
+          \ \u0441\u043F\u0438\u043D\u0443, \u0435\u0441\u0442\u044C \u043C\u0435\u0441\
+          \u0442\u043E \u0438 \u0431\u043B\u0430\u0433\u043E\u0440\u043E\u0434\u0441\
+          \u0442\u0432\u0443, \u0441\u043E\u0441\u0442\u0440\u0430\u0434\u0430\u043D\
+          \u0438\u044E \u0438 \u043B\u044E\u0431\u0432\u0438. \u041C\u0435\u0436\u0434\
+          \u0443 \u0442\u0435\u043C, \u043D\u0438\u043A\u0442\u043E \u043D\u0435 \u0437\
+          \u0430\u043C\u0435\u0447\u0430\u0435\u0442 \u043F\u0440\u043E\u0431\u0443\
+          \u0436\u0434\u0435\u043D\u0438\u0435 \u0442\u044C\u043C\u044B \u0438\u0437\
+          \ \u043B\u0435\u0433\u0435\u043D\u0434 \u0434\u0430\u043B\u0435\u043A\u043E\
+          \ \u043D\u0430 \u0421\u0435\u0432\u0435\u0440\u0435 \u2014 \u0438 \u043B\
+          \u0438\u0448\u044C \u0421\u0442\u0435\u043D\u0430 \u0437\u0430\u0449\u0438\
+          \u0449\u0430\u0435\u0442 \u0436\u0438\u0432\u044B\u0445 \u043A \u044E\u0433\
+          \u0443 \u043E\u0442 \u043D\u0435\u0435.\",\"language\":\"ru\"},{\"title\"\
+          :\"Tr\xF3nok harca\",\"overview\":\"Westeros f\xF6l\xF6tt valaha a s\xE1\
+          rk\xE1nykir\xE1lyok uralkodtak, \xE1m a Targaryen-dinaszti\xE1t 15 \xE9\
+          vvel ezel\u0151tt el\u0171zt\xE9k, \xE9s most Robert Baratheon uralkodik\
+          \ h\u0171 bar\xE1tai, Jon Arryn, majd Eddard Stark seg\xEDts\xE9g\xE9vel.\
+          \ A konfliktus k\xF6z\xE9ppontj\xE1ban Deres urai, a Starkok \xE1llnak.\
+          \ Olyanok, mint a f\xF6ld, ahol sz\xFClettek: makacs, kem\xE9ny jellem\u0171\
+          \ csal\xE1d. Szem\xFCnk el\u0151tt h\u0151s\xF6k, gazemberek \xE9s egy gonosz\
+          \ hatalom t\xF6rt\xE9nete elevenedik meg. \xC1m hamar r\xE1 kell \xE9bredn\xFC\
+          nk, hogy ebben a vil\xE1gban m\xE9gsem egyszer\u0171en j\xF3k \xE9s gonoszok\
+          \ ker\xFClnek szembe egym\xE1ssal, hanem mesterien \xE1br\xE1zolt jellemek\
+          \ bontakoznak ki el\u0151tt\xFCnk k\xFCl\xF6nb\xF6z\u0151 v\xE1gyakkal,\
+          \ c\xE9lokkal, f\xE9lelmekkel \xE9s sebekkel. George R.R. Martin nagy siker\u0171\
+          , A t\u0171z \xE9s j\xE9g dala c\xEDm\u0171 reg\xE9nyciklus\xE1nak els\u0151\
+          \ k\xF6tete sorozat form\xE1j\xE1ban, amelyben k\xE9t nagyhatalm\xFA csal\xE1\
+          d v\xEDv hal\xE1los harcot a Westeros H\xE9t Kir\xE1lys\xE1g\xE1nak ir\xE1\
+          ny\xEDt.\",\"language\":\"hu\"},{\"title\":\"Game of Thrones\",\"overview\"\
+          :\"\u0391\u03C0\u03CC \u03C4\u03B9\u03C2 \u03BA\u03CC\u03BA\u03BA\u03B9\u03BD\
+          \u03B5\u03C2 \u03B1\u03BC\u03BC\u03BF\u03C5\u03B4\u03B9\u03AD\u03C2 \u03C4\
+          \u03BF\u03C5 \u039D\u03CC\u03C4\u03BF\u03C5 \u03BA\u03B1\u03B9 \u03C4\u03B9\
+          \u03C2 \u03AC\u03B3\u03C1\u03B9\u03B5\u03C2 \u03C0\u03B5\u03B4\u03B9\u03AC\
+          \u03B4\u03B5\u03C2 \u03C4\u03B7\u03C2 \u0391\u03BD\u03B1\u03C4\u03BF\u03BB\
+          \u03AE\u03C2 \u03AD\u03C9\u03C2 \u03C4\u03BF\u03BD \u03C0\u03B1\u03B3\u03C9\
+          \u03BC\u03AD\u03BD\u03BF \u0392\u03BF\u03C1\u03C1\u03AC \u03BA\u03B1\u03B9\
+          \ \u03C4\u03BF \u03B1\u03C1\u03C7\u03B1\u03AF\u03BF \u03A4\u03B5\u03AF\u03C7\
+          \u03BF\u03C2, \u03C0\u03BF\u03C5 \u03C0\u03C1\u03BF\u03C3\u03C4\u03B1\u03C4\
+          \u03B5\u03CD\u03B5\u03B9 \u03C4\u03BF \u03A3\u03C4\u03AD\u03BC\u03BC\u03B1\
+          \ \u03B1\u03C0\u03CC \u03C3\u03BA\u03BF\u03C4\u03B5\u03B9\u03BD\u03AC \u03CC\
+          \u03BD\u03C4\u03B1, \u03BF\u03B9 \u03B9\u03C3\u03C7\u03C5\u03C1\u03AD\u03C2\
+          \ \u03BF\u03B9\u03BA\u03BF\u03B3\u03AD\u03BD\u03B5\u03B9\u03B5\u03C2 \u03C4\
+          \u03C9\u03BD \u0395\u03C0\u03C4\u03AC \u0392\u03B1\u03C3\u03B9\u03BB\u03B5\
+          \u03AF\u03C9\u03BD \u03B5\u03C0\u03B9\u03B4\u03AF\u03B4\u03BF\u03BD\u03C4\
+          \u03B1\u03B9 \u03C3\u03B5 \u03BC\u03B9\u03B1 \u03B1\u03BD\u03B5\u03BB\u03AD\
+          \u03B7\u03C4\u03B7 \u03BC\u03AC\u03C7\u03B7 \u03C3\u03C4\u03B7 \u03B4\u03B9\
+          \u03B1\u03B4\u03BF\u03C7\u03AE \u03C4\u03BF\u03C5 \u03A3\u03B9\u03B4\u03B5\
+          \u03C1\u03AD\u03BD\u03B9\u03BF\u03C5 \u0398\u03C1\u03CC\u03BD\u03BF\u03C5\
+          . \u039C\u03B9\u03B1 \u03B9\u03C3\u03C4\u03BF\u03C1\u03AF\u03B1 \u03B3\u03B5\
+          \u03BC\u03AC\u03C4\u03B7 \u03AF\u03BD\u03C4\u03C1\u03B9\u03B3\u03BA\u03B5\
+          \u03C2 \u03BA\u03B1\u03B9 \u03C0\u03C1\u03BF\u03B4\u03BF\u03C3\u03AF\u03B5\
+          \u03C2, \u03B9\u03C0\u03C0\u03BF\u03C4\u03B9\u03C3\u03BC\u03CC \u03BA\u03B1\
+          \u03B9 \u03C4\u03B9\u03BC\u03AE, \u03BA\u03B1\u03C4\u03B1\u03BA\u03C4\u03AE\
+          \u03C3\u03B5\u03B9\u03C2 \u03BA\u03B1\u03B9 \u03B8\u03C1\u03B9\u03AC\u03BC\
+          \u03B2\u03BF\u03C5\u03C2. \u03A3\u03C4\u03BF \u03A0\u03B1\u03B9\u03C7\u03BD\
+          \u03AF\u03B4\u03B9 \u03C4\u03BF\u03C5 \u03A3\u03C4\u03AD\u03BC\u03BC\u03B1\
+          \u03C4\u03BF\u03C2, \u03B8\u03B1 \u03BD\u03B9\u03BA\u03AE\u03C3\u03B5\u03B9\
+          \u03C2 \u03AE \u03B8\u03B1 \u03C0\u03B5\u03B8\u03AC\u03BD\u03B5\u03B9\u03C2\
+          .\",\"language\":\"el\"},{\"title\":\"Hra o tr\u016Fny\",\"overview\":\"\
+          Kontinent, kde l\xE9ta trvaj\xED des\xEDtky rok\u016F a zimy se mohou prot\xE1\
+          hnout na cel\xFD lidsk\xFD \u017Eivot, za\u010D\xEDnaj\xED su\u017Eovat\
+          \ nepokoje. V\u0161ech Sedm kr\xE1lovstv\xED Z\xE1padozem\xED \u2013 pletich\xE1\
+          \u0159sk\xFD jih, divok\xE9 v\xFDchodn\xED krajiny i ledov\xFD sever ohrani\u010D\
+          en\xFD starobylou Zd\xED, kter\xE1 chr\xE1n\xED kr\xE1lovstv\xED p\u0159\
+          ed pronik\xE1n\xEDm temnoty \u2013 je zm\xEDt\xE1no bojem dvou mocn\xFD\
+          ch rod\u016F na \u017Eivot a na smrt o nadvl\xE1du nad celou \u0159\xED\u0161\
+          \xED. Zem\xED ot\u0159\xE1s\xE1 zrada, cht\xED\u010D, intriky a nadp\u0159\
+          irozen\xE9 s\xEDly. Krvav\xFD boj o \u017Delezn\xFD tr\u016Fn, post nejvy\u0161\
+          \u0161\xEDho vl\xE1dce Sedmi kr\xE1lovstv\xED, bude m\xEDt nep\u0159edv\xED\
+          dateln\xE9 a dalekos\xE1hl\xE9 d\u016Fsledky\u2026\",\"language\":\"cs\"\
+          },{\"title\":\"A Guerra dos Tronos\",\"overview\":\"Adaptada por David Benioff\
+          \ e Dan Weiss, a primeira temporada, com dez epis\xF3dios encomendados,\
+          \ ter\xE1 como base o livro \u201CGame of Thrones\u201D. Game of Thrones\
+          \ se passa em Westeros, uma terra reminiscente da Europa Medieval, onde\
+          \ as esta\xE7\xF5es duram por anos ou at\xE9 mesmo d\xE9cadas. A hist\xF3\
+          ria gira em torno de uma batalha entre os Sete Reinos, onde duas fam\xED\
+          lias dominantes est\xE3o lutando pelo controle do Trono de Ferro, cuja posse\
+          \ assegura a sobreviv\xEAncia durante o inverno de 40 anos que est\xE1 por\
+          \ vir. A s\xE9rie \xE9 encabe\xE7ada por Lena Headey, Sean Bean e Mark Addy.\
+          \ Bean interpreta Eddard \u201CNed\u201D Stark, Lorde de Winterfell, um\
+          \ homem conhecido pelo seu senso de honra e justi\xE7a que se torna o principal\
+          \ conselheiro do Rei Robert, vivido por Addy.\",\"language\":\"pt\"},{\"\
+          title\":\"Hra o Tr\xF3ny\",\"overview\":\"\",\"language\":\"sk\"},{\"title\"\
+          :\"Game of Thrones\",\"overview\":\"Een eeuwenoude machtsstrijd barst los\
+          \ in het land waar de zomers decennia duren en de winters een leven lang\
+          \ kunnen aanslepen. Twee machtige geslachten - de regerende Baratheons en\
+          \ de verbannen Targaryens - maken zich op om de IJzeren Troon te claimen\
+          \ en de Zeven Koninkrijken van Westeros onder hun controle te krijgen. Maar\
+          \ in een tijdperk waarin verraad, lust, intriges en bovennatuurlijke krachten\
+          \ hoogtij vieren, zal hun dodelijke kat-en-muisspelletje onvoorziene en\
+          \ verreikende gevolgen hebben. Achter een eeuwenoude, gigantische muur van\
+          \ ijs in het uiterste noorden van Westeros maakt een kille vijand zich immers\
+          \ op om het land onder de voet te lopen. Gebaseerd op de bestseller fantasyreeks\
+          \ \\\"A Song of Ice and Fire\\\" van George R.R. Martin.\",\"language\"\
+          :\"nl\"},{\"title\":\"\u0418\u0433\u0440\u0430 \u043D\u0430 \u0442\u0440\
+          \u043E\u043D\u043E\u0432\u0435\",\"overview\":\"\u201E\u0418\u0433\u0440\
+          \u0430 \u043D\u0430 \u0442\u0440\u043E\u043D\u043E\u0432\u0435\u201C \u0435\
+          \ \u0441\u0435\u0440\u0438\u0430\u043B \u043D\u0430 HBO, \u043A\u043E\u0439\
+          \u0442\u043E \u0441\u043B\u0435\u0434\u0432\u0430 \u0438\u0441\u0442\u043E\
+          \u0440\u0438\u044F\u0442\u0430 \u043D\u0430 \u0444\u0435\u043D\u0442\u044A\
+          \u0437\u0438 \u0435\u043F\u043E\u0441 \u043F\u043E\u0440\u0435\u0434\u0438\
+          \u0446\u0430\u0442\u0430 \u201E\u041F\u0435\u0441\u0435\u043D \u0437\u0430\
+          \ \u043E\u0433\u044A\u043D \u0438 \u043B\u0435\u0434\u201C, \u0432\u0437\
+          \u0435\u043C\u0430\u0439\u043A\u0438 \u0438\u043C\u0435\u0442\u043E \u043D\
+          \u0430 \u043F\u044A\u0440\u0432\u0430\u0442\u0430 \u043A\u043D\u0438\u0433\
+          \u0430. \u0414\u0435\u0439\u0441\u0442\u0432\u0438\u0435\u0442\u043E \u043D\
+          \u0430 \u0441\u0435\u0440\u0438\u0430\u043B\u0430 \u0441\u0435 \u0440\u0430\
+          \u0437\u0432\u0438\u0432\u0430 \u0432 \u0421\u0435\u0434\u0435\u043C\u0442\
+          \u0435 \u043A\u0440\u0430\u043B\u0441\u0442\u0432\u0430 \u043D\u0430 \u0412\
+          \u0435\u0441\u0442\u0435\u0440\u043E\u0441, \u043A\u044A\u0434\u0435\u0442\
+          \u043E \u043B\u044F\u0442\u043E\u0442\u043E \u043F\u0440\u043E\u0434\u044A\
+          \u043B\u0436\u0430\u0432\u0430 \u0434\u0435\u0441\u0435\u0442\u0438\u043B\
+          \u0435\u0442\u0438\u044F, \u0430 \u0437\u0438\u043C\u0430\u0442\u0430 \u2013\
+          \ \u0446\u044F\u043B\u0430 \u0432\u0435\u0447\u043D\u043E\u0441\u0442.\"\
+          ,\"language\":\"bg\"},{\"title\":\"Game of Thrones\",\"overview\":\"Serien\
+          \ utspelar sig p\xE5 den fiktiva kontinenten Westeros, oftast kallad \\\"\
+          De sju konungarikena\\\". Eddard \\\"Ned\\\" Stark bekymras av rykten fr\xE5\
+          n muren i norr d\xE5 han f\xE5r besked om att Jon Arryn, hans mentor och\
+          \ kungens hand, d\xF6tt och att kung Robert Baratheon \xE4r p\xE5 v\xE4\
+          g till Vinterhed. P\xE5 andra sidan havet smider exilprinsen Viseras Targaryen\
+          \ planer f\xF6r att \xE5terer\xF6vra De sju konungarikena.\",\"language\"\
+          :\"sv\"},{\"title\":\"\u6743\u529B\u7684\u6E38\u620F\",\"overview\":\"\u6545\
+          \u4E8B\u80CC\u666F\u662F\u4E00\u4E2A\u865A\u6784\u7684\u4E16\u754C\uFF0C\
+          \u4E3B\u8981\u5206\u4E3A\u4E24\u7247\u5927\u9646\uFF0C\u4F4D\u4E8E\u897F\
+          \u9762\u7684\u662F\u201C\u65E5\u843D\u56FD\u5EA6\u201D\u7EF4\u65AF\u7279\
+          \u6D1B\uFF08Westeros\uFF09\uFF0C\u9762\u79EF\u7EA6\u7B49\u4E8E\u5357\u7F8E\
+          \u6D32\u3002\u4F4D\u4E8E\u4E1C\u9762\u7684\u662F\u4E00\u5757\u9762\u79EF\
+          \u3001\u5F62\u72B6\u8FD1\u4F3C\u4E8E\u4E9A\u6B27\u5927\u9646\u7684\u9646\
+          \u5730\u3002\u6545\u4E8B\u7684\u4E3B\u7EBF\u4FBF\u53D1\u751F\u5728\u7EF4\
+          \u65AF\u7279\u6D1B\u5927\u9646\u4E0A\u3002\u4ECE\u56FD\u738B\u52B3\u52C3\
+          \xB7\u62DC\u62C9\u5E2D\u6069\u524D\u5F80\u6B64\u5730\u62DC\u8BBF\u4ED6\u7684\
+          \u597D\u53CB\u4E34\u51AC\u57CE\u4E3B\u3001\u5317\u5883\u5B88\u62A4\u827E\
+          \u5FB7\xB7\u53F2\u5854\u514B\u5F00\u59CB\uFF0C\u6E10\u6E10\u5C55\u793A\u4E86\
+          \u8FD9\u7247\u56FD\u5EA6\u7684\u5168\u8C8C\u3002\u5355\u7EAF\u7684\u56FD\
+          \u738B\uFF0C\u803F\u76F4\u7684\u9996\u76F8\uFF0C\u5404\u6000\u5FC3\u601D\
+          \u7684\u5927\u81E3\uFF0C\u62E5\u5175\u81EA\u91CD\u7684\u56DB\u65B9\u8BF8\
+          \u4FAF\uFF0C\u5168\u56FD\u4EC5\u9760\u7740\u4E00\u6839\u7EC6\u5F26\u7EF4\
+          \u7CFB\u7740\u8868\u9762\u7684\u548C\u5E73\uFF0C\u800C\u5F53\u5F26\u65AD\
+          \u4E4B\u65F6\uFF0C\u56FD\u5BB6\u518D\u5EA6\u9677\u5165\u65E0\u5C3D\u7684\
+          \u6218\u4E71\u4E4B\u4E2D\u3002\u800C\u66F4\u8BA9\u4EBA\u60CA\u609A\u7684\
+          \u3001\u90A3\u4E9B\u8FDC\u53E4\u7684\u4F20\u8BF4\u548C\u65E9\u5DF2\u706D\
+          \u7EDD\u7684\u751F\u7269\uFF0C\u6B63\u91CD\u65B0\u56DE\u5230\u8FD9\u7247\
+          \u571F\u5730\u3002\",\"language\":\"zh\"},{\"title\":\"Gra o Tron\",\"overview\"\
+          :\"Siedem rodzin szlacheckich walczy o panowanie nad ziemiami krainy Westeros.\
+          \ Polityczne i seksualne intrygi s\u0105 na porz\u0105dku dziennym. Pierwszorz\u0119\
+          dne role wiod\u0105 rodziny: Stark, Lannister i Baratheon. Robert Baratheon,\
+          \ kr\xF3l Westeros, prosi swojego starego przyjaciela, Eddarda Starka, aby\
+          \ s\u0142u\u017Cy\u0142 jako jego g\u0142\xF3wny doradca. Eddard, podejrzewaj\u0105\
+          c, \u017Ce jego poprzednik na tym stanowisku zosta\u0142 zamordowany, przyjmuje\
+          \ propozycj\u0119, aby dog\u0142\u0119bnie zbada\u0107 spraw\u0119. Okazuje\
+          \ si\u0119, \u017Ce przej\u0119cie tronu planuje kilka rodzin. Lannisterowie,\
+          \ familia kr\xF3lowej, staje si\u0119 podejrzana o podst\u0119pne knucie\
+          \ spisku. Po drugiej stronie morza, pozbawieni w\u0142adzy ostatni przedstawiciele\
+          \ poprzednio rz\u0105dz\u0105cego rodu, Targaryen\xF3w, r\xF3wnie\u017C\
+          \ planuj\u0105 odzyska\u0107 kontrol\u0119 nad kr\xF3lestwem. Narastaj\u0105\
+          cy konflikt pomi\u0119dzy rodzinami, do kt\xF3rego w\u0142\u0105czaj\u0105\
+          \ si\u0119 r\xF3wnie\u017C inne rody, prowadzi do wojny. W mi\u0119dzyczasie\
+          \ na dalekiej p\xF3\u0142nocy budzi si\u0119 starodawne z\u0142o. W chaosie\
+          \ pe\u0142nym walk i konflikt\xF3w tylko grupa wyrzutk\xF3w zwana Nocn\u0105\
+          \ Stra\u017C\u0105 stoi pomi\u0119dzy kr\xF3lestwem ludzi, a horrorem kryj\u0105\
+          cym si\u0119 poza nim.\",\"language\":\"pl\"},{\"title\":\"\u0628\u0627\u0632\
+          \u06CC \u062A\u0627\u062C \u0648 \u062A\u062E\u062A\",\"overview\":\"\u0647\
+          \u0641\u062A \u062E\u0627\u0646\u062F\u0627\u0646 \u0627\u0634\u0631\u0627\
+          \u0641\u06CC \u0628\u0631\u0627\u06CC \u062D\u0627\u06A9\u0645\u06CC\u062A\
+          \ \u0628\u0631 \u0633\u0631\u0632\u0645\u06CC\u0646 \u0627\u0641\u0633\u0627\
+          \u0646\u0647 \u0627\u06CC \xAB\u0648\u0633\u062A\u0631\u0648\u0633\xBB \u062F\
+          \u0631 \u062D\u0627\u0644 \u0633\u062A\u06CC\u0632 \u0628\u0627 \u06CC\u06A9\
+          \u062F\u06CC\u06AF\u0631\u0646\u062F. \u062E\u0627\u0646\u062F\u0627\u0646\
+          \ \xAB\u0627\u0633\u062A\u0627\u0631\u06A9\xBB\u060C \xAB\u0644\u0646\u06CC\
+          \u0633\u062A\u0631\xBB \u0648 \xAB\u0628\u0627\u0631\u0627\u062B\u06CC\u0648\
+          \u0646\xBB \u0628\u0631\u062C\u0633\u062A\u0647 \u062A\u0631\u06CC\u0646\
+          \ \u0622\u0646\u0647\u0627 \u0647\u0633\u062A\u0646\u062F. \u062F\u0627\u0633\
+          \u062A\u0627\u0646 \u0627\u0632 \u062C\u0627\u06CC\u06CC \u0634\u0631\u0648\
+          \u0639 \u0645\u06CC \u0634\u0648\u062F \u06A9\u0647 \xAB\u0631\u0627\u0628\
+          \u0631\u062A \u0628\u0627\u0631\u0627\u062B\u06CC\u0648\u0646\xBB \u067E\
+          \u0627\u062F\u0634\u0627\u0647 \u0648\u0633\u062A\u0631\u0648\u0633\u060C\
+          \ \u0627\u0632 \u062F\u0648\u0633\u062A \u0642\u062F\u06CC\u0645\u06CC \u0627\
+          \u0634\u060C \xAB\u0627\u062F\u0627\u0631\u062F\xBB \u0627\u0631\u0628\u0627\
+          \u0628 \u062E\u0627\u0646\u062F\u0627\u0646 \u0627\u0633\u062A\u0627\u0631\
+          \u06A9\u060C \u062A\u0642\u0627\u0636\u0627 \u0645\u06CC \u06A9\u0646\u062F\
+          \ \u06A9\u0647 \u0628\u0639\u0646\u0648\u0627\u0646 \u0645\u0634\u0627\u0648\
+          \u0631 \u067E\u0627\u062F\u0634\u0627\u0647\u060C \u0628\u0631\u062A\u0631\
+          \u06CC\u0646 \u0633\u0645\u062A \u062F\u0631\u0628\u0627\u0631\u060C \u0628\
+          \u0647 \u0627\u0648 \u062E\u062F\u0645\u062A \u06A9\u0646\u062F. \u0627\u06CC\
+          \u0646 \u062F\u0631 \u062D\u0627\u0644\u06CC \u0627\u0633\u062A \u06A9\u0647\
+          \ \u0645\u0634\u0627\u0648\u0631 \u0642\u0628\u0644\u06CC \u0628\u0647 \u0637\
+          \u0631\u0632 \u0645\u0631\u0645\u0648\u0632\u06CC \u0628\u0647 \u0642\u062A\
+          \u0644 \u0631\u0633\u06CC\u062F\u0647 \u0627\u0633\u062A\u060C \u0628\u0627\
+          \ \u0627\u06CC\u0646 \u062D\u0627\u0644 \u0627\u062F\u0627\u0631\u062F \u062A\
+          \u0642\u0627\u0636\u0627\u06CC \u067E\u0627\u062F\u0634\u0627\u0647 \u0631\
+          \u0627 \u0645\u06CC \u067E\u0630\u06CC\u0631\u062F \u0648 \u0628\u0647 \u0633\
+          \u0631\u0632\u0645\u06CC\u0646 \u0634\u0627\u0647\u06CC \u0631\u0627\u0647\
+          \u06CC \u0645\u06CC \u0634\u0648\u062F. \u062E\u0627\u0646\u0648\u0627\u062F\
+          \u0647 \u0645\u0644\u06A9\u0647\u060C \u06CC\u0639\u0646\u06CC \u0644\u0646\
+          \u06CC\u0633\u062A\u0631 \u0647\u0627 \u062F\u0631 \u062D\u0627\u0644 \u062A\
+          \u0648\u0637\u0626\u0647 \u0628\u0631\u0627\u06CC \u0628\u062F\u0633\u062A\
+          \ \u0622\u0648\u0631\u062F\u0646 \u0642\u062F\u0631\u062A \u0647\u0633\u062A\
+          \u0646\u062F. \u0627\u0632 \u0633\u0648\u06CC \u062F\u06CC\u06AF\u0631\u060C\
+          \ \u0628\u0627\u0632\u0645\u0627\u0646\u062F\u0647 \u0647\u0627\u06CC \u062E\
+          \u0627\u0646\u062F\u0627\u0646 \u067E\u0627\u062F\u0634\u0627\u0647 \u0642\
+          \u0628\u0644\u06CC \u0648\u0633\u062A\u0631\u0648\u0633\u060C \xAB\u062A\
+          \u0627\u0631\u06AF\u0631\u06CC\u0646 \u0647\u0627\xBB \u0646\u06CC\u0632\
+          \ \u0646\u0642\u0634\u0647 \u06CC \u067E\u0633 \u06AF\u0631\u0641\u062A\u0646\
+          \ \u062A\u0627\u062C \u0648 \u062A\u062E\u062A \u0631\u0627 \u062F\u0631\
+          \ \u0633\u0631 \u0645\u06CC \u067E\u0631\u0648\u0631\u0627\u0646\u0646\u062F\
+          \u060C \u0648 \u062A\u0645\u0627\u0645 \u0627\u06CC\u0646 \u0645\u0627\u062C\
+          \u0631\u0627\u0647\u0627 \u0645\u0648\u062C\u0628 \u062F\u0631 \u06AF\u0631\
+          \u0641\u062A\u0646 \u0646\u0628\u0631\u062F\u06CC \u0639\u0638\u06CC\u0645\
+          \ \u0645\u06CC\u0627\u0646 \u0622\u0646\u200C\u0647\u0627 \u062E\u0648\u0627\
+          \u0647\u062F \u0634\u062F...\",\"language\":\"fa\"},{\"title\":\"Game of\
+          \ Thrones\",\"overview\":\"George R. R. Martins Game of Thrones er en lang\
+          \ fort\xE6lling gennem syv b\xF8ger. Handlingen foreg\xE5r i et fiktivt\
+          \ kongerige kaldet Westeros. Denne middelalderlige verden er fuld af k\xE6\
+          mper, profetier og fortryllede skove, og bag en mur af is, der adskiller\
+          \ Riget, truer sp\xF8gelser og andre farer. Men de overnaturlige elementer\
+          \ er ikke rigtig s\xE5 fremtr\xE6dende i serien. Den narrative ramme er\
+          \ den hensynsl\xF8se kamp om magten, hvilket involverer en r\xE6kke konger,\
+          \ riddere og herrem\xE6nd med navne som Baratheon, Stark og Lannister. Det\
+          \ er ingen opl\xF8ftende historie, hvor det gode n\xF8dvendigvis sejrer\
+          \ frem for det onde, eller hvor det egentlig er s\xE5 let at afg\xF8re,\
+          \ hvad der er godt og ondt. Men Martin form\xE5r at tryllebinde publikum\
+          \ - ogs\xE5 dem, der normalt ikke synes om magi og fantasiverdener.\",\"\
+          language\":\"da\"},{\"title\":\"Taht Oyunlar\u0131\",\"overview\":\"Krall\u0131\
+          k dedi\u011Fin sava\u015Fs\u0131z olur mu? En g\xFC\xE7l\xFC krall\u0131\
+          \u011F\u0131 kurup, huzuru sa\u011Flam\u0131\u015F olsan bile bu g\xFCc\xFC\
+          \ elinde nas\u0131l koruyacaks\u0131n? Burada yanl\u0131\u015F yapana yer\
+          \ yok, affetmek yok. Kuzey Krall\u0131\u011F\u0131n\u0131n h\xFCk\xFCmdar\u0131\
+          \ Lord Ned Stark, uzun ve zorlu sava\u015Flardan sonra anayurduna d\xF6\
+          n\xFCp krall\u0131\u011F\u0131n\u0131 b\xFCt\xFCnl\xFCk i\xE7erisinde tutmay\u0131\
+          \ ba\u015Farm\u0131\u015Ft\u0131r. Kral Robert Baratheon ile y\u0131llarca\
+          \ omuz omuza \xE7arp\u0131\u015Fan ve Baratheon'un kral olmas\u0131n\u0131\
+          \ sa\u011Flayan Ned Stark'\u0131n tek istedi\u011Fi kuzey s\u0131n\u0131\
+          rlar\u0131n\u0131 koruyan krall\u0131\u011F\u0131nda ailesiyle ve halk\u0131\
+          yla ya\u015Famakt\u0131r. \\n\\nFakat suyun \xF6te yan\u0131nda kendi topraklar\u0131\
+          ndan ve krall\u0131\u011F\u0131ndan kovuldu\u011Funu iddia eden Viserys\
+          \ Targaryen , k\u0131z karde\u015Fi Daenerys'i barbar kavimlerin ba\u015F\
+          \u0131 Han Drogo'ya vererek, g\xFC\xE7 birli\u011Fi planlar\u0131 yapmaktad\u0131\
+          r. Taht\u0131n\u0131 b\xFCy\xFCk bir i\u015Ftahla geri isteyen ama kraliyet\
+          \ oyunlar\u0131ndan habersiz olan Viserys'in planlar\u0131 Kral Baratheon'a\
+          \ ula\u015F\u0131r. Sava\u015F alan\u0131nda b\xFCy\xFCk cengaver olan ama\
+          \ \xFClke ve aile y\xF6netiminde ayn\u0131 ba\u015Far\u0131y\u0131 tutturamayan\
+          \ Baratheon'un tamamen g\xFCvenebilece\u011Fi ve her yanl\u0131\u015F hamlesini\
+          \ arkas\u0131ndan toplayacak yeni bir sa\u011F kola ihtiyac\u0131 vard\u0131\
+          r. Kuzeyin Lordu Ned Stark bu g\xF6rev i\xE7in se\xE7ilen tek aday isimdir.\
+          \ K\u0131\u015F yakla\u015F\u0131yor...\\n\\nHanedan entrikalar\u0131, kap\u0131\
+          l\u0131 kap\u0131lar ard\u0131nda d\xF6nen oyunlar, birilerinin kuyusunu\
+          \ kazmak i\xE7in d\xFC\u015Fman\u0131n koynuna girmekten \xE7ekinmeyen kad\u0131\
+          nlar, karde\u015Fler aras\u0131 \xE7eki\u015Fmeler, d\u0131\u015Flanmalar...\
+          \ Hepsi tek bir hedef i\xE7in: taht kavgas\u0131..\",\"language\":\"tr\"\
+          },{\"title\":\"\u05DE\u05E9\u05D7\u05E7\u05D9 \u05D4\u05DB\u05E1\",\"overview\"\
+          :\"\u05DE\u05E9\u05D7\u05E7\u05D9 \u05D4\u05DB\u05E1 \u05E9\u05DC \u05D0\
+          \u05D9\u05D9\u05E5'-\u05D1\u05D9-\u05D0\u05D5 \u05D4\u05D9\u05D0 \u05E2\u05D9\
+          \u05D1\u05D5\u05D3 \u05DC\u05D8\u05DC\u05D5\u05D5\u05D9\u05D6\u05D9\u05D4\
+          \ \u05E9\u05DC \u05E1\u05D3\u05E8\u05EA \u05D4\u05E1\u05E4\u05E8\u05D9\u05DD\
+          \ \u05E8\u05D1\u05D9-\u05D4\u05DE\u05DB\u05E8 \u05E9\u05DC \u05D2'\u05D5\
+          \u05E8\u05D2' \u05E8.\u05E8. \u05DE\u05E8\u05D8\u05D9\u05DF (\\\"\u05E9\u05D9\
+          \u05E8 \u05E9\u05DC \u05D0\u05E9 \u05D5\u05E9\u05DC \u05E7\u05E8\u05D7\\\
+          \") \u05D1\u05D4\u05DD \u05D4\u05E7\u05D9\u05E5 \u05E0\u05DE\u05E9\u05DA\
+          \ \u05E2\u05DC \u05E4\u05E0\u05D9 \u05E2\u05E9\u05D5\u05E8\u05D9\u05DD,\
+          \ \u05D4\u05D7\u05D5\u05E8\u05E3 \u05D9\u05DB\u05D5\u05DC \u05DC\u05D4\u05D9\
+          \u05DE\u05E9\u05DA \u05D3\u05D5\u05E8 \u05D5\u05D4\u05DE\u05D0\u05D1\u05E7\
+          \ \u05E2\u05DC \u05DB\u05E1 \u05D4\u05D1\u05E8\u05D6\u05DC \u05D4\u05D7\u05DC\
+          . \u05D4\u05D5\u05D0 \u05D9\u05E9\u05EA\u05E8\u05E2 \u05DE\u05DF \u05D4\u05D3\
+          \u05E8\u05D5\u05DD, \u05D1\u05D5 \u05D4\u05D7\u05D5\u05DD \u05DE\u05D5\u05DC\
+          \u05D9\u05D3 \u05DE\u05D6\u05D9\u05DE\u05D5\u05EA, \u05EA\u05D0\u05D5\u05D5\
+          \u05EA \u05D5\u05E7\u05E0\u05D5\u05E0\u05D9\u05D5\u05EA; \u05D0\u05DC \u05D0\
+          \u05D3\u05DE\u05D5\u05EA \u05D4\u05DE\u05D6\u05E8\u05D7 \u05D4\u05E0\u05E8\
+          \u05D7\u05D1\u05D5\u05EA \u05D5\u05D4\u05E4\u05E8\u05D0\u05D9\u05D5\u05EA\
+          ; \u05DB\u05DC \u05D4\u05D3\u05E8\u05DA \u05D0\u05DC \u05D4\u05E6\u05E4\u05D5\
+          \u05DF \u05D4\u05E7\u05E4\u05D5\u05D0, \u05E9\u05DD \u05D7\u05D5\u05DE\u05EA\
+          \ \u05E7\u05E8\u05D7 \u05D0\u05D3\u05D9\u05E8\u05D4 \u05DE\u05D2\u05E0\u05D4\
+          \ \u05E2\u05DC \u05D4\u05DE\u05DE\u05DC\u05DB\u05D4 \u05DE\u05E4\u05E0\u05D9\
+          \ \u05DB\u05D5\u05D7\u05D5\u05EA \u05D4\u05D0\u05D5\u05E4\u05DC \u05D4\u05E9\
+          \u05D5\u05DB\u05E0\u05D9\u05DD \u05DE\u05E6\u05D3\u05D4 \u05D4\u05E9\u05E0\
+          \u05D9. \u05DE\u05DC\u05DB\u05D9\u05DD \u05D5\u05DE\u05DC\u05DB\u05D5\u05EA\
+          , \u05D0\u05D1\u05D9\u05E8\u05D9\u05DD \u05D5\u05E4\u05D5\u05E8\u05E2\u05D9\
+          \ \u05D7\u05D5\u05E7, \u05E9\u05E7\u05E8\u05E0\u05D9\u05DD, \u05D0\u05D3\
+          \u05D5\u05E0\u05D9\u05DD \u05D5\u05D0\u05E0\u05E9\u05D9\u05DD \u05D9\u05E9\
+          \u05E8\u05D9\u05DD. \u05E2\u05D5\u05DC\u05DD \u05D1\u05D5 \u05DE\u05EA\u05D1\
+          \u05E9\u05DC\u05D5\u05EA \u05E7\u05E0\u05D5\u05E0\u05D9\u05D5\u05EA \u05D1\
+          \u05E6\u05D5\u05E8\u05EA \u05E0\u05D9\u05E1\u05D9\u05D5\u05E0\u05D5\u05EA\
+          \ \u05E8\u05E6\u05D7 \u05D5\u05DE\u05D2\u05E2\u05D9\u05DD \u05D0\u05E1\u05D5\
+          \u05E8\u05D9\u05DD.\",\"language\":\"he\"},{\"title\":\"Urzeala tronurilor\"\
+          ,\"overview\":\"\",\"language\":\"ro\"},{\"title\":\"Game of Thrones\",\"\
+          overview\":\"George R.R. Martinin kirjoihin perustuva, eeppinen sarja valtataistelusta,\
+          \ kunniasta ja petoksesta myyttisess\xE4 Westerosissa\",\"language\":\"\
+          fi\"},{\"title\":\"\u0E40\u0E01\u0E21\u0E25\u0E48\u0E32\u0E1A\u0E31\u0E25\
+          \u0E25\u0E31\u0E07\u0E01\u0E4C\",\"overview\":\"\",\"language\":\"th\"},{\"\
+          title\":\"\uC655\uC88C\uC758 \uAC8C\uC784\",\"overview\":\"\uC218\uC2ED\
+          \ \uB144\uAC04 \uC774\uC5B4\uC9C4 \uC5EC\uB984, \uD558\uC9C0\uB9CC \uC774\
+          \uC81C \uC601\uC6D0\uD788 \uB05D\uB098\uC9C0 \uC54A\uC744 \uACA8\uC6B8\uC774\
+          \ \uB2E4\uAC00\uC628\uB2E4.\\n\\n\uADF8\uB9AC\uACE0... \uCCA0\uC655\uC88C\
+          \uB97C \uB458\uB7EC\uC2FC \uD608\uD22C\uAC00 \uC2DC\uC791\uB41C\uB2E4.\\\
+          n\\n\uC220\uC218\uC640 \uD0D0\uC695, \uC74C\uBAA8\uAC00 \uB09C\uBB34\uD558\
+          \uB294 \uB0A8\uBD80\uC5D0\uC11C \uC57C\uB9CC\uC774 \uC228 \uC26C\uB294 \uB3D9\
+          \uBD80\uC758 \uAD11\uD65C\uD55C \uB300\uC9C0, \uC5B4\uB460\uC758 \uC874\uC7AC\
+          \uB4E4\uB85C\uBD80\uD130 \uC655\uAD6D\uC744 \uC9C0\uD0A4\uAE30 \uC704\uD574\
+          \ 250M \uB192\uC774\uC758 \uC7A5\uBCBD\uC744 \uC313\uC740 \uBD81\uBD80\uC5D0\
+          \ \uC774\uB974\uAE30\uAE4C\uC9C0 \uD3BC\uCCD0\uC9C0\uB294 \uB300\uC11C\uC0AC\
+          \uC2DC.\\n\\n\uC655\uB4E4\uACFC \uC655\uBE44\uB4E4, \uAE30\uC0AC\uB4E4\uACFC\
+          \ \uBC30\uC2E0\uC790\uB4E4, \uBAA8\uB7B5\uAC00\uB4E4, \uC601\uC8FC\uB4E4\
+          \uACFC \uC815\uC9C1\uD55C \uC778\uBB3C\uB4E4\uC774 \uC655\uC88C\uC758 \uAC8C\
+          \uC784\uC744 \uBC8C\uC778\uB2E4.\",\"language\":\"ko\"},{\"title\":\"\u0413\
+          \u0440\u0430 \u041F\u0440\u0435\u0441\u0442\u043E\u043B\u0456\u0432\",\"\
+          overview\":\"\u0421\u0435\u0440\u0456\u0430\u043B \\\"\u0413\u0440\u0430\
+          \ \u041F\u0440\u0435\u0441\u0442\u043E\u043B\u0456\u0432\\\" \u0437\u043D\
+          \u044F\u0442\u043E \u0437\u0430 \u0441\u044E\u0436\u0435\u0442\u043E\u043C\
+          \ \u0444\u0435\u043D\u0442\u0435\u0437\u0456-\u0431\u0435\u0441\u0442\u0441\
+          \u0435\u043B\u0435\u0440\u0456\u0432 \\\"\u041F\u0456\u0441\u043D\u044F\
+          \ \u043B\u044C\u043E\u0434\u0443 \u0456 \u043F\u043E\u043B\u0443\u043C'\u044F\
+          \\\" \u0414\u0436\u043E\u0440\u0434\u0436\u0430 \u0420.\u0420. \u041C\u0430\
+          \u0440\u0442\u0456\u043D\u0430 (\u0432\u043E\u043B\u043E\u0434\u0430\u0440\
+          \u044F \u043F\u0440\u0435\u043C\u0456\u0439 \u0413'\u044E\u0491\u043E \u0442\
+          \u0430 \u041D\u0435\u0431'\u044E\u043B\u0430). \u0417 \u043C\u043E\u043C\
+          \u0435\u043D\u0442\u0443 \u0441\u0432\u043E\u0433\u043E \u0441\u0442\u0432\
+          \u043E\u0440\u0435\u043D\u043D\u044F \\\"\u0413\u0440\u0430 \u041F\u0440\
+          \u0435\u0441\u0442\u043E\u043B\u0456\u0432\\\" \u0441\u0442\u0430\u0432\
+          \ \u043E\u0434\u043D\u0438\u043C \u0437 \u043D\u0430\u0439\u0434\u043E\u0440\
+          \u043E\u0436\u0447\u0438\u0445 \u0444\u0435\u043D\u0442\u0435\u0437\u0456\
+          -\u0441\u0435\u0440\u0456\u0430\u043B\u0456\u0432 \u0432 \u0456\u0441\u0442\
+          \u043E\u0440\u0456\u0457 \u0442\u0435\u043B\u0435\u0431\u0430\u0447\u0435\
+          \u043D\u043D\u044F. \u0426\u0435 \u043E\u0434\u043D\u0430 \u0437 \u043F\u0440\
+          \u0438\u0447\u0438\u043D, \u0437 \u044F\u043A\u043E\u0457 \u0442\u0435\u043B\
+          \u0435\u043A\u0440\u0438\u0442\u0438\u043A\u0438 \u0432\u0432\u0430\u0436\
+          \u0430\u044E\u0442\u044C \u0441\u0435\u0440\u0456\u0430\u043B \u0433\u043E\
+          \u043B\u043E\u0432\u043D\u0438\u043C \u043F\u0440\u0435\u0442\u0435\u043D\
+          \u0434\u0435\u043D\u0442\u043E\u043C \u043D\u0430 \u043B\u0430\u0432\u0440\
+          \u0438 \\\"\u0412\u043E\u043B\u043E\u0434\u0430\u0440\u0430 \u043F\u0435\
+          \u0440\u0441\u0442\u0435\u043D\u0456\u0432\\\" (\u044F\u043A \u043F\u0435\
+          \u0440\u0448\u043E\u0432\u0456\u0434\u043A\u0440\u0438\u0432\u0430\u0447\
+          \u0430 \u0436\u0430\u043D\u0440\u0443) \u043D\u0430 \u0442\u0435\u043B\u0435\
+          \u0431\u0430\u0447\u0435\u043D\u043D\u0456.\\n\\n\u041F\u043E\u0434\u0456\
+          \u0457 \u0441\u0435\u0440\u0456\u0430\u043B\u0443 \u0440\u043E\u0437\u0433\
+          \u043E\u0440\u0442\u0430\u044E\u0442\u044C\u0441\u044F \u0443 \u0444\u0435\
+          \u043D\u0442\u0435\u0437\u0456\u0439\u043D\u043E\u043C\u0443 \u0441\u0432\
+          \u0456\u0442\u0456, \u043C\u0435\u0448\u043A\u0430\u043D\u0446\u044F\u043C\
+          \u0438 \u044F\u043A\u043E\u0433\u043E - \u0430\u043C\u0431\u0456\u0446\u0456\
+          \u0439\u043D\u0456 \u0447\u043E\u043B\u043E\u0432\u0456\u043A\u0438 \u0442\
+          \u0430 \u0436\u0456\u043D\u043A\u0438, \u043A\u043E\u0442\u0440\u0438\u043C\
+          \ \u043F\u0440\u0438\u0442\u0430\u043C\u0430\u043D\u043D\u0456 \u044F\u043A\
+          \ \u0433\u0456\u0434\u043D\u0456\u0441\u0442\u044C, \u0442\u0430\u043A \u0456\
+          \ \u0440\u043E\u0437\u043F\u0443\u0441\u0442\u0430. \u041D\u0430\u0439\u0446\
+          \u0456\u043D\u043D\u0456\u0448\u0430 \u0440\u0456\u0447 \u0443 \u0446\u044C\
+          \u043E\u043C\u0443 \u041A\u043E\u0440\u043E\u043B\u0456\u0432\u0441\u0442\
+          \u0432\u0456 \u2013 \u0417\u0430\u043B\u0456\u0437\u043D\u0438\u0439 \u0422\
+          \u0440\u043E\u043D. \u0422\u043E\u0439, \u0445\u0442\u043E \u043D\u0438\u043C\
+          \ \u0432\u043E\u043B\u043E\u0434\u0456\u0454, \u043E\u0442\u0440\u0438\u043C\
+          \u0443\u0454 \u043D\u0435\u0439\u043C\u043E\u0432\u0456\u0440\u043D\u0443\
+          \ \u0432\u043B\u0430\u0434\u0443 \u0456 \u0432\u0438\u0437\u043D\u0430\u043D\
+          \u043D\u044F.\\n\\n\u0417\u0430 \u043F\u0430\u043D\u0443\u0432\u0430\u043D\
+          \u043D\u044F \u0443 \u041A\u043E\u0440\u043E\u043B\u0456\u0432\u0441\u0442\
+          \u0432\u0456 \u0431\u043E\u0440\u0435\u0442\u044C\u0441\u044F \u043E\u0434\
+          \u0440\u0430\u0437\u0443 \u0434\u0435\u043A\u0456\u043B\u044C\u043A\u0430\
+          \ \u0432\u0456\u0434\u043E\u043C\u0438\u0445 \u0440\u043E\u0434\u0438\u043D\
+          . \u0421\u0435\u0440\u0435\u0434 \u043D\u0438\u0445: \u0431\u043B\u0430\u0433\
+          \u043E\u0440\u043E\u0434\u043D\u0456 \u0421\u0442\u0430\u0440\u043A\u0438\
+          , \u0437\u043C\u043E\u0432\u043D\u0438\u043A\u0438 \u041B\u0430\u043D\u043D\
+          \u0456\u0441\u0442\u0435\u0440\u0438, \u043F\u0440\u0438\u043D\u0446\u0435\
+          \u0441\u0430 \u0434\u0440\u0430\u043A\u043E\u043D\u0456\u0432 \u0414\u0435\
+          \u0439\u043D\u0435\u0440\u0456\u0441 \u0456 \u0457\u0457 \u0436\u043E\u0440\
+          \u0441\u0442\u043E\u043A\u0438\u0439 \u0431\u0440\u0430\u0442 \u0412\u0456\
+          \u0437\u0435\u0440\u0456\u0441.\\n\\n\\\"\u0413\u0440\u0430 \u043F\u0440\
+          \u0435\u0441\u0442\u043E\u043B\u0456\u0432\\\" \u2013 \u0446\u0435 \u0456\
+          \u0441\u0442\u043E\u0440\u0456\u044F \u043F\u0440\u043E \u0434\u0432\u043E\
+          \u0432\u043B\u0430\u0434\u0434\u044F \u0456 \u0437\u0440\u0430\u0434\u0443\
+          , \u0433\u0456\u0434\u043D\u0456\u0441\u0442\u044C \u0456 \u0431\u0435\u0437\
+          \u0447\u0435\u0441\u0442\u044F, \u0437\u0430\u0432\u043E\u044E\u0432\u0430\
+          \u043D\u043D\u044F \u0439 \u0442\u0440\u0456\u0443\u043C\u0444. \u0406 \u043A\
+          \u043E\u0436\u043D\u043E\u0433\u043E \u0443\u0447\u0430\u0441\u043D\u0438\
+          \u043A\u0430 \u0446\u0456\u0454\u0457 \u0433\u0440\u0438 \u043E\u0447\u0456\
+          \u043A\u0443\u0454 \u0430\u0431\u043E \u043F\u0435\u0440\u0435\u043C\u043E\
+          \u0433\u0430, \u0430\u0431\u043E \u0441\u043C\u0435\u0440\u0442\u044C.\"\
+          ,\"language\":\"uk\"},{\"title\":\"Kr\xFAnuleikar\",\"overview\":\"\",\"\
+          language\":\"is\"},{\"title\":\"Sost\u0173 karai\",\"overview\":\"\",\"\
+          language\":\"lt\"},{\"title\":\"Igra Prijestolja\",\"overview\":\"Game of\
+          \ Thrones (Igra Prijestolja) srednjovjekovna je fantazija bazirana na seriji\
+          \ romana Georgea R. R. Martina smje\u0161tena u izmi\u0161ljenom svijetu\
+          \ Sedam kraljevina i prati dinasti\u010Dka previranja i borbu nekoliko Ku\u0107\
+          a za kontrolu nad \u017Deljeznim prijestoljem. Osim me\u0111usobnih borbi\
+          \ plemi\u0107kih obitelji, stanovni\u0161tvu prijeti natprirodna invazija\
+          \ s ledenog sjevera, prognana zmajeva princeza koja \u017Eeli povratiti\
+          \ obiteljsko naslije\u0111e te zima koja \u0107e trajati godinama.\\n\\\
+          nNakon sumnjive smrti namjesnika kralja Roberta Baratheona, on sa svojom\
+          \ kraljicom Cersei iz bogate i iskvarene obitelji Lannister kre\u0107e na\
+          \ putovanje na sjever svome prijatelju knezu Eddardu Starku od O\u0161trozimlja,\
+          \ od kojega zatra\u017Ei za postane novi Kraljev Namjesnik. Eddard nevoljko\
+          \ pristaje i tu zapo\u010Dinje epska pri\u010Da o \u010Dasti i izdaji, ljubavi\
+          \ i mr\u017Enji, tajnama i osveti...\",\"language\":\"hr\"},{\"title\":\"\
+          Game of Thrones\",\"overview\":\"Game of Thrones (Igra Prijestolja) srednjovjekovna\
+          \ je fantazija bazirana na seriji romana Georgea R. R. Martina smje\u0161\
+          tena u izmi\u0161ljenom svijetu Sedam kraljevina i prati dinasti\u010Dka\
+          \ previranja i borbu nekoliko Ku\u0107a za kontrolu nad \u017Deljeznim prijestoljem.\
+          \ Osim me\u0111usobnih borbi plemi\u0107kih obitelji, stanovni\u0161tvu\
+          \ prijeti natprirodna invazija s ledenog sjevera, prognana zmajeva princeza\
+          \ koja \u017Eeli povratiti obiteljsko naslije\u0111e te zima koja \u0107\
+          e trajati godinama.\\n\\nNakon sumnjive smrti namjesnika kralja Roberta\
+          \ Baratheona, on sa svojom kraljicom Cersei iz bogate i iskvarene obitelji\
+          \ Lannister kre\u0107e na putovanje na sjever svome prijatelju knezu Eddardu\
+          \ Starku od O\u0161trozimlja, od kojega zatra\u017Ei za postane novi Kraljev\
+          \ Namjesnik. Eddard nevoljko pristaje i tu zapo\u010Dinje epska pri\u010D\
+          a o \u010Dasti i izdaji, ljubavi i mr\u017Enji, tajnama i osveti...\",\"\
+          language\":\"bs\"},{\"title\":\"Game of Thrones\",\"overview\":\"\",\"language\"\
+          :\"ar\"},{\"title\":\"Game of Thrones\",\"overview\":\"\",\"language\":\"\
+          id\"},{\"title\":\"\u51B0\u8207\u706B\u4E4B\u6B4C\uFF1A\u6B0A\u529B\u904A\
+          \u6232\",\"overview\":\"\",\"language\":\"tw\"},{\"title\":\"Game of Thrones\"\
+          ,\"overview\":\"\",\"language\":\"lb\"},{\"title\":\"Game of Thrones\",\"\
+          overview\":\"\",\"language\":\"vi\"}]"}
+      headers:
+        CF-Cache-Status: [HIT]
+        CF-RAY: [2c4c2a5caea80b1a-SYD]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Tue, 19 Jul 2016 06:37:33 GMT']
+        ETag: [W/"f95c3dd4a0f85cf0b719de4a5b58a29e"]
+        Expires: ['Tue, 19 Jul 2016 10:37:33 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=df8e8c5bbbeb1ea9954bc52c904b7ca3f1468910253; expires=Wed,
+            19-Jul-17 06:37:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [0e36ed3a-3f90-456d-9743-d4ab92c048e6]
+        X-Runtime: ['0.030045']
+        X-XSS-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1

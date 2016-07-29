@@ -1,24 +1,28 @@
+/* global angular */
 (function () {
-  'use strict';
-  angular
-    .module("flexget.plugins.history")
-    .component('historyView', {
-      templateUrl: 'plugins/history/history.tmpl.html',
-      controllerAs: 'vm',
-      controller: historyController,
-    });
+	'use strict';
 
-  function historyController($http) {
-    var vm = this;
+	angular
+		.module('plugins.history')
+		.component('historyView', {
+			templateUrl: 'plugins/history/history.tmpl.html',
+			controllerAs: 'vm',
+			controller: historyController
+		});
 
-    vm.title = 'History';
-    $http.get('/api/history/')
-      .success(function (data) {
-        vm.entries = data['entries'];
-      })
-      .error(function (data, status, headers, config) {
-        // log error
-      });
-  }
+	function historyController(historyService) {
+		var vm = this;
 
-})();
+		vm.$onInit = activate;
+
+		function activate() {
+			getHistory();
+		}
+
+		function getHistory() {
+			return historyService.getHistory().then(function (data) {
+				vm.entries = data.entries;
+			});
+		}
+	}
+}());

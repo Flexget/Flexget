@@ -3,7 +3,6 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.xmlrpc import client as xmlrpc_client
 from future.moves.urllib.parse import urlparse
 from future.utils import native_str
-from future.utils import PY3
 
 import logging
 import os
@@ -25,6 +24,7 @@ log = logging.getLogger('rtorrent')
 class _Method(object):
     # some magic to bind an XML-RPC method to an RPC server.
     # supports "nested" methods (e.g. examples.getStateName)
+
     def __init__(self, send, name):
         self.__send = send
         self.__name = name
@@ -61,7 +61,7 @@ class SCGITransport(xmlrpc_client.Transport):
                 host = parsed_host.hostname
                 port = parsed_host.port
 
-                addr_info = socket.getaddrinfo(host, int(port), socket.AF_INET, socket.SOCK_STREAM)
+                addr_info = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
                 sock = socket.socket(*addr_info[0][:3])
                 sock.connect(addr_info[0][4])
             else:
@@ -92,7 +92,7 @@ class SCGITransport(xmlrpc_client.Transport):
             log.info('body: %s', repr(response_body))
 
         # Remove SCGI headers from the response.
-        response_header, response_body = re.split(r'\n\s*?\n', response_body, maxsplit=1)
+        _, response_body = re.split(r'\n\s*?\n', response_body, maxsplit=1)
         p.feed(response_body)
         p.close()
 
@@ -106,7 +106,7 @@ class SCGIServerProxy(object):
                  verbose=False, allow_none=False, use_datetime=False):
         parsed_url = urlparse(uri)
         self.__host = uri if parsed_url.scheme else None
-        self.__handler = urlparse(uri).path
+        self.__handler = parsed_url.path
         if not self.__handler:
             self.__handler = '/'
 
@@ -400,7 +400,8 @@ class RTorrentPluginBase(object):
 
     def on_task_start(self, task, config):
         try:
-            client = RTorrent(config['uri'], username=config.get('username'),
+            client = RTorrent(os.path.expanduser(config['uri']),
+                              username=config.get('username'),
                               password=config.get('password'))
             if client.version < [0, 9, 2]:
                 log.error('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
@@ -435,13 +436,15 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
     }
 
     def _verify_load(self, client, info_hash):
-        for i in range(0, 5):
+        e = IOError()
+        for _ in range(0, 5):
             try:
                 return client.torrent(info_hash, fields=['hash'])
-            except (IOError, xmlrpc_client.Error):
+            except (IOError, xmlrpc_client.Error) as e:
                 sleep(0.5)
-        raise
+        raise e
 
+    @plugin.priority(120)
     def on_task_download(self, task, config):
         # If the download plugin is not enabled, we need to call it to get
         # our temp .torrent files
@@ -449,8 +452,10 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             download = plugin.get_plugin_by_name('download')
             download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
+    @plugin.priority(135)
     def on_task_output(self, task, config):
-        client = RTorrent(config['uri'], username=config.get('username'),
+        client = RTorrent(os.path.expanduser(config['uri']),
+                          username=config.get('username'),
                           password=config.get('password'))
 
         for entry in task.accepted:
@@ -540,13 +545,11 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         else:
             # Check that file is downloaded
             if 'file' not in entry:
-                entry.fail('file missing?')
-                return
+                raise plugin.PluginError('Temporary download file is missing from entry')
 
             # Verify the temp file exists
             if not os.path.exists(entry['file']):
-                entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
-                return
+                raise plugin.PluginError('Temporary download file is missing from disk')
 
             # Verify valid torrent file
             if not is_torrent_file(entry['file']):
@@ -618,7 +621,8 @@ class RTorrentInputPlugin(RTorrentPluginBase):
     }
 
     def on_task_input(self, task, config):
-        client = RTorrent(config['uri'], username=config.get('username'),
+        client = RTorrent(os.path.expanduser(config['uri']),
+                          username=config.get('username'),
                           password=config.get('password'))
 
         fields = config.get('fields')
@@ -634,7 +638,8 @@ class RTorrentInputPlugin(RTorrentPluginBase):
         for torrent in torrents:
             entry = Entry(
                 title=torrent['name'],
-                url='%s/%s' % (config['uri'], torrent['hash']),
+                url='%s/%s' % (os.path.expanduser(config['uri']),
+                               torrent['hash']),
                 path=torrent['base_path'],
                 torrent_info_hash=torrent['hash'],
             )

@@ -11,7 +11,6 @@ from flexget.event import event
 
 log = logging.getLogger('cli_config')
 
-
 """
 Allows specifying yml configuration values from commandline parameters.
 

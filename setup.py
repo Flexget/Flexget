@@ -4,14 +4,13 @@ import sys
 
 from setuptools import setup, find_packages
 
-
 with io.open('README.rst', encoding='utf-8') as readme:
     long_description = readme.read()
 
 # Populates __version__ without importing the package
 __version__ = None
 with io.open('flexget/_version.py', encoding='utf-8')as ver_file:
-    exec(ver_file.read())
+    exec(ver_file.read())  # pylint: disable=W0122
 if not __version__:
     print('Could not find __version__ from flexget/_version.py')
     sys.exit(1)
@@ -33,7 +32,7 @@ setup(
     license='MIT',
     url='http://flexget.com',
     download_url='http://download.flexget.com',
-    packages=find_packages(exclude=['tests']),
+    packages=find_packages(exclude=['flexget/tests']),
     include_package_data=True,
     zip_safe=False,
     install_requires=load_requirements('requirements.txt'),

@@ -41,7 +41,7 @@ class PluginUtorrent(object):
         'required': ['username', 'password', 'url'],
         'additionalProperties': False
     }
-    
+
     @plugin.priority(120)
     def on_task_download(self, task, config):
         """
@@ -52,7 +52,7 @@ class PluginUtorrent(object):
         # our temp .torrent files
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
-            for entry in task.accepted:
+            for _ in task.accepted:
                 download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
     @plugin.priority(135)
@@ -81,10 +81,10 @@ class PluginUtorrent(object):
         token = get_soup(response.text).find('div', id='token').text
         result = session.get(url, auth=auth, params={'action': 'list-dirs', 'token': token}).json()
         download_dirs = dict((os.path.normcase(dir['path']), i) for i, dir in enumerate(result['download-dirs']))
-        
+
         for entry in task.accepted:
             # bunch of urls now going to check
-            
+
             folder = 0
             path = entry.get('path', config.get('path', ''))
             try:
@@ -95,7 +95,7 @@ class PluginUtorrent(object):
                 path = ''
             if path:
                 path_normcase = os.path.normcase(path)
-                
+
                 for dir in download_dirs:
                     if path_normcase.startswith(dir):
                         folder = download_dirs[dir]
@@ -113,12 +113,12 @@ class PluginUtorrent(object):
 
             # Get downloaded
             downloaded = not entry['url'].startswith('magnet:')
-            
+
             # Check that file is downloaded
             if downloaded and 'file' not in entry:
                 entry.fail('file missing?')
                 continue
-                
+
             # Verify the temp file exists
             if downloaded and not os.path.exists(entry['file']):
                 tmp_path = os.path.join(task.manager.config_base, 'temp')
@@ -126,7 +126,7 @@ class PluginUtorrent(object):
                 log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
                 entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                 continue
-            
+
             # Add torrent
             if downloaded:
                 # HTTP://[IP]:[PORT]/GUI/?ACTION=ADD-FILE
@@ -137,7 +137,7 @@ class PluginUtorrent(object):
                 # http://[IP]:[PORT]/gui/?action=add-url&s=[TORRENT URL]
                 data = {'action': 'add-url', 's': entry['url'], 'token': token, 'download_dir': folder, 'path': path}
                 result = session.get(url, params=data, auth=auth)
-                
+
             # Check result
             if 'build' in result.json():
                 log.info('Added `%s` to utorrent' % entry['url'])
@@ -151,7 +151,7 @@ class PluginUtorrent(object):
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
             download.instance.cleanup_temp_files(task)
-            
+
     on_task_abort = on_task_exit
 
 

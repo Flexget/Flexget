@@ -15,7 +15,6 @@ log = logging.getLogger('exists')
 
 
 class FilterExists(object):
-
     """
         Reject entries that already exist in given path.
 

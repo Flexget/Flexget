@@ -166,7 +166,7 @@ class PluginFailed(object):
             log.debug('Marking %s in failed list. Has failed %s times.' % (item.title, item.count))
             if self.backlog and item.count <= config['max_retries']:
                 self.backlog.instance.add_backlog(entry.task, entry, amount=retry_time, session=session)
-            entry.task.rerun()
+            entry.task.rerun(plugin='retry_failed')
 
     @plugin.priority(255)
     def on_task_filter(self, task, config):

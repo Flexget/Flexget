@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.utils import old_div
-from future.moves.urllib.parse import urlencode
+from future.moves.urllib.parse import urlencode, quote
 
 import logging
 
@@ -77,13 +77,13 @@ class Newznab(object):
 
         for rss_entry in rss.entries:
             new_entry = Entry()
-            
+
             for key in list(rss_entry.keys()):
                 new_entry[key] = rss_entry[key]
             new_entry['url'] = new_entry['link']
             if rss_entry.enclosures:
                 size = int(rss_entry.enclosures[0]['length'])  # B
-                new_entry['content_size'] = old_div(size, 2**20)       # MB
+                new_entry['content_size'] = old_div(size, 2 ** 20)  # MB
             entries.append(new_entry)
         return entries
 
@@ -100,16 +100,14 @@ class Newznab(object):
 
     def do_search_tvsearch(self, arg_entry, task, config=None):
         log.info('Searching for %s' % (arg_entry['title']))
-        # normally this should be used with emit_series who has provided season and episodenumber
+        # normally this should be used with next_series_episodes who has provided season and episodenumber
         if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
             return []
-        if 'tvrage_id' not in arg_entry:
-            # TODO: Is newznab replacing tvrage with something else? Update this.
-            log.warning('tvrage lookup support is gone, someone needs to update this plugin!')
-            return []
-
-        url = (config['url'] + '&rid=%s&season=%s&ep=%s' %
-               (arg_entry['tvrage_id'], arg_entry['series_season'], arg_entry['series_episode']))
+        if arg_entry.get('tvrage_id'):
+            lookup = '&rid=%s' % arg_entry.get('tvrage_id')
+        else:
+            lookup = '&q=%s' % quote(arg_entry['series_name'])
+        url = config['url'] + lookup + '&season=%s&ep=%s' % (arg_entry['series_season'], arg_entry['series_episode'])
         return self.fill_entries_for_url(url, task)
 
     def do_search_movie(self, arg_entry, task, config=None):
@@ -122,6 +120,7 @@ class Newznab(object):
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
         url = config['url'] + '&imdbid=' + imdb_id
         return self.fill_entries_for_url(url, task)
+
 
 @event('plugin.register')
 def register_plugin():

@@ -3,15 +3,28 @@ from __future__ import unicode_literals, division, absolute_import
 import copy
 
 from flask import jsonify
+from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.plugins.api_trakt import ApiTrakt as at
+from flexget.plugins.api_trakt import ApiTrakt as at, list_actors, get_translations
 
 trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 
 
 class objects_container(object):
     images_object = {'type': 'array', 'items': {'type': 'string'}}
+
+    translation_object = {
+        'type': 'object',
+        'properties': {
+            'language': {'type': 'object',
+                         'properties': {
+                             "overview": {'type': 'string'},
+                             "tagline": {'type': 'string'},
+                             "title": {'type': 'string'},
+                         }}
+        }
+    }
 
     actor_object = {
         'type': 'object',
@@ -32,6 +45,7 @@ class objects_container(object):
     base_return_object = {
         'type': 'object',
         'properties': {
+            'translations': translation_object,
             'actors': {'type': 'array', 'items': actor_object},
             'cached_at': {'type': 'string', 'format': 'date-time'},
             'genres': {'type': 'array', 'items': 'string'},
@@ -76,7 +90,6 @@ series_return_schema = api.schema('series_return_schema', objects_container.seri
 movie_return_schema = api.schema('movie_return_schema', objects_container.movie_return_object)
 
 lookup_parser = api.parser()
-lookup_parser.add_argument('title', required=True, help='Lookup title')
 lookup_parser.add_argument('year', type=int, help='Lookup year')
 lookup_parser.add_argument('trakt_id', type=int, help='Trakt ID')
 lookup_parser.add_argument('trakt_slug', help='Trakt slug')
@@ -84,37 +97,59 @@ lookup_parser.add_argument('tmdb_id', type=int, help='TMDB ID')
 lookup_parser.add_argument('imdb_id', help='IMDB ID')
 lookup_parser.add_argument('tvdb_id', type=int, help='TVDB ID')
 lookup_parser.add_argument('tvrage_id', type=int, help='TVRage ID')
+lookup_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
+lookup_parser.add_argument('include_translations', type=inputs.boolean, help='Include translations in response')
 
 
-@trakt_api.route('/series/')
+@trakt_api.route('/series/<string:title>/')
+@api.doc(params={'title': 'Series name'})
 class TraktSeriesSearchApi(APIResource):
+
     @api.response(200, 'Successfully found show', series_return_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.doc(parser=lookup_parser)
-    def get(self, session=None):
+    def get(self, title, session=None):
         args = lookup_parser.parse_args()
+        include_actors = args.pop('include_actors')
+        include_translations = args.pop('include_translations')
+        kwargs = args
+        kwargs['title'] = title
         try:
-            result = at.lookup_series(session=session, **args)
+            series = at.lookup_series(session=session, **kwargs)
         except LookupError as e:
             return {'status': 'error',
                     'message': e.args[0]
                     }, 404
+        result = series.to_dict()
+        if include_actors:
+            result["actors"] = list_actors(series.actors),
+        if include_translations:
+            result["translations"] = get_translations(series.translate)
+        return jsonify(result)
 
-        return jsonify(result.to_dict())
 
-
-@trakt_api.route('/movie/')
+@trakt_api.route('/movies/<string:title>/')
+@api.doc(params={'title': 'Movie name'})
 class TraktMovieSearchApi(APIResource):
+
     @api.response(200, 'Successfully found show', movie_return_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.doc(parser=lookup_parser)
-    def get(self, session=None):
+    def get(self, title, session=None):
         args = lookup_parser.parse_args()
+        include_actors = args.pop('include_actors')
+        include_translations = args.pop('include_translations')
+        kwargs = args
+        kwargs['title'] = title
         try:
-            result = at.lookup_movie(session=session, **args)
+            movie = at.lookup_movie(session=session, **kwargs)
         except LookupError as e:
             return {'status': 'error',
                     'message': e.args[0]
                     }, 404
-
-        return jsonify(result.to_dict())
+        result = movie.to_dict()
+        if include_actors:
+            result["actors"] = list_actors(movie.actors)
+        if include_translations:
+            result["translations"] = get_translations(movie.translate)
+        return jsonify(result)

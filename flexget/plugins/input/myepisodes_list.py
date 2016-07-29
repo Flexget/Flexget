@@ -58,7 +58,7 @@ class MyEpisodesList(object):
             loginsrc = task.requests.post(URL + 'login.php?action=login', data=params).content
             if str(username) not in loginsrc:
                 raise plugin.PluginWarning(('Login to myepisodes.com failed, please check '
-                                 'your account data or see if the site is down.'), log)
+                                            'your account data or see if the site is down.'), log)
 
         page = task.requests.get(URL + "myshows/manage/").content
         try:

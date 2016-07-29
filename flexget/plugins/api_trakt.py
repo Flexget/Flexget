@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import, print_function
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from past.builtins import basestring
 
 import logging
 import re
 import time
+
 from datetime import datetime, timedelta
-
-
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from dateutil.parser import parse as dateutil_parse
-from past.builtins import basestring
-from sqlalchemy import Table, Column, Integer, String, Unicode, Date, DateTime, Time, or_, func
+from sqlalchemy import Table, Column, Integer, String, Unicode, Date, DateTime, Time, or_, and_
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
@@ -21,7 +20,7 @@ from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
-from flexget.utils import requests, json
+from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.tools import TimedDict
@@ -102,17 +101,17 @@ def device_auth():
                 interval += 1
         raise plugin.PluginError('User code has expired. Please try again.')
     except requests.RequestException as e:
-        raise plugin.PluginError('Device authorization with Trakt.tv failed: {0}'.format(e.args[0]))
+        raise plugin.PluginError('Device authorization with Trakt.tv failed: {0}'.format(e))
 
 
 def token_auth(data):
     try:
         return requests.post(get_api_url('oauth/token'), data=data).json()
     except requests.RequestException as e:
-        raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e.args[0]))
+        raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e))
 
 
-def get_access_token(account, token=None, refresh=False, re_auth=False):
+def get_access_token(account, token=None, refresh=False, re_auth=False, called_from_cli=False):
     """
     Gets authorization info from a pin or refresh token.
     :param account: Arbitrary account name to attach authorization to.
@@ -142,9 +141,12 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
                 data['grant_type'] = 'authorization_code'
                 data['redirect_uri'] = 'urn:ietf:wg:oauth:2.0:oob'
                 token_dict = token_auth(data)
-            else:
+            elif called_from_cli:
                 log.debug('No pin specified for an unknown account %s. Attempting to authorize device.', account)
                 token_dict = device_auth()
+            else:
+                raise plugin.PluginError('Account %s has not been authorized. See `flexget trakt auth -h` on how to.' %
+                                         account)
             try:
                 access_token = token_dict['access_token']
                 refresh_token = token_dict['refresh_token']
@@ -161,7 +163,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
                     session.add(acc)
                 return access_token
             except requests.RequestException as e:
-                raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e.args[0]))
+                raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e))
 
 
 def make_list_slug(name):
@@ -284,14 +286,15 @@ def get_translation(ident, style):
         results = req_session.get(url, params={'extended': 'full,images'}).json()
         with Session() as session:
             for result in results:
-                translate = session.query(TraktTranslate).filter(
-                    TraktTranslate.language == result.get('language')).first()
+                translate = session.query(TraktTranslate).filter(and_(
+                    TraktTranslate.language == result.get('language'),
+                    TraktTranslate.title == result.get('title'))).first()
                 if not translate:
                     translate = TraktTranslate(result, session)
                 translations.append(translate)
         return translations
     except requests.RequestException as e:
-        log.debug('Error adding translations to trakt id %s : %s'.format(ident, e))
+        log.debug('Error adding translations to trakt id {} : {}'.format(ident, e))
 
 
 trans_show_table = Table('show_trans', Base.metadata,
@@ -447,7 +450,7 @@ def get_db_images(image, session):
             images.append(im)
         return images
     except TypeError as e:
-        log.debug('Error has Occured during images: %s' % e.args[0])
+        log.debug('Error has Occured during images: %s', e)
         return
 
 
@@ -619,7 +622,7 @@ class TraktShow(Base):
             "overview": self.overview,
             "first_aired": self.first_aired,
             "air_day": self.air_day,
-            "air_time": self.air_time.strftime("%H:%M"),
+            "air_time": self.air_time.strftime("%H:%M") if self.air_time else None,
             "timezone": self.timezone,
             "runtime": self.runtime,
             "certification": self.certification,
@@ -632,7 +635,6 @@ class TraktShow(Base):
             "homepage": self.homepage,
             "number_of_aired_episodes": self.aired_episodes,
             "genres": [g.name for g in self.genres],
-            "actors": list_actors(self.actors),
             "updated_at": self.updated_at,
             "cached_at": self.cached_at,
             "images": list_images(self.images)
@@ -674,8 +676,8 @@ class TraktShow(Base):
                     'trailer', 'homepage']:
             setattr(self, col, trakt_show.get(col))
 
-        self.genres[:] = get_db_genres(trakt_show.get('genres', []), session)
-        self.translations[:] = get_db_trans(trakt_show.get('available_translations', []), session)
+        self.genres[:] = get_db_genres(trakt_show.get('genres') or [], session)
+        self.translations[:] = get_db_trans(trakt_show.get('available_translations') or [], session)
         self.cached_at = datetime.now()
 
     def get_episode(self, season, number, session, only_cached=False):
@@ -783,7 +785,6 @@ class TraktMovie(Base):
             "homepage": self.homepage,
             "trailer": self.trailer,
             "genres": [g.name for g in self.genres],
-            "actors": list_actors(self.actors),
             "updated_at": self.updated_at,
             "cached_at": self.cached_at,
             "images": list_images(self.images)
@@ -801,7 +802,7 @@ class TraktMovie(Base):
         for col in ['title', 'overview', 'runtime', 'rating', 'votes',
                     'language', 'tagline', 'year', 'trailer', 'homepage']:
             setattr(self, col, trakt_movie.get(col))
-        if self.released:
+        if trakt_movie.get('released'):
             self.released = dateutil_parse(trakt_movie.get('released'), ignoretz=True)
         self.updated_at = dateutil_parse(trakt_movie.get('updated_at'), ignoretz=True)
         self.genres[:] = get_db_genres(trakt_movie.get('genres', []), session)
@@ -847,6 +848,13 @@ class TraktShowSearchResult(Base):
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=True)
     series = relation(TraktShow, backref='search_strings')
 
+    def __init__(self, search, series_id=None, series=None):
+        self.search = search.lower()
+        if series_id:
+            self.series_id = series_id
+        if series:
+            self.series = series
+
 
 class TraktMovieSearchResult(Base):
     __tablename__ = 'trakt_movie_search_results'
@@ -855,6 +863,13 @@ class TraktMovieSearchResult(Base):
     search = Column(Unicode, unique=True, nullable=False)
     movie_id = Column(Integer, ForeignKey('trakt_movies.id'), nullable=True)
     movie = relation(TraktMovie, backref='search_strings')
+
+    def __init__(self, search, movie_id=None, movie=None):
+        self.search = search.lower()
+        if movie_id:
+            self.movie_id = movie_id
+        if movie:
+            self.movie = movie
 
 
 def split_title_year(title):
@@ -1050,8 +1065,7 @@ class ApiTrakt(object):
         title = lookup_params.get('title', '')
         found = None
         if not series and title:
-            found = session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
-                                                                title.lower()).first()
+            found = session.query(TraktShowSearchResult).filter(TraktShowSearchResult.search == title.lower()).first()
             if found and found.series:
                 log.debug('Found %s in previous search results as %s', title, found.series.title)
                 series = found.series
@@ -1077,8 +1091,7 @@ class ApiTrakt(object):
         if series and title.lower() == series.title.lower():
             return series
         elif series and not found:
-            if not session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
-                                                                       title.lower()).first():
+            if not session.query(TraktShowSearchResult).filter(TraktShowSearchResult.search == title.lower()).first():
                 log.debug('Adding search result to db')
                 session.add(TraktShowSearchResult(search=title, series=series))
         elif series and found:
@@ -1093,8 +1106,7 @@ class ApiTrakt(object):
         title = lookup_params.get('title', '')
         found = None
         if not movie and title:
-            found = session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
-                                                                 title.lower()).first()
+            found = session.query(TraktMovieSearchResult).filter(TraktMovieSearchResult.search == title.lower()).first()
             if found and found.movie:
                 log.debug('Found %s in previous search results as %s', title, found.movie.title)
                 movie = found.movie
@@ -1120,8 +1132,7 @@ class ApiTrakt(object):
         if movie and title.lower() == movie.title.lower():
             return movie
         if movie and not found:
-            if not session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
-                                                                        title.lower()).first():
+            if not session.query(TraktMovieSearchResult).filter(TraktMovieSearchResult.search == title.lower()).first():
                 log.debug('Adding search result to db')
                 session.add(TraktMovieSearchResult(search=title, movie=movie))
         elif movie and found:
@@ -1212,7 +1223,7 @@ def do_cli(manager, options):
             console('You must specify an account (local identifier) so we know where to save your access token!')
             return
         try:
-            get_access_token(options.account, options.pin, re_auth=True)
+            get_access_token(options.account, options.pin, re_auth=True, called_from_cli=True)
             console('Successfully authorized Flexget app on Trakt.tv. Enjoy!')
             return
         except plugin.PluginError as e:
@@ -1269,7 +1280,7 @@ def register_parser_arguments():
 
     auth_parser.add_argument('account', metavar='<account>', help=acc_text)
     auth_parser.add_argument('pin', metavar='<pin>', help='get this by authorizing FlexGet to use your trakt account '
-                                                          'at %s' % PIN_URL, nargs='?')
+                                                          'at %s. WARNING: DEPRECATED.' % PIN_URL, nargs='?')
 
     show_parser = subparsers.add_parser('show', help='show expiration date for Flexget authorization(s) (don\'t worry, '
                                                      'they will automatically refresh when expired)')

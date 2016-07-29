@@ -1,24 +1,40 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 from collections import MutableSet
 from datetime import datetime
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 
 from flexget import plugin
+from flexget.manager import Session
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.plugin import get_plugin_by_name
+from flexget.plugins.parsers.parser_common import normalize_name, remove_dirt
 from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('movie_list')
 Base = versioned_base('movie_list', 0)
 
-SUPPORTED_IDS = ['imdb_id', 'trakt_movie_id', 'tmdb_id']
+
+class MovieListBase(object):
+    """
+    Class that contains helper methods for movie list as well as plugins that use it,
+    such as API and CLI.
+    """
+
+    @property
+    def supported_ids(self):
+        # Return a list of supported series identifier as registered via their plugins
+        ids = []
+        for p in plugin.get_plugins(group='movie_metainfo'):
+            ids.append(p.instance.movie_identifier)
+        return ids
 
 
 class MovieListList(Base):
@@ -51,12 +67,14 @@ class MovieListMovie(Base):
     def __repr__(self):
         return '<MovieListMovie title=%s,year=%s,list_id=%d>' % (self.title, self.year, self.list_id)
 
-    def to_entry(self):
+    def to_entry(self, strip_year=False):
         entry = Entry()
         entry['title'] = entry['movie_name'] = self.title
         entry['url'] = 'mock://localhost/movie_list/%d' % self.id
+        entry['added'] = self.added
         if self.year:
-            entry['title'] += ' (%d)' % self.year
+            if strip_year is False:
+                entry['title'] += ' (%d)' % self.year
             entry['movie_year'] = self.year
         for movie_list_id in self.ids:
             entry[movie_list_id.id_name] = movie_list_id.id_value
@@ -96,8 +114,9 @@ class MovieListID(Base):
 
 
 class MovieList(MutableSet):
+
     def _db_list(self, session):
-        return session.query(MovieListList).filter(MovieListList.name == self.config).first()
+        return session.query(MovieListList).filter(MovieListList.name == self.list_name).first()
 
     def _from_iterable(self, it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
@@ -105,46 +124,51 @@ class MovieList(MutableSet):
 
     @with_session
     def __init__(self, config, session=None):
-        self.config = config
+        if not isinstance(config, dict):
+            config = {'list_name': config}
+        config.setdefault('strip_year', False)
+        self.list_name = config.get('list_name')
+        self.strip_year = config.get('strip_year')
+
         db_list = self._db_list(session)
         if not db_list:
-            session.add(MovieListList(name=self.config))
+            session.add(MovieListList(name=self.list_name))
 
-    @with_session
-    def __iter__(self, session=None):
-        return iter([movie.to_entry() for movie in self._db_list(session).movies])
+    def __iter__(self):
+        with Session() as session:
+            return iter([movie.to_entry(self.strip_year) for movie in self._db_list(session).movies])
 
-    @with_session
-    def __len__(self, session=None):
-        return len(self._db_list(session).movies)
+    def __len__(self):
+        with Session() as session:
+            return len(self._db_list(session).movies)
 
-    @with_session
-    def add(self, entry, session=None):
-        # Check if this is already in the list, refresh info if so
-        db_list = self._db_list(session=session)
-        db_movie = self._find_entry(entry, session=session)
-        # Just delete and re-create to refresh
-        if db_movie:
-            session.delete(db_movie)
-        db_movie = MovieListMovie()
-        if 'movie_name' in entry:
-            db_movie.title, db_movie.year = entry['movie_name'], entry.get('movie_year')
-        else:
-            db_movie.title, db_movie.year = split_title_year(entry['title'])
-        for id_name in SUPPORTED_IDS:
-            if id_name in entry:
-                db_movie.ids.append(MovieListID(id_name=id_name, id_value=entry[id_name]))
-        log.debug('adding entry %s', entry)
-        db_list.movies.append(db_movie)
-        session.commit()
-        return db_movie.to_entry()
+    def add(self, entry):
+        with Session() as session:
+            # Check if this is already in the list, refresh info if so
+            db_list = self._db_list(session=session)
+            db_movie = self._find_entry(entry, session=session)
+            # Just delete and re-create to refresh
+            if db_movie:
+                session.delete(db_movie)
+            db_movie = MovieListMovie()
+            if 'movie_name' in entry:
+                db_movie.title, db_movie.year = entry['movie_name'], entry.get('movie_year')
+            else:
+                db_movie.title, db_movie.year = split_title_year(entry['title'])
+            for id_name in MovieListBase().supported_ids:
+                if id_name in entry:
+                    db_movie.ids.append(MovieListID(id_name=id_name, id_value=entry[id_name]))
+            log.debug('adding entry %s', entry)
+            db_list.movies.append(db_movie)
+            session.commit()
+            return db_movie.to_entry()
 
-    @with_session
-    def discard(self, entry, session=None):
-        db_movie = self._find_entry(entry, session=session)
-        if db_movie:
-            log.debug('deleting movie %s', db_movie)
-            session.delete(db_movie)
+    def discard(self, entry):
+        with Session() as session:
+            db_movie = self._find_entry(entry, session=session)
+            if db_movie:
+                log.debug('deleting movie %s', db_movie)
+                session.delete(db_movie)
 
     def __contains__(self, entry):
         return self._find_entry(entry) is not None
@@ -152,7 +176,7 @@ class MovieList(MutableSet):
     @with_session
     def _find_entry(self, entry, session=None):
         """Finds `MovieListMovie` corresponding to this entry, if it exists."""
-        for id_name in SUPPORTED_IDS:
+        for id_name in MovieListBase().supported_ids:
             if entry.get(id_name):
                 log.debug('trying to match movie based off id %s: %s', id_name, entry[id_name])
                 res = (self._db_list(session).movies.join(MovieListMovie.ids).filter(
@@ -161,22 +185,30 @@ class MovieList(MutableSet):
                         MovieListID.id_value == entry[id_name]))
                        .first())
                 if res:
-                    log.debug('found movie %s', res)
+                    log.verbose('found movie %s', res)
                     return res
         # Fall back to title/year match
-        if entry.get('movie_name') and entry.get('movie_year'):
-            name, year = entry['movie_name'], entry['movie_year']
+        if not entry.get('movie_name'):
+            self._parse_title(entry)
+        if entry.get('movie_name'):
+            name = entry['movie_name']
+            year = entry.get('movie_year') if entry.get('movie_year') else None
         else:
-            name, year = split_title_year(entry['title'])
-        if not name:
-            log.verbose('no movie name to match, skipping')
+            log.warning('Could not get a movie name, skipping')
             return
-        log.debug('trying to match movie based of name: %s and year: %d', name, year)
+        log.debug('trying to match movie based of name: %s and year: %s', name, year)
         res = (self._db_list(session).movies.filter(func.lower(MovieListMovie.title) == name.lower())
                .filter(MovieListMovie.year == year).first())
         if res:
-            log.debug('found movie %s', res)
+            log.verbose('found movie %s', res)
         return res
+
+    @staticmethod
+    def _parse_title(entry):
+        parser = get_plugin_by_name('parsing').instance.parse_movie(data=entry['title'])
+        if parser and parser.valid:
+            parser.name = normalize_name(remove_dirt(parser.name))
+            entry.update(parser.fields)
 
     @property
     def immutable(self):
@@ -196,7 +228,17 @@ class MovieList(MutableSet):
 
 class PluginMovieList(object):
     """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
-    schema = {'type': 'string'}
+    schema = {'oneOf': [
+        {'type': 'string'},
+        {'type': 'object',
+         'properties': {
+             'list_name': {'type': 'string'},
+             'strip_year': {'type': 'boolean'}
+         },
+         'required': ['list_name'],
+         'additionalProperties': False
+         }
+    ]}
 
     @staticmethod
     def get_list(config):
@@ -282,12 +324,12 @@ def get_db_movie_identifiers(identifier_list, movie_id=None, session=None):
     db_movie_ids = []
     for identifier in identifier_list:
         for key, value in identifier.items():
-            if key in SUPPORTED_IDS:
+            if key in MovieListBase().supported_ids:
                 db_movie_id = get_movie_identifier(identifier_name=key, identifier_value=value, movie_id=movie_id,
                                                    session=session)
                 if not db_movie_id:
                     log.debug('creating movie identifier %s: %s', key, value)
                     db_movie_id = MovieListID(id_name=key, id_value=value, movie_id=movie_id)
-                    session.add(db_movie_id)
+                session.merge(db_movie_id)
                 db_movie_ids.append(db_movie_id)
     return db_movie_ids

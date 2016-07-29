@@ -23,7 +23,6 @@ class UrlRewriteDivxATope(object):
     divxatope urlrewriter and search Plugin.
     """
 
-    
     schema = {
         'type': 'boolean',
         'default': False
@@ -75,7 +74,7 @@ class UrlRewriteDivxATope(object):
                 log.error('Error searching DivxATope: %s' % e)
                 return
             content = response.content
-            
+
             soup = get_soup(content)
             soup2 = soup.find('ul', attrs={'class': 'peliculas-box'})
             children = soup2.findAll('a', href=True)
@@ -86,7 +85,7 @@ class UrlRewriteDivxATope(object):
                 quality_lan = child.find('strong').contents
                 log.debug(len(quality_lan))
                 if len(quality_lan) > 2:
-                    if (isinstance(quality_lan[0],Tag)):
+                    if (isinstance(quality_lan[0], Tag)):
                         entry_quality_lan = quality_lan[1]
                     else:
                         entry_quality_lan = quality_lan[0] + ' ' + quality_lan[2]

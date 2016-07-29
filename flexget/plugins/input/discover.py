@@ -34,6 +34,7 @@ class DiscoverEntry(Base):
     def __str__(self):
         return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (self.title, self.task, self.last_execution)
 
+
 Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
 
 
@@ -53,7 +54,7 @@ class Discover(object):
 
       discover:
         what:
-          - emit_series: yes
+          - next_series_episodes: yes
         from:
           - piratebay
         interval: [1 hours|days|weeks]
@@ -109,7 +110,7 @@ class Discover(object):
                         continue
 
                     if entry['title'] in entry_titles:
-                        log.verbose('Ignored duplicate title `%s`' % entry['title'])    # TODO: should combine?
+                        log.verbose('Ignored duplicate title `%s`' % entry['title'])  # TODO: should combine?
                         continue
 
                     entries.append(entry)
@@ -140,12 +141,7 @@ class Discover(object):
                 log.verbose('Searching for `%s` with plugin `%s` (%i of %i)' %
                             (entry['title'], plugin_name, index + 1, len(entries)))
                 try:
-                    try:
-                        search_results = search.search(task=task, entry=entry, config=plugin_config)
-                    except TypeError:
-                        # Old search api did not take task argument
-                        log.warning('Search plugin %s does not support latest search api.' % plugin_name)
-                        search_results = search.search(entry, plugin_config)
+                    search_results = search.search(task=task, entry=entry, config=plugin_config)
                     if not search_results:
                         log.debug('No results from %s' % plugin_name)
                         continue
@@ -198,7 +194,7 @@ class Discover(object):
                 else:
                     result.append(entry)
                 continue
-            if type(est_date) == datetime.date:
+            if isinstance(est_date, datetime.date):
                 # If we just got a date, add a time so we can compare it to now()
                 est_date = datetime.datetime.combine(est_date, datetime.time())
             if datetime.datetime.now() >= est_date:
@@ -231,8 +227,8 @@ class Discover(object):
         interval_count = 0
         with Session() as session:
             for entry in entries:
-                de = session.query(DiscoverEntry).\
-                    filter(DiscoverEntry.title == entry['title']).\
+                de = session.query(DiscoverEntry). \
+                    filter(DiscoverEntry.title == entry['title']). \
                     filter(DiscoverEntry.task == task.name).first()
 
                 if not de:

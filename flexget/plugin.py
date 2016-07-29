@@ -8,6 +8,7 @@ import os
 import re
 import time
 import warnings
+import pkg_resources
 from functools import total_ordering
 from http.client import BadStatusLine
 
@@ -57,11 +58,10 @@ class DependencyError(Exception):
 
     def __str__(self):
         return '<DependencyError(issued_by=%r,missing=%r,message=%r,silent=%r)>' % \
-            (self.issued_by, self.missing, self.message, self.silent)
+               (self.issued_by, self.missing, self.message, self.silent)
 
 
 class RegisterException(Exception):
-
     def __init__(self, value):
         super(RegisterException, self).__init__()
         self.value = value
@@ -72,7 +72,6 @@ class RegisterException(Exception):
 
 @python_2_unicode_compatible
 class PluginWarning(Warning):
-
     def __init__(self, value, logger=log, **kwargs):
         super(PluginWarning, self).__init__()
         self.value = value
@@ -85,7 +84,6 @@ class PluginWarning(Warning):
 
 @python_2_unicode_compatible
 class PluginError(Exception):
-
     def __init__(self, value, logger=log, **kwargs):
         super(PluginError, self).__init__()
         # Value is expected to be a string
@@ -139,6 +137,7 @@ class internet(object):
                 elif hasattr(e, 'code'):
                     raise PluginError('The server couldn\'t fulfill the request. Error code: %s' % e.code, self.log)
                 raise PluginError('IOError when connecting to server: %s' % e, self.log)
+
         return wrapped_func
 
 
@@ -148,7 +147,9 @@ def priority(value):
     def decorator(target):
         target.priority = value
         return target
+
     return decorator
+
 
 DEFAULT_PRIORITY = 128
 
@@ -267,8 +268,9 @@ class PluginInfo(dict):
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
-            log.critical('Error while registering plugin %s. A plugin with the same name is already registered' %
-                         self.name)
+            raise Exception('already %s' % self.name)
+            log.critical('Error while registering plugin %s. '
+                         'A plugin with the same name is already registered', self.name)
         else:
             plugins[self.name] = self
 
@@ -332,13 +334,13 @@ class PluginInfo(dict):
 
     def __str__(self):
         return '<PluginInfo(name=%s)>' % self.name
-        
+
     def _is_valid_operand(self, other):
         return hasattr(other, 'name')
 
     def __eq__(self, other):
         return self.name == other.name
-    
+
     def __lt__(self, other):
         return self.name < other.name
 
@@ -367,6 +369,12 @@ def _get_standard_plugins_path():
     return paths
 
 
+def _check_phase_queue():
+    if _new_phase_queue:
+        for phase, args in _new_phase_queue.items():
+            log.error('Plugin %s requested new phase %s, but it could not be created at requested '
+                      'point (before, after). Plugin is not working properly.', args[0], phase)
+
 def _load_plugins_from_dirs(dirs):
     """
     :param list dirs: Directories from where plugins are loaded from
@@ -389,28 +397,47 @@ def _load_plugins_from_dirs(dirs):
                 if e.has_message():
                     msg = e.message
                 else:
-                    msg = 'Plugin `%s` requires `%s` to load.' % (e.issued_by or module_name, e.missing or 'N/A')
+                    msg = 'Plugin `%s` requires `%s` to load.', e.issued_by or module_name, e.missing or 'N/A'
                 if not e.silent:
                     log.warning(msg)
                 else:
                     log.debug(msg)
             except ImportError as e:
-                log.critical('Plugin `%s` failed to import dependencies' % module_name)
-                log.exception(e)
+                log.critical('Plugin `%s` failed to import dependencies', module_name, exc_info=True)
             except ValueError as e:
                 # Debugging #2755
                 log.error('ValueError attempting to import `%s` (from %s): %s', module_name, plugin_path, e)
             except Exception as e:
-                log.critical('Exception while loading plugin %s' % module_name)
-                log.exception(e)
+                log.critical('Exception while loading plugin %s', module_name, exc_info=True)
                 raise
             else:
-                log.trace('Loaded module %s from %s' % (module_name, plugin_path))
+                log.trace('Loaded module %s from %s', module_name, plugin_path)
+    _check_phase_queue()
+                      
 
-    if _new_phase_queue:
-        for phase, args in _new_phase_queue.items():
-            log.error('Plugin %s requested new phase %s, but it could not be created at requested '
-                      'point (before, after). Plugin is not working properly.' % (args[0], phase))
+def _load_plugins_from_packages():
+    """Load plugins installed via PIP"""
+    for entrypoint in pkg_resources.iter_entry_points('FlexGet.plugins'):
+        try:
+            plugin_module = entrypoint.load()
+        except DependencyError as e:
+            if e.has_message():
+                msg = e.message
+            else:
+                msg = 'Plugin `%s` requires `%s` to load.', e.issued_by or entrypoint.module_name, e.missing or 'N/A'
+            if not e.silent:
+                log.warning(msg)
+            else:
+                log.debug(msg)
+        except ImportError as e:
+            log.critical('Plugin `%s` failed to import dependencies', entrypoint.module_name, exc_info=True)
+        except Exception as e:
+            log.critical('Exception while loading plugin %s', entrypoint.module_name, exc_info=True)
+            raise
+        else:
+            log.trace('Loaded packaged module %s from %s', entrypoint.module_name, plugin_module.__file__)
+    _check_phase_queue()
+
 
 
 def load_plugins(extra_dirs=None):
@@ -429,6 +456,7 @@ def load_plugins(extra_dirs=None):
     start_time = time.time()
     # Import all the plugins
     _load_plugins_from_dirs(extra_dirs)
+    _load_plugins_from_packages()
     # Register them
     fire_event('plugin.register')
     # Plugins should only be registered once, remove their handlers after
@@ -438,7 +466,7 @@ def load_plugins(extra_dirs=None):
         plugin.initialize()
     took = time.time() - start_time
     plugins_loaded = True
-    log.debug('Plugins took %.2f seconds to load' % took)
+    log.debug('Plugins took %.2f seconds to load. %s plugins in registry.', took, len(plugins.keys()))
 
 
 def get_plugins(phase=None, group=None, context=None, category=None, name=None, min_api=None):
@@ -454,6 +482,7 @@ def get_plugins(phase=None, group=None, context=None, category=None, name=None, 
     :return: List of PluginInfo instances.
     :rtype: list
     """
+
     def matches(plugin):
         if phase is not None and phase not in phase_methods:
             raise ValueError('Unknown phase %s' % phase)
@@ -470,6 +499,7 @@ def get_plugins(phase=None, group=None, context=None, category=None, name=None, 
         if min_api is not None and plugin.api_ver < min_api:
             return False
         return True
+
     return filter(matches, iter(plugins.values()))
 
 
@@ -485,33 +515,9 @@ def plugin_schemas(**kwargs):
 config_schema.register_schema('/schema/plugins', plugin_schemas)
 
 
-def get_plugins_by_phase(phase):
-    """
-    .. deprecated:: 1.0.3328
-       Use :func:`get_plugins` instead
-
-    Return an iterator over all plugins that hook :phase:
-    """
-    warnings.warn('Deprecated API', DeprecationWarning, stacklevel=2)
-    if phase not in phase_methods:
-        raise Exception('Unknown phase %s' % phase)
-    return get_plugins(phase=phase)
-
-
 def get_phases_by_plugin(name):
     """Return all phases plugin :name: hooks"""
     return list(get_plugin_by_name(name).phase_handlers)
-
-
-def get_plugins_by_group(group):
-    """
-    .. deprecated:: 1.0.3328
-       Use :func:`get_plugins` instead
-
-    Return an iterator over all plugins with in specified group.
-    """
-    warnings.warn('Deprecated API', DeprecationWarning, stacklevel=2)
-    return get_plugins(group=group)
 
 
 def get_plugin_keywords():

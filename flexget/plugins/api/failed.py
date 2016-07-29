@@ -41,6 +41,7 @@ retry_entries_list_schema = api.schema('retry_entries_list_schema', retry_entrie
 
 @retry_failed_api.route('/')
 class RetryFailed(APIResource):
+
     @api.response(200, model=retry_entries_list_schema)
     def get(self, session=None):
         """ List all failed entries """
@@ -60,7 +61,8 @@ class RetryFailed(APIResource):
 
 @retry_failed_api.route('/<int:failed_entry_id>/')
 @api.response(404, 'No failed entry found')
-class RetryFailed(APIResource):
+class RetryFailedID(APIResource):
+
     @api.doc(params={'failed_entry_id': 'ID of the failed entry'})
     @api.response(200, model=retry_failed_entry_schema)
     def get(self, failed_entry_id, session=None):

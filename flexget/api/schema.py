@@ -23,6 +23,7 @@ schema_api_list = api.schema('schema.list', {
 
 @schema_api.route('/')
 class SchemaAllAPI(APIResource):
+
     @api.response(200, model=schema_api_list)
     def get(self, session=None):
         """ List all schema definitions """
@@ -37,6 +38,7 @@ class SchemaAllAPI(APIResource):
 @api.doc(params={'path': 'Path of schema'})
 @api.response(404, 'invalid schema path')
 class SchemaAPI(APIResource):
+
     @api.response(200, model=schema_api_list)
     def get(self, path, session=None):
         """ Get schema definition """

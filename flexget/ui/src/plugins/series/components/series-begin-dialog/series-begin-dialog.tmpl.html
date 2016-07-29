@@ -1,0 +1,27 @@
+<md-toolbar>
+	<div class="md-toolbar-tools">
+		<h2>Series Begin</h2>
+		<span flex></span>
+		<md-button class="md-icon-button" ng-click="vm.cancel()">
+			<md-icon md-font-icon="fa-times" class="fa fa-lg" aria-label="close dialog"></md-icon>
+		</md-button>
+	</div>
+</md-toolbar>
+<form name="seriesBeginForm" ng-submit="vm.saveBegin()">
+	<md-dialog-content>
+		<div class="md-dialog-content">
+			<md-input-container>
+				<label>Begin</label>
+				<input type="text" ng-model="vm.begin">
+			</md-input-container>
+		</div>
+	</md-dialog-content>
+	<md-dialog-actions>
+		<md-button ng-click="vm.cancel()" class="md-default md-raised">
+			Cancel
+		</md-button>
+		<md-button type="submit" ng-disabled="!vm.begin || vm.begin == vm.originalBegin" class="md-primary md-raised">
+			Save
+		</md-button>
+	</md-dialog-actions>
+</form>

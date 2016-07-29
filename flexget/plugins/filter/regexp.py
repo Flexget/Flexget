@@ -16,7 +16,6 @@ log = logging.getLogger('regexp')
 
 
 class FilterRegexp(object):
-
     """
         All possible forms.
 
@@ -184,7 +183,7 @@ class FilterRegexp(object):
                 values = [values]
             for value in values:
                 if not isinstance(value, basestring):
-                    continue
+                    value = str(value)
                 if field in unquote_fields:
                     value = unquote(value)
                     # If none of the not_regexps match

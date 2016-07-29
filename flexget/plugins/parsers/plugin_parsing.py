@@ -27,7 +27,7 @@ def init_parsers(manager):
         # Select default parsers based on priority
         func_name = 'parse_' + parser_type
         default_parsers[parser_type] = max(iter(parsers[parser_type].items()),
-                                          key=lambda p: getattr(getattr(p[1], func_name), 'priority', 0))[0]
+                                           key=lambda p: getattr(getattr(p[1], func_name), 'priority', 0))[0]
         log.debug('setting default %s parser to %s. (options: %s)' %
                   (parser_type, default_parsers[parser_type], parsers[parser_type]))
 

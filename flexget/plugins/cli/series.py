@@ -250,7 +250,7 @@ def register_parser_arguments():
                              help='limit list to series which have not seen a release in %(const)s days. number of '
                                   'days can be overridden with %(metavar)s')
     list_parser.add_argument('--porcelain', action='store_true', help='make the output parseable')
-    show_parser = subparsers.add_parser('show', parents=[series_parser],
+    subparsers.add_parser('show', parents=[series_parser],
                                         help='show the releases FlexGet has seen for a given series ')
     begin_parser = subparsers.add_parser('begin', parents=[series_parser],
                                          help='set the episode to start getting a series from')

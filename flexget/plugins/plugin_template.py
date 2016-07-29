@@ -111,7 +111,7 @@ class PluginTemplate(object):
                 merge_dict_from_to(template_config, task.config)
             except MergeException as exc:
                 raise plugin.PluginError('Failed to merge template %s to task %s. Error: %s' %
-                                  (template, task.name, exc.value))
+                                         (template, task.name, exc.value))
 
         log.trace('templates: %s' % config)
 
@@ -132,4 +132,5 @@ def register_config():
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--template', metavar='NAME', help='execute tasks using given template')
+    options.get_parser('execute').add_argument('-T', '--template', metavar='NAME',
+                                               help='execute tasks using given template')

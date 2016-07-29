@@ -86,11 +86,10 @@ class InputPlex(object):
             'unwatched_only': {'type': 'boolean', 'default': False},
             'fetch': {'type': 'string', 'default': 'file', 'enum': ['file', 'art', 'cover', 'thumb', 'season_cover']}
 
-
         },
         'required': ['section']
     }
-    
+
     def prepare_config(self, config):
         config['plexserver'] = config['server']
         config = self.plex_format_server(config)

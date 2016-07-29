@@ -10,12 +10,6 @@ import threading
 import uuid
 import warnings
 
-# Support order in python 2.7 and 3
-try:
-    from collections import OrderedDict
-except ImportError:
-    pass
-
 from flexget import __version__
 from flexget.utils.tools import io_encoding
 
@@ -54,6 +48,7 @@ def task_logging(task):
 
 
 class SessionFilter(logging.Filter):
+
     def __init__(self, session_id):
         self.session_id = session_id
 
@@ -122,6 +117,7 @@ def console(text, *args, **kwargs):
 
 class RollingBuffer(collections.deque):
     """File-like that keeps a certain number of lines of text in memory."""
+
     def write(self, line):
         self.append(line)
 

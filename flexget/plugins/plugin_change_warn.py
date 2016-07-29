@@ -44,6 +44,7 @@ def register_plugin():
 # check that no old plugins are in pre-compiled form (pyc)
 try:
     import os.path
+
     plugin_dirs = (os.path.normpath(sys.path[0] + '/../flexget/plugins/'),
                    os.path.normpath(sys.path[0] + '/../flexget/plugins/input/'))
     for plugin_dir in plugin_dirs:
@@ -97,5 +98,5 @@ try:
                 found_deprecated = True
                 break
 
-except:
+except Exception:
     pass

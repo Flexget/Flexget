@@ -35,8 +35,8 @@ categories = {
 }
 
 default_search_params = {
-    #'searchstring': 'search term',
-    #'advancedsearchparameters': '[year=1999]',
+    # 'searchstring': 'search term',
+    # 'advancedsearchparameters': '[year=1999]',
     'sort': 'browsedate',
     'skw': 'showall',
     'compression': 'unraredonly',

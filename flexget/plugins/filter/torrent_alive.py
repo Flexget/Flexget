@@ -69,7 +69,7 @@ def get_udp_seeds(url, info_hash):
     parsed_url = urlparse(url)
     try:
         port = parsed_url.port
-    except ValueError as ve:
+    except ValueError:
         log.error('UDP Port Error, url was %s' % url)
         return 0
 
@@ -121,7 +121,7 @@ def get_udp_seeds(url, info_hash):
         return 0
 
     # first 8 bytes are followed by seeders, completed and leechers for requested torrent
-    seeders, completed, leechers = struct.unpack(b">LLL", res[8:20])
+    seeders, _, _ = struct.unpack(b">LLL", res[8:20])
     log.debug('get_udp_seeds is returning: %s', seeders)
     clisocket.close()
     return seeders
@@ -135,7 +135,7 @@ def get_http_seeds(url, info_hash):
     log.debug('Checking for seeds from %s' % url)
 
     try:
-        data = bdecode(requests.get(url).text.encode('utf-8')).get('files')
+        data = bdecode(requests.get(url).content).get('files')
     except RequestException as e:
         log.debug('Error scraping: %s' % e)
         return 0
@@ -251,7 +251,7 @@ class TorrentAlive(object):
                     entry.reject(reason='Tracker(s) had < %s required seeds. (%s)' % (min_seeds, seeds),
                                  remember_time=config['reject_for'])
                     # Maybe there is better match that has enough seeds
-                    task.rerun()
+                    task.rerun(plugin='torrent_alive', reason='Not enough seeds')
                 else:
                     log.debug('Found %i seeds from trackers' % seeds)
 

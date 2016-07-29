@@ -37,7 +37,7 @@ def migrate_imdb_queue(manager):
             for row in session.execute(old_table.select()):
                 try:
                     queue_add(imdb_id=row['imdb_id'], quality=row['quality'], session=session)
-                except QueueError as e:
+                except QueueError:
                     log.error('Unable to migrate %s from imdb_queue to movie_queue' % row['title'])
             old_table.drop()
             session.commit()
@@ -255,8 +255,6 @@ def parse_what(what, lookup=True, session=None):
     :return: A dictionary with 'title', 'imdb_id' and 'tmdb_id' keys
     """
 
-    tmdb_lookup = plugin.get_plugin_by_name('api_tmdb').instance.lookup
-
     result = {'title': None, 'imdb_id': None, 'tmdb_id': None}
     result['imdb_id'] = extract_id(what)
     if not result['imdb_id']:
@@ -362,7 +360,7 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
         title = item.title
         session.delete(item)
         return title
-    except NoResultFound as e:
+    except NoResultFound:
         raise QueueError(
             'title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue %s' % (
                 title, imdb_id, tmdb_id, movie_id, queue_name))
@@ -410,7 +408,7 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=
             raise QueueError(message=('%s is not marked as downloaded' % title), errno=1)
         item.downloaded = None
         return item.to_dict()
-    except NoResultFound as e:
+    except NoResultFound:
         raise QueueError(message=('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s, queue_name=%s not found in queue' %
                                   (title, imdb_id, tmdb_id, movie_id, queue_name)), errno=2)
 
@@ -441,7 +439,7 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None,
         item.quality = quality
         session.commit()
         return item.to_dict()
-    except NoResultFound as e:
+    except NoResultFound:
         raise QueueError(
             'imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue %s' % (imdb_id, tmdb_id, movie_id, queue_name))
 

@@ -25,12 +25,12 @@ class PluginSubliminal(object):
     """
     Search and download subtitles using Subliminal by Antoine Bertin
     (https://pypi.python.org/pypi/subliminal).
-    
+
     Example (complete task)::
 
       subs:
         find:
-          path: 
+          path:
             - d:\media\incoming
           regexp: '.*\.(avi|mkv|mp4)$'
           recursive: yes
@@ -45,7 +45,7 @@ class PluginSubliminal(object):
           single: no
           directory: /disk/subtitles
     """
-    
+
     schema = {
         'type': 'object',
         'properties': {
@@ -73,7 +73,7 @@ class PluginSubliminal(object):
         except ImportError as e:
             log.debug('Error importing Subliminal: %s', e)
             raise plugin.DependencyError('subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e)
-    
+
     def on_task_output(self, task, config):
         """
         Configuration::
@@ -103,8 +103,11 @@ class PluginSubliminal(object):
             pass
         logging.getLogger("subliminal").setLevel(logging.CRITICAL)
         logging.getLogger("enzyme").setLevel(logging.WARNING)
-        languages = set([Language.fromietf(s) for s in config.get('languages', [])])
-        alternative_languages = set([Language.fromietf(s) for s in config.get('alternatives', [])])
+        try:
+            languages = set([Language.fromietf(s) for s in config.get('languages', [])])
+            alternative_languages = set([Language.fromietf(s) for s in config.get('alternatives', [])])
+        except ValueError as e:
+            raise plugin.PluginError(e)
         # keep all downloaded subtitles and save to disk when done (no need to write every time)
         downloaded_subtitles = collections.defaultdict(list)
         providers_list = config.get('providers', None)
@@ -122,7 +125,7 @@ class PluginSubliminal(object):
                 entry.fail('file not found: %s' % entry['location'])
             elif '$RECYCLE.BIN' not in entry['location']:  # ignore deleted files in Windows shares
                 try:
-                    entry_languages = entry.get('subtitle_languages') or languages
+                    entry_languages = set(entry.get('subtitle_languages', [])) or languages
 
                     video = subliminal.scan_video(entry['location'])
                     existing_subtitles = set(subliminal.core.search_external_subtitles(entry['location']).values())
@@ -135,19 +138,19 @@ class PluginSubliminal(object):
                         hash_scores = movie_scores['hash']
                     log.info('Name computed for %s was %s', entry['location'], title)
                     msc = hash_scores if config['exact_match'] else 0
-                    if entry_languages & existing_subtitles:
+                    if entry_languages.issubset(existing_subtitles):
                         log.debug('All preferred languages already exist for "%s"', entry['title'])
                         entry['subtitles_missing'] = set()
                         continue  # subs for preferred lang(s) already exists
                     else:
-                        subtitle = subliminal.download_best_subtitles([video], entry_languages,
+                        subtitle = subliminal.download_best_subtitles({video}, entry_languages,
                                                                       providers=providers_list, min_score=msc)
                         if subtitle and any(subtitle.values()):
                             downloaded_subtitles.update(subtitle)
                             log.info('Subtitles found for %s', entry['location'])
                         else:
                             # only try to download for alternatives that aren't alread downloaded
-                            subtitle = subliminal.download_best_subtitles([video], alternative_languages,
+                            subtitle = subliminal.download_best_subtitles({video}, alternative_languages,
                                                                           providers=providers_list, min_score=msc)
 
                             if subtitle and any(subtitle.values()):
@@ -159,6 +162,8 @@ class PluginSubliminal(object):
                                                     for l in subtitle[video]])
                         if entry_languages:
                             entry['subtitles_missing'] = entry_languages - downloaded_languages
+                            if len(entry['subtitles_missing']) > 0:
+                                entry.fail('Subtitles for all primary languages not found')
                 except ValueError as e:
                     log.error('subliminal error: %s', e)
                     entry.fail()

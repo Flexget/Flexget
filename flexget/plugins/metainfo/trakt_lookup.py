@@ -11,12 +11,12 @@ from flexget.manager import Session
 
 try:
     from flexget.plugins.api_trakt import ApiTrakt, list_actors, list_images, get_translations
+
     lookup_series = ApiTrakt.lookup_series
     lookup_movie = ApiTrakt.lookup_movie
 except ImportError:
     raise plugin.DependencyError(issued_by='trakt_lookup', missing='api_trakt',
                                  message='trakt_lookup requires the `api_trakt` plugin')
-
 
 log = logging.getLogger('trakt_lookup')
 
@@ -76,7 +76,7 @@ class PluginTraktLookup(object):
         'imdb_id': 'imdb_id',
         'tvdb_id': 'tvdb_id',
         'tmdb_id': 'tmdb_id',
-        'trakt_id': 'id',
+        'trakt_show_id': 'id',
         'trakt_slug': 'slug',
         'tvrage_id': 'tvrage_id',
         'trakt_trailer': 'trailer',
@@ -130,9 +130,9 @@ class PluginTraktLookup(object):
     movie_map = {
         'movie_name': 'title',
         'movie_year': 'year',
-        'trakt_name': 'title',
-        'trakt_year': 'year',
-        'trakt_id': 'id',
+        'trakt_movie_name': 'title',
+        'trakt_movie_year': 'year',
+        'trakt_movie_id': 'id',
         'trakt_slug': 'slug',
         'imdb_id': 'imdb_id',
         'tmdb_id': 'tmdb_id',
@@ -220,7 +220,6 @@ class PluginTraktLookup(object):
                 entry.update_using_map(self.show_translate_map, series)
         return entry
 
-
     def lazy_episode_lookup(self, entry):
         with Session(expire_on_commit=False) as session:
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
@@ -271,7 +270,7 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         with Session() as session:
             lookupargs = {'trakt_id': entry.get('trakt_movie_id', eval_lazy=False),
-                          'title': entry.get('series_name', eval_lazy=False),
+                          'title': entry.get('movie_name', eval_lazy=False),
                           'session': session}
             try:
                 movie = lookup_movie(**lookupargs)
@@ -285,10 +284,10 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         if style == 'show' or style == 'episode':
             lookup = lookup_series
-            trakt_id = entry.get('trakt_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_show_id', eval_lazy=True)
         else:
             lookup = lookup_movie
-            trakt_id = entry.get('trakt_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_movie_id', eval_lazy=True)
         with Session() as session:
             lookupargs = {'trakt_id': trakt_id,
                           'session': session}
@@ -308,10 +307,10 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         if style == 'show' or style == 'episode':
             lookup = lookup_series
-            trakt_id = entry.get('trakt_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_show_id', eval_lazy=True)
         else:
             lookup = lookup_movie
-            trakt_id = entry.get('trakt_id', eval_lazy=True)
+            trakt_id = entry.get('trakt_movie_id', eval_lazy=True)
         with Session() as session:
             lookupargs = {'trakt_id': trakt_id,
                           'session': session}
@@ -362,7 +361,17 @@ class PluginTraktLookup(object):
                     entry.register_lazy_func(collected_lookup, ['trakt_collected'])
                     entry.register_lazy_func(watched_lookup, ['trakt_watched'])
 
+    @property
+    def series_identifier(self):
+        """Returns the plugin main identifier type"""
+        return 'trakt_show_id'
+
+    @property
+    def movie_identifier(self):
+        """Returns the plugin main identifier type"""
+        return 'trakt_movie_id'
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=3)
+    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=3, groups=['series_metainfo', 'movie_metainfo'])

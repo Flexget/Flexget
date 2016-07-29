@@ -1,0 +1,28 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=House%20MD
+  response:
+    body: {string: !!python/unicode '{"id":118,"url":"http://www.tvmaze.com/shows/118/house-md","name":"House
+        M.D.","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":8.9},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255,"imdb":"tt0412142"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/43/109520.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/43/109520.jpg"},"summary":"<p>Sink
+        your teeth into meaty drama and intrigue with <em><strong>\"House\"</strong></em>,
+        FOX''s take on mystery, where the villain is a medical malady and the hero
+        is an irreverent, controversial doctor who trusts no one, least of all his
+        patients.</p>","updated":1463257116,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 17 May 2016 08:58:12 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+    status: {code: 200, message: OK}
+version: 1

@@ -55,7 +55,7 @@ class DisablePlugin(object):
             # Disable plugins explicitly included in config.
             if p in task.config:
                 disabled.append(p)
-                del(task.config[p])
+                del (task.config[p])
             # Disable built-in plugins.
             if p in plugin.plugins and plugin.plugins[p].builtin:
                 plugin.plugins[p].builtin = False

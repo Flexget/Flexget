@@ -11,6 +11,7 @@ log = logging.getLogger('utils.qualities')
 
 class QualityComponent(object):
     """"""
+
     def __init__(self, type, value, name, regexp=None, modifier=None, defaults=None):
         """
         :param type: Type of quality component. (resolution, source, codec, or audio)
@@ -115,6 +116,7 @@ class QualityComponent(object):
         # No mutable attributes, return a regular copy
         return copy.copy(self)
 
+
 _resolutions = [
     QualityComponent('resolution', 10, '360p'),
     QualityComponent('resolution', 20, '368p', '368p?'),
@@ -142,7 +144,7 @@ _sources = [
     QualityComponent('source', 130, 'dvdscr', '(?:(?:dvd|web)[\W_]?)?scr(?:eener)?', modifier=0),
     QualityComponent('source', 140, 'bdscr', 'bdscr(?:eener)?'),
     QualityComponent('source', 150, 'hdtv', 'a?hdtv(?:[\W_]?rip)?'),
-    QualityComponent('source', 160, 'webdl', 'web(?:[\W_]?(dl|hd))'),
+    QualityComponent('source', 160, 'webdl', 'web(?:[\W_]?(dl|hd))?'),
     QualityComponent('source', 170, 'dvdrip', 'dvd(?:[\W_]?rip)?'),
     QualityComponent('source', 175, 'remux'),
     QualityComponent('source', 180, 'bluray', '(?:b[dr][\W_]?rip|blu[\W_]?ray(?:[\W_]?rip)?)')
@@ -182,7 +184,6 @@ _UNKNOWNS = {
         print '- ' + item.name
     print '}}}'
 '''
-
 
 _registry = {}
 for items in (_resolutions, _sources, _codecs, _audios):
@@ -412,6 +413,7 @@ class RequirementComponent(object):
 
 class Requirements(object):
     """Represents requirements for allowable qualities. Can determine whether a given Quality passes requirements."""
+
     def __init__(self, req=''):
         self.text = ''
         self.resolution = RequirementComponent('resolution')

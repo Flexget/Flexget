@@ -25,8 +25,8 @@ REPUTATIONS = {  # Maps reputation name to feed address
 }
 
 
-class UrlRewriteTorrentz(object):
-    """Torrentz urlrewriter."""
+class Torrentz(object):
+    """Torrentz search and urlrewriter"""
 
     schema = {
         'oneOf': [
@@ -55,8 +55,13 @@ class UrlRewriteTorrentz(object):
         return REGEXP.match(entry['url'])
 
     def url_rewrite(self, task, entry):
+        """URL rewrite torrentz domain url with infohash to any torrent cache"""
         thash = REGEXP.match(entry['url']).group(2)
-        entry['url'] = 'https://torcache.net/torrent/%s.torrent' % thash.upper()
+        torrent_cache = plugin.get_plugin_by_name('torrent_cache').instance
+        urls = torrent_cache.infohash_urls(thash)
+        # default to first shuffled url
+        entry['url'] = urls[0]
+        entry['urls'] = urls
         entry['torrent_info_hash'] = thash
 
     def search(self, task, entry, config=None):
@@ -113,4 +118,4 @@ class UrlRewriteTorrentz(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteTorrentz, 'torrentz', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(Torrentz, 'torrentz', groups=['urlrewriter', 'search'], api_ver=2)

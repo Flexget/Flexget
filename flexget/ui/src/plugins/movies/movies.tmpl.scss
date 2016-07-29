@@ -3,3 +3,17 @@
   padding: 3px;
   height: auto;
 }
+
+.tab-tab-plus {
+  padding: 3px;
+  height: auto;
+}
+
+//nth-last-child(2), because 1 doesnt work
+.movie-tabs .md-tab:nth-last-child(2) {
+	padding: 0px;
+	
+	section {
+		padding: 12px 24px;
+	}
+}

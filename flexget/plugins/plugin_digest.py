@@ -18,7 +18,6 @@ from flexget.utils.database import entry_synonym
 from flexget.utils.tools import parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
-
 log = logging.getLogger('digest')
 Base = versioned_base('digest', 1)
 
@@ -88,7 +87,7 @@ class OutputDigest(object):
                 session.add(DigestEntry(list=config['list'], entry=entry))
 
 
-class EmitDigest(object):
+class FromDigest(object):
     schema = {
         'type': 'object',
         'properties': {
@@ -134,4 +133,4 @@ class EmitDigest(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(OutputDigest, 'digest', api_ver=2)
-    plugin.register(EmitDigest, 'emit_digest', api_ver=2)
+    plugin.register(FromDigest, 'from_digest', api_ver=2)

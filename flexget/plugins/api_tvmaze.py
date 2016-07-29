@@ -7,7 +7,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from dateutil import parser
 from future.utils import native
 from requests.exceptions import HTTPError
-from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, func, Table, or_, \
+from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, Table, or_, \
     and_
 from sqlalchemy.orm import relation
 
@@ -37,7 +37,7 @@ TVMAZE_ENDPOINTS = {
 
 @db_schema.upgrade('tvmaze')
 def upgrade(ver, session):
-    if ver is None or ver < 5:
+    if ver is None or ver < 6:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -63,6 +63,13 @@ class TVMazeLookup(Base):
     search_name = Column(Unicode, index=True, unique=True)
     series_id = Column(Integer, ForeignKey('tvmaze_series.tvmaze_id'))
     series = relation('TVMazeSeries', backref='search_strings')
+
+    def __init__(self, search_name, series_id=None, series=None):
+        self.search_name = search_name.lower()
+        if series_id:
+            self.series_id = series_id
+        if series:
+            self.series = series
 
     def __repr__(self):
         return '<TVMazeLookup(search_name={0},series_id={1})'.format(self.search_name, self.series_id)
@@ -136,8 +143,8 @@ class TVMazeSeries(Base):
         self.language = series['language']
         self.schedule = series['schedule']
         self.url = series['url']
-        self.original_image = series['image'].get('original')
-        self.medium_image = series['image'].get('medium')
+        self.original_image = series.get('image').get('original') if series.get('image') else None
+        self.medium_image = series.get('image').get('medium') if series.get('image') else None
         self.tvdb_id = series['externals'].get('thetvdb')
         self.tvrage_id = series['externals'].get('tvrage')
         self.premiered = parser.parse(series.get('premiered'), ignoretz=True) if series.get('premiered') else None
@@ -279,13 +286,13 @@ def from_cache(session=None, search_params=None, cache_type=None):
 @with_session
 def from_lookup(session=None, title=None):
     log.debug('searching lookup table using title {0}'.format(title))
-    return session.query(TVMazeLookup).filter(func.lower(TVMazeLookup.search_name) == title.lower()).first()
+    return session.query(TVMazeLookup).filter(TVMazeLookup.search_name == title.lower()).first()
 
 
 @with_session
 def add_to_lookup(session=None, title=None, series=None):
     log.debug('trying to add search title {0} to series {1} in lookup table'.format(title, series.name))
-    exist = session.query(TVMazeLookup).filter(TVMazeLookup.search_name == title).first()
+    exist = session.query(TVMazeLookup).filter(TVMazeLookup.search_name == title.lower()).first()
     if exist:
         log.debug('title {0} already exist for series {1}, no need to save lookup'.format(title, series.name))
         return
@@ -302,7 +309,7 @@ def prepare_lookup_for_tvmaze(**lookup_params):
     title = None
     series_name = lookup_params.get('series_name') or lookup_params.get('show_name') or lookup_params.get('title')
     if series_name:
-        title, year_match = split_title_year(series_name)
+        title, _ = split_title_year(series_name)
     # Support for when title is just a number
     if not title:
         title = series_name
@@ -318,6 +325,7 @@ def prepare_lookup_for_tvmaze(**lookup_params):
 
 
 class APITVMaze(object):
+
     @staticmethod
     @with_session
     def series_lookup(session=None, only_cached=False, **lookup_params):
@@ -410,7 +418,7 @@ class APITVMaze(object):
                 and_(TVMazeEpisodes.series_id == series.tvmaze_id,
                      TVMazeEpisodes.airdate == episode_date)
             )
-        ).first()
+        ).one_or_none()
 
         # Logic for cache only mode
         if only_cached:
@@ -446,9 +454,10 @@ class APITVMaze(object):
             or_(TVMazeEpisodes.tvmaze_id == tvmaze_episode['id'],
                 and_(
                     TVMazeEpisodes.number == tvmaze_episode['number'],
-                    TVMazeEpisodes.season_number == tvmaze_episode['season'])
+                    TVMazeEpisodes.season_number == tvmaze_episode['season'],
+                    TVMazeEpisodes.series_id == series.tvmaze_id)
                 )
-        ).first()
+        ).one_or_none()
 
         if episode:
             log.debug('found expired episode {0} in cache, refreshing data.'.format(episode.tvmaze_id))

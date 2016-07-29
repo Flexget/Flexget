@@ -59,7 +59,7 @@ class PluginCookies(object):
             from pysqlite2 import dbapi2 as sqlite
         except ImportError:
             try:
-                from sqlite3 import dbapi2 as sqlite # try the 2.5+ stdlib
+                from sqlite3 import dbapi2 as sqlite  # try the 2.5+ stdlib
             except ImportError:
                 raise plugin.PluginWarning('Unable to use sqlite3 or pysqlite2', log)
 
@@ -72,7 +72,7 @@ class PluginCookies(object):
         cur = con.cursor()
         try:
             cur.execute('select host, path, isSecure, expiry, name, value from moz_cookies')
-        except:
+        except sqlite.Error:
             raise plugin.PluginError('%s does not appear to be a valid Firefox 3 cookies file' % filename, log)
 
         ftstr = ['FALSE', 'TRUE']
@@ -104,7 +104,7 @@ class PluginCookies(object):
 
                     log.trace('Adding cookie for %s. key: %s value: %s' % (item[0], item[4], item[5]))
                     count += 1
-                except:
+                except IOError:
                     to_hex = lambda x: ''.join([hex(ord(c))[2:].zfill(2) for c in x])
                     i = 0
                     for val in item:

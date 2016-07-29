@@ -163,7 +163,7 @@ def upgrade(plugin):
                         set_version(plugin, new_ver, session=session)
                         manager.db_upgraded = True
                     elif new_ver < current_ver:
-                        log.critical('A lower schema version was returned (%s) from the %s upgrade function '
+                        log.critical('A lower schema version was returned (%s) from plugin %s upgrade function '
                                      'than passed in (%s)' % (new_ver, plugin, current_ver))
                         session.rollback()
                         manager.shutdown(finish_queue=False)

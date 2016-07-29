@@ -33,7 +33,7 @@ class InputSceper(object):
         try:
             page = task.requests.get(url).content
         except RequestException as e:
-            raise plugin.PluginError('Error getting input page: %e' % e)
+            raise plugin.PluginError('Error getting input page: %s' % e)
         soup = get_soup(page)
 
         releases = []

@@ -1,14 +1,16 @@
+/* global angular, registerPlugin */
 (function () {
     'use strict';
 
-    var seriesModule = angular.module('flexget.plugins.series', []);
-    registerPlugin(seriesModule);
+    angular
+		.module('plugins.series', [
+			'ngMaterial',
 
-    seriesModule.run(function ($state, route, sideNav, toolBar) {
-        route.register('series', '/series', 'series-view');
-        route.register('episodes', '/series/:id/episodes', 'series-episodes-view');
+			'angular-cache',
 
-        sideNav.register('/series', 'Series', 'fa fa-tv', 40);
-    });
+			'blocks.exception',
+			'blocks.router'
+		]);
 
-})();
+	registerPlugin('plugins.series');
+}());

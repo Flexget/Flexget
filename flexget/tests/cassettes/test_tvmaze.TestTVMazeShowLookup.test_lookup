@@ -1,0 +1,99 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.1.15.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.tvmaze.com/singlesearch/shows?q=House%20MD
+    response:
+      body: {string: !!python/unicode '{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":8.9},"weight":2,"network":{"id":4,"name":"FOX","country":{"name":"United
+          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255,"imdb":"tt0412142"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/43/109520.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/43/109520.jpg"},"summary":"<p>Sink
+          your teeth into meaty drama and intrigue with <em>House</em>, FOX''s take
+          on mystery, where the villain is a medical malady and the hero is an irreverent,
+          controversial doctor who trusts no one, least of all his patients.</p>","updated":1468337738,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}}}'}
+      headers:
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [keep-alive]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Sun, 17 Jul 2016 11:57:36 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.1.15.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.tvmaze.com/shows/118/episodebynumber?season=1&number=2
+    response:
+      body: {string: !!python/unicode '{"id":9032,"url":"http://www.tvmaze.com/episodes/9032/house-1x02-paternity","name":"Paternity","season":1,"number":2,"airdate":"2004-11-23","airtime":"21:00","airstamp":"2004-11-23T21:00:00-05:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/57/144511.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/57/144511.jpg"},"summary":"<p>When
+          a teenage lacrosse player is stricken with an unidentifiable brain disease,
+          Dr. House and the team hustle to give his parents answers. Chase breaks
+          the bad news, the kid has MS, but the boy''s night-terror hallucinations
+          disprove the diagnosis and send House and his team back to square one. As
+          the boy''s health deteriorates, House''s side-bet on the paternity of the
+          patient infuriates Dr. Cuddy and the teenager''s parents, but may just pay
+          off in spades.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/9032"}}}'}
+      headers:
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [keep-alive]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Sun, 17 Jul 2016 11:57:36 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.1.15.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.tvmaze.com/singlesearch/shows?q=Doctor%20Who
+    response:
+      body: {string: !!python/unicode '{"id":210,"url":"http://www.tvmaze.com/shows/210/doctor-who","name":"Doctor
+          Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Running","runtime":45,"premiered":"2005-03-26","schedule":{"time":"21:00","days":["Saturday"]},"rating":{"average":9.2},"weight":3,"network":{"id":12,"name":"BBC
+          One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":3332,"thetvdb":78804,"imdb":"tt0436992"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3179.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3179.jpg"},"summary":"<p>Adventures
+          across time and space with the time travelling alien and his companions.</p>","updated":1468333142,"_links":{"self":{"href":"http://api.tvmaze.com/shows/210"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228572"}}}'}
+      headers:
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [keep-alive]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Sun, 17 Jul 2016 11:57:36 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [!!python/unicode 'FlexGet/2.1.15.dev (www.flexget.com)']
+      method: GET
+      uri: http://api.tvmaze.com/shows/210/episodebynumber?season=2&number=3
+    response:
+      body: {string: !!python/unicode '{"id":13872,"url":"http://www.tvmaze.com/episodes/13872/doctor-who-2x03-school-reunion","name":"School
+          Reunion","season":2,"number":3,"airdate":"2006-04-29","airtime":"19:35","airstamp":"2006-04-29T19:35:00+01:00","runtime":45,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/14/36848.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/14/36848.jpg"},"summary":"<p>The
+          return of Sarah Jane and K-9! The Doctor plus companions old and new fight
+          the bat-like Krillitanes!</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/13872"}}}'}
+      headers:
+        access-control-allow-origin: ['*']
+        cache-control: ['public, max-age=3600']
+        connection: [keep-alive]
+        content-type: [application/json; charset=UTF-8]
+        date: ['Sun, 17 Jul 2016 11:57:36 GMT']
+        server: [nginx/1.4.6 (Ubuntu)]
+        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+      status: {code: 200, message: OK}
+version: 1
