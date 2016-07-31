@@ -226,8 +226,8 @@ class Manager(object):
     def should_reload(self):
         """ Add triggers to the list to trigger a config reload from memory. Needed for some options to work while
          daemon is running """
-        reload_triggers = [self.options.cli_config]
-        if any(trigger for trigger in reload_triggers):
+        reload_triggers = ['cli_config']
+        if any(getattr(self.options, trigger, False) for trigger in reload_triggers):
             return True
         return False
 
