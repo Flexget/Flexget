@@ -325,7 +325,6 @@ def prepare_lookup_for_tvmaze(**lookup_params):
 
 
 class APITVMaze(object):
-
     @staticmethod
     @with_session
     def series_lookup(session=None, only_cached=False, **lookup_params):
@@ -411,23 +410,16 @@ class APITVMaze(object):
         # See if episode already exists in cache
         log.debug('searching for episode of show {0} in cache'.format(series.name))
         episode = session.query(TVMazeEpisodes).filter(
-            or_(
-                and_(TVMazeEpisodes.series_id == series.tvmaze_id,
-                     TVMazeEpisodes.season_number == season_number,
-                     TVMazeEpisodes.number == episode_number),
-                and_(TVMazeEpisodes.series_id == series.tvmaze_id,
-                     TVMazeEpisodes.airdate == episode_date)
-            )
+            and_(TVMazeEpisodes.series_id == series.tvmaze_id,
+                 TVMazeEpisodes.season_number == season_number,
+                 TVMazeEpisodes.number == episode_number)
         ).one_or_none()
 
         # Logic for cache only mode
         if only_cached:
             if episode:
                 log.debug('forcing cache for episode id {3}, number{0}, season {1} for show {2}'
-                          .format(episode.number,
-                                  episode.season_number,
-                                  series.name,
-                                  episode.tvmaze_id))
+                          .format(episode.number, episode.season_number, series.name, episode.tvmaze_id))
                 return episode
         if episode and not episode.expired:
             log.debug('found episode id {3}, number {0}, season {1} for show {2} in cache'
