@@ -117,7 +117,13 @@ class PluginSubliminal(object):
                                         })
         except RegionAlreadyConfigured:
             pass
-        logging.getLogger("subliminal").setLevel(logging.CRITICAL)
+
+        # Let subliminal be more verbose if our logger is set to DEBUG
+        if log.isEnabledFor(logging.DEBUG):
+            logging.getLogger("subliminal").setLevel(logging.INFO)
+        else:
+            logging.getLogger("subliminal").setLevel(logging.CRITICAL)
+
         logging.getLogger("dogpile").setLevel(logging.CRITICAL)
         logging.getLogger("enzyme").setLevel(logging.WARNING)
         try:
