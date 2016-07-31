@@ -118,6 +118,7 @@ class PluginSubliminal(object):
         except RegionAlreadyConfigured:
             pass
         logging.getLogger("subliminal").setLevel(logging.CRITICAL)
+        logging.getLogger("dogpile").setLevel(logging.CRITICAL)
         logging.getLogger("enzyme").setLevel(logging.WARNING)
         try:
             languages = set([Language.fromietf(s) for s in config.get('languages', [])])
