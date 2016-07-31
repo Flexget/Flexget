@@ -49,6 +49,7 @@ class PluginSubliminal(object):
           providers: addic7ed, opensubtitles
           single: no
           directory: /disk/subtitles
+          hearing_impaired: yes
           authentication:
             addic7ed:
               username: myuser
@@ -64,6 +65,7 @@ class PluginSubliminal(object):
             'providers': {'type': 'array', 'items': {'type': 'string', 'enum': PROVIDERS}},
             'single': {'type': 'boolean', 'default': True},
             'directory': {'type:': 'string'},
+            'hearing_impaired': {'type': 'boolean', 'default': False},
             'authentication': {'type': 'object', 'properties': AUTHENTICATION_SCHEMA},
         },
         'required': ['languages'],
@@ -94,6 +96,7 @@ class PluginSubliminal(object):
                 providers: List of providers from where to download subtitles.
                 single: Download subtitles in single mode (no language code added to subtitle filename).
                 directory: Path to directory where to save the subtitles, default is next to the video.
+                hearing_impaired: Prefer subtitles for the hearing impaired when available
                 authentication: >
                   Dictionary of configuration options for different providers.
                   Keys correspond to provider names, and values are dictionaries, usually specifying `username` and `password`.
@@ -132,6 +135,7 @@ class PluginSubliminal(object):
         # we ignore the configuration and add the language code to the
         # potentially downloaded files
         single_mode = config.get('single', '') and len(languages | alternative_languages) <= 1
+        hearing_impaired = config.get('hearing_impaired', False)
 
         with subliminal.core.ProviderPool(providers=providers_list, provider_configs=provider_configs) as provider_pool:
             for entry in task.accepted:
@@ -171,14 +175,16 @@ class PluginSubliminal(object):
                         all_subtitles = provider_pool.list_subtitles(video, entry_languages | alternative_languages)
 
                         subtitles = provider_pool.download_best_subtitles(all_subtitles, video, entry_languages,
-                                                                          min_score=msc)
+                                                                          min_score=msc,
+                                                                          hearing_impaired=hearing_impaired)
                         if subtitles:
                             downloaded_subtitles[video].extend(subtitles)
                             log.info('Subtitles found for %s', entry['location'])
                         else:
                             # only try to download for alternatives that aren't alread downloaded
                             subtitles = provider_pool.download_best_subtitles(all_subtitles, video, alternative_languages,
-                                                                              min_score=msc)
+                                                                              min_score=msc,
+                                                                              hearing_impaired=hearing_impaired)
 
                             if subtitles:
                                 downloaded_subtitles[video].extend(subtitles)
