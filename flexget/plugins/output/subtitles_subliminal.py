@@ -12,14 +12,17 @@ from flexget.event import event
 
 log = logging.getLogger('subtitles')
 
-PROVIDERS = [
-    'opensubtitles',
-    'thesubdb',
-    'podnapisi',
-    'addic7ed',
-    'tvsubtitles'
-]
-
+try:
+    from subliminal.extensions import provider_manager
+    PROVIDERS = provider_manager.names()
+except ImportError as e:
+    PROVIDERS = [
+        'opensubtitles',
+        'thesubdb',
+        'podnapisi',
+        'addic7ed',
+        'tvsubtitles'
+    ]
 
 class PluginSubliminal(object):
     """
