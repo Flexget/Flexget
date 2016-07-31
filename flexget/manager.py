@@ -222,6 +222,15 @@ class Manager(object):
     def has_lock(self):
         return self._has_lock
 
+    @property
+    def should_reload(self):
+        """ Add triggers to the list to trigger a config reload from memory. Needed for some options to work while
+         daemon is running """
+        reload_triggers = [self.options.cli_config]
+        if any(trigger for trigger in reload_triggers):
+            return True
+        return False
+
     def execute(self, options=None, output=None, loglevel=None, priority=1):
         """
         Run all (can be limited with options) tasks from the config.
@@ -263,7 +272,9 @@ class Manager(object):
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
         task_names = sorted(task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535))
 
-        self.update_config(self.validate_config())
+        # A hack to make specific option work by revalidating the config
+        if self.should_reload:
+            self.update_config(self.validate_config())
         finished_events = []
         for task_name in task_names:
             task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority)
