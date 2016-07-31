@@ -24,6 +24,8 @@ except ImportError as e:
         'tvsubtitles'
     ]
 
+AUTHENTICATION_SCHEMA = dict((provider, {'type': 'object'}) for provider in PROVIDERS)
+
 class PluginSubliminal(object):
     """
     Search and download subtitles using Subliminal by Antoine Bertin
@@ -47,6 +49,10 @@ class PluginSubliminal(object):
           providers: addic7ed, opensubtitles
           single: no
           directory: /disk/subtitles
+          authentication:
+            addic7ed:
+              username: myuser
+              passsword: mypassword
     """
 
     schema = {
@@ -58,6 +64,7 @@ class PluginSubliminal(object):
             'providers': {'type': 'array', 'items': {'type': 'string', 'enum': PROVIDERS}},
             'single': {'type': 'boolean', 'default': True},
             'directory': {'type:': 'string'},
+            'authentication': {'type': 'object', 'properties': AUTHENTICATION_SCHEMA},
         },
         'required': ['languages'],
         'additionalProperties': False
@@ -87,6 +94,9 @@ class PluginSubliminal(object):
                 providers: List of providers from where to download subtitles.
                 single: Download subtitles in single mode (no language code added to subtitle filename).
                 directory: Path to directory where to save the subtitles, default is next to the video.
+                authentication: >
+                  Dictionary of configuration options for different providers.
+                  Keys correspond to provider names, and values are dictionaries, usually specifying `username` and `password`.
         """
         if not task.accepted:
             log.debug('nothing accepted, aborting')
@@ -114,6 +124,7 @@ class PluginSubliminal(object):
         # keep all downloaded subtitles and save to disk when done (no need to write every time)
         downloaded_subtitles = collections.defaultdict(list)
         providers_list = config.get('providers', None)
+        provider_configs = config.get('authentication', None)
         # test if only one language was provided, if so we will download in single mode
         # (aka no language code added to subtitle filename)
         # unless we are forced not to by configuration
@@ -121,12 +132,18 @@ class PluginSubliminal(object):
         # we ignore the configuration and add the language code to the
         # potentially downloaded files
         single_mode = config.get('single', '') and len(languages | alternative_languages) <= 1
-        for entry in task.accepted:
-            if 'location' not in entry:
-                log.warning('Cannot act on entries that do not represent a local file.')
-            elif not os.path.exists(entry['location']):
-                entry.fail('file not found: %s' % entry['location'])
-            elif '$RECYCLE.BIN' not in entry['location']:  # ignore deleted files in Windows shares
+
+        with subliminal.core.ProviderPool(providers=providers_list, provider_configs=provider_configs) as provider_pool:
+            for entry in task.accepted:
+                if 'location' not in entry:
+                    log.warning('Cannot act on entries that do not represent a local file.')
+                    continue
+                if not os.path.exists(entry['location']):
+                    entry.fail('file not found: %s' % entry['location'])
+                    continue
+                if '$RECYCLE.BIN' in entry['location']:  # ignore deleted files in Windows shares
+                    continue
+
                 try:
                     entry_languages = set(entry.get('subtitle_languages', [])) or languages
 
@@ -149,23 +166,28 @@ class PluginSubliminal(object):
                         entry['subtitles_missing'] = set()
                         continue  # subs for preferred lang(s) already exists
                     else:
-                        subtitle = subliminal.download_best_subtitles({video}, entry_languages,
-                                                                      providers=providers_list, min_score=msc)
-                        if subtitle and any(subtitle.values()):
-                            downloaded_subtitles.update(subtitle)
+                        # Gather the subtitles for the alternative languages too, to avoid needing to search the sites
+                        # again. They'll just be ignored if the main languages are found.
+                        all_subtitles = provider_pool.list_subtitles(video, entry_languages | alternative_languages)
+
+                        subtitles = provider_pool.download_best_subtitles(all_subtitles, video, entry_languages,
+                                                                          min_score=msc)
+                        if subtitles:
+                            downloaded_subtitles[video].extend(subtitles)
                             log.info('Subtitles found for %s', entry['location'])
                         else:
                             # only try to download for alternatives that aren't alread downloaded
-                            subtitle = subliminal.download_best_subtitles({video}, alternative_languages,
-                                                                          providers=providers_list, min_score=msc)
+                            subtitles = provider_pool.download_best_subtitles(all_subtitles, video, alternative_languages,
+                                                                              min_score=msc)
 
-                            if subtitle and any(subtitle.values()):
-                                downloaded_subtitles.update(subtitle)
+                            if subtitles:
+                                downloaded_subtitles[video].extend(subtitles)
                                 entry.fail('subtitles found for a second-choice language.')
                             else:
                                 entry.fail('cannot find any subtitles for now.')
+
                         downloaded_languages = set([Language.fromietf(str(l.language))
-                                                    for l in subtitle[video]])
+                                                    for l in subtitles])
                         if entry_languages:
                             entry['subtitles_missing'] = entry_languages - downloaded_languages
                             if len(entry['subtitles_missing']) > 0:
