@@ -220,11 +220,11 @@ class FilterSeen(object):
             if config is False:
                 return config
             else:
-                config = {'local': config}
+                config = {'local': False}
         elif isinstance(config, basestring):
-            config = {'local': config}
+            config = {'local': config == 'local'}
 
-        config.setdefault('local', 'global')
+        config.setdefault('local', False)
         config.setdefault('fields', self.fields)
         return config
 
@@ -237,7 +237,7 @@ class FilterSeen(object):
             return
 
         fields = config.get('fields')
-        local = config.get('local') == 'local'
+        local = config.get('local')
 
         for entry in task.entries:
             # construct list of values looked
@@ -267,7 +267,7 @@ class FilterSeen(object):
             return
 
         fields = config.get('fields')
-        local = config.get('local') == 'local'
+        local = config.get('local')
 
         if isinstance(config, list):
             fields.extend(config)
