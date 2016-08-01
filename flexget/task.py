@@ -178,9 +178,11 @@ class Task(object):
 
     """
 
-    max_reruns = 5
     # Used to determine task order, when priority is the same
     _counter = itertools.count()
+    
+    RERUN_DEFAULT = 5
+    RERUN_MAX = 100
 
     def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None):
         """
@@ -224,8 +226,10 @@ class Task(object):
         # simple persistence
         self.simple_persistence = SimpleTaskPersistence(self)
 
-        # not to be reset
+        # rerun related flags and values
         self._rerun_count = 0
+        self._max_reruns = Task.RERUN_DEFAULT
+        self._reruns_locked = False
 
         self.config_modified = None
 
@@ -249,6 +253,37 @@ class Task(object):
         # current state
         self.current_phase = None
         self.current_plugin = None
+        
+    @property
+    def max_reruns(self):
+        """How many times task can be rerunned before stopping"""
+        return self._max_reruns
+        
+    @max_reruns.setter
+    def max_reruns(self, value):
+        """Set new maximum value for reruns unless property has been locked"""
+        if not self._reruns_locked:
+            self._max_reruns = value
+        else:
+            log.debug('max_reruns is locked, %s tried to modify it', self.current_plugin)
+            
+    def lock_reruns(self):
+        """Prevent modification of max_reruns property"""
+        log.debug('Enabling rerun lock')
+        self._reruns_locked = True
+        
+    def unlock_reruns(self):
+        """Allow modification of max_reruns property"""
+        log.debug('Releasing rerun lock')
+        self._reruns_locked = False
+        
+    @property
+    def reruns_locked(self):
+        return self._reruns_locked
+
+    @property
+    def is_rerun(self):
+        return bool(self._rerun_count)
 
     @property
     def undecided(self):
@@ -292,10 +327,6 @@ class Task(object):
         """
         return self._all_entries
 
-    @property
-    def is_rerun(self):
-        return self._rerun_count
-
     def __lt__(self, other):
         return (self.priority, self._count) < (other.priority, other._count)
 
@@ -307,9 +338,6 @@ class Task(object):
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
-
-        All disabled phases are re-enabled by :meth:`Task._reset()` after task
-        execution has been completed.
 
         :param string phase: Name of ``phase``
         :raises ValueError: *phase* could not be found.
@@ -601,7 +629,7 @@ class Task(object):
             while True:
                 self._execute()
                 # rerun task
-                if self._rerun and self._rerun_count < self.max_reruns:
+                if self._rerun and self._rerun_count < self.max_reruns and self._rerun_count < Task.RERUN_MAX:
                     log.info('Rerunning the task in case better resolution can be achieved.')
                     self._rerun_count += 1
                     # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in

@@ -101,6 +101,7 @@ def display_summary(options):
 
 def begin(manager, options):
     series_name = options.series_name
+    series_name = series_name.replace(r'\!', '!')
     ep_id = options.episode_id
     normalized_name = normalize_series_name(series_name)
     with Session() as session:
