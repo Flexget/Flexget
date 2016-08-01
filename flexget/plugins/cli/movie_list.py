@@ -3,12 +3,14 @@ from __future__ import unicode_literals, division, absolute_import
 from argparse import ArgumentParser, ArgumentTypeError
 
 from sqlalchemy.orm.exc import NoResultFound
+from terminaltables import AsciiTable, SingleTable, GithubFlavoredMarkdownTable, DoubleTable
 
 from flexget import options
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
+from flexget.options import CLITable
 from flexget.plugin import PluginError
 from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
     get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase
@@ -72,10 +74,13 @@ def do_cli(manager, options):
 def movie_list_lists(options):
     """ Show all movie lists """
     lists = get_movie_lists()
-    console('Existing movie lists:')
-    console('-' * 20)
-    for movie_list in lists:
-        console(movie_list.name)
+    title = 'Movie lists'
+    header = ['#', 'List Name']
+    table_data = [header]
+    for list in lists:
+        table_data.append([list.id, list.name])
+    table = CLITable('plain', table_data, title)
+    console(table.output)
 
 
 def movie_list_list(options):
