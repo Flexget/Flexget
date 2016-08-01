@@ -78,6 +78,12 @@ class TestSeenLocal(object):
           mock:
           - title: item 1
           - title: item 2
+        local seen 2:
+          seen:
+            local: yes
+          mock:
+          - title: item 1
+          - title: item 2
     """
 
     def test_local(self, execute_task):
@@ -92,6 +98,19 @@ class TestSeenLocal(object):
         task = execute_task('global seen 2')
         assert task.find_entry('rejected', title='item 1'), 'item 1 should be seen'
         assert task.find_entry('accepted', title='item 2'), 'item 2 should be accepted'
+
+    def test_local_dict_config(self, execute_task):
+        task = execute_task('local seen 2')
+        assert task.find_entry('accepted', title='item 1'), 'item 1 should be accepted'
+        assert task.find_entry('accepted', title='item 2'), 'item 2 should be accepted'
+
+        task = execute_task('global seen 2')
+        assert task.find_entry('accepted', title='item 1'), 'item 1 should be accepted'
+        assert task.find_entry('accepted', title='item 2'), 'item 2 should be accepted'
+
+        task = execute_task('local seen 2')
+        assert task.find_entry('rejected', title='item 1'), 'item 1 should be seen'
+        assert task.find_entry('rejected', title='item 2'), 'item 2 should be seen'
 
 
 class TestFilterSeenMovies(object):
