@@ -472,10 +472,17 @@ class CoreArgumentParser(ArgumentParser):
 
 
 class CLITable(object):
+    TABLE_TYPES = {
+        'plain': AsciiTable,
+        'single': SingleTable,
+        'double': DoubleTable,
+        'github': GithubFlavoredMarkdownTable
+    }
+
     def __init__(self, type, table_data, title=None):
         self.table_data = table_data
         self.title = title
-        self.table = self.table_type(type)
+        self.table = self.TABLE_TYPES[type]
 
     @property
     def output(self):
@@ -483,15 +490,8 @@ class CLITable(object):
         table.title = self.title
         return table.table
 
-    @staticmethod
-    def table_type(table_type):
-        if table_type == 'plain':
-            return AsciiTable
-        elif table_type == 'single':
-            return SingleTable
-        elif table_type == 'double':
-            return DoubleTable
-        elif table_type == 'github':
-            return GithubFlavoredMarkdownTable
-        else:
-            raise SyntaxError('Table type {} is not supported'.format(table_type))
+    @property
+    def supported_table_types(self):
+        return list(self.TABLE_TYPES)
+
+
