@@ -8,6 +8,7 @@ from flexget import options, plugin
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
+from flexget.options import CLITable, table_parser
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
@@ -39,64 +40,45 @@ def display_summary(options):
     with Session() as session:
         kwargs = {'configured': options.configured,
                   'premieres': options.premieres,
-                  'session': session}
+                  'session': session,
+                  'sort_by': options.sort_by,
+                  'descending': options.order}
         if options.new:
             kwargs['status'] = 'new'
             kwargs['days'] = options.new
         elif options.stale:
             kwargs['status'] = 'stale'
             kwargs['days'] = options.stale
+        if options.sort_by == 'name':
+            kwargs['sort_by'] = 'show_name'
+        else:
+            kwargs['sort_by'] = 'last_download_date'
 
         query = get_series_summary(**kwargs)
-
-        if options.porcelain:
-            formatting = '%-30s %s %-10s %s %-10s %s %-20s'
-            console(formatting % ('Name', '|', 'Latest', '|', 'Age', '|', 'Downloaded'))
-        else:
-            formatting = ' %-30s %-10s %-10s %-20s'
-            console('-' * 79)
-            console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
-            console('-' * 79)
-
-        for series in query.order_by(Series.name).yield_per(10):
+        header = ['Name', 'Latest', 'Age', 'Downloaded']
+        footer = 'Use `flexget series show NAME` to get detailed information'
+        table_data = [header]
+        for series in query:
             series_name = series.name
-            if len(series_name) > 30:
-                series_name = series_name[:27] + '...'
 
-            new_ep = ' '
+            new_ep = ''
             behind = 0
-            status = 'N/A'
-            age = 'N/A'
-            episode_id = 'N/A'
+            status = '-'
+            age = '-'
+            episode_id = '-'
             latest = get_latest_release(series)
             if latest:
                 if latest.first_seen > datetime.now() - timedelta(days=2):
-                    if options.porcelain:
-                        pass
-                    else:
-                        new_ep = '>'
+                    new_ep = 'Yes'
                 behind = new_eps_after(latest)
                 status = get_latest_status(latest)
                 age = latest.age
                 episode_id = latest.identifier
 
-            if behind:
-                episode_id += ' +%s' % behind
-
-            if options.porcelain:
-                console(formatting % (series_name, '|', episode_id, '|', age, '|', status))
-            else:
-                console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
-            if behind >= 3:
-                console(' ! Latest download is %d episodes behind, this may require '
-                        'manual intervention' % behind)
-
-        if options.porcelain:
-            pass
-        else:
-            console('-' * 79)
-            console(' > = new episode ')
-            console(' Use `flexget series show NAME` to get detailed information')
+            table_data.append([series_name, episode_id, age, status])
+        table = CLITable(options.table_type, table_data)
+        console(table.output)
+        console(footer)
 
 
 def begin(manager, options):
@@ -237,7 +219,8 @@ def register_parser_arguments():
 
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='series_action')
-    list_parser = subparsers.add_parser('list', help='list a summary of the different series being tracked')
+    list_parser = subparsers.add_parser('list', parents=[table_parser],
+                                        help='list a summary of the different series being tracked')
     list_parser.add_argument('configured', nargs='?', choices=['configured', 'unconfigured', 'all'],
                              default='configured',
                              help='limit list to series that are currently in the config or not (default: %(default)s)')
@@ -250,8 +233,14 @@ def register_parser_arguments():
                              help='limit list to series which have not seen a release in %(const)s days. number of '
                                   'days can be overridden with %(metavar)s')
     list_parser.add_argument('--porcelain', action='store_true', help='make the output parseable')
+    list_parser.add_argument('--sort-by', choices=('name', 'age'),
+                             help='Choose list sort attribute')
+    order = list_parser.add_mutually_exclusive_group(required=False)
+    order.add_argument('--descending', dest='order', action='store_true')
+    order.add_argument('--ascending', dest='order', action='store_false')
+
     subparsers.add_parser('show', parents=[series_parser],
-                                        help='show the releases FlexGet has seen for a given series ')
+                          help='show the releases FlexGet has seen for a given series ')
     begin_parser = subparsers.add_parser('begin', parents=[series_parser],
                                          help='set the episode to start getting a series from')
     begin_parser.add_argument('episode_id', metavar='<episode ID>',

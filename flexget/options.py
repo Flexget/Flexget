@@ -476,21 +476,19 @@ class CLITable(object):
     A  data table suited for CLI output, created via its sent parameters.
     """
     def __init__(self, type, table_data, title=None):
-        self.table_data = table_data
         self.title = title
         self.type = type
-        self.table = self.supported_table_types()[type]
+        self.table = self.supported_table_types()[type](table_data)
 
     @property
     def output(self):
-        table = self.table(self.table_data)
-        table.title = self.title
+        self.table.title = self.title
         if self.type == 'porcelain':
             # porcelain is a special case of AsciiTable
-            table.inner_footing_row_border = False
-            table.inner_heading_row_border = False
-            table.outer_border = False
-        return '\n' + table.table
+            self.table.inner_footing_row_border = False
+            self.table.inner_heading_row_border = False
+            self.table.outer_border = False
+        return '\n' + self.table.table
 
     @staticmethod
     def supported_table_types(keys=False):
