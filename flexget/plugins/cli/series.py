@@ -78,7 +78,8 @@ def display_summary(options):
             table_data.append([series_name, episode_id, age, status])
         table = CLITable(options.table_type, table_data)
         console(table.output)
-        console(footer)
+        if not options.table_type == 'porcelain':
+            console(footer)
 
 
 def begin(manager, options):
