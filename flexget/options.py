@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import copy
 import random
@@ -7,7 +8,6 @@ import sys
 from argparse import ArgumentParser as ArgParser
 from argparse import (_VersionAction, Action, ArgumentError, Namespace, PARSER, REMAINDER, SUPPRESS,
                       _SubParsersAction)
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from terminaltables.ascii_table import AsciiTable
 from terminaltables.github_table import GithubFlavoredMarkdownTable
