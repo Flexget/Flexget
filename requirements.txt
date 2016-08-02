@@ -1,11 +1,9 @@
 FeedParser>=5.2.1
 SQLAlchemy >=1.0.9, <1.999
 PyYAML
-# There is a bug in beautifulsoup 4.2.0 that breaks imdb parsing, see http://flexget.com/ticket/2091
-beautifulsoup4>=4.1, !=4.2.0, <4.5
-# Beautifulsoup4 does not work with later versions of html5lib as of bs4 4.4.1 and html5lib>=0.99999999
-# (note the number of 9s, html5lib versions are stupid) https://bugs.launchpad.net/bugs/1603299
-html5lib>=0.11, <=0.9999999
+# Beautifulsoup 4.5+ is required to support different versions of html5lib
+beautifulsoup4>=4.5
+html5lib>=0.11
 PyRSS2Gen
 pynzb
 #PY3 progressbar
