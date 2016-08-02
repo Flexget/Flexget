@@ -31,10 +31,7 @@ class MovieListBase(object):
     @property
     def supported_ids(self):
         # Return a list of supported series identifier as registered via their plugins
-        ids = []
-        for p in plugin.get_plugins(group='movie_metainfo'):
-            ids.append(p.instance.movie_identifier)
-        return ids
+        return [p.instance.movie_identifier for p in plugin.get_plugins(group='movie_metainfo')]
 
 
 class MovieListList(Base):

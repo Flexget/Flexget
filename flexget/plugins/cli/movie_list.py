@@ -89,15 +89,16 @@ def movie_list_list(options):
         except NoResultFound:
             console('Could not find movie list with name {}'.format(options.list_name))
             return
-    title = 'Movies for movies list `{}`'.format(options.list_name)
-    header = ['#', 'Movie Name', 'Movie year']
+    header = ['Movie Name', 'Movie year']
     header += MovieListBase().supported_ids
     table_data = [header]
-    for movie in get_movies_by_list_id(movie_list.id, order_by='added', descending=True, session=session):
-        movie_row = [movie.id, movie.title, movie.year or '-']
+    movies = get_movies_by_list_id(movie_list.id, order_by='added', descending=True, session=session)
+    for movie in movies:
+        movie_row = [movie.title, movie.year or '']
         for identifier in MovieListBase().supported_ids:
             movie_row.append(movie.identifiers.get(identifier, ''))
         table_data.append(movie_row)
+    title = '{} Movies in movie list: `{}`'.format(len(movies), options.list_name)
     table = CLITable(options.table_type, table_data, title)
     console(table.output)
 
