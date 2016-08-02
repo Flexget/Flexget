@@ -55,27 +55,32 @@ def display_summary(options):
             kwargs['sort_by'] = 'last_download_date'
 
         query = get_series_summary(**kwargs)
-        header = ['Name', 'Latest', 'Age', 'Downloaded']
+        header = ['Name', 'Latest', 'Age', 'Downloaded', 'Status']
         footer = 'Use `flexget series show NAME` to get detailed information'
         table_data = [header]
         for series in query:
             series_name = series.name
 
-            new_ep = ''
+            new_ep = False
             behind = 0
-            status = '-'
+            latest_release = '-'
             age = '-'
             episode_id = '-'
             latest = get_latest_release(series)
+            status = ''
             if latest:
                 if latest.first_seen > datetime.now() - timedelta(days=2):
-                    new_ep = 'Yes'
+                    new_ep = True
                 behind = new_eps_after(latest)
-                status = get_latest_status(latest)
+                latest_release = get_latest_status(latest)
                 age = latest.age
                 episode_id = latest.identifier
+            if new_ep:
+                status = 'NEW'
+            if behind > 0:
+                status = '{} behind'.format(behind)
 
-            table_data.append([series_name, episode_id, age, status])
+            table_data.append([series_name, episode_id, age, latest_release, status])
         table = CLITable(options.table_type, table_data)
         console(table.output)
         if not options.table_type == 'porcelain':
