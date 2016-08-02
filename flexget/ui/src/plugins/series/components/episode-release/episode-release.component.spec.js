@@ -1,107 +1,107 @@
 /* global bard, mockSeriesData */
 describe('Plugin: Episode-Release.Component', function () {
-	var component, deferred;
-	var release = mockSeriesData.getRelease();
-	var episode = mockSeriesData.getEpisode();
-	var show = mockSeriesData.getShow();
+    var component, deferred;
+    var release = mockSeriesData.getRelease();
+    var episode = mockSeriesData.getEpisode();
+    var show = mockSeriesData.getShow();
 
-	beforeEach(function () {
-		bard.appModule('plugins.series');
+    beforeEach(function () {
+        bard.appModule('plugins.series');
 
-		/* global $componentController, $q, seriesService, $rootScope, $mdDialog */
-		bard.inject('$componentController', '$q', 'seriesService', '$rootScope', '$mdDialog');
-	});
+        /* global $componentController, $q, seriesService, $rootScope, $mdDialog */
+        bard.inject('$componentController', '$q', 'seriesService', '$rootScope', '$mdDialog');
+    });
 
-	beforeEach(function () {
-		component = $componentController('episodeRelease', null, {
-			show: show,
-			episode: episode.episode,
-			release: release
-		});
-	});
+    beforeEach(function () {
+        component = $componentController('episodeRelease', null, {
+            show: show,
+            episode: episode.episode,
+            release: release
+        });
+    });
 
-	it('should exist', function () {
-		expect(component).to.exist;
-	});
+    it('should exist', function () {
+        expect(component).to.exist;
+    });
 
-	describe('cancel()', function () {
-		it('should exist', function () {
-			expect(component.cancel).to.exist;
-			expect(component.cancel).to.be.a('function');
-		});
+    describe('cancel()', function () {
+        it('should exist', function () {
+            expect(component.cancel).to.exist;
+            expect(component.cancel).to.be.a('function');
+        });
 
-		it('should close the dialog', function () {
-			sinon.stub($mdDialog, 'cancel');
+        it('should close the dialog', function () {
+            sinon.stub($mdDialog, 'cancel');
 
-			component.cancel();
+            component.cancel();
 
-			expect($mdDialog.cancel).to.have.been.calledOnce;
-		});
-	});
+            expect($mdDialog.cancel).to.have.been.calledOnce;
+        });
+    });
 
-	describe('resetRelease()', function () {
-		beforeEach(function () {
-			deferred = $q.defer();
-			sinon.stub(seriesService, 'resetRelease').returns(deferred.promise);
+    describe('resetRelease()', function () {
+        beforeEach(function () {
+            deferred = $q.defer();
+            sinon.stub(seriesService, 'resetRelease').returns(deferred.promise);
 
-		});
+        });
 
-		it('should exist', function () {
-			expect(component.resetRelease).to.exist;
-			expect(component.resetRelease).to.be.a('function');
-		});
+        it('should exist', function () {
+            expect(component.resetRelease).to.exist;
+            expect(component.resetRelease).to.be.a('function');
+        });
 
-		it('should open a dialog', function () {
-			sinon.spy($mdDialog, 'show');
+        it('should open a dialog', function () {
+            sinon.spy($mdDialog, 'show');
 
-			component.resetRelease();
+            component.resetRelease();
 
-			expect($mdDialog.show).to.have.been.calledOnce;
-		});
+            expect($mdDialog.show).to.have.been.calledOnce;
+        });
 
-		describe('confirmation', function () {
-			it('should call the series service', function () {
-				sinon.stub($mdDialog, 'show').returns($q.resolve());
+        describe('confirmation', function () {
+            it('should call the series service', function () {
+                sinon.stub($mdDialog, 'show').returns($q.resolve());
 
-				component.resetRelease(episode);
+                component.resetRelease(episode);
 
-				$rootScope.$digest();
+                $rootScope.$digest();
 
-				expect(seriesService.resetRelease).to.have.been.calledOnce;
-			});
-		});
-	});
+                expect(seriesService.resetRelease).to.have.been.calledOnce;
+            });
+        });
+    });
 
-	describe('forgetRelease()', function () {
-		beforeEach(function () {
-			deferred = $q.defer();
-			sinon.stub(seriesService, 'forgetRelease').returns(deferred.promise);
+    describe('forgetRelease()', function () {
+        beforeEach(function () {
+            deferred = $q.defer();
+            sinon.stub(seriesService, 'forgetRelease').returns(deferred.promise);
 
-		});
+        });
 
-		it('should exist', function () {
-			expect(component.forgetRelease).to.exist;
-			expect(component.forgetRelease).to.be.a('function');
-		});
+        it('should exist', function () {
+            expect(component.forgetRelease).to.exist;
+            expect(component.forgetRelease).to.be.a('function');
+        });
 
-		it('should call the dialog show function', function () {
-			sinon.spy($mdDialog, 'show');
+        it('should call the dialog show function', function () {
+            sinon.spy($mdDialog, 'show');
 
-			component.forgetRelease();
+            component.forgetRelease();
 
-			expect($mdDialog.show).to.have.been.calledOnce;
-		});
+            expect($mdDialog.show).to.have.been.calledOnce;
+        });
 
-		describe('confirmation', function () {
-			it('should call the series service', function () {
-				sinon.stub($mdDialog, 'show').returns($q.resolve());
+        describe('confirmation', function () {
+            it('should call the series service', function () {
+                sinon.stub($mdDialog, 'show').returns($q.resolve());
 
-				component.forgetRelease();
+                component.forgetRelease();
 
-				$rootScope.$digest();
+                $rootScope.$digest();
 
-				expect(seriesService.forgetRelease).to.have.been.calledOnce;
-			});
-		});
-	});
+                expect(seriesService.forgetRelease).to.have.been.calledOnce;
+            });
+        });
+    });
 });

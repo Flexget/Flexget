@@ -3,13 +3,13 @@
     'use strict';
 
     angular
-		.module('plugins.movies')
+        .module('plugins.movies')
         .factory('moviesService', moviesService);
 
     function moviesService($http, CacheFactory, exception) {
         // If cache doesn't exist, create it
 
-		//TODO: Enable cache
+        //TODO: Enable cache
         /*if (!CacheFactory.get('moviesCache')) {
             CacheFactory.createCache('moviesCache');
         }
@@ -22,7 +22,7 @@
             getListMovies: getListMovies,
             deleteMovie: deleteMovie,
             createList: createList,
-			getMovieMetadata: getMovieMetadata
+            getMovieMetadata: getMovieMetadata
         };
 
         function getLists() {
@@ -77,21 +77,21 @@
             }
         }
 
-		function getMovieMetadata(title, params) {
-			return $http.get('/api/trakt/movies/' + title + '/', {
-				params: params,
-				cache: true
-			})
-				.then(getMovieMetadataComplete)
-				.catch(callFailed);
+        function getMovieMetadata(title, params) {
+            return $http.get('/api/trakt/movies/' + title + '/', {
+                params: params,
+                cache: true
+            })
+                .then(getMovieMetadataComplete)
+                .catch(callFailed);
 
-			function getMovieMetadataComplete(response) {
+            function getMovieMetadataComplete(response) {
                 return response.data;
             }
-		}
+        }
 
         function callFailed(error) {
-			return exception.catcher(error);
+            return exception.catcher(error);
         }
     }
 }());

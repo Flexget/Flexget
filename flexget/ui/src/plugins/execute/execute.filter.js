@@ -3,7 +3,7 @@
     'use strict';
 
     angular
-		.module('plugins.execute')
+        .module('plugins.execute')
         .filter('executePhaseFilter', executePhaseFilter);
 
     function executePhaseFilter() {

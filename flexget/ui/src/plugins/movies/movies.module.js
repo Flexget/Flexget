@@ -3,15 +3,15 @@
     'use strict';
 
     angular
-		.module('plugins.movies', [
-			'ngMaterial',
-			'ngSanitize',
+        .module('plugins.movies', [
+            'ngMaterial',
+            'ngSanitize',
 
-			'angular-cache',
+            'angular-cache',
 
-			'blocks.exception',
-			'blocks.router'
-		]);
+            'blocks.exception',
+            'blocks.router'
+        ]);
 
-	registerPlugin('plugins.movies');
+    registerPlugin('plugins.movies');
 }());

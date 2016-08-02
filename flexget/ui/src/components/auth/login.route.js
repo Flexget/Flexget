@@ -4,21 +4,21 @@
 
     angular
         .module('components.auth')
-		.run(appRun);
+        .run(appRun);
 
     function appRun(authService, routerHelper, toolBarService) {
         routerHelper.configureStates(getStates());
 
-		var logoutItem = {
-			menu: 'Manage',
-			type: 'menuItem',
-			label: 'Logout',
-			icon: 'sign-out',
-			action: authService.logout,
-			order: 255
-		};
+        var logoutItem = {
+            menu: 'Manage',
+            type: 'menuItem',
+            label: 'Logout',
+            icon: 'sign-out',
+            action: authService.logout,
+            order: 255
+        };
 
-		toolBarService.registerItem(logoutItem);
+        toolBarService.registerItem(logoutItem);
     }
 
     function getStates() {
@@ -28,10 +28,10 @@
                 config: {
                     url: '/login',
                     component: 'login',
-					root: true,
-					params: {
-						timeout: false
-					}
+                    root: true,
+                    params: {
+                        timeout: false
+                    }
                 }
             }
         ];

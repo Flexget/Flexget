@@ -4,6 +4,6 @@
 
     angular
         .module('components.404', [
-			'blocks.router'
-		]);
+            'blocks.router'
+        ]);
 }());

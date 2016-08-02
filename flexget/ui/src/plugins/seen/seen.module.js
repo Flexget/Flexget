@@ -1,14 +1,14 @@
 /* global angular, registerPlugin */
 (function () {
-	'use strict';
+    'use strict';
 
-	angular
-		.module('plugins.seen', [
-			'angular-cache',
+    angular
+        .module('plugins.seen', [
+            'angular-cache',
 
-			'blocks.exception',
-			'blocks.router'
-		]);
+            'blocks.exception',
+            'blocks.router'
+        ]);
 
-	registerPlugin('plugins.seen');
+    registerPlugin('plugins.seen');
 }());

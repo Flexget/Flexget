@@ -3,14 +3,14 @@
     'use strict';
 
     angular
-		.module('plugins.series', [
-			'ngMaterial',
+        .module('plugins.series', [
+            'ngMaterial',
 
-			'angular-cache',
+            'angular-cache',
 
-			'blocks.exception',
-			'blocks.router'
-		]);
+            'blocks.exception',
+            'blocks.router'
+        ]);
 
-	registerPlugin('plugins.series');
+    registerPlugin('plugins.series');
 }());

@@ -3,7 +3,7 @@
     'use strict';
 
     angular
-		.module('plugins.history')
+        .module('plugins.history')
         .factory('historyService', historyService);
 
     function historyService($http, CacheFactory, exception) {
@@ -29,7 +29,7 @@
         }
 
         function callFailed(error) {
-			return exception.catcher(error);
+            return exception.catcher(error);
         }
     }
 }());

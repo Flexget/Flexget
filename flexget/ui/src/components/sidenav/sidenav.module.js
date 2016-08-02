@@ -4,7 +4,7 @@
 
     angular
         .module('components.sidenav', [
-			'ngMaterial',
-			'blocks.router'
-		]);
+            'ngMaterial',
+            'blocks.router'
+        ]);
 }());

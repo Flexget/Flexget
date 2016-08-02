@@ -1,21 +1,21 @@
 /* global angular */
 (function () {
-	'use strict';
+    'use strict';
 
-	angular
-		.module('components.toolbar')
-		.run(toolbarSetup);
+    angular
+        .module('components.toolbar')
+        .run(toolbarSetup);
 
-	function toolbarSetup(toolBarService) {
-		var manageMenu = {
-			type: 'menu',
-			label: 'Manage',
-			icon: 'cog',
-			items: [],
-			order: 255
-		};
+    function toolbarSetup(toolBarService) {
+        var manageMenu = {
+            type: 'menu',
+            label: 'Manage',
+            icon: 'cog',
+            items: [],
+            order: 255
+        };
 
-		//Register default Manage menu
-		toolBarService.registerItem(manageMenu);
-	}
+        //Register default Manage menu
+        toolBarService.registerItem(manageMenu);
+    }
 }());

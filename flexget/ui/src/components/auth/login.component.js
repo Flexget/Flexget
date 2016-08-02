@@ -1,23 +1,23 @@
 /* global angular */
 (function () {
-	'use strict';
+    'use strict';
 
-	angular
-		.module('components.auth')
-		.component('login', {
-			templateUrl: 'components/auth/login.tmpl.html',
-			controllerAs: 'vm',
-			controller: loginController
-		});
+    angular
+        .module('components.auth')
+        .component('login', {
+            templateUrl: 'components/auth/login.tmpl.html',
+            controllerAs: 'vm',
+            controller: loginController
+        });
 
-	function loginController($stateParams, authService) {
-		var vm = this;
+    function loginController($stateParams, authService) {
+        var vm = this;
 
-		vm.timeout = $stateParams.timeout;
+        vm.timeout = $stateParams.timeout;
         vm.login = login;
-		vm.credentials = {};
+        vm.credentials = {};
 
-		function login() {
+        function login() {
             authService.login(vm.credentials, vm.remember)
                 .catch(function (data) {
                     vm.credentials.password = '';
@@ -28,5 +28,5 @@
                     }
                 });
         }
-	}
+    }
 }());

@@ -4,8 +4,8 @@
     'use strict';
 
     angular
-		.module('components.user', []);
-	//TODO: user component
+        .module('components.user', []);
+    //TODO: user component
  /*       .run(userConfig);
 
     function userConfig(toolBar) {

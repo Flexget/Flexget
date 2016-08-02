@@ -4,8 +4,8 @@
 
     angular
         .module('components.auth', [
-			'blocks.exception',
-			'blocks.router',
-			'components.toolbar'
-		]);
+            'blocks.exception',
+            'blocks.router',
+            'components.toolbar'
+        ]);
 }());

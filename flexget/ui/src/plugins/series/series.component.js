@@ -20,21 +20,21 @@
             'sort_by': 'show_name'
         };
 
-		var params = {
-			forget: true
-		};
+        var params = {
+            forget: true
+        };
 
         vm.searchTerm = '';
 
-		vm.$onInit = activate;
-		vm.forgetShow = forgetShow;
-		vm.search = search;
-		vm.toggleEpisodes = toggleEpisodes;
-		vm.areEpisodesOnShowRow = areEpisodesOnShowRow;
+        vm.$onInit = activate;
+        vm.forgetShow = forgetShow;
+        vm.search = search;
+        vm.toggleEpisodes = toggleEpisodes;
+        vm.areEpisodesOnShowRow = areEpisodesOnShowRow;
 
-		function activate() {
-			getSeriesList();
-		}
+        function activate() {
+            getSeriesList();
+        }
 
         function getSeriesList() {
             seriesService.getShows(options).then(function (data) {
@@ -46,19 +46,19 @@
             });
         }
 
-		function forgetShow(show) {
-			var confirm = $mdDialog.confirm()
+        function forgetShow(show) {
+            var confirm = $mdDialog.confirm()
                 .title('Confirm forgetting show.')
                 .htmlContent('Are you sure you want to completely forget <b>' + show['show_name'] + '</b>?<br /> This will also forget all downloaded releases.')
                 .ok('Forget')
                 .cancel('No');
 
-			$mdDialog.show(confirm).then(function () {
-				seriesService.deleteShow(show, params).then(function () {
-					getSeriesList();
-				});
-			});
-		}
+            $mdDialog.show(confirm).then(function () {
+                seriesService.deleteShow(show, params).then(function () {
+                    getSeriesList();
+                });
+            });
+        }
 
         //Call from the pagination to update the page to the selected page
         vm.updateListPage = function (index) {
@@ -69,52 +69,52 @@
 
 
         function search() {
-			vm.searchTerm ? searchShows() : emptySearch();
+            vm.searchTerm ? searchShows() : emptySearch();
 
-			function searchShows() {
+            function searchShows() {
                 seriesService.searchShows(vm.searchTerm).then(function (data) {
                     vm.series = data.shows;
                 });
-			}
+            }
 
-			function emptySearch() {
+            function emptySearch() {
                 options.page = 1;
                 getSeriesList();
             }
         }
 
         function toggleEpisodes(show) {
-			show === vm.selectedShow ? clearShow() : setSelectedShow();
+            show === vm.selectedShow ? clearShow() : setSelectedShow();
 
-			function clearShow() {
-				vm.selectedShow = null;
-			}
+            function clearShow() {
+                vm.selectedShow = null;
+            }
 
-			function setSelectedShow() {
-				vm.selectedShow = null;
-				$timeout(function () {
-					vm.selectedShow = show;
-				});
-			}
+            function setSelectedShow() {
+                vm.selectedShow = null;
+                $timeout(function () {
+                    vm.selectedShow = show;
+                });
+            }
         }
 
-		function getNumberOfColumns() {
-			if ($mdMedia('gt-lg')) {
-				return 3;
-			} else if ($mdMedia('gt-md')) {
-				return 2;
-			}
-			return 1;
-		}
+        function getNumberOfColumns() {
+            if ($mdMedia('gt-lg')) {
+                return 3;
+            } else if ($mdMedia('gt-md')) {
+                return 2;
+            }
+            return 1;
+        }
 
         function areEpisodesOnShowRow(index) {
-			var show = vm.selectedShow;
+            var show = vm.selectedShow;
 
             if (!show) {
-				return false;
-			}
-			
-			var numberOfColumns = getNumberOfColumns();
+                return false;
+            }
+            
+            var numberOfColumns = getNumberOfColumns();
 
             var column = index % numberOfColumns;
             var row = (index - column) / numberOfColumns;
@@ -124,15 +124,15 @@
             var showRow = (showIndex - showColumn) / numberOfColumns;
 
             if (row !== showRow) {
-				return false;
-			}
+                return false;
+            }
 
-			//Check if not last series, since it doesn't work correctly with the matrix here
+            //Check if not last series, since it doesn't work correctly with the matrix here
             if (index !== vm.series.length - 1 && column !== numberOfColumns - 1) {
-				return false;
-			}
+                return false;
+            }
 
             return true;
-		}
-	}
+        }
+    }
 }());

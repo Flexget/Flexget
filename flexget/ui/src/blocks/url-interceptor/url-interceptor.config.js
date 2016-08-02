@@ -1,12 +1,12 @@
 /* global angular */
 (function () {
-	'use strict';
+    'use strict';
 
-	angular
-		.module('blocks.urlInterceptor')
-		.config(configInterceptor);
+    angular
+        .module('blocks.urlInterceptor')
+        .config(configInterceptor);
 
-	function configInterceptor($httpProvider) {
-		$httpProvider.interceptors.push('urlInterceptor');
-	}
+    function configInterceptor($httpProvider) {
+        $httpProvider.interceptors.push('urlInterceptor');
+    }
 }());

@@ -3,13 +3,13 @@
     'use strict';
 
     angular
-		.module('plugins.config')
+        .module('plugins.config')
         .factory('configService', configService);
 
     function configService($http, exception, $q) {
         return {
             getRawConfig: getRawConfig,
-			saveRawConfig: saveRawConfig
+            saveRawConfig: saveRawConfig
         };
 
         function getRawConfig() {
@@ -22,24 +22,24 @@
             }
         }
 
-		function saveRawConfig(encoded) {
-			return $http.post('/api/server/raw_config', {
-				'raw_config': encoded
-			})
-				.then(saveRawConfigComplete)
-				.catch(saveRawConfigFailed);
+        function saveRawConfig(encoded) {
+            return $http.post('/api/server/raw_config', {
+                'raw_config': encoded
+            })
+                .then(saveRawConfigComplete)
+                .catch(saveRawConfigFailed);
 
-			function saveRawConfigComplete() {
-				return;
-			}
+            function saveRawConfigComplete() {
+                return;
+            }
 
-			function saveRawConfigFailed(response) {
-				return $q.reject(response.data);
-			}
-		}
+            function saveRawConfigFailed(response) {
+                return $q.reject(response.data);
+            }
+        }
 
         function callFailed(error) {
-			return exception.catcher(error);
+            return exception.catcher(error);
         }
     }
 }());

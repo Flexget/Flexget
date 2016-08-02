@@ -3,14 +3,14 @@
     'use strict';
 
     angular
-		.module('plugins.execute')
-		.factory('executeService', executeService);
+        .module('plugins.execute')
+        .factory('executeService', executeService);
 
     function executeService($http, $q, exception) {
         return {
             getTasks: getTasks,
-			getQueue: getQueue,
-			executeTasks: executeTasks
+            getQueue: getQueue,
+            executeTasks: executeTasks
         };
 
         function getTasks() {
@@ -23,17 +23,17 @@
             }
         }
 
-		function getQueue() {
+        function getQueue() {
             return $http.get('/api/tasks/queue/', { ignoreLoadingBar: true })
-				.then(getQueueComplete)
+                .then(getQueueComplete)
                 .catch(callFailed);
 
-			function getQueueComplete(response) {
-				return response.data;
-			}
+            function getQueueComplete(response) {
+                return response.data;
+            }
         }
 
-		function executeTasks(options) {
+        function executeTasks(options) {
             var deferred = $q.defer();
 
             var stream = oboe({
@@ -74,7 +74,7 @@
         }
 
         function callFailed(error) {
-			return exception.catcher(error);
+            return exception.catcher(error);
         }
     }
 }());

@@ -3,7 +3,7 @@
     'use strict';
 
     angular
-		.module('plugins.seen')
+        .module('plugins.seen')
         .factory('seenService', seenService);
 
     function seenService($http, CacheFactory, exception) {
@@ -29,7 +29,7 @@
         }
 
         function callFailed(error) {
-			return exception.catcher(error);
+            return exception.catcher(error);
         }
     }
 }());

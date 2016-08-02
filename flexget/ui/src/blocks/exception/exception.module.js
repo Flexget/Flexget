@@ -4,6 +4,6 @@
 
     angular
         .module('blocks.exception', [
-			'blocks.error'
-		]);
+            'blocks.error'
+        ]);
 }());

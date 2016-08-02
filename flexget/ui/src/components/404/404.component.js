@@ -1,22 +1,22 @@
 /* global angular */
 (function () {
-	'use strict';
+    'use strict';
 
-	angular
-		.module('components.404')
-		.component('notFound', {
-			templateUrl: 'components/404/404.tmpl.html',
-			controllerAs: 'vm',
-			controller: notFoundController
-		});
+    angular
+        .module('components.404')
+        .component('notFound', {
+            templateUrl: 'components/404/404.tmpl.html',
+            controllerAs: 'vm',
+            controller: notFoundController
+        });
 
-	function notFoundController($state) {
-		var vm = this;
+    function notFoundController($state) {
+        var vm = this;
 
-		vm.goHome = goHome;
+        vm.goHome = goHome;
 
-		function goHome() {
+        function goHome() {
             $state.go('flexget.home');
-		}
-	}
+        }
+    }
 }());

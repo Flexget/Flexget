@@ -4,8 +4,8 @@
 
     angular
         .module('components.core', [
-			'ngMaterial',
+            'ngMaterial',
 
-			'blocks.router'
-		]);
+            'blocks.router'
+        ]);
 }());
