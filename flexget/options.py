@@ -472,6 +472,9 @@ class CoreArgumentParser(ArgumentParser):
 
 
 class CLITable(object):
+    """
+    A  data table suited for CLI output, created via its sent parameters.
+    """
     def __init__(self, type, table_data, title=None):
         self.table_data = table_data
         self.title = title
@@ -491,6 +494,9 @@ class CLITable(object):
 
     @staticmethod
     def supported_table_types(keys=False):
+        """
+        This method hold the dict for supported table type. Call with `keys=True` to get just the list of keys.
+        """
         table_types = {
             'plain': AsciiTable,
             'porcelain': AsciiTable,
