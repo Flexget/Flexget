@@ -481,7 +481,7 @@ class CLITable(object):
     def output(self):
         table = self.table(self.table_data)
         table.title = self.title
-        return table.table
+        return '\n' + table.table
 
     @staticmethod
     def supported_table_types(keys=False):
