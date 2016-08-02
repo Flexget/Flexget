@@ -3,7 +3,6 @@ from __future__ import unicode_literals, division, absolute_import
 from argparse import ArgumentParser, ArgumentTypeError
 
 from sqlalchemy.orm.exc import NoResultFound
-from terminaltables import AsciiTable, SingleTable, GithubFlavoredMarkdownTable, DoubleTable
 
 from flexget import options
 from flexget.entry import Entry
@@ -76,8 +75,8 @@ def movie_list_lists(options):
     lists = get_movie_lists()
     header = ['#', 'List Name']
     table_data = [header]
-    for list in lists:
-        table_data.append([list.id, list.name])
+    for movie_list in lists:
+        table_data.append([movie_list.id, movie_list.name])
     table = CLITable(options.table_type, table_data)
     console(table.output)
 
