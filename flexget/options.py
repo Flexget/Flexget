@@ -475,18 +475,25 @@ class CLITable(object):
     def __init__(self, type, table_data, title=None):
         self.table_data = table_data
         self.title = title
+        self.type = type
         self.table = self.supported_table_types()[type]
 
     @property
     def output(self):
         table = self.table(self.table_data)
         table.title = self.title
+        if self.type == 'porcelain':
+            # porcelain is a special case of AsciiTable
+            table.inner_footing_row_border = False
+            table.inner_heading_row_border = False
+            table.outer_border = False
         return '\n' + table.table
 
     @staticmethod
     def supported_table_types(keys=False):
         table_types = {
             'plain': AsciiTable,
+            'porcelain': AsciiTable,
             'single': SingleTable,
             'double': DoubleTable,
             'github': GithubFlavoredMarkdownTable
