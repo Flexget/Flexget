@@ -94,10 +94,7 @@ class MovieListMovie(Base):
     @property
     def identifiers(self):
         """ Return a dict of movie identifiers """
-        ident_dict = {}
-        for identifer in self.ids:
-            ident_dict[identifer.id_name] = identifer.id_value
-        return ident_dict
+        return {identifier.id_name: identifier.id_value for identifier in self.ids}
 
 
 class MovieListID(Base):
