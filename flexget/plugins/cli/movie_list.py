@@ -10,7 +10,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
-from flexget.options import CLITable
+from flexget.options import CLITable, table_parser
 from flexget.plugin import PluginError
 from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
     get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase
@@ -79,7 +79,7 @@ def movie_list_lists(options):
     table_data = [header]
     for list in lists:
         table_data.append([list.id, list.name])
-    table = CLITable('plain', table_data, title)
+    table = CLITable(options.table_type, table_data, title)
     console(table.output)
 
 
@@ -182,7 +182,7 @@ def register_parser_arguments():
     parser = options.register_command('movie-list', do_cli, help='view and manage movie lists')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='list_action')
-    subparsers.add_parser('all', help='shows all existing movie lists')
+    subparsers.add_parser('all', parents=[table_parser], help='shows all existing movie lists')
     subparsers.add_parser('list', parents=[list_name_parser], help='list movies from a list')
     subparsers.add_parser('add', parents=[list_name_parser, movie_parser, identifiers_parser],
                           help='add a movie to a list')

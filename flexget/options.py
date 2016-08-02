@@ -472,17 +472,10 @@ class CoreArgumentParser(ArgumentParser):
 
 
 class CLITable(object):
-    TABLE_TYPES = {
-        'plain': AsciiTable,
-        'single': SingleTable,
-        'double': DoubleTable,
-        'github': GithubFlavoredMarkdownTable
-    }
-
     def __init__(self, type, table_data, title=None):
         self.table_data = table_data
         self.title = title
-        self.table = self.TABLE_TYPES[type]
+        self.table = self.supported_table_types()[type]
 
     @property
     def output(self):
@@ -490,8 +483,20 @@ class CLITable(object):
         table.title = self.title
         return table.table
 
-    @property
-    def supported_table_types(self):
-        return list(self.TABLE_TYPES)
+    @staticmethod
+    def supported_table_types(keys=False):
+        table_types = {
+            'plain': AsciiTable,
+            'single': SingleTable,
+            'double': DoubleTable,
+            'github': GithubFlavoredMarkdownTable
+        }
+        if keys:
+            return list(table_types)
+        return table_types
 
 
+# The CLI table parent parser
+table_parser = ArgumentParser(add_help=False)
+table_parser.add_argument('--table-type', choices=CLITable.supported_table_types(keys=True), default='single',
+                          help='Select output table style')
