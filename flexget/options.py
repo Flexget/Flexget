@@ -4,15 +4,14 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import copy
 import random
 import string
+import sys
 from argparse import ArgumentParser as ArgParser
 from argparse import (_VersionAction, Action, ArgumentError, Namespace, PARSER, REMAINDER, SUPPRESS,
                       _SubParsersAction)
 
 from colorclass import Color
 from colorclass.windows import Windows
-from terminaltables.ascii_table import AsciiTable
-from terminaltables.github_table import GithubFlavoredMarkdownTable
-from terminaltables.other_tables import SingleTable, DoubleTable
+from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable
 
 import flexget
 from flexget.entry import Entry
