@@ -109,22 +109,25 @@ if __name__ == '__main__':
     oldestref = re.match('<!---\s*([\d\w]+)', end_comment).group(1)
     released_vers = []
     commits = list(repo.iter_commits('{0}..HEAD'.format(latestref), reverse=True))
+    modified = False
     if commits:
-        modified = False
         tags = {}
         for tag in repo.tags:
-            tags[tag.commit] = tag.tag
+            tags[tag.commit.hexsha] = tag.tag
         for commit in commits:
             if cur_ver.parse_message(commit.message):
                 modified = True
-            if commit in tags:
+            if commit.hexsha in tags:
                 modified = True
                 # Tag changeset with release date and version and create new current changeset
-                version = tags[commit].tag
-                release_date = datetime.datetime.fromtimestamp(tags[commit].tagged_date).strftime('%Y-%m-%d')
+                version = tags[commit.hexsha].tag
+                release_date = datetime.datetime.fromtimestamp(tags[commit.hexsha].tagged_date).strftime('%Y-%m-%d')
                 cur_ver.version_header = '## {0} ({1})\n'.format(version, release_date)
+                diffstartref = oldestref
+                if oldestref in tags:
+                    diffstartref = tags[oldestref].tag
                 cur_ver.post_header.insert(0, '[all commits](https://github.com/Flexget/Flexget/compare/{0}...{1})\n'.
-                                           format(oldestref, commit.hexsha))
+                                           format(diffstartref, version))
                 released_vers.insert(0, cur_ver)
                 cur_ver = MDChangeSet()
                 oldestref = commit.hexsha
@@ -138,12 +141,15 @@ if __name__ == '__main__':
                     pass
                 cur_ver.version_header = '## {0} (unreleased)\n'.format(__version__)
 
-        if modified:
-            with io.open(filename, 'w', encoding='utf-8') as logfile:
-                logfile.writelines(pre_lines)
-                logfile.write('<!---{0}--->\n'.format(commit.hexsha))
-                logfile.writelines(cur_ver.to_md_lines())
-                logfile.write('<!---{0}--->\n'.format(oldestref))
-                for ver in released_vers:
-                    logfile.writelines(ver.to_md_lines())
-                logfile.writelines(post_lines)
+    if modified:
+        print('Writing modified changelog.')
+        with io.open(filename, 'w', encoding='utf-8') as logfile:
+            logfile.writelines(pre_lines)
+            logfile.write('<!---{0}--->\n'.format(commit.hexsha))
+            logfile.writelines(cur_ver.to_md_lines())
+            logfile.write('<!---{0}--->\n'.format(oldestref))
+            for ver in released_vers:
+                logfile.writelines(ver.to_md_lines())
+            logfile.writelines(post_lines)
+    else:
+        print('No updates to write.')
