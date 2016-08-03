@@ -12,13 +12,13 @@ from argparse import (_VersionAction, Action, ArgumentError, Namespace, PARSER, 
 from colorclass import Color
 from colorclass.windows import Windows
 from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable
+from terminaltables.terminal_io import terminal_size
 
 import flexget
 from flexget.entry import Entry
 from flexget.event import fire_event
 from flexget.logger import console
 from flexget.utils import requests
-from terminaltables.terminal_io import terminal_size
 
 _UNSET = object()
 

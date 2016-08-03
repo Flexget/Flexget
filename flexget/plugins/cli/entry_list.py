@@ -106,6 +106,7 @@ def entry_list_show(options):
         header = ['Field name', 'Value']
         table_data = [header]
         for k, v in sorted(entry.entry.items()):
+            # Entry can contain a lot of crap, need to convert to str
             try:
                 try:
                     if len(str(v)) > 100:
