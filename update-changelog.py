@@ -30,7 +30,9 @@ class MDChangeSet(object):
     def from_md_lines(cls, lines):
         """Parse an existing markdown changeset section and return the VersionLog instance."""
         instance = cls()
-        instance.pre_header, instance.version_header, tail = isplit('## ', lines)
+        instance.pre_header, version_header, tail = isplit('## ', lines)
+        if version_header:
+            instance.version_header = version_header
         instance.post_header, section, tail = isplit('### ', tail)
         while section:
             instance.sections[section], section, tail = isplit('### ', tail)
