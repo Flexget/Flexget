@@ -57,7 +57,10 @@ def entry_list_lists(options):
         for entry_list in lists:
             table_data.append([entry_list.id, entry_list.name])
     table = CLITable(options.table_type, table_data)
-    console(table.output)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def entry_list_list(options):
@@ -73,7 +76,10 @@ def entry_list_list(options):
         for entry in get_entries_by_list_id(entry_list.id, order_by='added', descending=True, session=session):
             table_data.append([entry.id, entry.title, len(entry.entry)])
     table = CLITable(options.table_type, table_data)
-    console(table.output)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def entry_list_show(options):

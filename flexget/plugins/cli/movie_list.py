@@ -9,7 +9,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
-from flexget.options import CLITable, table_parser
+from flexget.options import CLITable, table_parser, CLITableError
 from flexget.plugin import PluginError
 from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
     get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase
@@ -78,7 +78,10 @@ def movie_list_lists(options):
     for movie_list in lists:
         table_data.append([movie_list.id, movie_list.name])
     table = CLITable(options.table_type, table_data)
-    console(table.output)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def movie_list_list(options):
@@ -100,7 +103,10 @@ def movie_list_list(options):
         table_data.append(movie_row)
     title = '{} Movies in movie list: `{}`'.format(len(movies), options.list_name)
     table = CLITable(options.table_type, table_data, title)
-    console(table.output)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def movie_list_add(options):

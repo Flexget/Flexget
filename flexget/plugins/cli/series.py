@@ -11,7 +11,7 @@ from flexget.logger import console
 from flexget.manager import Session
 
 try:
-    from flexget.options import CLITable, table_parser
+    from flexget.options import CLITable, table_parser, CLITableError
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='CLITable',
                                  message='Series commandline interface not loaded')
@@ -105,7 +105,11 @@ def display_summary(options):
 
             table_data.append([series_name, episode_id, age, latest_release, identifier_type, status])
     table = CLITable(options.table_type, table_data)
-    console(table.output)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
+        return
     if not options.table_type == 'porcelain':
         console(footer)
 
@@ -236,7 +240,11 @@ def display_details(options):
         if series.begin:
             footer += ' Begin episode for this series set to `%s`.' % series.begin.identifier
     table = CLITable(options.table_type, table_data, table_title)
-    console(table.output)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
+        return
     if not options.table_type == 'porcelain':
         console(footer)
 
