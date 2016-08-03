@@ -32,7 +32,8 @@ BEHIND_EP_COLOR = 'autored'
 def do_cli(manager, options):
     global color
     # Create partial that passes table type, since `porcelain` should disable colors
-    color = partial(CLITable.colorize, porcelain=options.table_type == 'porcelain')
+    if options.series_action in ['list', 'show']:
+        color = partial(CLITable.colorize, porcelain=options.table_type == 'porcelain')
 
     if options.series_action == 'list':
         display_summary(options)
@@ -70,7 +71,7 @@ def display_summary(options):
             kwargs['sort_by'] = 'last_download_date'
 
         query = get_series_summary(**kwargs)
-        header = ['Name', 'Latest', 'Age', 'Downloaded', 'Status']
+        header = ['Name', 'Latest', 'Age', 'Downloaded', 'Identified By', 'Status']
         for i in range(len(header)):
             if header[i].lower() == options.sort_by:
                 header[i] = color(header[i], SORT_COLUMN_COLOR)
@@ -86,6 +87,7 @@ def display_summary(options):
             episode_id = '-'
             latest = get_latest_release(series)
             status = ''
+            identifier_type = series.identified_by
             if latest:
                 if latest.first_seen > datetime.now() - timedelta(days=2):
                     new_ep = True
@@ -98,7 +100,7 @@ def display_summary(options):
             if behind > 0:
                 status = color('{} behind'.format(behind), BEHIND_EP_COLOR)
 
-            table_data.append([series_name, episode_id, age, latest_release, status])
+            table_data.append([series_name, episode_id, age, latest_release, identifier_type, status])
     table = CLITable(options.table_type, table_data)
     console(table.output)
     if not options.table_type == 'porcelain':
@@ -172,6 +174,25 @@ def get_latest_status(episode):
                 status += str(release.proper_count)
         status += ', '
     return status.rstrip(', ') if status else None
+
+
+def display_details2(name):
+    """Display detailed series information, ie. series show NAME"""
+    with Session() as session:
+        name = normalize_series_name(name)
+        # Sort by length of name, so that partial matches always show shortest matching title
+        matches = shows_by_name(name, session=session)
+        if not matches:
+            console('ERROR: Unknown series `%s`' % name)
+            return
+        # Pick the best matching series
+        series = matches[0]
+        console('Showing results for `%s`.' % series.name)
+        if len(matches) > 1:
+            console('WARNING: Multiple series match to `%s`.' % name)
+            console('Be more specific to see the results of other matches:')
+            for s in matches[1:]:
+                console(' - %s' % s.name)
 
 
 def display_details(name):
@@ -264,7 +285,7 @@ def register_parser_arguments():
     order.add_argument('--descending', dest='order', action='store_true', help='Sort in descending order')
     order.add_argument('--ascending', dest='order', action='store_false', help='Sort in ascending order')
 
-    subparsers.add_parser('show', parents=[series_parser],
+    subparsers.add_parser('show', parents=[series_parser, table_parser],
                           help='Show the releases FlexGet has seen for a given series ')
     begin_parser = subparsers.add_parser('begin', parents=[series_parser],
                                          help='set the episode to start getting a series from')
