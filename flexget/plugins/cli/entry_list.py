@@ -68,10 +68,12 @@ def entry_list_list(options):
         except NoResultFound:
             console('Could not find entry list with name {}'.format(options.list_name))
             return
-        console('Entries for list `{}`:'.format(options.list_name))
-        console('-' * 79)
+        header = ['#', 'Title', '# of fields']
+        table_data = [header]
         for entry in get_entries_by_list_id(entry_list.id, order_by='added', descending=True, session=session):
-            console('{:2d}: {}, {} fields'.format(entry.id, entry.title, len(entry.entry)))
+            table_data.append([entry.id, entry.title, len(entry.entry)])
+    table = CLITable(options.table_type, table_data)
+    console(table.output)
 
 
 def entry_list_show(options):
@@ -189,8 +191,8 @@ def register_parser_arguments():
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='list_action')
     subparsers.add_parser('all', help='Shows all existing entry lists', parents=[table_parser])
-    subparsers.add_parser('list', parents=[list_name_parser], help='List entries from a list')
-    subparsers.add_parser('show', parents=[list_name_parser, global_entry_parser],
+    subparsers.add_parser('list', parents=[list_name_parser, table_parser], help='List entries from a list')
+    subparsers.add_parser('show', parents=[list_name_parser, global_entry_parser, table_parser],
                           help='Show entry fields.')
     subparsers.add_parser('add', parents=[list_name_parser, entry_parser, attributes_parser],
                           help='Add an entry to a list')
