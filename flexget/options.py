@@ -18,6 +18,7 @@ from flexget.entry import Entry
 from flexget.event import fire_event
 from flexget.logger import console
 from flexget.utils import requests
+from terminaltables.terminal_io import terminal_size
 
 _UNSET = object()
 
@@ -495,7 +496,9 @@ class CLITable(object):
             self.table.outer_border = False
         if self.table.ok:
             return '\n' + self.table.table
-        raise CLITableError('Terminal size is not suffice to display table.')
+        raise CLITableError(
+            'Terminal size is not suffice to display table. Terminal width is {}, table width is {}'.format(
+                terminal_size()[0], self.table.table_width))
 
     @staticmethod
     def supported_table_types(keys=False):
