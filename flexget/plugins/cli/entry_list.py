@@ -8,7 +8,7 @@ from flexget import options
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
-from flexget.options import CLITable, table_parser
+from flexget.options import CLITable, table_parser, CLITableError
 from flexget.plugins.list.entry_list import get_entry_lists, get_list_by_exact_name, get_entries_by_list_id, \
     get_entry_by_id, get_entry_by_title, EntryListList, EntryListEntry
 
@@ -97,11 +97,23 @@ def entry_list_show(options):
                     'Could not find matching entry with title `{}` in list `{}`'.format(options.entry,
                                                                                         options.list_name))
                 return
-
-        console('Showing fields for entry ID {}'.format(options.list_name))
-        console('-' * 79)
+        header = ['Field name', 'Value']
+        table_data = [header]
         for k, v in sorted(entry.entry.items()):
-            console('{}: {}'.format(k.upper(), v))
+            try:
+                try:
+                    if len(str(v)) > 100:
+                        v = str(v)[:150] + '...'
+                except UnicodeEncodeError:
+                    v = v.encode('utf-8')[:150] + '...'
+            except TypeError:
+                pass
+            table_data.append([k, v])
+    table = CLITable(options.table_type, table_data)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def entry_list_add(options):

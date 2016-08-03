@@ -471,6 +471,10 @@ class CoreArgumentParser(ArgumentParser):
         return result
 
 
+class CLITableError(Exception):
+    """ A CLI table error"""
+
+
 class CLITable(object):
     """
     A data table suited for CLI output, created via its sent parameters.
@@ -489,7 +493,9 @@ class CLITable(object):
             self.table.inner_footing_row_border = False
             self.table.inner_heading_row_border = False
             self.table.outer_border = False
-        return '\n' + self.table.table
+        if self.table.ok:
+            return '\n' + self.table.table
+        raise CLITableError('Terminal size is not suffice to display table.')
 
     @staticmethod
     def supported_table_types(keys=False):
@@ -528,4 +534,4 @@ table_parser = ArgumentParser(add_help=False)
 table_parser.add_argument('--table-type', choices=CLITable.supported_table_types(keys=True), default='single',
                           help='Select output table style')
 table_parser.add_argument('--porcelain', dest='table_type', action='store_const', const='porcelain',
-                         help='Make the output parseable. Similar to using `--table-type porcelain`')
+                          help='Make the output parseable. Similar to using `--table-type porcelain`')
