@@ -4,16 +4,15 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import copy
 import random
 import string
-import sys
 from argparse import ArgumentParser as ArgParser
 from argparse import (_VersionAction, Action, ArgumentError, Namespace, PARSER, REMAINDER, SUPPRESS,
                       _SubParsersAction)
 
+from colorclass import Color
 from colorclass.windows import Windows
 from terminaltables.ascii_table import AsciiTable
 from terminaltables.github_table import GithubFlavoredMarkdownTable
 from terminaltables.other_tables import SingleTable, DoubleTable
-from colorclass import Color
 
 import flexget
 from flexget.entry import Entry
@@ -475,7 +474,7 @@ class CoreArgumentParser(ArgumentParser):
 
 class CLITable(object):
     """
-    A  data table suited for CLI output, created via its sent parameters.
+    A data table suited for CLI output, created via its sent parameters.
     """
 
     def __init__(self, type, table_data, title=None):
@@ -510,12 +509,19 @@ class CLITable(object):
         return table_types
 
     @staticmethod
-    def colorize(text, color, porcelain=False):
+    def colorize(text, color_tag, porcelain=False):
+        """
+        This method calls for `colorclass` to try and color the given text
+        :param text: Text to color
+        :param color_tag: Color tag. Should adhere to colorclass.list_tags().
+        :param porcelain: If True, no colors should be returned.
+        :return: Text or colorized text
+        """
         if porcelain:
             return text
         if sys.platform == 'win32':
             Windows.enable(auto_colors=True)
-        return Color('{%s}%s{%s}' % (color, text, '/' + color))
+        return Color('{%s}%s{%s}' % (color_tag, text, '/' + color_tag))
 
 
 # The CLI table parent parser

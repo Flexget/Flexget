@@ -24,7 +24,7 @@ except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
 
-SORT_COLUMN_COLOR = 'autobgwhite'
+SORT_COLUMN_COLOR = 'autoyellow'
 NEW_EP_COLOR = 'autogreen'
 BEHIND_EP_COLOR = 'autored'
 
@@ -99,10 +99,10 @@ def display_summary(options):
                 status = color('{} behind'.format(behind), BEHIND_EP_COLOR)
 
             table_data.append([series_name, episode_id, age, latest_release, status])
-        table = CLITable(options.table_type, table_data)
-        console(table.output)
-        if not options.table_type == 'porcelain':
-            console(footer)
+    table = CLITable(options.table_type, table_data)
+    console(table.output)
+    if not options.table_type == 'porcelain':
+        console(footer)
 
 
 def begin(manager, options):
