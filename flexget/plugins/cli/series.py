@@ -24,7 +24,7 @@ except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
 
-SORT_COLUMN_COLOR = 'autowhite'
+SORT_COLUMN_COLOR = 'autobgwhite'
 NEW_EP_COLOR = 'autogreen'
 BEHIND_EP_COLOR = 'autored'
 
