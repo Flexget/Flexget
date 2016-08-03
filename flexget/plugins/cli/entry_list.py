@@ -8,6 +8,7 @@ from flexget import options
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
+from flexget.options import CLITable, table_parser
 from flexget.plugins.list.entry_list import get_entry_lists, get_list_by_exact_name, get_entries_by_list_id, \
     get_entry_by_id, get_entry_by_title, EntryListList, EntryListEntry
 
@@ -23,7 +24,7 @@ def attribute_type(attribute):
 def do_cli(manager, options):
     """Handle entry-list subcommand"""
     if options.list_action == 'all':
-        entry_list_lists()
+        entry_list_lists(options)
         return
 
     if options.list_action == 'list':
@@ -47,14 +48,16 @@ def do_cli(manager, options):
         return
 
 
-def entry_list_lists():
+def entry_list_lists(options):
     """ Show all entry lists """
     with Session() as session:
         lists = get_entry_lists(session=session)
-        console('Existing entry lists:')
-        console('-' * 20)
+        header = ['#', 'List Name']
+        table_data = [header]
         for entry_list in lists:
-            console(entry_list.name)
+            table_data.append([entry_list.id, entry_list.name])
+    table = CLITable(options.table_type, table_data)
+    console(table.output)
 
 
 def entry_list_list(options):
@@ -185,7 +188,7 @@ def register_parser_arguments():
     parser = options.register_command('entry-list', do_cli, help='view and manage entry lists')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='list_action')
-    subparsers.add_parser('all', help='Shows all existing entry lists')
+    subparsers.add_parser('all', help='Shows all existing entry lists', parents=[table_parser])
     subparsers.add_parser('list', parents=[list_name_parser], help='List entries from a list')
     subparsers.add_parser('show', parents=[list_name_parser, global_entry_parser],
                           help='Show entry fields.')
