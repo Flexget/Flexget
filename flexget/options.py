@@ -9,9 +9,11 @@ from argparse import ArgumentParser as ArgParser
 from argparse import (_VersionAction, Action, ArgumentError, Namespace, PARSER, REMAINDER, SUPPRESS,
                       _SubParsersAction)
 
+from colorclass.windows import Windows
 from terminaltables.ascii_table import AsciiTable
 from terminaltables.github_table import GithubFlavoredMarkdownTable
 from terminaltables.other_tables import SingleTable, DoubleTable
+from colorclass import Color
 
 import flexget
 from flexget.entry import Entry
@@ -475,6 +477,7 @@ class CLITable(object):
     """
     A  data table suited for CLI output, created via its sent parameters.
     """
+
     def __init__(self, type, table_data, title=None):
         self.title = title
         self.type = type
@@ -505,6 +508,14 @@ class CLITable(object):
         if keys:
             return list(table_types)
         return table_types
+
+    @staticmethod
+    def colorize(text, color, porcelain=False):
+        if porcelain:
+            return text
+        if sys.platform == 'win32':
+            Windows.enable(auto_colors=True)
+        return Color('{%s}%s{%s}' % (color, text, '/' + color))
 
 
 # The CLI table parent parser

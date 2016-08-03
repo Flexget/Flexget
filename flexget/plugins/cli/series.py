@@ -3,12 +3,18 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import argparse
 from datetime import datetime, timedelta
+from functools import partial
 
 from flexget import options, plugin
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
-from flexget.options import CLITable, table_parser
+
+try:
+    from flexget.options import CLITable, table_parser
+except ImportError:
+    raise plugin.DependencyError(issued_by='cli_series', missing='CLITable',
+                                 message='Series commandline interface not loaded')
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
@@ -17,6 +23,10 @@ try:
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
+
+SORT_COLUMN_COLOR = 'autowhite'
+NEW_EP_COLOR = 'autogreen'
+BEHIND_EP_COLOR = 'autored'
 
 
 def do_cli(manager, options):
@@ -37,6 +47,7 @@ def display_summary(options):
     Display series summary.
     :param options: argparse options from the CLI
     """
+    color = partial(CLITable.colorize, porcelain=options.table_type == 'porcelain')
     with Session() as session:
         kwargs = {'configured': options.configured,
                   'premieres': options.premieres,
@@ -56,6 +67,9 @@ def display_summary(options):
 
         query = get_series_summary(**kwargs)
         header = ['Name', 'Latest', 'Age', 'Downloaded', 'Status']
+        for i in range(len(header)):
+            if header[i].lower() == options.sort_by:
+                header[i] = color(header[i], SORT_COLUMN_COLOR)
         footer = 'Use `flexget series show NAME` to get detailed information'
         table_data = [header]
         for series in query:
@@ -76,9 +90,9 @@ def display_summary(options):
                 age = latest.age
                 episode_id = latest.identifier
             if new_ep:
-                status = 'NEW'
+                status = color('NEW', NEW_EP_COLOR)
             if behind > 0:
-                status = '{} behind'.format(behind)
+                status = color('{} behind'.format(behind), BEHIND_EP_COLOR)
 
             table_data.append([series_name, episode_id, age, latest_release, status])
         table = CLITable(options.table_type, table_data)
@@ -238,8 +252,9 @@ def register_parser_arguments():
     list_parser.add_argument('--stale', nargs='?', type=int, metavar='DAYS', const=365,
                              help='Limit list to series which have not seen a release in %(const)s days. number of '
                                   'days can be overridden with %(metavar)s')
-    list_parser.add_argument('--porcelain', action='store_true', help='make the output parseable')
-    list_parser.add_argument('--sort-by', choices=('name', 'age'),
+    list_parser.add_argument('--porcelain', dest='table_type', action='store_const', const='porcelain',
+                             help='Make the output parseable. Similar to using `--table-type porcelain`')
+    list_parser.add_argument('--sort-by', choices=('name', 'age'), default='name',
                              help='Choose list sort attribute')
     order = list_parser.add_mutually_exclusive_group(required=False)
     order.add_argument('--descending', dest='order', action='store_true', help='Sort in descending order')
