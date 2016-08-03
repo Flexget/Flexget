@@ -39,11 +39,17 @@ class MDChangeSet(object):
         return instance
 
     def parse_message(self, message):
-        """Parses a git commit message and formats and adds any tagged messages to this changeset."""
+        """
+        Parses a git commit message and formats and adds any tagged messages to this changeset.
+        Returns True if one or more changelog messages was found.
+        """
+        found = False
         for cat, item in self.change_items(message):
+            found = True
             item = re.sub('#(\d{3,4})', r'[#\1](https://github.com/Flexget/Flexget/issues/\1)', item)
             item = '- {0}\n'.format(item)
             self.sections.setdefault(cat, ['\n']).insert(0, item)
+        return found
 
     def change_items(self, message):
         """An iterator of changelog updates from a commit message in the form (category, message)"""
@@ -104,12 +110,15 @@ if __name__ == '__main__':
     released_vers = []
     commits = list(repo.iter_commits('{0}..HEAD'.format(latestref), reverse=True))
     if commits:
+        modified = False
         tags = {}
         for tag in repo.tags:
             tags[tag.commit] = tag.tag
         for commit in commits:
-            cur_ver.parse_message(commit.message)
+            if cur_ver.parse_message(commit.message):
+                modified = True
             if commit in tags:
+                modified = True
                 # Tag changeset with release date and version and create new current changeset
                 version = tags[commit].tag
                 release_date = datetime.datetime.fromtimestamp(tags[commit].tagged_date).strftime('%Y-%m-%d')
@@ -120,6 +129,7 @@ if __name__ == '__main__':
                 cur_ver = MDChangeSet()
                 oldestref = commit.hexsha
             if cur_ver.sections and not cur_ver.version_header:
+                modified = True
                 verfile = repo.tree('HEAD')['flexget/_version.py'].data_stream.read()
                 __version__ = None
                 try:
@@ -128,11 +138,12 @@ if __name__ == '__main__':
                     pass
                 cur_ver.version_header = '## {0} (unreleased)\n'.format(__version__)
 
-        with io.open(filename, 'w', encoding='utf-8') as logfile:
-            logfile.writelines(pre_lines)
-            logfile.write('<!---{0}--->\n'.format(commit.hexsha))
-            logfile.writelines(cur_ver.to_md_lines())
-            logfile.write('<!---{0}--->\n'.format(oldestref))
-            for ver in released_vers:
-                logfile.writelines(ver.to_md_lines())
-            logfile.writelines(post_lines)
+        if modified:
+            with io.open(filename, 'w', encoding='utf-8') as logfile:
+                logfile.writelines(pre_lines)
+                logfile.write('<!---{0}--->\n'.format(commit.hexsha))
+                logfile.writelines(cur_ver.to_md_lines())
+                logfile.write('<!---{0}--->\n'.format(oldestref))
+                for ver in released_vers:
+                    logfile.writelines(ver.to_md_lines())
+                logfile.writelines(post_lines)
