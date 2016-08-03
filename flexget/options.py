@@ -528,3 +528,5 @@ class CLITable(object):
 table_parser = ArgumentParser(add_help=False)
 table_parser.add_argument('--table-type', choices=CLITable.supported_table_types(keys=True), default='single',
                           help='Select output table style')
+table_parser.add_argument('--porcelain', dest='table_type', action='store_const', const='porcelain',
+                         help='Make the output parseable. Similar to using `--table-type porcelain`')

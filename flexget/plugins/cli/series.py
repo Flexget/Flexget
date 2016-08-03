@@ -27,6 +27,8 @@ except ImportError:
 SORT_COLUMN_COLOR = 'autoyellow'
 NEW_EP_COLOR = 'autogreen'
 BEHIND_EP_COLOR = 'autored'
+DOWNLOADED_RELEASE_COLOR = 'autogreen'
+ERROR_COLOR = 'autored'
 
 
 def do_cli(manager, options):
@@ -38,7 +40,7 @@ def do_cli(manager, options):
     if options.series_action == 'list':
         display_summary(options)
     elif options.series_action == 'show':
-        display_details(options.series_name)
+        display_details(options)
     elif options.series_action == 'remove':
         remove(manager, options)
     elif options.series_action == 'forget':
@@ -71,7 +73,7 @@ def display_summary(options):
             kwargs['sort_by'] = 'last_download_date'
 
         query = get_series_summary(**kwargs)
-        header = ['Name', 'Latest', 'Age', 'Downloaded', 'Identified By', 'Status']
+        header = ['Name', 'Latest', 'Age', 'Downloaded', 'Identified By', 'Latest status']
         for i in range(len(header)):
             if header[i].lower() == options.sort_by:
                 header[i] = color(header[i], SORT_COLUMN_COLOR)
@@ -176,81 +178,67 @@ def get_latest_status(episode):
     return status.rstrip(', ') if status else None
 
 
-def display_details2(name):
+def display_details(options):
     """Display detailed series information, ie. series show NAME"""
+    name = options.series_name
     with Session() as session:
         name = normalize_series_name(name)
         # Sort by length of name, so that partial matches always show shortest matching title
         matches = shows_by_name(name, session=session)
         if not matches:
-            console('ERROR: Unknown series `%s`' % name)
+            console(color('ERROR: Unknown series `%s`' % name, ERROR_COLOR))
             return
         # Pick the best matching series
         series = matches[0]
-        console('Showing results for `%s`.' % series.name)
+        table_title = 'Showing results for `%s`.' % series.name
         if len(matches) > 1:
-            console('WARNING: Multiple series match to `%s`.' % name)
-            console('Be more specific to see the results of other matches:')
-            for s in matches[1:]:
-                console(' - %s' % s.name)
-
-
-def display_details(name):
-    """Display detailed series information, ie. series show NAME"""
-    with Session() as session:
-        name = normalize_series_name(name)
-        # Sort by length of name, so that partial matches always show shortest matching title
-        matches = shows_by_name(name, session=session)
-        if not matches:
-            console('ERROR: Unknown series `%s`' % name)
-            return
-        # Pick the best matching series
-        series = matches[0]
-        console('Showing results for `%s`.' % series.name)
-        if len(matches) > 1:
-            console('WARNING: Multiple series match to `%s`.' % name)
-            console('Be more specific to see the results of other matches:')
-            for s in matches[1:]:
-                console(' - %s' % s.name)
-
-        console(' %-63s%-15s' % ('Identifier, Title', 'Quality'))
-        console('-' * 79)
-
+            warning = (' WARNING: Multiple series match to `{}`.\n '
+                       'Be more specific to see the results of other matches:\n'
+                       ' {}'.format(name, '-\n'.join(s.name for s in matches[1:])))
+            if not options.table_type == 'porcelain':
+                console(warning)
+        header = ['Episode ID', 'Latest age', 'Release titles', 'Release Quality', 'Proper']
+        table_data = [header]
         episodes = show_episodes(series, session=session)
         for episode in episodes:
-
             if episode.identifier is None:
-                console(' None <--- Broken!')
+                identifier = color('MISSING', ERROR_COLOR)
+                age = ''
             else:
-                console(' %s (%s) - %s' % (episode.identifier, episode.identified_by or 'N/A', episode.age))
-
+                identifier = episode.identifier
+                age = episode.age
+            ep_data = [identifier, age]
+            release_titles = []
+            release_qualities = []
+            release_propers = []
             for release in episode.releases:
-                status = release.quality.name
                 title = release.title
-                if len(title) > 55:
-                    title = title[:55] + '...'
-                if release.proper_count > 0:
-                    status += '-proper'
-                    if release.proper_count > 1:
-                        status += str(release.proper_count)
+                quality = release.quality.name
                 if release.downloaded:
-                    console('  * %-60s%-15s' % (title, status))
-                else:
-                    console('    %-60s%-15s' % (title, status))
-
-        console('-' * 79)
-        console(' * = downloaded')
+                    title = color(title, DOWNLOADED_RELEASE_COLOR)
+                    quality = color(quality, DOWNLOADED_RELEASE_COLOR)
+                release_titles.append(title)
+                release_qualities.append(quality)
+                release_propers.append('Yes' if release.proper_count > 0 else '')
+            ep_data.append('\n'.join(release_titles))
+            ep_data.append('\n'.join(release_qualities))
+            ep_data.append('\n'.join(release_propers))
+            table_data.append(ep_data)
         if not series.identified_by:
-            console('')
-            console(' Series plugin is still learning which episode numbering mode is ')
-            console(' correct for this series (identified_by: auto).')
-            console(' Few duplicate downloads can happen with different numbering schemes')
-            console(' during this time.')
+            footer = ('\n'
+                      ' Series plugin is still learning which episode numbering mode is \n'
+                      ' correct for this series (identified_by: auto).\n'
+                      ' Few duplicate downloads can happen with different numbering schemes\n'
+                      ' during this time.')
         else:
-            console(' Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by)
-        console(' See option `identified_by` for more information.')
+            footer = ' Series uses `%s` mode to identify episode numbering (identified_by).\n' % series.identified_by
+        footer += ' See option `identified_by` for more information.\n'
         if series.begin:
-            console(' Begin episode for this series set to `%s`.' % series.begin.identifier)
+            footer += ' Begin episode for this series set to `%s`.' % series.begin.identifier
+    table = CLITable(options.table_type, table_data, table_title)
+    console(table.output)
+    if not options.table_type == 'porcelain':
+        console(footer)
 
 
 @event('options.register')
@@ -277,8 +265,6 @@ def register_parser_arguments():
     list_parser.add_argument('--stale', nargs='?', type=int, metavar='DAYS', const=365,
                              help='Limit list to series which have not seen a release in %(const)s days. number of '
                                   'days can be overridden with %(metavar)s')
-    list_parser.add_argument('--porcelain', dest='table_type', action='store_const', const='porcelain',
-                             help='Make the output parseable. Similar to using `--table-type porcelain`')
     list_parser.add_argument('--sort-by', choices=('name', 'age'), default='name',
                              help='Choose list sort attribute')
     order = list_parser.add_mutually_exclusive_group(required=False)
