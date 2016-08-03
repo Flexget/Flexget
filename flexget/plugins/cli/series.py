@@ -30,6 +30,10 @@ BEHIND_EP_COLOR = 'autored'
 
 
 def do_cli(manager, options):
+    global color
+    # Create partial that passes table type, since `porcelain` should disable colors
+    color = partial(CLITable.colorize, porcelain=options.table_type == 'porcelain')
+
     if options.series_action == 'list':
         display_summary(options)
     elif options.series_action == 'show':
@@ -47,7 +51,7 @@ def display_summary(options):
     Display series summary.
     :param options: argparse options from the CLI
     """
-    color = partial(CLITable.colorize, porcelain=options.table_type == 'porcelain')
+    global color
     with Session() as session:
         kwargs = {'configured': options.configured,
                   'premieres': options.premieres,
