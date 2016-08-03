@@ -30,6 +30,8 @@ BEHIND_EP_COLOR = 'autored'
 DOWNLOADED_RELEASE_COLOR = 'autogreen'
 ERROR_COLOR = 'autored'
 
+color = CLITable.colorize
+
 
 def do_cli(manager, options):
     global color
@@ -54,7 +56,6 @@ def display_summary(options):
     Display series summary.
     :param options: argparse options from the CLI
     """
-    global color
     with Session() as session:
         kwargs = {'configured': options.configured,
                   'premieres': options.premieres,
@@ -74,9 +75,9 @@ def display_summary(options):
 
         query = get_series_summary(**kwargs)
         header = ['Name', 'Latest', 'Age', 'Downloaded', 'Identified By', 'Latest status']
-        for i in range(len(header)):
-            if header[i].lower() == options.sort_by:
-                header[i] = color(header[i], SORT_COLUMN_COLOR)
+        for index, value in enumerate(header):
+            if value.lower() == options.sort_by:
+                header[index] = color(value, SORT_COLUMN_COLOR)
         footer = 'Use `flexget series show NAME` to get detailed information'
         table_data = [header]
         for series in query:
@@ -134,7 +135,6 @@ def begin(manager, options):
 
 def remove(manager, options, forget=False):
     name = options.series_name
-
     if options.episode_id:
         # remove by id
         identifier = options.episode_id
