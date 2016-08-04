@@ -211,7 +211,7 @@ def display_details(options):
                 console(warning)
         header = ['Episode ID', 'Latest age', 'Release titles', 'Release Quality', 'Proper']
         table_data = [header]
-        episodes = show_episodes(series, session=session, descending=True)
+        episodes = show_episodes(series, session=session)
         for episode in episodes:
             if episode.identifier is None:
                 identifier = color('MISSING', ERROR_COLOR)
