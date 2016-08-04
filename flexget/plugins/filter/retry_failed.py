@@ -204,7 +204,7 @@ def list_failed(options):
         table_data = [header]
         for entry in results:
             table_data.append([entry.id, ww(entry.title), entry.count, entry.reason or '', entry.tof.strftime('%Y-%m-%d %H:%M')])
-    table = CLITable(options.table_type, table_data)
+    table = CLITable(options.table_type, table_data, check_size=options.check_size)
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)
