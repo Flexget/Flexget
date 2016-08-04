@@ -12,6 +12,7 @@ from textwrap import wrap
 
 from colorclass import Color
 from colorclass.windows import Windows
+from math import floor
 from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable
 from terminaltables.terminal_io import terminal_size
 
@@ -523,6 +524,7 @@ class CLITable(object):
     def colorize(text, color_tag, porcelain=False):
         """
         This method calls for `colorclass` to try and color the given text
+
         :param text: Text to color
         :param color_tag: Color tag. Should adhere to colorclass.list_tags().
         :param porcelain: If True, no colors should be returned.
@@ -539,6 +541,7 @@ class CLITable(object):
         """
         A helper method designed to return a wrapped string. This is a hack until (and if) `terminaltables` will support
         native word wrap.
+
         :param text: Text to wrap
         :param max_length: Maximum allowed string length, corresponds with column width when used with table
         :return: Wrapped text or original text
@@ -546,6 +549,21 @@ class CLITable(object):
         if max_length and len(str(text)) >= max_length:
             return '\n'.join(wrap(str(text), max_length))
         return text
+
+    @staticmethod
+    def table_truncate(table, num_of_columns, force_value=None):
+        max_size = force_value or terminal_size()[0]
+        # Maximum average column size equals the maximum size divided by number of columns subtracting 2
+        #  spaces per column for padding
+        max_col_size = floor(max_size / num_of_columns)
+        output_table = []
+        for row in table:
+            output_row = []
+            for value in row:
+                output_value = str(value)[:max_col_size - 3] + '...' if len(str(value)) >= max_col_size else value
+                output_row.append(output_value)
+            output_table.append(output_row)
+        return output_table
 
 
 # The CLI table parent parser
