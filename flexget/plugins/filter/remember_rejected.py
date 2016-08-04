@@ -1,6 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 from past.builtins import basestring
+
+from functools import partial
 
 import logging
 from datetime import datetime, timedelta
@@ -14,6 +17,7 @@ from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
 from flexget.utils.tools import parse_timedelta
+from flexget.options import CLITable, table_parser, CLITableError
 
 log = logging.getLogger('remember_rej')
 Base = db_schema.versioned_base('remember_rejected', 3)
@@ -155,20 +159,25 @@ class FilterRememberRejected(object):
 
 def do_cli(manager, options):
     if options.rejected_action == 'list':
-        list_rejected()
+        list_rejected(options)
     elif options.rejected_action == 'clear':
         clear_rejected(manager)
 
 
-def list_rejected():
+def list_rejected(options):
+    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
     with Session() as session:
         results = session.query(RememberEntry).all()
-        if not results:
-            console('No rejected entries recorded by remember_rejected')
-        else:
-            console('Rejections remembered by remember_rejected:')
+        header = ['#', 'Title', 'Task', 'Rejected by', 'Reason']
+        table_data = [header]
         for entry in results:
-            console('%s from %s by %s because %s' % (entry.title, entry.task.name, entry.rejected_by, entry.reason))
+            table_data.append([entry.id, ww(entry.title), entry.task.name, entry.rejected_by, entry.reason or ''])
+    table = CLITable(options.table_type, table_data)
+    table.table.justify_columns[0] = 'center'
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def clear_rejected(manager):
@@ -197,5 +206,5 @@ def register_plugin():
 def register_parser_arguments():
     parser = options.register_command('rejected', do_cli, help='list or clear remembered rejections')
     subparsers = parser.add_subparsers(dest='rejected_action', metavar='<action>')
-    subparsers.add_parser('list', help='list all the entries that have been rejected')
+    subparsers.add_parser('list', help='list all the entries that have been rejected', parents=[table_parser])
     subparsers.add_parser('clear', help='clear all rejected entries from database, so they can be retried')

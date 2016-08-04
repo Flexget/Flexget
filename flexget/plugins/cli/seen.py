@@ -1,15 +1,22 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+from functools import partial
+
 from flexget import options
 from flexget.event import event
 from flexget.logger import console
+from flexget.options import CLITable, CLITableError, table_parser
 from flexget.plugins.filter import seen
 from flexget.utils.database import with_session
 from flexget.utils.imdb import is_imdb_url, extract_id
 
+ww = CLITable.word_wrap
+
 
 def do_cli(manager, options):
+    global ww
+    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
     if options.seen_action == 'forget':
         seen_forget(manager, options)
     elif options.seen_action == 'add':
@@ -44,23 +51,34 @@ def seen_add(options):
 def seen_search(options, session=None):
     search_term = '%' + options.search_term + '%'
     seen_entries = seen.search(value=search_term, status=None, session=session)
+    header = ['#', 'Title', 'Names', 'Values', 'Task', 'Added']
+    table_data = [header]
     for se in seen_entries.all():
-        console('ID: %s Name: %s Task: %s Added: %s' % (se.id, se.title, se.task, se.added.strftime('%c')))
+        seen_data = [ww(se.id), ww(se.title)]
+        names = []
+        values = []
         for sf in se.fields:
-            console(' %s: %s' % (sf.field, sf.value))
-        console('')
-    if not seen_entries:
-        console('No results')
+            names.append(ww(sf.field))
+            values.append(ww(str(sf.value)))
+        seen_data.append('\n'.join(names))
+        seen_data.append('\n'.join(values))
+        seen_data += [se.task, se.added.strftime('%c')]
+        table_data.append(seen_data)
+    table = CLITable(options.table_type, table_data)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 @event('options.register')
 def register_parser_arguments():
-    parser = options.register_command('seen', do_cli, help='view or forget entries remembered by the seen plugin')
+    parser = options.register_command('seen', do_cli, help='View or forget entries remembered by the seen plugin')
     subparsers = parser.add_subparsers(dest='seen_action', metavar='<action>')
-    forget_parser = subparsers.add_parser('forget', help='forget entry or entire task from seen plugin database')
+    forget_parser = subparsers.add_parser('forget', help='Forget entry or entire task from seen plugin database')
     forget_parser.add_argument('forget_value', metavar='<value>',
-                               help='title or url of entry to forget, or name of task to forget')
-    add_parser = subparsers.add_parser('add', help='add a title or url to the seen database')
+                               help='Title or url of entry to forget, or name of task to forget')
+    add_parser = subparsers.add_parser('add', help='Add a title or url to the seen database')
     add_parser.add_argument('add_value', metavar='<value>', help='the title or url to add')
-    search_parser = subparsers.add_parser('search', help='search text from the seen database')
+    search_parser = subparsers.add_parser('search', help='Search text from the seen database', parents=[table_parser])
     search_parser.add_argument('search_term', metavar='<search term>')
