@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+from functools import partial
+
 import logging
 from datetime import datetime
 
@@ -10,6 +12,7 @@ from flexget import options, plugin
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Base, Session
+from flexget.options import CLITable, table_parser, CLITableError
 
 log = logging.getLogger('history')
 
@@ -67,9 +70,8 @@ class PluginHistory(object):
 
 
 def do_cli(manager, options):
-    session = Session()
-    try:
-        console('-- History: ' + '-' * 67)
+    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+    with Session() as session:
         query = session.query(History)
         if options.search:
             search_term = options.search.replace(' ', '%').replace('.', '%')
@@ -77,30 +79,26 @@ def do_cli(manager, options):
         if options.task:
             query = query.filter(History.task.like('%' + options.task + '%'))
         query = query.order_by(desc(History.time)).limit(options.limit)
+        header = ['Task', 'Title', 'URL', 'Stored', 'Time', 'Details']
+        table_data = [header]
         for item in reversed(query.all()):
-            if options.short:
-                console(' %-25s %s' % (item.time.strftime("%c"), item.title))
-            else:
-                console(' Task    : %s' % item.task)
-                console(' Title   : %s' % item.title)
-                console(' Url     : %s' % item.url)
-                if item.filename:
-                    console(' Stored  : %s' % item.filename)
-                console(' Time    : %s' % item.time.strftime("%c"))
-                console(' Details : %s' % item.details)
-                console('-' * 79)
-    finally:
-        session.close()
+            table_data.append(
+                [item.task, ww(item.title), ww(item.url), ww(item.filename) or '', item.time.strftime("%c"), item.details])
+    table = CLITable(options.table_type, table_data)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 @event('options.register')
 def register_parser_arguments():
-    parser = options.register_command('history', do_cli, help='view the history of entries that FlexGet has accepted')
+    parser = options.register_command('history', do_cli, help='view the history of entries that FlexGet has accepted',
+                                      parents=[table_parser])
     parser.add_argument('--limit', action='store', type=int, metavar='NUM', default=50,
                         help='limit to %(metavar)s results')
     parser.add_argument('--search', action='store', metavar='TERM', help='limit to results that contain %(metavar)s')
     parser.add_argument('--task', action='store', metavar='TASK', help='limit to results in specified %(metavar)s')
-    parser.add_argument('--short', '-s', action='store_true', dest='short', default=False, help='shorter output')
 
 
 @event('plugin.register')
