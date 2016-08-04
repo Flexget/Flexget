@@ -79,12 +79,13 @@ def do_cli(manager, options):
         if options.task:
             query = query.filter(History.task.like('%' + options.task + '%'))
         query = query.order_by(desc(History.time)).limit(options.limit)
-        header = ['Task', 'Title', 'URL', 'Stored', 'Time', 'Details']
+        header = ['#',' Task', 'Title', 'URL', 'Stored', 'Time', 'Details']
         table_data = [header]
         for item in reversed(query.all()):
             table_data.append(
-                [item.task, ww(item.title), ww(item.url), ww(item.filename) or '', item.time.strftime("%c"), item.details])
+                [item.id, item.task, ww(item.title), ww(item.url), ww(item.filename) or '', item.time.strftime("%c"), item.details])
     table = CLITable(options.table_type, table_data)
+    table.table.justify_columns[0] = 'center'
     try:
         console(table.output)
     except CLITableError as e:

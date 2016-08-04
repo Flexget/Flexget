@@ -168,11 +168,12 @@ def list_rejected(options):
     ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
     with Session() as session:
         results = session.query(RememberEntry).all()
-        header = ['Title', 'Task', 'Rejected by', 'Reason']
+        header = ['#', 'Title', 'Task', 'Rejected by', 'Reason']
         table_data = [header]
         for entry in results:
-            table_data.append([ww(entry.title), entry.task.name, entry.rejected_by, entry.reason or ''])
+            table_data.append([entry.id, ww(entry.title), entry.task.name, entry.rejected_by, entry.reason or ''])
     table = CLITable(options.table_type, table_data)
+    table.table.justify_columns[0] = 'center'
     try:
         console(table.output)
     except CLITableError as e:

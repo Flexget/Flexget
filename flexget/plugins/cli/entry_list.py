@@ -112,11 +112,12 @@ def entry_list_show(options):
                     'Could not find matching entry with title `{}` in list `{}`'.format(options.entry,
                                                                                         options.list_name))
                 return
-        header = ['Field name', 'Value']
+        header = ['#', 'Field name', 'Value']
         table_data = [header]
         for k, v in sorted(entry.entry.items()):
-            table_data.append([k, ww(v)])
+            table_data.append([entry.id, k, ww(v)])
     table = CLITable(options.table_type, table_data)
+    table.table.justify_columns[0] = 'center'
     try:
         console(table.output)
     except CLITableError as e:
