@@ -11,12 +11,8 @@ from flexget.plugins.filter import seen
 from flexget.utils.database import with_session
 from flexget.utils.imdb import is_imdb_url, extract_id
 
-ww = CLITable.word_wrap
-
 
 def do_cli(manager, options):
-    global ww
-    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
     if options.seen_action == 'forget':
         seen_forget(manager, options)
     elif options.seen_action == 'add':
@@ -49,9 +45,10 @@ def seen_add(options):
 
 @with_session
 def seen_search(options, session=None):
+    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
     search_term = '%' + options.search_term + '%'
     seen_entries = seen.search(value=search_term, status=None, session=session)
-    header = ['#', 'Title', 'Names', 'Values', 'Task', 'Added']
+    header = ['#', 'Title', 'Field', 'Value', 'Task', 'Added']
     table_data = [header]
     for se in seen_entries.all():
         seen_data = [ww(se.id), ww(se.title)]
@@ -64,7 +61,7 @@ def seen_search(options, session=None):
         seen_data.append('\n'.join(values))
         seen_data += [se.task, se.added.strftime('%c')]
         table_data.append(seen_data)
-    table = CLITable(options.table_type, table_data)
+    table = CLITable(options.table_type, table_data, check_size=options.check_size)
     try:
         console(table.output)
     except CLITableError as e:
