@@ -14,6 +14,7 @@ from flexget.options import CLITable, table_parser, CLITableError
 from flexget.plugins.list.entry_list import get_entry_lists, get_list_by_exact_name, get_entries_by_list_id, \
     get_entry_by_id, get_entry_by_title, EntryListList, EntryListEntry
 
+cli_table = CLITable
 ww = CLITable.word_wrap
 
 
@@ -31,6 +32,9 @@ def do_cli(manager, options):
     # Handle globally setting value for word wrap method
     global ww
     ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+
+    global cli_table
+    cli_table = partial(CLITable, check_size=options.check_size)
 
     if options.list_action == 'all':
         entry_list_lists(options)
@@ -65,7 +69,7 @@ def entry_list_lists(options):
         table_data = [header]
         for entry_list in lists:
             table_data.append([entry_list.id, entry_list.name])
-    table = CLITable(options.table_type, table_data)
+    table = cli_table(options.table_type, table_data)
     try:
         console(table.output)
     except CLITableError as e:
@@ -84,7 +88,7 @@ def entry_list_list(options):
         table_data = [header]
         for entry in get_entries_by_list_id(entry_list.id, order_by='added', descending=True, session=session):
             table_data.append([entry.id, entry.title, len(entry.entry)])
-    table = CLITable(options.table_type, table_data)
+    table = cli_table(options.table_type, table_data)
     try:
         console(table.output)
     except CLITableError as e:
@@ -116,7 +120,7 @@ def entry_list_show(options):
         table_data = [header]
         for k, v in sorted(entry.entry.items()):
             table_data.append([entry.id, k, ww(v)])
-    table = CLITable(options.table_type, table_data)
+    table = cli_table(options.table_type, table_data)
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)
