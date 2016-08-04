@@ -22,9 +22,6 @@ from flexget.utils.tools import split_title_year
 imdb_lookup = ImdbLookup().lookup
 tmdb_lookup = PluginTmdbLookup().lookup
 
-ww = CLITable.word_wrap
-cli_table = CLITable
-
 def lookup_movie(title, session, identifiers=None):
     entry = Entry(title=title)
     if identifiers:

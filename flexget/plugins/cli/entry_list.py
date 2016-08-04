@@ -14,9 +14,6 @@ from flexget.options import CLITable, table_parser, CLITableError
 from flexget.plugins.list.entry_list import get_entry_lists, get_list_by_exact_name, get_entries_by_list_id, \
     get_entry_by_id, get_entry_by_title, EntryListList, EntryListEntry
 
-cli_table = CLITable
-ww = CLITable.word_wrap
-
 
 def attribute_type(attribute):
     if attribute.count('=') != 1:

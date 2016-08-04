@@ -31,10 +31,6 @@ UNDOWNLOADED_RELEASE_COLOR = 'autoblack'
 DOWNLOADED_RELEASE_COLOR = 'autowhite'
 ERROR_COLOR = 'autored'
 
-cli_table = CLITable
-color = CLITable.colorize
-ww = CLITable.word_wrap
-
 
 def do_cli(manager, options):
     global color
