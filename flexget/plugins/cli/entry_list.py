@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser, ArgumentTypeError
+from functools import partial
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -11,6 +13,8 @@ from flexget.manager import Session
 from flexget.options import CLITable, table_parser, CLITableError
 from flexget.plugins.list.entry_list import get_entry_lists, get_list_by_exact_name, get_entries_by_list_id, \
     get_entry_by_id, get_entry_by_title, EntryListList, EntryListEntry
+
+ww = CLITable.word_wrap
 
 
 def attribute_type(attribute):
@@ -23,6 +27,11 @@ def attribute_type(attribute):
 
 def do_cli(manager, options):
     """Handle entry-list subcommand"""
+
+    # Handle globally setting value for word wrap method
+    global ww
+    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+
     if options.list_action == 'all':
         entry_list_lists(options)
         return
@@ -106,16 +115,7 @@ def entry_list_show(options):
         header = ['Field name', 'Value']
         table_data = [header]
         for k, v in sorted(entry.entry.items()):
-            # Entry can contain a lot of crap, need to convert to str
-            try:
-                try:
-                    if len(str(v)) > 100:
-                        v = str(v)[:150] + '...'
-                except UnicodeEncodeError:
-                    v = v.encode('utf-8')[:150] + '...'
-            except TypeError:
-                pass
-            table_data.append([k, v])
+            table_data.append([k, ww(v)])
     table = CLITable(options.table_type, table_data)
     try:
         console(table.output)
