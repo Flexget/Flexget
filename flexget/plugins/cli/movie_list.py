@@ -23,6 +23,7 @@ imdb_lookup = ImdbLookup().lookup
 tmdb_lookup = PluginTmdbLookup().lookup
 
 ww = CLITable.word_wrap
+cli_table = CLITable
 
 def lookup_movie(title, session, identifiers=None):
     entry = Entry(title=title)
@@ -57,6 +58,9 @@ def do_cli(manager, options):
     global ww
     ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
 
+    global cli_table
+    cli_table = partial(CLITable, check_size=options.check_size)
+
     if options.list_action == 'all':
         movie_list_lists(options)
         return
@@ -85,7 +89,7 @@ def movie_list_lists(options):
     table_data = [header]
     for movie_list in lists:
         table_data.append([movie_list.id, movie_list.name])
-    table = CLITable(options.table_type, table_data)
+    table = cli_table(options.table_type, table_data)
     try:
         console(table.output)
     except CLITableError as e:
@@ -110,7 +114,7 @@ def movie_list_list(options):
             movie_row.append(movie.identifiers.get(identifier, ''))
         table_data.append(movie_row)
     title = '{} Movies in movie list: `{}`'.format(len(movies), options.list_name)
-    table = CLITable(options.table_type, table_data, title)
+    table = cli_table(options.table_type, table_data, title)
     try:
         console(table.output)
     except CLITableError as e:

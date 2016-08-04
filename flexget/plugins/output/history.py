@@ -84,7 +84,7 @@ def do_cli(manager, options):
         for item in reversed(query.all()):
             table_data.append(
                 [item.id, item.task, ww(item.title), ww(item.url), ww(item.filename) or '', item.time.strftime("%c"), item.details])
-    table = CLITable(options.table_type, table_data)
+    table = CLITable(options.table_type, table_data, check_size=options.check_size)
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)

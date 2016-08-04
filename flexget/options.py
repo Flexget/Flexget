@@ -482,9 +482,10 @@ class CLITable(object):
     A data table suited for CLI output, created via its sent parameters.
     """
 
-    def __init__(self, type, table_data, title=None):
+    def __init__(self, type, table_data, title=None, check_size=False):
         self.title = title
         self.type = type
+        self.check_size = check_size
         self.table = self.supported_table_types()[type](table_data)
 
     @property
@@ -495,8 +496,7 @@ class CLITable(object):
             self.table.inner_footing_row_border = False
             self.table.inner_heading_row_border = False
             self.table.outer_border = False
-
-        if self.table.ok:
+        if not self.check_size or self.table.ok:
             return '\n' + self.table.table
         raise CLITableError(
             'Terminal size is not suffice to display table. Terminal width is {}, table width is {}. '
@@ -526,7 +526,7 @@ class CLITable(object):
         :param text: Text to color
         :param color_tag: Color tag. Should adhere to colorclass.list_tags().
         :param porcelain: If True, no colors should be returned.
-        :return: Text or colorized text
+        :return: Text or colorized textyo
         """
         if porcelain:
             return text
@@ -557,3 +557,5 @@ table_parser.add_argument('--porcelain', dest='table_type', action='store_const'
 table_parser.add_argument('--max-width', dest='max_column_width', type=int, default=0,
                           help='Set the max allowed column width, will wrap any text longer than this value.'
                                ' Use this in case table size exceeds terminal size')
+table_parser.add_argument('--check-size', action='store_true',
+                          help='Only display table if it fits the current terminal size')
