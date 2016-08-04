@@ -82,7 +82,9 @@ your checkout directory, but these instructions assume that's where it is.
 
 Next we need to install dependencies and FlexGet itself, this can be done simply::
 
-    bin/python setup.py develop
+    bin/pip install -e .
+
+This does an editable (`-e`) development install of the current directory (`.`).
 
 After that FlexGet is usable via ``<checkout directory>/bin/flexget``. Verify
 installation by running::
