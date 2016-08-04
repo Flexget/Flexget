@@ -8,6 +8,7 @@ import sys
 from argparse import ArgumentParser as ArgParser
 from argparse import (_VersionAction, Action, ArgumentError, Namespace, PARSER, REMAINDER, SUPPRESS,
                       _SubParsersAction)
+from textwrap import wrap
 
 from colorclass import Color
 from colorclass.windows import Windows
@@ -494,11 +495,13 @@ class CLITable(object):
             self.table.inner_footing_row_border = False
             self.table.inner_heading_row_border = False
             self.table.outer_border = False
+
         if self.table.ok:
             return '\n' + self.table.table
         raise CLITableError(
-            'Terminal size is not suffice to display table. Terminal width is {}, table width is {}'.format(
-                terminal_size()[0], self.table.table_width))
+            'Terminal size is not suffice to display table. Terminal width is {}, table width is {}. '
+            'Consider setting a lower value using `--max-width` option.'.format(terminal_size()[0],
+                                                                                self.table.table_width))
 
     @staticmethod
     def supported_table_types(keys=False):
@@ -531,6 +534,19 @@ class CLITable(object):
             Windows.enable(auto_colors=True)
         return Color('{%s}%s{%s}' % (color_tag, text, '/' + color_tag))
 
+    @staticmethod
+    def word_wrap(text, max_length=0):
+        """
+        A helper method designed to return a wrapped string. This is a hack until (and if) `terminaltables` will support
+        native word wrap.
+        :param text: Text to wrap
+        :param max_length: Maximum allowed string length, corresponds with column width when used with table
+        :return: Wrapped text or original text
+        """
+        if max_length and len(str(text)) >= max_length:
+            return '\n'.join(wrap(str(text), max_length))
+        return text
+
 
 # The CLI table parent parser
 table_parser = ArgumentParser(add_help=False)
@@ -538,3 +554,6 @@ table_parser.add_argument('--table-type', choices=CLITable.supported_table_types
                           help='Select output table style')
 table_parser.add_argument('--porcelain', dest='table_type', action='store_const', const='porcelain',
                           help='Make the output parseable. Similar to using `--table-type porcelain`')
+table_parser.add_argument('--max-width', dest='max_column_width', type=int, default=0,
+                          help='Set the max allowed column width, will wrap any text longer than this value.'
+                               ' Use this in case table size exceeds terminal size')
