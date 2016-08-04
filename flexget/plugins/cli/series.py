@@ -30,6 +30,7 @@ BEHIND_EP_COLOR = 'autored'
 DOWNLOADED_RELEASE_COLOR = 'autogreen'
 ERROR_COLOR = 'autored'
 
+cli_table = CLITable
 color = CLITable.colorize
 ww = CLITable.word_wrap
 
@@ -42,6 +43,9 @@ def do_cli(manager, options):
 
     global ww
     ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+
+    global cli_table
+    cli_table = partial(CLITable, check_size=options.check_size)
 
     if options.series_action == 'list':
         display_summary(options)
@@ -107,7 +111,7 @@ def display_summary(options):
             if behind > 0:
                 status = color('{} behind'.format(behind), BEHIND_EP_COLOR)
             table_data.append([ww(series_name), episode_id, age, ww(latest_release), identifier_type, status])
-    table = CLITable(options.table_type, table_data)
+    table = cli_table(options.table_type, table_data)
     try:
         console(table.output)
     except CLITableError as e:
@@ -242,7 +246,7 @@ def display_details(options):
         footer += ' See option `identified_by` for more information.\n'
         if series.begin:
             footer += ' Begin episode for this series set to `%s`.' % series.begin.identifier
-    table = CLITable(options.table_type, table_data, table_title)
+    table = cli_table(options.table_type, table_data, table_title)
     try:
         console(table.output)
     except CLITableError as e:
