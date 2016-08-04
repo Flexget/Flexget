@@ -27,7 +27,8 @@ except ImportError:
 SORT_COLUMN_COLOR = 'autoyellow'
 NEW_EP_COLOR = 'autogreen'
 BEHIND_EP_COLOR = 'autored'
-DOWNLOADED_RELEASE_COLOR = 'autogreen'
+UNDOWNLOADED_RELEASE_COLOR = 'autoblack'
+DOWNLOADED_RELEASE_COLOR = 'autowhite'
 ERROR_COLOR = 'autored'
 
 cli_table = CLITable
@@ -225,7 +226,10 @@ def display_details(options):
             for release in episode.releases:
                 title = release.title
                 quality = release.quality.name
-                if release.downloaded:
+                if not release.downloaded:
+                    title = color(title, UNDOWNLOADED_RELEASE_COLOR)
+                    quality = color(quality, UNDOWNLOADED_RELEASE_COLOR)
+                else:
                     title = color(title, DOWNLOADED_RELEASE_COLOR)
                     quality = color(quality, DOWNLOADED_RELEASE_COLOR)
                 release_titles.append(ww(title))
@@ -235,15 +239,17 @@ def display_details(options):
             ep_data.append('\n'.join(release_qualities))
             ep_data.append('\n'.join(release_propers))
             table_data.append(ep_data)
+        footer = ('\n %s\n %s\n' % (color('Downloaded releases', DOWNLOADED_RELEASE_COLOR),
+                                    color('Un-downloaded releases', UNDOWNLOADED_RELEASE_COLOR)))
         if not series.identified_by:
-            footer = ('\n'
-                      ' Series plugin is still learning which episode numbering mode is \n'
-                      ' correct for this series (identified_by: auto).\n'
-                      ' Few duplicate downloads can happen with different numbering schemes\n'
-                      ' during this time.')
+            footer += ('\n'
+                       ' Series plugin is still learning which episode numbering mode is \n'
+                       ' correct for this series (identified_by: auto).\n'
+                       ' Few duplicate downloads can happen with different numbering schemes\n'
+                       ' during this time.')
         else:
-            footer = ' Series uses `%s` mode to identify episode numbering (identified_by).\n' % series.identified_by
-        footer += ' See option `identified_by` for more information.\n'
+            footer += ' \n Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by
+        footer += ' \n See option `identified_by` for more information.\n'
         if series.begin:
             footer += ' Begin episode for this series set to `%s`.' % series.begin.identifier
     table = cli_table(options.table_type, table_data, table_title)
