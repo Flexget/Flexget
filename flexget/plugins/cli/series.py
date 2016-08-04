@@ -31,6 +31,7 @@ DOWNLOADED_RELEASE_COLOR = 'autogreen'
 ERROR_COLOR = 'autored'
 
 color = CLITable.colorize
+ww = CLITable.word_wrap
 
 
 def do_cli(manager, options):
@@ -38,6 +39,9 @@ def do_cli(manager, options):
     # Create partial that passes table type, since `porcelain` should disable colors
     if options.series_action in ['list', 'show']:
         color = partial(CLITable.colorize, porcelain=options.table_type == 'porcelain')
+
+    global ww
+    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
 
     if options.series_action == 'list':
         display_summary(options)
@@ -103,7 +107,8 @@ def display_summary(options):
             if behind > 0:
                 status = color('{} behind'.format(behind), BEHIND_EP_COLOR)
 
-            table_data.append([series_name, episode_id, age, latest_release, identifier_type, status])
+            table_data.append(
+                [ww(series_name), ww(episode_id), ww(age), ww(latest_release), ww(identifier_type), ww(status)])
     table = CLITable(options.table_type, table_data)
     try:
         console(table.output)
@@ -221,8 +226,8 @@ def display_details(options):
                 if release.downloaded:
                     title = color(title, DOWNLOADED_RELEASE_COLOR)
                     quality = color(quality, DOWNLOADED_RELEASE_COLOR)
-                release_titles.append(title)
-                release_qualities.append(quality)
+                release_titles.append(ww(title))
+                release_qualities.append(ww(quality))
                 release_propers.append('Yes' if release.proper_count > 0 else '')
             ep_data.append('\n'.join(release_titles))
             ep_data.append('\n'.join(release_qualities))
