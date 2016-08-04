@@ -1,19 +1,19 @@
 /* global bard */
 describe('Home Component:', function () {
-	var component;
+    var component;
 
-	beforeEach(function () {
-		bard.appModule('components.home');
+    beforeEach(function () {
+        bard.appModule('components.home');
 
-		/* global $componentController */
-		bard.inject('$componentController');
-	});
+        /* global $componentController */
+        bard.inject('$componentController');
+    });
 
-	beforeEach(function () {
-		component = $componentController('home');
-	});
+    beforeEach(function () {
+        component = $componentController('home');
+    });
 
-	it('should exist', function () {
-		expect(component).to.exist;
-	});
+    it('should exist', function () {
+        expect(component).to.exist;
+    });
 });

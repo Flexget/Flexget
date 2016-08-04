@@ -14,12 +14,12 @@
             }
             return $http.get('/api/schema/' + path)
                 .then(
-				function (response) {
-					return response.data;
-				},
-				function (httpError) {
-					throw httpError.status + ' : ' + httpError.data;
-				});
+                function (response) {
+                    return response.data;
+                },
+                function (httpError) {
+                    throw httpError.status + ' : ' + httpError.data;
+                });
         };
 
         this.config = function (name) {

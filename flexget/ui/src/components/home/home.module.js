@@ -4,6 +4,6 @@
 
     angular
         .module('components.home', [
-			'blocks.router'
-		]);
+            'blocks.router'
+        ]);
 }());

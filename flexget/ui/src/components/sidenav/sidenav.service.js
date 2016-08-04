@@ -3,11 +3,11 @@
     'use strict';
 
     angular
-		.module('components.sidenav')
+        .module('components.sidenav')
         .factory('sideNavService', sideNavService);
 
     function sideNavService($mdMedia, $mdSidenav, $rootScope) {
-		return {
+        return {
             toggle: toggle,
             close: close
         };
@@ -26,5 +26,5 @@
                 $mdSidenav('left').close();
             }
         }
-	}
+    }
 }());

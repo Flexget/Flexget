@@ -4,7 +4,7 @@
 
     angular
         .module('components.toolbar', [
-			'ngMaterial',
-			'components.sidenav'
-		]);
+            'ngMaterial',
+            'components.sidenav'
+        ]);
 }());

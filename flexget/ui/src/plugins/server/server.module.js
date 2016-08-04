@@ -1,11 +1,11 @@
 /* global angular, registerPlugin */
 (function () {
-	'use strict';
+    'use strict';
 
-	angular
-		.module('plugins.server', [
-			'components.toolbar'
-		]);
+    angular
+        .module('plugins.server', [
+            'components.toolbar'
+        ]);
 
-	registerPlugin('plugins.server');
+    registerPlugin('plugins.server');
 }());

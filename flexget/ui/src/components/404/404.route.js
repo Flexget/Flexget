@@ -4,7 +4,7 @@
 
     angular
         .module('components.404')
-		.run(appRun);
+        .run(appRun);
 
     function appRun(routerHelper) {
         routerHelper.configureStates(getStates(), '/404');
@@ -17,7 +17,7 @@
                 config: {
                     url: '/404',
                     component: 'notFound',
-					root: true
+                    root: true
                 }
             }
         ];

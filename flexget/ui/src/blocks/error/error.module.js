@@ -4,7 +4,7 @@
 
     angular
         .module('blocks.error', [
-			'ngMaterial',
-			'ngclipboard'
-		]);
+            'ngMaterial',
+            'ngclipboard'
+        ]);
 }());

@@ -1,12 +1,12 @@
 /* global angular registerPlugin */
 (function () {
-	'use strict';
+    'use strict';
 
-	angular
-		.module('plugins.execute', [
-			'blocks.exception',
-			'blocks.router'
-		]);
+    angular
+        .module('plugins.execute', [
+            'blocks.exception',
+            'blocks.router'
+        ]);
 
-	registerPlugin('plugins.execute');
+    registerPlugin('plugins.execute');
 }());

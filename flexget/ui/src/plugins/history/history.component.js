@@ -1,28 +1,28 @@
 /* global angular */
 (function () {
-	'use strict';
+    'use strict';
 
-	angular
-		.module('plugins.history')
-		.component('historyView', {
-			templateUrl: 'plugins/history/history.tmpl.html',
-			controllerAs: 'vm',
-			controller: historyController
-		});
+    angular
+        .module('plugins.history')
+        .component('historyView', {
+            templateUrl: 'plugins/history/history.tmpl.html',
+            controllerAs: 'vm',
+            controller: historyController
+        });
 
-	function historyController(historyService) {
-		var vm = this;
+    function historyController(historyService) {
+        var vm = this;
 
-		vm.$onInit = activate;
+        vm.$onInit = activate;
 
-		function activate() {
-			getHistory();
-		}
+        function activate() {
+            getHistory();
+        }
 
-		function getHistory() {
-			return historyService.getHistory().then(function (data) {
-				vm.entries = data.entries;
-			});
-		}
-	}
+        function getHistory() {
+            return historyService.getHistory().then(function (data) {
+                vm.entries = data.entries;
+            });
+        }
+    }
 }());

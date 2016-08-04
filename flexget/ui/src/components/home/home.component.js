@@ -1,15 +1,15 @@
 /* global angular */
 (function () {
-	'use strict';
+    'use strict';
 
-	angular
-		.module('components.home')
-		.component('home', {
-			templateUrl: 'components/home/home.tmpl.html',
-			controllerAs: 'vm',
-			controller: homeController
-		});
+    angular
+        .module('components.home')
+        .component('home', {
+            templateUrl: 'components/home/home.tmpl.html',
+            controllerAs: 'vm',
+            controller: homeController
+        });
 
-	function homeController() {
-	}
+    function homeController() {
+    }
 }());

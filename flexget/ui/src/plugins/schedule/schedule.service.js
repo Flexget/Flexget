@@ -3,7 +3,7 @@
     'use strict';
 
     angular
-		.module('plugins.schedule')
+        .module('plugins.schedule')
         .factory('schedulesService', schedulesService);
 
     function schedulesService($http, CacheFactory, exception) {
@@ -29,7 +29,7 @@
         }
 
         function callFailed(error) {
-			return exception.catcher(error);
+            return exception.catcher(error);
         }
     }
 }());

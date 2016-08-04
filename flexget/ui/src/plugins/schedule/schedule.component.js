@@ -7,13 +7,13 @@
         .component('scheduleView', {
             templateUrl: 'plugins/schedule/schedule.tmpl.html',
             controllerAs: 'vm',
-			controller: scheduleController
+            controller: scheduleController
         });
 
     function scheduleController(schedulesService) {
         var vm = this;
 
-		vm.$onInit = activate;
+        vm.$onInit = activate;
 
         /*vm.form = [
             '*',
@@ -38,14 +38,14 @@
             vm.schema = { type: 'object', 'properties': { 'schedules': schema }, required: ['schedules'] };
         });*/
 
-		function activate() {
-			getSchedules();
-		}
+        function activate() {
+            getSchedules();
+        }
 
-		function getSchedules() {
-			schedulesService.getSchedules().then(function (data) {
-				vm.models = data;
-			});
-		}
+        function getSchedules() {
+            schedulesService.getSchedules().then(function (data) {
+                vm.models = data;
+            });
+        }
     }
 }());

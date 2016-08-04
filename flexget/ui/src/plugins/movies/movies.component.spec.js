@@ -1,117 +1,117 @@
 /* global bard, sinon, angular, mockMovieListData */
 describe('Plugin: Movies.Component', function () {
-	var component, deferred;
-	var lists = mockMovieListData.getMovieLists();
-	var list = mockMovieListData.getMovieListById();
+    var component, deferred;
+    var lists = mockMovieListData.getMovieLists();
+    var list = mockMovieListData.getMovieListById();
 
-	beforeEach(function () {
-		bard.appModule('plugins.movies');
+    beforeEach(function () {
+        bard.appModule('plugins.movies');
 
-		/* global $componentController, $q, moviesService, $rootScope, $mdDialog */
-		bard.inject('$componentController', '$q', 'moviesService', '$rootScope', '$mdDialog');
+        /* global $componentController, $q, moviesService, $rootScope, $mdDialog */
+        bard.inject('$componentController', '$q', 'moviesService', '$rootScope', '$mdDialog');
 
-		sinon.stub(moviesService, 'getLists').returns($q.when(lists));
-	});
+        sinon.stub(moviesService, 'getLists').returns($q.when(lists));
+    });
 
-	beforeEach(function () {
-		component = $componentController('moviesView');
-	});
+    beforeEach(function () {
+        component = $componentController('moviesView');
+    });
 
-	it('should exist', function () {
-		expect(component).to.exist;
-	});
+    it('should exist', function () {
+        expect(component).to.exist;
+    });
 
-	describe('activation', function () {
-		beforeEach(function () {
-			component.$onInit();
-			$rootScope.$digest();
-		});
+    describe('activation', function () {
+        beforeEach(function () {
+            component.$onInit();
+            $rootScope.$digest();
+        });
 
-		it('should call the movies service', function () {
-			expect(moviesService.getLists).to.have.been.calledOnce;
-		});
+        it('should call the movies service', function () {
+            expect(moviesService.getLists).to.have.been.calledOnce;
+        });
 
-		it('should set the metadata values', function () {
-			expect(component.lists).to.exist;
-			expect(component.lists).not.to.be.empty;
-		});
-	});
+        it('should set the metadata values', function () {
+            expect(component.lists).to.exist;
+            expect(component.lists).not.to.be.empty;
+        });
+    });
 
-	describe('deleteMovieList()', function () {
-		beforeEach(function () {
-			deferred = $q.defer();
+    describe('deleteMovieList()', function () {
+        beforeEach(function () {
+            deferred = $q.defer();
 
-			sinon.stub(moviesService, 'deleteList').returns(deferred.promise);
-		});
+            sinon.stub(moviesService, 'deleteList').returns(deferred.promise);
+        });
 
-		it('should exist', function () {
-			expect(component.deleteMovieList).to.exist;
-			expect(component.deleteMovieList).to.be.a('function');
-		});
+        it('should exist', function () {
+            expect(component.deleteMovieList).to.exist;
+            expect(component.deleteMovieList).to.be.a('function');
+        });
 
-		it('should call the dialog show function', function () {
-			sinon.spy($mdDialog, 'show');
+        it('should call the dialog show function', function () {
+            sinon.spy($mdDialog, 'show');
 
-			component.deleteMovieList(list);
+            component.deleteMovieList(list);
 
-			expect($mdDialog.show).to.have.been.calledOnce;
-		});
+            expect($mdDialog.show).to.have.been.calledOnce;
+        });
 
-		describe('confirmation', function () {
-			it('should call the movies service', function () {
-				sinon.stub($mdDialog, 'show').returns($q.resolve());
+        describe('confirmation', function () {
+            it('should call the movies service', function () {
+                sinon.stub($mdDialog, 'show').returns($q.resolve());
 
-				component.deleteMovieList(list);
+                component.deleteMovieList(list);
 
-				$rootScope.$digest();
+                $rootScope.$digest();
 
-				expect(moviesService.deleteList).to.have.been.calledOnce;
-			});
+                expect(moviesService.deleteList).to.have.been.calledOnce;
+            });
 
-			it('should remove the list from all lists', function () {
-				sinon.stub($mdDialog, 'show').returns($q.resolve());
+            it('should remove the list from all lists', function () {
+                sinon.stub($mdDialog, 'show').returns($q.resolve());
 
-				deferred.resolve();
-							
-				component.lists = angular.copy(lists.movie_lists);
+                deferred.resolve();
+                            
+                component.lists = angular.copy(lists.movie_lists);
 
-				component.deleteMovieList(list);
+                component.deleteMovieList(list);
 
-				$rootScope.$digest();
+                $rootScope.$digest();
 
-				expect(component.lists.length).to.equal(lists.movie_lists.length - 1);
-			});
-		});
-	});
+                expect(component.lists.length).to.equal(lists.movie_lists.length - 1);
+            });
+        });
+    });
 
-	describe('newList()', function () {
-		it('should exist', function () {
-			expect(component.newList).to.exist;
-			expect(component.newList).to.be.a('function');
-		});
+    describe('newList()', function () {
+        it('should exist', function () {
+            expect(component.newList).to.exist;
+            expect(component.newList).to.be.a('function');
+        });
 
-		it('should call the dialog show function', function () {
-			var event = $rootScope.$emit('click');
+        it('should call the dialog show function', function () {
+            var event = $rootScope.$emit('click');
 
-			sinon.spy($mdDialog, 'show');
+            sinon.spy($mdDialog, 'show');
 
-			component.newList(event);
+            component.newList(event);
 
-			expect($mdDialog.show).to.have.been.calledOnce;
-		});
+            expect($mdDialog.show).to.have.been.calledOnce;
+        });
 
-		it('should add the new list to all lists', function () {
-			var event = $rootScope.$emit('click');
+        it('should add the new list to all lists', function () {
+            var event = $rootScope.$emit('click');
 
-			sinon.stub($mdDialog, 'show').returns($q.when(list));
+            sinon.stub($mdDialog, 'show').returns($q.when(list));
 
-			component.lists = angular.copy(lists.movie_lists);
+            component.lists = angular.copy(lists.movie_lists);
 
-			component.newList(event);
+            component.newList(event);
 
-			$rootScope.$digest();
+            $rootScope.$digest();
 
-			expect(component.lists.length).to.equal(lists.movie_lists.length + 1);
-		});
-	});
+            expect(component.lists.length).to.equal(lists.movie_lists.length + 1);
+        });
+    });
 });

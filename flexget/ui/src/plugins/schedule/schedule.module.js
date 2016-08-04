@@ -3,13 +3,13 @@
     'use strict';
 
     angular
-		.module('plugins.schedule', [
-			'angular-cache',
+        .module('plugins.schedule', [
+            'angular-cache',
 
-			'blocks.exception',
-			'blocks.router'
-			//'schemaForm'
-		]);
+            'blocks.exception',
+            'blocks.router'
+            //'schemaForm'
+        ]);
 
-	registerPlugin('plugins.schedule');
+    registerPlugin('plugins.schedule');
 }());

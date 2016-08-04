@@ -3,54 +3,54 @@
     'use strict';
 
     angular
-		.module('plugins.series')
-		.component('seriesEntry', {
-			templateUrl: 'plugins/series/components/series-entry/series-entry.tmpl.html',
-			controllerAs: 'vm',
-			controller: seriesEntryController,
-			bindings: {
-				show: '<',
-				forgetShow: '&',
-				toggleEpisodes: '&'
-			},
-			transclude: true
-		});
+        .module('plugins.series')
+        .component('seriesEntry', {
+            templateUrl: 'plugins/series/components/series-entry/series-entry.tmpl.html',
+            controllerAs: 'vm',
+            controller: seriesEntryController,
+            bindings: {
+                show: '<',
+                forgetShow: '&',
+                toggleEpisodes: '&'
+            },
+            transclude: true
+        });
 
     function seriesEntryController($mdDialog, seriesService) {
         var vm = this;
 
-		vm.$onInit = activate;
-		vm.setBegin = setBegin;
+        vm.$onInit = activate;
+        vm.setBegin = setBegin;
 
-		var dialog = {
-			template: '<series-begin-dialog begin=\'vm.begin\' show=\'vm.show\'></series-begin>',
-			bindToController: true,
-			controllerAs: 'vm',
-			controller: function () { }
-		};
+        var dialog = {
+            template: '<series-begin-dialog begin=\'vm.begin\' show=\'vm.show\'></series-begin>',
+            bindToController: true,
+            controllerAs: 'vm',
+            controller: function () { }
+        };
 
-		function activate() {
-			loadMetadata();
-		}
+        function activate() {
+            loadMetadata();
+        }
 
-		function loadMetadata() {
+        function loadMetadata() {
             seriesService.getShowMetadata(vm.show)
-				.then(function (data) {
-					vm.show.metadata = data;
-				});
-		}
+                .then(function (data) {
+                    vm.show.metadata = data;
+                });
+        }
 
-		function setBegin() {
-			dialog.locals = {
-				show: vm.show
-			};
+        function setBegin() {
+            dialog.locals = {
+                show: vm.show
+            };
 
-			$mdDialog.show(dialog).then(function (begin) {
-				if (begin) {
-					vm.show['begin_episode']['episode_identifier'] = begin;
-				}
-			});
-		}
+            $mdDialog.show(dialog).then(function (begin) {
+                if (begin) {
+                    vm.show['begin_episode']['episode_identifier'] = begin;
+                }
+            });
+        }
 
 
         //Dialog for the update possibilities, such as begin and alternate names
@@ -80,5 +80,5 @@
                 console.log(err);
             });
         }*/
-	}
+    }
 }());

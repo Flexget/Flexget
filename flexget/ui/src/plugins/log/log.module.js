@@ -1,17 +1,17 @@
 /* global angular, registerPlugin */
 (function () {
-	'use strict';
+    'use strict';
 
-	angular
-		.module('plugins.log', [
-			'blocks.exception',
-			'blocks.router',
+    angular
+        .module('plugins.log', [
+            'blocks.exception',
+            'blocks.router',
 
-			'components.toolbar',
-			'ui.grid',
-			'ui.grid.autoResize',
-			'ui.grid.autoScroll'
-		]);
+            'components.toolbar',
+            'ui.grid',
+            'ui.grid.autoResize',
+            'ui.grid.autoScroll'
+        ]);
 
-	registerPlugin('plugins.log');
+    registerPlugin('plugins.log');
 }());
