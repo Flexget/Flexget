@@ -81,13 +81,14 @@ def do_cli(manager, options):
         query = query.order_by(desc(History.time)).limit(options.limit)
         table_data = []
         for item in reversed(query.all()):
-            table_data.append([
-                'Task\nTitle\nURL\nStored\nTime\nDetails',
-                '{}\n{}\n{}\n{}\n{}\n{}'.format(item.task, ww(item.title),
-                                                ww(item.url),
-                                                ww(item.filename) or '',
-                                                item.time.strftime("%c"),
-                                                item.details)])
+            titles = 'Task\nTitle\nURL\nTime\nDetails'
+            data = '{}\n{}\n{}\n{}\n{}'.format(item.task, ww(item.title), ww(item.url), item.time.strftime("%c"),
+                                               item.details)
+            if item.filename:
+                titles += '\nStored'
+                data = '{}\n{}\n{}\n{}\n{}\n{}'.format(item.task, ww(item.title), ww(item.url),
+                                                       item.time.strftime("%c"), item.details, ww(item.filename))
+            table_data.append([titles, data])
 
     title = 'Showing {} entries from History'.format(query.count())
     table = CLITable(options.table_type, table_data, title=title, check_size=options.check_size)
