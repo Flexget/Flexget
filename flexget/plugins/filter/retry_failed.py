@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+from functools import partial
+
 import logging
 from datetime import datetime, timedelta
 
@@ -13,6 +15,7 @@ from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.tools import parse_timedelta
+from flexget.options import CLITable, table_parser, CLITableError
 
 SCHEMA_VER = 3
 
@@ -188,22 +191,24 @@ class PluginFailed(object):
 
 def do_cli(manager, options):
     if options.failed_action == 'list':
-        list_failed()
+        list_failed(options)
     elif options.failed_action == 'clear':
         clear_failed(manager)
 
 
-def list_failed():
-    session = Session()
-    try:
+def list_failed(options):
+    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+    with Session() as session:
         results = session.query(FailedEntry).all()
-        if not results:
-            console('No failed entries recorded')
+        header = ['Title', 'Fail count', 'Reason', 'Failure time']
+        table_data = [header]
         for entry in results:
-            console('%16s - %s - %s times - %s' %
-                    (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title, entry.count, entry.reason))
-    finally:
-        session.close()
+            table_data.append([ww(entry.title), entry.count, entry.reason or '', entry.tof.strftime('%Y-%m-%d %H:%M')])
+    table = CLITable(options.table_type, table_data)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def clear_failed(manager):
@@ -227,5 +232,5 @@ def register_plugin():
 def register_parser_arguments():
     parser = options.register_command('failed', do_cli, help='list or clear remembered failures')
     subparsers = parser.add_subparsers(dest='failed_action', metavar='<action>')
-    subparsers.add_parser('list', help='list all the entries that have had failures')
+    subparsers.add_parser('list', help='list all the entries that have had failures', parents=[table_parser])
     subparsers.add_parser('clear', help='clear all failures from database, so they can be retried')
