@@ -172,7 +172,7 @@ def list_rejected(options):
         table_data = [header]
         for entry in results:
             table_data.append([entry.id, ww(entry.title), entry.task.name, entry.rejected_by, entry.reason or ''])
-    table = CLITable(options.table_type, table_data)
+    table = CLITable(options.table_type, table_data, check_size=options.check_size)
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)
