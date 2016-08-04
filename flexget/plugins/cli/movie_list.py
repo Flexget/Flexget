@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser, ArgumentTypeError
+from functools import partial
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -20,6 +22,7 @@ from flexget.utils.tools import split_title_year
 imdb_lookup = ImdbLookup().lookup
 tmdb_lookup = PluginTmdbLookup().lookup
 
+ww = CLITable.word_wrap
 
 def lookup_movie(title, session, identifiers=None):
     entry = Entry(title=title)
@@ -49,6 +52,11 @@ def movie_list_keyword_type(identifier):
 
 def do_cli(manager, options):
     """Handle movie-list subcommand"""
+
+    # Handle globally setting value for word wrap method
+    global ww
+    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+
     if options.list_action == 'all':
         movie_list_lists(options)
         return
@@ -97,7 +105,7 @@ def movie_list_list(options):
     table_data = [header]
     movies = get_movies_by_list_id(movie_list.id, order_by='added', descending=True, session=session)
     for movie in movies:
-        movie_row = [movie.title, movie.year or '']
+        movie_row = [ww(movie.title), movie.year or '']
         for identifier in MovieListBase().supported_ids:
             movie_row.append(movie.identifiers.get(identifier, ''))
         table_data.append(movie_row)
