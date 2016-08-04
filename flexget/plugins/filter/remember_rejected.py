@@ -1,6 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 from past.builtins import basestring
+
+from functools import partial
 
 import logging
 from datetime import datetime, timedelta
@@ -162,12 +165,13 @@ def do_cli(manager, options):
 
 
 def list_rejected(options):
+    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
     with Session() as session:
         results = session.query(RememberEntry).all()
         header = ['Title', 'Task', 'Rejected by', 'Reason']
         table_data = [header]
         for entry in results:
-            table_data.append([entry.title, entry.task.name, entry.rejected_by, entry.reason or ''])
+            table_data.append([ww(entry.title), entry.task.name, entry.rejected_by, entry.reason or ''])
     table = CLITable(options.table_type, table_data)
     try:
         console(table.output)
