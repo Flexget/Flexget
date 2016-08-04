@@ -106,9 +106,7 @@ def display_summary(options):
                 status = color('NEW', NEW_EP_COLOR)
             if behind > 0:
                 status = color('{} behind'.format(behind), BEHIND_EP_COLOR)
-
-            table_data.append(
-                [ww(series_name), ww(episode_id), ww(age), ww(latest_release), ww(identifier_type), ww(status)])
+            table_data.append([ww(series_name), episode_id, age, ww(latest_release), identifier_type, status])
     table = CLITable(options.table_type, table_data)
     try:
         console(table.output)
