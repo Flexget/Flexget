@@ -79,13 +79,20 @@ def do_cli(manager, options):
         if options.task:
             query = query.filter(History.task.like('%' + options.task + '%'))
         query = query.order_by(desc(History.time)).limit(options.limit)
-        header = ['#',' Task', 'Title', 'URL', 'Stored', 'Time', 'Details']
-        table_data = [header]
+        table_data = []
         for item in reversed(query.all()):
-            table_data.append(
-                [item.id, item.task, ww(item.title), ww(item.url), ww(item.filename) or '', item.time.strftime("%c"), item.details])
-    table = CLITable(options.table_type, table_data, check_size=options.check_size)
-    table.table.justify_columns[0] = 'center'
+            table_data.append([
+                'Task\nTitle\nURL\nStored\nTime\nDetails',
+                '{}\n{}\n{}\n{}\n{}\n{}'.format(item.task, ww(item.title),
+                                                ww(item.url),
+                                                ww(item.filename) or '',
+                                                item.time.strftime("%c"),
+                                                item.details)])
+
+    title = 'Showing {} entries from History'.format(query.count())
+    table = CLITable(options.table_type, table_data, title=title, check_size=options.check_size)
+    table.table.inner_row_border = True
+
     try:
         console(table.output)
     except CLITableError as e:
