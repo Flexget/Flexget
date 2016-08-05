@@ -151,8 +151,14 @@ class InputHtml(object):
 
     def _title_from_url(self, url):
         parts = parse.urlsplit(url)
-        title = parse.unquote_plus(posixpath.basename(parts.path))
-        return title
+        name = ''
+        if parts.scheme == 'magnet':
+            match = re.search('(?:&dn(\.\d)?=)(.+?)(?:&)', parts.query)
+            if match:
+                name = match.group(1)
+        else:
+            name = posixpath.basename(parts.path)
+        return parse.unquote_plus(name)
 
     def create_entries(self, page_url, soup, config):
 
