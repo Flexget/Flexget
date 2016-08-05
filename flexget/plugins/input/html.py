@@ -158,8 +158,7 @@ class InputHtml(object):
                 name = match.group(1)
         else:
             name = posixpath.basename(parts.path)
-        title = parse.unquote_plus(name)
-        return title
+        return parse.unquote_plus(name)
 
     def create_entries(self, page_url, soup, config):
 
