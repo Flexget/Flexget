@@ -20,8 +20,6 @@ class TestURLRewriters(object):
               - {title: 'tbp torrent subdomain', url: 'http://torrents.thepiratebay.se/8492471/Test.avi'}
               - {title: 'tbp torrent bad subdomain', url: 'http://torrent.thepiratebay.se/8492471/Test.avi'}
               - {title: 'nyaa', url: 'http://www.nyaa.eu/?page=torrentinfo&tid=12345'}
-              - {title: 'isohunt search', url: 'http://isohunt.com/torrents/?ihq=Query.Here'}
-              - {title: 'isohunt direct', url: 'http://isohunt.com/torrent_details/123456789/Name.Here'}
               - {title: 'cinemageddon download', url: 'http://cinemageddon.net/details.php?id=1234'}
     """
 
@@ -59,16 +57,6 @@ class TestURLRewriters(object):
         assert urlrewriter.url_rewritable(task, entry)
         urlrewriter.url_rewrite(task, entry)
         assert entry['url'] == 'http://www.nyaa.eu/?page=download&tid=12345'
-
-    def test_isohunt(self, execute_task):
-        task = execute_task('test')
-        entry = task.find_entry(title='isohunt search')
-        urlrewriter = self.get_urlrewriter('isohunt')
-        assert not urlrewriter.url_rewritable(task, entry), \
-            'search entry should not be url_rewritable'
-        entry = task.find_entry(title='isohunt direct')
-        assert urlrewriter.url_rewritable(task, entry), \
-            'direct entry should be url_rewritable'
 
     def test_cinemageddon(self, execute_task):
         task = execute_task('test')
