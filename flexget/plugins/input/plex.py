@@ -235,14 +235,21 @@ class InputPlex(object):
             if viewgroup == "episode":
                 e['plex_thumb'] = "http://%s:%d%s%s" % (
                     config['server'], config['port'], node.getAttribute('thumb'), urlappend)
+                e['series_name'] = title
                 season = int(node.getAttribute('parentIndex'))
                 if node.getAttribute('parentIndex') == node.getAttribute('year'):
                     season = node.getAttribute('originallyAvailableAt')
                     filenamemap = "%s_%s%s_%s_%s_%s.%s"
                     episode = ""
+                    e['series_id_type'] = 'date'
+                    e['series_date'] = season
                 elif node.getAttribute('index'):
                     episode = int(node.getAttribute('index'))
                     filenamemap = "%s_%02dx%02d_%s_%s_%s.%s"
+                    e['series_season'] = season
+                    e['series_episode'] = episode
+                    e['series_id_type'] = 'ep'
+                    e['series_id'] = 'S%02dE%02d' % (season, episode)
                 else:
                     log.debug("Could not get episode number for '%s' (Hint, ratingKey: %s)"
                               % (title, node.getAttribute('ratingKey')))
