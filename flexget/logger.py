@@ -108,10 +108,12 @@ def console(text, *args, **kwargs):
 
     Accepts arguments like the `print` function does.
     """
-    if not isinstance(text, str):
-        text = str(text).encode(io_encoding, 'replace')
     kwargs['file'] = getattr(local_context, 'output', sys.stdout)
-    print(text, *args, **kwargs)
+    try:
+        print(text, *args, **kwargs)
+    except UnicodeEncodeError:
+        text = text.encode(io_encoding, 'replace').decode(io_encoding)
+        print(text, *args, **kwargs)
     kwargs['file'].flush()  # flush to make sure the output is printed right away
 
 
