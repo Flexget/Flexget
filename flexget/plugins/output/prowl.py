@@ -52,7 +52,7 @@ class OutputProwl(object):
             event = entry.get('event', config['event'])
             priority = entry.get('priority', config['priority'])
             description = config.get('description', entry['title'])
-            message_url = config.get('url')
+            message_url = config.get('url', '')
 
             # If event has jinja template, render it
             try:
