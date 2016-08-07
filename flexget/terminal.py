@@ -54,17 +54,14 @@ class TerminalTable(object):
         return table_types
 
     @staticmethod
-    def colorize(text, color_tag, porcelain=False):
+    def colorize(text, color_tag):
         """
         This method calls for `colorclass` to try and color the given text
 
         :param text: Text to color
         :param color_tag: Color tag. Should adhere to colorclass.list_tags().
-        :param porcelain: If True, no colors should be returned.
-        :return: Text or colorized textyo
+        :return: Text or colorized text
         """
-        if porcelain:
-            return text
         if sys.platform == 'win32':
             Windows.enable(auto_colors=True)
         return Color('{%s}%s{%s}' % (color_tag, text, '/' + color_tag))
@@ -114,3 +111,12 @@ table_parser.add_argument('--max-width', dest='max_column_width', type=int, defa
                                ' Use this in case table size exceeds terminal size')
 table_parser.add_argument('--check-size', action='store_true',
                           help='Only display table if it fits the current terminal size')
+
+
+class Colorize(Color):
+    @classmethod
+    def colorize(cls, string, color, auto=True):
+        if sys.platform == 'win32':
+            Windows.enable(auto_colors=True)
+        tag = '{0}{1}'.format('auto' if auto and 'auto' not in color else '', color)
+        return cls('{%s}%s{/%s}' % (tag, string, tag))

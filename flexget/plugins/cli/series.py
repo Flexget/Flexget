@@ -9,12 +9,7 @@ from flexget import options, plugin
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
-
-try:
-    from flexget.terminal import TerminalTable, CLITableError, table_parser
-except ImportError:
-    raise plugin.DependencyError(issued_by='cli_series', missing='CLITable',
-                                 message='Series commandline interface not loaded')
+from flexget.terminal import TerminalTable, CLITableError, table_parser, Colorize
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
@@ -24,26 +19,18 @@ except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
 
-SORT_COLUMN_COLOR = 'autoyellow'
+SORT_COLUMN_COLOR = 'yellow'
 NEW_EP_COLOR = 'autogreen'
 BEHIND_EP_COLOR = 'autored'
 UNDOWNLOADED_RELEASE_COLOR = 'autoblack'
 DOWNLOADED_RELEASE_COLOR = 'autowhite'
 ERROR_COLOR = 'autored'
 
+color = Colorize.colorize
+cli_table = TerminalTable
+
 
 def do_cli(manager, options):
-    global color
-    # Create partial that passes table type, since `porcelain` should disable colors
-    if options.series_action in ['list', 'show']:
-        color = partial(TerminalTable.colorize, porcelain=options.table_type == 'porcelain')
-
-    global ww
-    ww = partial(TerminalTable.word_wrap, max_length=options.max_column_width)
-
-    global cli_table
-    cli_table = partial(TerminalTable, check_size=options.check_size)
-
     if options.series_action == 'list':
         display_summary(options)
     elif options.series_action == 'show':
@@ -107,7 +94,7 @@ def display_summary(options):
                 status = color('NEW', NEW_EP_COLOR)
             if behind > 0:
                 status = color('{} behind'.format(behind), BEHIND_EP_COLOR)
-            table_data.append([ww(series_name), episode_id, age, ww(latest_release), identifier_type, status])
+            table_data.append([series_name, episode_id, age, latest_release, identifier_type, status])
     table = cli_table(options.table_type, table_data)
     try:
         console(table.output)
@@ -228,8 +215,8 @@ def display_details(options):
                 else:
                     title = color(title, DOWNLOADED_RELEASE_COLOR)
                     quality = color(quality, DOWNLOADED_RELEASE_COLOR)
-                release_titles.append(ww(title))
-                release_qualities.append(ww(quality))
+                release_titles.append(title)
+                release_qualities.append(quality)
                 release_propers.append('Yes' if release.proper_count > 0 else '')
             ep_data.append('\n'.join(release_titles))
             ep_data.append('\n'.join(release_qualities))
