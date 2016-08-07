@@ -128,8 +128,11 @@ class PluginSubliminal(object):
                     entry_languages = set(entry.get('subtitle_languages', [])) or languages
 
                     video = subliminal.scan_video(entry['location'])
+                    # use metadata refiner to get mkv metadata
+                    refiner = ('metadata',)
+                    subliminal.core.refine(video, episode_refiners=refiner, movie_refiners=refiner)
                     existing_subtitles = set(subliminal.core.search_external_subtitles(entry['location']).values())
-                    video.subtitle_languages = existing_subtitles
+                    video.subtitle_languages |= existing_subtitles
                     if isinstance(video, subliminal.Episode):
                         title = video.series
                         hash_scores = episode_scores['hash']
@@ -138,7 +141,7 @@ class PluginSubliminal(object):
                         hash_scores = movie_scores['hash']
                     log.info('Name computed for %s was %s', entry['location'], title)
                     msc = hash_scores if config['exact_match'] else 0
-                    if entry_languages.issubset(existing_subtitles):
+                    if entry_languages.issubset(video.subtitle_languages) or (single_mode and video.subtitle_languages):
                         log.debug('All preferred languages already exist for "%s"', entry['title'])
                         entry['subtitles_missing'] = set()
                         continue  # subs for preferred lang(s) already exists
