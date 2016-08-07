@@ -17,7 +17,7 @@ from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
 from flexget.utils.tools import parse_timedelta
-from flexget.options import CLITable, table_parser, CLITableError
+from flexget.terminal import CLITable, CLITableError, table_parser
 
 log = logging.getLogger('remember_rej')
 Base = db_schema.versioned_base('remember_rejected', 3)

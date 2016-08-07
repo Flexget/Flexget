@@ -15,7 +15,7 @@ from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.tools import parse_timedelta
-from flexget.options import CLITable, table_parser, CLITableError
+from flexget.terminal import CLITable, CLITableError, table_parser
 
 SCHEMA_VER = 3
 

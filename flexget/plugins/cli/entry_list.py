@@ -10,7 +10,7 @@ from flexget import options
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
-from flexget.options import CLITable, table_parser, CLITableError
+from flexget.terminal import CLITable, CLITableError, table_parser
 from flexget.plugins.list.entry_list import get_entry_lists, get_list_by_exact_name, get_entries_by_list_id, \
     get_entry_by_id, get_entry_by_title, EntryListList, EntryListEntry
 

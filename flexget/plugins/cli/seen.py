@@ -6,7 +6,7 @@ from functools import partial
 from flexget import options
 from flexget.event import event
 from flexget.logger import console
-from flexget.options import CLITable, CLITableError, table_parser
+from flexget.terminal import CLITable, CLITableError, table_parser
 from flexget.plugins.filter import seen
 from flexget.utils.database import with_session
 from flexget.utils.imdb import is_imdb_url, extract_id

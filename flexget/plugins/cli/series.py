@@ -11,7 +11,7 @@ from flexget.logger import console
 from flexget.manager import Session
 
 try:
-    from flexget.options import CLITable, table_parser, CLITableError
+    from flexget.terminal import CLITable, CLITableError, table_parser
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='CLITable',
                                  message='Series commandline interface not loaded')
