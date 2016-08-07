@@ -71,6 +71,7 @@ class OutputProwl(object):
             try:
                 message_url = entry.render(message_url)
             except RenderError as e:
+                message_url = ''
                 log.error('Error rendering jinja url: %s' % e)
 
             url = 'https://api.prowlapp.com/publicapi/add'
