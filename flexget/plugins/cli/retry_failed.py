@@ -5,7 +5,7 @@ from functools import partial
 
 from flexget import options
 from flexget.logger import console
-from flexget.terminal import CLITable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser
 from flexget.manager import Session
 from flexget.event import event
 from flexget.plugins.filter.retry_failed import FailedEntry
@@ -19,7 +19,7 @@ def do_cli(manager, options):
 
 
 def list_failed(options):
-    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+    ww = partial(TerminalTable.word_wrap, max_length=options.max_column_width)
     with Session() as session:
         results = session.query(FailedEntry).all()
         header = ['#', 'Title', 'Fail count', 'Reason', 'Failure time']
@@ -28,7 +28,7 @@ def list_failed(options):
             table_data.append(
                 [entry.id, ww(entry.title), entry.count, '' if entry.reason == 'None' else entry.reason,
                  entry.tof.strftime('%Y-%m-%d %H:%M')])
-    table = CLITable(options.table_type, table_data, check_size=options.check_size)
+    table = TerminalTable(options.table_type, table_data, check_size=options.check_size)
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)

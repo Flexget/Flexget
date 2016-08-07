@@ -6,7 +6,7 @@ from functools import partial
 from flexget import options
 from flexget.event import event
 from flexget.logger import console
-from flexget.terminal import CLITable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser
 from flexget.plugins.filter import seen
 from flexget.utils.database import with_session
 from flexget.utils.imdb import is_imdb_url, extract_id
@@ -45,7 +45,7 @@ def seen_add(options):
 
 @with_session
 def seen_search(options, session=None):
-    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+    ww = partial(TerminalTable.word_wrap, max_length=options.max_column_width)
     search_term = '%' + options.search_term + '%'
     seen_entries = seen.search(value=search_term, status=None, session=session)
     header = ['#', 'Title', 'Field', 'Value', 'Task', 'Added']
@@ -61,7 +61,7 @@ def seen_search(options, session=None):
         seen_data.append('\n'.join(values))
         seen_data += [se.task, se.added.strftime('%c')]
         table_data.append(seen_data)
-    table = CLITable(options.table_type, table_data, check_size=options.check_size)
+    table = TerminalTable(options.table_type, table_data, check_size=options.check_size)
     try:
         console(table.output)
     except CLITableError as e:

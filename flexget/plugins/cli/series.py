@@ -11,7 +11,7 @@ from flexget.logger import console
 from flexget.manager import Session
 
 try:
-    from flexget.terminal import CLITable, CLITableError, table_parser
+    from flexget.terminal import TerminalTable, CLITableError, table_parser
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='CLITable',
                                  message='Series commandline interface not loaded')
@@ -36,13 +36,13 @@ def do_cli(manager, options):
     global color
     # Create partial that passes table type, since `porcelain` should disable colors
     if options.series_action in ['list', 'show']:
-        color = partial(CLITable.colorize, porcelain=options.table_type == 'porcelain')
+        color = partial(TerminalTable.colorize, porcelain=options.table_type == 'porcelain')
 
     global ww
-    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+    ww = partial(TerminalTable.word_wrap, max_length=options.max_column_width)
 
     global cli_table
-    cli_table = partial(CLITable, check_size=options.check_size)
+    cli_table = partial(TerminalTable, check_size=options.check_size)
 
     if options.series_action == 'list':
         display_summary(options)

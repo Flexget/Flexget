@@ -11,7 +11,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
-from flexget.terminal import CLITable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser
 from flexget.plugin import PluginError
 from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
     get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase
@@ -53,10 +53,10 @@ def do_cli(manager, options):
 
     # Handle globally setting value for word wrap method
     global ww
-    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+    ww = partial(TerminalTable.word_wrap, max_length=options.max_column_width)
 
     global cli_table
-    cli_table = partial(CLITable, check_size=options.check_size)
+    cli_table = partial(TerminalTable, check_size=options.check_size)
 
     if options.list_action == 'all':
         movie_list_lists(options)

@@ -12,7 +12,7 @@ from flexget import options, plugin
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Base, Session
-from flexget.terminal import CLITable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser
 
 log = logging.getLogger('history')
 
@@ -70,7 +70,7 @@ class PluginHistory(object):
 
 
 def do_cli(manager, options):
-    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+    ww = partial(TerminalTable.word_wrap, max_length=options.max_column_width)
     with Session() as session:
         query = session.query(History)
         if options.search:
@@ -91,7 +91,7 @@ def do_cli(manager, options):
             table_data.append([titles, data])
 
     title = 'Showing {} entries from History'.format(query.count())
-    table = CLITable(options.table_type, table_data, title=title, check_size=options.check_size)
+    table = TerminalTable(options.table_type, table_data, title=title, check_size=options.check_size)
     table.table.inner_row_border = True
 
     try:

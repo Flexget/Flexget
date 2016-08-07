@@ -8,7 +8,7 @@ from flexget import options
 from flexget.event import event
 from flexget.logger import console
 from flexget.plugin import get_plugins
-from flexget.terminal import CLITable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser
 
 log = logging.getLogger('plugins')
 
@@ -39,7 +39,7 @@ def plugins_summary(manager, options):
 
         table_data.append([plugin.name, jc.join(roles), jc.join(flags)])
 
-    table = CLITable(options.table_type, table_data)
+    table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
     except CLITableError as e:

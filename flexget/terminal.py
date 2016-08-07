@@ -11,7 +11,7 @@ from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredM
 from terminaltables.terminal_io import terminal_size
 
 
-class CLITable(object):
+class TerminalTable(object):
     """
     A data table suited for CLI output, created via its sent parameters.
     """
@@ -105,7 +105,7 @@ class CLITableError(Exception):
 
 table_parser = ArgumentParser(add_help=False)
 # The CLI table parent parser
-table_parser.add_argument('--table-type', choices=CLITable.supported_table_types(keys=True), default='single',
+table_parser.add_argument('--table-type', choices=TerminalTable.supported_table_types(keys=True), default='single',
                           help='Select output table style')
 table_parser.add_argument('--porcelain', dest='table_type', action='store_const', const='porcelain',
                           help='Make the output parseable. Similar to using `--table-type porcelain`')

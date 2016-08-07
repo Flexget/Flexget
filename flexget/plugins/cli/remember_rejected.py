@@ -8,7 +8,7 @@ from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugins.filter.remember_rejected import RememberEntry
-from flexget.terminal import CLITable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser
 
 
 def do_cli(manager, options):
@@ -19,14 +19,14 @@ def do_cli(manager, options):
 
 
 def list_rejected(options):
-    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+    ww = partial(TerminalTable.word_wrap, max_length=options.max_column_width)
     with Session() as session:
         results = session.query(RememberEntry).all()
         header = ['#', 'Title', 'Task', 'Rejected by', 'Reason']
         table_data = [header]
         for entry in results:
             table_data.append([entry.id, ww(entry.title), entry.task.name, entry.rejected_by, entry.reason or ''])
-    table = CLITable(options.table_type, table_data, check_size=options.check_size)
+    table = TerminalTable(options.table_type, table_data, check_size=options.check_size)
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)
