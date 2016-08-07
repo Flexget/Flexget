@@ -34,7 +34,8 @@ class OutputProwl(object):
             'application': {'type': 'string', 'default': 'FlexGet'},
             'event': {'type': 'string', 'default': 'New Release'},
             'priority': {'type': 'integer', 'default': 0},
-            'description': {'type': 'string'}
+            'description': {'type': 'string'},
+            'url': {'type': 'string'}
         },
         'required': ['apikey'],
         'additionalProperties': False
@@ -51,6 +52,7 @@ class OutputProwl(object):
             event = entry.get('event', config['event'])
             priority = entry.get('priority', config['priority'])
             description = config.get('description', entry['title'])
+            message_url = config.get('url', '')
 
             # If event has jinja template, render it
             try:
@@ -65,9 +67,16 @@ class OutputProwl(object):
                 description = entry['title']
                 log.error('Error rendering jinja description: %s' % e)
 
+            # If url has jinja template, render it
+            try:
+                message_url = entry.render(message_url)
+            except RenderError as e:
+                message_url = ''
+                log.error('Error rendering jinja url: %s' % e)
+
             url = 'https://api.prowlapp.com/publicapi/add'
             data = {'priority': priority, 'application': application, 'apikey': apikey,
-                    'event': event.encode('utf-8'), 'description': description}
+                    'event': event.encode('utf-8'), 'description': description, 'url': message_url}
 
             if task.options.test:
                 log.info('Would send prowl message about: %s', entry['title'])
