@@ -3,21 +3,18 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from past.builtins import basestring
 
-from functools import partial
-
 import logging
 from datetime import datetime, timedelta
 
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, and_, Index
 from sqlalchemy.orm import relation
 
-from flexget import db_schema, options, plugin
+from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
 from flexget.utils.tools import parse_timedelta
-from flexget.terminal import CLITable, CLITableError, table_parser
+
 
 log = logging.getLogger('remember_rej')
 Base = db_schema.versioned_base('remember_rejected', 3)
@@ -157,38 +154,6 @@ class FilterRememberRejected(object):
                                           expires=expires))
 
 
-def do_cli(manager, options):
-    if options.rejected_action == 'list':
-        list_rejected(options)
-    elif options.rejected_action == 'clear':
-        clear_rejected(manager)
-
-
-def list_rejected(options):
-    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
-    with Session() as session:
-        results = session.query(RememberEntry).all()
-        header = ['#', 'Title', 'Task', 'Rejected by', 'Reason']
-        table_data = [header]
-        for entry in results:
-            table_data.append([entry.id, ww(entry.title), entry.task.name, entry.rejected_by, entry.reason or ''])
-    table = CLITable(options.table_type, table_data, check_size=options.check_size)
-    table.table.justify_columns[0] = 'center'
-    try:
-        console(table.output)
-    except CLITableError as e:
-        console('ERROR: %s' % str(e))
-
-
-def clear_rejected(manager):
-    with Session() as session:
-        results = session.query(RememberEntry).delete()
-        console('Cleared %i items.' % results)
-        session.commit()
-        if results:
-            manager.config_changed()
-
-
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     # Remove entries older than 30 days
@@ -200,11 +165,3 @@ def db_cleanup(manager, session):
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
-
-
-@event('options.register')
-def register_parser_arguments():
-    parser = options.register_command('rejected', do_cli, help='list or clear remembered rejections')
-    subparsers = parser.add_subparsers(dest='rejected_action', metavar='<action>')
-    subparsers.add_parser('list', help='list all the entries that have been rejected', parents=[table_parser])
-    subparsers.add_parser('clear', help='clear all rejected entries from database, so they can be retried')
