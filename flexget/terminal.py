@@ -114,6 +114,9 @@ table_parser.add_argument('--check-size', action='store_true',
 
 
 class Colorize(Color):
+    """
+    Inherited class from colorclass, tweaked some defaults for ease of use
+    """
     @classmethod
     def colorize(cls, string, color, auto=True):
         if sys.platform == 'win32':
