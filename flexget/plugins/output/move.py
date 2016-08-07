@@ -78,12 +78,29 @@ class BaseFileOps(object):
         'required': ['files']
     }
 
-    def on_task_output(self, task, config):
+    def prepare_config(self, config):
         if config is True:
-            config = {}
+            return {}
         elif config is False:
             return
 
+        if 'along' not in config:
+            return config
+
+        files = config['along'].get('files')
+        subdirs = config['along'].get('subdirs')
+
+        if files and not isinstance(files, list):
+            config['along']['files'] = [files]
+        if subdirs and not isinstance(subdirs, list):
+            config['along']['subdirs'] = [subdirs]
+
+        return config
+
+    def on_task_output(self, task, config):
+        config = self.prepare_config(config)
+        if config is None:
+            return
         for entry in task.accepted:
             if 'location' not in entry:
                 self.log.verbose('Cannot handle %s because it does not have the field location.' % entry['title'])
