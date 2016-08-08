@@ -5,7 +5,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 import re
 
-from sqlalchemy import Unicode, DateTime
+from sqlalchemy import Unicode
 
 from flexget import plugin, db_schema
 from flexget.entry import Entry
@@ -63,7 +63,6 @@ class _1337x(object):
         if url.startswith('http://1337x.to/'):
             return True
         return False
-
 
     def url_rewrite(self, task, entry):
         """
