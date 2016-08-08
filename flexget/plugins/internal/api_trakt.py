@@ -14,7 +14,6 @@ from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
-from flexget import options
 from flexget import plugin
 from flexget.event import event
 from flexget.logger import console
@@ -26,6 +25,7 @@ from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.tools import TimedDict
 
 Base = db_schema.versioned_base('api_trakt', 5)
+ApiBase = db_schema.versioned_base('api_trakt_auth', 0)
 log = logging.getLogger('api_trakt')
 # Production Site
 CLIENT_ID = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
@@ -37,7 +37,7 @@ updated = SimplePersistence('api_trakt')
 
 
 # Oauth account authentication
-class TraktUserAuth(Base):
+class TraktUserAuth(ApiBase):
     __tablename__ = 'trakt_user_auth'
 
     account = Column(Unicode, primary_key=True)
@@ -109,6 +109,14 @@ def token_auth(data):
         return requests.post(get_api_url('oauth/token'), data=data).json()
     except requests.RequestException as e:
         raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e))
+
+
+def delete_account(account):
+    with Session() as session:
+        acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == account).first()
+        if not acc:
+            raise plugin.PluginError('Account %s not found.' % account)
+        session.delete(acc)
 
 
 def get_access_token(account, token=None, refresh=False, re_auth=False, called_from_cli=False):
@@ -1206,94 +1214,6 @@ class ApiTrakt(object):
         log.debug('The result for entry "%s" is: %s', title,
                   'Watched' if watched else 'Not watched')
         return watched
-
-
-def delete_account(account):
-    with Session() as session:
-        acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == account).first()
-        if not acc:
-            raise plugin.PluginError('Account %s not found.' % account)
-        session.delete(acc)
-
-
-def do_cli(manager, options):
-    if options.action == 'auth':
-        if not (options.account):
-            console('You must specify an account (local identifier) so we know where to save your access token!')
-            return
-        try:
-            get_access_token(options.account, options.pin, re_auth=True, called_from_cli=True)
-            console('Successfully authorized Flexget app on Trakt.tv. Enjoy!')
-            return
-        except plugin.PluginError as e:
-            console('Authorization failed: %s' % e)
-    elif options.action == 'show':
-        with Session() as session:
-            if not options.account:
-                # Print all accounts
-                accounts = session.query(TraktUserAuth).all()
-                if not accounts:
-                    console('No trakt authorizations stored in database.')
-                    return
-                console('{:-^21}|{:-^28}|{:-^28}'.format('Account', 'Created', 'Expires'))
-                for auth in accounts:
-                    console('{:<21}|{:>28}|{:>28}'.format(
-                        auth.account, auth.created.strftime('%Y-%m-%d'), auth.expires.strftime('%Y-%m-%d')))
-                return
-            # Show a specific account
-            acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == options.account).first()
-            if acc:
-                console('Authorization expires on %s' % acc.expires)
-            else:
-                console('Flexget has not been authorized to access your account.')
-    elif options.action == 'refresh':
-        if not options.account:
-            console('Please specify an account')
-            return
-        try:
-            get_access_token(options.account, refresh=True)
-            console('Successfully refreshed your access token.')
-            return
-        except plugin.PluginError as e:
-            console('Authorization failed: %s' % e)
-    elif options.action == 'delete':
-        if not options.account:
-            console('Please specify an account')
-            return
-        try:
-            delete_account(options.account)
-            console('Successfully deleted your access token.')
-            return
-        except plugin.PluginError as e:
-            console('Deletion failed: %s' % e)
-
-
-@event('options.register')
-def register_parser_arguments():
-    acc_text = 'local identifier which should be used in your config to refer these credentials'
-    # Register subcommand
-    parser = options.register_command('trakt', do_cli, help='view and manage trakt authentication.')
-    # Set up our subparsers
-    subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='action')
-    auth_parser = subparsers.add_parser('auth', help='authorize Flexget to access your Trakt.tv account')
-
-    auth_parser.add_argument('account', metavar='<account>', help=acc_text)
-    auth_parser.add_argument('pin', metavar='<pin>', help='get this by authorizing FlexGet to use your trakt account '
-                                                          'at %s. WARNING: DEPRECATED.' % PIN_URL, nargs='?')
-
-    show_parser = subparsers.add_parser('show', help='show expiration date for Flexget authorization(s) (don\'t worry, '
-                                                     'they will automatically refresh when expired)')
-
-    show_parser.add_argument('account', metavar='<account>', nargs='?', help=acc_text)
-
-    refresh_parser = subparsers.add_parser('refresh', help='manually refresh your access token associated with your'
-                                                           ' --account <name>')
-
-    refresh_parser.add_argument('account', metavar='<account>', help=acc_text)
-
-    delete_parser = subparsers.add_parser('delete', help='delete the specified <account> name from local database')
-
-    delete_parser.add_argument('account', metavar='<account>', help=acc_text)
 
 
 @event('plugin.register')
