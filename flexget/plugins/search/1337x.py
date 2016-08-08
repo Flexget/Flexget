@@ -5,8 +5,6 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 import re
 
-from sqlalchemy import Unicode
-
 from flexget import plugin, db_schema
 from flexget.entry import Entry
 from flexget.event import event
