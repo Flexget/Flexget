@@ -25,7 +25,7 @@ from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.tools import TimedDict
 
 Base = db_schema.versioned_base('api_trakt', 5)
-ApiBase = db_schema.versioned_base('api_trakt_auth', 0)
+AuthBase = db_schema.versioned_base('api_trakt_auth', 0)
 log = logging.getLogger('api_trakt')
 # Production Site
 CLIENT_ID = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
@@ -37,7 +37,7 @@ updated = SimplePersistence('api_trakt')
 
 
 # Oauth account authentication
-class TraktUserAuth(ApiBase):
+class TraktUserAuth(AuthBase):
     __tablename__ = 'trakt_user_auth'
 
     account = Column(Unicode, primary_key=True)
