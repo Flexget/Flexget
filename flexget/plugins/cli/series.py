@@ -87,6 +87,8 @@ def display_summary(options):
             episode_id = '-'
             latest = get_latest_release(series)
             identifier_type = series.identified_by
+            if identifier_type is None:
+                identifier_type = color('learning', 'autoyellow')
             if latest:
                 if latest.first_seen > datetime.now() - timedelta(days=2):
                     new_ep = True
@@ -201,7 +203,7 @@ def display_details(options):
             return
         # Pick the best matching series
         series = matches[0]
-        table_title = 'Showing results for `%s`.' % series.name
+        table_title = color(series.name, 'autowhite')
         if len(matches) > 1:
             warning = (' WARNING: Multiple series match to `{}`.\n '
                        'Be more specific to see the results of other matches:\n'
@@ -238,8 +240,8 @@ def display_details(options):
             ep_data.append('\n'.join(release_qualities))
             ep_data.append('\n'.join(release_propers))
             table_data.append(ep_data)
-        footer = ('\n %s\n %s\n' % (color('Downloaded releases', DOWNLOADED_RELEASE_COLOR),
-                                    color('Un-downloaded releases', UNDOWNLOADED_RELEASE_COLOR)))
+        footer = (' %s %s\n' % (color('Downloaded', DOWNLOADED_RELEASE_COLOR),
+                                color('Un-downloaded', UNDOWNLOADED_RELEASE_COLOR)))
         if not series.identified_by:
             footer += ('\n'
                        ' Series plugin is still learning which episode numbering mode is \n'
