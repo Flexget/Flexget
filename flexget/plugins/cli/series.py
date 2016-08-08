@@ -4,6 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import argparse
 from datetime import datetime, timedelta
 from functools import partial
+from textwrap import wrap
 
 from flexget import options, plugin
 from flexget.event import event
@@ -21,10 +22,13 @@ except ImportError:
 
 SORT_COLUMN_COLOR = 'yellow'
 NEW_EP_COLOR = 'autogreen'
+FRESH_EP_COLOR = 'autoyellow'
+OLD_EP_COLOR = 'autoblack'
 BEHIND_EP_COLOR = 'autored'
 UNDOWNLOADED_RELEASE_COLOR = 'autoblack'
 DOWNLOADED_RELEASE_COLOR = 'autowhite'
 ERROR_COLOR = 'autored'
+
 
 color = Colorize.colorize
 cli_table = TerminalTable
@@ -48,6 +52,7 @@ def display_summary(options):
     Display series summary.
     :param options: argparse options from the CLI
     """
+    porcelain = options.table_type == 'porcelain'
     with Session() as session:
         kwargs = {'configured': options.configured,
                   'premieres': options.premieres,
@@ -66,42 +71,53 @@ def display_summary(options):
             kwargs['sort_by'] = 'last_download_date'
 
         query = get_series_summary(**kwargs)
-        header = ['Name', 'Latest', 'Age', 'Downloaded', 'Identified By', 'Latest status']
+        header = ['Name', 'Latest', 'Age', 'Downloaded', 'Identified By']
         for index, value in enumerate(header):
             if value.lower() == options.sort_by:
                 header[index] = color(value, SORT_COLUMN_COLOR)
         footer = 'Use `flexget series show NAME` to get detailed information'
         table_data = [header]
         for series in query:
-            series_name = series.name
+            name_column = series.name
 
             new_ep = False
             behind = 0
             latest_release = '-'
-            age = '-'
+            age_col = '-'
             episode_id = '-'
             latest = get_latest_release(series)
-            status = ''
             identifier_type = series.identified_by
             if latest:
                 if latest.first_seen > datetime.now() - timedelta(days=2):
                     new_ep = True
                 behind = new_eps_after(latest)
                 latest_release = get_latest_status(latest)
-                age = latest.age
+                # split qualities if too long
+                if not porcelain:
+                    if len(latest_release) > 30:
+                        latest_release = '\n'.join(wrap(latest_release, 30))
+                # colorize age
+                age_col = latest.age
+                if latest.age_timedelta is not None:
+                    if latest.age_timedelta < timedelta(days=1):
+                        age_col = color(latest.age, NEW_EP_COLOR)
+                    elif latest.age_timedelta < timedelta(days=3):
+                        age_col = color(latest.age, FRESH_EP_COLOR)
+                    elif latest.age_timedelta > timedelta(days=400):
+                        age_col = color(latest.age, OLD_EP_COLOR)
                 episode_id = latest.identifier
-            if new_ep:
-                status = color('NEW', NEW_EP_COLOR)
-            if behind > 0:
-                status = color('{} behind'.format(behind), BEHIND_EP_COLOR)
-            table_data.append([series_name, episode_id, age, latest_release, identifier_type, status])
+            if not porcelain:
+                if behind > 0:
+                    name_column += color(' {} behind'.format(behind), BEHIND_EP_COLOR)
+
+            table_data.append([name_column, episode_id, age_col, latest_release, identifier_type])
     table = cli_table(options.table_type, table_data)
     try:
         console(table.output)
     except CLITableError as e:
         console('ERROR: %s' % str(e))
         return
-    if not options.table_type == 'porcelain':
+    if not porcelain:
         console(footer)
 
 

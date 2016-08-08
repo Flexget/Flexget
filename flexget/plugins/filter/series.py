@@ -338,6 +338,15 @@ class Episode(Base):
             age += '%sd ' % age_days
         age += '%sh' % age_hours
         return age
+        
+    @property
+    def age_timedelta(self):
+        """
+        :return: Timedelta or None if episode is never seen
+        """
+        if not self.first_seen:
+            return None
+        return  datetime.now() - self.first_seen
 
     @property
     def is_premiere(self):
