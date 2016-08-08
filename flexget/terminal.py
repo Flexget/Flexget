@@ -54,19 +54,6 @@ class TerminalTable(object):
         return table_types
 
     @staticmethod
-    def colorize(text, color_tag):
-        """
-        This method calls for `colorclass` to try and color the given text
-
-        :param text: Text to color
-        :param color_tag: Color tag. Should adhere to colorclass.list_tags().
-        :return: Text or colorized text
-        """
-        if sys.platform == 'win32':
-            Windows.enable(auto_colors=True)
-        return Color('{%s}%s{%s}' % (color_tag, text, '/' + color_tag))
-
-    @staticmethod
     def word_wrap(text, max_length=0):
         """
         A helper method designed to return a wrapped string. This is a hack until (and if) `terminaltables` will support
@@ -117,6 +104,7 @@ class Colorize(Color):
     """
     Inherited class from colorclass, tweaked some defaults for ease of use
     """
+
     @classmethod
     def colorize(cls, string, color, auto=True):
         if sys.platform == 'win32':
