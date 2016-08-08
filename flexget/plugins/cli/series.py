@@ -3,14 +3,12 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import argparse
 from datetime import datetime, timedelta
-from functools import partial
-from textwrap import wrap
 
 from flexget import options, plugin
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, CLITableError, table_parser, colorize
+from flexget.terminal import TerminalTable, CLITableError, table_parser, colorize, word_wrap
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
@@ -28,9 +26,6 @@ BEHIND_EP_COLOR = 'red'
 UNDOWNLOADED_RELEASE_COLOR = 'black'
 DOWNLOADED_RELEASE_COLOR = 'white'
 ERROR_COLOR = 'red'
-
-
-cli_table = TerminalTable
 
 
 def do_cli(manager, options):
@@ -95,8 +90,7 @@ def display_summary(options):
                 latest_release = get_latest_status(latest)
                 # split qualities if too long
                 if not porcelain:
-                    if len(latest_release) > 30:
-                        latest_release = '\n'.join(wrap(latest_release, 30))
+                    latest_release = word_wrap(latest_release, 30)
                 # colorize age
                 age_col = latest.age
                 if latest.age_timedelta is not None:
@@ -112,7 +106,7 @@ def display_summary(options):
                     name_column += colorize(' {} behind'.format(behind), BEHIND_EP_COLOR)
 
             table_data.append([name_column, episode_id, age_col, latest_release, identifier_type])
-    table = cli_table(options.table_type, table_data)
+    table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
     except CLITableError as e:
@@ -252,7 +246,7 @@ def display_details(options):
         footer += ' \n See option `identified_by` for more information.\n'
         if series.begin:
             footer += ' Begin episode for this series set to `%s`.' % series.begin.identifier
-    table = cli_table(options.table_type, table_data, table_title)
+    table = TerminalTable(options.table_type, table_data, table_title)
     try:
         console(table.output)
     except CLITableError as e:
