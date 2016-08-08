@@ -3,21 +3,17 @@ from future.moves.urllib.parse import quote
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
-import datetime
 import re
 
-from sqlalchemy import Column, Unicode, DateTime
+from sqlalchemy import Unicode, DateTime
 
 from flexget import plugin, db_schema
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import TimedLimiter, RequestException
-from flexget.manager import Session
-from flexget.utils.database import json_synonym
 from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability
-from flexget.config_schema import one_or_more
 
 log = logging.getLogger('1337x')
 Base = db_schema.versioned_base('1337x', 0)
@@ -59,7 +55,17 @@ class _1337x(object):
 
         return response
 
-    def rewrite(self, entry, task=None, cookies=None, **kwargs):
+    # urlrewriter API
+    def url_rewritable(self, task, entry):
+        url = entry['url']
+        if url.endswith('.torrent'):
+            return False
+        if url.startswith('http://1337x.to/'):
+            return True
+        return False
+
+
+    def url_rewrite(self, task, entry):
         """
             Gets the download information for 1337x result
         """
@@ -86,7 +92,7 @@ class _1337x(object):
 
         # Can't update the title to the full title name because it breaks entry.remove
         #title = str(soup.title.string).replace("Download Torrent ","").replace("| 1337x","")
-        
+
         entry['url'] = torrentURL
         entry['urls'] = []
         entry['urls'].append(torrentURL)
@@ -153,11 +159,10 @@ class _1337x(object):
                     e['search_sort'] = torrent_availability(e['torrent_seeds'], e['torrent_leeches'])
                     e['content_size'] = size
 
-                    e.on_accept(self.rewrite, cookies=None)
                     entries.add(e)
 
         return entries
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(_1337x, '1337x', groups=['search'], api_ver=2)
+    plugin.register(_1337x, '1337x', groups=['urlrewriter', 'search'], api_ver=2)
