@@ -101,14 +101,27 @@ table_parser.add_argument('--check-size', action='store_true',
                           help='Only display table if it fits the current terminal size')
 
 
-class Colorize(Color):
+def colorize(text, color, auto=True):
     """
-    Inherited class from colorclass, tweaked some defaults for ease of use
+    Helper function to color strings
+    :param text: Text to color
+    :param color: Color tag name
+    :param auto: Wether to add `auto` to tag or not to use autocolors
+    :return: Colorized string
     """
+    if sys.platform == 'win32':
+        Windows.enable(auto_colors=True)
+    return Color.colorize(color, text, auto)
 
-    @classmethod
-    def colorize(cls, string, color, auto=True):
-        if sys.platform == 'win32':
-            Windows.enable(auto_colors=True)
-        tag = '{0}{1}'.format('auto' if auto and 'auto' not in color else '', color)
-        return cls('{%s}%s{/%s}' % (tag, string, tag))
+
+def word_wrap(text, max_length):
+    """
+    A helper method designed to return a wrapped string.
+
+    :param text: Text to wrap
+    :param max_length: Maximum allowed string length
+    :return: Wrapped text or original text
+    """
+    if len(text) >= max_length:
+        return '\n'.join(wrap(text, max_length))
+    return text
