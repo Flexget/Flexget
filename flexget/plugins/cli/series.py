@@ -82,7 +82,7 @@ def display_summary(options):
             latest = get_latest_release(series)
             identifier_type = series.identified_by
             if identifier_type is None:
-                identifier_type = colorize('learning', 'autoyellow')
+                identifier_type = colorize('learning', 'yellow')
             if latest:
                 if latest.first_seen > datetime.now() - timedelta(days=2):
                     new_ep = True
