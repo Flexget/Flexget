@@ -5,7 +5,7 @@ import sys
 from math import floor
 from textwrap import wrap
 
-from colorclass import Windows, Color
+from colorclass import Windows, Color, disable_all_colors
 from flexget.options import ArgumentParser
 from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable
 from terminaltables.terminal_io import terminal_size
@@ -30,6 +30,7 @@ class TerminalTable(object):
             self.table.inner_footing_row_border = False
             self.table.inner_heading_row_border = False
             self.table.outer_border = False
+            disable_all_colors()
         if not self.check_size or self.table.ok:
             return '\n' + self.table.table
         raise CLITableError(
