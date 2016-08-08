@@ -243,25 +243,6 @@ class TestImdb(object):
 
 
 @pytest.mark.online
-class TestImdbRequired(object):
-    config = """
-        tasks:
-          test:
-            mock:
-              - {title: 'Taken[2008]DvDrip[Eng]-FOO', imdb_url: 'http://www.imdb.com/title/tt0936501/'}
-              - {title: 'ASDFASDFASDF'}
-            imdb_required: yes
-    """
-
-    def test_imdb_required(self, execute_task):
-        task = execute_task('test')
-        assert not task.find_entry('rejected', title='Taken[2008]DvDrip[Eng]-FOO'), \
-            'Taken should NOT have been rejected'
-        assert task.find_entry('rejected', title='ASDFASDFASDF'), \
-            'ASDFASDFASDF should have been rejected'
-
-
-@pytest.mark.online
 class TestImdbLookup(object):
     config = """
         tasks:
