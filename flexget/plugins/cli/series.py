@@ -88,9 +88,6 @@ def display_summary(options):
                     new_ep = True
                 behind = new_eps_after(latest)
                 latest_release = get_latest_status(latest)
-                # split qualities if too long
-                if not porcelain:
-                    latest_release = word_wrap(latest_release, 30)
                 # colorize age
                 age_col = latest.age
                 if latest.age_timedelta is not None:
@@ -106,7 +103,7 @@ def display_summary(options):
                     name_column += colorize(' {} behind'.format(behind), BEHIND_EP_COLOR)
 
             table_data.append([name_column, episode_id, age_col, latest_release, identifier_type])
-    table = TerminalTable(options.table_type, table_data)
+    table = TerminalTable(options.table_type, table_data, wrap_columns=[(3, 30)])
     try:
         console(table.output)
     except CLITableError as e:
