@@ -25,13 +25,6 @@ Base = db_schema.versioned_base('1337x', 0)
 requests = RequestSession()
 requests.add_domain_limiter(TimedLimiter('1337x.to', '5 seconds'))  # TODO find out if they want a delay
 
-#CATEGORIES = {
-#    'Movies': 'filter_cat[1]',
-#    'TV': 'filter_cat[2]',
-#    'Other': 'filter_cat[3]'
-#}
-
-
 class _1337x(object):
     """
         1337x search plugin.
@@ -70,7 +63,7 @@ class _1337x(object):
         """
             Gets the download information for 1337x result
         """
-        
+
         url = entry['url']
 
         log.info('1337x rewriting download url: %s' % url)
@@ -80,13 +73,13 @@ class _1337x(object):
             log.debug('requesting: %s', page.url)
         except RequestException as e:
             log.error('1337x request failed: %s', e)
-    
+
         soup = get_soup(page.content)
 
         # Get the infohash - not needed but the code is here *shrugs*
         #infohash = str(soup.find("div", class_="infohash-box").contents)
         #infohash = infohash[-(len(infohash)-infohash.find(':'))+2:]
-        #infohash = infohash[:infohash.find(' ')]                        
+        #infohash = infohash[:infohash.find(' ')]
 
         magnetURL = str(soup.find("a", id="magnetdl").get('href')).lower()
         torrentURL = str(soup.find("a", id="torrentdl").get('href')).lower()
@@ -95,7 +88,7 @@ class _1337x(object):
         #title = str(soup.title.string).replace("Download Torrent ","").replace("| 1337x","")
         
         entry['url'] = torrentURL
-        entry['urls'] = [] 
+        entry['urls'] = []
         entry['urls'].append(torrentURL)
         entry['urls'].append(magnetURL)
 
@@ -104,11 +97,10 @@ class _1337x(object):
         """
             Search for entries on 1337x
         """
-        params = {}
-                
+
         if not isinstance(config, dict):
             config = {}
-            
+
         order_by = ""
         sorted = ""
         if (isinstance(config.get('order_by'), str)):
@@ -119,17 +111,17 @@ class _1337x(object):
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            
+
             query = "{0}search/{1}{2}/1/" . format(sorted,quote(search_string.encode('utf8')), order_by)
-            log.debug('Using search params: {0}; ordering by: {1}', search_string, order_by or "default")
-            try:                
+            log.debug('Using search params: {0}; ordering by: {1}' . format(search_string, order_by or "default"))
+            try:
                 page = self.get(self.base_url + query, None)
                 log.debug('requesting: %s', page.url)
             except RequestException as e:
                 log.error('1337x request failed: %s', e)
                 continue
 
-            soup = get_soup(page.content)            
+            soup = get_soup(page.content)
             if (soup.find('div', attrs={'class': 'tab-detail'}) != None):
                 for link in soup.find('div', attrs={'class': 'tab-detail'}).findAll('a',href=re.compile('^/torrent/')):
 
