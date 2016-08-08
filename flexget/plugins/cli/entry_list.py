@@ -25,14 +25,6 @@ def attribute_type(attribute):
 
 def do_cli(manager, options):
     """Handle entry-list subcommand"""
-
-    # Handle globally setting value for word wrap method
-    global ww
-    ww = partial(TerminalTable.word_wrap, max_length=options.max_column_width)
-
-    global cli_table
-    cli_table = partial(TerminalTable, check_size=options.check_size)
-
     if options.list_action == 'all':
         entry_list_lists(options)
         return
@@ -66,7 +58,7 @@ def entry_list_lists(options):
         table_data = [header]
         for entry_list in lists:
             table_data.append([entry_list.id, entry_list.name])
-    table = cli_table(options.table_type, table_data)
+    table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
     except CLITableError as e:
@@ -85,7 +77,7 @@ def entry_list_list(options):
         table_data = [header]
         for entry in get_entries_by_list_id(entry_list.id, order_by='added', descending=True, session=session):
             table_data.append([entry.id, entry.title, len(entry.entry)])
-    table = cli_table(options.table_type, table_data)
+    table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
     except CLITableError as e:
@@ -113,11 +105,11 @@ def entry_list_show(options):
                     'Could not find matching entry with title `{}` in list `{}`'.format(options.entry,
                                                                                         options.list_name))
                 return
-        header = ['#', 'Field name', 'Value']
+        header = ['Field name', 'Value']
         table_data = [header]
         for k, v in sorted(entry.entry.items()):
-            table_data.append([entry.id, k, ww(v)])
-    table = cli_table(options.table_type, table_data)
+            table_data.append([k, str(v)])
+    table = TerminalTable(options.table_type, table_data, wrap_columns=[(1, 100)])
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)
