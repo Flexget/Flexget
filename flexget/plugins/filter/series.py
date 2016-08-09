@@ -5,7 +5,6 @@ import argparse
 import logging
 import re
 import time
-from copy import copy
 from datetime import datetime, timedelta
 
 from past.builtins import basestring
@@ -20,7 +19,6 @@ from flexget.config_schema import one_or_more
 from flexget.event import event, fire_event
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
-from flexget.plugins.parsers import SERIES_ID_TYPES
 from flexget.utils import qualities
 from flexget.utils.database import quality_property, with_session
 from flexget.utils.log import log_once
@@ -222,7 +220,6 @@ def normalize_series_name(name):
 
 
 class NormalizedComparator(Comparator):
-
     def operate(self, op, other):
         return op(self.__clause_element__(), normalize_series_name(other))
 
@@ -847,49 +844,6 @@ def release_in_episode(episode_id, release_id):
         return release.episode_id == episode_id
 
 
-def populate_entry_fields(entry, parser, config):
-    """
-    Populates all series_fields for given entry based on parser.
-
-    :param parser: A valid result from a series parser used to populate the fields.
-    :config dict: If supplied, will use 'path' and 'set' options to populate specified fields.
-    """
-    entry['series_parser'] = copy(parser)
-    # add series, season and episode to entry
-    entry['series_name'] = parser.name
-    if 'quality' in entry and entry['quality'] != parser.quality:
-        log.verbose('Found different quality for %s. Was %s, overriding with %s.' %
-                    (entry['title'], entry['quality'], parser.quality))
-    entry['quality'] = parser.quality
-    entry['proper'] = parser.proper
-    entry['proper_count'] = parser.proper_count
-    entry['release_group'] = parser.group
-    if parser.id_type == 'ep':
-        entry['series_season'] = parser.season
-        entry['series_episode'] = parser.episode
-    elif parser.id_type == 'date':
-        entry['series_date'] = parser.id
-        entry['series_season'] = parser.id.year
-    else:
-        entry['series_season'] = time.gmtime().tm_year
-    entry['series_episodes'] = parser.episodes
-    entry['series_id'] = parser.pack_identifier
-    entry['series_id_type'] = parser.id_type
-
-    # If a config is passed in, also look for 'path' and 'set' options to set more fields
-    if config:
-        # set custom download path
-        if 'path' in config:
-            log.debug('setting %s custom path to %s', entry['title'], config.get('path'))
-            # Just add this to the 'set' dictionary, so that string replacement is done cleanly
-            config.setdefault('set', {}).update(path=config['path'])
-
-        # accept info from set: and place into the entry
-        if 'set' in config:
-            set = plugin.get_plugin_by_name('set')
-            set.instance.modify(entry, config.get('set'))
-
-
 class FilterSeriesBase(object):
     """
     Class that contains helper methods for both filter.series as well as plugins that configure it,
@@ -1099,8 +1053,12 @@ class FilterSeries(FilterSeriesBase):
         except plugin.DependencyError:
             log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
 
-    def auto_exact(self, config):
-        """Automatically enable exact naming option for series that look like a problem"""
+    @plugin.priority(125)
+    def on_task_metainfo(self, task, config):
+        """ Call metainfo_series plugin with specific settings for each series """
+
+        config = self.prepare_config(config)
+        metainfo_plugin = get_plugin_by_name('metainfo_series').instance
 
         # generate list of all series in one dict
         all_series = {}
@@ -1117,18 +1075,8 @@ class FilterSeries(FilterSeriesBase):
                         log.verbose('Auto enabling exact matching for series %s (reason %s)', series_name, name)
                         series_config['exact'] = True
 
-    # Run after metainfo_quality and before metainfo_series
-    @plugin.priority(125)
-    def on_task_metainfo(self, task, config):
-        config = self.prepare_config(config)
-        self.auto_exact(config)
-        for series_item in config:
-            series_name, series_config = list(series_item.items())[0]
-            log.trace('series_name: %s series_config: %s', series_name, series_config)
-            start_time = time.clock()
-            self.parse_series(task.entries, series_name, series_config)
-            took = time.clock() - start_time
-            log.trace('parsing %s took %s', series_name, took)
+        for series_name, series_config in all_series.items():
+            metainfo_plugin.evaluate(task.entries, series_config, series_name=series_name)
 
     def on_task_filter(self, task, config):
         """Filter series"""
@@ -1195,60 +1143,6 @@ class FilterSeries(FilterSeriesBase):
 
                 took = time.clock() - start_time
                 log.trace('processing %s took %s', series_name, took)
-
-    def parse_series(self, entries, series_name, config):
-        """
-        Search for `series_name` and populate all `series_*` fields in entries when successfully parsed
-
-        :param session: SQLAlchemy session
-        :param entries: List of entries to process
-        :param series_name: Series name which is being processed
-        :param config: Series config being processed
-        """
-
-        def get_as_array(config, key):
-            """Return configuration key as array, even if given as a single string"""
-            v = config.get(key, [])
-            if isinstance(v, basestring):
-                return [v]
-            return v
-
-        # set parser flags flags based on config / database
-        identified_by = config.get('identified_by', 'auto')
-        if identified_by == 'auto':
-            with Session() as session:
-                series = session.query(Series).filter(Series.name == series_name).first()
-                if series:
-                    # set flag from database
-                    identified_by = series.identified_by or 'auto'
-
-        params = dict(identified_by=identified_by,
-                      alternate_names=get_as_array(config, 'alternate_name'),
-                      name_regexps=get_as_array(config, 'name_regexp'),
-                      strict_name=config.get('exact', False),
-                      allow_groups=get_as_array(config, 'from_group'),
-                      date_yearfirst=config.get('date_yearfirst'),
-                      date_dayfirst=config.get('date_dayfirst'),
-                      special_ids=get_as_array(config, 'special_ids'),
-                      prefer_specials=config.get('prefer_specials'),
-                      assume_special=config.get('assume_special'))
-        for id_type in SERIES_ID_TYPES:
-            params[id_type + '_regexps'] = get_as_array(config, id_type + '_regexp')
-
-        for entry in entries:
-            # skip processed entries
-            if (entry.get('series_parser') and entry['series_parser'].valid and entry[
-                    'series_parser'].name.lower() != series_name.lower()):
-                continue
-
-            # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
-            parsed = get_plugin_by_name('parsing').instance.parse_series(entry['title'], name=series_name, **params)
-            if not parsed.valid:
-                continue
-            parsed.field = 'title'
-
-            log.debug('%s detected as %s, field: %s', entry['title'], parsed, parsed.field)
-            populate_entry_fields(entry, parsed, config)
 
     def process_series(self, task, series_entries, config):
         """
@@ -1424,7 +1318,7 @@ class FilterSeries(FilterSeriesBase):
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
             if (entry['quality'] in downloaded_qualities and entry['series_parser'].proper_count > downloaded_qualities[
-                    entry['quality']]):
+                entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
@@ -1487,7 +1381,7 @@ class FilterSeries(FilterSeriesBase):
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
             if (not backfill and (episode.season < latest.season or (
-                    episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
+                            episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
