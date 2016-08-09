@@ -714,7 +714,7 @@ def set_series_begin(series, ep_id):
             identified_by = 'sequence'
         except ValueError:
             raise ValueError('`%s` is not a valid episode identifier' % ep_id)
-    if series.identified_by != 'auto':
+    if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
                              (ep_id, series.identified_by))
