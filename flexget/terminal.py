@@ -91,11 +91,6 @@ table_parser.add_argument('--table-type', choices=list(TerminalTable.supported_t
                           help='Select output table style')
 table_parser.add_argument('--porcelain', dest='table_type', action='store_const', const='porcelain',
                           help='Make the output parseable. Similar to using `--table-type porcelain`')
-table_parser.add_argument('--max-width', dest='max_column_width', type=int, default=0,
-                          help='Set the max allowed column width, will wrap any text longer than this value.'
-                               ' Use this in case table size exceeds terminal size')
-table_parser.add_argument('--check-size', action='store_true',
-                          help='Only display table if it fits the current terminal size')
 
 
 def colorize(text, color, auto=True):
