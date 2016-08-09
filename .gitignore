@@ -42,3 +42,6 @@ cherrypy
 pip-selfcheck.json
 npm-debug.log
 .config-lock
+.cache/
+*.yml
+*.sqlite
