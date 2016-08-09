@@ -170,7 +170,7 @@ class SceneAccessSearch(object):
             category_list.accept('number', key=category)
         return root
 
-    def processCategories(self, config):
+    def process_categories(self, config):
         """
         sceneaccess use different url for different supercategories (let's call them scopes)
 
@@ -214,12 +214,11 @@ class SceneAccessSearch(object):
                     cat_id = CATEGORIES[scope][category]
                 except KeyError:  # User provided category id directly
                     cat_id = category
-                finally:
-                    if isinstance(cat_id, list):
-                        for l in cat_id:
-                            cat_id_list.append(l)
-                    else:
-                        cat_id_list.append(cat_id)
+                if isinstance(cat_id, list):
+                    for l in cat_id:
+                        cat_id_list.append(l)
+                else:
+                    cat_id_list.append(cat_id)
 
             if scope == 'mp3/0day':  # mp3/0day is actually /spam?search= in URL, can safely change it now
                 scope = 'spam'
@@ -252,17 +251,17 @@ class SceneAccessSearch(object):
             multip = 1
 
         # Prepare queries...
-        BASE_URLS = list()
+        base_urls = list()
         entries = set()
-        for category in self.processCategories(config):
-            BASE_URLS.append(URL + '%(url_path)s?method=2%(category_url_string)s' % category)
+        for category in self.process_categories(config):
+            base_urls.append(URL + '%(url_path)s?method=2%(category_url_string)s' % category)
 
         # Search...
         for search_string in entry.get('search_strings', [entry['title']]):
             search_string_normalized = normalize_unicode(clean_title(search_string))
             search_string_url_fragment = '&search=' + quote(search_string_normalized.encode('utf8'))
 
-            for url in BASE_URLS:
+            for url in base_urls:
                 url += search_string_url_fragment
                 log.debug('Search URL for `%s`: %s' % (search_string, url))
 
