@@ -9,7 +9,7 @@ from flexget.event import event
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.api_tvmaze import APITVMaze
+    from flexget.plugins.internal.api_tvmaze import APITVMaze
 
     series_lookup = APITVMaze.series_lookup
     episode_lookup = APITVMaze.episode_lookup

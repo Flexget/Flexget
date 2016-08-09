@@ -6,7 +6,7 @@ import re
 
 from flexget.config_schema import one_or_more
 from flexget.manager import Session
-from flexget.plugins.api_t411 import T411Proxy, FriendlySearchQuery, ApiError
+from flexget.plugins.internal.api_t411 import T411Proxy, FriendlySearchQuery, ApiError
 from flexget import plugin
 from flexget.event import event
 

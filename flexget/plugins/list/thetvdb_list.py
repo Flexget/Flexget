@@ -8,7 +8,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
-from flexget.plugins.api_tvdb import TVDBRequest, lookup_series
+from flexget.plugins.internal.api_tvdb import TVDBRequest, lookup_series
 from flexget.utils.requests import RequestException
 from flexget.utils.tools import split_title_year
 

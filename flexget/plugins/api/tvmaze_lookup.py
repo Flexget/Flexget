@@ -5,7 +5,7 @@ from flask import jsonify
 from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.plugins.api_tvmaze import APITVMaze as tvm
+from flexget.plugins.internal.api_tvmaze import APITVMaze as tvm
 
 tvmaze_api = api.namespace('tvmaze', description='TVMaze Shows')
 

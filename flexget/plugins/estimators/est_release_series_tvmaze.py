@@ -8,7 +8,7 @@ from flexget.event import event
 from flexget.utils.tools import split_title_year
 
 try:
-    from flexget.plugins.api_tvmaze import APITVMaze
+    from flexget.plugins.internal.api_tvmaze import APITVMaze
 
     lookup = APITVMaze.episode_lookup
 except ImportError:

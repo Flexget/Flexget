@@ -7,7 +7,7 @@ from flexget.logger import console
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.api_t411 import (T411Proxy)
+    from flexget.plugins.internal.api_t411 import (T411Proxy)
 except:
     raise plugin.DependencyError(issued_by='cli_series', missing='api_t411',
                                  message='Torrent411 commandline interface not loaded')

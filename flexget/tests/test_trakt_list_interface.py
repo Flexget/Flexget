@@ -7,7 +7,7 @@ import pytest
 
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.plugins.api_trakt import TraktUserAuth
+from flexget.plugins.internal.api_trakt import TraktUserAuth
 from flexget.plugins.list.trakt_list import TraktSet
 
 

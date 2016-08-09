@@ -7,7 +7,7 @@ import pytest
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget.manager import Session
-from flexget.plugins.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries, TVMazeEpisodes
+from flexget.plugins.internal.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries, TVMazeEpisodes
 
 lookup_series = APITVMaze.series_lookup
 

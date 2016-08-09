@@ -9,7 +9,7 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 
 try:
-    from flexget.plugins.api_rottentomatoes import lists
+    from flexget.plugins.internal.api_rottentomatoes import lists
 except ImportError:
     raise plugin.DependencyError(issued_by='rottentomatoes_lookup', missing='api_rottentomatoes',
                                  message='rottentomatoes_lookup requires the `api_rottentomatoes` plugin')

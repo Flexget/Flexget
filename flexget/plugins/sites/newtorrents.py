@@ -9,7 +9,7 @@ import socket
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugins.plugin_urlrewriting import UrlRewritingError
+from flexget.plugins.internal.urlrewriting import UrlRewritingError
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 from flexget.utils import requests

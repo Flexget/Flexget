@@ -8,7 +8,7 @@ from collections import MutableSet
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugins.api_trakt import get_api_url, get_entry_ids, get_session, make_list_slug
+from flexget.plugins.internal.api_trakt import get_api_url, get_entry_ids, get_session, make_list_slug
 from flexget.utils import json
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException, TimedLimiter

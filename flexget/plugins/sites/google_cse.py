@@ -7,7 +7,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.plugin_urlrewriting import UrlRewritingError
+from flexget.plugins.internal.urlrewriting import UrlRewritingError
 from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.soup import get_soup
 
