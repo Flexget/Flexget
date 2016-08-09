@@ -98,7 +98,7 @@ def colorize(text, color, auto=True):
     Helper function to color strings
     :param text: Text to color
     :param color: Color tag name
-    :param auto: Wether to add `auto` to tag or not to use autocolors
+    :param auto: Whether to add `auto` to tag or not to use autocolors
     :return: Colorized string
     """
     if sys.platform == 'win32':
