@@ -29,10 +29,10 @@ def do_cli(manager, options):
             table_data.append(['Details', item.details])
             if item.filename:
                 table_data.append(['Stored', item.filename])
+            table_data.append([''])
 
     title = 'Showing {} entries from History'.format(query.count())
     table = TerminalTable(options.table_type, table_data, title=title, wrap_columns=[(1, 80)])
-    table.table.inner_row_border = True
 
     try:
         console(table.output)

@@ -52,12 +52,6 @@ def do_cli(manager, options):
     """Handle movie-list subcommand"""
 
     # Handle globally setting value for word wrap method
-    global ww
-    ww = partial(TerminalTable.word_wrap, max_length=options.max_column_width)
-
-    global cli_table
-    cli_table = partial(TerminalTable, check_size=options.check_size)
-
     if options.list_action == 'all':
         movie_list_lists(options)
         return
@@ -86,7 +80,7 @@ def movie_list_lists(options):
     table_data = [header]
     for movie_list in lists:
         table_data.append([movie_list.id, movie_list.name])
-    table = cli_table(options.table_type, table_data)
+    table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
     except CLITableError as e:
@@ -106,12 +100,12 @@ def movie_list_list(options):
     table_data = [header]
     movies = get_movies_by_list_id(movie_list.id, order_by='added', descending=True, session=session)
     for movie in movies:
-        movie_row = [ww(movie.title), movie.year or '']
+        movie_row = [movie.title, movie.year or '']
         for identifier in MovieListBase().supported_ids:
             movie_row.append(movie.identifiers.get(identifier, ''))
         table_data.append(movie_row)
     title = '{} Movies in movie list: `{}`'.format(len(movies), options.list_name)
-    table = cli_table(options.table_type, table_data, title)
+    table = TerminalTable(options.table_type, table_data, title)
     try:
         console(table.output)
     except CLITableError as e:
