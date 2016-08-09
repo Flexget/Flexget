@@ -6,7 +6,7 @@ from flask import jsonify
 from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.plugins.api_trakt import ApiTrakt as at, list_actors, get_translations
+from flexget.plugins.internal.api_trakt import ApiTrakt as at, list_actors, get_translations
 
 trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 

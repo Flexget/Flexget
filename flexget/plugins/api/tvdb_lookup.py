@@ -5,7 +5,7 @@ from flask import jsonify
 from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.plugins.api_tvdb import lookup_series, lookup_episode, search_for_series
+from flexget.plugins.internal.api_tvdb import lookup_series, lookup_episode, search_for_series
 
 tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
 

@@ -9,7 +9,7 @@ from flexget.event import event
 from flexget.utils.log import log_once
 
 try:
-    from flexget.plugins.api_rottentomatoes import lookup_movie, API_KEY
+    from flexget.plugins.internal.api_rottentomatoes import lookup_movie, API_KEY
 except ImportError:
     raise plugin.DependencyError(issued_by='rottentomatoes_lookup', missing='api_rottentomatoes',
                                  message='rottentomatoes_lookup requires the `api_rottentomatoes` plugin')

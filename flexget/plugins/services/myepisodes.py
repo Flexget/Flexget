@@ -15,7 +15,7 @@ from flexget import db_schema, plugin
 from flexget.event import event
 
 try:
-    from flexget.plugins.api_tvdb import lookup_series
+    from flexget.plugins.internal.api_tvdb import lookup_series
 except ImportError:
     raise plugin.DependencyError(issued_by='myepisodes', missing='api_tvdb',
                                  message='myepisodes requires the `api_tvdb` plugin')

@@ -9,7 +9,7 @@ from requests import RequestException
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugins.api_trakt import get_session, make_list_slug, get_api_url
+from flexget.plugins.internal.api_trakt import get_session, make_list_slug, get_api_url
 
 log = logging.getLogger('next_trakt_episodes')
 

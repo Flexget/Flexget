@@ -6,7 +6,7 @@ import os
 
 import mock
 
-from flexget.plugins.plugin_rtorrent import RTorrent
+from flexget.plugins.clients.rtorrent import RTorrent
 
 torrent_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'private.torrent')
 torrent_url = 'file:///%s' % torrent_file
@@ -34,7 +34,7 @@ class Matcher(object):
         return self.compare(self.some_obj, other)
 
 
-@mock.patch('flexget.plugins.plugin_rtorrent.xmlrpc_client.ServerProxy')
+@mock.patch('flexget.plugins.clients.rtorrent.xmlrpc_client.ServerProxy')
 class TestRTorrentClient(object):
     def test_version(self, mocked_proxy):
         mocked_client = mocked_proxy()
@@ -206,7 +206,7 @@ class TestRTorrentClient(object):
         assert mocked_proxy.d.close.called_with((torrent_info_hash,))
 
 
-@mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
+@mock.patch('flexget.plugins.clients.rtorrent.RTorrent')
 class TestRTorrentOutputPlugin(object):
     config = """
         tasks:
@@ -345,7 +345,7 @@ class TestRTorrentOutputPlugin(object):
         mocked_client.delete.assert_called_with(torrent_info_hash)
 
 
-@mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
+@mock.patch('flexget.plugins.clients.rtorrent.RTorrent')
 class TestRTorrentInputPlugin(object):
     config = """
         tasks:

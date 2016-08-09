@@ -11,7 +11,7 @@ from flexget.utils.log import log_once
 
 try:
     # TODO: Fix this after api_tmdb has module level functions
-    from flexget.plugins.api_tmdb import ApiTmdb
+    from flexget.plugins.internal.api_tmdb import ApiTmdb
 
     lookup = ApiTmdb.lookup
 except ImportError:

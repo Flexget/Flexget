@@ -11,7 +11,7 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugins.plugin_urlrewriting import UrlRewritingError
+from flexget.plugins.internal.urlrewriting import UrlRewritingError
 from flexget.utils.tools import arithmeticEval, native_str_to_text
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode

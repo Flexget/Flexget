@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import pytest
 
 from flexget.manager import Session
-from flexget.plugins.api_tmdb import TMDBSearchResult
+from flexget.plugins.internal.api_tmdb import TMDBSearchResult
 
 
 @pytest.mark.online

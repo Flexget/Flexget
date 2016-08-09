@@ -6,7 +6,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-from flexget.plugins.api_tvdb import lookup_series, lookup_episode
+from flexget.plugins.internal.api_tvdb import lookup_series, lookup_episode
 from flexget.utils.database import with_session
 
 log = logging.getLogger('thetvdb_lookup')

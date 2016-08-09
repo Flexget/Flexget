@@ -8,7 +8,7 @@ import os
 import mock
 import pytest
 
-from flexget.plugins.api_t411 import T411RestClient, T411ObjectMapper, T411Proxy, FriendlySearchQuery, ApiError
+from flexget.plugins.internal.api_t411 import T411RestClient, T411ObjectMapper, T411Proxy, FriendlySearchQuery, ApiError
 from flexget.utils.qualities import Requirements
 
 log = logging.getLogger('test_t411')
@@ -298,11 +298,11 @@ class TestInputPlugin(object):
             t411_lookup: fill
     """
 
-    @mock.patch('flexget.plugins.api_t411.T411Proxy.set_credential')
-    @mock.patch('flexget.plugins.api_t411.T411RestClient.search')
-    @mock.patch('flexget.plugins.api_t411.T411RestClient.retrieve_terms_tree')
-    @mock.patch('flexget.plugins.api_t411.T411RestClient.retrieve_category_tree')
-    @mock.patch('flexget.plugins.api_t411.T411RestClient.details')
+    @mock.patch('flexget.plugins.internal.api_t411.T411Proxy.set_credential')
+    @mock.patch('flexget.plugins.internal.api_t411.T411RestClient.search')
+    @mock.patch('flexget.plugins.internal.api_t411.T411RestClient.retrieve_terms_tree')
+    @mock.patch('flexget.plugins.internal.api_t411.T411RestClient.retrieve_category_tree')
+    @mock.patch('flexget.plugins.internal.api_t411.T411RestClient.details')
     def test_schema(self, mock_details, mock_cat, mock_term, mock_search, mock_auth, execute_task):
         mock_details.return_value = MockRestClient.details_result
         mock_cat.return_value = MockRestClient.cat_result
