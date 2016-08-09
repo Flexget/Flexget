@@ -5,7 +5,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 import re
 
-from flexget import plugin, db_schema
+from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import TimedLimiter, RequestException
@@ -15,10 +15,9 @@ from flexget.utils.search import torrent_availability
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 
 log = logging.getLogger('1337x')
-Base = db_schema.versioned_base('1337x', 0)
 
 requests = RequestSession()
-requests.add_domain_limiter(TimedLimiter('1337x.to', '5 seconds'))  # TODO find out if they want a delay
+requests.add_domain_limiter(TimedLimiter('1337x.to', '5 seconds'))
 
 class _1337x(object):
     """
