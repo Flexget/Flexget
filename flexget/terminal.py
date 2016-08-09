@@ -15,12 +15,11 @@ class TerminalTable(object):
     """
     A data table suited for CLI output, created via its sent parameters.
 
-
     :param table_type: A string matching supported_table_types() keys.
     :param table_data: Table data as a list of lists of strings. See `terminaltables` doc.
     :param title: Optional title for table
     :param wrap_columns: A list of tuples which will be used to limit column size. First value in tuple should be column
-     number, 2nd is maximum allowed size
+     number, 2nd is maximum allowed size.
     """
 
     def __init__(self, table_type, table_data, title=None, wrap_columns=None):
