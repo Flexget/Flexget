@@ -113,7 +113,12 @@ class TokenBucketLimiter(DomainLimiter):
             if not self.wait:
                 raise RequestException('Requests to %s have exceeded their limit.' % self.domain)
             wait = timedelta_total_seconds(self.rate) * (1 - self.tokens)
-            log.verbose('Waiting %.2f seconds until next request to %s' % (wait, self.domain))
+            # Don't spam console if wait is low
+            if wait < 4:
+                level = log.debug
+            else:
+                level = log.verbose
+            level('Waiting %.2f seconds until next request to %s', wait, self.domain)
             # Sleep until it is time for the next request
             time.sleep(wait)
         self.tokens -= 1
