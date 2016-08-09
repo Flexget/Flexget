@@ -1,8 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-from functools import partial
-
 from flexget import options
 from flexget.logger import console
 from flexget.terminal import TerminalTable, CLITableError, table_parser
@@ -19,16 +17,15 @@ def do_cli(manager, options):
 
 
 def list_failed(options):
-    ww = partial(TerminalTable.word_wrap, max_length=options.max_column_width)
     with Session() as session:
         results = session.query(FailedEntry).all()
         header = ['#', 'Title', 'Fail count', 'Reason', 'Failure time']
         table_data = [header]
         for entry in results:
             table_data.append(
-                [entry.id, ww(entry.title), entry.count, '' if entry.reason == 'None' else entry.reason,
+                [entry.id, entry.title, entry.count, '' if entry.reason == 'None' else entry.reason,
                  entry.tof.strftime('%Y-%m-%d %H:%M')])
-    table = TerminalTable(options.table_type, table_data, check_size=options.check_size)
+    table = TerminalTable(options.table_type, table_data)
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)
