@@ -5,7 +5,7 @@ from flexget import options, plugin
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
-from flexget.plugins.api_trakt import get_access_token, TraktUserAuth, delete_account, PIN_URL
+from flexget.plugins.internal.api_trakt import get_access_token, TraktUserAuth, delete_account, PIN_URL
 
 
 def action_auth(options):
