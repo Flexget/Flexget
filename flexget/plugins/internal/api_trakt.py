@@ -189,7 +189,7 @@ def get_session(account=None, token=None):
     session = requests.Session()
     session.headers = {
         'Content-Type': 'application/json',
-        'trakt-api-version': 2,
+        'trakt-api-version': '2',
         'trakt-api-key': CLIENT_ID,
     }
     if account:

@@ -19,7 +19,7 @@ from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')
 
-DB_VERSION = 5
+DB_VERSION = 6
 Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 BASE_URL = 'http://api.tvmaze.com'
