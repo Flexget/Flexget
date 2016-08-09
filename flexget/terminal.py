@@ -28,7 +28,17 @@ class TerminalTable(object):
         self.type = table_type
         self.wrap_columns = wrap_columns
         self.table_data = table_data
-        self.table = self.build_table(table_type, table_data)
+        self.init_table()
+
+    def init_table(self):
+        """
+        Build tables based on data. If table does not fit terminal, type is not porcelain and wrap_columns data has been
+        passed, wrap table.
+        :return: Mutate se
+        """
+        self.table = self.build_table(self.type, self.table_data)
+        if not self.table.ok and not self.type == 'porcelain' and self.wrap_columns:
+            self.table = self._wrap_table()
 
     def build_table(self, table_type, table_data):
         return self.supported_table_types()[table_type](table_data)
@@ -42,11 +52,7 @@ class TerminalTable(object):
             self.table.inner_heading_row_border = False
             self.table.outer_border = False
             disable_all_colors()
-        if self.table.ok or not self.wrap_columns or self.type == 'porcelain':
-            return '\n' + self.table.table
-        else:
-            self._wrap_table()
-            return '\n' + self.table.table
+        return '\n' + self.table.table
 
     @staticmethod
     def supported_table_types():
@@ -72,7 +78,7 @@ class TerminalTable(object):
                         output_value = word_wrap(value, col_limit[1])
                 output_row.append(output_value)
             output_table.append(output_row)
-        self.table = self.build_table(self.type, output_table)
+        return self.build_table(self.type, output_table)
 
 
 class CLITableError(Exception):
