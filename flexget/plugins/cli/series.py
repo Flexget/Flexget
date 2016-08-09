@@ -193,11 +193,12 @@ def display_details(options):
             return
         # Pick the best matching series
         series = matches[0]
-        table_title = colorize(series.name, 'autowhite')
+        table_title = colorize(series.name, 'white')
         if len(matches) > 1:
-            warning = (' WARNING: Multiple series match to `{}`.\n '
-                       'Be more specific to see the results of other matches:\n'
-                       ' {}'.format(name, '-\n'.join(s.name for s in matches[1:])))
+            warning = (colorize(' WARNING: ', 'red') + 
+                'Multiple series match to `{}`.\n '
+                'Be more specific to see the results of other matches:\n\n'
+                ' {}'.format(name, ', '.join(s.name for s in matches[1:])))
             if not options.table_type == 'porcelain':
                 console(warning)
         header = ['Episode ID', 'Latest age', 'Release titles', 'Release Quality', 'Proper']
