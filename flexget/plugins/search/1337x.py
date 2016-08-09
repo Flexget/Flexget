@@ -17,7 +17,6 @@ from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 log = logging.getLogger('1337x')
 
 requests = RequestSession()
-requests.add_domain_limiter(TimedLimiter('1337x.to', '5 seconds'))
 
 class _1337x(object):
     """
