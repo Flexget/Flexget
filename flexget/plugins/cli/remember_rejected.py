@@ -1,8 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-from functools import partial
-
 from flexget import options
 from flexget.event import event
 from flexget.logger import console
@@ -19,14 +17,13 @@ def do_cli(manager, options):
 
 
 def list_rejected(options):
-    ww = partial(TerminalTable.word_wrap, max_length=options.max_column_width)
     with Session() as session:
         results = session.query(RememberEntry).all()
         header = ['#', 'Title', 'Task', 'Rejected by', 'Reason']
         table_data = [header]
         for entry in results:
-            table_data.append([entry.id, ww(entry.title), entry.task.name, entry.rejected_by, entry.reason or ''])
-    table = TerminalTable(options.table_type, table_data, check_size=options.check_size)
+            table_data.append([entry.id, entry.title, entry.task.name, entry.rejected_by, entry.reason or ''])
+    table = TerminalTable(options.table_type, table_data)
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)
