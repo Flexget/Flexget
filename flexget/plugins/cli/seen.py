@@ -1,8 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-from functools import partial
-
 from flexget import options
 from flexget.event import event
 from flexget.logger import console
@@ -45,23 +43,19 @@ def seen_add(options):
 
 @with_session
 def seen_search(options, session=None):
-    ww = partial(TerminalTable.word_wrap, max_length=options.max_column_width)
     search_term = '%' + options.search_term + '%'
     seen_entries = seen.search(value=search_term, status=None, session=session)
-    header = ['#', 'Title', 'Field', 'Value', 'Task', 'Added']
-    table_data = [header]
+    table_data = []
     for se in seen_entries.all():
-        seen_data = [ww(se.id), ww(se.title)]
-        names = []
-        values = []
+        table_data.append(['Entry title', se.title])
         for sf in se.fields:
-            names.append(ww(sf.field))
-            values.append(ww(str(sf.value)))
-        seen_data.append('\n'.join(names))
-        seen_data.append('\n'.join(values))
-        seen_data += [se.task, se.added.strftime('%c')]
-        table_data.append(seen_data)
-    table = TerminalTable(options.table_type, table_data, check_size=options.check_size)
+            if sf.field.lower() == 'title':
+                continue
+            table_data.append(['{}'.format(sf.field.upper()), str(sf.value)])
+        if options.table_type != 'porcelain':
+            table_data.append([''])
+
+    table = TerminalTable(options.table_type, table_data, wrap_columns=[(1, 80)])
     try:
         console(table.output)
     except CLITableError as e:
