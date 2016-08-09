@@ -22,16 +22,16 @@ def do_cli(manager, options):
         query = query.order_by(desc(History.time)).limit(options.limit)
         table_data = []
         for item in reversed(query.all()):
-            titles = 'Task\nTitle\nURL\nTime\nDetails'
-            data = '{}\n{}\n{}\n{}\n{}'.format(item.task, item.title, item.url, item.time.strftime("%c"), item.details)
+            table_data.append(['Task', item.task])
+            table_data.append(['Title', item.title])
+            table_data.append(['URL', item.url])
+            table_data.append(['Time', item.time.strftime("%c")])
+            table_data.append(['Details', item.details])
             if item.filename:
-                titles += '\nStored'
-                data = '{}\n{}\n{}\n{}\n{}\n{}'.format(item.task, item.title, item.url, item.time.strftime("%c"),
-                                                       item.details, item.filename)
-            table_data.append([titles, data])
+                table_data.append(['Stored', item.filename])
 
     title = 'Showing {} entries from History'.format(query.count())
-    table = TerminalTable(options.table_type, table_data, title=title, check_size=options.check_size)
+    table = TerminalTable(options.table_type, table_data, title=title, wrap_columns=[(1, 80)])
     table.table.inner_row_border = True
 
     try:
