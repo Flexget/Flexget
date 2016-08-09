@@ -28,7 +28,7 @@ from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_ta
                                             create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 
-SCHEMA_VER = 12
+SCHEMA_VER = 13
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -149,7 +149,11 @@ def upgrade(ver, session):
         from flexget.task import config_changed
         config_changed(session=session)
         ver = 12
-
+    if ver == 12:
+        # Force identified_by value None to 'auto'
+        series_table = table_schema('series', session)
+        session.execute(update(series_table, series_table.c.identified_by == None, {'identified_by': 'auto'}))
+        ver = 13
     return ver
 
 
@@ -710,7 +714,7 @@ def set_series_begin(series, ep_id):
             identified_by = 'sequence'
         except ValueError:
             raise ValueError('`%s` is not a valid episode identifier' % ep_id)
-    if series.identified_by not in ['auto', '', None]:
+    if series.identified_by != 'auto':
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
                              (ep_id, series.identified_by))

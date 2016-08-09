@@ -93,7 +93,7 @@ class NextSeriesEpisodes(object):
             self.rerun_entries = []
 
         entries = []
-        impossible = []
+        impossible = {}
         with Session() as session:
             for seriestask in session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
                 series = seriestask.series
@@ -104,7 +104,8 @@ class NextSeriesEpisodes(object):
                     continue
 
                 if series.identified_by not in ['ep', 'sequence']:
-                    impossible.append(series.name)
+                    reason = series.identified_by or 'auto'
+                    impossible.setdefault(reason, []).append(series.name)
                     continue
 
                 low_season = 0 if series.identified_by == 'ep' else -1
@@ -162,12 +163,10 @@ class NextSeriesEpisodes(object):
                     # Don't look for seasons older than begin ep
                     if series.begin and series.begin.season >= season:
                         break
-
-        for item in impossible:
-            log.verbose(
-                'Can only emit ep or sequence based series. '
-                'Series `%s` are not supported or are still learning numbering.',
-                ','.join(impossible))
+        
+        for reason, series in impossible.items():
+            log.verbose('Series `%s` with identified_by value `%s` are not supported. ',
+                        ', '.join(series), reason)
 
         return entries
 

@@ -81,8 +81,8 @@ def display_summary(options):
             episode_id = '-'
             latest = get_latest_release(series)
             identifier_type = series.identified_by
-            if identifier_type is None:
-                identifier_type = colorize('learning', 'yellow')
+            if identifier_type == 'auto':
+                identifier_type = colorize('auto', 'yellow')
             if latest:
                 if latest.first_seen > datetime.now() - timedelta(days=2):
                     new_ep = True
@@ -195,7 +195,7 @@ def display_details(options):
         series = matches[0]
         table_title = colorize(series.name, 'white')
         if len(matches) > 1:
-            warning = (colorize(' WARNING: ', 'red') + 
+            warning = (colorize(' WARNING: ', 'red') +
                 'Multiple series match to `{}`.\n '
                 'Be more specific to see the results of other matches:\n\n'
                 ' {}'.format(name, ', '.join(s.name for s in matches[1:])))
