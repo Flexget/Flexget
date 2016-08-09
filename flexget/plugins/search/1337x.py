@@ -60,7 +60,7 @@ class _1337x(object):
         log.info('1337x rewriting download url: %s' % url)
 
         try:
-            page = requests.get(url)
+            page = task.requests.get(url)
             log.debug('requesting: %s', page.url)
         except RequestException as e:
             log.error('1337x request failed: %s', e)
@@ -93,12 +93,12 @@ class _1337x(object):
 
         entries = set()
 
-        for search_string in entry.get('search_strings',[entry['title']]):
+        for search_string in entry.get('search_strings', [entry['title']]):
 
-            query = '{0}search/{1}{2}/1/' . format(sort_order,quote(search_string.encode('utf8')), order_by)
+            query = '{0}search/{1}{2}/1/'.format(sort_order,quote(search_string.encode('utf8')), order_by)
             log.debug('Using search params: {0}; ordering by: {1}'.format(search_string, order_by or 'default'))
             try:
-                page = requests.get(self.base_url + query)
+                page = task.requests.get(self.base_url + query)
                 log.debug('requesting: %s', page.url)
             except RequestException as e:
                 log.error('1337x request failed: %s', e)
@@ -131,7 +131,7 @@ class _1337x(object):
                     e['title'] = title
                     e['torrent_seeds'] = seeds
                     e['torrent_leeches'] = leeches
-                    e['search_sort'] = torrent_availability(e['torrent_seeds'],e['torrent_leeches'])
+                    e['search_sort'] = torrent_availability(e['torrent_seeds'], e['torrent_leeches'])
                     e['content_size'] = size
 
                     entries.add(e)
