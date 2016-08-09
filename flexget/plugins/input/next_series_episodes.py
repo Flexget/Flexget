@@ -162,13 +162,13 @@ class NextSeriesEpisodes(object):
                     # Don't look for seasons older than begin ep
                     if series.begin and series.begin.season >= season:
                         break
-                        
+
         for item in impossible:
             log.verbose(
                 'Can only emit ep or sequence based series. '
                 'Series `%s` are not supported or are still learning numbering.',
                 ','.join(impossible))
-            
+
         return entries
 
     def on_search_complete(self, entry, task=None, identified_by=None, **kwargs):

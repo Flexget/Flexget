@@ -11,7 +11,7 @@ from flexget.terminal import TerminalTable, CLITableError, table_parser
 
 def do_cli(manager, options):
     if options.action == 'clear':
-        num = clear_entries(options.task)
+        num = clear_entries(options.task, all=True)
         console('%s entries cleared from backlog.' % num)
     else:
         header = ['Title', 'Task', 'Expires']
@@ -19,7 +19,7 @@ def do_cli(manager, options):
         with Session() as session:
             entries = get_entries(options.task, session=session)
             for entry in entries:
-                table_data.append([entry.title, entry.task, entry.expire])
+                table_data.append([entry.title, entry.task, entry.expire.strftime('%Y-%m-%d %H:%M')])
         table = TerminalTable(options.table_type, table_data, wrap_columns=[(0, 100)])
         try:
             console(table.output)
@@ -29,7 +29,7 @@ def do_cli(manager, options):
 
 @event('options.register')
 def register_options():
-    parser = options.register_command('backlog', do_cli, help='view or clear entries from backlog plugin',
+    parser = options.register_command('backlog', do_cli, help='View or clear entries from backlog plugin',
                                       parents=[table_parser])
-    parser.add_argument('action', choices=['list', 'clear'], help='choose to show items in backlog, or clear them')
-    parser.add_argument('task', nargs='?', help='limit to specific task (if supplied)')
+    parser.add_argument('action', choices=['list', 'clear'], help='Choose to show items in backlog, or clear all of them')
+    parser.add_argument('task', nargs='?', help='Limit to specific task (if supplied)')
