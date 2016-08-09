@@ -14,12 +14,12 @@ def do_cli(manager, options):
         num = clear_entries(options.task)
         console('%s entries cleared from backlog.' % num)
     else:
-        header = ['Title', 'Task']
+        header = ['Title', 'Task', 'Expires']
         table_data = [header]
         with Session() as session:
             entries = get_entries(options.task, session=session)
             for entry in entries:
-                table_data.append([entry.title, entry.task])
+                table_data.append([entry.title, entry.task, entry.expire])
         table = TerminalTable(options.table_type, table_data, wrap_columns=[(0, 100)])
         try:
             console(table.output)
