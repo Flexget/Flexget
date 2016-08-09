@@ -923,6 +923,8 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
     # TODO: Better error messages
     # Trakt api accepts either id or slug (there is a rare possibility for conflict though, e.g. 24)
     trakt_id = trakt_id or trakt_slug
+    if not any([title, trakt_id, tmdb_id, imdb_id, tvdb_id, tvrage_id]):
+        raise LookupError('No lookup arguments provided.')
     req_session = get_session()
     last_search_query = None  # used if no results are found
     last_search_type = None
@@ -944,14 +946,11 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
                 log.debug('Searching with params: %s=%s', id_type, identifier)
                 results = req_session.get(get_api_url('search'), params={'id_type': id_type, 'id': identifier}).json()
             except requests.RequestException as e:
-                log.debug('Error searching for trakt id %s', e)
-                continue
+                raise LookupError('Searching trakt for %s=%s failed with error: %s' % (id_type, identifier, e))
             for result in results:
                 if result['type'] != style:
                     continue
                 trakt_id = result[style]['ids']['trakt']
-                break
-            if trakt_id:
                 break
         if not trakt_id and title:
             last_search_query = title
@@ -1062,7 +1061,7 @@ class ApiTrakt(object):
     @with_session
     def lookup_series(session=None, only_cached=None, **lookup_params):
         series = get_cached('show', session=session, **lookup_params)
-        title = lookup_params.get('title', '')
+        title = lookup_params.get('title') or ''
         found = None
         if not series and title:
             found = session.query(TraktShowSearchResult).filter(TraktShowSearchResult.search == title.lower()).first()
@@ -1090,7 +1089,7 @@ class ApiTrakt(object):
             session.add(series)
         if series and title.lower() == series.title.lower():
             return series
-        elif series and not found:
+        elif series and title and not found:
             if not session.query(TraktShowSearchResult).filter(TraktShowSearchResult.search == title.lower()).first():
                 log.debug('Adding search result to db')
                 session.add(TraktShowSearchResult(search=title, series=series))
@@ -1103,7 +1102,7 @@ class ApiTrakt(object):
     @with_session
     def lookup_movie(session=None, only_cached=None, **lookup_params):
         movie = get_cached('movie', session=session, **lookup_params)
-        title = lookup_params.get('title', '')
+        title = lookup_params.get('title') or ''
         found = None
         if not movie and title:
             found = session.query(TraktMovieSearchResult).filter(TraktMovieSearchResult.search == title.lower()).first()
@@ -1131,7 +1130,7 @@ class ApiTrakt(object):
             session.add(movie)
         if movie and title.lower() == movie.title.lower():
             return movie
-        if movie and not found:
+        if movie and title and not found:
             if not session.query(TraktMovieSearchResult).filter(TraktMovieSearchResult.search == title.lower()).first():
                 log.debug('Adding search result to db')
                 session.add(TraktMovieSearchResult(search=title, movie=movie))
