@@ -218,7 +218,7 @@ class TestTraktSeriesLookupAPI(object):
 class TestTraktMovieLookupAPI(object):
     config = 'tasks: {}'
 
-    def test_trakt_movies_lookup_no_params(self, api_client):
+    def test_trakt_movies_lookup_no_params(self, api_client, schema_match):
         # Bad API call
         rsp = api_client.get('/trakt/movies/')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
@@ -227,7 +227,15 @@ class TestTraktMovieLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        assert data.get('id') == 481
-        assert data.get('year') == 1999
-        assert data.get('tmdb_id') == 603
-        assert data.get('imdb_id') == 'tt0133093'
+        errors = schema_match(oc.movie_return_object, data)
+        assert not errors
+
+        values = {
+            'id': 481,
+            'title': 'The Matrix',
+            'year': 1999,
+            'tmdb_id': 603,
+            'imdb_id': 'tt0133093'
+        }
+        for field, value in values.items():
+            assert data.get(field) == value
