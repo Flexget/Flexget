@@ -3,9 +3,12 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import collections
 import contextlib
+import hashlib
 import logging
 import logging.handlers
+import random
 import sys
+import string
 import threading
 import uuid
 import warnings
@@ -24,10 +27,12 @@ local_context = threading.local()
 
 def redact(s):
     if redact.enabled:
-        return '--(redacted)--'
+        cid = hashlib.md5(redact.salt + str(s)).hexdigest()[:5]
+        return '--(redacted:%s)--' % cid 
     return s
 
 redact.enabled = False
+redact.salt = ''.join(random.choice(string.letters) for i in range(16))
 
 
 def get_level_no(level):
