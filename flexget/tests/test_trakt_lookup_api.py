@@ -75,8 +75,8 @@ class TestTraktSeriesLookupAPI(object):
         for field, value in values.items():
             assert data.get(field) == value
 
-    def test_trakt_series_lookup_with_trakt_slug_id_param(self, api_client):
-        exact_match = {
+    def test_trakt_series_lookup_with_trakt_slug_id_param(self, api_client, schema_match):
+        values = {
             'id': 75481,
             'title': 'The Flash',
             'tvdb_id': 272094,
@@ -87,7 +87,12 @@ class TestTraktSeriesLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        check_trakt_fields(data, exact=exact_match)
+
+        errors = schema_match(oc.series_return_object, data)
+        assert not errors
+
+        for field, value in values.items():
+            assert data.get(field) == value
 
     def test_trakt_series_lookup_with_tmdb_id_param(self, api_client):
         exact_match = {

@@ -67,25 +67,25 @@ class objects_container(object):
             'cached_at': {'type': 'string', 'format': 'date-time'},
             'genres': {'type': 'array', 'items': {'type': 'string'}},
             'id': {'type': 'integer'},
-            "overview": {'type': 'string'},
-            "runtime": {'type': 'integer'},
-            "rating": {'type': 'number'},
-            "votes": {'type': 'integer'},
-            "language": {'type': 'string'},
+            "overview": {'type': ['string', 'null']},
+            "runtime": {'type': ['integer', 'null']},
+            "rating": {'type': ['number', 'null']},
+            "votes": {'type': ['integer', 'null']},
+            "language": {'type': ['string', 'null']},
             "updated_at": {'type': 'string', 'format': 'date-time'},
             "images": images_object
         }
     }
 
     series_return_object = copy.deepcopy(base_return_object)
-    series_return_object['properties']['tvdb_id'] = {'type': 'integer'}
-    series_return_object['properties']['tvrage_id'] = {'type': 'integer'}
-    series_return_object['properties']['first_aired'] = {'type': 'string', 'format': 'date-time'}
-    series_return_object['properties']['air_day'] = {'type': 'string'}
-    series_return_object['properties']['air_time'] = {'type': 'string'}
-    series_return_object['properties']['certification'] = {'type': 'string'}
-    series_return_object['properties']['network'] = {'type': 'string'}
-    series_return_object['properties']['country'] = {'type': 'string'}
+    series_return_object['properties']['tvdb_id'] = {'type': ['integer', 'null']}
+    series_return_object['properties']['tvrage_id'] = {'type': ['integer', 'null']}
+    series_return_object['properties']['first_aired'] = {'type': ['string', 'null'], 'format': 'date-time'}
+    series_return_object['properties']['air_day'] = {'type': ['string', 'null']}
+    series_return_object['properties']['air_time'] = {'type': ['string', 'null']}
+    series_return_object['properties']['certification'] = {'type': ['string', "null"]}
+    series_return_object['properties']['network'] = {'type': ['string', 'null']}
+    series_return_object['properties']['country'] = {'type': ['string', 'null']}
     series_return_object['properties']['status'] = {'type': 'string'}
     series_return_object['properties']['aired_episodes'] = {'type': 'integer'}
 
