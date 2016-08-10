@@ -149,6 +149,13 @@ def upgrade(ver, session):
         from flexget.task import config_changed
         config_changed(session=session)
         ver = 12
+    if ver == 12:
+        log.info('Adding `tvdb_id`, `imdb_id`, `tmdb_id` and `trakt_show_id` columns to series table.')
+        table_add_column('series', 'tvdb_id', Integer, session)
+        table_add_column('series', 'imdb_id', String, session)
+        table_add_column('series', 'tmdb_id', Integer, session)
+        table_add_column('series', 'trakt_show_id', Integer, session)
+        ver = 13
 
     return ver
 
@@ -269,6 +276,10 @@ class Series(Base):
     id = Column(Integer, primary_key=True)
     _name = Column('name', Unicode)
     _name_normalized = Column('name_lower', Unicode, index=True, unique=True)
+    tvdb_id = Column(Integer)
+    imdb_id = Column(String)
+    tmdb_id = Column(Integer)
+    trakt_show_id = Column(Integer)
     identified_by = Column(String)
     begin_episode_id = Column(Integer, ForeignKey('series_episodes.id', name='begin_episode_id', use_alter=True))
     begin = relation('Episode', uselist=False, primaryjoin="Series.begin_episode_id == Episode.id",
@@ -905,6 +916,11 @@ class FilterSeriesBase(object):
                 'path': {'type': 'string'},
                 'set': {'type': 'object'},
                 'alternate_name': one_or_more({'type': 'string'}),
+                # Manually set external site IDs
+                'tvdb_id': {'type': 'integer'},
+                'imdb_id': {'type': 'string', 'pattern': r'^tt\d{7}', 'error_pattern': 'imdb_id must be in the form `ttxxxxxxx`'},
+                'tmdb_id': {'type': 'integer'},
+                'trakt_show_id': {'type': 'integer'},
                 # Custom regexp options
                 'name_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
                 'ep_regexp': one_or_more({'type': 'string', 'format': 'regex'}),
@@ -1155,6 +1171,10 @@ class FilterSeries(FilterSeriesBase):
                     log.debug('adding series %s into db', series_name)
                     db_series = Series()
                     db_series.name = series_name
+                    db_series.tvdb_id = series_config.get('tvdb_id', None)
+                    db_series.imdb_id = series_config.get('imdb_id', None)
+                    db_series.tmdb_id = series_config.get('tmdb_id', None)
+                    db_series.trakt_show_id = series_config.get('trakt_show_id', None)
                     db_series.identified_by = series_config.get('identified_by', 'auto')
                     session.add(db_series)
                     log.debug('-> added %s' % db_series)
@@ -1644,6 +1664,15 @@ class SeriesDBManager(FilterSeriesBase):
                 for alt in alts:
                     _add_alt_name(alt, db_series, series_name, session)
                 db_series.in_tasks.append(SeriesTask(task.name))
+                # Look for manually specified external site IDs in config and populate series table if present
+                if series_config.get('tvdb_id', None) != None:
+                    db_series.tvdb_id = series_config['tvdb_id']
+                if series_config.get('imdb_id', None) != None:
+                    db_series.imdb_id = series_config['imdb_id']
+                if series_config.get('tvdb_id', None) != None:
+                    db_series.tmdb_id = series_config['tmdb_id']
+                if series_config.get('tvdb_id', None) != None:
+                    db_series.trakt_show_id = series_config['trakt_show_id']                
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
                 # Set the begin episode
