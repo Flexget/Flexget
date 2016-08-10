@@ -77,8 +77,9 @@ class ConfigureSeries(FilterSeriesBase):
 
             for entry in result:
                 s = series.setdefault(entry['title'], {})
-                if entry.get('tvdb_id'):
-                    s['set'] = {'tvdb_id': entry['tvdb_id']}
+                for supported_id in FilterSeriesBase().supported_ids:
+                    if entry.get(supported_id):
+                        s['set'] = {supported_id: entry[supported_id]}
 
                 # Allow configure_series to set anything available to series
                 for key, schema in self.settings_schema['properties'].items():

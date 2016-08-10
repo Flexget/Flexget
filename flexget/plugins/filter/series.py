@@ -950,6 +950,11 @@ class FilterSeriesBase(object):
             'additionalProperties': False
         }
 
+    @property
+    def supported_ids(self):
+        # A list of supported series IDs to be used by various series plugins like configure_series, series_list, etc.
+        return ['tvdb_id', 'trakt_show_id', 'tvmaze_id']
+
     def make_grouped_config(self, config):
         """Turns a simple series list into grouped format with a empty settings dict"""
         if not isinstance(config, dict):
