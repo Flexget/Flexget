@@ -33,13 +33,13 @@ class objects_container(object):
 
     translation_object = {
         'type': 'object',
-        'properties': {
-            'language': {'type': 'object',
-                         'properties': {
-                             "overview": {'type': 'string'},
-                             "tagline": {'type': 'string'},
-                             "title": {'type': 'string'},
-                         }}
+        'patternProperties': {
+            "^[/d]$": {'type': 'object',
+                       'properties': {
+                           "overview": {'type': 'string'},
+                           "tagline": {'type': 'string'},
+                           "title": {'type': 'string'},
+                       }}
         }
     }
 

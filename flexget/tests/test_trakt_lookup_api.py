@@ -211,7 +211,6 @@ class TestTraktSeriesLookupAPI(object):
         assert not errors
 
         assert 'translations' in data
-        assert 'bs' in data['translations']
 
 
 @pytest.mark.online
@@ -296,3 +295,24 @@ class TestTraktMovieLookupAPI(object):
 
         assert 'actors' in data
         assert len(data['actors']) > 0
+
+    def test_trakt_movies_lookup_translations_params(self, api_client, schema_match):
+        rsp = api_client.get('/trakt/movies/the matrix/?include_translations=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(oc.movie_return_object, data)
+        assert not errors
+
+        values = {
+            'id': 481,
+            'title': 'The Matrix',
+            'year': 1999,
+            'tmdb_id': 603,
+            'imdb_id': 'tt0133093'
+        }
+        for field, value in values.items():
+            assert data.get(field) == value
+
+        assert 'translations' in data
+        assert len(data['translations']) > 0
