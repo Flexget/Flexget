@@ -2,18 +2,32 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import sys
-from math import floor
 from textwrap import wrap
 
 from colorclass import Windows, Color, disable_all_colors
 from flexget.options import ArgumentParser
 from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable
-from terminaltables.terminal_io import terminal_size
 
 
 class TerminalTable(object):
-    """
-    A data table suited for CLI output, created via its sent parameters.
+    """A data table suited for CLI output, created via its sent parameters. For example::
+
+        header = ['Col1', 'Col2']
+        table_data = [header]
+        for item in iterable:
+            table_data.append([item.attribute1, item.attribute2])
+        table = TerminalTable('plain', table_data)
+        print table.output
+
+    Optional values are setting table title, and supplying wrap_columns list. Each value in wrap_columns list is a tuple
+    where first value is column number and second one is maximum column width. For example::
+
+        header = ['Col1', 'Col2']
+        table_data = [header]
+        for item in iterable:
+            table_data.append([item.attribute1, item.attribute2])
+        table = TerminalTable('plain', table_data, 'Table title', wrap_columns=[(0,40),(1,50)])
+        print table.output
 
     :param table_type: A string matching supported_table_types() keys.
     :param table_data: Table data as a list of lists of strings. See `terminaltables` doc.
@@ -31,11 +45,7 @@ class TerminalTable(object):
         self.init_table()
 
     def init_table(self):
-        """
-        Build tables based on data. If table does not fit terminal, type is not porcelain and wrap_columns data has been
-        passed, wrap table.
-        :return: Mutate se
-        """
+        """Assigns self.table with the built table based on data."""
         self.table = self.build_table(self.type, self.table_data)
         if not self.table.ok and not self.type == 'porcelain' and self.wrap_columns:
             self.table = self._wrap_table()
@@ -56,9 +66,7 @@ class TerminalTable(object):
 
     @staticmethod
     def supported_table_types():
-        """
-        This method hold the dict for supported table type. Call with `keys=True` to get just the list of keys.
-        """
+        """This method hold the dict for supported table type."""
         return {
             'plain': AsciiTable,
             'porcelain': AsciiTable,
@@ -86,7 +94,6 @@ class CLITableError(Exception):
 
 
 table_parser = ArgumentParser(add_help=False)
-# The CLI table parent parser
 table_parser.add_argument('--table-type', choices=list(TerminalTable.supported_table_types()), default='single',
                           help='Select output table style')
 table_parser.add_argument('--porcelain', dest='table_type', action='store_const', const='porcelain',
@@ -94,8 +101,8 @@ table_parser.add_argument('--porcelain', dest='table_type', action='store_const'
 
 
 def colorize(text, color, auto=True):
-    """
-    Helper function to color strings
+    """Helper function to color strings
+
     :param text: Text to color
     :param color: Color tag name
     :param auto: Whether to add `auto` to tag or not to use autocolors
@@ -107,8 +114,7 @@ def colorize(text, color, auto=True):
 
 
 def word_wrap(text, max_length):
-    """
-    A helper method designed to return a wrapped string.
+    """A helper method designed to return a wrapped string.
 
     :param text: Text to wrap
     :param max_length: Maximum allowed string length
