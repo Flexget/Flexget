@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser, ArgumentTypeError
+from functools import partial
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -8,8 +10,11 @@ from flexget import options
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
+from flexget.options import CLITable, table_parser, CLITableError
 from flexget.plugins.list.entry_list import get_entry_lists, get_list_by_exact_name, get_entries_by_list_id, \
     get_entry_by_id, get_entry_by_title, EntryListList, EntryListEntry
+
+ww = CLITable.word_wrap
 
 
 def attribute_type(attribute):
@@ -22,8 +27,13 @@ def attribute_type(attribute):
 
 def do_cli(manager, options):
     """Handle entry-list subcommand"""
+
+    # Handle globally setting value for word wrap method
+    global ww
+    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+
     if options.list_action == 'all':
-        entry_list_lists()
+        entry_list_lists(options)
         return
 
     if options.list_action == 'list':
@@ -47,14 +57,19 @@ def do_cli(manager, options):
         return
 
 
-def entry_list_lists():
+def entry_list_lists(options):
     """ Show all entry lists """
     with Session() as session:
         lists = get_entry_lists(session=session)
-        console('Existing entry lists:')
-        console('-' * 20)
+        header = ['#', 'List Name']
+        table_data = [header]
         for entry_list in lists:
-            console(entry_list.name)
+            table_data.append([entry_list.id, entry_list.name])
+    table = CLITable(options.table_type, table_data)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def entry_list_list(options):
@@ -65,10 +80,15 @@ def entry_list_list(options):
         except NoResultFound:
             console('Could not find entry list with name {}'.format(options.list_name))
             return
-        console('Entries for list `{}`:'.format(options.list_name))
-        console('-' * 79)
+        header = ['#', 'Title', '# of fields']
+        table_data = [header]
         for entry in get_entries_by_list_id(entry_list.id, order_by='added', descending=True, session=session):
-            console('{:2d}: {}, {} fields'.format(entry.id, entry.title, len(entry.entry)))
+            table_data.append([entry.id, entry.title, len(entry.entry)])
+    table = CLITable(options.table_type, table_data)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def entry_list_show(options):
@@ -92,11 +112,16 @@ def entry_list_show(options):
                     'Could not find matching entry with title `{}` in list `{}`'.format(options.entry,
                                                                                         options.list_name))
                 return
-
-        console('Showing fields for entry ID {}'.format(options.list_name))
-        console('-' * 79)
+        header = ['#', 'Field name', 'Value']
+        table_data = [header]
         for k, v in sorted(entry.entry.items()):
-            console('{}: {}'.format(k.upper(), v))
+            table_data.append([entry.id, k, ww(v)])
+    table = CLITable(options.table_type, table_data)
+    table.table.justify_columns[0] = 'center'
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def entry_list_add(options):
@@ -185,9 +210,9 @@ def register_parser_arguments():
     parser = options.register_command('entry-list', do_cli, help='view and manage entry lists')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='list_action')
-    subparsers.add_parser('all', help='Shows all existing entry lists')
-    subparsers.add_parser('list', parents=[list_name_parser], help='List entries from a list')
-    subparsers.add_parser('show', parents=[list_name_parser, global_entry_parser],
+    subparsers.add_parser('all', help='Shows all existing entry lists', parents=[table_parser])
+    subparsers.add_parser('list', parents=[list_name_parser, table_parser], help='List entries from a list')
+    subparsers.add_parser('show', parents=[list_name_parser, global_entry_parser, table_parser],
                           help='Show entry fields.')
     subparsers.add_parser('add', parents=[list_name_parser, entry_parser, attributes_parser],
                           help='Add an entry to a list')

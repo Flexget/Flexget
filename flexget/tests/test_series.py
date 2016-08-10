@@ -2000,7 +2000,7 @@ class TestCLI(object):
     def test_series_list(self, manager, execute_task):
         """Very rudimentary test, mostly makes sure this doesn't crash."""
         execute_task('learn_series')
-        options = get_parser().parse_args(['series', 'list'])
+        options = get_parser().parse_args(['series', 'list', '--porcelain'])
         buffer = StringIO()
         with capture_output(buffer, loglevel='error'):
             manager.handle_cli(options=options)

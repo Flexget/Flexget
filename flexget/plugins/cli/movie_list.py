@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser, ArgumentTypeError
+from functools import partial
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -9,6 +11,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
+from flexget.options import CLITable, table_parser, CLITableError
 from flexget.plugin import PluginError
 from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
     get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase
@@ -19,6 +22,7 @@ from flexget.utils.tools import split_title_year
 imdb_lookup = ImdbLookup().lookup
 tmdb_lookup = PluginTmdbLookup().lookup
 
+ww = CLITable.word_wrap
 
 def lookup_movie(title, session, identifiers=None):
     entry = Entry(title=title)
@@ -48,6 +52,11 @@ def movie_list_keyword_type(identifier):
 
 def do_cli(manager, options):
     """Handle movie-list subcommand"""
+
+    # Handle globally setting value for word wrap method
+    global ww
+    ww = partial(CLITable.word_wrap, max_length=options.max_column_width)
+
     if options.list_action == 'all':
         movie_list_lists(options)
         return
@@ -72,10 +81,15 @@ def do_cli(manager, options):
 def movie_list_lists(options):
     """ Show all movie lists """
     lists = get_movie_lists()
-    console('Existing movie lists:')
-    console('-' * 20)
+    header = ['#', 'List Name']
+    table_data = [header]
     for movie_list in lists:
-        console(movie_list.name)
+        table_data.append([movie_list.id, movie_list.name])
+    table = CLITable(options.table_type, table_data)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def movie_list_list(options):
@@ -86,13 +100,21 @@ def movie_list_list(options):
         except NoResultFound:
             console('Could not find movie list with name {}'.format(options.list_name))
             return
-        console('Movies for list {}:'.format(options.list_name))
-        console('-' * 79)
-        for movie in get_movies_by_list_id(movie_list.id, order_by='added', descending=True, session=session):
-            _str = '{} ({}) '.format(movie.title, movie.year) if movie.year else '{} '.format(movie.title)
-            _ids = '[' + ', '.join(
-                '{}={}'.format(identifier.id_name, identifier.id_value) for identifier in movie.ids) + ']'
-            console(_str + _ids)
+    header = ['Movie Name', 'Movie year']
+    header += MovieListBase().supported_ids
+    table_data = [header]
+    movies = get_movies_by_list_id(movie_list.id, order_by='added', descending=True, session=session)
+    for movie in movies:
+        movie_row = [ww(movie.title), movie.year or '']
+        for identifier in MovieListBase().supported_ids:
+            movie_row.append(movie.identifiers.get(identifier, ''))
+        table_data.append(movie_row)
+    title = '{} Movies in movie list: `{}`'.format(len(movies), options.list_name)
+    table = CLITable(options.table_type, table_data, title)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def movie_list_add(options):
@@ -174,14 +196,14 @@ def register_parser_arguments():
     list_name_parser = ArgumentParser(add_help=False)
     list_name_parser.add_argument('list_name', nargs='?', default='movies', help='Name of movie list to operate on')
     # Register subcommand
-    parser = options.register_command('movie-list', do_cli, help='view and manage movie lists')
+    parser = options.register_command('movie-list', do_cli, help='View and manage movie lists')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='list_action')
-    subparsers.add_parser('all', help='shows all existing movie lists')
-    subparsers.add_parser('list', parents=[list_name_parser], help='list movies from a list')
+    subparsers.add_parser('all', parents=[table_parser], help='Shows all existing movie lists')
+    subparsers.add_parser('list', parents=[list_name_parser, table_parser], help='List movies from a list')
     subparsers.add_parser('add', parents=[list_name_parser, movie_parser, identifiers_parser],
-                          help='add a movie to a list')
+                          help='Add a movie to a list')
     subparsers.add_parser('del', parents=[list_name_parser, movie_parser],
-                          help='remove a movie from a list using its title')
+                          help='Remove a movie from a list using its title')
     subparsers.add_parser('purge', parents=[list_name_parser],
-                          help='removes an entire list with all of its movies. Use this with caution')
+                          help='Removes an entire list with all of its movies. Use this with caution')

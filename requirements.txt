@@ -18,6 +18,8 @@ path.py>=8.1.1
 pathlib>=1.0
 guessit<=2.0.4
 apscheduler>=3.2.0
+terminaltables>=3.0.0
+colorclass>=2.2.0
 # WebUI Requirements
 cherrypy>=3.7.0
 flask>=0.7
@@ -29,3 +31,4 @@ flask-cors>=2.1.2
 pyparsing>=2.0.3
 Safe>=0.4
 future>=0.15.2
+

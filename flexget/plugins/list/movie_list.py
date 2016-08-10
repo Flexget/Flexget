@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from collections import MutableSet
 from datetime import datetime
 
@@ -10,10 +10,10 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 
 from flexget import plugin
-from flexget.manager import Session
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.plugins.parsers.parser_common import normalize_name, remove_dirt
 from flexget.utils.tools import split_title_year
@@ -31,10 +31,7 @@ class MovieListBase(object):
     @property
     def supported_ids(self):
         # Return a list of supported series identifier as registered via their plugins
-        ids = []
-        for p in plugin.get_plugins(group='movie_metainfo'):
-            ids.append(p.instance.movie_identifier)
-        return ids
+        return [p.instance.movie_identifier for p in plugin.get_plugins(group='movie_metainfo')]
 
 
 class MovieListList(Base):
@@ -91,6 +88,11 @@ class MovieListMovie(Base):
             'movies_list_ids': movies_list_ids
         }
 
+    @property
+    def identifiers(self):
+        """ Return a dict of movie identifiers """
+        return {identifier.id_name: identifier.id_value for identifier in self.ids}
+
 
 class MovieListID(Base):
     __tablename__ = 'movie_list_ids'
@@ -114,7 +116,6 @@ class MovieListID(Base):
 
 
 class MovieList(MutableSet):
-
     def _db_list(self, session):
         return session.query(MovieListList).filter(MovieListList.name == self.list_name).first()
 

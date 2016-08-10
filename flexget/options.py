@@ -8,6 +8,12 @@ import sys
 from argparse import ArgumentParser as ArgParser
 from argparse import (_VersionAction, Action, ArgumentError, Namespace, PARSER, REMAINDER, SUPPRESS,
                       _SubParsersAction)
+from textwrap import wrap
+
+from colorclass import Color
+from colorclass.windows import Windows
+from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable
+from terminaltables.terminal_io import terminal_size
 
 import flexget
 from flexget.entry import Entry
@@ -58,7 +64,6 @@ def required_length(nmin, nmax):
     """Generates a custom Action to validate an arbitrary range of arguments."""
 
     class RequiredLength(Action):
-
         def __call__(self, parser, args, values, option_string=None):
             if not nmin <= len(values) <= nmax:
                 raise ArgumentError(self, 'requires between %s and %s arguments' % (nmin, nmax))
@@ -88,14 +93,12 @@ class VersionAction(_VersionAction):
 
 
 class DebugAction(Action):
-
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, True)
         namespace.loglevel = 'debug'
 
 
 class DebugTraceAction(Action):
-
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, True)
         namespace.debug = True
@@ -103,7 +106,6 @@ class DebugTraceAction(Action):
 
 
 class CronAction(Action):
-
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, True)
         # Only set loglevel if it has not already explicitly been set
@@ -113,7 +115,6 @@ class CronAction(Action):
 
 # This makes the old --inject form forwards compatible
 class InjectAction(Action):
-
     def __call__(self, parser, namespace, values, option_string=None):
         kwargs = {'title': values.pop(0)}
         if values:
@@ -148,7 +149,6 @@ class ParseExtrasAction(Action):
 
 
 class ScopedNamespace(Namespace):
-
     def __init__(self, **kwargs):
         super(ScopedNamespace, self).__init__(**kwargs)
         self.__parent__ = None
@@ -188,7 +188,6 @@ class ScopedNamespace(Namespace):
 
 
 class NestedSubparserAction(_SubParsersAction):
-
     def __init__(self, *args, **kwargs):
         self.nested_namespaces = kwargs.pop('nested_namespaces', False)
         self.parent_defaults = {}
@@ -218,7 +217,6 @@ class NestedSubparserAction(_SubParsersAction):
 
 
 class ParserError(Exception):
-
     def __init__(self, message, parser):
         self.message = message
         self.parser = parser
@@ -473,3 +471,89 @@ class CoreArgumentParser(ArgumentParser):
         # Set the 'allow_manual' flag to True for any usage of the CLI
         setattr(result, 'allow_manual', True)
         return result
+
+
+class CLITableError(Exception):
+    """ A CLI table error"""
+
+
+class CLITable(object):
+    """
+    A data table suited for CLI output, created via its sent parameters.
+    """
+
+    def __init__(self, type, table_data, title=None):
+        self.title = title
+        self.type = type
+        self.table = self.supported_table_types()[type](table_data)
+
+    @property
+    def output(self):
+        self.table.title = self.title
+        if self.type == 'porcelain':
+            # porcelain is a special case of AsciiTable
+            self.table.inner_footing_row_border = False
+            self.table.inner_heading_row_border = False
+            self.table.outer_border = False
+
+        if self.table.ok:
+            return '\n' + self.table.table
+        raise CLITableError(
+            'Terminal size is not suffice to display table. Terminal width is {}, table width is {}. '
+            'Consider setting a lower value using `--max-width` option.'.format(terminal_size()[0],
+                                                                                self.table.table_width))
+
+    @staticmethod
+    def supported_table_types(keys=False):
+        """
+        This method hold the dict for supported table type. Call with `keys=True` to get just the list of keys.
+        """
+        table_types = {
+            'plain': AsciiTable,
+            'porcelain': AsciiTable,
+            'single': SingleTable,
+            'double': DoubleTable,
+            'github': GithubFlavoredMarkdownTable
+        }
+        if keys:
+            return list(table_types)
+        return table_types
+
+    @staticmethod
+    def colorize(text, color_tag, porcelain=False):
+        """
+        This method calls for `colorclass` to try and color the given text
+        :param text: Text to color
+        :param color_tag: Color tag. Should adhere to colorclass.list_tags().
+        :param porcelain: If True, no colors should be returned.
+        :return: Text or colorized text
+        """
+        if porcelain:
+            return text
+        if sys.platform == 'win32':
+            Windows.enable(auto_colors=True)
+        return Color('{%s}%s{%s}' % (color_tag, text, '/' + color_tag))
+
+    @staticmethod
+    def word_wrap(text, max_length=0):
+        """
+        A helper method designed to return a wrapped string. This is a hack until (and if) `terminaltables` will support
+        native word wrap.
+        :param text: Text to wrap
+        :param max_length: Maximum allowed string length, corresponds with column width when used with table
+        :return: Wrapped text or original text
+        """
+        if max_length and len(str(text)) >= max_length:
+            return '\n'.join(wrap(str(text), max_length))
+        return text
+
+
+# The CLI table parent parser
+table_parser = ArgumentParser(add_help=False)
+table_parser.add_argument('--table-type', choices=CLITable.supported_table_types(keys=True), default='single',
+                          help='Select output table style')
+table_parser.add_argument('--porcelain', dest='table_type', action='store_const', const='porcelain',
+                          help='Make the output parseable. Similar to using `--table-type porcelain`')
+table_parser.add_argument('--max-width', dest='max_column_width', type=int, default=0,
+                          help='Set the max allowed column width, will wrap any text longer than this value.'
+                               ' Use this in case table size exceeds terminal size')
