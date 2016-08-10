@@ -15,9 +15,9 @@ class objects_container(object):
     internal_image_object = {
         "type": "object",
         "properties": {
-            "full": {"type": "string"},
-            "medium": {"type": "string"},
-            "thumb": {"type": "string"}
+            "full": {"type": ["string", "null"]},
+            "medium": {"type": ["string", "null"]},
+            "thumb": {"type": ["string", "null"]}
         }
     }
 
