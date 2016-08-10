@@ -22,6 +22,14 @@ VERBOSE = 15
 local_context = threading.local()
 
 
+def redact(s):
+    if redact.enabled:
+        return '--(redacted)--'
+    return s
+
+redact.enabled = False
+
+
 def get_level_no(level):
     if not isinstance(level, int):
         # Cannot use getLevelName here as in 3.4.0 it returns a string.

@@ -13,7 +13,7 @@ import flexget
 
 from flexget.entry import Entry
 from flexget.event import fire_event
-from flexget.logger import console
+from flexget.logger import console, redact
 from flexget.utils import requests
 
 _UNSET = object()
@@ -106,6 +106,12 @@ class CronAction(Action):
         # Only set loglevel if it has not already explicitly been set
         if not hasattr(namespace, 'loglevel'):
             namespace.loglevel = 'info'
+
+
+class RedactAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, True)
+        redact.enabled = True
 
 
 # This makes the old --inject form forwards compatible
@@ -379,6 +385,8 @@ manager_parser.add_argument('-V', '--version', action=VersionAction, version=fle
                             help='Print FlexGet version and exit.')
 manager_parser.add_argument('--test', action='store_true', dest='test', default=0,
                             help='Verbose what would happen on normal execution.')
+manager_parser.add_argument('--redact', action=RedactAction, dest='redact', nargs=0,
+                            help='Redact sensitive information from logs and output.')
 manager_parser.add_argument('-c', dest='config', default='config.yml',
                             help='Specify configuration file. Default: %(default)s')
 manager_parser.add_argument('--logfile', '-l', default='flexget.log',

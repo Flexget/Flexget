@@ -6,7 +6,7 @@ from sqlalchemy import desc
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.logger import console
+from flexget.logger import console, redact
 from flexget.terminal import TerminalTable, CLITableError, table_parser
 from flexget.plugins.output.history import History
 
@@ -24,7 +24,7 @@ def do_cli(manager, options):
         for item in reversed(query.all()):
             table_data.append(['Task', item.task])
             table_data.append(['Title', item.title])
-            table_data.append(['URL', item.url])
+            table_data.append(['URL', redact(item.url)])
             table_data.append(['Time', item.time.strftime("%c")])
             table_data.append(['Details', item.details])
             if item.filename:
