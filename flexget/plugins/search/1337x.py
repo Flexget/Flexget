@@ -16,8 +16,6 @@ from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 
 log = logging.getLogger('1337x')
 
-requests = RequestSession()
-
 class _1337x(object):
     """
         1337x search plugin.
