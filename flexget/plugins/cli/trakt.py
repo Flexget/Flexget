@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 
-
 from flexget import options, plugin
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugins.internal.api_trakt import get_access_token, TraktUserAuth, delete_account, PIN_URL
+from flexget.terminal import TerminalTable, table_parser
 
 
 def action_auth(options):
@@ -28,10 +28,13 @@ def action_list(options):
             if not accounts:
                 console('No trakt authorizations stored in database.')
                 return
-            console('{:-^21}|{:-^28}|{:-^28}'.format('Account', 'Created', 'Expires'))
+            header = ['Account', 'Created', 'Expires']
+            table_data = [header]
+
             for auth in accounts:
-                console('{:<21}|{:>28}|{:>28}'.format(
-                    auth.account, auth.created.strftime('%Y-%m-%d'), auth.expires.strftime('%Y-%m-%d')))
+                table_data.append([auth.account, auth.created.strftime('%Y-%m-%d'), auth.expires.strftime('%Y-%m-%d')])
+            table = TerminalTable(options.table_type, table_data)
+            console(table.output)
             return
         # Show a specific account
         acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == options.account).first()
@@ -78,24 +81,25 @@ def do_cli(manager, options):
 
 @event('options.register')
 def register_parser_arguments():
-    acc_text = 'local identifier which should be used in your config to refer these credentials'
+    acc_text = 'Local identifier which should be used in your config to refer these credentials'
     # Register subcommand
-    parser = options.register_command('trakt', do_cli, help='view and manage trakt authentication.')
+    parser = options.register_command('trakt', do_cli, help='View and manage trakt authentication.')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='action')
-    auth_parser = subparsers.add_parser('auth', help='authorize Flexget to access your Trakt.tv account')
+    auth_parser = subparsers.add_parser('auth', help='Authorize Flexget to access your Trakt.tv account')
 
     auth_parser.add_argument('account', metavar='<account>', help=acc_text)
-    auth_parser.add_argument('pin', metavar='<pin>', help='get this by authorizing FlexGet to use your trakt account '
+    auth_parser.add_argument('pin', metavar='<pin>', help='Get this by authorizing FlexGet to use your trakt account '
                                                           'at %s. WARNING: DEPRECATED.' % PIN_URL, nargs='?')
 
-    show_parser = subparsers.add_parser('list', help='list expiration date for Flexget authorization(s) (don\'t worry, '
-                                                     'they will automatically refresh when expired)')
+    show_parser = subparsers.add_parser('list', help='List expiration date for Flexget authorization(s) (don\'t worry, '
+                                                     'they will automatically refresh when expired)',
+                                        parents=[table_parser])
     show_parser.add_argument('account', metavar='<account>', nargs='?', help=acc_text)
 
-    refresh_parser = subparsers.add_parser('refresh', help='manually refresh your access token associated with your'
+    refresh_parser = subparsers.add_parser('refresh', help='Manually refresh your access token associated with your'
                                                            ' --account <name>')
     refresh_parser.add_argument('account', metavar='<account>', help=acc_text)
 
-    delete_parser = subparsers.add_parser('delete', help='delete the specified <account> name from local database')
+    delete_parser = subparsers.add_parser('delete', help='Delete the specified <account> name from local database')
     delete_parser.add_argument('account', metavar='<account>', help=acc_text)
