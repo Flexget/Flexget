@@ -239,3 +239,41 @@ class TestTraktMovieLookupAPI(object):
         }
         for field, value in values.items():
             assert data.get(field) == value
+
+    def test_trakt_movies_lookup_year_param(self, api_client, schema_match):
+        rsp = api_client.get('/trakt/movies/the matrix/?year=2003')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(oc.movie_return_object, data)
+        assert not errors
+
+        values = {
+            'id': 483,
+            'title': 'The Matrix Revolutions',
+            'year': 2003,
+            'tmdb_id': 605,
+            'imdb_id': 'tt0242653'
+        }
+        for field, value in values.items():
+            assert data.get(field) == value
+
+    def test_trakt_movies_lookup_slug_param(self, api_client, schema_match):
+        rsp = api_client.get('/trakt/movies/the matrix/?trakt_slug=the-matrix-reloaded-2003')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(oc.movie_return_object, data)
+        assert not errors
+
+        values = {
+            'id': 482,
+            'title': 'The Matrix Reloaded',
+            'year': 2003,
+            'tmdb_id': 604,
+            'imdb_id': 'tt0234215'
+        }
+        for field, value in values.items():
+            assert data.get(field) == value
+
+
