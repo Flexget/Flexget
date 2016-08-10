@@ -56,7 +56,7 @@ class objects_container(object):
                     "images": images_object,
                     "trakt_slug": {'type': 'string'},
                     "birthday": {'type': 'string'},
-                    "biography": {'type': 'string'},
+                    "biography": {'type': ['string', 'null']},
                     "homepage": {'type': 'string'},
                     "death": {'type': ['string', 'null']}
                 }
