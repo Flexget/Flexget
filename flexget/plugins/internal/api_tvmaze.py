@@ -246,10 +246,10 @@ def get_db_genres(genres, session):
         db_genre = session.query(TVMazeGenre).filter(TVMazeGenre.name == genre).first()
         if not db_genre:
             db_genre = TVMazeGenre(name=genre)
-            log.debug('adding genre %s to db', genre)
+            log.trace('adding genre %s to db', genre)
             session.add(db_genre)
         else:
-            log.debug('genre %s found in db, returning', db_genre.name)
+            log.trace('genre %s found in db, returning', db_genre.name)
         db_genres.append(db_genre)
     return db_genres
 
@@ -269,6 +269,7 @@ def search_params_for_series(**lookup_params):
 def from_cache(session=None, search_params=None, cache_type=None):
     """
     Returns a result from requested table based on search params
+
     :param session: Current session
     :param search_params: Relevant search params. Should match table column names
     :param cache_type: Object for search
@@ -302,6 +303,7 @@ def add_to_lookup(session=None, title=None, series=None):
 def prepare_lookup_for_tvmaze(**lookup_params):
     """
     Return a dict of params which is valid with tvmaze API lookups
+
     :param lookup_params: Search parameters
     :return: Dict of tvmaze recognizable key words
     """
@@ -487,6 +489,7 @@ def get_episode(series_id, date=None, number=None, season=None):
 def tvmaze_lookup(lookup_type, lookup_values):
     """
     Build the URL and return the reply from TVMaze API
+
     :param lookup_type: Selects the endpoint that will be used
     :param lookup_values: A list of values to be used in the URL
     :return: A JSON reply from the API

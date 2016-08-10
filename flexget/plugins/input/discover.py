@@ -253,7 +253,7 @@ class Discover(object):
                         entry.complete()
                         continue
                     de.last_execution = datetime.datetime.now()
-                log.debug('interval passed')
+                log.trace('interval passed for %s', entry['title'])
                 result.append(entry)
         if interval_count:
             log.verbose('Discover interval of %s not met for %s entries. Use --discover-now to override.' %
