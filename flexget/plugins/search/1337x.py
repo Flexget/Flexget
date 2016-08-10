@@ -9,7 +9,6 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import TimedLimiter, RequestException
-from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
