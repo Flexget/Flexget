@@ -71,7 +71,7 @@ class Discover(object):
                 'allOf': [{'$ref': '/schema/plugins?group=search'}, {'maxProperties': 1, 'minProperties': 1}]
             }},
             'interval': {'type': 'string', 'format': 'interval', 'default': '5 hours'},
-            'release_estimations': {'type': 'string', 'default': 'auto', 'enum': ['auto', 'strict', 'ignore']},
+            'release_estimations': {'type': 'string', 'default': 'strict', 'enum': ['loose', 'strict', 'ignore']},
             'limit': {'type': 'integer', 'minimum': 1}
         },
         'required': ['what', 'from'],
@@ -169,6 +169,7 @@ class Discover(object):
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort', -1))
 
     def entry_complete(self, entry, query=None, search_results=None, **kwargs):
+        """Callback for Entry"""
         if entry.accepted:
             # One of the search results was accepted, transfer the acceptance back to the query entry which generated it
             query.accept()
@@ -180,6 +181,7 @@ class Discover(object):
 
     def estimated(self, entries, estimation_mode):
         """
+        :param str estimation_mode: loose, strict, ignore
         :return: Entries that we have estimated to be available
         """
         estimator = get_plugin_by_name('estimate_release').instance
@@ -206,6 +208,7 @@ class Discover(object):
                 log.debug("%s hasn't been released yet (Expected: %s)" % (entry['title'], est_date))
         return result
 
+    # TODO: we no longer support 2.6
     def interval_total_seconds(self, interval):
         """
         Because python 2.6 doesn't have total_seconds()
@@ -258,7 +261,7 @@ class Discover(object):
         return result
 
     def on_task_input(self, task, config):
-        config.setdefault('release_estimations', 'auto')
+        config.setdefault('release_estimations', 'strict')
         task.no_entries_ok = True
         entries = self.execute_inputs(config, task)
         log.verbose('Discovering %i titles ...' % len(entries))
@@ -281,4 +284,4 @@ def register_plugin():
 @event('options.register')
 def register_parser_arguments():
     options.get_parser('execute').add_argument('--discover-now', action='store_true', dest='discover_now',
-                                               default=False, help='immediately try to discover everything')
+                                               default=False, help='Immediately try to discover everything')
