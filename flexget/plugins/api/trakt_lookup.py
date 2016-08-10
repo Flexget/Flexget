@@ -58,7 +58,7 @@ class objects_container(object):
                     "birthday": {'type': 'string'},
                     "biography": {'type': 'string'},
                     "homepage": {'type': 'string'},
-                    "death": {'type': 'string'}
+                    "death": {'type': ['string', 'null']}
                 }
             }}}
 
@@ -66,7 +66,7 @@ class objects_container(object):
         'type': 'object',
         'properties': {
             'translations': translation_object,
-            'actors': actor_object,
+            'actors': {'type': 'array', 'items': actor_object},
             'cached_at': {'type': 'string', 'format': 'date-time'},
             'genres': {'type': 'array', 'items': {'type': 'string'}},
             'id': {'type': 'integer'},
