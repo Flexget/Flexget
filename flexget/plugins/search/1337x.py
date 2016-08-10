@@ -94,7 +94,7 @@ class _1337x(object):
         for search_string in entry.get('search_strings', [entry['title']]):
 
             query = '{0}search/{1}{2}/1/'.format(sort_order,quote(search_string.encode('utf8')), order_by)
-            log.debug('Using search params: {0}; ordering by: {1}'.format(search_string, order_by or 'default'))
+            log.debug('Using search params: %s; ordering by: %s',search_string, order_by or 'default')
             try:
                 page = task.requests.get(self.base_url + query)
                 log.debug('requesting: %s', page.url)
