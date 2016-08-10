@@ -66,7 +66,7 @@ class objects_container(object):
         'type': 'object',
         'properties': {
             'translations': translation_object,
-            'actors': {'type': 'array', 'items': actor_object},
+            'actors': actor_object,
             'cached_at': {'type': 'string', 'format': 'date-time'},
             'genres': {'type': 'array', 'items': {'type': 'string'}},
             'id': {'type': 'integer'},
@@ -141,7 +141,7 @@ class TraktSeriesSearchApi(APIResource):
                     }, 404
         result = series.to_dict()
         if include_actors:
-            result["actors"] = list_actors(series.actors),
+            result["actors"] = list_actors(series.actors)
         if include_translations:
             result["translations"] = get_translations(series.translate)
         return jsonify(result)
