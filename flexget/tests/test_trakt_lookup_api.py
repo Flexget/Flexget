@@ -276,4 +276,23 @@ class TestTraktMovieLookupAPI(object):
         for field, value in values.items():
             assert data.get(field) == value
 
+    def test_trakt_movies_lookup_actors_params(self, api_client, schema_match):
+        rsp = api_client.get('/trakt/movies/the matrix/?include_actors=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(oc.movie_return_object, data)
+        assert not errors
+
+        values = {
+            'id': 481,
+            'title': 'The Matrix',
+            'year': 1999,
+            'tmdb_id': 603,
+            'imdb_id': 'tt0133093'
+        }
+        for field, value in values.items():
+            assert data.get(field) == value
+
+        assert 'actors' in data
+        assert len(data['actors']) > 0

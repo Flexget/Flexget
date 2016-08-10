@@ -44,26 +44,29 @@ class objects_container(object):
     }
 
     actor_object = {
-        'type': 'object',
-        'properties': {
-            "imdb_id": {'type': 'string'},
-            "name": {'type': 'string'},
-            "tmdb_id": {'type': 'integer'},
-            "trakt_id": {'type': 'integer'},
-            "images": images_object,
-            "trakt_slug": {'type': 'string'},
-            "birthday": {'type': 'string'},
-            "biography": {'type': 'string'},
-            "homepage": {'type': 'string'},
-            "death": {'type': 'string'}
-        }
-    }
+        "type": "object",
+        "patternProperties": {
+            "^[/d]$": {
+                'type': 'object',
+                'properties': {
+                    "imdb_id": {'type': 'string'},
+                    "name": {'type': 'string'},
+                    "tmdb_id": {'type': 'integer'},
+                    "trakt_id": {'type': 'integer'},
+                    "images": images_object,
+                    "trakt_slug": {'type': 'string'},
+                    "birthday": {'type': 'string'},
+                    "biography": {'type': 'string'},
+                    "homepage": {'type': 'string'},
+                    "death": {'type': 'string'}
+                }
+            }}}
 
     base_return_object = {
         'type': 'object',
         'properties': {
             'translations': translation_object,
-            'actors': {'type': 'array', 'items': actor_object},
+            'actors': actor_object,
             'cached_at': {'type': 'string', 'format': 'date-time'},
             'genres': {'type': 'array', 'items': {'type': 'string'}},
             'id': {'type': 'integer'},
