@@ -259,6 +259,8 @@ class InputPlex(object):
 
             e['plex_duration'] = node.getAttribute('duration')
             e['plex_summary'] = node.getAttribute('summary')
+            e['plex_userrating'] = node.getAttribute('userrating')
+            e['plex_key'] = node.getAttribute('ratingKey')
             count = node.getAttribute('viewCount')
             offset = node.getAttribute('viewOffset')
             if count:
