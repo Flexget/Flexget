@@ -7,21 +7,6 @@ from flexget.utils import json
 from flexget.plugins.api.trakt_lookup import objects_container as oc
 
 
-def check_trakt_fields(data, exact=None):
-    expected_fields = [
-        'air_day', 'air_time', 'first_aired', 'certification', 'country', 'genres', 'homepage',
-        'id', 'images', 'imdb_id', 'language', 'network', 'overview', 'runtime', 'slug', 'timezone',
-        'title', 'tmdb_id', 'tvdb_id', 'tvrage_id', 'year'
-    ]
-
-    for field in expected_fields:
-        assert field in data, 'Field %s didn\'t exist in data' % field
-
-    if exact:
-        for field, value in exact.items():
-            assert data.get(field) == value
-
-
 @pytest.mark.online
 class TestTraktSeriesLookupAPI(object):
     config = 'tasks: {}'
@@ -116,7 +101,7 @@ class TestTraktSeriesLookupAPI(object):
             assert data.get(field) == value
 
     def test_trakt_series_lookup_with_imdb_id_param(self, api_client):
-        exact_match = {
+        values = {
             'id': 60300,
             'imdb_id': 'tt3107288',
             'title': 'The Flash',
@@ -130,7 +115,8 @@ class TestTraktSeriesLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        check_trakt_fields(data, exact=exact_match)
+        for field, value in values.items():
+            assert data.get(field) == value
 
     def test_trakt_series_lookup_with_tvdb_id_param(self, api_client, schema_match):
         values = {
