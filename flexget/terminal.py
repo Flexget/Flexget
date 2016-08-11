@@ -13,6 +13,7 @@ from terminaltables.terminal_io import terminal_size
 if sys.platform == 'win32':
     Windows.enable(auto_colors=True)
 
+
 class TerminalTable(object):
     """A data table suited for CLI output, created via its sent parameters. For example::
 
@@ -106,17 +107,6 @@ table_parser.add_argument('--table-type', choices=list(TerminalTable.supported_t
                           help='Select output table style')
 table_parser.add_argument('--porcelain', dest='table_type', action='store_const', const='porcelain',
                           help='Make the output parseable. Similar to using `--table-type porcelain`')
-
-
-def colorize(text, color, auto=True):
-    """Helper function to color strings
-
-    :param text: Text to color
-    :param color: Color tag name
-    :param auto: Whether to add `auto` to tag or not to use autocolors
-    :return: Colorized string
-    """
-    return Color.colorize(color, text, auto)
 
 
 def word_wrap(text, max_length):

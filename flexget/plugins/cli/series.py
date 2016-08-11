@@ -2,13 +2,15 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import argparse
-from datetime import datetime, timedelta
+from datetime import timedelta
+from functools import partial
 
+from colorclass.color import Color
 from flexget import options, plugin
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, CLITableError, table_parser, colorize, word_wrap
+from flexget.terminal import TerminalTable, CLITableError, table_parser
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
@@ -26,6 +28,8 @@ BEHIND_EP_COLOR = 'red'
 UNDOWNLOADED_RELEASE_COLOR = 'black'
 DOWNLOADED_RELEASE_COLOR = 'white'
 ERROR_COLOR = 'red'
+
+colorize = partial(Color.colorize, auto=True)
 
 
 def do_cli(manager, options):
@@ -68,7 +72,7 @@ def display_summary(options):
         header = ['Name', 'Latest', 'Age', 'Downloaded', 'Identified By']
         for index, value in enumerate(header):
             if value.lower() == options.sort_by:
-                header[index] = colorize(value, SORT_COLUMN_COLOR)
+                header[index] = colorize(SORT_COLUMN_COLOR, value)
         footer = 'Use `flexget series show NAME` to get detailed information'
         table_data = [header]
         for series in query:
@@ -82,25 +86,23 @@ def display_summary(options):
             latest = get_latest_release(series)
             identifier_type = series.identified_by
             if identifier_type == 'auto':
-                identifier_type = colorize('auto', 'yellow')
+                identifier_type = colorize('yellow', 'auto')
             if latest:
-                if latest.first_seen > datetime.now() - timedelta(days=2):
-                    new_ep = True
                 behind = new_eps_after(latest)
                 latest_release = get_latest_status(latest)
                 # colorize age
                 age_col = latest.age
                 if latest.age_timedelta is not None:
                     if latest.age_timedelta < timedelta(days=1):
-                        age_col = colorize(latest.age, NEW_EP_COLOR)
+                        age_col = colorize(NEW_EP_COLOR, latest.age)
                     elif latest.age_timedelta < timedelta(days=3):
-                        age_col = colorize(latest.age, FRESH_EP_COLOR)
+                        age_col = colorize(FRESH_EP_COLOR, latest.age)
                     elif latest.age_timedelta > timedelta(days=400):
-                        age_col = colorize(latest.age, OLD_EP_COLOR)
+                        age_col = colorize(OLD_EP_COLOR, latest.age)
                 episode_id = latest.identifier
             if not porcelain:
                 if behind > 0:
-                    name_column += colorize(' {} behind'.format(behind), BEHIND_EP_COLOR)
+                    name_column += colorize(BEHIND_EP_COLOR, ' {} behind'.format(behind))
 
             table_data.append([name_column, episode_id, age_col, latest_release, identifier_type])
     table = TerminalTable(options.table_type, table_data, wrap_columns=[(3, 30)])
@@ -189,16 +191,16 @@ def display_details(options):
         # Sort by length of name, so that partial matches always show shortest matching title
         matches = shows_by_name(name, session=session)
         if not matches:
-            console(colorize('ERROR: Unknown series `%s`' % name, ERROR_COLOR))
+            console(colorize(ERROR_COLOR, 'ERROR: Unknown series `%s`' % name))
             return
         # Pick the best matching series
         series = matches[0]
-        table_title = colorize(series.name, 'white')
+        table_title = colorize('white', series.name)
         if len(matches) > 1:
-            warning = (colorize(' WARNING: ', 'red') +
-                'Multiple series match to `{}`.\n '
-                'Be more specific to see the results of other matches:\n\n'
-                ' {}'.format(name, ', '.join(s.name for s in matches[1:])))
+            warning = (colorize('red', ' WARNING: ') +
+                       'Multiple series match to `{}`.\n '
+                       'Be more specific to see the results of other matches:\n\n'
+                       ' {}'.format(name, ', '.join(s.name for s in matches[1:])))
             if not options.table_type == 'porcelain':
                 console(warning)
         header = ['Episode ID', 'Latest age', 'Release titles', 'Release Quality', 'Proper']
@@ -206,7 +208,7 @@ def display_details(options):
         episodes = show_episodes(series, session=session)
         for episode in episodes:
             if episode.identifier is None:
-                identifier = colorize('MISSING', ERROR_COLOR)
+                identifier = colorize(ERROR_COLOR, 'MISSING')
                 age = ''
             else:
                 identifier = episode.identifier
@@ -219,10 +221,10 @@ def display_details(options):
                 title = release.title
                 quality = release.quality.name
                 if not release.downloaded:
-                    title = colorize(title, UNDOWNLOADED_RELEASE_COLOR)
+                    title = colorize(UNDOWNLOADED_RELEASE_COLOR, title)
                     quality = quality
                 else:
-                    title = colorize(title, DOWNLOADED_RELEASE_COLOR)
+                    title = colorize(DOWNLOADED_RELEASE_COLOR, title)
                     quality = quality
                 release_titles.append(title)
                 release_qualities.append(quality)
@@ -231,8 +233,8 @@ def display_details(options):
             ep_data.append('\n'.join(release_qualities))
             ep_data.append('\n'.join(release_propers))
             table_data.append(ep_data)
-        footer = (' %s %s\n' % (colorize('Downloaded', DOWNLOADED_RELEASE_COLOR),
-                                colorize('Un-downloaded', UNDOWNLOADED_RELEASE_COLOR)))
+        footer = (' %s %s\n' % (colorize(DOWNLOADED_RELEASE_COLOR, 'Downloaded'),
+                                colorize(UNDOWNLOADED_RELEASE_COLOR, 'Un-downloaded')))
         if not series.identified_by:
             footer += ('\n'
                        ' Series plugin is still learning which episode numbering mode is \n'
