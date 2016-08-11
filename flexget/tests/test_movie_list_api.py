@@ -50,7 +50,8 @@ class TestMovieListAPI(object):
         errors = schema_match(OC.return_lists, data)
         assert not errors
 
-
+        for field, value in values.items():
+            assert data['movie_lists'][0].get(field) == value
 
     def test_movie_list_list_id(self, api_client, schema_match):
         payload = {'name': 'test'}
