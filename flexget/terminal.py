@@ -7,6 +7,7 @@ from textwrap import wrap
 from colorclass import Windows, Color, disable_all_colors
 from flexget.options import ArgumentParser
 from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable
+from terminaltables.terminal_io import terminal_size
 
 
 class TerminalTable(object):
@@ -47,7 +48,7 @@ class TerminalTable(object):
     def init_table(self):
         """Assigns self.table with the built table based on data."""
         self.table = self.build_table(self.type, self.table_data)
-        if not self.table.ok and not self.type == 'porcelain' and self.wrap_columns:
+        if not self.valid_table and not self.type == 'porcelain' and self.wrap_columns:
             self.table = self._wrap_table()
 
     def build_table(self, table_type, table_data):
@@ -74,6 +75,10 @@ class TerminalTable(object):
             'double': DoubleTable,
             'github': GithubFlavoredMarkdownTable
         }
+
+    @property
+    def valid_table(self):
+        return self.table.table_width <= terminal_size()[0]
 
     def _wrap_table(self):
         output_table = []

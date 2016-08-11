@@ -7,10 +7,12 @@ import string
 import threading
 
 import rpyc
-from rpyc.utils.server import ThreadedServer
 
+from flexget import terminal
 from flexget.logger import console, capture_output
 from flexget.options import get_parser
+from rpyc.utils.server import ThreadedServer
+from terminaltables.terminal_io import terminal_size
 
 log = logging.getLogger('ipc')
 
@@ -66,6 +68,7 @@ class DaemonService(rpyc.Service):
         return IPC_VERSION
 
     def exposed_handle_cli(self, args):
+        original_terminal_size = terminal.terminal_size
         args = rpyc.utils.classic.obtain(args)
         log.verbose('Running command `%s` for client.' % ' '.join(args))
         parser = get_parser()
@@ -76,11 +79,15 @@ class DaemonService(rpyc.Service):
                 # TODO: Not sure how to properly propagate the exit code back to client
                 log.debug('Parsing cli args caused system exit with status %s.' % e.code)
             return
-        if not options.cron:
-            with capture_output(self.client_out_stream, loglevel=options.loglevel):
+        try:
+            terminal.terminal_size = self._conn.root.terminal_size
+            if not options.cron:
+                with capture_output(self.client_out_stream, loglevel=options.loglevel):
+                    self.manager.handle_cli(options)
+            else:
                 self.manager.handle_cli(options)
-        else:
-            self.manager.handle_cli(options)
+        finally:
+            terminal.terminal_size = original_terminal_size
 
     def client_console(self, text):
         self._conn.root.console(text)
@@ -91,7 +98,6 @@ class DaemonService(rpyc.Service):
 
 
 class ClientService(rpyc.Service):
-
     def on_connect(self):
         """Make sure the client version matches our own."""
         daemon_version = self._conn.root.version()
@@ -105,9 +111,11 @@ class ClientService(rpyc.Service):
     def exposed_console(self, text, *args, **kwargs):
         console(text, *args, **kwargs)
 
+    def exposed_terminal_size(self, *args):
+        return terminal_size(*args)
+
 
 class IPCServer(threading.Thread):
-
     def __init__(self, manager, port=None):
         super(IPCServer, self).__init__(name='ipc_server')
         self.daemon = True
@@ -146,7 +154,6 @@ class IPCServer(threading.Thread):
 
 
 class IPCClient(object):
-
     def __init__(self, port, password):
         channel = rpyc.Channel(rpyc.SocketStream.connect('127.0.0.1', port))
         channel.send(password.encode('utf-8'))
