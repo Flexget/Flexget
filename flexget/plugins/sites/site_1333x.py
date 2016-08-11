@@ -11,11 +11,11 @@ from flexget.event import event
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability
-from flexget.plugins.plugin_urlrewriting import UrlRewritingError
+from flexget.plugins.internal.urlrewriting import UrlRewritingError
 
 log = logging.getLogger('1337x')
 
-class _1337x(object):
+class Site1337x(object):
     """
         1337x search plugin.
     """
@@ -135,4 +135,4 @@ class _1337x(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(_1337x, '1337x', groups=['urlrewriter','search'], api_ver=2)
+    plugin.register(Site1337x, '1337x', groups=['urlrewriter','search'], api_ver=2)

@@ -45,3 +45,4 @@ npm-debug.log
 .cache/
 *.yml
 *.sqlite
+node_modules/
