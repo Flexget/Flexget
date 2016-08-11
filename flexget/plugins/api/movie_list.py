@@ -94,8 +94,13 @@ class ObjectsContainer(object):
         }
     }
 
+    return_lists = {
+        'type': 'object',
+        'properties': {
+            'movie_lists': {'type': 'array', 'items': list_object}
+        }
+    }
 
-return_lists = {'type': 'array', 'items': ObjectsContainer.list_object}
 
 input_movie_entry_schema = api.schema('input_movie_entry', ObjectsContainer.input_movie_entry)
 input_movie_list_id_schema = api.schema('input_movie_list_id_object', ObjectsContainer.input_movie_list_id_object)
@@ -103,7 +108,7 @@ input_movie_list_id_schema = api.schema('input_movie_list_id_object', ObjectsCon
 movie_list_id_object_schema = api.schema('movie_list_id_object', ObjectsContainer.return_movie_list_id_object)
 movie_list_object_schema = api.schema('movie_list_object', ObjectsContainer.movie_list_object)
 list_object_schema = api.schema('list_object', ObjectsContainer.list_object)
-return_lists_schema = api.schema('return_lists', return_lists)
+return_lists_schema = api.schema('return_lists', ObjectsContainer.return_lists)
 return_movies_schema = api.schema('return_movies', ObjectsContainer.return_movies)
 
 new_list_schema = api.schema('new_list', ObjectsContainer.list_input)
