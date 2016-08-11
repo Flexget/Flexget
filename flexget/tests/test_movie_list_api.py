@@ -3,6 +3,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget.utils import json
 
+from flexget.api import empty_response
 from flexget.plugins.api.movie_list import ObjectsContainer as OC
 
 
@@ -73,10 +74,23 @@ class TestMovieListAPI(object):
         # Get list
         rsp = api_client.get('/movie_list/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(OC.list_object, data)
+        assert not errors
+
+        values = {
+            'name': 'test',
+            'id': 1
+        }
+        for field, value in values.items():
+            assert data.get(field) == value
 
         # Delete list
         rsp = api_client.delete('/movie_list/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(empty_response, data)
+        assert not errors
 
     def test_movie_list_movies(self, api_client):
         # Get non existent list
