@@ -9,6 +9,9 @@ from flexget.options import ArgumentParser
 from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable
 from terminaltables.terminal_io import terminal_size
 
+# Enable terminal colors on windows
+if sys.platform == 'win32':
+    Windows.enable(auto_colors=True)
 
 class TerminalTable(object):
     """A data table suited for CLI output, created via its sent parameters. For example::
@@ -113,8 +116,6 @@ def colorize(text, color, auto=True):
     :param auto: Whether to add `auto` to tag or not to use autocolors
     :return: Colorized string
     """
-    if sys.platform == 'win32':
-        Windows.enable(auto_colors=True)
     return Color.colorize(color, text, auto)
 
 

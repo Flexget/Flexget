@@ -68,6 +68,7 @@ class DaemonService(rpyc.Service):
         return IPC_VERSION
 
     def exposed_handle_cli(self, args):
+        # Saving original terminal size to restore after monkeypatch
         original_terminal_size = terminal.terminal_size
         args = rpyc.utils.classic.obtain(args)
         log.verbose('Running command `%s` for client.' % ' '.join(args))
@@ -80,6 +81,7 @@ class DaemonService(rpyc.Service):
                 log.debug('Parsing cli args caused system exit with status %s.' % e.code)
             return
         try:
+            # Monkeypatching terminal_size so it'll work using IPC
             terminal.terminal_size = self._conn.root.terminal_size
             if not options.cron:
                 with capture_output(self.client_out_stream, loglevel=options.loglevel):
@@ -87,6 +89,7 @@ class DaemonService(rpyc.Service):
             else:
                 self.manager.handle_cli(options)
         finally:
+            # Restoring original terminal_size value
             terminal.terminal_size = original_terminal_size
 
     def client_console(self, text):
