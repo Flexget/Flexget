@@ -268,6 +268,14 @@ class ValidationError(ApiError):
         return error_dict
 
 empty_response = api.schema('empty', {'type': 'object'})
+default_error_schema = {
+        'type': 'object',
+        'properties': {
+            'status': {'type': 'string'},
+            'message': {'type': 'string'}
+        }
+    }
+default_error_schema = api.schema('default_error_schema', default_error_schema)
 
 
 @api.errorhandler(ApiError)
