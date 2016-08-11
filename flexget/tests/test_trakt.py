@@ -148,25 +148,8 @@ class TestTraktShowLookup(object):
 
     def test_lookup_actors(self, execute_task):
         task = execute_task('test')
-        actors = ['Hugh Laurie',
-                  'Jesse Spencer',
-                  'Jennifer Morrison',
-                  'Omar Epps',
-                  'Robert Sean Leonard',
-                  'Peter Jacobson',
-                  'Olivia Wilde',
-                  'Odette Annable',
-                  'Charlyne Yi',
-                  'Anne Dudek',
-                  'Kal Penn',
-                  'Jennifer Crystal Foley',
-                  'Bobbin Bergstrom',
-                  'Patrick Bradford']
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
-        trakt_actors = list(entry['trakt_actors'].values())
-        trakt_actors = [trakt_actor['name'] for trakt_actor in trakt_actors]
         assert entry['series_name'] == 'House', 'series lookup failed'
-        assert set(trakt_actors) == set(actors), 'looking up actors for %s failed' % entry.get('title')
         assert entry['trakt_actors']['297390']['name'] == 'Hugh Laurie', 'trakt id mapping failed'
         assert entry['trakt_actors']['297390']['imdb_id'] == 'nm0491402', 'fetching imdb id for actor failed'
         assert entry['trakt_actors']['297390']['tmdb_id'] == '41419', 'fetching tmdb id for actor failed'
