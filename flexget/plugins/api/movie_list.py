@@ -32,18 +32,12 @@ class ObjectsContainer(object):
     input_movie_entry = {
         'type': 'object',
         'properties': {
-            'title': {'type': 'string'},
-            'original_url': {'type': 'string'},
             'movie_name': {'type': 'string'},
             'movie_year': {'type': 'integer'},
             'movie_identifiers': input_movie_list_id_object
         },
         'additionalProperties': True,
-        'required': ['original_url'],
-        'anyOf': [
-            {'required': ['title']},
-            {'required': ['movie_name', 'movie_year']}
-        ]
+        'required': ['movie_name'],
     }
 
     return_movie_list_id_object = copy.deepcopy(input_movie_list_id_object)
