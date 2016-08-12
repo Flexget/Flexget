@@ -3,7 +3,6 @@ from future.moves.urllib.parse import quote
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
-import re
 
 from flexget import plugin
 from flexget.entry import Entry
