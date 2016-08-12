@@ -542,6 +542,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
         if entry['url'].startswith('magnet:'):
             torrent_raw = 'd10:magnet-uri%d:%se' % (len(entry['url']), entry['url'])
+            torrent_raw = str.encode(torrent_raw)
         else:
             # Check that file is downloaded
             if 'file' not in entry:
