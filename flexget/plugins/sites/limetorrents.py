@@ -10,13 +10,13 @@ from flexget.event import event
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability
-from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 
-log = logging.getLogger('limetorrents')
+log = logging.getLogger('Limetorrents')
 
-class limetorrents(object):
+
+class Limetorrents(object):
     """
-        limetorrents search plugin.
+        Limetorrents search plugin.
     """
 
     schema = {
@@ -40,7 +40,7 @@ class limetorrents(object):
     @plugin.internet(log)
     def search(self, task, entry, config):
         """
-            Search for entries on limetorents
+            Search for entries on Limetorrents
         """
 
         if not isinstance(config, dict):
@@ -110,4 +110,4 @@ class limetorrents(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(limetorrents, 'limetorrents', groups=['search'], api_ver=2)
+    plugin.register(Limetorrents, 'limetorrents', groups=['search'], api_ver=2)
