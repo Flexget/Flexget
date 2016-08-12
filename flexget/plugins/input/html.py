@@ -199,6 +199,7 @@ class InputHtml(object):
                     if re.search(regexp, url):
                         accept = True
                 if not accept:
+                    log.debug('url does not match any "links_re": %s' % url)
                     continue
 
             title_from = config.get('title_from', 'auto')
