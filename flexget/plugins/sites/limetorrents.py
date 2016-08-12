@@ -36,7 +36,6 @@ class Limetorrents(object):
     base_url = 'https://www.limetorrents.cc/'
     errors = False
 
-
     @plugin.internet(log)
     def search(self, task, entry, config):
         """
