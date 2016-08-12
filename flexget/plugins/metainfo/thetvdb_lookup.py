@@ -50,7 +50,7 @@ class PluginThetvdbLookup(object):
       tvdb_ep_air_date
       tvdb_ep_rating
       tvdb_ep_guest_stars
-      tvdb_ep_image_url
+      tvdb_ep_image
     """
 
     # Series info
