@@ -88,7 +88,7 @@ class ImdbEntrySet(MutableSet):
         self.config = config
         self._session = RequestSession()
         self._session.add_domain_limiter(TimedLimiter('imdb.com', '5 seconds'))
-        self._session.headers = {'Accept-Language': config.get('force_language', 'en-us')}
+        self._session.headers.update( {'Accept-Language': config.get('force_language', 'en-us')} )
         self.user_id = None
         self.list_id = None
         self.cookies = None
@@ -117,13 +117,14 @@ class ImdbEntrySet(MutableSet):
                     cached_credentials = True
             if not cached_credentials:
                 log.debug('user credentials not found in cache or outdated, fetching from IMDB')
+                url_credentials = ( 'https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
+                    'handler&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&'
+                    'openid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%'
+                    '2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.ope'
+                    'nid.net%2Fauth%2F2.0'
+                )
                 try:
-                    r = self._session.get(
-                        'https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
-                        'handler&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&'
-                        'openid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%'
-                        '2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.ope'
-                        'nid.net%2Fauth%2F2.0')
+                    r = self._session.get(url_credentials)
                 except RequestException as e:
                     raise PluginError(e.args[0])
                 soup = get_soup(r.content)
@@ -131,8 +132,11 @@ class ImdbEntrySet(MutableSet):
                 data = dict((i['name'], i.get('value')) for i in inputs if i.get('name'))
                 data['email'] = self.config['login']
                 data['password'] = self.config['password']
+                action = soup.find('form', id='ap_signin_form').get('action')
                 log.debug('email=%s, password=%s', data['email'], data['password'])
-                d = self._session.post('https://www.imdb.com/ap/signin', data=data)
+                self._session.headers.update({'Referer':url_credentials})
+                d = self._session.post(action, data=data)
+                self._session.headers.update({'Referer':'http://www.imdb.com/'})
                 # Get user id by extracting from redirect url
                 r = self._session.head('http://www.imdb.com/profile', allow_redirects=False)
                 if not r.headers.get('location') or 'login' in r.headers['location']:
