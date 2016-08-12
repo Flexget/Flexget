@@ -6,7 +6,7 @@ import os
 import re
 import threading
 import logging
-from xml.etree.ElementTree import fromstring
+from xml.etree.ElementTree import fromstring, parse
 import io
 from uuid import uuid4
 import time
@@ -241,13 +241,12 @@ class IRCConnection(IRCBot):
         :param path: path to .tracker file
         :return: the parsed XML
         """
-        with io.open(path, 'r') as f:
-            try:
-                tracker_config = fromstring(f.read())
-            except Exception as e:
-                raise TrackerFileParseError('Unable to parse tracker config file %s: %s' % (path, e))
-            else:
-                return tracker_config
+        try:
+            tracker_config = parse(path).getroot()
+        except Exception as e:
+            raise TrackerFileParseError('Unable to parse tracker config file %s: %s' % (path, e))
+        else:
+            return tracker_config
 
     @classmethod
     def retrieve_tracker_config(cls, tracker_config_file):
