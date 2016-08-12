@@ -255,30 +255,75 @@ class IRCConnection(IRCBot):
         :param tracker_config_file: URL or path to .tracker file
         :return: parsed XML
         """
-        tracker_config_file = os.path.expanduser(tracker_config_file)
+        base_url = 'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/'
+
+        # First we attempt to find the file locally as-is
         if os.path.exists(tracker_config_file):
+            log.debug('Found tracker file: %s', tracker_config_file)
             return cls.read_tracker_config(tracker_config_file)
-        elif re.match('^(?![\\\/]).+\.tracker$', tracker_config_file):
-            tracker_basepath = os.path.abspath(os.path.join(manager.config_base, 'trackers'))
-            save_path = os.path.join(tracker_basepath, tracker_config_file)
-            if not os.path.exists(tracker_basepath):
-                try:
-                    os.mkdir(tracker_basepath)
-                except IOError as e:
-                    raise TrackerFileError(e)
-            if not os.path.exists(save_path):
-                log.info('Tracker file not found on disk. Attempting to fetch tracker config file from Github.')
-                url = 'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/' + tracker_config_file
-                try:
-                    r = requests.get(url)
-                    with io.open(save_path, 'wb') as tracker_file:
-                        for chunk in r.iter_content(8192):
-                            tracker_file.write(chunk)
-                except (requests.RequestException, IOError) as e:
-                    raise TrackerFileError(e)
-            return cls.read_tracker_config(save_path)
+
+        tracker_config_file = os.path.expanduser(tracker_config_file)
+        if not tracker_config_file.endswith('.tracker'):
+            tracker_config_file += '.tracker'
+
+            # Maybe the file is missing extension?
+            if os.path.exists(tracker_config_file):
+                log.debug('Found tracker file: %s', tracker_config_file)
+                return cls.read_tracker_config(tracker_config_file.rsplit('.tracker')[0])
+
+        # Check that containing dir exists, otherwise default to flexget_config_dir/trackers
+        if os.path.exists(os.path.dirname(tracker_config_file)):
+            base_dir = os.path.dirname(tracker_config_file)
         else:
-            raise TrackerFileError('Unable to open tracker config file %s', tracker_config_file)
+            base_dir = os.path.abspath(os.path.join(manager.config_base, 'trackers'))
+        # Find the filenames for easy use later
+        tracker_name = os.path.basename(tracker_config_file)
+        tracker_name_no_ext = os.path.splitext(tracker_name)[0]
+        # One last try with case insensitive search!
+        if os.path.exists(base_dir):
+            files = os.listdir(base_dir)
+            for f in files:
+                if tracker_name_no_ext in f.lower():
+                    found_path = os.path.join(base_dir, f)
+                    log.debug('Found tracker file: %s', found_path)
+                    return cls.read_tracker_config(found_path)
+
+        # Download from Github instead
+        if not os.path.exists(base_dir):  # will only try to create the default `trackers` dir
+            try:
+                os.mkdir(base_dir)
+            except IOError as e:
+                raise TrackerFileError(e)
+        log.info('Tracker file not found on disk. Attempting to fetch tracker config file from Github.')
+        tracker = None
+        try:
+            tracker = requests.get(base_url + tracker_config_file)
+        except (requests.RequestException, IOError):
+            pass
+        if not tracker:
+            try:
+                log.debug('Trying to search list of tracker files on Github')
+                # Try to see if it's not found due to case sensitivity
+                trackers = requests.get('https://api.github.com/repos/autodl-community/'
+                                        'autodl-trackers/git/trees/master?recursive=1').json().get('tree', [])
+                for tracker in trackers:
+                    name = tracker.get('path', '')
+                    if not name.endswith('.tracker') or name.lower() != tracker_name.lower():
+                        continue
+                    tracker = requests.get(base_url + name)
+                    tracker_name = name
+                    break
+            except (requests.RequestException, IOError) as e:
+                raise TrackerFileError(e)
+        if not tracker:
+            raise TrackerFileError('Unable to find %s on disk or Github' % tracker_config_file)
+
+        # If we got this far, let's save our work :)
+        save_path = os.path.join(base_dir, tracker_name)
+        with io.open(save_path, 'wb') as tracker_file:
+            for chunk in tracker.iter_content(8192):
+                tracker_file.write(chunk)
+        return cls.read_tracker_config(save_path)
 
     def is_alive(self):
         return self.thread and self.thread.is_alive()
