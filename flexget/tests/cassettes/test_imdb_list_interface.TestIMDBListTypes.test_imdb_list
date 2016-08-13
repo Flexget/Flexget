@@ -264,7 +264,7 @@ interactions:
       Content-Type: [application/x-www-form-urlencoded]
       Cookie: [session-id=166-1066870-6775531; session-id-time=2100087888l]
     method: POST
-    uri: https://www.imdb.com/ap/signin
+    uri: https://www.imdb.com/ap/signin/166-1066870-6775531?ie=UTF8&pf_rd_r=1P284FWD1YWTTE42RGG8&pf_rd_m=A2A1PIL045UJ9G&pf_rd_t=6301&pf_rd_i=imdb_mobile_us&pf_rd_p=2187562082&pf_rd_s=mobile-signin-slot
   response:
     body: {string: !!python/unicode ''}
     headers:
