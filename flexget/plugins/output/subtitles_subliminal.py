@@ -15,7 +15,7 @@ log = logging.getLogger('subtitles')
 try:
     from subliminal.extensions import provider_manager
     PROVIDERS = provider_manager.names()
-except ImportError as e:
+except ImportError:
     PROVIDERS = [
         'opensubtitles',
         'thesubdb',
@@ -99,7 +99,8 @@ class PluginSubliminal(object):
                 hearing_impaired: Prefer subtitles for the hearing impaired when available
                 authentication: >
                   Dictionary of configuration options for different providers.
-                  Keys correspond to provider names, and values are dictionaries, usually specifying `username` and `password`.
+                  Keys correspond to provider names, and values are dictionaries, usually specifying `username` and
+                  `password`.
         """
         if not task.accepted:
             log.debug('nothing accepted, aborting')
@@ -189,8 +190,8 @@ class PluginSubliminal(object):
                             log.info('Subtitles found for %s', entry['location'])
                         else:
                             # only try to download for alternatives that aren't alread downloaded
-                            subtitles = provider_pool.download_best_subtitles(all_subtitles, video, alternative_languages,
-                                                                              min_score=msc,
+                            subtitles = provider_pool.download_best_subtitles(all_subtitles, video,
+                                                                              alternative_languages, min_score=msc,
                                                                               hearing_impaired=hearing_impaired)
 
                             if subtitles:
