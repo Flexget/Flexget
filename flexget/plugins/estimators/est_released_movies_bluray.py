@@ -34,7 +34,6 @@ class EstimatesMoviesBluray(object):
         if movie and movie.release_date:
             log.debug('received release date: {0}'.format(movie.release_date))
             return movie.release_date
-        return
 
 
 @event('plugin.register')
