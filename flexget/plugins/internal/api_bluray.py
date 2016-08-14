@@ -29,13 +29,6 @@ Base.register_table(genres_table)
 BASE_URL = 'http://m.blu-ray.com/'
 
 
-@db_schema.upgrade('api_bluray')
-def upgrade(ver, session):
-    if ver is None:
-        raise db_schema.UpgradeImpossible
-    return ver
-
-
 def bluray_request(endpoint, **params):
     full_url = BASE_URL + endpoint
     return requests.get(full_url, params=params).json()
@@ -162,11 +155,6 @@ class BluraySearchResult(Base):
 
 class ApiBluray(object):
     """Does lookups to Blu-ray.com and provides movie information. Caches lookups."""
-
-    @staticmethod
-    def estimate_release(title, year=None, session=None):
-        #releasetimestampdesc
-        pass
 
     @staticmethod
     def lookup(title=None, year=None, only_cached=False, session=None):
