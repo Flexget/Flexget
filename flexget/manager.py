@@ -205,6 +205,8 @@ class Manager(object):
 
         if db_schema.upgrade_required():
             log.info('Database upgrade is required. Attempting now.')
+            if self.options.backup_db:
+                fire_event('manager.backup_db', self)
             fire_event('manager.upgrade', self)
             if manager.db_upgraded:
                 fire_event('manager.db_upgraded', self)
