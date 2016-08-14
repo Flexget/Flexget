@@ -23,7 +23,7 @@ Base = db_schema.versioned_base('api_bluray', 0)
 # association tables
 genres_table = Table('bluray_movie_genres', Base.metadata,
                      Column('movie_id', Integer, ForeignKey('bluray_movies.id')),
-                     Column('genre_id', Integer, ForeignKey('bluray_genres.id')))
+                     Column('genre_name', Integer, ForeignKey('bluray_genres.name')))
 Base.register_table(genres_table)
 
 BASE_URL = 'http://m.blu-ray.com/'
@@ -38,11 +38,6 @@ def upgrade(ver, session):
 
 def bluray_request(endpoint, **params):
     full_url = BASE_URL + endpoint
-    cookies = {
-        'country': 'all',
-        'listlayout_7': 'full',
-        'search_section': 'bluraymovies'
-    }
     return requests.get(full_url, params=params).json()
 
 
@@ -148,8 +143,7 @@ class BlurayMovie(Base):
 class BlurayGenre(Base):
     __tablename__ = 'bluray_genres'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(Unicode, nullable=False)
+    name = Column(Unicode, primary_key=True, nullable=False)
 
 
 class BluraySearchResult(Base):
@@ -186,21 +180,20 @@ class ApiBluray(object):
             movie_filter = movie_filter.filter(BlurayMovie.year == year)
         movie = movie_filter.first()
         if not movie:
-            search_string = title + ' ({})'.format(year) if year else ''
             found = session.query(BluraySearchResult). \
-                filter(BluraySearchResult.search == search_string.lower()).first()
+                filter(BluraySearchResult.search == title_year.lower()).first()
             if found and found.movie:
                 movie = found.movie
 
         if movie:
             # Movie found in cache, check if cache has expired. Shamefully stolen from api_tmdb
             refresh_time = timedelta(days=2)
-            if movie.released:
-                if movie.released > datetime.now() - timedelta(days=7):
+            if movie.release_date:
+                if movie.release_date > datetime.now() - timedelta(days=7):
                     # Movie is less than a week old, expire after 1 day
                     refresh_time = timedelta(days=1)
                 else:
-                    age_in_years = (datetime.now() - movie.released).days / 365
+                    age_in_years = (datetime.now() - movie.release_date).days / 365
                     refresh_time += timedelta(days=age_in_years * 5)
             if movie.updated < datetime.now() - refresh_time and not only_cached:
                 log.debug('Cache has expired for %s, attempting to refresh from blu-ray.com.', movie.name)
@@ -224,7 +217,7 @@ class ApiBluray(object):
 
             # Add to search results table if necessary
             if title.lower() != movie.name.lower():
-                session.add(BluraySearchResult(search=title.lower(), movie_id=movie.id))
+                session.add(BluraySearchResult(search=title_year.lower(), movie_id=movie.id))
 
             session.merge(movie)
 
