@@ -10,7 +10,7 @@ from flexget.plugin import get_plugin_by_name
 from flexget.utils.tools import split_title_year
 from flexget.utils.log import log_once
 
-log = logging.getLogger('tmdb_lookup')
+log = logging.getLogger('bluray_lookup')
 
 
 class PluginBlurayLookup(object):

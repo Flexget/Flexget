@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta
 import time
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, DateTime, func
+from sqlalchemy import Table, Column, Integer, Float, Unicode, DateTime, Date, func
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
@@ -47,8 +47,7 @@ class BlurayMovie(Base):
     id = Column(Integer, primary_key=True, autoincrement=False, nullable=False)
     name = Column(Unicode)
     url = Column(Unicode)
-    _release_date = Column('release_date', DateTime)
-    release_date = text_date_synonym('_release_date')
+    release_date = Column(Date)
     year = year_property('release_date')
     runtime = Column(Integer)
     overview = Column(Unicode)
@@ -97,7 +96,7 @@ class BlurayMovie(Base):
                 if c['c'].lower() == country_code:
                     country = c['n']
             self.country = country
-            self.release_date = dateutil_parse(result['reldate'])
+            self.release_date = dateutil_parse(result['reldate']).date()
             self.bluray_rating = int(result['rating']) if result['rating'] else None
 
             # Used for parsing some more data, sadly with soup
@@ -189,7 +188,7 @@ class ApiBluray(object):
             # Movie found in cache, check if cache has expired. Shamefully stolen from api_tmdb
             refresh_time = timedelta(days=2)
             if movie.release_date:
-                if movie.release_date > datetime.now() - timedelta(days=7):
+                if movie.release_date > datetime.now().date() - timedelta(days=7):
                     # Movie is less than a week old, expire after 1 day
                     refresh_time = timedelta(days=1)
                 else:
