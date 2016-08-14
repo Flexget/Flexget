@@ -14,7 +14,6 @@ from dateutil.parser import parse as dateutil_parse
 from flexget import db_schema, plugin
 from flexget.utils.soup import get_soup
 from flexget.event import event
-from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, year_property
 
@@ -28,6 +27,13 @@ genres_table = Table('bluray_movie_genres', Base.metadata,
 Base.register_table(genres_table)
 
 BASE_URL = 'http://m.blu-ray.com/'
+
+
+@db_schema.upgrade('api_bluray')
+def upgrade(ver, session):
+    if ver is None:
+        raise db_schema.UpgradeImpossible
+    return ver
 
 
 def bluray_request(endpoint, **params):
@@ -48,11 +54,9 @@ class BlurayMovie(Base):
     url = Column(Unicode)
     _release_date = Column('release_date', DateTime)
     release_date = text_date_synonym('_release_date')
-    url = Column(Unicode)
-    year = year_property('released')
+    year = year_property('release_date')
     runtime = Column(Integer)
     overview = Column(Unicode)
-    language = Column(Unicode)
     country = Column(Unicode)
     studio = Column(Unicode)
     rating = Column(Float)
@@ -84,8 +88,12 @@ class BlurayMovie(Base):
 
         # Simply take the first result unless year does not match
         for result in search_results:
-            self.id = result['url'].split('/')[-1]
+            if year and str(year) != result['year']:
+                continue
+
+            self.id = int(result['url'].split('/')[-2])
             self.name = result['title']
+
             flag = result['flag']
             country_code = flag.split('/')[-1].split('.')[0].lower()  # eg. http://some/url/UK.png -> uk
             # find country based on flag url, default United States
@@ -103,6 +111,18 @@ class BlurayMovie(Base):
             movie_info_response = requests.get(self.url).content
 
             movie_info = get_soup(movie_info_response)
+
+            # runtime and rating, should be the last span tag with class subheading
+            bluray_info = movie_info.find('div', attrs={'class': 'bluray'})
+            bluray_info = bluray_info.find_all('span', attrs={'class': 'subheading'})[-1].text.split('|')
+
+            self.studio = bluray_info[0].strip()
+
+            for info in bluray_info[1:]:
+                if 'min' in info:
+                    self.runtime = int(info.replace('min', '').strip())
+                elif 'Rated' in info:
+                    self.certification = info.replace('Rated', '').strip()
 
             # rating col
             self.rating = float(movie_info.find('div', id='ratingscore').text.strip())
@@ -128,7 +148,7 @@ class BlurayMovie(Base):
 class BlurayGenre(Base):
     __tablename__ = 'bluray_genres'
 
-    id = Column(Integer, primary_key=True, autoincrement=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(Unicode, nullable=False)
 
 
@@ -201,11 +221,12 @@ class ApiBluray(object):
 
             # Add/merge movie to db
             movie = BlurayMovie(title=title, year=year)
-            session.merge(movie)
 
             # Add to search results table if necessary
             if title.lower() != movie.name.lower():
-                session.add(BluraySearchResult(search=title.lower(), movie_id=movie.id, movie=movie))
+                session.add(BluraySearchResult(search=title.lower(), movie_id=movie.id))
+
+            session.merge(movie)
 
             if not movie:
                 raise LookupError('Unable to find movie on blu-ray: {}'.format(title_year))
@@ -215,4 +236,4 @@ class ApiBluray(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(BlurayMovie, 'api_bluray', api_ver=2)
+    plugin.register(ApiBluray, 'api_bluray', api_ver=2)

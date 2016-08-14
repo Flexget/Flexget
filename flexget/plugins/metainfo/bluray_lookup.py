@@ -26,7 +26,8 @@ class PluginBlurayLookup(object):
         'bluray_year': 'year',
         'bluray_disc_rating': 'bluray_rating',
         'bluray_rating': 'rating',
-        # Make sure we don't stor the db association proxy directly on the entry
+        'bluray_studio': 'studio',
+        # Make sure we don't store the db association proxy directly on the entry
         'bluray_genres': lambda movie: list(movie.genres),
         'bluray_released': 'release_date',
         'bluray_certification': 'certification',
@@ -34,7 +35,8 @@ class PluginBlurayLookup(object):
         'bluray_url': 'url',
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'name',
-        'movie_year': 'year'}
+        'movie_year': 'year'
+    }
 
     schema = {'type': 'boolean'}
 
