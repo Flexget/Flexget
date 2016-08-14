@@ -180,7 +180,7 @@ class ApiBluray(object):
                     # Movie is less than a week old, expire after 1 day
                     refresh_time = timedelta(days=1)
                 else:
-                    age_in_years = (datetime.now() - movie.release_date).days / 365
+                    age_in_years = (datetime.now().date() - movie.release_date).days / 365
                     refresh_time += timedelta(days=age_in_years * 5)
             if movie.updated < datetime.now() - refresh_time and not only_cached:
                 log.debug('Cache has expired for %s, attempting to refresh from blu-ray.com.', movie.name)
