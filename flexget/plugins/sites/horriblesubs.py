@@ -7,6 +7,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
+from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('horriblesubs')
@@ -21,8 +22,13 @@ class HorribleSubs(object):
     @staticmethod
     def horrible_entries(requests, page_url):
         entries = []
-        soup = get_soup(requests.get(page_url).content)
-        
+
+        try:
+            soup = get_soup(requests.get(page_url).content)
+            log.debug('requesting: %s', page_url)
+        except RequestException as e:
+            log.error('HorribleSubs request failed: %s', e)
+
         for td_label in soup.findAll('td', attrs={'class': 'dl-label'}):
             title = '[HorribleSubs] {0}'.format(str(td_label.find('i').string))
             urls = []
