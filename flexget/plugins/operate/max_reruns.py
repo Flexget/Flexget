@@ -16,18 +16,13 @@ class MaxReRuns(object):
     schema = {'type': 'integer'}
 
     def __init__(self):
-        self.default = Task.max_reruns
+        self.default = Task.RERUN_DEFAULT
 
     def on_task_start(self, task, config):
         self.default = task.max_reruns
         task.max_reruns = int(config)
+        task.lock_reruns()
         log.debug('changing max task rerun variable to: %s' % config)
-
-    def on_task_exit(self, task, config):
-        log.debug('restoring max task rerun variable to: %s' % self.default)
-        task.max_reruns = self.default
-
-    on_task_abort = on_task_exit
 
 
 @event('plugin.register')

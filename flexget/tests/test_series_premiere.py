@@ -64,7 +64,7 @@ class TestSeriesPremiere(object):
               - title: theshow s01e01
               - title: theshow s01e02
             series_premiere: yes
-            rerun: yes
+            rerun: 0
           test_no_configured_1:
             series:
             - explicit show

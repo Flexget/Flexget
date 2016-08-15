@@ -187,6 +187,10 @@ class NextSeriesEpisodes(object):
                                                             entry['series_season'],
                                                             entry['series_episode'] + 1,
                                                             task))
+                # Increase rerun limit by one if we have matches, this way
+                # we keep searching as long as matches are found!
+                # TODO: this should ideally be in discover so it would be more generic
+                task.max_reruns += 1
                 task.rerun(plugin='next_series_episodes', reason='Look for next episode')
             elif db_release:
                 # There are know releases of this episode, but none were accepted
