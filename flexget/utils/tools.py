@@ -438,11 +438,11 @@ def data_size_to_bytes(size, base2=False):
     else:
         split = 1000 ** 2
 
-    if size.split()[1] == 'GB' or size.split()[1 == "GiB"]:
+    if size.split()[1] == 'GB' or size.split()[1] == "GiB":
         size = int(float(size.split()[0].replace(',', '')) * 1000 ** 3 / split)
-    elif size.split()[1] == 'MB' or size.split()[1 == "MiB"]:
+    elif size.split()[1] == 'MB' or size.split()[1] == "MiB":
         size = int(float(size.split()[0].replace(',', '')) * 1000 ** 2 / split)
-    elif size.split()[1] == 'KB' or size.split()[1 == "KiB"]:
+    elif size.split()[1] == 'KB' or size.split()[1] == "KiB":
         size = int(float(size.split()[0].replace(',', '')) * 1000 / split)
     else:
         size = int(float(size.split()[0].replace(',', '')) / split)
