@@ -15,7 +15,7 @@ from flexget import db_schema, plugin
 from flexget.utils.soup import get_soup
 from flexget.event import event
 from flexget.utils import requests
-from flexget.utils.database import text_date_synonym, year_property
+from flexget.utils.database import year_property
 
 log = logging.getLogger('api_bluray')
 Base = db_schema.versioned_base('api_bluray', 0)
