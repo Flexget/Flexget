@@ -75,6 +75,7 @@ def build_webui():
     for folder in ['bower_components' 'node_modules']:
         folder = os.path.join(cwd, folder)
         if os.path.exists(folder):
+            click.echo('Deleting recursively {}'.format(folder))
             shutil.rmtree(folder)
 
     # Install npm packages
