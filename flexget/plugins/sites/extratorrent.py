@@ -10,7 +10,6 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.search import normalize_unicode
-from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('extratorrent')
 
