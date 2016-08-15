@@ -284,7 +284,7 @@ class Discover(object):
         # TODO: the entries that are estimated should be given priority over expiration
         entries = self.interval_expired(config, task, entries)
         estimation_mode = config['release_estimations']
-        if estimation_mode != 'ignore':
+        if estimation_mode['mode'] != 'ignore':
             entries = self.estimated(entries, estimation_mode)
         return self.execute_searches(config, entries, task)
 
