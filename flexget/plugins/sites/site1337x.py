@@ -11,13 +11,13 @@ from flexget.event import event
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability
-from flexget.utils.tools import data_size_to_bytes
+from flexget.utils.tools import parse_filesize
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
 
-log = logging.getLogger('site_1337x')
+log = logging.getLogger('1337x')
 
 
-class site_1337x(object):
+class Site1337x(object):
     """
         1337x search plugin.
     """
@@ -114,7 +114,7 @@ class site_1337x(object):
                     leeches = int(li.find('span', class_='red').string)
                     size = str(li.find('div', class_='coll-4').string)
 
-                    size = data_size_to_bytes(size)
+                    size = parse_filesize(size)
 
                     e = Entry()
 
@@ -132,4 +132,4 @@ class site_1337x(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(site_1337x, '1337x', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(Site1337x, '1337x', groups=['urlrewriter', 'search'], api_ver=2)

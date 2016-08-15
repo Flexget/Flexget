@@ -12,6 +12,7 @@ from flexget.event import event
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode, clean_title
 from flexget.utils.requests import TimedLimiter
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('search_sceneaccess')
 
@@ -281,15 +282,7 @@ class SceneAccessSearch(object):
                     size = result.find('td', attrs={'class': 'ttr_size'}).text
                     size = re.search('(\d+(?:[.,]\d+)*)\s?([KMG]B)', size)
 
-                    if size:
-                        if size.group(2) == 'GB':
-                            entry['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)
-                        elif size.group(2) == 'MB':
-                            entry['content_size'] = int(float(size.group(1)) * 1000 ** 2 / 1024 ** 2)
-                        elif size.group(2) == 'KB':
-                            entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
-                        else:
-                            entry['content_size'] = int(float(size.group(1)) / 1024 ** 2)
+                    entry['content_size'] = parse_filesize(size)
 
                     entries.add(entry)
 

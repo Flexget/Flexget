@@ -10,7 +10,7 @@ from flexget.event import event
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability
-from flexget.utils.tools import data_size_to_bytes
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('limetorrents')
 
@@ -87,7 +87,7 @@ class Limetorrents(object):
                     seeds = int(row.find('td', attrs={'class': 'tdseed'}).text.replace(',', ''))
                     leeches = int(row.find('td', attrs={'class': 'tdleech'}).text.replace(',', ''))
 
-                    size = data_size_to_bytes(size)
+                    size = parse_filesize(size)
 
                     e = Entry()
 
