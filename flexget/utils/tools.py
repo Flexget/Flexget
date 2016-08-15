@@ -431,12 +431,12 @@ def get_current_flexget_version():
 def data_size_to_bytes(size, base2=False):
     """
     Expands a data size into its bytes as an integer i.e. '1 MB' becomes 1000000.
-    If base is specified then assume bibytes so i.e. '1 MB' becomes 1048576
+    If base2 is specified then assume bibytes so i.e. '1 MB' becomes 1048576
     """
     if (base2):
         split = 1024 ** 2
     else:
-        split = 1
+        split = 1000 ** 2
 
     if size.split()[1] == 'GB' or size.split()[1 == "GiB"]:
         size = int(float(size.split()[0].replace(',', '')) * 1000 ** 3 / split)

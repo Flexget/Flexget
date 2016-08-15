@@ -17,7 +17,7 @@ from flexget.plugins.internal.urlrewriting import UrlRewritingError
 log = logging.getLogger('site_1337x')
 
 
-class Site1337x(object):
+class site_1337x(object):
     """
         1337x search plugin.
     """
@@ -66,12 +66,12 @@ class Site1337x(object):
 
         soup = get_soup(page.content)
 
-        magneturl = str(soup.find('a', id='magnetdl').get('href')).lower()
-        torrenturl = str(soup.find('a', id='torrentdl').get('href')).lower()
+        magnet_url = str(soup.find('a', id='magnetdl').get('href')).lower()
+        torrent_url = str(soup.find('a', id='torrentdl').get('href')).lower()
 
-        entry['url'] = torrenturl
-        entry.setdefault('urls', []).append(torrenturl)
-        entry['urls'].append(magneturl)
+        entry['url'] = torrent_url
+        entry.setdefault('urls', []).append(torrent_url)
+        entry['urls'].append(magnet_url)
 
     @plugin.internet(log)
     def search(self, task, entry, config):
@@ -132,4 +132,4 @@ class Site1337x(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Site1337x, '1337x', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(site_1337x, '1337x', groups=['urlrewriter', 'search'], api_ver=2)
