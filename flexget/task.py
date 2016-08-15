@@ -180,7 +180,7 @@ class Task(object):
 
     # Used to determine task order, when priority is the same
     _counter = itertools.count()
-    
+
     RERUN_DEFAULT = 5
     RERUN_MAX = 100
 

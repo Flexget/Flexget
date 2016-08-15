@@ -5,14 +5,13 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
-from flexget.task import Task
 
 log = logging.getLogger('rerun')
 
 
 class Rerun(object):
     """
-    Force a task to rerun for debugging purposes. 
+    Force a task to rerun for debugging purposes.
     Configured value will set max_rerun value and enables a lock
     that prevents other plugins modifying it.
     """

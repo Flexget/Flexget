@@ -5,14 +5,13 @@ from datetime import timedelta
 
 from colorclass.color import Color
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Index, desc
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, desc
 from sqlalchemy.schema import Table, ForeignKey
 from sqlalchemy.orm import relation
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import db_schema, options, plugin
 from flexget.event import event
-from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.logger import console
 from flexget.terminal import TerminalTable, CLITableError, table_parser
 from flexget.manager import Session
