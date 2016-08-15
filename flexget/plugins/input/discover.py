@@ -41,9 +41,9 @@ Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     value = datetime.datetime.now() - parse_timedelta('7 days')
-    for de in session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all():
-        log.debug('deleting %s' % de)
-        session.delete(de)
+    for discover_entry in session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all():
+        log.debug('deleting %s' % discover_entry)
+        session.delete(discover_entry)
 
 
 class Discover(object):
@@ -238,29 +238,29 @@ class Discover(object):
         interval_count = 0
         with Session() as session:
             for entry in entries:
-                de = session.query(DiscoverEntry). \
+                discover_entry = session.query(DiscoverEntry). \
                     filter(DiscoverEntry.title == entry['title']). \
                     filter(DiscoverEntry.task == task.name).first()
 
-                if not de:
+                if not discover_entry:
                     log.debug('%s -> No previous run recorded' % entry['title'])
-                    de = DiscoverEntry(entry['title'], task.name)
-                    session.add(de)
-                if (not task.is_rerun and task.options.discover_now) or not de.last_execution:
+                    discover_entry = DiscoverEntry(entry['title'], task.name)
+                    session.add(discover_entry)
+                if (not task.is_rerun and task.options.discover_now) or not discover_entry.last_execution:
                     # First time we execute (and on --discover-now) we randomize time to avoid clumping
                     delta = multiply_timedelta(interval, random.random())
-                    de.last_execution = datetime.datetime.now() - delta
+                    discover_entry.last_execution = datetime.datetime.now() - delta
                 else:
-                    next_time = de.last_execution + interval
+                    next_time = discover_entry.last_execution + interval
                     log.debug('last_time: %r, interval: %s, next_time: %r, ',
-                              de.last_execution, config['interval'], next_time)
+                              discover_entry.last_execution, config['interval'], next_time)
                     if datetime.datetime.now() < next_time:
                         log.debug('interval not met')
                         interval_count += 1
                         entry.reject('discover interval not met')
                         entry.complete()
                         continue
-                    de.last_execution = datetime.datetime.now()
+                    discover_entry.last_execution = datetime.datetime.now()
                 log.trace('interval passed for %s', entry['title'])
                 result.append(entry)
         if interval_count:
