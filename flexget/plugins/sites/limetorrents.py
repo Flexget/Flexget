@@ -11,7 +11,7 @@ from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability
 
-log = logging.getLogger('Limetorrents')
+log = logging.getLogger('limetorrents')
 
 
 class Limetorrents(object):
