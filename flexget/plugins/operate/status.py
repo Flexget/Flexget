@@ -63,42 +63,44 @@ class Status(object):
 
     def __init__(self):
         self.execution = None
-        self.session = None
 
     def on_task_start(self, task, config):
-        self.session = Session()
-        st = self.session.query(StatusTask).filter(StatusTask.name == task.name).first()
-        if not st:
-            log.debug('Adding new task %s', task.name)
-            st = StatusTask()
-            st.name = task.name
-            self.session.add(st)
-        # TODO: purge removed tasks
+        with Session() as session:
+            st = session.query(StatusTask).filter(StatusTask.name == task.name).first()
+            if not st:
+                log.debug('Adding new task %s', task.name)
+                st = StatusTask()
+                st.name = task.name
+                session.add(st)
+            # TODO: purge removed tasks
 
-        self.execution = TaskExecution()
-        self.execution.start = datetime.datetime.utcnow()
-        self.execution.task = st
+            self.execution = TaskExecution()
+            self.execution.start = datetime.datetime.utcnow()
+            self.execution.task = st
 
     @plugin.priority(-255)
     def on_task_input(self, task, config):
-        self.execution.produced = len(task.entries)
-
+        with Session() as session:
+            self.execution.produced = len(task.entries)
+            session.merge(self.execution)
+ 
     @plugin.priority(-255)
     def on_task_output(self, task, config):
-        self.execution.accepted = len(task.accepted)
-        self.execution.rejected = len(task.rejected)
-        self.execution.failed = len(task.failed)
+        with Session() as session:
+            self.execution.accepted = len(task.accepted)
+            self.execution.rejected = len(task.rejected)
+            self.execution.failed = len(task.failed)
+            session.merge(self.execution)
 
     def on_task_exit(self, task, config):
-        if self.execution is None:
-            return
-        if task.aborted:
-            self.execution.succeeded = False
-            self.execution.abort_reason = task.abort_reason
-        self.execution.end = datetime.datetime.utcnow()
-        self.session.add(self.execution)
-        self.session.commit()
-
+        with Session() as session:
+            if self.execution is None:
+                return
+            if task.aborted:
+                self.execution.succeeded = False
+                self.execution.abort_reason = task.abort_reason
+            self.execution.end = datetime.datetime.utcnow()
+            session.merge(self.execution)
 
     on_task_abort = on_task_exit
 
