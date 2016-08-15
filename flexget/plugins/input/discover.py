@@ -274,6 +274,7 @@ class Discover(object):
             config['release_estimations'] = {'mode': config['release_estimations']}
 
         config['release_estimations'].setdefault('mode', 'strict')
+        config['release_estimations'].setdefault('optimistic', '0 days')
 
         task.no_entries_ok = True
         entries = self.execute_inputs(config, task)
