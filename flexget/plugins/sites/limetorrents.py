@@ -25,7 +25,8 @@ class Limetorrents(object):
             {
                 'type': 'object',
                 'properties': {
-                    'category': {'type': 'string', 'enum': ['all', 'anime', 'applications', 'games', 'movies', 'music', 'tv', 'other'], 'default': 'all'},
+                    'category': {'type': 'string', 'enum': ['all', 'anime', 'applications', 'games', 'movies', 'music',
+                                                            'tv', 'other'], 'default': 'all'},
                     'order_by': {'type': 'string', 'enum': ['date', 'seeds'], 'default': 'date'}
                 },
                 'additionalProperties': False
@@ -58,17 +59,17 @@ class Limetorrents(object):
 
         for search_string in entry.get('search_strings', [entry['title']]):
 
-            query = 'search/{0}/{1}/{2}'.format(category,quote(search_string.encode('utf8')),order_by)
-            log.debug('Using search params: %s; category: %s; ordering by: %s',search_string, category, order_by or 'default')
+            query = 'search/{0}/{1}/{2}'.format(category, quote(search_string.encode('utf8')), order_by)
+            log.debug('Using search: %s; category: %s; ordering: %s', search_string, category, order_by or 'default')
             try:
                 page = task.requests.get(self.base_url + query)
                 log.debug('requesting: %s', page.url)
             except RequestException as e:
-                log.error('limetorrents request failed: %s', e)
+                log.error('Limetorrents request failed: %s', e)
                 continue
 
             soup = get_soup(page.content)
-            if soup.find('a', attrs={'class':'csprite_dl14'}) is not None:
+            if soup.find('a', attrs={'class': 'csprite_dl14'}) is not None:
                 for link in soup.findAll('a', attrs={'class': 'csprite_dl14'}):
 
                     row = link.find_parent('tr')
@@ -80,10 +81,10 @@ class Limetorrents(object):
                     title = title[1:]
 
                     data = row.findAll('td', attrs={'class': 'tdnormal'})
-                    size = str(data[1].text).replace(',','')
+                    size = str(data[1].text).replace(',', '')
 
-                    seeds = int(row.find('td', attrs={'class': 'tdseed'}).text.replace(',',''))
-                    leeches = int(row.find('td', attrs={'class': 'tdleech'}).text.replace(',',''))
+                    seeds = int(row.find('td', attrs={'class': 'tdseed'}).text.replace(',', ''))
+                    leeches = int(row.find('td', attrs={'class': 'tdleech'}).text.replace(',', ''))
 
                     if size.split()[1] == 'GB':
                         size = int(float(size.split()[0].replace(',', '')) * 1000 ** 3 / 1024 ** 2)
@@ -106,6 +107,7 @@ class Limetorrents(object):
                     entries.add(e)
 
         return entries
+
 
 @event('plugin.register')
 def register_plugin():
