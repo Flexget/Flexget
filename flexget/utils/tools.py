@@ -428,20 +428,16 @@ def get_current_flexget_version():
     return flexget.__version__
 
 
-def parse_filesize(text_size, base2=False):
+def parse_filesize(text_size, base2=True):
     """
-    Expands a data size into its bytes as an integer i.e. '1 MB' becomes 1000000.
-    If base2 is specified then assume bibytes so i.e. '1 MB' becomes 1048576
+    Expands a data size into its bibytes as an integer i.e. '1 MB' becomes 1048576.
+    If base2 is false then assume bytes so i.e. '1 MB' becomes 1000000
     """
     prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
 
     unit, amount = text_size.lower().split()
     if not unit.endswith('b'):
         raise ValueError('%s does not look like a file size' % text_size)
-    unit.rstrip('b')
-    if unit.endswith('i'):
-        base2 = True
-        unit.rstrip('i')
     if unit not in prefix_order:
         raise ValueError('%s does not look like a file size' % text_size)
     order = prefix_order[unit]
