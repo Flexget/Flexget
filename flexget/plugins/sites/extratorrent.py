@@ -89,7 +89,7 @@ class UrlRewriteExtraTorrent(object):
                 entry = Entry()
                 entry['title'] = item.title
                 entry['url'] = item.link
-                entry['content_size'] = parse_filesize(item.size)
+                entry['content_size'] = int(item.size) / 1024 / 1024
                 entry['torrent_info_hash'] = item.info_hash
 
                 if isinstance(item.seeders, int):

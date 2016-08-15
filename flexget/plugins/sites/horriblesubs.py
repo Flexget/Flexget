@@ -7,7 +7,6 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('horriblesubs')
