@@ -58,7 +58,7 @@ class Discover(object):
         from:
           - piratebay
         interval: [1 hours|days|weeks]
-        ignore_estimations: [yes|no]
+        release_estimations: [strict|loose|ignore]
     """
 
     schema = {
@@ -71,7 +71,18 @@ class Discover(object):
                 'allOf': [{'$ref': '/schema/plugins?group=search'}, {'maxProperties': 1, 'minProperties': 1}]
             }},
             'interval': {'type': 'string', 'format': 'interval', 'default': '5 hours'},
-            'release_estimations': {'type': 'string', 'default': 'strict', 'enum': ['loose', 'strict', 'ignore']},
+            'release_estimations': {
+                'oneOf': [
+                    {'type': 'string', 'default': 'strict', 'enum': ['loose', 'strict', 'ignore']},
+                    {
+                        'type': 'object',
+                        'properties': {
+                            'optimistic': {'type': 'string', 'format': 'interval'}
+                        },
+                        'required': ['optimistic']
+                    }
+                ]
+            },
             'limit': {'type': 'integer', 'minimum': 1}
         },
         'required': ['what', 'from'],
@@ -181,7 +192,7 @@ class Discover(object):
 
     def estimated(self, entries, estimation_mode):
         """
-        :param str estimation_mode: loose, strict, ignore
+        :param dict estimation_mode: mode -> loose, strict, ignore
         :return: Entries that we have estimated to be available
         """
         estimator = get_plugin_by_name('estimate_release').instance
@@ -190,7 +201,7 @@ class Discover(object):
             est_date = estimator.estimate(entry)
             if est_date is None:
                 log.debug('No release date could be determined for %s' % entry['title'])
-                if estimation_mode == 'strict':
+                if estimation_mode['mode'] == 'strict':
                     entry.reject('has no release date')
                     entry.complete()
                 else:
@@ -202,18 +213,15 @@ class Discover(object):
             if datetime.datetime.now() >= est_date:
                 log.debug('%s has been released at %s' % (entry['title'], est_date))
                 result.append(entry)
+            elif datetime.datetime.now() >= est_date - parse_timedelta(estimation_mode['optimistic']):
+                log.debug('%s will be released at %s. Ignoring release estimation because estimated release date is '
+                          'in less than %s', entry['title'], est_date, estimation_mode['optimistic'])
+                result.append(entry)
             else:
                 entry.reject('has not been released')
                 entry.complete()
                 log.debug("%s hasn't been released yet (Expected: %s)" % (entry['title'], est_date))
         return result
-
-    # TODO: we no longer support 2.6
-    def interval_total_seconds(self, interval):
-        """
-        Because python 2.6 doesn't have total_seconds()
-        """
-        return interval.seconds + interval.days * 24 * 3600
 
     def interval_expired(self, config, task, entries):
         """
@@ -261,7 +269,12 @@ class Discover(object):
         return result
 
     def on_task_input(self, task, config):
-        config.setdefault('release_estimations', 'strict')
+        config.setdefault('release_estimations', {})
+        if not isinstance(config['release_estimations'], dict):
+            config['release_estimations'] = {'mode': config['release_estimations']}
+
+        config['release_estimations'].setdefault('mode', 'strict')
+
         task.no_entries_ok = True
         entries = self.execute_inputs(config, task)
         log.verbose('Discovering %i titles ...' % len(entries))
