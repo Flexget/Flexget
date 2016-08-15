@@ -1,5 +1,8 @@
+# pylint: disable=no-self-use
+
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.utils import text_type
 
 import os
 import stat
@@ -148,6 +151,16 @@ class TestEntryUnicodeError(object):
         e = Entry('title', 'url')
         with pytest.raises(EntryUnicodeError):
             e['invalid'] = b'\x8e'
+
+
+class TestEntryStringCoercion(object):
+    def test_coercion(self):
+        class EnrichedString(text_type):
+            pass
+
+        e = Entry('title', 'url')
+        e['test'] = EnrichedString("test")
+        assert type(e['test']) == text_type  # pylint: disable=unidiomatic-typecheck
 
 
 class TestFilterRequireField(object):
