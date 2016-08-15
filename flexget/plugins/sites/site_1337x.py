@@ -11,9 +11,11 @@ from flexget.event import event
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability
+from flexget.utils.tools import data_size_to_bytes
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
 
-log = logging.getLogger('1337x')
+log = logging.getLogger('site_1337x')
+
 
 class Site1337x(object):
     """
@@ -26,7 +28,8 @@ class Site1337x(object):
             {
                 'type': 'object',
                 'properties': {
-                    'order_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'time', 'size'], 'default': 'seeders'}
+                    'order_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'time', 'size'],
+                                 'default': 'seeders'}
                 },
                 'additionalProperties': False
             }
@@ -63,12 +66,12 @@ class Site1337x(object):
 
         soup = get_soup(page.content)
 
-        magnetURL = str(soup.find('a',id='magnetdl').get('href')).lower()
-        torrentURL = str(soup.find('a',id='torrentdl').get('href')).lower()
+        magneturl = str(soup.find('a', id='magnetdl').get('href')).lower()
+        torrenturl = str(soup.find('a', id='torrentdl').get('href')).lower()
 
-        entry['url'] = torrentURL
-        entry.setdefault('urls', []).append(torrentURL)
-        entry['urls'].append(magnetURL)
+        entry['url'] = torrenturl
+        entry.setdefault('urls', []).append(torrenturl)
+        entry['urls'].append(magneturl)
 
     @plugin.internet(log)
     def search(self, task, entry, config):
@@ -90,8 +93,8 @@ class Site1337x(object):
 
         for search_string in entry.get('search_strings', [entry['title']]):
 
-            query = '{0}search/{1}{2}/1/'.format(sort_order,quote(search_string.encode('utf8')), order_by)
-            log.debug('Using search params: %s; ordering by: %s',search_string, order_by or 'default')
+            query = '{0}search/{1}{2}/1/'.format(sort_order, quote(search_string.encode('utf8')), order_by)
+            log.debug('Using search params: %s; ordering by: %s', search_string, order_by or 'default')
             try:
                 page = task.requests.get(self.base_url + query)
                 log.debug('requesting: %s', page.url)
@@ -100,25 +103,18 @@ class Site1337x(object):
                 continue
 
             soup = get_soup(page.content)
-            if soup.find('div', attrs={'class':'tab-detail'}) is not None:
-                for link in soup.find('div', attrs={'class':'tab-detail'}).findAll('a',href=re.compile('^/torrent/')):
+            if soup.find('div', attrs={'class': 'tab-detail'}) is not None:
+                for link in soup.find('div', attrs={'class': 'tab-detail'}).findAll('a', href=re.compile('^/torrent/')):
 
                     li = link.parent.parent.parent
 
-                    title = str(link.text).replace('...','')
+                    title = str(link.text).replace('...', '')
                     info_url = self.base_url + str(link.get('href'))[1:]
                     seeds = int(li.find('span', class_='green').string)
                     leeches = int(li.find('span', class_='red').string)
                     size = str(li.find('div', class_='coll-4').string)
 
-                    if size.split()[1] == 'GB':
-                        size = int(float(size.split()[0].replace(',', '')) * 1000 ** 3 / 1024 ** 2)
-                    elif size.split()[1] == 'MB':
-                        size = int(float(size.split()[0].replace(',', '')) * 1000 ** 2 / 1024 ** 2)
-                    elif size.split()[1] == 'KB':
-                        size = int(float(size.split()[0].replace(',', '')) * 1000 / 1024 ** 2)
-                    else:
-                        size = int(float(size.split()[0].replace(',', '')) / 1024 ** 2)
+                    size = data_size_to_bytes(size)
 
                     e = Entry()
 
@@ -133,6 +129,7 @@ class Site1337x(object):
 
         return entries
 
+
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Site1337x, '1337x', groups=['urlrewriter','search'], api_ver=2)
+    plugin.register(Site1337x, '1337x', groups=['urlrewriter', 'search'], api_ver=2)
