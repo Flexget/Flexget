@@ -426,3 +426,25 @@ def get_latest_flexget_version_number():
 
 def get_current_flexget_version():
     return flexget.__version__
+
+
+def data_size_to_bytes(size, base2=False):
+    """
+    Expands a data size into its bytes as an integer i.e. '1 MB' becomes 1000000.
+    If base is specified then assume bibytes so i.e. '1 MB' becomes 1048576
+    """
+    if (base2):
+        split = 1024 ** 2
+    else:
+        split = 1
+
+    if size.split()[1] == 'GB' or size.split()[1 == "GiB"]:
+        size = int(float(size.split()[0].replace(',', '')) * 1000 ** 3 / split)
+    elif size.split()[1] == 'MB' or size.split()[1 == "MiB"]:
+        size = int(float(size.split()[0].replace(',', '')) * 1000 ** 2 / split)
+    elif size.split()[1] == 'KB' or size.split()[1 == "KiB"]:
+        size = int(float(size.split()[0].replace(',', '')) * 1000 / split)
+    else:
+        size = int(float(size.split()[0].replace(',', '')) / split)
+
+    return size
