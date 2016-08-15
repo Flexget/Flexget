@@ -24,16 +24,18 @@ class EstimatesMoviesBluray(object):
 
         log.debug('Searching Blu-ray.com for release date of {} ({})'.format(movie_name, movie_year))
 
+        release_date = None
         try:
             with Session() as session:
                 lookup = get_plugin_by_name('api_bluray').instance.lookup
                 movie = lookup(title=movie_name, year=movie_year, session=session)
-                if movie and movie.release_date:
-                    log.debug('received release date: {0}'.format(movie.release_date))
-                    return movie.release_date
+                if movie:
+                    release_date = movie.release_date
         except LookupError as e:
             log.debug(e)
-            return
+        if release_date:
+            log.debug('received release date: {0}'.format(release_date))
+        return release_date
 
 
 @event('plugin.register')
