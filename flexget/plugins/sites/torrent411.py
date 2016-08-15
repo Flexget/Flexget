@@ -12,7 +12,7 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
-from flexget.utils.tools import arithmeticEval, native_str_to_text
+from flexget.utils.tools import arithmeticEval, native_str_to_text, parse_filesize
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 
@@ -500,15 +500,9 @@ class UrlRewriteTorrent411(object):
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
                                                             entry['torrent_leeches'])
                 size = re.search('([\.\d]+) ([GMK]?)B', size)
-                if size:
-                    if size.group(2) == 'G':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)
-                    elif size.group(2) == 'M':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 ** 2 / 1024 ** 2)
-                    elif size.group(2) == 'K':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
-                    else:
-                        entry['content_size'] = int(float(size.group(1)) / 1024 ** 2)
+
+                entry['content_size'] = parse_filesize(size.group(0))
+
                 auth_handler = t411Auth(config['username'],
                                         config['password'])
 

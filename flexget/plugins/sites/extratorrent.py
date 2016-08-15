@@ -10,6 +10,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.search import normalize_unicode
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('extratorrent')
 
@@ -88,7 +89,7 @@ class UrlRewriteExtraTorrent(object):
                 entry = Entry()
                 entry['title'] = item.title
                 entry['url'] = item.link
-                entry['content_size'] = int(item.size) / 1024 / 1024
+                entry['content_size'] = parse_filesize(item.size)
                 entry['torrent_info_hash'] = item.info_hash
 
                 if isinstance(item.seeders, int):

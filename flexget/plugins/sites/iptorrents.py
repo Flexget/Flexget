@@ -13,6 +13,7 @@ from flexget.plugins.internal.urlrewriting import UrlRewritingError
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('iptorrents')
 
@@ -157,15 +158,9 @@ class UrlRewriteIPTorrents(object):
 
                 size = torrent.findNext(text=re.compile('^([\.\d]+) ([GMK]?)B$'))
                 size = re.search('^([\.\d]+) ([GMK]?)B$', size)
-                if size:
-                    if size.group(2) == 'G':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)
-                    elif size.group(2) == 'M':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 ** 2 / 1024 ** 2)
-                    elif size.group(2) == 'K':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
-                    else:
-                        entry['content_size'] = int(float(size.group(1)) / 1024 ** 2)
+
+                entry['content_size'] = parse_filesize(size.group(0))
+
                 entries.add(entry)
 
         return entries

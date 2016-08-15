@@ -148,7 +148,7 @@ class UrlRewritePirateBay(object):
                 size = link.find_next(attrs={'class': 'detDesc'}).contents[0]
                 size = re.search('Size ([\.\d]+)\xa0([GMK])iB', size)
 
-                entry['content_size'] = parse_filesize(size)
+                entry['content_size'] = parse_filesize(size.group(0))
 
                 entries.add(entry)
 

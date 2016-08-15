@@ -282,7 +282,7 @@ class SceneAccessSearch(object):
                     size = result.find('td', attrs={'class': 'ttr_size'}).text
                     size = re.search('(\d+(?:[.,]\d+)*)\s?([KMG]B)', size)
 
-                    entry['content_size'] = parse_filesize(size)
+                    entry['content_size'] = parse_filesize(size.group(0))
 
                     entries.add(entry)
 
