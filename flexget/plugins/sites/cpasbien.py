@@ -11,6 +11,7 @@ from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import normalize_unicode
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('search_cpasbien')
 
@@ -113,15 +114,10 @@ class SearchCPASBIEN(object):
 
                         entry['torrent_seeds'] = (int(result.find('span', attrs={'class': re.compile('seed')}).text))
                         entry['torrent_leeches'] = (int(result.find('div', attrs={'class': re.compile('down')}).text))
-                        sizefull = (result.find('div', attrs={'class': re.compile('poid')}).text)
-                        size = sizefull[:-3]
-                        unit = sizefull[-2:]
-                        if unit == 'GB':
-                            entry['content_size'] = int(float(size) * 1024)
-                        elif unit == 'MB':
-                            entry['content_size'] = int(float(size))
-                        elif unit == 'KB':
-                            entry['content_size'] = int(float(size) / 1024)
+                        size = result.find('div', attrs={'class': re.compile('poid')}).text
+
+                        entry['content_size'] = parse_filesize(size)
+
                         if (entry['torrent_seeds'] > 0):
                             entries.add(entry)
                         else:
