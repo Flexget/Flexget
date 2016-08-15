@@ -26,6 +26,7 @@ class HorribleSubs(object):
         try:
             soup = get_soup(requests.get(page_url).content)
         except RequestException as e:
+            log.error('HorribleSubs request failed: %s', e)
             return entries
 
         for td_label in soup.findAll('td', attrs={'class': 'dl-label'}):
