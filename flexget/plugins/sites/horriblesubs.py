@@ -25,7 +25,6 @@ class HorribleSubs(object):
 
         try:
             soup = get_soup(requests.get(page_url).content)
-            log.debug('requesting: %s', page_url)
         except RequestException as e:
             return entries
 
