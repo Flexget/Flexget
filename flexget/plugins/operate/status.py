@@ -5,7 +5,7 @@ from datetime import timedelta
 
 from colorclass.color import Color
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Index, asc
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Index, desc
 from sqlalchemy.schema import Table, ForeignKey
 from sqlalchemy.orm import relation
 from sqlalchemy.orm.exc import NoResultFound
@@ -74,23 +74,19 @@ class Status(object):
                 session.add(st)
             # TODO: purge removed tasks
 
-            self.execution = TaskExecution()
-            self.execution.start = datetime.datetime.utcnow()
-            self.execution.task = st
+        self.execution = TaskExecution()
+        self.execution.start = datetime.datetime.utcnow()
+        self.execution.task = st
 
     @plugin.priority(-255)
     def on_task_input(self, task, config):
-        with Session() as session:
-            self.execution.produced = len(task.entries)
-            session.merge(self.execution)
- 
+        self.execution.produced = len(task.entries)
+
     @plugin.priority(-255)
     def on_task_output(self, task, config):
-        with Session() as session:
-            self.execution.accepted = len(task.accepted)
-            self.execution.rejected = len(task.rejected)
-            self.execution.failed = len(task.failed)
-            session.merge(self.execution)
+        self.execution.accepted = len(task.accepted)
+        self.execution.rejected = len(task.rejected)
+        self.execution.failed = len(task.failed)
 
     def on_task_exit(self, task, config):
         with Session() as session:
@@ -113,7 +109,7 @@ def do_cli(manager, options):
 
 
 def do_cli_task(manager, options):
-    header = ['Start', 'Duration', 'Produces', 'Accepted', 'Rejected', 'Failed', 'Reason']
+    header = ['Start', 'Duration', 'Produced', 'Accepted', 'Rejected', 'Failed', 'Abort Reason']
     table_data = [header]
     with Session() as session:
         try:
@@ -121,8 +117,8 @@ def do_cli_task(manager, options):
         except NoResultFound:
             console('Task name `%s` does not exists or does not have any records' % options.task)
         else:
-            query = task.executions.order_by(asc(TaskExecution.start)).limit(options.limit)
-            for ex in query:
+            query = task.executions.order_by(desc(TaskExecution.start))[:options.limit]
+            for ex in reversed(query):
                 start = ex.start.strftime('%Y-%m-%d %H:%M')
                 if ex.succeeded:
                     start = Color('{green}%s{/green}' % start)
