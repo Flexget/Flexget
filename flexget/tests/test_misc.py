@@ -139,7 +139,7 @@ class TestDownload(object):
         testfile = task.entries[0]['location']
         assert os.path.exists(testfile), 'download file does not exists'
         testfile_stat = os.stat(testfile)
-        modes_equal = 0o666 - curr_umask == stat.S_IMODE(testfile_stat.st_mode)
+        modes_equal = 0o666 & ~curr_umask == stat.S_IMODE(testfile_stat.st_mode)
         assert modes_equal, 'download file mode not honoring umask'
 
 

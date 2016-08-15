@@ -9,7 +9,7 @@ from flask import jsonify
 from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import api, APIResource, empty_response, default_error_schema
 from flexget.plugins.list import movie_list as ml
 from flexget.plugins.list.movie_list import MovieListBase
 from flexget.utils.tools import split_title_year
@@ -18,103 +18,94 @@ log = logging.getLogger('movie_list')
 
 movie_list_api = api.namespace('movie_list', description='Movie List operations')
 
-default_error_schema = {
-    'type': 'object',
-    'properties': {
-        'status': {'type': 'string'},
-        'message': {'type': 'string'}
+
+class ObjectsContainer(object):
+    input_movie_list_id_object = {
+        'type': 'array',
+        'items': {
+            'type': 'object',
+            'minProperties': 1,
+            'additionalProperties': True
+        }
     }
-}
-empty_response = api.schema('empty', {'type': 'object'})
 
-default_error_schema = api.schema('default_error_schema', default_error_schema)
-empty_response = api.schema('empty_response', empty_response)
-
-input_movie_list_id_object = {
-    'type': 'array',
-    'items': {
+    input_movie_entry = {
         'type': 'object',
-        'minProperties': 1,
-        'additionalProperties': True
-    }
-}
-
-input_movie_entry = {
-    'type': 'object',
-    'properties': {
-        'title': {'type': 'string'},
-        'original_url': {'type': 'string'},
-        'movie_name': {'type': 'string'},
-        'movie_year': {'type': 'integer'},
-        'movie_identifiers': input_movie_list_id_object
-    },
-    'additionalProperties': True,
-    'required': ['original_url'],
-    'anyOf': [
-        {'required': ['title']},
-        {'required': ['movie_name', 'movie_year']}
-    ]
-}
-
-return_movie_list_id_object = copy.deepcopy(input_movie_list_id_object)
-return_movie_list_id_object.update(
-    {'properties': {
-        'id': {'type': 'integer'},
-        'added_on': {'type': 'string'},
-        'movie_id': {'type': 'integer'}
-    }})
-
-movie_list_object = {
-    'type': 'object',
-    'properties': {
-        'title': {'type': 'string'},
-        'added_on': {'type': 'string'},
-        'year': {'type': 'integer'},
-        'list_id': {'type': 'integer'},
-        'movie_list_ids': {
-            'type': 'array',
-            'items': return_movie_list_id_object
+        'properties': {
+            'movie_name': {'type': 'string'},
+            'movie_year': {'type': 'integer'},
+            'movie_identifiers': input_movie_list_id_object
         },
+        'additionalProperties': True,
+        'required': ['movie_name'],
     }
-}
 
-list_object = {
-    'type': 'object',
-    'properties': {
-        'id': {'type': 'integer'},
-        'added_on': {'type': 'string'},
-        'name': {'type': 'string'}
+    return_movie_list_id_object = copy.deepcopy(input_movie_list_id_object)
+    return_movie_list_id_object.update(
+        {'properties': {
+            'id': {'type': 'integer'},
+            'added_on': {'type': 'string'},
+            'movie_id': {'type': 'integer'}
+        }})
+
+    movie_list_object = {
+        'type': 'object',
+        'properties': {
+            'title': {'type': 'string'},
+            'added_on': {'type': 'string'},
+            'year': {'type': 'integer'},
+            'list_id': {'type': 'integer'},
+            'movie_list_ids': {
+                'type': 'array',
+                'items': return_movie_list_id_object
+            },
+        }
     }
-}
 
-list_input = copy.deepcopy(list_object)
-del list_input['properties']['id']
-del list_input['properties']['added_on']
-
-return_movies = {
-    'type': 'object',
-    'properties': {
-        'movies': {
-            'type': 'array',
-            'items': movie_list_object
-        },
-        'number_of_movies': {'type': 'integer'},
-        'total_number_of_movies': {'type': 'integer'},
-        'page_number': {'type': 'integer'}
+    list_object = {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'integer'},
+            'added_on': {'type': 'string'},
+            'name': {'type': 'string'}
+        }
     }
-}
-return_lists = {'type': 'array', 'items': list_object}
 
-input_movie_entry_schema = api.schema('input_movie_entry', input_movie_entry)
-input_movie_list_id_schema = api.schema('input_movie_list_id_object', input_movie_list_id_object)
+    list_input = copy.deepcopy(list_object)
+    del list_input['properties']['id']
+    del list_input['properties']['added_on']
 
-movie_list_id_object_schema = api.schema('movie_list_id_object', return_movie_list_id_object)
-movie_list_object_schema = api.schema('movie_list_object', movie_list_object)
-list_object_schema = api.schema('list_object', list_object)
-return_lists_schema = api.schema('return_lists', return_lists)
-return_movies_schema = api.schema('return_movies', return_movies)
+    return_movies = {
+        'type': 'object',
+        'properties': {
+            'movies': {
+                'type': 'array',
+                'items': movie_list_object
+            },
+            'number_of_movies': {'type': 'integer'},
+            'total_number_of_movies': {'type': 'integer'},
+            'page_number': {'type': 'integer'}
+        }
+    }
 
-new_list_schema = api.schema('new_list', list_input)
+    return_lists = {
+        'type': 'object',
+        'properties': {
+            'movie_lists': {'type': 'array', 'items': list_object}
+        }
+    }
+
+
+input_movie_entry_schema = api.schema('input_movie_entry', ObjectsContainer.input_movie_entry)
+input_movie_list_id_schema = api.schema('input_movie_list_id_object', ObjectsContainer.input_movie_list_id_object)
+
+movie_list_id_object_schema = api.schema('movie_list_id_object', ObjectsContainer.return_movie_list_id_object)
+movie_list_object_schema = api.schema('movie_list_object', ObjectsContainer.movie_list_object)
+list_object_schema = api.schema('list_object', ObjectsContainer.list_object)
+return_lists_schema = api.schema('return_lists', ObjectsContainer.return_lists)
+return_movies_schema = api.schema('return_movies', ObjectsContainer.return_movies)
+
+new_list_schema = api.schema('new_list', ObjectsContainer.list_input)
 
 movie_list_parser = api.parser()
 movie_list_parser.add_argument('name', help='Filter results by list name')
@@ -180,8 +171,7 @@ class MovieListListAPI(APIResource):
         return {}
 
 
-movie_identifiers_doc = "Use movie identifier using the following format:\n[{'ID_NAME: 'ID_VALUE'}]." \
-                        " Has to be one of %s" % " ,".join(MovieListBase().supported_ids)
+movie_identifiers_doc = "Use movie identifier using the following format:\n[{'ID_NAME: 'ID_VALUE'}]."
 
 movies_parser = api.parser()
 movies_parser.add_argument('sort_by', choices=('id', 'added', 'title', 'year'), default='title',

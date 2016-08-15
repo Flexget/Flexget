@@ -4,33 +4,27 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import pytest
 
 from flexget.utils import json
-
-
-def check_trakt_fields(data, exact=None):
-    expected_fields = [
-        'air_day', 'air_time', 'first_aired', 'certification', 'country', 'genres', 'homepage',
-        'id', 'images', 'imdb_id', 'language', 'network', 'overview', 'runtime', 'slug', 'timezone',
-        'title', 'tmdb_id', 'tvdb_id', 'tvrage_id', 'year'
-    ]
-
-    for field in expected_fields:
-        assert field in data, 'Field %s didn\'t exist in data' % field
-
-    if exact:
-        for field, value in exact.items():
-            assert data.get(field) == value
+from flexget.plugins.api.trakt_lookup import objects_container as oc
 
 
 @pytest.mark.online
 class TestTraktSeriesLookupAPI(object):
     config = 'tasks: {}'
 
-    def test_trakt_series_lookup_no_params(self, api_client):
+    def test_trakt_series_lookup_no_params(self, api_client, schema_match):
         # Bad API call
         rsp = api_client.get('/trakt/series/')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
 
-        exact_match = {
+        rsp = api_client.get('/trakt/series/the x-files/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(oc.series_return_object, data)
+        assert not errors
+
+        values = {
             'id': 4063,
             'imdb_id': 'tt0106179',
             'language': 'en',
@@ -41,15 +35,11 @@ class TestTraktSeriesLookupAPI(object):
             'year': 1993
         }
 
-        rsp = api_client.get('/trakt/series/the x-files/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        for field, value in values.items():
+            assert data.get(field) == value
 
-        data = json.loads(rsp.get_data(as_text=True))
-        check_trakt_fields(data, exact=exact_match)
-
-    def test_trakt_series_lookup_with_year_param(self, api_client):
-
-        exact_match = {
+    def test_trakt_series_lookup_with_year_param(self, api_client, schema_match):
+        values = {
             'id': 235,
             'imdb_id': 'tt0098798',
             'language': 'en',
@@ -64,11 +54,14 @@ class TestTraktSeriesLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        check_trakt_fields(data, exact=exact_match)
+        errors = schema_match(oc.series_return_object, data)
+        assert not errors
 
-    def test_trakt_series_lookup_with_trakt_slug_id_param(self, api_client):
+        for field, value in values.items():
+            assert data.get(field) == value
 
-        exact_match = {
+    def test_trakt_series_lookup_with_trakt_slug_id_param(self, api_client, schema_match):
+        values = {
             'id': 75481,
             'title': 'The Flash',
             'tvdb_id': 272094,
@@ -79,11 +72,15 @@ class TestTraktSeriesLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        check_trakt_fields(data, exact=exact_match)
 
-    def test_trakt_series_lookup_with_tmdb_id_param(self, api_client):
+        errors = schema_match(oc.series_return_object, data)
+        assert not errors
 
-        exact_match = {
+        for field, value in values.items():
+            assert data.get(field) == value
+
+    def test_trakt_series_lookup_with_tmdb_id_param(self, api_client, schema_match):
+        values = {
             'id': 60300,
             'imdb_id': 'tt3107288',
             'title': 'The Flash',
@@ -97,11 +94,14 @@ class TestTraktSeriesLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        check_trakt_fields(data, exact=exact_match)
+        errors = schema_match(oc.series_return_object, data)
+        assert not errors
+
+        for field, value in values.items():
+            assert data.get(field) == value
 
     def test_trakt_series_lookup_with_imdb_id_param(self, api_client):
-
-        exact_match = {
+        values = {
             'id': 60300,
             'imdb_id': 'tt3107288',
             'title': 'The Flash',
@@ -115,11 +115,11 @@ class TestTraktSeriesLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        check_trakt_fields(data, exact=exact_match)
+        for field, value in values.items():
+            assert data.get(field) == value
 
-    def test_trakt_series_lookup_with_tvdb_id_param(self, api_client):
-
-        exact_match = {
+    def test_trakt_series_lookup_with_tvdb_id_param(self, api_client, schema_match):
+        values = {
             'id': 60300,
             'imdb_id': 'tt3107288',
             'title': 'The Flash',
@@ -133,10 +133,14 @@ class TestTraktSeriesLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        check_trakt_fields(data, exact=exact_match)
+        errors = schema_match(oc.series_return_object, data)
+        assert not errors
 
-    def test_trakt_series_lookup_with_tvrage_id_param(self, api_client):
-        exact_match = {
+        for field, value in values.items():
+            assert data.get(field) == value
+
+    def test_trakt_series_lookup_with_tvrage_id_param(self, api_client, schema_match):
+        values = {
             'id': 60300,
             'imdb_id': 'tt3107288',
             'title': 'The Flash',
@@ -150,10 +154,14 @@ class TestTraktSeriesLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        check_trakt_fields(data, exact=exact_match)
+        errors = schema_match(oc.series_return_object, data)
+        assert not errors
 
-    def test_trakt_series_lookup_with_trakt_id_param(self, api_client):
-        exact_match = {
+        for field, value in values.items():
+            assert data.get(field) == value
+
+    def test_trakt_series_lookup_with_trakt_id_param(self, api_client, schema_match):
+        values = {
             'id': 75481,
             'title': 'The Flash',
             'year': 1967
@@ -163,31 +171,39 @@ class TestTraktSeriesLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        check_trakt_fields(data, exact=exact_match)
+        errors = schema_match(oc.series_return_object, data)
+        assert not errors
 
-    def test_trakt_series_lookup_with_actors_param(self, api_client):
+        for field, value in values.items():
+            assert data.get(field) == value
+
+    def test_trakt_series_lookup_with_actors_param(self, api_client, schema_match):
         rsp = api_client.get('/trakt/series/the x-files/?include_actors=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(oc.series_return_object, data)
+        assert not errors
+
         assert 'actors' in data
         assert len(data['actors']) > 0
 
-    def test_trakt_series_lookup_with_translations_param(self, api_client):
-
+    def test_trakt_series_lookup_with_translations_param(self, api_client, schema_match):
         rsp = api_client.get('/trakt/series/game of thrones/?include_translations=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(oc.series_return_object, data)
+        assert not errors
+
         assert 'translations' in data
-        assert 'bs' in data['translations']
 
 
 @pytest.mark.online
 class TestTraktMovieLookupAPI(object):
     config = 'tasks: {}'
 
-    def test_trakt_movies_lookup_no_params(self, api_client):
+    def test_trakt_movies_lookup_no_params(self, api_client, schema_match):
         # Bad API call
         rsp = api_client.get('/trakt/movies/')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
@@ -196,8 +212,93 @@ class TestTraktMovieLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        assert data.get('id') ==  481
-        assert data.get('year') == 1999
-        assert data.get('tmdb_id') == 603
-        assert data.get('imdb_id') == 'tt0133093'
+        errors = schema_match(oc.movie_return_object, data)
+        assert not errors
 
+        values = {
+            'id': 481,
+            'title': 'The Matrix',
+            'year': 1999,
+            'tmdb_id': 603,
+            'imdb_id': 'tt0133093'
+        }
+        for field, value in values.items():
+            assert data.get(field) == value
+
+    def test_trakt_movies_lookup_year_param(self, api_client, schema_match):
+        rsp = api_client.get('/trakt/movies/the matrix/?year=2003')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(oc.movie_return_object, data)
+        assert not errors
+
+        values = {
+            'id': 483,
+            'title': 'The Matrix Revolutions',
+            'year': 2003,
+            'tmdb_id': 605,
+            'imdb_id': 'tt0242653'
+        }
+        for field, value in values.items():
+            assert data.get(field) == value
+
+    def test_trakt_movies_lookup_slug_param(self, api_client, schema_match):
+        rsp = api_client.get('/trakt/movies/the matrix/?trakt_slug=the-matrix-reloaded-2003')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(oc.movie_return_object, data)
+        assert not errors
+
+        values = {
+            'id': 482,
+            'title': 'The Matrix Reloaded',
+            'year': 2003,
+            'tmdb_id': 604,
+            'imdb_id': 'tt0234215'
+        }
+        for field, value in values.items():
+            assert data.get(field) == value
+
+    def test_trakt_movies_lookup_actors_params(self, api_client, schema_match):
+        rsp = api_client.get('/trakt/movies/the matrix/?include_actors=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(oc.movie_return_object, data)
+        assert not errors
+
+        values = {
+            'id': 481,
+            'title': 'The Matrix',
+            'year': 1999,
+            'tmdb_id': 603,
+            'imdb_id': 'tt0133093'
+        }
+        for field, value in values.items():
+            assert data.get(field) == value
+
+        assert 'actors' in data
+        assert len(data['actors']) > 0
+
+    def test_trakt_movies_lookup_translations_params(self, api_client, schema_match):
+        rsp = api_client.get('/trakt/movies/the matrix/?include_translations=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(oc.movie_return_object, data)
+        assert not errors
+
+        values = {
+            'id': 481,
+            'title': 'The Matrix',
+            'year': 1999,
+            'tmdb_id': 603,
+            'imdb_id': 'tt0133093'
+        }
+        for field, value in values.items():
+            assert data.get(field) == value
+
+        assert 'translations' in data
+        assert len(data['translations']) > 0

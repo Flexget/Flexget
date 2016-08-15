@@ -229,4 +229,4 @@ def render_from_task(template, task):
     :param task: Task to render the template from.
     :return: The rendered template text.
     """
-    return render(template, {'task': task})
+    return render(template, {'task': task, 'now': datetime.now()})

@@ -6,7 +6,7 @@ import os
 import re
 import threading
 import logging
-from xml.etree.ElementTree import fromstring
+from xml.etree.ElementTree import fromstring, parse
 import io
 from uuid import uuid4
 import time
@@ -241,13 +241,12 @@ class IRCConnection(IRCBot):
         :param path: path to .tracker file
         :return: the parsed XML
         """
-        with io.open(path, 'r') as f:
-            try:
-                tracker_config = fromstring(f.read())
-            except Exception as e:
-                raise TrackerFileParseError('Unable to parse tracker config file %s: %s' % (path, e))
-            else:
-                return tracker_config
+        try:
+            tracker_config = parse(path).getroot()
+        except Exception as e:
+            raise TrackerFileParseError('Unable to parse tracker config file %s: %s' % (path, e))
+        else:
+            return tracker_config
 
     @classmethod
     def retrieve_tracker_config(cls, tracker_config_file):
@@ -256,30 +255,75 @@ class IRCConnection(IRCBot):
         :param tracker_config_file: URL or path to .tracker file
         :return: parsed XML
         """
-        tracker_config_file = os.path.expanduser(tracker_config_file)
+        base_url = 'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/'
+
+        # First we attempt to find the file locally as-is
         if os.path.exists(tracker_config_file):
+            log.debug('Found tracker file: %s', tracker_config_file)
             return cls.read_tracker_config(tracker_config_file)
-        elif re.match('^(?![\\\/]).+\.tracker$', tracker_config_file):
-            tracker_basepath = os.path.abspath(os.path.join(manager.config_base, 'trackers'))
-            save_path = os.path.join(tracker_basepath, tracker_config_file)
-            if not os.path.exists(tracker_basepath):
-                try:
-                    os.mkdir(tracker_basepath)
-                except IOError as e:
-                    raise TrackerFileError(e)
-            if not os.path.exists(save_path):
-                log.info('Tracker file not found on disk. Attempting to fetch tracker config file from Github.')
-                url = 'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/' + tracker_config_file
-                try:
-                    r = requests.get(url)
-                    with io.open(save_path, 'wb') as tracker_file:
-                        for chunk in r.iter_content(8192):
-                            tracker_file.write(chunk)
-                except (requests.RequestException, IOError) as e:
-                    raise TrackerFileError(e)
-            return cls.read_tracker_config(save_path)
+
+        tracker_config_file = os.path.expanduser(tracker_config_file)
+        if not tracker_config_file.endswith('.tracker'):
+            tracker_config_file += '.tracker'
+
+            # Maybe the file is missing extension?
+            if os.path.exists(tracker_config_file):
+                log.debug('Found tracker file: %s', tracker_config_file)
+                return cls.read_tracker_config(tracker_config_file.rsplit('.tracker')[0])
+
+        # Check that containing dir exists, otherwise default to flexget_config_dir/trackers
+        if os.path.exists(os.path.dirname(tracker_config_file)):
+            base_dir = os.path.dirname(tracker_config_file)
         else:
-            raise TrackerFileError('Unable to open tracker config file %s', tracker_config_file)
+            base_dir = os.path.abspath(os.path.join(manager.config_base, 'trackers'))
+        # Find the filenames for easy use later
+        tracker_name = os.path.basename(tracker_config_file)
+        tracker_name_no_ext = os.path.splitext(tracker_name)[0]
+        # One last try with case insensitive search!
+        if os.path.exists(base_dir):
+            files = os.listdir(base_dir)
+            for f in files:
+                if tracker_name_no_ext in f.lower():
+                    found_path = os.path.join(base_dir, f)
+                    log.debug('Found tracker file: %s', found_path)
+                    return cls.read_tracker_config(found_path)
+
+        # Download from Github instead
+        if not os.path.exists(base_dir):  # will only try to create the default `trackers` dir
+            try:
+                os.mkdir(base_dir)
+            except IOError as e:
+                raise TrackerFileError(e)
+        log.info('Tracker file not found on disk. Attempting to fetch tracker config file from Github.')
+        tracker = None
+        try:
+            tracker = requests.get(base_url + tracker_config_file)
+        except (requests.RequestException, IOError):
+            pass
+        if not tracker:
+            try:
+                log.debug('Trying to search list of tracker files on Github')
+                # Try to see if it's not found due to case sensitivity
+                trackers = requests.get('https://api.github.com/repos/autodl-community/'
+                                        'autodl-trackers/git/trees/master?recursive=1').json().get('tree', [])
+                for tracker in trackers:
+                    name = tracker.get('path', '')
+                    if not name.endswith('.tracker') or name.lower() != tracker_name.lower():
+                        continue
+                    tracker = requests.get(base_url + name)
+                    tracker_name = name
+                    break
+            except (requests.RequestException, IOError) as e:
+                raise TrackerFileError(e)
+        if not tracker:
+            raise TrackerFileError('Unable to find %s on disk or Github' % tracker_config_file)
+
+        # If we got this far, let's save our work :)
+        save_path = os.path.join(base_dir, tracker_name)
+        with io.open(save_path, 'wb') as tracker_file:
+            for chunk in tracker.iter_content(8192):
+                tracker_file.write(chunk)
+        return cls.read_tracker_config(save_path)
 
     def is_alive(self):
         return self.thread and self.thread.is_alive()
@@ -459,11 +503,13 @@ class IRCConnection(IRCBot):
         :return:
         """
 
-        parsed_fields = {}
         ignore_optionals = []
 
         if rules is None:
             rules = self.tracker_config.find('parseinfo/linematched')
+
+        # Make sure all irc fields from entry are in `fields`
+        fields = {key: val for key, val in entry.items() if key.startswith('irc_')}
 
         for rule in rules:
             log.debug('Processing rule %s' % rule.tag)
@@ -476,8 +522,8 @@ class IRCConnection(IRCBot):
                         result += element.get('value')
                     elif element.tag in ['var', 'varenc']:
                         varname = element.get('name')
-                        if irc_prefix(varname) in entry:
-                            value = entry[irc_prefix(varname)]
+                        if irc_prefix(varname) in fields:
+                            value = fields[irc_prefix(varname)]
                         elif self.config.get(varname):
                             value = self.config.get(varname)
                         else:
@@ -492,7 +538,7 @@ class IRCConnection(IRCBot):
                 else:
                     # Only set the result if we processed all elements
                     log.debug('Result for rule %s: %s=%s', rule.tag, rule.get('name'), result)
-                    parsed_fields[irc_prefix(rule.get('name'))] = result
+                    fields[irc_prefix(rule.get('name'))] = result
 
             # Var Replace - replace text in a var
             elif rule.tag == 'varreplace':
@@ -500,16 +546,16 @@ class IRCConnection(IRCBot):
                 target_var = irc_prefix(rule.get('name'))
                 regex = rule.get('regex')
                 replace = rule.get('replace')
-                if source_var and target_var and regex is not None and replace is not None and source_var in entry:
-                    parsed_fields[target_var] = re.sub(regex, replace, entry[source_var])
-                    log.debug('varreplace: %s=%s', target_var, parsed_fields[target_var])
+                if source_var and target_var and regex is not None and replace is not None and source_var in fields:
+                    fields[target_var] = re.sub(regex, replace, fields[source_var])
+                    log.debug('varreplace: %s=%s', target_var, fields[target_var])
                 else:
                     log.error('Invalid varreplace options, skipping rule')
 
             # Extract - create multiple vars from a single regex
             elif rule.tag == 'extract':
                 source_var = irc_prefix(rule.get('srcvar'))
-                if source_var not in entry:
+                if source_var not in fields:
                     if rule.get('optional', 'false') == 'false':
                         log.error('Error processing extract rule, non-optional value %s missing!', source_var)
                     ignore_optionals.append(source_var)
@@ -520,9 +566,9 @@ class IRCConnection(IRCBot):
                     log.error('Regex option missing on extract rule, skipping rule')
                     continue
                 group_names = [irc_prefix(x.get('name')) for x in rule.find('vars') if x.tag == 'var']
-                match = re.search(regex, entry[source_var])
+                match = re.search(regex, fields[source_var])
                 if match:
-                    parsed_fields.update(dict(zip(group_names, match.groups())))
+                    fields.update(dict(zip(group_names, match.groups())))
                 else:
                     log.debug('No match found for rule extract')
 
@@ -532,7 +578,7 @@ class IRCConnection(IRCBot):
                 split = rule.get('split')
                 if source_var in ignore_optionals:
                     continue
-                values = [strip_whitespace(x) for x in entry[source_var].split(split)]
+                values = [strip_whitespace(x) for x in fields[source_var].split(split)]
                 for element in rule:
                     if element.tag == 'setvarif':
                         target_var = irc_prefix(element.get('varName'))
@@ -544,13 +590,13 @@ class IRCConnection(IRCBot):
                             for val in values:
                                 match = re.match(regex, val)
                                 if match:
-                                    parsed_fields[target_var] = val
+                                    fields[target_var] = val
                                     found_match = True
                             if not found_match:
                                 log.debug('No matches found for regex %s', regex)
                         elif value is not None and new_value is not None:
                             if value in values:
-                                parsed_fields[target_var] = new_value
+                                fields[target_var] = new_value
                             else:
                                 log.debug('No match found for value %s in %s', value, source_var)
                         else:
@@ -571,9 +617,9 @@ class IRCConnection(IRCBot):
                         else:
                             log.error('No variable bindings found in extract rule, skipping.')
                             continue
-                        match = re.match(regex, entry.get(source_var, ''))
+                        match = re.match(regex, fields.get(source_var, ''))
                         if match:
-                            parsed_fields.update(dict(zip(vars, match.groups())))
+                            fields.update(dict(zip(vars, match.groups())))
                         else:
                             log.debug('No match for extract with regex: %s', regex)
                     else:
@@ -586,8 +632,8 @@ class IRCConnection(IRCBot):
                 target_var = irc_prefix(rule.get('varName'))
                 target_val = rule.get('newValue')
                 if source_var and regex and target_var and target_val:
-                    if source_var in entry and re.match(regex, entry[source_var]):
-                        parsed_fields[target_var] = target_val
+                    if source_var in fields and re.match(regex, fields[source_var]):
+                        fields[target_var] = target_val
                 else:
                     log.error('Option missing on setregex, skipping rule')
 
@@ -597,15 +643,15 @@ class IRCConnection(IRCBot):
                 regex = rule.get('regex')
 
                 if source_var and regex:
-                    if source_var in entry and re.match(regex, entry[source_var]):
-                        parsed_fields.update(self.process_tracker_config_rules(entry, rule))
+                    if source_var in fields and re.match(regex, fields[source_var]):
+                        fields.update(self.process_tracker_config_rules(fields, rule))
                 else:
                     log.error('Option missing for if statement, skipping rule')
 
             else:
                 log.warning('Unsupported linematched tag: %s', rule.tag)
 
-        return parsed_fields
+        return fields
 
     def on_privmsg(self, msg):
         """
