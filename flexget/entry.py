@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from future.utils import PY2, native_str
+from future.utils import PY2, native_str, text_type
 
 import copy
 import functools
@@ -195,6 +195,10 @@ class Entry(LazyDict):
                 raise EntryUnicodeError(key, value)
         elif isinstance(value, bytes):
             raise EntryUnicodeError(key, value)
+        # Coerce any enriched strings (such as those returned by BeautifulSoup) to plain strings to avoid serialization
+        # troubles.
+        elif isinstance(value, text_type) and type(value) != text_type:
+            value = text_type(value)
 
         # url and original_url handling
         if key == 'url':
