@@ -4,7 +4,7 @@ import datetime
 from datetime import timedelta
 
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, desc
-from sqlalchemy.schema import Table, ForeignKey
+from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from sqlalchemy.orm.exc import NoResultFound
 
