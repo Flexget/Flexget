@@ -95,7 +95,7 @@ class BlurayMovie(Base):
                 if c['c'].lower() == country_code:
                     country = c['n']
             self.country = country
-            self.release_date = dateutil_parse(result['reldate']).date()
+            self.release_date = extract_release_date(result.get('reldate'))
             self.bluray_rating = int(result['rating']) if result['rating'] else None
 
             # Used for parsing some more data, sadly with soup
