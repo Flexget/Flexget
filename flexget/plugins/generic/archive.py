@@ -6,6 +6,7 @@ import logging
 import re
 from datetime import datetime
 
+from flexget.terminal import TerminalTable, CLITableError, table_parser
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import Table, ForeignKey
@@ -393,37 +394,33 @@ def cli_search(options):
     search_term = ' '.join(options.keywords)
     tags = options.tags
     sources = options.sources
+    query = re.sub(r'[ \(\)]+', ' ', search_term).strip()
 
-    def print_ae(ae):
-        diff = datetime.now() - ae.added
+    table_data = []
+    with Session() as session:
+        for archived_entry in search(session, query, tags=tags, sources=sources):
+            days_ago = (datetime.now() - archived_entry.added).days
+            source_names = ', '.join([s.name for s in archived_entry.sources])
+            tag_names = ', '.join([t.name for t in archived_entry.tags])
 
-        console('ID: %-6s | Title: %s\nAdded: %s (%d days ago)\nURL: %s' %
-                (ae.id, ae.title, ae.added, diff.days, ae.url))
-        source_names = ', '.join([s.name for s in ae.sources])
-        tag_names = ', '.join([t.name for t in ae.tags])
-        console('Source(s): %s | Tag(s): %s' % (source_names or 'N/A', tag_names or 'N/A'))
-        if ae.description:
-            console('Description: %s' % strip_html(ae.description))
-        console('---')
-
-    session = Session()
+            table_data.append(['ID', str(archived_entry.id)])
+            table_data.append(['Title', archived_entry.title])
+            table_data.append(['Added', str(days_ago) + ' days ago'])
+            table_data.append(['URL', archived_entry.url])
+            table_data.append(['Source(s)', source_names or 'N/A'])
+            table_data.append(['Tag(s)', tag_names or 'N/A'])
+            if archived_entry.description:
+                table_data.append(['Description', strip_html(archived_entry.description)])
+            table_data.append([])
+    if not table_data:
+        console('No results found for search')
+        return
+    table = TerminalTable(options.table_type, table_data, wrap_columns=[(1, 100)])
+    table.table.inner_heading_row_border = False
     try:
-        console('Searching: %s' % search_term)
-        if tags:
-            console('Tags: %s' % ', '.join(tags))
-        if sources:
-            console('Sources: %s' % ', '.join(sources))
-        console('Please wait...')
-        console('')
-        results = False
-        query = re.sub(r'[ \(\)]+', ' ', search_term).strip()
-        for ae in search(session, query, tags=tags, sources=sources):
-            print_ae(ae)
-            results = True
-        if not results:
-            console('No results found.')
-    finally:
-        session.close()
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def cli_inject(manager, options):
@@ -493,22 +490,23 @@ def register_plugin():
 
 @event('options.register')
 def register_parser_arguments():
-    archive_parser = options.register_command('archive', do_cli, help='search and manipulate the archive database')
+    archive_parser = options.register_command('archive', do_cli, help='Search and manipulate the archive database')
     archive_parser.add_subparsers(title='Actions', metavar='<action>', dest='archive_action')
     # Default usage shows the positional arguments after the optional ones, override usage to fix it
-    search_parser = archive_parser.add_subparser('search', help='search from the archive',
-                                                 usage='%(prog)s [-h] <keyword> [<keyword> ...] [optional arguments]')
-    search_parser.add_argument('keywords', metavar='<keyword>', nargs='+', help='keyword(s) to search for')
-    search_parser.add_argument('--tags', metavar='TAG', nargs='+', default=[], help='tag(s) to search within')
-    search_parser.add_argument('--sources', metavar='SOURCE', nargs='+', default=[], help='source(s) to search within')
-    inject_parser = archive_parser.add_subparser('inject', help='inject entries from the archive back into tasks')
-    inject_parser.add_argument('ids', nargs='+', type=int, metavar='ID', help='archive ID of an item to inject')
-    inject_parser.add_argument('--immortal', action='store_true', help='injected entries will not be able to be '
+    search_parser = archive_parser.add_subparser('search', help='Search from the archive',
+                                                 usage='%(prog)s [-h] <keyword> [<keyword> ...] [optional arguments]',
+                                                 parents=[table_parser])
+    search_parser.add_argument('keywords', metavar='<keyword>', nargs='+', help='Keyword(s) to search for')
+    search_parser.add_argument('--tags', metavar='TAG', nargs='+', default=[], help='Tag(s) to search within')
+    search_parser.add_argument('--sources', metavar='SOURCE', nargs='+', default=[], help='Source(s) to search within')
+    inject_parser = archive_parser.add_subparser('inject', help='Inject entries from the archive back into tasks')
+    inject_parser.add_argument('ids', nargs='+', type=int, metavar='ID', help='Archive ID of an item to inject')
+    inject_parser.add_argument('--immortal', action='store_true', help='Injected entries will not be able to be '
                                                                        'rejected by any plugins')
     exec_group = inject_parser.add_argument_group('execute arguments')
     exec_group.add_argument('execute_options', action=ParseExtrasAction, parser=get_parser('execute'))
-    tag_parser = archive_parser.add_subparser('tag-source', help='tag all archived entries within a given source')
-    tag_parser.add_argument('source', metavar='<source>', help='the source whose entries you would like to tag')
+    tag_parser = archive_parser.add_subparser('tag-source', help='Tag all archived entries within a given source')
+    tag_parser.add_argument('source', metavar='<source>', help='The source whose entries you would like to tag')
     tag_parser.add_argument('tags', nargs='+', metavar='<tag>',
-                            help='the tag(s) you would like to apply to the entries')
-    archive_parser.add_subparser('consolidate', help='migrate old archive data to new model, may take a long time')
+                            help='The tag(s) you would like to apply to the entries')
+    archive_parser.add_subparser('consolidate', help='Migrate old archive data to new model, may take a long time')
