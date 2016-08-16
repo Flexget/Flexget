@@ -428,19 +428,28 @@ def get_current_flexget_version():
     return flexget.__version__
 
 
-def parse_filesize(text_size, base2=True):
+def parse_filesize(text_size, si=True):
     """
-    Expands a data size into its bibytes as an integer i.e. '1 MB' becomes 1048576.
-    If base2 is false then assume bytes so i.e. '1 MB' becomes 1000000
+    Parses a data size and returns its value in megabytes
+
+    :param string text_size: string containing the data size to parse i.e. "5 GB"
+    :param bool base2: If True, possibly ambiguous units like KB, MB, GB will be assumed to be base 10 units,
+    rather than the default base 2. i.e. if si then 50 GB = 47684 else 50GB = 51200
+
+    :returns: an float with the data size in megabytes
     """
     prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
 
     unit, amount = text_size.lower().split()
     if not unit.endswith('b'):
         raise ValueError('%s does not look like a file size' % text_size)
+    unit.rstrip('b')
+    if unit.endswith('i'):
+        si = False
+        unit.rstrip('i')
     if unit not in prefix_order:
         raise ValueError('%s does not look like a file size' % text_size)
     order = prefix_order[unit]
     amount = float(amount.replace(',', ''))
-    base = 1024 if base2 else 1000
-    return amount * (base**order)
+    base = 1000 if si else 1024
+    return (amount * (base**order)) / 1024**2
