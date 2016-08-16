@@ -34,6 +34,12 @@ def bluray_request(endpoint, **params):
     return requests.get(full_url, params=params).json()
 
 
+def extract_release_date(release_date):
+    if not release_date or release_date.lower() == 'no release date':
+        release_date = 'Dec 31, %s' % datetime.now().year
+    return dateutil_parse(release_date)
+
+
 class BlurayMovie(Base):
     __tablename__ = 'bluray_movies'
 
@@ -69,7 +75,7 @@ class BlurayMovie(Base):
             if not search_results:
                 raise LookupError('No search results found for {} on blu-ray.com'.format(title))
 
-            search_results = sorted(search_results, key=lambda k: dateutil_parse(k['reldate'] or 'Dec 31'))
+            search_results = sorted(search_results, key=lambda k: extract_release_date(k.get('reldate')))
         except requests.RequestException as e:
             raise LookupError('Error searching for {} on blu-ray.com: {}'.format(title, e))
 
