@@ -37,7 +37,7 @@ def do_cli(manager, options):
             else:
                 table_data.append([item.time.strftime("%c"), item.title])
     title = 'Showing {} entries from History'.format(query.count())
-    table = TerminalTable(options.table_type, table_data, title=title, wrap_columns=[(1, 80)])
+    table = TerminalTable(options.table_type, table_data, title=title, wrap_columns=[(1, 100)])
 
     try:
         console(table.output)
