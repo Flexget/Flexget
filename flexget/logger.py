@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import collections
 import contextlib
@@ -9,7 +10,6 @@ import threading
 import uuid
 import warnings
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flexget import __version__
 
 # A level more detailed than DEBUG
@@ -47,7 +47,6 @@ def task_logging(task):
 
 
 class SessionFilter(logging.Filter):
-
     def __init__(self, session_id):
         self.session_id = session_id
 
