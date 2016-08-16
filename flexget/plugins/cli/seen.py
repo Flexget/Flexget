@@ -56,6 +56,10 @@ def seen_search(options, session=None):
             table_data.append([''])
 
     table = TerminalTable(options.table_type, table_data, wrap_columns=[(1, 80)])
+    table.table.inner_heading_row_border = False
+    if not table_data:
+        console('No results found for search')
+        return
     try:
         console(table.output)
     except CLITableError as e:
