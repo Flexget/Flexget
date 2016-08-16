@@ -3,7 +3,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 from flexget.manager import Session
 
 try:

@@ -16,7 +16,7 @@ from sqlalchemy.schema import ForeignKey
 from flexget import db_schema
 from flexget import plugin
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests

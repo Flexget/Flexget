@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
 
+import flexget.terminal
+
 native_int = int
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
@@ -284,7 +286,7 @@ class Manager(object):
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
         if ipc_info:
-            logger.console('There is a FlexGet process already running for this config, sending execution there.')
+            flexget.terminal.console('There is a FlexGet process already running for this config, sending execution there.')
             log.debug('Sending command to running FlexGet process: %s' % self.args)
             try:
                 client = IPCClient(ipc_info['port'], ipc_info['password'])

@@ -1,5 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import collections
 import contextlib
@@ -10,8 +9,8 @@ import threading
 import uuid
 import warnings
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flexget import __version__
-from flexget.utils.tools import io_encoding
 
 # A level more detailed than DEBUG
 TRACE = 5
@@ -97,24 +96,6 @@ def get_capture_stream():
 def get_capture_loglevel():
     """If output is currently being redirected to a stream, returns declared loglevel for that stream."""
     return getattr(local_context, 'loglevel', None)
-
-
-def console(text, *args, **kwargs):
-    """
-    Print to console safely. Output is able to be captured by different streams in different contexts.
-
-    Any plugin wishing to output to the user's console should use this function instead of print so that
-    output can be redirected when FlexGet is invoked from another process.
-
-    Accepts arguments like the `print` function does.
-    """
-    kwargs['file'] = getattr(local_context, 'output', sys.stdout)
-    try:
-        print(text, *args, **kwargs)
-    except UnicodeEncodeError:
-        text = text.encode(io_encoding, 'replace').decode(io_encoding)
-        print(text, *args, **kwargs)
-    kwargs['file'].flush()  # flush to make sure the output is printed right away
 
 
 class RollingBuffer(collections.deque):

@@ -7,7 +7,7 @@ from argparse import SUPPRESS
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 
 log = logging.getLogger('dump_config')
 

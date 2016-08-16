@@ -9,11 +9,10 @@ from datetime import datetime
 from flexget import options
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.logger import console
 from flexget.manager import Session
 from flexget.options import ParseExtrasAction, get_parser
 from flexget.plugins.generic.archive import ArchiveEntry, ArchiveSource, get_source, get_tag, search
-from flexget.terminal import TerminalTable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser, console
 from flexget.utils.tools import strip_html
 
 log = logging.getLogger('archive_cli')

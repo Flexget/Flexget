@@ -9,7 +9,8 @@ import threading
 import rpyc
 
 from flexget import terminal
-from flexget.logger import console, capture_output
+from flexget.logger import capture_output
+from flexget.terminal import console
 from flexget.options import get_parser
 from rpyc.utils.server import ThreadedServer
 from terminaltables.terminal_io import terminal_size

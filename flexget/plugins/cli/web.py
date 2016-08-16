@@ -3,7 +3,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 from flexget.utils.database import with_session
 from flexget.webserver import change_password, generate_token, WeakPassword, get_user
 

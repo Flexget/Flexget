@@ -6,9 +6,8 @@ from datetime import timedelta
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.logger import console
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, CLITableError, table_parser, colorize
+from flexget.terminal import TerminalTable, CLITableError, table_parser, colorize, console
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,

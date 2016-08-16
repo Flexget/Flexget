@@ -2,10 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugins.internal.api_trakt import get_access_token, TraktUserAuth, delete_account, PIN_URL
-from flexget.terminal import TerminalTable, table_parser
+from flexget.terminal import TerminalTable, table_parser, console
 
 
 def action_auth(options):

@@ -3,10 +3,9 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
 from flexget.event import event
-from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugins.filter.remember_rejected import RememberEntry
-from flexget.terminal import TerminalTable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser, console
 
 
 def do_cli(manager, options):

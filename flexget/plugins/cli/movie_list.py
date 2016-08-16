@@ -9,9 +9,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from flexget import options
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.logger import console
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser, console
 from flexget.plugin import PluginError
 from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
     get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase

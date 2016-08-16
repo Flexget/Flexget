@@ -6,8 +6,7 @@ from sqlalchemy import desc
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.logger import console
-from flexget.terminal import TerminalTable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser, console
 from flexget.plugins.output.history import History
 
 

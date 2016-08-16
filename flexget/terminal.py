@@ -1,12 +1,14 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import sys
 from textwrap import wrap
 
 from colorclass import Windows, Color, disable_all_colors
+from flexget.logger import local_context
 from flexget.options import ArgumentParser
-from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable
+from flexget.utils.tools import io_encoding
+from terminaltables import *
 from terminaltables.terminal_io import terminal_size
 
 # Enable terminal colors on windows
@@ -131,3 +133,21 @@ def colorize(color, text, auto=True):
     :return: Colored text
     """
     return Color.colorize(color, text, auto)
+
+
+def console(text, *args, **kwargs):
+    """
+    Print to console safely. Output is able to be captured by different streams in different contexts.
+
+    Any plugin wishing to output to the user's console should use this function instead of print so that
+    output can be redirected when FlexGet is invoked from another process.
+
+    Accepts arguments like the `print` function does.
+    """
+    kwargs['file'] = getattr(local_context, 'output', sys.stdout)
+    try:
+        print(text, *args, **kwargs)
+    except UnicodeEncodeError:
+        text = text.encode(io_encoding, 'replace').decode(io_encoding)
+        print(text, *args, **kwargs)
+    kwargs['file'].flush()  # flush to make sure the output is printed right away

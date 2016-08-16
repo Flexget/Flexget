@@ -7,7 +7,7 @@ import yaml
 
 from flexget import options
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 
 log = logging.getLogger('check')
 

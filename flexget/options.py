@@ -13,7 +13,6 @@ import flexget
 
 from flexget.entry import Entry
 from flexget.event import fire_event
-from flexget.logger import console
 from flexget.utils import requests
 
 _UNSET = object()
@@ -71,6 +70,7 @@ class VersionAction(_VersionAction):
     """Action to print the current version. Also checks latest release revision."""
 
     def __call__(self, parser, namespace, values, option_string=None):
+        from flexget.terminal import console
         # Print the version number
         console('%s' % self.version)
         # Check for latest version from server

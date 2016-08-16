@@ -8,7 +8,7 @@ from sqlalchemy import Column, Integer, String
 
 from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 from flexget.utils.template import RenderError
 
 try:

@@ -6,10 +6,9 @@ from datetime import timedelta
 
 from flexget import options
 from flexget.event import event
-from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugins.operate.status import StatusTask, TaskExecution
-from flexget.terminal import TerminalTable, CLITableError, table_parser, colorize
+from flexget.terminal import TerminalTable, CLITableError, table_parser, colorize, console
 from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 

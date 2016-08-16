@@ -6,9 +6,8 @@ import logging
 
 from flexget import options
 from flexget.event import event
-from flexget.logger import console
 from flexget.plugin import get_plugins
-from flexget.terminal import TerminalTable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser, console
 
 log = logging.getLogger('plugins')
 

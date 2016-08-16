@@ -2,8 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
-from flexget.logger import console
-from flexget.terminal import TerminalTable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser, console
 from flexget.manager import Session
 from flexget.event import event
 from flexget.plugins.filter.retry_failed import FailedEntry
