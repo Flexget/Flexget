@@ -3,8 +3,6 @@ import logging
 import datetime
 from datetime import timedelta
 
-from colorclass.color import Color
-
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, desc
 from sqlalchemy.schema import Table, ForeignKey
 from sqlalchemy.orm import relation
@@ -13,7 +11,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flexget import db_schema, options, plugin
 from flexget.event import event
 from flexget.logger import console
-from flexget.terminal import TerminalTable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser, colorize
 from flexget.manager import Session
 
 log = logging.getLogger('status')
@@ -51,8 +49,8 @@ class TaskExecution(Base):
 
     def __repr__(self):
         return ('<TaskExecution(task_id=%s,start=%s,end=%s,succeeded=%s,p=%s,a=%s,r=%s,f=%s,reason=%s)>' %
-            (self.task_id, self.start, self.end, self.succeeded, self.produced, self.accepted,
-            self.rejected, self.failed, self.abort_reason))
+                (self.task_id, self.start, self.end, self.succeeded, self.produced, self.accepted,
+                 self.rejected, self.failed, self.abort_reason))
 
 
 class Status(object):
@@ -71,7 +69,7 @@ class Status(object):
                 st = StatusTask()
                 st.name = task.name
                 session.add(st)
-            # TODO: purge removed tasks
+                # TODO: purge removed tasks
 
         self.execution = TaskExecution()
         self.execution.start = datetime.datetime.utcnow()
@@ -112,17 +110,14 @@ def do_cli_task(manager, options):
     table_data = [header]
     with Session() as session:
         try:
-            task = session.query(StatusTask).filter(StatusTask.name==options.task).one()
+            task = session.query(StatusTask).filter(StatusTask.name == options.task).one()
         except NoResultFound:
             console('Task name `%s` does not exists or does not have any records' % options.task)
         else:
             query = task.executions.order_by(desc(TaskExecution.start))[:options.limit]
             for ex in reversed(query):
                 start = ex.start.strftime('%Y-%m-%d %H:%M')
-                if ex.succeeded:
-                    start = Color('{green}%s{/green}' % start)
-                else:
-                    start = Color('{red}%s{/red}' % start)
+                start = colorize('green', start) if ex.succeeded else colorize('red', start)
 
                 if ex.end is not None and ex.start is not None:
                     delta = ex.end - ex.start
@@ -142,7 +137,6 @@ def do_cli_task(manager, options):
                     ]
                 )
 
-
     table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
@@ -151,15 +145,15 @@ def do_cli_task(manager, options):
 
 
 def do_cli_summary(manager, options):
-    header= ['Task', 'Last success', 'Produced', 'Accepted', 'Rejected', 'Failed', 'Duration']
+    header = ['Task', 'Last success', 'Produced', 'Accepted', 'Rejected', 'Failed', 'Duration']
     table_data = [header]
 
     with Session() as session:
         for task in session.query(StatusTask).all():
-            ok = session.query(TaskExecution).\
-                filter(TaskExecution.task_id == task.id).\
-                filter(TaskExecution.succeeded == True).\
-                filter(TaskExecution.produced > 0).\
+            ok = session.query(TaskExecution). \
+                filter(TaskExecution.task_id == task.id). \
+                filter(TaskExecution.succeeded == True). \
+                filter(TaskExecution.produced > 0). \
                 order_by(TaskExecution.start.desc()).first()
 
             if ok is None:
@@ -171,19 +165,19 @@ def do_cli_summary(manager, options):
 
                 age = datetime.datetime.utcnow() - ok.start
                 if age > timedelta(days=7):
-                    last_success = Color('{red}%s{/red}' % last_success)
+                    last_success = colorize('red', last_success)
                 elif age < timedelta(minutes=10):
-                    last_success = Color('{green}%s{/green}' % last_success)
+                    last_success = colorize('green', last_success)
 
             table_data.append([
-              task.name,
-              last_success,
-              ok.produced if ok is not None else '-',
-              ok.accepted if ok is not None else '-',
-              ok.rejected if ok is not None else '-',
-              ok.failed if ok is not None else '-',
-              '%1.fs' % duration.total_seconds() if duration is not None else '-',
-              ]
+                task.name,
+                last_success,
+                ok.produced if ok is not None else '-',
+                ok.accepted if ok is not None else '-',
+                ok.rejected if ok is not None else '-',
+                ok.failed if ok is not None else '-',
+                '%1.fs' % duration.total_seconds() if duration is not None else '-',
+            ]
             )
 
     table = TerminalTable(options.table_type, table_data)
@@ -195,7 +189,8 @@ def do_cli_summary(manager, options):
 
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
-    result = session.query(TaskExecution).filter(TaskExecution.start < datetime.datetime.utcnow() - timedelta(days=365)).delete()
+    result = session.query(TaskExecution).filter(
+        TaskExecution.start < datetime.datetime.utcnow() - timedelta(days=365)).delete()
     if result:
         log.verbose('Removed %s task executions from history older than 1 year', result)
 
@@ -210,4 +205,4 @@ def register_parser_arguments():
     parser = options.register_command('status', do_cli, help='View task health status', parents=[table_parser])
     parser.add_argument('--task', action='store', metavar='TASK', help='Limit to results in specified %(metavar)s')
     parser.add_argument('--limit', action='store', type=int, metavar='NUM', default=50,
-                         help='Limit to %(metavar)s results')
+                        help='Limit to %(metavar)s results')
