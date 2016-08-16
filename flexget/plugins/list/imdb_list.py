@@ -28,6 +28,9 @@ IMMUTABLE_LISTS = ['ratings', 'checkins']
 
 Base = db_schema.versioned_base('imdb_list', 0)
 
+MOVIE_TYPES = ['feature film', 'documentary']
+SERIES_TYPES = ['tv series']
+
 
 class IMDBListUser(Base):
     __tablename__ = "imdb_list_user"
@@ -88,7 +91,7 @@ class ImdbEntrySet(MutableSet):
         self.config = config
         self._session = RequestSession()
         self._session.add_domain_limiter(TimedLimiter('imdb.com', '5 seconds'))
-        self._session.headers.update( {'Accept-Language': config.get('force_language', 'en-us')} )
+        self._session.headers.update({'Accept-Language': config.get('force_language', 'en-us')})
         self.user_id = None
         self.list_id = None
         self.cookies = None
@@ -117,11 +120,12 @@ class ImdbEntrySet(MutableSet):
                     cached_credentials = True
             if not cached_credentials:
                 log.debug('user credentials not found in cache or outdated, fetching from IMDB')
-                url_credentials = ( 'https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
-                    'handler&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&'
-                    'openid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%'
-                    '2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.ope'
-                    'nid.net%2Fauth%2F2.0'
+                url_credentials = (
+                'https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
+                'handler&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&'
+                'openid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%'
+                '2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.ope'
+                'nid.net%2Fauth%2F2.0'
                 )
                 try:
                     r = self._session.get(url_credentials)
@@ -134,9 +138,9 @@ class ImdbEntrySet(MutableSet):
                 data['password'] = self.config['password']
                 action = soup.find('form', id='ap_signin_form').get('action')
                 log.debug('email=%s, password=%s', data['email'], data['password'])
-                self._session.headers.update({'Referer':url_credentials})
+                self._session.headers.update({'Referer': url_credentials})
                 d = self._session.post(action, data=data)
-                self._session.headers.update({'Referer':'http://www.imdb.com/'})
+                self._session.headers.update({'Referer': 'http://www.imdb.com/'})
                 # Get user id by extracting from redirect url
                 r = self._session.head('http://www.imdb.com/profile', allow_redirects=False)
                 if not r.headers.get('location') or 'login' in r.headers['location']:
@@ -219,12 +223,14 @@ class ImdbEntrySet(MutableSet):
                     'imdb_genres': [genre.strip() for genre in row[12].split(',')]
                 })
                 item_type = row[6].lower()
-                if item_type == 'feature film':
-                    entry['movie_name'] = row[5]
-                    entry['movie_year'] = int(row[11]) if row[11] != '????' else None
-                elif item_type == 'tv series':
-                    entry['series_name'] = row[5]
-                    entry['series_year'] = int(row[11]) if row[11] != '????' else None
+                name = row[5]
+                year = int(row[11]) if row[11] != '????' else None
+                if item_type in MOVIE_TYPES:
+                    entry['movie_name'] = name
+                    entry['movie_year'] = year
+                elif item_type in SERIES_TYPES:
+                    entry['series_name'] = name
+                    entry['series_year'] = year
                 else:
                     log.verbose('Unknown IMDB type entry received: %s. Skipping', item_type)
                     continue
