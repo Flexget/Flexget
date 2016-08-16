@@ -116,7 +116,7 @@ class SearchCPASBIEN(object):
                         entry['torrent_leeches'] = (int(result.find('div', attrs={'class': re.compile('down')}).text))
                         size = result.find('div', attrs={'class': re.compile('poid')}).text
 
-                        entry['content_size'] = parse_filesize(size, False)
+                        entry['content_size'] = parse_filesize(size, si=False)
 
                         if (entry['torrent_seeds'] > 0):
                             entries.add(entry)
