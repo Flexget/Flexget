@@ -11,6 +11,7 @@ from flexget.utils import requests
 from flexget.utils.imdb import extract_id
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('search_ptn')
 
@@ -84,13 +85,9 @@ class SearchPTN(object):
             entry['torrent_seeds'] = int(row.find(title='Number of Seeders').text)
             entry['torrent_leeches'] = int(row.find(title='Number of Leechers').text)
             entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-            size, unit = row.find(title='Torrent size').text.split(' ')
-            if unit == 'GB':
-                entry['content_size'] = int(float(size) * 1024)
-            elif unit == 'MB':
-                entry['content_size'] = int(float(size))
-            elif unit == 'KB':
-                entry['content_size'] = int(float(size) / 1024)
+
+            entry['content_size'] = parse_filesize(str(row.find(title='Torrent size').text), False)
+
             if imdb_id:
                 entry['imdb_id'] = imdb_id
             entries.append(entry)

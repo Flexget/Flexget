@@ -18,6 +18,7 @@ from flexget.plugin import PluginError
 from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('fuzer')
 
@@ -106,17 +107,8 @@ class UrlRewriteFuzer(object):
             e['search_sort'] = torrent_availability(e['torrent_seeds'], e['torrent_leeches'])
 
             size = re.search('(\d+.?\d+)([TGMK]?)B', raw_size)
-            if size:
-                if size.group(2) == 'T':
-                    e['content_size'] = int(float(size.group(1)) * 1000 ** 4 / 1024 ** 2)
-                elif size.group(2) == 'G':
-                    e['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)
-                elif size.group(2) == 'M':
-                    e['content_size'] = int(float(size.group(1)) * 1000 ** 2 / 1024 ** 2)
-                elif size.group(2) == 'K':
-                    e['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
-                else:
-                    e['content_size'] = int(float(size.group(1)) / 1024 ** 2)
+            e['content_size'] = parse_filesize(size.group(0))
+
             entries.append(e)
         return entries
 

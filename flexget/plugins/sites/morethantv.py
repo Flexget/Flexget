@@ -16,6 +16,7 @@ from flexget.utils.database import json_synonym
 from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
 from flexget.config_schema import one_or_more
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('morethantv')
 Base = db_schema.versioned_base('morethantv', 0)
@@ -242,15 +243,7 @@ class SearchMoreThanTV(object):
                 e['torrent_sticky'] = True if group_info.find('span', attrs={'class': 'flag_sticky'}) else False
                 e['torrent_tags'] = torrent_tags
 
-                if size:
-                    if size.group(2) == 'GB':
-                        entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 ** 3 / 1024 ** 2)
-                    elif size.group(2) == 'MB':
-                        entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 ** 2 / 1024 ** 2)
-                    elif size.group(2) == 'KB':
-                        entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 / 1024 ** 2)
-                    else:
-                        entry['content_size'] = int(float(size.group(1).replace(',', '')) / 1024 ** 2)
+                entry['content_size'] = parse_filesize(size.group(0))
 
                 entries.add(e)
 

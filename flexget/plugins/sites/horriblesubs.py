@@ -22,8 +22,13 @@ class HorribleSubs(object):
     @staticmethod
     def horrible_entries(requests, page_url):
         entries = []
-        soup = get_soup(requests.get(page_url).content)
-        
+
+        try:
+            soup = get_soup(requests.get(page_url).content)
+        except RequestException as e:
+            log.error('HorribleSubs request failed: %s', e)
+            return entries
+
         for td_label in soup.findAll('td', attrs={'class': 'dl-label'}):
             title = '[HorribleSubs] {0}'.format(str(td_label.find('i').string))
             urls = []

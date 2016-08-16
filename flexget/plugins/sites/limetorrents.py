@@ -10,6 +10,7 @@ from flexget.event import event
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability
+from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('limetorrents')
 
@@ -86,14 +87,7 @@ class Limetorrents(object):
                     seeds = int(row.find('td', attrs={'class': 'tdseed'}).text.replace(',', ''))
                     leeches = int(row.find('td', attrs={'class': 'tdleech'}).text.replace(',', ''))
 
-                    if size.split()[1] == 'GB':
-                        size = int(float(size.split()[0].replace(',', '')) * 1000 ** 3 / 1024 ** 2)
-                    elif size.split()[1] == 'MB':
-                        size = int(float(size.split()[0].replace(',', '')) * 1000 ** 2 / 1024 ** 2)
-                    elif size.split()[1] == 'KB':
-                        size = int(float(size.split()[0].replace(',', '')) * 1000 / 1024 ** 2)
-                    else:
-                        size = int(float(size.split()[0].replace(',', '')) / 1024 ** 2)
+                    size = parse_filesize(size)
 
                     e = Entry()
 

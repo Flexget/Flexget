@@ -426,3 +426,30 @@ def get_latest_flexget_version_number():
 
 def get_current_flexget_version():
     return flexget.__version__
+
+
+def parse_filesize(text_size, si=True):
+    """
+    Parses a data size and returns its value in mebibytes
+
+    :param string text_size: string containing the data size to parse i.e. "5 GB"
+    :param bool si: If True, possibly ambiguous units like KB, MB, GB will be assumed to be base 10 units,
+    rather than the default base 2. i.e. if si then 50 GB = 47684 else 50GB = 51200
+
+    :returns: an float with the data size in mebibytes
+    """
+    prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
+
+    unit, amount = text_size.lower().split()
+    if not unit.endswith('b'):
+        raise ValueError('%s does not look like a file size' % text_size)
+    unit.rstrip('b')
+    if unit.endswith('i'):
+        si = False
+        unit.rstrip('i')
+    if unit not in prefix_order:
+        raise ValueError('%s does not look like a file size' % text_size)
+    order = prefix_order[unit]
+    amount = float(amount.replace(',', ''))
+    base = 1000 if si else 1024
+    return (amount * (base**order)) / 1024**2
