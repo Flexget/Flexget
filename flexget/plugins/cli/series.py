@@ -3,14 +3,12 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import argparse
 from datetime import timedelta
-from functools import partial
 
-from colorclass.color import Color
 from flexget import options, plugin
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, CLITableError, table_parser
+from flexget.terminal import TerminalTable, CLITableError, table_parser, colorize
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
@@ -28,8 +26,6 @@ BEHIND_EP_COLOR = 'red'
 UNDOWNLOADED_RELEASE_COLOR = 'black'
 DOWNLOADED_RELEASE_COLOR = 'white'
 ERROR_COLOR = 'red'
-
-colorize = partial(Color.colorize, auto=True)
 
 
 def do_cli(manager, options):

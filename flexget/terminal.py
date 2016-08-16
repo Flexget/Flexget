@@ -119,3 +119,15 @@ def word_wrap(text, max_length):
     if len(text) >= max_length:
         return '\n'.join(wrap(text, max_length))
     return text
+
+
+def colorize(color, text, auto=True):
+    """
+    A simple override of Color.colorize which sets the default auto colors value to True, since it's the more common
+    use case.
+    :param color: Color tag to use
+    :param text: Text to color
+    :param auto: Whether to apply auto colors
+    :return: Colored text
+    """
+    return Color.colorize(color, text, auto)
