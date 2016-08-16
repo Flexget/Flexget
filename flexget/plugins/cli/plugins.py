@@ -32,14 +32,10 @@ def plugins_summary(manager, options):
             prio = handlers[phase].priority
             roles.append('{0}({1})'.format(phase, prio))
 
-        if options.table_type == 'porcelain':
-            jc = ', '
-        else:
-            jc = '\n'
         name = colorize('green', plugin.name) if 'builtin' in flags else plugin.name
-        table_data.append([name, jc.join(roles), jc.join(flags)])
+        table_data.append([name, ' ,'.join(roles), ' ,'.join(flags)])
 
-    table = TerminalTable(options.table_type, table_data)
+    table = TerminalTable(options.table_type, table_data, wrap_columns=[(1, 60), (2, 60)])
     try:
         console(table.output)
     except CLITableError as e:
