@@ -37,7 +37,7 @@ def bluray_request(endpoint, **params):
 def extract_release_date(release_date):
     if not release_date or release_date.lower() == 'no release date':
         release_date = 'Dec 31, %s' % datetime.now().year
-    return dateutil_parse(release_date)
+    return dateutil_parse(release_date).date()
 
 
 class BlurayMovie(Base):
