@@ -430,13 +430,13 @@ def get_current_flexget_version():
 
 def parse_filesize(text_size, si=True):
     """
-    Parses a data size and returns its value in megabytes
+    Parses a data size and returns its value in mebibytes
 
     :param string text_size: string containing the data size to parse i.e. "5 GB"
-    :param bool base2: If True, possibly ambiguous units like KB, MB, GB will be assumed to be base 10 units,
+    :param bool si: If True, possibly ambiguous units like KB, MB, GB will be assumed to be base 10 units,
     rather than the default base 2. i.e. if si then 50 GB = 47684 else 50GB = 51200
 
-    :returns: an float with the data size in megabytes
+    :returns: an float with the data size in mebibytes
     """
     prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
 

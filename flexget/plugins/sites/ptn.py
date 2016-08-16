@@ -86,7 +86,7 @@ class SearchPTN(object):
             entry['torrent_leeches'] = int(row.find(title='Number of Leechers').text)
             entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
 
-            entry['content_size'] = parse_filesize(str(row.find(title='Torrent size').text))
+            entry['content_size'] = parse_filesize(str(row.find(title='Torrent size').text), False)
 
             if imdb_id:
                 entry['imdb_id'] = imdb_id
