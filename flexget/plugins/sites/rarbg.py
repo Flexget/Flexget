@@ -19,9 +19,13 @@ CATEGORIES = {
     'all': 0,
 
     # Movies
+    'x264': 17,
     'x264 720p': 45,
     'x264 1080p': 44,
+    'x264 3D': 47,
+
     'XviD': 14,
+    'XviD 720p': 48,
     'Full BD': 42,
 
     # TV
