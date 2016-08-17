@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
+import io
 import os
 import socket
 
@@ -69,7 +70,7 @@ class FormLogin(object):
                 if not os.path.isdir(received):
                     os.mkdir(received)
                 filename = os.path.join(received, '%s.formlogin.html' % task.name)
-                with open(filename, 'wb') as f:
+                with io.open(filename, 'wb') as f:
                     f.write(br.response().get_data())
                 log.critical('I have saved the login page content to %s for you to view' % filename)
                 raise plugin.PluginError('Unable to find login fields', log)
