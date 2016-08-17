@@ -440,13 +440,13 @@ def parse_filesize(text_size, si=True):
     """
     prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
 
-    unit, amount = text_size.lower().split()
+    amount, unit = text_size.strip().lower().split()
     if not unit.endswith('b'):
         raise ValueError('%s does not look like a file size' % text_size)
-    unit.rstrip('b')
+    unit = unit.rstrip('b')
     if unit.endswith('i'):
         si = False
-        unit.rstrip('i')
+        unit = unit.rstrip('i')
     if unit not in prefix_order:
         raise ValueError('%s does not look like a file size' % text_size)
     order = prefix_order[unit]
