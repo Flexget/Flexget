@@ -5,6 +5,7 @@ import logging
 import re
 import os
 import xmlrpc.client
+import xmlrpclib
 
 from flexget import plugin
 from flexget.event import event
@@ -89,6 +90,9 @@ class OutputAria2(object):
                 self.add_entry(aria2, entry, config)
             except socket_error as se:
                 entry.fail('Unable to reach Aria2')
+            except xmlrpclib.Fault as err:
+                log.critical('Fault code %s message %s', err.faultCode, err.faultString)
+                entry.fail('Aria2 communication Fault')
             except Exception as e:
                 log.debug('Exception type %s', type(e), exc_info=True)
                 raise
