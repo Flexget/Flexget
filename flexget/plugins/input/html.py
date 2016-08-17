@@ -3,10 +3,13 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 from future.moves.urllib import parse
 
+
 import logging
 import posixpath
 import zlib
 import re
+import io
+
 from jinja2 import Template
 
 from flexget import plugin
@@ -122,7 +125,7 @@ class InputHtml(object):
                 current += step
             return entries
         else:
-            return self._request_url(task, config, base_url, auth)
+            return self._request_url(task, config, base_url, auth, dump_name=config.get('dump'))
 
     def _request_url(self, task, config, url, auth, dump_name=None):
         log.verbose('Requesting: %s' % url)
@@ -134,7 +137,7 @@ class InputHtml(object):
         if dump_name:
             log.verbose('Dumping: %s' % dump_name)
             data = soup.prettify()
-            with open(dump_name, 'w') as f:
+            with io.open(dump_name, 'w', encoding='utf-8') as f:
                 f.write(data)
 
         return self.create_entries(url, soup, config)
