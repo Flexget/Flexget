@@ -2,8 +2,17 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from datetime import datetime
+import math
+
+import pytest
 
 from flexget.utils import json
+from flexget.utils.tools import parse_filesize
+
+
+def compare_floats(float1, float2):
+    eps = 0.0001
+    return math.fabs(float1 - float2) <= eps
 
 
 class TestJson(object):
@@ -33,3 +42,33 @@ class TestJson(object):
 
         dt = datetime.strptime(date_str, '"%Y-%m-%dT%H:%M:%SZ"')
         assert decoded_dt == {'date': dt}
+
+
+class TestParseFilesize(object):
+    def test_parse_filesize_no_space(self):
+        size = '200KB'
+        expected = 200 * 1000 / 1024 ** 2
+        assert compare_floats(parse_filesize(size), expected)
+
+    def test_parse_filesize_space(self):
+        size = '200.0 KB'
+        expected = 200 * 1000 / 1024**2
+        assert compare_floats(parse_filesize(size), expected)
+
+    def test_parse_filesize_non_si(self):
+        size = '1234 GB'
+        expected = 1234 * 1000**3 / 1024 ** 2
+        assert compare_floats(parse_filesize(size), expected)
+
+    def test_parse_filesize_auto(self):
+        size = '1234 GiB'
+        expected = 1234 * 1024**3 / 1024 ** 2
+        assert compare_floats(parse_filesize(size), expected)
+
+    def test_parse_filesize_auto_mib(self):
+        size = '1234 MiB'
+        assert compare_floats(parse_filesize(size), 1234)
+
+    def test_parse_filesize_ib_not_valid(self):
+        with pytest.raises(ValueError):
+            parse_filesize('100 ib')
