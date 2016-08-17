@@ -48,6 +48,14 @@ def escape(pathname):
 
 
 def get_siblings(ext, main_file_path, main_file_no_ext, abs_path):
+    """
+    Retrieves siblings using glob
+    :param ext: the file extension we wish to find (from user config)
+    :param main_file_path: absolute path to the main file from the entry
+    :param main_file_no_ext: main file name without extension
+    :param abs_path: the absolute path to walk through to find siblings for main_file_no_ext. Assumes it's glob-escaped
+    :return: all siblings matching `main_file_no_ext + ext`
+    """
     siblings = {}
     normalized_ext = make_ext(ext)
     # escape the filename to avoid special characters in main file confusing glob
@@ -127,12 +135,12 @@ class BaseFileOps(object):
                             abs_subdirs = [subdir]
                         else:
                             # use glob to get a list of matching dirs
-                            abs_subdirs = glob.glob(os.path.join(parent, os.path.normpath(subdir)))
+                            abs_subdirs = glob.glob(os.path.join(escape(parent), os.path.normpath(subdir)))
                         # iterate over every dir returned by glob looking for matching ext
                         for abs_subdir in abs_subdirs:
                             if os.path.isdir(abs_subdir):
                                 for ext in config['along']['files']:
-                                    siblings.update(get_siblings(ext, src, filename_no_ext, abs_subdir))
+                                    siblings.update(get_siblings(ext, src, filename_no_ext, escape(abs_subdir)))
 
                 # execute action in subclasses
                 self.handle_entry(task, config, entry, siblings)
