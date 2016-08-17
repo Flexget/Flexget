@@ -89,6 +89,9 @@ class OutputAria2(object):
                 self.add_entry(aria2, entry, config)
             except socket_error as se:
                 entry.fail('Unable to reach Aria2')
+            except Exception as e:
+                log.debug('Exception type %s', type(e), exc_info=True)
+                raise
 
     def add_entry(self, aria2, entry, config):
         """
@@ -96,13 +99,18 @@ class OutputAria2(object):
         """
         options = config['options']
         options['dir'] = os.path.expanduser(entry.render(config['path']).rstrip('/'))
+        secret = None
+        if config['secret']:
+            secret = 'token:%s' % config['secret']
         # handle torrent files
         if 'torrent' in entry:
+            if secret:
+                 return aria2.addTorrent(secret, xmlrpclib.Binary(open(entry['file'], mode='rb').read()))
             return aria2.addTorrent(xmlrpclib.Binary(open(entry['file'], mode='rb').read()))
         # handle everything else (except metalink -- which is unsupported)
         # so magnets, https, http, ftp .. etc
-        if config['secret']:
-            return aria2.addUri(config['secret'], [entry['url']], options)
+        if secret:
+            return aria2.addUri(secret, [entry['url']], options)
         return aria2.addUri([entry['url']], options)
 
 
