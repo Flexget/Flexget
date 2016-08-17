@@ -29,8 +29,8 @@ def plugins_summary(manager, options):
         handlers = plugin.phase_handlers
         roles = []
         for phase in handlers:
-            prio = handlers[phase].priority
-            roles.append('{0}({1})'.format(phase, prio))
+            priority = handlers[phase].priority
+            roles.append('{0}({1})'.format(phase, priority))
 
         name = colorize('green', plugin.name) if 'builtin' in flags else plugin.name
         table_data.append([name, ' ,'.join(roles), ' ,'.join(flags)])
