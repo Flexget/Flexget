@@ -22,16 +22,14 @@ class QualityPriority(object):
 
     schema = {
         'type': 'object',
-        'additionalProperties':
-            {
-                'type': 'object',
-                'properties': {
-                    'oneOf': [
-                        {'above': {'type': 'string'}},
-                        {'below': {'type': 'string'}}
-                    ]
-                }
-            }
+        'additionalProperties': {
+            'type': 'object',
+            'properties': {
+                'above': {'type': 'string'},
+                'below': {'type': 'string'}
+            },
+            'maxProperties': 1
+        }
     }
 
     def __init__(self):
