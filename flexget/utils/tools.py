@@ -440,7 +440,11 @@ def parse_filesize(text_size, si=True):
     """
     prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
 
-    amount, unit = text_size.strip().lower().split()
+    parsed_size = re.match('(\d+.?\d+)\s?([ptgmk]?b)', text_size.strip().lower())
+    if not parsed_size:
+        raise ValueError('%s does not look like a file size' % text_size)
+    amount = parsed_size.group(1)
+    unit = parsed_size.group(2)
     if not unit.endswith('b'):
         raise ValueError('%s does not look like a file size' % text_size)
     unit = unit.rstrip('b')
