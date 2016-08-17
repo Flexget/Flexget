@@ -10,7 +10,8 @@ class TestQualityPriority(object):
               - {title: 'Some Show S01E01 WEBRip'}
               - {title: 'Some Show S01E01 HDTV'}
             quality_priority:
-              webrip: 155
+              webrip:
+                above: hdtv
             series:
               - Some Show:
                   identified_by: ep

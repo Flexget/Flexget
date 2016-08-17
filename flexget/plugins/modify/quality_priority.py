@@ -20,21 +20,46 @@ class QualityPriority(object):
           webrip: 155  # just above hdtv
     """
 
-    schema = {'type': 'object', 'additionalProperties': {'type': 'integer'}}
+    schema = {
+        'type': 'object',
+        'additionalProperties':
+            {
+                'type': 'object',
+                'properties': {
+                    'oneOf': [
+                        {'above': {'type': 'string'}},
+                        {'below': {'type': 'string'}}
+                    ]
+                }
+            }
+    }
 
     def __init__(self):
         self.quality_priorities = {}
 
     def on_task_start(self, task, config):
         self.quality_priorities = {}
-        names = []
-        for name, value in config.items():
-            quality_component = qualities._registry[name]
-            self.quality_priorities[name] = quality_component.value
-            log.debug('stored %s original value %s' % (name, quality_component.value))
-            quality_component.value = value
-            log.debug('set %s new value %s' % (name, value))
-        log.debug('Changed priority for: %s' % ', '.join(names))
+        for quality, _config in config.items():
+            action, other_quality = _config.items()[0]
+
+            if quality not in qualities._registry:
+                raise plugin.PluginError('%s is not a valid quality' % quality)
+            if other_quality not in qualities._registry:
+                raise plugin.PluginError('%s is not a valid quality' % other_quality)
+
+            quality_component = qualities._registry[quality]
+            self.quality_priorities[quality] = quality_component.value
+            log.debug('stored %s original value %s' % (quality, quality_component.value))
+
+            new_value = qualities._registry[other_quality].value
+            if action == 'above':
+                new_value += 1
+            else:
+                new_value -= 1
+
+            quality_component.value = new_value
+            log.debug('New value for %s: %s (%s %s)', quality, new_value, action, other_quality)
+        log.debug('Changed priority for: %s' % ', '.join(list(config.keys())))
 
     def on_task_exit(self, task, config):
         if not self.quality_priorities:
