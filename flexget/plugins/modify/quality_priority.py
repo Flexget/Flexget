@@ -25,8 +25,8 @@ class QualityPriority(object):
         'additionalProperties': {
             'type': 'object',
             'properties': {
-                'above': {'type': 'string'},
-                'below': {'type': 'string'}
+                'above': {'type': 'string', 'format': 'quality_requirements'},
+                'below': {'type': 'string', 'format': 'quality_requirements'}
             },
             'maxProperties': 1
         }
@@ -38,7 +38,7 @@ class QualityPriority(object):
     def on_task_start(self, task, config):
         self.quality_priorities = {}
         for quality, _config in config.items():
-            action, other_quality = _config.items()[0]
+            action, other_quality = list(_config.items())[0]
 
             if quality not in qualities._registry:
                 raise plugin.PluginError('%s is not a valid quality' % quality)
