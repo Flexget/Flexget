@@ -259,7 +259,9 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
 
     @property
     def episodes(self):
-        return len(self._guess_result.values_list.get('episode', []))
+        if 'episode' not in self._guess_result.values_list:
+            return len(self._guess_result.values_list.get('part', []))
+        return len(self._guess_result.values_list['episode'])
 
     @property
     def date(self):
