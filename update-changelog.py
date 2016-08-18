@@ -63,7 +63,7 @@ class MDChangeSet(object):
     def cat_lookup(self, cat):
         """Return an official category for `cat` tag text."""
         for cat_item in self.CATEGORIES:
-            if cat in cat_item[1]:
+            if cat.lower() in cat_item[1]:
                 return cat_item[0]
 
     def to_md_lines(self):
