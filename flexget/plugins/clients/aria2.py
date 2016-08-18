@@ -83,7 +83,7 @@ class OutputAria2(object):
                                       config['username'], config['password'])
         for entry in task.accepted:
             if task.options.test:
-                log.verbose('Would add `%s` to aria2.' % entry['title'])
+                log.verbose('Would add `%s` to aria2.', entry['title'])
                 continue
             try:
                 self.add_entry(aria2, entry, config)
