@@ -6,10 +6,12 @@
         .module('components.auth')
         .config(authConfig);
 
-    function authConfig(/*authService,*/ routerHelperProvider/*, toolBarService*/) {
+    function authConfig(routerHelperProvider, toolbarHelperProvider, authServiceProvider) {
         routerHelperProvider.configureStates(getStates());
 
-        /*var logoutItem = {
+        var authService = authServiceProvider.$get();
+       
+        var logoutItem = {
             menu: 'Manage',
             type: 'menuItem',
             label: 'Logout',
@@ -18,7 +20,7 @@
             order: 255
         };
 
-        toolBarService.registerItem(logoutItem);*/
+         toolbarHelperProvider.registerItem(logoutItem);
     }
 
     function getStates() {

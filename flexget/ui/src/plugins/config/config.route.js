@@ -6,10 +6,12 @@
         .module('plugins.config')
         .config(configConfig);
 
-    function configConfig(/*$state, */routerHelperProvider/*, toolBarService*/) {
+    function configConfig(routerHelperProvider, toolbarHelperProvider, $stateProvider) {
         routerHelperProvider.configureStates(getStates());
 
-        /*var configButton = {
+        var $state = $stateProvider.$get();
+
+        var configButton = {
             type: 'button',
             label: 'Config',
             icon: 'pencil',
@@ -21,7 +23,7 @@
             $state.go('flexget.config');
         }
 
-        toolBarService.registerItem(configButton);*/
+        toolbarHelperProvider.registerItem(configButton);
     }
 
     function getStates() {

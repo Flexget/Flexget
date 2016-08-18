@@ -6,10 +6,12 @@
         .module('plugins.log')
         .config(logConfig);
 
-    function logConfig(routerHelperProvider/*, toolBarService, $state*/) {
+    function logConfig(routerHelperProvider, toolbarHelperProvider, $stateProvider) {
         routerHelperProvider.configureStates(getStates());
 
-        /*var logButton = {
+        var $state = $stateProvider.$get();        
+        
+        var logButton = {
             type: 'button',
             label: 'Log',
             icon: 'file-text-o',
@@ -21,7 +23,7 @@
             $state.go('flexget.log');
         }
 
-        toolBarService.registerItem(logButton);*/
+        toolbarHelperProvider.registerItem(logButton);
     }
 
     function getStates() {

@@ -4,9 +4,9 @@
 
     angular
         .module('components.toolbar')
-        .run(toolbarSetup);
+        .config(toolbarConfig);
 
-    function toolbarSetup(toolBarService) {
+    function toolbarConfig(toolbarHelperProvider) {
         var manageMenu = {
             type: 'menu',
             label: 'Manage',
@@ -16,6 +16,6 @@
         };
 
         //Register default Manage menu
-        toolBarService.registerItem(manageMenu);
+        toolbarHelperProvider.registerItem(manageMenu);
     }
 }());
