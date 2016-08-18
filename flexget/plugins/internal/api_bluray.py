@@ -60,6 +60,11 @@ class BlurayMovie(Base):
     updated = Column(DateTime, default=datetime.now, nullable=False)
 
     def __init__(self, title, year):
+        if year:
+            title_year = '{} ({})'.format(title, year)
+        else:
+            title_year = title
+
         params = {
             'search': 'bluraymovies',
             'country': 'ALL',
@@ -73,11 +78,11 @@ class BlurayMovie(Base):
             countries = bluray_request('countries.json.php', **country_params) or {}
 
             if not search_results:
-                raise LookupError('No search results found for {} on blu-ray.com'.format(title))
+                raise LookupError('No search results found for {} on blu-ray.com'.format(title_year))
 
             search_results = sorted(search_results, key=lambda k: extract_release_date(k.get('reldate')))
         except requests.RequestException as e:
-            raise LookupError('Error searching for {} on blu-ray.com: {}'.format(title, e))
+            raise LookupError('Error searching for {} on blu-ray.com: {}'.format(title_year, e))
 
         # Simply take the first result unless year does not match
         for result in search_results:
@@ -117,8 +122,9 @@ class BlurayMovie(Base):
                 elif 'Rated' in info:
                     self.certification = info.replace('Rated', '').strip()
 
-            # rating col
-            self.rating = float(movie_info.find('div', id='ratingscore').text.strip())
+            # rating
+            rating_tag = movie_info.find('div', id='ratingscore')
+            self.rating = float(rating_tag.text.strip()) if rating_tag else None
 
             # Third onecol_content contains some information we want
             onecol_content = movie_info.find_all('div', attrs={'class': 'onecol_content'})[2]
@@ -136,6 +142,8 @@ class BlurayMovie(Base):
                 genres.add(genre.find('td').text.strip())
             self._genres = [BlurayGenre(name=genre) for genre in genres]
             break
+        else:
+            raise LookupError('No search results found for {} on blu-ray.com'.format(title_year))
 
 
 class BlurayGenre(Base):
