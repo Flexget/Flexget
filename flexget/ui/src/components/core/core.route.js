@@ -4,10 +4,10 @@
 
     angular
         .module('components.core')
-        .run(appRun);
+        .config(coreConfig);
 
-    function appRun(routerHelper) {
-        routerHelper.configureStates(getStates());
+    function coreConfig(routerHelperProvider) {
+        routerHelperProvider.configureStates(getStates());
     }
 
     function getStates() {

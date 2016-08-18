@@ -4,10 +4,10 @@
 
     angular
         .module('plugins.schedule')
-        .run(appRun);
+        .config(scheduleConfig);
 
-    function appRun(routerHelper) {
-        routerHelper.configureStates(getStates());
+    function scheduleConfig(routerHelperProvider) {
+        routerHelperProvider.configureStates(getStates());
     }
 
     function getStates() {

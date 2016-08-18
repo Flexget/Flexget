@@ -4,10 +4,10 @@
 
     angular
         .module('plugins.history')
-        .run(appRun);
+        .config(historyConfig);
 
-    function appRun(routerHelper) {
-        routerHelper.configureStates(getStates());
+    function historyConfig(routerHelperProvider) {
+        routerHelperProvider.configureStates(getStates());
     }
 
     function getStates() {

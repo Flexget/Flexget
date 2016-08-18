@@ -15,41 +15,43 @@
         //TODO: Figure out if htlm5Mode is possible
         //$locationProvider.html5Mode(true);
 
-
-
+        this.configureStates = configureStates;
         this.$get = RouterHelper;
+
+        var hasOtherwise = false;
+
+        function configureStates(states, otherwisePath) {
+            angular.forEach(states, function (state) {
+                if (!state.config.root && !state.config.abstract) {
+                    state.state = 'flexget.' + state.state;
+                    state.config.template = '<' + state.config.component + ' flex layout="row"></' + state.config.component + '>';
+                    delete state.config.component;
+                }
+                $stateProvider.state(state.state, state.config);
+
+                if (state.when) {
+                    for (var i = 0; i < state.when.length; i++) {
+                        $urlRouterProvider.when(state.when[i], state.config.url);
+                    }
+                }
+            });
+
+            if (otherwisePath && !hasOtherwise) {
+                hasOtherwise = true;
+                $urlRouterProvider.otherwise(otherwisePath);
+            }
+        }
 
         function RouterHelper($location, $log, $rootScope, $state) {
             //var handlingStateChangeError = false;
-            var hasOtherwise = false;
+            
             return {
-                configureStates: configureStates,
+                //configureStates: function () { },
                 getStates: getStates
             };
 
-            //init();
 
-            function configureStates(states, otherwisePath) {
-                angular.forEach(states, function (state) {
-                    if (!state.config.root && !state.config.abstract) {
-                        state.state = 'flexget.' + state.state;
-                        state.config.template = '<' + state.config.component + ' flex layout="row"></' + state.config.component + '>';
-                        delete state.config.component;
-                    }
-                    $stateProvider.state(state.state, state.config);
-
-                    if (state.when) {
-                        for (var i = 0; i < state.when.length; i++) {
-                            $urlRouterProvider.when(state.when[i], state.config.url);
-                        }
-                    }
-                });
-
-                if (otherwisePath && !hasOtherwise) {
-                    hasOtherwise = true;
-                    $urlRouterProvider.otherwise(otherwisePath);
-                }
-            }
+            //init()
 
             /*function handleRoutingErrors() {
                 //TODO: Convert to UI-router v1 (using transition.start etc.)

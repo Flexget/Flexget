@@ -4,12 +4,12 @@
 
     angular
         .module('plugins.config')
-        .run(appRun);
+        .config(configConfig);
 
-    function appRun($state, routerHelper, toolBarService) {
-        routerHelper.configureStates(getStates());
+    function configConfig(/*$state, */routerHelperProvider/*, toolBarService*/) {
+        routerHelperProvider.configureStates(getStates());
 
-        var configButton = {
+        /*var configButton = {
             type: 'button',
             label: 'Config',
             icon: 'pencil',
@@ -21,7 +21,7 @@
             $state.go('flexget.config');
         }
 
-        toolBarService.registerItem(configButton);
+        toolBarService.registerItem(configButton);*/
     }
 
     function getStates() {

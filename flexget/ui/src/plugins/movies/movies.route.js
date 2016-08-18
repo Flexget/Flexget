@@ -4,10 +4,10 @@
 
     angular
         .module('plugins.movies')
-        .run(appRun);
+        .config(moviesConfig);
 
-    function appRun(routerHelper) {
-        routerHelper.configureStates(getStates());
+    function moviesConfig(routerHelperProvider) {
+        routerHelperProvider.configureStates(getStates());
     }
 
     function getStates() {

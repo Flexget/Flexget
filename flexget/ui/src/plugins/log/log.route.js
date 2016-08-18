@@ -4,12 +4,12 @@
 
     angular
         .module('plugins.log')
-        .run(appRun);
+        .config(logConfig);
 
-    function appRun(routerHelper, toolBarService, $state) {
-        routerHelper.configureStates(getStates());
+    function logConfig(routerHelperProvider/*, toolBarService, $state*/) {
+        routerHelperProvider.configureStates(getStates());
 
-        var logButton = {
+        /*var logButton = {
             type: 'button',
             label: 'Log',
             icon: 'file-text-o',
@@ -21,7 +21,7 @@
             $state.go('flexget.log');
         }
 
-        toolBarService.registerItem(logButton);
+        toolBarService.registerItem(logButton);*/
     }
 
     function getStates() {

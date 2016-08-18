@@ -4,10 +4,10 @@
 
     angular
         .module('plugins.execute')
-        .run(appRun);
+        .config(executeConfig);
 
-    function appRun(routerHelper) {
-        routerHelper.configureStates(getStates());
+    function executeConfig(routerHelperProvider) {
+        routerHelperProvider.configureStates(getStates());
     }
 
     function getStates() {

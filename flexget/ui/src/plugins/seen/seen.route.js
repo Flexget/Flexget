@@ -4,10 +4,10 @@
 
     angular
         .module('plugins.seen')
-        .run(appRun);
+        .config(seenConfig);
 
-    function appRun(routerHelper) {
-        routerHelper.configureStates(getStates());
+    function seenConfig(routerHelperProvider) {
+        routerHelperProvider.configureStates(getStates());
     }
 
     function getStates() {
