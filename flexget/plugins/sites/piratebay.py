@@ -146,9 +146,9 @@ class UrlRewritePirateBay(object):
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                 # Parse content_size
                 size = link.find_next(attrs={'class': 'detDesc'}).contents[0]
-                size = re.search('Size ([\.\d]+)\xa0([GMK])iB', size)
+                size = re.search('Size (\d+\.?\d+\xa0(?:[PTGMK])iB)', size)
 
-                entry['content_size'] = parse_filesize(size.group(0))
+                entry['content_size'] = parse_filesize(size.group(1))
 
                 entries.add(entry)
 
