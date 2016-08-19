@@ -256,13 +256,13 @@ class IRCConnection(IRCBot):
         :return: parsed XML
         """
         base_url = 'https://raw.githubusercontent.com/autodl-community/autodl-trackers/master/'
+        tracker_config_file = os.path.expanduser(tracker_config_file)
 
         # First we attempt to find the file locally as-is
         if os.path.exists(tracker_config_file):
             log.debug('Found tracker file: %s', tracker_config_file)
             return cls.read_tracker_config(tracker_config_file)
 
-        tracker_config_file = os.path.expanduser(tracker_config_file)
         if not tracker_config_file.endswith('.tracker'):
             tracker_config_file += '.tracker'
 
