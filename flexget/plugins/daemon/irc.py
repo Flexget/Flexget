@@ -283,7 +283,7 @@ class IRCConnection(IRCBot):
         if os.path.exists(base_dir):
             files = os.listdir(base_dir)
             for f in files:
-                if tracker_name_no_ext in f.lower():
+                if tracker_name_no_ext.lower() in f.lower():
                     found_path = os.path.join(base_dir, f)
                     log.debug('Found tracker file: %s', found_path)
                     return cls.read_tracker_config(found_path)
