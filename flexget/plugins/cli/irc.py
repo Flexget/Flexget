@@ -1,22 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-from argparse import ArgumentParser, ArgumentTypeError
-from functools import partial
-
-from sqlalchemy.orm.exc import NoResultFound
+from argparse import ArgumentParser
 
 from flexget import options
-from flexget.entry import Entry
 from flexget.event import event
-from flexget.manager import Session
 from flexget.terminal import TerminalTable, CLITableError, table_parser, console
-from flexget.plugin import PluginError
-from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
-    get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase
-from flexget.plugins.metainfo.imdb_lookup import ImdbLookup
-from flexget.plugins.metainfo.tmdb_lookup import PluginTmdbLookup
-from flexget.utils.tools import split_title_year
 
 
 def do_cli(manager, options):
