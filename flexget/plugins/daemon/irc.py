@@ -716,6 +716,7 @@ class IRCConnectionManager(object):
         attempt to reconnect for 30s.
         :return:
         """
+        global irc_connections
         self.start_connections()
 
         schedule = {}  # used to keep track of reconnection schedules
@@ -724,15 +725,13 @@ class IRCConnectionManager(object):
             for conn_name, conn in irc_connections.items():
                 # Don't want to revive if connection was closed cleanly
                 if not conn.running:
-                    del irc_connections[conn_name]
                     continue
 
                 now = datetime.now()
                 # Attempt to revive the thread if it has died. conn.running will be True if it died unexpectedly.
                 if not conn and self.config.get(conn_name):
                     try:
-                        irc_connections[conn_name] = IRCConnection(self.config[conn_name], conn_name)
-                        irc_connections[conn_name].thread.start()
+                        self.restart_connection(conn_name, self.config[conn_name])
                     except IOError as e:
                         log.error(e)
                 elif not conn.is_alive() and conn.running:
@@ -746,9 +745,7 @@ class IRCConnectionManager(object):
                     if schedule[conn_name] <= now:
                         log.error('IRC connection for %s has died unexpectedly. Restarting it.', conn_name)
                         try:
-                            irc_connections[conn_name].close()  # close connection if it's still alive
-                            irc_connections[conn_name] = IRCConnection(conn.config, conn_name)
-                            irc_connections[conn_name].thread.start()
+                            self.restart_connection(conn_name, conn.config)
                         except IOError as e:
                             log.error(e)
                         # remove it from the schedule
@@ -757,6 +754,19 @@ class IRCConnectionManager(object):
             time.sleep(1)
 
         self.stop_connections(self.wait)
+        irc_connections = {}
+
+    def restart_connections(self):
+        for name, connection in irc_connections.items():
+            self.restart_connection(name, connection.config)
+
+    def restart_connection(self, name, config=None):
+        if not config:
+            config = irc_connections[name].config
+        if irc_connections[name].is_alive():
+            self.stop_connection(name)
+        irc_connections[name] = IRCConnection(config, name)
+        irc_connections[name].thread.start()
 
     def start_connections(self):
         """
@@ -780,16 +790,35 @@ class IRCConnectionManager(object):
             connection.thread.start()
 
     def stop_connections(self, wait):
-        global irc_connections
+        for name in irc_connections.keys():
+            self.stop_connection(name, wait)
 
-        for _, conn in irc_connections.items():
-            conn.stop(wait)
-            conn.thread.join(10)
-        irc_connections = {}
+    def stop_connection(self, name, wait=False):
+        if irc_connections[name].is_alive():
+            irc_connections[name].stop(wait)
+            irc_connections[name].thread.join(11)
 
     def stop(self, wait):
         self.wait = wait
         self.shutdown_event.set()
+
+    def status_all(self):
+        status = {}
+        for name in irc_connections.keys():
+            status.update(self.status(name))
+        return status
+
+    def status(self, name):
+        if name not in irc_connections:
+            raise ValueError('%s is not a valid irc connection' % name)
+        status = {name: {}}
+        connection = irc_connections[name]
+        status[name]['thread'] = 'alive' if connection.is_alive() else 'dead'
+        status[name]['channels'] = connection.channels
+        status[name]['connected_channels'] = connection.connected_channels
+        status[name]['server'] = (connection.servers[0], connection.port)
+
+        return status
 
 
 @event('manager.daemon.started')
@@ -845,7 +874,8 @@ def stop_irc(manager, wait=False):
         # this check is necessary for when the irc manager is the one shutting down the daemon
         # a thread can't join itself
         if not threading.current_thread() == irc_manager.thread:
-            irc_manager.thread.join(60)
+            # It's important to give the threads time to shut down to avoid socket issues later (eg. quick restart)
+            irc_manager.thread.join(len(irc_connections.keys()) * 11)
 
 
 @event('config.register')
