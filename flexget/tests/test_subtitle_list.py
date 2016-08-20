@@ -267,7 +267,7 @@ class TestSubtitleList(object):
         assert len(task.failed) == 2, 'Entries should fail since the files are not valid.'
 
     # Skip if subliminal is not installed or if python version <2.7
-    @pytest.skip
+    @pytest.mark.skip
     @pytest.mark.online
     @pytest.mark.skipif(sys.version_info < (2, 7), reason='requires python2.7')
     @pytest.mark.skipif(not subliminal, reason='requires subliminal')
