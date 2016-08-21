@@ -72,3 +72,7 @@ class TestParseFilesize(object):
     def test_parse_filesize_ib_not_valid(self):
         with pytest.raises(ValueError):
             parse_filesize('100 ib')
+
+    def test_parse_filesize_single_digit(self):
+        size = '1 GiB'
+        assert compare_floats(parse_filesize(size), 1024)
