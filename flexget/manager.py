@@ -244,9 +244,14 @@ class Manager(object):
             options = options_namespace
         task_names = self.tasks
         # Only reload config if daemon
-        if self.is_daemon and self.config_file_hash != self.hash_config():
+        config_hash = self.hash_config()
+        if self.is_daemon and self.config_file_hash != config_hash:
             log.info('Config change detected. Reloading.')
-            self.load_config(output_to_console=False)
+            try:
+                self.load_config(output_to_console=False, config_file_hash=config_hash)
+                log.info('Config successfully reloaded!')
+            except Exception as e:
+                log.error('Reloading config failed: %s', e)
         # Handle --tasks
         if options.tasks:
             # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
@@ -535,7 +540,7 @@ class Manager(object):
                 sha1_hash.update(data)
         return sha1_hash.hexdigest()
 
-    def load_config(self, output_to_console=True):
+    def load_config(self, output_to_console=True, config_file_hash=None):
         """
         Loads the config file from disk, validates and activates it.
 
@@ -549,7 +554,7 @@ class Manager(object):
                 log.critical('Config file must be UTF-8 encoded.')
                 raise ValueError('Config file is not UTF-8 encoded')
         try:
-            self.config_file_hash = self.hash_config()
+            self.config_file_hash = config_file_hash or self.hash_config()
             config = yaml.safe_load(raw_config) or {}
         except Exception as e:
             msg = str(e).replace('\n', ' ')
