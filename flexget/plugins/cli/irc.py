@@ -39,11 +39,11 @@ def action_status(options, irc_manager):
     for name, info in status.items():
         table_data.append([name, info['thread'], ', '.join(info['channels']), ', '.join(info['connected_channels']),
                            '%s:%s' % info['server']])
-        table = TerminalTable(options.table_type, table_data)
-        try:
-            console(table.output)
-        except CLITableError as e:
-            console('ERROR: %s' % e)
+    table = TerminalTable(options.table_type, table_data)
+    try:
+        console(table.output)
+    except CLITableError as e:
+        console('ERROR: %s' % e)
 
 
 def action_restart(options, irc_manager):
