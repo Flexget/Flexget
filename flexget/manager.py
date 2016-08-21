@@ -245,6 +245,7 @@ class Manager(object):
         task_names = self.tasks
         # Only reload config if daemon
         if self.is_daemon and self.config_file_hash != self.hash_config():
+            log.info('Config change detected. Reloading.')
             self.load_config(output_to_console=False)
         # Handle --tasks
         if options.tasks:
