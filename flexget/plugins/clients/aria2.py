@@ -2,15 +2,13 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
-import re
 import os
 import xmlrpc.client
+from socket import error as socket_error
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import RenderError
-
-from socket import error as socket_error
 
 log = logging.getLogger('aria2')
 
@@ -46,14 +44,14 @@ class OutputAria2(object):
     }
 
     def aria2_connection(self, server, port, username=None, password=None):
+        if username and password:
+            userpass = '%s:%s@' % (username, password)
+        else:
+            userpass = ''
+        url = 'http://%s%s:%s/rpc' % (userpass, server, port)
+        log.debug('aria2 url: %s' % url)
+        log.info('Connecting to daemon at %s', url)
         try:
-            if username and password:
-                userpass = '%s:%s@' % (username, password)
-            else:
-                userpass = ''
-            url = 'http://%s%s:%s/rpc' % (userpass, server, port)
-            log.debug('aria2 url: %s' % url)
-            log.info('Connected to daemon at %s', url)
             return xmlrpc.client.ServerProxy(url).aria2
         except xmlrpc.client.ProtocolError as err:
             raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
@@ -62,8 +60,7 @@ class OutputAria2(object):
             raise plugin.PluginError('XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
                               % (url, err.faultString), log)
         except socket_error as e:
-            _, msg = e.args
-            raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s' % (url, msg), log)
+            raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s' % (url, e), log)
         except:
             log.debug('Unexpected error during aria2 connection', exc_info=True)
             raise plugin.PluginError('Unidentified error during connection to aria2 daemon', log)
@@ -85,24 +82,42 @@ class OutputAria2(object):
         aria2 = self.aria2_connection(config['server'], config['port'],
                                       config['username'], config['password'])
         for entry in task.accepted:
+            if task.options.test:
+                log.verbose('Would add `%s` to aria2.', entry['title'])
+                continue
             try:
                 self.add_entry(aria2, entry, config)
             except socket_error as se:
-                entry.fail('Unable to reach Aria2')
+                entry.fail('Unable to reach Aria2: %s', se)
+            except xmlrpc.client.Fault as err:
+                log.critical('Fault code %s message %s', err.faultCode, err.faultString)
+                entry.fail('Aria2 communication Fault')
+            except Exception as e:
+                log.debug('Exception type %s', type(e), exc_info=True)
+                raise
 
     def add_entry(self, aria2, entry, config):
         """
         Add entry to Aria2
         """
         options = config['options']
-        options['dir'] = os.path.expanduser(entry.render(config['path']).rstrip('/'))
+        try:
+            options['dir'] = os.path.expanduser(entry.render(config['path']).rstrip('/'))
+        except RenderError as e:
+            entry.fail('failed to render \'path\': %s' % e)
+            return
+        secret = None
+        if config['secret']:
+            secret = 'token:%s' % config['secret']
         # handle torrent files
         if 'torrent' in entry:
-            return aria2.addTorrent(xmlrpclib.Binary(open(entry['file'], mode='rb').read()))
+            if secret:
+                return aria2.addTorrent(secret, xmlrpc.client.Binary(open(entry['file'], mode='rb').read()))
+            return aria2.addTorrent(xmlrpc.client.Binary(open(entry['file'], mode='rb').read()))
         # handle everything else (except metalink -- which is unsupported)
         # so magnets, https, http, ftp .. etc
-        if config['secret']:
-            return aria2.addUri(config['secret'], [entry['url']], options)
+        if secret:
+            return aria2.addUri(secret, [entry['url']], options)
         return aria2.addUri([entry['url']], options)
 
 

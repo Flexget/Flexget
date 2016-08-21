@@ -28,8 +28,8 @@ IMMUTABLE_LISTS = ['ratings', 'checkins']
 
 Base = db_schema.versioned_base('imdb_list', 0)
 
-MOVIE_TYPES = ['feature film', 'documentary']
-SERIES_TYPES = ['tv series']
+MOVIE_TYPES = ['feature film', 'documentary', 'tv movie', 'video', 'short film']
+SERIES_TYPES = ['tv series', 'mini-series']
 
 
 class IMDBListUser(Base):

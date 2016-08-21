@@ -168,6 +168,7 @@ class TestSeriesParser(object):
         assert (s.season == 1 and s.episode == 6), 'failed to parse %s' % s
         s = parse(name='Test', data='Test.Part.2.720p-FlexGet')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
+        assert s.identifier == 'S01E02'
         s = parse(name='Test', data='Test.Part3.720p-FlexGet')
         assert (s.season == 1 and s.episode == 3), 'failed to parse %s' % s
         s = parse(name='Test', data='Test.Season.3.Part.IV')

@@ -1,8 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-
-import flexget.terminal
-
-native_int = int
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import atexit
@@ -18,7 +14,6 @@ import threading
 import traceback
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-
 import io
 
 import sqlalchemy
@@ -40,11 +35,14 @@ from flexget.options import CoreArgumentParser, get_parser, manager_parser, Pars
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.utils.tools import pid_exists, get_current_flexget_version  # noqa
+from flexget.terminal import console  # noqa
 
 log = logging.getLogger('manager')
 
 manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
+
+native_int = int
 
 
 class Manager(object):
@@ -286,7 +284,7 @@ class Manager(object):
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
         if ipc_info:
-            flexget.terminal.console('There is a FlexGet process already running for this config, sending execution there.')
+            console('There is a FlexGet process already running for this config, sending execution there.')
             log.debug('Sending command to running FlexGet process: %s' % self.args)
             try:
                 client = IPCClient(ipc_info['port'], ipc_info['password'])
@@ -464,7 +462,6 @@ class Manager(object):
         :param bool create: If a config file is not found, and create is True, one will be created in the home folder
         :raises: `IOError` when no config file could be found, and `create` is False.
         """
-        config = None
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
         options_config = os.path.expanduser(self.options.config)
 

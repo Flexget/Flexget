@@ -4,10 +4,10 @@
 
     angular
         .module('components.home')
-        .run(appRun);
+        .config(homeConfig);
 
-    function appRun(routerHelper) {
-        routerHelper.configureStates(getStates());
+    function homeConfig(routerHelperProvider) {
+        routerHelperProvider.configureStates(getStates());
     }
 
     function getStates() {

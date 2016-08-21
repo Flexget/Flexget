@@ -10,14 +10,14 @@
             controller: toolbarController
         });
 
-    function toolbarController(sideNavService, toolBarService) {
+    function toolbarController(sideNavService, toolbarHelper) {
         var vm = this;
 
         vm.$onInit = activate;
         vm.toggle = sideNavService.toggle;
 
         function activate() {
-            vm.toolBarItems = toolBarService.items;
+            vm.toolBarItems = toolbarHelper.items;
         }
     }
 

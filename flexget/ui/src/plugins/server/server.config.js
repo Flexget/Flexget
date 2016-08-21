@@ -4,9 +4,10 @@
 
     angular
         .module('plugins.server')
-        .run(appRun);
+        .config(serverConfig);
 
-    function appRun(serverService, toolBarService) {
+    function serverConfig(serverServiceProvider, toolbarHelperProvider) {
+        var serverService = serverServiceProvider.$get();
         var reloadButton = {
             menu: 'Manage',
             type: 'menuItem',
@@ -25,7 +26,7 @@
             order: 128
         };
 
-        toolBarService.registerItem(reloadButton);
-        toolBarService.registerItem(shutdownButton);
+        toolbarHelperProvider.registerItem(reloadButton);
+        toolbarHelperProvider.registerItem(shutdownButton);
     }
 }());

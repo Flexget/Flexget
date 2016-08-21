@@ -27,17 +27,5 @@ describe('Home Routes: ', function () {
             $rootScope.$digest();
             expect($state.is('flexget.home')).to.be.true;
         });
-
-        it('should work with \'\' path', function() {
-            $location.path('');
-            $rootScope.$digest();
-            expect($state.is('flexget.home')).to.be.true;
-        });
-
-        it('should work with '/' path', function() {
-            $location.path('/');
-            $rootScope.$digest();
-            expect($state.is('flexget.home')).to.be.true;
-        });
     });
 });

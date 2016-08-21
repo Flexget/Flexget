@@ -4,10 +4,10 @@
 
     angular
         .module('plugins.series')
-        .run(appRun);
+        .config(seriesConfig);
 
-    function appRun(routerHelper) {
-        routerHelper.configureStates(getStates());
+    function seriesConfig(routerHelperProvider) {
+        routerHelperProvider.configureStates(getStates());
     }
 
     function getStates() {

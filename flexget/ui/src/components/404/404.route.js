@@ -4,10 +4,10 @@
 
     angular
         .module('components.404')
-        .run(appRun);
+        .config(notfoundConfig);
 
-    function appRun(routerHelper) {
-        routerHelper.configureStates(getStates(), '/404');
+    function notfoundConfig(routerHelperProvider) {
+        routerHelperProvider.configureStates(getStates(), '/404');
     }
 
     function getStates() {

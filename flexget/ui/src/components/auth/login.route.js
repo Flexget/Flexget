@@ -4,11 +4,13 @@
 
     angular
         .module('components.auth')
-        .run(appRun);
+        .config(authConfig);
 
-    function appRun(authService, routerHelper, toolBarService) {
-        routerHelper.configureStates(getStates());
+    function authConfig(routerHelperProvider, toolbarHelperProvider, authServiceProvider) {
+        routerHelperProvider.configureStates(getStates());
 
+        var authService = authServiceProvider.$get();
+       
         var logoutItem = {
             menu: 'Manage',
             type: 'menuItem',
@@ -18,7 +20,7 @@
             order: 255
         };
 
-        toolBarService.registerItem(logoutItem);
+         toolbarHelperProvider.registerItem(logoutItem);
     }
 
     function getStates() {
