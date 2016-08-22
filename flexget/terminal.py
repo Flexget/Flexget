@@ -65,8 +65,11 @@ class TerminalTable(object):
     def init_table(self):
         """Assigns self.table with the built table based on data."""
         self.table = self.build_table(self.type, self.table_data)
-        if not self.valid_table and not self.type == 'porcelain' and self.wrap_columns:
-            self.table = self._wrap_table()
+        if self.type == 'porcelain':
+            return
+        adjustable = bool(self.wrap_columns + self.drop_columns)
+        if not self.valid_table and adjustable:
+            self.table = self._resize_table()
 
     def build_table(self, table_type, table_data):
         return self.supported_table_types()[table_type](table_data)
@@ -94,19 +97,19 @@ class TerminalTable(object):
         }
 
     @property
-    def columns(self):
+    def _columns(self):
         if not self.table_data:
             return 0
         else:
             return len(self.table_data[0])
 
-    def longest_rows(self):
+    def _longest_rows(self):
         """
         Calculate longest line for each column.
 
         :returns: dictionary where key is column number and value longest value
         """
-        longest = {c: 0 for c in range(self.columns)}
+        longest = {c: 0 for c in range(self._columns)}
         for row in self.table_data:
             for index, value in enumerate(row):
                 if len(value) > longest[index]:
@@ -115,6 +118,8 @@ class TerminalTable(object):
 
     @property
     def valid_table(self):
+        # print('self.table.table_width: %s' % self.table.table_width)
+        # print('terminal_size()[0]: %s' % terminal_size()[0])
         return self.table.table_width <= terminal_size()[0]
 
 
@@ -125,23 +130,27 @@ class TerminalTable(object):
         """
         if not self.wrap_columns:
             return None
-        longest = self.longest_rows()
-        margin = self.columns * 2 + self.columns + 1
+        longest = self._longest_rows()
+        margin = self._columns * 2 + self._columns + 1
         static_columns = sum(longest.values())
         for wrap in self.wrap_columns:
-          static_columns -= longest[wrap]
+            static_columns -= longest[wrap]
         space_left = terminal_size()[0] - static_columns - margin
         """
         print('margin: %s' % margin)
         print('static_columns: %s' % static_columns)
         print('space_left: %s' % space_left)
+        print('self.table.table_width: %s' % self.table.table_width)
         print(longest)
         """
         # TODO: This is a bit dumb if wrapped columns have huge disparity
         # for example in flexget plugins the phases and flags
         return int(space_left/len(self.wrap_columns))
 
-    def drop_column(self, col):
+    def _drop_column(self, col):
+        name = self.table_data[0][col]
+        console('Least important column `%s` removed due terminal size' % name)
+
         for row in self.table_data:
             del row[col]
 
@@ -161,23 +170,27 @@ class TerminalTable(object):
         self.wrap_columns = adjust(self.wrap_columns)
         self.drop_columns = adjust(self.drop_columns)
 
-    def _drop_columns(self):
+    def _drop_columns_with_wrap(self):
         """Drop columns until wrapped columns fit or are removed as well"""
         while self.drop_columns and self.wrap_columns:
             drop = self.drop_columns.pop(0)
-            name = self.table_data[0][drop]
-            console('Least important column `%s` removed due terminal size' % name)
-            self.drop_column(drop)
+            self._drop_column(drop)
             wrapped_width = self._calc_wrap()
             if wrapped_width < self.MIN_WIDTH:
                 continue
             else:
                 return
 
-    def _wrap_table(self):
+    def _resize_table(self):
+        """Adjust table data and columns to fit into terminal"""
+        if self.drop_columns and not self.wrap_columns:
+            while self.drop_columns and not self.valid_table:
+                drop = self.drop_columns.pop(0)
+                self._drop_column(drop)
+
         wrapped_width = self._calc_wrap()
         if wrapped_width and wrapped_width < self.MIN_WIDTH:
-            self._drop_columns()
+            self._drop_columns_with_wrap()
             wrapped_width = self._calc_wrap()
 
         # construct new table

@@ -104,7 +104,7 @@ def movie_list_list(options):
             movie_row.append(movie.identifiers.get(identifier, ''))
         table_data.append(movie_row)
     title = '{} Movies in movie list: `{}`'.format(len(movies), options.list_name)
-    table = TerminalTable(options.table_type, table_data, title)
+    table = TerminalTable(options.table_type, table_data, title, drop_columns=[5, 2, 4])
     try:
         console(table.output)
     except TerminalTableError as e:
