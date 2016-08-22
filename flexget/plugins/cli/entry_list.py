@@ -107,7 +107,7 @@ def entry_list_show(options):
         table_data = [header]
         for k, v in sorted(entry.entry.items()):
             table_data.append([k, str(v)])
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[(1, 100)])
+    table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)

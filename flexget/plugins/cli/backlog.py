@@ -19,7 +19,7 @@ def do_cli(manager, options):
             entries = get_entries(options.task, session=session)
             for entry in entries:
                 table_data.append([entry.title, entry.task, entry.expire.strftime('%Y-%m-%d %H:%M')])
-        table = TerminalTable(options.table_type, table_data, wrap_columns=[(0, 100)])
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[0])
         try:
             console(table.output)
         except TerminalTableError as e:

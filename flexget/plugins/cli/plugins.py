@@ -33,9 +33,9 @@ def plugins_summary(manager, options):
             roles.append('{0}({1})'.format(phase, priority))
 
         name = colorize('green', plugin.name) if 'builtin' in flags else plugin.name
-        table_data.append([name, ' ,'.join(roles), ' ,'.join(flags)])
+        table_data.append([name, ', '.join(roles), ', '.join(flags)])
 
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[(1, 60), (2, 60)])
+    table = TerminalTable(options.table_type, table_data, wrap_columns=[1, 2])
     try:
         console(table.output)
     except TerminalTableError as e:

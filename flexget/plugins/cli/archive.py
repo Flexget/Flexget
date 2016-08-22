@@ -152,7 +152,7 @@ def cli_search(options):
     if not table_data:
         console('No results found for search')
         return
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[(1, 100)])
+    table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
     table.table.inner_heading_row_border = False
     try:
         console(table.output)

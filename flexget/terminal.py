@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import, print_functi
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import sys
+import math
 from textwrap import wrap
 
 from colorclass import Windows, Color, disable_all_colors
@@ -17,7 +18,8 @@ if sys.platform == 'win32':
 
 
 class TerminalTable(object):
-    """A data table suited for CLI output, created via its sent parameters. For example::
+    """
+    A data table suited for CLI output, created via its sent parameters. For example::
 
         header = ['Col1', 'Col2']
         table_data = [header]
@@ -26,28 +28,37 @@ class TerminalTable(object):
         table = TerminalTable('plain', table_data)
         print table.output
 
-    Optional values are setting table title, and supplying wrap_columns list. Each value in wrap_columns list is a tuple
-    where first value is column number and second one is maximum column width. For example::
+    Optional values are setting table title, and supplying wrap_columns list and
+    drop_column list. If table does not fit into terminal any columns listed in
+    wrap_columns will be tried to wrap and if resulting columns are below MIN_WIDTH(10)
+    columns listed in drop_column will be removed from output.
+
+    Example::
 
         header = ['Col1', 'Col2']
         table_data = [header]
         for item in iterable:
             table_data.append([item.attribute1, item.attribute2])
-        table = TerminalTable('plain', table_data, 'Table title', wrap_columns=[(0,40),(1,50)])
+        table = TerminalTable('plain', table_data, 'Table title', wrap_columns=[1,2],
+                              drop_columns=[4,2])
         print table.output
 
     :param table_type: A string matching supported_table_types() keys.
     :param table_data: Table data as a list of lists of strings. See `terminaltables` doc.
     :param title: Optional title for table
-    :param wrap_columns: A list of tuples which will be used to limit column size. First value in tuple should be column
-     number, 2nd is maximum allowed size.
+    :param wrap_columns: A list of column numbers which will can be wrapped.
+        In case of multuple values even split is used.
+    :param drop_columns: A list of column numbers which can be dropped if needed.
+        List in order of priority.
     """
 
-    def __init__(self, table_type, table_data, title=None, wrap_columns=None):
+    MIN_WIDTH = 10
 
+    def __init__(self, table_type, table_data, title=None, wrap_columns=None, drop_columns=None):
         self.title = title
         self.type = table_type
-        self.wrap_columns = wrap_columns
+        self.wrap_columns = wrap_columns or []
+        self.drop_columns = drop_columns or []
         self.table_data = table_data
         self.init_table()
 
@@ -83,18 +94,101 @@ class TerminalTable(object):
         }
 
     @property
+    def columns(self):
+        if not self.table_data:
+            return 0
+        else:
+            return len(self.table_data[0])
+
+    def longest_rows(self):
+        """
+        Calculate longest line for each column.
+
+        :returns: dictionary where key is column number and value longest value
+        """
+        longest = {c: 0 for c in range(self.columns)}
+        for row in self.table_data:
+            for index, value in enumerate(row):
+                if len(value) > longest[index]:
+                    longest[index] = len(value)
+        return longest
+
+    @property
     def valid_table(self):
         return self.table.table_width <= terminal_size()[0]
 
+
+    def _calc_wrap(self):
+        """
+        :return: Calculated wrap value to be used for self.wrap_columns.
+            If wraps are not defined None is returned
+        """
+        if not self.wrap_columns:
+            return None
+        longest = self.longest_rows()
+        margin = self.columns * 2 + self.columns + 1
+        static_columns = sum(longest.values())
+        for wrap in self.wrap_columns:
+          static_columns -= longest[wrap]
+        space_left = terminal_size()[0] - static_columns - margin
+        """
+        print('margin: %s' % margin)
+        print('static_columns: %s' % static_columns)
+        print('space_left: %s' % space_left)
+        print(longest)
+        """
+        # TODO: This is a bit dumb if wrapped columns have huge disparity
+        # for example in flexget plugins the phases and flags
+        return int(space_left/len(self.wrap_columns))
+
+    def drop_column(self, col):
+        for row in self.table_data:
+            del row[col]
+
+        def adjust(l):
+            new_vals = []
+            for c in l:
+                if c == col:
+                    # column removed
+                    continue
+                if c > col:
+                    # column before removed
+                    new_vals.append(c - 1)
+                else:
+                    new_vals.append(c)
+            return new_vals
+
+        self.wrap_columns = adjust(self.wrap_columns)
+        self.drop_columns = adjust(self.drop_columns)
+
+    def _drop_columns(self):
+        """Drop columns until wrapped columns fit or are removed as well"""
+        while self.drop_columns and self.wrap_columns:
+            drop = self.drop_columns.pop(0)
+            name = self.table_data[0][drop]
+            console('Least important column `%s` removed due terminal size' % name)
+            self.drop_column(drop)
+            wrapped_width = self._calc_wrap()
+            if wrapped_width < self.MIN_WIDTH:
+                continue
+            else:
+                return
+
     def _wrap_table(self):
+        wrapped_width = self._calc_wrap()
+        if wrapped_width and wrapped_width < self.MIN_WIDTH:
+            self._drop_columns()
+            wrapped_width = self._calc_wrap()
+
+        # construct new table
         output_table = []
         for row in self.table_data:
             output_row = []
             for col_num, value in enumerate(row):
                 output_value = value
-                for col_limit in self.wrap_columns:
-                    if col_num == col_limit[0]:
-                        output_value = word_wrap(value, col_limit[1])
+                if col_num in self.wrap_columns:
+                    # print('wrapping val %s col: %s' %  (value, col_num))
+                    output_value = word_wrap(value, wrapped_width)
                 output_row.append(output_value)
             output_table.append(output_row)
         return self.build_table(self.type, output_table)

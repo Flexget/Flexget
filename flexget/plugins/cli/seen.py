@@ -56,7 +56,7 @@ def seen_search(options, session=None):
         if options.table_type != 'porcelain':
             table_data.append([''])
 
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[(1, 80)])
+    table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
     table.table.inner_heading_row_border = False
     if not table_data:
         console('No results found for search')
