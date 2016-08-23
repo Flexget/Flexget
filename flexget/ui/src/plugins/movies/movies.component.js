@@ -17,7 +17,9 @@
         vm.$onInit = activate;
         vm.deleteMovieList = deleteMovieList;
         vm.newList = newList;
+        vm.addMovie = addMovie;
         vm.searchMovies = searchMovies;
+        vm.movieSelected = movieSelected;
 
         function activate() {
             getMovieLists();
@@ -44,6 +46,16 @@
                         vm.lists.splice(index, 1);
                     });
             });
+        }
+
+        // Function to prevent a movie from being selected in the autocomplete
+        function movieSelected($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+        }
+
+        function addMovie(movie) {
+            console.log(movie);
         }
 
         function searchMovies(searchText) {
