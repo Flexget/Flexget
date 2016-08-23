@@ -1,5 +1,23 @@
 <div layout="column" flex>
 	<md-content flex ng-if="vm.lists">
+		<md-autocomplete
+			md-items="movie in vm.searchMovies(searchText)"
+			md-search-text="searchText"
+			md-delay="1000"
+			md-min-length="3">
+			<md-item-template>
+				<span class="item-title">
+					<span md-hightlight-text="searchText">{{ movie.name }}</span>
+
+					<md-button class="md-raised" ng-click="vm.clicked(movie, $event)">Add</md-button>
+				</span>
+			</md-item-template>
+			<md-not-found>
+				No movies found.
+			</md-not-found>
+		</md-autocomplete>
+
+
 		<md-tabs md-dynamic-height md-border-bottom class="movie-tabs">
 			<movie-list ng-repeat="list in vm.lists" 
 				list="::list" 

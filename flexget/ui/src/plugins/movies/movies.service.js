@@ -6,7 +6,7 @@
         .module('plugins.movies')
         .factory('moviesService', moviesService);
 
-    function moviesService($http, /*CacheFactory,*/ exception) {
+    function moviesService($http, $q, $timeout,/*CacheFactory,*/ exception) {
         // If cache doesn't exist, create it
 
         //TODO: Enable cache
@@ -16,6 +16,24 @@
 
         var moviesCache = CacheFactory.get('moviesCache');*/
 
+        let movies = [
+            {
+                name: "First movie"
+            }, 
+            {
+                name: "Second movie"
+            },
+            {
+                name: "Testing"
+            },
+            {
+                name: "The Collector"
+            },
+            {
+                name: "Toy Story 2"
+            }
+        ]
+
         return {
             getLists: getLists,
             deleteList: deleteList,
@@ -23,7 +41,8 @@
             deleteMovie: deleteMovie,
             createList: createList,
             getMovieMetadata: getMovieMetadata,
-            addMovieToList: addMovieToList
+            addMovieToList: addMovieToList,
+            searchMovies: searchMovies
         };
 
         function getLists() {
@@ -99,6 +118,30 @@
             function addMovieToListComplete(response) {
                 return;
             }
+        }
+
+        function searchMovies(searchText) {
+            /*
+            return $http.get('/api/movies/search/', searchtext)
+                .then(searchMoviesComplete)
+                .catch(callFailed);
+
+                function searchMoviesComplete(response) {
+                    return response.data;
+                }
+
+                */
+            var results = movies.filter(function(movie) {
+                var lowercaseMovieName = angular.lowercase(movie.name);
+                return lowercaseMovieName.indexOf(searchText) !== -1;
+            });
+
+            return $q(function(resolve, reject) {
+                $timeout(function () {
+                    resolve(results);
+                }, Math.random() * 1000, false);
+            });
+                
         }
 
         function callFailed(error) {

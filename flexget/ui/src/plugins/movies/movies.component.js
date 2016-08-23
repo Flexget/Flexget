@@ -17,6 +17,7 @@
         vm.$onInit = activate;
         vm.deleteMovieList = deleteMovieList;
         vm.newList = newList;
+        vm.searchMovies = searchMovies;
 
         function activate() {
             getMovieLists();
@@ -43,6 +44,11 @@
                         vm.lists.splice(index, 1);
                     });
             });
+        }
+
+        function searchMovies(searchText) {
+            var lowercaseSearchText = angular.lowercase(searchText);
+            return moviesService.searchMovies(lowercaseSearchText);
         }
 
         function newList($event) {
