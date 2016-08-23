@@ -235,10 +235,10 @@ class MovieListMoviesAPI(APIResource):
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
         data = request.json
-
+        movie_identifiers = data.get('movie_identifiers', [])
         # Validates ID type based on allowed ID
         # TODO pass this to json schema validation
-        for id_name in data.get('movie_identifiers'):
+        for id_name in movie_identifiers:
             if set(id_name.keys()) & set(MovieListBase().supported_ids) == set([]):
                 return {'status': 'error',
                         'message': 'movie identifier %s is not allowed' % id_name}, 501
@@ -253,7 +253,7 @@ class MovieListMoviesAPI(APIResource):
         movie = ml.MovieListMovie()
         movie.title = title
         movie.year = year
-        movie.ids = ml.get_db_movie_identifiers(identifier_list=data.get('movie_identifiers'), session=session)
+        movie.ids = ml.get_db_movie_identifiers(identifier_list=movie_identifiers, session=session)
         movie.list_id = list_id
         session.add(movie)
         session.commit()
