@@ -54,8 +54,8 @@
             $event.stopPropagation();
         }
 
-        function addMovie(movie) {
-            console.log(movie);
+        function addMovie(movie, list) {
+            moviesService.addMovieToList(list, movie)
         }
 
         function searchMovies(searchText) {

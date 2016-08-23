@@ -6,11 +6,20 @@
 			md-min-length="3"
 			md-floating-label="Search for new movies">
 			<md-item-template >
-				<div ng-click="vm.movieSelected($event)">
+				<div ng-click="vm.movieSelected($event)" class="movie-select">
 					<span class="item-title">
-						<span md-hightlight-text="searchText">{{ movie.name }}</span>
+						<span md-hightlight-text="searchText">{{ movie.movie_name }}</span>
 
-						<md-button class="md-raised" ng-click="vm.addMovie(movie)">Add</md-button>
+						<md-input-container>
+							<md-select ng-model="listid"
+								md-container-class="list-selection">
+								<md-option ng-repeat="list in ::vm.lists" value="{{ list.id }}">
+									{{ list.name }}
+								</md-option>
+							</md-select>
+						</md-input-container>
+
+						<md-button class="md-raised" ng-click="vm.addMovie(movie, listid)">Add</md-button>
 					</span>
 				</div>
 			</md-item-template>

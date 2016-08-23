@@ -18,19 +18,19 @@
 
         let movies = [
             {
-                name: "First movie"
+                movie_name: "First movie"
             }, 
             {
-                name: "Second movie"
+                movie_name: "Second movie"
             },
             {
-                name: "Testing"
+                movie_name: "Testing"
             },
             {
-                name: "The Collector"
+                movie_name: "The Collector"
             },
             {
-                name: "Toy Story 2"
+                movie_name: "Toy Story 2"
             }
         ]
 
@@ -132,7 +132,7 @@
 
                 */
             var results = movies.filter(function(movie) {
-                var lowercaseMovieName = angular.lowercase(movie.name);
+                var lowercaseMovieName = angular.lowercase(movie.movie_name);
                 return lowercaseMovieName.indexOf(searchText) !== -1;
             });
 
