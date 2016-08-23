@@ -46,7 +46,9 @@ def seen_search(options, session=None):
     seen_entries = seen.search(value=search_term, status=None, session=session)
     table_data = []
     for se in seen_entries.all():
-        table_data.append(['Entry title', se.title])
+        table_data.append(['Title', se.title])
+        table_data.append(['Task', se.task])
+        table_data.append(['Added', se.added.strftime('%c')])
         for sf in se.fields:
             if sf.field.lower() == 'title':
                 continue
