@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 from datetime import datetime
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from dateutil import parser
 from future.utils import native
-from requests.exceptions import HTTPError
+from requests.exceptions import RequestException
 from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, Table, or_, \
     and_
 from sqlalchemy.orm import relation
@@ -498,7 +498,7 @@ def tvmaze_lookup(lookup_type, lookup_values):
     log.debug('querying tvmaze API with the following URL: %s', lookup_url)
     try:
         result = requests.get(lookup_url).json()
-    except HTTPError as e:
+    except RequestException as e:
         raise LookupError(e)
     return result
 
