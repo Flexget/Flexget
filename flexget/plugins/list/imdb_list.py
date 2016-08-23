@@ -30,6 +30,7 @@ Base = db_schema.versioned_base('imdb_list', 0)
 
 MOVIE_TYPES = ['feature film', 'documentary', 'tv movie', 'video', 'short film']
 SERIES_TYPES = ['tv series', 'mini-series']
+OTHER_TYPES = ['video game']
 
 
 class IMDBListUser(Base):
@@ -121,11 +122,11 @@ class ImdbEntrySet(MutableSet):
             if not cached_credentials:
                 log.debug('user credentials not found in cache or outdated, fetching from IMDB')
                 url_credentials = (
-                'https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
-                'handler&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&'
-                'openid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%'
-                '2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.ope'
-                'nid.net%2Fauth%2F2.0'
+                    'https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
+                    'handler&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&'
+                    'openid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%'
+                    '2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.ope'
+                    'nid.net%2Fauth%2F2.0'
                 )
                 try:
                     r = self._session.get(url_credentials)
@@ -231,6 +232,8 @@ class ImdbEntrySet(MutableSet):
                 elif item_type in SERIES_TYPES:
                     entry['series_name'] = name
                     entry['series_year'] = year
+                elif item_type in OTHER_TYPES:
+                    entry['title'] = name
                 else:
                     log.verbose('Unknown IMDB type entry received: %s. Skipping', item_type)
                     continue
