@@ -17,43 +17,39 @@
         vm.$onInit = activate;
         vm.deleteMovieList = deleteMovieList;
         vm.newList = newList;
-        vm.addMovie = addMovie;
         vm.searchMovies = searchMovies;
-        vm.movieSelected = movieSelected;
 
         function activate() {
             getMovieLists();
         }
 
+        vm.results = [];
+
         vm.typed = function(text) {
-            //TODO: Search
             //TODO: Close menu or update results?
 
             if(text.length >= 3) {
-
-                searchMovies(text).then(function(results) {
-                    vm.openSearchMenu(results);
+                searchMovies(text).then(function (results) {
+                    vm.results = results;
+                    vm.openSearchMenu();
                 });
             }
-
-            //text.length >= 3 ? vm.openSearchMenu() : null;
         }
 
-        vm.openSearchMenu = function(results) {
+        vm.openSearchMenu = function () {
             var position = $mdPanel.newPanelPosition().relativeTo('.search-menu').addPanelPosition($mdPanel.xPosition.ALIGN_START, $mdPanel.yPosition.BELOW);
 
             var config = {
                 attachTo: angular.element(document.body),
-                controller: function(mdPanelRef) {
-                    var vm = this;
-                },
+                controller: 'addMovieController',
                 controllerAs: 'vm',
-                templateUrl: 'plugins/movies/search.tmpl.html',
+                templateUrl: 'plugins/movies/components/add-movie/add-movie.tmpl.html',
                 panelClass: 'add-movie-panel',
                 position: position,
                 locals: {
-                    'foundmovies': results,
-                    'lists': vm.lists
+                    foundmovies: vm.results,
+                    lists: vm.lists,
+                    selectedlist: vm.selectedlist
                 },
                 clickOutsideToClose: true,
                 escapeToClose: true,
@@ -85,16 +81,6 @@
                         vm.lists.splice(index, 1);
                     });
             });
-        }
-
-        // Function to prevent a movie from being selected in the autocomplete
-        function movieSelected($event) {
-            $event.preventDefault();
-            $event.stopPropagation();
-        }
-
-        function addMovie(movie, list) {
-            moviesService.addMovieToList(list, movie)
         }
 
         function searchMovies(searchText) {
