@@ -119,6 +119,7 @@ def movie_list_add(options):
             console('Could not find movie list with name {}, creating'.format(options.list_name))
             movie_list = MovieListList(name=options.list_name)
         session.merge(movie_list)
+        session.commit()
         title, year = split_title_year(options.movie_title)
         console('Trying to lookup movie %s title' % title)
         entry = lookup_movie(title=title, session=session, identifiers=options.identifiers)
