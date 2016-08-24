@@ -53,7 +53,7 @@ class ObjectsContainer(object):
         'properties': {
             'title': {'type': 'string'},
             'added_on': {'type': 'string'},
-            'year': {'type': 'integer'},
+            'year': {'type': ['integer', 'null']},
             'list_id': {'type': 'integer'},
             'movie_list_ids': {
                 'type': 'array',

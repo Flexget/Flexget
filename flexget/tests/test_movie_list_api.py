@@ -93,13 +93,26 @@ class TestMovieListAPI(object):
         assert not errors
 
     def test_movie_list_movies(self, api_client, schema_match):
-        # Get non existent list
-        rsp = api_client.get('/movie_list/1/movies/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        payload = {'name': 'name'}
+
+        # Create list
+        rsp = api_client.json_post('/movie_list/', data=json.dumps(payload))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+
+        movie_data = {'movie_name': 'title'}
+
+        # Add movie to list
+        rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie_data))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(OC.return_movies, data)
+        errors = schema_match(OC.movie_list_object, data)
         assert not errors
 
+        # Get movies from list
+        rsp = api_client.get('/movie_list/1/movies/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+    def test_movie_list_movies_with_identifiers(self, api_client, schema_match):
         payload = {'name': 'name'}
 
         # Create list
@@ -120,11 +133,14 @@ class TestMovieListAPI(object):
         # Get movies from list
         rsp = api_client.get('/movie_list/1/movies/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(OC.return_movies, data)
+        assert not errors
 
-        returned_identifier = json.loads(rsp.get_data(as_text=True))['movies'][0]['movies_list_ids'][0]
+        returned_identifier = data['movies'][0]['movies_list_ids'][0]
         assert returned_identifier['id_name'], returned_identifier['id_value'] == identifier.items()[0]
 
-    def test_movie_list_movie(self, api_client):
+    def test_movie_list_movie(self, api_client, schema_match):
         payload = {'name': 'name'}
 
         # Create list
@@ -138,12 +154,6 @@ class TestMovieListAPI(object):
         # Add movie to list
         rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie_data))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
-
-        # Get movies from list
-        rsp = api_client.get('/movie_list/1/movies/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        returned_identifier = json.loads(rsp.get_data(as_text=True))['movies'][0]['movies_list_ids'][0]
-        assert returned_identifier['id_name'], returned_identifier['id_value'] == identifier.items()[0]
 
         # Get specific movie from list
         rsp = api_client.get('/movie_list/1/movies/1/')
