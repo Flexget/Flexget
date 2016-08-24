@@ -95,7 +95,7 @@ class TMDBMovie(Base):
         self.imdb_id = movie['imdb_id']
         self.name = movie['title']
         self.original_name = movie['original_title']
-        self.released = dateutil_parse(movie['release_date'])
+        self.released = dateutil_parse(movie['release_date']).date()
         self.runtime = movie['runtime']
         self.language = movie['original_language']
         self.overview = movie['overview']
