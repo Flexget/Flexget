@@ -24,6 +24,12 @@
         function activate() {
             getMovieLists();
         }
+
+        vm.typed = function(text) {
+            //TODO: Search
+            //TODO: Close menu or update results?
+            text.length >= 3 ? vm.openSearchMenu() : null;
+        }
     
     let foundmovies = [
   {
@@ -170,8 +176,7 @@
   }
 ];
 
-
-        vm.openSearchMenu = function(event) {
+        vm.openSearchMenu = function() {
             var position = $mdPanel.newPanelPosition().relativeTo('.search-menu').addPanelPosition($mdPanel.xPosition.ALIGN_START, $mdPanel.yPosition.BELOW);
 
             var config = {
@@ -181,16 +186,15 @@
                 },
                 controllerAs: 'vm',
                 templateUrl: 'plugins/movies/search.tmpl.html',
-                panelClass: 'demo-menu-example',
+                panelClass: 'add-movie-panel',
                 position: position,
-                openFrom: event,
                 locals: {
                     'foundmovies': foundmovies,
                     'lists': vm.lists
                 },
                 clickOutsideToClose: true,
                 escapeToClose: true,
-                focusOnOpen: true,
+                focusOnOpen: false,
                 zIndex: 2
             }
 

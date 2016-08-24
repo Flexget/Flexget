@@ -1,41 +1,18 @@
-<div class="demo-menu-example""
-    aria-label="Select your favorite dessert." 
-    role="listbox">
-    <md-list>
-        <md-list-item ng-repeat="movie in vm.foundmovies | orderBy : 'match' : true" class="add-movie-button">
+<md-content flex>
+    <md-list flex>
+        <md-list-item ng-repeat="movie in vm.foundmovies | orderBy : 'match' : true" class="add-movie-button" flex>
             <img ng-src="{{ movie.thumbnail }}"/>
             <span flex>{{ movie.name }} ({{ movie.year }})</span>
             <md-input-container>
-				<md-select ng-model="listid"
-					md-container-class="list-selection"
+                <md-select ng-model="listid"
+                    md-container-class="list-selection"
                     placeholder="Movie list">
-					<md-option ng-repeat="list in ::vm.lists" value="{{ list.id }}"  ng-click="vm.movieSelected($event)">
-				    	{{ list.name }}
-					</md-option>
-				</md-select>
-			</md-input-container>
+                    <md-option ng-repeat="list in ::vm.lists" value="{{ list.id }}"  ng-click="vm.movieSelected($event)">
+                        {{ list.name }}
+                    </md-option>
+                </md-select>
+            </md-input-container>
             <md-button class="md-raised md-secondary" ng-disabled="!listid" ng-click="vm.addMovie(movie, listid)">Add</md-button>
         </md-list-item>
     </md-list>
-        <!--<div class="demo-menu-item" 
-            ng-class="{selected : dessert == ctrl.favoriteDessert}" 
-            aria-selected="{{dessert == ctrl.favoriteDessert}}" 
-            tabindex="-1" 
-            ng-repeat="movie in vm.foundmovies | orderBy : 'match'"
-            role="option">
-
-                {{ movie.name }} ({{ movie.year }})
-
-                <md-input-container>
-					<md-select ng-model="listid"
-						md-container-class="list-selection"
-                        placeholder="Movie list">
-						<md-option ng-repeat="list in ::vm.lists" value="{{ list.id }}"  ng-click="vm.movieSelected($event)">
-					    	{{ list.name }}
-						</md-option>
-					</md-select>
-				</md-input-container>
-
-						<md-button class="md-raised" ng-click="vm.addMovie(movie, listid)">Add</md-button>
-        </div>-->
-</div>
+</md-content>

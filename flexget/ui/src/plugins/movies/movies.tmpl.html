@@ -1,5 +1,5 @@
 <div layout="column" flex>
-	<md-autocomplete
+	<!--<md-autocomplete
 			md-items="movie in vm.searchMovies(searchText)"
 			md-search-text="searchText"
 			md-delay="1000"
@@ -27,11 +27,15 @@
 			<md-not-found>
 				No movies found
 			</md-not-found>
-		</md-autocomplete>
-
-	<md-button class="search-menu" ng-click="vm.openSearchMenu($event)">
-		Open
-	</md-button>
+		</md-autocomplete>-->
+	<md-input-container>
+		<label>Add a movie</label>
+		<input type="text" 
+			class="search-menu"
+			ng-model="searchText"
+			ng-change="vm.typed(searchText)"
+			ng-model-options="{ debounce: 1000 }">
+	</md-input-container>
 	<md-content flex ng-if="vm.lists">
 		<md-tabs md-dynamic-height md-border-bottom class="movie-tabs">
 			<movie-list ng-repeat="list in vm.lists" 
