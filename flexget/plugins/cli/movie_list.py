@@ -21,6 +21,7 @@ from flexget.utils.tools import split_title_year
 imdb_lookup = ImdbLookup().lookup
 tmdb_lookup = PluginTmdbLookup().lookup
 
+
 def lookup_movie(title, session, identifiers=None):
     entry = Entry(title=title)
     if identifiers:
@@ -142,7 +143,10 @@ def movie_list_add(options):
                 if entry.get(_id):
                     id_list.append({_id: entry.get(_id)})
         if id_list:
-            console('Setting movie identifiers:', id_list)
+            console('Setting movie identifiers:')
+            for ident in id_list:
+                for key in ident:
+                    console('{}: {}'.format(key, ident[key]))
             movie.ids = get_db_movie_identifiers(identifier_list=id_list, session=session)
         session.merge(movie)
 
