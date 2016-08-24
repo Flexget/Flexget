@@ -29,23 +29,23 @@ CATEGORIES = {
 
     # TV
     'HDTV': 41,
-    'SDTV': 18
+    'SDTV': 18,
 
-    #Adult
+    # Adult
     'XXX': 4,
 
-    #Music
+    # Music
     'MusicMP3': 23,
     'MusicFLAC':25,
 
-    #Games
+    # Games
     'Games/PC ISO': 27,
     'Games/PC RIP': 28,
     'Games/PS3': 40,
     'Games/XBOX-360': 32,
     'Software/PC ISO':33,
 
-    #E-Books
+    # E-Books
     'e-Books': 35
 }
 
