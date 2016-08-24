@@ -242,7 +242,7 @@ def display_details(options):
         footer += ' \n See option `identified_by` for more information.\n'
         if series.begin:
             footer += ' Begin episode for this series set to `%s`.' % series.begin.identifier
-    table = TerminalTable(options.table_type, table_data, table_title)
+    table = TerminalTable(options.table_type, table_data, table_title, drop_columns=[4, 3, 1])
     try:
         console(table.output)
     except TerminalTableError as e:
