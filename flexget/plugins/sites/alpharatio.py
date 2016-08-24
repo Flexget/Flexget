@@ -82,8 +82,8 @@ class SearchAlphaRatio(object):
             'category': one_or_more({'type': 'string', 'enum': list(CATEGORIES.keys())}, unique_items=True),
             'order_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'time', 'size', 'year', 'snatched'],
                          'default': 'time'},
-            'order_way': {'type': 'string', 'enum': ['desc', 'asc'], 'default': 'desc'},
-            'scene':  {'type': 'boolean', 'enum':  [True, False]},
+            'order_desc': {'type': 'boolean'},
+            'scene':  {'type': 'boolean'},
             'leechstatus': {'type': 'string', 'enum': list(LEECHSTATUS.keys()), 'default': 'normal'},
         },
         'required': ['username', 'password'],
@@ -113,6 +113,8 @@ class SearchAlphaRatio(object):
             self.errors = True
             # try again
             response = self.get(url, params, username, password, force=True)
+        else:
+            self.errors = False
 
         return response
 
@@ -169,11 +171,15 @@ class SearchAlphaRatio(object):
         if 'scene' in config:
             params['scene'] = int(config['scene'])
 
+        if 'order_desc' in config:
+            ordering = 'desc' if config['order_desc'] else 'asc'
+        else:
+            ordering = 'desc'
+
         entries = set()
 
-        params.update({'order_by': config['order_by'], 'search_submit': 1,
-                       'freeleech': LEECHSTATUS[config['leechstatus']],
-                       'order_way': config['order_way'], 'action': 'basic'})
+        params.update({'order_by': config['order_by'], 'search_submit': 1, 'action': 'basic', 'order_way': ordering,
+                       'freeleech': LEECHSTATUS[config['leechstatus']]})
 
         for search_string in entry.get('search_strings', [entry['title']]):
             params['searchstr'] = search_string

@@ -149,6 +149,8 @@ class SearchMoreThanTV(object):
             self.errors = True
             # try again
             response = self.get(url, params, username, password, force=True)
+        else:
+            self.errors = False
 
         return response
 
