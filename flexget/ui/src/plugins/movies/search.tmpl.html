@@ -1,18 +1,21 @@
 <md-content flex>
     <md-list flex>
-        <md-list-item ng-repeat="movie in vm.foundmovies | orderBy : 'match' : true" class="add-movie-button" flex>
+        <md-list-item ng-repeat="movie in vm.foundmovies | orderBy : 'match' : true" class="list" flex>
             <img ng-src="{{ movie.thumbnail }}"/>
-            <span flex>{{ movie.name }} ({{ movie.year }})</span>
+            <span flex class="title">{{ movie.name }} ({{ movie.year }})</span>
             <md-input-container>
                 <md-select ng-model="listid"
-                    md-container-class="list-selection"
                     placeholder="Movie list">
-                    <md-option ng-repeat="list in ::vm.lists" value="{{ list.id }}"  ng-click="vm.movieSelected($event)">
+                    <md-option ng-repeat="list in ::vm.lists" value="{{ list.id }}">
                         {{ list.name }}
                     </md-option>
                 </md-select>
             </md-input-container>
             <md-button class="md-raised md-secondary" ng-disabled="!listid" ng-click="vm.addMovie(movie, listid)">Add</md-button>
+            <md-divider ng-if="!$last"></md-divider>
+        </md-list-item>
+        <md-list-item ng-if="vm.foundmovies.length === 0">
+            No movies found
         </md-list-item>
     </md-list>
 </md-content>
