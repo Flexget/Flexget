@@ -82,7 +82,7 @@ class SearchAlphaRatio(object):
             'category': one_or_more({'type': 'string', 'enum': list(CATEGORIES.keys())}, unique_items=True),
             'order_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'time', 'size', 'year', 'snatched'],
                          'default': 'time'},
-            'order_desc': {'type': 'boolean'},
+            'order_desc': {'type': 'boolean', 'default': True},
             'scene':  {'type': 'boolean'},
             'leechstatus': {'type': 'string', 'enum': list(LEECHSTATUS.keys()), 'default': 'normal'},
         },
@@ -171,11 +171,8 @@ class SearchAlphaRatio(object):
         if 'scene' in config:
             params['scene'] = int(config['scene'])
 
-        if 'order_desc' in config:
-            ordering = 'desc' if config['order_desc'] else 'asc'
-        else:
-            ordering = 'desc'
-
+        ordering = 'desc' if config['order_desc'] else 'asc'
+        
         entries = set()
 
         params.update({'order_by': config['order_by'], 'search_submit': 1, 'action': 'basic', 'order_way': ordering,
