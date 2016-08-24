@@ -154,7 +154,7 @@ class MyEpisodes(object):
         else:
             try:
                 series = lookup_series(name=series_name, tvdb_id=entry.get('tvdb_id'))
-                query_name = series.seriesname
+                query_name = series.name
             except LookupError as e:
                 log.warning('Unable to lookup series `%s` from tvdb, using raw name.' % series_name)
                 query_name = series_name
