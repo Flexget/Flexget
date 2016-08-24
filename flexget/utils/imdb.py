@@ -52,7 +52,6 @@ def make_url(imdb_id):
 
 
 class ImdbSearch(object):
-
     def __init__(self):
         # de-prioritize aka matches a bit
         self.aka_weight = 0.95
@@ -69,7 +68,7 @@ class ImdbSearch(object):
         pattern = re.compile(re.escape(old), re.I)
         return re.sub(pattern, new, text, count)
 
-    def smart_match(self, raw_name):
+    def smart_match(self, raw_name, single_match=True):
         """Accepts messy name, cleans it and uses information available to make smartest and best match"""
         parser = get_plugin_by_name('parsing').instance.parse_movie(raw_name)
         name = parser.name
@@ -78,9 +77,9 @@ class ImdbSearch(object):
             log.critical('Failed to parse name from %s' % raw_name)
             return None
         log.debug('smart_match name=%s year=%s' % (name, str(year)))
-        return self.best_match(name, year)
+        return self.best_match(name, year, single_match)
 
-    def best_match(self, name, year=None):
+    def best_match(self, name, year=None, single_match=True):
         """Return single movie that best matches name criteria or None"""
         movies = self.search(name)
 
@@ -121,7 +120,7 @@ class ImdbSearch(object):
                 log.debug('remain: %s (match: %s) %s' % (m['name'], m['match'], m['url']))
             return None
         else:
-            return movies[0]
+            return movies[0] if single_match else movies
 
     def search(self, name):
         """Return array of movie details (dict)"""
@@ -135,22 +134,25 @@ class ImdbSearch(object):
         actual_url = page.url
 
         movies = []
+        soup = get_soup(page.text)
         # in case we got redirected to movie page (perfect match)
         re_m = re.match(r'.*\.imdb\.com/title/tt\d+/', actual_url)
         if re_m:
+            div = soup.find('div', {'class': 'title_wrapper'})
+            title_wrapper = div.find('h1', {'itemprop': 'name'})
+            title = ''.join(text for text in title_wrapper.find_all(text=True) if text.parent.name not in ['span', 'a'])
+            title = title.strip()
+            year = int(div.find('a').text)
             actual_url = re_m.group(0)
             log.debug('Perfect hit. Search got redirected to %s' % actual_url)
             movie = {}
             movie['match'] = 1.0
-            movie['name'] = name
+            movie['name'] = title
             movie['imdb_id'] = extract_id(actual_url)
             movie['url'] = make_url(movie['imdb_id'])
-            movie['year'] = None  # skips year check
+            movie['year'] = year
             movies.append(movie)
             return movies
-
-        # the god damn page has declared a wrong encoding
-        soup = get_soup(page.text)
 
         section_table = soup.find('table', 'findList')
         if not section_table:
