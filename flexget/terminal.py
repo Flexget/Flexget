@@ -9,7 +9,7 @@ from colorclass import Windows, Color, disable_all_colors
 from flexget.logger import local_context
 from flexget.options import ArgumentParser
 from flexget.utils.tools import io_encoding
-from terminaltables import *
+from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable
 from terminaltables.terminal_io import terminal_size
 
 # Enable terminal colors on windows
