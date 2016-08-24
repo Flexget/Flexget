@@ -7,7 +7,7 @@ from datetime import timedelta
 from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, CLITableError, table_parser, colorize, console
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
@@ -103,7 +103,7 @@ def display_summary(options):
     table = TerminalTable(options.table_type, table_data, wrap_columns=[(3, 30)])
     try:
         console(table.output)
-    except CLITableError as e:
+    except TerminalTableError as e:
         console('ERROR: %s' % str(e))
         return
     if not porcelain:
@@ -245,7 +245,7 @@ def display_details(options):
     table = TerminalTable(options.table_type, table_data, table_title)
     try:
         console(table.output)
-    except CLITableError as e:
+    except TerminalTableError as e:
         console('ERROR: %s' % str(e))
         return
     if not options.table_type == 'porcelain':

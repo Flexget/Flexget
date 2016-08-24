@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 
 from flexget import options
 from flexget.event import event
-from flexget.terminal import TerminalTable, CLITableError, table_parser, console
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 
 
 def do_cli(manager, options):
@@ -42,7 +42,7 @@ def action_status(options, irc_manager):
     table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
-    except CLITableError as e:
+    except TerminalTableError as e:
         console('ERROR: %s' % e)
 
 

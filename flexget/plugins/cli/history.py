@@ -6,7 +6,7 @@ from sqlalchemy import desc
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, CLITableError, table_parser, console
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.plugins.output.history import History
 
 
@@ -41,7 +41,7 @@ def do_cli(manager, options):
         table.table.inner_heading_row_border = False
     try:
         console(table.output)
-    except CLITableError as e:
+    except TerminalTableError as e:
         console('ERROR: %s' % str(e))
 
 

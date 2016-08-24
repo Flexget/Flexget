@@ -5,7 +5,7 @@ from flexget import options
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugins.input.backlog import get_entries, clear_entries
-from flexget.terminal import TerminalTable, CLITableError, table_parser, console
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 
 
 def do_cli(manager, options):
@@ -22,7 +22,7 @@ def do_cli(manager, options):
         table = TerminalTable(options.table_type, table_data, wrap_columns=[(0, 100)])
         try:
             console(table.output)
-        except CLITableError as e:
+        except TerminalTableError as e:
             console('ERROR: %s' % str(e))
 
 

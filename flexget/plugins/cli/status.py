@@ -8,7 +8,7 @@ from flexget import options
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugins.operate.status import StatusTask, TaskExecution
-from flexget.terminal import TerminalTable, CLITableError, table_parser, colorize, console
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
 from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -56,7 +56,7 @@ def do_cli_task(manager, options):
     table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
-    except CLITableError as e:
+    except TerminalTableError as e:
         console('ERROR: %s' % str(e))
 
 
@@ -99,7 +99,7 @@ def do_cli_summary(manager, options):
     table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
-    except CLITableError as e:
+    except TerminalTableError as e:
         console('ERROR: %s' % str(e))
 
 

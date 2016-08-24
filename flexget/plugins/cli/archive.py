@@ -12,7 +12,7 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.options import ParseExtrasAction, get_parser
 from flexget.plugins.generic.archive import ArchiveEntry, ArchiveSource, get_source, get_tag, search
-from flexget.terminal import TerminalTable, CLITableError, table_parser, console
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.utils.tools import strip_html
 
 log = logging.getLogger('archive_cli')
@@ -156,7 +156,7 @@ def cli_search(options):
     table.table.inner_heading_row_border = False
     try:
         console(table.output)
-    except CLITableError as e:
+    except TerminalTableError as e:
         console('ERROR: %s' % str(e))
 
 

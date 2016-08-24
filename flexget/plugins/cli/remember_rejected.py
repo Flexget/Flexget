@@ -5,7 +5,7 @@ from flexget import options
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugins.filter.remember_rejected import RememberEntry
-from flexget.terminal import TerminalTable, CLITableError, table_parser, console
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 
 
 def do_cli(manager, options):
@@ -26,7 +26,7 @@ def list_rejected(options):
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)
-    except CLITableError as e:
+    except TerminalTableError as e:
         console('ERROR: %s' % str(e))
 
 

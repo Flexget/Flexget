@@ -6,7 +6,7 @@ import logging
 from flexget import options
 from flexget.event import event
 from flexget.plugin import get_plugins
-from flexget.terminal import TerminalTable, CLITableError, table_parser, console, colorize
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
 
 log = logging.getLogger('plugins')
 
@@ -38,7 +38,7 @@ def plugins_summary(manager, options):
     table = TerminalTable(options.table_type, table_data, wrap_columns=[(1, 60), (2, 60)])
     try:
         console(table.output)
-    except CLITableError as e:
+    except TerminalTableError as e:
         console('ERROR: %s' % str(e))
         return
     console(colorize('green', ' Built-in plugins'))

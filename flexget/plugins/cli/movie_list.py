@@ -10,7 +10,7 @@ from flexget import options
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
-from flexget.terminal import TerminalTable, CLITableError, table_parser, console
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.plugin import PluginError
 from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
     get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase
@@ -82,7 +82,7 @@ def movie_list_lists(options):
     table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
-    except CLITableError as e:
+    except TerminalTableError as e:
         console('ERROR: %s' % str(e))
 
 
@@ -107,7 +107,7 @@ def movie_list_list(options):
     table = TerminalTable(options.table_type, table_data, title)
     try:
         console(table.output)
-    except CLITableError as e:
+    except TerminalTableError as e:
         console('ERROR: %s' % str(e))
 
 

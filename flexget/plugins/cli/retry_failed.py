@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
-from flexget.terminal import TerminalTable, CLITableError, table_parser, console
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.manager import Session
 from flexget.event import event
 from flexget.plugins.filter.retry_failed import FailedEntry
@@ -28,7 +28,7 @@ def list_failed(options):
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)
-    except CLITableError as e:
+    except TerminalTableError as e:
         console('ERROR: %s' % str(e))
 
 

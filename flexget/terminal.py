@@ -100,7 +100,7 @@ class TerminalTable(object):
         return self.build_table(self.type, output_table)
 
 
-class CLITableError(Exception):
+class TerminalTableError(Exception):
     """ A CLI table error"""
 
 
