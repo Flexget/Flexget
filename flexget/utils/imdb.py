@@ -159,7 +159,7 @@ class ImdbSearch(object):
             log.debug('results table not found')
             return
 
-        rows = section_table.find_all('td', 'result_text')
+        rows = section_table.find_all('tr')
         if not rows:
             log.debug('Titles section does not have links')
         for count, row in enumerate(rows):
@@ -167,18 +167,21 @@ class ImdbSearch(object):
             if count > self.max_results:
                 break
 
+            result_text = row.find('td', 'result_text')
             movie = {}
-            additional = re.findall(r'\((.*?)\)', row.text)
+            additional = re.findall(r'\((.*?)\)', result_text.text)
             if len(additional) > 0:
                 if re.match('^\d{4}$', additional[-1]):
                     movie['year'] = additional[-1]
                 elif len(additional) > 1:
                     movie['year'] = additional[-2]
                     if additional[-1] not in ['TV Movie', 'Video']:
-                        log.debug('skipping %s', row.text)
+                        log.debug('skipping %s', result_text.text)
                         continue
+            primary_photo = row.find('td', 'primary_photo')
+            movie['thumbnail'] = primary_photo.find('a').find('img').get('src')
 
-            link = row.find_next('a')
+            link = result_text.find_next('a')
             movie['name'] = link.text
             movie['imdb_id'] = extract_id(link.get('href'))
             movie['url'] = make_url(movie['imdb_id'])
