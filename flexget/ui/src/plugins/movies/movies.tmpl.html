@@ -28,6 +28,10 @@
 				No movies found
 			</md-not-found>
 		</md-autocomplete>
+
+	<md-button class="search-menu" ng-click="vm.openSearchMenu($event)">
+		Open
+	</md-button>
 	<md-content flex ng-if="vm.lists">
 		<md-tabs md-dynamic-height md-border-bottom class="movie-tabs">
 			<movie-list ng-repeat="list in vm.lists" 
