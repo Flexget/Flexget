@@ -6,7 +6,7 @@
         .module('plugins.movies')
         .factory('moviesService', moviesService);
 
-    function moviesService($http, $q, $timeout,/*CacheFactory,*/ exception) {
+    function moviesService($http, /*CacheFactory,*/ exception) {
         // If cache doesn't exist, create it
 
         //TODO: Enable cache
@@ -15,24 +15,6 @@
         }
 
         var moviesCache = CacheFactory.get('moviesCache');*/
-
-        let movies = [
-            {
-                movie_name: "First movie"
-            }, 
-            {
-                movie_name: "Second movie"
-            },
-            {
-                movie_name: "Testing"
-            },
-            {
-                movie_name: "The Collector"
-            },
-            {
-                movie_name: "Toy Story 2"
-            }
-        ]
 
         return {
             getLists: getLists,
@@ -121,27 +103,13 @@
         }
 
         function searchMovies(searchText) {
-            /*
-            return $http.get('/api/movies/search/', searchtext)
+            return $http.get('/api/imdb/search/' + searchText)
                 .then(searchMoviesComplete)
                 .catch(callFailed);
 
                 function searchMoviesComplete(response) {
                     return response.data;
                 }
-
-                */
-            var results = movies.filter(function(movie) {
-                var lowercaseMovieName = angular.lowercase(movie.movie_name);
-                return lowercaseMovieName.indexOf(searchText) !== -1;
-            });
-
-            return $q(function(resolve, reject) {
-                $timeout(function () {
-                    resolve(results);
-                }, Math.random() * 1000, false);
-            });
-                
         }
 
         function callFailed(error) {
