@@ -158,7 +158,12 @@ class TestMovieListAPI(object):
         # Get specific movie from list
         rsp = api_client.get('/movie_list/1/movies/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        returned_identifier = json.loads(rsp.get_data(as_text=True))['movies_list_ids'][0]
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(OC.movie_list_object, data)
+        assert not errors
+
+        returned_identifier = data['movies_list_ids'][0]
         assert returned_identifier['id_name'], returned_identifier['id_value'] == identifier.items()[0]
 
         identifiers = [{'trakt_movie_id': '12345'}]
@@ -166,12 +171,21 @@ class TestMovieListAPI(object):
         # Change specific movie from list
         rsp = api_client.json_put('/movie_list/1/movies/1/', data=json.dumps(identifiers))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        returned_identifier = json.loads(rsp.get_data(as_text=True))['movies_list_ids'][0]
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(OC.movie_list_object, data)
+        assert not errors
+
+        returned_identifier = data['movies_list_ids'][0]
         assert returned_identifier['id_name'], returned_identifier['id_value'] == identifiers[0].items()
 
         # Delete specific movie from list
         rsp = api_client.delete('/movie_list/1/movies/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(empty_response, data)
+        assert not errors
 
         # Get non existent movie from list
         rsp = api_client.get('/movie_list/1/movies/1/')
