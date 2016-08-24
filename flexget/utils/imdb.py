@@ -142,7 +142,7 @@ class ImdbSearch(object):
             title_wrapper = div.find('h1', {'itemprop': 'name'})
             title = ''.join(text for text in title_wrapper.find_all(text=True) if text.parent.name not in ['span', 'a'])
             title = title.strip()
-            year = int(div.find('a').text)
+            year = div.find('a').text
             actual_url = re_m.group(0)
             log.debug('Perfect hit. Search got redirected to %s' % actual_url)
             movie = {}
