@@ -263,7 +263,7 @@ class Discover(object):
                     discover_entry.last_execution = datetime.datetime.now()
                 log.trace('interval passed for %s', entry['title'])
                 result.append(entry)
-        if interval_count:
+        if interval_count and not task.is_rerun:
             log.verbose('Discover interval of %s not met for %s entries. Use --discover-now to override.' %
                         (config['interval'], interval_count))
         return result
