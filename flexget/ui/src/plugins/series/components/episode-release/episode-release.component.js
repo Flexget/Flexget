@@ -15,7 +15,7 @@
             }
         });
 
-    function episodesReleaseController($http, $filter, $mdDialog, seriesService) {
+    function episodesReleaseController($mdDialog, $sce, seriesService) {
         var vm = this;
 
         vm.cancel = cancel;
@@ -30,7 +30,7 @@
         function resetRelease() {
             var confirm = $mdDialog.confirm()
                 .title('Confirm resetting a release')
-                .htmlContent('Are you sure you want to reset the release <b>' + vm.release.release_title + '</b>?')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to reset the release <b>' + vm.release.release_title + '</b>?'))
                 .ok('reset')
                 .cancel('No');
 
@@ -43,7 +43,7 @@
         function forgetRelease() {
             var confirm = $mdDialog.confirm()
                 .title('Confirm forgetting a release')
-                .htmlContent('Are you sure you want to delete the release <b>' + vm.release.release_title + '</b>?')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to delete the release <b>' + vm.release.release_title + '</b>?'))
                 .ok('Forget')
                 .cancel('No');
 

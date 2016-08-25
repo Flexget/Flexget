@@ -15,7 +15,7 @@
             }
         });
 
-    function seriesEpisodeController($mdDialog, $http, seriesService) {
+    function seriesEpisodeController($mdDialog, $sce, seriesService) {
         var vm = this;
 
         vm.showReleases = showReleases;
@@ -45,7 +45,7 @@
         function resetReleases() {
             var confirm = $mdDialog.confirm()
                 .title('Confirm resetting releases.')
-                .htmlContent('Are you sure you want to reset downloaded releases for <b>' + vm.episode['episode_identifier'] + '</b> from show <b>' + vm.show['show_name'] + '</b>?<br /> This does not remove seen entries but will clear the quality to be downloaded again.')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to reset downloaded releases for <b>' + vm.episode['episode_identifier'] + '</b> from show <b>' + vm.show['show_name'] + '</b>?<br /> This does not remove seen entries but will clear the quality to be downloaded again.'))
                 .ok('Forget')
                 .cancel('No');
 
@@ -58,7 +58,7 @@
         function deleteReleases() {
             var confirm = $mdDialog.confirm()
                 .title('Confirm deleting releases.')
-                .htmlContent('Are you sure you want to delete all releases for <b>' + vm.episode['episode_identifier'] + '</b> from show <b>' + vm.show['show_name'] + '</b>?<br /> This also removes all seen releases for this episode!')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to delete all releases for <b>' + vm.episode['episode_identifier'] + '</b> from show <b>' + vm.show['show_name'] + '</b>?<br /> This also removes all seen releases for this episode!'))
                 .ok('Forget')
                 .cancel('No');
 

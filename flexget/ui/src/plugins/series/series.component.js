@@ -10,7 +10,7 @@
             controller: seriesController
         });
 
-    function seriesController($mdDialog, seriesService, $timeout, $mdMedia) {
+    function seriesController($mdMedia, $mdDialog, $sce, $timeout, seriesService) {
         var vm = this;
 
         var options = {
@@ -49,7 +49,7 @@
         function forgetShow(show) {
             var confirm = $mdDialog.confirm()
                 .title('Confirm forgetting show.')
-                .htmlContent('Are you sure you want to completely forget <b>' + show['show_name'] + '</b>?<br /> This will also forget all downloaded releases.')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to completely forget <b>' + show['show_name'] + '</b>?<br /> This will also forget all downloaded releases.'))
                 .ok('Forget')
                 .cancel('No');
 

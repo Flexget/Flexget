@@ -10,7 +10,7 @@
             controller: moviesController
         });
 
-    function moviesController($http, $mdDialog, $scope, moviesService) {
+    function moviesController($mdDialog, $sce, moviesService) {
         var vm = this;
 
         vm.lists = [];
@@ -31,7 +31,7 @@
         function deleteMovieList(list) {
             var confirm = $mdDialog.confirm()
                 .title('Confirm deleting movie list.')
-                .htmlContent('Are you sure you want to delete the movie list <b>' + list.name + '</b>?')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to delete the movie list <b>' + list.name + '</b>?'))
                 .ok('Forget')
                 .cancel('No');
 

@@ -16,7 +16,7 @@
         });
 
 
-    function movieListController(moviesService, $mdDialog) {
+    function movieListController($mdDialog, $sce, moviesService) {
         var vm = this;
 
         vm.$onInit = activate;
@@ -58,7 +58,7 @@
         function deleteMovie(list, movie) {
             var confirm = $mdDialog.confirm()
                 .title('Confirm deleting movie from list.')
-                .htmlContent('Are you sure you want to delete the movie <b>' + movie.title + '</b> from list <b>' + list.name + '?')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to delete the movie <b>' + movie.title + '</b> from list <b>' + list.name + '</b>?'))
                 .ok('Forget')
                 .cancel('No');
 

@@ -14,7 +14,7 @@
             transclude: true
         });
 
-    function episodesController($http, $mdDialog, seriesService) {
+    function episodesController($mdDialog, $sce, seriesService) {
         var vm = this;
 
         vm.$onInit = activate;
@@ -60,7 +60,7 @@
         function deleteEpisode(episode) {
             var confirm = $mdDialog.confirm()
                 .title('Confirm forgetting episode.')
-                .htmlContent('Are you sure you want to forget episode <b>' + episode.episode_identifier + '</b> from show <b>' + vm.show.show_name + '</b>?<br /> This also removes all downloaded releases for this episode!')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to forget episode <b>' + episode.episode_identifier + '</b> from show <b>' + vm.show.show_name + '</b>?<br /> This also removes all downloaded releases for this episode!'))
                 .ok('Forget')
                 .cancel('No');
 
