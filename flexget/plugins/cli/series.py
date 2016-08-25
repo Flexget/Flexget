@@ -144,22 +144,18 @@ def remove(manager, options, forget=False):
         identifier = options.episode_id
         try:
             remove_series_episode(name, identifier, forget)
-            console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
-        except ValueError:
-            # Try upper casing identifier if we fail at first
-            try:
-                remove_series_episode(name, identifier.upper(), forget)
-                console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
-            except ValueError as e:
-                console(e.args[0])
-
+        except ValueError as e:
+            console(e.args[0])
+        else:
+            console('Removed episode(s) matching `%s` from series `%s`.' % (identifier, name.capitalize()))
     else:
         # remove whole series
         try:
             remove_series(name, forget)
-            console('Removed series `%s` from database.' % name.capitalize())
         except ValueError as e:
             console(e.args[0])
+        else:
+            console('Removed series `%s` from database.' % name.capitalize())
 
     manager.config_changed()
 

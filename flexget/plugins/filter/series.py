@@ -342,7 +342,7 @@ class Episode(Base):
             age += '%sd ' % age_days
         age += '%sh' % age_hours
         return age
-        
+
     @property
     def age_timedelta(self):
         """
@@ -743,6 +743,7 @@ def set_series_begin(series, ep_id):
 def remove_series(name, forget=False):
     """
     Remove a whole series `name` from database.
+
     :param name: Name of series to be removed
     :param forget: Indication whether or not to fire a 'forget' event
     """
@@ -766,29 +767,41 @@ def remove_series(name, forget=False):
 def remove_series_episode(name, identifier, forget=False):
     """
     Remove all episodes by `identifier` from series `name` from database.
+
     :param name: Name of series to be removed
-    :param identifier: Series identifier to be deleted
+    :param identifier: Series identifier to be deleted,
+        supports case insensitive startwith matching
     :param forget: Indication whether or not to fire a 'forget' event
     """
     downloaded_releases = []
     with Session() as session:
         series = session.query(Series).filter(Series.name == name).first()
-        if series:
-            episode = session.query(Episode).filter(Episode.identifier == identifier). \
-                filter(Episode.series_id == series.id).first()
-            if episode:
-                if not series.begin:
-                    series.identified_by = ''  # reset identified_by flag so that it will be recalculated
-                if forget:
-                    downloaded_releases = [release.title for release in episode.downloaded_releases]
-                session.delete(episode)
-                log.debug('Episode %s from series %s removed from database.', identifier, name)
-            else:
-                raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
-        else:
+        if not series:
             raise ValueError('Unknown series %s' % name)
-    for downloaded_release in downloaded_releases:
-        fire_event('forget', downloaded_release)
+
+        def remove_episode(episode):
+            if not series.begin:
+                series.identified_by = ''  # reset identified_by flag so that it will be recalculated
+            session.delete(episode)
+            log.debug('Episode %s from series %s removed from database.', identifier, name)
+            return [release.title for release in episode.downloaded_releases]
+
+        episode = session.query(Episode).filter(Episode.identifier == identifier). \
+            filter(Episode.series_id == series.id).first()
+        if episode:
+            downloaded_releases = remove_episode(episode)
+        else:
+            removed = False
+            for episode in session.query(Episode).filter(Episode.series_id == series.id).all():
+                if episode.identifier.upper().startswith(identifier.upper()):
+                    removed = True
+                    downloaded_releases.extend(remove_episode(episode))
+            if not removed:
+                raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
+
+    if forget:
+        for downloaded_release in downloaded_releases:
+            fire_event('forget', downloaded_release)
 
 
 def delete_release_by_id(release_id):
