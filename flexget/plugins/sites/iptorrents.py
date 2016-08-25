@@ -141,7 +141,7 @@ class UrlRewriteIPTorrents(object):
                 raise plugin.PluginError("Invalid cookies (user not logged in)...")
 
             soup = get_soup(req.content, parser="html.parser")
-            torrents = soup.find('table', {'class': 'torrents'})
+            torrents = soup.find('table', {'id': 'torrents'})
 
             for torrent in torrents.findAll('a', href=re.compile('\.torrent$')):
                 entry = Entry()
