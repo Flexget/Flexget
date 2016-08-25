@@ -132,10 +132,17 @@ class BlurayMovie(Base):
             # overview, genres etc
             contents = onecol_content.find('div').find('div')
 
-            self.overview = contents.find('p').text.strip()
+            overview_tag = contents.find('p')
+            self.overview = overview_tag.text.strip() if overview_tag else None
 
             # genres
-            genres_content = contents.find('table').find_all('tr')
+            genres_table = contents.find('table')
+            if not genres_table:
+                break
+
+            genres_content = genres_table.find_all('tr')
+            if not genres_content:
+                break
 
             genres = set()
             for genre in genres_content:
