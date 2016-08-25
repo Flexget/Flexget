@@ -186,7 +186,7 @@ class MovieList(MutableSet):
                         MovieListID.id_value == entry[id_name]))
                        .first())
                 if res:
-                    log.verbose('found movie %s', res)
+                    log.debug('found movie %s', res)
                     return res
         # Fall back to title/year match
         if not entry.get('movie_name'):
