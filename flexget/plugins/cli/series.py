@@ -4,6 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import argparse
 from datetime import timedelta
 
+from colorclass.toggles import disable_all_colors
 from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Session
@@ -28,6 +29,8 @@ ERROR_COLOR = 'red'
 
 
 def do_cli(manager, options):
+    if options.table_type == 'porcelain':
+        disable_all_colors()
     if options.series_action == 'list':
         display_summary(options)
     elif options.series_action == 'show':

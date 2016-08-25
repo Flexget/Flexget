@@ -3,6 +3,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
+from colorclass.toggles import disable_all_colors
 from flexget import options
 from flexget.event import event
 from flexget.plugin import get_plugins
@@ -12,6 +13,8 @@ log = logging.getLogger('plugins')
 
 
 def plugins_summary(manager, options):
+    if options.table_type == 'porcelain':
+        disable_all_colors()
     header = ['Keyword', 'Phases', 'Flags']
     table_data = [header]
     for plugin in sorted(get_plugins(phase=options.phase, group=options.group)):

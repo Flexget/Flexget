@@ -5,7 +5,8 @@ import sys
 import math
 from textwrap import wrap
 
-from colorclass import Windows, Color, disable_all_colors
+from colorclass import Windows, Color
+from colorclass.toggles import disable_if_no_tty
 from flexget.logger import local_context
 from flexget.options import ArgumentParser
 from flexget.utils.tools import io_encoding
@@ -15,6 +16,9 @@ from terminaltables.terminal_io import terminal_size
 # Enable terminal colors on windows
 if sys.platform == 'win32':
     Windows.enable(auto_colors=True)
+
+# Disables colors on no TTY output
+disable_if_no_tty()
 
 
 class TerminalTable(object):
@@ -82,7 +86,6 @@ class TerminalTable(object):
             self.table.inner_footing_row_border = False
             self.table.inner_heading_row_border = False
             self.table.outer_border = False
-            disable_all_colors()
         return '\n' + self.table.table
 
     @staticmethod
@@ -122,7 +125,6 @@ class TerminalTable(object):
         # print('terminal_size()[0]: %s' % terminal_size()[0])
         return self.table.table_width <= terminal_size()[0]
 
-
     def _calc_wrap(self):
         """
         :return: Calculated wrap value to be used for self.wrap_columns.
@@ -145,7 +147,7 @@ class TerminalTable(object):
         """
         # TODO: This is a bit dumb if wrapped columns have huge disparity
         # for example in flexget plugins the phases and flags
-        return int(space_left/len(self.wrap_columns))
+        return int(space_left / len(self.wrap_columns))
 
     def _drop_column(self, col):
         name = self.table_data[0][col]

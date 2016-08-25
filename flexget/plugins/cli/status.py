@@ -4,6 +4,7 @@ from builtins import *
 import datetime
 from datetime import timedelta
 
+from colorclass.toggles import disable_all_colors
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
@@ -14,6 +15,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 
 def do_cli(manager, options):
+    if options.table_type == 'porcelain':
+        disable_all_colors()
     if options.task:
         do_cli_task(manager, options)
     else:
