@@ -245,7 +245,7 @@ class SearchMoreThanTV(object):
                 e['torrent_sticky'] = True if group_info.find('span', attrs={'class': 'flag_sticky'}) else False
                 e['torrent_tags'] = torrent_tags
 
-                entry['content_size'] = parse_filesize(size.group(0))
+                e['content_size'] = parse_filesize(size.group(0))
 
                 entries.add(e)
 
