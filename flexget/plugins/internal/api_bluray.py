@@ -218,7 +218,7 @@ class ApiBluray(object):
             if only_cached:
                 raise LookupError('Movie %s not found from cache' % title_year)
             # There was no movie found in the cache, do a lookup from blu-ray.com
-            log.verbose('Searching from blu-ray.com title=%s', title)
+            log.verbose('Searching from blu-ray.com `%s`', title)
 
             # Add/merge movie to db
             movie = BlurayMovie(title=title, year=year)
