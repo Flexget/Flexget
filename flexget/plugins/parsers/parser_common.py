@@ -25,12 +25,18 @@ def extract_group(data):
         stripped_part = part
         if not part or part in illegal_groups:
             continue
+
+        # simple check for CRC32
+        if re.search('\[[0-f]{8}\]', part):
+            log.debug('Skipping %s because it looks like CRC', part)
+            continue
+
         # remove leading and closing bracket
         if stripped_part[0] == '[' and stripped_part[-1] == ']':
             stripped_part = stripped_part[1:-1]
-        elif '[' not in stripped_part and ']' in stripped_part:
+        if '[' not in stripped_part and ']' in stripped_part:
             stripped_part = stripped_part.replace(']', '')
-        elif '[' in stripped_part and ']' not in stripped_part:
+        if '[' in stripped_part and ']' not in stripped_part:
             stripped_part = stripped_part.replace('[', '')
 
         # remove leading junk
@@ -45,30 +51,6 @@ def extract_group(data):
         if match and len(match.group(1)) > 1:
             potential = match.group(1)
             return potential, ''
-    return None, None
-    # First match something like "- Whatever[IsThisAlsoPartOfIt]" TODO should include brackets?
-    potential_group = re.search('(\-\s*([A-Za-z0-9]+(?:[\-\.]*[A-Za-z0-9]+)?)\s*)(?:\[\w+\])?$', data)
-    group = None
-    junk = ''
-
-    if potential_group:
-        group = potential_group.group(2)
-        junk = potential_group.group(1)
-    # If all else fails then perhaps it's anime and release group is bracketed
-    else:
-        # Just going to assume that the release group is at the end since any prefixes will have been moved to the end
-        match = re.search('\s*\[([A-Za-z0-9\-\.]+)\]\s*$', data)
-        if match:
-            group = match.group(1)
-            junk = match.group(0)
-
-    if not group:
-        match = re.search('\s*([A-Za-z0-9]+(?:[\-\.]*[A-Za-z0-9]+)?)\s*$', data)
-        if match:
-            group = match.group(1)
-            junk = match.group(0)
-
-    return group, data.replace(junk, '')
 
 
 def clean_value(name):
