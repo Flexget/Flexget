@@ -10,5 +10,5 @@
         </md-select>
     </md-input-container>
     <md-button class="md-raised md-secondary" ng-disabled="!vm.selectedList" ng-click="vm.addMovie()">Add</md-button>
-    <md-divider ng-if="!$last"></md-divider>
+	<ng-transclude></ng-transclude>
 </md-list-item>

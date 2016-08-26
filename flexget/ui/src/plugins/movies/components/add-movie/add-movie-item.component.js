@@ -13,7 +13,8 @@
                 lists: '<',
                 selectedList: '<',
                 addMovieToList: '&'
-            }
+            },
+            transclude: true
         });
 
     function addMovieController() {
