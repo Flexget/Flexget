@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
+import re
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -103,11 +104,19 @@ def action_purge(options):
         session.delete(regexp_list)
 
 
+def regexp_type(regexp):
+    try:
+        re.compile(regexp)
+        return regexp
+    except Exception as e:
+        raise ArgumentTypeError(e)
+
+
 @event('options.register')
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
     regexp_parser = ArgumentParser(add_help=False)
-    regexp_parser.add_argument('regexp', help="The regexp")
+    regexp_parser.add_argument('regexp', type=regexp_type, help="The regexp")
 
     list_name_parser = ArgumentParser(add_help=False)
     list_name_parser.add_argument('list_name', nargs='?', help='Name of regexp list to operate on')
