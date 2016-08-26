@@ -132,11 +132,12 @@ class SearchMoreThanTV(object):
     def get(self, url, params, username, password, force=False):
         """
         Wrapper to allow refreshing the cookie if it is invalid for some reason
-        :param url:
-        :param params:
-        :param username:
-        :param password:
-        :param force: flag used to refresh the cookie forcefully ie. forgo DB lookup
+
+        :param str url:
+        :param list params:
+        :param str username:
+        :param str password:
+        :param bool force: flag used to refresh the cookie forcefully ie. forgo DB lookup
         :return:
         """
         cookies = self.get_login_cookie(username, password, force=force)
@@ -157,9 +158,10 @@ class SearchMoreThanTV(object):
     def get_login_cookie(self, username, password, force=False):
         """
         Retrieves login cookie
-        :param username:
-        :param password:
-        :param force: if True, then retrieve a fresh cookie instead of looking in the DB
+
+        :param str username:
+        :param str password:
+        :param bool force: if True, then retrieve a fresh cookie instead of looking in the DB
         :return:
         """
         if not force:
