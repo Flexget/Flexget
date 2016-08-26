@@ -1,13 +1,13 @@
 <md-content flex>
     <md-list flex>
         <add-movie-item 
-            ng-repeat="movie in vm.foundmovies | orderBy : 'match' : true" 
+            ng-repeat="movie in vm.foundMovies | orderBy : 'match' : true" 
             selected-list="vm.currentList"
             movie="movie"
             lists="vm.lists"
             add-movie-to-list="vm.addMovietoList(movie, list)">
         </add-movie-item>
-        <md-list-item ng-if="vm.foundmovies.length === 0">
+        <md-list-item ng-if="vm.foundMovies.length === 0">
             No movies found
         </md-list-item>
     </md-list>

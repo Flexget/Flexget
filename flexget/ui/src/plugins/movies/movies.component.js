@@ -19,45 +19,31 @@
         vm.newList = newList;
         vm.searchMovies = searchMovies;
 
+        vm.searchtext = "";
+
         function activate() {
             getMovieLists();
         }
 
-        vm.results = [];
-
-        vm.typed = function(text) {
-            //TODO: Close menu or update results?
-
-            if(text.length >= 3) {
-                searchMovies(text).then(function (results) {
-                    vm.results = results;
-                    vm.openSearchMenu();
-                });
-            }
-        }
-
-        vm.openSearchMenu = function () {
-            var position = $mdPanel.newPanelPosition().relativeTo('.search-menu').addPanelPosition($mdPanel.xPosition.ALIGN_START, $mdPanel.yPosition.BELOW);
-
-            var config = {
+        var position = $mdPanel.newPanelPosition().relativeTo('.search-menu').addPanelPosition($mdPanel.xPosition.ALIGN_START, $mdPanel.yPosition.BELOW);
+        var panel = $mdPanel.create({
                 attachTo: angular.element(document.body),
                 controller: 'addMovieController',
                 controllerAs: 'vm',
                 templateUrl: 'plugins/movies/components/add-movie/add-movie.tmpl.html',
                 panelClass: 'add-movie-panel',
                 position: position,
-                locals: {
-                    foundmovies: vm.results,
-                    lists: vm.lists,
-                    selectedlist: vm.selectedlist
-                },
+                locals: {},
                 clickOutsideToClose: true,
                 escapeToClose: true,
                 focusOnOpen: false,
                 zIndex: 2
-            }
+            });
 
-            $mdPanel.open(config);
+        function searchMovies() {
+            panel.config.locals.searchtext = vm.searchtext;
+
+            panel.open();
         }
 
         function getMovieLists() {
@@ -81,11 +67,6 @@
                         vm.lists.splice(index, 1);
                     });
             });
-        }
-
-        function searchMovies(searchText) {
-            var lowercaseSearchText = angular.lowercase(searchText);
-            return moviesService.searchMovies(lowercaseSearchText);
         }
 
         function newList($event) {

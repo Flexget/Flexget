@@ -3,9 +3,8 @@
 		<label>Add a movie</label>
 		<input type="text" 
 			class="search-menu"
-			ng-model="searchText"
-			ng-change="vm.typed(searchText)"
-			ng-model-options="{ debounce: 1000 }">
+			ng-model="vm.searchtext"
+			ng-change="vm.searchMovies()">
 	</md-input-container>
 	<md-content flex ng-if="vm.lists">
 		<md-tabs md-dynamic-height md-border-bottom class="movie-tabs" md-selected="vm.selectedlist">

@@ -6,10 +6,32 @@
         .module('plugins.movies')
         .controller('addMovieController', addMovieController);
 
-    function addMovieController(moviesService) {
+    function addMovieController(moviesService, mdPanelRef, $scope, $timeout) {
         var vm = this;
 
-        vm.currentList = vm.lists[vm.selectedlist].id;
+        $scope.$watch(function () {
+            return mdPanelRef.config.locals.searchtext;
+        }, function (newValue, oldValue) {
+            vm.searchtext = mdPanelRef.config.locals.searchtext;
+            checkSearch(newValue);
+        });
+        
+        function checkSearch(val) {
+            $timeout(function () {
+                if (val === vm.searchtext) {
+                    searchMovies(val).then(function (data) {
+                        vm.foundMovies = data;
+                    })
+                }
+            }, 1000);
+        }
+
+        function searchMovies(searchText) {
+            var lowercaseSearchText = angular.lowercase(searchText);
+            return moviesService.searchMovies(lowercaseSearchText);
+        }
+
+        /*vm.currentList = vm.lists[vm.selectedlist].id;
         
         vm.addMovietoList = function (movie, list) {
             var movieObject = {
@@ -20,6 +42,6 @@
                 ]
             }
             moviesService.addMovieToList(list, movieObject)
-        }
+        }*/
     }
 }());
