@@ -9,6 +9,9 @@
     function addMovieController(moviesService, mdPanelRef, $scope, $timeout) {
         var vm = this;
 
+        vm.panelRef = mdPanelRef.config.locals;
+        delete vm.panelRef.mdPanelRef; //Remove circular reference to self
+
         vm.loading = true;
 
         $scope.$watch(function () {
@@ -36,7 +39,7 @@
             return moviesService.searchMovies(lowercaseSearchText);
         }
 
-        /*vm.currentList = vm.lists[vm.selectedlist].id;
+        vm.currentList = vm.panelRef.lists[vm.panelRef.selectedlist].id;
         
         vm.addMovietoList = function (movie, list) {
             var movieObject = {
@@ -47,6 +50,6 @@
                 ]
             }
             moviesService.addMovieToList(list, movieObject)
-        }*/
+        }
     }
 }());

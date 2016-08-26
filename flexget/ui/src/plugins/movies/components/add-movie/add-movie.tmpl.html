@@ -4,7 +4,7 @@
             ng-repeat="movie in vm.foundMovies | orderBy : 'match' : true" 
             selected-list="vm.currentList"
             movie="movie"
-            lists="vm.lists"
+            lists="vm.panelRef.lists"
             add-movie-to-list="vm.addMovietoList(movie, list)">
             <md-divider ng-if="!$last"></md-divider>
         </add-movie-item>

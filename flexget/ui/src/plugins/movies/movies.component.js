@@ -42,6 +42,8 @@
 
         function searchMovies() {
             panel.config.locals.searchtext = vm.searchtext;
+            panel.config.locals.lists = vm.lists;
+            panel.config.locals.selectedlist = vm.selectedlist;
 
             panel.open();
         }
