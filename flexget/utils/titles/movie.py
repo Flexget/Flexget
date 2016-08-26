@@ -5,6 +5,7 @@ import logging
 import re
 
 from flexget.utils.titles.parser import TitleParser
+from flexget.plugins.parsers.parser_common import extract_group
 from flexget.utils import qualities
 from flexget.utils.tools import str_to_int
 
@@ -36,6 +37,7 @@ class MovieParser(TitleParser):
             'movie_parser': self,
             'movie_name': self.name,
             'movie_year': self.year,
+            'release_group': self.group,
             'proper': self.proper,
             'proper_count': self.proper_count
         }
@@ -60,6 +62,7 @@ class MovieParser(TitleParser):
         # parsing results
         self.name = None
         self.year = None
+        self.group = None
         self.quality = qualities.Quality()
         self.proper_count = 0
 
@@ -150,3 +153,6 @@ class MovieParser(TitleParser):
 
         # save results
         self.name = data
+
+        # extract group
+        self.group = extract_group(parts[-1])
