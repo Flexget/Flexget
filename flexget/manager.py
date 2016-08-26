@@ -12,6 +12,7 @@ import signal
 import sys
 import threading
 import traceback
+import hashlib
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 import io
@@ -115,6 +116,7 @@ class Manager(object):
             # Decode all arguments to unicode before parsing
             args = unicode_argv()[1:]
         self.args = args
+        self.config_file_hash = None
         self.config_base = None
         self.config_name = None
         self.config_path = None
@@ -241,6 +243,15 @@ class Manager(object):
             options_namespace.__dict__.update(options)
             options = options_namespace
         task_names = self.tasks
+        # Only reload config if daemon
+        config_hash = self.hash_config()
+        if self.is_daemon and self.config_file_hash != config_hash:
+            log.info('Config change detected. Reloading.')
+            try:
+                self.load_config(output_to_console=False, config_file_hash=config_hash)
+                log.info('Config successfully reloaded!')
+            except Exception as e:
+                log.error('Reloading config failed: %s', e)
         # Handle --tasks
         if options.tasks:
             # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
@@ -519,7 +530,17 @@ class Manager(object):
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
 
-    def load_config(self, output_to_console=True):
+    def hash_config(self):
+        sha1_hash = hashlib.sha1()
+        with io.open(self.config_path, 'rb') as f:
+            while True:
+                data = f.read(65536)
+                if not data:
+                    break
+                sha1_hash.update(data)
+        return sha1_hash.hexdigest()
+
+    def load_config(self, output_to_console=True, config_file_hash=None):
         """
         Loads the config file from disk, validates and activates it.
 
@@ -533,6 +554,7 @@ class Manager(object):
                 log.critical('Config file must be UTF-8 encoded.')
                 raise ValueError('Config file is not UTF-8 encoded')
         try:
+            self.config_file_hash = config_file_hash or self.hash_config()
             config = yaml.safe_load(raw_config) or {}
         except Exception as e:
             msg = str(e).replace('\n', ' ')
