@@ -24,7 +24,7 @@ def list_failed(options):
             table_data.append(
                 [entry.id, entry.title, entry.count, '' if entry.reason == 'None' else entry.reason,
                  entry.tof.strftime('%Y-%m-%d %H:%M')])
-    table = TerminalTable(options.table_type, table_data)
+    table = TerminalTable(options.table_type, table_data, wrap_columns=[3])
     table.table.justify_columns[0] = 'center'
     try:
         console(table.output)

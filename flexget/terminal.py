@@ -115,8 +115,8 @@ class TerminalTable(object):
         longest = {c: 0 for c in range(self._columns)}
         for row in self.table_data:
             for index, value in enumerate(row):
-                if len(value) > longest[index]:
-                    longest[index] = len(value)
+                if len(str(value)) > longest[index]:
+                    longest[index] = len(str(value))
         return longest
 
     @property
