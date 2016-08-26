@@ -1,5 +1,5 @@
-<md-content flex>
-    <md-list flex>
+<md-content flex ng-cloak>
+    <md-list flex ng-if="!vm.loading">
         <add-movie-item
             ng-repeat="movie in vm.foundMovies | orderBy : 'match' : true" 
             selected-list="vm.currentList"
@@ -12,4 +12,9 @@
             No movies found
         </md-list-item>
     </md-list>
+    <div layout-padding ng-if="vm.loading">
+        <div layout="row" layout-align="space-around">
+            <md-progress-circular></md-progress-circular>
+        </div>
+    </div>
 </md-content>

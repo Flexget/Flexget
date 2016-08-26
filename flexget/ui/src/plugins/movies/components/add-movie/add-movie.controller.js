@@ -9,6 +9,8 @@
     function addMovieController(moviesService, mdPanelRef, $scope, $timeout) {
         var vm = this;
 
+        vm.loading = true;
+
         $scope.$watch(function () {
             return mdPanelRef.config.locals.searchtext;
         }, function (newValue, oldValue) {
@@ -19,9 +21,12 @@
         function checkSearch(val) {
             $timeout(function () {
                 if (val === vm.searchtext) {
+                    vm.loading = true;
                     searchMovies(val).then(function (data) {
                         vm.foundMovies = data;
-                    })
+                        
+                        vm.loading = false;
+                    });
                 }
             }, 1000);
         }
