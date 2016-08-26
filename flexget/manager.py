@@ -531,6 +531,8 @@ class Manager(object):
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
 
     def hash_config(self):
+        if not self.config_path:
+            return
         sha1_hash = hashlib.sha1()
         with io.open(self.config_path, 'rb') as f:
             while True:
