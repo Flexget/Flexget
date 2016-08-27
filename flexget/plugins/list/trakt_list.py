@@ -237,36 +237,35 @@ class TraktSet(MutableSet):
         """Submits movies or episodes to trakt api."""
         found = {}
         for entry in entries:
-            if self.config['type'] in ['auto', 'episodes'] and (
-                entry.get('trakt_episode_id') or
-                entry.get('tvdb_id') or
-                entry.get('imdb_id') or
-                entry.get('tmdb_id') or
-                entry.get('tvrage_id')
-            ):
-                episode = {'ids': {}}
-                if entry.get('trakt_episode_id'):
-                    episode['ids']['trakt'] = entry['trakt_episode_id']
-                if entry.get('tvdb_id'):
-                    episode['ids']['tvdb'] = entry['tvdb_id']
-                if entry.get('imdb_id'):
-                    episode['ids']['imdb'] = entry['imdb_id']
-                if entry.get('tmdb_id'):
-                    episode['ids']['tmdb'] = entry['tmdb_id']
-                if entry.get('tvrage_id'):
-                    episode['ids']['tvrage'] = entry['tvrage_id']
+            if self.config['type'] in ['auto', 'episodes'] and entry.get('series_name') and entry.get('series_id'):
+                episode = {'ids': get_entry_ids(entry, episode=True)}
                 if not episode['ids']:
-                    log.debug('Not submitting `%s`, no episode identifier found.' % entry['title'])
+                    entry = plugin.get_plugin_by_name('trakt_lookup').instance.lazy_episode_lookup(entry)
+                    episode['ids'] = get_entry_ids(entry, episode=True)
+                if episode['ids']:
+                    episode['ids']['trakt'] = entry['trakt_episode_id']
+                    found.setdefault('episodes', []).append(episode)
                     continue
-                found.setdefault('episodes', []).append(episode)
-            elif self.config['type'] in ['auto', 'shows', 'seasons'] and entry.get('series_name') is not None:
+                log.debug('Not submitting `%s` as episode, no episode identifier found.' % entry['title'])
+
+            if self.config['type'] in ['auto', 'shows', 'seasons'] and entry.get('series_name') is not None:
                 show_name, show_year = split_title_year(entry['series_name'])
                 show = {'title': show_name, 'ids': get_entry_ids(entry)}
                 if show_year:
                     show['year'] = show_year
-                found.setdefault('shows', []).append(show)
-            elif self.config['type'] in ['auto', 'movies']:
+                if not show['ids']:
+                    entry = plugin.get_plugin_by_name('trakt_lookup').instance.lazy_series_lookup(entry)
+                    show['ids'] = get_entry_ids(entry)
+                if show['ids']:
+                    found.setdefault('shows', []).append(show)
+                    continue
+                log.debug('Not submitting `%s` as series, no series identifiers found.' % entry['title'])
+
+            if self.config['type'] in ['auto', 'movies']:
                 movie = {'ids': get_entry_ids(entry)}
+                if not movie['ids']:
+                    entry = plugin.get_plugin_by_name('trakt_lookup').instance.lazy_movie_lookup(entry)
+                    movie['ids'] = get_entry_ids(entry)
                 if not movie['ids']:
                     if entry.get('movie_name') is not None:
                         movie['title'] = entry.get('movie_name') or entry.get('imdb_name')
