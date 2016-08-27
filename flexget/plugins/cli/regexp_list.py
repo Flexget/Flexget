@@ -44,9 +44,8 @@ def action_all(options):
 def action_list(options):
     """List regexp list"""
     with Session() as session:
-        try:
-            regexp_list = get_list_by_exact_name(options.list_name)
-        except NoResultFound:
+        regexp_list = get_list_by_exact_name(options.list_name)
+        if not regexp_list:
             console('Could not find regexp list with name {}'.format(options.list_name))
             return
         header = ['Regexp']
@@ -95,9 +94,8 @@ def action_del(options):
 
 def action_purge(options):
     with Session() as session:
-        try:
-            regexp_list = get_list_by_exact_name(options.list_name)
-        except NoResultFound:
+        regexp_list = get_list_by_exact_name(options.list_name)
+        if not regexp_list:
             console('Could not find regexp list with name {}'.format(options.list_name))
             return
         console('Deleting list %s' % options.list_name)
