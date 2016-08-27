@@ -107,6 +107,7 @@ class MyEpisodes(object):
         try:
             logincon = opener.open(baseurl, loginparams)
             loginsrc = logincon.read()
+            loginsrc = loginsrc.decode("utf8")
         except URLError as e:
             log.error('Error logging in to myepisodes: %s' % e)
             return
