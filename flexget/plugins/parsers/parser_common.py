@@ -16,7 +16,7 @@ SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
 
 
 def extract_group(data):
-    if not data:
+    if not data.strip():
         return None, None
     data_parts = re.split('[\s\.]', data)
     illegal_groups = ['mkv', 'avi', 'mp4']
@@ -51,6 +51,7 @@ def extract_group(data):
         if match and len(match.group(1)) > 1:
             potential = match.group(1)
             return potential, ''
+    return None, None
 
 
 def clean_value(name):

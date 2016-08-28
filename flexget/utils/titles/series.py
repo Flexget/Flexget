@@ -272,6 +272,7 @@ class SeriesParser(TitleParser):
 
         log.debug("data for date/ep/id parsing '%s'", data_stripped)
 
+        matched_string = ''
         found_identifier = False
         # Try date mode before ep mode
         if self.identified_by in ['date', 'auto']:
@@ -280,15 +281,13 @@ class SeriesParser(TitleParser):
                 if self.strict_name:
                     if date_match['match'].start() > 1:
                         found_identifier = True
-                        groups_data_stripped = re.sub(date_match['match'].group(0).replace(' ', '.*?'), '',
-                                                      groups_data_stripped)
+                        matched_string = date_match['match'].group(0)
                 if not found_identifier:
                     self.id = date_match['date']
                     self.id_groups = date_match['match'].groups()
                     self.id_type = 'date'
                     self.valid = True
-                    groups_data_stripped = re.sub(date_match['match'].group(0).replace(' ', '.*?'), '',
-                                                  groups_data_stripped)
+                    matched_string = date_match['match'].group(0)
                     if not (self.special and self.prefer_specials):
                         found_identifier = True
             else:
@@ -301,8 +300,7 @@ class SeriesParser(TitleParser):
                 if self.strict_name:
                     if ep_match['match'].start() > 1:
                         found_identifier = True
-                        groups_data_stripped = re.sub(ep_match['match'].group(0).replace(' ', '.*?'), '',
-                                                      groups_data_stripped)
+                        matched_string = ep_match['match'].group(0)
 
                 if not found_identifier:
 
@@ -311,8 +309,7 @@ class SeriesParser(TitleParser):
                         log.debug('Series pack contains too many episodes (%d). Rejecting',
                                   ep_match['end_episode'] - ep_match['episode'])
                         found_identifier = True
-                        groups_data_stripped = re.sub(ep_match['match'].group(0).replace(' ', '.*?'), '',
-                                                      groups_data_stripped)
+                        matched_string = ep_match['match'].group(0)
                     if not found_identifier:
 
                         self.season = ep_match['season']
@@ -323,8 +320,7 @@ class SeriesParser(TitleParser):
                             self.episodes = 1
                         self.id_type = 'ep'
                         self.valid = True
-                        groups_data_stripped = re.sub(ep_match['match'].group(0).replace(' ', '.*?'), '',
-                                                      groups_data_stripped)
+                        matched_string = ep_match['match'].group(0)
                         if not (self.special and self.prefer_specials):
                             found_identifier = True
             else:
@@ -342,8 +338,7 @@ class SeriesParser(TitleParser):
                     if self.strict_name:
                         if match.start() > 1:
                             found_identifier = True
-                            groups_data_stripped = re.sub(match.group(0).replace(' ', '.*?'), '',
-                                                          groups_data_stripped)
+                            matched_string = match.group(0)
 
                     if not found_identifier:
 
@@ -352,9 +347,7 @@ class SeriesParser(TitleParser):
                         log.debug(self)
                         self.id_type = 'ep'
                         self.valid = True
-                        found_identifier = True
-                        groups_data_stripped = re.sub(match.group(0).replace(' ', '.*?'), '',
-                                                      groups_data_stripped)
+                        matched_string = match.group(0)
                 else:
                     log.debug('-> no luck with the expect_ep')
 
@@ -367,8 +360,7 @@ class SeriesParser(TitleParser):
                     if self.strict_name:
                         if match.start() > 1:
                             found_identifier = True
-                            groups_data_stripped = re.sub(match.group(0).replace(' ', '.*?'), '',
-                                                          groups_data_stripped)
+                            matched_string = match.group(0)
                             break
                     found_id = '-'.join(g for g in match.groups() if g)
                     if not found_id:
@@ -377,8 +369,7 @@ class SeriesParser(TitleParser):
                     self.id = found_id
                     self.id_type = 'id'
                     self.valid = True
-                    groups_data_stripped = re.sub(match.group(0).replace(' ', '.*?'), '',
-                                                  groups_data_stripped)
+                    matched_string = match.group(0)
                     log.debug('found id \'%s\' with regexp \'%s\'', self.id, id_re.pattern)
                     if not (self.special and self.prefer_specials):
                         found_identifier = True
@@ -401,8 +392,7 @@ class SeriesParser(TitleParser):
                     if self.strict_name:
                         if match.start() > 1:
                             found_identifier = True
-                            groups_data_stripped = re.sub(match.group(0).replace(' ', '.*?'), '',
-                                                          groups_data_stripped)
+                            matched_string = match.group(0)
                             break
                     # First matching group is the sequence number
                     try:
@@ -417,8 +407,7 @@ class SeriesParser(TitleParser):
                             self.proper_count = int(match.group('version')) - 1
                     self.id_type = 'sequence'
                     self.valid = True
-                    groups_data_stripped = re.sub(match.group(0).replace(' ', '.*?'), '',
-                                                  groups_data_stripped)
+                    matched_string = match.group(0)
                     log.debug('found id \'%s\' with regexp \'%s\'', self.id, sequence_re.pattern)
                     if not (self.special and self.prefer_specials):
                         found_identifier = True
@@ -446,6 +435,10 @@ class SeriesParser(TitleParser):
             else:
                 msg += 'a(n) `%s` style identifier.' % self.identified_by
             raise ParseWarning(self, msg)
+
+        # Remove episode id
+        if found_identifier and matched_string:
+            groups_data_stripped = re.sub(matched_string.replace(' ', '.*?'), '', groups_data_stripped)
 
         # Find quality and clean from data
         log.debug('parsing quality ->')
