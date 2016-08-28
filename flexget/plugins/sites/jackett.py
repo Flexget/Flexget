@@ -80,7 +80,7 @@ class Jackett(object):
         log.debug("Raw RSS: %s" % rss)
 
         if not len(rss.entries):
-            return
+            return []
 
         for rss_entry in rss.entries:
             new_entry = Entry()
@@ -120,7 +120,7 @@ class Jackett(object):
         log.info('Searching for %s (imdbid:%s)' % (arg_entry['title'], arg_entry['imdb_id']))
         # normally this should be used with emit_movie_queue who has imdbid (i guess)
         if 'imdb_id' not in arg_entry:
-            return entries
+            return []
 
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
         url = config['url'] + '&imdbid=' + imdb_id
@@ -131,7 +131,7 @@ class Jackett(object):
         log.info('Searching for %s by title' % (arg_entry['title']))
         # general search by matching title
         if 'title' not in arg_entry:
-            return entries
+            return []
         query = normalize_unicode(arg_entry['title'])
         query = quote_plus(query.encode('utf8'))
         url = config['url'] + '&q=' + query
