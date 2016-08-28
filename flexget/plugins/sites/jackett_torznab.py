@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.utils import old_div
-from future.moves.urllib.parse import urlencode, quote
+from future.moves.urllib.parse import urlencode, quote_plus
 
 import logging
 
@@ -16,9 +16,9 @@ __author__ = 'davst'
 log = logging.getLogger('jackett_torznab')
 
 
-class Jackett_Torznab(object):
+class Jackett_torznab(object):
     """
-    Jackett_Torznab search plugin
+    Jackett_torznab search plugin
     Based on the newznab plugin
     Provide a url or your website + apikey and a category
 
@@ -110,7 +110,7 @@ class Jackett_Torznab(object):
         if arg_entry.get('tvrage_id'):
             lookup = '&rid=%s' % arg_entry.get('tvrage_id')
         else:
-            lookup = '&q=%s' % quote(arg_entry['series_name'])
+            lookup = '&q=%s' % quote_plus(arg_entry['series_name'])
         url = config['url'] + lookup + '&season=%s&ep=%s' % (arg_entry['series_season'], arg_entry['series_episode'])
         return self.fill_entries_for_url(url, task)
 
@@ -138,4 +138,4 @@ class Jackett_Torznab(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Jackett_Torznab, 'jackett_torznab', api_ver=2, groups=['search'])
+    plugin.register(Jackett_torznab, 'jackett_torznab', api_ver=2, groups=['search'])
