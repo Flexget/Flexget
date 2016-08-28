@@ -244,8 +244,6 @@ class SeriesParser(TitleParser):
         data_stripped = data_stripped.lower()
         log.debug('data stripped: %s', data_stripped)
 
-
-
         # Remove unwanted words from data for ep / id parsing
         data_stripped = self.remove_words(data_stripped, self.remove, not_in_word=True)
 
@@ -464,7 +462,7 @@ class SeriesParser(TitleParser):
             self.quality = quality
 
         # try to extract release group
-        self.group, _ = extract_group(groups_data_stripped)
+        self.group = extract_group(groups_data_stripped)
 
         # allow group(s)
         if self.allow_groups:

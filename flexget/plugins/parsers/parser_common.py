@@ -15,9 +15,35 @@ log = logging.getLogger('parser')
 SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
 
 
+def remove_leading_trailing_junk(data):
+    """
+    Removes any leading and trailing junk characters such as comma, dot etc.
+
+    :param str data: data to be stripped of junk
+    :return str: stripped str
+    """
+    allowed_junk = ['[', ']']
+    # remove leading junk
+    for c in data:
+        if c.isalpha() or c.isdigit() or c in allowed_junk:
+            break
+        data = data[1:]
+    # remove trailing junk
+    for c in reversed(data):
+        if c.isalpha() or c.isdigit() or c in allowed_junk:
+            break
+        data = data[:-1]
+    return data
+
+
 def extract_group(data):
+    """
+
+    :param str data: String to extract release group from. Assumes everything has been removed (titles, qualities etc)
+    :return str: Returns the release group if found
+    """
     if not data.strip():
-        return None, None
+        return
     data_parts = re.split('[\s\.]', data)
     illegal_groups = ['mkv', 'avi', 'mp4']
     # start from the end
@@ -34,24 +60,22 @@ def extract_group(data):
         # remove leading and closing bracket
         if stripped_part[0] == '[' and stripped_part[-1] == ']':
             stripped_part = stripped_part[1:-1]
+
+        # Remove any brackets missing an opening/closing. Assumed to only have one.
         if '[' not in stripped_part and ']' in stripped_part:
             stripped_part = stripped_part.replace(']', '')
         if '[' in stripped_part and ']' not in stripped_part:
             stripped_part = stripped_part.replace('[', '')
 
-        # remove leading junk
-        for c in stripped_part:
-            if c.isalpha() or c.isdigit():
-                break
-            stripped_part = stripped_part[1:]
+        stripped_part = remove_leading_trailing_junk(stripped_part)
+
         if not stripped_part:
             continue
 
         match = re.search('^([A-Za-z0-9_\-\[\]]+)$', stripped_part)
         if match and len(match.group(1)) > 1:
             potential = match.group(1)
-            return potential, ''
-    return None, None
+            return potential
 
 
 def clean_value(name):
