@@ -77,7 +77,10 @@ class UrlRewriteFuzer(object):
         return get_soup(page.content)
 
     def extract_entry_from_soup(self, soup):
-        table = soup.find('div', {'id': 'main_table'}).find('table', {'class': 'table_info'})
+        table = soup.find('div', {'id': 'main_table'})
+        if table is None:
+            raise PluginError('Could fetch results table from Fuzer, aborting')
+        table = table.find('table', {'class': 'table_info'})
         if len(table.find_all('tr')) == 1:
             log.debug('No search results were returned, continuing')
             return []

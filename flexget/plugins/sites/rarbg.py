@@ -19,15 +19,36 @@ CATEGORIES = {
     'all': 0,
 
     # Movies
+    'x264': 17,
     'x264 720p': 45,
     'x264 1080p': 44,
+    'x264 3D': 47,
     'XviD': 14,
+    'XviD 720p': 48,
     'Full BD': 42,
 
     # TV
     'HDTV': 41,
-    'SDTV': 18
+    'SDTV': 18,
+
+    # Adult
+    'XXX': 4,
+
+    # Music
+    'MusicMP3': 23,
+    'MusicFLAC':25,
+
+    # Games
+    'Games/PC ISO': 27,
+    'Games/PC RIP': 28,
+    'Games/PS3': 40,
+    'Games/XBOX-360': 32,
+    'Software/PC ISO':33,
+
+    # E-Books
+    'e-Books': 35
 }
+
 
 
 class SearchRarBG(object):
