@@ -79,9 +79,9 @@ class MovieParser(TitleParser):
             data = self.data
 
         # Move anything in leading brackets to the end
-        data = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', data)
+        data = re.sub(r'^(\[(?:.*?)\])(.*)', r'\2\1', data)
 
-        for char in '[]()_,.':
+        for char in '()_,.':
             data = data.replace(char, ' ')
 
         # if there are no spaces
@@ -135,6 +135,7 @@ class MovieParser(TitleParser):
 
         # parse quality
         quality = qualities.Quality(data)
+        dp = abs_cut
         if quality:
             self.quality = quality
             # remaining string is same as data but quality information removed
@@ -155,4 +156,4 @@ class MovieParser(TitleParser):
         self.name = data
 
         # extract group
-        self.group = extract_group(parts[-1])
+        self.group = extract_group(quality.clean_text[dp:].lower())
