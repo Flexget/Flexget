@@ -18,87 +18,50 @@ from flexget.utils.soup import get_soup
 from flexget.config_schema import one_or_more
 from flexget.utils.tools import parse_filesize
 
-log = logging.getLogger('morethantv')
-Base = db_schema.versioned_base('morethantv', 0)
+log = logging.getLogger('alpharatio')
+Base = db_schema.versioned_base('alpharatio', 0)
 
 requests = RequestSession()
-requests.add_domain_limiter(TimedLimiter('morethan.tv', '5 seconds'))  # TODO find out if they want a delay
+requests.add_domain_limiter(TimedLimiter('alpharatio.cc', '5 seconds'))
+# ElementZero confirmed with AlphaRato sysop 'jasonmaster' that they do want a 5 second limiter
 
 CATEGORIES = {
-    'Movies': 'filter_cat[1]',
-    'TV': 'filter_cat[2]',
-    'Other': 'filter_cat[3]'
+    'tvsd': 'filter_cat[1]',
+    'tvhd': 'filter_cat[2]',
+    'tvdvdrip': 'filter_cat[3]',
+    'tvpacksd': 'filter_cat[4]',
+    'tvpackhd': 'filter_cat[5]',
+    'moviesd': 'filter_cat[6]',
+    'moviehd': 'filter_cat[7]',
+    'moviepacksd': 'filter_cat[8]',
+    'moviepackhd': 'filter_cat[9]',
+    'moviexxx': 'filter_cat[10]',
+    'mvid': 'filter_cat[11]',
+    'gamespc': 'filter_cat[12]',
+    'gamesxbox': 'filter_cat[13]',
+    'gamesps3': 'filter_cat[14]',
+    'gameswii':  'filter_cat[15]',
+    'appspc': 'filter_cat[16]',
+    'appsmac': 'filter_cat[17]',
+    'appslinux': 'filter_cat[18]',
+    'appsmobile': 'filter_cat[19]',
+    '0dayXXX': 'filter_cat[20]',
+    'ebook': 'filter_cat[21]',
+    'audiobook': 'filter_cat[22]',
+    'music': 'filter_cat[23]',
+    'misc': 'filter_cat[24]'
 }
 
-TAGS = [
-    'action',
-    'adventure',
-    'animation',
-    'anime',
-    'art',
-    'asian',
-    'biography',
-    'celebrities',
-    'comedy',
-    'cooking',
-    'crime',
-    'cult',
-    'documentary',
-    'drama',
-    'educational',
-    'elclasico',
-    'family',
-    'fantasy',
-    'film.noir',
-    'filmromanesc',
-    'food',
-    'football',
-    'formula.e',
-    'formula1',
-    'gameshow',
-    'highlights',
-    'history',
-    'horror',
-    'investigation',
-    'lifestyle',
-    'liga1',
-    'ligabbva',
-    'ligue1',
-    'martial.arts',
-    'morethan.tv',
-    'motogp',
-    'musical',
-    'mystery',
-    'nba',
-    'news',
-    'other',
-    'performance',
-    'philosophy',
-    'politics',
-    'reality',
-    'romance',
-    'romanian.content',
-    'science',
-    'scifi',
-    'short',
-    'silent',
-    'sitcom',
-    'sketch',
-    'sports',
-    'talent',
-    'tennis',
-    'thriller',
-    'uefachampionsleague',
-    'uefaeuropaleague',
-    'ufc',
-    'war',
-    'western',
-    'wta'
-]
+LEECHSTATUS = {
+    'normal': 0,
+    'freeleech': 1,
+    'neutral leech': 2,
+    'either': 3
+}
 
 
-class MoreThanTVCookie(Base):
-    __tablename__ = 'morethantv_cookie'
+class AlphaRatioCookie(Base):
+    __tablename__ = 'alpharatio_cookie'
 
     username = Column(Unicode, primary_key=True)
     _cookie = Column('cookie', Unicode)
@@ -106,9 +69,9 @@ class MoreThanTVCookie(Base):
     expires = Column(DateTime)
 
 
-class SearchMoreThanTV(object):
+class SearchAlphaRatio(object):
     """
-        MorethanTV search plugin.
+        AlphaRatio search plugin.
     """
 
     schema = {
@@ -117,16 +80,17 @@ class SearchMoreThanTV(object):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'category': one_or_more({'type': 'string', 'enum': list(CATEGORIES.keys())}, unique_items=True),
-            'order_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'time'], 'default': 'time'},
-            'order_way': {'type': 'string', 'enum': ['desc', 'asc'], 'default': 'desc'},
-            'tags': one_or_more({'type': 'string', 'enum': TAGS}, unique_items=True),
-            'all_tags': {'type': 'boolean', 'default': True}
+            'order_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'time', 'size', 'year', 'snatched'],
+                         'default': 'time'},
+            'order_desc': {'type': 'boolean', 'default': True},
+            'scene':  {'type': 'boolean'},
+            'leechstatus': {'type': 'string', 'enum': list(LEECHSTATUS.keys()), 'default': 'normal'},
         },
         'required': ['username', 'password'],
         'additionalProperties': False
     }
 
-    base_url = 'https://www.morethan.tv/'
+    base_url = 'https://alpharatio.cc/'
     errors = False
 
     def get(self, url, params, username, password, force=False):
@@ -146,7 +110,7 @@ class SearchMoreThanTV(object):
 
         if self.base_url + 'login.php' in response.url:
             if self.errors:
-                raise plugin.PluginError('MoreThanTV login cookie is invalid. Login page received?')
+                raise plugin.PluginError('AlphaRatio login cookie is invalid. Login page received?')
             self.errors = True
             # try again
             response = self.get(url, params, username, password, force=True)
@@ -166,21 +130,21 @@ class SearchMoreThanTV(object):
         """
         if not force:
             with Session() as session:
-                saved_cookie = session.query(MoreThanTVCookie).filter(MoreThanTVCookie.username == username).first()
+                saved_cookie = session.query(AlphaRatioCookie).filter(AlphaRatioCookie.username == username).first()
                 if saved_cookie and saved_cookie.expires and saved_cookie.expires >= datetime.datetime.now():
                     log.debug('Found valid login cookie')
                     return saved_cookie.cookie
 
         url = self.base_url + 'login.php'
         try:
-            log.debug('Attempting to retrieve MoreThanTV cookie')
+            log.debug('Attempting to retrieve AlphaRatio cookie')
             response = requests.post(url, data={'username': username, 'password': password, 'login': 'Log in',
                                                 'keeplogged': '1'}, timeout=30)
         except RequestException as e:
-            raise plugin.PluginError('MoreThanTV login failed: %s', e)
+            raise plugin.PluginError('AlphaRatio login failed: %s', e)
 
         if 'Your username or password was incorrect.' in response.text:
-            raise plugin.PluginError('MoreThanTV login failed: Your username or password was incorrect.')
+            raise plugin.PluginError('AlphaRatio login failed: Your username or password was incorrect.')
 
         with Session() as session:
             expires = None
@@ -189,15 +153,15 @@ class SearchMoreThanTV(object):
                     expires = c.expires
             if expires:
                 expires = datetime.datetime.fromtimestamp(expires)
-            log.debug('Saving or updating MoreThanTV cookie in db')
-            cookie = MoreThanTVCookie(username=username, cookie=dict(requests.cookies), expires=expires)
+            log.debug('Saving or updating AlphaRatio cookie in db')
+            cookie = AlphaRatioCookie(username=username, cookie=dict(requests.cookies), expires=expires)
             session.merge(cookie)
             return cookie.cookie
 
     @plugin.internet(log)
     def search(self, task, entry, config):
         """
-            Search for entries on MoreThanTV
+            Search for entries on AlphaRatio
         """
         params = {}
 
@@ -206,15 +170,15 @@ class SearchMoreThanTV(object):
             for category in categories:
                 params[CATEGORIES[category]] = 1
 
-        if 'tags' in config:
-            tags = config['tags'] if isinstance(config['tags'], list) else [config['tags']]
-            tags = ', '.join(tags)
-            params['taglist'] = tags
+        if 'scene' in config:
+            params['scene'] = int(config['scene'])
+
+        ordering = 'desc' if config['order_desc'] else 'asc'
 
         entries = set()
 
-        params.update({'tags_type': int(config['all_tags']), 'order_by': config['order_by'], 'search_submit': 1,
-                       'order_way': config['order_way'], 'action': 'basic', 'group_results': 0})
+        params.update({'order_by': config['order_by'], 'search_submit': 1, 'action': 'basic', 'order_way': ordering,
+                       'freeleech': LEECHSTATUS[config['leechstatus']]})
 
         for search_string in entry.get('search_strings', [entry['title']]):
             params['searchstr'] = search_string
@@ -223,31 +187,29 @@ class SearchMoreThanTV(object):
                 page = self.get(self.base_url + 'torrents.php', params, config['username'], config['password'])
                 log.debug('requesting: %s', page.url)
             except RequestException as e:
-                log.error('MoreThanTV request failed: %s', e)
+                log.error('AlphaRatio request failed: %s', e)
                 continue
 
             soup = get_soup(page.content)
             for result in soup.findAll('tr', attrs={'class': 'torrent'}):
                 group_info = result.find('td', attrs={'class': 'big_info'}).find('div', attrs={'class': 'group_info'})
                 title = group_info.find('a', href=re.compile('torrents.php\?id=\d+')).text
-                url = self.base_url + group_info.find('a', href=re.compile('torrents.php\?action=download'))['href']
-                torrent_info = result.findAll('td', attrs={'class': 'number_column'})
-                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMG]B)', torrent_info[0].text)
+                url = self.base_url + \
+                    group_info.find('a', href=re.compile('torrents.php\?action=download(?!usetoken)'))['href']
+
+                torrent_info = result.findAll('td')
+                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', torrent_info[5].text)
                 torrent_tags = ', '.join([tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})])
 
                 e = Entry()
 
                 e['title'] = title
                 e['url'] = url
-                e['torrent_snatches'] = int(torrent_info[1].text)
-                e['torrent_seeds'] = int(torrent_info[2].text)
-                e['torrent_leeches'] = int(torrent_info[3].text)
-                e['torrent_internal'] = True if group_info.find('span', attrs={'class': 'flag_internal'}) else False
-                e['torrent_fast_server'] = True if group_info.find('span', attrs={'class': 'flag_fast'}) else False
-                e['torrent_sticky'] = True if group_info.find('span', attrs={'class': 'flag_sticky'}) else False
                 e['torrent_tags'] = torrent_tags
-
                 e['content_size'] = parse_filesize(size.group(0))
+                e['torrent_snatches'] = int(torrent_info[6].text)
+                e['torrent_seeds'] = int(torrent_info[7].text)
+                e['torrent_leeches'] = int(torrent_info[8].text)
 
                 entries.add(e)
 
@@ -256,4 +218,4 @@ class SearchMoreThanTV(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchMoreThanTV, 'morethantv', groups=['search'], api_ver=2)
+    plugin.register(SearchAlphaRatio, 'alpharatio', groups=['search'], api_ver=2)
