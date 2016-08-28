@@ -35,6 +35,9 @@ def do_cli(manager, options):
                     table_data.append([''])
             else:
                 table_data.append([item.time.strftime("%c"), item.title])
+    if not table_data:
+        console('No history to display')
+        return
     title = 'Showing {} entries from History'.format(query.count())
     if options.table_type != 'porcelain':
         del table_data[-1]

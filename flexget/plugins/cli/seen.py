@@ -55,14 +55,14 @@ def seen_search(options, session=None):
         table_data.append(['Added', se.added.strftime('%Y-%m-%d %H:%M')])
         if options.table_type != 'porcelain':
             table_data.append(['', ''])
-
+    if not table_data:
+        console('No results found for search')
+        return
     if options.table_type != 'porcelain':
         del table_data[-1]
     table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
     table.table.inner_heading_row_border = False
-    if not table_data:
-        console('No results found for search')
-        return
+
     try:
         console(table.output)
     except TerminalTableError as e:
