@@ -79,10 +79,17 @@ class MovieParser(TitleParser):
             data = self.data
 
         # Move anything in leading brackets to the end
-        data = re.sub(r'^(\[(?:.*?)\])(.*)', r'\2\1', data)
+        prefix = re.match(r'^(\[(?:.*?)\])(?:.*)', data)
+        prefix = prefix.group(1) if prefix else ''
+        data = re.sub(r'^(\[(?:.*?)\])(.*)', r'\2', data)
 
         for char in '()_,.':
             data = data.replace(char, ' ')
+            prefix = prefix.replace(char, ' ')
+        data = data.replace('[', ' ')
+        data = data.replace(']', ' ')
+
+        data += prefix
 
         # if there are no spaces
         if data.find(' ') == -1:
