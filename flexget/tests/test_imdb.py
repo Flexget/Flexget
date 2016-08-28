@@ -32,6 +32,13 @@ class TestImdb(object):
               - {title: 'Futurama.Into.The.Wild.Green.Yonder.2009.PROPER'}
               # test (TV Movie) result
               - {title: 'Carny 2009'}
+              # test confusing names for proper parsing
+              - {title: 'Dan.In.Real.Life.2007'}
+              - {title: 'The Final Cut.2004.720p.proper'}
+              # tricky names for year parsing
+              - {title: '2012 2009'}
+              - {title: 'Red Riding In The Year Of Our Lord 1974 (2009) 720p BRrip X264'}
+              - {title: 'Nightmare City 2035 (2007) DVDRip'}
               # test a movie that is far from the top in search results
               - {title: 'The Hunter 2010'}
               # test a search in which a movie has lower relevance than tv episodes
@@ -126,6 +133,16 @@ class TestImdb(object):
             'Failed to lookup Futurama.Into.The.Wild.Green.Yonder.2009.PROPER'
         assert task.find_entry(imdb_id='tt1397497'), \
             'Failed to lookup Carny 2009'
+        assert task.find_entry(imdb_id='tt0364343'), \
+            'Failed to lookup The Final Cut.2004.720p.proper'
+        assert task.find_entry(imdb_id='tt0480242'), \
+            'Failed to lookup Dan.In.Real.Life.2007'
+        assert task.find_entry(imdb_id='tt1190080'), \
+            'Failed to lookup 2012 2009'
+        assert task.find_entry(imdb_id='tt1259574'), \
+            'Failed to lookup Red Riding In The Year Of Our Lord 1974 (2009) 720p BRrip X264'
+        assert task.find_entry(imdb_id='tt0910868'), \
+            'Failed to lookup Nightmare City 2035 (2007) DVDRip'
         assert task.find_entry(imdb_id='tt1190072'), \
             'Failed to lookup The Hunter 2010'
         assert task.find_entry(imdb_id='tt1392190'), \

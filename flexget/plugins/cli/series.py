@@ -29,7 +29,7 @@ ERROR_COLOR = 'red'
 
 
 def do_cli(manager, options):
-    if options.table_type == 'porcelain':
+    if hasattr(options, 'table_type') and options.table_type == 'porcelain':
         disable_all_colors()
     if options.series_action == 'list':
         display_summary(options)
