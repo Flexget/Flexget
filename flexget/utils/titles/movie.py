@@ -7,6 +7,7 @@ import re
 from flexget.utils.titles.parser import TitleParser
 from flexget.utils import qualities
 from flexget.utils.tools import str_to_int
+from datetime import datetime
 
 log = logging.getLogger('movieparser')
 
@@ -60,6 +61,7 @@ class MovieParser(TitleParser):
         # parsing results
         self.name = None
         self.year = None
+        self.year_pos = None
         self.quality = qualities.Quality()
         self.proper_count = 0
 
@@ -102,8 +104,13 @@ class MovieParser(TitleParser):
             # check for year
             num = str_to_int(part)
             if num is not None:
-                if 1930 < num < 2050:
+                if 1930 < num <= datetime.now().year:
+                    if self.year_pos == cut_part:
+                        # Looks like a year, but we already set the cutpoint to a year, let's move it forward
+                        cut_part = part_pos
+                        
                     self.year = num
+                    self.year_pos = part_pos
                     cut = True
             # Don't consider all caps words cut words if the whole title has been all caps
             if not part.isupper():
@@ -116,8 +123,10 @@ class MovieParser(TitleParser):
                 cut = True
             # check for propers
             if part.lower() in self.propers:
-                self.proper_count += 1
-                cut = True
+                # 'real' and 'final' are too common in movie titles, only cut if it comes after year
+                if part.lower() not in ['real', 'final'] or self.year:
+                    self.proper_count += 1
+                    cut = True
             # update cut position
             if cut and parts.index(part) < cut_part:
                 cut_part = part_pos

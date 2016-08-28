@@ -16,7 +16,7 @@ class TitleParser(object):
 
     # lowercase required
     cutoffs = ['limited', 'xvid', 'h264', 'x264', 'h.264', 'x.264', 'screener', 'unrated', '3d', 'extended',
-               'directors', 'director\'s', 'multisubs', 'dubbed', 'subbed', 'multi'] + propers + specials + editions
+               'directors', 'director\'s', 'multisubs', 'dubbed', 'subbed', 'multi'] + specials + editions
 
     remove = ['imax']
 
