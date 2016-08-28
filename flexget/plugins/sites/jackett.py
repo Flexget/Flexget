@@ -13,43 +13,48 @@ import feedparser
 
 __author__ = 'davst'
 
-log = logging.getLogger('jackett_torznab')
+log = logging.getLogger('jackett')
 
 
-class Jackett_torznab(object):
+class Jackett(object):
     """
-    Jackett_torznab search plugin
+    Jackett search plugin
     Based on the newznab plugin
-    Provide a url or your website + apikey and a category
+    Provide either url or website + apikey, and a category
 
-    Config example::
+    Config examples::
 
-        Jackett_Torznab:
-          url: "http://website/api?apikey=xxxxxxxxxxxxxxxxxxxxxxxxxx&t=movie&extended=1"
+        Jackett:
           website: https://website
           apikey: xxxxxxxxxxxxxxxxxxxxxxxxxx
           category: movie
+          
+        -- or --
+        
+        Jackett:
+          url: "http://website/api?apikey=xxxxxxxxxxxxxxxxxxxxxxxxxx&t=movie&extended=1"
+          category: movie
 
-    Category is any of: movie, tvsearch, search
+    Category is any of: movie, tv, search (default)
     """
 
     schema = {
         'type': 'object',
         'properties': {
-            'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'search']},
+            'category': {'type': 'string', 'enum': ['movie',  'tv', 'search']},
             'url': {'type': 'string', 'format': 'url'},
             'website': {'type': 'string', 'format': 'url'},
             'apikey': {'type': 'string'}
         },
-        'required': ['category'],
+        'oneOf': [
+            {'required': ['url']},
+            {'required': ['website', 'apikey']}
+        ],
         'additionalProperties': False
     }
 
     def build_config(self, config):
         log.debug(type(config))
-
-        if config['category'] == 'tv':
-            config['category'] = 'tvsearch'
 
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
@@ -64,18 +69,18 @@ class Jackett_torznab(object):
 
     def fill_entries_for_url(self, url, task):
         entries = []
-        log.verbose('Fetching %s' % url)
+        log.verbose('Fetching %s', url)
 
         try:
             r = task.requests.get(url)
         except task.requests.RequestException as e:
-            log.error("Failed fetching '%s': %s" % (url, e))
+            raise PluginError("Failed fetching '%s': %s" % (url, e))
 
         rss = feedparser.parse(r.content)
         log.debug("Raw RSS: %s" % rss)
 
         if not len(rss.entries):
-            log.info('No results returned')
+            return
 
         for rss_entry in rss.entries:
             new_entry = Entry()
@@ -93,19 +98,15 @@ class Jackett_torznab(object):
         config = self.build_config(config)
         if config['category'] == 'movie':
             return self.do_search_movie(entry, task, config)
-        elif config['category'] == 'tvsearch':
+        elif config['category'] == 'tv':
             return self.do_search_tvsearch(entry, task, config)
-        elif config['category'] == 'search':
-            return self.do_search_search(entry, task, config)
         else:
-            entries = []
-            log.warning("Not done yet...")
-            return entries
+            return self.do_search_search(entry, task, config)
 
     def do_search_tvsearch(self, arg_entry, task, config=None):
         log.info('Searching for %s' % (arg_entry['title']))
         # normally this should be used with next_series_episodes who has provided season and episodenumber
-        if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
+        if not all(value in arg_entry for value in ['series_name', 'series_episode', 'series_season']):
             return []
         if arg_entry.get('tvrage_id'):
             lookup = '&rid=%s' % arg_entry.get('tvrage_id')
@@ -138,4 +139,4 @@ class Jackett_torznab(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Jackett_torznab, 'jackett_torznab', api_ver=2, groups=['search'])
+    plugin.register(Jackett, 'jackett', api_ver=2, groups=['search'])
