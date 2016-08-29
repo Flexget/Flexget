@@ -102,7 +102,7 @@ class RegexpList(MutableSet):
 
     def discard(self, entry):
         with Session() as session:
-            for match_regexp in [True, False]:
+            for match_regexp in [False, True]:
                 db_regexp = self._find_entry(entry, match_regexp=match_regexp, session=session)
                 if db_regexp:
                     log.debug('deleting file %s', db_regexp)
