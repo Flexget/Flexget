@@ -81,7 +81,7 @@ class TestDiscover(object):
             series:
             - My Show:
                 identified_by: ep
-            rerun: 0
+            max_reruns: 0
           test_next_series_episodes_with_bad_search:
             discover:
               release_estimations: ignore
@@ -96,7 +96,7 @@ class TestDiscover(object):
             - My Show:
                 identified_by: ep
             mock_output: yes
-            rerun: 3
+            max_reruns: 3
 
     """
 
@@ -164,7 +164,7 @@ class TestEmitSeriesInDiscover(object):
             - My Show 2:
                 tracking: backfill
                 identified_by: ep
-            rerun: 0
+            max_reruns: 0
     """
 
     def test_next_series_episodes_backfill(self, execute_task):

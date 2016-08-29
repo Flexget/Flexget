@@ -211,7 +211,7 @@ class Task(object):
             options = options_namespace
         # If execution hasn't specifically set the `allow_manual` flag, set it to False by default
         if not hasattr(options, 'allow_manual'):
-          setattr(options, 'allow_manual', False)
+            setattr(options, 'allow_manual', False)
         self.options = options
         self.output = output
         self.loglevel = loglevel
@@ -284,6 +284,10 @@ class Task(object):
     @property
     def is_rerun(self):
         return bool(self._rerun_count)
+
+    @property
+    def rerun_count(self):
+        return self._rerun_count
 
     @property
     def undecided(self):

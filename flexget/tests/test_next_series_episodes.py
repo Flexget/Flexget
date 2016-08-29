@@ -33,12 +33,12 @@ class TestNextSeriesEpisodes(object):
             - Test Series 1:
                 tracking: backfill
                 identified_by: ep
-            rerun: 0
+            max_reruns: 0
           test_next_series_episodes_no_backfill:
             next_series_episodes: yes
             series:
             - Test Series 1
-            rerun: 0
+            max_reruns: 0
           test_next_series_episodes_rejected:
             next_series_episodes:
               backfill: yes
@@ -46,21 +46,21 @@ class TestNextSeriesEpisodes(object):
             - Test Series 2:
                 tracking: backfill
                 identified_by: ep
-            rerun: 0
+            max_reruns: 0
           test_next_series_episodes_from_start:
             next_series_episodes:
               from_start: yes
             series:
             - Test Series 3:
                 identified_by: ep
-            rerun: 0
+            max_reruns: 0
           test_next_series_episodes_begin:
             next_series_episodes: yes
             series:
             - Test Series 4:
                 begin: S03E03
                 identified_by: ep
-            rerun: 0
+            max_reruns: 0
           test_next_series_episodes_begin_and_backfill:
             next_series_episodes:
               backfill: yes
@@ -68,7 +68,7 @@ class TestNextSeriesEpisodes(object):
             - Test Series 5:
                 begin: S03E02
                 tracking: backfill
-            rerun: 0
+            max_reruns: 0
           test_next_series_episodes_begin_backfill_and_rerun:
             accept_all: yes  # make sure mock output stores all created entries
             next_series_episodes:
@@ -78,7 +78,7 @@ class TestNextSeriesEpisodes(object):
                 begin: S03E02
                 tracking: backfill
             mock_output: yes
-            rerun: 1
+            max_reruns: 1
           test_next_series_episodes_backfill_advancement:
             next_series_episodes:
               backfill: yes
@@ -105,7 +105,7 @@ class TestNextSeriesEpisodes(object):
                alternate_name:
                  - Testing Series 8
                  - Tests Series 8
-            rerun: 0
+            max_reruns: 0
             mock_output: yes
           test_next_series_episodes_alternate_name_duplicates:
             next_series_episodes: yes
@@ -115,7 +115,7 @@ class TestNextSeriesEpisodes(object):
                alternate_name:
                  - Testing Series 8
                  - Testing SerieS 8
-            rerun: 0
+            max_reruns: 0
             mock_output: yes
     """
 

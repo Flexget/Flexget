@@ -20,9 +20,21 @@ class MaxReRuns(object):
 
     def on_task_start(self, task, config):
         self.default = task.max_reruns
+        log.debug('saving old max task rerun value: %s', self.default)
         task.max_reruns = int(config)
         task.lock_reruns()
         log.debug('changing max task rerun variable to: %s' % config)
+
+    def on_task_exit(self, task, config):
+        if task.rerun_count > task.max_reruns:
+            task.unlock_reruns()
+            task.max_reruns = self.default
+            log.debug('changing max task rerun variable back to: %s' % self.default)
+
+    def on_task_abort(self, task, config):
+        task.unlock_reruns()
+        task.max_reruns = self.default
+        log.debug('changing max task rerun variable back to: %s' % self.default)
 
 
 @event('plugin.register')
