@@ -39,7 +39,7 @@ def do_cli(manager, options):
         console('No history to display')
         return
     title = 'Showing {} entries from History'.format(query.count())
-    if options.table_type != 'porcelain':
+    if options.table_type != 'porcelain' and not options.short:
         del table_data[-1]
     table = TerminalTable(options.table_type, table_data, title=title, wrap_columns=[1])
     if not options.short:
