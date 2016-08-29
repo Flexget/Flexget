@@ -136,6 +136,10 @@ class PluginFailed(object):
         # Timedeltas do not allow floating point multiplication. Convert to seconds and then back to avoid this.
         base_retry_secs = base_retry_time.days * 86400 + base_retry_time.seconds
         retry_secs = base_retry_secs * (config['retry_time_multiplier'] ** fail_count)
+        # prevent OverflowError: date value out of range, cap to 30 days
+        max = 60 * 60 * 24 * 30
+        if retry_secs > max:
+            retry_secs = max
         return timedelta(seconds=retry_secs)
 
     @plugin.priority(-255)
