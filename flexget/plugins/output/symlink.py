@@ -20,6 +20,7 @@ class Symlink(object):
                 'type': 'object',
                 'properties': {
                     'to': {'type': 'string', 'format': 'path'},
+                    'existing': {'type': 'string', 'enum': ['ignore', 'fail']}
                 },
                 'additionalProperties': False
             },
@@ -40,7 +41,11 @@ class Symlink(object):
             name = os.path.split(lnkfrom.rstrip('/'))[1]
             lnkto = os.path.join(config['to'], name)
             if os.path.exists(lnkto):
-                entry.fail('Symnlink destination already exists')
+                msg = 'Symlink destination already exists'
+                if config.get('existing', 'fail') == 'ignore':
+                    log.verbose(msg)
+                else:
+                    entry.fail(msg)
                 continue
             log.verbose('Symlink `%s` to `%s`', lnkfrom, lnkto)
             try:
