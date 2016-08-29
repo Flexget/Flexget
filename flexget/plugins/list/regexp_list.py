@@ -102,10 +102,11 @@ class RegexpList(MutableSet):
 
     def discard(self, entry):
         with Session() as session:
-            db_regexp = self._find_entry(entry, session=session)
-            if db_regexp:
-                log.debug('deleting file %s', db_regexp)
-                session.delete(db_regexp)
+            for match_regexp in [True, False]:
+                db_regexp = self._find_entry(entry, match_regexp=match_regexp, session=session)
+                if db_regexp:
+                    log.debug('deleting file %s', db_regexp)
+                    session.delete(db_regexp)
 
     def __contains__(self, entry):
         return self._find_entry(entry, match_regexp=True) is not None
