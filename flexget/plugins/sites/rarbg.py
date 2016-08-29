@@ -50,7 +50,6 @@ CATEGORIES = {
 }
 
 
-
 class SearchRarBG(object):
     """
         RarBG search plugin.
@@ -152,11 +151,11 @@ class SearchRarBG(object):
                 log.error('RarBG request failed: %s' % e.args[0])
                 continue
             r = page.json()
-            # error code 20 just means no results were found
-            if r.get('error_code') == 20:
+            # error code 10 and 20 just mean no results were found
+            if r.get('error_code') in [10, 20]:
                 searched_string = params.get('search_string') or 'imdb={0}'.format(params.get('search_imdb')) or \
                     'tvdb={0}'.format(params.get('tvdb_id'))
-                log.debug('No results found for %s', searched_string)
+                log.debug('No results found for %s. Message from rarbg: %s', searched_string, r.get('error'))
                 continue
             elif r.get('error'):
                 log.error('Error code %s: %s', r.get('error_code'), r.get('error'))
