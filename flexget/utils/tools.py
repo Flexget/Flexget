@@ -1,25 +1,28 @@
 """Contains miscellaneous helpers"""
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.moves.urllib import request
 from future.utils import PY2
 from past.builtins import basestring
-from future.moves.urllib import request
 
-import queue
 import ast
 import copy
+import hashlib
 import locale
+import mimetypes
 import operator
 import os
 import re
 import sys
+import io
 from collections import MutableMapping
 from datetime import timedelta, datetime
-from html.entities import name2codepoint
-
-import requests
 
 import flexget
+import queue
+import requests
+
+from html.entities import name2codepoint
 
 
 def str_to_boolean(string):
@@ -455,3 +458,25 @@ def parse_filesize(text_size, si=True):
     amount = float(amount.replace(',', ''))
     base = 1000 if si else 1024
     return (amount * (base ** order)) / 1024 ** 2
+
+
+def cached_resource(url, force=False):
+    """
+    Caches a remote resource to local filesystem. Return a tuple of local file name and mime type, use primarily
+    for API/WebUI.
+    :param url: Resource URL
+    :param force: Does not check for existence of cached resource, fetches the remote URL
+    :return: Tuple of file path and mime type
+    """
+    mime_type, encoding = mimetypes.guess_type(url)
+    hashed_name = hashlib.md5(url).hexdigest()
+    file_path = os.path.join(os.getcwd(), 'cached_resources', hashed_name)
+    if not os.path.exists(file_path) or force:
+        response = requests.get(url)
+        response.raise_for_status()
+        content = response.content
+        if not os.path.exists(os.path.dirname(file_path)):
+            os.makedirs(os.path.dirname(file_path))
+        with io.open(file_path, 'wb') as file:
+            file.write(content)
+    return file_path, mime_type
