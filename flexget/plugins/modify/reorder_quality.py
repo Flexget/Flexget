@@ -26,8 +26,8 @@ class ReorderQuality(object):
         'additionalProperties': {
             'type': 'object',
             'properties': {
-                'above': {'type': 'string', 'format': 'quality_requirements'},
-                'below': {'type': 'string', 'format': 'quality_requirements'}
+                'above': {'type': 'string', 'format': 'quality'},
+                'below': {'type': 'string', 'format': 'quality'}
             },
             'maxProperties': 1
         }
