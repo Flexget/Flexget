@@ -1,14 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-import io
 import logging
 
 from flask.helpers import send_file
 from flask_restplus import inputs
-
-from flexget.api import api, APIResource, ApiError
+from flexget.api import api, APIResource, ApiError, BadRequest
 from flexget.utils.tools import cached_resource
+from requests import RequestException
 
 log = logging.getLogger('cached')
 
@@ -22,6 +21,7 @@ cached_parser.add_argument('force', type=inputs.boolean, default=False, help='Fo
 @cached_api.route('/')
 class CachedResource(APIResource):
     @api.response(200, description='Return file')
+    @api.response(BadRequest)
     @api.response(ApiError)
     @api.doc(parser=cached_parser)
     def get(self, session=None):
@@ -30,6 +30,8 @@ class CachedResource(APIResource):
         force = args.get('force')
         try:
             file_path, mime_type = cached_resource(url, force)
+        except RequestException as e:
+            raise BadRequest('Request Error: {}'.format(str(e.message)))
         except OSError as e:
-            return ApiError(e)
+            raise ApiError(str(e))
         return send_file(file_path, mimetype=mime_type)
