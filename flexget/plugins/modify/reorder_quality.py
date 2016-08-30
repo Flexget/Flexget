@@ -45,10 +45,16 @@ class ReorderQuality(object):
                 raise plugin.PluginError('%s is not a valid quality' % quality)
 
             quality_component = qualities._registry[quality]
+            other_quality_component = qualities._registry[other_quality]
+
+            if quality_component.type != other_quality_component.type:
+                raise plugin.PluginError('%s=%s and %s=%s do not have the same quality type' %
+                                         (quality, quality_component.type, other_quality, other_quality_component.type))
+
             self.quality_priorities[quality] = quality_component.value
             log.debug('stored %s original value %s' % (quality, quality_component.value))
 
-            new_value = qualities._registry[other_quality].value
+            new_value = other_quality_component.value
             if action == 'above':
                 new_value += 1
             else:
