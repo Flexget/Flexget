@@ -1,15 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-import logging
-
 from flask.helpers import send_file
 from flask_restplus import inputs
 from flexget.api import api, APIResource, ApiError, BadRequest
 from flexget.utils.tools import cached_resource
 from requests import RequestException
-
-log = logging.getLogger('cached')
 
 cached_api = api.namespace('cached', description='Cache remote resources')
 
@@ -25,6 +21,7 @@ class CachedResource(APIResource):
     @api.response(ApiError)
     @api.doc(parser=cached_parser)
     def get(self, session=None):
+        """ Cache remote resources """
         args = cached_parser.parse_args()
         url = args.get('url')
         force = args.get('force')
