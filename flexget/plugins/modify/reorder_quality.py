@@ -7,17 +7,18 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
 
-log = logging.getLogger('quality_priority')
+log = logging.getLogger('reorder_quality')
 
 
-class QualityPriority(object):
+class ReorderQuality(object):
     """
-        Allows modifying quality priorities from default values.
+        Allows modifying quality priorities from default ordering.
 
         Example:
 
-        quality_priority:
-          webrip: 155  # just above hdtv
+        reorder_quality:
+          webrip:
+            above: hdtv
     """
 
     schema = {
@@ -42,8 +43,6 @@ class QualityPriority(object):
 
             if quality not in qualities._registry:
                 raise plugin.PluginError('%s is not a valid quality' % quality)
-            if other_quality not in qualities._registry:
-                raise plugin.PluginError('%s is not a valid quality' % other_quality)
 
             quality_component = qualities._registry[quality]
             self.quality_priorities[quality] = quality_component.value
@@ -73,4 +72,4 @@ class QualityPriority(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(QualityPriority, 'quality_priority', api_ver=2)
+    plugin.register(ReorderQuality, 'reorder_quality', api_ver=2)
