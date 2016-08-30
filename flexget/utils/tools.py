@@ -5,6 +5,7 @@ from future.moves.urllib import request
 from future.utils import PY2
 from past.builtins import basestring
 
+import logging
 import ast
 import copy
 import hashlib
@@ -23,6 +24,8 @@ import queue
 import requests
 
 from html.entities import name2codepoint
+
+log = logging.getLogger('utils')
 
 
 def str_to_boolean(string):
@@ -472,6 +475,7 @@ def cached_resource(url, force=False):
     hashed_name = hashlib.md5(url).hexdigest()
     file_path = os.path.join(os.getcwd(), 'cached_resources', hashed_name)
     if not os.path.exists(file_path) or force:
+        log.debug('caching %s', url)
         response = requests.get(url)
         response.raise_for_status()
         content = response.content
