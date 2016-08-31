@@ -254,12 +254,8 @@ class TraktSet(MutableSet):
                     log.debug('Not submitting `%s`, no episode number found.' % entry['title'])
                     continue
                 found.setdefault('shows', []).append(show)
-
-            if self.config['type'] in ['auto', 'movies']:
+            elif self.config['type'] in ['auto', 'movies']:
                 movie = {'ids': get_entry_ids(entry)}
-                if not movie['ids']:
-                    entry = plugin.get_plugin_by_name('trakt_lookup').instance.lazy_movie_lookup(entry)
-                    movie['ids'] = get_entry_ids(entry)
                 if not movie['ids']:
                     if entry.get('movie_name') is not None:
                         movie['title'] = entry.get('movie_name') or entry.get('imdb_name')
