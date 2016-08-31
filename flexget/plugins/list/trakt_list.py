@@ -214,8 +214,6 @@ class TraktSet(MutableSet):
         if any(entry1.get(id) is not None and entry1[id] == entry2[id] for id in
                ['series_name', 'trakt_show_id', 'tmdb_id', 'tvdb_id', 'imdb_id', 'tvrage_id']):
             return True
-        if entry1.get('series_name') and entry2.get('series_name'):
-            return split_title_year(entry1.get('series_name')) == split_title_year(entry2.get('series_name'))
         return False
 
     def season_match(self, entry1, entry2):
