@@ -228,13 +228,13 @@ def upgrade(ver, session):
     return ver
 
 
-def get_entry_ids(entry, episode=False):
+def get_entry_ids(entry):
     """Creates a trakt ids dict from id fields on an entry. Prefers already populated info over lazy lookups."""
     ids = {}
     for lazy in [False, True]:
         if entry.get('trakt_movie_id', eval_lazy=lazy):
             ids['trakt'] = entry['trakt_movie_id']
-        elif not episode and entry.get('trakt_show_id', eval_lazy=lazy):
+        elif entry.get('trakt_show_id', eval_lazy=lazy):
             ids['trakt'] = entry['trakt_show_id']
         elif entry.get('trakt_episode_id', eval_lazy=lazy):
             ids['trakt'] = entry['trakt_episode_id']
