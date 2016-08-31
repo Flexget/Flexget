@@ -262,7 +262,6 @@ class MyEpisodes(object):
 
         try:
             response = self.http_session.post(url, data=payload)
-            print response.text
 
         except requests.RequestException as e:
             # log.info('
