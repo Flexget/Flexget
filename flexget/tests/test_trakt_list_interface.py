@@ -20,7 +20,25 @@ class TestTraktList(object):
     """
 
     config = """
-      'tasks': {}
+      tasks:
+        test_list:
+          trakt_list:
+            account: 'flexget_list_test'
+            list: watchlist
+            type: episodes
+            strip_dates: yes
+        test_add_episode_auto:
+          mock:
+            - {title: 'Stranger Things S01E05 720p HDTV'}
+            - {title: 'Stranger Things S01E06 720p HDTV'}
+          series:
+            - Stranger Things:
+                begin: S01E05
+          list_add:
+            - trakt_list:
+                account: 'flexget_list_test'
+                list: watchlist
+                strip_dates: yes
     """
 
     trakt_config = {'account': 'flexget_list_test',
@@ -92,7 +110,7 @@ class TestTraktList(object):
         config = {'account': 'flexget_list_test', 'list': 'testlist', 'strip_dates': True, 'type': 'auto'}
         trakt_set = TraktSet(config)
         titles = [e['title'] for e in trakt_set]
-        assert set(titles) == set(('The Walking Dead', 'Deadpool', 'Castle S08E15 Fidelis Ad Mortem'))
+        assert set(titles) == {'The Walking Dead', 'Deadpool', 'Castle S08E15 Fidelis Ad Mortem'}
 
     def test_trakt_add(self):
         # Initialize trakt set
@@ -126,6 +144,40 @@ class TestTraktList(object):
 
         trakt_set.add(entry)
         assert entry in trakt_set
+
+    def test_trakt_add_episode_simple(self):
+        episode_config = self.trakt_config.copy()
+        episode_config['type'] = 'episodes'
+        trakt_set = TraktSet(episode_config)
+        # Initialize trakt set
+        trakt_set.clear()
+
+        entry = Entry(**{u'series_name': u'Game of Thrones (2011)', u'series_id': u'S04E05', u'series_episode': 5,
+                         u'series_season': 4, u'title': u'Game of Thrones (2011) S04E05 First of His Name'})
+
+        assert entry not in trakt_set
+
+        trakt_set.add(entry)
+        assert entry in trakt_set
+
+    def test_trakt_add_episode_task(self, execute_task):
+        episode_config = self.trakt_config.copy()
+        episode_config['type'] = 'episodes'
+        # Initialize trakt set
+        trakt_set = TraktSet(episode_config)
+        trakt_set.clear()
+
+        execute_task('test_add_episode_auto')
+
+        task = execute_task('test_list')
+        assert len(task.entries) == 2
+        assert task.entries[0]['series_name'] == 'Stranger Things (2016)'
+        assert task.entries[1]['series_name'] == 'Stranger Things (2016)'
+        for series_id in ['S01E05', 'S01E06']:
+            entry1 = task.entries[0]
+            entry2 = task.entries[1]
+
+            assert series_id in [entry1['series_id'], entry2['series_id']]
 
     def test_trakt_remove(self):
         trakt_set = TraktSet(self.trakt_config)
