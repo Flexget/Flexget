@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -13,15 +13,15 @@ log = logging.getLogger('set_series_begin')
 class SetSeriesBegin(object):
     """
     Set the first episode for series. Uses series_name and series_id.
-    
+
     Example::
 
       set_series_begin: yes
-    
+
     """
-    
+
     schema = {'type': 'boolean'}
-    
+
     def on_task_output(self, task, config):
         if not (config and task.accepted):
             return

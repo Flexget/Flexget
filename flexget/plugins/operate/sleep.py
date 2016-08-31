@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import time
@@ -12,7 +12,7 @@ log = logging.getLogger('sleep')
 
 class PluginSleep(object):
     """Causes a pause to occur during the specified phase of a task"""
-    
+
     schema = {
         'oneOf': [
             {

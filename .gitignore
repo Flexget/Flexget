@@ -37,7 +37,12 @@ flexget/ui/node_modules/
 flexget/ui/bower_components/
 flexget/ui/.tmp/
 flexget/ui/app/
+flexget/ui/coverage/
 cherrypy
 pip-selfcheck.json
 npm-debug.log
 .config-lock
+.cache/
+*.yml
+*.sqlite
+node_modules/

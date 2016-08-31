@@ -1,28 +1,30 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
 
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import options
 from flexget.event import event
-from flexget.logger import console
 from flexget.manager import Session
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.plugins.list.entry_list import get_entry_lists, get_list_by_exact_name, get_entries_by_list_id, \
     get_entry_by_id, get_entry_by_title, EntryListList, EntryListEntry
 
 
-def parse_identifier(identifier_string):
-    if identifier_string.count('=') != 1:
-        return
-    name, value = identifier_string.split('=', 2)
+def attribute_type(attribute):
+    if attribute.count('=') != 1:
+        raise ArgumentTypeError('Received attribute in wrong format: %s, '
+                                'should be in keyword format like `imdb_id=tt1234567`' % attribute)
+    name, value = attribute.split('=', 2)
     return {name: value}
 
 
 def do_cli(manager, options):
     """Handle entry-list subcommand"""
     if options.list_action == 'all':
-        entry_list_lists()
+        entry_list_lists(options)
         return
 
     if options.list_action == 'list':
@@ -38,22 +40,27 @@ def do_cli(manager, options):
         return
 
     if options.list_action == 'del':
-        movie_list_del(options)
+        entry_list_del(options)
         return
 
     if options.list_action == 'purge':
-        movie_list_purge(options)
+        entry_list_purge(options)
         return
 
 
-def entry_list_lists():
+def entry_list_lists(options):
     """ Show all entry lists """
     with Session() as session:
         lists = get_entry_lists(session=session)
-        console('Existing entry lists:')
-        console('-' * 20)
+        header = ['#', 'List Name']
+        table_data = [header]
         for entry_list in lists:
-            console(entry_list.name)
+            table_data.append([entry_list.id, entry_list.name])
+    table = TerminalTable(options.table_type, table_data)
+    try:
+        console(table.output)
+    except TerminalTableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def entry_list_list(options):
@@ -64,10 +71,15 @@ def entry_list_list(options):
         except NoResultFound:
             console('Could not find entry list with name {}'.format(options.list_name))
             return
-        console('Entries for list `{}`:'.format(options.list_name))
-        console('-' * 79)
+        header = ['#', 'Title', '# of fields']
+        table_data = [header]
         for entry in get_entries_by_list_id(entry_list.id, order_by='added', descending=True, session=session):
-            console('{:2d}: {}, {} fields'.format(entry.id, entry.title, len(entry.entry)))
+            table_data.append([entry.id, entry.title, len(entry.entry)])
+    table = TerminalTable(options.table_type, table_data)
+    try:
+        console(table.output)
+    except TerminalTableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def entry_list_show(options):
@@ -91,11 +103,16 @@ def entry_list_show(options):
                     'Could not find matching entry with title `{}` in list `{}`'.format(options.entry,
                                                                                         options.list_name))
                 return
-
-        console('Showing fields for entry ID {}'.format(options.list_name))
-        console('-' * 79)
+        header = ['Field name', 'Value']
+        table_data = [header]
         for k, v in sorted(entry.entry.items()):
-            console('{}: {}'.format(k.upper(), v))
+            table_data.append([k, str(v)])
+    table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
+    table.table.justify_columns[0] = 'center'
+    try:
+        console(table.output)
+    except TerminalTableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def entry_list_add(options):
@@ -107,7 +124,7 @@ def entry_list_add(options):
             entry_list = EntryListList(name=options.list_name)
             session.add(entry_list)
         session.merge(entry_list)
-
+        session.commit()
         title = options.entry_title
         entry = {'title': options.entry_title, 'original_url': options.original_url}
         db_entry = get_entry_by_title(list_id=entry_list.id, title=title, session=session)
@@ -120,18 +137,16 @@ def entry_list_add(options):
             db_entry = EntryListEntry(entry=entry, entry_list_id=entry_list.id)
             session.add(db_entry)
             output = 'Successfully added entry `{}` to entry list `{}` '.format(title, entry_list.name)
-        if options.identifiers:
-            output = 'Successfully updated entry `{}` to entry list `{}` '.format(title, entry_list.name)
-            identifiers = [parse_identifier(identifier) for identifier in options.identifiers if options.identifiers]
-            console('Adding identifiers to entry `{}`'.format(title))
-            for identifier in identifiers:
+        if options.attributes:
+            console('Adding attributes to entry `{}`'.format(title))
+            for identifier in options.attributes:
                 for k, v in identifier.items():
                     entry[k] = v
             db_entry.entry = entry
         console(output)
 
 
-def movie_list_del(options):
+def entry_list_del(options):
     with Session() as session:
         try:
             entry_list = get_list_by_exact_name(options.list_name)
@@ -155,7 +170,7 @@ def movie_list_del(options):
         session.delete(db_entry)
 
 
-def movie_list_purge(options):
+def entry_list_purge(options):
     with Session() as session:
         try:
             entry_list = get_list_by_exact_name(options.list_name)
@@ -170,31 +185,29 @@ def movie_list_purge(options):
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
     entry_parser = ArgumentParser(add_help=False)
-    entry_parser.add_argument('-t', '--entry_title', required=True, help="Title of the entry")
-    entry_parser.add_argument('-u', '--original_url', required=True, help="URL of the entry")
+    entry_parser.add_argument('entry_title', help="Title of the entry")
+    entry_parser.add_argument('original_url', help="URL of the entry")
 
     global_entry_parser = ArgumentParser(add_help=False)
-    global_entry_parser.add_argument('entry', help='can be entry title or ID')
+    global_entry_parser.add_argument('entry', help='Can be entry title or ID')
 
-    identifiers_parser = ArgumentParser(add_help=False)
-    identifiers_parser.add_argument('-i', '--identifiers', metavar='<identifiers>', nargs='+',
-                                    help='Can be a string or a list of string with the format imdb_id=XXX,'
-                                         ' tmdb_id=XXX, etc')
+    attributes_parser = ArgumentParser(add_help=False)
+    attributes_parser.add_argument('--attributes', metavar='<attributes>', nargs='+', type=attribute_type,
+                                   help='Can be a string or a list of string with the format imdb_id=XXX,'
+                                        ' tmdb_id=XXX, etc')
     list_name_parser = ArgumentParser(add_help=False)
-    list_name_parser.add_argument('-l', '--list_name', metavar='<list_name>', required=True,
-                                  help='name of entry list to operate on')
+    list_name_parser.add_argument('list_name', nargs='?', default='entries', help='Name of entry list to operate on')
     # Register subcommand
     parser = options.register_command('entry-list', do_cli, help='view and manage entry lists')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='list_action')
-    all_parser = subparsers.add_parser('all', help='shows all existing entry lists')
-    list_parser = subparsers.add_parser('list', parents=[list_name_parser], help='list entries from a list')
-    show_parser = subparsers.add_parser('show', parents=[list_name_parser, global_entry_parser],
-                                        help='show entry fields.')
-
-    add_parser = subparsers.add_parser('add', parents=[identifiers_parser, list_name_parser, entry_parser],
-                                       help='add an entry to a list')
-    subparsers.add_parser('del', parents=[global_entry_parser, list_name_parser],
-                          help='remove an entry from a list using its title')
+    subparsers.add_parser('all', help='Shows all existing entry lists', parents=[table_parser])
+    subparsers.add_parser('list', parents=[list_name_parser, table_parser], help='List entries from a list')
+    subparsers.add_parser('show', parents=[list_name_parser, global_entry_parser, table_parser],
+                          help='Show entry fields.')
+    subparsers.add_parser('add', parents=[list_name_parser, entry_parser, attributes_parser],
+                          help='Add an entry to a list')
+    subparsers.add_parser('del', parents=[list_name_parser, global_entry_parser],
+                          help='Remove an entry from a list using its title or ID')
     subparsers.add_parser('purge', parents=[list_name_parser],
-                          help='removes an entire list with all of its entries. Use this with caution')
+                          help='Removes an entire list with all of its entries. Use this with caution')

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse, unquote
 
 import logging
@@ -73,7 +73,7 @@ class OutputFtp(object):
     def check_connection(self, ftp, config, ftp_url, current_path):
         try:
             ftp.voidcmd("NOOP")
-        except:
+        except (IOError, ftplib.Error):
             ftp = self.ftp_connect(config, ftp_url, current_path)
         return ftp
 
@@ -163,7 +163,7 @@ class OutputFtp(object):
         try:
             ftp.sendcmd("TYPE I")
             file_size = ftp.size(file_name)
-        except Exception as e:
+        except Exception:
             file_size = 1
 
         max_attempts = 5

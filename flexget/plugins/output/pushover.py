@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -27,7 +27,7 @@ class OutputPushover(object):
         apikey: <API_KEY>
         [device: <DEVICE_STRING>] (default: (none))
         [title: <MESSAGE_TITLE>] (default: "Download started" -- accepts Jinja2)
-        [message: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}" -- accepts Jinja2)
+        [message: <MESSAGE_BODY>] (default uses series/tvdb name and imdb if available -- accepts Jinja2)
         [priority: <PRIORITY>] (default = 0 -- normal = 0, high = 1, silent = -1, emergency = 2)
         [url: <URL>] (default: "{{imdb_url}}" -- accepts Jinja2)
         [urltitle: <URL_TITLE>] (default: (none) -- accepts Jinja2)
@@ -36,12 +36,18 @@ class OutputPushover(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-    defaults = {'message': "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} "
-                           "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}}"
-                           "{{imdb_year}}{% else %}{{title}}{% endif %}",
-                'url': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}',
-                'title': '{{task}}'
-                }
+    defaults = {
+        'message': "{% if series_name is defined %}"
+                   "{{tvdb_series_name|d(series_name)}} "
+                   "{{series_id}} {{tvdb_ep_name|d('')}}"
+                   "{% elif imdb_name is defined %}"
+                   "{{imdb_name}} {{imdb_year}}"
+                   "{% else %}"
+                   "{{title}}"
+                   "{% endif %}",
+        'url': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}',
+        'title': '{{task}}'
+    }
 
     schema = {
         'type': 'object',
@@ -74,7 +80,6 @@ class OutputPushover(object):
         # Require at least 5 seconds of waiting between API calls
         while time_dif < 5:
             time_dif = (datetime.datetime.now() - OutputPushover.last_request).seconds
-            pass
         try:
             response = task.requests.post(PUSHOVER_URL, data=data, raise_status=False)
             OutputPushover.last_request = datetime.datetime.now()
@@ -100,9 +105,7 @@ class OutputPushover(object):
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
-
         config = self.prepare_config(config)
-
         data = {"token": config["apikey"]}
 
         # Loop through the provided entries

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -113,15 +113,15 @@ class FilterRottenTomatoes(object):
             if 'min_critics_score' in config:
                 if entry.get('rt_critics_score', 0) < config['min_critics_score']:
                     reasons.append('min_critics_score (%s < %s)' % (entry.get('rt_critics_score'),
-                        config['min_critics_score']))
+                                                                    config['min_critics_score']))
             if 'min_audience_score' in config:
                 if entry.get('rt_audience_score', 0) < config['min_audience_score']:
                     reasons.append('min_audience_score (%s < %s)' % (entry.get('rt_audience_score'),
-                        config['min_audience_score']))
+                                                                     config['min_audience_score']))
             if 'min_average_score' in config:
                 if entry.get('rt_average_score', 0) < config['min_average_score']:
                     reasons.append('min_average_score (%s < %s)' % (entry.get('rt_average_score'),
-                        config['min_average_score']))
+                                                                    config['min_average_score']))
             if 'min_critics_rating' in config:
                 if not entry.get('rt_critics_rating'):
                     reasons.append('min_critics_rating (no rt_critics_rating)')
@@ -193,7 +193,7 @@ class FilterRottenTomatoes(object):
 
             if reasons and not force_accept:
                 msg = 'Didn\'t accept `%s` because of rule(s) %s' % \
-                    (entry.get('rt_name', None) or entry['title'], ', '.join(reasons))
+                      (entry.get('rt_name', None) or entry['title'], ', '.join(reasons))
                 if task.options.debug:
                     log.debug(msg)
                 else:

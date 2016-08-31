@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import json
 import logging
@@ -9,7 +9,7 @@ from collections import deque
 from functools import wraps
 
 from flask import Flask, request
-from flask.ext.cors import CORS
+from flask_cors import CORS
 from flask_compress import Compress
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.model import Model
@@ -23,7 +23,7 @@ from flexget.utils.database import with_session
 from flexget.webserver import User
 from flexget.webserver import register_app, get_secret
 
-__version__ = '0.5.2-beta'
+__version__ = '0.6-beta'
 
 log = logging.getLogger('api')
 
@@ -64,8 +64,11 @@ class ApiSchemaModel(Model):
         else:
             return self._schema
 
-    def __bool__(self):
+    def __nonzero__(self):
         return bool(self._schema)
+
+    def __bool__(self):
+        return self._schema is not None
 
     def __repr__(self):
         return '<ApiSchemaModel(%r)>' % self._schema
@@ -143,7 +146,7 @@ class Api(RestPlusAPI):
 
         return decorator
 
-    def response(self, code_or_apierror, description=None, model=None, **kwargs):
+    def response(self, code_or_apierror, description='Success', model=None, **kwargs):
         """
         Extends :meth:`flask_restplus.Api.response` to allow passing an :class:`ApiError` class instead of
         response code. If an `ApiError` is used, the response code, and expected response model, is automatically
@@ -151,7 +154,7 @@ class Api(RestPlusAPI):
         """
         try:
             if issubclass(code_or_apierror, ApiError):
-                description = description or code_or_apierror.description
+                description = code_or_apierror.description or description
                 return self.doc(responses={code_or_apierror.code: (description, code_or_apierror.response_model)})
         except TypeError:
             # If first argument isn't a class this happens
@@ -185,9 +188,8 @@ api = Api(
 
 
 class ApiError(Exception):
-    code = 500
     description = 'server error'
-
+    code = 500
     response_model = api.schema('error', {
         'type': 'object',
         'properties': {
@@ -216,8 +218,13 @@ class NotFoundError(ApiError):
     description = 'not found'
 
 
-class ValidationError(ApiError):
+class BadRequest(ApiError):
     code = 400
+    description = 'bad request'
+
+
+class ValidationError(ApiError):
+    code = 422
     description = 'validation error'
 
     response_model = api.inherit('validation_error', ApiError.response_model, {
@@ -257,13 +264,24 @@ class ValidationError(ApiError):
             if isinstance(getattr(error, attr), deque):
                 error_dict[attr] = list(getattr(error, attr))
             else:
-                error_dict[attr] = getattr(error, attr)
+                error_dict[attr] = str(getattr(error, attr))
         return error_dict
+
+empty_response = api.schema('empty', {'type': 'object'})
+default_error_schema = {
+        'type': 'object',
+        'properties': {
+            'status': {'type': 'string'},
+            'message': {'type': 'string'}
+        }
+    }
+default_error_schema = api.schema('default_error_schema', default_error_schema)
 
 
 @api.errorhandler(ApiError)
 @api.errorhandler(NotFoundError)
 @api.errorhandler(ValidationError)
+@api.errorhandler(BadRequest)
 def api_errors(error):
     return error.to_dict(), error.code
 
@@ -305,6 +323,7 @@ class ApiClient(object):
 
 
 class ApiEndopint(object):
+
     def __init__(self, endpoint, caller):
         self.endpoint = endpoint
         self.caller = caller

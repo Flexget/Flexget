@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 from collections import defaultdict
@@ -41,7 +41,7 @@ class FilterSeenMovies(FilterSeen):
 
     # We run last (-255) to make sure we don't reject duplicates before all the other plugins get a chance to reject.
     @plugin.priority(-255)
-    def on_task_filter(self, task, config):
+    def on_task_filter(self, task, config):  # pylint: disable=W0221
         if not isinstance(config, dict):
             config = {'matching': config}
         # Reject all entries without
@@ -62,6 +62,12 @@ class FilterSeenMovies(FilterSeen):
                         break
                     else:
                         accepted_ids[field].add(entry[field])
+
+    def on_task_learn(self, task, config):
+        if not isinstance(config, dict):
+            config = {'matching': config}
+        # call super
+        super(FilterSeenMovies, self).on_task_learn(task, config.get('scope', True))
 
 
 @event('plugin.register')

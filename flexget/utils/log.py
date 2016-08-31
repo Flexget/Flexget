@@ -1,6 +1,6 @@
 """Logging utilities"""
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import hashlib
@@ -69,7 +69,7 @@ def log_once(message, logger=logging.getLogger('log_once'), once_level=logging.I
         return
 
     digest = hashlib.md5()
-    digest.update(message.encode('latin1', 'replace')) # ticket:250
+    digest.update(message.encode('latin1', 'replace'))  # ticket:250
     md5sum = digest.hexdigest()
 
     # abort if this has already been logged

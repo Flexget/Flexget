@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
 
 import copy
-import datetime
 from math import ceil
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
 from flask import request
 from flask_restplus import inputs
@@ -312,10 +311,11 @@ series_list_parser.add_argument('days', type=int,
 series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
 series_list_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Max is 100.')
 
-series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behind_latest', 'last_download_date'),
-                                default='show_name',
+series_list_parser.add_argument('sort_by', choices=('show_name', 'last_download_date'),
+                                default='last_download_date',
                                 help="Sort response by attribute.")
-series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
+series_list_parser.add_argument('descending', type=inputs.boolean, default=True, store_missing=True,
+                                help="Sorting order.")
 series_list_parser.add_argument('lookup', choices=('tvdb', 'tvmaze'), action='append',
                                 help="Get lookup result for every show by sending another request to lookup API")
 
@@ -338,14 +338,6 @@ class SeriesListAPI(APIResource):
         if page_size > 100:
             page_size = 100
 
-        sort_by = args['sort_by']
-        order = args['order']
-        # In case the default 'desc' order was received
-        if order == 'desc':
-            order = True
-        else:
-            order = False
-
         start = page_size * (page - 1)
         stop = start + page_size
 
@@ -356,6 +348,8 @@ class SeriesListAPI(APIResource):
             'days': args.get('days'),
             'start': start,
             'stop': stop,
+            'sort_by': args.get('sort_by'),
+            'descending': args.get('descending'),
             'session': session
 
         }
@@ -363,19 +357,6 @@ class SeriesListAPI(APIResource):
 
         raw_series_list = series.get_series_summary(**kwargs)
         converted_series_list = [get_series_details(show) for show in raw_series_list]
-        sorted_show_list = []
-        if sort_by == 'show_name':
-            sorted_show_list = sorted(converted_series_list, key=lambda show: show['show_name'], reverse=order)
-        elif sort_by == 'episodes_behind_latest':
-            sorted_show_list = sorted(converted_series_list,
-                                      key=lambda show: show['latest_downloaded_episode']['number_of_episodes_behind'],
-                                      reverse=order)
-        elif sort_by == 'last_download_date':
-            sorted_show_list = sorted(converted_series_list,
-                                      key=lambda show: show['latest_downloaded_episode']['last_downloaded_release'][
-                                          'release_first_seen'] if show['latest_downloaded_episode'][
-                                          'last_downloaded_release'] else datetime.datetime(1970, 1, 1),
-                                      reverse=order)
 
         pages = int(ceil(num_of_shows / float(page_size)))
 
@@ -385,7 +366,7 @@ class SeriesListAPI(APIResource):
         number_of_shows = min(page_size, num_of_shows)
 
         response = {
-            'shows': sorted_show_list,
+            'shows': converted_series_list,
             'page_size': number_of_shows,
             'total_number_of_shows': num_of_shows,
             'page': page,
@@ -444,7 +425,7 @@ class SeriesListAPI(APIResource):
         return jsonify(get_series_details(show))
 
 
-@series_api.route('/search/<string:name>')
+@series_api.route('/search/<string:name>/')
 @api.doc(description='Searches for a show in the DB via its name. Returns a list of matching shows.')
 class SeriesGetShowsAPI(APIResource):
     @api.response(200, 'Show list retrieved successfully', shows_schema)
@@ -470,7 +451,7 @@ delete_parser.add_argument('forget', type=inputs.boolean, default=False,
                                 "from the entire DB, enabling to re-download them")
 
 
-@series_api.route('/<int:show_id>')
+@series_api.route('/<int:show_id>/')
 @api.doc(params={'show_id': 'ID of the show'})
 class SeriesShowAPI(APIResource):
     @api.response(404, 'Show ID not found', default_error_schema)
@@ -555,7 +536,7 @@ episode_parser.add_argument('order', choices=('desc', 'asc'), default='desc', he
 
 
 @api.response(404, 'Show ID not found', default_error_schema)
-@series_api.route('/<int:show_id>/episodes')
+@series_api.route('/<int:show_id>/episodes/')
 @api.doc(params={'show_id': 'ID of the show'})
 class SeriesEpisodesAPI(APIResource):
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
@@ -573,10 +554,7 @@ class SeriesEpisodesAPI(APIResource):
 
         order = args['order']
         # In case the default 'desc' order was received
-        if order == 'desc':
-            order = True
-        else:
-            order = False
+        descending = bool(order == 'desc')
 
         start = page_size * (page - 1)
         stop = start + page_size
@@ -584,7 +562,7 @@ class SeriesEpisodesAPI(APIResource):
         kwargs = {
             'start': start,
             'stop': stop,
-            'descending': order,
+            'descending': descending,
             'session': session
         }
 
@@ -637,7 +615,7 @@ class SeriesEpisodesAPI(APIResource):
 @api.response(404, 'Show ID not found', default_error_schema)
 @api.response(414, 'Episode ID not found', default_error_schema)
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id', default_error_schema)
-@series_api.route('/<int:show_id>/episodes/<int:ep_id>')
+@series_api.route('/<int:show_id>/episodes/<int:ep_id>/')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
 class SeriesEpisodeAPI(APIResource):
     @api.response(200, 'Episode retrieved successfully for show', episode_schema)
@@ -709,7 +687,7 @@ release_delete_parser.add_argument('forget', type=inputs.boolean, default=False,
 @api.response(404, 'Show ID not found', default_error_schema)
 @api.response(414, 'Episode ID not found', default_error_schema)
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id', default_error_schema)
-@series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases')
+@series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
          description='Releases are any seen entries that match the episode. ')
 class SeriesReleasesAPI(APIResource):
@@ -719,7 +697,7 @@ class SeriesReleasesAPI(APIResource):
     def get(self, show_id, ep_id, session):
         """ Get all episodes releases by show ID and episode ID """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
@@ -754,7 +732,7 @@ class SeriesReleasesAPI(APIResource):
     def delete(self, show_id, ep_id, session):
         """ Deletes all episodes releases by show ID and episode ID """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
@@ -788,7 +766,7 @@ class SeriesReleasesAPI(APIResource):
     def put(self, show_id, ep_id, session):
         """ Marks all downloaded releases as not downloaded """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
@@ -829,7 +807,7 @@ class SeriesReleaseAPI(APIResource):
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = series.episode_by_id(ep_id, session)
+            series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
@@ -860,13 +838,13 @@ class SeriesReleaseAPI(APIResource):
     def delete(self, show_id, ep_id, rel_id, session):
         ''' Delete episode release by show ID, episode ID and release ID '''
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = series.episode_by_id(ep_id, session)
+            series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
@@ -896,13 +874,13 @@ class SeriesReleaseAPI(APIResource):
     def put(self, show_id, ep_id, rel_id, session):
         """ Resets a downloaded release status """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = series.episode_by_id(ep_id, session)
+            series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id

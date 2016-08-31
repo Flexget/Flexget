@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import argparse
@@ -10,7 +10,6 @@ from flexget import options
 from flexget.event import event
 
 log = logging.getLogger('cli_config')
-
 
 """
 Allows specifying yml configuration values from commandline parameters.

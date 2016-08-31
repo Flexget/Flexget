@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -11,7 +11,6 @@ log = logging.getLogger('modify_torrents')
 
 
 class AddTrackers(object):
-
     """
         Adds tracker URL to torrent files.
 
@@ -38,7 +37,6 @@ class AddTrackers(object):
 
 
 class RemoveTrackers(object):
-
     """
         Removes trackers from torrent files using regexp matching.
 
@@ -71,7 +69,6 @@ class RemoveTrackers(object):
 
 
 class ModifyTrackers(object):
-
     """
     Modify tracker URL to torrent files.
 

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -8,7 +8,6 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugins.filter.series import populate_entry_fields
 from flexget.plugin import get_plugin_by_name
-
 
 log = logging.getLogger('metainfo_series')
 

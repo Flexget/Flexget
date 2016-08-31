@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -11,7 +11,7 @@ from flexget.utils.log import log_once
 
 try:
     # TODO: Fix this after api_tmdb has module level functions
-    from flexget.plugins.api_tmdb import ApiTmdb
+    from flexget.plugins.internal.api_tmdb import ApiTmdb
 
     lookup = ApiTmdb.lookup
 except ImportError:
@@ -80,7 +80,12 @@ class PluginTmdbLookup(object):
         for entry in task.entries:
             self.lookup(entry)
 
+    @property
+    def movie_identifier(self):
+        """Returns the plugin main identifier type"""
+        return 'tmdb_id'
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTmdbLookup, 'tmdb_lookup', api_ver=2)
+    plugin.register(PluginTmdbLookup, 'tmdb_lookup', api_ver=2, groups=['movie_metainfo'])

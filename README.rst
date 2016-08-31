@@ -23,13 +23,18 @@ directory support or provide interface for external utilities like FlexGet.
 .. image:: https://img.shields.io/pypi/dm/Flexget.svg
     :target: https://pypi.python.org/pypi/Flexget
 
-.. image:: https://landscape.io/github/Flexget/Flexget/develop/landscape.png
-    :target: https://landscape.io/github/Flexget/Flexget/develop
+.. image:: https://api.codacy.com/project/badge/Grade/81e8ae42c7544dc48853102b1b7f88d5
+    :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
+
+.. image:: https://api.codacy.com/project/badge/Coverage/81e8ae42c7544dc48853102b1b7f88d5
+    :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Coverage
 
 .. image:: https://badges.gitter.im/Flexget/Flexget.svg
     :alt: Join the chat at https://gitter.im/Flexget/Flexget
     :target: https://gitter.im/Flexget/Flexget?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-
+    
+.. image:: http://isitmaintained.com/badge/resolution/Flexget/Flexget.svg
+    :target: http://isitmaintained.com/project/Flexget/Flexget
 
 
 **Help:** http://discuss.flexget.com/
@@ -47,23 +52,16 @@ FlexGet is installable via pip with the command::
 
 For more detailed instructions see the `installation guide`_.
 
-.. _installation guide: http://flexget.com/wiki/Install
-
-Install using Docker (Linux only)
----------------------------------
-
-Docker can be used to install and run flexget::
-
-    docker run -it -v /home/<username>/.flexget:/root/.flexget --rm toilal/flexget
+.. _installation guide: http://flexget.com/Install
 
 How to use GIT checkout
 -----------------------
 
-Check that you have Python 2.7 available with command ``python -V``.
+Check that you have Python 2.7 / 3.3 or newer available with command ``python -V``.
 
-In some environments newer (or older, if your distro is on python 3,) python
-might be available under another name like 'python2.7' in which
-case you need to use that one instead of plain 'python'.
+In some environments newer python might be available under another name like 
+'python2.7' or 'python3' in which case you need to use that one instead of 
+plain 'python'.
 
 To start using FlexGet from this directory:
 
@@ -81,11 +79,12 @@ Or, if you need deluge or transmission libraries from system wide python use::
 
 This will initialize python virtualenv. This doesn't need to be directly in
 your checkout directory, but these instructions assume that's where it is.
-Now use pip from your new virtualenv to install paver, then install flexget
-from your checkout dir in editable mode::
 
-    bin/pip install paver
+Next we need to install dependencies and FlexGet itself, this can be done simply::
+
     bin/pip install -e .
+
+This does an editable (`-e`) development install of the current directory (`.`).
 
 After that FlexGet is usable via ``<checkout directory>/bin/flexget``. Verify
 installation by running::
@@ -96,5 +95,12 @@ You may place the config file in your checkout directory, or in ``~/.flexget``
 (Unix, Mac OS X) or ``C:\Documents and Setting\<username>\flexget`` (Windows).
 
 If you don't want to use virtualenv there's ``flexget_vanilla.py`` file which
-can be used to run FlexGet without bootstrapping, note that you will need to
+can be used to run FlexGet without virtualenv, note that you will need to
 install all required dependencies yourself.
+
+Install using Docker (Linux only)
+---------------------------------
+
+Docker can be used to install and run FlexGet::
+
+    docker run -it -v /home/<username>/.flexget:/root/.flexget --rm toilal/flexget

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.utils import tobytes
 from past.builtins import basestring
 from future.moves.urllib.parse import urlparse, urlsplit
 
@@ -159,6 +160,9 @@ class InputRSS(object):
         if data is None:
             log.critical('Received empty page - no content')
             return
+        else:
+            data = tobytes(data)
+
         ext = 'xml'
         if b'<html>' in data.lower():
             log.critical('Received content is HTML page, not an RSS feed')
@@ -176,7 +180,7 @@ class InputRSS(object):
             filename += '-' + sourcename
         filename = pathscrub(filename, filename=True)
         filepath = os.path.join(received, '%s.%s' % (filename, ext))
-        with open(filepath, 'w') as f:
+        with open(filepath, 'wb') as f:
             f.write(data)
         log.critical('I have saved the invalid content to %s for you to view', filepath)
 
@@ -187,7 +191,7 @@ class InputRSS(object):
         if 'length' in enclosure:
             try:
                 entry['size'] = int(enclosure['length'])
-            except:
+            except ValueError:
                 entry['size'] = 0
         if 'type' in enclosure:
             entry['type'] = enclosure['type']
@@ -239,7 +243,7 @@ class InputRSS(object):
                 content = response.content
             except RequestException as e:
                 raise plugin.PluginError('Unable to download the RSS for task %s (%s): %s' %
-                                  (task.name, config['url'], e))
+                                         (task.name, config['url'], e))
             if config.get('ascii'):
                 # convert content to ascii (cleanup), can also help with parsing problems on malformed feeds
                 content = response.text.encode('ascii', 'ignore')
@@ -319,7 +323,7 @@ class InputRSS(object):
                     # all other bozo errors
                     self.process_invalid_content(task, content, config['url'])
                     raise plugin.PluginError('Unhandled bozo_exception. Type: %s (task: %s)' %
-                                      (ex.__class__.__name__, task.name), log)
+                                             (ex.__class__.__name__, task.name), log)
 
         log.debug('encoding %s', rss.encoding)
 

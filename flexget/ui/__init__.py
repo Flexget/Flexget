@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import os
@@ -9,7 +9,6 @@ from flask import send_from_directory, Flask
 
 from flexget.webserver import register_app, register_home
 from flask_compress import Compress
-
 
 log = logging.getLogger('webui')
 
@@ -49,9 +48,9 @@ def root():
 
 def _find(path, f):
     matches = []
-    for root, dir_names, file_names in os.walk(path):
+    for root_dir, _, file_names in os.walk(path):
         for filename in fnmatch.filter(file_names, f):
-            matches.append(os.path.join(root, filename))
+            matches.append(os.path.join(root_dir, filename))
     return matches
 
 
@@ -70,7 +69,7 @@ def register_web_ui(mgr):
         app_base = os.path.join(ui_base, '.tmp', 'serve')
         if not os.path.exists(app_base):
             log.warning('Unable to start web ui in debug mode. To enable debug mode please run the debug build, '
-                     'see http://flexget.com/wiki/Web-UI for instructions')
+                        'see http://flexget.com/wiki/Web-UI for instructions')
             log.warning('Attempting to serve web ui from complied directory')
             app_base = None
 

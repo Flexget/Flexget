@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import random
@@ -47,7 +47,7 @@ class GenSeries(object):
                     for quality in config['qualities']:
                         entry = Entry()
                         entry['title'] = 'series %d name - S%02dE%02d - %s' % \
-                            (num, season + 1, episode + 1, quality)
+                                         (num, season + 1, episode + 1, quality)
                         entry['url'] = 'http://localhost/mock/%s' % \
                                        ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
                         self.entries.append(entry)

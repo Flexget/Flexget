@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *
-from past.builtins import basestring
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import collections
 import contextlib
@@ -11,14 +10,7 @@ import threading
 import uuid
 import warnings
 
-# Support order in python 2.7 and 3
-try:
-    from collections import OrderedDict
-except ImportError:
-    pass
-
 from flexget import __version__
-from flexget.utils.tools import io_encoding
 
 # A level more detailed than DEBUG
 TRACE = 5
@@ -105,24 +97,9 @@ def get_capture_loglevel():
     return getattr(local_context, 'loglevel', None)
 
 
-def console(text, *args, **kwargs):
-    """
-    Print to console safely. Output is able to be captured by different streams in different contexts.
-
-    Any plugin wishing to output to the user's console should use this function instead of print so that
-    output can be redirected when FlexGet is invoked from another process.
-
-    Accepts arguments like the `print` function does.
-    """
-    if not isinstance(text, str):
-        text = str(text).encode(io_encoding, 'replace')
-    kwargs['file'] = getattr(local_context, 'output', sys.stdout)
-    print(text, *args, **kwargs)
-    kwargs['file'].flush()  # flush to make sure the output is printed right away
-
-
 class RollingBuffer(collections.deque):
     """File-like that keeps a certain number of lines of text in memory."""
+
     def write(self, line):
         self.append(line)
 
@@ -136,7 +113,7 @@ class FlexGetLogger(logging.Logger):
             task=getattr(local_context, 'task', ''),
             session_id=getattr(local_context, 'session_id', ''))
         # Replace newlines in log messages with \n
-        if isinstance(msg, basestring):
+        if isinstance(msg, str):
             msg = msg.replace('\n', '\\n')
 
         return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra, *exargs)

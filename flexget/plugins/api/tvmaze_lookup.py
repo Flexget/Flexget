@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flask import jsonify
 from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.plugins.api_tvmaze import APITVMaze as tvm
+from flexget.plugins.internal.api_tvmaze import APITVMaze as tvm
 
 tvmaze_api = api.namespace('tvmaze', description='TVMaze Shows')
 
@@ -63,7 +63,6 @@ tvmaze_series_object = {
         'runtime': {'type': 'integer'},
         'show_type': {'type': 'string'},
         'network': {'type': 'string'},
-        'actors': {'type': 'array', 'items': actor_object},
         'last_update': {'type': 'string', 'format': 'date-time'}
     }
 }
@@ -91,14 +90,15 @@ tvmaze_series_schema = api.schema('tvmaze_series_schema', tvmaze_series_object)
 tvmaze_episode_schema = api.schema('tvmaze_episode_schema', tvmaze_episode_object)
 
 
-@tvmaze_api.route('/series/<string:search>/')
-@api.doc(params={'search': 'TV Show name or TVMaze ID'})
+@tvmaze_api.route('/series/<string:title>/')
+@api.doc(params={'title': 'TV Show name or TVMaze ID'})
 class TVDBSeriesSearchApi(APIResource):
+
     @api.response(200, 'Successfully found show', model=tvmaze_series_schema)
     @api.response(404, 'No show found', default_error_schema)
-    def get(self, search, session=None):
+    def get(self, title, session=None):
         try:
-            tvmaze_id = int(search)
+            tvmaze_id = int(title)
         except ValueError:
             tvmaze_id = None
 
@@ -106,7 +106,7 @@ class TVDBSeriesSearchApi(APIResource):
             if tvmaze_id:
                 result = tvm.series_lookup(tvmaze_id=tvmaze_id, session=session)
             else:
-                result = tvm.series_lookup(series_name=search, session=session)
+                result = tvm.series_lookup(series_name=title, session=session)
         except LookupError as e:
             return {'status': 'error',
                     'message': e.args[0]
@@ -125,6 +125,7 @@ episode_parser.add_argument('air_date', type=inputs.date_from_iso8601, help="Air
 @api.doc(params={'tvmaze_id': 'TVMaze ID of show'})
 @api.doc(parser=episode_parser)
 class TVDBEpisodeSearchAPI(APIResource):
+
     @api.response(200, 'Successfully found episode', tvmaze_episode_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.response(500, 'Not enough parameters for lookup', default_error_schema)

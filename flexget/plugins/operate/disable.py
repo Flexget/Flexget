@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -55,7 +55,7 @@ class DisablePlugin(object):
             # Disable plugins explicitly included in config.
             if p in task.config:
                 disabled.append(p)
-                del(task.config[p])
+                del (task.config[p])
             # Disable built-in plugins.
             if p in plugin.plugins and plugin.plugins[p].builtin:
                 plugin.plugins[p].builtin = False

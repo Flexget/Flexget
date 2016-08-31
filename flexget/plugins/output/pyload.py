@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import quote
 
 from logging import getLogger
@@ -16,6 +16,7 @@ log = getLogger('pyload')
 
 
 class PyloadApi(object):
+
     def __init__(self, requests, url):
         self.requests = requests
         self.url = url
@@ -90,23 +91,23 @@ class PluginPyLoad(object):
         'oneOf': [
             {'type': 'boolean'},
             {'type': 'object',
-                'properties': {
-                    'api': {'type': 'string'},
-                    'username': {'type': 'string'},
-                    'password': {'type': 'string'},
-                    'folder': {'type': 'string'},
-                    'package': {'type': 'string'},
-                    'package_password': {'type': 'string'},
-                    'queue': {'type': 'boolean'},
-                    'parse_url': {'type': 'boolean'},
-                    'multiple_hoster': {'type': 'boolean'},
-                    'hoster': one_or_more({'type': 'string'}),
-                    'preferred_hoster_only': {'type': 'boolean'},
-                    'handle_no_url_as_failure': {'type': 'boolean'},
-                    'enabled': {'type': 'boolean'},
+             'properties': {
+                 'api': {'type': 'string'},
+                 'username': {'type': 'string'},
+                 'password': {'type': 'string'},
+                 'folder': {'type': 'string'},
+                 'package': {'type': 'string'},
+                 'package_password': {'type': 'string'},
+                 'queue': {'type': 'boolean'},
+                 'parse_url': {'type': 'boolean'},
+                 'multiple_hoster': {'type': 'boolean'},
+                 'hoster': one_or_more({'type': 'string'}),
+                 'preferred_hoster_only': {'type': 'boolean'},
+                 'handle_no_url_as_failure': {'type': 'boolean'},
+                 'enabled': {'type': 'boolean'},
 
-                },
-                'additionalProperties': False
+             },
+             'additionalProperties': False
              }
         ]
     }
@@ -139,7 +140,7 @@ class PluginPyLoad(object):
         for entry in task.accepted:
             # bunch of urls now going to check
             content = entry.get('description', '') + ' ' + quote(entry['url'])
-            content = json.dumps(content.encode("utf8"))
+            content = json.dumps(content)
 
             url = json.dumps(entry['url']) if config.get('parse_url', self.DEFAULT_PARSE_URL) else "''"
 
@@ -213,7 +214,7 @@ class PluginPyLoad(object):
                     # set folder with api
                     data = json.dumps({'folder': folder})
                     api.query("setPackageData", {'pid': pid, 'data': data, 'session': session})
-                
+
                 # Set Package Password
                 package_password = config.get('package_password')
                 if package_password:

@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
-from past.builtins import basestring
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import hashlib
 import logging
@@ -11,7 +10,7 @@ import threading
 import cherrypy
 import safe
 from flask import Flask, abort, redirect
-from flask.ext.login import UserMixin
+from flask_login import UserMixin
 from sqlalchemy import Column, Integer, Unicode
 from werkzeug.security import generate_password_hash
 
@@ -63,7 +62,6 @@ def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEF
 
 @with_session
 def get_secret(session=None):
-    pass
     """ Generate a secret key for flask applications and store it in the database. """
     web_secret = session.query(WebSecret).first()
     if not web_secret:
@@ -75,10 +73,11 @@ def get_secret(session=None):
 
 
 class WeakPassword(Exception):
+
     def __init__(self, value, logger=log, **kwargs):
         super(WeakPassword, self).__init__()
         # Value is expected to be a string
-        if not isinstance(value, basestring):
+        if not isinstance(value, str):
             value = str(value)
         self.value = value
         self.log = logger
@@ -153,8 +152,8 @@ def setup_server(manager, session=None):
         return
 
     web_server = WebServer(
-            bind=web_server_config['bind'],
-            port=web_server_config['port'],
+        bind=web_server_config['bind'],
+        port=web_server_config['port'],
     )
 
     _default_app.secret_key = get_secret()
@@ -162,7 +161,7 @@ def setup_server(manager, session=None):
     user = get_user()
     if not user or not user.password:
         log.warning('No password set for web server, create one by using'
-                 ' `flexget web passwd <password>`')
+                    ' `flexget web passwd <password>`')
 
     if web_server.is_alive():
         web_server.stop()

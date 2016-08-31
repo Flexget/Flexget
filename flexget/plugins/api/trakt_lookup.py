@@ -3,51 +3,92 @@ from __future__ import unicode_literals, division, absolute_import
 import copy
 
 from flask import jsonify
+from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.plugins.api_trakt import ApiTrakt as at
+from flexget.plugins.internal.api_trakt import ApiTrakt as at, list_actors, get_translations
 
 trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 
 
 class objects_container(object):
-    actor_object = {
-        'type': 'object',
-        'properties': {
-            "imdb_id": {'type': 'string'},
-            "name": {'type': 'string'},
-            "tmdb_id": {'type': 'integer'},
-            "trakt_id": {'type': 'integer'},
+    internal_image_object = {
+        "type": "object",
+        "properties": {
+            "full": {"type": ["string", "null"]},
+            "medium": {"type": ["string", "null"]},
+            "thumb": {"type": ["string", "null"]}
         }
     }
+
+    images_object = {
+        "type": "object",
+        "properties": {
+            "banner": internal_image_object,
+            "clearart": internal_image_object,
+            "fanart": internal_image_object,
+            "logo": internal_image_object,
+            "poster": internal_image_object
+        }}
+
+    translation_object = {
+        'type': 'object',
+        'patternProperties': {
+            "^[/d]$": {'type': 'object',
+                       'properties': {
+                           "overview": {'type': 'string'},
+                           "tagline": {'type': 'string'},
+                           "title": {'type': 'string'},
+                       }}
+        }
+    }
+
+    actor_object = {
+        "type": "object",
+        "patternProperties": {
+            "^[/d]$": {
+                'type': 'object',
+                'properties': {
+                    "imdb_id": {'type': 'string'},
+                    "name": {'type': 'string'},
+                    "tmdb_id": {'type': 'integer'},
+                    "trakt_id": {'type': 'integer'},
+                    "images": images_object,
+                    "trakt_slug": {'type': 'string'},
+                    "birthday": {'type': 'string'},
+                    "biography": {'type': ['string', 'null']},
+                    "homepage": {'type': 'string'},
+                    "death": {'type': ['string', 'null']}
+                }
+            }}}
 
     base_return_object = {
         'type': 'object',
         'properties': {
-            'actors': {'type': 'array', 'items': actor_object},
+            'translations': translation_object,
+            'actors': actor_object,
             'cached_at': {'type': 'string', 'format': 'date-time'},
-            'genres': {'type': 'array', 'items': 'string'},
+            'genres': {'type': 'array', 'items': {'type': 'string'}},
             'id': {'type': 'integer'},
-            "overview": {'type': 'string'},
-            "poster": {'type': 'string'},
-            "runtime": {'type': 'integer'},
-            "rating": {'type': 'number'},
-            "votes": {'type': 'integer'},
-            "language": {'type': 'string'},
+            "overview": {'type': ['string', 'null']},
+            "runtime": {'type': ['integer', 'null']},
+            "rating": {'type': ['number', 'null']},
+            "votes": {'type': ['integer', 'null']},
+            "language": {'type': ['string', 'null']},
             "updated_at": {'type': 'string', 'format': 'date-time'},
-
+            "images": images_object
         }
     }
 
     series_return_object = copy.deepcopy(base_return_object)
-    series_return_object['properties']['tvdb_id'] = {'type': 'integer'}
-    series_return_object['properties']['tvrage_id'] = {'type': 'integer'}
-    series_return_object['properties']['first_aired'] = {'type': 'string', 'format': 'date-time'}
-    series_return_object['properties']['air_day'] = {'type': 'string'}
-    series_return_object['properties']['air_time'] = {'type': 'string'}
-    series_return_object['properties']['certification'] = {'type': 'string'}
-    series_return_object['properties']['network'] = {'type': 'string'}
-    series_return_object['properties']['country'] = {'type': 'string'}
+    series_return_object['properties']['tvdb_id'] = {'type': ['integer', 'null']}
+    series_return_object['properties']['tvrage_id'] = {'type': ['integer', 'null']}
+    series_return_object['properties']['first_aired'] = {'type': ['string', 'null'], 'format': 'date-time'}
+    series_return_object['properties']['air_day'] = {'type': ['string', 'null']}
+    series_return_object['properties']['air_time'] = {'type': ['string', 'null']}
+    series_return_object['properties']['certification'] = {'type': ['string', "null"]}
+    series_return_object['properties']['network'] = {'type': ['string', 'null']}
+    series_return_object['properties']['country'] = {'type': ['string', 'null']}
     series_return_object['properties']['status'] = {'type': 'string'}
     series_return_object['properties']['aired_episodes'] = {'type': 'integer'}
 
@@ -69,7 +110,6 @@ series_return_schema = api.schema('series_return_schema', objects_container.seri
 movie_return_schema = api.schema('movie_return_schema', objects_container.movie_return_object)
 
 lookup_parser = api.parser()
-lookup_parser.add_argument('title', required=True, help='Lookup title')
 lookup_parser.add_argument('year', type=int, help='Lookup year')
 lookup_parser.add_argument('trakt_id', type=int, help='Trakt ID')
 lookup_parser.add_argument('trakt_slug', help='Trakt slug')
@@ -77,37 +117,57 @@ lookup_parser.add_argument('tmdb_id', type=int, help='TMDB ID')
 lookup_parser.add_argument('imdb_id', help='IMDB ID')
 lookup_parser.add_argument('tvdb_id', type=int, help='TVDB ID')
 lookup_parser.add_argument('tvrage_id', type=int, help='TVRage ID')
+lookup_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
+lookup_parser.add_argument('include_translations', type=inputs.boolean, help='Include translations in response')
 
 
-@trakt_api.route('/series/')
+@trakt_api.route('/series/<string:title>/')
+@api.doc(params={'title': 'Series name'})
 class TraktSeriesSearchApi(APIResource):
     @api.response(200, 'Successfully found show', series_return_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.doc(parser=lookup_parser)
-    def get(self, session=None):
+    def get(self, title, session=None):
         args = lookup_parser.parse_args()
+        include_actors = args.pop('include_actors')
+        include_translations = args.pop('include_translations')
+        kwargs = args
+        kwargs['title'] = title
         try:
-            result = at.lookup_series(session=session, **args)
+            series = at.lookup_series(session=session, **kwargs)
         except LookupError as e:
             return {'status': 'error',
                     'message': e.args[0]
                     }, 404
+        result = series.to_dict()
+        if include_actors:
+            result["actors"] = list_actors(series.actors)
+        if include_translations:
+            result["translations"] = get_translations(series.translate)
+        return jsonify(result)
 
-        return jsonify(result.to_dict())
 
-
-@trakt_api.route('/movie/')
-class TraktSeriesSearchApi(APIResource):
+@trakt_api.route('/movies/<string:title>/')
+@api.doc(params={'title': 'Movie name'})
+class TraktMovieSearchApi(APIResource):
     @api.response(200, 'Successfully found show', movie_return_schema)
     @api.response(404, 'No show found', default_error_schema)
     @api.doc(parser=lookup_parser)
-    def get(self, session=None):
+    def get(self, title, session=None):
         args = lookup_parser.parse_args()
+        include_actors = args.pop('include_actors')
+        include_translations = args.pop('include_translations')
+        kwargs = args
+        kwargs['title'] = title
         try:
-            result = at.lookup_movie(session=session, **args)
+            movie = at.lookup_movie(session=session, **kwargs)
         except LookupError as e:
             return {'status': 'error',
                     'message': e.args[0]
                     }, 404
-
-        return jsonify(result.to_dict())
+        result = movie.to_dict()
+        if include_actors:
+            result["actors"] = list_actors(movie.actors)
+        if include_translations:
+            result["translations"] = get_translations(movie.translate)
+        return jsonify(result)

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import codecs
 import logging
@@ -7,7 +7,7 @@ import yaml
 
 from flexget import options
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 
 log = logging.getLogger('check')
 
@@ -79,9 +79,9 @@ def pre_check_config(config_path):
                 # print 'list open at line %s' % line
                 continue
 
-            # print '#%i: %s' % (line_num, line)
-            # print 'indentation: %s, prev_ind: %s, prev_mapping: %s, prev_list: %s, cur_list: %s' % \
-            #        (indentation, prev_indentation, prev_mapping, prev_list, cur_list)
+                # print '#%i: %s' % (line_num, line)
+                # print 'indentation: %s, prev_ind: %s, prev_mapping: %s, prev_list: %s, cur_list: %s' % \
+                #        (indentation, prev_indentation, prev_mapping, prev_list, cur_list)
 
         if ':\t' in line:
             log.critical('Line %s has TAB character after : character. '
@@ -116,7 +116,7 @@ def pre_check_config(config_path):
             ns = duplicates.setdefault(indentation, {})
             if name in ns:
                 log.warning('Trying to set value for `%s` in line %s, but it is already defined in line %s!' %
-                    (name, line_num, ns[name]))
+                            (name, line_num, ns[name]))
             ns[name] = line_num
 
         prev_indentation = indentation

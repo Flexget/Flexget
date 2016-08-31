@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 
 from flexget import plugin
@@ -100,7 +100,7 @@ class TorrentScrub(object):
                 new_infohash = entry["torrent"].info_hash
                 if infohash != new_infohash:
                     log.warning("Info hash changed from #%s to #%s in '%s'" %
-                             (infohash, new_infohash, entry['filename']))
+                                (infohash, new_infohash, entry['filename']))
 
 
 @event('plugin.register')

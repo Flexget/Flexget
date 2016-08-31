@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -28,7 +28,7 @@ class FilterRequireField(object):
             config = [config]
         for entry in task.entries:
             for field in config:
-                if not entry.get(field):
+                if field not in entry:
                     entry.reject('Required field %s is not present' % field)
                     break
 

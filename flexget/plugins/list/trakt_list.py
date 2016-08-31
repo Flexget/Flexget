@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -8,7 +8,7 @@ from collections import MutableSet
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugins.api_trakt import get_api_url, get_entry_ids, get_session, make_list_slug
+from flexget.plugins.internal.api_trakt import get_api_url, get_entry_ids, get_session, make_list_slug
 from flexget.utils import json
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException, TimedLimiter
@@ -56,6 +56,7 @@ field_maps = {
 
 
 class TraktSet(MutableSet):
+
     @property
     def immutable(self):
         if self.config['list'] in IMMUTABLE_LISTS:
@@ -105,22 +106,28 @@ class TraktSet(MutableSet):
         # Optimization to submit multiple entries at same time
         self.submit(entries, remove=True)
 
-    def __contains__(self, entry):
+    def _find_entry(self, entry):
         for item in self.items:
             if self.config['type'] in ['episodes', 'auto'] and self.episode_match(entry, item):
-                return True
+                return item
             if self.config['type'] in ['seasons', 'auto'] and self.season_match(entry, item):
-                return True
+                return item
             if self.config['type'] in ['shows', 'auto'] and self.show_match(entry, item):
-                return True
+                return item
             if self.config['type'] in ['movies', 'auto'] and self.movie_match(entry, item):
-                return True
+                return item
+
+    def __contains__(self, entry):
+        return self._find_entry(entry) is not None
 
     def clear(self):
         if self.items:
             for item in self.items:
                 self.discard(item)
             self._items = None
+
+    def get(self, entry):
+        return self._find_entry(entry)
 
     # -- Public interface ends here -- #
 
@@ -194,8 +201,10 @@ class TraktSet(MutableSet):
                 raise plugin.PluginError('`type` cannot be `auto` for ratings lists.')
             endpoint += ('ratings', self.config['type'], self.config['list']['rating'])
         elif self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
-            if self.config['type'] == 'auto':
-                raise plugin.PluginError('`type` cannot be `auto` for %s list.' % self.config['list'])
+            if self.config['type'] == 'auto' or (self.config['list'] == 'collection' and
+                                                 self.config['type'] == 'episodes'):
+                raise plugin.PluginError('`type` cannot be `%s` for %s list.' % (self.config['type'],
+                                                                                 self.config['list']))
             endpoint += (self.config['list'], self.config['type'])
         else:
             endpoint += ('lists', make_list_slug(self.config['list']), 'items')
@@ -208,7 +217,7 @@ class TraktSet(MutableSet):
         return False
 
     def season_match(self, entry1, entry2):
-        return (self.series_match(entry1, entry2) and entry1.get('series_season') is not None and
+        return (self.show_match(entry1, entry2) and entry1.get('series_season') is not None and
                 entry1['series_season'] == entry2.get('series_season'))
 
     def episode_match(self, entry1, entry2):
@@ -220,7 +229,7 @@ class TraktSet(MutableSet):
                ['trakt_movie_id', 'imdb_id', 'tmdb_id']):
             return True
         if entry1.get('movie_name') and ((entry1.get('movie_name'), entry1.get('movie_year')) ==
-                                             (entry2.get('movie_name'), entry2.get('movie_year'))):
+                                         (entry2.get('movie_name'), entry2.get('movie_year'))):
             return True
         return False
 
@@ -228,22 +237,33 @@ class TraktSet(MutableSet):
         """Submits movies or episodes to trakt api."""
         found = {}
         for entry in entries:
-            if self.config['type'] in ['auto', 'shows', 'seasons', 'episodes'] and entry.get('series_name') is not None:
+            if self.config['type'] in ['auto', 'episodes'] and (
+                entry.get('trakt_episode_id') or
+                entry.get('tvdb_id') or
+                entry.get('imdb_id') or
+                entry.get('tmdb_id') or
+                entry.get('tvrage_id')
+            ):
+                episode = {'ids': {}}
+                if entry.get('trakt_episode_id'):
+                    episode['ids']['trakt'] = entry['trakt_episode_id']
+                if entry.get('tvdb_id'):
+                    episode['ids']['tvdb'] = entry['tvdb_id']
+                if entry.get('imdb_id'):
+                    episode['ids']['imdb'] = entry['imdb_id']
+                if entry.get('tmdb_id'):
+                    episode['ids']['tmdb'] = entry['tmdb_id']
+                if entry.get('tvrage_id'):
+                    episode['ids']['tvrage'] = entry['tvrage_id']
+                if not episode['ids']:
+                    log.debug('Not submitting `%s`, no episode identifier found.' % entry['title'])
+                    continue
+                found.setdefault('episodes', []).append(episode)
+            elif self.config['type'] in ['auto', 'shows', 'seasons'] and entry.get('series_name') is not None:
                 show_name, show_year = split_title_year(entry['series_name'])
                 show = {'title': show_name, 'ids': get_entry_ids(entry)}
                 if show_year:
                     show['year'] = show_year
-                if self.config['type'] in ['auto', 'seasons', 'episodes'] and entry.get('series_season') is not None:
-                    season = {'number': entry['series_season']}
-                    if self.config['type'] in ['auto', 'episodes'] and entry.get('series_episode') is not None:
-                        season['episodes'] = [{'number': entry['series_episode']}]
-                    show['seasons'] = [season]
-                if self.config['type'] in ['seasons', 'episodes'] and 'seasons' not in show:
-                    log.debug('Not submitting `%s`, no season found.' % entry['title'])
-                    continue
-                if self.config['type'] == 'episodes' and 'episodes' not in show:
-                    log.debug('Not submitting `%s`, no episode number found.' % entry['title'])
-                    continue
                 found.setdefault('shows', []).append(show)
             elif self.config['type'] in ['auto', 'movies']:
                 movie = {'ids': get_entry_ids(entry)}
@@ -256,7 +276,7 @@ class TraktSet(MutableSet):
                         continue
                 found.setdefault('movies', []).append(movie)
 
-        if not (found.get('shows') or found.get('movies')):
+        if not (found.get('episodes') or found.get('shows') or found.get('movies')):
             log.debug('Nothing to submit to trakt.')
             return
 
@@ -316,34 +336,6 @@ class TraktList(object):
         return list(TraktSet(config))
 
 
-class TraktAdd(object):
-    """Add all accepted elements in your trakt.tv watchlist/library/seen or custom list."""
-    schema = dict(TraktList.schema, deprecated='trakt_add is deprecated, use list_add instead')
-
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
-        if task.manager.options.test:
-            log.info('Not submitting to trakt.tv because of test mode.')
-            return
-        thelist = TraktSet(config)
-        thelist |= task.accepted
-
-
-class TraktRemove(object):
-    """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
-    schema = dict(TraktList.schema, deprecated='trakt_remove is deprecated, use list_remove instead')
-
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
-        if task.manager.options.test:
-            log.info('Not submitting to trakt.tv because of test mode.')
-            return
-        thelist = TraktSet(config)
-        thelist -= task.accepted
-
-
 @event('plugin.register')
 def register_plugin():
     plugin.register(TraktList, 'trakt_list', api_ver=2, groups=['list'])
-    plugin.register(TraktAdd, 'trakt_add', api_ver=2)
-    plugin.register(TraktRemove, 'trakt_remove', api_ver=2)

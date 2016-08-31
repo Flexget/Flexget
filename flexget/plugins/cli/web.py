@@ -1,16 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 from flexget.utils.database import with_session
 from flexget.webserver import change_password, generate_token, WeakPassword, get_user
 
 
 @with_session
 def do_cli(manager, options, session=None):
-
     if options.action == 'passwd':
         try:
             change_password(password=options.password, session=session)

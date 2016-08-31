@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -9,10 +9,10 @@ from flexget.event import event
 from flexget.utils.log import log_once
 
 try:
-    from flexget.plugins.api_rottentomatoes import lookup_movie, API_KEY
+    from flexget.plugins.internal.api_rottentomatoes import lookup_movie, API_KEY
 except ImportError:
     raise plugin.DependencyError(issued_by='rottentomatoes_lookup', missing='api_rottentomatoes',
-                          message='rottentomatoes_lookup requires the `api_rottentomatoes` plugin')
+                                 message='rottentomatoes_lookup requires the `api_rottentomatoes` plugin')
 
 log = logging.getLogger('rottentomatoes_lookup')
 
@@ -40,7 +40,7 @@ class PluginRottenTomatoesLookup(object):
         'rt_runtime': 'runtime',
         'rt_critics_consensus': 'critics_consensus',
         'rt_releases': lambda movie: dict((release.name, release.date) for
-            release in movie.release_dates),
+                                          release in movie.release_dates),
         'rt_critics_rating': 'critics_rating',
         'rt_critics_score': 'critics_score',
         'rt_audience_rating': 'audience_rating',
@@ -52,7 +52,7 @@ class PluginRottenTomatoesLookup(object):
         'rt_directors': lambda movie: [director.name for director in movie.directors],
         'rt_studio': 'studio',
         'rt_alternate_ids': lambda movie: dict((alt_id.name, alt_id.id)
-            for alt_id in movie.alternate_ids),
+                                               for alt_id in movie.alternate_ids),
         'rt_url': get_rt_url,
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'title',
@@ -97,7 +97,7 @@ class PluginRottenTomatoesLookup(object):
                              )
         log.debug(u'Got movie: %s' % movie)
         entry.update_using_map(self.field_map, movie)
-        
+
         if not entry.get('imdb_id', eval_lazy=False):
             for alt_id in movie.alternate_ids:
                 if alt_id.name == 'imdb':

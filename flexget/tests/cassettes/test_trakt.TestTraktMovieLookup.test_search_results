@@ -1,0 +1,92 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/search?query=harry+potter+and+the+philosopher%27s+stone&type=movie
+    response:
+      body: {string: '[{"type":"movie","score":89.6801,"movie":{"title":"Harry Potter
+          and the Philosopher''s Stone","overview":"Harry Potter has lived under the
+          stairs at his aunt and uncle''s house his whole life. But on his 11th birthday,
+          he learns he''s a powerful wizard -- with a place waiting for him at the
+          Hogwarts School of Witchcraft and Wizardry. As he learns to harness his
+          newfound powers with the help of the school''s kindly headmaster, Harry
+          uncovers the truth about his parents'' deaths -- and about the villain who''s
+          to blame.","year":2001,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/545/posters/original/c8779ab3c4.jpg","medium":"https://walter.trakt.us/images/movies/000/000/545/posters/medium/c8779ab3c4.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/545/posters/thumb/c8779ab3c4.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/545/fanarts/original/8446d03b80.jpg","medium":"https://walter.trakt.us/images/movies/000/000/545/fanarts/medium/8446d03b80.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/545/fanarts/thumb/8446d03b80.jpg"}},"ids":{"trakt":545,"slug":"harry-potter-and-the-philosopher-s-stone-2001","imdb":"tt0241527","tmdb":671}}},{"type":"movie","score":2.354529,"movie":{"title":"Magic
+          Beyond Words: The JK Rowling Story","overview":"Magic Beyond Words: The
+          J.K. Rowling Story is a made-for-TV film starring Australian actress Poppy
+          Montgomery. The film, which was shot in B.C. Canada locations altered to
+          look like British locations, details the journey of struggling single mother
+          J. K. Rowling, her bid to become a published author, and her rise to fame
+          that followed the publication of Harry Potter and the Philosopher''s Stone.
+          The film aired on Lifetime on July 18th and was criticized for being too
+          lacklustre (mainly down to the fiercely private author having no say in
+          the production) but it also shed some light on her personal life and featured
+          scenes such as her highly abusive first husband and the death of her mother.
+          The eponymous J.K. Rowling is the world''s first billionaire (in terms of
+          US dollars) author and the films inspired by her books have been the highest
+          grossing films of all time.  Poppy Montgomery reportedly got blue contact
+          lenses to play the role of the highly influential author.","year":2011,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/059/971/posters/original/d5c52dbee5.jpg","medium":"https://walter.trakt.us/images/movies/000/059/971/posters/medium/d5c52dbee5.jpg","thumb":"https://walter.trakt.us/images/movies/000/059/971/posters/thumb/d5c52dbee5.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/059/971/fanarts/original/7505ef5301.jpg","medium":"https://walter.trakt.us/images/movies/000/059/971/fanarts/medium/7505ef5301.jpg","thumb":"https://walter.trakt.us/images/movies/000/059/971/fanarts/thumb/7505ef5301.jpg"}},"ids":{"trakt":59971,"slug":"magic-beyond-words-the-jk-rowling-story-2011","imdb":"tt1979269","tmdb":80530}}}]'}
+      headers:
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de23997d502635-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:33 GMT']
+        ETag: [W/"b05ab207d59c16b16b3414ba37996ef8"]
+        Expires: ['Wed, 04 May 2016 22:50:33 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=da6065994792f9a7e10cc117ab31bff981462387833; expires=Thu,
+            04-May-17 18:50:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Pagination-Item-Count: ['2']
+        X-Pagination-Limit: ['10']
+        X-Pagination-Page: ['1']
+        X-Pagination-Page-Count: ['1']
+        X-Request-Id: [601043c8-42c1-4c90-b81c-42610510743f]
+        X-Runtime: ['0.026725']
+        X-XSS-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        Cookie: [__cfduid=da6065994792f9a7e10cc117ab31bff981462387833]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/movies/545?extended=full%2Cimages
+    response:
+      body: {string: '{"title":"Harry Potter and the Philosopher''s Stone","year":2001,"ids":{"trakt":545,"slug":"harry-potter-and-the-philosopher-s-stone-2001","imdb":"tt0241527","tmdb":671},"tagline":"Let
+          the Magic Begin.","overview":"Harry Potter has lived under the stairs at
+          his aunt and uncle''s house his whole life. But on his 11th birthday, he
+          learns he''s a powerful wizard -- with a place waiting for him at the Hogwarts
+          School of Witchcraft and Wizardry. As he learns to harness his newfound
+          powers with the help of the school''s kindly headmaster, Harry uncovers
+          the truth about his parents'' deaths -- and about the villain who''s to
+          blame.","released":"2001-11-16","runtime":152,"trailer":"http://youtube.com/watch?v=qPvlb6eXzMA","homepage":"http://harrypotter.warnerbros.com/harrypotterandthedeathlyhallows/mainsite/index.html","rating":7.92266,"votes":11288,"updated_at":"2016-04-25T11:53:11.000Z","language":"en","available_translations":["en","de","it","fr","nl","hu","sk","pt","ru","sv","cs","zh","tr","es","fa","fi","el","da","pl","th","he","sr","ja","no","et","ko","lv","ro"],"genres":["adventure","fantasy","family"],"certification":"","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/545/fanarts/original/8446d03b80.jpg","medium":"https://walter.trakt.us/images/movies/000/000/545/fanarts/medium/8446d03b80.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/545/fanarts/thumb/8446d03b80.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/545/posters/original/c8779ab3c4.jpg","medium":"https://walter.trakt.us/images/movies/000/000/545/posters/medium/c8779ab3c4.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/545/posters/thumb/c8779ab3c4.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/545/logos/original/5cd563176f.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/545/cleararts/original/9f8a6c427c.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/545/banners/original/cd12f8041e.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/545/thumbs/original/fb21cb2584.jpg"}}}'}
+      headers:
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de2399cd582635-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:33 GMT']
+        ETag: [W/"574845f9757cb7dd5556833ca3d6d7f6"]
+        Expires: ['Wed, 04 May 2016 22:50:33 GMT']
+        Last-Modified: ['Mon, 25 Apr 2016 11:53:11 GMT']
+        Server: [cloudflare-nginx]
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [c22931bb-e6c5-4793-a7b0-c6025b0a6797]
+        X-Runtime: ['0.055695']
+        X-XSS-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1

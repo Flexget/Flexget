@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import smtplib
@@ -7,7 +7,6 @@ import socket
 import sys
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from smtplib import SMTPException
 from email.utils import formatdate
 
 from flexget import config_schema, manager, plugin
@@ -99,10 +98,7 @@ def send_email(subject, content, config):
                     mailServer.ehlo()
                     mailServer.starttls()
                     mailServer.ehlo()
-        except socket.error as e:
-            log.warning('Socket error: %s' % e)
-            return
-        except SMTPException as e:
+        except (socket.error, OSError) as e:
             # Ticket #1133
             log.warning('Unable to send email: %s' % e)
             return
@@ -117,15 +113,11 @@ def send_email(subject, content, config):
             # Ticket #686
             log.warning('Unable to send email! IOError: %s' % e)
             return
-        except SMTPException as e:
-            log.warning('Unable to send email! SMTPException: %s' % e)
-            return
 
         mailServer.quit()
 
 
 class OutputEmail(object):
-
     """
     Send an e-mail with the list of all succeeded (downloaded) entries.
 

@@ -1,15 +1,25 @@
-<div layout="column" flex>
-	<md-toolbar class="md-accent">
-		<span class="md-toolbar-tools" flex>
-			Please note that performed operations on this page might not be persistent. Depending on your config, settings might get overriden and data might be recreated.
-		</span>
+<div layout="column">
+	<md-toolbar class="md-warn">
+    	<span class="md-toolbar-tools" flex>
+    	Please note that performed operations on this page might not be persistent. Depending on your config, settings might get overriden and data might be recreated.
+    </span>
 	</md-toolbar>
-    <md-input-container>
-            <label>Search</label>
-            <input ng-model="vm.searchTerm" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }">
-        </md-input-container>
-    <md-content layout="row" layout-wrap>
-        <series-show layout="row" show="show" flex="100" flex-gt-md="50" forget-show="vm.forgetShow(show)" ng-repeat="show in vm.series"></series-show>
-    </md-content>
-    <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalShows" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
+	<md-content layout="column" flex layout-margin>
+		<md-input-container>
+			<label>Search</label>
+			<input ng-model="vm.searchTerm" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }">
+		</md-input-container>
+		<div layout="row" layout-wrap layout-padding>
+			<series-entry show="show" 
+				forget-show="vm.forgetShow(show)" 
+				toggle-episodes="vm.toggleEpisodes(show)"
+				layout="row" flex="100" flex-gt-md="50" flex-gt-lg="33" ng-repeat-start="show in vm.series">
+				<span class="show-indicator" ng-if="show == vm.selectedShow"></span>
+			</series-entry>
+			<series-episodes-view ng-repeat-end ng-if="vm.areEpisodesOnShowRow($index)" show="vm.selectedShow" class="series-episodes">
+				<md-button class="md-fab md-mini hide-episodes-button" ng-click="vm.toggleEpisodes(show)" aria-label="hide the episodes"><i class="fa fa-times" aria-hidden="true"></i></md-button>
+			</series-episodes-view>
+		</div>
+	</md-content>
+	<fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalShows" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
 </div>

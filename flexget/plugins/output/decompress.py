@@ -1,26 +1,81 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import os
 import re
-import shutil
-import zipfile
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import render_from_entry, RenderError
-
-try:
-    import rarfile
-except ImportError:
-    rarfile = None
+from flexget.utils import archive
 
 log = logging.getLogger('decompress')
 
 
-class Decompress(object):
+def fail_entry_with_error(entry, error):
     """
+    Log error message at error level and fail the entry
+    """
+    log.error(error)
+    entry.fail(error)
+
+
+def open_archive_entry(entry):
+    """
+    Convenience method for opening archives from entries. Returns an archive.Archive object
+    """
+    arch = None
+
+    try:
+        archive_path = entry['location']
+        arch = archive.open_archive(archive_path)
+    except KeyError:
+        log.error('Entry does not appear to represent a local file.')
+    except archive.BadArchive as error:
+        fail_entry_with_error(entry, 'Bad archive: %s (%s)' % (archive_path, error))
+    except archive.NeedFirstVolume:
+        log.error('Not the first volume: %s', archive_path)
+    except archive.ArchiveError as error:
+        fail_entry_with_error(entry, 'Failed to open Archive: %s (%s)' % (archive_path, error))
+
+    return arch
+
+
+def get_destination_path(path, to, keep_dirs):
+    """
+    Generate the destination path for a given file
+    """
+    filename = os.path.basename(path)
+
+    if keep_dirs:
+        path_suffix = path
+    else:
+        path_suffix = filename
+
+    return os.path.join(to, path_suffix)
+
+
+def is_dir(info):
+    """
+    Tests whether the file descibed in info is a directory
+    """
+
+    if hasattr(info, 'isdir'):
+        return info.isdir()
+    else:
+        base = os.path.basename(info.filename)
+        return not base
+
+
+def makepath(path):
+    if not os.path.exists(path):
+        log.debug('Creating path: %s', path)
+        os.makedirs(path)
+
+
+class Decompress(object):
+    r"""
     Extracts files from Zip or RAR archives. By default this plugin will extract to the same
     directory as the source archive, preserving directory structure from the archive.
 
@@ -70,48 +125,6 @@ class Decompress(object):
         ]
     }
 
-    def open_archive(self, entry):
-        """
-        Returns the appropriate archive
-        """
-
-        archive_path = entry['location']
-
-        archive = None
-
-        if zipfile.is_zipfile(archive_path):
-            try:
-                archive = zipfile.ZipFile(file=archive_path)
-                log.debug('Successfully opened ZIP: %s', archive_path)
-            except zipfile.BadZipfile:
-                error_message = 'Bad ZIP file: %s' % archive_path
-                log.error(error_message)
-                entry.fail(error_message)
-            except Exception as error:
-                error_message = 'Failed to open ZIP: %s (%s)' % (archive_path, error)
-                log.error(error_message)
-                entry.fail(error_message)
-        elif rarfile and rarfile.is_rarfile(archive_path):
-            try:
-                archive = rarfile.RarFile(rarfile=archive_path)
-                log.debug('Successfully opened RAR: %s', archive_path)
-            except rarfile.BadRarFile:
-                error_message = 'Bad RAR file: %s' % archive_path
-                log.error(error_message)
-                entry.fail(error_message)
-            except rarfile.NeedFirstVolume:
-                log.error('Not the first volume: %s', archive_path)
-            except Exception as error:
-                error_message = 'Failed to open RAR: %s (%s)' % (archive_path, error)
-                log.error(error_message)
-                entry.fail(error_message)
-        else:
-            if not rarfile:
-                log.warning('Rarfile module not installed; unable to extract RAR archives.')
-            log.error('Can\'t open file: %s', archive_path)
-
-        return archive
-
     def prepare_config(self, config):
         """
         Prepare config for processing
@@ -135,17 +148,6 @@ class Decompress(object):
 
         return config
 
-    def is_dir(self, info):
-        """
-        Tests whether the file descibed in info is a directory
-        """
-
-        if hasattr(info, 'isdir'):
-            return info.isdir()
-        else:
-            base = os.path.basename(info.filename)
-            return not base
-
     def handle_entry(self, entry, config):
         """
         Extract matching files into the directory specified
@@ -156,103 +158,77 @@ class Decompress(object):
         match = re.compile(config['regexp'], re.IGNORECASE).match
         archive_path = entry.get('location')
         if not archive_path:
-            log.warning('Entry does not appear to represent a local file, decompress plugin only supports local files')
+            log.warning('Entry does not appear to represent a local file.')
             return
         archive_dir = os.path.dirname(archive_path)
-        archive_file = os.path.basename(archive_path)
 
         if not os.path.exists(archive_path):
             log.warning('File no longer exists: %s', archive_path)
             return
 
-        archive = self.open_archive(entry)
+        arch = open_archive_entry(entry)
 
-        if not archive:
+        if not arch:
             return
 
         to = config['to']
         if to:
             try:
                 to = render_from_entry(to, entry)
-            except RenderError as e:
+            except RenderError as error:
                 log.error('Could not render path: %s', to)
-                entry.fail(e)
+                entry.fail(error)
                 return
         else:
             to = archive_dir
 
-        for info in archive.infolist():
-            path = info.filename
-            filename = os.path.basename(path)
-
-            if self.is_dir(info):
-                log.debug('Appears to be a directory: %s', path)
-                continue
-
-            if not match(path):
-                log.debug('File did not match regexp: %s', path)
-                continue
-
-            log.debug('Found matching file: %s', path)
-
-            if config['keep_dirs']:
-                path_suffix = path
-            else:
-                path_suffix = filename
-            destination = os.path.join(to, path_suffix)
+        for info in arch.infolist():
+            destination = get_destination_path(info.filename, to, config['keep_dirs'])
             dest_dir = os.path.dirname(destination)
+            arch_file = os.path.basename(info.filename)
 
-            if not os.path.exists(dest_dir):
-                log.debug('Creating path: %s', dest_dir)
-                os.makedirs(dest_dir)
+            if is_dir(info):
+                log.debug('Appears to be a directory: %s', info.filename)
+                continue
 
-            if not os.path.exists(destination):
-                success = False
-                error_message = ''
-                source = None
+            if not match(arch_file):
+                log.debug('File did not match regexp: %s', arch_file)
+                continue
 
-                log.debug('Attempting to extract: %s to %s', path, destination)
-                try:
-                    # python 2.6 doesn't seem to like "with" in conjuntion with ZipFile.open
-                    source = archive.open(path)
-                    with open(destination, 'wb') as target:
-                        shutil.copyfileobj(source, target)
+            log.debug('Found matching file: %s', info.filename)
 
-                    log.verbose('Extracted: %s', path)
-                    success = True
-                except (IOError, os.error) as error:
-                    error_message = 'OS error while creating file: %s (%s)' % (destination, error)
-                except (zipfile.BadZipfile, rarfile.Error) as error:
-                    error_message = 'Failed to extract file: %s in %s (%s)' % (path, archive_path, error)
-                finally:
-                    if source and not source.closed:
-                        source.close()
+            log.debug('Creating path: %s', dest_dir)
+            makepath(dest_dir)
 
-                if not success:
-                    log.error(error_message)
-                    entry.fail(error_message)
-
-                    if os.path.exists(destination):
-                        log.debug('Cleaning up partially extracted file: %s', destination)
-                    return
-            else:
+            if os.path.exists(destination):
                 log.verbose('File already exists: %s', destination)
+                continue
+
+            error_message = ''
+
+            log.debug('Attempting to extract: %s to %s', arch_file, destination)
+            try:
+                arch.extract_file(info, destination)
+            except archive.FSError as error:
+                error_message = 'OS error while creating file: %s (%s)' % (destination, error)
+            except archive.ArchiveError as error:
+                error_message = 'Failed to extract file: %s in %s (%s)' % (info.filename,
+                                                                           archive_path, error)
+
+            if error_message:
+                log.error(error_message)
+                entry.fail(entry)
+
+                if os.path.exists(destination):
+                    log.debug('Cleaning up partially extracted file: %s', destination)
+                    os.remove(destination)
+
+                return
 
         if config['delete_archive']:
-            if hasattr(archive, 'volumelist'):
-                volumes = archive.volumelist()
-            else:
-                volumes = [archive_path]
-
-            archive.close()
-
-            for volume in volumes:
-                log.debug('Deleting volume: %s', volume)
-                os.remove(volume)
-
-            log.verbose('Deleted archive: %s', archive_file)
+            arch.delete()
         else:
-            archive.close()
+            arch.close()
 
     @plugin.priority(255)
     def on_task_output(self, task, config):
@@ -261,19 +237,9 @@ class Decompress(object):
             return
 
         config = self.prepare_config(config)
+        archive.rarfile_set_tool_path(config)
 
-        # Set the path of the unrar tool if it's not specified in PATH
-        unrar_tool = config['unrar_tool']
-
-        if rarfile:
-            rarfile.PATH_SEP = os.path.sep
-
-        if unrar_tool:
-            if not rarfile:
-                raise log.warning('rarfile Python module is not installed.')
-            else:
-                rarfile.UNRAR_TOOL = unrar_tool
-                log.debug('Set RarFile.unrar_tool to: %s', unrar_tool)
+        archive.rarfile_set_path_sep(os.path.sep)
 
         for entry in task.accepted:
             self.handle_entry(entry, config)

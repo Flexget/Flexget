@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 from sys import maxsize
@@ -12,7 +12,6 @@ log = logging.getLogger('content_size')
 
 
 class FilterContentSize(object):
-
     schema = {
         'type': 'object',
         'properties': {

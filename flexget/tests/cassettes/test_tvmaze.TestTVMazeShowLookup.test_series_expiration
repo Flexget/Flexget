@@ -1,0 +1,84 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=Shameless
+  response:
+    body: {string: !!python/unicode '{"id":150,"url":"http://www.tvmaze.com/shows/150/shameless","name":"Shameless","type":"Scripted","language":"English","genres":["Drama","Comedy"],"status":"Running","runtime":60,"premiered":"2011-01-09","schedule":{"time":"21:00","days":["Sunday"]},"rating":{"average":8.8},"weight":2,"network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":25117,"thetvdb":161511,"imdb":"tt1586680"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/45/114890.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/45/114890.jpg"},"summary":"<p>Oscar-nominated
+        William H. Macy and Emmy Rossum star in this fiercely engaging and fearlessly
+        twisted series. Chicagoan Frank Gallagher is the proud single dad of six smart,
+        industrious, independent kids, who without him would be... perhaps better
+        off. When Frank''s not at the bar spending what little money they have, he''s
+        passed out on the floor. But the kids have found ways to grow up in spite
+        of him. They may not be like any family you know, but they make no apologies
+        for being exactly who they are.</p>","updated":1462267965,"_links":{"self":{"href":"http://api.tvmaze.com/shows/150"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/617861"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/768057"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 17 May 2016 08:58:23 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/150/episodebynumber?season=3&number=2
+  response:
+    body: {string: !!python/unicode '{"id":11134,"url":"http://www.tvmaze.com/episodes/11134/shameless-3x02-the-american-dream","name":"The
+        American Dream","season":3,"number":2,"airdate":"2013-01-20","airtime":"21:00","airstamp":"2013-01-20T21:00:00-05:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/45/114847.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/45/114847.jpg"},"summary":"<p>Fiona
+        has second thoughts about loaning money to Meg; and a drunken Frank staggers
+        home, where no one wants him, until he proves to be the only one who can quiet
+        fussy Baby Hymie. Meanwhile, Lip''s community-service encounter with a North
+        Side youth group gives him a moneymaking idea, while Kev''s wife returns with
+        her son Kyle and Frank puts in a call to child services.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/11134"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 17 May 2016 08:58:23 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=Shameless
+  response:
+    body: {string: !!python/unicode '{"id":150,"url":"http://www.tvmaze.com/shows/150/shameless","name":"Shameless","type":"Scripted","language":"English","genres":["Drama","Comedy"],"status":"Running","runtime":60,"premiered":"2011-01-09","schedule":{"time":"21:00","days":["Sunday"]},"rating":{"average":8.8},"weight":2,"network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":25117,"thetvdb":161511,"imdb":"tt1586680"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/45/114890.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/45/114890.jpg"},"summary":"<p>Oscar-nominated
+        William H. Macy and Emmy Rossum star in this fiercely engaging and fearlessly
+        twisted series. Chicagoan Frank Gallagher is the proud single dad of six smart,
+        industrious, independent kids, who without him would be... perhaps better
+        off. When Frank''s not at the bar spending what little money they have, he''s
+        passed out on the floor. But the kids have found ways to grow up in spite
+        of him. They may not be like any family you know, but they make no apologies
+        for being exactly who they are.</p>","updated":1462267965,"_links":{"self":{"href":"http://api.tvmaze.com/shows/150"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/617861"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/768057"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 17 May 2016 08:58:23 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+    status: {code: 200, message: OK}
+version: 1

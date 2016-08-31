@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import copy
@@ -58,7 +58,6 @@ def config_changed(task=None, session=None):
 
 
 def use_task_logging(func):
-
     @wraps(func)
     def wrapper(self, *args, **kw):
         # Set the task name in the logger and capture output
@@ -78,7 +77,7 @@ class EntryIterator(object):
 
     def __init__(self, entries, states):
         self.all_entries = entries
-        if isinstance(states, basestring):
+        if isinstance(states, str):
             states = [states]
         self.filter = lambda e: e._state in states
 
@@ -149,7 +148,6 @@ class TaskAbort(Exception):
 
 @total_ordering
 class Task(object):
-
     """
     Represents one task in the configuration.
 
@@ -180,9 +178,11 @@ class Task(object):
 
     """
 
-    max_reruns = 5
     # Used to determine task order, when priority is the same
     _counter = itertools.count()
+
+    RERUN_DEFAULT = 5
+    RERUN_MAX = 100
 
     def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None):
         """
@@ -209,6 +209,9 @@ class Task(object):
             options_namespace = copy.copy(self.manager.options.execute)
             options_namespace.__dict__.update(options)
             options = options_namespace
+        # If execution hasn't specifically set the `allow_manual` flag, set it to False by default
+        if not hasattr(options, 'allow_manual'):
+            setattr(options, 'allow_manual', False)
         self.options = options
         self.output = output
         self.loglevel = loglevel
@@ -223,8 +226,10 @@ class Task(object):
         # simple persistence
         self.simple_persistence = SimpleTaskPersistence(self)
 
-        # not to be reset
+        # rerun related flags and values
         self._rerun_count = 0
+        self._max_reruns = Task.RERUN_DEFAULT
+        self._reruns_locked = False
 
         self.config_modified = None
 
@@ -248,6 +253,41 @@ class Task(object):
         # current state
         self.current_phase = None
         self.current_plugin = None
+        
+    @property
+    def max_reruns(self):
+        """How many times task can be rerunned before stopping"""
+        return self._max_reruns
+        
+    @max_reruns.setter
+    def max_reruns(self, value):
+        """Set new maximum value for reruns unless property has been locked"""
+        if not self._reruns_locked:
+            self._max_reruns = value
+        else:
+            log.debug('max_reruns is locked, %s tried to modify it', self.current_plugin)
+            
+    def lock_reruns(self):
+        """Prevent modification of max_reruns property"""
+        log.debug('Enabling rerun lock')
+        self._reruns_locked = True
+        
+    def unlock_reruns(self):
+        """Allow modification of max_reruns property"""
+        log.debug('Releasing rerun lock')
+        self._reruns_locked = False
+        
+    @property
+    def reruns_locked(self):
+        return self._reruns_locked
+
+    @property
+    def is_rerun(self):
+        return bool(self._rerun_count)
+
+    @property
+    def rerun_count(self):
+        return self._rerun_count
 
     @property
     def undecided(self):
@@ -291,10 +331,6 @@ class Task(object):
         """
         return self._all_entries
 
-    @property
-    def is_rerun(self):
-        return self._rerun_count
-
     def __lt__(self, other):
         return (self.priority, self._count) < (other.priority, other._count)
 
@@ -306,9 +342,6 @@ class Task(object):
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
-
-        All disabled phases are re-enabled by :meth:`Task._reset()` after task
-        execution has been completed.
 
         :param string phase: Name of ``phase``
         :raises ValueError: *phase* could not be found.
@@ -475,12 +508,23 @@ class Task(object):
             self.manager.crash_report()
             self.abort(msg)
 
-    def rerun(self):
-        """Immediately re-run the task after execute has completed,
-        task can be re-run up to :attr:`.max_reruns` times."""
-        msg = 'Plugin %s has requested task to be ran again after execution has completed.' % self.current_plugin
+    def rerun(self, plugin=None, reason=None):
+        """
+        Immediately re-run the task after execute has completed,
+        task can be re-run up to :attr:`.max_reruns` times.
+
+        :param str plugin: Plugin name
+        :param str reason: Why the rerun is done
+        """
+        msg = 'Plugin {0} has requested task to be ran again after execution has completed.'.format(
+            self.current_plugin if plugin is None else plugin)
+        if reason:
+            msg += ' Reason: {0}'.format(reason)
         # Only print the first request for a rerun to the info log
-        log.debug(msg) if self._rerun else log.info(msg)
+        if self._rerun:
+            log.debug(msg)
+        else:
+            log.info(msg)
         self._rerun = True
 
     def config_changed(self):
@@ -508,11 +552,17 @@ class Task(object):
         if self.options.inject:
             # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')
-            self.all_entries.extend(self.options.inject)
+            self.all_entries.extend(copy.deepcopy(self.options.inject))
 
         # Save current config hash and set config_modidied flag
         with Session() as session:
-            config_hash = hashlib.md5(str(sorted(self.config.items())).encode('utf-8')).hexdigest()
+            task_templates = {}
+            templates = self.config.get('template', [])
+            for template, value in self.manager.config.get('templates', {}).items():
+                if isinstance(templates, basestring) or isinstance(templates, list) and template in templates:
+                    task_templates.update({template: value})
+            hashable_config = list(self.config.items()) + list(task_templates.items())
+            config_hash = hashlib.md5(str(sorted(hashable_config, key=lambda x: x[0])).encode('utf-8')).hexdigest()
             last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
             if self.is_rerun:
                 # Restore the config to state right after start phase
@@ -583,7 +633,7 @@ class Task(object):
             while True:
                 self._execute()
                 # rerun task
-                if self._rerun and self._rerun_count < self.max_reruns:
+                if self._rerun and self._rerun_count < self.max_reruns and self._rerun_count < Task.RERUN_MAX:
                     log.info('Rerunning the task in case better resolution can be achieved.')
                     self._rerun_count += 1
                     # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in

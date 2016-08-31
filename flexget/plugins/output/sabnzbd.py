@@ -1,11 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlencode
 
 import logging
 
 from flexget import plugin
 from flexget.event import event
+from requests import RequestException
 
 log = logging.getLogger('sabnzbd')
 
@@ -84,10 +85,10 @@ class OutputSabnzbd(object):
             request_url = config['url'] + urlencode(params)
             log.debug('request_url: %s' % request_url)
             try:
-                response = task.get(request_url)
-            except Exception as e:
+                response = task.requests.get(request_url)
+            except RequestException as e:
                 log.critical('Failed to use sabnzbd. Requested %s' % request_url)
-                log.critical('Result was: %s' % e)
+                log.critical('Result was: %s' % e.args[0])
                 entry.fail('sabnzbd unreachable')
                 if task.options.debug:
                     log.exception(e)

@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
-
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -9,7 +8,7 @@ from flexget.event import event
 from flexget.utils.tools import split_title_year
 
 try:
-    from flexget.plugins.api_tvmaze import APITVMaze
+    from flexget.plugins.internal.api_tvmaze import APITVMaze
 
     lookup = APITVMaze.episode_lookup
 except ImportError:
@@ -20,6 +19,7 @@ log = logging.getLogger('est_series_tvmaze')
 
 
 class EstimatesSeriesTVMaze(object):
+
     @plugin.priority(2)
     def estimate(self, entry):
         if not all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
@@ -30,7 +30,7 @@ class EstimatesSeriesTVMaze(object):
         title, year_match = split_title_year(series_name)
 
         kwargs = {}
-        kwargs['maze_id'] = entry.get('tvmaze_id')
+        kwargs['tvmaze_id'] = entry.get('tvmaze_id')
         kwargs['tvdb_id'] = entry.get('tvdb_id') or entry.get('trakt_series_tvdb_id')
         kwargs['tvrage_id'] = entry.get('tvrage_id') or entry.get('trakt_series_tvrage_id')
         kwargs['imdb_id'] = entry.get('imdb_id')

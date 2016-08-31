@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from datetime import datetime
 import logging
@@ -12,6 +12,7 @@ log = logging.getLogger('est_movies')
 
 class EstimatesReleasedMovies(object):
 
+    @plugin.priority(0)
     def estimate(self, entry):
         if 'tmdb_released' in entry:
             log.verbose('Querying release estimation for %s' % entry['title'])

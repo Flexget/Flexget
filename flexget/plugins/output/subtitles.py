@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.xmlrpc.client import ServerProxy
 
 import re
@@ -9,37 +9,6 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
-
-"""
-
-DRAFT
-
-class SubtitleQueue(Base):
-
-    __tablename__ = 'subtitle_queue'
-
-    id = Column(Integer, primary_key=True)
-    task = Column(String)
-    imdb_id = Column(String)
-    added = Column(DateTime)
-
-    def __init__(self, task, imdb_id):
-        self.task = task
-        self.imdb_id = imdb_id
-        self.added = datetime.now()
-
-    def __str__(self):
-        return '<SubtitleQueue(%s=%s)>' % (self.task, self.imdb_id)
-
-TODO:
-
- * add new option, retry: [n] days
- * add everything into queue using above class
- * consume queue (look up by task name), configuration is available from task
- * remove successful downloads
- * remove queue items that are part retry: n days
-
-"""
 
 log = logging.getLogger('subtitles')
 
@@ -86,7 +55,7 @@ class Subtitles(object):
         try:
             s = ServerProxy("http://api.opensubtitles.org/xml-rpc")
             res = s.LogIn("", "", "en", "FlexGet")
-        except:
+        except Exception:
             log.warning('Error connecting to opensubtitles.org')
             return
 
@@ -100,7 +69,7 @@ class Subtitles(object):
         # configuration
         languages = config['languages']
         min_sub_rating = config['min_sub_rating']
-        match_limit = config['match_limit'] # no need to change this, but it should be configurable
+        match_limit = config['match_limit']  # no need to change this, but it should be configurable
 
         # loop through the entries
         for entry in entries:

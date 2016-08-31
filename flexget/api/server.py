@@ -1,38 +1,93 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
+import base64
 
 import os
 import json
 import sys
 import logging
+import threading
+import traceback
 from time import sleep
 
+import binascii
 import cherrypy
-from flask import Response
+import yaml
+from flask import Response, jsonify, request
 from flask_restplus import inputs
 from pyparsing import Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, \
     Combine
 from pyparsing import nums, alphanums, printables
+from yaml.error import YAMLError
 
 from flexget._version import __version__
-from flexget.api import api, APIResource, ApiError, __version__ as __api_version__
+from flexget.api import api, APIResource, ApiError, __version__ as __api_version__, BadRequest
 
 log = logging.getLogger('api.server')
 
 server_api = api.namespace('server', description='Manage Daemon')
 
+yaml_error_response = {
+    'type': 'object',
+    'properties': {
+        'code': {'type': 'integer'},
+        'column': {'type': 'integer'},
+        'line': {'type': 'integer'},
+        'message': {'type': 'string'},
+        'reason': {'type': 'string'}
+    }
+}
+
+config_error = {
+    'type': 'object',
+    'properties': {
+        'error': {'type': 'string'},
+        'config_path': {'type': 'string'}
+    }
+}
+
+config_validation_error = {
+    'type': 'object',
+    'properties': {
+        'code': {'type': 'integer'},
+        'error': {'type': 'array', 'items': config_error},
+        'message': {'type': 'string'},
+
+    }
+}
+
+yaml_error_schema = api.schema('yaml_error_schema', yaml_error_response)
+config_validation_schema = api.schema('config_validation_schema', config_validation_error)
+
 
 @server_api.route('/reload/')
 class ServerReloadAPI(APIResource):
-    @api.response(ApiError, description='Error loading the config')
+
+    @api.response(501, model=yaml_error_schema, description='YAML syntax error')
+    @api.response(502, model=config_validation_schema, description='Config validation error')
     @api.response(200, description='Newly reloaded config')
     def get(self, session=None):
         """ Reload Flexget config """
         log.info('Reloading config from disk.')
         try:
-            self.manager.load_config()
+            self.manager.load_config(output_to_console=False)
+        except YAMLError as e:
+            if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
+                error = {}
+                if e.problem is not None:
+                    error.update({'reason': e.problem})
+                if e.context_mark is not None:
+                    error.update({'line': e.context_mark.line, 'column': e.context_mark.column})
+                if e.problem_mark is not None:
+                    error.update({'line': e.problem_mark.line, 'column': e.problem_mark.column})
+                raise ApiError(message='Invalid YAML syntax', payload=error)
         except ValueError as e:
-            raise ApiError('Error loading config: %s' % e.args[0])
+            errors = []
+            for er in e.errors:
+                errors.append({'error': er.message,
+                               'config_path': er.json_pointer})
+            raise ApiError('Error loading config: %s' % e.args[0], payload={'errors': errors})
 
         log.info('Config successfully reloaded from disk.')
         return {}
@@ -50,6 +105,7 @@ pid_schema = api.schema('server.pid', {
 
 @server_api.route('/pid/')
 class ServerPIDAPI(APIResource):
+
     @api.response(200, description='Reloaded config', model=pid_schema)
     def get(self, session=None):
         """ Get server PID """
@@ -63,6 +119,7 @@ shutdown_parser.add_argument('force', type=inputs.boolean, required=False, defau
 
 @server_api.route('/shutdown/')
 class ServerShutdownAPI(APIResource):
+
     @api.doc(parser=shutdown_parser)
     @api.response(200, 'Shutdown requested')
     def get(self, session=None):
@@ -74,10 +131,83 @@ class ServerShutdownAPI(APIResource):
 
 @server_api.route('/config/')
 class ServerConfigAPI(APIResource):
+
     @api.response(200, description='Flexget config')
     def get(self, session=None):
         """ Get Flexget Config """
         return self.manager.config
+
+
+raw_config_object = {
+    'type': 'object',
+    'properties': {
+        'raw_config': {'type': 'string'}
+    }
+}
+raw_config_schema = api.schema('raw_config', raw_config_object)
+
+
+@server_api.route('/raw_config/')
+class ServerRawConfigAPI(APIResource):
+    @api.doc(description='Return config file encoded in Base64')
+    @api.response(200, model=raw_config_schema, description='Flexget raw YAML config file')
+    def get(self, session=None):
+        """ Get raw YAML config file """
+        with open(self.manager.config_path, 'r', encoding='utf-8') as f:
+            raw_config = base64.b64encode(f.read().encode("utf-8"))
+        return jsonify(raw_config=raw_config.decode('utf-8'))
+
+    @api.validate(raw_config_schema)
+    @api.response(200, description='Successfully updated config')
+    @api.response(BadRequest)
+    @api.response(ApiError)
+    @api.doc(description='Config file must be base64 encoded. A backup will be created, and if successful config will'
+                         ' be loaded and saved to original file.')
+    def post(self, session=None):
+        """ Update config """
+        data = request.json
+        try:
+            raw_config = base64.b64decode(data['raw_config'])
+        except (TypeError, binascii.Error):
+            raise BadRequest(message='payload was not a valid base64 encoded string')
+
+        try:
+            config = yaml.safe_load(raw_config)
+        except YAMLError as e:
+            if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
+                error = {}
+                if e.problem is not None:
+                    error.update({'reason': e.problem})
+                if e.context_mark is not None:
+                    error.update({'line': e.context_mark.line, 'column': e.context_mark.column})
+                if e.problem_mark is not None:
+                    error.update({'line': e.problem_mark.line, 'column': e.problem_mark.column})
+                raise BadRequest(message='Invalid YAML syntax', payload=error)
+
+        try:
+            backup_path = self.manager.update_config(config)
+        except ValueError as e:
+            errors = []
+            for er in e.errors:
+                errors.append({'error': er.message,
+                               'config_path': er.json_pointer})
+            raise BadRequest(message='Error loading config: %s' % e.args[0], payload={'errors': errors})
+
+        try:
+            self.manager.backup_config()
+        except Exception as e:
+            raise ApiError(message='Failed to create config backup, config updated but NOT written to file',
+                           payload={'reason': str(e)})
+
+        try:
+            with open(self.manager.config_path, 'w', encoding='utf-8') as f:
+                f.write(raw_config.decode('utf-8').replace('\r\n', '\n'))
+        except Exception as e:
+            raise ApiError(message='Failed to write new config to file, please load from backup',
+                           payload={'reason': str(e), 'backup_path': backup_path})
+
+        return {'status': 'success',
+                'message': 'new config loaded and successfully updated to file'}
 
 
 version_schema = api.schema('server.version', {
@@ -91,6 +221,7 @@ version_schema = api.schema('server.version', {
 
 @server_api.route('/version/')
 class ServerVersionAPI(APIResource):
+
     @api.response(200, description='Flexget version', model=version_schema)
     def get(self, session=None):
         """ Flexget Version """
@@ -120,10 +251,10 @@ dump_threads_schema = api.schema('server.dump_threads', {
 
 @server_api.route('/dump_threads/')
 class ServerDumpThreads(APIResource):
+
     @api.response(200, description='Flexget threads dump', model=dump_threads_schema)
     def get(self, session=None):
         """ Dump Server threads for debugging """
-        import threading, traceback, sys
         id2name = dict([(th.ident, th.name) for th in threading.enumerate()])
         threads = []
         for threadId, stack in sys._current_frames().items():
@@ -196,6 +327,7 @@ def file_inode(filename):
 
 @server_api.route('/log/')
 class ServerLogAPI(APIResource):
+
     @api.doc(parser=server_log_parser)
     @api.response(200, description='Streams as line delimited JSON')
     def get(self, session=None):

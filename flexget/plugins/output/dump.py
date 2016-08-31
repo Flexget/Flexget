@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 
 log = logging.getLogger('dump')
 
@@ -21,6 +21,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
     :param bool trace: Display trace information.
     :param bool title_only: Display only title field
     """
+
     def sort_key(field):
         # Sort certain fields above the rest
         if field == 'title':
@@ -123,5 +124,6 @@ def register_plugin():
 @event('options.register')
 def register_parser_arguments():
     options.get_parser('execute').add_argument('--dump', nargs='*', choices=['eval', 'trace', 'accepted', 'rejected',
-        'undecided', 'title'], dest='dump_entries', help='display all entries in task with fields they contain, '
-        'use `--dump eval` to evaluate all lazy fields. Specify an entry state/states to only dump matching entries.')
+                                                                             'undecided', 'title'], dest='dump_entries',
+                                               help='display all entries in task with fields they contain, '
+                                                    'use `--dump eval` to evaluate all lazy fields. Specify an entry state/states to only dump matching entries.')

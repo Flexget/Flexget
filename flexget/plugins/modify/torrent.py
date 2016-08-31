@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import os
@@ -108,7 +108,7 @@ class TorrentFilename(object):
         if os.path.exists(entry['file']):
             log.debug('removing temp file %s from %s' % (entry['file'], entry['title']))
             os.remove(entry['file'])
-        del(entry['file'])
+        del (entry['file'])
 
 
 @event('plugin.register')

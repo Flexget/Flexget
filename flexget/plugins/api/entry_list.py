@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import copy
 import logging
@@ -49,6 +49,7 @@ entry_list_parser.add_argument('name', help='Filter results by list name')
 
 @entry_list_api.route('/')
 class EntryListListsAPI(APIResource):
+
     @api.doc(parser=entry_list_parser)
     @api.response(200, 'Successfully retrieved entry lists', entry_list_return_lists_schema)
     def get(self, session=None):
@@ -85,6 +86,7 @@ class EntryListListsAPI(APIResource):
 @entry_list_api.route('/<int:list_id>/')
 @api.doc(params={'list_id': 'ID of the list'})
 class EntryListListAPI(APIResource):
+
     @api.response(404, model=default_error_schema)
     @api.response(200, model=entry_list_object_schema)
     def get(self, list_id, session=None):
@@ -156,6 +158,7 @@ entry_list_parser.add_argument('page_size', type=int, default=10, help='Number o
 
 @entry_list_api.route('/<int:list_id>/entries/')
 class EntryListEntriesAPI(APIResource):
+
     @api.response(404, 'List does not exist', model=default_error_schema)
     @api.response(200, model=entry_lists_entries_return_schema)
     @api.doc(params={'list_id': 'ID of the list'}, parser=entry_list_parser)
@@ -168,10 +171,7 @@ class EntryListEntriesAPI(APIResource):
 
         start = page_size * (page - 1)
         stop = start + page_size
-        if args.get('order') == 'desc':
-            descending = True
-        else:
-            descending = False
+        descending = bool(args.get('order') == 'desc')
 
         kwargs = {
             'start': start,
@@ -183,7 +183,7 @@ class EntryListEntriesAPI(APIResource):
         }
 
         try:
-            list = el.get_list_by_id(list_id=list_id, session=session)
+            el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
@@ -209,7 +209,7 @@ class EntryListEntriesAPI(APIResource):
     def post(self, list_id, session=None):
         """ Create a new entry object"""
         try:
-            list = el.get_list_by_id(list_id=list_id, session=session)
+            el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
@@ -231,6 +231,7 @@ class EntryListEntriesAPI(APIResource):
 @api.doc(params={'list_id': 'ID of the list', 'entry_id': 'ID of the entry'})
 @api.response(404, description='List or entry not found', model=default_error_schema)
 class EntryListEntryAPI(APIResource):
+
     @api.response(200, model=entry_list_entry_base_schema)
     def get(self, list_id, entry_id, session=None):
         """ Get an entry by list ID and entry ID """

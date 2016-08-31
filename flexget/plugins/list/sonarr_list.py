@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
 
 import json
@@ -72,7 +72,7 @@ class SonarrSet(MutableSet):
 
     def post_json(self, url, headers, data):
         try:
-            response =  requests.post(url, headers=headers, data=data)
+            response = requests.post(url, headers=headers, data=data)
             if response.status_code == 201:
                 return response.json()
             else:
@@ -203,7 +203,7 @@ class SonarrSet(MutableSet):
         delete_series_url, delete_series_headers = self.request_builder(self.config.get('base_url'), 'series',
                                                                         self.config.get('port'), self.config['api_key'])
         delete_series_url += '/%s' % show.get('sonarr_id')
-        response = requests.delete(delete_series_url, headers=delete_series_headers)
+        requests.delete(delete_series_url, headers=delete_series_headers)
 
     @property
     def shows(self):
@@ -260,6 +260,9 @@ class SonarrSet(MutableSet):
         """ Set the online status of the plugin, online plugin should be treated differently in certain situations,
         like test mode"""
         return True
+
+    def get(self, entry):
+        return self._find_entry(entry)
 
 
 class SonarrList(object):

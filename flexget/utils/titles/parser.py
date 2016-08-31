@@ -1,11 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import re
 
 
 class TitleParser(object):
-
     propers = ['proper', 'repack', 'rerip', 'real', 'final']
 
     specials = ['special', 'bonus', 'extra', 'omake', 'ova']
@@ -17,7 +16,7 @@ class TitleParser(object):
 
     # lowercase required
     cutoffs = ['limited', 'xvid', 'h264', 'x264', 'h.264', 'x.264', 'screener', 'unrated', '3d', 'extended',
-               'directors', 'director\'s', 'multisubs', 'dubbed', 'subbed', 'multi'] + propers + specials + editions
+               'directors', 'director\'s', 'multisubs', 'dubbed', 'subbed', 'multi'] + specials + editions
 
     remove = ['imax']
 

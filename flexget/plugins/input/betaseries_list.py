@@ -1,6 +1,6 @@
 """Input plugin for www.betaseries.com"""
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from hashlib import md5
 import logging
@@ -10,7 +10,6 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.cached_input import cached
-
 
 log = logging.getLogger('betaseries_list')
 

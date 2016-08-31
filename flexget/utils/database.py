@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring, long, unicode
 
 import functools
@@ -32,6 +32,7 @@ def with_session(*args, **kwargs):
             with _Session() as session:
                 kwargs['session'] = session
                 return func(*args, **kwargs)
+
         return wrapper
 
     if len(args) == 1 and not kwargs and callable(args[0]):
@@ -85,10 +86,10 @@ def entry_synonym(name):
     """Use json to serialize python objects for db storage."""
 
     def only_builtins(item):
-        supported_types = [str, unicode, int, float, long, bool, datetime]
+        supported_types = (str, unicode, int, float, long, bool, datetime)
         # dict, list, tuple and set are also supported, but handled separately
 
-        if type(item) in supported_types:
+        if isinstance(item, supported_types):
             return item
         elif isinstance(item, Mapping):
             result = {}
@@ -133,6 +134,7 @@ def entry_synonym(name):
 
 def json_synonym(name):
     """Use json to serialize python objects for db storage."""
+
     def getter(self):
         return json.loads(getattr(self, name), decode_datetime=True)
 
@@ -174,7 +176,6 @@ class CaseInsensitiveWord(Comparator):
 
 
 def quality_property(text_attr):
-
     def getter(self):
         return qualities.Quality(getattr(self, text_attr))
 
@@ -185,6 +186,7 @@ def quality_property(text_attr):
             setattr(self, text_attr, value.name)
 
     class QualComparator(Comparator):
+
         def operate(self, op, other):
             if isinstance(other, qualities.Quality):
                 other = other.name
@@ -199,7 +201,6 @@ def quality_property(text_attr):
 
 
 def quality_requirement_property(text_attr):
-
     def getter(self):
         return qualities.Requirements(getattr(self, text_attr))
 
@@ -214,7 +215,6 @@ def quality_requirement_property(text_attr):
 
 
 def ignore_case_property(text_attr):
-
     def getter(self):
         return CaseInsensitiveWord(getattr(self, text_attr))
 
@@ -225,7 +225,6 @@ def ignore_case_property(text_attr):
 
 
 def year_property(date_attr):
-
     def getter(self):
         date = getattr(self, date_attr)
         return date and date.year

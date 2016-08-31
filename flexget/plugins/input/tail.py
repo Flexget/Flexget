@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+import io
 import os
 import re
 import logging
@@ -8,7 +9,6 @@ import logging
 from sqlalchemy import Column, Integer, Unicode
 
 from flexget import options, plugin
-from flexget.utils.tools import native_str_to_text
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry
 from flexget.event import event
@@ -27,7 +27,6 @@ class TailPosition(Base):
 
 
 class InputTail(object):
-
     """
     Parse any text for entries using regular expression.
 
@@ -86,7 +85,7 @@ class InputTail(object):
         task.no_entries_ok = True
 
         filename = os.path.expanduser(config['file'])
-        encoding = config.get('encoding', None)
+        encoding = config.get('encoding', 'utf-8')
         with Session() as session:
             db_pos = (session.query(TailPosition).
                       filter(TailPosition.task == task.name).filter(TailPosition.filename == filename).first())
@@ -95,7 +94,7 @@ class InputTail(object):
             else:
                 last_pos = 0
 
-            with open(filename, 'r') as file:
+            with io.open(filename, 'r', encoding=encoding, errors='replace') as file:
                 if task.options.tail_reset == filename or task.options.tail_reset == task.name:
                     if last_pos == 0:
                         log.info('Task %s tail position is already zero' % task.name)
@@ -121,14 +120,7 @@ class InputTail(object):
 
                 # now parse text
 
-                while True:
-                    line = file.readline()
-                    if encoding:
-                        try:
-                            line = native_str_to_text(line, encoding=encoding)
-                        except UnicodeError:
-                            raise plugin.PluginError('Failed to decode file using %s. Check encoding.' % encoding)
-
+                for line in file:
                     if not line:
                         break
 

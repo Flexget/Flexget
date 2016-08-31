@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import base64
 import hashlib
+import io
 import logging
 import datetime
 import os
@@ -20,7 +21,7 @@ Base = db_schema.versioned_base('make_rss', 0)
 rss2gen = True
 try:
     import PyRSS2Gen
-except:
+except ImportError:
     rss2gen = False
 
 
@@ -36,7 +37,6 @@ def upgrade(ver, session):
 
 
 class RSSEntry(Base):
-
     __tablename__ = 'make_rss'
 
     id = Column(Integer, primary_key=True)
@@ -209,7 +209,7 @@ class OutputRSS(object):
         if task.options.learn:
             return
 
-        db_items = task.session.query(RSSEntry).filter(RSSEntry.file == config['file']).\
+        db_items = task.session.query(RSSEntry).filter(RSSEntry.file == config['file']). \
             order_by(RSSEntry.published.desc()).all()
 
         # make items
@@ -228,7 +228,7 @@ class OutputRSS(object):
                 hasher.update(db_item.title.encode('utf8'))
                 hasher.update(db_item.description.encode('utf8'))
                 hasher.update(db_item.link.encode('utf8'))
-                guid = base64.urlsafe_b64encode(hasher.digest())
+                guid = base64.urlsafe_b64encode(hasher.digest()).decode('ascii')
                 guid = PyRSS2Gen.Guid(guid, isPermaLink=False)
 
                 gen = {'title': db_item.title,
@@ -256,7 +256,7 @@ class OutputRSS(object):
 
         # write rss
         fn = os.path.expanduser(config['file'])
-        with open(fn, 'w') as file:
+        with io.open(fn, 'wb') as file:
             try:
                 log.verbose('Writing output rss to %s' % fn)
                 rss.write_xml(file, encoding=config['encoding'])

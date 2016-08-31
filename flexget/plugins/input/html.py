@@ -1,11 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 from future.moves.urllib import parse
 
+
 import logging
+import posixpath
 import zlib
 import re
+import io
+
 from jinja2 import Template
 
 from flexget import plugin
@@ -121,7 +125,7 @@ class InputHtml(object):
                 current += step
             return entries
         else:
-            return self._request_url(task, config, base_url, auth)
+            return self._request_url(task, config, base_url, auth, dump_name=config.get('dump'))
 
     def _request_url(self, task, config, url, auth, dump_name=None):
         log.verbose('Requesting: %s' % url)
@@ -133,7 +137,7 @@ class InputHtml(object):
         if dump_name:
             log.verbose('Dumping: %s' % dump_name)
             data = soup.prettify()
-            with open(dump_name, 'w') as f:
+            with io.open(dump_name, 'w', encoding='utf-8') as f:
                 f.write(data)
 
         return self.create_entries(url, soup, config)
@@ -149,9 +153,15 @@ class InputHtml(object):
         return title or None
 
     def _title_from_url(self, url):
-        parts = parse.splitquery(url[url.rfind('/') + 1:])
-        title = parse.unquote_plus(parts[0])
-        return title
+        parts = parse.urlsplit(url)
+        name = ''
+        if parts.scheme == 'magnet':
+            match = re.search('(?:&dn(?:\.\d)?=)(.+?)(?:&)', parts.query)
+            if match:
+                name = match.group(1)
+        else:
+            name = posixpath.basename(parts.path)
+        return parse.unquote_plus(name)
 
     def create_entries(self, page_url, soup, config):
 
@@ -192,6 +202,7 @@ class InputHtml(object):
                     if re.search(regexp, url):
                         accept = True
                 if not accept:
+                    log.debug('url does not match any "links_re": %s' % url)
                     continue
 
             title_from = config.get('title_from', 'auto')

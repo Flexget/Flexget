@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -55,7 +55,7 @@ class OutputNzbget(object):
                                  params["top"],
                                  entry["url"])
                 log.info("Added `%s` to nzbget" % entry["title"])
-            except:
+            except Exception:
                 log.critical("rpc call to nzbget failed")
                 entry.fail("could not call appendurl via RPC")
 

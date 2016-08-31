@@ -7,7 +7,7 @@ You can safely use task.simple_persistence and manager.persist, if we implement 
 can replace underlying mechanism in single point (and provide transparent switch).
 """
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.types.newstr import newstr
 
 import logging
@@ -55,14 +55,16 @@ def upgrade(ver, session):
         table_add_column(table, 'json', Unicode, session)
         # Make sure we get the new schema with the added column
         table = table_schema('simple_persistence', session)
+        failures = 0
         for row in session.execute(select([table.c.id, table.c.value])):
             try:
                 p = pickle.loads(row['value'])
                 session.execute(table.update().where(table.c.id == row['id']).values(
                     json=json.dumps(p, encode_datetime=True)))
-            except KeyError as e:
-                log.error('Unable error upgrading simple_persistence pickle object due to %s' % str(e))
-
+            except Exception as e:
+                failures += 1
+        if failures > 0:
+            log.error('Error upgrading %s simple_persistence pickle objects. Some information has been lost.', failures)
         ver = 4
     return ver
 

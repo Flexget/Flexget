@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib import request
 from future.moves.urllib import parse
 from future.moves.urllib.error import URLError
@@ -15,11 +15,10 @@ from flexget import db_schema, plugin
 from flexget.event import event
 
 try:
-    from flexget.plugins.api_tvdb import lookup_series
+    from flexget.plugins.internal.api_tvdb import lookup_series
 except ImportError:
     raise plugin.DependencyError(issued_by='myepisodes', missing='api_tvdb',
                                  message='myepisodes requires the `api_tvdb` plugin')
-
 
 log = logging.getLogger('myepisodes')
 Base = db_schema.versioned_base('myepisodes', 0)
@@ -103,8 +102,8 @@ class MyEpisodes(object):
         opener = request.build_opener(request.HTTPCookieProcessor(cookiejar))
         baseurl = request.Request('http://www.myepisodes.com/login.php?')
         loginparams = parse.urlencode({'username': username,
-                                        'password': password,
-                                        'action': 'Login'})
+                                       'password': password,
+                                       'action': 'Login'})
         try:
             logincon = opener.open(baseurl, loginparams)
             loginsrc = logincon.read()
@@ -114,7 +113,7 @@ class MyEpisodes(object):
 
         if str(username) not in loginsrc:
             raise plugin.PluginWarning(('Login to myepisodes.com failed, please check '
-                                 'your account data or see if the site is down.'), log)
+                                        'your account data or see if the site is down.'), log)
 
         for entry in task.accepted:
             try:
@@ -143,7 +142,7 @@ class MyEpisodes(object):
         series_name = entry['series_name']
 
         # First check if we already have a myepisodes id stored for this series
-        myepisodes_info = session.query(MyEpisodesInfo).\
+        myepisodes_info = session.query(MyEpisodesInfo). \
             filter(MyEpisodesInfo.series_name == series_name.lower()).first()
         if myepisodes_info:
             entry['myepisodes_id'] = myepisodes_info.myepisodes_id
@@ -155,7 +154,7 @@ class MyEpisodes(object):
         else:
             try:
                 series = lookup_series(name=series_name, tvdb_id=entry.get('tvdb_id'))
-                query_name = series.seriesname
+                query_name = series.name
             except LookupError as e:
                 log.warning('Unable to lookup series `%s` from tvdb, using raw name.' % series_name)
                 query_name = series_name
@@ -174,7 +173,7 @@ class MyEpisodes(object):
             db_item = session.query(MyEpisodesInfo).filter(MyEpisodesInfo.myepisodes_id == myepisodes_id).first()
             if db_item:
                 log.info('Changing name to `%s` for series with myepisodes_id %s' %
-                    (series_name.lower(), myepisodes_id))
+                         (series_name.lower(), myepisodes_id))
                 db_item.series_name = series_name.lower()
             else:
                 session.add(MyEpisodesInfo(series_name.lower(), myepisodes_id))

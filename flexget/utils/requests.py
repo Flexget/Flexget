@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.request import urlopen
 from future.moves.urllib.parse import urlparse
 
@@ -10,7 +10,7 @@ from datetime import timedelta, datetime
 import requests
 # Allow some request objects to be imported from here instead of requests
 import warnings
-from requests import RequestException, HTTPError
+from requests import RequestException
 
 from flexget import __version__ as version
 from flexget.utils.tools import parse_timedelta, TimedDict, timedelta_total_seconds
@@ -55,6 +55,7 @@ def set_unresponsive(url):
 
 
 class DomainLimiter(object):
+
     def __init__(self, domain):
         self.domain = domain
 
@@ -66,13 +67,13 @@ class DomainLimiter(object):
 class TokenBucketLimiter(DomainLimiter):
     """
     A token bucket rate limiter for domains.
-    
+
     New instances for the same domain will restore previous values.
     """
     # This is just an in memory cache right now, it works for the daemon, and across tasks in a single execution
     # but not for multiple executions via cron. Do we need to store this to db?
     state_cache = {}
-    
+
     def __init__(self, domain, tokens, rate, wait=True):
         """
         :param int tokens: Size of bucket
@@ -112,7 +113,12 @@ class TokenBucketLimiter(DomainLimiter):
             if not self.wait:
                 raise RequestException('Requests to %s have exceeded their limit.' % self.domain)
             wait = timedelta_total_seconds(self.rate) * (1 - self.tokens)
-            log.verbose('Waiting %.2f seconds until next request to %s' % (wait, self.domain))
+            # Don't spam console if wait is low
+            if wait < 4:
+                level = log.debug
+            else:
+                level = log.verbose
+            level('Waiting %.2f seconds until next request to %s', wait, self.domain)
             # Sleep until it is time for the next request
             time.sleep(wait)
         self.tokens -= 1
@@ -120,6 +126,7 @@ class TokenBucketLimiter(DomainLimiter):
 
 class TimedLimiter(TokenBucketLimiter):
     """Enforces a minimum interval between requests to a given domain."""
+
     def __init__(self, domain, interval):
         super(TimedLimiter, self).__init__(domain, 1, interval)
 
@@ -167,9 +174,9 @@ class Session(requests.Session):
 
     """
 
-    def __init__(self, timeout=30, max_retries=1):
+    def __init__(self, timeout=30, max_retries=1, *args, **kwargs):
         """Set some defaults for our session if not explicitly defined."""
-        requests.Session.__init__(self)
+        super(Session, self).__init__(*args, **kwargs)
         self.timeout = timeout
         self.stream = True
         self.adapters['http://'].max_retries = max_retries
@@ -196,7 +203,7 @@ class Session(requests.Session):
         """
         warnings.warn('set_domain_delay is deprecated, use add_domain_limiter', DeprecationWarning, stacklevel=2)
         self.domain_limiters[domain] = TimedLimiter(domain, delay)
-            
+
     def add_domain_limiter(self, limiter):
         """
         Add a limiter to throttle requests to a specific domain.
@@ -216,7 +223,7 @@ class Session(requests.Session):
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
             raise requests.Timeout('Requests to this site (%s) have timed out recently. Waiting before trying again.' %
-                urlparse(url).hostname)
+                                   urlparse(url).hostname)
 
         # Run domain limiters for this url
         limit_domains(url, self.domain_limiters)
@@ -231,7 +238,7 @@ class Session(requests.Session):
 
         try:
             log.debug('Fetching %s' % url)
-            result = requests.Session.request(self, method, url, *args, **kwargs)
+            result = super(Session, self).request(method, url, *args, **kwargs)
         except requests.Timeout:
             # Mark this site in known unresponsive list
             set_unresponsive(url)

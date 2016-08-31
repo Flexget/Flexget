@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 from past.builtins import basestring
 
 import logging
@@ -8,12 +9,12 @@ from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, and_, Index
 from sqlalchemy.orm import relation
 
-from flexget import db_schema, options, plugin
+from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
 from flexget.utils.tools import parse_timedelta
+
 
 log = logging.getLogger('remember_rej')
 Base = db_schema.versioned_base('remember_rejected', 3)
@@ -42,7 +43,6 @@ def upgrade(ver, session):
 
 
 class RememberTask(Base):
-
     __tablename__ = 'remember_rejected_feeds'
 
     id = Column(Integer, primary_key=True)
@@ -52,7 +52,6 @@ class RememberTask(Base):
 
 
 class RememberEntry(Base):
-
     __tablename__ = 'remember_rejected_entry'
 
     id = Column(Integer, primary_key=True)
@@ -64,6 +63,7 @@ class RememberEntry(Base):
     reason = Column(String)
 
     task_id = Column('feed_id', Integer, ForeignKey('remember_rejected_feeds.id'), nullable=False)
+
 
 Index('remember_feed_title_url', RememberEntry.task_id, RememberEntry.title, RememberEntry.url)
 
@@ -93,7 +93,7 @@ class FilterRememberRejected(object):
                 session.add(RememberTask(name=task.name))
             elif not task.is_rerun:
                 # Delete expired items if this is not a rerun
-                deleted = session.query(RememberEntry).filter(RememberEntry.task_id == old_task.id).\
+                deleted = session.query(RememberEntry).filter(RememberEntry.task_id == old_task.id). \
                     filter(RememberEntry.expires < datetime.now()).delete()
                 if deleted:
                     log.debug('%s entries have expired from remember_rejected table.' % deleted)
@@ -120,7 +120,7 @@ class FilterRememberRejected(object):
                                                               RememberEntry.url == entry['original_url'])).first()
                     if reject_entry:
                         entry.reject('Rejected on behalf of %s plugin: %s' %
-                            (reject_entry.rejected_by, reject_entry.reason))
+                                     (reject_entry.rejected_by, reject_entry.reason))
 
     def on_entry_reject(self, entry, remember=None, remember_time=None, **kwargs):
         # We only remember rejections that specify the remember keyword argument
@@ -154,33 +154,6 @@ class FilterRememberRejected(object):
                                           expires=expires))
 
 
-def do_cli(manager, options):
-    if options.rejected_action == 'list':
-        list_rejected()
-    elif options.rejected_action == 'clear':
-        clear_rejected(manager)
-
-
-def list_rejected():
-    with Session() as session:
-        results = session.query(RememberEntry).all()
-        if not results:
-            console('No rejected entries recorded by remember_rejected')
-        else:
-            console('Rejections remembered by remember_rejected:')
-        for entry in results:
-            console('%s from %s by %s because %s' % (entry.title, entry.task.name, entry.rejected_by, entry.reason))
-
-
-def clear_rejected(manager):
-    with Session() as session:
-        results = session.query(RememberEntry).delete()
-        console('Cleared %i items.' % results)
-        session.commit()
-        if results:
-            manager.config_changed()
-
-
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     # Remove entries older than 30 days
@@ -192,11 +165,3 @@ def db_cleanup(manager, session):
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
-
-
-@event('options.register')
-def register_parser_arguments():
-    parser = options.register_command('rejected', do_cli, help='list or clear remembered rejections')
-    subparsers = parser.add_subparsers(dest='rejected_action', metavar='<action>')
-    subparsers.add_parser('list', help='list all the entries that have been rejected')
-    subparsers.add_parser('clear', help='clear all rejected entries from database, so they can be retried')

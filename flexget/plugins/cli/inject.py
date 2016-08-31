@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import cgi
@@ -10,7 +10,7 @@ import yaml
 from flexget import options
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 from flexget.utils import requests
 
 

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
 
 import logging
@@ -73,7 +73,7 @@ class Sickbeard(object):
                 api_key: MYAPIKEY1123
           discover:
             what:
-              - emit_series: yes
+              - next_series_episodes: yes
             from:
               torrentz: any
           download:
@@ -93,7 +93,7 @@ class Sickbeard(object):
             raise plugin.PluginError('Unable to connect to Sickbeard at %s://%s:%s%s. Error: %s'
                                      % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e))
         entries = []
-        for id, show in list(json['data'].items()):
+        for _, show in list(json['data'].items()):
             fg_qualities = ''  # Initializes the quality parameter
             if show['paused'] and config.get('only_monitored'):
                 continue

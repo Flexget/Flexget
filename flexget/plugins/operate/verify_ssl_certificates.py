@@ -1,9 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
-from flexget import plugin, validator
+from flexget import plugin
 from flexget.event import event
 
 log = logging.getLogger('verify_ssl')
@@ -17,8 +17,7 @@ class VerifySSLCertificates(object):
       verify_ssl_certificates: no
     """
 
-    def validator(self):
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     @plugin.priority(253)
     def on_task_start(self, task, config):

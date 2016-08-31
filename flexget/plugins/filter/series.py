@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
-from past.builtins import basestring
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import logging
@@ -9,6 +8,7 @@ import time
 from copy import copy
 from datetime import datetime, timedelta
 
+from past.builtins import basestring
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
 from sqlalchemy.exc import OperationalError
@@ -28,7 +28,7 @@ from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_ta
                                             create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 
-SCHEMA_VER = 12
+SCHEMA_VER = 13
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -149,7 +149,11 @@ def upgrade(ver, session):
         from flexget.task import config_changed
         config_changed(session=session)
         ver = 12
-
+    if ver == 12:
+        # Force identified_by value None to 'auto'
+        series_table = table_schema('series', session)
+        session.execute(update(series_table, series_table.c.identified_by == None, {'identified_by': 'auto'}))
+        ver = 13
     return ver
 
 
@@ -222,6 +226,7 @@ def normalize_series_name(name):
 
 
 class NormalizedComparator(Comparator):
+
     def operate(self, op, other):
         return op(self.__clause_element__(), normalize_series_name(other))
 
@@ -339,6 +344,15 @@ class Episode(Base):
         return age
 
     @property
+    def age_timedelta(self):
+        """
+        :return: Timedelta or None if episode is never seen
+        """
+        if not self.first_seen:
+            return None
+        return  datetime.now() - self.first_seen
+
+    @property
     def is_premiere(self):
         if self.season == 1 and self.number in (0, 1):
             return 'Series Premiere'
@@ -444,7 +458,7 @@ def get_latest_status(episode):
 
 @with_session
 def get_series_summary(configured=None, premieres=None, status=None, days=None, start=None, stop=None, count=False,
-                       session=None):
+                       sort_by='show_name', descending=None, session=None):
     """
     Return a query with results for all series.
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
@@ -481,6 +495,11 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
     if count:
         return query.count()
+    if sort_by == 'show_name':
+        order_by = Series.name
+    elif sort_by == 'last_download_date':
+        order_by = func.max(Release.first_seen)
+    query = query.order_by(desc(order_by)) if descending else query.order_by(order_by)
     query = query.slice(start, stop).from_self()
     return query
 
@@ -724,6 +743,7 @@ def set_series_begin(series, ep_id):
 def remove_series(name, forget=False):
     """
     Remove a whole series `name` from database.
+
     :param name: Name of series to be removed
     :param forget: Indication whether or not to fire a 'forget' event
     """
@@ -747,29 +767,41 @@ def remove_series(name, forget=False):
 def remove_series_episode(name, identifier, forget=False):
     """
     Remove all episodes by `identifier` from series `name` from database.
+
     :param name: Name of series to be removed
-    :param identifier: Series identifier to be deleted
+    :param identifier: Series identifier to be deleted,
+        supports case insensitive startwith matching
     :param forget: Indication whether or not to fire a 'forget' event
     """
     downloaded_releases = []
     with Session() as session:
         series = session.query(Series).filter(Series.name == name).first()
-        if series:
-            episode = session.query(Episode).filter(Episode.identifier == identifier). \
-                filter(Episode.series_id == series.id).first()
-            if episode:
-                if not series.begin:
-                    series.identified_by = ''  # reset identified_by flag so that it will be recalculated
-                if forget:
-                    downloaded_releases = [release.title for release in episode.downloaded_releases]
-                session.delete(episode)
-                log.debug('Episode %s from series %s removed from database.', identifier, name)
-            else:
-                raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
-        else:
+        if not series:
             raise ValueError('Unknown series %s' % name)
-    for downloaded_release in downloaded_releases:
-        fire_event('forget', downloaded_release)
+
+        def remove_episode(episode):
+            if not series.begin:
+                series.identified_by = ''  # reset identified_by flag so that it will be recalculated
+            session.delete(episode)
+            log.debug('Episode %s from series %s removed from database.', identifier, name)
+            return [release.title for release in episode.downloaded_releases]
+
+        episode = session.query(Episode).filter(Episode.identifier == identifier). \
+            filter(Episode.series_id == series.id).first()
+        if episode:
+            downloaded_releases = remove_episode(episode)
+        else:
+            removed = False
+            for episode in session.query(Episode).filter(Episode.series_id == series.id).all():
+                if episode.identifier.upper().startswith(identifier.upper()):
+                    removed = True
+                    downloaded_releases.extend(remove_episode(episode))
+            if not removed:
+                raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
+
+    if forget:
+        for downloaded_release in downloaded_releases:
+            fire_event('forget', downloaded_release)
 
 
 def delete_release_by_id(release_id):
@@ -1232,7 +1264,7 @@ class FilterSeries(FilterSeriesBase):
         for entry in entries:
             # skip processed entries
             if (entry.get('series_parser') and entry['series_parser'].valid and entry[
-                'series_parser'].name.lower() != series_name.lower()):
+                    'series_parser'].name.lower() != series_name.lower()):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
@@ -1418,7 +1450,7 @@ class FilterSeries(FilterSeriesBase):
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
             if (entry['quality'] in downloaded_qualities and entry['series_parser'].proper_count > downloaded_qualities[
-                entry['quality']]):
+                    entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
@@ -1481,7 +1513,7 @@ class FilterSeries(FilterSeriesBase):
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
             if (not backfill and (episode.season < latest.season or (
-                            episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
+                    episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
@@ -1535,7 +1567,7 @@ class FilterSeries(FilterSeriesBase):
 
             hours, remainder = divmod(diff.seconds, 3600)
             hours += diff.days * 24
-            minutes, seconds = divmod(remainder, 60)
+            minutes, _ = divmod(remainder, 60)
 
             log.info('Timeframe waiting %s for %sh:%smin, currently best is %s' %
                      (episode.series.name, hours, minutes, best['title']))

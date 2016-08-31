@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import logging
@@ -10,10 +10,9 @@ import sys
 import flexget
 from flexget import options
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 
 log = logging.getLogger('win32_service')
-
 
 try:
     import servicemanager
@@ -21,7 +20,7 @@ try:
     import win32service
     import win32serviceutil
 
-    class AppServerSvc (win32serviceutil.ServiceFramework):
+    class AppServerSvc(win32serviceutil.ServiceFramework):
         _svc_name_ = 'FlexGet'
         _svc_display_name_ = 'FlexGet Daemon'
         _svc_description_ = 'Runs FlexGet tasks according to defined schedules'

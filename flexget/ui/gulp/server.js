@@ -4,14 +4,12 @@ var gulp = require('gulp');
 
 var paths = gulp.paths;
 
-var util = require('util');
-
 var browserSync = require('browser-sync');
 
 var middleware = require('./proxy');
 
 function browserSyncInit(baseDir, files, browser) {
-    browser = browser === undefined ? 'default' : browser;
+    browser = browser ? 'default' : browser;
 
     var routes = {
         '/bower_components': 'bower_components'

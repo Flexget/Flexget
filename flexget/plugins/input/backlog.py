@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import pickle
@@ -14,7 +14,6 @@ from flexget.manager import Session
 from flexget.utils.database import entry_synonym, with_session
 from flexget.utils.tools import parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
-
 
 log = logging.getLogger('backlog')
 Base = db_schema.versioned_base('backlog', 2)
@@ -56,7 +55,6 @@ def upgrade(ver, session):
 
 
 class BacklogEntry(Base):
-
     __tablename__ = 'backlog'
 
     id = Column(Integer, primary_key=True)
@@ -68,6 +66,7 @@ class BacklogEntry(Base):
 
     def __repr__(self):
         return '<BacklogEntry(title=%s)>' % (self.title)
+
 
 Index('ix_backlog_feed_expire', BacklogEntry.task, BacklogEntry.expire)
 
@@ -141,7 +140,7 @@ class InputBacklog(object):
                 log.warning('No input snapshot available for `%s`, using current state' % entry['title'])
             snapshot = entry
         expire_time = datetime.now() + parse_timedelta(amount)
-        backlog_entry = session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
+        backlog_entry = session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']). \
             filter(BacklogEntry.task == task.name).first()
         if backlog_entry:
             # If there is already a backlog entry for this, update the expiry time if necessary.

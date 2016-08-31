@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget import plugin
 from flexget.event import event
@@ -77,7 +77,8 @@ class FilterSeriesPremiere(FilterSeriesBase):
         # Since we are running after task start phase, make sure not to merge into the config multiple times on reruns
         if not task.is_rerun:
             # Combine settings and series into series plugin config format
-            allseries = {'settings': {'series_premiere': group_settings}, 'series_premiere': list(guessed_series.values())}
+            allseries = {'settings': {'series_premiere': group_settings},
+                         'series_premiere': list(guessed_series.values())}
             # Merge the our config in to the main series config
             self.merge_config(task, allseries)
 

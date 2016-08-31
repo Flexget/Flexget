@@ -1,6 +1,6 @@
 """Contains miscellaneous helpers"""
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.utils import PY2
 from past.builtins import basestring
 from future.moves.urllib import request
@@ -23,10 +23,7 @@ import flexget
 
 
 def str_to_boolean(string):
-    if string.lower() in ['true', '1', 't', 'y', 'yes']:
-        return True
-    else:
-        return False
+    return string.lower() in ['true', '1', 't', 'y', 'yes']
 
 
 def str_to_int(string):
@@ -34,6 +31,7 @@ def str_to_int(string):
         return int(string.replace(',', ''))
     except ValueError:
         return None
+
 
 if PY2:
     def native_str_to_text(string, **kwargs):
@@ -80,7 +78,7 @@ def strip_html(text):
     try:
         text = ' '.join(BeautifulSoup(text).find_all(text=True))
         return ' '.join(text.split())
-    except:
+    except Exception:
         return text
 
 
@@ -92,7 +90,7 @@ charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
 def _htmldecode(text):
     """Decode HTML entities in the given text."""
     # From screpe.py - licensed under apache 2.0 .. should not be a problem for a MIT afaik
-    if type(text) is str:
+    if isinstance(text, str):
         uchr = chr
     else:
         uchr = lambda value: value > 127 and chr(value) or chr(value)
@@ -151,7 +149,7 @@ def merge_dict_from_to(d1, d2):
     """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
     for k, v in list(d1.items()):
         if k in d2:
-            if type(v) == type(d2[k]):
+            if isinstance(v, type(d2[k])):
                 if isinstance(v, dict):
                     merge_dict_from_to(d1[k], d2[k])
                 elif isinstance(v, list):
@@ -345,7 +343,7 @@ class TimedDict(MutableMapping):
 
     def _prune(self):
         """Prune all expired keys."""
-        for key, (add_time, value) in list(self._store.items()):
+        for key, (add_time, _) in list(self._store.items()):
             if add_time < datetime.now() - self.cache_time:
                 del self._store[key]
         self._last_prune = datetime.now()
@@ -375,7 +373,8 @@ class TimedDict(MutableMapping):
         return len(list(self.__iter__()))
 
     def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__, dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))))
+        return '%s(%r)' % (
+            self.__class__.__name__, dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))))
 
 
 class BufferQueue(queue.Queue):
@@ -425,3 +424,34 @@ def get_latest_flexget_version_number():
 
 def get_current_flexget_version():
     return flexget.__version__
+
+
+def parse_filesize(text_size, si=True):
+    """
+    Parses a data size and returns its value in mebibytes
+
+    :param string text_size: string containing the data size to parse i.e. "5 GB"
+    :param bool si: If True, possibly ambiguous units like KB, MB, GB will be assumed to be base 10 units,
+    rather than the default base 2. i.e. if si then 50 GB = 47684 else 50GB = 51200
+
+    :returns: an float with the data size in mebibytes
+    """
+    prefix_order = {'': 0, 'k': 1, 'm': 2, 'g': 3, 't': 4, 'p': 5}
+
+    parsed_size = re.match('(\d+(?:\.\d+)?)(?:\s*)((?:[ptgmk]i?)?b)', text_size.strip().lower(), flags=re.UNICODE)
+    if not parsed_size:
+        raise ValueError('%s does not look like a file size' % text_size)
+    amount = parsed_size.group(1)
+    unit = parsed_size.group(2)
+    if not unit.endswith('b'):
+        raise ValueError('%s does not look like a file size' % text_size)
+    unit = unit.rstrip('b')
+    if unit.endswith('i'):
+        si = False
+        unit = unit.rstrip('i')
+    if unit not in prefix_order:
+        raise ValueError('%s does not look like a file size' % text_size)
+    order = prefix_order[unit]
+    amount = float(amount.replace(',', ''))
+    base = 1000 if si else 1024
+    return (amount * (base ** order)) / 1024 ** 2

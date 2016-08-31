@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import cmp
 
 import logging
@@ -15,18 +15,16 @@ from flexget.plugins.parsers.parser_common import default_ignore_prefixes, name_
 from flexget.utils import qualities
 from flexget.utils.tools import ReList
 
-
 log = logging.getLogger('seriesparser')
 
 # Forced to INFO !
 # switch to logging.DEBUG if you want to debug this class (produces quite a bit info ..)
 log.setLevel(logging.INFO)
 
-ID_TYPES = ['ep', 'date', 'sequence', 'id'] # may also be 'special'
+ID_TYPES = ['ep', 'date', 'sequence', 'id']  # may also be 'special'
 
 
 class SeriesParser(TitleParser):
-
     """
     Parse series.
 
@@ -611,8 +609,8 @@ class SeriesParser(TitleParser):
         if self.valid:
             valid = 'OK'
         return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,episode=%s,quality=%s,proper=%s,status=%s)>' % \
-            (self.data, self.name, str(self.id), self.season, self.episode,
-             self.quality, self.proper_count, valid)
+               (self.data, self.name, str(self.id), self.season, self.episode,
+                self.quality, self.proper_count, valid)
 
     def __cmp__(self, other):
         """Compares quality of parsers, if quality is equal, compares proper_count."""

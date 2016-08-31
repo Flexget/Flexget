@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -26,7 +26,6 @@ class PogcalShow(Base):
 
 
 class PogcalAcquired(object):
-
     schema = {
         'type': 'object',
         'properties': {

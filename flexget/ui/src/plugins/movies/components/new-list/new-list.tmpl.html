@@ -1,0 +1,28 @@
+	<md-toolbar>
+		<div class="md-toolbar-tools">
+			<h2>New Movie List</h2>
+			<span flex></span>
+			<md-button class="md-icon-button" ng-click="vm.cancel()">
+				<md-icon md-font-icon="fa-times" class="fa fa-lg"></md-icon>
+			</md-button>
+		</div>
+	</md-toolbar>
+	<form name="newListForm" ng-submit="vm.saveList()">
+		<md-dialog-content>
+			<div class="md-dialog-content">
+				<!-- TODO: Add a unique validator to the input, checking the DB if the name already exists -->
+				<md-input-container>
+					<label>Name</label>
+					<input type="text" ng-model="vm.listName" required>
+				</md-input-container>
+			</div>
+    	</md-dialog-content>
+    <md-dialog-actions>
+      <md-button ng-click="vm.cancel()" class="md-default md-raised">
+        Cancel
+      </md-button>
+      <md-button type="submit" ng-disabled="newListForm.$invalid || vm.lists.indexOf(vm.listName) != -1" class="md-primary md-raised">
+        Save
+      </md-button>
+    </md-dialog-actions>
+	</form>

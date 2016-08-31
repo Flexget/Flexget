@@ -1,15 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 from datetime import datetime
 
-from sqlalchemy import Column, String, Integer, DateTime, Unicode, desc
+from sqlalchemy import Column, String, Integer, DateTime, Unicode
 
-from flexget import options, plugin
+from flexget import plugin
 from flexget.event import event
-from flexget.logger import console
-from flexget.manager import Base, Session
+from flexget.manager import Base
 
 log = logging.getLogger('history')
 
@@ -64,39 +63,6 @@ class PluginHistory(object):
                 reason = ' (reason: %s)' % entry['reason']
             item.details = 'Accepted by %s%s' % (entry.get('accepted_by', '<unknown>'), reason)
             task.session.add(item)
-
-
-def do_cli(manager, options):
-    session = Session()
-    try:
-        console('-- History: ' + '-' * 67)
-        query = session.query(History)
-        if options.search:
-            search_term = options.search.replace(' ', '%').replace('.', '%')
-            query = query.filter(History.title.like('%' + search_term + '%'))
-        if options.task:
-            query = query.filter(History.task.like('%' + options.task + '%'))
-        query = query.order_by(desc(History.time)).limit(options.limit)
-        for item in reversed(query.all()):
-            console(' Task    : %s' % item.task)
-            console(' Title   : %s' % item.title)
-            console(' Url     : %s' % item.url)
-            if item.filename:
-                console(' Stored  : %s' % item.filename)
-            console(' Time    : %s' % item.time.strftime("%c"))
-            console(' Details : %s' % item.details)
-            console('-' * 79)
-    finally:
-        session.close()
-
-
-@event('options.register')
-def register_parser_arguments():
-    parser = options.register_command('history', do_cli, help='view the history of entries that FlexGet has accepted')
-    parser.add_argument('--limit', action='store', type=int, metavar='NUM', default=50,
-                        help='limit to %(metavar)s results')
-    parser.add_argument('--search', action='store', metavar='TERM', help='limit to results that contain %(metavar)s')
-    parser.add_argument('--task', action='store', metavar='TASK', help='limit to results in specified %(metavar)s')
 
 
 @event('plugin.register')

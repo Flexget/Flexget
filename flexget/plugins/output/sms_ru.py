@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import hashlib
@@ -87,9 +87,6 @@ class OutputSMSru(object):
 
             # Make the request
             response = task.requests.get(sms_send_url, params=send_params, raise_status=False)
-
-            # Get resul code from sms.ru backend returned in body
-            result_text = response.text
 
             # Check if it succeeded
             if response.text.find("100") == 0:

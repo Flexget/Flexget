@@ -11,13 +11,17 @@ addons:
   apt:
     packages:
       - libyaml-dev
+      - unrar
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
-  - pip install --upgrade pip
+  - pip install --upgrade pip setuptools
   - pip install .
   - pip install -r dev-requirements.txt
+  - pip install -r dev-requirements-extras.txt
 # command to run tests, e.g. python setup.py test
-script: py.test -n 3
+script: py.test --cov flexget --cov-report xml -n 3
+after_success:
+  - python-codacy-coverage -r coverage.xml
 env: VCR_RECORD_MODE=none
 notifications:
   email: false

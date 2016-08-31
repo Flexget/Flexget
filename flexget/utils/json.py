@@ -5,7 +5,7 @@ Plugins can just import the methods from this module.
 Also allows date and datetime objects to be encoded/decoded.
 """
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import datetime
 
@@ -23,12 +23,12 @@ except ImportError:
         except ImportError:
             raise DependencyError(missing='simplejson')
 
-
 DATE_FMT = '%Y-%m-%d'
 ISO8601_FMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 class DTDecoder(json.JSONDecoder):
+
     def decode(self, obj, **kwargs):
         # The built-in `json` library will `unicode` strings, except for empty strings. patch this for
         # consistency so that `unicode` is always returned.

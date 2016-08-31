@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import datetime
 import logging
@@ -34,15 +34,16 @@ class DiscoverEntry(Base):
     def __str__(self):
         return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (self.title, self.task, self.last_execution)
 
+
 Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
 
 
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     value = datetime.datetime.now() - parse_timedelta('7 days')
-    for de in session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all():
-        log.debug('deleting %s' % de)
-        session.delete(de)
+    for discover_entry in session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all():
+        log.debug('deleting %s' % discover_entry)
+        session.delete(discover_entry)
 
 
 class Discover(object):
@@ -53,11 +54,11 @@ class Discover(object):
 
       discover:
         what:
-          - emit_series: yes
+          - next_series_episodes: yes
         from:
           - piratebay
         interval: [1 hours|days|weeks]
-        ignore_estimations: [yes|no]
+        release_estimations: [strict|loose|ignore]
     """
 
     schema = {
@@ -70,7 +71,18 @@ class Discover(object):
                 'allOf': [{'$ref': '/schema/plugins?group=search'}, {'maxProperties': 1, 'minProperties': 1}]
             }},
             'interval': {'type': 'string', 'format': 'interval', 'default': '5 hours'},
-            'release_estimations': {'type': 'string', 'default': 'auto', 'enum': ['auto', 'strict', 'ignore']},
+            'release_estimations': {
+                'oneOf': [
+                    {'type': 'string', 'default': 'strict', 'enum': ['loose', 'strict', 'ignore']},
+                    {
+                        'type': 'object',
+                        'properties': {
+                            'optimistic': {'type': 'string', 'format': 'interval'}
+                        },
+                        'required': ['optimistic']
+                    }
+                ]
+            },
             'limit': {'type': 'integer', 'minimum': 1}
         },
         'required': ['what', 'from'],
@@ -109,7 +121,7 @@ class Discover(object):
                         continue
 
                     if entry['title'] in entry_titles:
-                        log.verbose('Ignored duplicate title `%s`' % entry['title'])    # TODO: should combine?
+                        log.verbose('Ignored duplicate title `%s`' % entry['title'])  # TODO: should combine?
                         continue
 
                     entries.append(entry)
@@ -140,12 +152,7 @@ class Discover(object):
                 log.verbose('Searching for `%s` with plugin `%s` (%i of %i)' %
                             (entry['title'], plugin_name, index + 1, len(entries)))
                 try:
-                    try:
-                        search_results = search.search(task=task, entry=entry, config=plugin_config)
-                    except TypeError:
-                        # Old search api did not take task argument
-                        log.warning('Search plugin %s does not support latest search api.' % plugin_name)
-                        search_results = search.search(entry, plugin_config)
+                    search_results = search.search(task=task, entry=entry, config=plugin_config)
                     if not search_results:
                         log.debug('No results from %s' % plugin_name)
                         continue
@@ -173,6 +180,7 @@ class Discover(object):
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort', -1))
 
     def entry_complete(self, entry, query=None, search_results=None, **kwargs):
+        """Callback for Entry"""
         if entry.accepted:
             # One of the search results was accepted, transfer the acceptance back to the query entry which generated it
             query.accept()
@@ -184,6 +192,7 @@ class Discover(object):
 
     def estimated(self, entries, estimation_mode):
         """
+        :param dict estimation_mode: mode -> loose, strict, ignore
         :return: Entries that we have estimated to be available
         """
         estimator = get_plugin_by_name('estimate_release').instance
@@ -192,29 +201,27 @@ class Discover(object):
             est_date = estimator.estimate(entry)
             if est_date is None:
                 log.debug('No release date could be determined for %s' % entry['title'])
-                if estimation_mode == 'strict':
+                if estimation_mode['mode'] == 'strict':
                     entry.reject('has no release date')
                     entry.complete()
                 else:
                     result.append(entry)
                 continue
-            if type(est_date) == datetime.date:
+            if isinstance(est_date, datetime.date):
                 # If we just got a date, add a time so we can compare it to now()
                 est_date = datetime.datetime.combine(est_date, datetime.time())
             if datetime.datetime.now() >= est_date:
                 log.debug('%s has been released at %s' % (entry['title'], est_date))
+                result.append(entry)
+            elif datetime.datetime.now() >= est_date - parse_timedelta(estimation_mode['optimistic']):
+                log.debug('%s will be released at %s. Ignoring release estimation because estimated release date is '
+                          'in less than %s', entry['title'], est_date, estimation_mode['optimistic'])
                 result.append(entry)
             else:
                 entry.reject('has not been released')
                 entry.complete()
                 log.debug("%s hasn't been released yet (Expected: %s)" % (entry['title'], est_date))
         return result
-
-    def interval_total_seconds(self, interval):
-        """
-        Because python 2.6 doesn't have total_seconds()
-        """
-        return interval.seconds + interval.days * 24 * 3600
 
     def interval_expired(self, config, task, entries):
         """
@@ -231,38 +238,44 @@ class Discover(object):
         interval_count = 0
         with Session() as session:
             for entry in entries:
-                de = session.query(DiscoverEntry).\
-                    filter(DiscoverEntry.title == entry['title']).\
+                discover_entry = session.query(DiscoverEntry). \
+                    filter(DiscoverEntry.title == entry['title']). \
                     filter(DiscoverEntry.task == task.name).first()
 
-                if not de:
+                if not discover_entry:
                     log.debug('%s -> No previous run recorded' % entry['title'])
-                    de = DiscoverEntry(entry['title'], task.name)
-                    session.add(de)
-                if (not task.is_rerun and task.options.discover_now) or not de.last_execution:
+                    discover_entry = DiscoverEntry(entry['title'], task.name)
+                    session.add(discover_entry)
+                if (not task.is_rerun and task.options.discover_now) or not discover_entry.last_execution:
                     # First time we execute (and on --discover-now) we randomize time to avoid clumping
                     delta = multiply_timedelta(interval, random.random())
-                    de.last_execution = datetime.datetime.now() - delta
+                    discover_entry.last_execution = datetime.datetime.now() - delta
                 else:
-                    next_time = de.last_execution + interval
+                    next_time = discover_entry.last_execution + interval
                     log.debug('last_time: %r, interval: %s, next_time: %r, ',
-                              de.last_execution, config['interval'], next_time)
+                              discover_entry.last_execution, config['interval'], next_time)
                     if datetime.datetime.now() < next_time:
                         log.debug('interval not met')
                         interval_count += 1
                         entry.reject('discover interval not met')
                         entry.complete()
                         continue
-                    de.last_execution = datetime.datetime.now()
-                log.debug('interval passed')
+                    discover_entry.last_execution = datetime.datetime.now()
+                log.trace('interval passed for %s', entry['title'])
                 result.append(entry)
-        if interval_count:
+        if interval_count and not task.is_rerun:
             log.verbose('Discover interval of %s not met for %s entries. Use --discover-now to override.' %
                         (config['interval'], interval_count))
         return result
 
     def on_task_input(self, task, config):
-        config.setdefault('release_estimations', 'auto')
+        config.setdefault('release_estimations', {})
+        if not isinstance(config['release_estimations'], dict):
+            config['release_estimations'] = {'mode': config['release_estimations']}
+
+        config['release_estimations'].setdefault('mode', 'strict')
+        config['release_estimations'].setdefault('optimistic', '0 days')
+
         task.no_entries_ok = True
         entries = self.execute_inputs(config, task)
         log.verbose('Discovering %i titles ...' % len(entries))
@@ -272,7 +285,7 @@ class Discover(object):
         # TODO: the entries that are estimated should be given priority over expiration
         entries = self.interval_expired(config, task, entries)
         estimation_mode = config['release_estimations']
-        if estimation_mode != 'ignore':
+        if estimation_mode['mode'] != 'ignore':
             entries = self.estimated(entries, estimation_mode)
         return self.execute_searches(config, entries, task)
 
@@ -285,4 +298,4 @@ def register_plugin():
 @event('options.register')
 def register_parser_arguments():
     options.get_parser('execute').add_argument('--discover-now', action='store_true', dest='discover_now',
-                                               default=False, help='immediately try to discover everything')
+                                               default=False, help='Immediately try to discover everything')

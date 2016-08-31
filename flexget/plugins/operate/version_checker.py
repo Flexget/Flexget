@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -77,10 +77,7 @@ class VersionChecker(object):
             log.debug('dev version detected, skipping check')
             return
 
-        if config.get('lookup') == 'always':
-            always_check = True
-        else:
-            always_check = False
+        always_check = bool(config.get('lookup') == 'always')
         interval = config.get('interval')
 
         session = Session()

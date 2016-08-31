@@ -1,10 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import difflib
 import logging
 import re
+import random
 
 from bs4.element import Tag
 
@@ -22,6 +23,7 @@ requests.headers.update({'User-Agent': 'Python-urllib/2.6'})
 
 # this makes most of the titles to be returned in english translation, but not all of them
 requests.headers.update({'Accept-Language': 'en-US,en;q=0.8'})
+requests.headers.update({'X-Forwarded-For': '24.110.%d.%d' % (random.randint(0, 254), random.randint(0, 254))})
 
 # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
 requests.add_domain_limiter(TimedLimiter('imdb.com', '3 seconds'))
@@ -50,7 +52,6 @@ def make_url(imdb_id):
 
 
 class ImdbSearch(object):
-
     def __init__(self):
         # de-prioritize aka matches a bit
         self.aka_weight = 0.95
@@ -60,14 +61,14 @@ class ImdbSearch(object):
         self.min_diff = 0.01
         self.debug = False
 
-        self.max_results = 10
+        self.max_results = 50
 
     def ireplace(self, text, old, new, count=0):
         """Case insensitive string replace"""
         pattern = re.compile(re.escape(old), re.I)
         return re.sub(pattern, new, text, count)
 
-    def smart_match(self, raw_name):
+    def smart_match(self, raw_name, single_match=True):
         """Accepts messy name, cleans it and uses information available to make smartest and best match"""
         parser = get_plugin_by_name('parsing').instance.parse_movie(raw_name)
         name = parser.name
@@ -76,9 +77,9 @@ class ImdbSearch(object):
             log.critical('Failed to parse name from %s' % raw_name)
             return None
         log.debug('smart_match name=%s year=%s' % (name, str(year)))
-        return self.best_match(name, year)
+        return self.best_match(name, year, single_match)
 
-    def best_match(self, name, year=None):
+    def best_match(self, name, year=None, single_match=True):
         """Return single movie that best matches name criteria or None"""
         movies = self.search(name)
 
@@ -119,43 +120,46 @@ class ImdbSearch(object):
                 log.debug('remain: %s (match: %s) %s' % (m['name'], m['match'], m['url']))
             return None
         else:
-            return movies[0]
+            return movies[0] if single_match else movies
 
     def search(self, name):
         """Return array of movie details (dict)"""
         log.debug('Searching: %s' % name)
         url = u'http://www.imdb.com/find'
-        # This will only include movies searched by title in the results
-        params = {'q': name, 's': 'tt', 'ttype': 'ft'}
+        # This may include Shorts and TV series in the results
+        params = {'q': name, 's': 'tt'}
 
-        log.debug('Serch query: %s' % repr(url))
+        log.debug('Search query: %s' % repr(url))
         page = requests.get(url, params=params)
         actual_url = page.url
 
         movies = []
+        soup = get_soup(page.text)
         # in case we got redirected to movie page (perfect match)
         re_m = re.match(r'.*\.imdb\.com/title/tt\d+/', actual_url)
         if re_m:
+            div = soup.find('div', {'class': 'title_wrapper'})
+            title_wrapper = div.find('h1', {'itemprop': 'name'})
+            title = ''.join(text for text in title_wrapper.find_all(text=True) if text.parent.name not in ['span', 'a'])
+            title = title.strip()
+            year = div.find('a').text
             actual_url = re_m.group(0)
             log.debug('Perfect hit. Search got redirected to %s' % actual_url)
             movie = {}
             movie['match'] = 1.0
-            movie['name'] = name
+            movie['name'] = title
             movie['imdb_id'] = extract_id(actual_url)
             movie['url'] = make_url(movie['imdb_id'])
-            movie['year'] = None  # skips year check
+            movie['year'] = year
             movies.append(movie)
             return movies
-
-        # the god damn page has declared a wrong encoding
-        soup = get_soup(page.text)
 
         section_table = soup.find('table', 'findList')
         if not section_table:
             log.debug('results table not found')
             return
 
-        rows = section_table.find_all('td', 'result_text')
+        rows = section_table.find_all('tr')
         if not rows:
             log.debug('Titles section does not have links')
         for count, row in enumerate(rows):
@@ -163,12 +167,21 @@ class ImdbSearch(object):
             if count > self.max_results:
                 break
 
+            result_text = row.find('td', 'result_text')
             movie = {}
-            additional = re.findall(r'\((.*?)\)', row.text)
+            additional = re.findall(r'\((.*?)\)', result_text.text)
             if len(additional) > 0:
-                movie['year'] = additional[-1]
+                if re.match('^\d{4}$', additional[-1]):
+                    movie['year'] = additional[-1]
+                elif len(additional) > 1:
+                    movie['year'] = additional[-2]
+                    if additional[-1] not in ['TV Movie', 'Video']:
+                        log.debug('skipping %s', result_text.text)
+                        continue
+            primary_photo = row.find('td', 'primary_photo')
+            movie['thumbnail'] = primary_photo.find('a').find('img').get('src')
 
-            link = row.find_next('a')
+            link = result_text.find_next('a')
             movie['name'] = link.text
             movie['imdb_id'] = extract_id(link.get('href'))
             movie['url'] = make_url(movie['imdb_id'])

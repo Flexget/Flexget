@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.utils import PY2
 
 import logging
@@ -110,7 +110,8 @@ class Filesystem(object):
         entry = Entry()
         entry['location'] = filepath
         if PY2:
-            import urllib, urlparse
+            import urllib
+            import urlparse
             entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(filepath.encode('utf8')))
         else:
             import pathlib
@@ -170,7 +171,8 @@ class Filesystem(object):
                 try:
                     path_object.exists()
                 except UnicodeError:
-                    log.error('File %s not decodable with filesystem encoding: %s' % (path_object, sys.getfilesystemencoding()))
+                    log.error('File %s not decodable with filesystem encoding: %s' % (
+                        path_object, sys.getfilesystemencoding()))
                     continue
                 entry = None
                 object_depth = len(path_object.splitall())

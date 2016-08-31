@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -15,7 +15,6 @@ UNSET = object()
 
 
 class ModifySet(object):
-
     """Allows adding information to a task entry for use later.
 
     Example:

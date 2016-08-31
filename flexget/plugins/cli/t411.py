@@ -1,13 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.logger import console
+from flexget.terminal import console
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.api_t411 import (T411Proxy)
+    from flexget.plugins.internal.api_t411 import (T411Proxy)
 except:
     raise plugin.DependencyError(issued_by='cli_series', missing='api_t411',
                                  message='Torrent411 commandline interface not loaded')

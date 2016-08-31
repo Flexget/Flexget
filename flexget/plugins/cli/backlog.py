@@ -1,40 +1,34 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
 from flexget.event import event
-from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugins.input.backlog import get_entries, clear_entries
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 
 
 def do_cli(manager, options):
     if options.action == 'clear':
-        num = clear_entries(options.task)
+        num = clear_entries(options.task, all=True)
         console('%s entries cleared from backlog.' % num)
     else:
-        if options.porcelain:
-            cols = '{:<65.64}{:<1.1}{:<15.15}'
-            console(cols.format('Title', '|', 'Task'))
-        else:
-            cols = '{:<65.64}{:<15.15}'
-            console('-' * 80)
-            console(cols.format('Title', 'Task'))
-            console('-' * 80)
+        header = ['Title', 'Task', 'Expires']
+        table_data = [header]
         with Session() as session:
             entries = get_entries(options.task, session=session)
             for entry in entries:
-                if options.porcelain:
-                    console(cols.format(entry.title, '|', entry.task))
-                else:
-                    console(cols.format(entry.title, entry.task))
-            if not entries:
-                console('No items')
+                table_data.append([entry.title, entry.task, entry.expire.strftime('%Y-%m-%d %H:%M')])
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[0])
+        try:
+            console(table.output)
+        except TerminalTableError as e:
+            console('ERROR: %s' % str(e))
 
 
 @event('options.register')
 def register_options():
-    parser = options.register_command('backlog', do_cli, help='view or clear entries from backlog plugin')
-    parser.add_argument('action', choices=['list', 'clear'], help='choose to show items in backlog, or clear them')
-    parser.add_argument('task', nargs='?', help='limit to specific task (if supplied)')
-    parser.add_argument('--porcelain', action='store_true', help='make the output parseable')
+    parser = options.register_command('backlog', do_cli, help='View or clear entries from backlog plugin',
+                                      parents=[table_parser])
+    parser.add_argument('action', choices=['list', 'clear'], help='Choose to show items in backlog, or clear all of them')
+    parser.add_argument('task', nargs='?', help='Limit to specific task (if supplied)')

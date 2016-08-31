@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -53,7 +53,7 @@ class RegexExtract(object):
 
         # Check the regex
         try:
-            for rx in self.regex_list:
+            for _ in self.regex_list:
                 pass
         except re.error as e:
             raise plugin.PluginError('Error compiling regex: %s' % str(e))

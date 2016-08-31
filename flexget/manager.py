@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import atexit
 import codecs
@@ -14,7 +14,6 @@ import threading
 import traceback
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-
 import io
 
 import sqlalchemy
@@ -36,11 +35,14 @@ from flexget.options import CoreArgumentParser, get_parser, manager_parser, Pars
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
 from flexget.utils.tools import pid_exists, get_current_flexget_version  # noqa
+from flexget.terminal import console  # noqa
 
 log = logging.getLogger('manager')
 
 manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
+
+native_int = int
 
 
 class Manager(object):
@@ -134,14 +136,15 @@ class Manager(object):
             # TODO: This is a bit hacky, but we can't call parse on real arguments when --help is used because it will
             # cause a system exit before plugins are loaded and print incomplete help. This will get us a default
             # options object and we'll parse the real args later, or send them to daemon. #2807
-            self.options, extra = CoreArgumentParser().parse_known_args(['execute'])
+            self.options, _ = CoreArgumentParser().parse_known_args(['execute'])
         else:
             try:
-                self.options, extra = CoreArgumentParser().parse_known_args(args)
+                self.options, _ = CoreArgumentParser().parse_known_args(args)
             except ParserError:
                 try:
-                    # If a non-built-in command was used, we need to parse with a parser that doesn't define the subparsers
-                    self.options, extra = manager_parser.parse_known_args(args)
+                    # If a non-built-in command was used, we need to parse with a parser that
+                    # doesn't define the subparsers
+                    self.options, _ = manager_parser.parse_known_args(args)
                 except ParserError as e:
                     manager_parser.print_help()
                     print('\nError: %s' % e.message)
@@ -228,7 +231,7 @@ class Manager(object):
             written to it.
         :param priority: If there are other executions waiting to be run, they will be run in priority order,
             lowest first.
-        :returns: a list of :class:`threading.Event` instances which will be
+         :returns: a list of :class:`threading.Event` instances which will be
             set when each respective task has finished running
         """
         if options is None:
@@ -281,7 +284,7 @@ class Manager(object):
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
         if ipc_info:
-            logger.console('There is a FlexGet process already running for this config, sending execution there.')
+            console('There is a FlexGet process already running for this config, sending execution there.')
             log.debug('Sending command to running FlexGet process: %s' % self.args)
             try:
                 client = IPCClient(ipc_info['port'], ipc_info['password'])
@@ -357,7 +360,7 @@ class Manager(object):
                                            loglevel=logger.get_capture_loglevel())
             if not options.cron:
                 # Wait until execution of all tasks has finished
-                for task_id, task_name, event in finished_events:
+                for _, _, event in finished_events:
                     event.wait()
         else:
             self.task_queue.start()
@@ -459,7 +462,6 @@ class Manager(object):
         :param bool create: If a config file is not found, and create is True, one will be created in the home folder
         :raises: `IOError` when no config file could be found, and `create` is False.
         """
-        config = None
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
         options_config = os.path.expanduser(self.options.config)
 
@@ -517,7 +519,7 @@ class Manager(object):
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
 
-    def load_config(self):
+    def load_config(self, output_to_console=True):
         """
         Loads the config file from disk, validates and activates it.
 
@@ -536,41 +538,44 @@ class Manager(object):
             msg = str(e).replace('\n', ' ')
             msg = ' '.join(msg.split())
             log.critical(msg, exc_info=False)
-            print('')
-            print('-' * 79)
-            print(' Malformed configuration file (check messages above). Common reasons:')
-            print('-' * 79)
-            print('')
-            print(' o Indentation error')
-            print(' o Missing : from end of the line')
-            print(' o Non ASCII characters (use UTF8)')
-            print(' o If text contains any of :[]{}% characters it must be single-quoted '
-                  '(eg. value{1} should be \'value{1}\')\n')
+            if output_to_console:
+                print('')
+                print('-' * 79)
+                print(' Malformed configuration file (check messages above). Common reasons:')
+                print('-' * 79)
+                print('')
+                print(' o Indentation error')
+                print(' o Missing : from end of the line')
+                print(' o Non ASCII characters (use UTF8)')
+                print(' o If text contains any of :[]{}% characters it must be single-quoted '
+                      '(eg. value{1} should be \'value{1}\')\n')
 
-            # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
-            # At least: ReaderError, YmlScannerError (or something like that)
-            if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
-                lines = 0
-                if e.problem is not None:
-                    print(' Reason: %s\n' % e.problem)
-                    if e.problem == 'mapping values are not allowed here':
-                        print(' ----> MOST LIKELY REASON: Missing : from end of the line!')
+                # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
+                # At least: ReaderError, YmlScannerError (or something like that)
+                if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
+                    lines = 0
+                    if e.problem is not None:
+                        print(' Reason: %s\n' % e.problem)
+                        if e.problem == 'mapping values are not allowed here':
+                            print(' ----> MOST LIKELY REASON: Missing : from end of the line!')
+                            print('')
+                    if e.context_mark is not None:
+                        print(' Check configuration near line %s, column %s' % (
+                            e.context_mark.line, e.context_mark.column))
+                        lines += 1
+                    if e.problem_mark is not None:
+                        print(' Check configuration near line %s, column %s' % (
+                            e.problem_mark.line, e.problem_mark.column))
+                        lines += 1
+                    if lines:
                         print('')
-                if e.context_mark is not None:
-                    print(' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column))
-                    lines += 1
-                if e.problem_mark is not None:
-                    print(' Check configuration near line %s, column %s' % (e.problem_mark.line, e.problem_mark.column))
-                    lines += 1
-                if lines:
-                    print('')
-                if lines == 1:
-                    print(' Fault is almost always in this or previous line\n')
-                if lines == 2:
-                    print(' Fault is almost always in one of these lines or previous ones\n')
+                    if lines == 1:
+                        print(' Fault is almost always in this or previous line\n')
+                    if lines == 2:
+                        print(' Fault is almost always in one of these lines or previous ones\n')
 
             # When --debug escalate to full stacktrace
-            if self.options.debug:
+            if self.options.debug or not output_to_console:
                 raise
             raise ValueError('Config file is not valid YAML')
 
@@ -600,15 +605,27 @@ class Manager(object):
         self.user_config = copy.deepcopy(new_user_config)
         fire_event('manager.config_updated', self)
 
+    def backup_config(self):
+        backup_path = os.path.join(self.config_base,
+                                   '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')))
+
+        log.debug('backing up old config to %s before new save' % backup_path)
+        try:
+            shutil.copy(self.config_path, backup_path)
+        except (OSError, IOError) as e:
+            log.warning('Config backup creation failed: %s', str(e))
+            raise
+        return backup_path
+
     def save_config(self):
         """Dumps current config to yaml config file"""
         # TODO: Only keep x number of backups..
 
         # Back up the user's current config before overwriting
-        backup_path = os.path.join(self.config_base,
-                                   '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')))
-        log.debug('backing up old config to %s before new save' % backup_path)
-        shutil.copy(self.config_path, backup_path)
+        try:
+            self.backup_config()
+        except (OSError, IOError):
+            return
         with open(self.config_path, 'w') as config_file:
             config_file.write(yaml.dump(self.user_config, default_flow_style=False))
 
@@ -655,7 +672,7 @@ class Manager(object):
             self.database_uri = 'sqlite:///%s' % filename
 
         if self.db_filename and not os.path.exists(self.db_filename):
-            log.verbose('Creating new database %s ...' % self.db_filename)
+            log.verbose('Creating new database %s - DO NOT INTERUPT ...' % self.db_filename)
 
         # fire up the engine
         log.debug('Connecting to: %s' % self.database_uri)
@@ -700,7 +717,7 @@ class Manager(object):
                 result[key.strip().lower()] = value.strip()
             for key in result:
                 if result[key].isdigit():
-                    result[key] = int(result[key])
+                    result[key] = native_int(result[key])
             result.setdefault('pid', None)
             if not result['pid']:
                 log.error('Invalid lock file. Make sure FlexGet is not running, then delete it.')

@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
-from past.builtins import basestring
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.utils import with_metaclass
 
 import re
@@ -43,7 +42,7 @@ class Errors(object):
         """Removes level from path by depth number"""
         if self.path_level is None:
             raise Exception('no path level')
-        del(self.path[self.path_level])
+        del (self.path[self.path_level])
         self.path_level -= 1
 
     def path_update_value(self, value):
@@ -51,6 +50,7 @@ class Errors(object):
         if self.path_level is None:
             raise Exception('no path level')
         self.path[self.path_level] = value
+
 
 # A registry mapping validator names to their class
 registry = {}
@@ -179,14 +179,14 @@ class ChoiceValidator(Validator):
         self.valid_ic = []
         Validator.__init__(self, parent, **kwargs)
 
-    def accept(self, value, ignore_case=False):
+    def accept(self, value, ignore_case=False):  # pylint: disable=W0221
         """
         :param value: accepted text, int or boolean
         :param bool ignore_case: Whether case matters for text values
         """
-        if not isinstance(value, (basestring, int, float)):
+        if not isinstance(value, (str, int, float)):
             raise Exception('Choice validator only accepts strings and numbers')
-        if isinstance(value, basestring) and ignore_case:
+        if isinstance(value, str) and ignore_case:
             self.valid_ic.append(value.lower())
         else:
             self.valid.append(value)
@@ -347,7 +347,7 @@ class PathValidator(TextValidator):
     def __init__(self, parent=None, allow_replacement=False, allow_missing=False, **kwargs):
         self.allow_replacement = allow_replacement
         self.allow_missing = allow_missing
-        Validator.__init__(self, parent, **kwargs)
+        TextValidator.__init__(self, parent, **kwargs)
 
     def _schema(self):
         if self.allow_missing:
@@ -363,7 +363,7 @@ class UrlValidator(TextValidator):
             self.protocols = protocols
         else:
             self.protocols = ['ftp', 'http', 'https', 'file']
-        Validator.__init__(self, parent, **kwargs)
+            TextValidator.__init__(self, parent, **kwargs)
 
     def _schema(self):
         return {'type': 'string', 'format': 'url'}
@@ -447,7 +447,7 @@ class DictValidator(Validator):
             # Make sure errors show up in our list
             key_validator.add_parent(self)
         elif key_type:
-            if isinstance(key_type, basestring):
+            if isinstance(key_type, str):
                 key_type = [key_type]
             key_validator = self.get_validator('root')
             for key_type in key_type:
@@ -493,6 +493,7 @@ class QualityRequirementsValidator(TextValidator):
 
     def _schema(self):
         return {'type': 'string', 'format': 'qualityRequirements'}
+
 
 # ---- TESTING ----
 
@@ -542,19 +543,11 @@ def build_options_validator(options):
 
 
 def complex_test():
-
     def build_list(series):
         """Build series list to series."""
         series.accept('text')
         series.accept('number')
         bundle = series.accept('dict')
-        # prevent invalid indentation level
-        """
-        bundle.reject_keys(['set', 'path', 'timeframe', 'name_regexp',
-            'ep_regexp', 'id_regexp', 'watched', 'quality', 'min_quality',
-            'max_quality', 'qualities', 'exact', 'from_group'],
-            'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
-        """
         bundle.accept_any_key('path')
         options = bundle.accept_any_key('dict')
         build_options_validator(options)
@@ -568,27 +561,12 @@ def complex_test():
     simple = root.accept('list')
     build_list(simple)
 
-    # advanced format:
-    #   settings:
-    #     group: {...}
-    #   group:
-    #     {...}
-
-    """
-    advanced = root.accept('dict')
-    settings = advanced.accept('dict', key='settings')
-    settings_group = settings.accept_any_key('dict')
-    build_options_validator(settings_group)
-
-    group = advanced.accept_any_key('list')
-    build_list(group)
-    """
-
     return root
 
 
 if __name__ == '__main__':
     from flexget.plugins.input.rss import InputRSS
+
     # v = complex_test()
     v = InputRSS().validator()
     schema = v.schema()
@@ -597,12 +575,9 @@ if __name__ == '__main__':
 
     print(json.dumps(schema, sort_keys=True, indent=4))
 
-    """
-    root = factory()
-    list = root.accept('list')
-    list.accept('text')
-    list.accept('regexp')
-    list.accept('choice').accept_choices(['foo', 'bar'])
-
-    print root.schema()
-    """
+    # root = factory()
+    # list = root.accept('list')
+    # list.accept('text')
+    # list.accept('regexp')
+    # list.accept('choice').accept_choices(['foo', 'bar'])
+    # print root.schema()

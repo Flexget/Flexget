@@ -1,8 +1,8 @@
 <div class="header md-whiteframe-4dp" ng-class="menuMini ? 'header-mini': 'header-full'">
-    <div class="logo"><a href="#/home"></a></div>
+    <div class="logo"><a href="#/"></a></div>
     <tool-bar></tool-bar>
 </div>
 <div layout="row" flex ng-class="menuMini ? 'nav-menu-mini': 'nav-menu-full'">
-    <side-nav></side-nav>
-    <md-content ui-view layout-padding flex layout="column" id="content"></md-content>
+    <side-nav layout="column"></side-nav>
+    <div ui-view layout-fill flex layout="column" id="content"></div>
 </div>

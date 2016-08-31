@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -12,6 +12,7 @@ from flexget.utils.soup import get_soup
 
 log = logging.getLogger('anidb_list')
 USER_ID_RE = r'^\d{1,6}$'
+
 
 class AnidbList(object):
     """"Creates an entry for each movie or series in your AniDB wishlist."""
@@ -26,10 +27,10 @@ class AnidbList(object):
             'type': {
                 'type': 'string',
                 'enum': ['shows', 'movies'],
-                'default' : 'movies'},
+                'default': 'movies'},
             'strip_dates': {
                 'type': 'boolean',
-                'default' : False}
+                'default': False}
         },
         'additionalProperties': False,
         'required': ['user_id'],
@@ -89,6 +90,7 @@ class AnidbList(object):
             else:
                 log.verbose('Entry does not match the requested type')
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

@@ -1,0 +1,50 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=Firefly
+  response:
+    body: {string: !!python/unicode '{"id":180,"url":"http://www.tvmaze.com/shows/180/firefly","name":"Firefly","type":"Scripted","language":"English","genres":["Adventure","Science-Fiction","Western"],"status":"Ended","runtime":60,"premiered":"2002-09-20","schedule":{"time":"20:00","days":["Friday"]},"rating":{"average":9.4},"weight":0,"network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3548,"thetvdb":78874,"imdb":"tt0303461"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2600.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2600.jpg"},"summary":"<p>Five
+        hundred years in the future, a renegade crew aboard a small spacecraft tries
+        to survive as they travel the unknown parts of the galaxy and evade warring
+        factions as well as authority agents out to get them.</p>","updated":1449590156,"_links":{"self":{"href":"http://api.tvmaze.com/shows/180"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/13006"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 17 May 2016 08:58:29 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/180/episodebynumber?season=1&number=13
+  response:
+    body: {string: !!python/unicode '{"id":13007,"url":"http://www.tvmaze.com/episodes/13007/firefly-1x13-heart-of-gold","name":"Heart
+        of Gold","season":1,"number":13,"airdate":"","airtime":"20:00","airstamp":null,"runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/9/23981.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/9/23981.jpg"},"summary":"<p>The
+        crew comes to the aid of a bordello when its madam, an old acquaintance of
+        Inara''s, asks for help after a rancher claims a prostitute''s baby is his
+        and he''s taking it because his wife is barren.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/13007"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 17 May 2016 08:58:29 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+    status: {code: 200, message: OK}
+version: 1

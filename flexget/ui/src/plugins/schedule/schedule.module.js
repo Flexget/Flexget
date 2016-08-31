@@ -1,12 +1,15 @@
+/* global angular, registerPlugin */
 (function () {
     'use strict';
 
-    var scheduleModule = angular.module('flexget.plugins.schedule', ['schemaForm']);
-    registerPlugin(scheduleModule);
+    angular
+        .module('plugins.schedule', [
+            'angular-cache',
 
-    scheduleModule.run(function (route, sideNav) {
-        route.register('schedule', '/schedule', 'schedule-view');
-        sideNav.register('/schedule', 'Schedule', 'fa fa-calendar', 128);
-    });
+            'blocks.exception',
+            'blocks.router'
+            //'schemaForm'
+        ]);
 
-})();
+    registerPlugin('plugins.schedule');
+}());

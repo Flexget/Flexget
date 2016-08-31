@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 from flexget import plugin
@@ -22,7 +22,7 @@ class FilterSeenInfoHash(FilterSeen):
         self.keyword = 'seen_info_hash'
 
     @plugin.priority(180)
-    def on_task_filter(self, task, config):
+    def on_task_filter(self, task, config):  # pylint: disable=W0221
         # Return if we are disabled.
         if config is False:
             return

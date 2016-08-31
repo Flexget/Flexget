@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.utils import native_str
-from past.builtins import basestring
 
 import logging
 from datetime import datetime
@@ -164,7 +163,7 @@ def upgrade(plugin):
                         set_version(plugin, new_ver, session=session)
                         manager.db_upgraded = True
                     elif new_ver < current_ver:
-                        log.critical('A lower schema version was returned (%s) from the %s upgrade function '
+                        log.critical('A lower schema version was returned (%s) from plugin %s upgrade function '
                                      'than passed in (%s)' % (new_ver, plugin, current_ver))
                         session.rollback()
                         manager.shutdown(finish_queue=False)
@@ -239,7 +238,7 @@ class Meta(type):
 
         :param table: Can either be the name of the table, or an :class:`sqlalchemy.Table` instance.
         """
-        if isinstance(table, basestring):
+        if isinstance(table, str):
             register_plugin_table(table, cls.plugin, cls.version)
         else:
             register_plugin_table(table.name, cls.plugin, cls.version)

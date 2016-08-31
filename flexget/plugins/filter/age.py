@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 from datetime import datetime
@@ -52,7 +52,7 @@ class Age(object):
             elif isinstance(field_value, str):
                 try:
                     field_date = dateutil_parse(entry[field])
-                except ValueError as e:
+                except ValueError:
                     log.warning('Entry %s ignored: %s is not a valid date', entry['title'], field_value)
                     continue
             else:

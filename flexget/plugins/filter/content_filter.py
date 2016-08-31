@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -96,17 +96,17 @@ class FilterContentFilter(object):
     @plugin.priority(150)
     def on_task_modify(self, task, config):
         if task.options.test or task.options.learn:
-            log.info('Plugin is partially disabled with --test and --learn \
-because content filename information may not be available')
+            log.info('Plugin is partially disabled with --test and --learn '
+                     'because content filename information may not be available')
             # return
 
         config = self.prepare_config(config)
         for entry in task.accepted:
             if self.process_entry(task, entry, config):
-                task.rerun()
+                task.rerun(plugin='content_filter')
             elif 'content_files' not in entry and config.get('strict'):
                 entry.reject('no content files parsed for entry', remember=True)
-                task.rerun()
+                task.rerun(plugin='content_filter')
 
 
 @event('plugin.register')

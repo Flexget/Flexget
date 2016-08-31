@@ -1,0 +1,37 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    response:
+      body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
+          to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
+          By day he is an average computer programmer and by night a malevolent hacker
+          known as Neo, who finds himself targeted by the police when he is contacted
+          by Morpheus, a legendary computer hacker, who reveals the shocking truth
+          about our reality.","released":"1999-03-30","runtime":136,"trailer":null,"homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.92215,"votes":19961,"updated_at":"2016-05-01T08:47:35.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id","fa","bs"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
+      headers:
+        CF-Cache-Status: [HIT]
+        CF-RAY: [29de2399e5c11189-DFW]
+        Cache-Control: ['public, max-age=14400']
+        Connection: [keep-alive]
+        Content-Type: [application/json; charset=utf-8]
+        Date: ['Wed, 04 May 2016 18:50:33 GMT']
+        ETag: [W/"839c412c457d52634cf714692bc10e07"]
+        Expires: ['Wed, 04 May 2016 22:50:33 GMT']
+        Last-Modified: ['Sun, 01 May 2016 08:47:35 GMT']
+        Server: [cloudflare-nginx]
+        Set-Cookie: ['__cfduid=d346fd4b22769bce2db90b30a972b9e891462387833; expires=Thu,
+            04-May-17 18:50:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        Vary: [Accept-Encoding]
+        X-Content-Type-Options: [nosniff]
+        X-Frame-Options: [SAMEORIGIN]
+        X-Request-Id: [9aa48160-a3ee-4b67-b681-bbf209702c89]
+        X-Runtime: ['0.032518']
+        X-XSS-Protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1

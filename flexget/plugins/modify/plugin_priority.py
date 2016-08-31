@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -10,7 +10,6 @@ log = logging.getLogger('p_priority')
 
 
 class PluginPriority(object):
-
     """
         Allows modifying plugin priorities from default values.
 

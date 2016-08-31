@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 from datetime import datetime, timedelta
@@ -7,12 +7,12 @@ from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime
 from sqlalchemy.schema import Index
 
-from flexget import db_schema, options, plugin
+from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.tools import parse_timedelta
+
 
 SCHEMA_VER = 3
 
@@ -136,6 +136,10 @@ class PluginFailed(object):
         # Timedeltas do not allow floating point multiplication. Convert to seconds and then back to avoid this.
         base_retry_secs = base_retry_time.days * 86400 + base_retry_time.seconds
         retry_secs = base_retry_secs * (config['retry_time_multiplier'] ** fail_count)
+        # prevent OverflowError: date value out of range, cap to 30 days
+        max = 60 * 60 * 24 * 30
+        if retry_secs > max:
+            retry_secs = max
         return timedelta(seconds=retry_secs)
 
     @plugin.priority(-255)
@@ -166,7 +170,7 @@ class PluginFailed(object):
             log.debug('Marking %s in failed list. Has failed %s times.' % (item.title, item.count))
             if self.backlog and item.count <= config['max_retries']:
                 self.backlog.instance.add_backlog(entry.task, entry, amount=retry_time, session=session)
-            entry.task.rerun()
+            entry.task.rerun(plugin='retry_failed')
 
     @plugin.priority(255)
     def on_task_filter(self, task, config):
@@ -186,46 +190,6 @@ class PluginFailed(object):
                                  item.reason)
 
 
-def do_cli(manager, options):
-    if options.failed_action == 'list':
-        list_failed()
-    elif options.failed_action == 'clear':
-        clear_failed(manager)
-
-
-def list_failed():
-    session = Session()
-    try:
-        results = session.query(FailedEntry).all()
-        if not results:
-            console('No failed entries recorded')
-        for entry in results:
-            console('%16s - %s - %s times - %s' %
-                    (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title, entry.count, entry.reason))
-    finally:
-        session.close()
-
-
-def clear_failed(manager):
-    session = Session()
-    try:
-        results = session.query(FailedEntry).delete()
-        console('Cleared %i items.' % results)
-        session.commit()
-        if results:
-            manager.config_changed()
-    finally:
-        session.close()
-
-
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginFailed, 'retry_failed', builtin=True, api_ver=2)
-
-
-@event('options.register')
-def register_parser_arguments():
-    parser = options.register_command('failed', do_cli, help='list or clear remembered failures')
-    subparsers = parser.add_subparsers(dest='failed_action', metavar='<action>')
-    subparsers.add_parser('list', help='list all the entries that have had failures')
-    subparsers.add_parser('clear', help='clear all failures from database, so they can be retried')

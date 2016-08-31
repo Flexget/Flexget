@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -130,12 +130,12 @@ class FilterImdb(object):
             if 'max_year' in config:
                 if entry.get('imdb_year', 0) > config['max_year']:
                     reasons.append('max_year (%s > %s)' % (entry.get('imdb_year'), config['max_year']))
-            
+
             if 'accept_genres' in config:
                 accepted = config['accept_genres']
                 accept_genre = False
                 for genre in entry.get('imdb_genres', []):
-                    if genre in accepted:                
+                    if genre in accepted:
                         accept_genre = True
                         break
                 if accept_genre == False:
@@ -205,7 +205,7 @@ class FilterImdb(object):
 
             if reasons and not force_accept:
                 msg = 'Didn\'t accept `%s` because of rule(s) %s' % \
-                    (entry.get('imdb_name', None) or entry['title'], ', '.join(reasons))
+                      (entry.get('imdb_name', None) or entry['title'], ', '.join(reasons))
                 if task.options.debug:
                     log.debug(msg)
                 else:

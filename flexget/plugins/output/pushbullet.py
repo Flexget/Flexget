@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import base64
@@ -131,7 +131,7 @@ class OutputPushbullet(object):
 
         # Make the request
         headers = {
-            'Authorization': 'Basic %s' % base64.b64encode(api_key),
+            'Authorization': b'Basic %s' % base64.b64encode(api_key.encode('ascii')),
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'User-Agent': 'Flexget'
@@ -148,12 +148,13 @@ class OutputPushbullet(object):
             log.warning('Pushbullet notification failed, Pushbullet API having issues')
             # TODO: Implement retrying. API requests 5 seconds between retries.
         elif request_status >= 400:
+            error = 'Unknown error'
             if response.content:
                 try:
-                    error = json.loads(response.content)['error']
-                except ValueError:
-                    error = 'Unknown Error (Invalid JSON returned)'
-            log.error('Pushbullet API error: %s' % error['message'])
+                    error = response.json()['error']['message']
+                except ValueError as e:
+                    error = 'Unknown Error (Invalid JSON returned): %s' % e
+            log.error('Pushbullet API error: %s' % error)
         else:
             log.error('Unknown error when sending Pushbullet notification')
 

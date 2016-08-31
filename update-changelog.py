@@ -30,18 +30,26 @@ class MDChangeSet(object):
     def from_md_lines(cls, lines):
         """Parse an existing markdown changeset section and return the VersionLog instance."""
         instance = cls()
-        instance.pre_header, instance.version_header, tail = isplit('## ', lines)
+        instance.pre_header, version_header, tail = isplit('## ', lines)
+        if version_header:
+            instance.version_header = version_header
         instance.post_header, section, tail = isplit('### ', tail)
         while section:
             instance.sections[section], section, tail = isplit('### ', tail)
         return instance
 
     def parse_message(self, message):
-        """Parses a git commit message and formats and adds any tagged messages to this changeset."""
+        """
+        Parses a git commit message and formats and adds any tagged messages to this changeset.
+        Returns True if one or more changelog messages was found.
+        """
+        found = False
         for cat, item in self.change_items(message):
+            found = True
             item = re.sub('#(\d{3,4})', r'[#\1](https://github.com/Flexget/Flexget/issues/\1)', item)
             item = '- {0}\n'.format(item)
             self.sections.setdefault(cat, ['\n']).insert(0, item)
+        return found
 
     def change_items(self, message):
         """An iterator of changelog updates from a commit message in the form (category, message)"""
@@ -55,7 +63,7 @@ class MDChangeSet(object):
     def cat_lookup(self, cat):
         """Return an official category for `cat` tag text."""
         for cat_item in self.CATEGORIES:
-            if cat in cat_item[1]:
+            if cat.lower() in cat_item[1]:
                 return cat_item[0]
 
     def to_md_lines(self):
@@ -101,31 +109,40 @@ if __name__ == '__main__':
     oldestref = re.match('<!---\s*([\d\w]+)', end_comment).group(1)
     released_vers = []
     commits = list(repo.iter_commits('{0}..HEAD'.format(latestref), reverse=True))
+    modified = False
     if commits:
         tags = {}
         for tag in repo.tags:
-            tags[tag.commit] = tag.tag
+            tags[tag.commit.hexsha] = tag.tag
         for commit in commits:
-            cur_ver.parse_message(commit.message)
-            if commit in tags:
+            if cur_ver.parse_message(commit.message):
+                modified = True
+            if commit.hexsha in tags:
+                modified = True
                 # Tag changeset with release date and version and create new current changeset
-                version = tags[commit].tag
-                release_date = datetime.datetime.fromtimestamp(tags[commit].tagged_date).strftime('%Y-%m-%d')
+                version = tags[commit.hexsha].tag
+                release_date = datetime.datetime.fromtimestamp(tags[commit.hexsha].tagged_date).strftime('%Y-%m-%d')
                 cur_ver.version_header = '## {0} ({1})\n'.format(version, release_date)
+                diffstartref = oldestref
+                if oldestref in tags:
+                    diffstartref = tags[oldestref].tag
                 cur_ver.post_header.insert(0, '[all commits](https://github.com/Flexget/Flexget/compare/{0}...{1})\n'.
-                                           format(oldestref, commit.hexsha))
+                                           format(diffstartref, version))
                 released_vers.insert(0, cur_ver)
                 cur_ver = MDChangeSet()
                 oldestref = commit.hexsha
             if cur_ver.sections and not cur_ver.version_header:
+                modified = True
                 verfile = repo.tree('HEAD')['flexget/_version.py'].data_stream.read()
                 __version__ = None
                 try:
-                    exec(verfile)
+                    exec(verfile)  # pylint: disable=W0122
                 except Exception:
                     pass
                 cur_ver.version_header = '## {0} (unreleased)\n'.format(__version__)
 
+    if modified:
+        print('Writing modified changelog.')
         with io.open(filename, 'w', encoding='utf-8') as logfile:
             logfile.writelines(pre_lines)
             logfile.write('<!---{0}--->\n'.format(commit.hexsha))
@@ -134,3 +151,5 @@ if __name__ == '__main__':
             for ver in released_vers:
                 logfile.writelines(ver.to_md_lines())
             logfile.writelines(post_lines)
+    else:
+        print('No updates to write.')

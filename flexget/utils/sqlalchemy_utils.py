@@ -2,7 +2,7 @@
 Miscellaneous SQLAlchemy helpers.
 """
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -132,6 +132,7 @@ def create_index(table_name, session, *column_names):
 
 class ContextSession(sqlalchemy.orm.Session):
     """:class:`sqlalchemy.orm.Session` which can be used as context manager"""
+
     def __enter__(self):
         return self
 

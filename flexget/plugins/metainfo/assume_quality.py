@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -52,7 +52,7 @@ class AssumeQuality(object):
                 p += 4
             if component.none_of:
                 p += len(component.none_of)
-            # Still a long way from perfect, but probably good enough.
+                # Still a long way from perfect, but probably good enough.
         return p
 
     def assume(self, entry, quality):
