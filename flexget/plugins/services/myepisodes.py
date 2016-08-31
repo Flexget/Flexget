@@ -1,3 +1,6 @@
+from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import logging
 import re
 from datetime import datetime
@@ -12,7 +15,6 @@ from flexget.db_schema import versioned_base
 
 try:
     from flexget.plugins.internal.api_tvdb import lookup_series
-
 except ImportError:
     raise plugin.DependencyError(issued_by='myepisodes',
                                  missing='api_tvdb',
@@ -86,6 +88,11 @@ class MyEpisodes(object):
         'additionalProperties': False
     }
 
+    def __init__(self):
+        self.plugin_config = None
+        self.db_session = None
+        self.test_mode = None
+        self.http_session = None
 
     @plugin.priority(-255)
     def on_task_output(self, task, config):
@@ -106,11 +113,11 @@ class MyEpisodes(object):
             self.http_session = self._login(config)
 
         except plugin.PluginWarning as w:
-            log.warning(str(w))
-            return;
+            log.warning(w)
+            return
 
         except plugin.PluginError as e:
-            log.error(str(e))
+            log.error(e)
             return
 
         for entry in task.accepted:
@@ -121,7 +128,7 @@ class MyEpisodes(object):
                 self._mark_episode_acquired(entry)
 
             except plugin.PluginWarning as w:
-                log.warning(str(w))
+                log.warning(w)
 
     def _validate_entry(self, entry):
         """
@@ -164,11 +171,10 @@ class MyEpisodes(object):
         Attempts to find the myepisodes id in the database
         Return: myepisode id or None
         """
-        lc_series_name =  entry['series_name'].lower()
+        lc_series_name = entry['series_name'].lower()
         info = self.db_session.query(MyEpisodesInfo).filter(MyEpisodesInfo.series_name == lc_series_name).first()
         if info:
             return info.myepisodes_id
-        return None
 
     def _retrieve_id_from_website(self, entry):
         """
@@ -214,8 +220,8 @@ class MyEpisodes(object):
             try:
                 series = lookup_series(name=entry['series_name'], tvdb_id=entry.get('tvdb_id'))
                 search_value = series.name
-            except LookupError as e:
-                log.warning('Unable to lookup series `%s` from tvdb, using raw name.' % entry['series_name'])
+            except LookupError:
+                log.warning('Unable to lookup series `%s` from tvdb, using raw name.', entry['series_name'])
 
         return search_value
 
@@ -228,7 +234,7 @@ class MyEpisodes(object):
         # if we already have the a record for that id, update the name so that we find it next time
         db_item = self.db_session.query(MyEpisodesInfo).filter(MyEpisodesInfo.myepisodes_id == myepisodes_id).first()
         if db_item:
-            log.info('Changing name to `%s` for series with myepisodes_id %s' % (series_name.lower(), myepisodes_id))
+            log.info('Changing name to `%s` for series with myepisodes_id %s', series_name.lower(), myepisodes_id)
             db_item.series_name = series_name.lower()
         else:
             self.db_session.add(MyEpisodesInfo(series_name.lower(), myepisodes_id))
@@ -257,17 +263,17 @@ class MyEpisodes(object):
         }
 
         if self.test_mode:
-            log.info('Would mark %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
+            log.info('Would mark %s of `%s` as acquired.', entry['series_id'], entry['series_name'])
             return
 
         try:
-            response = self.http_session.post(url, data=payload)
+            self.http_session.post(url, data=payload)
 
-        except requests.RequestException as e:
-            # log.info('
-            raise plugin.PluginError('Failed to mark %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
+        except requests.RequestException:
+            raise plugin.PluginError('Failed to mark %s of `%s` as acquired.' % (entry['series_id'],
+                                                                                 entry['series_name']))
 
-        log.info('Marked %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
+        log.info('Marked %s of `%s` as acquired.', entry['series_id'], entry['series_name'])
 
     def _login(self, config):
         """Authenicate with the myepisodes service and return a requests session
@@ -292,7 +298,7 @@ class MyEpisodes(object):
         try:
             response = session.post(url, data=payload)
 
-            if str(config['username']) not in response.text:
+            if config['username'] not in response.text:
                 raise plugin.PluginWarning(('Login to myepisodes.com failed, please see if the site is down and verify '
                                             'your credentials.'), log)
         except requests.RequestException as e:
