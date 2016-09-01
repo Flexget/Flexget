@@ -27,7 +27,8 @@
 
         var options = {
             page: 1,
-            'page_size': 10
+            'page_size': 10,
+            order: 'asc'
         };
 
         function activate() {
