@@ -17,7 +17,8 @@
             page: 1,
             'page_size': 10,
             'in_config': 'all',
-            'sort_by': 'show_name'
+            'sort_by': 'show_name',
+            'descending': false
         };
 
         var params = {
