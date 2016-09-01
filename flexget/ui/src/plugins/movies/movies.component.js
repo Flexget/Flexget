@@ -10,7 +10,7 @@
             controller: moviesController
         });
 
-    function moviesController($mdDialog, $mdPanel, $sce, moviesService) {
+    function moviesController($mdDialog, $mdPanel, $sce, addMovieService, moviesService) {
         var vm = this;
 
         vm.lists = [];
@@ -27,18 +27,19 @@
 
         var position = $mdPanel.newPanelPosition().relativeTo('.search-menu').addPanelPosition($mdPanel.xPosition.ALIGN_START, $mdPanel.yPosition.BELOW);
         var panel = $mdPanel.create({
-                attachTo: angular.element(document.body),
-                controller: 'addMovieController',
-                controllerAs: 'vm',
-                templateUrl: 'plugins/movies/components/add-movie/add-movie.tmpl.html',
-                panelClass: 'add-movie-panel',
-                position: position,
-                locals: {},
-                clickOutsideToClose: true,
-                escapeToClose: true,
-                focusOnOpen: false,
-                zIndex: 2
-            });
+            attachTo: angular.element(document.body),
+            controller: 'addMovieController',
+            controllerAs: 'vm',
+            templateUrl: 'plugins/movies/components/add-movie/add-movie.tmpl.html',
+            panelClass: 'add-movie-panel',
+            position: position,
+            locals: {},
+            clickOutsideToClose: true,
+            escapeToClose: true,
+            focusOnOpen: false,
+            zIndex: 2,
+            onRemoving: addMovieService.clearWatcher
+        });
 
         function searchMovies() {
             panel.config.locals.searchtext = vm.searchtext;
