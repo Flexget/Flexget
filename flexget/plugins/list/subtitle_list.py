@@ -114,7 +114,7 @@ class SubtitleList(MutableSet):
             'remove_after': {'type': 'string', 'format': 'interval'},
             'path': {'type': 'string'},
             'allow_dir': {'type': 'boolean', 'default': False},
-            'recursion_depth': {'type': 'integer', 'default': 1},
+            'recursion_depth': {'type': 'integer', 'default': 1, 'minimum': 1},
             'force_file_existence': {'type': 'boolean', 'default': True}
         },
         'required': ['list'],
