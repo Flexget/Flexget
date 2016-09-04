@@ -28,7 +28,7 @@ class CachedResource(APIResource):
         try:
             file_path, mime_type = cached_resource(url, force)
         except RequestException as e:
-            raise BadRequest('Request Error: {}'.format(str(e.message)))
+            raise BadRequest('Request Error: {}'.format(e.message))
         except OSError as e:
-            raise ApiError(str(e))
+            raise ApiError(e)
         return send_file(file_path, mimetype=mime_type)

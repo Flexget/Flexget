@@ -463,25 +463,59 @@ def parse_filesize(text_size, si=True):
     return (amount * (base ** order)) / 1024 ** 2
 
 
-def cached_resource(url, force=False):
+def cached_resource(url, force=False, max_size=250):
     """
     Caches a remote resource to local filesystem. Return a tuple of local file name and mime type, use primarily
     for API/WebUI.
 
     :param url: Resource URL
     :param force: Does not check for existence of cached resource, fetches the remote URL
+    :param max_size: Maximum allowed size of directory, in MB.
     :return: Tuple of file path and mime type
     """
     mime_type, encoding = mimetypes.guess_type(url)
     hashed_name = hashlib.md5(url).hexdigest()
     file_path = os.path.join(os.getcwd(), 'cached_resources', hashed_name)
+    directory = os.path.dirname(file_path)
     if not os.path.exists(file_path) or force:
         log.debug('caching %s', url)
         response = requests.get(url)
         response.raise_for_status()
         content = response.content
-        if not os.path.exists(os.path.dirname(file_path)):
-            os.makedirs(os.path.dirname(file_path))
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        size = dir_size(directory) / (1024 * 1024.0)
+        while size >= max_size:
+            log.debug('directory %s size is over the allowed limit of %s, trimming', size, max_size)
+            trim_dir(directory)
+            size = dir_size(directory) / (1024 * 1024.0)
         with io.open(file_path, 'wb') as file:
             file.write(content)
     return file_path, mime_type
+
+
+def dir_size(directory):
+    """
+    Sums the size of all files in a given dir. Not recursive.
+
+    :param directory: Directory to check
+    :return: Summed size of all files in Bytes.
+    """
+    size = 0
+    for file in os.listdir(directory):
+        filename = os.path.join(directory, file)
+        size += os.path.getsize(filename)
+    return size
+
+
+def trim_dir(directory):
+    """
+    Removed the least accessed file on a given dir
+
+    :param directory: Directory to check
+    """
+    access_time = lambda f: os.stat(os.path.join(directory, f)).st_atime
+    files = sorted(os.listdir(directory), key=access_time)
+    file_name = os.path.join(directory, files[0])
+    log.debug('removing least accessed file: %s', file_name)
+    os.remove(file_name)
