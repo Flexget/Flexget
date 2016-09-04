@@ -9,7 +9,7 @@ vcrpy>=1.7.4
 virtualenv
 boto3
 wheel
-pytest>=2.7
+pytest>=2.7,!=3.0.2
 pytest-capturelog
 pytest-xdist
 pytest-runner
