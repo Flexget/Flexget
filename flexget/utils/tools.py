@@ -467,6 +467,7 @@ def cached_resource(url, force=False):
     """
     Caches a remote resource to local filesystem. Return a tuple of local file name and mime type, use primarily
     for API/WebUI.
+
     :param url: Resource URL
     :param force: Does not check for existence of cached resource, fetches the remote URL
     :return: Tuple of file path and mime type
