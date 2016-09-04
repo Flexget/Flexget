@@ -188,7 +188,7 @@ api = Api(
 
 
 class ApiError(Exception):
-    description = 'server error'
+    description = 'Server error'
     code = 500
     response_model = api.schema('error', {
         'type': 'object',
@@ -215,17 +215,17 @@ class ApiError(Exception):
 
 class NotFoundError(ApiError):
     code = 404
-    description = 'not found'
+    description = 'Not found'
 
 
 class BadRequest(ApiError):
     code = 400
-    description = 'bad request'
+    description = 'Bad request'
 
 
 class ValidationError(ApiError):
     code = 422
-    description = 'validation error'
+    description = 'Validation error'
 
     response_model = api.inherit('validation_error', ApiError.response_model, {
         'type': 'object',
