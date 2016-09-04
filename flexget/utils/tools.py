@@ -463,20 +463,22 @@ def parse_filesize(text_size, si=True):
     return (amount * (base ** order)) / 1024 ** 2
 
 
-def cached_resource(url, force=False, max_size=250):
+def cached_resource(url, force=False, max_size=250, directory='cached_resources'):
     """
     Caches a remote resource to local filesystem. Return a tuple of local file name and mime type, use primarily
     for API/WebUI.
 
     :param url: Resource URL
-    :param force: Does not check for existence of cached resource, fetches the remote URL
+    :param force: Does not check for existence of cached resource, fetches the remote URL, ignores directory size limit
     :param max_size: Maximum allowed size of directory, in MB.
+    :param directory: Name of directory to use. Default is `cached_resources`
     :return: Tuple of file path and mime type
     """
     mime_type, encoding = mimetypes.guess_type(url)
     hashed_name = hashlib.md5(url).hexdigest()
-    file_path = os.path.join(os.getcwd(), 'cached_resources', hashed_name)
+    file_path = os.path.join(os.getcwd(), directory, hashed_name)
     directory = os.path.dirname(file_path)
+
     if not os.path.exists(file_path) or force:
         log.debug('caching %s', url)
         response = requests.get(url)
@@ -484,11 +486,15 @@ def cached_resource(url, force=False, max_size=250):
         content = response.content
         if not os.path.exists(directory):
             os.makedirs(directory)
+
+        # Checks directory size and trims if necessary.
         size = dir_size(directory) / (1024 * 1024.0)
-        while size >= max_size:
-            log.debug('directory %s size is over the allowed limit of %s, trimming', size, max_size)
-            trim_dir(directory)
-            size = dir_size(directory) / (1024 * 1024.0)
+        if not force:
+            while size >= max_size:
+                log.debug('directory %s size is over the allowed limit of %s, trimming', size, max_size)
+                trim_dir(directory)
+                size = dir_size(directory) / (1024 * 1024.0)
+
         with io.open(file_path, 'wb') as file:
             file.write(content)
     return file_path, mime_type
