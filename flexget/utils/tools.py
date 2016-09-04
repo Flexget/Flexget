@@ -475,7 +475,7 @@ def cached_resource(url, force=False, max_size=250, directory='cached_resources'
     :return: Tuple of file path and mime type
     """
     mime_type, encoding = mimetypes.guess_type(url)
-    hashed_name = hashlib.md5(url).hexdigest()
+    hashed_name = hashlib.md5(url.encode('utf-8')).hexdigest()
     file_path = os.path.join(os.getcwd(), directory, hashed_name)
     directory = os.path.dirname(file_path)
 
