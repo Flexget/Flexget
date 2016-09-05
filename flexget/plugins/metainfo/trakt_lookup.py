@@ -109,7 +109,7 @@ class PluginTraktLookup(object):
         'trakt_actors': lambda show: list_actors(show.actors),
     }
     show_translate_map = {
-        'trakt_translations': lambda show: get_translations(show.translate),
+        'trakt_translations': lambda show: get_translations(show.id, 'show'),
     }
 
     # Episode info
@@ -165,7 +165,7 @@ class PluginTraktLookup(object):
     }
 
     movie_translate_map = {
-        'trakt_translations': lambda movie: get_translations(movie.translate),
+        'trakt_translations': lambda movie: get_translations(movie.id, 'movie'),
     }
 
     movie_actor_map = {
