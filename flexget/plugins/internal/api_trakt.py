@@ -582,6 +582,12 @@ class TraktShow(Base):
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
 
+    @property
+    def main_image(self):
+        for size in ['medium', 'full', 'thumb']:
+            if getattr(self, 'image_poster_%s' % size) is not None:
+                return getattr(self, 'image_poster_%s' % size)
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -619,7 +625,8 @@ class TraktShow(Base):
                 'thumb': {
                     'full': self.image_thumb_full
                 }
-            }
+            },
+            "main_image": self.main_image
         }
 
     def __init__(self, trakt_show, session):
@@ -760,6 +767,13 @@ class TraktMovie(Base):
         super(TraktMovie, self).__init__()
         self.update(trakt_movie, session)
 
+    @property
+    def main_image(self):
+        for size in ['medium', 'full', 'thumb']:
+            for type in ['poster', 'fanart']:
+                if getattr(self, 'image_%s_%s' % (type, size)) is not None:
+                    return getattr(self, 'image_%s_%s' % (type, size))
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -780,6 +794,7 @@ class TraktMovie(Base):
             "genres": [g.name for g in self.genres],
             "updated_at": self.updated_at,
             "cached_at": self.cached_at,
+            "main_image": self.main_image,
             "images": {
                 'fanart': {
                     'full': self.image_fanart_full,
