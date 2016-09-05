@@ -15,6 +15,7 @@ cached_parser.add_argument('force', type=inputs.boolean, default=False, help='Fo
 
 
 @cached_api.route('/')
+@api.doc(description='Returns a cached copy of the requested resource, matching its mime type')
 class CachedResource(APIResource):
     @api.response(200, description='Return file')
     @api.response(BadRequest)

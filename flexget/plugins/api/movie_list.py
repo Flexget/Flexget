@@ -9,7 +9,7 @@ from flask import jsonify
 from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource, empty_response, default_error_schema
+from flexget.api import api, APIResource, empty_response
 from flexget.plugins.list import movie_list as ml
 from flexget.plugins.list.movie_list import MovieListBase
 from flexget.utils.tools import split_title_year
@@ -124,7 +124,7 @@ class MovieListAPI(APIResource):
 
     @api.validate(new_list_schema)
     @api.response(201, model=list_object_schema)
-    @api.response(500, description='List already exist', model=default_error_schema)
+    @api.response(500, description='List already exist')
     def post(self, session=None):
         """ Create a new list """
         data = request.json
@@ -147,7 +147,7 @@ class MovieListAPI(APIResource):
 @movie_list_api.route('/<int:list_id>/')
 @api.doc(params={'list_id': 'ID of the list'})
 class MovieListListAPI(APIResource):
-    @api.response(404, model=default_error_schema)
+    @api.response(404)
     @api.response(200, model=list_object_schema)
     def get(self, list_id, session=None):
         """ Get list by ID """
@@ -159,7 +159,7 @@ class MovieListListAPI(APIResource):
         return jsonify(movie_list.to_dict())
 
     @api.response(200, model=empty_response)
-    @api.response(404, model=default_error_schema)
+    @api.response(404)
     def delete(self, list_id, session=None):
         """ Delete list by ID """
         try:
@@ -183,7 +183,7 @@ movies_parser.add_argument('page_size', type=int, default=10, help='Number of mo
 
 @movie_list_api.route('/<int:list_id>/movies/')
 class MovieListMoviesAPI(APIResource):
-    @api.response(404, model=default_error_schema)
+    @api.response(404)
     @api.response(200, model=return_movies_schema)
     @api.doc(params={'list_id': 'ID of the list'}, parser=movies_parser)
     def get(self, list_id, session=None):
@@ -224,9 +224,9 @@ class MovieListMoviesAPI(APIResource):
 
     @api.validate(model=input_movie_entry_schema, description=movie_identifiers_doc)
     @api.response(201, model=movie_list_object_schema)
-    @api.response(404, description='List not found', model=default_error_schema)
-    @api.response(500, description='Movie already exist in list', model=default_error_schema)
-    @api.response(501, description='Movie identifier not allowed', model=default_error_schema)
+    @api.response(404, description='List not found')
+    @api.response(500, description='Movie already exist in list')
+    @api.response(501, description='Movie identifier not allowed')
     def post(self, list_id, session=None):
         """ Add movies to list by ID """
         try:
@@ -264,7 +264,7 @@ class MovieListMoviesAPI(APIResource):
 
 @movie_list_api.route('/<int:list_id>/movies/<int:movie_id>/')
 @api.doc(params={'list_id': 'ID of the list', 'movie_id': 'ID of the movie'})
-@api.response(404, description='List or movie not found', model=default_error_schema)
+@api.response(404, description='List or movie not found')
 class MovieListMovieAPI(APIResource):
     @api.response(200, model=movie_list_object_schema)
     def get(self, list_id, movie_id, session=None):
@@ -290,7 +290,7 @@ class MovieListMovieAPI(APIResource):
 
     @api.validate(model=input_movie_list_id_schema, description=movie_identifiers_doc)
     @api.response(200, model=movie_list_object_schema)
-    @api.response(501, description='Movie identifier not allowed', model=default_error_schema)
+    @api.response(501, description='Movie identifier not allowed')
     @api.doc(description='Sent movie identifiers will override any existing identifiers that the movie currently holds')
     def put(self, list_id, movie_id, session=None):
         """ Sets movie identifiers """

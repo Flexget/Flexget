@@ -15,7 +15,6 @@ db_api = api.namespace('database', description='Manage Flexget DB')
 
 @db_api.route('/cleanup/')
 class DBCleanup(APIResource):
-
     @api.response(200, 'DB Cleanup triggered')
     def get(self, session=None):
         """ Make all plugins clean un-needed data from the database """
@@ -26,7 +25,6 @@ class DBCleanup(APIResource):
 
 @db_api.route('/vacuum/')
 class DBVacuum(APIResource):
-
     @api.response(200, 'DB VACUUM triggered')
     def get(self, session=None):
         """ Potentially increase performance and decrease database size"""
@@ -42,7 +40,6 @@ plugin_parser.add_argument('plugin_name', required=True, help='Name of plugin to
 
 @db_api.route('/reset_plugin/')
 class DBPluginReset(APIResource):
-
     @api.response(200, 'Plugin DB reset triggered')
     @api.response(400, 'The plugin has no stored schema to reset')
     @api.doc(parser=plugin_parser)
@@ -61,7 +58,6 @@ class DBPluginReset(APIResource):
 
 @db_api.route('/plugins/')
 class DBPluginsSchemas(APIResource):
-
     @api.response(200, 'Successfully retrieved a list of plugin names to reset')
     def get(self, session=None):
         """ Get a list of plugin names available to reset """
