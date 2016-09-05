@@ -1156,7 +1156,7 @@ class ApiTrakt(object):
                 log.debug('Error refreshing movie data from trakt, using cached. %s', e)
                 return movie
             raise
-        movie = session.query(TraktMovie).filter(TraktMovie.id == trakt_movie['ids']['trakt']).first()
+        movie = TraktMovie(trakt_movie, session)
         session.merge(movie)
         if movie and title.lower() == movie.title.lower():
             return movie
