@@ -308,7 +308,7 @@ def get_translation(ident, style):
                 translations.append(translate)
         return translations
     except requests.RequestException as e:
-        log.debug('Error adding translations to trakt id {} : {}'.format(ident, e))
+        log.debug('Error adding translations to trakt id %s: %s', ident, e)
 
 
 trans_show_table = Table('show_trans', Base.metadata,
@@ -336,18 +336,17 @@ def get_db_trans(trans, session):
 class TraktGenre(Base):
     __tablename__ = 'trakt_genres'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(Unicode)
+    name = Column(Unicode, primary_key=True)
 
 
 show_genres_table = Table('trakt_show_genres', Base.metadata,
                           Column('show_id', Integer, ForeignKey('trakt_shows.id')),
-                          Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
+                          Column('genre_id', Unicode, ForeignKey('trakt_genres.name')))
 Base.register_table(show_genres_table)
 
 movie_genres_table = Table('trakt_movie_genres', Base.metadata,
                            Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
-                           Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
+                           Column('genre_id', Unicode, ForeignKey('trakt_genres.name')))
 Base.register_table(movie_genres_table)
 
 
@@ -357,8 +356,6 @@ def get_db_genres(genres, session):
     for genre in genres:
         genre = genre.replace('-', ' ')
         db_genre = TraktGenre(name=genre)
-        session.merge(db_genre)
-        session.commit()
         db_genres.append(db_genre)
     return db_genres
 
@@ -1122,12 +1119,8 @@ class ApiTrakt(object):
                 log.debug('Error refreshing show data from trakt, using cached. %s', e)
                 return series
             raise
-        series = session.query(TraktShow).filter(TraktShow.id == trakt_show['ids']['trakt']).first()
-        if series:
-            series.update(trakt_show, session)
-        else:
-            series = TraktShow(trakt_show, session)
-            session.add(series)
+        series = TraktShow(trakt_show, session)
+        session.merge(series)
         if series and title.lower() == series.title.lower():
             return series
         elif series and title and not found:
@@ -1164,11 +1157,7 @@ class ApiTrakt(object):
                 return movie
             raise
         movie = session.query(TraktMovie).filter(TraktMovie.id == trakt_movie['ids']['trakt']).first()
-        if movie:
-            movie.update(trakt_movie, session)
-        else:
-            movie = TraktMovie(trakt_movie, session)
-            session.add(movie)
+        session.merge(movie)
         if movie and title.lower() == movie.title.lower():
             return movie
         if movie and title and not found:
