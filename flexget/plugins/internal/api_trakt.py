@@ -358,6 +358,7 @@ def get_db_genres(genres, session):
         genre = genre.replace('-', ' ')
         db_genre = TraktGenre(name=genre)
         session.merge(db_genre)
+        session.commit()
         db_genres.append(db_genre)
     return db_genres
 
