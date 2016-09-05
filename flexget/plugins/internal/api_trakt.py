@@ -1119,8 +1119,7 @@ class ApiTrakt(object):
                 log.debug('Error refreshing show data from trakt, using cached. %s', e)
                 return series
             raise
-        series = TraktShow(trakt_show, session)
-        session.merge(series)
+        series = session.merge(TraktShow(trakt_show, session))
         if series and title.lower() == series.title.lower():
             return series
         elif series and title and not found:
@@ -1156,8 +1155,7 @@ class ApiTrakt(object):
                 log.debug('Error refreshing movie data from trakt, using cached. %s', e)
                 return movie
             raise
-        movie = TraktMovie(trakt_movie, session)
-        session.merge(movie)
+        movie = session.merge(TraktMovie(trakt_movie, session))
         if movie and title.lower() == movie.title.lower():
             return movie
         if movie and title and not found:
