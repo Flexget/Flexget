@@ -10,7 +10,7 @@ from flexget.event import event
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.internal.api_trakt import ApiTrakt, list_actors, get_translations
+    from flexget.plugins.internal.api_trakt import ApiTrakt, list_actors, get_translations_dict
 
     lookup_series = ApiTrakt.lookup_series
     lookup_movie = ApiTrakt.lookup_movie
@@ -109,7 +109,7 @@ class PluginTraktLookup(object):
         'trakt_actors': lambda show: list_actors(show.actors),
     }
     show_translate_map = {
-        'trakt_translations': lambda show: get_translations(show.id, 'show'),
+        'trakt_translations': lambda show: get_translations_dict(show.translations, 'show'),
     }
 
     # Episode info
@@ -165,7 +165,7 @@ class PluginTraktLookup(object):
     }
 
     movie_translate_map = {
-        'trakt_translations': lambda movie: get_translations(movie.id, 'movie'),
+        'trakt_translations': lambda movie: get_translations_dict(movie.translations, 'movie'),
     }
 
     movie_actor_map = {
