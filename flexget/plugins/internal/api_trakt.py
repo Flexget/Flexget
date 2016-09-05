@@ -1126,7 +1126,7 @@ class ApiTrakt(object):
         elif series and title and not found:
             if not session.query(TraktShowSearchResult).filter(TraktShowSearchResult.search == title.lower()).first():
                 log.debug('Adding search result to db')
-                session.add(TraktShowSearchResult(search=title, series=series))
+                session.merge(TraktShowSearchResult(search=title, series=series))
         elif series and found:
             log.debug('Updating search result in db')
             found.series = series
@@ -1163,7 +1163,7 @@ class ApiTrakt(object):
         if movie and title and not found:
             if not session.query(TraktMovieSearchResult).filter(TraktMovieSearchResult.search == title.lower()).first():
                 log.debug('Adding search result to db')
-                session.add(TraktMovieSearchResult(search=title, movie=movie))
+                session.merge(TraktMovieSearchResult(search=title, movie=movie))
         elif movie and found:
             log.debug('Updating search result in db')
             found.movie = movie
