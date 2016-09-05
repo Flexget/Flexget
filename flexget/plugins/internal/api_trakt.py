@@ -350,7 +350,7 @@ movie_genres_table = Table('trakt_movie_genres', Base.metadata,
 Base.register_table(movie_genres_table)
 
 
-def get_db_genres(genres, session):
+def get_db_genres(genres):
     """Takes a list of genres as strings, returns the database instances for them."""
     db_genres = []
     for genre in genres:
@@ -673,7 +673,7 @@ class TraktShow(Base):
                     'trailer', 'homepage']:
             setattr(self, col, trakt_show.get(col))
 
-        self.genres[:] = get_db_genres(trakt_show.get('genres') or [], session)
+        self.genres[:] = get_db_genres(trakt_show.get('genres') or [])
         self.translations[:] = get_db_trans(trakt_show.get('available_translations') or [], session)
         self.cached_at = datetime.now()
 
@@ -842,7 +842,7 @@ class TraktMovie(Base):
         if trakt_movie.get('released'):
             self.released = dateutil_parse(trakt_movie.get('released'), ignoretz=True)
         self.updated_at = dateutil_parse(trakt_movie.get('updated_at'), ignoretz=True)
-        self.genres[:] = get_db_genres(trakt_movie.get('genres', []), session)
+        self.genres[:] = get_db_genres(trakt_movie.get('genres', []))
         self.translations[:] = get_db_trans(trakt_movie.get('available_translations', []), session)
         self.cached_at = datetime.now()
         if trakt_movie.get('images'):
