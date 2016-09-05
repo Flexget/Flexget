@@ -24,7 +24,7 @@ from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.tools import TimedDict
 
-Base = db_schema.versioned_base('api_trakt', 5)
+Base = db_schema.versioned_base('api_trakt', 6)
 AuthBase = db_schema.versioned_base('trakt_auth', 0)
 log = logging.getLogger('api_trakt')
 # Production Site
@@ -223,7 +223,7 @@ def get_api_url(*endpoint):
 
 @db_schema.upgrade('api_trakt')
 def upgrade(ver, session):
-    if ver is None or ver <= 4:
+    if ver is None or ver <= 5:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -350,47 +350,10 @@ def get_db_genres(genres, session):
     db_genres = []
     for genre in genres:
         genre = genre.replace('-', ' ')
-        db_genre = session.query(TraktGenre).filter(TraktGenre.name == genre).first()
-        if not db_genre:
-            db_genre = TraktGenre(name=genre)
-            session.add(db_genre)
+        db_genre = TraktGenre(name=genre)
+        session.merge(db_genre)
         db_genres.append(db_genre)
     return db_genres
-
-
-class TraktImages(Base):
-    __tablename__ = 'trakt_images'
-
-    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    ident = Column(Unicode)
-    style = Column(Unicode)
-    url = Column(Unicode)
-
-    def __init__(self, images):
-        super(TraktImages, self).__init__()
-        self.update(images)
-
-    def update(self, images):
-        for col in images.keys():
-            setattr(self, col, images.get(col))
-
-
-trakt_image_actors = Table('trakt_image_actor', Base.metadata,
-                           Column('trakt_actor', Integer, ForeignKey('trakt_actors.id')),
-                           Column('trakt_image', Integer, ForeignKey('trakt_images.id')))
-Base.register_table(trakt_image_actors)
-trakt_image_shows = Table('trakt_image_show', Base.metadata,
-                          Column('trakt_show', Integer, ForeignKey('trakt_shows.id')),
-                          Column('trakt_image', Integer, ForeignKey('trakt_images.id')))
-Base.register_table(trakt_image_shows)
-trakt_image_movies = Table('trakt_image_movie', Base.metadata,
-                           Column('trakt_movie', Integer, ForeignKey('trakt_movies.id')),
-                           Column('trakt_image', Integer, ForeignKey('trakt_images.id')))
-Base.register_table(trakt_image_movies)
-trakt_image_episodes = Table('trakt_image_episode', Base.metadata,
-                             Column('trakt_episode', Integer, ForeignKey('trakt_episodes.id')),
-                             Column('trakt_image', Integer, ForeignKey('trakt_images.id')))
-Base.register_table(trakt_image_episodes)
 
 
 class TraktActor(Base):
@@ -405,7 +368,12 @@ class TraktActor(Base):
     birthday = Column(Date)
     death = Column(Date)
     homepage = Column(Unicode)
-    images = relation(TraktImages, secondary=trakt_image_actors)
+    image_headshot_full = Column(Unicode)
+    image_headshot_medium = Column(Unicode)
+    image_headshot_thumb = Column(Unicode)
+    image_fanart_full = Column(Unicode)
+    image_fanart_medium = Column(Unicode)
+    image_fanart_thumb = Column(Unicode)
 
     def __init__(self, actor, session):
         super(TraktActor, self).__init__()
@@ -428,8 +396,9 @@ class TraktActor(Base):
             self.death = dateutil_parse(actor.get('death'))
         self.homepage = actor.get('homepage')
         if actor.get('images'):
-            img = actor.get('images')
-            self.images = get_db_images(img, session)
+            for image, images in actor['images'].items():
+                for size, url in images.items():
+                    setattr(self, 'image_%s_%s' % (image, size), url)
 
     def to_dict(self):
         return {
@@ -439,27 +408,6 @@ class TraktActor(Base):
             'tmdb_id': self.tmdb,
             'images': list_images(self.images)
         }
-
-
-def get_db_images(image, session):
-    try:
-        flat = []
-        images = []
-        if image:
-            for i, s in image.items():
-                for ss, u in s.items():
-                    a = {'ident': i, 'style': ss, 'url': u}
-                    flat.append(a)
-        for i in flat:
-            url = i.get('url')
-            im = session.query(TraktImages).filter(TraktImages.url == url).first()
-            if not im:
-                im = TraktImages(i)
-            images.append(im)
-        return images
-    except TypeError as e:
-        log.debug('Error has Occured during images: %s', e)
-        return
 
 
 show_actors_table = Table('trakt_show_actors', Base.metadata,
@@ -524,7 +472,12 @@ def list_actors(actors):
             'biography': actor.biography,
             'homepage': actor.homepage,
             'death': actor.death.strftime("%Y/%m/%d") if actor.death else None,
-            'images': list_images(actor.images)
+            'headshot_full': 'image_headshot_full',
+            'headshot_medium': 'image_headshot_medium',
+            'headshot_thumb': 'image_headshot_thumb',
+            'fanart_full': 'image_fanart_full',
+            'fanart_medium': 'image_fanart_medium',
+            'fanart_thumb': 'image_fanart_thumb',
         }
         res[str(actor.id)] = info
     return res
@@ -543,10 +496,13 @@ class TraktEpisode(Base):
     number = Column(Integer)
     number_abs = Column(Integer)
     overview = Column(Unicode)
-    images = relation(TraktImages, secondary=trakt_image_episodes)
     first_aired = Column(DateTime)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
+
+    image_screenshot_full = Column(Unicode)
+    image_screenshot_medium = Column(Unicode)
+    image_screenshot_thumb = Column(Unicode)
 
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=False)
 
@@ -564,7 +520,9 @@ class TraktEpisode(Base):
         self.tmdb_id = trakt_episode['ids']['tmdb']
         self.tvrage_id = trakt_episode['ids']['tvrage']
         if trakt_episode.get('images'):
-            self.images = get_db_images(trakt_episode.get('images'), session)
+            for image, images in trakt_episode['images'].items():
+                for size, url in images.items():
+                    setattr(self, 'image_%s_%s' % (image, size), url)
         self.tvdb_id = trakt_episode['ids']['tvdb']
         self.first_aired = None
         if trakt_episode.get('first_aired'):
@@ -600,7 +558,10 @@ class TraktShow(Base):
     runtime = Column(Integer)
     certification = Column(Unicode)
     network = Column(Unicode)
-    images = relation(TraktImages, secondary=trakt_image_shows)
+    image_poster_full = Column(Unicode)
+    image_poster_medium = Column(Unicode)
+    image_poster_thumb = Column(Unicode)
+    image_thumb_full = Column(Unicode)
     country = Column(Unicode)
     status = Column(String)
     rating = Column(Integer)
@@ -664,7 +625,9 @@ class TraktShow(Base):
         self.tvrage_id = trakt_show['ids']['tvrage']
         self.tvdb_id = trakt_show['ids']['tvdb']
         if trakt_show.get('images'):
-            self.images = get_db_images(trakt_show.get('images'), session)
+            for image, images in trakt_show['images'].items():
+                for size, url in images.items():
+                    setattr(self, 'image_%s_%s' % (image, size), url)
         if trakt_show.get('airs'):
             airs = trakt_show.get('airs')
             self.air_day = airs.get('day')
@@ -767,7 +730,16 @@ class TraktMovie(Base):
     cached_at = Column(DateTime)
     translations = relation(TraktTranslation, secondary=movie_trans_table)
     _translate = relation(TraktTranslate, secondary=trans_movie_table)
-    images = relation(TraktImages, secondary=trakt_image_movies)
+    image_fanart_full = Column(Unicode)
+    image_fanart_medium = Column(Unicode)
+    image_fanart_thumb = Column(Unicode)
+    image_poster_full = Column(Unicode)
+    image_poster_medium = Column(Unicode)
+    image_poster_thumb = Column(Unicode)
+    image_logo_full = Column(Unicode)
+    image_clearart_full = Column(Unicode)
+    image_banner_full = Column(Unicode)
+    image_thumb_full = Column(Unicode)
     genres = relation(TraktGenre, secondary=movie_genres_table)
     _actors = relation(TraktActor, secondary=movie_actors_table)
 
@@ -816,7 +788,10 @@ class TraktMovie(Base):
         self.genres[:] = get_db_genres(trakt_movie.get('genres', []), session)
         self.translations[:] = get_db_trans(trakt_movie.get('available_translations', []), session)
         self.cached_at = datetime.now()
-        self.images = get_db_images(trakt_movie.get('images'), session)
+        if trakt_movie.get('images'):
+            for image, images in trakt_movie['images'].items():
+                for size, url in images.items():
+                    setattr(self, 'image_%s_%s' % (image, size), url)
 
     @property
     def expired(self):
