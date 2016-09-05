@@ -174,6 +174,12 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
                 raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e))
 
 
+def set_image_attributes(obj, data):
+    for image, images in data['images'].items():
+        for size, url in images.items():
+            setattr(obj, 'image_%s_%s' % (image, size), url)
+
+
 def make_list_slug(name):
     """Return the slug for use in url for given list name."""
     slug = name.lower()
@@ -403,9 +409,7 @@ class TraktActor(Base):
             self.death = dateutil_parse(actor.get('death'))
         self.homepage = actor.get('homepage')
         if actor.get('images'):
-            for image, images in actor['images'].items():
-                for size, url in images.items():
-                    setattr(self, 'image_%s_%s' % (image, size), url)
+            set_image_attributes(self, actor)
 
     def to_dict(self):
         return {
@@ -532,9 +536,7 @@ class TraktEpisode(Base):
         self.tmdb_id = trakt_episode['ids']['tmdb']
         self.tvrage_id = trakt_episode['ids']['tvrage']
         if trakt_episode.get('images'):
-            for image, images in trakt_episode['images'].items():
-                for size, url in images.items():
-                    setattr(self, 'image_%s_%s' % (image, size), url)
+            set_image_attributes(self, trakt_episode)
         self.tvdb_id = trakt_episode['ids']['tvdb']
         self.first_aired = None
         if trakt_episode.get('first_aired'):
@@ -653,9 +655,7 @@ class TraktShow(Base):
         self.tvrage_id = trakt_show['ids']['tvrage']
         self.tvdb_id = trakt_show['ids']['tvdb']
         if trakt_show.get('images'):
-            for image, images in trakt_show['images'].items():
-                for size, url in images.items():
-                    setattr(self, 'image_%s_%s' % (image, size), url)
+            set_image_attributes(self, trakt_show)
         if trakt_show.get('airs'):
             airs = trakt_show.get('airs')
             self.air_day = airs.get('day')
@@ -848,9 +848,7 @@ class TraktMovie(Base):
         self.translations[:] = get_db_trans(trakt_movie.get('available_translations', []), session)
         self.cached_at = datetime.now()
         if trakt_movie.get('images'):
-            for image, images in trakt_movie['images'].items():
-                for size, url in images.items():
-                    setattr(self, 'image_%s_%s' % (image, size), url)
+            set_image_attributes(self, trakt_movie)
 
     @property
     def expired(self):
