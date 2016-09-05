@@ -8,7 +8,7 @@ from flask_login import login_user, LoginManager, current_user, current_app
 from flask_restplus import inputs
 from werkzeug.security import check_password_hash
 
-from flexget.api import api, APIResource, app
+from flexget.api import api, APIResource, app, Unauthorized
 from flexget.utils.database import with_session
 from flexget.webserver import User
 
@@ -82,9 +82,8 @@ login_parser.add_argument('remember', type=inputs.boolean, required=False, defau
 
 @auth_api.route('/login/')
 class LoginAPI(APIResource):
-
     @api.expect((login_api_schema, 'Username and Password'))
-    @api.response(401, 'Invalid username or password')
+    @api.response(Unauthorized)
     @api.response(200, 'Login successful')
     @api.doc(parser=login_parser)
     def post(self, session=None):
@@ -97,23 +96,20 @@ class LoginAPI(APIResource):
             user = session.query(User).filter(User.name == user_name.lower()).first()
             if user:
                 if user_name == 'flexget' and not user.password:
-                    return {
-                        'status': 'failed',
-                        'message': 'If this is your first time running the webui you need to set a password via'
-                        ' the command line by running flexget web passwd <new_password>'
-                    }, 401
+                    raise Unauthorized(
+                        message='If this is your first time running the WebUI you need to set a password via'
+                                ' the command line by running `flexget web passwd <new_password>`')
 
                 if user.password and check_password_hash(user.password, password):
                     args = login_parser.parse_args()
                     login_user(user, remember=args['remember'])
                     return {}
 
-        return {'status': 'failed', 'message': 'Invalid username or password'}, 401
+        raise Unauthorized(message='Invalid username or password')
 
 
 @auth_api.route('/logout/')
 class LogoutAPI(APIResource):
-
     @api.response(200, 'Logout successful')
     def get(self, session=None):
         """ Logout and clear session cookies """

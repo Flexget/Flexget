@@ -218,6 +218,11 @@ class NotFoundError(ApiError):
     description = 'Not found'
 
 
+class Unauthorized(ApiError):
+    code = 401
+    description = 'Unauthorized'
+
+
 class BadRequest(ApiError):
     code = 400
     description = 'Bad request'
@@ -267,14 +272,15 @@ class ValidationError(ApiError):
                 error_dict[attr] = str(getattr(error, attr))
         return error_dict
 
+
 empty_response = api.schema('empty', {'type': 'object'})
 default_error_schema = {
-        'type': 'object',
-        'properties': {
-            'status': {'type': 'string'},
-            'message': {'type': 'string'}
-        }
+    'type': 'object',
+    'properties': {
+        'status': {'type': 'string'},
+        'message': {'type': 'string'}
     }
+}
 default_error_schema = api.schema('default_error_schema', default_error_schema)
 
 
@@ -282,6 +288,7 @@ default_error_schema = api.schema('default_error_schema', default_error_schema)
 @api.errorhandler(NotFoundError)
 @api.errorhandler(ValidationError)
 @api.errorhandler(BadRequest)
+@api.errorhandler(Unauthorized)
 def api_errors(error):
     return error.to_dict(), error.code
 
@@ -323,7 +330,6 @@ class ApiClient(object):
 
 
 class ApiEndopint(object):
-
     def __init__(self, endpoint, caller):
         self.endpoint = endpoint
         self.caller = caller
