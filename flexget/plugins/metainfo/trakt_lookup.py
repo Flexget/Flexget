@@ -155,7 +155,7 @@ class PluginTraktLookup(object):
         'trakt_fanart_full': 'image_fanart_full',
         'trakt_fanart_medium': 'image_fanart_medium',
         'trakt_fanart_thumb': 'image_fanart_thumb',
-        'trakt_poster_full': 'image__poster_full',
+        'trakt_poster_full': 'image_poster_full',
         'trakt_poster_medium': 'image_poster_medium',
         'trakt_poster_thumb': 'image_poster_thumb',
         'trakt_logo': 'image_logo_full',
