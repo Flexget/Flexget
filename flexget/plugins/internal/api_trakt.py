@@ -379,6 +379,13 @@ class TraktActor(Base):
         super(TraktActor, self).__init__()
         self.update(actor, session)
 
+    @property
+    def main_image(self):
+        for size in ['medium', 'full', 'thumb']:
+            for image_type in ['headshot', 'fanart']:
+                if getattr(self, 'image_%s_%s' % (image_type, size)) is not None:
+                    return getattr(self, 'image_%s_%s' % (image_type, size))
+
     def update(self, actor, session):
         if self.id and self.id != actor.get('ids').get('trakt'):
             raise Exception('Tried to update db actors with different actor data')
@@ -417,7 +424,8 @@ class TraktActor(Base):
                     'medium': self.image_fanart_medium,
                     'thumb': self.image_fanart_thumb
                 }
-            }
+            },
+            "main_image": self.main_image
         }
 
 
@@ -770,9 +778,9 @@ class TraktMovie(Base):
     @property
     def main_image(self):
         for size in ['medium', 'full', 'thumb']:
-            for type in ['poster', 'fanart']:
-                if getattr(self, 'image_%s_%s' % (type, size)) is not None:
-                    return getattr(self, 'image_%s_%s' % (type, size))
+            for image_type in ['poster', 'fanart']:
+                if getattr(self, 'image_%s_%s' % (image_type, size)) is not None:
+                    return getattr(self, 'image_%s_%s' % (image_type, size))
 
     def to_dict(self):
         return {
