@@ -102,7 +102,7 @@ class PluginTraktLookup(object):
         'trakt_series_poster_medium': 'image_poster_medium',
         'trakt_series_poster_thumb': 'image_poster_thumb',
         'trakt_series_thumb': 'image_thumb_full',
-        'trakt_languages': lambda i: [t.name for t in i.translations],
+        'trakt_languages': 'translation_languages',
     }
 
     series_actor_map = {
@@ -151,7 +151,7 @@ class PluginTraktLookup(object):
         'trakt_trailer': 'trailer',
         'trakt_language': 'language',
         'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
-        'trakt_languages': lambda i: [t.name for t in i.translations],
+        'trakt_languages': 'translation_languages',
         'trakt_fanart_full': 'image_fanart_full',
         'trakt_fanart_medium': 'image_fanart_medium',
         'trakt_fanart_thumb': 'image_fanart_thumb',

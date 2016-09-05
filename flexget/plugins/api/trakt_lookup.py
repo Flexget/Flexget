@@ -6,7 +6,7 @@ from flask import jsonify
 from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.plugins.internal.api_trakt import ApiTrakt as at, list_actors, get_translations
+from flexget.plugins.internal.api_trakt import ApiTrakt as at, list_actors, get_translations_dict
 
 trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 
@@ -161,7 +161,7 @@ class TraktSeriesSearchApi(APIResource):
         if include_actors:
             result['actors'] = list_actors(series.actors)
         if include_translations:
-            result['translations'] = get_translations(series.translate)
+            result['translations'] = get_translations_dict(series.translations, 'show')
         return jsonify(result)
 
 
@@ -187,5 +187,5 @@ class TraktMovieSearchApi(APIResource):
         if include_actors:
             result['actors'] = list_actors(movie.actors)
         if include_translations:
-            result['translations'] = get_translations(movie.translate)
+            result['translations'] = get_translations_dict(movie.translations, 'movie')
         return jsonify(result)

@@ -20,7 +20,7 @@ from flexget.terminal import console
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
-from flexget.utils.database import with_session
+from flexget.utils.database import with_session, json_synonym
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.tools import TimedDict
 
@@ -434,14 +434,15 @@ def get_db_actors(ident, style):
         return
 
 
-def get_translations_dict(translate):
+def get_translations_dict(translate, style):
     res = {}
     for lang in translate:
         info = {
             'overview': lang.overview,
             'title': lang.title,
-            'tagline': lang.tagline,
         }
+        if style == 'movie':
+            info['tagline'] = lang.tagline
         res[lang.language] = info
     return res
 
@@ -556,6 +557,8 @@ class TraktShow(Base):
     trailer = Column(Unicode)
     aired_episodes = Column(Integer)
     _translations = relation(TraktShowTranslation)
+    _translation_languages = Column('translation_languages', Unicode)
+    translation_languages = json_synonym('_translation_languages')
     episodes = relation(TraktEpisode, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic')
     genres = relation(TraktGenre, secondary=show_genres_table)
     _actors = relation(TraktActor, secondary=show_actors_table)
@@ -647,6 +650,7 @@ class TraktShow(Base):
 
         self.genres = [TraktGenre(name=g.replace(' ', '-')) for g in trakt_show.get('genres', [])]
         self.cached_at = datetime.now()
+        self.translation_languages = trakt_show.get('available_translations', [])
 
     def get_episode(self, season, number, session, only_cached=False):
         # TODO: Does series data being expired mean all episode data should be refreshed?
@@ -726,6 +730,8 @@ class TraktMovie(Base):
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
     _translations = relation(TraktMovieTranslation, backref='movie')
+    _translation_languages = Column('translation_languages', Unicode)
+    translation_languages = json_synonym('_translation_languages')
     image_fanart_full = Column(Unicode)
     image_fanart_medium = Column(Unicode)
     image_fanart_thumb = Column(Unicode)
@@ -816,6 +822,7 @@ class TraktMovie(Base):
         self.cached_at = datetime.now()
         if trakt_movie.get('images'):
             set_image_attributes(self, trakt_movie)
+        self.translation_languages = trakt_movie.get('available_translations', [])
 
     @property
     def expired(self):
