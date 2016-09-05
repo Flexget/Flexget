@@ -10,7 +10,7 @@ from flexget.event import event
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.internal.api_trakt import ApiTrakt, list_actors, list_images, get_translations
+    from flexget.plugins.internal.api_trakt import ApiTrakt, list_actors, get_translations
 
     lookup_series = ApiTrakt.lookup_series
     lookup_movie = ApiTrakt.lookup_movie

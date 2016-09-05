@@ -406,7 +406,18 @@ class TraktActor(Base):
             'trakt_id': self.id,
             'imdb_id': self.imdb,
             'tmdb_id': self.tmdb,
-            'images': list_images(self.images)
+            'images': {
+                'headshot': {
+                    'full': self.image_headshot_full,
+                    'medium': self.image_headshot_medium,
+                    'thumb': self.image_headshot_thumb
+                },
+                'fanart': {
+                    'full': self.image_fanart_full,
+                    'medium': self.image_fanart_medium,
+                    'thumb': self.image_fanart_thumb
+                }
+            }
         }
 
 
@@ -439,13 +450,6 @@ def get_db_actors(ident, style):
     except requests.RequestException as e:
         log.debug('Error searching for actors for trakt id %s', e)
         return
-
-
-def list_images(images):
-    res = {}
-    for image in images:
-        res.setdefault(image.ident, {})[image.style] = image.url
-    return res
 
 
 def get_translations(translate):
@@ -606,7 +610,16 @@ class TraktShow(Base):
             "genres": [g.name for g in self.genres],
             "updated_at": self.updated_at,
             "cached_at": self.cached_at,
-            "images": list_images(self.images)
+            "images": {
+                'poster': {
+                    'full': self.image_poster_full,
+                    'medium': self.image_poster_medium,
+                    'thumb': self.image_poster_thumb
+                },
+                'thumb': {
+                    'full': self.image_thumb_full
+                }
+            }
         }
 
     def __init__(self, trakt_show, session):
@@ -767,7 +780,30 @@ class TraktMovie(Base):
             "genres": [g.name for g in self.genres],
             "updated_at": self.updated_at,
             "cached_at": self.cached_at,
-            "images": list_images(self.images)
+            "images": {
+                'fanart': {
+                    'full': self.image_fanart_full,
+                    'medium': self.image_fanart_medium,
+                    'thumb': self.image_fanart_thumb
+                },
+                'poster': {
+                    'full': self.image_poster_full,
+                    'medium': self.image_poster_medium,
+                    'thumb': self.image_poster_thumb
+                },
+                'logo': {
+                    'full': self.image_logo_full
+                },
+                'clearart': {
+                    'full': self.image_clearart_full
+                },
+                'banner': {
+                    'full': self.image_banner_full
+                },
+                'thumb': {
+                    'full': self.image_thumb_full
+                }
+            }
         }
 
     def update(self, trakt_movie, session):
