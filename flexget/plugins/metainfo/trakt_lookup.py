@@ -10,7 +10,7 @@ from flexget.event import event
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.internal.api_trakt import ApiTrakt, list_actors, list_images, get_translations
+    from flexget.plugins.internal.api_trakt import ApiTrakt, list_actors, get_translations_dict
 
     lookup_series = ApiTrakt.lookup_series
     lookup_movie = ApiTrakt.lookup_movie
@@ -98,15 +98,18 @@ class PluginTraktLookup(object):
         'trakt_series_language': 'language',
         'trakt_series_aired_episodes': 'aired_episodes',
         'trakt_series_episodes': lambda show: [episodes.title for episodes in show.episodes],
-        'trakt_series_images': lambda im: list_images(im.images),
-        'trakt_languages': lambda i: [t.name for t in i.translations],
+        'trakt_series_poster_full': 'image_poster_full',
+        'trakt_series_poster_medium': 'image_poster_medium',
+        'trakt_series_poster_thumb': 'image_poster_thumb',
+        'trakt_series_thumb': 'image_thumb_full',
+        'trakt_languages': 'translation_languages',
     }
 
     series_actor_map = {
         'trakt_actors': lambda show: list_actors(show.actors),
     }
     show_translate_map = {
-        'trakt_translations': lambda show: get_translations(show.translate),
+        'trakt_translations': lambda show: get_translations_dict(show.translations, 'show'),
     }
 
     # Episode info
@@ -123,7 +126,9 @@ class PluginTraktLookup(object):
         'trakt_season': 'season',
         'trakt_episode': 'number',
         'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep.season, ep.number),
-        'trakt_ep_images': lambda im: list_images(im.images),
+        'trakt_ep_screenshot_full': 'image_screenshot_full',
+        'trakt_ep_screenshot_medium': 'image_screenshot_medium',
+        'trakt_ep_screenshot_thumb': 'image_screenshot_thumb',
     }
 
     # Movie info
@@ -146,12 +151,21 @@ class PluginTraktLookup(object):
         'trakt_trailer': 'trailer',
         'trakt_language': 'language',
         'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
-        'trakt_images': lambda im: list_images(im.images),
-        'trakt_languages': lambda i: [t.name for t in i.translations]
+        'trakt_languages': 'translation_languages',
+        'trakt_fanart_full': 'image_fanart_full',
+        'trakt_fanart_medium': 'image_fanart_medium',
+        'trakt_fanart_thumb': 'image_fanart_thumb',
+        'trakt_poster_full': 'image_poster_full',
+        'trakt_poster_medium': 'image_poster_medium',
+        'trakt_poster_thumb': 'image_poster_thumb',
+        'trakt_logo': 'image_logo_full',
+        'trakt_clearart': 'image_clearart_full',
+        'trakt_banner': 'image_banner_full',
+        'trakt_thumb': 'image_thumb_full'
     }
 
     movie_translate_map = {
-        'trakt_translations': lambda movie: get_translations(movie.translate),
+        'trakt_translations': lambda movie: get_translations_dict(movie.translations, 'movie'),
     }
 
     movie_actor_map = {

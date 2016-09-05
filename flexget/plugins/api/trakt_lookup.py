@@ -6,7 +6,7 @@ from flask import jsonify
 from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.plugins.internal.api_trakt import ApiTrakt as at, list_actors, get_translations
+from flexget.plugins.internal.api_trakt import ApiTrakt as at, list_actors, get_translations_dict
 
 trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 
@@ -18,7 +18,8 @@ class objects_container(object):
             "full": {"type": ["string", "null"]},
             "medium": {"type": ["string", "null"]},
             "thumb": {"type": ["string", "null"]}
-        }
+        },
+        'additionalProperties': False
     }
 
     images_object = {
@@ -28,8 +29,11 @@ class objects_container(object):
             "clearart": internal_image_object,
             "fanart": internal_image_object,
             "logo": internal_image_object,
-            "poster": internal_image_object
-        }}
+            "poster": internal_image_object,
+            "thumb": internal_image_object
+        },
+        'additionalProperties': False
+    }
 
     translation_object = {
         'type': 'object',
@@ -39,7 +43,8 @@ class objects_container(object):
                            "overview": {'type': 'string'},
                            "tagline": {'type': 'string'},
                            "title": {'type': 'string'},
-                       }}
+                       },
+                       'additionalProperties': False}
         }
     }
 
@@ -59,8 +64,10 @@ class objects_container(object):
                     "biography": {'type': ['string', 'null']},
                     "homepage": {'type': 'string'},
                     "death": {'type': ['string', 'null']}
-                }
-            }}}
+                },
+                'additionalProperties': False
+            }}
+    }
 
     base_return_object = {
         'type': 'object',
@@ -70,14 +77,23 @@ class objects_container(object):
             'cached_at': {'type': 'string', 'format': 'date-time'},
             'genres': {'type': 'array', 'items': {'type': 'string'}},
             'id': {'type': 'integer'},
-            "overview": {'type': ['string', 'null']},
-            "runtime": {'type': ['integer', 'null']},
-            "rating": {'type': ['number', 'null']},
-            "votes": {'type': ['integer', 'null']},
-            "language": {'type': ['string', 'null']},
-            "updated_at": {'type': 'string', 'format': 'date-time'},
-            "images": images_object
-        }
+            'overview': {'type': ['string', 'null']},
+            'runtime': {'type': ['integer', 'null']},
+            'rating': {'type': ['number', 'null']},
+            'votes': {'type': ['integer', 'null']},
+            'language': {'type': ['string', 'null']},
+            'updated_at': {'type': 'string', 'format': 'date-time'},
+            'images': images_object,
+            'main_image': {'type': ['string', 'null']},
+            'title': {'type': 'string'},
+            'year': {'type': ['integer', 'null']},
+            'homepage': {'type': ['string', 'null']},
+            'slug': {'type': ['string', 'null']},
+            'tmdb_id': {'type': ['integer', 'null']},
+            'imdb_id': {'type': ['string', 'null']}
+
+        },
+        'additionalProperties': False
     }
 
     series_return_object = copy.deepcopy(base_return_object)
@@ -86,15 +102,17 @@ class objects_container(object):
     series_return_object['properties']['first_aired'] = {'type': ['string', 'null'], 'format': 'date-time'}
     series_return_object['properties']['air_day'] = {'type': ['string', 'null']}
     series_return_object['properties']['air_time'] = {'type': ['string', 'null']}
-    series_return_object['properties']['certification'] = {'type': ['string', "null"]}
+    series_return_object['properties']['certification'] = {'type': ['string', 'null']}
     series_return_object['properties']['network'] = {'type': ['string', 'null']}
     series_return_object['properties']['country'] = {'type': ['string', 'null']}
     series_return_object['properties']['status'] = {'type': 'string'}
-    series_return_object['properties']['aired_episodes'] = {'type': 'integer'}
+    series_return_object['properties']['timezone'] = {'type': ['string', 'null']}
+    series_return_object['properties']['number_of_aired_episodes'] = {'type': ['integer', 'null']}
 
     movie_return_object = copy.deepcopy(base_return_object)
     movie_return_object['properties']['tagline'] = {'type': 'string'}
     movie_return_object['properties']['released'] = {'type': 'string'}
+    movie_return_object['properties']['trailer'] = {'type': 'string'}
 
     default_error_object = {
         'type': 'object',
@@ -141,9 +159,9 @@ class TraktSeriesSearchApi(APIResource):
                     }, 404
         result = series.to_dict()
         if include_actors:
-            result["actors"] = list_actors(series.actors)
+            result['actors'] = list_actors(series.actors)
         if include_translations:
-            result["translations"] = get_translations(series.translate)
+            result['translations'] = get_translations_dict(series.translations, 'show')
         return jsonify(result)
 
 
@@ -167,7 +185,7 @@ class TraktMovieSearchApi(APIResource):
                     }, 404
         result = movie.to_dict()
         if include_actors:
-            result["actors"] = list_actors(movie.actors)
+            result['actors'] = list_actors(movie.actors)
         if include_translations:
-            result["translations"] = get_translations(movie.translate)
+            result['translations'] = get_translations_dict(movie.translations, 'movie')
         return jsonify(result)
