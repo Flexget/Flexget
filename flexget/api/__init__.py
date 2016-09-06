@@ -199,7 +199,7 @@ class APIError(Exception):
             'message': {'type': 'string'},
             'status': {'type': 'string'}
         },
-        'required': ['code', 'error']
+        'required': ['message']
     })
 
     def __init__(self, message, payload=None):
@@ -302,7 +302,7 @@ def success_response(message, status_code=200, status='success'):
 @api.errorhandler(BadRequest)
 @api.errorhandler(Unauthorized)
 def api_errors(error):
-    return error.to_dict(), error.code
+    return error.to_dict(), error.status_code
 
 
 @event('manager.daemon.started')
