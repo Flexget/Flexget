@@ -234,6 +234,11 @@ class BadRequest(APIError):
     description = 'Bad request'
 
 
+class CannotAddResource(APIError):
+    status_code = 409
+    description = 'Conflict'
+
+
 class ValidationError(APIError):
     status_code = 422
     description = 'Validation error'

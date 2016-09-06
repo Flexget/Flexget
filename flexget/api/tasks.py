@@ -11,7 +11,8 @@ from flask import jsonify, Response
 from flask import request
 from queue import Queue, Empty
 
-from flexget.api import api, APIResource, APIError, NotFoundError
+from flexget.api import api, APIResource, APIError, NotFoundError, CannotAddResource, BadRequest, success_response, \
+    success_schema
 from flexget.config_schema import process_config
 from flexget.entry import Entry
 from flexget.event import event
@@ -59,7 +60,8 @@ class TasksAPI(APIResource):
 
     @api.validate(task_api_schema, schema_override=task_schema_validate, description='New task object')
     @api.response(201, description='Newly created task', model=task_api_schema)
-    @api.response(409, description='Task already exists')
+    @api.response(CannotAddResource)
+    @api.response(APIError)
     def post(self, session=None):
         """ Add new task """
         data = request.json
@@ -67,7 +69,7 @@ class TasksAPI(APIResource):
         task_name = data['name']
 
         if task_name in self.manager.user_config.get('tasks', {}):
-            return {'error': 'task already exists'}, 409
+            raise CannotAddResource('task already exists')
 
         if 'tasks' not in self.manager.user_config:
             self.manager.user_config['tasks'] = {}
@@ -78,7 +80,7 @@ class TasksAPI(APIResource):
         errors = process_config(task_schema_processed, schema=task_api_schema.__schema__, set_defaults=True)
 
         if errors:
-            return {'error': 'problem loading config, raise a BUG as this should not happen!'}, 500
+            raise APIError('problem loading config, raise a BUG as this should not happen!')
 
         self.manager.user_config['tasks'][task_name] = data['config']
         self.manager.config['tasks'][task_name] = task_schema_processed['config']
@@ -104,8 +106,8 @@ class TaskAPI(APIResource):
     @api.validate(task_api_schema, schema_override=task_schema_validate)
     @api.response(200, model=task_api_schema)
     @api.response(201, description='renamed task', model=task_api_schema)
-    @api.response(404, description='task does not exist', model=task_api_schema)
-    @api.response(400, description='cannot rename task as it already exist', model=task_api_schema)
+    @api.response(NotFoundError)
+    @api.response(BadRequest)
     def put(self, task, session=None):
         """ Update tasks config """
         data = request.json
@@ -113,7 +115,7 @@ class TaskAPI(APIResource):
         new_task_name = data['name']
 
         if task not in self.manager.user_config.get('tasks', {}):
-            return {'error': 'task does not exist'}, 404
+            raise NotFoundError('task `%s` not found' % task)
 
         if 'tasks' not in self.manager.user_config:
             self.manager.user_config['tasks'] = {}
@@ -124,7 +126,7 @@ class TaskAPI(APIResource):
         if task != new_task_name:
             # Rename task
             if new_task_name in self.manager.user_config['tasks']:
-                return {'error': 'cannot rename task as it already exist'}, 400
+                raise BadRequest('cannot rename task as it already exist')
 
             del self.manager.user_config['tasks'][task]
             del self.manager.config['tasks'][task]
@@ -135,7 +137,7 @@ class TaskAPI(APIResource):
         errors = process_config(task_schema_processed, schema=task_api_schema.__schema__, set_defaults=True)
 
         if errors:
-            return {'error': 'problem loading config, raise a BUG as this should not happen!'}, 500
+            raise APIError('problem loading config, raise a BUG as this should not happen!')
 
         self.manager.user_config['tasks'][new_task_name] = data['config']
         self.manager.config['tasks'][new_task_name] = task_schema_processed['config']
@@ -145,19 +147,19 @@ class TaskAPI(APIResource):
 
         return {'name': new_task_name, 'config': self.manager.user_config['tasks'][new_task_name]}, code
 
-    @api.response(200, description='deleted task')
-    @api.response(404, description='task not found')
+    @api.response(200, model=success_schema, description='deleted task')
+    @api.response(NotFoundError)
     def delete(self, task, session=None):
         """ Delete a task """
         try:
             self.manager.config['tasks'].pop(task)
             self.manager.user_config['tasks'].pop(task)
         except KeyError:
-            return {'error': 'invalid task'}, 404
+            raise NotFoundError('task does not exist')
 
         self.manager.save_config()
         self.manager.config_changed()
-        return {}
+        return success_response('successfully deleted task')
 
 
 def _task_info_dict(task):
@@ -170,18 +172,15 @@ def _task_info_dict(task):
 
 
 task_queue_schema = {
-    'type': 'object',
-    'properties': {
-        'tasks': {
-            'type': 'array',
-            'items': {
-                'id': {'type': 'integer'},
-                'name': {'type': 'string'},
-                'current_phase': {'type': 'string'},
-                'current_plugin': {'type': 'string'},
-            }
-        }
-    }
+    'type': 'array',
+    'items': {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'integer'},
+            'name': {'type': 'string'},
+            'current_phase': {'type': 'string'},
+            'current_plugin': {'type': 'string'},
+        }}
 }
 
 task_execution_results_schema = {
@@ -271,7 +270,7 @@ class TaskQueueAPI(APIResource):
         if self.manager.task_queue.current_task:
             tasks.insert(0, _task_info_dict(self.manager.task_queue.current_task))
 
-        return jsonify({'tasks': tasks})
+        return jsonify(tasks)
 
 
 class ExecuteLog(Queue):
