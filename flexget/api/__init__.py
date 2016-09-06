@@ -186,21 +186,24 @@ api = Api(
     version=__version__,
     description='<font color="red"><b>Warning: under development, subject to change without notice.<b/></font>'
 )
+base_error = {
+    'type': 'object',
+    'properties': {
+        'status_code': {'type': 'integer'},
+        'message': {'type': 'string'},
+        'status': {'type': 'string'}
+    },
+    'required': ['message', 'status_code']
+}
+
+base_error_schema = api.schema('error', base_error)
 
 
 class APIError(Exception):
     description = 'Server error'
     status_code = 500
     status = 'Error'
-    response_model = api.schema('error', {
-        'type': 'object',
-        'properties': {
-            'status_code': {'type': 'integer'},
-            'message': {'type': 'string'},
-            'status': {'type': 'string'}
-        },
-        'required': ['message']
-    })
+    response_model = base_error_schema
 
     def __init__(self, message, payload=None):
         self.message = message

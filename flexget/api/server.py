@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+import copy
 
 import base64
 
@@ -22,40 +23,21 @@ from pyparsing import nums, alphanums, printables
 from yaml.error import YAMLError
 
 from flexget._version import __version__
-from flexget.api import api, APIResource, APIError, __version__ as __api_version__, BadRequest
+from flexget.api import api, APIResource, APIError, __version__ as __api_version__, BadRequest, base_error, \
+    success_response, success_schema
 
 log = logging.getLogger('api.server')
 
 server_api = api.namespace('server', description='Manage Daemon')
 
-yaml_error_response = {
-    'type': 'object',
-    'properties': {
-        'code': {'type': 'integer'},
-        'column': {'type': 'integer'},
-        'line': {'type': 'integer'},
-        'message': {'type': 'string'},
-        'reason': {'type': 'string'}
-    }
-}
+yaml_error_response = copy.deepcopy(base_error)
+yaml_error_response['properties']['column'] = {'type': 'integer'}
+yaml_error_response['properties']['line'] = {'type': 'integer'}
+yaml_error_response['properties']['reason'] = {'type': 'string'}
 
-config_error = {
-    'type': 'object',
-    'properties': {
-        'error': {'type': 'string'},
-        'config_path': {'type': 'string'}
-    }
-}
-
-config_validation_error = {
-    'type': 'object',
-    'properties': {
-        'code': {'type': 'integer'},
-        'error': {'type': 'array', 'items': config_error},
-        'message': {'type': 'string'},
-
-    }
-}
+config_validation_error = copy.deepcopy(base_error)
+config_validation_error['properties']['error'] = {'type': 'string'}
+config_validation_error['properties']['config_path'] = {'type': 'string'}
 
 yaml_error_schema = api.schema('yaml_error_schema', yaml_error_response)
 config_validation_schema = api.schema('config_validation_schema', config_validation_error)
@@ -63,10 +45,9 @@ config_validation_schema = api.schema('config_validation_schema', config_validat
 
 @server_api.route('/reload/')
 class ServerReloadAPI(APIResource):
-
     @api.response(501, model=yaml_error_schema, description='YAML syntax error')
     @api.response(502, model=config_validation_schema, description='Config validation error')
-    @api.response(200, description='Newly reloaded config')
+    @api.response(200, model=success_schema, description='Newly reloaded config')
     def get(self, session=None):
         """ Reload Flexget config """
         log.info('Reloading config from disk.')
@@ -88,24 +69,19 @@ class ServerReloadAPI(APIResource):
                 errors.append({'error': er.message,
                                'config_path': er.json_pointer})
             raise APIError('Error loading config: %s' % e.args[0], payload={'errors': errors})
-
-        log.info('Config successfully reloaded from disk.')
-        return {}
+        return success_response('Config successfully reloaded from disk')
 
 
 pid_schema = api.schema('server.pid', {
     'type': 'object',
     'properties': {
-        'pid': {
-            'type': 'integer'
-        }
+        'pid': {'type': 'integer'}
     }
 })
 
 
 @server_api.route('/pid/')
 class ServerPIDAPI(APIResource):
-
     @api.response(200, description='Reloaded config', model=pid_schema)
     def get(self, session=None):
         """ Get server PID """
@@ -119,7 +95,6 @@ shutdown_parser.add_argument('force', type=inputs.boolean, required=False, defau
 
 @server_api.route('/shutdown/')
 class ServerShutdownAPI(APIResource):
-
     @api.doc(parser=shutdown_parser)
     @api.response(200, 'Shutdown requested')
     def get(self, session=None):
@@ -131,7 +106,6 @@ class ServerShutdownAPI(APIResource):
 
 @server_api.route('/config/')
 class ServerConfigAPI(APIResource):
-
     @api.response(200, description='Flexget config')
     def get(self, session=None):
         """ Get Flexget Config """
@@ -221,7 +195,6 @@ version_schema = api.schema('server.version', {
 
 @server_api.route('/version/')
 class ServerVersionAPI(APIResource):
-
     @api.response(200, description='Flexget version', model=version_schema)
     def get(self, session=None):
         """ Flexget Version """
@@ -251,7 +224,6 @@ dump_threads_schema = api.schema('server.dump_threads', {
 
 @server_api.route('/dump_threads/')
 class ServerDumpThreads(APIResource):
-
     @api.response(200, description='Flexget threads dump', model=dump_threads_schema)
     def get(self, session=None):
         """ Dump Server threads for debugging """
@@ -327,7 +299,6 @@ def file_inode(filename):
 
 @server_api.route('/log/')
 class ServerLogAPI(APIResource):
-
     @api.doc(parser=server_log_parser)
     @api.response(200, description='Streams as line delimited JSON')
     def get(self, session=None):
