@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import request
 from flask_login import current_user
 
-from flexget.api import api, APIResource
+from flexget.api import api, APIResource, BadRequest, success_schema, success_response
 from flexget.webserver import change_password, generate_token, WeakPassword
 
 user_api = api.namespace('user', description='Manage user login credentials')
@@ -13,30 +13,19 @@ user_password_input = {
     'type': 'object',
     'properties': {
         'password': {'type': 'string'}
-    }
+    },
+    'required': ['password'],
+    'additionalProperties': False
 }
 user_password_input_schema = api.schema('user_password_input', user_password_input)
-
-default_error_schema = {
-    'type': 'object',
-    'properties': {
-        'status': {'type': 'string'},
-        'message': {'type': 'string'}
-    }
-}
-
-default_error_schema = api.schema('default_error_schema', default_error_schema)
-
-empty_response = api.schema('empty', {'type': 'object'})
 
 
 @user_api.route('/')
 @api.doc('Change user password')
 class UserManagementAPI(APIResource):
-
     @api.validate(model=user_password_input_schema, description='Password change schema')
-    @api.response(500, 'Password not strong enough', default_error_schema)
-    @api.response(200, 'Success', empty_response)
+    @api.response(BadRequest)
+    @api.response(200, 'Success', model=success_schema)
     @api.doc(description='Change user password. A medium strength password is required.'
                          ' See https://github.com/lepture/safe for reference')
     def put(self, session=None):
@@ -46,10 +35,8 @@ class UserManagementAPI(APIResource):
         try:
             change_password(username=user.name, password=data.get('password'), session=session)
         except WeakPassword as e:
-            return {'status': 'error',
-                    'message': e.value}, 500
-        return {'status': 'success',
-                'message': 'Successfully changed user password'}
+            raise BadRequest(e.value)
+        return success_response('Successfully changed user password')
 
 
 user_token_response = {
@@ -65,7 +52,6 @@ user_token_response_schema = api.schema('user_token_response', user_token_respon
 @user_api.route('/token/')
 @api.doc('Change user token')
 class UserManagementTokenAPI(APIResource):
-
     @api.response(200, 'Successfully changed user token', user_token_response_schema)
     @api.doc(description='Get new user token')
     def get(self, session=None):
