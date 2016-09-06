@@ -8,7 +8,7 @@ import pkgutil
 from collections import deque
 from functools import wraps
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_compress import Compress
 from flask_restplus import Api as RestPlusAPI
@@ -155,7 +155,8 @@ class Api(RestPlusAPI):
         try:
             if issubclass(code_or_apierror, APIError):
                 description = code_or_apierror.description or description
-                return self.doc(responses={code_or_apierror.code: (description, code_or_apierror.response_model)})
+                return self.doc(
+                    responses={code_or_apierror.status_code: (description, code_or_apierror.response_model)})
         except TypeError:
             # If first argument isn't a class this happens
             pass
@@ -189,12 +190,14 @@ api = Api(
 
 class APIError(Exception):
     description = 'Server error'
-    code = 500
+    status_code = 500
+    status = 'Error'
     response_model = api.schema('error', {
         'type': 'object',
         'properties': {
-            'code': {'type': 'integer'},
-            'message': {'type': 'string'}
+            'status_code': {'type': 'integer'},
+            'message': {'type': 'string'},
+            'status': {'type': 'string'}
         },
         'required': ['code', 'error']
     })
@@ -205,7 +208,7 @@ class APIError(Exception):
 
     def to_dict(self):
         rv = self.payload or {}
-        rv.update(code=self.code, message=self.message)
+        rv.update(status_code=self.status_code, message=self.message, status=self.status)
         return rv
 
     @classmethod
@@ -214,7 +217,7 @@ class APIError(Exception):
 
 
 class NotFoundError(APIError):
-    code = 404
+    status_code = 404
     description = 'Not found'
 
 
@@ -224,12 +227,12 @@ class Unauthorized(APIError):
 
 
 class BadRequest(APIError):
-    code = 400
+    status_code = 400
     description = 'Bad request'
 
 
 class ValidationError(APIError):
-    code = 422
+    status_code = 422
     description = 'Validation error'
 
     response_model = api.inherit('validation_error', APIError.response_model, {
@@ -274,6 +277,23 @@ class ValidationError(APIError):
 
 
 empty_response = api.schema('empty', {'type': 'object'})
+success_schema = api.schema('success', {'type': 'object',
+                                        'properties': {
+                                            'status': {'type': 'string'},
+                                            'message': {'type': 'string'},
+                                            'status_code': {'type': 'integer'}
+                                        }})
+
+
+def success_response(message, status_code=200, status='success'):
+    rsp_dict = {
+        'message': message,
+        'status_code': status_code,
+        'status': status
+    }
+    rsp = jsonify(rsp_dict)
+    rsp.status_code = status_code
+    return rsp
 
 
 @api.errorhandler(APIError)
