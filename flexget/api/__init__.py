@@ -156,11 +156,11 @@ class Api(RestPlusAPI):
             if issubclass(code_or_apierror, APIError):
                 description = code_or_apierror.description or description
                 return self.doc(
-                    responses={code_or_apierror.status_code: (description, code_or_apierror.response_model)})
+                    responses={code_or_apierror.status_code: (description, code_or_apierror.response_model)}, **kwargs)
         except TypeError:
             # If first argument isn't a class this happens
             pass
-        return super(Api, self).response(code_or_apierror, description, model=model)
+        return super(Api, self).response(code_or_apierror, description, model=model, **kwargs)
 
 
 class APIResource(Resource):
