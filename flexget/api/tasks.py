@@ -304,8 +304,8 @@ inject_api = api.namespace('inject', description='Entry injection API')
 @tasks_api.route('/execute/')
 @api.doc(description=execution_doc)
 class TaskExecutionAPI(APIResource):
-    @api.response(404, description='Task not found')
-    @api.response(500, description='Could not resolve title from URL')
+    @api.response(NotFoundError)
+    @api.response(BadRequest)
     @api.response(200, model=task_api_execute_schema)
     @api.validate(task_execution_schema, description=entry_doc)
     def post(self, session=None):
@@ -313,7 +313,7 @@ class TaskExecutionAPI(APIResource):
         data = request.json
         for task in data.get('tasks'):
             if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {}).keys()]:
-                return {'error': 'task %s does not exist' % task}, 404
+                raise NotFoundError('task %s does not exist' % task)
 
         queue = ExecuteLog()
         output = queue if data.get('loglevel') else None
@@ -339,8 +339,8 @@ class TaskExecutionAPI(APIResource):
                         value, params = cgi.parse_header(requests.head(item['url']).headers['Content-Disposition'])
                         entry['title'] = params['filename']
                     except KeyError:
-                        return {'status': 'error',
-                                'message': 'No title given, and couldn\'t get one from the URL\'s HTTP response'}, 500
+                        raise BadRequest('No title given, and couldn\'t get one from the URL\'s HTTP response')
+
                 else:
                     entry['title'] = item.get('title')
                 if item.get('force'):
