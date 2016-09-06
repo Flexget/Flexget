@@ -23,24 +23,27 @@ class PyloadApi(object):
 
     def get_session(self, config):
         # Login
-        post = {'username': config['username'], 'password': config['password']}
-        result = self.query("login", post)
+        data = {'username': config['username'], 'password': config['password']}
+        result = self.post('login', data=data)
         response = result.json()
         if not response:
             raise plugin.PluginError('Login failed', log)
         return response.replace('"', '')
 
-    def query(self, method, post=None):
+    def get(self, method):
         try:
-            response = self.requests.request(
-                'post' if post is not None else 'get',
-                self.url.rstrip("/") + "/" + method.strip("/"),
-                data=post)
-            response.raise_for_status()
-            return response
+            return self.requests.get(self.url.rstrip("/") + "/" + method.strip("/"))
         except RequestException as e:
             if e.response and e.response.status_code == 500:
-                raise plugin.PluginError('Internal API Error: <%s> <%s> <%s>' % (method, self.url, post), log)
+                raise plugin.PluginError('Internal API Error: <%s> <%s>' % (method, self.url), log)
+            raise
+
+    def post(self, method, data):
+        try:
+            return self.requests.post(self.url.rstrip("/") + "/" + method.strip("/"), data=data)
+        except RequestException as e:
+            if e.response and e.response.status_code == 500:
+                raise plugin.PluginError('Internal API Error: <%s> <%s> <%s>' % (method, self.url, data), log)
             raise
 
 
@@ -88,28 +91,24 @@ class PluginPyLoad(object):
     DEFAULT_HANDLE_NO_URL_AS_FAILURE = False
 
     schema = {
-        'oneOf': [
-            {'type': 'boolean'},
-            {'type': 'object',
-             'properties': {
-                 'api': {'type': 'string'},
-                 'username': {'type': 'string'},
-                 'password': {'type': 'string'},
-                 'folder': {'type': 'string'},
-                 'package': {'type': 'string'},
-                 'package_password': {'type': 'string'},
-                 'queue': {'type': 'boolean'},
-                 'parse_url': {'type': 'boolean'},
-                 'multiple_hoster': {'type': 'boolean'},
-                 'hoster': one_or_more({'type': 'string'}),
-                 'preferred_hoster_only': {'type': 'boolean'},
-                 'handle_no_url_as_failure': {'type': 'boolean'},
-                 'enabled': {'type': 'boolean'},
-
-             },
-             'additionalProperties': False
-             }
-        ]
+        'type': 'object',
+        'properties': {
+            'api': {'type': 'string'},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'folder': {'type': 'string'},
+            'package': {'type': 'string'},
+            'package_password': {'type': 'string'},
+            'queue': {'type': 'boolean'},
+            'parse_url': {'type': 'boolean'},
+            'multiple_hoster': {'type': 'boolean'},
+            'hoster': one_or_more({'type': 'string'}),
+            'preferred_hoster_only': {'type': 'boolean'},
+            'handle_no_url_as_failure': {'type': 'boolean'},
+            'enabled': {'type': 'boolean'}
+        },
+        'required': ['username', 'password'],
+        'additionalProperties': False
     }
 
     def on_task_output(self, task, config):
@@ -144,11 +143,11 @@ class PluginPyLoad(object):
 
             url = json.dumps(entry['url']) if config.get('parse_url', self.DEFAULT_PARSE_URL) else "''"
 
-            log.debug("Parsing url %s" % url)
+            log.debug('Parsing url %s', url)
 
-            result = api.query("parseURLs", {"html": content, "url": url, "session": session})
+            data = {'html': content, 'url': url, 'session': session}
+            result = api.post('parseURLs', data=data)
 
-            # parsed { plugins: [urls] }
             parsed = result.json()
 
             urls = []
@@ -163,22 +162,22 @@ class PluginPyLoad(object):
             # no preferred hoster and not preferred hoster only - add all recognized plugins
             if not urls and not config.get('preferred_hoster_only', self.DEFAULT_PREFERRED_HOSTER_ONLY):
                 for name, purls in parsed.items():
-                    if name != "BasePlugin":
+                    if name != 'BasePlugin':
                         urls.extend(purls)
 
             if task.options.test:
-                log.info('Would add `%s` to pyload' % urls)
+                log.info('Would add `%s` to pyload', urls)
                 continue
 
             # no urls found
             if not urls:
                 if config.get('handle_no_url_as_failure', self.DEFAULT_HANDLE_NO_URL_AS_FAILURE):
-                    entry.fail("No suited urls in entry %s" % entry['title'])
+                    entry.fail('No suited urls in entry %s' % entry['title'])
                 else:
-                    log.info("No suited urls in entry %s" % entry['title'])
+                    log.info('No suited urls in entry %s', entry['title'])
                 continue
 
-            log.debug("Add %d urls to pyLoad" % len(urls))
+            log.debug('Add %d urls to pyLoad', len(urls))
 
             try:
                 dest = 1 if config.get('queue', self.DEFAULT_QUEUE) else 0  # Destination.Queue = 1
@@ -191,15 +190,15 @@ class PluginPyLoad(object):
                     name = entry.render(name)
                 except RenderError as e:
                     name = entry['title']
-                    log.error('Error rendering jinja event: %s' % e)
+                    log.error('Error rendering jinja event: %s', e)
 
-                post = {'name': "'%s'" % name.encode("ascii", "ignore"),
-                        'links': str(urls),
-                        'dest': dest,
+                data = {'name': json.dumps('"%s"' % name.encode('ascii', 'ignore')),
+                        'links': json.dumps(urls),
+                        'dest': json.dumps(dest),
                         'session': session}
 
-                pid = api.query("addPackage", post).text
-                log.debug('added package pid: %s' % pid)
+                pid = api.post('addPackage', data=data).text
+                log.debug('added package pid: %s', pid)
 
                 # Set Folder
                 folder = config.get('folder', self.DEFAULT_FOLDER)
@@ -210,16 +209,16 @@ class PluginPyLoad(object):
                         folder = entry.render(folder)
                     except RenderError as e:
                         folder = self.DEFAULT_FOLDER
-                        log.error('Error rendering jinja event: %s' % e)
+                        log.error('Error rendering jinja event: %s', e)
                     # set folder with api
                     data = json.dumps({'folder': folder})
-                    api.query("setPackageData", {'pid': pid, 'data': data, 'session': session})
+                    api.post("setPackageData", data={'pid': pid, 'data': data, 'session': session})
 
                 # Set Package Password
                 package_password = config.get('package_password')
                 if package_password:
                     data = json.dumps({'password': package_password})
-                    api.query("setPackageData", {'pid': pid, 'data': data, 'session': session})
+                    api.post('setPackageData', data={'pid': pid, 'data': data, 'session': session})
 
             except Exception as e:
                 entry.fail(str(e))
