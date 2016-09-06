@@ -24,7 +24,7 @@ from yaml.error import YAMLError
 
 from flexget._version import __version__
 from flexget.api import api, APIResource, APIError, __version__ as __api_version__, BadRequest, base_error, \
-    success_response, success_schema
+    success_response, success_schema, empty_response
 
 log = logging.getLogger('api.server')
 
@@ -89,26 +89,25 @@ class ServerPIDAPI(APIResource):
 
 
 shutdown_parser = api.parser()
-shutdown_parser.add_argument('force', type=inputs.boolean, required=False, default=False,
-                             help='Ignore tasks in the queue')
+shutdown_parser.add_argument('force', type=inputs.boolean, default=False, help='Ignore tasks in the queue')
 
 
 @server_api.route('/shutdown/')
 class ServerShutdownAPI(APIResource):
     @api.doc(parser=shutdown_parser)
-    @api.response(200, 'Shutdown requested')
+    @api.response(200, model=success_schema, description='Shutdown requested')
     def get(self, session=None):
         """ Shutdown Flexget Daemon """
         args = shutdown_parser.parse_args()
         self.manager.shutdown(args['force'])
-        return {}
+        return success_response('Shutdown requested')
 
 
 @server_api.route('/config/')
 class ServerConfigAPI(APIResource):
-    @api.response(200, description='Flexget config')
+    @api.response(200, description='Flexget config', model=empty_response)
     def get(self, session=None):
-        """ Get Flexget Config """
+        """ Get Flexget Config in JSON form"""
         return self.manager.config
 
 
@@ -124,7 +123,7 @@ raw_config_schema = api.schema('raw_config', raw_config_object)
 @server_api.route('/raw_config/')
 class ServerRawConfigAPI(APIResource):
     @api.doc(description='Return config file encoded in Base64')
-    @api.response(200, model=raw_config_schema, description='Flexget raw YAML config file')
+    @api.response(200, model=raw_config_schema, description='Flexget raw YAML config file encoded in Base64')
     def get(self, session=None):
         """ Get raw YAML config file """
         with open(self.manager.config_path, 'r', encoding='utf-8') as f:
@@ -132,7 +131,7 @@ class ServerRawConfigAPI(APIResource):
         return jsonify(raw_config=raw_config.decode('utf-8'))
 
     @api.validate(raw_config_schema)
-    @api.response(200, description='Successfully updated config')
+    @api.response(200, model=success_schema, description='Successfully updated config')
     @api.response(BadRequest)
     @api.response(APIError)
     @api.doc(description='Config file must be base64 encoded. A backup will be created, and if successful config will'
@@ -179,9 +178,7 @@ class ServerRawConfigAPI(APIResource):
         except Exception as e:
             raise APIError(message='Failed to write new config to file, please load from backup',
                            payload={'reason': str(e), 'backup_path': backup_path})
-
-        return {'status': 'success',
-                'message': 'new config loaded and successfully updated to file'}
+        return success_response('Config was loaded and successfully updated to file')
 
 
 version_schema = api.schema('server.version', {
@@ -245,11 +242,8 @@ class ServerDumpThreads(APIResource):
 
 
 server_log_parser = api.parser()
-server_log_parser.add_argument(
-    'lines', type=int, required=False, default=200,
-    help='How many lines to find before streaming'
-)
-server_log_parser.add_argument('search', type=str, required=False, help='Search filter support google like syntax')
+server_log_parser.add_argument('lines', type=int, default=200, help='How many lines to find before streaming')
+server_log_parser.add_argument('search', help='Search filter support google like syntax')
 
 
 def reverse_readline(fh, start_byte=0, buf_size=8192):
