@@ -28,7 +28,7 @@ class TestValidator(object):
 
         assert rsp.status_code == 422
         data = json.loads(rsp.get_data(as_text=True))
-        assert data.get('code') == 422
+        assert data.get('status_code') == 422
         assert data.get('message') == 'validation error'
         assert data.get('validation_errors')
         assert 'The keys' in data['validation_errors'][0]['message']
