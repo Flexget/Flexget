@@ -192,7 +192,7 @@ class PluginPyLoad(object):
                     name = entry['title']
                     log.error('Error rendering jinja event: %s', e)
 
-                data = {'name': json.dumps('"%s"' % name.encode('ascii', 'ignore')),
+                data = {'name': json.dumps(name.encode('ascii', 'ignore').decode()),
                         'links': json.dumps(urls),
                         'dest': json.dumps(dest),
                         'session': session}
