@@ -22,7 +22,7 @@ from pyparsing import nums, alphanums, printables
 from yaml.error import YAMLError
 
 from flexget._version import __version__
-from flexget.api import api, APIResource, ApiError, __version__ as __api_version__, BadRequest
+from flexget.api import api, APIResource, APIError, __version__ as __api_version__, BadRequest
 
 log = logging.getLogger('api.server')
 
@@ -81,13 +81,13 @@ class ServerReloadAPI(APIResource):
                     error.update({'line': e.context_mark.line, 'column': e.context_mark.column})
                 if e.problem_mark is not None:
                     error.update({'line': e.problem_mark.line, 'column': e.problem_mark.column})
-                raise ApiError(message='Invalid YAML syntax', payload=error)
+                raise APIError(message='Invalid YAML syntax', payload=error)
         except ValueError as e:
             errors = []
             for er in e.errors:
                 errors.append({'error': er.message,
                                'config_path': er.json_pointer})
-            raise ApiError('Error loading config: %s' % e.args[0], payload={'errors': errors})
+            raise APIError('Error loading config: %s' % e.args[0], payload={'errors': errors})
 
         log.info('Config successfully reloaded from disk.')
         return {}
@@ -160,7 +160,7 @@ class ServerRawConfigAPI(APIResource):
     @api.validate(raw_config_schema)
     @api.response(200, description='Successfully updated config')
     @api.response(BadRequest)
-    @api.response(ApiError)
+    @api.response(APIError)
     @api.doc(description='Config file must be base64 encoded. A backup will be created, and if successful config will'
                          ' be loaded and saved to original file.')
     def post(self, session=None):
@@ -196,14 +196,14 @@ class ServerRawConfigAPI(APIResource):
         try:
             self.manager.backup_config()
         except Exception as e:
-            raise ApiError(message='Failed to create config backup, config updated but NOT written to file',
+            raise APIError(message='Failed to create config backup, config updated but NOT written to file',
                            payload={'reason': str(e)})
 
         try:
             with open(self.manager.config_path, 'w', encoding='utf-8') as f:
                 f.write(raw_config.decode('utf-8').replace('\r\n', '\n'))
         except Exception as e:
-            raise ApiError(message='Failed to write new config to file, please load from backup',
+            raise APIError(message='Failed to write new config to file, please load from backup',
                            payload={'reason': str(e), 'backup_path': backup_path})
 
         return {'status': 'success',

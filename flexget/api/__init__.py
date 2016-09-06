@@ -139,7 +139,7 @@ class Api(RestPlusAPI):
                     if errors:
                         raise ValidationError(errors)
                 except RefResolutionError as e:
-                    raise ApiError(str(e))
+                    raise APIError(str(e))
                 return func(*args, **kwargs)
 
             return wrapper
@@ -153,7 +153,7 @@ class Api(RestPlusAPI):
         documented.
         """
         try:
-            if issubclass(code_or_apierror, ApiError):
+            if issubclass(code_or_apierror, APIError):
                 description = code_or_apierror.description or description
                 return self.doc(responses={code_or_apierror.code: (description, code_or_apierror.response_model)})
         except TypeError:
@@ -187,7 +187,7 @@ api = Api(
 )
 
 
-class ApiError(Exception):
+class APIError(Exception):
     description = 'Server error'
     code = 500
     response_model = api.schema('error', {
@@ -213,26 +213,26 @@ class ApiError(Exception):
         return cls.response_model.__schema__
 
 
-class NotFoundError(ApiError):
+class NotFoundError(APIError):
     code = 404
     description = 'Not found'
 
 
-class Unauthorized(ApiError):
+class Unauthorized(APIError):
     code = 401
     description = 'Unauthorized'
 
 
-class BadRequest(ApiError):
+class BadRequest(APIError):
     code = 400
     description = 'Bad request'
 
 
-class ValidationError(ApiError):
+class ValidationError(APIError):
     code = 422
     description = 'Validation error'
 
-    response_model = api.inherit('validation_error', ApiError.response_model, {
+    response_model = api.inherit('validation_error', APIError.response_model, {
         'type': 'object',
         'properties': {
             'validation_errors': {
@@ -276,7 +276,7 @@ class ValidationError(ApiError):
 empty_response = api.schema('empty', {'type': 'object'})
 
 
-@api.errorhandler(ApiError)
+@api.errorhandler(APIError)
 @api.errorhandler(NotFoundError)
 @api.errorhandler(ValidationError)
 @api.errorhandler(BadRequest)

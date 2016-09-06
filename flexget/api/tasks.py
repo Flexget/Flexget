@@ -11,7 +11,7 @@ from flask import jsonify, Response
 from flask import request
 from queue import Queue, Empty
 
-from flexget.api import api, APIResource, ApiError, NotFoundError
+from flexget.api import api, APIResource, APIError, NotFoundError
 from flexget.config_schema import process_config
 from flexget.entry import Entry
 from flexget.event import event
@@ -99,7 +99,7 @@ class TasksAPI(APIResource):
 class TaskAPI(APIResource):
     @api.response(200, model=task_api_schema)
     @api.response(NotFoundError, description='task not found')
-    @api.response(ApiError, description='unable to read config')
+    @api.response(APIError, description='unable to read config')
     def get(self, task, session=None):
         """ Get task config """
         if task not in self.manager.user_config.get('tasks', {}):
