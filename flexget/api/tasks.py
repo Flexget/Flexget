@@ -25,14 +25,8 @@ from flexget.utils.lazy_dict import LazyLookup
 tasks_api = api.namespace('tasks', description='Manage Tasks')
 
 tasks_list_api_schema = api.schema('tasks.list', {
-    "type": "object",
-    "properties": {
-        "tasks": {
-            "type": "array",
-            "items": {'$ref': '#/definitions/tasks.task'}
-        }
-    },
-    'additionalProperties': False
+    "type": "array",
+    "items": {'$ref': '#/definitions/tasks.task'}
 })
 
 task_schema_validate = {
@@ -61,7 +55,7 @@ class TasksAPI(APIResource):
         tasks = []
         for name, config in self.manager.user_config.get('tasks', {}).items():
             tasks.append({'name': name, 'config': config})
-        return {'tasks': tasks}
+        return jsonify(tasks)
 
     @api.validate(task_api_schema, schema_override=task_schema_validate, description='New task object')
     @api.response(201, description='Newly created task', model=task_api_schema)

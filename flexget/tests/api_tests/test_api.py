@@ -100,23 +100,21 @@ class TestTaskAPI(object):
     def test_list_tasks(self, api_client):
         rsp = api_client.get('/tasks/')
         data = json.loads(rsp.get_data(as_text=True))
-        assert data == {
-            'tasks': [
-                {
-                    'name': 'test',
-                    'config': {
-                        'mock': [{'title': 'entry 1'}],
-                        'rss': {
-                            'url': u'http://test/rss',
-                            'group_links': False,
-                            'ascii': False,
-                            'silent': False,
-                            'all_entries': True
-                        }
-                    },
-                }
-            ]
-        }
+        assert data == [
+            {
+                'name': 'test',
+                'config': {
+                    'mock': [{'title': 'entry 1'}],
+                    'rss': {
+                        'url': u'http://test/rss',
+                        'group_links': False,
+                        'ascii': False,
+                        'silent': False,
+                        'all_entries': True
+                    }
+                },
+            }
+        ]
 
     @patch.object(Manager, 'save_config')
     def test_add_task(self, mocked_save_config, api_client, manager):
