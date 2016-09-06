@@ -222,7 +222,7 @@ class NotFoundError(APIError):
 
 
 class Unauthorized(APIError):
-    code = 401
+    status_code = 401
     description = 'Unauthorized'
 
 

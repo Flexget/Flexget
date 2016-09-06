@@ -3,12 +3,12 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import base64
 
-from flask import request, jsonify, session as flask_session
+from flask import request, session as flask_session
 from flask_login import login_user, LoginManager, current_user, current_app
 from flask_restplus import inputs
 from werkzeug.security import check_password_hash
 
-from flexget.api import api, APIResource, app, Unauthorized, empty_response
+from flexget.api import api, APIResource, app, Unauthorized, success_response, success_schema
 from flexget.utils.database import with_session
 from flexget.webserver import User
 
@@ -86,7 +86,7 @@ login_parser.add_argument('remember', type=inputs.boolean, required=False, defau
 class LoginAPI(APIResource):
     @api.validate(login_api_schema, description='Username and Password')
     @api.response(Unauthorized)
-    @api.response(200, 'Login successful', model=empty_response)
+    @api.response(200, 'Login successful', model=success_schema)
     @api.doc(parser=login_parser)
     def post(self, session=None):
         """ Login with username and password """
@@ -105,17 +105,17 @@ class LoginAPI(APIResource):
                 if user.password and check_password_hash(user.password, password):
                     args = login_parser.parse_args()
                     login_user(user, remember=args['remember'])
-                    return {}
+                    return success_response('User logged in')
 
         raise Unauthorized(message='Invalid username or password')
 
 
 @auth_api.route('/logout/')
 class LogoutAPI(APIResource):
-    @api.response(200, 'Logout successful', model=empty_response)
+    @api.response(200, 'Logout successful', model=success_schema)
     def get(self, session=None):
         """ Logout and clear session cookies """
         flask_session.clear()
-        resp = jsonify({})
+        resp = success_response('User logged out')
         resp.set_cookie('flexgetToken', '', expires=0)
         return resp
