@@ -9,22 +9,12 @@ from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
 import flexget.plugins.list.entry_list as el
-from flexget.api import api, APIResource
+from flexget.api import api, APIResource, BadRequest, NotFoundError, success_schema, success_response
 
 log = logging.getLogger('entry_list')
 
 entry_list_api = api.namespace('entry_list', description='Entry List operations')
 
-default_error_schema = {
-    'type': 'object',
-    'properties': {
-        'status': {'type': 'string'},
-        'message': {'type': 'string'}
-    }
-}
-empty_response = api.schema('empty', {'type': 'object'})
-
-default_error_schema = api.schema('default_error_schema', default_error_schema)
 entry_list_base_object = {
     'type': 'object',
     'properties': {
@@ -49,7 +39,6 @@ entry_list_parser.add_argument('name', help='Filter results by list name')
 
 @entry_list_api.route('/')
 class EntryListListsAPI(APIResource):
-
     @api.doc(parser=entry_list_parser)
     @api.response(200, 'Successfully retrieved entry lists', entry_list_return_lists_schema)
     def get(self, session=None):
@@ -58,23 +47,22 @@ class EntryListListsAPI(APIResource):
         name = args.get('name')
 
         entry_lists = [entry_list.to_dict() for entry_list in el.get_entry_lists(name=name, session=session)]
-        return jsonify({'entry_lists': entry_lists})
+        return jsonify(entry_lists)
 
     @api.validate(entry_list_input_object_schema)
     @api.response(201, model=entry_list_return_lists_schema)
-    @api.response(500, description='List already exist', model=default_error_schema)
+    @api.response(BadRequest)
     def post(self, session=None):
         """ Create a new entry list """
         data = request.json
         name = data.get('name')
         new_list = False
         try:
-            entry_list = el.get_list_by_exact_name(name=name, session=session)
+            el.get_list_by_exact_name(name=name, session=session)
         except NoResultFound:
             new_list = True
         if not new_list:
-            return {'status': 'error',
-                    'message': "list with name '%s' already exists" % name}, 500
+            raise BadRequest('list with name \'%s\' already exists' % name)
         entry_list = el.EntryListList(name=name)
         session.add(entry_list)
         session.commit()
@@ -86,28 +74,25 @@ class EntryListListsAPI(APIResource):
 @entry_list_api.route('/<int:list_id>/')
 @api.doc(params={'list_id': 'ID of the list'})
 class EntryListListAPI(APIResource):
-
-    @api.response(404, model=default_error_schema)
+    @api.response(NotFoundError)
     @api.response(200, model=entry_list_object_schema)
     def get(self, list_id, session=None):
         """ Get list by ID """
         try:
             list = el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            return {'status': 'error',
-                    'message': 'list_id %d does not exist' % list_id}, 404
+            raise NotFoundError('list_id %d does not exist' % list_id)
         return jsonify(list.to_dict())
 
-    @api.response(200, model=empty_response)
-    @api.response(404, model=default_error_schema)
+    @api.response(200, description='list successfully deleted', model=success_schema)
+    @api.response(NotFoundError)
     def delete(self, list_id, session=None):
         """ Delete list by ID """
         try:
             el.delete_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            return {'status': 'error',
-                    'message': 'list_id %d does not exist' % list_id}, 404
-        return {}
+            raise NotFoundError('list_id %d does not exist' % list_id)
+        return success_response('list successfully deleted')
 
 
 base_entry_object = {
@@ -157,9 +142,8 @@ entry_list_parser.add_argument('page_size', type=int, default=10, help='Number o
 
 
 @entry_list_api.route('/<int:list_id>/entries/')
+@api.response(NotFoundError)
 class EntryListEntriesAPI(APIResource):
-
-    @api.response(404, 'List does not exist', model=default_error_schema)
     @api.response(200, model=entry_lists_entries_return_schema)
     @api.doc(params={'list_id': 'ID of the list'}, parser=entry_list_parser)
     def get(self, list_id, session=None):
@@ -185,8 +169,7 @@ class EntryListEntriesAPI(APIResource):
         try:
             el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            return {'status': 'error',
-                    'message': 'list_id %d does not exist' % list_id}, 404
+            raise NotFoundError('list_id %d does not exist' % list_id)
         count = el.get_entries_by_list_id(count=True, **kwargs)
         log.debug('entry lists entries count is %d', count)
         entries = [entry.to_dict() for entry in el.get_entries_by_list_id(**kwargs)]
@@ -204,55 +187,50 @@ class EntryListEntriesAPI(APIResource):
 
     @api.validate(base_entry_schema)
     @api.response(201, description='Successfully created entry object', model=entry_list_entry_base_schema)
-    @api.response(404, 'List id not found', model=default_error_schema)
-    @api.response(500, 'Entry already exist', model=default_error_schema)
+    @api.response(BadRequest)
     def post(self, list_id, session=None):
         """ Create a new entry object"""
         try:
             el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
-            return {'status': 'error',
-                    'message': 'list_id %d does not exist' % list_id}, 404
+            raise NotFoundError('list_id %d does not exist' % list_id)
         data = request.json
         title = data.get('title')
         entry_object = el.get_entry_by_title(list_id=list_id, title=title, session=session)
         if entry_object:
-            return {'status': 'error',
-                    'message': "entry with title '%s' already exists" % title}, 500
+            raise BadRequest('entry with title \'%s\' already exists' % title)
         entry_object = el.EntryListEntry(entry=data, entry_list_id=list_id)
         session.add(entry_object)
         session.commit()
-        response = jsonify({'entry': entry_object.to_dict()})
+        response = jsonify(entry_object.to_dict())
         response.status_code = 201
         return response
 
 
 @entry_list_api.route('/<int:list_id>/entries/<int:entry_id>/')
 @api.doc(params={'list_id': 'ID of the list', 'entry_id': 'ID of the entry'})
-@api.response(404, description='List or entry not found', model=default_error_schema)
+@api.response(NotFoundError)
 class EntryListEntryAPI(APIResource):
-
     @api.response(200, model=entry_list_entry_base_schema)
     def get(self, list_id, entry_id, session=None):
         """ Get an entry by list ID and entry ID """
         try:
             entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
-            return {'status': 'error',
-                    'message': 'could not find entry with id %d in list %d' % (entry_id, list_id)}, 404
+            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
+
         return jsonify(entry.to_dict())
 
-    @api.response(200, model=empty_response)
+    @api.response(200, model=success_schema)
     def delete(self, list_id, entry_id, session=None):
         """ Delete an entry by list ID and entry ID """
         try:
             entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
-            return {'status': 'error',
-                    'message': 'could not find entry with id %d in list %d' % (entry_id, list_id)}, 404
+            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
         log.debug('deleting movie %d', entry.id)
         session.delete(entry)
-        return {}
+        return success_response('successfully deleted entry %d' % entry.id)
 
     @api.validate(model=base_entry_schema)
     @api.response(200, model=entry_list_entry_base_schema)
@@ -262,8 +240,7 @@ class EntryListEntryAPI(APIResource):
         try:
             entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
         except NoResultFound:
-            return {'status': 'error',
-                    'message': 'could not find entry with id %d in list %d' % (entry_id, list_id)}, 4044
+            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
         data = request.json
         entry.entry = data
         session.commit()
