@@ -1,4 +1,4 @@
-<md-tab md-on-select="vm.loadMovies()">
+<md-tab md-on-select="vm.tabSelected()" md-on-deselect="vm.tabDeselected()">
     <md-tab-label layout-fill>
     	<section layout="row" layout-align="center center" layout-fill>
             <span>{{ ::vm.list.name }}</span>

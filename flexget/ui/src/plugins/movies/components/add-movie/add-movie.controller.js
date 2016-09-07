@@ -51,7 +51,9 @@
                     { imdb_id: movie.imdb_id }
                 ]
             }
-            moviesService.addMovieToList(list, movieObject);
+            moviesService.addMovieToList(list, movieObject).then(function () {
+                $scope.$emit('movie-added-list:' + list);
+            });
         }
     }
 }());

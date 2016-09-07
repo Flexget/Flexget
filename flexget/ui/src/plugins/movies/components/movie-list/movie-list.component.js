@@ -16,24 +16,52 @@
         });
 
 
-    function movieListController($mdDialog, $sce, moviesService) {
+    function movieListController($mdDialog, $sce, moviesService, $rootScope) {
         var vm = this;
 
         vm.$onInit = activate;
+        vm.$onDestroy = destroy;
+        vm.tabSelected = tabSelected;
+        vm.tabDeselected = tabDeselected;
         vm.loadMovies = loadMovies;
         vm.deleteList = deleteList;
         vm.deleteMovie = deleteMovie;
         vm.updateListPage = updateListPage;
+
+        var listener;
+        var currentTab = false;
 
         var options = {
             page: 1,
             'page_size': 10
         };
 
+        function tabSelected() {
+            loadMovies();
+            currentTab = true;
+        }
+
+        function tabDeselected() {
+            currentTab = false;
+        }
+        
         function activate() {
             //Hack to make the movies from the first tab load (md-on-select not firing for initial tab)
             if (vm.tabIndex === 0) {
                 loadMovies();
+                currentTab = true;
+            }
+
+            listener = $rootScope.$on('movie-added-list:' + vm.list.id, function (event) {
+                if (currentTab) {
+                    loadMovies();
+                }
+            });
+        }
+
+        function destroy() {
+            if (listener) {
+                listener();
             }
         }
 
