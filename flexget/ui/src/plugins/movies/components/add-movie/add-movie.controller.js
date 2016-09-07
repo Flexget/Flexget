@@ -46,12 +46,12 @@
         vm.addMovietoList = function (movie, list) {
             var movieObject = {
                 movie_name: movie.name,
-                movie_year: parseInt(movie.year),
+                movie_year: parseInt(movie.year) || undefined,
                 movie_identifiers: [
                     { imdb_id: movie.imdb_id }
                 ]
             }
-            moviesService.addMovieToList(list, movieObject)
+            moviesService.addMovieToList(list, movieObject);
         }
     }
 }());

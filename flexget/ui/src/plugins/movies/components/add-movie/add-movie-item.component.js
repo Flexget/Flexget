@@ -23,7 +23,6 @@
         vm.addMovie = addMovie;
 
         function addMovie() {
-            console.log(vm);
             vm.addMovieToList({
                 movie: vm.movie,
                 list: vm.selectedList
