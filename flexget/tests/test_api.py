@@ -3,6 +3,8 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import json
 import os
+import pytest
+from flexget.utils.tools import get_latest_flexget_version_number
 
 from mock import patch
 
@@ -80,11 +82,15 @@ class TestServerAPI(object):
             }
         }
 
+    @pytest.mark.online
     def test_version(self, api_client):
+        latest = get_latest_flexget_version_number()
+
         rsp = api_client.get('/server/version/')
         assert rsp.status_code == 200
         assert json.loads(rsp.get_data(as_text=True)) == {'flexget_version': __version__,
-                                                          'api_version': __api_version__}
+                                                          'api_version': __api_version__,
+                                                          'latest_version': latest}
 
 
 class TestTaskAPI(object):

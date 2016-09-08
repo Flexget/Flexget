@@ -16,6 +16,7 @@ import cherrypy
 import yaml
 from flask import Response, jsonify, request
 from flask_restplus import inputs
+from flexget.utils.tools import get_latest_flexget_version_number
 from pyparsing import Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, \
     Combine
 from pyparsing import nums, alphanums, printables
@@ -63,7 +64,6 @@ config_validation_schema = api.schema('config_validation_schema', config_validat
 
 @server_api.route('/reload/')
 class ServerReloadAPI(APIResource):
-
     @api.response(501, model=yaml_error_schema, description='YAML syntax error')
     @api.response(502, model=config_validation_schema, description='Config validation error')
     @api.response(200, description='Newly reloaded config')
@@ -105,7 +105,6 @@ pid_schema = api.schema('server.pid', {
 
 @server_api.route('/pid/')
 class ServerPIDAPI(APIResource):
-
     @api.response(200, description='Reloaded config', model=pid_schema)
     def get(self, session=None):
         """ Get server PID """
@@ -119,7 +118,6 @@ shutdown_parser.add_argument('force', type=inputs.boolean, required=False, defau
 
 @server_api.route('/shutdown/')
 class ServerShutdownAPI(APIResource):
-
     @api.doc(parser=shutdown_parser)
     @api.response(200, 'Shutdown requested')
     def get(self, session=None):
@@ -131,7 +129,6 @@ class ServerShutdownAPI(APIResource):
 
 @server_api.route('/config/')
 class ServerConfigAPI(APIResource):
-
     @api.response(200, description='Flexget config')
     def get(self, session=None):
         """ Get Flexget Config """
@@ -214,18 +211,22 @@ version_schema = api.schema('server.version', {
     'type': 'object',
     'properties': {
         'flexget_version': {'type': 'string'},
-        'api_version': {'type': 'integer'}
+        'api_version': {'type': 'integer'},
+        'latest_version': {'type': ['string', 'null']}
     }
 })
 
 
 @server_api.route('/version/')
+@api.doc(description='In case of a request error when fetching latest flexget version, that value will return as null')
 class ServerVersionAPI(APIResource):
-
     @api.response(200, description='Flexget version', model=version_schema)
     def get(self, session=None):
         """ Flexget Version """
-        return {'flexget_version': __version__, 'api_version': __api_version__}
+        latest = get_latest_flexget_version_number()
+        return {'flexget_version': __version__,
+                'api_version': __api_version__,
+                'latest_version': latest}
 
 
 dump_threads_schema = api.schema('server.dump_threads', {
@@ -251,7 +252,6 @@ dump_threads_schema = api.schema('server.dump_threads', {
 
 @server_api.route('/dump_threads/')
 class ServerDumpThreads(APIResource):
-
     @api.response(200, description='Flexget threads dump', model=dump_threads_schema)
     def get(self, session=None):
         """ Dump Server threads for debugging """
@@ -327,7 +327,6 @@ def file_inode(filename):
 
 @server_api.route('/log/')
 class ServerLogAPI(APIResource):
-
     @api.doc(parser=server_log_parser)
     @api.response(200, description='Streams as line delimited JSON')
     def get(self, session=None):
