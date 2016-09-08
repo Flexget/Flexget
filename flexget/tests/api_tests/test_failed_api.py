@@ -13,7 +13,7 @@ class TestRetryFailedAPI(object):
         rsp = api_client.get('/failed/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        assert json.loads(rsp.get_data(as_text=True))['number_of_failed_entries'] == 0
+        assert json.loads(rsp.get_data(as_text=True)) == []
 
         with Session() as session:
             failed_entry = FailedEntry(title='Failed title', url='http://123.com', reason='Test reason')
@@ -23,13 +23,13 @@ class TestRetryFailedAPI(object):
         rsp = api_client.get('/failed/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        assert json.loads(rsp.get_data(as_text=True))['number_of_failed_entries'] == 1
+        assert len(json.loads(rsp.get_data(as_text=True))) == 1
 
     def test_retry_failed_delete_all(self, api_client):
         rsp = api_client.get('/failed/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        assert json.loads(rsp.get_data(as_text=True))['number_of_failed_entries'] == 0
+        assert json.loads(rsp.get_data(as_text=True)) == []
 
         with Session() as session:
             failed_entry = FailedEntry(title='Failed title', url='http://123.com', reason='Test reason')
@@ -39,14 +39,14 @@ class TestRetryFailedAPI(object):
         rsp = api_client.get('/failed/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        assert json.loads(rsp.get_data(as_text=True))['number_of_failed_entries'] == 1
+        assert len(json.loads(rsp.get_data(as_text=True))) == 1
 
         rsp = api_client.delete('/failed/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         rsp = api_client.get('/failed/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert json.loads(rsp.get_data(as_text=True))['number_of_failed_entries'] == 0
+        assert len(json.loads(rsp.get_data(as_text=True))) == 0
 
     def test_retry_failed_get_by_id(self, api_client):
         rsp = api_client.get('/failed/1/')

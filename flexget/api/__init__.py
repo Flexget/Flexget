@@ -309,6 +309,7 @@ def success_response(message, status_code=200, status='success'):
 @api.errorhandler(ValidationError)
 @api.errorhandler(BadRequest)
 @api.errorhandler(Unauthorized)
+@api.errorhandler(CannotAddResource)
 def api_errors(error):
     return error.to_dict(), error.status_code
 
