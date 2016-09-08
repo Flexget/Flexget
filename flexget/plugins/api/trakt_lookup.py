@@ -5,13 +5,13 @@ import copy
 from flask import jsonify
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource
+from flexget.api import api, APIResource, NotFoundError
 from flexget.plugins.internal.api_trakt import ApiTrakt as at, list_actors, get_translations_dict
 
 trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 
 
-class objects_container(object):
+class ObjectsContainer(object):
     internal_image_object = {
         "type": "object",
         "properties": {
@@ -114,18 +114,9 @@ class objects_container(object):
     movie_return_object['properties']['released'] = {'type': 'string'}
     movie_return_object['properties']['trailer'] = {'type': 'string'}
 
-    default_error_object = {
-        'type': 'object',
-        'properties': {
-            'status': {'type': 'string'},
-            'message': {'type': 'string'}
-        }
-    }
 
-
-default_error_schema = api.schema('default_error_schema', objects_container.default_error_object)
-series_return_schema = api.schema('series_return_schema', objects_container.series_return_object)
-movie_return_schema = api.schema('movie_return_schema', objects_container.movie_return_object)
+series_return_schema = api.schema('series_return_schema', ObjectsContainer.series_return_object)
+movie_return_schema = api.schema('movie_return_schema', ObjectsContainer.movie_return_object)
 
 lookup_parser = api.parser()
 lookup_parser.add_argument('year', type=int, help='Lookup year')
@@ -143,7 +134,7 @@ lookup_parser.add_argument('include_translations', type=inputs.boolean, help='In
 @api.doc(params={'title': 'Series name'})
 class TraktSeriesSearchApi(APIResource):
     @api.response(200, 'Successfully found show', series_return_schema)
-    @api.response(404, 'No show found', default_error_schema)
+    @api.response(NotFoundError)
     @api.doc(parser=lookup_parser)
     def get(self, title, session=None):
         args = lookup_parser.parse_args()
@@ -154,9 +145,7 @@ class TraktSeriesSearchApi(APIResource):
         try:
             series = at.lookup_series(session=session, **kwargs)
         except LookupError as e:
-            return {'status': 'error',
-                    'message': e.args[0]
-                    }, 404
+            raise NotFoundError(e.args[0])
         result = series.to_dict()
         if include_actors:
             result['actors'] = list_actors(series.actors)
@@ -169,7 +158,7 @@ class TraktSeriesSearchApi(APIResource):
 @api.doc(params={'title': 'Movie name'})
 class TraktMovieSearchApi(APIResource):
     @api.response(200, 'Successfully found show', movie_return_schema)
-    @api.response(404, 'No show found', default_error_schema)
+    @api.response(NotFoundError)
     @api.doc(parser=lookup_parser)
     def get(self, title, session=None):
         args = lookup_parser.parse_args()
@@ -180,9 +169,7 @@ class TraktMovieSearchApi(APIResource):
         try:
             movie = at.lookup_movie(session=session, **kwargs)
         except LookupError as e:
-            return {'status': 'error',
-                    'message': e.args[0]
-                    }, 404
+            raise NotFoundError(e.args[0])
         result = movie.to_dict()
         if include_actors:
             result['actors'] = list_actors(movie.actors)

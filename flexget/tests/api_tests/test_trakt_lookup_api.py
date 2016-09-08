@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import pytest
 
 from flexget.utils import json
-from flexget.plugins.api.trakt_lookup import objects_container as oc
+from flexget.plugins.api.trakt_lookup import ObjectsContainer as oc
 
 
 @pytest.mark.online
