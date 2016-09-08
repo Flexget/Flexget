@@ -175,13 +175,13 @@ class APIResource(Resource):
 app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__path__[0]), 'templates'))
 app.config['REMEMBER_COOKIE_NAME'] = 'flexgetToken'
 app.config['DEBUG'] = True
+app.config['ERROR_404_HELP'] = False
 
 CORS(app)
 Compress(app)
 
 api = Api(
     app,
-    catch_all_404s=True,
     title='API',
     version=__version__,
     description='<font color="red"><b>Warning: under development, subject to change without notice.<b/></font>'
