@@ -642,6 +642,7 @@ class PluginTransmissionClean(TransmissionBase):
         advanced.accept('boolean', key='transmission_seed_limits')
         advanced.accept('boolean', key='delete_files')
         advanced.accept('regexp', key='tracker')
+        advanced.accept('choice', key='tracker_mode').accept_choices(['include', 'exclude'], ignore_case=True)
         directories_re = advanced.accept('list', key='directories')
         directories_re.accept('regexp')
         return root
@@ -657,6 +658,7 @@ class PluginTransmissionClean(TransmissionBase):
         delete_files = bool(config['delete_files']) if 'delete_files' in config else False
         trans_checks = bool(config['transmission_seed_limits']) if 'transmission_seed_limits' in config else False
         tracker_re = re.compile(config['tracker'], re.IGNORECASE) if 'tracker' in config else None
+        tracker_mode_exclude = (config['tracker_mode'].lower() == 'exclude') if 'tracker_mode' in config else False
         directories_re = config.get('directories')
 
         session = self.client.get_session()
@@ -676,7 +678,10 @@ class PluginTransmissionClean(TransmissionBase):
             is_torrent_seed_only = torrent.date_done <= torrent.date_added
             is_torrent_idlelimit_since_added_reached = nfor and (torrent.date_added + nfor) <= datetime.now()
             is_torrent_idlelimit_since_finished_reached = nfor and (torrent.date_done + nfor) <= datetime.now()
-            is_tracker_matching = not tracker_re or any(tracker_re.search(host) for host in tracker_hosts)
+            is_tracker_matching = True
+            if tracker_re:
+                have_tracker_matches = any(tracker_re.search(host) for host in tracker_hosts)
+                is_tracker_matching = not have_tracker_matches if tracker_mode_exclude else have_tracker_matches
             is_directories_matching = not directories_re or any(
                 re.compile(directory, re.IGNORECASE).search(torrent.downloadDir) for directory in directories_re)
             if (downloaded and (is_clean_all or
