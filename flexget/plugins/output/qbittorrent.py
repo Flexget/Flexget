@@ -68,7 +68,7 @@ class OutputQBitTorrent(object):
         with open(filepath, 'rb') as f:
             multipart_data['torrents'] = f
             self.session.post(self.url + '/command/upload', files=multipart_data)
-        log.debug('Added task to qBittorrent')
+        log.debug('Added torrent file %s to qBittorrent', filepath)
 
     def add_torrent_url(self, url, data):
         if not self.connected:
@@ -76,7 +76,7 @@ class OutputQBitTorrent(object):
         data['urls'] = url
         multipart_data = {k: (None, v) for k, v in data.items()}
         self.session.post(self.url + '/command/download', files=multipart_data)
-        log.debug('Added task to qBittorrent')
+        log.debug('Added url %s to qBittorrent', url)
 
     def prepare_config(self, config):
         if isinstance(config, bool):
@@ -96,17 +96,17 @@ class OutputQBitTorrent(object):
             if savepath:
                 formdata['savepath'] = savepath
 
-            label = entry.get('label', config['label']).lower()
+            label = entry.get('label', config.get('label'))
             if label:
                 formdata['label'] = label # qBittorrent v3.3.3-
                 formdata['category'] = label # qBittorrent v3.3.4+
 
-            downloaded = not entry['url'].startswith('magnet:')
+            is_magnet = entry['url'].startswith('magnet:')
 
             if task.manager.options.test:
                 log.info('Test mode.')
                 log.info('Would add torrent to qBittorrent with:')
-                if downloaded:
+                if not is_magnet:
                     log.info('    File: %s', entry.get('file'))
                 else:
                     log.info('    Url: %s', entry.get('url'))
@@ -114,14 +114,14 @@ class OutputQBitTorrent(object):
                 log.info('    Label: %s', formdata.get('label'))
                 continue
 
-            if downloaded:
+            if not is_magnet:
                 if 'file' not in entry:
                     entry.fail('File missing?')
                     continue
                 if not os.path.exists(entry['file']):
                     tmp_path = os.path.join(task.manager.config_base, 'temp')
-                    log.debug('entry: %s' % entry)
-                    log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
+                    log.debug('entry: %s', entry)
+                    log.debug('temp: %s', ', '.join(os.listdir(tmp_path)))
                     entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                     continue
                 self.add_torrent_file(entry['file'], formdata)
