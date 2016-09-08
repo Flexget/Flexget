@@ -4,13 +4,13 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource
+from flexget.api import api, APIResource, NotFoundError, BadRequest
 from flexget.plugins.internal.api_tvdb import lookup_series, lookup_episode, search_for_series
 
 tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
 
 
-class objects_container(object):
+class ObjectsContainer(object):
     default_error_schema = {
         'type': 'object',
         'properties': {
@@ -78,18 +78,12 @@ class objects_container(object):
             'tvdb_id': {'type': 'integer'}
         }
     }
-    search_results_object = {
-        'type': 'object',
-        'properties': {
-            'search_results': {'type': 'array', 'items': search_result_object}
-        }
-    }
+    search_results_object = {'type': 'array', 'items': search_result_object}
 
 
-default_error_schema = api.schema('default_error_schema', objects_container.default_error_schema)
-tvdb_series_schema = api.schema('tvdb_series_schema', objects_container.tvdb_series_object)
-tvdb_episode_schema = api.schema('tvdb_episode_schema', objects_container.episode_object)
-search_results_schema = api.schema('tvdb_search_results_schema', objects_container.search_results_object)
+tvdb_series_schema = api.schema('tvdb_series_schema', ObjectsContainer.tvdb_series_object)
+tvdb_episode_schema = api.schema('tvdb_episode_schema', ObjectsContainer.episode_object)
+search_results_schema = api.schema('tvdb_search_results_schema', ObjectsContainer.search_results_object)
 
 series_parser = api.parser()
 series_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
@@ -98,9 +92,8 @@ series_parser.add_argument('include_actors', type=inputs.boolean, help='Include 
 @tvdb_api.route('/series/<string:title>/')
 @api.doc(params={'title': 'TV Show name or TVDB ID'}, parser=series_parser)
 class TVDBSeriesSearchApi(APIResource):
-
     @api.response(200, 'Successfully found show', tvdb_series_schema)
-    @api.response(404, 'No show found', default_error_schema)
+    @api.response(NotFoundError)
     def get(self, title, session=None):
         args = series_parser.parse_args()
         try:
@@ -114,9 +107,7 @@ class TVDBSeriesSearchApi(APIResource):
             else:
                 series = lookup_series(name=title, session=session)
         except LookupError as e:
-            return {'status': 'error',
-                    'message': e.args[0]
-                    }, 404
+            raise NotFoundError(e.args[0])
         result = series.to_dict()
         if args.get('include_actors'):
             result['actors'] = series.actors
@@ -132,21 +123,17 @@ episode_parser.add_argument('absolute_number', type=int, help='Absolute episode 
 @tvdb_api.route('/episode/<int:tvdb_id>/')
 @api.doc(params={'tvdb_id': 'TVDB ID of show'}, parser=episode_parser)
 class TVDBEpisodeSearchAPI(APIResource):
-
     @api.response(200, 'Successfully found episode', tvdb_episode_schema)
-    @api.response(404, 'No show found', default_error_schema)
-    @api.response(500, 'Not enough parameters for lookup', default_error_schema)
+    @api.response(NotFoundError)
+    @api.response(BadRequest)
     def get(self, tvdb_id, session=None):
         args = episode_parser.parse_args()
         absolute_number = args.get('absolute_number')
         season_number = args.get('season_number')
         ep_number = args.get('ep_number')
         if not ((season_number and ep_number) or absolute_number):
-            return {'status': 'error',
-                    'message': 'not enough parameters for lookup. Either season and episode number or absolute number '
-                               'are required.'
-                    }, 500
-
+            raise BadRequest('not enough parameters for lookup. Either season and episode number or absolute number '
+                             'are required.')
         kwargs = {'tvdb_id': tvdb_id,
                   'session': session}
 
@@ -159,9 +146,7 @@ class TVDBEpisodeSearchAPI(APIResource):
         try:
             episode = lookup_episode(**kwargs)
         except LookupError as e:
-            return {'status': 'error',
-                    'message': e.args[0]
-                    }, 404
+            raise NotFoundError(e.args[0])
         return jsonify(episode.to_dict())
 
 
@@ -176,16 +161,13 @@ search_parser.add_argument('force_search', type=inputs.boolean,
 @tvdb_api.route('/search/')
 @api.doc(parser=search_parser)
 class TVDBSeriesSearchAPI(APIResource):
-
     @api.response(200, 'Successfully got results', search_results_schema)
-    @api.response(404, 'No results found', default_error_schema)
-    @api.response(400, 'Not enough parameters for lookup', default_error_schema)
+    @api.response(BadRequest)
+    @api.response(NotFoundError)
     def get(self, session=None):
         args = search_parser.parse_args()
         if not (args.get('search_name') or args.get('imdb_id') or args.get('zap2it_id')):
-            return {'status': 'error',
-                    'message': 'Not enough lookup arguments'
-                    }, 400
+            raise BadRequest('Not enough lookup arguments')
         kwargs = {
             'search_name': args.get('search_name'),
             'imdb_id': args.get('imdb_id'),
@@ -196,7 +178,5 @@ class TVDBSeriesSearchAPI(APIResource):
         try:
             search_results = search_for_series(**kwargs)
         except LookupError as e:
-            return {'status': 'error',
-                    'message': e.args[0]
-                    }, 404
-        return jsonify({'search_results': [a.to_dict() for a in search_results]})
+            raise NotFoundError(e.args[0])
+        return jsonify([a.to_dict() for a in search_results])
