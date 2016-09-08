@@ -17,6 +17,7 @@ import cherrypy
 import yaml
 from flask import Response, jsonify, request
 from flask_restplus import inputs
+from flexget.utils.tools import get_latest_flexget_version_number
 from pyparsing import Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, \
     Combine
 from pyparsing import nums, alphanums, printables
@@ -185,17 +186,22 @@ version_schema = api.schema('server.version', {
     'type': 'object',
     'properties': {
         'flexget_version': {'type': 'string'},
-        'api_version': {'type': 'integer'}
+        'api_version': {'type': 'integer'},
+        'latest_version': {'type': ['string', 'null']}
     }
 })
 
 
 @server_api.route('/version/')
+@api.doc(description='In case of a request error when fetching latest flexget version, that value will return as null')
 class ServerVersionAPI(APIResource):
     @api.response(200, description='Flexget version', model=version_schema)
     def get(self, session=None):
         """ Flexget Version """
-        return {'flexget_version': __version__, 'api_version': __api_version__}
+        latest = get_latest_flexget_version_number()
+        return {'flexget_version': __version__,
+                'api_version': __api_version__,
+                'latest_version': latest}
 
 
 dump_threads_schema = api.schema('server.dump_threads', {
