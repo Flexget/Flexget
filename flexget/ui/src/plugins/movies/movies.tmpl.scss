@@ -9,6 +9,10 @@
   height: auto;
 }
 
+md-toolbar.movie-tabsbar {
+  background-color: transparent;
+}
+
 //nth-last-child(2), because 1 doesnt work
 .movie-tabs .md-tab:nth-last-child(2) {
 	padding: 0px;
