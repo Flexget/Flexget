@@ -46,10 +46,10 @@ class TestSeenAPI(object):
 
         assert mock_seen_search.call_count == 8, 'Should have 8 calls, is actually %s' % mock_seen_search.call_count
 
-    @patch.object(seen, 'forget_by_id')
+    @patch.object(seen, 'get_entry_by_id')
     def test_delete_seen_entry(self, mock_forget, api_client):
         rsp = api_client.delete('/seen/1234/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_cod
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         assert mock_forget.called
 
     def test_seen_add(self, execute_task, api_client):
@@ -67,7 +67,7 @@ class TestSeenAPI(object):
         }
 
         rsp = api_client.json_post('/seen/', data=json.dumps(entry))
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
 
     @patch.object(seen, 'search')
     def test_seen_delete_all(self, mock_seen_search, api_client):
@@ -77,7 +77,7 @@ class TestSeenAPI(object):
 
         # No params
         rsp = api_client.delete('/seen/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         fields = {
             'url': 'http://test.com/file.torrent',
@@ -93,7 +93,7 @@ class TestSeenAPI(object):
         }
 
         rsp = api_client.json_post('/seen/', data=json.dumps(entry))
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
 
         # With value
         rsp = api_client.delete('/seen/?value=Test.Title')

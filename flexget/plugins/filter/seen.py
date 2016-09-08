@@ -152,20 +152,6 @@ def forget(value):
 
 
 @with_session
-def forget_by_id(entry_id, session=None):
-    """
-    Delete SeenEntry via its ID
-    :param entry_id: SeenEntry ID
-    :param session: DB Session
-    """
-    entry = session.query(SeenEntry).filter(SeenEntry.id == entry_id).first()
-    if not entry:
-        raise ValueError('Could not find entry with ID {0}'.format(entry_id))
-    log.debug('Deleting seen entry with ID {0}'.format(entry_id))
-    session.delete(entry)
-
-
-@with_session
 def search_by_field_values(field_value_list, task_name, local=False, session=None):
     """
     Return a SeenEntry instance if it matches field values
@@ -360,6 +346,17 @@ def search(value=None, status=None, start=None, stop=None, count=False, order_by
 @with_session
 def get_entry_by_id(entry_id, session=None):
     return session.query(SeenEntry).filter(SeenEntry.id == entry_id).one()
+
+@with_session
+def forget_by_id(entry_id, session=None):
+    """
+    Delete SeenEntry via its ID
+    :param entry_id: SeenEntry ID
+    :param session: DB Session
+    """
+    entry = get_entry_by_id(entry_id, session=session)
+    log.debug('Deleting seen entry with ID {0}'.format(entry_id))
+    session.delete(entry)
 
 
 @event('plugin.register')

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from flexget.plugins.filter.seen import forget_by_id
 from future.moves.urllib.parse import unquote
 
 import copy
@@ -8,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask import jsonify, request
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource, NotFoundError, CannotAddResource, success_schema, success_response
+from flexget.api import api, APIResource, NotFoundError, CannotAddResource, success_schema, success_response, APIError
 from flexget.plugins.filter import seen
 
 seen_api = api.namespace('seen', description='Managed Flexget seen entries and fields')
@@ -196,7 +197,12 @@ class SeenSearchAPI(APIResource):
             value = '%' + value + '%'
         seen_entries_list = seen.search(value=value, status=is_seen_local, session=session)
 
-        deleted = seen_entries_list.delete()
+        deleted = 0
+        for se in seen_entries_list:
+            try:
+                forget_by_id(se.id, session=session)
+            except NoResultFound:
+                raise APIError('Error, could not delete seen entry with id {}'.format(se.id))
         return success_response('successfully deleted %i entries' % deleted)
 
 
@@ -213,12 +219,11 @@ class SeenSearchIDAPI(APIResource):
             raise NotFoundError('Could not find entry ID {0}'.format(seen_entry_id))
         return jsonify(seen_entry.to_dict())
 
-
     @api.response(200, 'Successfully deleted entry', model=success_schema)
     def delete(self, seen_entry_id, session):
         """ Delete seen entry by ID """
         try:
-            entry = seen.get_entry_by_id(seen_entry_id, session)
+            entry = seen.get_entry_by_id(seen_entry_id, session=session)
         except NoResultFound:
             raise NotFoundError('Could not delete entry ID {0}'.format(seen_entry_id))
         entry.delete()
