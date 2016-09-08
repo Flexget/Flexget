@@ -1,11 +1,14 @@
 <div layout="column" flex>
-	<md-input-container>
-		<label>Add a movie</label>
-		<input type="text" 
-			class="search-menu"
-			ng-model="vm.searchtext"
-			ng-change="vm.searchMovies()">
-	</md-input-container>
+	<div>
+		<md-input-container>
+			<label>Add a movie</label>
+			<input type="text" 
+				class="search-menu"
+				ng-model="vm.searchtext"
+				ng-change="vm.searchMovies()">
+		</md-input-container>
+	</div>
+	
 	<md-content flex ng-if="vm.lists">
 		<md-tabs md-dynamic-height md-border-bottom class="movie-tabs" md-selected="vm.selectedlist">
 			<movie-list ng-repeat="list in vm.lists" 
