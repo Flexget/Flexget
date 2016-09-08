@@ -357,6 +357,11 @@ def search(value=None, status=None, start=None, stop=None, count=False, order_by
     return query
 
 
+@with_session
+def get_entry_by_id(entry_id, session=None):
+    return session.query(SeenEntry).filter(SeenEntry.id == entry_id).one()
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterSeen, 'seen', builtin=True, api_ver=2)
