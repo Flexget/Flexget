@@ -6,7 +6,7 @@ import logging
 from flask import jsonify
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource, BadRequest
+from flexget.api import api, APIResource, BadRequest, success_schema, success_response
 from flexget.plugins.filter.remember_rejected import RememberEntry
 
 log = logging.getLogger('rejected')
@@ -59,21 +59,20 @@ class Rejected(APIResource):
         return jsonify(rejected_entries=[rejected_entry_to_dict(e) for e in entries],
                        number_of_rejected_entries=len(entries))
 
-    @api.response(200)
+    @api.response(200, model=success_schema)
     def delete(self, session=None):
         """ Clears all rejected entries"""
         entries = session.query(RememberEntry).delete()
         if entries:
             session.commit()
             self.manager.config_changed()
-        return {'status': 'success',
-                'message': 'successfully deleted %i rejected entries' % entries}
+        return success_response('successfully deleted %i rejected entries' % entries)
 
 
 @rejected_api.route('/<int:rejected_entry_id>/')
+@api.response(BadRequest)
 class RejectedEntry(APIResource):
     @api.response(200, model=rejected_entry_schema)
-    @api.response(BadRequest)
     def get(self, rejected_entry_id, session=None):
         """ Returns a rejected entry """
         try:
@@ -82,6 +81,7 @@ class RejectedEntry(APIResource):
             raise BadRequest('rejected entry ID %d not found' % rejected_entry_id)
         return jsonify(rejected_entry_to_dict(entry))
 
+    @api.response(200, model=success_schema)
     def delete(self, rejected_entry_id, session=None):
         """ Deletes a rejected entry """
         try:
@@ -89,5 +89,4 @@ class RejectedEntry(APIResource):
         except NoResultFound:
             raise BadRequest('rejected entry ID %d not found' % rejected_entry_id)
         session.delete(entry)
-        return {'status': 'success',
-                'message': 'successfully deleted rejected entry %i' % rejected_entry_id}
+        return success_response('successfully deleted rejected entry %i' % rejected_entry_id)
