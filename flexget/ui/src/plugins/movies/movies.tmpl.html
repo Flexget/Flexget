@@ -1,10 +1,14 @@
 <div layout="column">
 	<md-toolbar layout="row" class="movie-tabsbar">
-		<md-tabs flex>
-			<md-tab ng-repeat="list in vm.lists">
-				{{ list.name }}
-			</md-tab>
-		</md-tabs>
+		<div class="md-toolbar-items" flex layout-fill>
+			<md-tabs flex>
+				<md-tab ng-repeat="list in vm.lists" flex>
+					<md-tab-label flex>
+						{{ list.name }}
+					</md-tab-label>
+				</md-tab>
+			</md-tabs>
+		</div>
 		<span flex></span>
 		<div>
 			<md-input-container>
