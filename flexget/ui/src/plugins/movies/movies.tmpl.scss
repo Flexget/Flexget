@@ -11,6 +11,10 @@
 
 md-toolbar.movie-tabsbar {
   background-color: transparent;
+
+  md-tabs > md-tabs-wrapper > md-tabs-canvas > md-pagination-wrapper > md-tab-item {
+    max-width: 100%;
+  }
 }
 
 //nth-last-child(2), because 1 doesnt work
