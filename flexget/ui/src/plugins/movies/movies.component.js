@@ -25,7 +25,7 @@
             getMovieLists();
         }
 
-        var position = $mdPanel.newPanelPosition().relativeTo('.search-menu').addPanelPosition($mdPanel.xPosition.ALIGN_START, $mdPanel.yPosition.BELOW);
+        var position = $mdPanel.newPanelPosition().relativeTo('.search-menu').addPanelPosition($mdPanel.xPosition.ALIGN_END, $mdPanel.yPosition.BELOW);
         var panel = $mdPanel.create({
             attachTo: angular.element(document.body),
             controller: 'addMovieController',

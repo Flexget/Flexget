@@ -6,7 +6,7 @@
         .module('plugins.movies')
         .controller('addMovieController', addMovieController);
 
-    function addMovieController($scope, $timeout, addMovieService, mdPanelRef, moviesService) {
+    function addMovieController($scope, $timeout, addMovieService, mdPanelRef, moviesService, $mdPanel) {
         var vm = this;
 
         vm.panelRef = mdPanelRef.config.locals;
@@ -27,13 +27,23 @@
             $timeout(function () {
                 if (val === vm.searchtext) {
                     vm.loading = true;
+                    
+                    updatePosition()
                     searchMovies(val).then(function (data) {
                         vm.foundMovies = data;
                         
                         vm.loading = false;
+
+                        updatePosition();
                     });
                 }
             }, 1000);
+        }
+
+        function updatePosition() {
+            $timeout(function () {
+                mdPanelRef.updatePosition($mdPanel.newPanelPosition().relativeTo('.search-menu').addPanelPosition($mdPanel.xPosition.ALIGN_END, $mdPanel.yPosition.BELOW));
+            }, 0);
         }
 
         function searchMovies(searchText) {
