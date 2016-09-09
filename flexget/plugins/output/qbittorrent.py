@@ -107,11 +107,11 @@ class OutputQBitTorrent(object):
                 log.info('Test mode.')
                 log.info('Would add torrent to qBittorrent with:')
                 if not is_magnet:
-                    log.info('    File: %s', entry.get('file'))
+                    log.info('File: %s', entry.get('file'))
                 else:
-                    log.info('    Url: %s', entry.get('url'))
-                log.info('    Save path: %s', formdata.get('savepath'))
-                log.info('    Label: %s', formdata.get('label'))
+                    log.info('Url: %s', entry.get('url'))
+                log.info('Save path: %s', formdata.get('savepath'))
+                log.info('Label: %s', formdata.get('label'))
                 continue
 
             if not is_magnet:
