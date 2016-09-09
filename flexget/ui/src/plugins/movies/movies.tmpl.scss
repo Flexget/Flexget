@@ -16,9 +16,17 @@ md-toolbar.movie-tabsbar {
     background-color: transparent;    
   }
 
+  .add-movie-input {
+    margin-bottom: 5px;
+  }
+
   md-tabs > md-tabs-wrapper > md-tabs-canvas > md-pagination-wrapper > md-tab-item {
     max-width: none !important;
   }
+}
+
+md-tabs.movie-tabs md-tabs-wrapper {
+  display:none !important;
 }
 
 //nth-last-child(2), because 1 doesnt work

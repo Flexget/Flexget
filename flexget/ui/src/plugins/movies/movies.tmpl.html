@@ -11,7 +11,7 @@
 		</div>
 		<span flex></span>
 		<div>
-			<md-input-container>
+			<md-input-container class="add-movie-input">
 				<label>Add a movie</label>
 				<input type="text" 
 					class="search-menu"
@@ -22,7 +22,7 @@
 	</md-toolbar>
 
 	<md-content flex ng-if="vm.lists">
-		<!--<md-tabs md-dynamic-height md-border-bottom class="movie-tabs" md-selected="vm.selectedlist">
+		<md-tabs md-dynamic-height md-border-bottom class="movie-tabs" md-selected="vm.selectedlist">
 			<movie-list ng-repeat="list in vm.lists" 
 				list="::list" 
 				delete-movie-list="vm.deleteMovieList(list)"
@@ -35,7 +35,7 @@
 					</section>
 				</md-tab-label>
 			</md-tab>-->
-		<!--</md-tabs>-->
+		</md-tabs>
 	</md-content>
 	<!-- TODO: Add screen that allows users to create their first list -->
 </div>
