@@ -6,8 +6,8 @@ import logging
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils.soup import get_soup
 
-from bs4 import BeautifulSoup
 from datetime import date, timedelta
 
 import unicodedata
@@ -103,7 +103,7 @@ class NPOWatchlist(object):
         elif login_response.url != 'https://mijn.npo.nl/inloggen':
             raise plugin.PluginError('Unexpected login page: {}'.format(login_response.url))
 
-        login_page = BeautifulSoup(login_response.content, 'html5lib')
+        login_page = get_soup(login_response.content)
         token = login_page.find('input', attrs={'name': 'authenticity_token'})['value']
 
         email = config.get('email')
@@ -126,7 +126,7 @@ class NPOWatchlist(object):
         log.info('Retrieving npo.nl episode watchlist for %s', email)
 
         response = self._get_page(task, config, 'https://mijn.npo.nl/profiel/kijklijst')
-        page = BeautifulSoup(response.content, 'html5lib')
+        page = get_soup(response.content)
 
         self.csrf_token = page.find('meta', attrs={'name': 'csrf-token'})['content']
 
@@ -159,7 +159,7 @@ class NPOWatchlist(object):
     def _get_series_episodes(self, task, config, series_name, series_url):
         log.info('Retrieving new episodes for %s', series_name)
         response = task.requests.get(series_url + '/search?category=broadcasts')
-        page = BeautifulSoup(response.content, 'html5lib')
+        page = get_soup(response.content)
 
         if page.find('div', class_='npo3-show-items'):
             log.debug('Parsing as npo3')
@@ -244,7 +244,7 @@ class NPOWatchlist(object):
 
         log.info('Retrieving npo.nl favorite series for %s', email)
         response = self._get_page(task, config, 'https://mijn.npo.nl/profiel/favorieten')
-        page = BeautifulSoup(response.content, 'html5lib')
+        page = get_soup(response.content)
 
         entries = list()
         for listItem in page.findAll('div', class_='thumb-item'):
