@@ -25,7 +25,6 @@ class TestScheduledAPI(object):
                   url: http://test/rss2
                 mock:
                   - title: entry 2
-
             """
 
     def test_schedules_get(self, api_client, schema_match):
@@ -36,12 +35,19 @@ class TestScheduledAPI(object):
         errors = schema_match(OC.schedules_list, data)
         assert not errors
 
+        schedule = {'tasks': ['test1'],
+                    'interval': {'minutes': 15}}
+
+        for key, value in schedule.items():
+            assert data[0][key] == value
+
     @patch.object(Manager, 'save_config')
     def test_schedules_post(self, mocked_save_config, api_client, schema_match):
         payload = {
-            'tasks': 'test2',
+            'tasks': ['test2', 'test3'],
             'interval': {'minutes': 10}
         }
+
         rsp = api_client.json_post('/schedules/', data=json.dumps(payload))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
@@ -49,3 +55,6 @@ class TestScheduledAPI(object):
         errors = schema_match(OC.schedule_object, data)
         assert not errors
         assert mocked_save_config.called
+
+        del data['id']
+        assert data == payload
