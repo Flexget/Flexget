@@ -31,6 +31,40 @@ class ObjectsContainer(object):
 
     entry_list_return_lists = {'type': 'array', 'items': entry_list_base_object}
 
+    base_entry_object = {
+        'type': 'object',
+        'properties': {
+            'title': {'type': 'string'},
+            'original_url': {'type': 'string'}
+        },
+        'required': ['title', 'original_url'],
+        'additionalProperties': True
+    }
+
+    entry_list_entry_base_object = {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'integer'},
+            'name': {'type': 'string'},
+            'added_on': {'type': 'string'},
+            'title': {'type': 'string'},
+            'original_url': {'type': 'string'},
+            'entry': base_entry_object,
+
+        }
+    }
+
+    entry_lists_entries_return_object = {
+        'type': 'object',
+        'properties': {
+            'entries': {'type': 'array', 'items': entry_list_entry_base_object},
+            'total_number_of_entries': {'type': 'integer'},
+            'number_of_entries': {'type': 'integer'},
+            'page': {'type': 'integer'},
+            'total_number_of_pages': {'type': 'integer'}
+        }
+    }
+
 
 entry_list_object_schema = api.schema('entry_list_object_schema', ObjectsContainer.entry_list_base_object)
 entry_list_input_object_schema = api.schema('entry_list_input_object_schema', ObjectsContainer.entry_list_input_object)
@@ -53,7 +87,7 @@ class EntryListListsAPI(APIResource):
         return jsonify(entry_lists)
 
     @api.validate(entry_list_input_object_schema)
-    @api.response(201, model=entry_list_return_lists_schema)
+    @api.response(201, model=entry_list_object_schema)
     @api.response(BadRequest)
     def post(self, session=None):
         """ Create a new entry list """
@@ -98,43 +132,10 @@ class EntryListListAPI(APIResource):
         return success_response('list successfully deleted')
 
 
-base_entry_object = {
-    'type': 'object',
-    'properties': {
-        'title': {'type': 'string'},
-        'original_url': {'type': 'string'}
-    },
-    'required': ['title', 'original_url'],
-    'additionalProperties': True
-}
-
-entry_list_entry_base_object = {
-    'type': 'object',
-    'properties': {
-        'id': {'type': 'integer'},
-        'name': {'type': 'string'},
-        'added_on': {'type': 'string'},
-        'title': {'type': 'string'},
-        'original_url': {'type': 'string'},
-        'entry': base_entry_object,
-
-    }
-}
-
-entry_lists_entries_return_object = {
-    'type': 'object',
-    'properties': {
-        'entries': {'type': 'array', 'items': entry_list_entry_base_object},
-        'total_number_of_entries': {'type': 'integer'},
-        'number_of_entries': {'type': 'integer'},
-        'page': {'type': 'integer'},
-        'total_number_of_pages': {'type': 'integer'}
-    }
-}
-
-base_entry_schema = api.schema('base_entry_schema', base_entry_object)
-entry_list_entry_base_schema = api.schema('entry_list_entry_base_schema', entry_list_entry_base_object)
-entry_lists_entries_return_schema = api.schema('entry_lists_entries_return_schema', entry_lists_entries_return_object)
+base_entry_schema = api.schema('base_entry_schema', ObjectsContainer.base_entry_object)
+entry_list_entry_base_schema = api.schema('entry_list_entry_base_schema', ObjectsContainer.entry_list_entry_base_object)
+entry_lists_entries_return_schema = api.schema('entry_lists_entries_return_schema',
+                                               ObjectsContainer.entry_lists_entries_return_object)
 
 entry_list_parser = api.parser()
 entry_list_parser.add_argument('sort_by', choices=('id', 'added', 'title', 'original_url', 'list_id'), default='title',
@@ -236,7 +237,7 @@ class EntryListEntryAPI(APIResource):
         return success_response('successfully deleted entry %d' % entry.id)
 
     @api.validate(model=base_entry_schema)
-    @api.response(200, model=entry_list_entry_base_schema)
+    @api.response(201, model=entry_list_entry_base_schema)
     @api.doc(description='Sent entry data will override any existing entry data the existed before')
     def put(self, list_id, entry_id, session=None):
         """ Sets entry object's entry data """
@@ -247,4 +248,6 @@ class EntryListEntryAPI(APIResource):
         data = request.json
         entry.entry = data
         session.commit()
-        return jsonify(entry.to_dict())
+        resp = jsonify(entry.to_dict())
+        resp.status_code = 201
+        return resp
