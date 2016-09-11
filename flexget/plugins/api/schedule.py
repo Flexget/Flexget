@@ -11,15 +11,23 @@ from flexget.api import api, APIResource, NotFoundError, APIError, base_message_
 
 schedule_api = api.namespace('schedules', description='Task Scheduler')
 
-# SwaggerUI does not yet support anyOf or oneOf
-schedule_schema = copy.deepcopy(schedule_schema)
-schedule_schema['properties']['id'] = {'type': 'integer'}
-api_schedule_schema = api.schema('schedules.schedule', schedule_schema)
-api_schedules_list_schema = api.schema('schedules.list', {'type': 'array', 'items': schedule_schema})
+
+class ObjectsContainer(object):
+    # SwaggerUI does not yet support anyOf or oneOf
+    schedule_object = copy.deepcopy(schedule_schema)
+    schedule_object['properties']['id'] = {'type': 'integer'}
+    schedule_object['maxProperties'] += 1
+
+    schedules_list = {'type': 'array', 'items': schedule_object}
 
 
-def _schedule_by_id(schedule_id):
-    for schedule in manager.config.get('schedules', []):
+base_schedule_schema = api.schema('schedules.base', schedule_schema)
+api_schedule_schema = api.schema('schedules.schedule', ObjectsContainer.schedule_object)
+api_schedules_list_schema = api.schema('schedules.list', ObjectsContainer.schedules_list)
+
+
+def _schedule_by_id(schedule_id, schedules):
+    for schedule in schedules:
         if id(schedule) == schedule_id:
             schedule = schedule.copy()
             schedule['id'] = schedule_id
@@ -38,10 +46,10 @@ class SchedulesAPI(APIResource):
     def get(self, session=None):
         """ List schedules """
         schedule_list = []
-        if 'schedules' not in manager.config or not manager.config['schedules']:
+        if 'schedules' not in self.manager.config or not self.manager.config['schedules']:
             return jsonify(schedule_list)
 
-        for schedule in manager.config['schedules']:
+        for schedule in self.manager.config['schedules']:
             # Copy the object so we don't apply id to the config
             schedule_id = id(schedule)
             schedule = schedule.copy()
@@ -50,25 +58,26 @@ class SchedulesAPI(APIResource):
 
         return jsonify(schedule_list)
 
-    @api.validate(api_schedule_schema, description='Schedule Object')
+    @api.validate(base_schedule_schema, description='Schedule Object')
     @api.response(201, model=api_schedule_schema)
     @api.response(APIError)
     def post(self, session=None):
         """ Add new schedule """
         data = request.json
 
-        if 'schedules' not in manager.config or not manager.config['schedules']:
+        if 'schedules' not in self.manager.config or not self.manager.config['schedules']:
             # Schedules not defined or are disabled, enable as one is being created
-            manager.config['schedules'] = []
+            self.manager.config['schedules'] = []
 
-        manager.config['schedules'].append(data)
-        new_schedule = _schedule_by_id(id(data))
+        self.manager.config['schedules'].append(data)
+        schedules = self.manager.config['schedules']
+        new_schedule = _schedule_by_id(id(data), schedules)
 
         if not new_schedule:
             raise APIError('schedule went missing after add')
 
-        manager.save_config()
-        manager.config_changed()
+        self.manager.save_config()
+        self.manager.config_changed()
         resp = jsonify(new_schedule)
         resp.status_code = 201
         return resp
@@ -82,7 +91,8 @@ class ScheduleAPI(APIResource):
     @api.response(200, model=api_schedule_schema)
     def get(self, schedule_id, session=None):
         """ Get schedule details """
-        schedule = _schedule_by_id(schedule_id)
+        schedules = self.manager.config.get('schedules', [])
+        schedule = _schedule_by_id(schedule_id, schedules)
         if not schedule:
             raise NotFoundError('schedule %d not found' % schedule_id)
 
@@ -93,11 +103,6 @@ class ScheduleAPI(APIResource):
                 schedule['next_run_time'] = job.next_run_time
         return jsonify(schedule)
 
-    def _get_schedule(self, schedule_id):
-        for i in range(len(manager.config.get('schedules', []))):
-            if id(manager.config['schedules'][i]) == schedule_id:
-                return manager.config['schedules'][i]
-
     def _update_schedule(self, existing, update, merge=False):
         if 'id' in update:
             del update['id']
@@ -106,31 +111,34 @@ class ScheduleAPI(APIResource):
             existing.clear()
 
         existing.update(update)
-        manager.save_config()
-        manager.config_changed()
+        self.manager.save_config()
+        self.manager.config_changed()
         return existing
 
-    @api.validate(api_schedule_schema, description='Updated Schedule Object')
-    @api.response(200, model=api_schedule_schema)
+    @api.validate(base_schedule_schema, description='Updated Schedule Object')
+    @api.response(201, model=api_schedule_schema)
     def put(self, schedule_id, session=None):
         """ Update schedule """
         data = request.json
-        schedule = self._get_schedule(schedule_id)
 
+        schedules = self.manager.config.get('schedules', [])
+        schedule = _schedule_by_id(schedule_id, schedules)
         if not schedule:
             raise NotFoundError('schedule %d not found' % schedule_id)
 
         new_schedule = self._update_schedule(schedule, data)
-        return jsonify(new_schedule)
+        resp = jsonify(new_schedule)
+        resp.status_code = 201
+        return resp
 
     @api.response(200, description='Schedule deleted', model=base_message_schema)
     def delete(self, schedule_id, session=None):
         """ Delete a schedule """
-        for i in range(len(manager.config.get('schedules', []))):
-            if id(manager.config['schedules'][i]) == schedule_id:
-                del manager.config['schedules'][i]
-                manager.save_config()
-                manager.config_changed()
+        for i in range(len(self.manager.config.get('schedules', []))):
+            if id(self.manager.config['schedules'][i]) == schedule_id:
+                del self.manager.config['schedules'][i]
+                self.manager.save_config()
+                self.manager.config_changed()
                 return success_response('schedule %d successfully deleted' % schedule_id)
 
         raise NotFoundError('schedule %d not found' % schedule_id)
