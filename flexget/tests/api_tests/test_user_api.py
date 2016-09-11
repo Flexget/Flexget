@@ -13,7 +13,7 @@ class TestUserAPI(object):
         strong_password = {'password': 'AVer123y$ron__g-=PaW[]rd'}
 
         rsp = api_client.json_put('/user/', data=json.dumps(weak_password))
-        assert rsp.status_code == 500
+        assert rsp.status_code == 400
 
         rsp = api_client.json_put('/user/', data=json.dumps(medium_password))
         assert rsp.status_code == 200
