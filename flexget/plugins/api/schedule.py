@@ -7,7 +7,7 @@ from flask import request, jsonify
 
 from flexget.manager import manager
 from flexget.plugins.daemon.scheduler import schedule_schema, scheduler, scheduler_job_map
-from flexget.api import api, APIResource, NotFoundError, APIError, success_schema, success_response
+from flexget.api import api, APIResource, NotFoundError, APIError, base_message_schema, success_response
 
 schedule_api = api.namespace('schedules', description='Task Scheduler')
 
@@ -123,7 +123,7 @@ class ScheduleAPI(APIResource):
         new_schedule = self._update_schedule(schedule, data)
         return jsonify(new_schedule)
 
-    @api.response(200, description='Schedule deleted', model=success_schema)
+    @api.response(200, description='Schedule deleted', model=base_message_schema)
     def delete(self, schedule_id, session=None):
         """ Delete a schedule """
         for i in range(len(manager.config.get('schedules', []))):

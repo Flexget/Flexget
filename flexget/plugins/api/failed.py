@@ -6,7 +6,7 @@ import logging
 from flask import jsonify
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource, success_schema, success_response, NotFoundError
+from flexget.api import api, APIResource, base_message_schema, success_response, NotFoundError
 from flexget.plugins.filter.retry_failed import FailedEntry
 
 log = logging.getLogger('failed_api')
@@ -42,7 +42,7 @@ class RetryFailed(APIResource):
         failed_entries = [failed.to_dict() for failed in session.query(FailedEntry).all()]
         return jsonify(failed_entries)
 
-    @api.response(200, 'successfully deleted failed entry', model=success_schema)
+    @api.response(200, 'successfully deleted failed entry', model=base_message_schema)
     def delete(self, session=None):
         """ Clear all failed entries """
         log.debug('deleting all failed entries')
@@ -63,7 +63,7 @@ class RetryFailedID(APIResource):
             raise NotFoundError('could not find entry with ID %i' % failed_entry_id)
         return jsonify(failed_entry.to_dict())
 
-    @api.response(200, 'successfully delete failed entry', model=success_schema)
+    @api.response(200, 'successfully delete failed entry', model=base_message_schema)
     def delete(self, failed_entry_id, session=None):
         """ Delete failed entry by ID """
         try:

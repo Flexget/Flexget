@@ -6,7 +6,7 @@ import logging
 from flask import jsonify
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource, BadRequest, success_schema, success_response
+from flexget.api import api, APIResource, BadRequest, base_message_schema, success_response
 from flexget.plugins.filter.remember_rejected import RememberEntry
 
 log = logging.getLogger('rejected')
@@ -61,7 +61,7 @@ class Rejected(APIResource):
         return jsonify(rejected_entries=[rejected_entry_to_dict(e) for e in entries],
                        number_of_rejected_entries=len(entries))
 
-    @api.response(200, model=success_schema)
+    @api.response(200, model=base_message_schema)
     def delete(self, session=None):
         """ Clears all rejected entries"""
         entries = session.query(RememberEntry).delete()
@@ -83,7 +83,7 @@ class RejectedEntry(APIResource):
             raise BadRequest('rejected entry ID %d not found' % rejected_entry_id)
         return jsonify(rejected_entry_to_dict(entry))
 
-    @api.response(200, model=success_schema)
+    @api.response(200, model=base_message_schema)
     def delete(self, rejected_entry_id, session=None):
         """ Deletes a rejected entry """
         try:

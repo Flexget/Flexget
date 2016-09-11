@@ -186,24 +186,23 @@ api = Api(
     version=__version__,
     description='<font color="red"><b>Warning: under development, subject to change without notice.<b/></font>'
 )
-base_error = {
+base_message = {
     'type': 'object',
     'properties': {
         'status_code': {'type': 'integer'},
         'message': {'type': 'string'},
         'status': {'type': 'string'}
-    },
-    'required': ['message', 'status_code']
+    }
 }
 
-base_error_schema = api.schema('error', base_error)
+base_message_schema = api.schema('base_message', base_message)
 
 
 class APIError(Exception):
     description = 'Server error'
     status_code = 500
     status = 'Error'
-    response_model = base_error_schema
+    response_model = base_message_schema
 
     def __init__(self, message, payload=None):
         self.message = message
@@ -285,12 +284,6 @@ class ValidationError(APIError):
 
 
 empty_response = api.schema('empty', {'type': 'object'})
-success_schema = api.schema('success', {'type': 'object',
-                                        'properties': {
-                                            'status': {'type': 'string'},
-                                            'message': {'type': 'string'},
-                                            'status_code': {'type': 'integer'}
-                                        }})
 
 
 def success_response(message, status_code=200, status='success'):

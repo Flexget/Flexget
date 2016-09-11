@@ -12,7 +12,7 @@ from flask import request
 from queue import Queue, Empty
 
 from flexget.api import api, APIResource, APIError, NotFoundError, CannotAddResource, BadRequest, success_response, \
-    success_schema
+    base_message_schema
 from flexget.config_schema import process_config
 from flexget.entry import Entry
 from flexget.event import event
@@ -147,7 +147,7 @@ class TaskAPI(APIResource):
 
         return {'name': new_task_name, 'config': self.manager.user_config['tasks'][new_task_name]}, code
 
-    @api.response(200, model=success_schema, description='deleted task')
+    @api.response(200, model=base_message_schema, description='deleted task')
     @api.response(NotFoundError)
     def delete(self, task, session=None):
         """ Delete a task """

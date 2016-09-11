@@ -9,7 +9,8 @@ from flask import jsonify
 from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource, CannotAddResource, NotFoundError, success_schema, success_response, BadRequest
+from flexget.api import api, APIResource, CannotAddResource, NotFoundError, base_message_schema, success_response, \
+    BadRequest
 from flexget.plugins.list import movie_list as ml
 from flexget.plugins.list.movie_list import MovieListBase
 
@@ -150,7 +151,7 @@ class MovieListListAPI(APIResource):
             raise NotFoundError('list_id %d does not exist' % list_id)
         return jsonify(movie_list.to_dict())
 
-    @api.response(200, model=success_schema)
+    @api.response(200, model=base_message_schema)
     @api.response(404)
     def delete(self, list_id, session=None):
         """ Delete list by ID """
@@ -259,7 +260,7 @@ class MovieListMovieAPI(APIResource):
             raise NotFoundError('could not find movie with id %d in list %d' % (movie_id, list_id))
         return jsonify(movie.to_dict())
 
-    @api.response(200, model=success_schema)
+    @api.response(200, model=base_message_schema)
     def delete(self, list_id, movie_id, session=None):
         """ Delete a movie by list ID and movie ID """
         try:

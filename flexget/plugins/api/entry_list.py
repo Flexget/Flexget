@@ -9,7 +9,7 @@ from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
 import flexget.plugins.list.entry_list as el
-from flexget.api import api, APIResource, BadRequest, NotFoundError, success_schema, success_response
+from flexget.api import api, APIResource, BadRequest, NotFoundError, base_message_schema, success_response
 
 log = logging.getLogger('entry_list')
 
@@ -87,7 +87,7 @@ class EntryListListAPI(APIResource):
             raise NotFoundError('list_id %d does not exist' % list_id)
         return jsonify(list.to_dict())
 
-    @api.response(200, description='list successfully deleted', model=success_schema)
+    @api.response(200, description='list successfully deleted', model=base_message_schema)
     @api.response(NotFoundError)
     def delete(self, list_id, session=None):
         """ Delete list by ID """
@@ -224,7 +224,7 @@ class EntryListEntryAPI(APIResource):
 
         return jsonify(entry.to_dict())
 
-    @api.response(200, model=success_schema)
+    @api.response(200, model=base_message_schema)
     def delete(self, list_id, entry_id, session=None):
         """ Delete an entry by list ID and entry ID """
         try:

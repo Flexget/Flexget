@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import request
 from flask_login import current_user
 
-from flexget.api import api, APIResource, BadRequest, success_schema, success_response
+from flexget.api import api, APIResource, BadRequest, base_message_schema, success_response
 from flexget.webserver import change_password, generate_token, WeakPassword
 
 user_api = api.namespace('user', description='Manage user login credentials')
@@ -25,7 +25,7 @@ user_password_input_schema = api.schema('user_password_input', user_password_inp
 class UserManagementAPI(APIResource):
     @api.validate(model=user_password_input_schema, description='Password change schema')
     @api.response(BadRequest)
-    @api.response(200, 'Success', model=success_schema)
+    @api.response(200, 'Success', model=base_message_schema)
     @api.doc(description='Change user password. A medium strength password is required.'
                          ' See https://github.com/lepture/safe for reference')
     def put(self, session=None):

@@ -9,7 +9,7 @@ from flask import request
 from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource, ApiClient, NotFoundError, CannotAddResource, BadRequest, success_schema, \
+from flexget.api import api, APIResource, ApiClient, NotFoundError, CannotAddResource, BadRequest, base_message_schema, \
     success_response
 from flexget.event import fire_event
 from flexget.plugin import PluginError
@@ -450,7 +450,7 @@ class SeriesShowAPI(APIResource):
 
         return jsonify(show)
 
-    @api.response(200, 'Removed series from DB', model=success_schema)
+    @api.response(200, 'Removed series from DB', model=base_message_schema)
     @api.doc(description='Delete a specific show using its ID',
              parser=delete_parser)
     def delete(self, show_id, session):
@@ -552,7 +552,7 @@ class SeriesEpisodesAPI(APIResource):
                         'page': page,
                         'total_number_of_pages': pages})
 
-    @api.response(200, 'Successfully forgotten all episodes from show', model=success_schema)
+    @api.response(200, 'Successfully forgotten all episodes from show', model=base_message_schema)
     @api.doc(description='Delete all show episodes via its ID. Deleting an episode will mark it as wanted again',
              parser=delete_parser)
     def delete(self, show_id, session):
@@ -593,7 +593,7 @@ class SeriesEpisodeAPI(APIResource):
             'episode': get_episode_details(episode)
         })
 
-    @api.response(200, 'Episode successfully forgotten for show', model=success_schema)
+    @api.response(200, 'Episode successfully forgotten for show', model=base_message_schema)
     @api.doc(description='Delete a specific episode via its ID and show ID. Deleting an episode will mark it as '
                          'wanted again',
              parser=delete_parser)
@@ -661,7 +661,7 @@ class SeriesReleasesAPI(APIResource):
 
         })
 
-    @api.response(200, 'Successfully deleted all releases for episode', model=success_schema)
+    @api.response(200, 'Successfully deleted all releases for episode', model=base_message_schema)
     @api.doc(description='Delete all releases for a specific episode of a specific show.',
              parser=release_delete_parser)
     def delete(self, show_id, ep_id, session):
@@ -690,7 +690,7 @@ class SeriesReleasesAPI(APIResource):
             series.delete_release_by_id(release.id)
         return success_response('successfully deleted all releases for episode %s from show %s' % (ep_id, show_id))
 
-    @api.response(200, 'Successfully reset all downloaded releases for episode', model=success_schema)
+    @api.response(200, 'Successfully reset all downloaded releases for episode', model=base_message_schema)
     @api.doc(description='Resets all of the downloaded releases of an episode, clearing the quality to be downloaded '
                          'again,')
     def put(self, show_id, ep_id, session):
@@ -747,7 +747,7 @@ class SeriesReleaseAPI(APIResource):
             'release': get_release_details(release)
         })
 
-    @api.response(200, 'Release successfully deleted', model=success_schema)
+    @api.response(200, 'Release successfully deleted', model=base_message_schema)
     @api.doc(description='Delete a specific releases for a specific episode of a specific show.',
              parser=delete_parser)
     def delete(self, show_id, ep_id, rel_id, session):
@@ -775,7 +775,7 @@ class SeriesReleaseAPI(APIResource):
         series.delete_release_by_id(rel_id)
         return success_response('successfully deleted release %d from episode %d' % (rel_id, ep_id))
 
-    @api.response(200, 'Successfully reset downloaded release status', model=success_schema)
+    @api.response(200, 'Successfully reset downloaded release status', model=base_message_schema)
     @api.doc(description='Resets the downloaded release status, clearing the quality to be downloaded again')
     def put(self, show_id, ep_id, rel_id, session):
         """ Resets a downloaded release status """

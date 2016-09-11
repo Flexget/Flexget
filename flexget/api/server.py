@@ -24,19 +24,19 @@ from pyparsing import nums, alphanums, printables
 from yaml.error import YAMLError
 
 from flexget._version import __version__
-from flexget.api import api, APIResource, APIError, __version__ as __api_version__, BadRequest, base_error, \
-    success_response, success_schema, empty_response
+from flexget.api import api, APIResource, APIError, __version__ as __api_version__, BadRequest, base_message, \
+    success_response, base_message_schema, empty_response
 
 log = logging.getLogger('api.server')
 
 server_api = api.namespace('server', description='Manage Daemon')
 
-yaml_error_response = copy.deepcopy(base_error)
+yaml_error_response = copy.deepcopy(base_message)
 yaml_error_response['properties']['column'] = {'type': 'integer'}
 yaml_error_response['properties']['line'] = {'type': 'integer'}
 yaml_error_response['properties']['reason'] = {'type': 'string'}
 
-config_validation_error = copy.deepcopy(base_error)
+config_validation_error = copy.deepcopy(base_message)
 config_validation_error['properties']['error'] = {'type': 'string'}
 config_validation_error['properties']['config_path'] = {'type': 'string'}
 
@@ -48,7 +48,7 @@ config_validation_schema = api.schema('config_validation_schema', config_validat
 class ServerReloadAPI(APIResource):
     @api.response(501, model=yaml_error_schema, description='YAML syntax error')
     @api.response(502, model=config_validation_schema, description='Config validation error')
-    @api.response(200, model=success_schema, description='Newly reloaded config')
+    @api.response(200, model=base_message_schema, description='Newly reloaded config')
     def get(self, session=None):
         """ Reload Flexget config """
         log.info('Reloading config from disk.')
@@ -96,7 +96,7 @@ shutdown_parser.add_argument('force', type=inputs.boolean, default=False, help='
 @server_api.route('/shutdown/')
 class ServerShutdownAPI(APIResource):
     @api.doc(parser=shutdown_parser)
-    @api.response(200, model=success_schema, description='Shutdown requested')
+    @api.response(200, model=base_message_schema, description='Shutdown requested')
     def get(self, session=None):
         """ Shutdown Flexget Daemon """
         args = shutdown_parser.parse_args()
@@ -132,7 +132,7 @@ class ServerRawConfigAPI(APIResource):
         return jsonify(raw_config=raw_config.decode('utf-8'))
 
     @api.validate(raw_config_schema)
-    @api.response(200, model=success_schema, description='Successfully updated config')
+    @api.response(200, model=base_message_schema, description='Successfully updated config')
     @api.response(BadRequest)
     @api.response(APIError)
     @api.doc(description='Config file must be base64 encoded. A backup will be created, and if successful config will'

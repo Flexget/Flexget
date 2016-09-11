@@ -8,7 +8,7 @@ from flask_login import login_user, LoginManager, current_user, current_app
 from flask_restplus import inputs
 from werkzeug.security import check_password_hash
 
-from flexget.api import api, APIResource, app, Unauthorized, success_response, success_schema
+from flexget.api import api, APIResource, app, Unauthorized, success_response, base_message_schema
 from flexget.utils.database import with_session
 from flexget.webserver import User
 
@@ -86,7 +86,7 @@ login_parser.add_argument('remember', type=inputs.boolean, required=False, defau
 class LoginAPI(APIResource):
     @api.validate(login_api_schema, description='Username and Password')
     @api.response(Unauthorized)
-    @api.response(200, 'Login successful', model=success_schema)
+    @api.response(200, 'Login successful', model=base_message_schema)
     @api.doc(parser=login_parser)
     def post(self, session=None):
         """ Login with username and password """
@@ -112,7 +112,7 @@ class LoginAPI(APIResource):
 
 @auth_api.route('/logout/')
 class LogoutAPI(APIResource):
-    @api.response(200, 'Logout successful', model=success_schema)
+    @api.response(200, 'Logout successful', model=base_message_schema)
     def get(self, session=None):
         """ Logout and clear session cookies """
         flask_session.clear()

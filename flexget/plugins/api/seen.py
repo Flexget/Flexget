@@ -9,7 +9,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask import jsonify, request
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource, NotFoundError, CannotAddResource, success_schema, success_response, APIError
+from flexget.api import api, APIResource, NotFoundError, CannotAddResource, base_message_schema, success_response, \
+    APIError
 from flexget.plugins.filter import seen
 
 seen_api = api.namespace('seen', description='Managed Flexget seen entries and fields')
@@ -184,7 +185,7 @@ class SeenSearchAPI(APIResource):
         reply.status_code = 201
         return reply
 
-    @api.response(200, 'Successfully delete all entries', model=success_schema)
+    @api.response(200, 'Successfully delete all entries', model=base_message_schema)
     @api.doc(parser=seen_delete_parser, description='Delete seen entries')
     def delete(self, session):
         """ Delete seen entries """
@@ -219,7 +220,7 @@ class SeenSearchIDAPI(APIResource):
             raise NotFoundError('Could not find entry ID {0}'.format(seen_entry_id))
         return jsonify(seen_entry.to_dict())
 
-    @api.response(200, 'Successfully deleted entry', model=success_schema)
+    @api.response(200, 'Successfully deleted entry', model=base_message_schema)
     def delete(self, seen_entry_id, session):
         """ Delete seen entry by ID """
         try:
