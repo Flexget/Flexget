@@ -24,7 +24,7 @@ class ObjectsContainer(object):
             'added_at': {'type': 'string', 'format': 'date-time'},
             'reason': {'type': 'string'},
             'count': {'type': 'integer'},
-            'retry_time': {'type': 'string', 'format': 'date-time'}
+            'retry_time': {'type': ['string', 'null'], 'format': 'date-time'}
         }
     }
     retry_entries_list_object = {'type': 'array', 'items': retry_failed_entry_object}
