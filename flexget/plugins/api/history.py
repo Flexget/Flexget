@@ -16,30 +16,29 @@ history_api = api.namespace('history', description='Entry History')
 
 
 class ObjectsContainer(object):
-    history_api_schema = {
+    base_history_object = {
         'type': 'object',
         'properties': {
-            'entries': {
-                'type': 'array',
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'details': {'type': 'string'},
-                        'filename': {'type': 'string'},
-                        'id': {'type': 'integer'},
-                        'task': {'type': 'string'},
-                        'time': {'type': 'string'},
-                        'title': {'type': 'string'},
-                        'url': {'type': 'string'}
-                    }
-                }
-            },
+            'details': {'type': 'string'},
+            'filename': {'type': 'string'},
+            'id': {'type': 'integer'},
+            'task': {'type': 'string'},
+            'time': {'type': 'string', 'format': 'date-time'},
+            'title': {'type': 'string'},
+            'url': {'type': 'string'}
+        }
+    }
+
+    history_list_object = {
+        'type': 'object',
+        'properties': {
+            'entries': {'type': 'array', 'items': base_history_object},
             'pages': {'type': 'integer'}
         }
     }
 
 
-history_api_schema = api.schema('history.list', ObjectsContainer.history_api_schema)
+history_list_schema = api.schema('history.list', ObjectsContainer.history_list_object)
 
 history_parser = api.parser()
 history_parser.add_argument('page', type=int, required=False, default=1, help='Page number')
@@ -51,7 +50,7 @@ history_parser.add_argument('task', type=str, required=False, default=None, help
 @api.doc(parser=history_parser)
 class HistoryAPI(APIResource):
     @api.response(BadRequest)
-    @api.response(200, model=history_api_schema)
+    @api.response(200, model=history_list_schema)
     def get(self, session=None):
         """ List of previously accepted entries """
         args = history_parser.parse_args()
