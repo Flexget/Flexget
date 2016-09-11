@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from datetime import datetime
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget.manager import Session
 from flexget.plugins.api.rejected import ObjectsContainer as OC
