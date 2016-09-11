@@ -126,7 +126,7 @@ def entry_list_add(options):
         session.merge(entry_list)
         session.commit()
         title = options.entry_title
-        entry = {'title': options.entry_title, 'original_url': options.original_url}
+        entry = {'title': options.entry_title, 'url': options.url}
         db_entry = get_entry_by_title(list_id=entry_list.id, title=title, session=session)
         if db_entry:
             console("Entry with the title `{}` already exist with list `{}`. Will replace identifiers if given".format(
@@ -186,7 +186,7 @@ def register_parser_arguments():
     # Common option to be used in multiple subparsers
     entry_parser = ArgumentParser(add_help=False)
     entry_parser.add_argument('entry_title', help="Title of the entry")
-    entry_parser.add_argument('original_url', help="URL of the entry")
+    entry_parser.add_argument('url', help="URL of the entry")
 
     global_entry_parser = ArgumentParser(add_help=False)
     global_entry_parser.add_argument('entry', help='Can be entry title or ID')

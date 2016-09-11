@@ -72,7 +72,7 @@ class EntryListEntry(Base):
 
     def __init__(self, entry, entry_list_id):
         self.title = entry['title']
-        self.original_url = entry['original_url']
+        self.original_url = entry.get('original_url') or entry['url']
         self.entry = entry
         self.list_id = entry_list_id
 
