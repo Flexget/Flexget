@@ -247,6 +247,10 @@ class EntryListEntryAPI(APIResource):
             raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
         data = request.json
         entry.entry = data
+        if data.get('title'):
+            entry.title = data['title']
+        if data.get('original_url'):
+            entry.original_url = data['original_url']
         session.commit()
         resp = jsonify(entry.to_dict())
         resp.status_code = 201
