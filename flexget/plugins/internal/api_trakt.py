@@ -1075,7 +1075,9 @@ def update_user_ratings_cache(style_ident, username=None, account=None):
             item_type = item['type']
             item_cache = cache[item_type + 's']
 
-            # put season shit in shows instead since seasons don't have a trakt id
+            # season cannot be put into shows because the code would turn to spaghetti later when retrieving from cache
+            # instead we put some season info inside the season cache key'd to series id
+            # eg. cache['seasons'][<show_id>][<season_number>] = ratings and stuff
             if item_type == 'season':
                 show_id = item['show']['ids']['trakt']
                 season = item['season']['number']
