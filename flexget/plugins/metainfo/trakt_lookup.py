@@ -340,6 +340,41 @@ class PluginTraktLookup(object):
                 entry['trakt_watched'] = watched
         return entry
 
+    def lazy_user_ratings_lookup(self, config, style, entry):
+        """Does the ratings lookup for this entry and populates the entry fields."""
+        if style in ['show', 'episode', 'season']:
+            lookup = lookup_series
+            trakt_id = entry.get('trakt_show_id', eval_lazy=True)
+        else:
+            lookup = lookup_movie
+            trakt_id = entry.get('trakt_movie_id', eval_lazy=True)
+        with Session() as session:
+            lookupargs = {'trakt_id': trakt_id,
+                          'session': session}
+            try:
+                item = lookup(**lookupargs)
+                if style in ['show', 'episode', 'season']:
+                    rating_style = style
+                    if style == 'show':
+                        rating_style = 'series'
+                    elif style == 'episode':
+                        rating_style = 'ep'
+                    # fetch episode data if style is not series
+                    if style in ['episode', 'season']:
+                        item = item.get_episode(entry['series_season'], entry['series_episode'], session)
+                    rating = ApiTrakt.user_ratings(style, item, entry.get('title'),
+                                                   username=config.get('username'),
+                                                   account=config.get('account'))
+                    entry['trakt_{}_user_rating'.format(rating_style)] = rating
+                else:
+                    movie_rating = ApiTrakt.user_ratings(style, item, entry.get('title'),
+                                                         username=config.get('username'),
+                                                         account=config.get('account'))
+                    entry['trakt_movie_user_rating'] = movie_rating
+            except LookupError as e:
+                log.debug(e.args[0])
+        return entry
+
     # Run after series and metainfo series
     @plugin.priority(110)
     def on_task_metainfo(self, task, config):
@@ -371,6 +406,17 @@ class PluginTraktLookup(object):
                 watched_lookup = functools.partial(self.lazy_watched_lookup, config, style)
                 entry.register_lazy_func(collected_lookup, ['trakt_collected'])
                 entry.register_lazy_func(watched_lookup, ['trakt_watched'])
+                if style in ['show', 'episode']:
+                    # register separate lazy calls to avoid fetching too much unnecessary data
+                    entry.register_lazy_func(functools.partial(self.lazy_user_ratings_lookup, config, 'show'),
+                                             ['trakt_series_user_rating'])
+                    entry.register_lazy_func(functools.partial(self.lazy_user_ratings_lookup, config, 'season'),
+                                             ['trakt_season_user_rating'])
+                    entry.register_lazy_func(functools.partial(self.lazy_user_ratings_lookup, config, 'episode'),
+                                             ['trakt_ep_user_rating'])
+                else:
+                    entry.register_lazy_func(functools.partial(self.lazy_user_ratings_lookup, config, style),
+                                             ['trakt_movie_user_rating'])
 
     @property
     def series_identifier(self):

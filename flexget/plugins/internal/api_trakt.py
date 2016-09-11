@@ -1058,12 +1058,50 @@ def update_watched_cache(style_ident, username=None, account=None):
         raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
 
 
+def update_user_ratings_cache(style_ident, username=None, account=None):
+    if account and not username:
+        username = 'me'
+    url = get_api_url('users', username, 'ratings', style_ident)
+    session = get_session(account=account)
+    try:
+        data = session.get(url).json()
+        if not data:
+            log.warning('No user ratings data returned from trakt.')
+            return
+        cache = get_user_cache(username=username, account=account)['user_ratings']
+        log.verbose('Received %d record(s) from trakt.tv %s\'s %s user ratings', len(data), username, style_ident)
+        for item in data:
+            # get the proper cache from the type returned by trakt
+            item_type = item['type']
+            item_cache = cache[item_type + 's']
+
+            # put season shit in shows instead since seasons don't have a trakt id
+            if item_type == 'season':
+                show_id = item['show']['ids']['trakt']
+                season = item['season']['number']
+                item_cache.setdefault(show_id, {})
+                item_cache[show_id].setdefault(season, {})
+                item_cache = item_cache[show_id]
+                item_id = season
+            else:
+                item_id = item[item_type]['ids']['trakt']
+            item_cache[item_id] = item[item_type]
+            item_cache[item_id]['rated_at'] = dateutil_parse(item['rated_at'], ignoretz=True)
+            item_cache[item_id]['rating'] = item['rating']
+    except requests.RequestException as e:
+        raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
+
+
 def get_user_cache(username=None, account=None):
     identifier = '{}|{}'.format(account, username or 'me')
     ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('watched', {}).setdefault('shows', {})
     ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('watched', {}).setdefault('movies', {})
     ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('collection', {}).setdefault('shows', {})
     ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('collection', {}).setdefault('movies', {})
+    ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('user_ratings', {}).setdefault('shows', {})
+    ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('user_ratings', {}).setdefault('seasons', {})
+    ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('user_ratings', {}).setdefault('episodes', {})
+    ApiTrakt.user_cache.setdefault(identifier, {}).setdefault('user_ratings', {}).setdefault('movies', {})
 
     return ApiTrakt.user_cache[identifier]
 
@@ -1210,6 +1248,27 @@ class ApiTrakt(object):
         log.debug('The result for entry "%s" is: %s', title,
                   'Watched' if watched else 'Not watched')
         return watched
+
+    @staticmethod
+    def user_ratings(style, trakt_data, title, username=None, account=None):
+        style_ident = style + 's'
+        cache = get_user_cache(username=username, account=account)
+        if not cache['user_ratings'][style_ident]:
+            log.debug('No user ratings found in cache.')
+            update_user_ratings_cache(style_ident, username=username, account=account)
+        if not cache['user_ratings'][style_ident]:
+            log.warning('No user ratings data returned from trakt.')
+            return
+        user_rating = None
+        cache = cache['user_ratings'][style_ident]
+        # season ratings are a little annoying and require butchering the code
+        if style == 'season' and trakt_data.series_id in cache:
+            if trakt_data.season in cache[trakt_data.series_id]:
+                user_rating = cache[trakt_data.series_id][trakt_data.season]['rating']
+        if trakt_data.id in cache:
+            user_rating = cache[trakt_data.id]['rating']
+        log.debug('User rating for entry "%s" is: %s', title, user_rating)
+        return user_rating
 
 
 @event('plugin.register')
