@@ -12,37 +12,41 @@ log = logging.getLogger('plugins')
 
 plugins_api = api.namespace('plugins', description='Get Flexget plugins')
 
-phase_object = {
-    'type': 'object',
-    'properties': {
-        'phase': {'type': 'string'},
-        'priority': {'type': 'integer'}
-    }
-}
 
-plugin_object = {
-    'type': 'object',
-    'properties': {
-        'name': {'type': 'string'},
-        'api_ver': {'type': 'integer'},
-        'builtin': {'type': 'boolean'},
-        'category': {'type': 'string'},
-        'contexts': {'type': 'array', 'items': {'type': 'string'}},
-        'debug': {'type': 'boolean'},
-        'groups': {'type': 'array', 'items': {'type': 'string'}},
-        'phase_handlers': {'type': 'array', 'items': phase_object}
+class ObjectsContainer(object):
+    phase_object = {
+        'type': 'object',
+        'properties': {
+            'phase': {'type': 'string'},
+            'priority': {'type': 'integer'}
+        }
     }
-}
 
-plugin_list_reply = {
-    'type': 'object',
-    'properties': {
-        'plugin_list': {'type': 'array', 'items': plugin_object},
-        'number_of_plugins': {'type': 'integer'}
+    plugin_object = {
+        'type': 'object',
+        'properties': {
+            'name': {'type': 'string'},
+            'api_ver': {'type': 'integer'},
+            'builtin': {'type': 'boolean'},
+            'category': {'type': 'string'},
+            'contexts': {'type': 'array', 'items': {'type': 'string'}},
+            'debug': {'type': 'boolean'},
+            'groups': {'type': 'array', 'items': {'type': 'string'}},
+            'phase_handlers': {'type': 'array', 'items': phase_object}
+        }
     }
-}
-plugin_schema = api.schema('plugin_object', plugin_object)
-plugin_list_reply_schema = api.schema('plugin_list_reply', plugin_list_reply)
+
+    plugin_list_reply = {
+        'type': 'object',
+        'properties': {
+            'plugin_list': {'type': 'array', 'items': plugin_object},
+            'number_of_plugins': {'type': 'integer'}
+        }
+    }
+
+
+plugin_schema = api.schema('plugin_object', ObjectsContainer.plugin_object)
+plugin_list_reply_schema = api.schema('plugin_list_reply', ObjectsContainer.plugin_list_reply)
 
 plugin_parser = api.parser()
 plugin_parser.add_argument('include_schema', type=inputs.boolean, default=False,
@@ -55,10 +59,6 @@ plugins_parser.add_argument('phase', case_sensitive=False, help='Show plugins th
 
 
 def plugin_to_dict(plugin):
-    """ Returns a dict for API usage from a PluginInfo object
-    :param plugin: PluginInfo instance
-    :return: Dict
-    """
     return {
         'name': plugin.name,
         'api_ver': plugin.api_ver,

@@ -14,29 +14,32 @@ log = logging.getLogger('history')
 
 history_api = api.namespace('history', description='Entry History')
 
-history_api_schema = {
-    'type': 'object',
-    'properties': {
-        'entries': {
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'properties': {
-                    'details': {'type': 'string'},
-                    'filename': {'type': 'string'},
-                    'id': {'type': 'integer'},
-                    'task': {'type': 'string'},
-                    'time': {'type': 'string'},
-                    'title': {'type': 'string'},
-                    'url': {'type': 'string'}
-                }
-            }
-        },
-        'pages': {'type': 'integer'}
-    }
-}
 
-history_api_schema = api.schema('history.list', history_api_schema)
+class ObjectsContainer(object):
+    history_api_schema = {
+        'type': 'object',
+        'properties': {
+            'entries': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'details': {'type': 'string'},
+                        'filename': {'type': 'string'},
+                        'id': {'type': 'integer'},
+                        'task': {'type': 'string'},
+                        'time': {'type': 'string'},
+                        'title': {'type': 'string'},
+                        'url': {'type': 'string'}
+                    }
+                }
+            },
+            'pages': {'type': 'integer'}
+        }
+    }
+
+
+history_api_schema = api.schema('history.list', ObjectsContainer.history_api_schema)
 
 history_parser = api.parser()
 history_parser.add_argument('page', type=int, required=False, default=1, help='Page number')
@@ -47,7 +50,6 @@ history_parser.add_argument('task', type=str, required=False, default=None, help
 @history_api.route('/')
 @api.doc(parser=history_parser)
 class HistoryAPI(APIResource):
-
     @api.response(BadRequest)
     @api.response(200, model=history_api_schema)
     def get(self, session=None):

@@ -17,7 +17,7 @@ seen_api = api.namespace('seen', description='Managed Flexget seen entries and f
 PLUGIN_TASK_NAME = 'seen_plugin_API'  # Name of task to use when adding entries via API
 
 
-class Container(object):
+class ObjectsContainer(object):
     seen_field_object = {
         'type': 'object',
         'properties': {
@@ -97,7 +97,7 @@ seen_delete_parser.add_argument('is_seen_local', type=inputs.boolean, default=No
 @seen_api.route('/')
 class SeenSearchAPI(APIResource):
     @api.response(NotFoundError)
-    @api.response(200, 'Successfully retrieved seen objects', Container.seen_search_schema)
+    @api.response(200, 'Successfully retrieved seen objects', ObjectsContainer.seen_search_schema)
     @api.doc(parser=seen_search_parser, description='Get seen entries')
     def get(self, session):
         """ Search for seen entries """
@@ -157,8 +157,8 @@ class SeenSearchAPI(APIResource):
     example = "fields: {'url': 'http://123.com', 'title': 'A.Torrent', 'imdb_id': 'tt1234567'"
 
     @api.response(CannotAddResource)
-    @api.response(201, 'Successfully added new seen object', Container.seen_object_schema)
-    @api.validate(model=Container.seen_object_input_schema,
+    @api.response(201, 'Successfully added new seen object', ObjectsContainer.seen_object_schema)
+    @api.validate(model=ObjectsContainer.seen_object_input_schema,
                   description='Fields attribute takes a dict to add as seen entry fields, '
                               'for example: {0}'.format(example))
     @api.doc(description='Add seen entries')
@@ -210,7 +210,7 @@ class SeenSearchAPI(APIResource):
 @api.doc(params={'seen_entry_id': 'ID of seen entry'})
 @api.response(NotFoundError)
 class SeenSearchIDAPI(APIResource):
-    @api.response(200, model=Container.seen_object_schema)
+    @api.response(200, model=ObjectsContainer.seen_object_schema)
     def get(self, seen_entry_id, session):
         """ Get seen entry by ID """
         try:

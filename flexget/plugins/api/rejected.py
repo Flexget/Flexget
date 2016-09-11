@@ -26,28 +26,30 @@ def rejected_entry_to_dict(entry):
     }
 
 
-rejected_entry_object = {
-    'type': 'object',
-    'properties': {
-        'id': {'type': 'integer'},
-        'title': {'type': 'string'},
-        'url': {'type': 'string'},
-        'added': {'type': 'string', 'format': 'date-time'},
-        'reason': {'type': 'string'},
-        'expires': {'type': 'string', 'format': 'date-time'},
-        'rejected_by': {'type': 'string'}
+class ObjectsContainer(object):
+    rejected_entry_object = {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'integer'},
+            'title': {'type': 'string'},
+            'url': {'type': 'string'},
+            'added': {'type': 'string', 'format': 'date-time'},
+            'reason': {'type': 'string'},
+            'expires': {'type': 'string', 'format': 'date-time'},
+            'rejected_by': {'type': 'string'}
+        }
     }
-}
-rejected_entries_list_object = {
-    'type': 'object',
-    'properties': {
-        'rejected_entries': {'type': 'array', 'items': rejected_entry_object},
-        'number_of_rejected_entries': {'type': 'integer'}
+    rejected_entries_list_object = {
+        'type': 'object',
+        'properties': {
+            'rejected_entries': {'type': 'array', 'items': rejected_entry_object},
+            'number_of_rejected_entries': {'type': 'integer'}
+        }
     }
-}
 
-rejected_entry_schema = api.schema('rejected_failed_entry_schema', rejected_entry_object)
-rejected_entries_list_schema = api.schema('rejected_entries_list_schema', rejected_entries_list_object)
+
+rejected_entry_schema = api.schema('rejected_failed_entry_schema', ObjectsContainer.rejected_entry_object)
+rejected_entries_list_schema = api.schema('rejected_entries_list_schema', ObjectsContainer.rejected_entries_list_object)
 
 
 @rejected_api.route('/')

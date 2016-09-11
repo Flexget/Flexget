@@ -15,23 +15,26 @@ log = logging.getLogger('entry_list')
 
 entry_list_api = api.namespace('entry_list', description='Entry List operations')
 
-entry_list_base_object = {
-    'type': 'object',
-    'properties': {
-        'id': {'type': 'integer'},
-        'name': {'type': 'string'},
-        'added_on': {'type': 'string'}
+
+class ObjectsContainer(object):
+    entry_list_base_object = {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'integer'},
+            'name': {'type': 'string'},
+            'added_on': {'type': 'string'}
+        }
     }
-}
-entry_list_input_object = copy.deepcopy(entry_list_base_object)
-del entry_list_input_object['properties']['id']
-del entry_list_input_object['properties']['added_on']
+    entry_list_input_object = copy.deepcopy(entry_list_base_object)
+    del entry_list_input_object['properties']['id']
+    del entry_list_input_object['properties']['added_on']
 
-entry_list_return_lists = {'type': 'array', 'items': entry_list_base_object}
+    entry_list_return_lists = {'type': 'array', 'items': entry_list_base_object}
 
-entry_list_object_schema = api.schema('entry_list_object_schema', entry_list_base_object)
-entry_list_input_object_schema = api.schema('entry_list_input_object_schema', entry_list_input_object)
-entry_list_return_lists_schema = api.schema('entry_list_return_lists_schema', entry_list_return_lists)
+
+entry_list_object_schema = api.schema('entry_list_object_schema', ObjectsContainer.entry_list_base_object)
+entry_list_input_object_schema = api.schema('entry_list_input_object_schema', ObjectsContainer.entry_list_input_object)
+entry_list_return_lists_schema = api.schema('entry_list_return_lists_schema', ObjectsContainer.entry_list_return_lists)
 
 entry_list_parser = api.parser()
 entry_list_parser.add_argument('name', help='Filter results by list name')

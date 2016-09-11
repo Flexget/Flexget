@@ -13,22 +13,25 @@ log = logging.getLogger('failed_api')
 
 retry_failed_api = api.namespace('failed', description='View and manage failed entries')
 
-retry_failed_entry_object = {
-    'type': 'object',
-    'properties': {
-        'id': {'type': 'integer'},
-        'title': {'type': 'string'},
-        'url': {'type': 'string'},
-        'added_at': {'type': 'string', 'format': 'date-time'},
-        'reason': {'type': 'string'},
-        'count': {'type': 'integer'},
-        'retry_time': {'type': 'string', 'format': 'date-time'}
-    }
-}
-retry_entries_list_object = {'type': 'array', 'items': retry_failed_entry_object}
 
-retry_failed_entry_schema = api.schema('retry_failed_entry_schema', retry_failed_entry_object)
-retry_entries_list_schema = api.schema('retry_entries_list_schema', retry_entries_list_object)
+class ObjectsContainer(object):
+    retry_failed_entry_object = {
+        'type': 'object',
+        'properties': {
+            'id': {'type': 'integer'},
+            'title': {'type': 'string'},
+            'url': {'type': 'string'},
+            'added_at': {'type': 'string', 'format': 'date-time'},
+            'reason': {'type': 'string'},
+            'count': {'type': 'integer'},
+            'retry_time': {'type': 'string', 'format': 'date-time'}
+        }
+    }
+    retry_entries_list_object = {'type': 'array', 'items': retry_failed_entry_object}
+
+
+retry_failed_entry_schema = api.schema('retry_failed_entry_schema', ObjectsContainer.retry_failed_entry_object)
+retry_entries_list_schema = api.schema('retry_entries_list_schema', ObjectsContainer.retry_entries_list_object)
 
 
 @retry_failed_api.route('/')
@@ -45,6 +48,7 @@ class RetryFailed(APIResource):
         log.debug('deleting all failed entries')
         deleted = session.query(FailedEntry).delete()
         return success_response('successfully deleted %d failed entries' % deleted)
+
 
 @retry_failed_api.route('/<int:failed_entry_id>/')
 @api.response(NotFoundError)
