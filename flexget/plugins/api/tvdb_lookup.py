@@ -11,21 +11,13 @@ tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
 
 
 class ObjectsContainer(object):
-    default_error_schema = {
-        'type': 'object',
-        'properties': {
-            'status': {'type': 'string'},
-            'message': {'type': 'string'}
-        }
-    }
-
     tvdb_series_object = {
         'type': 'object',
         'properties': {
             'tvdb_id': {'type': 'integer'},
             'last_updated': {'type': 'string', 'format': 'date-time'},
             'expired': {'type': 'boolean'},
-            'name': {'type': 'string'},
+            'series_name': {'type': 'string'},
             'rating': {'type': 'number'},
             'status': {'type': 'string'},
             'runtime': {'type': 'integer'},
@@ -42,7 +34,9 @@ class ObjectsContainer(object):
             'aliases': {'type': 'array', 'items': {'type': 'string'}},
             'posters': {'type': 'array', 'items': {'type': 'string'}},
             'genres': {'type': 'array', 'items': {'type': 'string'}},
-        }
+            'language': {'type': 'string'}
+        },
+        'additionalProperties': False
     }
 
     episode_object = {
@@ -50,19 +44,20 @@ class ObjectsContainer(object):
         'properties': {
             'id': {'type': 'integer'},
             'expired': {'type': 'boolean'},
-            'last_update': {'type': 'string'},
+            'last_update': {'type': 'integer'},
             'season_number': {'type': 'integer'},
             'episode_number': {'type': 'integer'},
-            'absolute_number': {'type': 'integer'},
+            'absolute_number': {'type': ['integer', 'null']},
             'episode_name': {'type': 'string'},
             'overview': {'type': 'string'},
-            'director': {'type': 'array', 'items': {'type': 'string'}},
+            'director': {'type': 'string'},
             'writer': {'type': 'array', 'items': {'type': 'string'}},
             'rating': {'type': 'number'},
             'image': {'type': 'string'},
             'first_aired': {'type': 'string'},
             'series_id': {'type': 'integer'}
-        }
+        },
+        'additionalProperties': False
     }
 
     search_result_object = {
@@ -70,13 +65,14 @@ class ObjectsContainer(object):
         'properties': {
             'aliases': {'type': 'array', 'items': {'type': 'string'}},
             'first_aired': {'type': 'string', 'format': 'date-time'},
-            'banner': {'type': 'string'},
+            'banner': {'type': ['string', 'null']},
             'network': {'type': 'string'},
             'series_name': {'type': 'string'},
             'status': {'type': 'string'},
-            'overview': {'type': 'string'},
+            'overview': {'type': ['string', 'null']},
             'tvdb_id': {'type': 'integer'}
-        }
+        },
+        'additionalProperties': False
     }
     search_results_object = {'type': 'array', 'items': search_result_object}
 

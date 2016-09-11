@@ -1,108 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
 
-import copy
-
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-
+from flexget.plugins.api.tvdb_lookup import ObjectsContainer as OC
 import pytest
 
 from flexget.utils import json
-
-series_schema = {
-    "type": "object",
-    "properties": {
-        "airs_dayofweek": {"type": "string"},
-        "airs_time": {"type": "string"},
-        "aliases": {"type": "array", "items": {"type": "string"}},
-        "banner": {"type": "string"},
-        "content_rating": {"type": "string"},
-        "expired": {"type": "boolean"},
-        "first_aired": {"type": "string"},
-        "genres": {"type": "array", "items": {"type": "string"}},
-        "imdb_id": {"type": "string"},
-        "language": {"type": "string"},
-        "last_updated": {"type": "string"},
-        "network": {"type": "string"},
-        "overview": {"type": "string"},
-        "posters": {"type": "array", "items": {"type": "string"}},
-        "rating": {"type": "number"},
-        "runtime": {"type": "integer"},
-        "series_name": {"type": "string"},
-        "status": {"type": "string"},
-        "tvdb_id": {"type": "integer"},
-        "zap2it_id": {"type": "string"}
-    },
-    "required": [
-        "airs_dayofweek",
-        "airs_time",
-        "aliases",
-        "banner",
-        "content_rating",
-        "expired",
-        "first_aired",
-        "genres",
-        "imdb_id",
-        "language",
-        "last_updated",
-        "network",
-        "overview",
-        "posters",
-        "rating",
-        "runtime",
-        "series_name",
-        "status",
-        "tvdb_id",
-        "zap2it_id"
-    ]
-}
-series_schema_actors = copy.deepcopy(series_schema)
-series_schema_actors.update({'properties': {"actors": {"type": "array", "items": {"type": "string"}}}})
-series_schema_actors['required'].append('actors')
-episode_schema = {
-    "type": "object",
-    "properties": {
-        "absolute_number": {"type": ["null", "integer"]},
-        "director": {"type": "string"},
-        "episode_name": {"type": "string"},
-        "episode_number": {"type": "integer"},
-        "expired": {"type": "boolean"},
-        "first_aired": {"type": "string"},
-        "id": {"type": "integer"},
-        "image": {"type": "string"},
-        "last_update": {"type": "integer"},
-        "overview": {"type": "string"},
-        "rating": {"type": "number"},
-        "season_number": {"type": "integer"},
-        "series_id": {"type": "integer"}
-    },
-    "required": ["absolute_number", "director", "episode_name", "episode_number", "expired", "first_aired",
-                 "id", "image", "last_update", "overview", "rating", "season_number", "series_id"]
-}
-search_results_schema = {
-    "type": "object",
-    "properties": {
-        "search_results": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "aliases": {"type": "array", "items": {"type": "string"}},
-                    "banner": {"type": ["string", "null"]},
-                    "first_aired": {"type": "string"},
-                    "network": {"type": "string"},
-                    "overview": {"type": ["string", "null"]},
-                    "series_name": {"type": "string"},
-                    "status": {"type": "string"},
-                    "tvdb_id": {"type": "integer"}
-                },
-                "required": ["aliases", "banner", "first_aired", "network", "overview", "series_name", "status",
-                             "tvdb_id"]}}
-    },
-    "required": [
-        "search_results"
-    ]
-}
 
 
 @pytest.mark.online
@@ -123,7 +26,7 @@ class TestTVDBSeriesLookupAPI(object):
 
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(series_schema, data)
+        errors = schema_match(OC.tvdb_series_object, data)
         assert not errors
 
         for field, value in values.items():
@@ -148,7 +51,7 @@ class TestTVDBSeriesActorsLookupAPI(object):
 
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(series_schema_actors, data)
+        errors = schema_match(OC.tvdb_series_object, data)
         assert not errors
 
         for field, value in values.items():
@@ -161,7 +64,7 @@ class TestTVDBEpisodeLookupAPI(object):
 
     def test_tvdb_episode_lookup_season_and_ep_number(self, api_client, schema_match):
         rsp = api_client.get('/tvdb/episode/77398/')
-        assert rsp.status_code == 500, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
 
         values = {
             'episode_number': 6,
@@ -175,7 +78,7 @@ class TestTVDBEpisodeLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(episode_schema, data)
+        errors = schema_match(OC.episode_object, data)
         assert not errors
 
         for field, value in values.items():
@@ -199,7 +102,7 @@ class TestTVDBEpisodeABSLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(episode_schema, data)
+        errors = schema_match(OC.episode_object, data)
         assert not errors
 
         for field, value in values.items():
@@ -216,7 +119,7 @@ class TestTVDSearchNameLookupAPI(object):
 
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(search_results_schema, data)
+        errors = schema_match(OC.search_results_object, data)
         assert not errors
 
         values = {
@@ -225,7 +128,7 @@ class TestTVDSearchNameLookupAPI(object):
         }
 
         for field, value in values.items():
-            assert data['search_results'][0].get(field) == value
+            assert data[0].get(field) == value
 
 
 @pytest.mark.online
@@ -237,7 +140,7 @@ class TestTVDSearchIMDBLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(search_results_schema, data)
+        errors = schema_match(OC.search_results_object, data)
         assert not errors
 
         values = {
@@ -246,7 +149,7 @@ class TestTVDSearchIMDBLookupAPI(object):
         }
 
         for field, value in values.items():
-            assert data['search_results'][0].get(field) == value
+            assert data[0].get(field) == value
 
 
 @pytest.mark.online
@@ -258,7 +161,7 @@ class TestTVDSearchZAP2ITLookupAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(search_results_schema, data)
+        errors = schema_match(OC.search_results_object, data)
         assert not errors
 
         values = {
@@ -267,4 +170,4 @@ class TestTVDSearchZAP2ITLookupAPI(object):
         }
 
         for field, value in values.items():
-            assert data['search_results'][0].get(field) == value
+            assert data[0].get(field) == value

@@ -78,6 +78,7 @@ class TestRejectedAPI(object):
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data == {'status': 'success',
+                        'status_code': 200,
                         'message': 'successfully deleted 1 rejected entries'}
 
     def test_rejected_get_entry(self, api_client, schema_match):
@@ -119,4 +120,5 @@ class TestRejectedAPI(object):
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data == {'status': 'success',
+                        'status_code': 200,
                         'message': 'successfully deleted rejected entry 1'}
