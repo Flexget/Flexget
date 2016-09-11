@@ -37,9 +37,9 @@ class TestRetryFailedAPI(object):
 
         errors = schema_match(OC.retry_entries_list_object, data)
         assert not errors
-        for idx, entry in enumerate(data):
+        for idx, entry in enumerate(failed_entries):
             for key, value in entry.items():
-                data[idx].get(key) == failed_entries[idx].get(key)
+                assert data[idx].get(key) == failed_entries[idx].get(key)
 
         rsp = api_client.delete('/failed/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
