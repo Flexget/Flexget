@@ -27,11 +27,11 @@ api_schedules_list_schema = api.schema('schedules.list', ObjectsContainer.schedu
 
 
 def _schedule_by_id(schedule_id, schedules):
-    for schedule in schedules:
-        if id(schedule) == schedule_id:
+    for idx, schedule in enumerate(schedules):
+        if schedule and id(schedule) == schedule_id:
             schedule = schedule.copy()
             schedule['id'] = schedule_id
-            return schedule
+            return schedule, idx
 
 
 schedule_desc = "Schedule ID changes upon daemon restart. The schedules object supports either interval or schedule" \
@@ -71,7 +71,7 @@ class SchedulesAPI(APIResource):
 
         self.manager.config['schedules'].append(data)
         schedules = self.manager.config['schedules']
-        new_schedule = _schedule_by_id(id(data), schedules)
+        new_schedule, _ = _schedule_by_id(id(data), schedules)
 
         if not new_schedule:
             raise APIError('schedule went missing after add')
@@ -92,8 +92,8 @@ class ScheduleAPI(APIResource):
     def get(self, schedule_id, session=None):
         """ Get schedule details """
         schedules = self.manager.config.get('schedules', [])
-        schedule = _schedule_by_id(schedule_id, schedules)
-        if not schedule:
+        schedule, _ = _schedule_by_id(schedule_id, schedules)
+        if schedule is None:
             raise NotFoundError('schedule %d not found' % schedule_id)
 
         job_id = scheduler_job_map.get(schedule_id)
@@ -119,14 +119,17 @@ class ScheduleAPI(APIResource):
     @api.response(201, model=api_schedule_schema)
     def put(self, schedule_id, session=None):
         """ Update schedule """
-        data = request.json
+        new_schedule = request.json
 
         schedules = self.manager.config.get('schedules', [])
-        schedule = _schedule_by_id(schedule_id, schedules)
+        schedule, idx = _schedule_by_id(schedule_id, schedules)
         if not schedule:
             raise NotFoundError('schedule %d not found' % schedule_id)
 
-        new_schedule = self._update_schedule(schedule, data)
+        self.manager.config['schedules'][idx] = new_schedule
+
+        self.manager.save_config()
+        self.manager.config_changed()
         resp = jsonify(new_schedule)
         resp.status_code = 201
         return resp
