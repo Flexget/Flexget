@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+import os
 import logging
 
 from requests import Session
@@ -60,12 +61,22 @@ class OutputQBitTorrent(object):
         log.debug('Successfully connected to qBittorrent')
         self.connected = True
 
-    def add_torrent(self, data):
+    def add_torrent_file(self, filepath, data):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
         multipart_data = {k: (None, v) for k, v in data.items()}
+        with open(filepath, 'rb') as f:
+            multipart_data['torrents'] = f
+            self.session.post(self.url + '/command/upload', files=multipart_data)
+        log.debug('Added torrent file %s to qBittorrent', filepath)
+
+    def add_torrent_url(self, url, data):
+        if not self.connected:
+            raise plugin.PluginError('Not connected.')
+        data['urls'] = url
+        multipart_data = {k: (None, v) for k, v in data.items()}
         self.session.post(self.url + '/command/download', files=multipart_data)
-        log.debug('Added task to qBittorrent')
+        log.debug('Added url %s to qBittorrent', url)
 
     def prepare_config(self, config):
         if isinstance(config, bool):
@@ -76,6 +87,46 @@ class OutputQBitTorrent(object):
         config.setdefault('label', '')
         config.setdefault('fail_html', True)
         return config
+
+    def add_entries(self, task, config):
+        for entry in task.accepted:
+            formdata = {}
+
+            savepath = entry.get('path', config.get('path'))
+            if savepath:
+                formdata['savepath'] = savepath
+
+            label = entry.get('label', config.get('label'))
+            if label:
+                formdata['label'] = label # qBittorrent v3.3.3-
+                formdata['category'] = label # qBittorrent v3.3.4+
+
+            is_magnet = entry['url'].startswith('magnet:')
+
+            if task.manager.options.test:
+                log.info('Test mode.')
+                log.info('Would add torrent to qBittorrent with:')
+                if not is_magnet:
+                    log.info('File: %s', entry.get('file'))
+                else:
+                    log.info('Url: %s', entry.get('url'))
+                log.info('Save path: %s', formdata.get('savepath'))
+                log.info('Label: %s', formdata.get('label'))
+                continue
+
+            if not is_magnet:
+                if 'file' not in entry:
+                    entry.fail('File missing?')
+                    continue
+                if not os.path.exists(entry['file']):
+                    tmp_path = os.path.join(task.manager.config_base, 'temp')
+                    log.debug('entry: %s', entry)
+                    log.debug('temp: %s', ', '.join(os.listdir(tmp_path)))
+                    entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+                    continue
+                self.add_torrent_file(entry['file'], formdata)
+            else:
+                self.add_torrent_url(entry['url'], formdata)
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
@@ -96,25 +147,7 @@ class OutputQBitTorrent(object):
         if task.accepted:
             config = self.prepare_config(config)
             self.connect(config)
-        for entry in task.accepted:
-            data = {}
-            savepath = entry.get('path', config.get('path'))
-            if savepath:
-                data['savepath'] = savepath
-            label = entry.get('label', config['label']).lower()
-            if label:
-                data['label'] = label
-            data['urls'] = entry.get('url')
-            if task.manager.options.test:
-                log.info('Test mode.')
-                log.info('Would add torrent to qBittorrent with:')
-                log.info('    Url: %s', data['urls'][0])
-                if data['savepath']:
-                    log.info('    Save path: %s', data['savepath'])
-                if data['label']:
-                    log.info('    Label: %s', data['label'])
-            else:
-                self.add_torrent(data)
+            self.add_entries(task, config)
 
 
 @event('plugin.register')
