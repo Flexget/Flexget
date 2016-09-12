@@ -9,15 +9,27 @@ from flexget.webserver import change_password, generate_token, WeakPassword
 
 user_api = api.namespace('user', description='Manage user login credentials')
 
-user_password_input = {
-    'type': 'object',
-    'properties': {
-        'password': {'type': 'string'}
-    },
-    'required': ['password'],
-    'additionalProperties': False
-}
-user_password_input_schema = api.schema('user_password_input', user_password_input)
+
+class ObjectsContainer(object):
+    user_password_input = {
+        'type': 'object',
+        'properties': {
+            'password': {'type': 'string'}
+        },
+        'required': ['password'],
+        'additionalProperties': False
+    }
+
+    user_token_response = {
+        'type': 'object',
+        'properties': {
+            'token': {'type': 'string'}
+        }
+    }
+
+
+user_password_input_schema = api.schema('user_password_input', ObjectsContainer.user_password_input)
+user_token_response_schema = api.schema('user_token_response', ObjectsContainer.user_token_response)
 
 
 @user_api.route('/')
@@ -37,16 +49,6 @@ class UserManagementAPI(APIResource):
         except WeakPassword as e:
             raise BadRequest(e.value)
         return success_response('Successfully changed user password')
-
-
-user_token_response = {
-    'type': 'object',
-    'properties': {
-        'token': {'type': 'string'}
-    }
-}
-
-user_token_response_schema = api.schema('user_token_response', user_token_response)
 
 
 @user_api.route('/token/')
