@@ -4,6 +4,8 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import json
 
 from flexget.api import base_message
+from flexget.api.database import ObjectsContainer as OC
+
 
 class TestDatabaseAPI(object):
     config = 'tasks: {}'
@@ -48,5 +50,5 @@ class TestDatabaseAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match({'type': 'array', 'items': {'type': 'string'}}, data)
+        errors = schema_match(OC.plugin_list, data)
         assert not errors

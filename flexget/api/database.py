@@ -12,7 +12,12 @@ log = logging.getLogger('database')
 
 db_api = api.namespace('database', description='Manage Flexget DB')
 
-plugins_schema = api.schema('plugins_list', {'type': 'array', 'items': {'type': 'string'}})
+
+class ObjectsContainer(object):
+    plugin_list = {'type': 'array', 'items': {'type': 'string'}}
+
+
+plugins_schema = api.schema('plugins_list', ObjectsContainer.plugin_list)
 
 
 @db_api.route('/cleanup/')

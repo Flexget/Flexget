@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import pkgutil
+from importlib import import_module
 from collections import deque
 from functools import wraps
 
@@ -359,4 +360,4 @@ class ApiEndopint(object):
 
 # Import API Sub Modules
 for loader, module_name, is_pkg in pkgutil.walk_packages(__path__):
-    loader.find_module(module_name).load_module(module_name)
+    import_module('.{}'.format(module_name), 'flexget.api')
