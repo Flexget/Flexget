@@ -5,7 +5,6 @@ import copy
 
 from flask import request, jsonify
 
-from flexget.manager import manager
 from flexget.plugins.daemon.scheduler import schedule_schema, scheduler, scheduler_job_map
 from flexget.api import api, APIResource, NotFoundError, APIError, base_message_schema, success_response
 
