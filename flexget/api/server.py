@@ -31,17 +31,67 @@ log = logging.getLogger('api.server')
 
 server_api = api.namespace('server', description='Manage Daemon')
 
-yaml_error_response = copy.deepcopy(base_message)
-yaml_error_response['properties']['column'] = {'type': 'integer'}
-yaml_error_response['properties']['line'] = {'type': 'integer'}
-yaml_error_response['properties']['reason'] = {'type': 'string'}
 
-config_validation_error = copy.deepcopy(base_message)
-config_validation_error['properties']['error'] = {'type': 'string'}
-config_validation_error['properties']['config_path'] = {'type': 'string'}
+class ObjectsContainer(object):
+    yaml_error_response = copy.deepcopy(base_message)
+    yaml_error_response['properties']['column'] = {'type': 'integer'}
+    yaml_error_response['properties']['line'] = {'type': 'integer'}
+    yaml_error_response['properties']['reason'] = {'type': 'string'}
 
-yaml_error_schema = api.schema('yaml_error_schema', yaml_error_response)
-config_validation_schema = api.schema('config_validation_schema', config_validation_error)
+    config_validation_error = copy.deepcopy(base_message)
+    config_validation_error['properties']['error'] = {'type': 'string'}
+    config_validation_error['properties']['config_path'] = {'type': 'string'}
+
+    pid_object = {
+        'type': 'object',
+        'properties': {
+            'pid': {'type': 'integer'}
+        }
+    }
+
+    raw_config_object = {
+        'type': 'object',
+        'properties': {
+            'raw_config': {'type': 'string'}
+        }
+    }
+
+    version_object = {
+        'type': 'object',
+        'properties': {
+            'flexget_version': {'type': 'string'},
+            'api_version': {'type': 'string'},
+            'latest_version': {'type': ['string', 'null']}
+        }
+    }
+
+    dump_threads_object = {
+        'type': 'object',
+        'properties': {
+            'threads': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'name': {'type': 'string'},
+                        'id': {'type': 'string'},
+                        'dump': {
+                            'type': 'array',
+                            'items': {'type': 'string'}
+                        }
+                    },
+                },
+            }
+        }
+    }
+
+
+yaml_error_schema = api.schema('yaml_error_schema', ObjectsContainer.yaml_error_response)
+config_validation_schema = api.schema('config_validation_schema', ObjectsContainer.config_validation_error)
+pid_schema = api.schema('server.pid', ObjectsContainer.pid_object)
+raw_config_schema = api.schema('raw_config', ObjectsContainer.raw_config_object)
+version_schema = api.schema('server.version', ObjectsContainer.version_object)
+dump_threads_schema = api.schema('server.dump_threads', ObjectsContainer.dump_threads_object)
 
 
 @server_api.route('/reload/')
@@ -73,14 +123,6 @@ class ServerReloadAPI(APIResource):
         return success_response('Config successfully reloaded from disk')
 
 
-pid_schema = api.schema('server.pid', {
-    'type': 'object',
-    'properties': {
-        'pid': {'type': 'integer'}
-    }
-})
-
-
 @server_api.route('/pid/')
 class ServerPIDAPI(APIResource):
     @api.response(200, description='Reloaded config', model=pid_schema)
@@ -110,15 +152,6 @@ class ServerConfigAPI(APIResource):
     def get(self, session=None):
         """ Get Flexget Config in JSON form"""
         return self.manager.config
-
-
-raw_config_object = {
-    'type': 'object',
-    'properties': {
-        'raw_config': {'type': 'string'}
-    }
-}
-raw_config_schema = api.schema('raw_config', raw_config_object)
 
 
 @server_api.route('/raw_config/')
@@ -182,16 +215,6 @@ class ServerRawConfigAPI(APIResource):
         return success_response('Config was loaded and successfully updated to file')
 
 
-version_schema = api.schema('server.version', {
-    'type': 'object',
-    'properties': {
-        'flexget_version': {'type': 'string'},
-        'api_version': {'type': 'integer'},
-        'latest_version': {'type': ['string', 'null']}
-    }
-})
-
-
 @server_api.route('/version/')
 @api.doc(description='In case of a request error when fetching latest flexget version, that value will return as null')
 class ServerVersionAPI(APIResource):
@@ -202,27 +225,6 @@ class ServerVersionAPI(APIResource):
         return {'flexget_version': __version__,
                 'api_version': __api_version__,
                 'latest_version': latest}
-
-
-dump_threads_schema = api.schema('server.dump_threads', {
-    'type': 'object',
-    'properties': {
-        'threads': {
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'properties': {
-                    'name': {'type': 'string'},
-                    'id': {'type': 'string'},
-                    'dump': {
-                        'type': 'array',
-                        'items': {'type': 'string'}
-                    }
-                },
-            },
-        }
-    }
-})
 
 
 @server_api.route('/dump_threads/')

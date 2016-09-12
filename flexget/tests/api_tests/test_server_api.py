@@ -9,9 +9,10 @@ from flexget.utils.tools import get_latest_flexget_version_number
 from mock import patch
 
 from flexget import __version__
-from flexget.api import __version__ as __api_version__
+from flexget.api import __version__ as __api_version__, base_message
 from flexget.manager import Manager
 from flexget.tests.conftest import MockManager
+from flexget.api.server import ObjectsContainer as OC
 
 
 class TestServerAPI(object):
@@ -24,26 +25,43 @@ class TestServerAPI(object):
               - title: entry 1
         """
 
-    def test_pid(self, api_client):
+    def test_pid(self, api_client, schema_match):
         rsp = api_client.get('/server/pid/', headers={})
         assert rsp.status_code == 200
-        assert json.loads(rsp.get_data(as_text=True)) == {'pid': os.getpid()}
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.pid_object, data)
+        assert not errors
+        assert data['pid'] == os.getpid()
 
     @patch.object(MockManager, 'load_config')
-    def test_reload(self, mocked_load_config, api_client):
+    def test_reload(self, mocked_load_config, api_client, schema_match):
         rsp = api_client.get('/server/reload/')
         assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
         assert mocked_load_config.called
 
     @patch.object(Manager, 'shutdown')
-    def test_shutdown(self, mocked_shutdown, api_client):
-        api_client.get('/server/shutdown/')
+    def test_shutdown(self, mocked_shutdown, api_client, schema_match):
+        rsp = api_client.get('/server/shutdown/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
         assert mocked_shutdown.called
 
-    def test_get_config(self, api_client):
+    def test_get_config(self, api_client, schema_match):
         rsp = api_client.get('/server/config/')
         assert rsp.status_code == 200
-        assert json.loads(rsp.get_data(as_text=True)) == {
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match({'type': 'object'}, data)
+        assert not errors
+        assert data == {
             'tasks': {
                 'test': {
                     'mock': [{'title': 'entry 1'}],
@@ -59,11 +77,15 @@ class TestServerAPI(object):
         }
 
     @pytest.mark.online
-    def test_version(self, api_client):
+    def test_version(self, api_client, schema_match):
         latest = get_latest_flexget_version_number()
 
         rsp = api_client.get('/server/version/')
         assert rsp.status_code == 200
-        assert json.loads(rsp.get_data(as_text=True)) == {'flexget_version': __version__,
-                                                          'api_version': __api_version__,
-                                                          'latest_version': latest}
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.version_object, data)
+        assert not errors
+        assert data == {'flexget_version': __version__,
+                        'api_version': __api_version__,
+                        'latest_version': latest}
