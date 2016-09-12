@@ -25,24 +25,115 @@ from flexget.utils.lazy_dict import LazyLookup
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
 
-tasks_list_api_schema = api.schema('tasks.list', {
-    "type": "array",
-    "items": {'$ref': '#/definitions/tasks.task'}
-})
 
-task_schema_validate = {
-    'type': 'object',
-    'properties': {
-        'name': {'type': 'string'},
-        'config': {'$ref': '/schema/plugins'}
-    },
-    'additionalProperties': False
-}
+class ObjectsContainer(object):
+    tasks_list_object = {
+        "type": "array",
+        "items": {'$ref': '#/definitions/tasks.task'}
+    }
 
-task_schema = copy.deepcopy(task_schema_validate)
-task_schema['properties']['config'] = {'type': 'object'}
+    task_input_object = {
+        'type': 'object',
+        'properties': {
+            'name': {'type': 'string'},
+            'config': {'$ref': '/schema/plugins'}
+        },
+        'additionalProperties': False
+    }
 
-task_api_schema = api.schema('tasks.task', task_schema)
+    task_return_object = copy.deepcopy(task_input_object)
+    task_return_object['properties']['config'] = {'type': 'object'}
+
+    task_queue_schema = {
+        'type': 'array',
+        'items': {
+            'type': 'object',
+            'properties': {
+                'id': {'type': 'integer'},
+                'name': {'type': 'string'},
+                'current_phase': {'type': 'string'},
+                'current_plugin': {'type': 'string'},
+            }}
+    }
+
+    task_execution_results_schema = {
+        'type': 'object',
+        'properties': {
+            'task': {
+                'type': 'object',
+                'properties': {
+                    'id': {'type': 'integer'},
+                    'name': {'type': 'string'},
+                    'stream': {
+                        'type': 'array',
+                        'items': {
+                            'progress': {
+                                'type': 'object',
+                                'properties': {
+                                    'status': {'type': 'string', 'enum': ['pending', 'running', 'complete']},
+                                    'phase': {'type': 'string', 'enum': task_phases},
+                                    'plugin': {'type': 'string'},
+                                    'percent': {'type': 'float'}
+                                }
+                            },
+                            'summary': {
+                                'type': 'object',
+                                'properties': {
+                                    'accepted': {'type': 'integer'},
+                                    'rejected': {'type': 'integer'},
+                                    'failed': {'type': 'integer'},
+                                    'undecided': {'type': 'integer'},
+                                    'aborted': {'type': 'boolean'},
+                                    'abort_reason': {'type': 'string'},
+                                }
+                            },
+                            'entry_dump': {'type': 'array', 'items': {'type': 'object'}},
+                            'log': {'type': 'string'}
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    inject_input = {
+        'type': 'object',
+        'properties': {
+            'title': {'type': 'string'},
+            'url': {'type': 'string', 'format': 'url'},
+            'force': {'type': 'boolean'},
+            'accept': {'type': 'boolean'},
+            'fields': {'type': 'object'}
+        },
+        'required': ['url']
+    }
+
+    task_execution_input = {
+        'type': 'object',
+        'properties': {
+            'tasks': {'type': "array",
+                      'items': {'type': 'string'},
+                      'minItems': 1,
+                      'uniqueItems': True},
+            'progress': {'type': 'boolean', 'default': True},
+            'summary': {'type': 'boolean', 'default': True},
+            'entry_dump': {'type': 'boolean', 'default': True},
+            'inject': {'type': 'array',
+                       'items': inject_input},
+            'loglevel': {'type': "string",
+                         "enum": ['critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace']}
+        },
+        'required': ['tasks']
+
+    }
+
+
+tasks_list_schema = api.schema('tasks.list', ObjectsContainer.tasks_list_object)
+task_input_schema = api.schema('tasks.task', ObjectsContainer.task_input_object)
+task_return_schema = api.schema('tasks.task', ObjectsContainer.task_return_object)
+task_api_queue_schema = api.schema('task.queue', ObjectsContainer.task_queue_schema)
+task_api_execute_schema = api.schema('task.execution', ObjectsContainer.task_execution_results_schema)
+task_execution_schema = api.schema('task_execution_input', ObjectsContainer.task_execution_input)
 
 task_api_desc = 'Task config schema too large to display, you can view the schema using the schema API'
 
@@ -50,7 +141,7 @@ task_api_desc = 'Task config schema too large to display, you can view the schem
 @tasks_api.route('/')
 @api.doc(description=task_api_desc)
 class TasksAPI(APIResource):
-    @api.response(200, model=tasks_list_api_schema)
+    @api.response(200, model=tasks_list_schema)
     def get(self, session=None):
         """ List all tasks """
         tasks = []
@@ -58,8 +149,8 @@ class TasksAPI(APIResource):
             tasks.append({'name': name, 'config': config})
         return jsonify(tasks)
 
-    @api.validate(task_api_schema, schema_override=task_schema_validate, description='New task object')
-    @api.response(201, description='Newly created task', model=task_api_schema)
+    @api.validate(task_input_schema, description='New task object')
+    @api.response(201, description='Newly created task', model=task_return_schema)
     @api.response(CannotAddResource)
     @api.response(APIError)
     def post(self, session=None):
@@ -77,7 +168,7 @@ class TasksAPI(APIResource):
             self.manager.config['tasks'] = {}
 
         task_schema_processed = copy.deepcopy(data)
-        errors = process_config(task_schema_processed, schema=task_api_schema.__schema__, set_defaults=True)
+        errors = process_config(task_schema_processed, schema=task_input_schema.__schema__, set_defaults=True)
 
         if errors:
             raise APIError('problem loading config, raise a BUG as this should not happen!')
@@ -93,7 +184,7 @@ class TasksAPI(APIResource):
 @tasks_api.route('/<task>/')
 @api.doc(params={'task': 'task name'}, description=task_api_desc)
 class TaskAPI(APIResource):
-    @api.response(200, model=task_api_schema)
+    @api.response(200, model=task_return_schema)
     @api.response(NotFoundError, description='task not found')
     @api.response(APIError, description='unable to read config')
     def get(self, task, session=None):
@@ -103,9 +194,9 @@ class TaskAPI(APIResource):
 
         return {'name': task, 'config': self.manager.user_config['tasks'][task]}
 
-    @api.validate(task_api_schema, schema_override=task_schema_validate)
-    @api.response(200, model=task_api_schema)
-    @api.response(201, description='renamed task', model=task_api_schema)
+    @api.validate(task_input_schema)
+    @api.response(200, model=task_return_schema)
+    @api.response(201, description='renamed task', model=task_return_schema)
     @api.response(NotFoundError)
     @api.response(BadRequest)
     def put(self, task, session=None):
@@ -134,7 +225,7 @@ class TaskAPI(APIResource):
 
         # Process the task config
         task_schema_processed = copy.deepcopy(data)
-        errors = process_config(task_schema_processed, schema=task_api_schema.__schema__, set_defaults=True)
+        errors = process_config(task_schema_processed, schema=task_return_schema.__schema__, set_defaults=True)
 
         if errors:
             raise APIError('problem loading config, raise a BUG as this should not happen!')
@@ -169,95 +260,6 @@ def _task_info_dict(task):
         'current_phase': task.current_phase,
         'current_plugin': task.current_plugin,
     }
-
-
-task_queue_schema = {
-    'type': 'array',
-    'items': {
-        'type': 'object',
-        'properties': {
-            'id': {'type': 'integer'},
-            'name': {'type': 'string'},
-            'current_phase': {'type': 'string'},
-            'current_plugin': {'type': 'string'},
-        }}
-}
-
-task_execution_results_schema = {
-    'type': 'object',
-    'properties': {
-        'task': {
-            'type': 'object',
-            'properties': {
-                'id': {'type': 'integer'},
-                'name': {'type': 'string'},
-                'stream': {
-                    'type': 'array',
-                    'items': {
-                        'progress': {
-                            'type': 'object',
-                            'properties': {
-                                'status': {'type': 'string', 'enum': ['pending', 'running', 'complete']},
-                                'phase': {'type': 'string', 'enum': task_phases},
-                                'plugin': {'type': 'string'},
-                                'percent': {'type': 'float'}
-                            }
-                        },
-                        'summary': {
-                            'type': 'object',
-                            'properties': {
-                                'accepted': {'type': 'integer'},
-                                'rejected': {'type': 'integer'},
-                                'failed': {'type': 'integer'},
-                                'undecided': {'type': 'integer'},
-                                'aborted': {'type': 'boolean'},
-                                'abort_reason': {'type': 'string'},
-                            }
-                        },
-                        'entry_dump': {'type': 'array', 'items': {'type': 'object'}},
-                        'log': {'type': 'string'}
-                    }
-                }
-            }
-        }
-    }
-}
-
-inject_input = {
-    'type': 'object',
-    'properties': {
-        'title': {'type': 'string'},
-        'url': {'type': 'string', 'format': 'url'},
-        'force': {'type': 'boolean'},
-        'accept': {'type': 'boolean'},
-        'fields': {'type': 'object'}
-    },
-    'required': ['url']
-}
-
-task_execution_input = {
-    'type': 'object',
-    'properties': {
-        'tasks': {'type': "array",
-                  'items': {'type': 'string'},
-                  'minItems': 1,
-                  'uniqueItems': True},
-        'progress': {'type': 'boolean', 'default': True},
-        'summary': {'type': 'boolean', 'default': True},
-        'entry_dump': {'type': 'boolean', 'default': True},
-        'inject': {'type': 'array',
-                   'items': inject_input},
-        'loglevel': {'type': "string",
-                     "enum": ['critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace']}
-    },
-    'required': ['tasks']
-
-}
-
-task_api_queue_schema = api.schema('task.queue', task_queue_schema)
-task_api_execute_schema = api.schema('task.execution', task_execution_results_schema)
-
-task_execution_schema = api.schema('task_execution_input', task_execution_input)
 
 
 @tasks_api.route('/queue/')
@@ -400,7 +402,7 @@ def setup_params(mgr):
             continue
         if isinstance(action, argparse._StoreConstAction) and action.help != '==SUPPRESS==':
             name = name.replace('-', '_')
-            task_execution_input['properties'][name] = {'type': 'boolean'}
+            ObjectsContainer.task_execution_input['properties'][name] = {'type': 'boolean'}
             TaskExecutionAPI.__apidoc__['description'] += "'{0}': {1}<br>".format(name, action.help)
 
 
