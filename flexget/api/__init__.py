@@ -75,7 +75,7 @@ class ApiSchemaModel(Model):
         return '<ApiSchemaModel(%r)>' % self._schema
 
 
-class Api(RestPlusAPI):
+class API(RestPlusAPI):
     """
     Extends a flask restplus :class:`flask_restplus.Api` with:
       - methods to make using json schemas easier
@@ -119,7 +119,7 @@ class Api(RestPlusAPI):
             model.__parent__ = parent
             self.models[name] = model
             return model
-        return super(Api, self).inherit(name, parent, fields)
+        return super(API, self).inherit(name, parent, fields)
 
     def validate(self, model, schema_override=None, description=None):
         """
@@ -161,7 +161,7 @@ class Api(RestPlusAPI):
         except TypeError:
             # If first argument isn't a class this happens
             pass
-        return super(Api, self).response(code_or_apierror, description, model=model, **kwargs)
+        return super(API, self).response(code_or_apierror, description, model=model, **kwargs)
 
 
 class APIResource(Resource):
@@ -181,7 +181,7 @@ app.config['ERROR_404_HELP'] = False
 CORS(app)
 Compress(app)
 
-api = Api(
+api = API(
     app,
     title='API',
     version=__version__,
