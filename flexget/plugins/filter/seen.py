@@ -307,25 +307,7 @@ def db_cleanup(manager, session):
 
 
 @with_session
-def add(title, task_name, fields, reason=None, local=None, session=None):
-    """
-    Adds seen entries to DB
-    :param title: name of title to be added
-    :param task_name: name of task to be added
-    :param fields: Dict of fields to be added to seen object
-    :return: Seen Entry object as committed to DB
-    """
-    se = SeenEntry(title, task_name, reason, local)
-    for field, value in list(fields.items()):
-        sf = SeenField(field, value)
-        se.fields.append(sf)
-    session.add(se)
-    session.commit()
-    return se.to_dict()
-
-
-@with_session
-def search(value=None, status=None, start=None, stop=None, count=False, order_by='added', descending=False,
+def search(value=None, status=None, start=None, stop=None, order_by='added', descending=False,
            session=None):
     query = session.query(SeenEntry)
     if descending:
@@ -337,8 +319,6 @@ def search(value=None, status=None, start=None, stop=None, count=False, order_by
         query = query.filter(SeenField.value.like(value))
     if status is not None:
         query = query.filter(SeenEntry.local == status)
-    if count:
-        return query.count()
     query = query.slice(start, stop).from_self()
     return query
 
@@ -346,6 +326,7 @@ def search(value=None, status=None, start=None, stop=None, count=False, order_by
 @with_session
 def get_entry_by_id(entry_id, session=None):
     return session.query(SeenEntry).filter(SeenEntry.id == entry_id).one()
+
 
 @with_session
 def forget_by_id(entry_id, session=None):

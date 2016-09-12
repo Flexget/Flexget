@@ -1,102 +1,69 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-from mock import patch
-
 from flexget.manager import Session
-from flexget.plugins.filter import seen
+from flexget.plugins.api.seen import ObjectsContainer as OC
 from flexget.plugins.filter.seen import SeenEntry, SeenField
 from flexget.utils import json
 
 
 class TestSeenAPI(object):
-    config = 'tasks: {}'
+    config = "{'tasks': {}}"
 
-    @patch.object(seen, 'search')
-    def test_seen_get(self, mock_seen_search, api_client):
-
-        def search(*args, **kwargs):
-            if 'count' in kwargs:
-                return 0
-            else:
-                with Session() as session:
-                    return session.query(SeenEntry).join(SeenField)
-
-        mock_seen_search.side_effect = search
-
-        # No params
+    def test_seen_get_all(self, api_client, schema_match):
         rsp = api_client.get('/seen/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
 
-        # Default params
-        rsp = api_client.get('/seen/?page=1&max=100&local_seen=true&sort_by=added&order=desc')
+        errors = schema_match(OC.seen_search_object, data)
+        assert not errors
+
+        seen_entry_1 = dict(title='test_title', reason='test_reason', task='test_task')
+        field_1 = dict(field='test_field_1', value='test_value_1')
+        field_2 = dict(field='test_field_2', value='test_value_2')
+        seen_entry_2 = dict(title='test_title_2', reason='test_reason_2', task='test_task_2', local=True)
+        field_3 = dict(field='test_field_3', value='test_value_3')
+        field_4 = dict(field='test_field_4', value='test_value_4')
+
+        entries = sorted([seen_entry_1, seen_entry_2], key=lambda entry: entry['title'])
+
+        with Session() as session:
+            seen_db_1 = SeenEntry(**seen_entry_1)
+            seen_db_1.fields = [SeenField(**field_1), SeenField(**field_2)]
+            session.add(seen_db_1)
+            seen_db_2 = SeenEntry(**seen_entry_2)
+            seen_db_2.fields = [SeenField(**field_3), SeenField(**field_4)]
+            session.add(seen_db_2)
+            session.commit()
+
+        rsp = api_client.get('/seen/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
 
-        # Changed params
-        rsp = api_client.get('/seen/?max=1000&local_seen=false&sort_by=title&order=asc')
+        errors = schema_match(OC.seen_search_object, data)
+        assert not errors
+
+        for idx, value in enumerate(sorted(data['seen_entries'], key=lambda entry: entry['title'])):
+            for k, v in entries[idx].items():
+                assert value[k] == v
+
+        assert data['total_number_of_seen_entries'] == len(data['seen_entries']) == 2
+
+        rsp = api_client.get('/seen/?local=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
 
-        # Negative test, invalid parameter
-        rsp = api_client.get('/seen/?max=1000&local_seen=BLA&sort_by=title &order=asc')
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        errors = schema_match(OC.seen_search_object, data)
+        assert not errors
 
-        # With value
-        rsp = api_client.get('/seen/?value=bla')
+        assert data['total_number_of_seen_entries'] == len(data['seen_entries']) == 1
+
+        rsp = api_client.get('/seen/?value=test_value_2')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
 
-        assert mock_seen_search.call_count == 8, 'Should have 8 calls, is actually %s' % mock_seen_search.call_count
+        errors = schema_match(OC.seen_search_object, data)
+        assert not errors
 
-    @patch.object(seen, 'get_entry_by_id')
-    def test_delete_seen_entry(self, mock_forget, api_client):
-        rsp = api_client.delete('/seen/1234/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_forget.called
-
-    def test_seen_add(self, execute_task, api_client):
-        fields = {
-            'url': 'http://test.com/file.torrent',
-            'title': 'Test.Title',
-            'torrent_hash_id': 'dsfgsdfg34tq34tq34t'
-        }
-        entry = {
-            'local': False,
-            'reason': 'test_reason',
-            'task': 'test_task',
-            'title': 'Test.Title',
-            'fields': fields
-        }
-
-        rsp = api_client.json_post('/seen/', data=json.dumps(entry))
-        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
-
-    @patch.object(seen, 'search')
-    def test_seen_delete_all(self, mock_seen_search, api_client):
-        session = Session()
-        entry_list = session.query(SeenEntry).join(SeenField)
-        mock_seen_search.return_value = entry_list
-
-        # No params
-        rsp = api_client.delete('/seen/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-
-        fields = {
-            'url': 'http://test.com/file.torrent',
-            'title': 'Test.Title',
-            'torrent_hash_id': 'dsfgsdfg34tq34tq34t'
-        }
-        entry = {
-            'local': False,
-            'reason': 'test_reason',
-            'task': 'test_task',
-            'title': 'Test.Title',
-            'fields': fields
-        }
-
-        rsp = api_client.json_post('/seen/', data=json.dumps(entry))
-        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
-
-        # With value
-        rsp = api_client.delete('/seen/?value=Test.Title')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-
-        assert mock_seen_search.call_count == 2, 'Should have 2 calls, is actually %s' % mock_seen_search.call_count
+        assert data['total_number_of_seen_entries'] == len(data['seen_entries']) == 1
