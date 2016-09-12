@@ -32,6 +32,7 @@ def _schedule_by_id(schedule_id, schedules):
             schedule = schedule.copy()
             schedule['id'] = schedule_id
             return schedule, idx
+    return None, None
 
 
 schedule_desc = "Schedule ID changes upon daemon restart. The schedules object supports either interval or schedule" \
@@ -126,6 +127,7 @@ class ScheduleAPI(APIResource):
         if not schedule:
             raise NotFoundError('schedule %d not found' % schedule_id)
 
+        new_schedule['id'] = id(schedule)
         self.manager.config['schedules'][idx] = new_schedule
 
         self.manager.save_config()
