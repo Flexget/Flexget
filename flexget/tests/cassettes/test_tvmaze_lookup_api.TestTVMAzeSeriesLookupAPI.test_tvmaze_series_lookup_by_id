@@ -27,30 +27,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 12 Sep 2016 13:22:52 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.24.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/13/episodebynumber?season=1&number=1
-  response:
-    body: {string: !!python/unicode '{"id":592,"url":"http://www.tvmaze.com/episodes/592/the-flash-1x01-city-of-heroes","name":"City
-        of Heroes","season":1,"number":1,"airdate":"2014-10-07","airtime":"20:00","airstamp":"2014-10-07T20:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/0/1167.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1167.jpg"},"summary":"<p>Barry
-        discovers his powers and puts them to the test, only when he finds its no
-        longer a test but the real thing when he encounters a certain someone.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/592"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 12 Sep 2016 13:22:52 GMT']
+      date: ['Mon, 12 Sep 2016 13:27:57 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.19]
     status: {code: 200, message: OK}

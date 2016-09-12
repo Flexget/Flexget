@@ -20,7 +20,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 12 Sep 2016 13:22:50 GMT']
+      date: ['Mon, 12 Sep 2016 13:27:56 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.19]
     status: {code: 200, message: OK}
@@ -40,7 +40,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
       content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 12 Sep 2016 13:22:50 GMT']
+      date: ['Mon, 12 Sep 2016 13:27:56 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.19]
     status: {code: 404, message: Not Found}
