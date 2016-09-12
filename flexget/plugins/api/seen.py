@@ -169,5 +169,5 @@ class SeenSearchIDAPI(APIResource):
             entry = seen.get_entry_by_id(seen_entry_id, session=session)
         except NoResultFound:
             raise NotFoundError('Could not delete entry ID {0}'.format(seen_entry_id))
-        entry.delete()
+        forget_by_id(entry.id, session=session)
         return success_response('successfully deleted seen entry {}'.format(seen_entry_id))

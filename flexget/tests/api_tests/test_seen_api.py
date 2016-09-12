@@ -134,3 +134,49 @@ class TestSeenAPI(object):
         assert not errors
 
         assert data['seen_entries'] == []
+
+    def test_seen_get_by_id(self, api_client, schema_match):
+        entries = self.add_seen_entries()
+
+        rsp = api_client.get('/seen/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.seen_object, data)
+        assert not errors
+
+        for key, value in entries[0].items():
+            assert data[key] == value
+
+        rsp = api_client.get('/seen/10/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+    def test_seen_get_delete_id(self, api_client, schema_match):
+        self.add_seen_entries()
+
+        rsp = api_client.delete('/seen/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.get('/seen/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.seen_search_object, data)
+        assert not errors
+
+        assert len(data['seen_entries']) == 1
+
+        rsp = api_client.delete('/seen/10/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
