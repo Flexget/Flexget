@@ -11,13 +11,6 @@ tvmaze_api = api.namespace('tvmaze', description='TVMaze Shows')
 
 
 class ObjectsContainer(object):
-    default_error_schema = {
-        'type': 'object',
-        'properties': {
-            'status': {'type': 'string'},
-            'message': {'type': 'string'}
-        }
-    }
 
     actor_object = {
         'type': 'object',
@@ -27,7 +20,7 @@ class ObjectsContainer(object):
             "name": {'type': 'string'},
             "original_image": {'type': 'string'},
             "tvmaze_id": {'type': 'integer'},
-            "url": {'type': 'string'},
+            "url": {'type': 'string'}
         }
     }
 
@@ -59,7 +52,7 @@ class ObjectsContainer(object):
             'premiered': {'type': 'string', 'format': 'date-time'},
             'year': {'type': 'integer'},
             'summary': {'type': 'string'},
-            'webchannel': {'type': 'string'},
+            'webchannel': {'type': ['string', 'null']},
             'runtime': {'type': 'integer'},
             'show_type': {'type': 'string'},
             'network': {'type': 'string'},
@@ -77,10 +70,10 @@ class ObjectsContainer(object):
             'title': {'type': 'string'},
             'airdate': {'type': 'string', 'format': 'date-time'},
             'url': {'type': 'string'},
-            'original_image': {'type': 'string'},
-            'medium_image': {'type': 'string'},
+            'original_image': {'type': ['string', 'null']},
+            'medium_image': {'type': ['string', 'null']},
             'airstamp': {'type': 'string', 'format': 'date-time'},
-            'runtime': {'type': 'string'},
+            'runtime': {'type': 'integer'},
             'summary': {'type': 'string'},
             'last_update': {'type': 'string', 'format': 'date-time'}
         }
@@ -103,12 +96,12 @@ class TVDBSeriesSearchApi(APIResource):
             tvmaze_id = None
         try:
             if tvmaze_id:
-                result = tvm.series_lookup(tvmaze_id=tvmaze_id, session=session)
+                series = tvm.series_lookup(tvmaze_id=tvmaze_id, session=session)
             else:
-                result = tvm.series_lookup(series_name=title, session=session)
+                series = tvm.series_lookup(series_name=title, session=session)
         except LookupError as e:
             raise NotFoundError(e.args[0])
-        return jsonify(result.to_dict())
+        return jsonify(series.to_dict())
 
 
 episode_parser = api.parser()

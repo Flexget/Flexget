@@ -1,0 +1,47 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.3.24.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
+  response:
+    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
+        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
+        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":5,"network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
+        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
+        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1472402236,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Mon, 12 Sep 2016 13:22:50 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.3.24.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=sdfgv35wvg23vg2
+  response:
+    body: {string: !!python/unicode ''}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Mon, 12 Sep 2016 13:22:50 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
+    status: {code: 404, message: Not Found}
+version: 1
