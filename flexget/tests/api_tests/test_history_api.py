@@ -1,7 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from datetime import datetime
-from flexget.api import base_message
 
 from flexget.manager import Session
 from flexget.plugins.output.history import History
@@ -22,21 +20,14 @@ class TestHistoryAPI(object):
 
         assert data['entries'] == []
 
-        history_entry_1 = dict(task='test_task1', title='test_title1', url='test_url1', filename='test_filename1',
-                               details='test_details1')
-        history_entry_2 = dict(task='test_task2', title='test_title2', url='test_url1', filename='test_filename1',
-                               details='test_details1')
-
-        history_entries = [history_entry_1, history_entry_2]
+        history_entry = dict(task='test_task1', title='test_title1', url='test_url1', filename='test_filename1',
+                             details='test_details1')
 
         with Session() as session:
-            item1 = History()
-            item2 = History()
-            for key, value in history_entry_1.items():
-                setattr(item1, key, value)
-            for key, value in history_entry_2.items():
-                setattr(item2, key, value)
-            session.bulk_save_objects([item1, item2])
+            item = History()
+            for key, value in history_entry.items():
+                setattr(item, key, value)
+            session.add(item)
             session.commit()
 
         rsp = api_client.get('/history/')
@@ -46,6 +37,5 @@ class TestHistoryAPI(object):
         errors = schema_match(OC.history_list_object, data)
         assert not errors
 
-        for idx, entry in enumerate(history_entries):
-            for key, value in entry.items():
-                assert data['entries'][idx][key] == history_entries[idx][key]
+        for key, value in history_entry.items():
+            assert data['entries'][0][key] == value
