@@ -28,7 +28,7 @@ class ObjectsContainer(object):
             'name': {'type': 'string'},
             'api_ver': {'type': 'integer'},
             'builtin': {'type': 'boolean'},
-            'category': {'type': 'string'},
+            'category': {'type': ['string', 'null']},
             'contexts': {'type': 'array', 'items': {'type': 'string'}},
             'debug': {'type': 'boolean'},
             'groups': {'type': 'array', 'items': {'type': 'string'}},
