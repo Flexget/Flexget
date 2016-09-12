@@ -109,3 +109,38 @@ class TestScheduledAPI(object):
 
         del data['id']
         assert data == payload
+
+        rsp = api_client.json_put('/schedules/1011/', data=json.dumps(payload))
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+    @patch.object(Manager, 'save_config')
+    def test_schedules_id_delete(self, mocked_save_config, api_client, schema_match):
+        # Get schedules to get their IDs
+        rsp = api_client.get('/schedules/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.schedules_list, data)
+        assert not errors
+
+        schedule_id = data[0]['id']
+
+        rsp = api_client.delete('/schedules/{}/'.format(schedule_id))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+        assert mocked_save_config.called
+
+        rsp = api_client.delete('/schedules/111/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+        assert mocked_save_config.called
