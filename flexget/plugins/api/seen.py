@@ -144,10 +144,8 @@ class SeenSearchAPI(APIResource):
 
         deleted = 0
         for se in seen_entries_list:
-            try:
-                forget_by_id(se.id, session=session)
-            except NoResultFound:
-                raise NotFoundError('Error, could not delete seen entry with id {}'.format(se.id))
+            forget_by_id(se.id, session=session)
+            deleted += 1
         return success_response('successfully deleted %i entries' % deleted)
 
 
