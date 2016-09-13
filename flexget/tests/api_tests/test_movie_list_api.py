@@ -1,9 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import copy
+
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flexget.utils import json
 
-from flexget.api import empty_response
+from flexget.api import empty_response, base_message
 from flexget.plugins.api.movie_list import ObjectsContainer as OC
 
 
@@ -194,3 +197,54 @@ class TestMovieListAPI(object):
         # Delete non existent movie from list
         rsp = api_client.delete('/movie_list/1/movies/1/')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+
+class TestMovieListUseCases(object):
+    config = 'tasks: {}'
+
+    def test_adding_same_movie(self, api_client, schema_match):
+        payload = {'name': 'test'}
+
+        # Create list
+        rsp = api_client.json_post('/movie_list/', data=json.dumps(payload))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(OC.list_object, data)
+        assert not errors
+
+        movie = {'movie_name': 'test movie',
+                 'movie_year': 2000}
+
+        # Add movie to list
+        rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(OC.movie_list_object, data)
+        assert not errors
+
+        # Try to add it again
+        rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie))
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        movie_2 = copy.deepcopy(movie)
+        movie_2['movie_year'] = 1999
+
+        # Add same movie name, different year
+        rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie_2))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(OC.movie_list_object, data)
+        assert not errors
+
+        movie_3 = copy.deepcopy(movie)
+        del movie_3['movie_year']
+
+        # Add same movie, no year
+        rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie_3))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors

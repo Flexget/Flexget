@@ -232,7 +232,7 @@ class MovieListMoviesAPI(APIResource):
             if set(id_name.keys()) & set(MovieListBase().supported_ids) == set([]):
                 raise BadRequest('movie identifier %s is not allowed' % id_name)
         title, year = data['movie_name'], data.get('movie_year')
-        movie = ml.get_movie_by_title(list_id=list_id, title=title, session=session)
+        movie = ml.get_movie_by_title_and_year(list_id=list_id, title=title, year=year, session=session)
         if movie:
             raise CannotAddResource('movie with name "%s" already exist in list %d' % (title, list_id))
         movie = ml.MovieListMovie()

@@ -13,7 +13,7 @@ from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
 from flexget.plugin import PluginError
 from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
-    get_movie_by_title, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase
+    get_movie_by_title_and_year, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase
 from flexget.plugins.metainfo.imdb_lookup import ImdbLookup
 from flexget.plugins.metainfo.tmdb_lookup import PluginTmdbLookup
 from flexget.utils.tools import split_title_year
@@ -128,7 +128,7 @@ def movie_list_add(options):
             console('movie lookup failed for movie %s, aborting')
             return
         title = entry['movie_name']
-        movie = get_movie_by_title(list_id=movie_list.id, title=title, session=session)
+        movie = get_movie_by_title_and_year(list_id=movie_list.id, title=title, session=session)
         if not movie:
             console("Adding movie with title {} to list {}".format(title, movie_list.name))
             movie = MovieListMovie(title=entry['movie_name'], year=year, list_id=movie_list.id)
@@ -161,7 +161,7 @@ def movie_list_del(options):
             console('Could not find movie list with name {}'.format(options.list_name))
             return
         title = split_title_year(options.movie_title)[0]
-        movie_exist = get_movie_by_title(list_id=movie_list.id, title=title, session=session)
+        movie_exist = get_movie_by_title_and_year(list_id=movie_list.id, title=title, session=session)
         if movie_exist:
             console('Removing movie %s from list %s' % (options.movie_title, options.list_name))
             session.delete(movie_exist)
