@@ -1,7 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 
-import hashlib
-
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import json
@@ -27,6 +25,7 @@ from flexget.event import event
 from flexget.utils.database import with_session
 from flexget.webserver import User
 from flexget.webserver import register_app, get_secret
+from werkzeug.http import generate_etag
 
 CORE_ENDPOINTS = 'core_endpoints'
 
@@ -48,7 +47,7 @@ def etag(f):
         assert request.method in ['HEAD', 'GET'], '@etag is only supported for GET requests'
         rv = f(*args, **kwargs)
         rv = make_response(rv)
-        etag = hashlib.md5(rv.get_data()).hexdigest()
+        etag = generate_etag(rv.get_data())
         rv.headers['Cache-Control'] = 'max-age=86400'
         rv.headers['ETag'] = etag
         if_match = request.headers.get('If-Match')
