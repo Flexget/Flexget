@@ -67,8 +67,8 @@ class ObjectsContainer(object):
     begin_object = {
         'type': 'object',
         'properties': {
-            'episode_id': {'type': 'integer'},
-            'episode_identifier': {'type': 'string'}
+            'episode_id': {'type': ['integer', 'null']},
+            'episode_identifier': {'type': ['string', 'null']}
         }
     }
 
@@ -111,10 +111,10 @@ class ObjectsContainer(object):
     latest_object = {
         'type': 'object',
         'properties': {
-            'episode_id': {'type': 'integer'},
-            'episode_identifier': {'type': 'string'},
-            'episode_age': {'type': 'string'},
-            'number_of_episodes_behind': {'type': 'integer'},
+            'episode_id': {'type': ['integer', 'null']},
+            'episode_identifier': {'type': ['string', 'null']},
+            'episode_age': {'type': ['string', 'null']},
+            'number_of_episodes_behind': {'type': ['integer', 'null']},
             'downloaded_releases': {
                 'type': 'array',
                 'items': release_object
@@ -312,7 +312,7 @@ ep_identifier_doc = "'episode_identifier' should be one of SxxExx, integer or da
 
 
 @series_api.route('/')
-class SeriesListAPI(APIResource):
+class SeriesAPI(APIResource):
     @api.response(200, 'Series list retrieved successfully', series_list_schema)
     @api.response(NotFoundError)
     @api.doc(parser=series_list_parser, description="Get a  list of Flexget's shows in DB")
