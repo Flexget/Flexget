@@ -82,8 +82,8 @@ class PluginTmdbLookup(object):
 
     @property
     def movie_identifier(self):
-        """Returns the plugin main identifier type"""
-        return 'tmdb_id'
+        """Returns the plugin main identifier type and schema"""
+        return 'tmdb_id', 'integer'
 
 
 @event('plugin.register')
