@@ -5,7 +5,7 @@ import sys
 import copy
 import random
 import string
-from argparse import ArgumentParser as ArgParser
+from argparse import ArgumentParser as ArgParser, _UNRECOGNIZED_ARGS_ATTR
 from argparse import (_VersionAction, Action, ArgumentError, Namespace, PARSER, REMAINDER, SUPPRESS,
                       _SubParsersAction)
 
@@ -207,6 +207,9 @@ class NestedSubparserAction(_SubParsersAction):
                 setattr(namespace, self.dest, parser_name)
                 delattr(subnamespace, self.dest)
             setattr(namespace, parser_name, subnamespace)
+            # Propagate unrecognized arguments back to parent namespace
+            vars(namespace).setdefault(_UNRECOGNIZED_ARGS_ATTR, [])
+            getattr(namespace, _UNRECOGNIZED_ARGS_ATTR).extend(getattr(subnamespace, _UNRECOGNIZED_ARGS_ATTR))
         else:
             super(NestedSubparserAction, self).__call__(parser, namespace, values, option_string)
 
