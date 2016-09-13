@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import json
 
 from flexget.api import base_message
-from flexget.api.tasks import ObjectsContainer as OC
+from flexget.api.core_endpoints.tasks import ObjectsContainer as OC
 
 
 class TestExecuteAPI(object):

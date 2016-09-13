@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import hashlib
+
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import json
@@ -10,6 +13,7 @@ from collections import deque
 from functools import wraps
 
 from flask import Flask, request, jsonify
+from flask.helpers import make_response
 from flask_cors import CORS
 from flask_compress import Compress
 from flask_restplus import Api as RestPlusAPI
@@ -24,6 +28,8 @@ from flexget.utils.database import with_session
 from flexget.webserver import User
 from flexget.webserver import register_app, get_secret
 
+CORE_ENDPOINTS = 'core_endpoints'
+
 __version__ = '0.6-beta'
 
 log = logging.getLogger('api')
@@ -33,6 +39,36 @@ api_config_schema = {
     'type': 'boolean',
     'additionalProperties': False
 }
+
+
+def etag(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+
+        # Identify if this is a GET or HEAD in order to proceed
+        assert request.method in ['HEAD', 'GET'], '@etag is only supported for GET requests'
+        rv = f(*args, **kwargs)
+        rv = make_response(rv)
+        etag = '"' + hashlib.md5(rv.get_data()).hexdigest() + '"'
+        rv.headers['Cache-Control'] = 'max-age=86400'
+        rv.headers['ETag'] = etag
+        if_match = request.headers.get('If-Match')
+        if_none_match = request.headers.get('If-None-Match')
+
+        # Rock'n'Roll
+        if if_match:
+            etag_list = [tag.strip() for tag in if_match.split(',')]
+            if etag not in etag_list and '*' not in etag_list:
+                rv = PreconditionFailed
+        elif if_none_match:
+            etag_list = [tag.strip() for tag in if_none_match.split(',')]
+            if etag in etag_list or '*' in etag_list:
+                rv = NotModifed
+
+        # Sends back the result
+        return rv
+
+    return wrapped
 
 
 @with_session
@@ -239,6 +275,16 @@ class CannotAddResource(APIError):
     description = 'Conflict'
 
 
+class PreconditionFailed(APIError):
+    status_code = 412
+    description = 'Precondition failed'
+
+
+class NotModifed(APIError):
+    status_code = 304
+    description = 'not modified'
+
+
 class ValidationError(APIError):
     status_code = 422
     description = 'Validation error'
@@ -359,5 +405,5 @@ class ApiEndopint(object):
 
 
 # Import API Sub Modules
-for loader, module_name, is_pkg in pkgutil.walk_packages(__path__):
-    import_module('.{}'.format(module_name), 'flexget.api')
+for loader, module_name, is_pkg in pkgutil.walk_packages([os.path.join(__path__[0], CORE_ENDPOINTS)]):
+    import_module('.{}'.format(module_name), 'flexget.api.{}'.format(CORE_ENDPOINTS))
