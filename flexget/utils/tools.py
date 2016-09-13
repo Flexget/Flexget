@@ -525,3 +525,27 @@ def trim_dir(directory):
     file_name = os.path.join(directory, files[0])
     log.debug('removing least accessed file: %s', file_name)
     os.remove(file_name)
+
+
+def parse_episode_identifier(ep_id):
+    """
+    Parses series episode identifier, raises ValueError if it fails
+
+    :param ep_id: Value to parse
+    :return: Return identifier type: `sequence`, `ep` or `date`
+    :raises ValueError: If ep_id does not match any valid types
+    """
+    if isinstance(ep_id, int):
+        identified_by = 'sequence'
+    elif re.match(r'(?i)^S\d{1,4}E\d{1,3}$', ep_id):
+        identified_by = 'ep'
+    elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
+        identified_by = 'date'
+    else:
+        # Check if a sequence identifier was passed as a string
+        try:
+            ep_id = int(ep_id)
+            identified_by = 'sequence'
+        except ValueError:
+            raise ValueError('`%s` is not a valid episode identifier' % ep_id)
+    return identified_by

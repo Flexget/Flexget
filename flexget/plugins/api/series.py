@@ -191,7 +191,7 @@ class ObjectsContainer(object):
     series_edit_object = {
         'type': 'object',
         'properties': {
-            'episode_identifier': {'type': 'string'},
+            'episode_identifier': {'type': 'string', 'format': 'episode_identifier'},
             'alternate_names': {'type': 'array', 'items': {'type': 'string'}}
         },
         'anyOf': [

@@ -26,7 +26,7 @@ from flexget.utils.database import quality_property, with_session
 from flexget.utils.log import log_once
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
-from flexget.utils.tools import merge_dict_from_to, parse_timedelta
+from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_episode_identifier
 
 SCHEMA_VER = 13
 
@@ -226,7 +226,6 @@ def normalize_series_name(name):
 
 
 class NormalizedComparator(Comparator):
-
     def operate(self, op, other):
         return op(self.__clause_element__(), normalize_series_name(other))
 
@@ -350,7 +349,7 @@ class Episode(Base):
         """
         if not self.first_seen:
             return None
-        return  datetime.now() - self.first_seen
+        return datetime.now() - self.first_seen
 
     @property
     def is_premiere(self):
@@ -700,20 +699,9 @@ def set_series_begin(series, ep_id):
     # If identified_by is not explicitly specified, auto-detect it based on begin identifier
     # TODO: use some method of series parser to do the identifier parsing
     session = Session.object_session(series)
-    if isinstance(ep_id, int):
-        identified_by = 'sequence'
-    elif re.match(r'(?i)^S\d{1,4}E\d{1,3}$', ep_id):
-        identified_by = 'ep'
+    identified_by = parse_episode_identifier(ep_id)
+    if identified_by == 'ep':
         ep_id = ep_id.upper()
-    elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
-        identified_by = 'date'
-    else:
-        # Check if a sequence identifier was passed as a string
-        try:
-            ep_id = int(ep_id)
-            identified_by = 'sequence'
-        except ValueError:
-            raise ValueError('`%s` is not a valid episode identifier' % ep_id)
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
@@ -1264,7 +1252,7 @@ class FilterSeries(FilterSeriesBase):
         for entry in entries:
             # skip processed entries
             if (entry.get('series_parser') and entry['series_parser'].valid and entry[
-                    'series_parser'].name.lower() != series_name.lower()):
+                'series_parser'].name.lower() != series_name.lower()):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
@@ -1450,7 +1438,7 @@ class FilterSeries(FilterSeriesBase):
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
             if (entry['quality'] in downloaded_qualities and entry['series_parser'].proper_count > downloaded_qualities[
-                    entry['quality']]):
+                entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
@@ -1513,7 +1501,7 @@ class FilterSeries(FilterSeriesBase):
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
             if (not backfill and (episode.season < latest.season or (
-                    episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
+                            episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
