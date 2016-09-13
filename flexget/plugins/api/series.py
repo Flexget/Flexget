@@ -191,11 +191,12 @@ class ObjectsContainer(object):
     series_edit_object = {
         'type': 'object',
         'properties': {
-            'episode_identifier': {'type': 'string', 'format': 'episode_identifier'},
+            'begin_episode':
+                {'type': ['string', 'integer'], 'format': 'episode_identifier'},
             'alternate_names': {'type': 'array', 'items': {'type': 'string'}}
         },
         'anyOf': [
-            {'required': ['episode_identifier']},
+            {'required': ['begin_episode']},
             {'required': ['alternate_names']}
         ],
         'additionalProperties:': False
@@ -391,7 +392,7 @@ class SeriesAPI(APIResource):
         show.name = series_name
         session.add(show)
 
-        ep_id = data.get('episode_identifier')
+        ep_id = data.get('begin_episode')
         alt_names = data.get('alternate_names')
         if ep_id:
             try:

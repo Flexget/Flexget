@@ -257,7 +257,7 @@ def is_url(instance):
 
 @format_checker.checks('episode_identifier', raises=ValueError)
 def is_episode_identifier(instance):
-    if not isinstance(instance, str_types):
+    if not isinstance(instance, (str_types, int)):
         return True
     return parse_episode_identifier(instance) is not None
 

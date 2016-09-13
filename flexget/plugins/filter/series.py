@@ -945,15 +945,7 @@ class FilterSeriesBase(object):
                 # Strict naming
                 'exact': {'type': 'boolean'},
                 # Begin takes an ep, sequence or date identifier
-                'begin': {
-                    'oneOf': [
-                        {'name': 'ep identifier', 'type': 'string', 'pattern': r'(?i)^S\d{2,4}E\d{2,3}$',
-                         'error_pattern': 'episode identifiers should be in the form `SxxEyy`'},
-                        {'name': 'date identifier', 'type': 'string', 'pattern': r'^\d{4}-\d{2}-\d{2}$',
-                         'error_pattern': 'date identifiers must be in the form `YYYY-MM-DD`'},
-                        {'name': 'sequence identifier', 'type': 'integer', 'minimum': 0}
-                    ]
-                },
+                'begin': {'type': ['string', 'integer'], 'format': 'episode_identifier'},
                 'from_group': one_or_more({'type': 'string'}),
                 'parse_only': {'type': 'boolean'},
                 'special_ids': one_or_more({'type': 'string'}),
