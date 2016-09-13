@@ -365,7 +365,7 @@ def register_api(mgr):
         register_app('/api', app)
 
 
-class ApiClient(object):
+class APIClient(object):
     """
     This is an client which can be used as a more pythonic interface to the rest api.
 
@@ -376,7 +376,7 @@ class ApiClient(object):
         self.app = app.test_client()
 
     def __getattr__(self, item):
-        return ApiEndopint('/api/' + item, self.get_endpoint)
+        return APIEndpoint('/api/' + item, self.get_endpoint)
 
     def get_endpoint(self, url, data=None, method=None):
         if method is None:
@@ -390,7 +390,7 @@ class ApiClient(object):
         return result
 
 
-class ApiEndopint(object):
+class APIEndpoint(object):
     def __init__(self, endpoint, caller):
         self.endpoint = endpoint
         self.caller = caller

@@ -9,7 +9,7 @@ from flask import request
 from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource, ApiClient, NotFoundError, CannotAddResource, BadRequest, base_message_schema, \
+from flexget.api import api, APIResource, APIClient, NotFoundError, CannotAddResource, BadRequest, base_message_schema, \
     success_response
 from flexget.event import fire_event
 from flexget.plugin import PluginError
@@ -364,7 +364,7 @@ class SeriesAPI(APIResource):
         }
 
         if lookup:
-            api_client = ApiClient()
+            api_client = APIClient()
             for endpoint in lookup:
                 base_url = '/%s/series/' % endpoint
                 for show in response['shows']:
