@@ -13,19 +13,29 @@ md-toolbar.movie-tabsbar {
   background-color: transparent;
 
   md-tabs > md-tabs-wrapper {
-    background-color: transparent;    
+    background-color: transparent;
+
+    > md-prev-button > md-icon {
+      color: rgba(0,0,0,0.54);
+      fill: currentColor;
+    }
+
+    > md-next-button > md-icon {
+      color: rgba(0,0,0,0.54);
+      fill: currentColor
+    }
+
+    > md-tabs-canvas > md-pagination-wrapper > md-tab-item {
+      max-width: none !important;
+
+      > section > md-icon {
+        color: inherit;
+      }
+    }
   }
 
   .add-movie-input {
     margin-bottom: 5px;
-  }
-
-  md-tabs > md-tabs-wrapper > md-tabs-canvas > md-pagination-wrapper > md-tab-item {
-    max-width: none !important;
-  }
-
-  md-tabs > md-tabs-wrapper > md-tabs-canvas > md-pagination-wrapper > md-tab-item > section > md-icon {
-    color: inherit;
   }
 }
 

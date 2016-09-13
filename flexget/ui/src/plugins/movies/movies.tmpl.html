@@ -3,8 +3,11 @@
 		<div class="md-toolbar-items" flex layout-fill>
 			<md-tabs flex md-selected="vm.selectedlist">
 				<md-tab ng-repeat="list in vm.lists" flex>
-					<md-tab-label flex>
-						{{ list.name }}
+					<md-tab-label layout-fill>
+						<section layout="row" layout-align="center center" layout-fill>
+							{{ ::list.name }}
+							<md-icon md-font-icon="fa-trash-o" class="fa tab-icon fa-lg" ng-click="vm.deleteList($event, list)"></md-icon>
+						</section>
 					</md-tab-label>
 				</md-tab>
 				<md-tab flex>
@@ -30,17 +33,9 @@
 	<md-content flex ng-if="vm.lists">
 		<md-tabs md-dynamic-height md-border-bottom class="movie-tabs" md-selected="vm.selectedlist">
 			<movie-list ng-repeat="list in vm.lists" 
-				list="::list" 
-				delete-movie-list="vm.deleteMovieList(list)"
+				list="::list"
 				tab-index="$index">
 			</movie-list>
-			<!--<md-tab class="test">
-				<md-tab-label layout-fill>
-					<section ng-click="vm.newList($event)">
-						<md-icon md-font-icon="fa-plus-circle" class="fa tab-icon-plus fa-lg"></md-icon>
-					</section>
-				</md-tab-label>
-			</md-tab>-->
 		</md-tabs>
 	</md-content>
 	<!-- TODO: Add screen that allows users to create their first list -->

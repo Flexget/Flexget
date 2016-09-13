@@ -15,7 +15,7 @@
 
         vm.lists = [];
         vm.$onInit = activate;
-        vm.deleteMovieList = deleteMovieList;
+        vm.deleteList = deleteList;
         vm.newList = newList;
         vm.searchMovies = searchMovies;
 
@@ -41,7 +41,7 @@
             onRemoving: addMovieService.clearWatcher,
             id: 'addMoviePanel'
         };
-
+        
         function searchMovies() {
             panelConfig.locals.searchtext = vm.searchtext;
             panelConfig.locals.lists = vm.lists;
@@ -56,7 +56,10 @@
             });
         }
 
-        function deleteMovieList(list) {
+        function deleteList($event, list) {
+            $event.preventDefault();
+            $event.stopPropagation();
+
             var confirm = $mdDialog.confirm()
                 .title('Confirm deleting movie list.')
                 .htmlContent($sce.trustAsHtml('Are you sure you want to delete the movie list <b>' + list.name + '</b>?'))

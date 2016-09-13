@@ -24,7 +24,6 @@
         vm.tabSelected = tabSelected;
         vm.tabDeselected = tabDeselected;
         vm.loadMovies = loadMovies;
-        vm.deleteList = deleteList;
         vm.deleteMovie = deleteMovie;
         vm.updateListPage = updateListPage;
 
@@ -63,13 +62,6 @@
             if (listener) {
                 listener();
             }
-        }
-
-        function deleteList($event) {
-            $event.preventDefault();
-            $event.stopPropagation();
-
-            vm.deleteMovieList();
         }
 
         function loadMovies() {
