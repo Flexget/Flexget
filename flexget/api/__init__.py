@@ -56,7 +56,7 @@ def etag(f):
         if if_match:
             etag_list = [tag.strip() for tag in if_match.split(',')]
             if etag not in etag_list and '*' not in etag_list:
-                raise PreconditionFailed
+                raise PreconditionFailed('etag does not match')
         elif if_none_match:
             etag_list = [tag.strip() for tag in if_none_match.split(',')]
             if etag in etag_list or '*' in etag_list:

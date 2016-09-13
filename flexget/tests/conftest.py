@@ -149,6 +149,7 @@ def schema_match(manager):
     This fixture enables verifying JSON Schema. Return a list of validation error dicts. List is empty if no errors
     occurred.
     """
+
     def match(schema, response):
         validator = jsonschema.Draft4Validator(schema)
         errors = list(validator.iter_errors(response))
@@ -243,13 +244,13 @@ def no_requests(monkeypatch):
 
 @pytest.fixture(scope='session', autouse=True)
 def setup_once(pytestconfig, request):
-#    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'flexget', 'tests'))
+    #    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'flexget', 'tests'))
     flexget.logger.initialize(True)
     m = MockManager('tasks: {}', 'init')  # This makes sure our template environment is set up before any tests are run
     m.shutdown()
     logging.getLogger().setLevel(logging.DEBUG)
     load_plugins()
-    
+
 
 @pytest.fixture(autouse=True)
 def chdir(pytestconfig, request):
@@ -352,3 +353,9 @@ class APIClient(object):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
 
         return self.client.delete(*args, **kwargs)
+
+    def head(self, *args, **kwargs):
+        if kwargs.get('auth', True):
+            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+
+        return self.client.head(*args, **kwargs)
