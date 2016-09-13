@@ -187,7 +187,6 @@ class ObjectsContainer(object):
             'show': {'type': 'string'}
         }
     }
-    episode_schema = api.schema('episode_item', episode_schema)
 
     series_edit_object = {
         'type': 'object',
@@ -288,6 +287,7 @@ series_edit_schema = api.schema('series_edit_schema', ObjectsContainer.series_ed
 series_input_schema = api.schema('series_input_schema', ObjectsContainer.series_input_object)
 show_details_schema = api.schema('show_details', ObjectsContainer.show_details_schema)
 shows_schema = api.schema('list_of_shows', ObjectsContainer.shows_schema)
+episode_schema = api.schema('episode_item', ObjectsContainer.episode_schema)
 
 series_list_parser = api.parser()
 series_list_parser.add_argument('in_config', choices=('configured', 'unconfigured', 'all'), default='configured',
@@ -340,8 +340,8 @@ class SeriesListAPI(APIResource):
             'sort_by': args.get('sort_by'),
             'descending': args.get('descending'),
             'session': session
-
         }
+
         num_of_shows = series.get_series_summary(count=True, **kwargs)
 
         raw_series_list = series.get_series_summary(**kwargs)
@@ -573,7 +573,7 @@ class SeriesEpisodesAPI(APIResource):
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
 class SeriesEpisodeAPI(APIResource):
-    @api.response(200, 'Episode retrieved successfully for show', ObjectsContainer.episode_schema)
+    @api.response(200, 'Episode retrieved successfully for show', episode_schema)
     @api.doc(description='Get a specific episode via its ID and show ID')
     def get(self, show_id, ep_id, session):
         """ Get episode by show ID and episode ID"""
