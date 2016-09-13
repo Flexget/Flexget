@@ -44,28 +44,25 @@ api_config_schema = {
 def etag(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
-
         # Identify if this is a GET or HEAD in order to proceed
         assert request.method in ['HEAD', 'GET'], '@etag is only supported for GET requests'
         rv = f(*args, **kwargs)
         rv = make_response(rv)
-        etag = '"' + hashlib.md5(rv.get_data()).hexdigest() + '"'
+        etag = hashlib.md5(rv.get_data()).hexdigest()
         rv.headers['Cache-Control'] = 'max-age=86400'
         rv.headers['ETag'] = etag
         if_match = request.headers.get('If-Match')
         if_none_match = request.headers.get('If-None-Match')
 
-        # Rock'n'Roll
         if if_match:
             etag_list = [tag.strip() for tag in if_match.split(',')]
             if etag not in etag_list and '*' not in etag_list:
-                rv = PreconditionFailed
+                raise PreconditionFailed
         elif if_none_match:
             etag_list = [tag.strip() for tag in if_none_match.split(',')]
             if etag in etag_list or '*' in etag_list:
-                rv = NotModifed
+                raise NotModified
 
-        # Sends back the result
         return rv
 
     return wrapped
@@ -241,7 +238,7 @@ class APIError(Exception):
     status = 'Error'
     response_model = base_message_schema
 
-    def __init__(self, message, payload=None):
+    def __init__(self, message=None, payload=None):
         self.message = message
         self.payload = payload
 
@@ -280,7 +277,7 @@ class PreconditionFailed(APIError):
     description = 'Precondition failed'
 
 
-class NotModifed(APIError):
+class NotModified(APIError):
     status_code = 304
     description = 'not modified'
 
@@ -350,8 +347,14 @@ def success_response(message, status_code=200, status='success'):
 @api.errorhandler(BadRequest)
 @api.errorhandler(Unauthorized)
 @api.errorhandler(CannotAddResource)
+@api.errorhandler(NotModified)
+@api.errorhandler(PreconditionFailed)
 def api_errors(error):
     return error.to_dict(), error.status_code
+
+
+def api_header_errors(error):
+    return error.status_code
 
 
 @event('manager.daemon.started')

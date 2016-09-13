@@ -10,7 +10,7 @@ from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, CannotAddResource, NotFoundError, base_message_schema, success_response, \
-    BadRequest
+    BadRequest, etag
 from flexget.plugins.list import movie_list as ml
 from flexget.plugins.list.movie_list import MovieListBase
 
@@ -108,6 +108,7 @@ movie_list_parser.add_argument('name', help='Filter results by list name')
 
 @movie_list_api.route('/')
 class MovieListAPI(APIResource):
+    @etag
     @api.response(200, model=return_lists_schema)
     @api.doc(parser=movie_list_parser)
     def get(self, session=None):
@@ -141,6 +142,7 @@ class MovieListAPI(APIResource):
 @movie_list_api.route('/<int:list_id>/')
 @api.doc(params={'list_id': 'ID of the list'})
 class MovieListListAPI(APIResource):
+    @etag
     @api.response(NotFoundError)
     @api.response(200, model=list_object_schema)
     def get(self, list_id, session=None):
@@ -175,6 +177,7 @@ movies_parser.add_argument('page_size', type=int, default=10, help='Number of mo
 
 @movie_list_api.route('/<int:list_id>/movies/')
 class MovieListMoviesAPI(APIResource):
+    @etag
     @api.response(NotFoundError)
     @api.response(200, model=return_movies_schema)
     @api.doc(params={'list_id': 'ID of the list'}, parser=movies_parser)
@@ -251,6 +254,7 @@ class MovieListMoviesAPI(APIResource):
 @api.doc(params={'list_id': 'ID of the list', 'movie_id': 'ID of the movie'})
 @api.response(NotFoundError)
 class MovieListMovieAPI(APIResource):
+    @etag
     @api.response(200, model=movie_list_object_schema)
     def get(self, list_id, movie_id, session=None):
         """ Get a movie by list ID and movie ID """

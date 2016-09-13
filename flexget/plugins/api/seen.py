@@ -8,7 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask import jsonify
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource, NotFoundError, base_message_schema, success_response
+from flexget.api import api, APIResource, NotFoundError, base_message_schema, success_response, etag
 from flexget.plugins.filter import seen
 
 seen_api = api.namespace('seen', description='Managed Flexget seen entries and fields')
@@ -72,6 +72,7 @@ seen_search_parser.add_argument('order', choices=('asc', 'desc'), default='desc'
 
 @seen_api.route('/')
 class SeenSearchAPI(APIResource):
+    @etag
     @api.response(NotFoundError)
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
     @api.doc(parser=seen_search_parser, description='Get seen entries')
@@ -153,6 +154,7 @@ class SeenSearchAPI(APIResource):
 @api.doc(params={'seen_entry_id': 'ID of seen entry'})
 @api.response(NotFoundError)
 class SeenSearchIDAPI(APIResource):
+    @etag
     @api.response(200, model=seen_object_schema)
     def get(self, seen_entry_id, session):
         """ Get seen entry by ID """
