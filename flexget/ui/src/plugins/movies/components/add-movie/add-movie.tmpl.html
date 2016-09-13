@@ -1,11 +1,12 @@
 <md-content flex ng-cloak>
-    <md-list flex ng-if="!vm.loading">
+    <md-list flex ng-if="!vm.loading" layout-fill>
         <add-movie-item
             ng-repeat="movie in vm.foundMovies | orderBy : 'match' : true" 
             selected-list="vm.currentList"
             movie="movie"
             lists="vm.panelRef.lists"
-            add-movie-to-list="vm.addMovietoList(movie, list)">
+            add-movie-to-list="vm.addMovietoList(movie, list)"
+            flex>
             <md-divider ng-if="!$last"></md-divider>
         </add-movie-item>
         <md-list-item ng-if="vm.foundMovies.length === 0">

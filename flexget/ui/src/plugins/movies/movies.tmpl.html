@@ -7,9 +7,15 @@
 						{{ list.name }}
 					</md-tab-label>
 				</md-tab>
+				<md-tab flex>
+					<md-tab-label layout-fill>
+						<section ng-click="vm.newList($event)">
+							<md-icon md-font-icon="fa-plus-circle" class="fa tab-icon-plus fa-lg"></md-icon>
+						</section>
+					</md-tab-label>
+				</md-tab>
 			</md-tabs>
 		</div>
-		<span flex></span>
 		<div>
 			<md-input-container class="add-movie-input">
 				<label>Add a movie</label>

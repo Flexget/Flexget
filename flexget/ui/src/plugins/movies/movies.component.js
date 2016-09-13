@@ -26,7 +26,7 @@
         }
 
         var position = $mdPanel.newPanelPosition().relativeTo('.search-menu').addPanelPosition($mdPanel.xPosition.ALIGN_END, $mdPanel.yPosition.BELOW);
-        var panel = $mdPanel.create({
+        var panelConfig = {
             attachTo: angular.element(document.body),
             controller: 'addMovieController',
             controllerAs: 'vm',
@@ -38,15 +38,16 @@
             escapeToClose: true,
             focusOnOpen: false,
             zIndex: 2,
-            onRemoving: addMovieService.clearWatcher
-        });
+            onRemoving: addMovieService.clearWatcher,
+            id: 'addMoviePanel'
+        };
 
         function searchMovies() {
-            panel.config.locals.searchtext = vm.searchtext;
-            panel.config.locals.lists = vm.lists;
-            panel.config.locals.selectedlist = vm.selectedlist;
+            panelConfig.locals.searchtext = vm.searchtext;
+            panelConfig.locals.lists = vm.lists;
+            panelConfig.locals.selectedlist = vm.selectedlist;
 
-            panel.open();
+            $mdPanel.open(panelConfig);
         }
 
         function getMovieLists() {

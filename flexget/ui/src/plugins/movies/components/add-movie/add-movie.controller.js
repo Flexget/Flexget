@@ -28,7 +28,7 @@
                 if (val === vm.searchtext) {
                     vm.loading = true;
                     
-                    updatePosition()
+                    updatePosition();
                     searchMovies(val).then(function (data) {
                         vm.foundMovies = data;
                         

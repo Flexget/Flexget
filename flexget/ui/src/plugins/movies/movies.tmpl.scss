@@ -23,6 +23,10 @@ md-toolbar.movie-tabsbar {
   md-tabs > md-tabs-wrapper > md-tabs-canvas > md-pagination-wrapper > md-tab-item {
     max-width: none !important;
   }
+
+  md-tabs > md-tabs-wrapper > md-tabs-canvas > md-pagination-wrapper > md-tab-item > section > md-icon {
+    color: inherit;
+  }
 }
 
 md-tabs.movie-tabs md-tabs-wrapper {
@@ -56,7 +60,6 @@ md-tabs.movie-tabs md-tabs-wrapper {
 
   .list {
       padding-left: 6px;
-      padding-right: 116px;
   }
 
   img {
