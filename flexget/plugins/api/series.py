@@ -10,7 +10,7 @@ from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, APIClient, NotFoundError, CannotAddResource, BadRequest, base_message_schema, \
-    success_response
+    success_response, etag
 from flexget.event import fire_event
 from flexget.plugin import PluginError
 from flexget.plugins.filter import series
@@ -314,6 +314,7 @@ ep_identifier_doc = "'episode_identifier' should be one of SxxExx, integer or da
 
 @series_api.route('/')
 class SeriesAPI(APIResource):
+    @etag
     @api.response(200, 'Series list retrieved successfully', series_list_schema)
     @api.response(NotFoundError)
     @api.doc(parser=series_list_parser, description="Get a  list of Flexget's shows in DB")
@@ -439,6 +440,7 @@ delete_parser.add_argument('forget', type=inputs.boolean, default=False,
 @api.doc(params={'show_id': 'ID of the show'})
 @api.response(NotFoundError)
 class SeriesShowAPI(APIResource):
+    @etag
     @api.response(200, 'Show information retrieved successfully', show_details_schema)
     @api.doc(description='Get a specific show using its ID')
     def get(self, show_id, session):
@@ -508,6 +510,7 @@ episode_parser.add_argument('order', choices=('desc', 'asc'), default='desc', he
 @series_api.route('/<int:show_id>/episodes/')
 @api.doc(params={'show_id': 'ID of the show'})
 class SeriesEpisodesAPI(APIResource):
+    @etag
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
     @api.doc(description='Get all show episodes via its ID', parser=episode_parser)
     def get(self, show_id, session):
@@ -574,6 +577,7 @@ class SeriesEpisodesAPI(APIResource):
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
 class SeriesEpisodeAPI(APIResource):
+    @etag
     @api.response(200, 'Episode retrieved successfully for show', episode_schema)
     @api.doc(description='Get a specific episode via its ID and show ID')
     def get(self, show_id, ep_id, session):
@@ -632,6 +636,7 @@ release_delete_parser.add_argument('forget', type=inputs.boolean, default=False,
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
          description='Releases are any seen entries that match the episode. ')
 class SeriesReleasesAPI(APIResource):
+    @etag
     @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
     @api.doc(description='Get all matching releases for a specific episode of a specific show.',
              parser=release_list_parser)
@@ -720,6 +725,7 @@ class SeriesReleasesAPI(APIResource):
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/<int:rel_id>/')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'})
 class SeriesReleaseAPI(APIResource):
+    @etag
     @api.response(200, 'Release retrieved successfully for episode', release_schema)
     @api.doc(description='Get a specific downloaded release for a specific episode of a specific show')
     def get(self, show_id, ep_id, rel_id, session):
