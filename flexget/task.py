@@ -48,6 +48,8 @@ def config_changed(task=None, session=None):
     Forces config_modified flag to come out true on next run of `task`. Used when the db changes, and all
     entries need to be reprocessed.
 
+    .. WARNING: DO NOT (FURTHER) USE FROM PLUGINS
+
     :param task: Name of the task. If `None`, will be set for all tasks.
     """
     log.debug('Marking config for %s as changed.' % (task or 'all tasks'))
@@ -253,12 +255,12 @@ class Task(object):
         # current state
         self.current_phase = None
         self.current_plugin = None
-        
+
     @property
     def max_reruns(self):
         """How many times task can be rerunned before stopping"""
         return self._max_reruns
-        
+
     @max_reruns.setter
     def max_reruns(self, value):
         """Set new maximum value for reruns unless property has been locked"""
@@ -266,17 +268,17 @@ class Task(object):
             self._max_reruns = value
         else:
             log.debug('max_reruns is locked, %s tried to modify it', self.current_plugin)
-            
+
     def lock_reruns(self):
         """Prevent modification of max_reruns property"""
         log.debug('Enabling rerun lock')
         self._reruns_locked = True
-        
+
     def unlock_reruns(self):
         """Allow modification of max_reruns property"""
         log.debug('Releasing rerun lock')
         self._reruns_locked = False
-        
+
     @property
     def reruns_locked(self):
         return self._reruns_locked

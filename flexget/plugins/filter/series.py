@@ -1638,8 +1638,11 @@ class SeriesDBManager(FilterSeriesBase):
 
     @plugin.priority(0)
     def on_task_start(self, task, config):
-        if not task.config_modified:
-            return
+        # TODO: broken currently, add new series to config and reload -> config is not changed?!
+        #if not task.config_modified:
+        #    log.trace('not task.config_modified, returning')
+        #    return
+
         # Clear all series from this task
         with Session() as session:
             session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
@@ -1661,7 +1664,7 @@ class SeriesDBManager(FilterSeriesBase):
                     db_series.alternate_names = [alt for alt in db_series.alternate_names if alt.alt_name in alts]
                     # Add/update the possibly new alternate names
                 else:
-                    log.debug('adding series %s into db', series_name)
+                    log.debug('adding series %s into db (on_task_start)', series_name)
                     db_series = Series()
                     db_series.name = series_name
                     session.add(db_series)
@@ -1669,6 +1672,7 @@ class SeriesDBManager(FilterSeriesBase):
                     log.debug('-> added %s' % db_series)
                 for alt in alts:
                     _add_alt_name(alt, db_series, series_name, session)
+                log.debug('connecting series %s to task %s', db_series.name, task.name)
                 db_series.in_tasks.append(SeriesTask(task.name))
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
