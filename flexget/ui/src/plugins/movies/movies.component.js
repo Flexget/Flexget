@@ -10,7 +10,7 @@
             controller: moviesController
         });
 
-    function moviesController($mdDialog, $mdPanel, $sce, addMovieService, moviesService) {
+    function moviesController($document, $mdDialog, $mdPanel, $sce, addMovieService, moviesService) {
         var vm = this;
 
         vm.lists = [];
@@ -27,7 +27,7 @@
 
         var position = $mdPanel.newPanelPosition().relativeTo('.search-menu').addPanelPosition($mdPanel.xPosition.ALIGN_END, $mdPanel.yPosition.BELOW);
         var panelConfig = {
-            attachTo: angular.element(document.body),
+            attachTo: angular.element($document[0].body),
             controller: 'addMovieController',
             controllerAs: 'vm',
             templateUrl: 'plugins/movies/components/add-movie/add-movie.tmpl.html',

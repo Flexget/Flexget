@@ -6,7 +6,7 @@
         .module('plugins.movies')
         .controller('addMovieController', addMovieController);
 
-    function addMovieController($scope, $timeout, addMovieService, mdPanelRef, moviesService, $mdPanel) {
+    function addMovieController($mdPanel, $scope, $timeout, addMovieService, mdPanelRef, moviesService) {
         var vm = this;
 
         vm.panelRef = mdPanelRef.config.locals;
@@ -16,7 +16,7 @@
 
         var searchWatch = $scope.$watch(function () {
             return mdPanelRef.config.locals.searchtext;
-        }, function (newValue, oldValue) {
+        }, function (newValue) {
             vm.searchtext = mdPanelRef.config.locals.searchtext;
             checkSearch(newValue);
         });

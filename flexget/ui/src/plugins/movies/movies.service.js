@@ -97,7 +97,7 @@
                 .then(addMovieToListComplete)
                 .catch(callFailed);
 
-            function addMovieToListComplete(response) {
+            function addMovieToListComplete() {
                 return;
             }
         }

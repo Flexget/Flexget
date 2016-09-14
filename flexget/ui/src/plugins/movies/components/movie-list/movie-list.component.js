@@ -51,7 +51,7 @@
                 currentTab = true;
             }
 
-            listener = $rootScope.$on('movie-added-list:' + vm.list.id, function (event) {
+            listener = $rootScope.$on('movie-added-list:' + vm.list.id, function () {
                 if (currentTab) {
                     loadMovies();
                 }

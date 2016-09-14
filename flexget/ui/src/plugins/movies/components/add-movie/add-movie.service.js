@@ -16,12 +16,12 @@
 
         function setWatcher(watch) {
             searchWatch = watch;
-        };
+        }
 
         function clearWatcher() {
             if (searchWatch) {
                 searchWatch();
             }    
-        };
+        }
     }
 })();
