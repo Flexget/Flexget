@@ -230,9 +230,8 @@ class MovieListMoviesAPI(APIResource):
         data = request.json
         movie_identifiers = data.get('movie_identifiers', [])
         # Validates ID type based on allowed ID
-        # TODO pass this to json schema validation
         for id_name in movie_identifiers:
-            if set(id_name.keys()) & set(MovieListBase().supported_ids) == set([]):
+            if list(id_name)[0] not in MovieListBase().supported_ids:
                 raise BadRequest('movie identifier %s is not allowed' % id_name)
         title, year = data['movie_name'], data.get('movie_year')
         movie = ml.get_movie_by_title_and_year(list_id=list_id, title=title, year=year, session=session)
@@ -288,9 +287,8 @@ class MovieListMovieAPI(APIResource):
         data = request.json
 
         # Validates ID type based on allowed ID
-        # TODO pass this to json schema validation
         for id_name in data:
-            if set(id_name.keys()) & set(MovieListBase().supported_ids) == set([]):
+            if list(id_name)[0] not in MovieListBase().supported_ids:
                 raise BadRequest('movie identifier %s is not allowed' % id_name)
         movie.ids[:] = ml.get_db_movie_identifiers(identifier_list=data, movie_id=movie_id, session=session)
         session.commit()
