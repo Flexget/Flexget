@@ -426,7 +426,7 @@ class PluginTraktLookup(object):
     @property
     def movie_identifier(self):
         """Returns the plugin main identifier type"""
-        return 'trakt_movie_id', 'string'
+        return 'trakt_movie_id'
 
 
 @event('plugin.register')

@@ -30,7 +30,7 @@ class MovieListBase(object):
 
     @property
     def supported_ids(self):
-        # Return a list of tuples of supported movie identifiers and their schema as registered via their plugins
+        # Return a list of supported series identifier as registered via their plugins
         return [p.instance.movie_identifier for p in plugin.get_plugins(group='movie_metainfo')]
 
 
@@ -156,7 +156,7 @@ class MovieList(MutableSet):
                 db_movie.title, db_movie.year = entry['movie_name'], entry.get('movie_year')
             else:
                 db_movie.title, db_movie.year = split_title_year(entry['title'])
-            for id_name, _ in MovieListBase().supported_ids:
+            for id_name in MovieListBase().supported_ids:
                 if id_name in entry:
                     db_movie.ids.append(MovieListID(id_name=id_name, id_value=entry[id_name]))
             log.debug('adding entry %s', entry)
@@ -178,7 +178,7 @@ class MovieList(MutableSet):
     def _find_entry(self, entry, session=None):
         """Finds `MovieListMovie` corresponding to this entry, if it exists."""
         # Match by supported IDs
-        for id_name, _ in MovieListBase().supported_ids:
+        for id_name in MovieListBase().supported_ids:
             if entry.get(id_name):
                 log.debug('trying to match movie based off id %s: %s', id_name, entry[id_name])
                 res = (self._db_list(session).movies.join(MovieListMovie.ids).filter(
@@ -329,8 +329,7 @@ def get_db_movie_identifiers(identifier_list, movie_id=None, session=None):
     db_movie_ids = []
     for identifier in identifier_list:
         for key, value in identifier.items():
-            names, _ = zip(*MovieListBase().supported_ids)
-            if key in names:
+            if key in MovieListBase().supported_ids:
                 db_movie_id = get_movie_identifier(identifier_name=key, identifier_value=value, movie_id=movie_id,
                                                    session=session)
                 if not db_movie_id:

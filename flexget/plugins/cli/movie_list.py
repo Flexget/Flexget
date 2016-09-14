@@ -41,10 +41,10 @@ def movie_list_keyword_type(identifier):
         raise ArgumentTypeError('Received identifier in wrong format: %s, '
                                 ' should be in keyword format like `imdb_id=tt1234567`' % identifier)
     name, value = identifier.split('=', 2)
-    identifiers, _ = zip(*MovieListBase().supported_ids)
-    if name not in identifiers:
+    if name not in MovieListBase().supported_ids:
         raise ArgumentTypeError(
-            'Received unsupported identifier ID %s. Should be one of %s' % (identifier, ' ,'.join(identifiers)))
+            'Received unsupported identifier ID %s. Should be one of %s' % (
+                identifier, ' ,'.join(MovieListBase().supported_ids)))
     return {name: value}
 
 
@@ -96,13 +96,12 @@ def movie_list_list(options):
             console('Could not find movie list with name {}'.format(options.list_name))
             return
     header = ['Movie Name', 'Movie year']
-    identifiers, _ = zip(*MovieListBase().supported_ids)
-    header += identifiers
+    header += MovieListBase().supported_ids
     table_data = [header]
     movies = get_movies_by_list_id(movie_list.id, order_by='added', descending=True, session=session)
     for movie in movies:
         movie_row = [movie.title, movie.year or '']
-        for identifier in identifiers:
+        for identifier in MovieListBase().supported_ids:
             movie_row.append(movie.identifiers.get(identifier, ''))
         table_data.append(movie_row)
     title = '{} Movies in movie list: `{}`'.format(len(movies), options.list_name)
@@ -140,8 +139,7 @@ def movie_list_add(options):
         if options.identifiers:
             id_list = options.identifiers
         else:
-            identifiers, _ = zip(*MovieListBase().supported_ids)
-            for _id in identifiers:
+            for _id in MovieListBase().supported_ids:
                 if entry.get(_id):
                     id_list.append({_id: entry.get(_id)})
         if id_list:

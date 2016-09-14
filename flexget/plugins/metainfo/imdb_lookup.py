@@ -436,8 +436,8 @@ class ImdbLookup(object):
 
     @property
     def movie_identifier(self):
-        """Returns the plugin main identifier type and schema type"""
-        return 'imdb_id', 'string'
+        """Returns the plugin main identifier type"""
+        return 'imdb_id'
 
 
 @event('plugin.register')

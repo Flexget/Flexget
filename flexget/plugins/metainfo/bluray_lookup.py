@@ -71,8 +71,8 @@ class PluginBlurayLookup(object):
 
     @property
     def movie_identifier(self):
-        """Returns the plugin main identifier type and schema"""
-        return 'bluray_id', 'integer'
+        """Returns the plugin main identifier type"""
+        return 'bluray_id'
 
 
 @event('plugin.register')
