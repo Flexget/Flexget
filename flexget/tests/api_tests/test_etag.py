@@ -49,9 +49,6 @@ class TestETAG(object):
         header = {'If-Match': 'not_etag'}
         rsp = api_client.head('/movie_list/', headers=header)
         assert rsp.status_code == 412, 'Response code is %s' % rsp.status_code
-        data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(base_message, data)
-        assert not errors
 
         # Change data
         list_3 = {'name': 'list_3'}
