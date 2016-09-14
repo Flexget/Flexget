@@ -4,7 +4,8 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
 from flask_restplus import inputs
 
-from flexget.api import api, NotFoundError, BadRequest
+from flexget.api.app import api
+from flexget.api.responses import NotFoundError, BadRequest
 from flexget.api.models import APIResource
 from flexget.plugins.internal.api_tvmaze import APITVMaze as tvm
 
@@ -12,7 +13,6 @@ tvmaze_api = api.namespace('tvmaze', description='TVMaze Shows')
 
 
 class ObjectsContainer(object):
-
     actor_object = {
         'type': 'object',
         'properties': {

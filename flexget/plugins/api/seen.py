@@ -8,7 +8,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask import jsonify
 from flask_restplus import inputs
 
-from flexget.api import api, NotFoundError, base_message_schema, success_response
+from flexget.api.app import api
+from flexget.api.responses import NotFoundError, base_message_schema, success_response
 from flexget.api.models import APIResource
 from flexget.api.decorators import etag
 from flexget.plugins.filter import seen

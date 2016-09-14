@@ -3,7 +3,7 @@ import json
 from flask_restplus import Resource
 from flexget import manager
 
-from flexget.api import app, api_key
+from flexget.api.app import api_app, api_key
 from flexget.utils.database import with_session
 
 
@@ -15,7 +15,7 @@ class APIClient(object):
     """
 
     def __init__(self):
-        self.app = app.test_client()
+        self.app = api_app.test_client()
 
     def __getattr__(self, item):
         return APIEndpoint('/api/' + item, self.get_endpoint)

@@ -5,7 +5,8 @@ import copy
 from flask import jsonify
 from flask_restplus import inputs
 
-from flexget.api import api, NotFoundError
+from flexget.api.app import api
+from flexget.api.responses import NotFoundError
 from flexget.api.models import APIResource
 from flexget.plugins.internal.api_trakt import ApiTrakt as at, list_actors, get_translations_dict
 

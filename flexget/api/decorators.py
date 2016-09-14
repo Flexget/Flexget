@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from functools import wraps
 from flask import request
 from flask.helpers import make_response
-from flexget.api import PreconditionFailed, NotModified
+from flexget.api.responses import PreconditionFailed, NotModified
 from werkzeug.http import generate_etag
 
 
