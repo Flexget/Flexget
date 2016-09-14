@@ -9,11 +9,11 @@
         </md-list>
         <span flex></span>
 
-        <div class="version-info" ng-if="!vm.isSmallMenu()">
+        <div class="version-info" ng-if="!vm.isSmallMenu() && vm.versions">
             <h3>Version info</h3>
             <span>
                 Flexget: {{ vm.versions.flexget_version }}&nbsp;
-                <span ng-if="vm.versions.flexget_version !== vm.versions.latest_version">
+                <span ng-if="::vm.hasUpdate()">
                     <md-tooltip>New version available ({{ vm.versions.latest_version }})</md-tooltip>
                     <md-icon class="fa fa-lg fa-arrow-circle-up"></md-icon>
                 </span>

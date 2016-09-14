@@ -5,6 +5,7 @@
     angular
         .module('components.sidenav', [
             'ngMaterial',
-            'blocks.router'
+            'blocks.router',
+            'components.core'
         ]);
 }());

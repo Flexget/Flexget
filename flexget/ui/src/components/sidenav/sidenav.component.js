@@ -10,13 +10,14 @@
             controller: sideNavController
         });
 
-    function sideNavController($rootScope, routerHelper, sideNavService) {
+    function sideNavController($rootScope, routerHelper, semver, sideNavService) {
         var vm = this;
 
         var allStates = routerHelper.getStates();
         vm.close = sideNavService.close;
         vm.$onInit = activate;
         vm.isSmallMenu = isSmallMenu;
+        vm.hasUpdate = hasUpdate;
 
         function activate() {
             getNavRoutes();
@@ -35,6 +36,10 @@
             sideNavService.getVersionInfo().then(function (data) {
                 vm.versions = data;
             });
+        }
+
+        function hasUpdate(current, latest) {
+            return semver(vm.versions.latest_version, vm.versions.flexget_version);
         }
 
         function isSmallMenu() {
