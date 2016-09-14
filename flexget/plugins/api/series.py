@@ -1,16 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import copy
 from math import ceil
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
 from flask import request
 from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, APIClient, NotFoundError, CannotAddResource, BadRequest, base_message_schema, \
-    success_response, etag
+    success_response
+from flexget.api.decorators import etag
 from flexget.event import fire_event
 from flexget.plugin import PluginError
 from flexget.plugins.filter import series

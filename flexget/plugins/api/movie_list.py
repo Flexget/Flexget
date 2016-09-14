@@ -10,7 +10,8 @@ from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, CannotAddResource, NotFoundError, base_message_schema, success_response, \
-    BadRequest, etag
+    BadRequest
+from flexget.api.decorators import etag
 from flexget.plugins.list import movie_list as ml
 from flexget.plugins.list.movie_list import MovieListBase
 
