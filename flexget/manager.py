@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
+native_int = int
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import atexit
@@ -41,8 +42,6 @@ log = logging.getLogger('manager')
 
 manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
-
-native_int = int
 
 
 class Manager(object):
