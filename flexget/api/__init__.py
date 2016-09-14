@@ -13,11 +13,9 @@ from flask_compress import Compress
 from flask_cors import CORS
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.model import Model
-from flexget.config_schema import process_config, register_config_key
-from flexget.event import event
+from flexget.config_schema import process_config
 from flexget.utils.database import with_session
 from flexget.webserver import User
-from flexget.webserver import register_app, get_secret
 from jsonschema.exceptions import RefResolutionError
 
 __version__ = '0.6-beta'
@@ -35,11 +33,6 @@ api_config_schema = {
 def api_key(session=None):
     log.debug('fetching token for internal lookup')
     return session.query(User).first().token
-
-
-@event('config.register')
-def register_config():
-    register_config_key('api', api_config_schema)
 
 
 class ApiSchemaModel(Model):
@@ -309,17 +302,6 @@ def api_errors(error):
 
 def api_header_errors(error):
     return error.status_code
-
-
-@event('manager.daemon.started')
-def register_api(mgr):
-    global api_config
-    api_config = mgr.config.get('api')
-
-    app.secret_key = get_secret()
-
-    if api_config:
-        register_app('/api', app)
 
 
 # Import API Sub Modules
