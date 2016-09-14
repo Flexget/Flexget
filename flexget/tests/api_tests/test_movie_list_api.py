@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 import copy
 
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from flexget.plugins.list.movie_list import MovieListBase
 
 from flexget.utils import json
 
@@ -248,3 +249,13 @@ class TestMovieListUseCases(object):
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(base_message, data)
         assert not errors
+
+    def test_identifiers(self, api_client, schema_match):
+        rsp = api_client.get('/movie_list/identifiers/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(OC.return_identifiers, data)
+        assert not errors
+
+        identifiers = MovieListBase().supported_ids
+        assert data == identifiers

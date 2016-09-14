@@ -90,6 +90,8 @@ class ObjectsContainer(object):
 
     return_lists = {'type': 'array', 'items': list_object}
 
+    return_identifiers = {'type': 'array', 'items': {'type': 'string'}}
+
 
 input_movie_entry_schema = api.schema('input_movie_entry', ObjectsContainer.input_movie_entry)
 input_movie_list_id_schema = api.schema('input_movie_list_id_object', ObjectsContainer.input_movie_list_id_object)
@@ -101,6 +103,7 @@ return_lists_schema = api.schema('return_lists', ObjectsContainer.return_lists)
 return_movies_schema = api.schema('return_movies', ObjectsContainer.return_movies)
 
 new_list_schema = api.schema('new_list', ObjectsContainer.list_input)
+identifiers_schema = api.schema('movie_list.identifiers', ObjectsContainer.return_identifiers)
 
 movie_list_parser = api.parser()
 movie_list_parser.add_argument('name', help='Filter results by list name')
@@ -293,3 +296,11 @@ class MovieListMovieAPI(APIResource):
         movie.ids[:] = ml.get_db_movie_identifiers(identifier_list=data, movie_id=movie_id, session=session)
         session.commit()
         return jsonify(movie.to_dict())
+
+
+@movie_list_api.route('/identifiers/')
+class MovieListIdentifiers(APIResource):
+    @api.response(200, model=identifiers_schema)
+    def get(self, session=None):
+        """ Return a list of supported movie list identifiers """
+        return jsonify(MovieListBase().supported_ids)
