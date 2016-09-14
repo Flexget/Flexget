@@ -3,16 +3,16 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import json
 import os
-
 import pytest
+from flexget.utils.tools import get_latest_flexget_version_number
+
+from mock import patch
 
 from flexget import __version__
 from flexget.api import __version__ as __api_version__, base_message
-from flexget.api.core_endpoints.server import ObjectsContainer as OC
 from flexget.manager import Manager
 from flexget.tests.conftest import MockManager
-from flexget.utils.tools import get_latest_flexget_version_number
-from mock import patch
+from flexget.api.server import ObjectsContainer as OC
 
 
 class TestServerAPI(object):

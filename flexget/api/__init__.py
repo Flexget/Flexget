@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 import os
@@ -7,7 +8,6 @@ from collections import deque
 from functools import wraps
 from importlib import import_module
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import Flask, request, jsonify
 from flask_compress import Compress
 from flask_cors import CORS
@@ -19,8 +19,6 @@ from flexget.utils.database import with_session
 from flexget.webserver import User
 from flexget.webserver import register_app, get_secret
 from jsonschema.exceptions import RefResolutionError
-
-CORE_ENDPOINTS = 'core_endpoints'
 
 __version__ = '0.6-beta'
 
@@ -325,5 +323,5 @@ def register_api(mgr):
 
 
 # Import API Sub Modules
-for loader, module_name, is_pkg in pkgutil.walk_packages([os.path.join(__path__[0], CORE_ENDPOINTS)]):
-    import_module('.{}'.format(module_name), 'flexget.api.{}'.format(CORE_ENDPOINTS))
+for loader, module_name, is_pkg in pkgutil.walk_packages(__path__):
+    import_module('.{}'.format(module_name), 'flexget.api')
