@@ -166,7 +166,7 @@ class NextSeriesEpisodes(object):
         
         for reason, series in impossible.items():
             log.verbose('Series `%s` with identified_by value `%s` are not supported. ',
-                        ', '.join(series), reason)
+                        ', '.join(sorted(series)), reason)
 
         return entries
 
