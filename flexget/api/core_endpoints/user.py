@@ -4,7 +4,8 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import request
 from flask_login import current_user
 
-from flexget.api import api, APIResource, BadRequest, base_message_schema, success_response
+from flexget.api import api, BadRequest, base_message_schema, success_response
+from flexget.api.models import APIResource
 from flexget.webserver import change_password, generate_token, WeakPassword
 
 user_api = api.namespace('user', description='Manage user login credentials')

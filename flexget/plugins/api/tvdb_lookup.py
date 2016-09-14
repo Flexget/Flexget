@@ -4,7 +4,8 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource, NotFoundError, BadRequest
+from flexget.api import api, NotFoundError, BadRequest
+from flexget.api.models import APIResource
 from flexget.plugins.internal.api_tvdb import lookup_series, lookup_episode, search_for_series
 
 tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')

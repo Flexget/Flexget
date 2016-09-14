@@ -8,7 +8,8 @@ from flask_login import login_user, LoginManager, current_user, current_app
 from flask_restplus import inputs
 from werkzeug.security import check_password_hash
 
-from flexget.api import api, APIResource, app, Unauthorized, success_response, base_message_schema
+from flexget.api import api, app, Unauthorized, success_response, base_message_schema
+from flexget.api.models import APIResource
 from flexget.utils.database import with_session
 from flexget.webserver import User
 

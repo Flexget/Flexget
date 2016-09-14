@@ -7,7 +7,8 @@ from math import ceil
 from flask import jsonify
 from sqlalchemy import desc
 
-from flexget.api import api, APIResource, BadRequest
+from flexget.api import api, BadRequest
+from flexget.api.models import APIResource
 from flexget.plugins.output.history import History
 
 log = logging.getLogger('history')

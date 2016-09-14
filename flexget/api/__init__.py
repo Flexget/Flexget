@@ -1,28 +1,24 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-import json
 import logging
 import os
 import pkgutil
-from importlib import import_module
 from collections import deque
 from functools import wraps
+from importlib import import_module
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 from flask_compress import Compress
+from flask_cors import CORS
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.model import Model
-from flask_restplus.resource import Resource
-from jsonschema.exceptions import RefResolutionError
-
-from flexget import manager
 from flexget.config_schema import process_config, register_config_key
 from flexget.event import event
 from flexget.utils.database import with_session
 from flexget.webserver import User
 from flexget.webserver import register_app, get_secret
+from jsonschema.exceptions import RefResolutionError
 
 CORE_ENDPOINTS = 'core_endpoints'
 
@@ -164,15 +160,6 @@ class API(RestPlusAPI):
             # If first argument isn't a class this happens
             pass
         return super(API, self).response(code_or_apierror, description, model=model, **kwargs)
-
-
-class APIResource(Resource):
-    """All api resources should subclass this class."""
-    method_decorators = [with_session]
-
-    def __init__(self, api, *args, **kwargs):
-        self.manager = manager.manager
-        super(APIResource, self).__init__(api, *args, **kwargs)
 
 
 app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__path__[0]), 'templates'))
@@ -335,45 +322,6 @@ def register_api(mgr):
 
     if api_config:
         register_app('/api', app)
-
-
-class APIClient(object):
-    """
-    This is an client which can be used as a more pythonic interface to the rest api.
-
-    It skips http, and is only usable from within the running flexget process.
-    """
-
-    def __init__(self):
-        self.app = app.test_client()
-
-    def __getattr__(self, item):
-        return APIEndpoint('/api/' + item, self.get_endpoint)
-
-    def get_endpoint(self, url, data=None, method=None):
-        if method is None:
-            method = 'POST' if data is not None else 'GET'
-        auth_header = dict(Authorization='Token %s' % api_key())
-        response = self.app.open(url, data=data, follow_redirects=True, method=method, headers=auth_header)
-        result = json.loads(response.get_data(as_text=True))
-        # TODO: Proper exceptions
-        if 200 > response.status_code >= 300:
-            raise Exception(result['error'])
-        return result
-
-
-class APIEndpoint(object):
-    def __init__(self, endpoint, caller):
-        self.endpoint = endpoint
-        self.caller = caller
-
-    def __getattr__(self, item):
-        return self.__class__(self.endpoint + '/' + item, self.caller)
-
-    __getitem__ = __getattr__
-
-    def __call__(self, data=None, method=None):
-        return self.caller(self.endpoint, data=data, method=method)
 
 
 # Import API Sub Modules

@@ -6,7 +6,8 @@ import logging
 from flask import jsonify
 
 from flexget.db_schema import reset_schema, plugin_schemas
-from flexget.api import api, APIResource, base_message_schema, success_response, BadRequest
+from flexget.api import api, base_message_schema, success_response, BadRequest
+from flexget.api.models import APIResource
 
 log = logging.getLogger('database')
 

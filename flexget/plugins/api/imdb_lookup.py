@@ -2,7 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 
 from flask import jsonify
 
-from flexget.api import api, APIResource
+from flexget.api import api
+from flexget.api.models import APIResource
 from flexget.utils.imdb import ImdbSearch
 
 imdb_api = api.namespace('imdb', description='IMDB lookup endpoint')
