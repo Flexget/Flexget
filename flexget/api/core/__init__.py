@@ -1,1 +1,1 @@
-__all__ = ["authentication", "cached", "database", "plugins", "server", "tasks", "user"]
+""" Core API endpoints, not plugin related"""
