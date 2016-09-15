@@ -1,10 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from flexget.api import base_message
 
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from flexget.api.plugins.movie_list import ObjectsContainer as OC
 from flexget.utils import json
-from flexget.plugins.api.entry_list import ObjectsContainer as OC
-from flexget.plugins.api.movie_list import ObjectsContainer as OC
 
 
 class TestETAG(object):

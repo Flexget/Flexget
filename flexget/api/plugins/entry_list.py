@@ -9,9 +9,8 @@ from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
 import flexget.plugins.list.entry_list as el
-from flexget.api.app import api
-from flexget.api.responses import BadRequest, NotFoundError, base_message_schema, success_response
-from flexget.api.models import APIResource
+from flexget.api import api, APIResource
+from flexget.api.app import BadRequest, NotFoundError, base_message_schema, success_response
 
 log = logging.getLogger('entry_list')
 

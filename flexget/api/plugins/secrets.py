@@ -5,9 +5,8 @@ import logging
 
 from flask import request
 
-from flexget.api.app import api
-from flexget.api.responses import empty_response
-from flexget.api.models import APIResource
+from flexget.api import api, APIResource
+from flexget.api.app import empty_response
 from flexget.plugins.modify.config_secrets import secrets_from_db, secrets_to_db
 
 log = logging.getLogger('secrets')

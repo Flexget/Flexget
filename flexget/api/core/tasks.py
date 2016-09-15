@@ -7,14 +7,12 @@ import copy
 from datetime import datetime
 from json import JSONEncoder
 
-from flask import jsonify, Response
-from flask import request
+from flask import jsonify, Response, request
 from queue import Queue, Empty
 
-from flexget.api.app import api
-from flexget.api.responses import APIError, NotFoundError, CannotAddResource, BadRequest, success_response, \
+from flexget.api import api, APIResource
+from flexget.api.app import APIError, NotFoundError, CannotAddResource, BadRequest, success_response, \
     base_message_schema
-from flexget.api.models import APIResource
 from flexget.config_schema import process_config
 from flexget.entry import Entry
 from flexget.event import event

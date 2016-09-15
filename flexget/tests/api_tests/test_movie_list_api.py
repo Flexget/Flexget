@@ -1,14 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import copy
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from flexget.api.app import empty_response, base_message
+from flexget.api.plugins.movie_list import ObjectsContainer as OC
 from flexget.plugins.list.movie_list import MovieListBase
-
 from flexget.utils import json
-
-from flexget.api import empty_response, base_message
-from flexget.plugins.api.movie_list import ObjectsContainer as OC
 
 
 class TestMovieListAPI(object):

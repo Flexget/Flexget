@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import jsonschema
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.utils import PY2
 from future.backports.http import client as backport_client
 
@@ -27,7 +27,7 @@ from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User
 from flexget.manager import Session
-from flexget.api import app
+from flexget.api import flask_app
 
 log = logging.getLogger('tests')
 
@@ -322,7 +322,7 @@ class MockManager(Manager):
 class APIClient(object):
     def __init__(self, api_key):
         self.api_key = api_key
-        self.client = app.test_client()
+        self.client = flask_app.test_client()
 
     def _append_header(self, key, value, kwargs):
         if 'headers' not in kwargs:

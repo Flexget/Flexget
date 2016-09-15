@@ -3,7 +3,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import json
 
-from flexget.api import base_message
+from flexget.api.app import base_message
 
 
 class TestAuthenticationAPI(object):

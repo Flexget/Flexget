@@ -6,9 +6,8 @@ import logging
 from flask import jsonify
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api.app import api
-from flexget.api.responses import BadRequest, base_message_schema, success_response
-from flexget.api.models import APIResource
+from flexget.api import api, APIResource
+from flexget.api.app import BadRequest, base_message_schema, success_response
 from flexget.plugins.filter.remember_rejected import RememberEntry
 
 log = logging.getLogger('rejected')

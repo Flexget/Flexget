@@ -3,8 +3,8 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from datetime import datetime
 
+from flexget.api.plugins.rejected import ObjectsContainer as OC
 from flexget.manager import Session
-from flexget.plugins.api.rejected import ObjectsContainer as OC
 from flexget.plugins.filter.remember_rejected import RememberEntry, RememberTask
 from flexget.utils import json
 from flexget.utils.tools import parse_timedelta

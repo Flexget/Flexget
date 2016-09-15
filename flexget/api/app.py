@@ -1,23 +1,76 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import json
 import logging
 import os
+from collections import deque
 from functools import wraps
 
-from flask import Flask
-from flask import request
+from flask import Flask, request, jsonify, make_response
 from flask_compress import Compress
 from flask_cors import CORS
 from flask_restplus import Model, Api as RestPlusAPI
-from flexget.api.responses import ValidationError, APIError
+from flask_restplus import Resource
+from flexget import manager
 from flexget.config_schema import process_config
 from flexget.utils.database import with_session
 from flexget.webserver import User
 from jsonschema import RefResolutionError
+from werkzeug.http import generate_etag
+
+from . import __path__
 
 __version__ = '0.6-beta'
 
 log = logging.getLogger('api')
+
+
+class APIClient(object):
+    """
+    This is an client which can be used as a more pythonic interface to the rest api.
+
+    It skips http, and is only usable from within the running flexget process.
+    """
+
+    def __init__(self):
+        self.app = api_app.test_client()
+
+    def __getattr__(self, item):
+        return APIEndpoint('/api/' + item, self.get_endpoint)
+
+    def get_endpoint(self, url, data=None, method=None):
+        if method is None:
+            method = 'POST' if data is not None else 'GET'
+        auth_header = dict(Authorization='Token %s' % api_key())
+        response = self.app.open(url, data=data, follow_redirects=True, method=method, headers=auth_header)
+        result = json.loads(response.get_data(as_text=True))
+        # TODO: Proper exceptions
+        if 200 > response.status_code >= 300:
+            raise Exception(result['error'])
+        return result
+
+
+class APIEndpoint(object):
+    def __init__(self, endpoint, caller):
+        self.endpoint = endpoint
+        self.caller = caller
+
+    def __getattr__(self, item):
+        return self.__class__(self.endpoint + '/' + item, self.caller)
+
+    __getitem__ = __getattr__
+
+    def __call__(self, data=None, method=None):
+        return self.caller(self.endpoint, data=data, method=method)
+
+
+class APIResource(Resource):
+    """All api resources should subclass this class."""
+    method_decorators = [with_session]
+
+    def __init__(self, api, *args, **kwargs):
+        self.manager = manager.manager
+        super(APIResource, self).__init__(api, *args, **kwargs)
 
 
 class ApiSchemaModel(Model):
@@ -153,8 +206,167 @@ api = API(
     description='<font color="red"><b>Warning: under development, subject to change without notice.<b/></font>'
 )
 
+base_message = {
+    'type': 'object',
+    'properties': {
+        'status_code': {'type': 'integer'},
+        'message': {'type': 'string'},
+        'status': {'type': 'string'}
+    }
+}
+
+base_message_schema = api.schema('base_message', base_message)
+
+
+class APIError(Exception):
+    description = 'Server error'
+    status_code = 500
+    status = 'Error'
+    response_model = base_message_schema
+
+    def __init__(self, message=None, payload=None):
+        self.message = message
+        self.payload = payload
+
+    def to_dict(self):
+        rv = self.payload or {}
+        rv.update(status_code=self.status_code, message=self.message, status=self.status)
+        return rv
+
+    @classmethod
+    def schema(cls):
+        return cls.response_model.__schema__
+
+
+class NotFoundError(APIError):
+    status_code = 404
+    description = 'Not found'
+
+
+class Unauthorized(APIError):
+    status_code = 401
+    description = 'Unauthorized'
+
+
+class BadRequest(APIError):
+    status_code = 400
+    description = 'Bad request'
+
+
+class CannotAddResource(APIError):
+    status_code = 409
+    description = 'Conflict'
+
+
+class PreconditionFailed(APIError):
+    status_code = 412
+    description = 'Precondition failed'
+
+
+class NotModified(APIError):
+    status_code = 304
+    description = 'not modified'
+
+
+class ValidationError(APIError):
+    status_code = 422
+    description = 'Validation error'
+
+    response_model = api.inherit('validation_error', APIError.response_model, {
+        'type': 'object',
+        'properties': {
+            'validation_errors': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'message': {'type': 'string', 'description': 'A human readable message explaining the error.'},
+                        'validator': {'type': 'string', 'description': 'The name of the failed validator.'},
+                        'validator_value': {
+                            'type': 'string', 'description': 'The value for the failed validator in the schema.'
+                        },
+                        'path': {'type': 'string'},
+                        'schema_path': {'type': 'string'},
+                    }
+                }
+            }
+        },
+        'required': ['validation_errors']
+    })
+
+    verror_attrs = (
+        'message', 'cause', 'validator', 'validator_value',
+        'path', 'schema_path', 'parent'
+    )
+
+    def __init__(self, validation_errors, message='validation error'):
+        payload = {'validation_errors': [self._verror_to_dict(error) for error in validation_errors]}
+        super(ValidationError, self).__init__(message, payload=payload)
+
+    def _verror_to_dict(self, error):
+        error_dict = {}
+        for attr in self.verror_attrs:
+            if isinstance(getattr(error, attr), deque):
+                error_dict[attr] = list(getattr(error, attr))
+            else:
+                error_dict[attr] = str(getattr(error, attr))
+        return error_dict
+
+
+empty_response = api.schema('empty', {'type': 'object'})
+
+
+def success_response(message, status_code=200, status='success'):
+    rsp_dict = {
+        'message': message,
+        'status_code': status_code,
+        'status': status
+    }
+    rsp = jsonify(rsp_dict)
+    rsp.status_code = status_code
+    return rsp
+
+
+@api.errorhandler(APIError)
+@api.errorhandler(NotFoundError)
+@api.errorhandler(ValidationError)
+@api.errorhandler(BadRequest)
+@api.errorhandler(Unauthorized)
+@api.errorhandler(CannotAddResource)
+@api.errorhandler(NotModified)
+@api.errorhandler(PreconditionFailed)
+def api_errors(error):
+    return error.to_dict(), error.status_code
+
 
 @with_session
 def api_key(session=None):
     log.debug('fetching token for internal lookup')
     return session.query(User).first().token
+
+
+def etag(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        # Identify if this is a GET or HEAD in order to proceed
+        assert request.method in ['HEAD', 'GET'], '@etag is only supported for GET requests'
+        rv = f(*args, **kwargs)
+        rv = make_response(rv)
+        etag = generate_etag(rv.get_data())
+        rv.headers['Cache-Control'] = 'max-age=86400'
+        rv.headers['ETag'] = etag
+        if_match = request.headers.get('If-Match')
+        if_none_match = request.headers.get('If-None-Match')
+
+        if if_match:
+            etag_list = [tag.strip() for tag in if_match.split(',')]
+            if etag not in etag_list and '*' not in etag_list:
+                raise PreconditionFailed('etag does not match')
+        elif if_none_match:
+            etag_list = [tag.strip() for tag in if_none_match.split(',')]
+            if etag in etag_list or '*' in etag_list:
+                raise NotModified
+
+        return rv
+
+    return wrapped

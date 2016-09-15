@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from flexget.api import base_message
 
+from flexget.api.app import base_message
+from flexget.api.plugins.failed import ObjectsContainer as OC
 from flexget.manager import Session
 from flexget.plugins.filter.retry_failed import FailedEntry
 from flexget.utils import json
-from flexget.plugins.api.failed import ObjectsContainer as OC
 
 
 class TestRetryFailedAPI(object):

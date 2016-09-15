@@ -24,10 +24,9 @@ from pyparsing import nums, alphanums, printables
 from yaml.error import YAMLError
 
 from flexget._version import __version__
-from flexget.api.app import api, __version__ as __api_version__
-from flexget.api.responses import APIError, BadRequest, base_message, success_response, base_message_schema, \
+from flexget.api import api, APIResource
+from flexget.api.app import __version__ as __api_version__, APIError, BadRequest, base_message, success_response, base_message_schema, \
     empty_response
-from flexget.api.models import APIResource
 
 log = logging.getLogger('api.server')
 

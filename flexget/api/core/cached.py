@@ -3,9 +3,8 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flask.helpers import send_file
 from flask_restplus import inputs
-from flexget.api.app import api
-from flexget.api.responses import APIError, BadRequest
-from flexget.api.models import APIResource
+from flexget.api import api, APIResource
+from flexget.api.app import APIError, BadRequest
 from flexget.utils.tools import cached_resource
 from requests import RequestException
 

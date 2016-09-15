@@ -6,8 +6,8 @@ import logging
 from flask_restplus import inputs
 
 from flexget.plugin import get_plugins, get_plugin_by_name, DependencyError
-from flexget.api.responses import api, BadRequest
-from flexget.api.models import APIResource
+from flexget.api import api, APIResource
+from flexget.api.app import BadRequest
 
 log = logging.getLogger('plugins')
 

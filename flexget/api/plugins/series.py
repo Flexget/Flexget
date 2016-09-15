@@ -9,10 +9,8 @@ from flask import request
 from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api.app import api
-from flexget.api.responses import NotFoundError, CannotAddResource, BadRequest, base_message_schema, success_response
-from flexget.api.models import APIClient, APIResource
-from flexget.api.decorators import etag
+from flexget.api import api, APIClient, APIResource
+from flexget.api.app import NotFoundError, CannotAddResource, BadRequest, base_message_schema, success_response, etag
 from flexget.event import fire_event
 from flexget.plugin import PluginError
 from flexget.plugins.filter import series

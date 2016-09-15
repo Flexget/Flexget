@@ -3,10 +3,10 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import json
 
-from flexget.api import base_message
-from mock import patch
+from flexget.api.app import base_message
+from flexget.api.core.tasks import ObjectsContainer as OC
 from flexget.manager import Manager
-from flexget.api.tasks import ObjectsContainer as OC
+from mock import patch
 
 
 class TestTaskAPI(object):

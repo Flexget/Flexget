@@ -3,8 +3,8 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import json
 
-from flexget.api import base_message
-from flexget.api.database import ObjectsContainer as OC
+from flexget.api.app import base_message
+from flexget.api.core.database import ObjectsContainer as OC
 
 
 class TestDatabaseAPI(object):

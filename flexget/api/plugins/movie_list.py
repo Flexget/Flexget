@@ -9,10 +9,8 @@ from flask import jsonify
 from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api.app import api
-from flexget.api.responses import CannotAddResource, NotFoundError, base_message_schema, success_response, BadRequest
-from flexget.api.models import APIResource
-from flexget.api.decorators import etag
+from flexget.api import api, APIResource
+from flexget.api.app import CannotAddResource, NotFoundError, base_message_schema, success_response, BadRequest, etag
 from flexget.plugins.list import movie_list as ml
 from flexget.plugins.list.movie_list import MovieListBase
 

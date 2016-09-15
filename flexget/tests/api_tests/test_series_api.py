@@ -1,13 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from flexget.plugins.filter.series import Series, SeriesTask
 
-from mock import patch
-
+from flexget.api.plugins.series import ObjectsContainer as OC
 from flexget.manager import Session
-from flexget.plugins.filter import series
+from flexget.plugins.filter.series import Series, SeriesTask
 from flexget.utils import json
-from flexget.plugins.api.series import ObjectsContainer as OC
 
 
 class TestSeriesAPI(object):

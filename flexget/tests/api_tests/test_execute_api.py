@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import json
 
-from flexget.api import base_message
-from flexget.api.tasks import ObjectsContainer as OC
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from flexget.api.app import base_message
+from flexget.api.core.tasks import ObjectsContainer as OC
 
 
 class TestExecuteAPI(object):

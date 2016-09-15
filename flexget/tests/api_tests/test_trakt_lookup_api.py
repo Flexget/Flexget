@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
+
 import pytest
 
+from flexget.api.plugins.trakt_lookup import ObjectsContainer as oc
 from flexget.utils import json
-from flexget.plugins.api.trakt_lookup import ObjectsContainer as oc
 
 
 @pytest.mark.online

@@ -3,7 +3,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
-from flexget.plugins.api.imdb_lookup import ObjectsContainer as OC
+from flexget.api.plugins.imdb_lookup import ObjectsContainer as OC
 from flexget.utils import json
 
 

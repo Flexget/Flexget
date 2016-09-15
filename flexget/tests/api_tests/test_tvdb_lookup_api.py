@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
-
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from flexget.plugins.api.tvdb_lookup import ObjectsContainer as OC
+
 import pytest
 
+from flexget.api.plugins.tvdb_lookup import ObjectsContainer as OC
 from flexget.utils import json
 
 

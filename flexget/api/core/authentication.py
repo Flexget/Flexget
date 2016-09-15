@@ -8,14 +8,13 @@ from flask_login import login_user, LoginManager, current_user, current_app
 from flask_restplus import inputs
 from werkzeug.security import check_password_hash
 
-from flexget.api.app import api, api_app
-from flexget.api.responses import Unauthorized, success_response, base_message_schema
-from flexget.api.models import APIResource
+from flexget.api import api, flask_app, APIResource
+from flexget.api.app import Unauthorized, success_response, base_message_schema
 from flexget.utils.database import with_session
 from flexget.webserver import User
 
 login_manager = LoginManager()
-login_manager.init_app(api_app)
+login_manager.init_app(flask_app)
 
 
 @login_manager.request_loader
@@ -54,7 +53,7 @@ def load_user(username, session=None):
     return session.query(User).filter(User.name == username).first()
 
 
-@api_app.before_request
+@flask_app.before_request
 def check_valid_login():
     # Allow access to root, login and swagger documentation without authentication
     if request.path == '/' or request.path.startswith('/auth/login') or \
