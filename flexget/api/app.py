@@ -346,6 +346,14 @@ def api_key(session=None):
 
 
 def etag(f):
+    """
+    A decorator that add an ETag header to the response and checks for the "If-Match" and "If-Not-Match" headers to
+     return an appropriate response.
+
+    :param f: A GET or HEAD flask method to wrap
+    :return: The method's response with the ETag and Cache-Control headers, raises a 412 error or returns a 304 response
+    """
+
     @wraps(f)
     def wrapped(*args, **kwargs):
         # Identify if this is a GET or HEAD in order to proceed
