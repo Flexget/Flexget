@@ -10,16 +10,44 @@
             controller: moviesController
         });
 
-    function moviesController($mdDialog, $sce, moviesService) {
+    function moviesController($document, $mdDialog, $mdPanel, $sce, addMovieService, moviesService) {
         var vm = this;
 
         vm.lists = [];
         vm.$onInit = activate;
-        vm.deleteMovieList = deleteMovieList;
+        vm.deleteList = deleteList;
         vm.newList = newList;
+        vm.searchMovies = searchMovies;
+
+        vm.searchtext = "";
 
         function activate() {
             getMovieLists();
+        }
+
+        var position = $mdPanel.newPanelPosition().relativeTo('.search-menu').addPanelPosition($mdPanel.xPosition.ALIGN_END, $mdPanel.yPosition.BELOW);
+        var panelConfig = {
+            attachTo: angular.element($document[0].body),
+            controller: 'addMovieController',
+            controllerAs: 'vm',
+            templateUrl: 'plugins/movies/components/add-movie/add-movie.tmpl.html',
+            panelClass: 'add-movie-panel',
+            position: position,
+            locals: {},
+            clickOutsideToClose: true,
+            escapeToClose: true,
+            focusOnOpen: false,
+            zIndex: 2,
+            onRemoving: addMovieService.clearWatcher,
+            id: 'addMoviePanel'
+        };
+        
+        function searchMovies() {
+            panelConfig.locals.searchtext = vm.searchtext;
+            panelConfig.locals.lists = vm.lists;
+            panelConfig.locals.selectedlist = vm.selectedlist;
+
+            $mdPanel.open(panelConfig);
         }
 
         function getMovieLists() {
@@ -28,7 +56,10 @@
             });
         }
 
-        function deleteMovieList(list) {
+        function deleteList($event, list) {
+            $event.preventDefault();
+            $event.stopPropagation();
+
             var confirm = $mdDialog.confirm()
                 .title('Confirm deleting movie list.')
                 .htmlContent($sce.trustAsHtml('Are you sure you want to delete the movie list <b>' + list.name + '</b>?'))

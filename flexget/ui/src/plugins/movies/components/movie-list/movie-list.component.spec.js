@@ -62,21 +62,6 @@ describe('Plugin: Movie-list.Component', function () {
         });
     });
 
-    describe('deleteList()', function () {
-        it('should exist', function () {
-            expect(component.deleteList).to.exist;
-            expect(component.deleteList).to.be.a('function');
-        });
-
-        it('should call the parent function', function () {
-            var event = $rootScope.$emit('click');
-
-            component.deleteList(event);
-
-            expect(component.deleteMovieList).to.have.been.calledOnce;
-        });
-    });
-
     describe('deleteMovie()', function () {
         beforeEach(function () {
             deferred = $q.defer();

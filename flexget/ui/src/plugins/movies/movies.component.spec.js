@@ -37,22 +37,24 @@ describe('Plugin: Movies.Component', function () {
         });
     });
 
-    describe('deleteMovieList()', function () {
+    describe('deleteList()', function () {
+        var event;
         beforeEach(function () {
+            event = $rootScope.$emit('click');
             deferred = $q.defer();
 
             sinon.stub(moviesService, 'deleteList').returns(deferred.promise);
         });
 
         it('should exist', function () {
-            expect(component.deleteMovieList).to.exist;
-            expect(component.deleteMovieList).to.be.a('function');
+            expect(component.deleteList).to.exist;
+            expect(component.deleteList).to.be.a('function');
         });
 
         it('should call the dialog show function', function () {
             sinon.spy($mdDialog, 'show');
 
-            component.deleteMovieList(list);
+            component.deleteList(event, list);
 
             expect($mdDialog.show).to.have.been.calledOnce;
         });
@@ -61,7 +63,7 @@ describe('Plugin: Movies.Component', function () {
             it('should call the movies service', function () {
                 sinon.stub($mdDialog, 'show').returns($q.resolve());
 
-                component.deleteMovieList(list);
+                component.deleteList(event, list);
 
                 $rootScope.$digest();
 
@@ -75,7 +77,7 @@ describe('Plugin: Movies.Component', function () {
                             
                 component.lists = angular.copy(lists.movie_lists);
 
-                component.deleteMovieList(list);
+                component.deleteList(event, list);
 
                 $rootScope.$digest();
 
