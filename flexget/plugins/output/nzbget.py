@@ -41,7 +41,7 @@ class OutputNzbget(object):
 
         for entry in task.accepted:
             if task.options.test:
-                log.info('Would add into nzbget: %s' % entry['title'])
+                log.info('Would add into nzbget: %s', entry['title'])
                 continue
 
             # allow overriding the category
@@ -49,15 +49,15 @@ class OutputNzbget(object):
                 params['category'] = entry['category']
 
             try:
-                server.appendurl(entry["title"] + '.nzb',
-                                 params["category"],
-                                 params["priority"],
-                                 params["top"],
-                                 entry["url"])
-                log.info("Added `%s` to nzbget" % entry["title"])
-            except Exception:
-                log.critical("rpc call to nzbget failed")
-                entry.fail("could not call appendurl via RPC")
+                server.appendurl(entry['title'] + '.nzb',
+                                 params['category'],
+                                 params['priority'],
+                                 params['top'],
+                                 entry['url'])
+                log.info('Added `%s` to nzbget', entry['title'])
+            except Exception as e:
+                log.critical('rpc call to nzbget failed: %s', e)
+                entry.fail('could not call appendurl via RPC')
 
 
 @event('plugin.register')
