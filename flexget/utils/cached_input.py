@@ -1,24 +1,21 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import copy
 import logging
-import hashlib
 import pickle
 from datetime import datetime, timedelta
-from pprint import pformat
 
-from sqlalchemy.orm import relation
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, ForeignKey
-
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flexget import db_schema
+from flexget.event import event
 from flexget.manager import Session
+from flexget.plugin import PluginError
 from flexget.utils import json
 from flexget.utils.database import entry_synonym
-from flexget.utils.tools import parse_timedelta, TimedDict
-from flexget.event import event
-from flexget.plugin import PluginError
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+from flexget.utils.tools import parse_timedelta, TimedDict, get_config_hash
+from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, ForeignKey
+from sqlalchemy.orm import relation
 
 log = logging.getLogger('input_cache')
 Base = db_schema.versioned_base('input_cache', 1)
@@ -69,18 +66,6 @@ def db_cleanup(manager, session):
     result = session.query(InputCache).filter(InputCache.added < datetime.now() - timedelta(days=7)).delete()
     if result:
         log.verbose('Removed %s old input caches.' % result)
-
-
-def get_config_hash(config):
-    """
-    :param dict config: Configuration
-    :return: MD5 hash for *config*
-    """
-    if isinstance(config, dict) or isinstance(config, list):
-        # this does in fact support nested dicts, they're sorted too!
-        return hashlib.md5(pformat(config).encode('utf-8')).hexdigest()
-    else:
-        return hashlib.md5(str(config).encode('utf-8')).hexdigest()
 
 
 class cached(object):

@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-import hashlib
 import logging
 
 from sqlalchemy import Column, Integer, Unicode
@@ -12,7 +11,7 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.plugins.filter.series import FilterSeriesBase
-from flexget.utils.cached_input import get_config_hash
+from flexget.utils.tools import get_config_hash
 
 log = logging.getLogger('configure_series')
 Base = db_schema.versioned_base('import_series', 0)

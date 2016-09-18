@@ -21,10 +21,9 @@ from flexget.plugin import plugins as all_plugins
 from flexget.plugin import (
     DependencyError, get_plugins, phase_methods, plugin_schemas, PluginError, PluginWarning, task_phases)
 from flexget.utils import requests
-from flexget.utils.cached_input import get_config_hash
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
-from flexget.utils.tools import merge_dict_from_to
+from flexget.utils.tools import merge_dict_from_to, get_config_hash
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
