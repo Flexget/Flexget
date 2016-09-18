@@ -1,8 +1,5 @@
 """Contains miscellaneous helpers"""
 from __future__ import unicode_literals, division, absolute_import
-
-from pprint import pformat
-
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib import request
 from future.utils import PY2
@@ -21,6 +18,7 @@ import sys
 import io
 from collections import MutableMapping
 from datetime import timedelta, datetime
+from pprint import pformat
 
 import flexget
 import queue
