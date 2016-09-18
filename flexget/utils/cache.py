@@ -3,7 +3,6 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import hashlib
 import io
-import mimetypes
 import os
 
 import requests
@@ -22,7 +21,7 @@ def cached_resource(url, force=False, max_size=250, directory='cached_resources'
     :param directory: Name of directory to use. Default is `cached_resources`
     :return: Tuple of file path and mime type
     """
-    mime_type, encoding = mimetypes.guess_type(url)
+    mime_type = None
     hashed_name = hashlib.md5(url.encode('utf-8')).hexdigest()
     file_path = os.path.join(manager.config_base, directory, hashed_name)
     directory = os.path.dirname(file_path)
@@ -31,6 +30,7 @@ def cached_resource(url, force=False, max_size=250, directory='cached_resources'
         log.debug('caching %s', url)
         response = requests.get(url)
         response.raise_for_status()
+        mime_type = response.headers.get('content-type')
         content = response.content
         if not os.path.exists(directory):
             os.makedirs(directory)
