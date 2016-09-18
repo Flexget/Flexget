@@ -1638,10 +1638,9 @@ class SeriesDBManager(FilterSeriesBase):
 
     @plugin.priority(0)
     def on_task_start(self, task, config):
-        # TODO: broken currently, add new series to config and reload -> config is not changed?!
-        #if not task.config_modified:
-        #    log.trace('not task.config_modified, returning')
-        #    return
+        if not task.config_modified:
+            log.trace('not task.config_modified, returning')
+            return
 
         # Clear all series from this task
         with Session() as session:
