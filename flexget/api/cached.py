@@ -26,7 +26,7 @@ class CachedResource(APIResource):
         url = args.get('url')
         force = args.get('force')
         try:
-            file_path, mime_type = cached_resource(url, force)
+            file_path, mime_type = cached_resource(url, self.manager.config_base, force=force)
         except RequestException as e:
             raise BadRequest('Request Error: {}'.format(e.args[0]))
         except OSError as e:

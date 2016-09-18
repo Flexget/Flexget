@@ -7,10 +7,9 @@ import os
 
 import requests
 from flexget.utils.tools import log
-from flexget.manager import manager
 
 
-def cached_resource(url, force=False, max_size=250, directory='cached_resources'):
+def cached_resource(url, base_dir, force=False, max_size=250, directory='cached_resources'):
     """
     Caches a remote resource to local filesystem. Return a tuple of local file name and mime type, use primarily
     for API/WebUI.
@@ -23,7 +22,7 @@ def cached_resource(url, force=False, max_size=250, directory='cached_resources'
     """
     mime_type = None
     hashed_name = hashlib.md5(url.encode('utf-8')).hexdigest()
-    file_path = os.path.join(manager.config_base, directory, hashed_name)
+    file_path = os.path.join(base_dir, directory, hashed_name)
     directory = os.path.dirname(file_path)
 
     if not os.path.exists(file_path) or force:
