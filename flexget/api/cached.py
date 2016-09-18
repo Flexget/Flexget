@@ -30,5 +30,5 @@ class CachedResource(APIResource):
         except RequestException as e:
             raise BadRequest('Request Error: {}'.format(e.args[0]))
         except OSError as e:
-            raise ApiError('Error: {}'.format(e.args[0]))
+            raise ApiError('Error: {}'.format(str(e)))
         return send_file(file_path, mimetype=mime_type)
