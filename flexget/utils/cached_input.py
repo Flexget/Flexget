@@ -6,6 +6,7 @@ import logging
 import hashlib
 import pickle
 from datetime import datetime, timedelta
+from pprint import pformat
 
 from sqlalchemy.orm import relation
 from sqlalchemy import Column, Integer, String, DateTime, Unicode, select, ForeignKey
@@ -70,14 +71,14 @@ def db_cleanup(manager, session):
         log.verbose('Removed %s old input caches.' % result)
 
 
-def config_hash(config):
+def get_config_hash(config):
     """
     :param dict config: Configuration
     :return: MD5 hash for *config*
     """
-    if isinstance(config, dict):
+    if isinstance(config, dict) or isinstance(config, list):
         # this does in fact support nested dicts, they're sorted too!
-        return hashlib.md5(str(sorted(config.items())).encode('utf-8')).hexdigest()
+        return hashlib.md5(pformat(config).encode('utf-8')).hexdigest()
     else:
         return hashlib.md5(str(config).encode('utf-8')).hexdigest()
 
@@ -118,9 +119,9 @@ class cached(object):
                 # get name for a cache from tasks configuration
                 if self.name not in task.config:
                     raise Exception('@cache config name %s is not configured in task %s' % (self.name, task.name))
-                hash = config_hash(task.config[self.name])
+                hash = get_config_hash(task.config[self.name])
             else:
-                hash = config_hash(args[2])
+                hash = get_config_hash(args[2])
 
             log.trace('self.name: %s' % self.name)
             log.trace('hash: %s' % hash)
