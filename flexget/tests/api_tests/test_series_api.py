@@ -188,3 +188,5 @@ class TestSeriesAPI(object):
         assert not errors
 
         assert len(data['shows']) == 1
+
+

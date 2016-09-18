@@ -482,8 +482,8 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
     elif configured == 'unconfigured':
         query = query.having(func.count(SeriesTask.id) < 1)
     if premieres:
-        query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2).
-                 having(func.count(SeriesTask.id) < 1)).filter(Release.downloaded == True)
+        query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2)).filter(
+            Release.downloaded == True)
     if status == 'new':
         if not days:
             days = 7
