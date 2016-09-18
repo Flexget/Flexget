@@ -565,7 +565,8 @@ class Task(object):
             for template, value in self.manager.config.get('templates', {}).items():
                 if isinstance(templates, basestring) or isinstance(templates, list) and template in templates:
                     task_templates.update({template: value})
-            hashable_config = merge_dict_from_to(task_templates, copy.deepcopy(self.config))
+            hashable_config = copy.deepcopy(self.config)
+            merge_dict_from_to(task_templates, hashable_config)
             config_hash = get_config_hash(hashable_config)
             last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
             if self.is_rerun:
