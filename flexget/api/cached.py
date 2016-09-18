@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask.helpers import send_file
 from flask_restplus import inputs
 from flexget.api import api, APIResource, ApiError, BadRequest
-from flexget.utils.tools import cached_resource
+from flexget.utils.cache import cached_resource
 from requests import RequestException
 
 cached_api = api.namespace('cached', description='Cache remote resources')

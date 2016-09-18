@@ -1,21 +1,14 @@
 """Contains miscellaneous helpers"""
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib import request
-from future.utils import PY2
-from past.builtins import basestring
 
-import logging
 import ast
 import copy
-import hashlib
 import locale
-import mimetypes
+import logging
 import operator
 import os
 import re
-import sys
-import io
 from collections import MutableMapping
 from datetime import timedelta, datetime
 from pprint import pformat
@@ -24,7 +17,10 @@ import flexget
 import queue
 import requests
 
+from future.moves.urllib import request
+from future.utils import PY2
 from html.entities import name2codepoint
+from past.builtins import basestring
 
 log = logging.getLogger('utils')
 
@@ -526,15 +522,3 @@ def trim_dir(directory):
     file_name = os.path.join(directory, files[0])
     log.debug('removing least accessed file: %s', file_name)
     os.remove(file_name)
-
-
-def get_config_hash(config):
-    """
-    :param dict config: Configuration
-    :return: MD5 hash for *config*
-    """
-    if isinstance(config, dict) or isinstance(config, list):
-        # this does in fact support nested dicts, they're sorted too!
-        return hashlib.md5(pformat(config).encode('utf-8')).hexdigest()
-    else:
-        return hashlib.md5(str(config).encode('utf-8')).hexdigest()
