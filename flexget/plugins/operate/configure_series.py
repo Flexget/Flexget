@@ -12,6 +12,7 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginError
 from flexget.plugins.filter.series import FilterSeriesBase
+from flexget.utils.cached_input import get_config_hash
 
 log = logging.getLogger('configure_series')
 Base = db_schema.versioned_base('import_series', 0)
@@ -90,7 +91,7 @@ class ConfigureSeries(FilterSeriesBase):
                             s[key] = entry['configure_series_' + key]
 
         # Set the config_modified flag if the list of shows changed since last time
-        new_hash = str(hashlib.md5(str(sorted(series)).encode('utf-8')).hexdigest())
+        new_hash = get_config_hash(series)
         with Session() as session:
             last_hash = session.query(LastHash).filter(LastHash.task == task.name).first()
             if not last_hash:
