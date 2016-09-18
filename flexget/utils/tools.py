@@ -12,6 +12,7 @@ import locale
 import logging
 import hashlib
 import operator
+import sys
 import os
 import re
 from collections import MutableMapping
