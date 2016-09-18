@@ -3,7 +3,6 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import copy
-import hashlib
 import itertools
 import logging
 import threading
@@ -24,6 +23,7 @@ from flexget.plugin import (
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
+from flexget.utils.tools import merge_dict_from_to, get_config_hash
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
@@ -558,13 +558,15 @@ class Task(object):
 
         # Save current config hash and set config_modidied flag
         with Session() as session:
+            # TODO: better handling of templates
             task_templates = {}
             templates = self.config.get('template', [])
             for template, value in self.manager.config.get('templates', {}).items():
                 if isinstance(templates, basestring) or isinstance(templates, list) and template in templates:
                     task_templates.update({template: value})
-            hashable_config = list(self.config.items()) + list(task_templates.items())
-            config_hash = hashlib.md5(str(sorted(hashable_config, key=lambda x: x[0])).encode('utf-8')).hexdigest()
+            hashable_config = copy.deepcopy(self.config)
+            merge_dict_from_to(task_templates, hashable_config)
+            config_hash = get_config_hash(hashable_config)
             last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
             if self.is_rerun:
                 # Restore the config to state right after start phase
