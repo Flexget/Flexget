@@ -235,11 +235,11 @@ class WebServer(threading.Thread):
             host = '127.0.0.1'
 
         if self.ssl_certificate and self.ssl_private_key:
-            proto = 'https'
+            protocol = 'https'
         else:
-            proto = 'http'
+            protocol = 'http'
 
-        log.info('Web interface available at %s://%s:%s' % (proto, host, self.port))
+        log.info('Web interface available at %s://%s:%s' % (protocol, host, self.port))
 
         # Start the CherryPy WSGI web server
         cherrypy.engine.start()
