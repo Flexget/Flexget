@@ -13,10 +13,10 @@
             <h3>Version info</h3>
             <span>
                 Flexget: {{ vm.versions.flexget_version }}&nbsp;
-                <span ng-if="::vm.hasUpdate()">
-                    <md-tooltip>New version available ({{ vm.versions.latest_version }})</md-tooltip>
+                <a ng-if="::vm.hasUpdate()" href="http://flexget.com/ChangeLog" target="_blank">
+                    <md-tooltip  md-direction="top">New version available ({{ vm.versions.latest_version }})</md-tooltip>
                     <md-icon class="fa fa-lg fa-arrow-circle-up"></md-icon>
-                </span>
+                </a>
             </span
             ></br>
             <span>API: {{ vm.versions.api_version }}</span>
