@@ -39,7 +39,11 @@ web_config_schema = {
                 'ssl_certificate': {'type': 'string', 'format': 'string', 'default': ''},
                 'ssl_private_key': {'type': 'string', 'format': 'string', 'default': ''},
             },
-            'additionalProperties': False
+            'additionalProperties': False,
+            'dependencies': {
+                'ssl_certificate': ['ssl_private_key'],
+                'ssl_private_key': ['ssl_certificate'],
+            }
         }
     ]
 }
@@ -75,7 +79,6 @@ def get_secret(session=None):
 
 
 class WeakPassword(Exception):
-
     def __init__(self, value, logger=log, **kwargs):
         super(WeakPassword, self).__init__()
         # Value is expected to be a string
@@ -232,9 +235,11 @@ class WebServer(threading.Thread):
             host = '127.0.0.1'
 
         if self.ssl_certificate and self.ssl_private_key:
-            log.info('Web interface available at https://%s:%s' % (host, self.port))
+            proto = 'https'
         else:
-            log.info('Web interface available at http://%s:%s' % (host, self.port))
+            proto = 'http'
+
+        log.info('Web interface available at %s://%s:%s' % (proto, host, self.port))
 
         # Start the CherryPy WSGI web server
         cherrypy.engine.start()
