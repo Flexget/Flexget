@@ -1,5 +1,5 @@
 (function(angular) {
-  angular.module('components.core').factory('semver', [
+  angular.module('components.sidenav').factory('semver', [
     function() {
       var temp = function() { /* global define */
         (function(root, factory) {
