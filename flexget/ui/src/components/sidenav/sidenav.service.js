@@ -6,10 +6,11 @@
         .module('components.sidenav')
         .factory('sideNavService', sideNavService);
 
-    function sideNavService($mdMedia, $mdSidenav, $rootScope) {
+    function sideNavService($http, $mdMedia, $mdSidenav, $rootScope, exception) {
         return {
             toggle: toggle,
-            close: close
+            close: close,
+            getVersionInfo: getVersionInfo
         };
 
         function toggle() {
@@ -25,6 +26,20 @@
             if (!$mdMedia('gt-lg')) {
                 $mdSidenav('left').close();
             }
+        }
+
+        function getVersionInfo() {
+            return $http.get('/api/server/version/')
+                .then(getVersionInfoComplete)
+                .catch(callFailed);
+            
+            function getVersionInfoComplete(response) {
+                return response.data;
+            }
+        }
+
+        function callFailed(error) {
+            return exception.catcher(error);
         }
     }
 }());

@@ -5,7 +5,7 @@ from flask.helpers import send_file
 from flask_restplus import inputs
 from flexget.api import api, APIResource
 from flexget.api.app import APIError, BadRequest
-from flexget.utils.tools import cached_resource
+from flexget.utils.cache import cached_resource
 from requests import RequestException
 
 cached_api = api.namespace('cached', description='Cache remote resources')
@@ -28,9 +28,9 @@ class CachedResource(APIResource):
         url = args.get('url')
         force = args.get('force')
         try:
-            file_path, mime_type = cached_resource(url, force)
+            file_path, mime_type = cached_resource(url, self.manager.config_base, force=force)
         except RequestException as e:
             raise BadRequest('Request Error: {}'.format(e.args[0]))
         except OSError as e:
-            raise APIError('Error: {}'.format(e.args[0]))
+            raise APIError('Error: {}'.format(str(e))
         return send_file(file_path, mimetype=mime_type)

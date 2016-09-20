@@ -6,7 +6,7 @@
         .module('plugins.movies')
         .factory('moviesService', moviesService);
 
-    function moviesService($http, CacheFactory, exception) {
+    function moviesService($http, /*CacheFactory,*/ exception) {
         // If cache doesn't exist, create it
 
         //TODO: Enable cache
@@ -22,7 +22,9 @@
             getListMovies: getListMovies,
             deleteMovie: deleteMovie,
             createList: createList,
-            getMovieMetadata: getMovieMetadata
+            getMovieMetadata: getMovieMetadata,
+            addMovieToList: addMovieToList,
+            searchMovies: searchMovies
         };
 
         function getLists() {
@@ -88,6 +90,26 @@
             function getMovieMetadataComplete(response) {
                 return response.data;
             }
+        }
+
+        function addMovieToList(listid, movie) {
+            return $http.post('/api/movie_list/' + listid + '/movies/', movie)
+                .then(addMovieToListComplete)
+                .catch(callFailed);
+
+            function addMovieToListComplete() {
+                return;
+            }
+        }
+
+        function searchMovies(searchText) {
+            return $http.get('/api/imdb/search/' + searchText)
+                .then(searchMoviesComplete)
+                .catch(callFailed);
+
+                function searchMoviesComplete(response) {
+                    return response.data;
+                }
         }
 
         function callFailed(error) {

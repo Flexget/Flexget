@@ -10,15 +10,18 @@
             controller: sideNavController
         });
 
-    function sideNavController(routerHelper, sideNavService) {
+    function sideNavController($rootScope, routerHelper, semver, sideNavService) {
         var vm = this;
 
         var allStates = routerHelper.getStates();
         vm.close = sideNavService.close;
         vm.$onInit = activate;
+        vm.isSmallMenu = isSmallMenu;
+        vm.hasUpdate = hasUpdate;
 
         function activate() {
             getNavRoutes();
+            getVersionInfo();
         }
 
         function getNavRoutes() {
@@ -27,6 +30,20 @@
             }).sort(function (r1, r2) {
                 return r1.settings.weight - r2.settings.weight;
             });
+        }
+
+        function getVersionInfo() {
+            sideNavService.getVersionInfo().then(function (data) {
+                vm.versions = data;
+            });
+        }
+
+        function hasUpdate(current, latest) {
+            return semver(vm.versions.latest_version, vm.versions.flexget_version);
+        }
+
+        function isSmallMenu() {
+            return $rootScope.menuMini;
         }
     }
 }());

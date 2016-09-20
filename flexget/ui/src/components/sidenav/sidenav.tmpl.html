@@ -7,5 +7,19 @@
 				</md-button>
             </md-list-item>
         </md-list>
+        <span flex></span>
+
+        <div class="version-info" ng-if="!vm.isSmallMenu() && vm.versions">
+            <h3>Version info</h3>
+            <span>
+                Flexget: {{ vm.versions.flexget_version }}&nbsp;
+                <a ng-if="::vm.hasUpdate()" href="http://flexget.com/ChangeLog" target="_blank">
+                    <md-tooltip  md-direction="top">New version available ({{ vm.versions.latest_version }})</md-tooltip>
+                    <md-icon class="fa fa-lg fa-arrow-circle-up"></md-icon>
+                </a>
+            </span
+            ></br>
+            <span>API: {{ vm.versions.api_version }}</span>
+        </div>
     </md-content>
 </md-sidenav>

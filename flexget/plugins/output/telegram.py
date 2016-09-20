@@ -290,7 +290,7 @@ class SendTelegram(object):
                 try:
                     self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
                 except TelegramError as e:
-                    if kwargs.get('parse_mode') and "can't parse message text" in e.message:
+                    if kwargs.get('parse_mode'):
                         self.log.warning(
                             'Failed to render message using parse mode %s. Falling back to basic parsing: %s' % (
                                 kwargs['parse_mode'], e.message))

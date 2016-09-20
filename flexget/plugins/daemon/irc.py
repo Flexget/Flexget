@@ -6,11 +6,10 @@ import os
 import re
 import threading
 import logging
-from xml.etree.ElementTree import fromstring, parse
+from xml.etree.ElementTree import parse
 import io
 from uuid import uuid4
 import time
-import hashlib
 import urllib
 from datetime import datetime, timedelta
 
@@ -20,6 +19,7 @@ from flexget.event import event
 from flexget.manager import manager
 from flexget.config_schema import one_or_more
 from flexget.utils import requests
+from flexget.utils.tools import get_config_hash
 
 try:
     from irc_bot.irc_bot import IRCBot
@@ -95,7 +95,7 @@ irc_connections = {}
 # The manager object and thread
 irc_manager = None
 # To avoid having to restart the connections whenever the config updated event is fired (which is apparently a lot)
-config_hash = None
+config_hash = {}
 
 
 def create_thread(name, conn):
@@ -775,11 +775,12 @@ class IRCConnectionManager(object):
         """
 
         # First we validate the config for all connections including their .tracker files
-        for conn_name, connection in self.config.items():
+        for conn_name, config in self.config.items():
             try:
                 log.info('Starting IRC connection for %s', conn_name)
-                conn = IRCConnection(connection, conn_name)
+                conn = IRCConnection(config, conn_name)
                 irc_connections[conn_name] = conn
+                config_hash['names'][conn_name] = get_config_hash(config)
             except (MissingConfigOption, TrackerFileParseError, TrackerFileError, IOError) as e:
                 log.error(e)
                 if conn_name in irc_connections:
@@ -820,6 +821,34 @@ class IRCConnectionManager(object):
 
         return status
 
+    def update_config(self, config):
+        new_irc_connections = {}
+        removed_connections = set(self.config.keys()) - set(config.keys())
+        for name, conf in config.items():
+            hash = get_config_hash(conf)
+            if name in self.config and config_hash['names'].get(name) == hash:
+                continue
+            try:
+                new_irc_connections[name] = IRCConnection(conf, name)
+                config_hash['names'][name] = hash
+            except (MissingConfigOption, TrackerFileParseError, TrackerFileError, IOError) as e:
+                log.error('Failed to update config. Error when updating %s: %s', name, e)
+                return
+
+        # stop connections that have been removed from config
+        for name in removed_connections:
+            self.stop_connection(name)
+            del irc_connections[name]
+
+        # and (re)start the new ones
+        for name, connection in new_irc_connections.items():
+            if name in irc_connections:
+                self.stop_connection(name)
+            irc_connections[name] = connection
+            connection.thread.start()
+
+        self.config = config
+
 
 @event('manager.daemon.started')
 def irc_start(manager):
@@ -847,18 +876,18 @@ def irc_update_config(manager):
         manager.shutdown(finish_queue=False)
         return
 
-    # TODO this hashing doesn't quite work for nested dicts
-    new_config_hash = hashlib.md5(str(sorted(list(config.items()))).encode('utf-8')).hexdigest()
-    if config_hash == new_config_hash:
-        log.debug('IRC config has not been changed. Not reloading the connections.')
+    config_hash.setdefault('names', {})
+    new_config_hash = get_config_hash(config)
+
+    if config_hash.get('config') == new_config_hash:
+        log.verbose('IRC config has not been changed. Not reloading any connections.')
         return
+    config_hash['manager'] = new_config_hash
 
-    config_hash = new_config_hash
-
-    # Config for IRC has been removed, shutdown all instances
-    stop_irc(manager)
-
-    irc_manager = IRCConnectionManager(config)
+    if irc_manager is not None and irc_manager.is_alive():
+        irc_manager.update_config(config)
+    else:
+        irc_manager = IRCConnectionManager(config)
 
 
 @event('manager.shutdown_requested')

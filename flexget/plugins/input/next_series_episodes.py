@@ -97,6 +97,7 @@ class NextSeriesEpisodes(object):
         with Session() as session:
             for seriestask in session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
                 series = seriestask.series
+                log.trace('evaluating %s', series.name)
                 if not series:
                     # TODO: How can this happen?
                     log.debug('Found SeriesTask item without series specified. Cleaning up.')
@@ -104,6 +105,7 @@ class NextSeriesEpisodes(object):
                     continue
 
                 if series.identified_by not in ['ep', 'sequence']:
+                    log.trace('unsupported identified_by scheme')
                     reason = series.identified_by or 'auto'
                     impossible.setdefault(reason, []).append(series.name)
                     continue
@@ -166,7 +168,7 @@ class NextSeriesEpisodes(object):
         
         for reason, series in impossible.items():
             log.verbose('Series `%s` with identified_by value `%s` are not supported. ',
-                        ', '.join(series), reason)
+                        ', '.join(sorted(series)), reason)
 
         return entries
 

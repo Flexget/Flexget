@@ -12,6 +12,11 @@ body {
   background: $flexget-background-color;
 }
 
+ui-view {
+  display: inherit;
+  width: 100%;
+}
+
 // Directives
 md-input-container .hint {
   left: 2px;
