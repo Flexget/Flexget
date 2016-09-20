@@ -18,7 +18,9 @@ web_config_schema = {
             'type': 'object',
             'properties': {
                 'bind': {'type': 'string', 'format': 'ipv4'},
-                'port': {'type': 'integer'},
+                'port': {'type': 'integer',
+                         'minimum': 0,
+                         'maximum': 65536},
                 'ssl_certificate': {'type': 'string'},
                 'ssl_private_key': {'type': 'string'},
                 'web_ui': {'type': 'boolean'}
