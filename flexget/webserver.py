@@ -239,7 +239,7 @@ class WebServer(threading.Thread):
         else:
             protocol = 'http'
 
-            log.info('Web interface available at %s://%s:%s', protocol, host, self.port)
+        log.info('Web interface available at %s://%s:%s', protocol, host, self.port)
 
         # Start the CherryPy WSGI web server
         cherrypy.engine.start()
