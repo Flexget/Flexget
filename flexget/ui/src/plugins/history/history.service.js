@@ -15,7 +15,8 @@
         var historyCache = CacheFactory.get('historyCache');
 
         return {
-            getHistory: getHistory
+            getHistory: getHistory,
+            getHistoryForTask: getHistoryForTask
         };
 
         function getHistory() {
@@ -24,6 +25,16 @@
                 .catch(callFailed);
 
             function getHistoryComplete(response) {
+                return response.data;
+            }
+        }
+
+        function getHistoryForTask(params) {
+            return $http.get('/api/history/', { params: params, cache: historyCache })
+                .then(getHistoryForTaskComplete)
+                .catch(callFailed);
+            
+            function getHistoryForTaskComplete(response) {
                 return response.data;
             }
         }

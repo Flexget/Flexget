@@ -1,4 +1,11 @@
 <md-content flex>
+    <md-input-container>
+        <label>Search</label>
+        <input ng-model="vm.taskName" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }">
+        <md-icon class="fa fa-lg fa-question-circle">
+            <md-tooltip  md-direction="top">Filtering happens on exact task name!</md-tooltip>
+        </md-icon>
+    </md-input-container>
     <section ng-repeat="(key, value) in vm.entries | groupBy: 'time | limitTo : 10'">
         <md-subheader class="md-primary">{{ key }}</md-subheader>
         <md-list layout-padding>
