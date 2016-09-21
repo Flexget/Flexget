@@ -13,7 +13,7 @@ from flexget.plugins.filter.series import Series, SeriesTask, Episode, Release
 from flexget.utils import json
 
 
-class TestSeriesAPI(object):
+class TestSeriesRootAPI(object):
     config = """
         tasks: {}
     """
@@ -46,10 +46,10 @@ class TestSeriesAPI(object):
         assert not errors
 
         show = data['shows'][0]
-        errors = schema_match(OC.show_details_schema, show)
+        errors = schema_match(OC.single_series_object, show)
         assert not errors
 
-        assert show['show_name'] == 'test series'
+        assert show['series_name'] == 'test series'
 
     def test_series_configured_param(self, api_client, schema_match):
         with Session() as session:
@@ -77,11 +77,11 @@ class TestSeriesAPI(object):
         assert not errors
 
         show = data['shows'][0]
-        errors = schema_match(OC.show_details_schema, show)
+        errors = schema_match(OC.single_series_object, show)
         assert not errors
 
         assert len(data['shows']) == 1
-        assert show['show_name'] == 'test series'
+        assert show['series_name'] == 'test series'
 
         # Add a configured series
         with Session() as session:
@@ -102,11 +102,11 @@ class TestSeriesAPI(object):
         assert not errors
 
         show = data['shows'][0]
-        errors = schema_match(OC.show_details_schema, show)
+        errors = schema_match(OC.single_series_object, show)
         assert not errors
 
         assert len(data['shows']) == 1
-        assert show['show_name'] == 'test series 2'
+        assert show['series_name'] == 'test series 2'
 
         # Get all series
         rsp = api_client.get('/series/?in_config=all')

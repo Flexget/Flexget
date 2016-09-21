@@ -236,7 +236,7 @@ class ObjectsContainer(object):
         }
     }
 
-    shows_schema = {
+    series_search_object = {
         'type': 'object',
         'properties': {
             'shows': {
@@ -283,7 +283,7 @@ episode_list_schema = api.schema('episode_list', ObjectsContainer.episode_list_s
 series_edit_schema = api.schema('series_edit_schema', ObjectsContainer.series_edit_object)
 series_input_schema = api.schema('series_input_schema', ObjectsContainer.series_input_object)
 show_details_schema = api.schema('show_details', ObjectsContainer.single_series_object)
-shows_schema = api.schema('list_of_shows', ObjectsContainer.shows_schema)
+series_search_schema = api.schema('list_of_shows', ObjectsContainer.series_search_object)
 episode_schema = api.schema('episode_item', ObjectsContainer.episode_schema)
 
 series_list_parser = api.parser()
@@ -367,7 +367,7 @@ class SeriesAPI(APIResource):
                 for show in response['shows']:
                     pos = response['shows'].index(show)
                     response['shows'][pos].setdefault('lookup', {})
-                    url = base_url + show['show_name'] + '/'
+                    url = base_url + show['series_name'] + '/'
                     result = api_client.get_endpoint(url)
                     response['shows'][pos]['lookup'].update({endpoint: result})
         return jsonify(response)
@@ -406,7 +406,7 @@ class SeriesAPI(APIResource):
 @series_api.route('/search/<string:name>/')
 @api.doc(description='Searches for a show in the DB via its name. Returns a list of matching shows.')
 class SeriesGetShowsAPI(APIResource):
-    @api.response(200, 'Show list retrieved successfully', shows_schema)
+    @api.response(200, 'Show list retrieved successfully', series_search_schema)
     @api.doc(params={'name': 'Name of the show(s) to search'})
     def get(self, name, session):
         """ List of shows matching lookup name """
