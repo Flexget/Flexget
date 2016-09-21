@@ -90,7 +90,7 @@ class ConfigureSeries(FilterSeriesBase):
                             s[key] = entry['configure_series_' + key]
 
         # Set the config_modified flag if the list of shows changed since last time
-        new_hash = get_config_hash(series)
+        new_hash = str(get_config_hash(series))
         with Session() as session:
             last_hash = session.query(LastHash).filter(LastHash.task == task.name).first()
             if not last_hash:
