@@ -1,9 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+import pytest
 from datetime import datetime, timedelta
 
 from flexget.api.plugins.series import ObjectsContainer as OC
+from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
+from flexget.api.plugins.tvmaze_lookup import ObjectsContainer as tvmaze
 from flexget.manager import Session
 from flexget.plugins.filter.series import Series, SeriesTask, Episode, Release
 from flexget.utils import json
@@ -316,4 +319,36 @@ class TestSeriesAPI(object):
 
         assert len(data['shows']) == 1
 
+    @pytest.mark.online
+    def test_series_lookup_param(self, api_client, schema_match):
+        # Add two real shows
+        with Session() as session:
+            series = Series()
+            series.name = 'Suits'
+            session.add(series)
 
+            series2 = Series()
+            series2.name = 'Stranger Things'
+            session.add(series2)
+
+            session.commit()
+
+        rsp = api_client.get('/series/?in_config=all&lookup=tvdb&lookup=tvmaze')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.series_list_schema, data)
+        assert not errors
+
+        assert len(data['shows']) == 2
+
+        for show in data['shows']:
+            tvdb_lookup = show['lookup']['tvdb']
+            assert tvdb_lookup
+            errors = schema_match(tvdb.tvdb_series_object, tvdb_lookup)
+            assert not errors
+
+            tvmaze_lookup = show['lookup']['tvmaze']
+            assert tvmaze_lookup
+            errors = schema_match(tvmaze.tvmaze_series_object, tvmaze_lookup)
+            assert not errors

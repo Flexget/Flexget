@@ -55,7 +55,7 @@ class ObjectsContainer(object):
             'webchannel': {'type': ['string', 'null']},
             'runtime': {'type': 'integer'},
             'show_type': {'type': 'string'},
-            'network': {'type': 'string'},
+            'network': {'type': ['string', 'null']},
             'last_update': {'type': 'string', 'format': 'date-time'}
         }
     }
