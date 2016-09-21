@@ -192,9 +192,10 @@ class ObjectsContainer(object):
         'type': 'object',
         'properties': {
             'episode': episode_object,
-            'show_id': {'type': 'integer'},
-            'show': {'type': 'string'}
-        }
+            'series_id': {'type': 'integer'},
+            'series_name': {'type': 'string'}
+        },
+        'required': ['episode', 'series_id', 'series_name']
     }
 
     series_edit_object = {
@@ -582,8 +583,8 @@ class SeriesEpisodeAPI(APIResource):
         if not series.episode_in_show(show_id, ep_id):
             raise BadRequest('episode with id %s does not belong to show %s' % (ep_id, show_id))
         return jsonify({
-            'show': show.name,
-            'show_id': show_id,
+            'series_name': show.name,
+            'series_id': show_id,
             'episode': get_episode_details(episode)
         })
 

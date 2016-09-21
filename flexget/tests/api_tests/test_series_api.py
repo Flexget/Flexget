@@ -601,6 +601,14 @@ class TestSeriesEpisodesAPI(object):
             series.episodes.append(episode2)
             session.commit()
 
+        # No series
+        rsp = api_client.get('/series/10/episodes/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
         rsp = api_client.get('/series/1/episodes/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
@@ -626,6 +634,7 @@ class TestSeriesEpisodesAPI(object):
         assert not errors
 
         assert len(data['episodes']) == data['number_of_episodes'] == 0
+
 
 class TestSeriesEpisodeAPI(object):
     config = """
@@ -663,6 +672,11 @@ class TestSeriesEpisodeAPI(object):
 
             series.episodes.append(episode1)
             series.episodes.append(episode2)
+
+            series2 = Series()
+            series2.name = 'test series 2'
+            session.add(series2)
+
             session.commit()
 
         rsp = api_client.get('/series/1/episodes/1/')
@@ -672,4 +686,47 @@ class TestSeriesEpisodeAPI(object):
         errors = schema_match(OC.episode_schema, data)
         assert not errors
 
-        # assert len(data['episodes']) == data['number_of_episodes'] == 2
+        assert data['episode']['identifier'] == 'S01E01'
+        assert data['episode']['identified_by'] == 'ep'
+        assert data['episode']['season'] == 1
+        assert data['episode']['number'] == 1
+        assert data['episode']['premiere_type'] == 'Series Premiere'
+
+        # No series ID
+        rsp = api_client.get('/series/10/episodes/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # No episode ID
+        rsp = api_client.get('/series/1/episodes/10/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Episode does not belong to series
+        rsp = api_client.get('/series/2/episodes/1/')
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Delete
+        rsp = api_client.delete('/series/1/episodes/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.get('/series/1/episodes/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
