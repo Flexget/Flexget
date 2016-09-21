@@ -4,6 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import pytest
 from datetime import datetime, timedelta
 
+from flexget.api.app import base_message
 from flexget.api.plugins.series import ObjectsContainer as OC
 from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
 from flexget.api.plugins.tvmaze_lookup import ObjectsContainer as tvmaze
@@ -352,3 +353,62 @@ class TestSeriesAPI(object):
             assert tvmaze_lookup
             errors = schema_match(tvmaze.tvmaze_series_object, tvmaze_lookup)
             assert not errors
+
+    def test_series_post(self, api_client, schema_match):
+        payload = {'series_name': 'test series'}
+
+        # Minimal payload
+        rsp = api_client.json_post('/series/', data=json.dumps(payload))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.single_series_object, data)
+        assert not errors
+
+        # Try to add again
+        rsp = api_client.json_post('/series/', data=json.dumps(payload))
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        payload2 = {'series_name': 'test series 2',
+                    'begin_episode': 'bla'}
+
+        # Invalid begin episode
+        rsp = api_client.json_post('/series/', data=json.dumps(payload2))
+        assert rsp.status_code == 422, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        payload3 = {'series_name': 'test series 2',
+                    'begin_episode': 's01e01',
+                    'alternate_names': [
+                        'show1', 'show2'
+                    ]}
+
+        # Maximal payload
+        rsp = api_client.json_post('/series/', data=json.dumps(payload3))
+        assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.single_series_object, data)
+        assert not errors
+
+        assert data['series_name'] == payload3['series_name']
+        assert data['alternate_names'] == payload3['alternate_names']
+        assert data['begin_episode']['identifier'].lower() == payload3['begin_episode']
+
+        payload4 = {'series_name': 'test series 3',
+                    'alternate_names': ['show1']}
+
+        # Alternate name already added to different show
+        rsp = api_client.json_post('/series/', data=json.dumps(payload4))
+        assert rsp.status_code ==409, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors

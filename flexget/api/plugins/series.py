@@ -29,8 +29,8 @@ def get_series_details(show):
         begin_ep_id = begin_ep_identifier = None
 
     begin = {
-        'episode_id': begin_ep_id,
-        'episode_identifier': begin_ep_identifier
+        'id': begin_ep_id,
+        'identifier': begin_ep_identifier
     }
 
     if latest_ep:
@@ -53,8 +53,8 @@ def get_series_details(show):
     }
 
     show_item = {
-        'show_id': show.id,
-        'show_name': show.name,
+        'series_id': show.id,
+        'series_name': show.name,
         'alternate_names': [n.alt_name for n in show.alternate_names],
         'begin_episode': begin,
         'latest_downloaded_episode': latest,
@@ -67,22 +67,25 @@ class ObjectsContainer(object):
     begin_object = {
         'type': 'object',
         'properties': {
-            'episode_id': {'type': ['integer', 'null']},
-            'episode_identifier': {'type': ['string', 'null']}
-        }
+            'id': {'type': ['integer', 'null']},
+            'identifier': {'type': ['string', 'null']}
+        },
+        'required': ['id', 'identifier']
+
     }
 
     release_object = {
         'type': 'object',
         'properties': {
-            'release_id': {'type': 'integer'},
-            'release_title': {'type': 'string'},
-            'release_downloaded': {'type': 'string'},
-            'release_quality': {'type': 'string'},
-            'release_proper_count': {'type': 'integer'},
-            'release_first_seen': {'type': 'string', 'format': 'date-time'},
-            'release_episode_id': {'type': 'integer'}
-        }
+            'id': {'type': 'integer'},
+            'title': {'type': 'string'},
+            'downloaded': {'type': 'string'},
+            'quality': {'type': 'string'},
+            'proper_count': {'type': 'integer'},
+            'first_seen': {'type': 'string', 'format': 'date-time'},
+            'episode_id': {'type': 'integer'}
+        },
+        'required': ['id', 'title', 'downloaded', 'quality', 'proper_count', 'first_seen', 'episode_id']
     }
 
     release_schema = {
@@ -125,28 +128,32 @@ class ObjectsContainer(object):
     episode_object = {
         'type': 'object',
         'properties': {
-            "episode_first_seen": {'type': 'string', 'format': 'date-time'},
-            "episode_id": {'type': 'string'},
-            "episode_identified_by": {'type': 'string'},
-            "episode_identifier": {'type': 'string'},
-            "episode_premiere_type": {'type': 'string'},
-            "episode_number": {'type': 'string'},
-            "episode_season": {'type': 'string'},
-            "episode_series_id": {'type': 'string'},
-            "episode_number_of_releases": {'type': 'integer'}
-        }
+            "first_seen": {'type': 'string', 'format': 'date-time'},
+            "id": {'type': 'string'},
+            "identified_by": {'type': 'string'},
+            "identifier": {'type': 'string'},
+            "premiere_type": {'type': 'string'},
+            "number": {'type': 'string'},
+            "season": {'type': 'string'},
+            "series_id": {'type': 'string'},
+            "number_of_releases": {'type': 'integer'}
+        },
+        'required': ['first_seen', 'id', 'identified_by', 'identifier', 'premiere_type', 'number', 'season',
+                     'series_id', 'number_of_releases']
     }
 
-    show_object = {
+    single_series_object = {
         'type': 'object',
         'properties': {
-            'show_id': {'type': 'integer'},
-            'show_name': {'type': 'string'},
+            'series_id': {'type': 'integer'},
+            'series_name': {'type': 'string'},
             'alternate_names': {'type': 'array', 'items': {'type': 'string'}},
             'begin_episode': begin_object,
             'latest_downloaded_episode': latest_object,
             'in_tasks': {'type': 'array', 'items': {'type': 'string'}}
-        }
+        },
+        'required': ['series_id', 'series_name', 'alternate_names', 'begin_episode', 'latest_downloaded_episode',
+                     'in_tasks']
     }
 
     series_list_schema = {
@@ -154,7 +161,7 @@ class ObjectsContainer(object):
         'properties': {
             'shows': {
                 'type': 'array',
-                'items': show_object
+                'items': single_series_object
             },
             'total_number_of_shows': {'type': 'integer'},
             'page_size': {'type': 'integer'},
@@ -229,23 +236,12 @@ class ObjectsContainer(object):
         }
     }
 
-    show_details_schema = {
-        'type': 'object',
-        'properties': {
-            'episodes': {
-                'type': 'array',
-                'items': episode_object
-            },
-            'show': show_object
-        }
-    }
-
     shows_schema = {
         'type': 'object',
         'properties': {
             'shows': {
                 'type': 'array',
-                'items': show_object
+                'items': single_series_object
             },
             'number_of_shows': {'type': 'integer'}
         }
@@ -254,28 +250,28 @@ class ObjectsContainer(object):
 
 def get_release_details(release):
     release_item = {
-        'release_id': release.id,
-        'release_title': release.title,
-        'release_downloaded': release.downloaded,
-        'release_quality': release.quality.name,
-        'release_proper_count': release.proper_count,
-        'release_first_seen': release.first_seen,
-        'release_episode_id': release.episode_id,
+        'id': release.id,
+        'title': release.title,
+        'downloaded': release.downloaded,
+        'quality': release.quality.name,
+        'proper_count': release.proper_count,
+        'first_seen': release.first_seen,
+        'episode_id': release.episode_id,
     }
     return release_item
 
 
 def get_episode_details(episode):
     episode_item = {
-        'episode_id': episode.id,
-        'episode_identifier': episode.identifier,
-        'episode_season': episode.season,
-        'episode_identified_by': episode.identified_by,
-        'episode_number': episode.number,
-        'episode_series_id': episode.series_id,
-        'episode_first_seen': episode.first_seen,
-        'episode_premiere_type': episode.is_premiere,
-        'episode_number_of_releases': len(episode.releases)
+        'id': episode.id,
+        'identifier': episode.identifier,
+        'season': episode.season,
+        'identified_by': episode.identified_by,
+        'number': episode.number,
+        'series_id': episode.series_id,
+        'first_seen': episode.first_seen,
+        'premiere_type': episode.is_premiere,
+        'number_of_releases': len(episode.releases)
     }
     return episode_item
 
@@ -286,7 +282,7 @@ series_list_schema = api.schema('list_series', ObjectsContainer.series_list_sche
 episode_list_schema = api.schema('episode_list', ObjectsContainer.episode_list_schema)
 series_edit_schema = api.schema('series_edit_schema', ObjectsContainer.series_edit_object)
 series_input_schema = api.schema('series_input_schema', ObjectsContainer.series_input_object)
-show_details_schema = api.schema('show_details', ObjectsContainer.show_details_schema)
+show_details_schema = api.schema('show_details', ObjectsContainer.single_series_object)
 shows_schema = api.schema('list_of_shows', ObjectsContainer.shows_schema)
 episode_schema = api.schema('episode_item', ObjectsContainer.episode_schema)
 
@@ -376,9 +372,8 @@ class SeriesAPI(APIResource):
                     response['shows'][pos]['lookup'].update({endpoint: result})
         return jsonify(response)
 
-    @api.response(200, 'Adding series and setting first accepted episode to ep_id', show_details_schema)
+    @api.response(201, model=show_details_schema)
     @api.response(CannotAddResource)
-    @api.response(BadRequest)
     @api.validate(series_input_schema, description=ep_identifier_doc)
     def post(self, session):
         """ Create a new show and set its first accepted episode and/or alternate names """
@@ -396,18 +391,16 @@ class SeriesAPI(APIResource):
         ep_id = data.get('begin_episode')
         alt_names = data.get('alternate_names')
         if ep_id:
-            try:
-                series.set_series_begin(show, ep_id)
-            except ValueError as e:
-                # Invalid begin identifier
-                raise BadRequest(e.args[0])
+            series.set_series_begin(show, ep_id)
         if alt_names:
             try:
                 series.set_alt_names(alt_names, show, session)
             except PluginError as e:
                 # Alternate name already exist for a different show
                 raise CannotAddResource(e.value)
-        return jsonify(get_series_details(show))
+        rsp = jsonify(get_series_details(show))
+        rsp.status_code = 201
+        return rsp
 
 
 @series_api.route('/search/<string:name>/')
