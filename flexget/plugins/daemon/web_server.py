@@ -41,7 +41,7 @@ def prepare_config(config):
     if not isinstance(config, dict):
         config = {}
     config.setdefault('bind', '0.0.0.0')
-    config.setdefault('port', 3539)
+    config.setdefault('port', 5050)
     config.setdefault('ssl_certificate', None)
     config.setdefault('ssl_private_key', None)
     config.setdefault('web_ui', True)
