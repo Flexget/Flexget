@@ -730,3 +730,68 @@ class TestSeriesEpisodeAPI(object):
 
         errors = schema_match(base_message, data)
         assert not errors
+
+class TestSeriesReleasesAPI(object):
+    config = """
+        tasks: {}
+    """
+
+    def test_releases_get(self, api_client, schema_match):
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 1'
+            session.add(series)
+
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            episode1 = Episode()
+            episode1.identifier = 'S01E01'
+            episode1.identified_by = 'ep'
+            episode1.season = 1
+            episode1.number = 1
+            episode1.series_id = series.id
+
+            release1 = Release()
+            release1.title = 'downloaded release'
+            release1.downloaded = True
+
+            release1 = Release()
+            release1.title = 'un-downloaded release'
+            release1.downloaded = False
+
+            episode1.releases = [release1]
+            series.episodes.append(episode1)
+
+            session.commit()
+
+        rsp = api_client.get('/series/1/episodes/1/releases/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.release_list_schema, data)
+        assert not errors
+
+        assert len(data['releases']) == data['number_of_releases'] == 2
+
+        # Just downloaded releases
+        rsp = api_client.get('/series/1/episodes/1/releases/?downloaded=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.release_list_schema, data)
+        assert not errors
+
+        assert len(data['releases']) == data['number_of_releases'] == 1
+        assert data['releases'][0]['title'] == 'downloaded release'
+
+        # Just un-downloaded releases
+        rsp = api_client.get('/series/1/episodes/1/releases/?downloaded=false')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.release_list_schema, data)
+        assert not errors
+
+        assert len(data['releases']) == data['number_of_releases'] == 1
+        assert data['releases'][0]['title'] == 'un-downloaded release'

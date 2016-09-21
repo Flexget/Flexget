@@ -79,7 +79,7 @@ class ObjectsContainer(object):
         'properties': {
             'id': {'type': 'integer'},
             'title': {'type': 'string'},
-            'downloaded': {'type': 'string'},
+            'downloaded': {'type': 'boolean'},
             'quality': {'type': 'string'},
             'proper_count': {'type': 'integer'},
             'first_seen': {'type': 'string', 'format': 'date-time'},
@@ -107,8 +107,9 @@ class ObjectsContainer(object):
             },
             'number_of_releases': {'type': 'integer'},
             'episode_id': {'type': 'integer'},
-            'show_id': {'type': 'integer'}
-        }
+            'series_id': {'type': 'integer'}
+        },
+        'required': ['releases', 'episode_id', 'series_id']
     }
 
     latest_object = {
@@ -463,7 +464,7 @@ class SeriesShowAPI(APIResource):
         args = delete_parser.parse_args()
         series.remove_series(name, forget=args.get('forget'))
 
-        return success_response('successfully remove series %s from DB' % show_id)
+        return success_response('successfully removed series %s from DB' % show_id)
 
     @api.response(200, 'Episodes for series will be accepted starting with ep_id', show_details_schema)
     @api.response(CannotAddResource)
@@ -559,7 +560,7 @@ class SeriesEpisodesAPI(APIResource):
         forget = args.get('forget')
         for episode in show.episodes:
             series.remove_series_episode(show.name, episode.identifier, forget)
-        return success_response('successfully remove all series %s episodes from DB' % show_id)
+        return success_response('successfully removed all series %s episodes from DB' % show_id)
 
 
 @api.response(NotFoundError)
@@ -608,7 +609,7 @@ class SeriesEpisodeAPI(APIResource):
         args = delete_parser.parse_args()
         series.remove_series_episode(show.name, episode.identifier, args.get('forget'))
 
-        return success_response('successfully remove episode %s from show %s' % (ep_id, show_id))
+        return success_response('successfully removed episode %s from show %s' % (ep_id, show_id))
 
 
 release_list_parser = api.parser()
@@ -653,7 +654,7 @@ class SeriesReleasesAPI(APIResource):
             'releases': release_items,
             'number_of_releases': len(release_items),
             'episode_id': ep_id,
-            'show_id': show_id
+            'series_id': show_id
 
         })
 
