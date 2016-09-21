@@ -9,7 +9,7 @@ from flexget.api.plugins.series import ObjectsContainer as OC
 from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
 from flexget.api.plugins.tvmaze_lookup import ObjectsContainer as tvmaze
 from flexget.manager import Session
-from flexget.plugins.filter.series import Series, SeriesTask, Episode, Release
+from flexget.plugins.filter.series import Series, SeriesTask, Episode, Release, AlternateNames
 from flexget.utils import json
 
 
@@ -407,7 +407,7 @@ class TestSeriesRootAPI(object):
 
         # Alternate name already added to different show
         rsp = api_client.json_post('/series/', data=json.dumps(payload4))
-        assert rsp.status_code ==409, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -420,7 +420,6 @@ class TestSeriesSearchAPI(object):
     """
 
     def test_series_search(self, api_client, schema_match):
-
         with Session() as session:
             series1 = Series()
             series1.name = 'test series1'
@@ -458,3 +457,107 @@ class TestSeriesSearchAPI(object):
         assert not errors
 
         assert len(data['shows']) == 0
+
+
+class TestSeriesSingleAPI(object):
+    config = """
+        tasks: {}
+    """
+
+    def test_series_get(self, api_client, schema_match):
+        with Session() as session:
+            series1 = Series()
+            series1.name = 'test series1'
+            session.add(series1)
+
+            session.commit()
+
+        rsp = api_client.get('/series/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.single_series_object, data)
+        assert not errors
+
+        assert data['series_name'] == 'test series1'
+
+        # No existing ID
+        rsp = api_client.get('/series/10/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+    def test_series_delete(self, api_client, schema_match):
+        with Session() as session:
+            series1 = Series()
+            series1.name = 'test series1'
+            session.add(series1)
+
+            session.commit()
+
+        rsp = api_client.delete('/series/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Delete again, no existing ID
+        rsp = api_client.delete('/series/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+    def test_series_put(self, api_client, schema_match):
+        with Session() as session:
+            series1 = Series()
+            series1.name = 'test series1'
+            session.add(series1)
+
+            session.commit()
+
+        payload = {}
+
+        # Validation error
+        rsp = api_client.json_put('/series/1/', data=json.dumps(payload))
+        assert rsp.status_code == 422, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        payload1 = {'begin_episode': 's01e01',
+                    'alternate_names': ['show1']}
+
+        rsp = api_client.json_put('/series/1/', data=json.dumps(payload1))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.single_series_object, data)
+        assert not errors
+
+        assert data['begin_episode']['identifier'].lower() == payload1['begin_episode']
+        assert data['alternate_names'] == payload1['alternate_names']
+
+        with Session() as session:
+            series = Series()
+            series.name = 'test series2'
+            session.add(series)
+
+            alt = AlternateNames('show2')
+            series.alternate_names = [alt]
+            session.commit()
+
+        payload2 = {'alternate_names': ['show2']}
+
+        # Alternate name used by another show
+        rsp = api_client.json_put('/series/1/', data=json.dumps(payload2))
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors

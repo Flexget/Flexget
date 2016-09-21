@@ -463,7 +463,6 @@ class SeriesShowAPI(APIResource):
         return success_response('successfully remove series %s from DB' % show_id)
 
     @api.response(200, 'Episodes for series will be accepted starting with ep_id', show_details_schema)
-    @api.response(BadRequest)
     @api.response(CannotAddResource)
     @api.validate(series_edit_schema, description=ep_identifier_doc)
     @api.doc(description='Set a begin episode or alternate names using a show ID. Note that alternate names override '
@@ -475,15 +474,10 @@ class SeriesShowAPI(APIResource):
         except NoResultFound:
             raise NotFoundError('Show with ID %s not found' % show_id)
         data = request.json
-        ep_id = data.get('episode_identifier')
+        ep_id = data.get('begin_episode')
         alt_names = data.get('alternate_names')
         if ep_id:
-            try:
-                series.set_series_begin(show, ep_id)
-            except ValueError as e:
-                # Invalid begin identifier
-                raise BadRequest(e.args[0])
-
+            series.set_series_begin(show, ep_id)
         if alt_names:
             try:
                 series.set_alt_names(alt_names, show, session)
