@@ -128,14 +128,14 @@ class ObjectsContainer(object):
     episode_object = {
         'type': 'object',
         'properties': {
-            "first_seen": {'type': 'string', 'format': 'date-time'},
-            "id": {'type': 'string'},
+            "first_seen": {'type': ['string', 'null'], 'format': 'date-time'},
+            "id": {'type': 'integer'},
             "identified_by": {'type': 'string'},
             "identifier": {'type': 'string'},
             "premiere_type": {'type': 'string'},
-            "number": {'type': 'string'},
-            "season": {'type': 'string'},
-            "series_id": {'type': 'string'},
+            "number": {'type': 'integer'},
+            "season": {'type': 'integer'},
+            "series_id": {'type': 'integer'},
             "number_of_releases": {'type': 'integer'}
         },
         'required': ['first_seen', 'id', 'identified_by', 'identifier', 'premiere_type', 'number', 'season',
@@ -181,9 +181,11 @@ class ObjectsContainer(object):
             'total_number_of_episodes': {'type': 'integer'},
             'page': {'type': 'integer'},
             'total_number_of_pages': {'type': 'integer'},
-            'show_id': {'type': 'integer'},
-            'show': {'type': 'string'}
-        }
+            'series_id': {'type': 'integer'},
+            'series': {'type': 'string'}
+        },
+        'required': ['episodes', 'number_of_episodes', 'total_number_of_episodes', 'page', 'total_number_of_pages',
+                     'series_id', 'series']
     }
 
     episode_schema = {
@@ -535,8 +537,8 @@ class SeriesEpisodesAPI(APIResource):
         if page > pages and pages != 0:
             raise NotFoundError('page %s does not exist' % page)
 
-        return jsonify({'show': show.name,
-                        'show_id': show_id,
+        return jsonify({'series': show.name,
+                        'series_id': show_id,
                         'number_of_episodes': len(episodes),
                         'episodes': episodes,
                         'total_number_of_episodes': count,
@@ -552,10 +554,10 @@ class SeriesEpisodesAPI(APIResource):
             show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
-        name = show.name
         args = delete_parser.parse_args()
-        series.remove_series(name, forget=args.get('forget'))
-
+        forget = args.get('forget')
+        for episode in show.episodes:
+            series.remove_series_episode(show.name, episode.identifier, forget)
         return success_response('successfully remove all series %s episodes from DB' % show_id)
 
 
