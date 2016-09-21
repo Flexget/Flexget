@@ -271,6 +271,16 @@ class TestSeriesAPI(object):
 
         assert len(data['shows']) == 2
 
+        # Just stale
+        rsp = api_client.get('/series/?status=stale')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.series_list_schema, data)
+        assert not errors
+
+        assert len(data['shows']) == 0
+
         # Add an episode with a release created over a year ago
         with Session() as session:
             series = Series()
