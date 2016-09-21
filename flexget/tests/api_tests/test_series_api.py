@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+from datetime import datetime, timedelta
+
 from flexget.api.plugins.series import ObjectsContainer as OC
 from flexget.manager import Session
 from flexget.plugins.filter.series import Series, SeriesTask, Episode, Release
@@ -181,6 +183,121 @@ class TestSeriesAPI(object):
 
         # Get only just premieres
         rsp = api_client.get('/series/?premieres=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.series_list_schema, data)
+        assert not errors
+
+        assert len(data['shows']) == 1
+
+    def test_series_status_param(self, api_client, schema_match):
+        # Add an episode with a release created now
+        with Session() as session:
+            series = Series()
+            series.name = 'test series'
+            session.add(series)
+
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            episode = Episode()
+            episode.identifier = 'S02E05'
+            episode.identified_by = 'ep'
+            episode.season = 2
+            episode.number = 5
+            episode.series_id = series.id
+            series.episodes.append(episode)
+
+            release = Release()
+            release.title = 'test release'
+            release.downloaded = True
+
+            episode.releases = [release]
+            session.commit()
+
+        # Add an episode with a release created 8 days ago
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 2'
+            session.add(series)
+
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            episode = Episode()
+            episode.identifier = 'S01E01'
+            episode.identified_by = 'ep'
+            episode.season = 1
+            episode.number = 1
+            episode.series_id = series.id
+            series.episodes.append(episode)
+
+            release = Release()
+            release.title = 'test release 2'
+            release.downloaded = True
+            release.first_seen = datetime.now() - timedelta(days=8)
+
+            episode.releases = [release]
+            session.commit()
+
+        # Default all, not just status = new
+        rsp = api_client.get('/series/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.series_list_schema, data)
+        assert not errors
+
+        assert len(data['shows']) == 2
+
+        # Just new
+        rsp = api_client.get('/series/?status=new')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.series_list_schema, data)
+        assert not errors
+
+        assert len(data['shows']) == 1
+
+        # New with days param
+        rsp = api_client.get('/series/?status=new&days=9')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.series_list_schema, data)
+        assert not errors
+
+        assert len(data['shows']) == 2
+
+        # Add an episode with a release created over a year ago
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 3'
+            session.add(series)
+
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            episode = Episode()
+            episode.identifier = 'S01E01'
+            episode.identified_by = 'ep'
+            episode.season = 1
+            episode.number = 1
+            episode.series_id = series.id
+            series.episodes.append(episode)
+
+            release = Release()
+            release.title = 'test release 3'
+            release.downloaded = True
+            release.first_seen = datetime.now() - timedelta(days=366)
+
+            episode.releases = [release]
+            session.commit()
+
+        # Just stale
+        rsp = api_client.get('/series/?status=stale')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
