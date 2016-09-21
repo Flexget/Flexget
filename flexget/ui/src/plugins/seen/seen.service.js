@@ -15,7 +15,8 @@
         var seenCache = CacheFactory.get('seenCache');
 
         return {
-            getSeen: getSeen
+            getSeen: getSeen,
+            deleteEntryById: deleteEntryById
         };
 
         function getSeen() {
@@ -25,6 +26,17 @@
 
             function getSeenComplete(response) {
                 return response.data;
+            }
+        }
+
+        function deleteEntryById(id) {
+            return $http.delete('/api/seen/' + id + '/')
+                .then(deleteEntryByIdComplete)
+                .catch(callFailed);
+            
+            function deleteEntryByIdComplete(response) {
+                seenCache.removeAll();
+                return;
             }
         }
 
