@@ -626,3 +626,50 @@ class TestSeriesEpisodesAPI(object):
         assert not errors
 
         assert len(data['episodes']) == data['number_of_episodes'] == 0
+
+class TestSeriesEpisodeAPI(object):
+    config = """
+        tasks: {}
+    """
+
+    def test_episode_get(self, api_client, schema_match):
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 1'
+            session.add(series)
+
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            episode1 = Episode()
+            episode1.identifier = 'S01E01'
+            episode1.identified_by = 'ep'
+            episode1.season = 1
+            episode1.number = 1
+            episode1.series_id = series.id
+
+            episode2 = Episode()
+            episode2.identifier = 'S01E01'
+            episode2.identified_by = 'ep'
+            episode2.season = 1
+            episode2.number = 1
+            episode2.series_id = series.id
+
+            release = Release()
+            release.title = 'test release'
+            release.downloaded = True
+
+            episode1.releases = [release]
+
+            series.episodes.append(episode1)
+            series.episodes.append(episode2)
+            session.commit()
+
+        rsp = api_client.get('/series/1/episodes/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.episode_schema, data)
+        assert not errors
+
+        # assert len(data['episodes']) == data['number_of_episodes'] == 2
