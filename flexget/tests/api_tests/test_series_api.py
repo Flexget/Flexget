@@ -412,3 +412,49 @@ class TestSeriesRootAPI(object):
 
         errors = schema_match(base_message, data)
         assert not errors
+
+
+class TestSeriesSearchAPI(object):
+    config = """
+        tasks: {}
+    """
+
+    def test_series_search(self, api_client, schema_match):
+
+        with Session() as session:
+            series1 = Series()
+            series1.name = 'test series1'
+            session.add(series1)
+
+            series2 = Series()
+            series2.name = 'test series2'
+            session.add(series2)
+
+            session.commit()
+
+        rsp = api_client.get('/series/search/test/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.series_search_object, data)
+        assert not errors
+
+        assert len(data['shows']) == 2
+
+        rsp = api_client.get('/series/search/series1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.series_search_object, data)
+        assert not errors
+
+        assert len(data['shows']) == 1
+
+        rsp = api_client.get('/series/search/bla/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.series_search_object, data)
+        assert not errors
+
+        assert len(data['shows']) == 0
