@@ -189,7 +189,7 @@ class WebServer(threading.Thread):
 
         if self.ssl_certificate and self.ssl_private_key:
             cherrypy.config.update({
-                'server.ssl_module': 'pyopenssl',
+                'server.ssl_module': 'builtin',
                 'server.ssl_certificate': self.ssl_certificate,
                 'server.ssl_private_key': self.ssl_private_key,
             })
@@ -204,7 +204,7 @@ class WebServer(threading.Thread):
         else:
             protocol = 'http'
 
-            log.info('Web interface available at %s://%s:%s', protocol, host, self.port)
+        log.info('Web interface available at %s://%s:%s', protocol, host, self.port)
 
         # Start the CherryPy WSGI web server
         cherrypy.engine.start()

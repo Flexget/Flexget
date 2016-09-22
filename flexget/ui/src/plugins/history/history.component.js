@@ -14,9 +14,16 @@
         var vm = this;
 
         vm.$onInit = activate;
+        vm.search = search;
 
         function activate() {
             getHistory();
+        }
+
+        function search() {
+            return historyService.getHistoryForTask({ task: vm.taskName }).then(function (data) {
+                vm.entries = data.entries;
+            });
         }
 
         function getHistory() {

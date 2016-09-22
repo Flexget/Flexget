@@ -5,7 +5,8 @@
     angular
         .module('components.sidenav', [
             'ngMaterial',
+
             'blocks.router',
-            'components.core'
+            'blocks.exception'
         ]);
 }());
