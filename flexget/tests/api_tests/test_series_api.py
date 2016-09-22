@@ -900,3 +900,28 @@ class TestSeriesReleasesAPI(object):
         assert not errors
 
         assert len(data['releases']) == data['number_of_releases'] == 0
+
+        # No series
+        rsp = api_client.delete('/series/10/episodes/1/releases/?downloaded=false')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # No episode for series
+        rsp = api_client.delete('/series/1/episodes/10/releases/?downloaded=false')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Episode does not belong to series
+        rsp = api_client.delete('/series/2/episodes/1/releases/?downloaded=false')
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
