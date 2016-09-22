@@ -3,6 +3,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
+from flask import jsonify
 from flask_restplus import inputs
 
 from flexget.plugin import get_plugins, get_plugin_by_name, DependencyError
@@ -91,8 +92,8 @@ class PluginsAPI(APIResource):
                 plugin_list.append(p)
         except ValueError as e:
             raise BadRequest(str(e))
-        return {'plugin_list': plugin_list,
-                'number_of_plugins': len(plugin_list)}
+        return jsonify({'plugin_list': plugin_list,
+                'number_of_plugins': len(plugin_list)})
 
 
 @plugins_api.route('/<string:plugin_name>/')
@@ -111,4 +112,4 @@ class PluginAPI(APIResource):
         p = plugin_to_dict(plugin)
         if args['include_schema']:
             p['schema'] = plugin.schema
-        return p
+        return jsonify(p)

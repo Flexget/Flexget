@@ -37,7 +37,7 @@ class IMDBMovieSearch(APIResource):
         """ Get a list of IMDB search result by name or ID"""
         raw_movies = ImdbSearch().smart_match(title, single_match=False)
         if not raw_movies:
-            return []
+            return jsonify([])
         # Convert single movie to list to preserve consistent reply
         if not isinstance(raw_movies, list):
             raw_movies = [raw_movies]

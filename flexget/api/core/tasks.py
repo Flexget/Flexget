@@ -194,7 +194,7 @@ class TaskAPI(APIResource):
         if task not in self.manager.user_config.get('tasks', {}):
             raise NotFoundError('task `%s` not found' % task)
 
-        return {'name': task, 'config': self.manager.user_config['tasks'][task]}
+        return jsonify({'name': task, 'config': self.manager.user_config['tasks'][task]})
 
     @api.validate(task_input_schema)
     @api.response(200, model=task_return_schema)

@@ -153,7 +153,7 @@ class ServerConfigAPI(APIResource):
     @api.response(200, description='Flexget config', model=empty_response)
     def get(self, session=None):
         """ Get Flexget Config in JSON form"""
-        return self.manager.config
+        return jsonify(self.manager.config)
 
 
 @server_api.route('/raw_config/')

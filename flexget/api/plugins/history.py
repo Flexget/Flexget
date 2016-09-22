@@ -66,7 +66,7 @@ class HistoryAPI(APIResource):
             count = session.query(History).count()
 
         if not count:
-            return {'entries': [], 'pages': 0}
+            return jsonify({'entries': [], 'pages': 0})
 
         pages = int(ceil(count / float(max_results)))
 
