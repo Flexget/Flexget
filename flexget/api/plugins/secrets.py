@@ -3,7 +3,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
-from flask import request
+from flask import request, jsonify
 
 from flexget.api import api, APIResource
 from flexget.api.app import empty_response, etag
@@ -19,7 +19,7 @@ class SecretsAPI(APIResource):
     @etag
     @api.response(200, model=empty_response)
     def get(self, session=None):
-        return secrets_from_db()
+        return jsonify(secrets_from_db())
 
     @api.response(201, 'Successfully updated secrets file')
     @api.validate(empty_response)
@@ -29,4 +29,6 @@ class SecretsAPI(APIResource):
         secrets_to_db(data)
         # This will trigger reloading the secrets file
         self.manager.validate_config()
-        return secrets_from_db(), 201
+        rsp = jsonify(secrets_from_db())
+        rsp.status_code = 201
+        return rsp
