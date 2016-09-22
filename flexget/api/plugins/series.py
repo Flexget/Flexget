@@ -91,11 +91,12 @@ class ObjectsContainer(object):
     release_schema = {
         'type': 'object',
         'properties': {
-            'show': {'type': 'string'},
-            'show_id': {'type': 'integer'},
+            'series': {'type': 'string'},
+            'series_id': {'type': 'integer'},
             'episode_id': {'type': 'integer'},
             'release': release_object
-        }
+        },
+        'required': ['series', 'series_id', 'episode_id', 'release']
     }
 
     release_list_schema = {
@@ -739,8 +740,8 @@ class SeriesReleaseAPI(APIResource):
             raise BadRequest('release id %s does not belong to episode %s' % (rel_id, ep_id))
 
         return jsonify({
-            'show': show.name,
-            'show_id': show_id,
+            'series': show.name,
+            'series_id': show_id,
             'episode_id': ep_id,
             'release': get_release_details(release)
         })
