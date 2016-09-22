@@ -7,7 +7,7 @@ from flask import request, jsonify
 
 from flexget.plugins.daemon.scheduler import schedule_schema, scheduler, scheduler_job_map
 from flexget.api import api, APIResource
-from flexget.api.app import NotFoundError, APIError, base_message_schema, success_response
+from flexget.api.app import NotFoundError, APIError, base_message_schema, success_response, etag
 
 schedule_api = api.namespace('schedules', description='Task Scheduler')
 
@@ -43,6 +43,7 @@ schedule_desc = "Schedule ID changes upon daemon restart. The schedules object s
 @schedule_api.route('/')
 @api.doc(description=schedule_desc)
 class SchedulesAPI(APIResource):
+    @etag
     @api.response(200, model=api_schedules_list_schema)
     def get(self, session=None):
         """ List schedules """
@@ -89,6 +90,7 @@ class SchedulesAPI(APIResource):
 @api.doc(description=schedule_desc)
 @api.response(NotFoundError)
 class ScheduleAPI(APIResource):
+    @etag
     @api.response(200, model=api_schedule_schema)
     def get(self, schedule_id, session=None):
         """ Get schedule details """

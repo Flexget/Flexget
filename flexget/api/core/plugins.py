@@ -7,7 +7,7 @@ from flask_restplus import inputs
 
 from flexget.plugin import get_plugins, get_plugin_by_name, DependencyError
 from flexget.api import api, APIResource
-from flexget.api.app import BadRequest
+from flexget.api.app import BadRequest, etag
 
 log = logging.getLogger('plugins')
 
@@ -75,6 +75,7 @@ def plugin_to_dict(plugin):
 
 @plugins_api.route('/')
 class PluginsAPI(APIResource):
+    @etag
     @api.response(200, model=plugin_list_reply_schema)
     @api.response(BadRequest)
     @api.doc(parser=plugins_parser)
@@ -96,6 +97,7 @@ class PluginsAPI(APIResource):
 
 @plugins_api.route('/<string:plugin_name>/')
 class PluginAPI(APIResource):
+    @etag
     @api.response(BadRequest)
     @api.response(200, model=plugin_schema)
     @api.doc(parser=plugin_parser, params={'plugin_name': 'Name of the plugin to return'})

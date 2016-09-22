@@ -411,6 +411,7 @@ class SeriesAPI(APIResource):
 @series_api.route('/search/<string:name>/')
 @api.doc(description='Searches for a show in the DB via its name. Returns a list of matching shows.')
 class SeriesGetShowsAPI(APIResource):
+    @etag
     @api.response(200, 'Show list retrieved successfully', series_search_schema)
     @api.doc(params={'name': 'Name of the show(s) to search'})
     def get(self, name, session):

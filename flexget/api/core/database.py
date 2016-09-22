@@ -7,7 +7,7 @@ from flask import jsonify
 
 from flexget.db_schema import reset_schema, plugin_schemas
 from flexget.api import api, APIResource
-from flexget.api.app import base_message_schema, success_response, BadRequest
+from flexget.api.app import base_message_schema, success_response, BadRequest, etag
 
 log = logging.getLogger('database')
 
@@ -23,6 +23,7 @@ plugins_schema = api.schema('plugins_list', ObjectsContainer.plugin_list)
 
 @db_api.route('/cleanup/')
 class DBCleanup(APIResource):
+    @etag
     @api.response(200, model=base_message_schema)
     def get(self, session=None):
         """ Make all plugins clean un-needed data from the database """
@@ -32,6 +33,7 @@ class DBCleanup(APIResource):
 
 @db_api.route('/vacuum/')
 class DBVacuum(APIResource):
+    @etag
     @api.response(200, model=base_message_schema)
     def get(self, session=None):
         """ Potentially increase performance and decrease database size"""
@@ -46,6 +48,7 @@ plugin_parser.add_argument('plugin_name', required=True, help='Name of plugin to
 
 @db_api.route('/reset_plugin/')
 class DBPluginReset(APIResource):
+    @etag
     @api.response(200, model=base_message_schema)
     @api.response(BadRequest)
     @api.doc(parser=plugin_parser)
@@ -62,6 +65,7 @@ class DBPluginReset(APIResource):
 
 @db_api.route('/plugins/')
 class DBPluginsSchemas(APIResource):
+    @etag
     @api.response(200, model=plugins_schema)
     def get(self, session=None):
         """ Get a list of plugin names available to reset """

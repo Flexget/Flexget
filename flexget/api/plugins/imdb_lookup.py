@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 from flask import jsonify
 
 from flexget.api import api, APIResource
+from flexget.api.app import etag
 from flexget.utils.imdb import ImdbSearch
 
 imdb_api = api.namespace('imdb', description='IMDB lookup endpoint')
@@ -30,6 +31,7 @@ return_schema = api.schema('imdb_search_schema', ObjectsContainer.return_object)
 @imdb_api.route('/search/<string:title>/')
 @api.doc(params={'title': 'Movie name or IMDB ID'})
 class IMDBMovieSearch(APIResource):
+    @etag
     @api.response(200, model=return_schema)
     def get(self, title, session=None):
         """ Get a list of IMDB search result by name or ID"""

@@ -6,7 +6,7 @@ from flask import jsonify
 from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.api.app import NotFoundError
+from flexget.api.app import NotFoundError, etag
 from flexget.plugins.internal.api_trakt import ApiTrakt as at, list_actors, get_translations_dict
 
 trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
@@ -134,6 +134,7 @@ lookup_parser.add_argument('include_translations', type=inputs.boolean, help='In
 @trakt_api.route('/series/<string:title>/')
 @api.doc(params={'title': 'Series name'})
 class TraktSeriesSearchApi(APIResource):
+    @etag
     @api.response(200, 'Successfully found show', series_return_schema)
     @api.response(NotFoundError)
     @api.doc(parser=lookup_parser)
@@ -158,6 +159,7 @@ class TraktSeriesSearchApi(APIResource):
 @trakt_api.route('/movies/<string:title>/')
 @api.doc(params={'title': 'Movie name'})
 class TraktMovieSearchApi(APIResource):
+    @etag
     @api.response(200, 'Successfully found show', movie_return_schema)
     @api.response(NotFoundError)
     @api.doc(parser=lookup_parser)

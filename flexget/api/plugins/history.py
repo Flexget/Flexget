@@ -8,7 +8,7 @@ from flask import jsonify
 from sqlalchemy import desc
 
 from flexget.api import api, APIResource
-from flexget.api.app import BadRequest
+from flexget.api.app import BadRequest, etag
 from flexget.plugins.output.history import History
 
 log = logging.getLogger('history')
@@ -50,6 +50,7 @@ history_parser.add_argument('task', type=str, required=False, default=None, help
 @history_api.route('/')
 @api.doc(parser=history_parser)
 class HistoryAPI(APIResource):
+    @etag
     @api.response(BadRequest)
     @api.response(200, model=history_list_schema)
     def get(self, session=None):

@@ -7,7 +7,7 @@ from flask import jsonify
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
-from flexget.api.app import BadRequest, base_message_schema, success_response
+from flexget.api.app import BadRequest, base_message_schema, success_response, etag
 from flexget.plugins.filter.remember_rejected import RememberEntry
 
 log = logging.getLogger('rejected')
@@ -55,6 +55,7 @@ rejected_entries_list_schema = api.schema('rejected_entries_list_schema', Object
 
 @rejected_api.route('/')
 class Rejected(APIResource):
+    @etag
     @api.response(200, model=rejected_entries_list_schema)
     def get(self, session=None):
         """ List all rejected entries """
@@ -75,6 +76,7 @@ class Rejected(APIResource):
 @rejected_api.route('/<int:rejected_entry_id>/')
 @api.response(BadRequest)
 class RejectedEntry(APIResource):
+    @etag
     @api.response(200, model=rejected_entry_schema)
     def get(self, rejected_entry_id, session=None):
         """ Returns a rejected entry """

@@ -5,7 +5,7 @@ from flask import jsonify
 from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.api.app import NotFoundError, BadRequest
+from flexget.api.app import NotFoundError, BadRequest, etag
 from flexget.plugins.internal.api_tvmaze import APITVMaze as tvm
 
 tvmaze_api = api.namespace('tvmaze', description='TVMaze Shows')
@@ -87,6 +87,7 @@ tvmaze_episode_schema = api.schema('tvmaze_episode_schema', ObjectsContainer.tvm
 @tvmaze_api.route('/series/<string:title>/')
 @api.doc(params={'title': 'TV Show name or TVMaze ID'})
 class TVDBSeriesSearchApi(APIResource):
+    @etag
     @api.response(200, 'Successfully found show', model=tvmaze_series_schema)
     @api.response(NotFoundError)
     def get(self, title, session=None):
@@ -114,6 +115,7 @@ episode_parser.add_argument('air_date', type=inputs.date_from_iso8601, help="Air
 @api.doc(params={'tvmaze_id': 'TVMaze ID of show'})
 @api.doc(parser=episode_parser)
 class TVDBEpisodeSearchAPI(APIResource):
+    @etag
     @api.response(200, 'Successfully found episode', tvmaze_episode_schema)
     @api.response(NotFoundError)
     @api.response(BadRequest)

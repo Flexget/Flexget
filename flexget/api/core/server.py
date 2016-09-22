@@ -26,7 +26,7 @@ from yaml.error import YAMLError
 from flexget._version import __version__
 from flexget.api import api, APIResource
 from flexget.api.app import __version__ as __api_version__, APIError, BadRequest, base_message, success_response, base_message_schema, \
-    empty_response
+    empty_response, etag
 
 log = logging.getLogger('api.server')
 
@@ -149,6 +149,7 @@ class ServerShutdownAPI(APIResource):
 
 @server_api.route('/config/')
 class ServerConfigAPI(APIResource):
+    @etag
     @api.response(200, description='Flexget config', model=empty_response)
     def get(self, session=None):
         """ Get Flexget Config in JSON form"""
@@ -157,6 +158,7 @@ class ServerConfigAPI(APIResource):
 
 @server_api.route('/raw_config/')
 class ServerRawConfigAPI(APIResource):
+    @etag
     @api.doc(description='Return config file encoded in Base64')
     @api.response(200, model=raw_config_schema, description='Flexget raw YAML config file encoded in Base64')
     def get(self, session=None):

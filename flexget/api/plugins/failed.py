@@ -7,7 +7,7 @@ from flask import jsonify
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
-from flexget.api.app import base_message_schema, success_response, NotFoundError
+from flexget.api.app import base_message_schema, success_response, NotFoundError, etag
 from flexget.plugins.filter.retry_failed import FailedEntry
 
 log = logging.getLogger('failed_api')
@@ -37,6 +37,7 @@ retry_entries_list_schema = api.schema('retry_entries_list_schema', ObjectsConta
 
 @retry_failed_api.route('/')
 class RetryFailed(APIResource):
+    @etag
     @api.response(200, model=retry_entries_list_schema)
     def get(self, session=None):
         """ List all failed entries """
@@ -54,6 +55,7 @@ class RetryFailed(APIResource):
 @retry_failed_api.route('/<int:failed_entry_id>/')
 @api.response(NotFoundError)
 class RetryFailedID(APIResource):
+    @etag
     @api.doc(params={'failed_entry_id': 'ID of the failed entry'})
     @api.response(200, model=retry_failed_entry_schema)
     def get(self, failed_entry_id, session=None):

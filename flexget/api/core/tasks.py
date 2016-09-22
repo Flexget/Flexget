@@ -12,7 +12,7 @@ from queue import Queue, Empty
 
 from flexget.api import api, APIResource
 from flexget.api.app import APIError, NotFoundError, CannotAddResource, BadRequest, success_response, \
-    base_message_schema
+    base_message_schema, etag
 from flexget.config_schema import process_config
 from flexget.entry import Entry
 from flexget.event import event
@@ -141,6 +141,7 @@ task_api_desc = 'Task config schema too large to display, you can view the schem
 @tasks_api.route('/')
 @api.doc(description=task_api_desc)
 class TasksAPI(APIResource):
+    @etag
     @api.response(200, model=tasks_list_schema)
     def get(self, session=None):
         """ List all tasks """
@@ -184,6 +185,7 @@ class TasksAPI(APIResource):
 @tasks_api.route('/<task>/')
 @api.doc(params={'task': 'task name'}, description=task_api_desc)
 class TaskAPI(APIResource):
+    @etag
     @api.response(200, model=task_return_schema)
     @api.response(NotFoundError, description='task not found')
     @api.response(APIError, description='unable to read config')

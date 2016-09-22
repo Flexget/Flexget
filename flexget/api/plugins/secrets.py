@@ -6,7 +6,7 @@ import logging
 from flask import request
 
 from flexget.api import api, APIResource
-from flexget.api.app import empty_response
+from flexget.api.app import empty_response, etag
 from flexget.plugins.modify.config_secrets import secrets_from_db, secrets_to_db
 
 log = logging.getLogger('secrets')
@@ -16,7 +16,7 @@ secrets_api = api.namespace('secrets', description='View and edit secrets')
 
 @secrets_api.route('/')
 class SecretsAPI(APIResource):
-
+    @etag
     @api.response(200, model=empty_response)
     def get(self, session=None):
         return secrets_from_db()
