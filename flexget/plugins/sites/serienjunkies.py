@@ -166,7 +166,7 @@ class UrlRewriteSerienjunkies(object):
     def check_language(self, languages):
         # Cut additional Subtitles
         try:
-            languages = languages[:languages.index("+")]
+            languages = languages.split('+', 1)[0]
         except IndexError:
             pass
 
