@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flexget.api import api, APIResource
 from flexget.api.app import base_message_schema, success_response
 
-schema_api = api.namespace('schema_format', description='Test Flexget custom schema format validations')
+schema_api = api.namespace('format_check', description='Test Flexget custom schema format validations')
 
 
 class ObjectContainer(object):
