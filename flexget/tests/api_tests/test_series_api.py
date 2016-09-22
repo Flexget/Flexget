@@ -1090,8 +1090,107 @@ class TestSeriesReleaseAPI(object):
         assert data['release']['title'] == 'un-downloaded release'
 
         # No series
-        rsp = api_client.json_put('/series/10/episodes/1/releases/1/')
+        rsp = api_client.get('/series/10/episodes/1/releases/1/')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # No episode for series
+        rsp = api_client.get('/series/1/episodes/10/releases/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Episode does not belong to series
+        rsp = api_client.get('/series/2/episodes/1/releases/1/')
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # No release
+        rsp = api_client.get('/series/1/episodes/1/releases/10/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Release does not belong to episode
+        rsp = api_client.get('/series/1/episodes/1/releases/3/')
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+
+    def test_release_put(self, api_client, schema_match):
+        with Session() as session:
+            series = Series()
+            series.name = 'test series 1'
+            session.add(series)
+
+            episode1 = Episode()
+            episode1.identifier = 'S01E01'
+            episode1.identified_by = 'ep'
+            episode1.season = 1
+            episode1.number = 1
+            episode1.series_id = series.id
+
+            episode2 = Episode()
+            episode2.identifier = 'S01E02'
+            episode2.identified_by = 'ep'
+            episode2.season = 1
+            episode2.number = 2
+            episode2.series_id = series.id
+
+            release1 = Release()
+            release1.title = 'downloaded release'
+            release1.downloaded = True
+
+            release2 = Release()
+            release2.title = 'un-downloaded release'
+            release2.downloaded = False
+
+            release3 = Release()
+            release3.title = 'downloaded release'
+            release3.downloaded = True
+
+            episode1.releases = [release1, release2]
+            episode2.releases = [release3]
+            series.episodes.append(episode1)
+            series.episodes.append(episode2)
+
+            series2 = Series()
+            series2.name = 'test series 2'
+            session.add(series2)
+
+            episode2 = Episode()
+            episode2.identifier = 'S01E02'
+            episode2.identified_by = 'ep'
+            episode2.season = 1
+            episode2.number = 2
+            episode2.series_id = series2.id
+
+            series2.episodes.append(episode2)
+            session.commit()
+
+        rsp = api_client.json_put('/series/1/episodes/1/releases/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Cannot reset if already downloaded
+        rsp = api_client.json_put('/series/1/episodes/1/releases/1/')
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -1128,5 +1227,3 @@ class TestSeriesReleaseAPI(object):
 
         errors = schema_match(base_message, data)
         assert not errors
-
-

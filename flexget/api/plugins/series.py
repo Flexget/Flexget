@@ -752,7 +752,7 @@ class SeriesReleaseAPI(APIResource):
     def delete(self, show_id, ep_id, rel_id, session):
         ''' Delete episode release by show ID, episode ID and release ID '''
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
         try:
@@ -794,8 +794,9 @@ class SeriesReleaseAPI(APIResource):
             raise BadRequest('episode with id %s does not belong to show %s' % (ep_id, show_id))
         if not series.release_in_episode(ep_id, rel_id):
             raise BadRequest('release id %s does not belong to episode %s' % (rel_id, ep_id))
+
         if not release.downloaded:
             raise BadRequest('release with id %s is not set as downloaded' % rel_id)
-
         release.downloaded = False
+
         return success_response('successfully reset download status for release %d from episode %d' % (rel_id, ep_id))
