@@ -14,6 +14,9 @@ log = logging.getLogger("web_server_daemon")
 web_config_schema = {
     'oneOf': [
         {'type': 'boolean'},
+        {'type': 'integer',
+         'minimum': 0,
+         'maximum': 65536},
         {
             'type': 'object',
             'properties': {
@@ -38,8 +41,10 @@ web_config_schema = {
 def prepare_config(config):
     if not config:
         return
-    if not isinstance(config, dict):
+    if isinstance(config, bool):
         config = {}
+    if isinstance(config, int):
+        config = {'port': config}
     config.setdefault('bind', '0.0.0.0')
     config.setdefault('port', 5050)
     config.setdefault('ssl_certificate', None)
