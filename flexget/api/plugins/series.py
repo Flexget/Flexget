@@ -647,7 +647,7 @@ class SeriesReleasesAPI(APIResource):
         downloaded = args.get('downloaded') == True if args.get('downloaded') is not None else None
         release_items = []
         for release in episode.releases:
-            if downloaded and release.downloaded or downloaded is False and not release.downloaded or not downloaded:
+            if downloaded and release.downloaded or downloaded is False and not release.downloaded or downloaded is None:
                 release_items.append(get_release_details(release))
 
         return jsonify({

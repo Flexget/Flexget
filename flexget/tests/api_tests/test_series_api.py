@@ -756,11 +756,11 @@ class TestSeriesReleasesAPI(object):
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release1 = Release()
-            release1.title = 'un-downloaded release'
-            release1.downloaded = False
+            release2 = Release()
+            release2.title = 'un-downloaded release'
+            release2.downloaded = False
 
-            episode1.releases = [release1]
+            episode1.releases = [release1, release2]
             series.episodes.append(episode1)
 
             session.commit()
