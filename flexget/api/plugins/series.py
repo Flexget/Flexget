@@ -680,10 +680,10 @@ class SeriesReleasesAPI(APIResource):
         for release in episode.releases:
             if downloaded and release.downloaded or downloaded is False and not release.downloaded or not downloaded:
                 release_items.append(release)
-            if args.get('delete_seen'):
-                fire_event('forget', release.title)
 
         for release in release_items:
+            if args.get('forget'):
+                fire_event('forget', release.title)
             series.delete_release_by_id(release.id)
         return success_response('successfully deleted all releases for episode %s from show %s' % (ep_id, show_id))
 
@@ -767,7 +767,7 @@ class SeriesReleaseAPI(APIResource):
         if not series.release_in_episode(ep_id, rel_id):
             raise BadRequest('release id %s does not belong to episode %s' % (rel_id, ep_id))
         args = delete_parser.parse_args()
-        if args.get('delete_seen'):
+        if args.get('forget'):
             fire_event('forget', release.title)
 
         series.delete_release_by_id(rel_id)
