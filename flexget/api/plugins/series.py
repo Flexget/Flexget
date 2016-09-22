@@ -780,7 +780,7 @@ class SeriesReleaseAPI(APIResource):
     def put(self, show_id, ep_id, rel_id, session):
         """ Resets a downloaded release status """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
         try:

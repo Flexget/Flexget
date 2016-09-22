@@ -33,10 +33,9 @@ class TestSeriesRootAPI(object):
             series = Series()
             series.name = 'test series'
             session.add(series)
-            session.commit()
+
             task = SeriesTask('test task')
             series.in_tasks = [task]
-            session.commit()
 
         rsp = api_client.get('/series/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -56,7 +55,6 @@ class TestSeriesRootAPI(object):
             series = Series()
             series.name = 'test series'
             session.add(series)
-            session.commit()
 
         # Default is configured series, no results
         rsp = api_client.get('/series/')
@@ -88,10 +86,9 @@ class TestSeriesRootAPI(object):
             series = Series()
             series.name = 'test series 2'
             session.add(series)
-            session.commit()
+
             task = SeriesTask('test task')
             series.in_tasks = [task]
-            session.commit()
 
         # Get only configures series
         rsp = api_client.get('/series/')
@@ -141,7 +138,6 @@ class TestSeriesRootAPI(object):
             release.downloaded = True
 
             episode.releases = [release]
-            session.commit()
 
         # Default all, not just premieres
         rsp = api_client.get('/series/')
@@ -183,7 +179,6 @@ class TestSeriesRootAPI(object):
             release.title = 'test release 2'
             release.downloaded = True
             episode.releases = [release]
-            session.commit()
 
         # Get only just premieres
         rsp = api_client.get('/series/?premieres=true')
@@ -218,7 +213,6 @@ class TestSeriesRootAPI(object):
             release.downloaded = True
 
             episode.releases = [release]
-            session.commit()
 
         # Add an episode with a release created 8 days ago
         with Session() as session:
@@ -243,7 +237,6 @@ class TestSeriesRootAPI(object):
             release.first_seen = datetime.now() - timedelta(days=8)
 
             episode.releases = [release]
-            session.commit()
 
         # Default all, not just status = new
         rsp = api_client.get('/series/')
@@ -308,7 +301,6 @@ class TestSeriesRootAPI(object):
             release.first_seen = datetime.now() - timedelta(days=366)
 
             episode.releases = [release]
-            session.commit()
 
         # Just stale
         rsp = api_client.get('/series/?status=stale')
@@ -331,8 +323,6 @@ class TestSeriesRootAPI(object):
             series2 = Series()
             series2.name = 'Stranger Things'
             session.add(series2)
-
-            session.commit()
 
         rsp = api_client.get('/series/?in_config=all&lookup=tvdb&lookup=tvmaze')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -429,8 +419,6 @@ class TestSeriesSearchAPI(object):
             series2.name = 'test series2'
             session.add(series2)
 
-            session.commit()
-
         rsp = api_client.get('/series/search/test/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
@@ -470,8 +458,6 @@ class TestSeriesSingleAPI(object):
             series1.name = 'test series1'
             session.add(series1)
 
-            session.commit()
-
         rsp = api_client.get('/series/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
@@ -495,8 +481,6 @@ class TestSeriesSingleAPI(object):
             series1.name = 'test series1'
             session.add(series1)
 
-            session.commit()
-
         rsp = api_client.delete('/series/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
@@ -517,8 +501,6 @@ class TestSeriesSingleAPI(object):
             series1 = Series()
             series1.name = 'test series1'
             session.add(series1)
-
-            session.commit()
 
         payload = {}
 
@@ -550,7 +532,6 @@ class TestSeriesSingleAPI(object):
 
             alt = AlternateNames('show2')
             series.alternate_names = [alt]
-            session.commit()
 
         payload2 = {'alternate_names': ['show2']}
 
@@ -599,7 +580,6 @@ class TestSeriesEpisodesAPI(object):
 
             series.episodes.append(episode1)
             series.episodes.append(episode2)
-            session.commit()
 
         # No series
         rsp = api_client.get('/series/10/episodes/')
@@ -676,8 +656,6 @@ class TestSeriesEpisodeAPI(object):
             series2 = Series()
             series2.name = 'test series 2'
             session.add(series2)
-
-            session.commit()
 
         rsp = api_client.get('/series/1/episodes/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -773,7 +751,6 @@ class TestSeriesReleasesAPI(object):
             episode2.series_id = series2.id
 
             series2.episodes.append(episode2)
-            session.commit()
 
         rsp = api_client.get('/series/1/episodes/1/releases/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -866,7 +843,6 @@ class TestSeriesReleasesAPI(object):
             episode2.series_id = series2.id
 
             series2.episodes.append(episode2)
-            session.commit()
 
         rsp = api_client.delete('/series/1/episodes/1/releases/?downloaded=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -961,7 +937,6 @@ class TestSeriesReleasesAPI(object):
             episode2.series_id = series2.id
 
             series2.episodes.append(episode2)
-            session.commit()
 
         rsp = api_client.json_put('/series/1/episodes/1/releases/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -1067,7 +1042,6 @@ class TestSeriesReleaseAPI(object):
             episode2.series_id = series2.id
 
             series2.episodes.append(episode2)
-            session.commit()
 
         rsp = api_client.get('/series/1/episodes/1/releases/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -1129,7 +1103,6 @@ class TestSeriesReleaseAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-
     def test_release_put(self, api_client, schema_match):
         with Session() as session:
             series = Series()
@@ -1179,7 +1152,6 @@ class TestSeriesReleaseAPI(object):
             episode2.series_id = series2.id
 
             series2.episodes.append(episode2)
-            session.commit()
 
         rsp = api_client.json_put('/series/1/episodes/1/releases/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -1269,30 +1241,20 @@ class TestSeriesReleaseAPI(object):
             series2.name = 'test series 2'
             session.add(series2)
 
-            episode2 = Episode()
-            episode2.identifier = 'S01E02'
-            episode2.identified_by = 'ep'
-            episode2.season = 1
-            episode2.number = 2
-            episode2.series_id = series2.id
+            episode3 = Episode()
+            episode3.identifier = 'S01E02'
+            episode3.identified_by = 'ep'
+            episode3.season = 1
+            episode3.number = 2
+            episode3.series_id = series2.id
 
-            series2.episodes.append(episode2)
-            session.commit()
+            release4 = Release()
+            release4.title = 'downloaded release'
+            release4.downloaded = True
 
-        rsp = api_client.delete('/series/1/episodes/1/releases/1/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        data = json.loads(rsp.get_data(as_text=True))
+            episode3.releases = [release4]
 
-        errors = schema_match(base_message, data)
-        assert not errors
-
-        # Already deleted
-        rsp = api_client.delete('/series/1/episodes/1/releases/1/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
-        data = json.loads(rsp.get_data(as_text=True))
-
-        errors = schema_match(base_message, data)
-        assert not errors
+            series2.episodes.append(episode3)
 
         # No episode for series
         rsp = api_client.delete('/series/1/episodes/10/releases/1/')
@@ -1321,6 +1283,21 @@ class TestSeriesReleaseAPI(object):
         # Release does not belong to episode
         rsp = api_client.delete('/series/1/episodes/1/releases/3/')
         assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.delete('/series/1/episodes/1/releases/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Already deleted
+        rsp = api_client.delete('/series/1/episodes/1/releases/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
