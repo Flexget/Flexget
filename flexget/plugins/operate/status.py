@@ -70,7 +70,7 @@ class Status(object):
                 # TODO: purge removed tasks
 
         self.execution = TaskExecution()
-        self.execution.start = datetime.datetime.utcnow()
+        self.execution.start = datetime.datetime.now()
         self.execution.task = st
 
     @plugin.priority(-255)
@@ -90,7 +90,7 @@ class Status(object):
             if task.aborted:
                 self.execution.succeeded = False
                 self.execution.abort_reason = task.abort_reason
-            self.execution.end = datetime.datetime.utcnow()
+            self.execution.end = datetime.datetime.now()
             session.merge(self.execution)
 
     on_task_abort = on_task_exit
@@ -99,7 +99,7 @@ class Status(object):
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     result = session.query(TaskExecution).filter(
-        TaskExecution.start < datetime.datetime.utcnow() - timedelta(days=365)).delete()
+        TaskExecution.start < datetime.datetime.now() - timedelta(days=365)).delete()
     if result:
         log.verbose('Removed %s task executions from history older than 1 year', result)
 
