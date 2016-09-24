@@ -191,7 +191,9 @@ class PluginTransmissionInput(TransmissionBase):
                 for attr in ['comment', 'downloadDir', 'isFinished', 'isPrivate']:
                     entry['transmission_' + attr] = getattr(torrent, attr)
                 entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
-                entry['location'] = bigfella
+                # bigfella? Is this actually the path to the torrent file? see GitHub #1403
+                if bigfella:
+                    entry['location'] = bigfella
                 entries.append(entry)
         return entries
 
