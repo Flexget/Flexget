@@ -20,7 +20,7 @@ from werkzeug.http import generate_etag
 
 from . import __path__
 
-__version__ = '0.6-beta'
+__version__ = '1.0-RC1'
 
 log = logging.getLogger('api')
 
@@ -64,9 +64,19 @@ class APIEndpoint(object):
         return self.caller(self.endpoint, data=data, method=method)
 
 
+def api_version(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        rv = f(*args, **kwargs)
+        rv.headers['X-API-Version'] = __version__
+        return rv
+
+    return wrapped
+
+
 class APIResource(Resource):
     """All api resources should subclass this class."""
-    method_decorators = [with_session]
+    method_decorators = [with_session, api_version]
 
     def __init__(self, api, *args, **kwargs):
         self.manager = manager.manager
