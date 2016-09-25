@@ -54,6 +54,7 @@ class ConfigureSeries(FilterSeriesBase):
                 'settings': self.settings_schema,
                 'from': {'$ref': '/schema/plugins?phase=input'}
             },
+            'required': ['from'],
             'additionalProperties': False
         }
 
