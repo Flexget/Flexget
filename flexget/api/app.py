@@ -378,3 +378,19 @@ def etag(f):
         return rv
 
     return wrapped
+
+
+pagination_parser = api.parser()
+pagination_parser.add_argument('page', type=int, default=1, help='Page number')
+pagination_parser.add_argument('per_page', type=int, default=50, help='Results per page')
+
+
+def link_header(url, page, per_page, total_pages):
+    LINKTEMPLATE = '<{}?page={}&per_page={}>; rel="{}"'
+    linkstring = ''
+    if page > 1:
+        linkstring += LINKTEMPLATE.format(url, page - 1, per_page, 'prev') + ', '
+    if page < total_pages:
+        linkstring += LINKTEMPLATE.format(url, page + 1, per_page, 'next') + ', '
+    linkstring += LINKTEMPLATE.format(url, total_pages, per_page, 'last')
+    return dict(Link=linkstring)

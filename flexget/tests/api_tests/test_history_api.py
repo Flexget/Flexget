@@ -12,13 +12,13 @@ class TestHistoryAPI(object):
 
     def test_history(self, api_client, schema_match):
         rsp = api_client.get('/history/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.history_list_object, data)
         assert not errors
 
-        assert data['entries'] == []
+        assert data == []
 
         history_entry = dict(task='test_task1', title='test_title1', url='test_url1', filename='test_filename1',
                              details='test_details1')
@@ -31,11 +31,11 @@ class TestHistoryAPI(object):
             session.commit()
 
         rsp = api_client.get('/history/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.history_list_object, data)
         assert not errors
 
         for key, value in history_entry.items():
-            assert data['entries'][0][key] == value
+            assert data[0][key] == value

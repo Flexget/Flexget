@@ -8,7 +8,7 @@ from flask import jsonify
 from sqlalchemy import desc
 
 from flexget.api import api, APIResource
-from flexget.api.app import BadRequest, etag
+from flexget.api.app import BadRequest, etag, link_header, pagination_parser
 from flexget.plugins.output.history import History
 
 log = logging.getLogger('history')
@@ -30,20 +30,12 @@ class ObjectsContainer(object):
         }
     }
 
-    history_list_object = {
-        'type': 'object',
-        'properties': {
-            'entries': {'type': 'array', 'items': base_history_object},
-            'pages': {'type': 'integer'}
-        }
-    }
+    history_list_object = {'type': 'array', 'items': base_history_object}
 
 
 history_list_schema = api.schema('history.list', ObjectsContainer.history_list_object)
 
-history_parser = api.parser()
-history_parser.add_argument('page', type=int, required=False, default=1, help='Page number')
-history_parser.add_argument('max', type=int, required=False, default=50, help='Results per page')
+history_parser = pagination_parser.copy()
 history_parser.add_argument('task', type=str, required=False, default=None, help='Filter by task name')
 
 
@@ -57,32 +49,33 @@ class HistoryAPI(APIResource):
         """ List of previously accepted entries """
         args = history_parser.parse_args()
         page = args['page']
-        max_results = args['max']
+        per_page = args['per_page']
         task = args['task']
 
+        count_query = session.query(History)
         if task:
-            count = session.query(History).filter(History.task == task).count()
-        else:
-            count = session.query(History).count()
+            count_query = count_query.filter(History.task == task)
+        count = count_query.count()
+
+        pages = int(ceil(count / float(per_page)))
 
         if not count:
-            return jsonify({'entries': [], 'pages': 0})
-
-        pages = int(ceil(count / float(max_results)))
+            return jsonify([])
 
         if page > pages:
             raise BadRequest('page %s does not exist' % page)
 
-        start = (page - 1) * max_results
-        finish = start + max_results
+        start = (page - 1) * per_page
+        finish = start + per_page
 
+        items = session.query(History)
         if task:
-            items = session.query(History).filter(History.task == task).order_by(desc(History.time)).slice(start,
-                                                                                                           finish)
-        else:
-            items = session.query(History).order_by(desc(History.time)).slice(start, finish)
+            items = items.filter(History.task == task).order_by(desc(History.time)).slice(start, finish)
+        items = items.order_by(desc(History.time)).slice(start, finish)
 
-        return jsonify({
-            'entries': [item.to_dict() for item in items],
-            'pages': pages
-        })
+        full_url = self.api.base_url + history_api.path
+
+        link = link_header(full_url, page, per_page, pages)
+        rsp = jsonify([item.to_dict() for item in items])
+        rsp.headers.extend(link)
+        return rsp
