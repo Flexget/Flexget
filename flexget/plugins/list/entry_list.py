@@ -228,11 +228,11 @@ def get_entries_by_list_id(list_id, count=False, start=None, stop=None, order_by
     query = session.query(EntryListEntry).join(EntryListList).filter(EntryListList.id == list_id)
     if count:
         return query.count()
-    query = query.slice(start, stop).from_self()
     if descending:
         query = query.order_by(getattr(EntryListEntry, order_by).desc())
     else:
         query = query.order_by(getattr(EntryListEntry, order_by))
+    query = query.slice(start, stop).from_self()
     return query.all()
 
 
