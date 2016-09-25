@@ -380,12 +380,38 @@ def etag(f):
     return wrapped
 
 
-pagination_parser = api.parser()
-pagination_parser.add_argument('page', type=int, default=1, help='Page number')
-pagination_parser.add_argument('per_page', type=int, default=50, help='Results per page')
+def pagination_parser(parser=None, sort_choices=None, default=None):
+    """
+    Return a standardized pagination parser, to be used for any endpoint that has pagination.
+
+    :param parser: Can extend a given parser or create a new one
+    :param sort_choices: A tuple of strings, to be used as server side attribute searches
+    :param default: The default sort string, used `sort_choices[0]` if not given
+    :return: An api.parser() instance with pagination and sorting arguments.
+    """
+    if not parser:
+        pagination = api.parser()
+    else:
+        pagination = parser.copy()
+    pagination.add_argument('page', type=int, default=1, help='Page number')
+    pagination.add_argument('per_page', type=int, default=50, help='Results per page')
+    if sort_choices:
+        pagination.add_argument('sort_by', choices=sort_choices, default=default or sort_choices[0],
+                                help='Sort by attribute')
+        pagination.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
+    return pagination
 
 
 def link_header(url, page, per_page, total_pages):
+    """
+    Created the `Link` header, to be used for pagination traversing
+
+    :param url: Base URL to be used in the links
+    :param page: Current page number
+    :param per_page: Results per page
+    :param total_pages: Total number of pages
+    :return: Dict representing the full Link header
+    """
     LINKTEMPLATE = '<{}?page={}&per_page={}>; rel="{}"'
     linkstring = ''
     if page > 1:
