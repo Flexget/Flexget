@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-from flask import request
+from flask import request, jsonify
 from flask_login import current_user
 
 from flexget.api import api, APIResource
@@ -60,4 +60,4 @@ class UserManagementTokenAPI(APIResource):
     def get(self, session=None):
         """ Change current user token """
         token = generate_token(username=current_user.name, session=session)
-        return {'token': token}
+        return jsonify({'token': token})

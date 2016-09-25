@@ -25,7 +25,8 @@ from yaml.error import YAMLError
 
 from flexget._version import __version__
 from flexget.api import api, APIResource
-from flexget.api.app import __version__ as __api_version__, APIError, BadRequest, base_message, success_response, base_message_schema, \
+from flexget.api.app import __version__ as __api_version__, APIError, BadRequest, base_message, success_response, \
+    base_message_schema, \
     empty_response, etag
 
 log = logging.getLogger('api.server')
@@ -129,7 +130,7 @@ class ServerPIDAPI(APIResource):
     @api.response(200, description='Reloaded config', model=pid_schema)
     def get(self, session=None):
         """ Get server PID """
-        return {'pid': os.getpid()}
+        return jsonify({'pid': os.getpid()})
 
 
 shutdown_parser = api.parser()
@@ -225,9 +226,9 @@ class ServerVersionAPI(APIResource):
     def get(self, session=None):
         """ Flexget Version """
         latest = get_latest_flexget_version_number()
-        return {'flexget_version': __version__,
-                'api_version': __api_version__,
-                'latest_version': latest}
+        return jsonify({'flexget_version': __version__,
+                        'api_version': __api_version__,
+                        'latest_version': latest})
 
 
 @server_api.route('/dump_threads/')

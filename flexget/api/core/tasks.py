@@ -179,7 +179,9 @@ class TasksAPI(APIResource):
 
         self.manager.save_config()
         self.manager.config_changed()
-        return {'name': task_name, 'config': self.manager.user_config['tasks'][task_name]}, 201
+        rsp = jsonify({'name': task_name, 'config': self.manager.user_config['tasks'][task_name]})
+        rsp.status_code = 201
+        return rsp
 
 
 @tasks_api.route('/<task>/')
@@ -238,7 +240,9 @@ class TaskAPI(APIResource):
         self.manager.save_config()
         self.manager.config_changed()
 
-        return {'name': new_task_name, 'config': self.manager.user_config['tasks'][new_task_name]}, code
+        rsp = jsonify({'name': new_task_name, 'config': self.manager.user_config['tasks'][new_task_name]})
+        rsp.status_code = code
+        return rsp
 
     @api.response(200, model=base_message_schema, description='deleted task')
     @api.response(NotFoundError)

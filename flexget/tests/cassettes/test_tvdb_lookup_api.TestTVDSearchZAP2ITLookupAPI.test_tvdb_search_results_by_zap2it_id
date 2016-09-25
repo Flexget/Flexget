@@ -110,4 +110,42 @@ interactions:
       x-powered-by: [Thundar!]
       x-thetvdb-api-version: [2.1.1]
     status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Authorization: [!!python/unicode Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzQ4OTk1NTQsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc0ODEzMTU0fQ.V_87fgu5g3BcdmHIV4JWmnlVAzXsyUkKBB1MqdbY335zj1Sa1rXjOnkvCWihtrapaFVpVhBejL_iAY5_OjMoDwgxaPnB8QLdTOn2BhUCEZMOQPqCKueMj5F-cpkqMXsrsK0RzvA5Pfz2iXxijjKsy1GQNDVmizwY0hQzUS5DYsEWuvV2Jd0MX1xxuuZt8YdtXyjXaGCJjEbTvswHL6z6N5VVJXxIYdMXtjS7cn-xpTjePtn1kb7iGjatZVOpwkaE-1wzhKVYt1F6seafVkoiynvPosSHCPu8xjqTkswL3kcnXLmnE3y1eGi5keQ3QC8lSWXuQbKYTyiW02HuKhs1hw]
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
+    method: GET
+    uri: https://api.thetvdb.com/search/series?zap2itId=EP01922936
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA0xTQW4UQQy85xWluQDSZkgipAhuYSUkJOAAkThADt4ez7TZHnvV7dlhhZD4Az/k
+        Jahnk2wufWiXy66y/esMaDpyat7g2xkA/FpeoKEkVLjUwN3q4XNDqpybN2iGTLsogdLLq+vXl1eX
+        58N1+2M3NI/QXnLxG8ncVfjVxeWr88uL84vrE0Jq5Jj9+Kfss+VtTbmNjPXXE9z2nPfCc43d9M4Z
+        hB1ll5AYFAInzuSWEWgqXEDoM9MWxS2PK6y/vMd73XNxGRbYW8r5gJuUWCEFxfMUttgckGSIrqID
+        SDv0lFKBqBsIwUZq8dHUY0Gi2kRk0Exb1oJZPMIjY2czZ1iPMu04o+yYuxWGTOqVNsq4wGgjSfwA
+        N4y2Z3jMNg0Ra1bPlLCuwSRbBikmLcyKYaLcCSlIB04tbuOSIioulNIB/DOIc1eFRClQnnubtDv2
+        VFb3sqvgaGHLXa3eSQnV3iqm5pgv/ZmmA743Izudx2kk/d5gjoaZCkJmqmVEF2h1oApeZD2ZBf/c
+        JStiin9//i5+VnLecz6YLsWmUi3xyJJrs/d9oreMwaxr7xuuk9YaWEz+0t62N+3nFh9oUxbajjsJ
+        5FwW1Ul6rsJ22ZzDUY2oWmD1Fu8sQ21eHQUSep4RkhVGn4W1OzJSKRZkodyqzfBIfnIviXNeDK/c
+        PRXn4hjrYJLseYXN5BDHbPrMsWEk0wEb7i3z0THLqUNiynVzTtzHhYxUsOFgI7dtHTLjXaIS29M5
+        FM7C5RON/HAsCwLP66m9eIJz8qmecbO2un6T6NAswd9nwN3Z7/8AAAD//wMAn4D4ywQEAAA=
+    headers:
+      cache-control: ['private, max-age=600']
+      cf-ray: [2e7f1de9d80927aa-FRA]
+      connection: [keep-alive]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Sun, 25 Sep 2016 14:20:26 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=dca32353dae2dfb6943c4bfddc3d38c8f1474813226; expires=Mon,
+          25-Sep-17 14:20:26 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      vary: [Accept-Language]
+      x-powered-by: [Thundar!]
+      x-thetvdb-api-version: [2.1.1]
+    status: {code: 200, message: OK}
 version: 1
