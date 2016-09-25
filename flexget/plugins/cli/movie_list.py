@@ -115,14 +115,14 @@ def movie_list_list(options):
 def movie_list_add(options):
     with Session() as session:
         try:
-            movie_list = get_list_by_exact_name(options.list_name)
+            movie_list = get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
             console('Could not find movie list with name {}, creating'.format(options.list_name))
             movie_list = MovieListList(name=options.list_name)
-        session.merge(movie_list)
-        session.commit()
+            session.add(movie_list)
+            session.commit()
         title, year = split_title_year(options.movie_title)
-        console('Trying to lookup movie %s title' % title)
+        console('Trying to lookup movie title: `{}`'.format(title))
         entry = lookup_movie(title=title, session=session, identifiers=options.identifiers)
         if not entry:
             console('movie lookup failed for movie %s, aborting')
@@ -149,8 +149,7 @@ def movie_list_add(options):
                     console('{}: {}'.format(key, ident[key]))
             movie.ids = get_db_movie_identifiers(identifier_list=id_list, session=session)
         session.merge(movie)
-
-    console('Successfully added movie {} to movie list {} '.format(title, movie_list.name))
+        console('Successfully added movie {} to movie list {} '.format(title, movie_list.name))
 
 
 def movie_list_del(options):
