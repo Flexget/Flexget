@@ -77,9 +77,9 @@ class UrlRewriteSerienjunkies(object):
             entry['description'] = ", ".join(download_urls)
 
         # Debug Information
-        log.debug('TV Show URL: %s' % series_url)
-        log.debug('Episode: %s' % search_title)
-        log.debug('Download URL: %s' % download_urls)
+        log.debug('TV Show URL: %s', series_url)
+        log.debug('Episode: %s', search_title)
+        log.debug('Download URL: %s', download_urls)
 
     @plugin.internet(log)
     def parse_downloads(self, series_url, search_title):
@@ -109,18 +109,18 @@ class UrlRewriteSerienjunkies(object):
             # find episode language
             episode_lang = episode.find_previous('strong', text=re.compile('Sprache')).next_sibling
             if not episode_lang:
-                log.warning('No language found for: %s' % series_url)
+                log.warning('No language found for: %s', series_url)
                 continue
 
             # filter language
             if not self.check_language(episode_lang):
-                log.warning('languages not matching: %s <> %s' % (self.config['language'], episode_lang))
+                log.warning('languages not matching: %s <> %s', self.config['language'], episode_lang)
                 continue
 
             # find download links
             links = episode.find_all('a')
             if not links:
-                log.warning('No links found for: %s' % series_url)
+                log.warning('No links found for: %s', series_url)
                 continue
 
             for link in links:
@@ -165,10 +165,7 @@ class UrlRewriteSerienjunkies(object):
 
     def check_language(self, languages):
         # Cut additional Subtitles
-        try:
-            languages = languages[:languages.index("+")]
-        except IndexError:
-            pass
+        languages = languages.split('|', 1)[0]
 
         language_list = re.split(r'[,&]', languages)
 
