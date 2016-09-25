@@ -40,7 +40,7 @@ CATEGORIES = {
     'gamespc': 'filter_cat[12]',
     'gamesxbox': 'filter_cat[13]',
     'gamesps3': 'filter_cat[14]',
-    'gameswii':  'filter_cat[15]',
+    'gameswii': 'filter_cat[15]',
     'appspc': 'filter_cat[16]',
     'appsmac': 'filter_cat[17]',
     'appslinux': 'filter_cat[18]',
@@ -97,8 +97,8 @@ class SearchAlphaRatio(object):
         """
         Wrapper to allow refreshing the cookie if it is invalid for some reason
 
-        :param str url:
-        :param list params:
+        :param unicode url:
+        :param dict params:
         :param str username:
         :param str password:
         :param bool force: flag used to refresh the cookie forcefully ie. forgo DB lookup
