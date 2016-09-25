@@ -10,7 +10,8 @@ from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
-from flexget.api.app import CannotAddResource, NotFoundError, base_message_schema, success_response, BadRequest, etag
+from flexget.api.app import CannotAddResource, NotFoundError, base_message_schema, success_response, BadRequest, etag, \
+    pagination_parser, link_header
 from flexget.plugins.list import movie_list as ml
 from flexget.plugins.list.movie_list import MovieListBase
 
@@ -75,18 +76,7 @@ class ObjectsContainer(object):
     del list_input['properties']['id']
     del list_input['properties']['added_on']
 
-    return_movies = {
-        'type': 'object',
-        'properties': {
-            'movies': {
-                'type': 'array',
-                'items': movie_list_object
-            },
-            'number_of_movies': {'type': 'integer'},
-            'total_number_of_movies': {'type': 'integer'},
-            'page_number': {'type': 'integer'}
-        }
-    }
+    return_movies = {'type': 'array', 'items': movie_list_object}
 
     return_lists = {'type': 'array', 'items': list_object}
 
@@ -170,12 +160,8 @@ class MovieListListAPI(APIResource):
 
 movie_identifiers_doc = "Use movie identifier using the following format:\n[{'ID_NAME: 'ID_VALUE'}]."
 
-movies_parser = api.parser()
-movies_parser.add_argument('sort_by', choices=('id', 'added', 'title', 'year'), default='title',
-                           help='Sort by attribute')
-movies_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
-movies_parser.add_argument('page', type=int, default=1, help='Page number')
-movies_parser.add_argument('page_size', type=int, default=10, help='Number of movies per page')
+sort_choices = ('id', 'added', 'title', 'year')
+movies_parser = pagination_parser(sort_choices=sort_choices, default='title')
 
 
 @movie_list_api.route('/<int:list_id>/movies/')
@@ -186,20 +172,23 @@ class MovieListMoviesAPI(APIResource):
     @api.doc(params={'list_id': 'ID of the list'}, parser=movies_parser)
     def get(self, list_id, session=None):
         """ Get movies by list ID """
-
         args = movies_parser.parse_args()
-        page = args.get('page')
-        page_size = args.get('page_size')
 
-        start = page_size * (page - 1)
-        stop = start + page_size
-        descending = bool(args.get('order') == 'desc')
+        # Pagination and sorting params
+        page = args['page']
+        per_page = args['per_page']
+        sort_by = args['sort_by']
+        sort_order = args['order']
+
+        start = per_page * (page - 1)
+        stop = start + per_page
+        descending = bool(sort_order == 'desc')
 
         kwargs = {
             'start': start,
             'stop': stop,
             'list_id': list_id,
-            'order_by': args.get('sort_by'),
+            'order_by': sort_by,
             'descending': descending,
             'session': session
         }
@@ -209,15 +198,18 @@ class MovieListMoviesAPI(APIResource):
             raise NotFoundError('list_id %d does not exist' % list_id)
         count = ml.get_movies_by_list_id(count=True, **kwargs)
         movies = [movie.to_dict() for movie in ml.get_movies_by_list_id(**kwargs)]
-        pages = int(ceil(count / float(page_size)))
+        pages = int(ceil(count / float(per_page)))
 
-        number_of_movies = min(page_size, count)
+        # Create Link header
+        full_url = self.api.base_url + movie_list_api.path.lstrip('/') + '/' + str(list_id) + '/movies/'
+        link = link_header(full_url, page, per_page, pages)
 
-        return jsonify({'movies': movies,
-                        'number_of_movies': number_of_movies,
-                        'total_number_of_movies': count,
-                        'page': page,
-                        'total_number_of_pages': pages})
+        # Create response
+        rsp = jsonify(movies)
+
+        # Add link header to response
+        rsp.headers.extend(link)
+        return rsp
 
     @api.validate(model=input_movie_entry_schema, description=movie_identifiers_doc)
     @api.response(201, model=movie_list_object_schema)
