@@ -299,6 +299,7 @@ class MovieListMovieAPI(APIResource):
 
 
 @movie_list_api.route('/identifiers/')
+@api.doc(description='A list of valid movie identifiers to be used when creating or editing movie')
 class MovieListIdentifiers(APIResource):
     @api.response(200, model=identifiers_schema)
     def get(self, session=None):

@@ -65,6 +65,9 @@ class APIEndpoint(object):
 
 
 def api_version(f):
+    """
+    Add the 'X-API-Version' header to all responses
+    """
     @wraps(f)
     def wrapped(*args, **kwargs):
         rv = f(*args, **kwargs)
@@ -83,11 +86,11 @@ class APIResource(Resource):
         super(APIResource, self).__init__(api, *args, **kwargs)
 
 
-class ApiSchemaModel(Model):
+class APISchemaModel(Model):
     """A flask restplus :class:`flask_restplus.models.ApiModel` which can take a json schema directly."""
 
     def __init__(self, name, schema, *args, **kwargs):
-        super(ApiSchemaModel, self).__init__(name, *args, **kwargs)
+        super(APISchemaModel, self).__init__(name, *args, **kwargs)
         self._schema = schema
 
     @property
@@ -140,7 +143,7 @@ class API(RestPlusAPI):
 
         :returns: An :class:`ApiSchemaModel` instance registered to this api.
         """
-        model = ApiSchemaModel(name, schema, **kwargs)
+        model = APISchemaModel(name, schema, **kwargs)
         model.__apidoc__.update(kwargs)
         self.models[name] = model
         return model
@@ -150,8 +153,8 @@ class API(RestPlusAPI):
         Extends :meth:`flask_restplus.Api.inherit` to allow `fields` to be a json schema, if `parent` is a
         :class:`ApiSchemaModel`.
         """
-        if isinstance(parent, ApiSchemaModel):
-            model = ApiSchemaModel(name, fields)
+        if isinstance(parent, APISchemaModel):
+            model = APISchemaModel(name, fields)
             model.__apidoc__['name'] = name
             model.__parent__ = parent
             self.models[name] = model
@@ -414,7 +417,7 @@ def pagination_parser(parser=None, sort_choices=None, default=None):
 
 def link_header(url, page, per_page, total_pages):
     """
-    Created the `Link` header, to be used for pagination traversing
+    Creates the `Link` header, to be used for pagination traversing
 
     :param url: Base URL to be used in the links
     :param page: Current page number
