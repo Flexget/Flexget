@@ -10,7 +10,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import flexget.plugins.list.entry_list as el
 from flexget.api import api, APIResource
-from flexget.api.app import BadRequest, NotFoundError, base_message_schema, success_response, etag
+from flexget.api.app import BadRequest, NotFoundError, base_message_schema, success_response, etag, pagination_parser, \
+    link_header
 
 log = logging.getLogger('entry_list')
 
@@ -55,16 +56,7 @@ class ObjectsContainer(object):
         }
     }
 
-    entry_lists_entries_return_object = {
-        'type': 'object',
-        'properties': {
-            'entries': {'type': 'array', 'items': entry_list_entry_base_object},
-            'total_number_of_entries': {'type': 'integer'},
-            'number_of_entries': {'type': 'integer'},
-            'page': {'type': 'integer'},
-            'total_number_of_pages': {'type': 'integer'}
-        }
-    }
+    entry_lists_entries_return_object = {'type': 'array', 'items': entry_list_entry_base_object}
 
 
 entry_list_object_schema = api.schema('entry_list_object_schema', ObjectsContainer.entry_list_base_object)
@@ -140,12 +132,8 @@ entry_list_entry_base_schema = api.schema('entry_list_entry_base_schema', Object
 entry_lists_entries_return_schema = api.schema('entry_lists_entries_return_schema',
                                                ObjectsContainer.entry_lists_entries_return_object)
 
-entry_list_parser = api.parser()
-entry_list_parser.add_argument('sort_by', choices=('id', 'added', 'title', 'original_url', 'list_id'), default='title',
-                               help='Sort by attribute')
-entry_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
-entry_list_parser.add_argument('page', type=int, default=1, help='Page number')
-entry_list_parser.add_argument('page_size', type=int, default=10, help='Number of movies per page')
+sort_choices = ('id', 'added', 'title', 'original_url', 'list_id')
+entries_parser = pagination_parser(sort_choices=sort_choices, default='title')
 
 
 @entry_list_api.route('/<int:list_id>/entries/')
@@ -153,23 +141,26 @@ entry_list_parser.add_argument('page_size', type=int, default=10, help='Number o
 class EntryListEntriesAPI(APIResource):
     @etag
     @api.response(200, model=entry_lists_entries_return_schema)
-    @api.doc(params={'list_id': 'ID of the list'}, parser=entry_list_parser)
+    @api.doc(params={'list_id': 'ID of the list'}, parser=entries_parser)
     def get(self, list_id, session=None):
         """ Get entries by list ID """
+        args = entries_parser.parse_args()
 
-        args = entry_list_parser.parse_args()
-        page = args.get('page')
-        page_size = args.get('page_size')
+        # Pagination and sorting params
+        page = args['page']
+        per_page = args['per_page']
+        sort_by = args['sort_by']
+        sort_order = args['order']
 
-        start = page_size * (page - 1)
-        stop = start + page_size
-        descending = bool(args.get('order') == 'desc')
+        start = per_page * (page - 1)
+        stop = start + per_page
+        descending = bool(sort_order == 'desc')
 
         kwargs = {
             'start': start,
             'stop': stop,
             'list_id': list_id,
-            'order_by': args.get('sort_by'),
+            'order_by': sort_by,
             'descending': descending,
             'session': session
         }
@@ -179,19 +170,22 @@ class EntryListEntriesAPI(APIResource):
         except NoResultFound:
             raise NotFoundError('list_id %d does not exist' % list_id)
         count = el.get_entries_by_list_id(count=True, **kwargs)
+
         log.debug('entry lists entries count is %d', count)
         entries = [entry.to_dict() for entry in el.get_entries_by_list_id(**kwargs)]
-        pages = int(ceil(count / float(page_size)))
 
-        number_of_entries = min(page_size, count)
+        pages = int(ceil(count / float(per_page)))
 
-        return jsonify({
-            'entries': entries,
-            'total_number_of_entries': count,
-            'number_of_entries': number_of_entries,
-            'page': page,
-            'total_number_of_pages': pages
-        })
+        # Create Link header
+        full_url = self.api.base_url + entry_list_api.path.lstrip('/') + '/' + str(list_id) + '/entries/'
+        link = link_header(full_url, page, per_page, pages)
+
+        # Create response
+        rsp = jsonify(entries)
+
+        # Add link header to response
+        rsp.headers.extend(link)
+        return rsp
 
     @api.validate(base_entry_schema)
     @api.response(201, description='Successfully created entry object', model=entry_list_entry_base_schema)

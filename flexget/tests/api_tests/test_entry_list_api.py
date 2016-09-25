@@ -120,7 +120,7 @@ class TestEntryListAPI(object):
         assert not errors
 
         for field, value in entry_data.items():
-            assert data['entries'][0].get(field) == value
+            assert data[0].get(field) == value
 
     def test_entry_list_entry(self, api_client, schema_match):
         payload = {'name': 'test_list'}
@@ -158,7 +158,7 @@ class TestEntryListAPI(object):
         assert not errors
 
         for field, value in entry_data.items():
-            assert data['entries'][0].get(field) == value
+            assert data[0].get(field) == value
 
         # Get specific entry from list
         rsp = api_client.get('/entry_list/1/entries/1/')
