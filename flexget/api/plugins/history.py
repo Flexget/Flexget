@@ -79,10 +79,7 @@ class HistoryAPI(APIResource):
         finish = start + per_page
 
         # Choose sorting order
-        if sort_order == 'desc':
-            order = desc
-        else:
-            order = asc
+        order = desc if sort_order == 'desc' else asc
 
         # Build item query
         items = session.query(History)
