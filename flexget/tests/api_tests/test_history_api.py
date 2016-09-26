@@ -39,3 +39,22 @@ class TestHistoryAPI(object):
 
         for key, value in history_entry.items():
             assert data[0][key] == value
+
+        rsp = api_client.get('/history/?task=test_task1')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.history_list_object, data)
+        assert not errors
+
+        for key, value in history_entry.items():
+            assert data[0][key] == value
+
+        rsp = api_client.get('/history/?task=bla')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.history_list_object, data)
+        assert not errors
+
+        assert data == []
