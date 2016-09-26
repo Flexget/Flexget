@@ -67,8 +67,12 @@ class TVDBRequest(object):
         result.raise_for_status()
         result = result.json()
 
-        if result.get('errors'):
-            raise LookupError('Error processing request on tvdb: %s' % result.get('errors'))
+        if 'errors' in result:
+            log.debug(result['errors'])
+            # a hack to make sure it doesn't raise exception on a simple invalidLanguage. This is because tvdb
+            # has a tendency to contain bad data and randomly return this error for no reason
+            if len(result['errors']) > 1 or 'invalidLanguage' not in result['errors']:
+                raise LookupError('Error processing request on tvdb: %s' % result['errors'])
 
         return result
 
