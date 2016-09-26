@@ -3,6 +3,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from datetime import datetime
 
+from flexget.api.app import base_message
 from flexget.api.plugins.rejected import ObjectsContainer as OC
 from flexget.manager import Session
 from flexget.plugins.filter.remember_rejected import RememberEntry, RememberTask
@@ -103,6 +104,14 @@ class TestRejectedAPI(object):
         for field, value in values.items():
             assert data.get(field) == value
 
+        rsp = api_client.get('/rejected/10/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
     def test_rejected_delete_entry(self, api_client, schema_match):
         add_rejected_entry(self.entry)
 
@@ -110,7 +119,6 @@ class TestRejectedAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-
         errors = schema_match(OC.rejected_entry_object, data)
         assert not errors
 
@@ -118,7 +126,19 @@ class TestRejectedAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
 
-        assert data == {'status': 'success',
-                        'status_code': 200,
-                        'message': 'successfully deleted rejected entry 1'}
+        rsp = api_client.delete('/rejected/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.get('/rejected/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
