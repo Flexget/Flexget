@@ -37,6 +37,9 @@ class ObjectsContainer(object):
             'genres': {'type': 'array', 'items': {'type': 'string'}},
             'language': {'type': 'string'}
         },
+        'required': ['tvdb_id', 'last_updated', 'expired', 'series_name', 'rating', 'status', 'runtime', 'airs_time',
+                     'airs_dayofweek', 'content_rating', 'network', 'overview', 'imdb_id', 'zap2it_id', 'banner',
+                     'first_aired', 'aliases', 'posters', 'genres', 'language'],
         'additionalProperties': False
     }
 
@@ -58,6 +61,8 @@ class ObjectsContainer(object):
             'first_aired': {'type': 'string'},
             'series_id': {'type': 'integer'}
         },
+        'required': ['id', 'expired', 'last_update', 'season_number', 'episode_number', 'absolute_number',
+                     'episode_name', 'overview', 'director', 'writer', 'rating', 'image', 'first_aired', 'series_id'],
         'additionalProperties': False
     }
 
@@ -73,6 +78,7 @@ class ObjectsContainer(object):
             'overview': {'type': ['string', 'null']},
             'tvdb_id': {'type': 'integer'}
         },
+        'required': ['aliases', 'first_aired', 'banner', 'network', 'series_name', 'status', 'overview', 'tvdb_id'],
         'additionalProperties': False
     }
     search_results_object = {'type': 'array', 'items': search_result_object}
@@ -88,7 +94,7 @@ series_parser.add_argument('include_actors', type=inputs.boolean, help='Include 
 
 @tvdb_api.route('/series/<string:title>/')
 @api.doc(params={'title': 'TV Show name or TVDB ID'}, parser=series_parser)
-class TVDBSeriesSearchApi(APIResource):
+class TVDBSeriesLookupAPI(APIResource):
     @etag
     @api.response(200, 'Successfully found show', tvdb_series_schema)
     @api.response(NotFoundError)
@@ -166,13 +172,19 @@ class TVDBSeriesSearchAPI(APIResource):
     @api.response(NotFoundError)
     def get(self, session=None):
         args = search_parser.parse_args()
-        if not (args.get('search_name') or args.get('imdb_id') or args.get('zap2it_id')):
+
+        search_name = args.get('search_name')
+        imdb_id = args.get('imdb_id')
+        zap2it_id = args.get('zap2it_id')
+        force_search = args.get('force_search')
+
+        if not any(arg for arg in [search_name, imdb_id, zap2it_id]):
             raise BadRequest('Not enough lookup arguments')
         kwargs = {
-            'search_name': args.get('search_name'),
-            'imdb_id': args.get('imdb_id'),
-            'zap2it_id': args.get('zap2it_id'),
-            'force_search': args.get('force_search'),
+            'search_name': search_name,
+            'imdb_id': imdb_id,
+            'zap2it_id': zap2it_id,
+            'force_search': force_search,
             'session': session
         }
         try:

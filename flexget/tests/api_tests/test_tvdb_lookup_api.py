@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import pytest
+from flexget.api.app import base_message
 
 from flexget.api.plugins.tvdb_lookup import ObjectsContainer as OC
 from flexget.utils import json
@@ -31,6 +32,33 @@ class TestTVDBSeriesLookupAPI(object):
 
         for field, value in values.items():
             assert data.get(field) == value
+
+    def test_tvdb_series_lookup_by_id(self, api_client, schema_match):
+        values = {
+            'tvdb_id': 77398,
+            'imdb_id': 'tt0106179',
+            'language': 'en',
+            'series_name': 'The X-Files',
+            'zap2it_id': 'EP00080955'
+        }
+
+        rsp = api_client.get('/tvdb/series/77398/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.tvdb_series_object, data)
+        assert not errors
+
+        for field, value in values.items():
+            assert data.get(field) == value
+
+    def test_tvdb_series_lookup_error(self, api_client, schema_match):
+        rsp = api_client.get('/tvdb/series/sdfgsfgbsfxfdgx/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
 
 
 @pytest.mark.online
@@ -171,3 +199,24 @@ class TestTVDSearchZAP2ITLookupAPI(object):
 
         for field, value in values.items():
             assert data[0].get(field) == value
+
+
+@pytest.mark.online
+class TestTVDSearchAPIErrors(object):
+    config = 'tasks: {}'
+
+    def test_tvdb_search_bad_request(self, api_client, schema_match):
+        rsp = api_client.get('/tvdb/search/')
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
+
+    def test_tvdb_search_lookup_error(self, api_client, schema_match):
+        rsp = api_client.get('/tvdb/search/?search_name=sdfgsdfgsdfgsdfg')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
