@@ -76,3 +76,10 @@ class TestParseFilesize(object):
     def test_parse_filesize_single_digit(self):
         size = '1 GiB'
         assert compare_floats(parse_filesize(size), 1024)
+
+    def test_parse_filesize_separators(self):
+        size = '1,234 GiB'
+        assert compare_floats(parse_filesize(size), 1263616)
+
+        size = '1 234 567 MiB'
+        assert compare_floats(parse_filesize(size), 1234567)
