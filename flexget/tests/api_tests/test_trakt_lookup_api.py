@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import pytest
+from flexget.api.app import base_message
 
 from flexget.api.plugins.trakt_lookup import ObjectsContainer as oc
 from flexget.utils import json
@@ -199,6 +200,14 @@ class TestTraktSeriesLookupAPI(object):
 
         assert 'translations' in data
 
+    def test_trakt_series_lookup_error(self, api_client, schema_match):
+        rsp = api_client.get('/trakt/series/sdfgsdfgsdfgsdfgsdfg/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
+
 
 @pytest.mark.online
 class TestTraktMovieLookupAPI(object):
@@ -303,3 +312,11 @@ class TestTraktMovieLookupAPI(object):
 
         assert 'translations' in data
         assert len(data['translations']) > 0
+
+    def test_trakt_movies_lookup_error(self, api_client, schema_match):
+        rsp = api_client.get('/trakt/movies/sdfgsdfgsdfgsdfgsdfg/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
