@@ -43,6 +43,14 @@ class TestEntryListAPI(object):
         for field, value in payload.items():
             assert data[0].get(field) == value
 
+        # Try to Create list again
+        rsp = api_client.json_post('/entry_list/', data=json.dumps(payload))
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
     def test_entry_list_list_id(self, api_client, schema_match):
         payload = {'name': 'test_list'}
 
@@ -71,6 +79,22 @@ class TestEntryListAPI(object):
         # Delete list
         rsp = api_client.delete('/entry_list/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Try to get list
+        rsp = api_client.get('/entry_list/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Try to Delete list
+        rsp = api_client.delete('/entry_list/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -121,6 +145,22 @@ class TestEntryListAPI(object):
 
         for field, value in entry_data.items():
             assert data[0].get(field) == value
+
+        # Try to re-add entry to list
+        rsp = api_client.json_post('/entry_list/1/entries/', data=json.dumps(entry_data))
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.entry_list_entry_base_object, data)
+        assert not errors
+
+        # Try to post to non existing list
+        rsp = api_client.json_post('/entry_list/10/entries/', data=json.dumps(entry_data))
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.entry_list_entry_base_object, data)
+        assert not errors
 
     def test_entry_list_entry(self, api_client, schema_match):
         payload = {'name': 'test_list'}
@@ -183,6 +223,14 @@ class TestEntryListAPI(object):
 
         for field, value in new_entry_data.items():
             assert data.get(field) == value
+
+        # Try to change non-existent entry from list
+        rsp = api_client.json_put('/entry_list/1/entries/10/', data=json.dumps(new_entry_data))
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
 
         # Delete specific entry from list
         rsp = api_client.delete('/entry_list/1/entries/1/')

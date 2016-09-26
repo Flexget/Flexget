@@ -10,8 +10,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import flexget.plugins.list.entry_list as el
 from flexget.api import api, APIResource
-from flexget.api.app import BadRequest, NotFoundError, base_message_schema, success_response, etag, pagination_parser, \
-    link_header
+from flexget.api.app import NotFoundError, base_message_schema, success_response, etag, pagination_parser, link_header, \
+    CannotAddResource
 
 log = logging.getLogger('entry_list')
 
@@ -82,7 +82,7 @@ class EntryListListsAPI(APIResource):
 
     @api.validate(entry_list_input_object_schema)
     @api.response(201, model=entry_list_object_schema)
-    @api.response(BadRequest)
+    @api.response(CannotAddResource)
     def post(self, session=None):
         """ Create a new entry list """
         data = request.json
@@ -93,7 +93,7 @@ class EntryListListsAPI(APIResource):
         except NoResultFound:
             new_list = True
         if not new_list:
-            raise BadRequest('list with name \'%s\' already exists' % name)
+            raise CannotAddResource('list with name \'%s\' already exists' % name)
         entry_list = el.EntryListList(name=name)
         session.add(entry_list)
         session.commit()
@@ -189,7 +189,7 @@ class EntryListEntriesAPI(APIResource):
 
     @api.validate(base_entry_schema)
     @api.response(201, description='Successfully created entry object', model=entry_list_entry_base_schema)
-    @api.response(BadRequest)
+    @api.response(CannotAddResource)
     def post(self, list_id, session=None):
         """ Create a new entry object"""
         try:
@@ -200,7 +200,7 @@ class EntryListEntriesAPI(APIResource):
         title = data.get('title')
         entry_object = el.get_entry_by_title(list_id=list_id, title=title, session=session)
         if entry_object:
-            raise BadRequest('entry with title \'%s\' already exists' % title)
+            raise CannotAddResource('entry with title \'%s\' already exists' % title)
         entry_object = el.EntryListEntry(entry=data, entry_list_id=list_id)
         session.add(entry_object)
         session.commit()
