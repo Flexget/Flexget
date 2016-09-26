@@ -130,3 +130,12 @@ class TestTVMAzeSeriesLookupAPI(object):
 
         errors = schema_match(base_message, data)
         assert not errors
+
+    def test_tvmaze_episode_lookup_error(self, api_client, schema_match):
+        rsp = api_client.get('/tvmaze/episode/13/?season_num=100&ep_num=100')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors

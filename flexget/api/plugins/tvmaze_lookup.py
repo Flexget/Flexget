@@ -57,7 +57,11 @@ class ObjectsContainer(object):
             'show_type': {'type': 'string'},
             'network': {'type': ['string', 'null']},
             'last_update': {'type': 'string', 'format': 'date-time'}
-        }
+        },
+        'required': ['tvmaze_id', 'status', 'rating', 'genres', 'weight', 'updated', 'name', 'language',
+                     'schedule', 'url', 'original_image', 'medium_image', 'tvdb_id', 'tvrage_id', 'premiered', 'year',
+                     'summary', 'webchannel', 'runtime', 'show_type', 'network', 'last_update'],
+        'additionalProperties': False
     }
 
     tvmaze_episode_object = {
@@ -76,7 +80,10 @@ class ObjectsContainer(object):
             'runtime': {'type': 'integer'},
             'summary': {'type': 'string'},
             'last_update': {'type': 'string', 'format': 'date-time'}
-        }
+        },
+        'required': ['tvmaze_id', 'series_id', 'number', 'season_number', 'title', 'airdate', 'url', 'original_image',
+                     'medium_image', 'airstamp', 'runtime', 'summary', 'last_update'],
+        'additionalProperties': False
     }
 
 
