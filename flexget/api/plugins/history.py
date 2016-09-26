@@ -27,7 +27,9 @@ class ObjectsContainer(object):
             'time': {'type': 'string', 'format': 'date-time'},
             'title': {'type': 'string'},
             'url': {'type': 'string'}
-        }
+        },
+        'required': ['details', 'filename', 'id', 'task', 'time', 'title', 'url'],
+        'additionalProperties': False
     }
 
     history_list_object = {'type': 'array', 'items': base_history_object}
@@ -58,6 +60,10 @@ class HistoryAPI(APIResource):
         sort_by = args['sort_by']
         sort_order = args['order']
 
+        # Hard limit results per page to 100
+        if per_page > 100:
+            per_page = 100
+
         # Filter param
         task = args['task']
 
@@ -85,7 +91,10 @@ class HistoryAPI(APIResource):
         items = session.query(History)
         if task:
             items = items.filter(History.task == task)
-        items = items.order_by(order(getattr(History, sort_by))).slice(start, finish)
+        try:
+            items = items.order_by(order(getattr(History, sort_by))).slice(start, finish)
+        except AttributeError as e:
+            raise BadRequest(str(e))
 
         # Create Link header
         full_url = self.api.base_url + history_api.path

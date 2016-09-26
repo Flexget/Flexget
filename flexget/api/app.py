@@ -72,7 +72,7 @@ def api_version(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
         rv = f(*args, **kwargs)
-        rv.headers['X-API-Version'] = __version__
+        rv.headers['API-Version'] = __version__
         return rv
 
     return wrapped
