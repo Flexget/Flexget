@@ -543,6 +543,14 @@ class TestSeriesSingleAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
+        # Non existent show
+        rsp = api_client.json_put('/series/10/', data=json.dumps(payload2))
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
 
 class TestSeriesEpisodesAPI(object):
     config = """
@@ -694,6 +702,14 @@ class TestSeriesEpisodeAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
+        # Episode does not belong to series
+        rsp = api_client.delete('/series/2/episodes/1/')
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
         # Delete
         rsp = api_client.delete('/series/1/episodes/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -703,6 +719,20 @@ class TestSeriesEpisodeAPI(object):
         assert not errors
 
         rsp = api_client.get('/series/1/episodes/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.delete('/series/1/episodes/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.delete('/series/10/episodes/1/')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
@@ -1153,11 +1183,19 @@ class TestSeriesReleaseAPI(object):
 
             series2.episodes.append(episode2)
 
+        # No series
+        rsp = api_client.json_put('/series/10/episodes/1/releases/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
         rsp = api_client.json_put('/series/1/episodes/1/releases/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(base_message, data)
+        errors = schema_match(OC.release_schema, data)
         assert not errors
 
         # Cannot reset if already downloaded
@@ -1255,6 +1293,14 @@ class TestSeriesReleaseAPI(object):
             episode3.releases = [release4]
 
             series2.episodes.append(episode3)
+
+        # No series
+        rsp = api_client.delete('/series/10/episodes/1/releases/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
 
         # No episode for series
         rsp = api_client.delete('/series/1/episodes/10/releases/1/')

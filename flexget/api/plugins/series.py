@@ -775,12 +775,12 @@ class SeriesReleaseAPI(APIResource):
         series.delete_release_by_id(rel_id)
         return success_response('successfully deleted release %d from episode %d' % (rel_id, ep_id))
 
-    @api.response(200, 'Successfully reset downloaded release status', model=base_message_schema)
+    @api.response(200, 'Successfully reset downloaded release status', model=release_schema)
     @api.doc(description='Resets the downloaded release status, clearing the quality to be downloaded again')
     def put(self, show_id, ep_id, rel_id, session):
         """ Resets a downloaded release status """
         try:
-            series.show_by_id(show_id, session=session)
+            show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
         try:
@@ -800,4 +800,9 @@ class SeriesReleaseAPI(APIResource):
             raise BadRequest('release with id %s is not set as downloaded' % rel_id)
         release.downloaded = False
 
-        return success_response('successfully reset download status for release %d from episode %d' % (rel_id, ep_id))
+        return jsonify({
+            'series': show.name,
+            'series_id': show_id,
+            'episode_id': ep_id,
+            'release': get_release_details(release)
+        })
