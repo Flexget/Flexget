@@ -183,4 +183,50 @@ interactions:
       last-modified: ['Sat, 24 Sep 2016 01:13:10 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
     status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: http://download.flexget.com/latestversion
+  response:
+    body: {string: !!python/unicode '2.3.34
+
+'}
+    headers:
+      accept-ranges: [bytes]
+      connection: [keep-alive]
+      content-length: ['7']
+      content-type: [application/octet-stream]
+      date: ['Mon, 26 Sep 2016 09:02:05 GMT']
+      etag: ['"57e875ef-7"']
+      last-modified: ['Mon, 26 Sep 2016 01:12:15 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: http://download.flexget.com/latestversion
+  response:
+    body: {string: !!python/unicode '2.3.34
+
+'}
+    headers:
+      accept-ranges: [bytes]
+      connection: [keep-alive]
+      content-length: ['7']
+      content-type: [application/octet-stream]
+      date: ['Mon, 26 Sep 2016 09:02:06 GMT']
+      etag: ['"57e875ef-7"']
+      last-modified: ['Mon, 26 Sep 2016 01:12:15 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+    status: {code: 200, message: OK}
 version: 1

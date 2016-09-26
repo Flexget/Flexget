@@ -27,7 +27,7 @@ from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User
 from flexget.manager import Session
-from flexget.api import flask_app
+from flexget.api import api_app
 
 log = logging.getLogger('tests')
 
@@ -322,7 +322,7 @@ class MockManager(Manager):
 class APIClient(object):
     def __init__(self, api_key):
         self.api_key = api_key
-        self.client = flask_app.test_client()
+        self.client = api_app.test_client()
 
     def _append_header(self, key, value, kwargs):
         if 'headers' not in kwargs:

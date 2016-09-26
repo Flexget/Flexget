@@ -5,7 +5,7 @@ import logging
 
 from flexget.config_schema import register_config_key
 from flexget.event import event
-from flexget.api import flask_app
+from flexget.api import api_app
 from flexget.webserver import get_secret, register_app, setup_server
 from flexget.ui import register_web_ui
 
@@ -71,9 +71,9 @@ def register_web_server(manager):
         return
     log.info("Running web server at IP %s:%s", web_server_config['bind'], web_server_config['port'])
     # Register API
-    flask_app.secret_key = get_secret()
+    api_app.secret_key = get_secret()
     log.info("Initiating API")
-    register_app('/api', flask_app)
+    register_app('/api', api_app)
 
     # Register WebUI
     if web_server_config.get('web_ui'):
