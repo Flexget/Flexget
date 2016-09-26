@@ -10,8 +10,8 @@ class TestAuthenticationAPI(object):
     config = "{'tasks': {}}"
 
     def test_login(self, api_client, schema_match):
-        rsp = api_client.json_post('/auth/login/', data={})
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        rsp = api_client.json_post('/auth/login/', data=json.dumps({}))
+        assert rsp.status_code == 422, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
 

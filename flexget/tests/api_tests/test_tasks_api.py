@@ -178,7 +178,7 @@ class TestTaskAPI(object):
 
         rsp = api_client.json_put('/tasks/test/', data=json.dumps(updated_task))
 
-        assert rsp.status_code == 201
+        assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(OC.task_return_object, data)
         assert not errors

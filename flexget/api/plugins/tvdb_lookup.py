@@ -55,14 +55,13 @@ class ObjectsContainer(object):
             'episode_name': {'type': 'string'},
             'overview': {'type': 'string'},
             'director': {'type': 'string'},
-            'writer': {'type': 'array', 'items': {'type': 'string'}},
             'rating': {'type': 'number'},
             'image': {'type': 'string'},
             'first_aired': {'type': 'string'},
             'series_id': {'type': 'integer'}
         },
         'required': ['id', 'expired', 'last_update', 'season_number', 'episode_number', 'absolute_number',
-                     'episode_name', 'overview', 'director', 'writer', 'rating', 'image', 'first_aired', 'series_id'],
+                     'episode_name', 'overview', 'director', 'rating', 'image', 'first_aired', 'series_id'],
         'additionalProperties': False
     }
 
