@@ -68,6 +68,7 @@ def api_version(f):
     """
     Add the 'X-API-Version' header to all responses
     """
+
     @wraps(f)
     def wrapped(*args, **kwargs):
         rv = f(*args, **kwargs)
@@ -225,7 +226,9 @@ base_message = {
         'status_code': {'type': 'integer'},
         'message': {'type': 'string'},
         'status': {'type': 'string'}
-    }
+    },
+    'required': ['status_code', 'message', 'status']
+
 }
 
 base_message_schema = api.schema('base_message', base_message)

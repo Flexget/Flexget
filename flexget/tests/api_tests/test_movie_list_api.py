@@ -56,6 +56,13 @@ class TestMovieListAPI(object):
         for field, value in values.items():
             assert data[0].get(field) == value
 
+        # Try to Create existing list
+        rsp = api_client.json_post('/movie_list/', data=json.dumps(payload))
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
+
     def test_movie_list_list_id(self, api_client, schema_match):
         payload = {'name': 'test'}
 
@@ -91,7 +98,21 @@ class TestMovieListAPI(object):
         rsp = api_client.delete('/movie_list/1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(empty_response, data)
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Get non existent list
+        rsp = api_client.get('/movie_list/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Delete non existent list
+        rsp = api_client.delete('/movie_list/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
         assert not errors
 
     def test_movie_list_movies(self, api_client, schema_match):
@@ -118,6 +139,13 @@ class TestMovieListAPI(object):
         assert not errors
 
         assert data[0] == movie
+
+        # Get movies from non-existent list
+        rsp = api_client.get('/movie_list/10/movies/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
 
     def test_movie_list_movies_with_identifiers(self, api_client, schema_match):
         payload = {'name': 'name'}
@@ -146,6 +174,24 @@ class TestMovieListAPI(object):
 
         returned_identifier = data[0]['movies_list_ids'][0]
         assert returned_identifier['id_name'], returned_identifier['id_value'] == identifier.items()[0]
+
+        # Add movie to non-existent list
+        rsp = api_client.json_post('/movie_list/10/movies/', data=json.dumps(movie_data))
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        non_valid_identifier = {'bla': 'tt1234567'}
+        movie_data = {'movie_name': 'title2',
+                      'movie_identifiers': [non_valid_identifier]}
+
+        # Add movie with invalid identifier to list
+        rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie_data))
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
 
     def test_movie_list_movie(self, api_client, schema_match):
         payload = {'name': 'name'}
@@ -185,6 +231,23 @@ class TestMovieListAPI(object):
 
         returned_identifier = data['movies_list_ids'][0]
         assert returned_identifier['id_name'], returned_identifier['id_value'] == identifiers[0].items()
+
+        # PUT non-existent movie from list
+        rsp = api_client.json_put('/movie_list/1/movies/10/', data=json.dumps(identifiers))
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        non_valid_identifier = [{'bla': 'tt1234567'}]
+        # Change movie using invalid identifier from list
+        rsp = api_client.json_put('/movie_list/1/movies/1/', data=json.dumps(non_valid_identifier))
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
 
         # Delete specific movie from list
         rsp = api_client.delete('/movie_list/1/movies/1/')
