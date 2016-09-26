@@ -313,7 +313,7 @@ class TestMovieListUseCases(object):
         rsp = api_client.json_post('/movie_list/1/movies/', data=json.dumps(movie_3))
         assert rsp.status_code == 201, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(base_message, data)
+        errors = schema_match(OC.movie_list_object, data)
         assert not errors
 
     def test_identifiers(self, api_client, schema_match):

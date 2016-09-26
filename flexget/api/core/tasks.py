@@ -38,6 +38,7 @@ class ObjectsContainer(object):
             'name': {'type': 'string'},
             'config': {'$ref': '/schema/plugins'}
         },
+        'required': ['name', 'config'],
         'additionalProperties': False
     }
 
