@@ -137,7 +137,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
         if acc and datetime.now() < acc.expires and not refresh and not re_auth:
             return acc.access_token
         else:
-            if acc and (refresh or datetime.now() >= acc.expires) and not re_auth:
+            if acc and (refresh or datetime.now() >= acc.expires - timedelta(days=5)) and not re_auth:
                 log.debug('Using refresh token to re-authorize account %s.', account)
                 data['refresh_token'] = acc.refresh_token
                 data['grant_type'] = 'refresh_token'
