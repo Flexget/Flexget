@@ -95,9 +95,12 @@ class TestTaskAPI(object):
 
     def test_get_task(self, api_client, schema_match):
         rsp = api_client.get('/tasks/test/')
+        assert rsp.status_code == 200
+
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(OC.task_return_object, data)
         assert not errors
+
         assert data == {
             'name': 'test',
             'config': {
@@ -112,8 +115,30 @@ class TestTaskAPI(object):
             },
         }
 
+        # Non existent task
+        rsp = api_client.get('/tasks/bla/')
+        data = json.loads(rsp.get_data(as_text=True))
+        assert rsp.status_code == 404
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
     @patch.object(Manager, 'save_config')
     def test_update_task(self, mocked_save_config, api_client, manager, schema_match):
+        same_task = {
+            'name': 'test',
+            'config': {
+                'mock': [{'title': 'entry 1'}],
+                'rss': {'url': 'http://newurl/rss'}
+            }
+        }
+
+        rsp = api_client.json_put('/tasks/test/', data=json.dumps(same_task))
+        assert rsp.status_code == 400
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
+
         updated_task = {
             'name': 'test',
             'config': {
@@ -132,6 +157,14 @@ class TestTaskAPI(object):
         assert data == updated_task
         assert manager.user_config['tasks']['test'] == updated_task['config']
         assert manager.config['tasks']['test'] == updated_task['config']
+
+        # Non existent task
+        rsp = api_client.json_put('/tasks/bla/', data=json.dumps(updated_task))
+        assert rsp.status_code == 404
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
+
 
     @patch.object(Manager, 'save_config')
     def test_rename_task(self, mocked_save_config, api_client, manager, schema_match):
@@ -167,3 +200,11 @@ class TestTaskAPI(object):
         assert mocked_save_config.called
         assert 'test' not in manager.user_config['tasks']
         assert 'test' not in manager.config['tasks']
+
+        # Non existent task
+        rsp = api_client.delete('/tasks/bla/')
+
+        assert rsp.status_code == 404
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(base_message, data)
+        assert not errors
