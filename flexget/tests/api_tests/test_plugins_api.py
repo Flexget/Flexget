@@ -66,3 +66,10 @@ class TestPluginsAPI(object):
 
         errors = schema_match(OC.plugin_object, data)
         assert not errors
+
+        rsp = api_client.get('/plugins/seen/?include_schema=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.plugin_object, data)
+        assert not errors
