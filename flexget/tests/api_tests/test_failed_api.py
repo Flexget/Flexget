@@ -13,7 +13,7 @@ class TestRetryFailedAPI(object):
 
     def test_retry_failed_all(self, api_client, schema_match):
         rsp = api_client.get('/failed/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.retry_entries_list_object, data)
@@ -32,7 +32,7 @@ class TestRetryFailedAPI(object):
             session.commit()
 
         rsp = api_client.get('/failed/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.retry_entries_list_object, data)
@@ -42,20 +42,20 @@ class TestRetryFailedAPI(object):
                 assert data[idx].get(key) == failed_entries[idx].get(key)
 
         rsp = api_client.delete('/failed/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
         assert not errors
 
         rsp = api_client.get('/failed/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200
 
         assert json.loads(rsp.get_data(as_text=True)) == []
 
     def test_retry_failed_by_id(self, api_client, schema_match):
         rsp = api_client.get('/failed/1/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -69,7 +69,7 @@ class TestRetryFailedAPI(object):
             session.commit()
 
         rsp = api_client.get('/failed/1/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.retry_failed_entry_object, data)
@@ -78,14 +78,21 @@ class TestRetryFailedAPI(object):
             assert data.get(key) == failed_entry_dict_1.get(key)
 
         rsp = api_client.delete('/failed/1/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
         assert not errors
 
         rsp = api_client.get('/failed/1/')
-        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 404
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.delete('/failed/1/')
+        assert rsp.status_code == 404
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
