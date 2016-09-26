@@ -186,11 +186,11 @@ class TasksAPI(APIResource):
 
 @tasks_api.route('/<task>/')
 @api.doc(params={'task': 'task name'}, description=task_api_desc)
+@api.response(APIError, description='unable to read config')
 class TaskAPI(APIResource):
     @etag
     @api.response(200, model=task_return_schema)
     @api.response(NotFoundError, description='task not found')
-    @api.response(APIError, description='unable to read config')
     def get(self, task, session=None):
         """ Get task config """
         if task not in self.manager.user_config.get('tasks', {}):
@@ -200,7 +200,6 @@ class TaskAPI(APIResource):
 
     @api.validate(task_input_schema)
     @api.response(200, model=task_return_schema)
-    @api.response(201, description='renamed task', model=task_return_schema)
     @api.response(NotFoundError)
     @api.response(BadRequest)
     def put(self, task, session=None):
@@ -217,7 +216,6 @@ class TaskAPI(APIResource):
         if 'tasks' not in self.manager.config:
             self.manager.config['tasks'] = {}
 
-        code = 200
         if task != new_task_name:
             # Rename task
             if new_task_name in self.manager.user_config['tasks']:
@@ -225,7 +223,6 @@ class TaskAPI(APIResource):
 
             del self.manager.user_config['tasks'][task]
             del self.manager.config['tasks'][task]
-            code = 201
 
         # Process the task config
         task_schema_processed = copy.deepcopy(data)
@@ -241,7 +238,7 @@ class TaskAPI(APIResource):
         self.manager.config_changed()
 
         rsp = jsonify({'name': new_task_name, 'config': self.manager.user_config['tasks'][new_task_name]})
-        rsp.status_code = code
+        rsp.status_code = 200
         return rsp
 
     @api.response(200, model=base_message_schema, description='deleted task')
