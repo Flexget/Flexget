@@ -200,6 +200,9 @@ class MovieListMoviesAPI(APIResource):
         movies = [movie.to_dict() for movie in ml.get_movies_by_list_id(**kwargs)]
         pages = int(ceil(count / float(per_page)))
 
+        if page > pages:
+            raise NotFoundError('page %s does not exist' % page)
+
         # Create Link header
         full_url = self.api.base_url + movie_list_api.path.lstrip('/') + '/' + str(list_id) + '/movies/'
 
@@ -211,7 +214,7 @@ class MovieListMoviesAPI(APIResource):
             'sort_by': sort_by,
             'order': sort_order
         }
-        pagination = pagination_headers(full_url, page, per_page, pages, count, params)
+        pagination = pagination_headers(full_url, page, per_page, pages, count, actual_size, params)
 
         # Create response
         rsp = jsonify(movies)
