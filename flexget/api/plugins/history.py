@@ -67,11 +67,12 @@ class HistoryAPI(APIResource):
         # Filter param
         task = args['task']
 
-        # Build query count
-        count_query = session.query(History)
+        # Build query
+        query = session.query(History)
         if task:
-            count_query = count_query.filter(History.task == task)
-        count = count_query.count()
+            query = query.filter(History.task == task)
+
+        count = query.count()
 
         if not count:
             return jsonify([])
@@ -87,12 +88,9 @@ class HistoryAPI(APIResource):
         # Choose sorting order
         order = desc if sort_order == 'desc' else asc
 
-        # Build item query
-        items = session.query(History)
-        if task:
-            items = items.filter(History.task == task)
+        # Get items
         try:
-            items = items.order_by(order(getattr(History, sort_by))).slice(start, finish)
+            items = query.order_by(order(getattr(History, sort_by))).slice(start, finish)
         except AttributeError as e:
             raise BadRequest(str(e))
 
