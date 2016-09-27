@@ -185,6 +185,9 @@ class EntryListEntriesAPI(APIResource):
         # Total number of pages
         pages = int(ceil(count / float(per_page)))
 
+        # Actual results in page
+        actual_size = min(len(entries), per_page)
+
         # Create Link header
         full_url = self.api.base_url + entry_list_api.path.lstrip('/') + '/' + str(list_id) + '/entries/'
 
@@ -193,7 +196,7 @@ class EntryListEntriesAPI(APIResource):
             'sort_by': sort_by,
             'order': sort_order
         }
-        pagination = pagination_headers(full_url, page, per_page, pages, count, params)
+        pagination = pagination_headers(full_url, page, per_page, pages, count, actual_size, params)
 
         # Create response
         rsp = jsonify(entries)

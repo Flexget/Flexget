@@ -94,6 +94,9 @@ class HistoryAPI(APIResource):
         except AttributeError as e:
             raise BadRequest(str(e))
 
+        # Actual results in page
+        actual_size = min(items.count(), per_page)
+
         # Create Link header
         full_url = self.api.base_url + history_api.path.lstrip('/') + '/'
 
@@ -102,7 +105,7 @@ class HistoryAPI(APIResource):
         if task:
             params.update(task=task)
 
-        pagination = pagination_headers(full_url, page, per_page, pages, count, params)
+        pagination = pagination_headers(full_url, page, per_page, pages, count, actual_size, params)
 
         # Create response
         rsp = jsonify([item.to_dict() for item in items])

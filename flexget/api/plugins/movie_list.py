@@ -203,6 +203,9 @@ class MovieListMoviesAPI(APIResource):
         # Create Link header
         full_url = self.api.base_url + movie_list_api.path.lstrip('/') + '/' + str(list_id) + '/movies/'
 
+        # Actual results in page
+        actual_size = min(len(movies), per_page)
+
         # Add all relevant params
         params = {
             'sort_by': sort_by,
