@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from flexget.plugins.filter.seen import forget_by_id
+from flexget.plugins.filter.seen import forget_by_id, SeenEntry
 from future.moves.urllib.parse import unquote
 
 from math import ceil
@@ -48,7 +48,7 @@ seen_object_schema = api.schema('seen_object_schema', ObjectsContainer.seen_obje
 seen_search_schema = api.schema('seen_search_schema', ObjectsContainer.seen_search_object)
 
 seen_base_parser = api.parser()
-seen_base_parser.add_argument('value', help='Search by any field value or leave empty to get all entries')
+seen_base_parser.add_argument('value', help='Filter by any field value or leave empty to get all entries')
 seen_base_parser.add_argument('local', type=inputs.boolean, default=None,
                               help='Filter results by seen locality.')
 
@@ -100,12 +100,13 @@ class SeenSearchAPI(APIResource):
             'descending': descending,
             'session': session
         }
-        raw_seen_entries_list = seen.search(**kwargs).all()
 
-        count = len(raw_seen_entries_list)
+        count = seen.count(value=value, status=local)
 
         if not count:
             return jsonify([])
+
+        raw_seen_entries_list = seen.search(**kwargs).all()
 
         converted_seen_entry_list = [entry.to_dict() for entry in raw_seen_entries_list]
 
@@ -113,7 +114,7 @@ class SeenSearchAPI(APIResource):
         pages = int(ceil(count / float(per_page)))
 
         # Actual results in page
-        actual_size = min(count, per_page)
+        actual_size = min(len(converted_seen_entry_list), per_page)
 
         # Invalid page request
         if page > pages and pages != 0:
@@ -132,7 +133,7 @@ class SeenSearchAPI(APIResource):
         if local:
             params.update(local=args['local'])
 
-        pagination = pagination_headers(full_url, page, per_page, pages, count, params)
+        pagination = pagination_headers(full_url, page, per_page, pages, count, actual_size, params)
 
         # Create response
         rsp = jsonify(converted_seen_entry_list)

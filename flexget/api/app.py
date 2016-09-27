@@ -419,25 +419,27 @@ def pagination_parser(parser=None, sort_choices=None, default=None):
     return pagination
 
 
-def pagination_headers(url, page, per_page, total_pages, total_items, params):
+def pagination_headers(url, page, per_page, total_pages, total_items, page_count, params=None):
     """
-    Creates the `Link` and 'Total-Count' headers, to be used for pagination traversing
+    Creates the `Link`. 'Count' and  'Total-Count' headers, to be used for pagination traversing
 
     :param url: Base URL to be used in the links
     :param page: Current page number
-    :param per_page: Results per page
+    :param per_page: Max results per page
     :param total_pages: Total number of pages
     :param total_items: Total number of items
+    :param page_count: Number of items in page (can vary from per_page)
     :param params: All other original request params that would be added to the Link header
-    :return: Dict representing the full Link header and the Total-Count
+    :return: Dict representing the full Link, Count and the Total-Count headers
     """
 
     # Build the base template
     LINKTEMPLATE = '<{}?per_page={}'.format(url, per_page)
 
     # Add all params to string
-    for key, value in params.items():
-        LINKTEMPLATE += '&{}={}'.format(key, value)
+    if params:
+        for key, value in params.items():
+            LINKTEMPLATE += '&{}={}'.format(key, value)
 
     LINKTEMPLATE += '&page={}>; rel="{}"'
 
@@ -451,5 +453,6 @@ def pagination_headers(url, page, per_page, total_pages, total_items, params):
 
     return {
         'Link': link_string,
-        'Total-Count': total_items
+        'Total-Count': total_items,
+        'Count': page_count
     }
