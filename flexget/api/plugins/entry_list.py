@@ -185,6 +185,9 @@ class EntryListEntriesAPI(APIResource):
         # Total number of pages
         pages = int(ceil(count / float(per_page)))
 
+        if page > pages:
+            raise NotFoundError('page %s does not exist' % page)
+
         # Actual results in page
         actual_size = min(len(entries), per_page)
 
