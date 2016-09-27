@@ -419,7 +419,7 @@ def pagination_parser(parser=None, sort_choices=None, default=None):
     return pagination
 
 
-def pagination_headers(url, page, per_page, total_pages, total_items, **params):
+def pagination_headers(url, page, per_page, total_pages, total_items, params):
     """
     Creates the `Link` and 'Total-Count' headers, to be used for pagination traversing
 

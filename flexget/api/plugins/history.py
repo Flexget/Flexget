@@ -8,7 +8,7 @@ from flask import jsonify
 from sqlalchemy import desc, asc
 
 from flexget.api import api, APIResource
-from flexget.api.app import BadRequest, etag, pagination_headers, pagination_parser
+from flexget.api.app import BadRequest, etag, pagination_headers, pagination_parser, NotFoundError
 from flexget.plugins.output.history import History
 
 log = logging.getLogger('history')
@@ -48,7 +48,7 @@ history_parser.add_argument('task', help='Filter by task name')
 @api.doc(parser=history_parser)
 class HistoryAPI(APIResource):
     @etag
-    @api.response(BadRequest)
+    @api.response(NotFoundError)
     @api.response(200, model=history_list_schema)
     def get(self, session=None):
         """ List of previously accepted entries """
@@ -80,7 +80,7 @@ class HistoryAPI(APIResource):
         pages = int(ceil(count / float(per_page)))
 
         if page > pages:
-            raise BadRequest('page %s does not exist' % page)
+            raise NotFoundError('page %s does not exist' % page)
 
         start = (page - 1) * per_page
         finish = start + per_page

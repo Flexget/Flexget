@@ -153,6 +153,10 @@ class EntryListEntriesAPI(APIResource):
         sort_by = args['sort_by']
         sort_order = args['order']
 
+        # Handle max size limit
+        if per_page > 100:
+            per_page = 100
+
         start = per_page * (page - 1)
         stop = start + per_page
         descending = bool(sort_order == 'desc')
@@ -172,9 +176,13 @@ class EntryListEntriesAPI(APIResource):
             raise NotFoundError('list_id %d does not exist' % list_id)
         count = el.get_entries_by_list_id(count=True, **kwargs)
 
+        if not count:
+            return jsonify([])
+
         log.debug('entry lists entries count is %d', count)
         entries = [entry.to_dict() for entry in el.get_entries_by_list_id(**kwargs)]
 
+        # Total number of pages
         pages = int(ceil(count / float(per_page)))
 
         # Create Link header
