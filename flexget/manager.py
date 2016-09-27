@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+# This needs to remain before the builtins import!
 native_int = int
+
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import atexit
 import codecs
