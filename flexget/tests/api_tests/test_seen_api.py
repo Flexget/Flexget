@@ -49,11 +49,11 @@ class TestSeenAPI(object):
         errors = schema_match(OC.seen_search_object, data)
         assert not errors
 
-        for idx, value in enumerate(sorted(data['seen_entries'], key=lambda entry: entry['title'])):
+        for idx, value in enumerate(sorted(data, key=lambda entry: entry['title'])):
             for k, v in entries[idx].items():
                 assert value[k] == v
 
-        assert data['total_number_of_seen_entries'] == len(data['seen_entries']) == 2
+        assert len(data) == 2
 
         rsp = api_client.get('/seen/?local=true')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -62,7 +62,7 @@ class TestSeenAPI(object):
         errors = schema_match(OC.seen_search_object, data)
         assert not errors
 
-        assert data['total_number_of_seen_entries'] == len(data['seen_entries']) == 1
+        assert len(data) == 1
 
         rsp = api_client.get('/seen/?value=test_value_2')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -71,7 +71,7 @@ class TestSeenAPI(object):
         errors = schema_match(OC.seen_search_object, data)
         assert not errors
 
-        assert data['total_number_of_seen_entries'] == len(data['seen_entries']) == 1
+        assert len(data) == 1
 
         rsp = api_client.get('/seen/?value=bla')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -80,7 +80,7 @@ class TestSeenAPI(object):
         errors = schema_match(OC.seen_search_object, data)
         assert not errors
 
-        assert data['total_number_of_seen_entries'] == len(data['seen_entries']) == 0
+        assert len(data) == 0
 
     def test_seen_delete_all(self, api_client, schema_match):
         entries = self.add_seen_entries()
@@ -92,7 +92,7 @@ class TestSeenAPI(object):
         errors = schema_match(OC.seen_search_object, data)
         assert not errors
 
-        for idx, value in enumerate(sorted(data['seen_entries'], key=lambda entry: entry['title'])):
+        for idx, value in enumerate(sorted(data, key=lambda entry: entry['title'])):
             for k, v in entries[idx].items():
                 assert value[k] == v
 
@@ -132,7 +132,7 @@ class TestSeenAPI(object):
         errors = schema_match(OC.seen_search_object, data)
         assert not errors
 
-        assert data['seen_entries'] == []
+        assert data == []
 
     def test_seen_get_by_id(self, api_client, schema_match):
         entries = self.add_seen_entries()
@@ -171,7 +171,7 @@ class TestSeenAPI(object):
         errors = schema_match(OC.seen_search_object, data)
         assert not errors
 
-        assert len(data['seen_entries']) == 1
+        assert len(data) == 1
 
         rsp = api_client.delete('/seen/10/')
         assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code

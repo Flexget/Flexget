@@ -208,7 +208,7 @@ class MovieListMoviesAPI(APIResource):
             'sort_by': sort_by,
             'order': sort_order
         }
-        pagination = pagination_headers(full_url, page, per_page, pages, count, **params)
+        pagination = pagination_headers(full_url, page, per_page, pages, count, params)
 
         # Create response
         rsp = jsonify(movies)

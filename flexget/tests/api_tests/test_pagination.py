@@ -61,7 +61,7 @@ class TestPaginationAPI(object):
 
         # Non existent page
         rsp = api_client.get('/history/?page=5')
-        assert rsp.status_code == 400
+        assert rsp.status_code == 404
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)

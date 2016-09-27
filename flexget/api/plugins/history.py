@@ -102,7 +102,7 @@ class HistoryAPI(APIResource):
         if task:
             params.update(task=task)
 
-        pagination = pagination_headers(full_url, page, per_page, pages, count, **params)
+        pagination = pagination_headers(full_url, page, per_page, pages, count, params)
 
         # Create response
         rsp = jsonify([item.to_dict() for item in items])
