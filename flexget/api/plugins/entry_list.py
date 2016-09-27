@@ -10,7 +10,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import flexget.plugins.list.entry_list as el
 from flexget.api import api, APIResource
-from flexget.api.app import NotFoundError, base_message_schema, success_response, etag, pagination_parser, link_header, \
+from flexget.api.app import NotFoundError, base_message_schema, success_response, etag, pagination_parser, \
+    pagination_headers, \
     CannotAddResource
 
 log = logging.getLogger('entry_list')
@@ -178,13 +179,19 @@ class EntryListEntriesAPI(APIResource):
 
         # Create Link header
         full_url = self.api.base_url + entry_list_api.path.lstrip('/') + '/' + str(list_id) + '/entries/'
-        link = link_header(full_url, page, per_page, pages)
+
+        # Add all other params
+        params = {
+            'sort_by': sort_by,
+            'order': sort_order
+        }
+        pagination = pagination_headers(full_url, page, per_page, pages, count, **params)
 
         # Create response
         rsp = jsonify(entries)
 
         # Add link header to response
-        rsp.headers.extend(link)
+        rsp.headers.extend(pagination)
         return rsp
 
     @api.validate(base_entry_schema)

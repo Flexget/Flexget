@@ -11,7 +11,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
 from flexget.api.app import CannotAddResource, NotFoundError, base_message_schema, success_response, BadRequest, etag, \
-    pagination_parser, link_header
+    pagination_parser, pagination_headers
 from flexget.plugins.list import movie_list as ml
 from flexget.plugins.list.movie_list import MovieListBase
 
@@ -202,13 +202,19 @@ class MovieListMoviesAPI(APIResource):
 
         # Create Link header
         full_url = self.api.base_url + movie_list_api.path.lstrip('/') + '/' + str(list_id) + '/movies/'
-        link = link_header(full_url, page, per_page, pages)
+
+        # Add all relevant params
+        params = {
+            'sort_by': sort_by,
+            'order': sort_order
+        }
+        pagination = pagination_headers(full_url, page, per_page, pages, count, **params)
 
         # Create response
         rsp = jsonify(movies)
 
         # Add link header to response
-        rsp.headers.extend(link)
+        rsp.headers.extend(pagination)
         return rsp
 
     @api.validate(model=input_movie_entry_schema, description=movie_identifiers_doc)

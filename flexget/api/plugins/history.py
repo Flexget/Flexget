@@ -8,7 +8,7 @@ from flask import jsonify
 from sqlalchemy import desc, asc
 
 from flexget.api import api, APIResource
-from flexget.api.app import BadRequest, etag, link_header, pagination_parser
+from flexget.api.app import BadRequest, etag, pagination_headers, pagination_parser
 from flexget.plugins.output.history import History
 
 log = logging.getLogger('history')
@@ -95,12 +95,18 @@ class HistoryAPI(APIResource):
             raise BadRequest(str(e))
 
         # Create Link header
-        full_url = self.api.base_url + history_api.path
-        link = link_header(full_url, page, per_page, pages)
+        full_url = self.api.base_url + history_api.path.lstrip('/') + '/'
+
+        # Pass a list of all relevant request params
+        params = dict(sort_by=sort_by, order=sort_order)
+        if task:
+            params.update(task=task)
+
+        pagination = pagination_headers(full_url, page, per_page, pages, count, **params)
 
         # Create response
         rsp = jsonify([item.to_dict() for item in items])
 
         # Add link header to response
-        rsp.headers.extend(link)
+        rsp.headers.extend(pagination)
         return rsp

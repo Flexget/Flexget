@@ -5,6 +5,7 @@ import logging
 import os
 from collections import deque
 from functools import wraps
+from string import Template
 
 from flask import Flask, request, jsonify, make_response
 from flask_compress import Compress
@@ -418,21 +419,37 @@ def pagination_parser(parser=None, sort_choices=None, default=None):
     return pagination
 
 
-def link_header(url, page, per_page, total_pages):
+def pagination_headers(url, page, per_page, total_pages, total_items, **params):
     """
-    Creates the `Link` header, to be used for pagination traversing
+    Creates the `Link` and 'Total-Count' headers, to be used for pagination traversing
 
     :param url: Base URL to be used in the links
     :param page: Current page number
     :param per_page: Results per page
     :param total_pages: Total number of pages
-    :return: Dict representing the full Link header
+    :param total_items: Total number of items
+    :param params: All other original request params that would be added to the Link header
+    :return: Dict representing the full Link header and the Total-Count
     """
-    LINKTEMPLATE = '<{}?page={}&per_page={}>; rel="{}"'
-    linkstring = ''
+
+    # Build the base template
+    LINKTEMPLATE = '<{}?per_page={}'.format(url, per_page)
+
+    # Add all params to string
+    for key, value in params.items():
+        LINKTEMPLATE += '&{}={}'.format(key, value)
+
+    LINKTEMPLATE += '&page={}>; rel="{}"'
+
+    link_string = ''
+
     if page > 1:
-        linkstring += LINKTEMPLATE.format(url, page - 1, per_page, 'prev') + ', '
+        link_string += LINKTEMPLATE.format(page - 1, 'prev') + ', '
     if page < total_pages:
-        linkstring += LINKTEMPLATE.format(url, page + 1, per_page, 'next') + ', '
-    linkstring += LINKTEMPLATE.format(url, total_pages, per_page, 'last')
-    return dict(Link=linkstring)
+        link_string += LINKTEMPLATE.format(page + 1, 'next') + ', '
+    link_string += LINKTEMPLATE.format(total_pages, 'last')
+
+    return {
+        'Link': link_string,
+        'Total-Count': total_items
+    }
