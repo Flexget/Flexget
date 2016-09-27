@@ -647,10 +647,11 @@ class TraktShow(Base):
                     'runtime', 'certification', 'network', 'country', 'status', 'aired_episodes',
                     'trailer', 'homepage']:
             setattr(self, col, trakt_show.get(col))
-
-        self.genres = [TraktGenre(name=g.replace(' ', '-')) for g in trakt_show.get('genres', [])]
+        
+        # Sometimes genres and translations are None but we really do want a list, hence the "or []"
+        self.genres = [TraktGenre(name=g.replace(' ', '-')) for g in trakt_show.get('genres') or []]
         self.cached_at = datetime.now()
-        self.translation_languages = trakt_show.get('available_translations', [])
+        self.translation_languages = trakt_show.get('available_translations') or []
 
     def get_episode(self, season, number, session, only_cached=False):
         # TODO: Does series data being expired mean all episode data should be refreshed?
