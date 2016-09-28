@@ -4,7 +4,7 @@ interactions:
     headers:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
-      Authorization: [!!python/unicode Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzQ5NzcyOTUsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc0ODkwODk1fQ.TON5jTk97kDMSDTSap2KOlqazzdqvZ3_otjZisq5esSHfgdBgsxGSjC5kRABTWR5pkUz-MhlZ4YIHApzw4FzjEhtyaVQM4yud0HeV3DFpylPCAIhz11Qkm5z22Gg-E4OmOTdYm1wsFCn8xlwv8zmHMH10rDFa1FsYPZcA5zoOYn5DAYRt8-NUjuWBWJdpN8QFqccTGyqDdosyHUzcQf0rT66MGYChFLP7MP40nNUU9q91fBpV6SSXne-KwEMcKbSxKSSrwyhybO1f1I-M_N-nrzGF3sQKG2YQN7yGlGlhOdLlvHKEjFupOBP0rz8BWPj4riIIJCsJG5uCOy87GONKA]
+      Authorization: [!!python/unicode Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTgyMzEsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcxODMxfQ.aV7J17NrbJfMnpO3PMg7IbscYNmLa310tKFFr2F1OiYE7Lqo799roA2gSRj-unmHnoOBbSrBKw9Z-J4V6a9LIvHE965gVsxpL9D_MiS5Vsx9gpMYYHWAY6Drtna3R48VplCv96orFPL7Dcz-Qefa45zVL9qpEQRrmttGvcw5xCJNrlC7bZhpeR-n3fzm8hkqF_C0OrW8WTX5YmjlVFqscdyQT5YZBlFaRuHCdYH0CTVN0yQNhJBxTEZvq5Ixw4ZnLN3NDek__D9bvJi5ggetes8bsTUp4oXU4bWe7itkpKROzogDYoRFAbcwTKex7DQ_K-zXUwxUNg3Wij1VQhPd3g]
       Connection: [keep-alive]
       User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
     method: GET
@@ -13,14 +13,14 @@ interactions:
     body: {string: !!python/unicode "{\n  \"Error\": \"Resource not found\"\n}"}
     headers:
       cache-control: ['private, max-age=600']
-      cf-ray: [2e868648b96327aa-FRA]
+      cf-ray: [2e97c7a24c22233c-FRA]
       connection: [keep-alive]
       content-length: ['35']
       content-type: [application/json; charset=utf-8]
-      date: ['Mon, 26 Sep 2016 11:55:02 GMT']
+      date: ['Wed, 28 Sep 2016 14:10:36 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=de875f3639d372301f029d793c21bf2521474890901; expires=Tue,
-          26-Sep-17 11:55:01 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      set-cookie: ['__cfduid=d2b6b75fb91e7546fab460f144afc84ae1475071836; expires=Thu,
+          28-Sep-17 14:10:36 GMT; path=/; domain=.thetvdb.com; HttpOnly']
       vary: [Accept-Language]
       x-powered-by: [Thundar!]
       x-thetvdb-api-version: [2.1.1]

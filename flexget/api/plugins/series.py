@@ -22,6 +22,34 @@ from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
 series_api = api.namespace('series', description='Flexget Series operations')
 
 
+def get_release_details(release):
+    release_item = {
+        'id': release.id,
+        'title': release.title,
+        'downloaded': release.downloaded,
+        'quality': release.quality.name,
+        'proper_count': release.proper_count,
+        'first_seen': release.first_seen,
+        'episode_id': release.episode_id,
+    }
+    return release_item
+
+
+def get_episode_details(episode):
+    episode_item = {
+        'id': episode.id,
+        'identifier': episode.identifier,
+        'season': episode.season,
+        'identified_by': episode.identified_by,
+        'number': episode.number,
+        'series_id': episode.series_id,
+        'first_seen': episode.first_seen,
+        'premiere_type': episode.is_premiere,
+        'number_of_releases': len(episode.releases)
+    }
+    return episode_item
+
+
 def get_series_details(show):
     latest_ep = series.get_latest_release(show)
     begin_ep = show.begin
@@ -44,7 +72,7 @@ def get_series_details(show):
         new_eps_after_latest_ep = series.new_eps_after(latest_ep)
         release = get_release_details(
             sorted(latest_ep.downloaded_releases,
-                   key=lambda release: release.first_seen if release.downloaded else None, reverse=True)[0])
+                   key=lambda rel: rel.first_seen if rel.downloaded else None, reverse=True)[0])
     else:
         latest_ep_id = latest_ep_identifier = latest_ep_age = new_eps_after_latest_ep = release = None
 
@@ -169,34 +197,6 @@ class ObjectsContainer(object):
     series_input_object['properties']['series_name'] = {'type': 'string'}
     del series_input_object['anyOf']
     series_input_object['required'] = ['series_name']
-
-
-def get_release_details(release):
-    release_item = {
-        'id': release.id,
-        'title': release.title,
-        'downloaded': release.downloaded,
-        'quality': release.quality.name,
-        'proper_count': release.proper_count,
-        'first_seen': release.first_seen,
-        'episode_id': release.episode_id,
-    }
-    return release_item
-
-
-def get_episode_details(episode):
-    episode_item = {
-        'id': episode.id,
-        'identifier': episode.identifier,
-        'season': episode.season,
-        'identified_by': episode.identified_by,
-        'number': episode.number,
-        'series_id': episode.series_id,
-        'first_seen': episode.first_seen,
-        'premiere_type': episode.is_premiere,
-        'number_of_releases': len(episode.releases)
-    }
-    return episode_item
 
 
 series_list_schema = api.schema('list_series', ObjectsContainer.series_list_schema)
