@@ -38,9 +38,13 @@ class ObjectsContainer(object):
             'reason': {'type': 'string'},
             'expires': {'type': 'string', 'format': 'date-time'},
             'rejected_by': {'type': 'string'}
-        }
+        },
+        'required': ['id', 'title', 'url', 'added', 'reason', 'expires', 'rejected_by'],
+        'additionalProperties': False
+
     }
-    rejected_entries_list_object =  {'type': 'array', 'items': rejected_entry_object}
+    rejected_entries_list_object = {'type': 'array', 'items': rejected_entry_object}
+
 
 rejected_entry_schema = api.schema('rejected_failed_entry_schema', ObjectsContainer.rejected_entry_object)
 rejected_entries_list_schema = api.schema('rejected_entries_list_schema', ObjectsContainer.rejected_entries_list_object)
