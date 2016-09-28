@@ -92,17 +92,6 @@ class ObjectsContainer(object):
         'required': ['id', 'title', 'downloaded', 'quality', 'proper_count', 'first_seen', 'episode_id']
     }
 
-    release_schema = {
-        'type': 'object',
-        'properties': {
-            'series': {'type': 'string'},
-            'series_id': {'type': 'integer'},
-            'episode_id': {'type': 'integer'},
-            'release': release_object
-        },
-        'required': ['series', 'series_id', 'episode_id', 'release']
-    }
-
     release_list_schema = {'type': 'array', 'items': release_object}
 
     latest_object = {
@@ -189,28 +178,6 @@ class ObjectsContainer(object):
     del series_input_object['anyOf']
     series_input_object['required'] = ['series_name']
 
-    release_object = {
-        'type': 'object',
-        'properties': {
-            'quality': {'type': 'string'},
-            'title': {'type': 'string'},
-            'proper_count': {'type': 'integer'},
-            'downloaded': {'type': 'boolean'}
-        }
-    }
-
-    episode_object = {
-        'type': 'object',
-        'properties': {
-            'identifier': {'type': 'string'},
-            'identifier_type': {'type': 'string'},
-            'download_age': {'type': 'string'},
-            'releases': {
-                'type': 'array',
-                'items': release_object}
-        }
-    }
-
 
 def get_release_details(release):
     release_item = {
@@ -240,14 +207,16 @@ def get_episode_details(episode):
     return episode_item
 
 
-release_schema = api.schema('release_schema', ObjectsContainer.release_schema)
-release_list_schema = api.schema('release_list_schema', ObjectsContainer.release_list_schema)
 series_list_schema = api.schema('list_series', ObjectsContainer.series_list_schema)
-episode_list_schema = api.schema('episode_list', ObjectsContainer.episode_list_schema)
 series_edit_schema = api.schema('series_edit_schema', ObjectsContainer.series_edit_object)
 series_input_schema = api.schema('series_input_schema', ObjectsContainer.series_input_object)
 show_details_schema = api.schema('show_details', ObjectsContainer.single_series_object)
+
+episode_list_schema = api.schema('episode_list', ObjectsContainer.episode_list_schema)
 episode_schema = api.schema('episode_item', ObjectsContainer.episode_schema)
+
+release_schema = api.schema('release_schema', ObjectsContainer.release_object)
+release_list_schema = api.schema('release_list_schema', ObjectsContainer.release_list_schema)
 
 sort_choices = ('show_name', 'last_download_date')
 series_list_parser = api.pagination_parser(sort_choices=sort_choices)
@@ -769,12 +738,12 @@ class SeriesReleaseAPI(APIResource):
         if not series.release_in_episode(ep_id, rel_id):
             raise BadRequest('release id %s does not belong to episode %s' % (rel_id, ep_id))
 
-        return jsonify({
-            'series': show.name,
-            'series_id': show_id,
-            'episode_id': ep_id,
-            'release': get_release_details(release)
+        rsp = jsonify(get_release_details(release))
+        rsp.headers.extend({
+            'Series-ID': show_id,
+            'Episode-ID': ep_id
         })
+        return rsp
 
     @api.response(200, 'Release successfully deleted', model=base_message_schema)
     @api.doc(description='Delete a specific releases for a specific episode of a specific show.',
@@ -829,9 +798,9 @@ class SeriesReleaseAPI(APIResource):
             raise BadRequest('release with id %s is not set as downloaded' % rel_id)
         release.downloaded = False
 
-        return jsonify({
-            'series': show.name,
-            'series_id': show_id,
-            'episode_id': ep_id,
-            'release': get_release_details(release)
+        rsp = jsonify(get_release_details(release))
+        rsp.headers.extend({
+            'Series-ID': show_id,
+            'Episode-ID': ep_id
         })
+        return rsp
