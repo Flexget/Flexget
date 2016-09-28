@@ -217,10 +217,10 @@ class API(RestPlusAPI):
         pagination = parser.copy() if parser else api.parser()
         pagination.add_argument('page', type=int, default=1, help='Page number')
         pagination.add_argument('per_page', type=int, default=50, help='Results per page')
+        pagination.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
         if sort_choices:
             pagination.add_argument('sort_by', choices=sort_choices, default=default or sort_choices[0],
                                     help='Sort by attribute')
-            pagination.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
         return pagination
 
 
@@ -425,7 +425,7 @@ def pagination_headers(total_pages, total_items, page_count, request):
     :param request: The flask request used, required to build other reoccurring vars like url and such.
     :return:
     """
-    
+
     # Build constant variables from request data
     url = request.url_root + request.path.lstrip('/')
     per_page = re.search('per_page=(\d+)', request.query_string).group(1)

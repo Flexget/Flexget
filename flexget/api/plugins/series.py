@@ -170,23 +170,7 @@ class ObjectsContainer(object):
 
     series_list_schema = {'type': 'array', 'items': single_series_object}
 
-    episode_list_schema = {
-        'type': 'object',
-        'properties': {
-            'episodes': {
-                'type': 'array',
-                'items': episode_object
-            },
-            'number_of_episodes': {'type': 'integer'},
-            'total_number_of_episodes': {'type': 'integer'},
-            'page': {'type': 'integer'},
-            'total_number_of_pages': {'type': 'integer'},
-            'series_id': {'type': 'integer'},
-            'series': {'type': 'string'}
-        },
-        'required': ['episodes', 'number_of_episodes', 'total_number_of_episodes', 'page', 'total_number_of_pages',
-                     'series_id', 'series']
-    }
+    episode_list_schema = {'type': 'array', 'items': episode_object}
 
     episode_schema = {
         'type': 'object',
@@ -505,10 +489,7 @@ class SeriesShowAPI(APIResource):
         return jsonify(get_series_details(show))
 
 
-episode_parser = api.parser()
-episode_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
-episode_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Max is 100.')
-episode_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
+episode_parser = api.pagination_parser()
 
 
 @api.response(NotFoundError)
@@ -521,19 +502,20 @@ class SeriesEpisodesAPI(APIResource):
     def get(self, show_id, session):
         """ Get episodes by show ID """
         args = episode_parser.parse_args()
+
+        # Pagination and sorting params
         page = args['page']
-        page_size = args['page_size']
+        per_page = args['per_page']
+        sort_order = args['order']
 
         # Handle max size limit
-        if page_size > 100:
-            page_size = 100
+        if per_page > 100:
+            per_page = 100
 
-        order = args['order']
-        # In case the default 'desc' order was received
-        descending = bool(order == 'desc')
+        descending = bool(sort_order == 'desc')
 
-        start = page_size * (page - 1)
-        stop = start + page_size
+        start = per_page * (page - 1)
+        stop = start + per_page
 
         kwargs = {
             'start': start,
@@ -546,20 +528,34 @@ class SeriesEpisodesAPI(APIResource):
             show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
-        count = series.show_episodes(show, count=True, session=session)
-        episodes = [get_episode_details(episode) for episode in series.show_episodes(show, **kwargs)]
-        pages = int(ceil(count / float(page_size)))
 
-        if page > pages and pages != 0:
+        total_items = series.show_episodes(show, count=True, session=session)
+
+        if not total_items:
+            return jsonify([])
+
+        episodes = [get_episode_details(episode) for episode in series.show_episodes(show, **kwargs)]
+
+        total_pages = int(ceil(total_items / float(per_page)))
+
+        if page > total_pages and total_pages != 0:
             raise NotFoundError('page %s does not exist' % page)
 
-        return jsonify({'series': show.name,
-                        'series_id': show_id,
-                        'number_of_episodes': len(episodes),
-                        'episodes': episodes,
-                        'total_number_of_episodes': count,
-                        'page': page,
-                        'total_number_of_pages': pages})
+        # Actual results in page
+        actual_size = min(per_page, len(episodes))
+
+        # Get pagination headers
+        pagination = pagination_headers(total_pages, total_items, actual_size, request)
+
+        # Created response
+        rsp = jsonify(episodes)
+
+        # Add link header to response
+        rsp.headers.extend(pagination)
+
+        # Add series ID header
+        rsp.headers.extend({'Series-ID': show_id})
+        return rsp
 
     @api.response(200, 'Successfully forgotten all episodes from show', model=base_message_schema)
     @api.doc(description='Delete all show episodes via its ID. Deleting an episode will mark it as wanted again',
