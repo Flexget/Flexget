@@ -103,19 +103,7 @@ class ObjectsContainer(object):
         'required': ['series', 'series_id', 'episode_id', 'release']
     }
 
-    release_list_schema = {
-        'type': 'object',
-        'properties': {
-            'releases': {
-                'type': 'array',
-                'items': release_object
-            },
-            'number_of_releases': {'type': 'integer'},
-            'episode_id': {'type': 'integer'},
-            'series_id': {'type': 'integer'}
-        },
-        'required': ['releases', 'episode_id', 'series_id']
-    }
+    release_list_schema = {'type': 'array', 'items': release_object}
 
     latest_object = {
         'type': 'object',
@@ -223,17 +211,6 @@ class ObjectsContainer(object):
         }
     }
 
-    series_search_object = {
-        'type': 'object',
-        'properties': {
-            'shows': {
-                'type': 'array',
-                'items': single_series_object
-            },
-            'number_of_shows': {'type': 'integer'}
-        }
-    }
-
 
 def get_release_details(release):
     release_item = {
@@ -270,7 +247,6 @@ episode_list_schema = api.schema('episode_list', ObjectsContainer.episode_list_s
 series_edit_schema = api.schema('series_edit_schema', ObjectsContainer.series_edit_object)
 series_input_schema = api.schema('series_input_schema', ObjectsContainer.series_input_object)
 show_details_schema = api.schema('show_details', ObjectsContainer.single_series_object)
-series_search_schema = api.schema('list_of_shows', ObjectsContainer.series_search_object)
 episode_schema = api.schema('episode_item', ObjectsContainer.episode_schema)
 
 sort_choices = ('show_name', 'last_download_date')
@@ -408,7 +384,7 @@ class SeriesAPI(APIResource):
 @api.doc(description='Searches for a show in the DB via its name. Returns a list of matching shows.')
 class SeriesGetShowsAPI(APIResource):
     @etag
-    @api.response(200, 'Show list retrieved successfully', series_search_schema)
+    @api.response(200, 'Show list retrieved successfully', series_list_schema)
     @api.doc(params={'name': 'Name of the show(s) to search'})
     def get(self, name, session):
         """ List of shows matching lookup name """
@@ -419,10 +395,7 @@ class SeriesGetShowsAPI(APIResource):
         for match in matches:
             shows.append(get_series_details(match))
 
-        return jsonify({
-            'shows': shows,
-            'number_of_shows': len(shows)
-        })
+        return jsonify(shows)
 
 
 delete_parser = api.parser()
@@ -593,11 +566,12 @@ class SeriesEpisodeAPI(APIResource):
             raise NotFoundError('episode with ID %s not found' % ep_id)
         if not series.episode_in_show(show_id, ep_id):
             raise BadRequest('episode with id %s does not belong to show %s' % (ep_id, show_id))
-        return jsonify({
-            'series_name': show.name,
-            'series_id': show_id,
-            'episode': get_episode_details(episode)
-        })
+
+        rsp = jsonify(get_episode_details(episode))
+
+        # Add Series-ID header
+        rsp.headers.extend({'Series-ID': show_id})
+        return rsp
 
     @api.response(200, 'Episode successfully forgotten for show', model=base_message_schema)
     @api.doc(description='Delete a specific episode via its ID and show ID. Deleting an episode will mark it as '
@@ -622,10 +596,13 @@ class SeriesEpisodeAPI(APIResource):
         return success_response('successfully removed episode %s from show %s' % (ep_id, show_id))
 
 
-release_list_parser = api.parser()
-release_list_parser.add_argument('downloaded', type=inputs.boolean, help='Filter between release status')
+release_base_parser = api.parser()
+release_base_parser.add_argument('downloaded', type=inputs.boolean, help='Filter between release status')
 
-release_delete_parser = release_list_parser.copy()
+sort_choices = ('first_seen', 'downloaded', 'proper_count', 'title')
+release_list_parser = api.pagination_parser(release_base_parser, sort_choices)
+
+release_delete_parser = release_base_parser.copy()
 release_delete_parser.add_argument('forget', type=inputs.boolean, default=False,
                                    help="Enabling this will for 'forget' event that will delete the downloaded"
                                         " releases from the entire DB, enabling to re-download them")
@@ -653,20 +630,64 @@ class SeriesReleasesAPI(APIResource):
             raise NotFoundError('episode with ID %s not found' % ep_id)
         if not series.episode_in_show(show_id, ep_id):
             raise BadRequest('episode with id %s does not belong to show %s' % (ep_id, show_id))
+
         args = release_list_parser.parse_args()
+        # Filter params
         downloaded = args.get('downloaded') == True if args.get('downloaded') is not None else None
-        release_items = []
-        for release in episode.releases:
-            if downloaded and release.downloaded or downloaded is False and not release.downloaded or downloaded is None:
-                release_items.append(get_release_details(release))
 
-        return jsonify({
-            'releases': release_items,
-            'number_of_releases': len(release_items),
-            'episode_id': ep_id,
-            'series_id': show_id
+        # Pagination and sorting params
+        page = args['page']
+        per_page = args['per_page']
+        sort_by = args['sort_by']
+        sort_order = args['order']
 
-        })
+        descending = bool(sort_order == 'desc')
+
+        # Handle max size limit
+        if per_page > 100:
+            per_page = 100
+
+        start = per_page * (page - 1)
+        stop = start + per_page
+
+        kwargs = {
+            'downloaded': downloaded,
+            'start': start,
+            'stop': stop,
+            'sort_by': sort_by,
+            'descending': descending,
+            'episode': episode,
+            'session': session
+        }
+
+        # Total number of releases
+        total_items = series.get_releases(count=True, **kwargs)
+
+        # Release items
+        release_items = [get_release_details(release) for release in series.get_releases(**kwargs)]
+
+        # Total number of pages
+        total_pages = int(ceil(total_items / float(per_page)))
+
+        if page > total_pages and total_pages != 0:
+            raise NotFoundError('page %s does not exist' % page)
+
+        # Actual results in page
+        actual_size = min(per_page, len(release_items))
+
+        # Get pagination headers
+        pagination = pagination_headers(total_pages, total_items, actual_size, request)
+
+        # Created response
+        rsp = jsonify(release_items)
+
+        # Add link header to response
+        rsp.headers.extend(pagination)
+
+        # Add Series-ID and Episode-ID headers
+        rsp.headers.extend({'Series-ID': show_id, 'Episode-ID': ep_id})
+
+        return rsp
 
     @api.response(200, 'Successfully deleted all releases for episode', model=base_message_schema)
     @api.doc(description='Delete all releases for a specific episode of a specific show.',

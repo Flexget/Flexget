@@ -496,7 +496,7 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         return query.group_by(Series).count()
     if sort_by == 'show_name':
         order_by = Series.name
-    elif sort_by == 'last_download_date':
+    else:
         order_by = func.max(Release.first_seen)
     query = query.order_by(desc(order_by)) if descending else query.order_by(order_by)
 
@@ -835,6 +835,7 @@ def show_episodes(series, start=None, stop=None, count=False, descending=False, 
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
     if count:
         return episodes.count()
+    episodes = episodes.slice(start, stop).from_self()
     # Query episodes in sane order instead of iterating from series.episodes
     if series.identified_by == 'sequence':
         episodes = episodes.order_by(Episode.number.desc()) if descending else episodes.order_by(Episode.number)
@@ -843,8 +844,23 @@ def show_episodes(series, start=None, stop=None, count=False, descending=False, 
             Episode.season, Episode.number)
     else:
         episodes = episodes.order_by(Episode.identifier.desc()) if descending else episodes.order_by(Episode.identifier)
-    episodes = episodes.slice(start, stop).from_self()
     return episodes.all()
+
+
+def get_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
+                 session=None):
+    """ Return all releases for a given episode """
+    releases = session.query(Release).filter(Release.episode_id == episode.id)
+    if downloaded:
+        releases = releases.filter(Release.downloaded == downloaded)
+    if count:
+        return releases.count()
+    releases = releases.slice(start, stop).from_self()
+    if descending:
+        releases = releases.order_by(getattr(Release, sort_by).desc())
+    else:
+        releases = releases.order_by(getattr(Release, sort_by))
+    return releases.all()
 
 
 def episode_in_show(series_id, episode_id):
