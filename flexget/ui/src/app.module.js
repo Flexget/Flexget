@@ -10,6 +10,7 @@
 
             'angular-cache',
             'angular-loading-bar',
+            'http-etag',
             
             'blocks.error',
             'blocks.exception',

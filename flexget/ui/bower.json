@@ -21,7 +21,8 @@
     "angular-utf8-base64": "~0.0.5",
     "angular-messages": "~1.5.6",
     "angular-cache": "~4.6.0",
-    "ngclipboard": "~1.1.1"
+    "ngclipboard": "~1.1.1",
+    "angular-http-etag": "^2.0.13"
   },
   "resolutions": {
     "angular": "~1.5.6"

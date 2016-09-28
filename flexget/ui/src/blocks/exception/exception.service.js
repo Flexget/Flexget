@@ -13,7 +13,9 @@
 
         function catcher(error) {
             //Don't show toast when request failed because of auth problems
-            if (error.status !== 401 && error.status !== 403) {
+            // 401 && 403 -> Authentication problems (session expired, not logged in, ...)
+            // 304 -> Cached data
+            if (error.status !== 401 && error.status !== 403 && error.status !== 304) {
                 $log.log(error.data.message);
 
                 //TODO: Check if this needs to improve

@@ -22,7 +22,7 @@
 
         function getSeen() {
             return seenService.getSeen().then(function (data) {
-                vm.entries = data.seen_entries;
+                vm.entries = data;
             });
         }
 

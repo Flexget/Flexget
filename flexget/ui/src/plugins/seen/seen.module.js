@@ -4,7 +4,7 @@
 
     angular
         .module('plugins.seen', [
-            'angular-cache',
+            'http-etag',
 
             'blocks.exception',
             'blocks.router'
