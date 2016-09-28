@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import json
 import logging
@@ -426,21 +427,21 @@ def pagination_headers(total_pages, total_items, page_count, request):
 
     # Build constant variables from request data
     url = request.url_root + request.path.lstrip('/')
-    per_page_match = re.search('per_page=(\d+)', request.query_string)
+    per_page_match = re.search(b'per_page=(\d+)', request.query_string)
     per_page = per_page_match.group(1) if per_page_match else 50
 
-    page_match = re.search('page=(\d+)', request.query_string)
+    page_match = re.search(b'page=(\d+)', request.query_string)
     page = int(page_match.group(1)) if page_match else 1
 
     # Build the base template
     LINKTEMPLATE = '<{}?per_page={}&'.format(url, per_page)
 
     # Removed page and per_page from query string
-    query_string = re.sub('&?per_page=\d+&?', '', request.query_string)
-    query_string = re.sub('&?page=\d+&?', '', query_string)
+    query_string = re.sub(b'&?per_page=\d+&?', '', request.query_string)
+    query_string = re.sub(b'&?page=\d+&?', '', query_string)
 
     # Add all original q
-    LINKTEMPLATE += query_string + '&page={}>; rel="{}"'
+    LINKTEMPLATE += query_string.decode() + '&page={}>; rel="{}"'
 
     link_string = ''
 
