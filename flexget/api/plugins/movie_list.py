@@ -11,7 +11,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
 from flexget.api.app import CannotAddResource, NotFoundError, base_message_schema, success_response, BadRequest, etag, \
-    pagination_parser, pagination_headers
+    pagination_headers
 from flexget.plugins.list import movie_list as ml
 from flexget.plugins.list.movie_list import MovieListBase
 
@@ -161,7 +161,7 @@ class MovieListListAPI(APIResource):
 movie_identifiers_doc = "Use movie identifier using the following format:\n[{'ID_NAME: 'ID_VALUE'}]."
 
 sort_choices = ('id', 'added', 'title', 'year')
-movies_parser = pagination_parser(sort_choices=sort_choices, default='title')
+movies_parser = api.pagination_parser(sort_choices=sort_choices, default='title')
 
 
 @movie_list_api.route('/<int:list_id>/movies/')

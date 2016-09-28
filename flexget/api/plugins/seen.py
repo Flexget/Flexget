@@ -9,8 +9,7 @@ from flask import jsonify
 from flask_restplus import inputs
 
 from flexget.api import api, APIResource
-from flexget.api.app import NotFoundError, base_message_schema, success_response, etag, pagination_parser, \
-    pagination_headers
+from flexget.api.app import NotFoundError, base_message_schema, success_response, etag, pagination_headers
 from flexget.plugins.filter import seen
 
 seen_api = api.namespace('seen', description='Managed Flexget seen entries and fields')
@@ -53,7 +52,7 @@ seen_base_parser.add_argument('local', type=inputs.boolean, default=None,
                               help='Filter results by seen locality.')
 
 sort_choices = ('title', 'task', 'added', 'local', 'id')
-seen_search_parser = pagination_parser(seen_base_parser, sort_choices)
+seen_search_parser = api.pagination_parser(seen_base_parser, sort_choices)
 
 
 @seen_api.route('/')

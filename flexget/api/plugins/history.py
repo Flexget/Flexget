@@ -8,7 +8,7 @@ from flask import jsonify
 from sqlalchemy import desc, asc
 
 from flexget.api import api, APIResource
-from flexget.api.app import BadRequest, etag, pagination_headers, pagination_parser, NotFoundError
+from flexget.api.app import BadRequest, etag, pagination_headers, NotFoundError
 from flexget.plugins.output.history import History
 
 log = logging.getLogger('history')
@@ -40,7 +40,7 @@ history_list_schema = api.schema('history.list', ObjectsContainer.history_list_o
 sort_choices = ('id', 'task', 'filename', 'url', 'title', 'time', 'details')
 
 # Create pagination parser
-history_parser = pagination_parser(sort_choices=sort_choices, default='time')
+history_parser = api.pagination_parser(sort_choices=sort_choices, default='time')
 history_parser.add_argument('task', help='Filter by task name')
 
 

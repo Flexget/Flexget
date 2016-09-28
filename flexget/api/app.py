@@ -5,13 +5,13 @@ import logging
 import os
 from collections import deque
 from functools import wraps
-from string import Template
 
 from flask import Flask, request, jsonify, make_response
 from flask_compress import Compress
 from flask_cors import CORS
 from flask_restplus import Model, Api as RestPlusAPI
 from flask_restplus import Resource
+from flask_restplus.reqparse import RequestParser
 from flexget import manager
 from flexget.config_schema import process_config
 from flexget.utils.database import with_session
@@ -205,6 +205,24 @@ class API(RestPlusAPI):
             pass
         return super(API, self).response(code_or_apierror, description, model=model, **kwargs)
 
+    def pagination_parser(self, parser=None, sort_choices=None, default=None):
+        """
+        Return a standardized pagination parser, to be used for any endpoint that has pagination.
+
+        :param parser: Can extend a given parser or create a new one
+        :param sort_choices: A tuple of strings, to be used as server side attribute searches
+        :param default: The default sort string, used `sort_choices[0]` if not given
+        :return: An api.parser() instance with pagination and sorting arguments.
+        """
+        pagination = parser.copy() if parser else api.parser()
+        pagination.add_argument('page', type=int, default=1, help='Page number')
+        pagination.add_argument('per_page', type=int, default=50, help='Results per page')
+        if sort_choices:
+            pagination.add_argument('sort_by', choices=sort_choices, default=default or sort_choices[0],
+                                    help='Sort by attribute')
+            pagination.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
+        return pagination
+
 
 api_app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__path__[0]), 'templates'))
 api_app.config['REMEMBER_COOKIE_NAME'] = 'flexgetToken'
@@ -395,28 +413,6 @@ def etag(f):
         return rv
 
     return wrapped
-
-
-def pagination_parser(parser=None, sort_choices=None, default=None):
-    """
-    Return a standardized pagination parser, to be used for any endpoint that has pagination.
-
-    :param parser: Can extend a given parser or create a new one
-    :param sort_choices: A tuple of strings, to be used as server side attribute searches
-    :param default: The default sort string, used `sort_choices[0]` if not given
-    :return: An api.parser() instance with pagination and sorting arguments.
-    """
-    if not parser:
-        pagination = api.parser()
-    else:
-        pagination = parser.copy()
-    pagination.add_argument('page', type=int, default=1, help='Page number')
-    pagination.add_argument('per_page', type=int, default=50, help='Results per page')
-    if sort_choices:
-        pagination.add_argument('sort_by', choices=sort_choices, default=default or sort_choices[0],
-                                help='Sort by attribute')
-        pagination.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
-    return pagination
 
 
 def pagination_headers(url, page, per_page, total_pages, total_items, page_count, params=None):
