@@ -204,7 +204,7 @@ class API(RestPlusAPI):
             pass
         return super(API, self).response(code_or_apierror, description, model=model, **kwargs)
 
-    def pagination_parser(self, parser=None, sort_choices=None, default=None):
+    def pagination_parser(self, parser=None, sort_choices=None, default=None, add_sort=None):
         """
         Return a standardized pagination parser, to be used for any endpoint that has pagination.
 
@@ -216,10 +216,12 @@ class API(RestPlusAPI):
         pagination = parser.copy() if parser else api.parser()
         pagination.add_argument('page', type=int, default=1, help='Page number')
         pagination.add_argument('per_page', type=int, default=50, help='Results per page')
+        if sort_choices or add_sort:
+            pagination.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
         if sort_choices:
             pagination.add_argument('sort_by', choices=sort_choices, default=default or sort_choices[0],
                                     help='Sort by attribute')
-            pagination.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
+
         return pagination
 
 
@@ -427,8 +429,8 @@ def pagination_headers(total_pages, total_items, page_count, request):
 
     # Build constant variables from request data
     url = request.url_root + request.path.lstrip('/')
-    per_page = request.args.get('per_page') or 50
-    page = int(request.args.get('page')) or 1
+    per_page = request.args.get('per_page', 50)
+    page = int(request.args.get('page', 1))
 
     # Build the base template
     LINKTEMPLATE = '<{}?per_page={}&'.format(url, per_page)

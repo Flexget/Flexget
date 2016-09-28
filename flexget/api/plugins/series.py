@@ -423,7 +423,7 @@ class SeriesShowAPI(APIResource):
         return jsonify(get_series_details(show))
 
 
-episode_parser = api.pagination_parser()
+episode_parser = api.pagination_parser(add_sort=True)
 
 
 @api.response(NotFoundError)

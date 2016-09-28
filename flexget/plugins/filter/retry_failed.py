@@ -194,13 +194,12 @@ def register_plugin():
     plugin.register(PluginFailed, 'retry_failed', builtin=True, api_ver=2)
 
 
-def get_failures(count=None, start=None, stop=None, sort_by=None, descending=None):
-    with Session() as session:
-        query = session.query(FailedEntry)
-        if count:
-            return query.count()
-        if descending:
-            query = query.order_by(getattr(FailedEntry, sort_by).desc())
-        else:
-            query = query.order_by(getattr(FailedEntry, sort_by))
-        return query.slice(start, stop).all()
+def get_failures(session, count=None, start=None, stop=None, sort_by=None, descending=None):
+    query = session.query(FailedEntry)
+    if count:
+        return query.count()
+    if descending:
+        query = query.order_by(getattr(FailedEntry, sort_by).desc())
+    else:
+        query = query.order_by(getattr(FailedEntry, sort_by))
+    return query.slice(start, stop).all()

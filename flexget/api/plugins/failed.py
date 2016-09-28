@@ -76,10 +76,11 @@ class RetryFailed(APIResource):
             'start': start,
             'stop': stop,
             'descending': descending,
+            'sort_by': sort_by,
             'session': session
         }
 
-        total_items = get_failures(count=True)
+        total_items = get_failures(session, count=True)
 
         if not total_items:
             return jsonify([])
