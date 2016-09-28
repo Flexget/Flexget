@@ -21,9 +21,13 @@
         }
 
         function getSeen() {
-            return seenService.getSeen().then(function (data) {
+            seenService.getSeen()
+                .then(setEntries)
+                .cached(setEntries);
+            
+            function setEntries(data) {
                 vm.entries = data;
-            });
+            };
         }
 
         function deleteEntry(entry) {

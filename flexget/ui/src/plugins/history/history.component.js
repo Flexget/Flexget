@@ -21,15 +21,19 @@
         }
 
         function search() {
-            return historyService.getHistoryForTask({ task: vm.taskName }).then(function (data) {
-                vm.entries = data;
-            });
+            historyService.getHistoryForTask({ task: vm.taskName })
+                .then(setEntries)
+                .cached(setEntries);
         }
 
         function getHistory() {
-            return historyService.getHistory().then(function (data) {
-                vm.entries = data;
-            });
+            historyService.getHistory()
+                .then(setEntries)
+                .cached(setEntries);
+        }
+
+         function setEntries(data) {
+            vm.entries = data;
         }
     }
 }());
