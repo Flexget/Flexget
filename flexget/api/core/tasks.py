@@ -8,6 +8,7 @@ from datetime import datetime
 from json import JSONEncoder
 
 from flask import jsonify, Response, request
+from flask_restplus import inputs
 from queue import Queue, Empty
 
 from flexget.api import api, APIResource
@@ -27,9 +28,11 @@ tasks_api = api.namespace('tasks', description='Manage Tasks')
 
 
 class ObjectsContainer(object):
-    tasks_list_object = {
-        "type": "array",
-        "items": {'$ref': '#/definitions/tasks.task'}
+    tasks_list_object = {'oneOf': [
+        {"type": "array",
+         "items": {'$ref': '#/definitions/tasks.task'}},
+        {'type': 'array', 'items': {'type': 'string'}}
+    ]
     }
 
     task_input_object = {
@@ -138,14 +141,23 @@ task_execution_schema = api.schema('task_execution_input', ObjectsContainer.task
 
 task_api_desc = 'Task config schema too large to display, you can view the schema using the schema API'
 
+tasks_parser = api.parser()
+tasks_parser.add_argument('include_config', type=inputs.boolean, default=False, help='Include task config')
+
 
 @tasks_api.route('/')
 @api.doc(description=task_api_desc)
 class TasksAPI(APIResource):
     @etag
     @api.response(200, model=tasks_list_schema)
+    @api.doc(parser=tasks_parser)
     def get(self, session=None):
         """ List all tasks """
+
+        args = tasks_parser.parse_args()
+        if not args.get('include_config'):
+            return jsonify(list(self.manager.user_config.get('tasks', {})))
+
         tasks = []
         for name, config in self.manager.user_config.get('tasks', {}).items():
             tasks.append({'name': name, 'config': config})
