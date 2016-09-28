@@ -5,7 +5,7 @@ from future.moves.urllib.parse import unquote
 
 from math import ceil
 from sqlalchemy.orm.exc import NoResultFound
-from flask import jsonify
+from flask import jsonify, request
 from flask_restplus import inputs
 
 from flexget.api import api, APIResource
@@ -99,9 +99,9 @@ class SeenSearchAPI(APIResource):
             'session': session
         }
 
-        count = seen.count(value=value, status=local)
+        total_items = seen.count(value=value, status=local)
 
-        if not count:
+        if not total_items:
             return jsonify([])
 
         raw_seen_entries_list = seen.search(**kwargs).all()
@@ -109,29 +109,24 @@ class SeenSearchAPI(APIResource):
         converted_seen_entry_list = [entry.to_dict() for entry in raw_seen_entries_list]
 
         # Total number of pages
-        pages = int(ceil(count / float(per_page)))
+        total_pages = int(ceil(total_items / float(per_page)))
 
         # Actual results in page
         actual_size = min(len(converted_seen_entry_list), per_page)
 
         # Invalid page request
-        if page > pages and pages != 0:
+        if page > total_pages and total_pages != 0:
             raise NotFoundError('page %s does not exist' % page)
 
-        # Create Link header
-        full_url = self.api.base_url + seen_api.path.lstrip('/') + '/'
-
-        # Add all other params
-        params = {
-            'sort_by': sort_by,
-            'order': sort_order
+        # Build pagination kwargs
+        pkwargs = {
+            'total_pages': total_pages,
+            'total_items': total_items,
+            'page_count': actual_size,
+            'request': request
         }
-        if value:
-            params.update(value=args['value'])
-        if local:
-            params.update(local=args['local'])
 
-        pagination = pagination_headers(full_url, page, per_page, pages, count, actual_size, params)
+        pagination = pagination_headers(**pkwargs)
 
         # Create response
         rsp = jsonify(converted_seen_entry_list)

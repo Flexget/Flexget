@@ -419,15 +419,14 @@ def pagination_headers(total_pages, total_items, page_count, request):
     """
     Creates the `Link`. 'Count' and  'Total-Count' headers, to be used for pagination traversing
 
-    :param url: Base URL to be used in the links
-    :param page: Current page number
-    :param per_page: Max results per page
     :param total_pages: Total number of pages
-    :param total_items: Total number of items
-    :param page_count: Number of items in page (can vary from per_page)
-    :param params: All other original request params that would be added to the Link header
-    :return: Dict representing the full Link, Count and the Total-Count headers
+    :param total_items: Total number of items in all the pages
+    :param page_count: Item count for page (may differ from page size request)
+    :param request: The flask request used, required to build other reoccurring vars like url and such.
+    :return:
     """
+    
+    # Build constant variables from request data
     url = request.url_root + request.path.lstrip('/')
     per_page = re.search('per_page=(\d+)', request.query_string).group(1)
     page = int(re.search('page=(\d+)', request.query_string).group(1))
