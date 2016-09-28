@@ -79,7 +79,7 @@ class NextSonarrEpisodes(object):
     # Function that gets a page number and page size and returns the responding result json
     def get_page(self, task, config, page_number):
         parsedurl = urlparse(config.get('base_url'))
-        url = '{}://{}:{}{}/api/wanted/missing?page=%d&pageSize=%d&sortKey=series.title&sortdir=asc'.format(
+        url = '{}://{}:{}{}/api/wanted/missing?page={}&pageSize={}&sortKey=series.title&sortdir=asc'.format(
             parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, page_number,
             config.get('page_size'))
         headers = {'X-Api-Key': config['api_key']}
@@ -99,6 +99,7 @@ class NextSonarrEpisodes(object):
         for page in range(1, pages + 1):
             json = self.get_page(task, config, page)
             for record in json['records']:
+                # Verifies that we only get the first missing episode from a series
                 if current_series_id != record['seriesId']:
                     current_series_id = record['seriesId']
                     season = record['seasonNumber']
