@@ -32,4 +32,37 @@ interactions:
       x-runtime: ['0.011537']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=sdfgsdfgsdfgsdfgsdfg&type=show
+  response:
+    body: {string: !!python/unicode '[]'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [EXPIRED]
+      cf-ray: [2e96073feec126d2-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:04:31 GMT']
+      etag: [W/"608cfd25571caeca0fe79255f14f145c"]
+      expires: ['Wed, 28 Sep 2016 17:04:31 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d10805a2a82f3e4c972c4728c0bb19a3d1475053470; expires=Thu,
+          28-Sep-17 09:04:30 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['0']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['0']
+      x-request-id: [d67f8441-8c28-4f31-a675-5360976b1ddf]
+      x-runtime: ['0.011748']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
 version: 1

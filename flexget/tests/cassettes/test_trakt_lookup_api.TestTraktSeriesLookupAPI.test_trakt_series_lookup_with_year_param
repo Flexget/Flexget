@@ -303,4 +303,232 @@ interactions:
       x-runtime: ['0.013994']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+flash&type=show&year=1990
+  response:
+    body: {string: !!python/unicode '[{"type":"show","score":68.256355,"show":{"title":"The
+        Flash","overview":"Central City Police forensic scientist Barry Allen''s crime
+        lab is struck by lightning. Allen''s electrified body is flung into and shatters
+        a cabinet of chemicals, which are both electrified and forced to interact
+        with each other and with his physiology when they come into physical contact
+        with his body. He soon discovers that the accident has changed his body''s
+        metabolism and as a result he has gained the ability to move at superhuman
+        speed. Barry Allen has become the Flash.","year":1990,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/000/235/posters/medium/fb1d03e09f.jpg","medium":"https://walter.trakt.us/images/shows/000/000/235/posters/medium/fb1d03e09f.jpg","thumb":"https://walter.trakt.us/images/shows/000/000/235/posters/thumb/fb1d03e09f.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/000/235/fanarts/medium/826b9ef114.jpg","medium":"https://walter.trakt.us/images/shows/000/000/235/fanarts/medium/826b9ef114.jpg","thumb":"https://walter.trakt.us/images/shows/000/000/235/fanarts/thumb/826b9ef114.jpg"}},"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781}}}]'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [EXPIRED]
+      cf-ray: [2e9606d77b762702-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:04:14 GMT']
+      etag: [W/"ef38d29d57cab0e4bda50be3d0942697"]
+      expires: ['Wed, 28 Sep 2016 17:04:14 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=db8848000cd7e883ca6d6e4303d9c30761475053453; expires=Thu,
+          28-Sep-17 09:04:13 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['1']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['1']
+      x-request-id: [3f25da66-9275-475c-ae98-b40539671368]
+      x-runtime: ['0.013977']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=db8848000cd7e883ca6d6e4303d9c30761475053453]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/235?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The Flash","year":1990,"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781},"overview":"Central
+        City Police forensic scientist Barry Allen''s crime lab is struck by lightning.
+        Allen''s electrified body is flung into and shatters a cabinet of chemicals,
+        which are both electrified and forced to interact with each other and with
+        his physiology when they come into physical contact with his body. He soon
+        discovers that the accident has changed his body''s metabolism and as a result
+        he has gained the ability to move at superhuman speed. Barry Allen has become
+        the Flash.","first_aired":"1990-09-19T23:00:00.000Z","airs":{"day":"Tuesday","time":"20:00","timezone":"America/New_York"},"runtime":60,"certification":"TV-PG","network":"CBS","country":"us","trailer":null,"homepage":null,"status":"ended","rating":7.32472,"votes":271,"updated_at":"2016-09-14T12:01:02.000Z","language":"en","available_translations":["en","bg","it","fr","de","bs","ru","pt","ro","da"],"genres":["drama","action","crime","fantasy","adventure"],"aired_episodes":22,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/000/235/fanarts/original/826b9ef114.jpg","medium":"https://walter.trakt.us/images/shows/000/000/235/fanarts/medium/826b9ef114.jpg","thumb":"https://walter.trakt.us/images/shows/000/000/235/fanarts/thumb/826b9ef114.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/000/235/posters/original/fb1d03e09f.jpg","medium":"https://walter.trakt.us/images/shows/000/000/235/posters/medium/fb1d03e09f.jpg","thumb":"https://walter.trakt.us/images/shows/000/000/235/posters/thumb/fb1d03e09f.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/000/235/logos/original/d31e38d6d4.png"},"clearart":{"full":null},"banner":{"full":"https://walter.trakt.us/images/shows/000/000/235/banners/original/7269414ca0.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/000/235/thumbs/original/407d93ca8b.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [REVALIDATED]
+      cf-ray: [2e9606db1c5e2702-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:04:14 GMT']
+      etag: [W/"413319f2ba2f0623175f9c9d39ea760c"]
+      expires: ['Wed, 28 Sep 2016 17:04:14 GMT']
+      last-modified: ['Wed, 14 Sep 2016 12:01:02 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [d261ed69-9af4-4a31-89a2-c0a5cb5b6c39]
+      x-runtime: ['0.013994']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+flash&type=show&year=1990
+  response:
+    body: {string: !!python/unicode '[{"type":"show","score":68.256355,"show":{"title":"The
+        Flash","overview":"Central City Police forensic scientist Barry Allen''s crime
+        lab is struck by lightning. Allen''s electrified body is flung into and shatters
+        a cabinet of chemicals, which are both electrified and forced to interact
+        with each other and with his physiology when they come into physical contact
+        with his body. He soon discovers that the accident has changed his body''s
+        metabolism and as a result he has gained the ability to move at superhuman
+        speed. Barry Allen has become the Flash.","year":1990,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/000/235/posters/medium/fb1d03e09f.jpg","medium":"https://walter.trakt.us/images/shows/000/000/235/posters/medium/fb1d03e09f.jpg","thumb":"https://walter.trakt.us/images/shows/000/000/235/posters/thumb/fb1d03e09f.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/000/235/fanarts/medium/826b9ef114.jpg","medium":"https://walter.trakt.us/images/shows/000/000/235/fanarts/medium/826b9ef114.jpg","thumb":"https://walter.trakt.us/images/shows/000/000/235/fanarts/thumb/826b9ef114.jpg"}},"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781}}}]'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e9608f35d3a0f93-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:05:40 GMT']
+      etag: [W/"ef38d29d57cab0e4bda50be3d0942697"]
+      expires: ['Wed, 28 Sep 2016 17:05:40 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=dd18c368985a2855b2a3dcf0bb7ee15871475053540; expires=Thu,
+          28-Sep-17 09:05:40 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['1']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['1']
+      x-request-id: [3f25da66-9275-475c-ae98-b40539671368]
+      x-runtime: ['0.013977']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=dd18c368985a2855b2a3dcf0bb7ee15871475053540]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/235?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The Flash","year":1990,"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781},"overview":"Central
+        City Police forensic scientist Barry Allen''s crime lab is struck by lightning.
+        Allen''s electrified body is flung into and shatters a cabinet of chemicals,
+        which are both electrified and forced to interact with each other and with
+        his physiology when they come into physical contact with his body. He soon
+        discovers that the accident has changed his body''s metabolism and as a result
+        he has gained the ability to move at superhuman speed. Barry Allen has become
+        the Flash.","first_aired":"1990-09-19T23:00:00.000Z","airs":{"day":"Tuesday","time":"20:00","timezone":"America/New_York"},"runtime":60,"certification":"TV-PG","network":"CBS","country":"us","trailer":null,"homepage":null,"status":"ended","rating":7.32472,"votes":271,"updated_at":"2016-09-14T12:01:02.000Z","language":"en","available_translations":["en","bg","it","fr","de","bs","ru","pt","ro","da"],"genres":["drama","action","crime","fantasy","adventure"],"aired_episodes":22,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/000/235/fanarts/original/826b9ef114.jpg","medium":"https://walter.trakt.us/images/shows/000/000/235/fanarts/medium/826b9ef114.jpg","thumb":"https://walter.trakt.us/images/shows/000/000/235/fanarts/thumb/826b9ef114.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/000/235/posters/original/fb1d03e09f.jpg","medium":"https://walter.trakt.us/images/shows/000/000/235/posters/medium/fb1d03e09f.jpg","thumb":"https://walter.trakt.us/images/shows/000/000/235/posters/thumb/fb1d03e09f.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/000/235/logos/original/d31e38d6d4.png"},"clearart":{"full":null},"banner":{"full":"https://walter.trakt.us/images/shows/000/000/235/banners/original/7269414ca0.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/000/235/thumbs/original/407d93ca8b.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e9608f43d840f93-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:05:40 GMT']
+      etag: [W/"413319f2ba2f0623175f9c9d39ea760c"]
+      expires: ['Wed, 28 Sep 2016 17:05:40 GMT']
+      last-modified: ['Wed, 14 Sep 2016 12:01:02 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [d261ed69-9af4-4a31-89a2-c0a5cb5b6c39]
+      x-runtime: ['0.013994']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+flash&type=show&year=1990
+  response:
+    body: {string: !!python/unicode '[{"type":"show","score":68.256355,"show":{"title":"The
+        Flash","overview":"Central City Police forensic scientist Barry Allen''s crime
+        lab is struck by lightning. Allen''s electrified body is flung into and shatters
+        a cabinet of chemicals, which are both electrified and forced to interact
+        with each other and with his physiology when they come into physical contact
+        with his body. He soon discovers that the accident has changed his body''s
+        metabolism and as a result he has gained the ability to move at superhuman
+        speed. Barry Allen has become the Flash.","year":1990,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/000/235/posters/medium/fb1d03e09f.jpg","medium":"https://walter.trakt.us/images/shows/000/000/235/posters/medium/fb1d03e09f.jpg","thumb":"https://walter.trakt.us/images/shows/000/000/235/posters/thumb/fb1d03e09f.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/000/235/fanarts/medium/826b9ef114.jpg","medium":"https://walter.trakt.us/images/shows/000/000/235/fanarts/medium/826b9ef114.jpg","thumb":"https://walter.trakt.us/images/shows/000/000/235/fanarts/thumb/826b9ef114.jpg"}},"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781}}}]'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e9609f60b72275c-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:06:21 GMT']
+      etag: [W/"ef38d29d57cab0e4bda50be3d0942697"]
+      expires: ['Wed, 28 Sep 2016 17:06:21 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=defbc30ee96cb04e8922b8e3c948eed931475053581; expires=Thu,
+          28-Sep-17 09:06:21 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['1']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['1']
+      x-request-id: [3f25da66-9275-475c-ae98-b40539671368]
+      x-runtime: ['0.013977']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=defbc30ee96cb04e8922b8e3c948eed931475053581]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/235?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The Flash","year":1990,"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781},"overview":"Central
+        City Police forensic scientist Barry Allen''s crime lab is struck by lightning.
+        Allen''s electrified body is flung into and shatters a cabinet of chemicals,
+        which are both electrified and forced to interact with each other and with
+        his physiology when they come into physical contact with his body. He soon
+        discovers that the accident has changed his body''s metabolism and as a result
+        he has gained the ability to move at superhuman speed. Barry Allen has become
+        the Flash.","first_aired":"1990-09-19T23:00:00.000Z","airs":{"day":"Tuesday","time":"20:00","timezone":"America/New_York"},"runtime":60,"certification":"TV-PG","network":"CBS","country":"us","trailer":null,"homepage":null,"status":"ended","rating":7.32472,"votes":271,"updated_at":"2016-09-14T12:01:02.000Z","language":"en","available_translations":["en","bg","it","fr","de","bs","ru","pt","ro","da"],"genres":["drama","action","crime","fantasy","adventure"],"aired_episodes":22,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/000/235/fanarts/original/826b9ef114.jpg","medium":"https://walter.trakt.us/images/shows/000/000/235/fanarts/medium/826b9ef114.jpg","thumb":"https://walter.trakt.us/images/shows/000/000/235/fanarts/thumb/826b9ef114.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/000/235/posters/original/fb1d03e09f.jpg","medium":"https://walter.trakt.us/images/shows/000/000/235/posters/medium/fb1d03e09f.jpg","thumb":"https://walter.trakt.us/images/shows/000/000/235/posters/thumb/fb1d03e09f.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/000/235/logos/original/d31e38d6d4.png"},"clearart":{"full":null},"banner":{"full":"https://walter.trakt.us/images/shows/000/000/235/banners/original/7269414ca0.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/000/235/thumbs/original/407d93ca8b.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e9609f6ebad275c-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:06:21 GMT']
+      etag: [W/"413319f2ba2f0623175f9c9d39ea760c"]
+      expires: ['Wed, 28 Sep 2016 17:06:21 GMT']
+      last-modified: ['Wed, 14 Sep 2016 12:01:02 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [d261ed69-9af4-4a31-89a2-c0a5cb5b6c39]
+      x-runtime: ['0.013994']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
 version: 1

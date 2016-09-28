@@ -125,4 +125,130 @@ interactions:
       x-runtime: ['0.012851']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/movies/the-matrix-reloaded-2003?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The Matrix Reloaded","year":2003,"ids":{"trakt":482,"slug":"the-matrix-reloaded-2003","imdb":"tt0234215","tmdb":604},"tagline":"Free
+        your mind.","overview":"Six months after the events depicted in The Matrix,
+        Neo has proved to be a good omen for the free humans, as more and more humans
+        are being freed from the matrix and brought to Zion, the one and only stronghold
+        of the Resistance.  Neo himself has discovered his superpowers including super
+        speed, ability to see the codes of the things inside the matrix and a certain
+        degree of pre-cognition. But a nasty piece of news hits the human resistance:
+        250,000 machine sentinels are digging to Zion and would reach them in 72 hours.
+        As Zion prepares for the ultimate war, Neo, Morpheus and Trinity are advised
+        by the Oracle to find the Keymaker who would help them reach the Source.  Meanwhile
+        Neo''s recurrent dreams depicting Trinity''s death have got him worried and
+        as if it was not enough, Agent Smith has somehow escaped deletion, has become
+        more powerful than before and has fixed Neo as his next target.","released":"2003-05-15","runtime":138,"trailer":"http://youtube.com/watch?v=zsgrsiZoymA","homepage":"http://whatisthematrix.warnerbros.com/","rating":7.51804,"votes":9395,"updated_at":"2016-09-10T08:55:25.000Z","language":"en","available_translations":["en","de","cs","ru","fr","zh","it","hu","tr","es","pt","sv","fi","nl","pl","sk","he","da","ja","el","bg","th","ko","uk","ro","fa","ca"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/482/fanarts/original/4928db3308.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/482/posters/original/b908a87fb1.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/482/logos/original/05211ae7b0.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/482/cleararts/original/53d6b06b5b.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/482/banners/original/7845b15228.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/482/thumbs/original/0c65446ae0.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [REVALIDATED]
+      cf-ray: [2e9607656c1615cb-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:04:36 GMT']
+      etag: [W/"9c8c04bc81172cfcdda1094055942014"]
+      expires: ['Wed, 28 Sep 2016 17:04:36 GMT']
+      last-modified: ['Sat, 10 Sep 2016 08:55:25 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d16d72838f579ac1fc2f9b2fdc26c83411475053476; expires=Thu,
+          28-Sep-17 09:04:36 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [ba0432ce-f751-4f39-a0ef-8187605078aa]
+      x-runtime: ['0.012851']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/movies/the-matrix-reloaded-2003?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The Matrix Reloaded","year":2003,"ids":{"trakt":482,"slug":"the-matrix-reloaded-2003","imdb":"tt0234215","tmdb":604},"tagline":"Free
+        your mind.","overview":"Six months after the events depicted in The Matrix,
+        Neo has proved to be a good omen for the free humans, as more and more humans
+        are being freed from the matrix and brought to Zion, the one and only stronghold
+        of the Resistance.  Neo himself has discovered his superpowers including super
+        speed, ability to see the codes of the things inside the matrix and a certain
+        degree of pre-cognition. But a nasty piece of news hits the human resistance:
+        250,000 machine sentinels are digging to Zion and would reach them in 72 hours.
+        As Zion prepares for the ultimate war, Neo, Morpheus and Trinity are advised
+        by the Oracle to find the Keymaker who would help them reach the Source.  Meanwhile
+        Neo''s recurrent dreams depicting Trinity''s death have got him worried and
+        as if it was not enough, Agent Smith has somehow escaped deletion, has become
+        more powerful than before and has fixed Neo as his next target.","released":"2003-05-15","runtime":138,"trailer":"http://youtube.com/watch?v=zsgrsiZoymA","homepage":"http://whatisthematrix.warnerbros.com/","rating":7.51804,"votes":9395,"updated_at":"2016-09-10T08:55:25.000Z","language":"en","available_translations":["en","de","cs","ru","fr","zh","it","hu","tr","es","pt","sv","fi","nl","pl","sk","he","da","ja","el","bg","th","ko","uk","ro","fa","ca"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/482/fanarts/original/4928db3308.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/482/posters/original/b908a87fb1.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/482/logos/original/05211ae7b0.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/482/cleararts/original/53d6b06b5b.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/482/banners/original/7845b15228.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/482/thumbs/original/0c65446ae0.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e96094b3f13089f-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:05:54 GMT']
+      etag: [W/"9c8c04bc81172cfcdda1094055942014"]
+      expires: ['Wed, 28 Sep 2016 17:05:54 GMT']
+      last-modified: ['Sat, 10 Sep 2016 08:55:25 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d0e907c6c7c8e4d7e61ddf91040013d811475053554; expires=Thu,
+          28-Sep-17 09:05:54 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [ba0432ce-f751-4f39-a0ef-8187605078aa]
+      x-runtime: ['0.012851']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/movies/the-matrix-reloaded-2003?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The Matrix Reloaded","year":2003,"ids":{"trakt":482,"slug":"the-matrix-reloaded-2003","imdb":"tt0234215","tmdb":604},"tagline":"Free
+        your mind.","overview":"Six months after the events depicted in The Matrix,
+        Neo has proved to be a good omen for the free humans, as more and more humans
+        are being freed from the matrix and brought to Zion, the one and only stronghold
+        of the Resistance.  Neo himself has discovered his superpowers including super
+        speed, ability to see the codes of the things inside the matrix and a certain
+        degree of pre-cognition. But a nasty piece of news hits the human resistance:
+        250,000 machine sentinels are digging to Zion and would reach them in 72 hours.
+        As Zion prepares for the ultimate war, Neo, Morpheus and Trinity are advised
+        by the Oracle to find the Keymaker who would help them reach the Source.  Meanwhile
+        Neo''s recurrent dreams depicting Trinity''s death have got him worried and
+        as if it was not enough, Agent Smith has somehow escaped deletion, has become
+        more powerful than before and has fixed Neo as his next target.","released":"2003-05-15","runtime":138,"trailer":"http://youtube.com/watch?v=zsgrsiZoymA","homepage":"http://whatisthematrix.warnerbros.com/","rating":7.51804,"votes":9395,"updated_at":"2016-09-10T08:55:25.000Z","language":"en","available_translations":["en","de","cs","ru","fr","zh","it","hu","tr","es","pt","sv","fi","nl","pl","sk","he","da","ja","el","bg","th","ko","uk","ro","fa","ca"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/482/fanarts/original/4928db3308.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/482/posters/original/b908a87fb1.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/482/logos/original/05211ae7b0.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/482/cleararts/original/53d6b06b5b.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/482/banners/original/7845b15228.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/482/thumbs/original/0c65446ae0.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e960a50abf815cb-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:06:36 GMT']
+      etag: [W/"9c8c04bc81172cfcdda1094055942014"]
+      expires: ['Wed, 28 Sep 2016 17:06:36 GMT']
+      last-modified: ['Sat, 10 Sep 2016 08:55:25 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d8277f72e5ba881aba6b142b11c99c75e1475053596; expires=Thu,
+          28-Sep-17 09:06:36 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [ba0432ce-f751-4f39-a0ef-8187605078aa]
+      x-runtime: ['0.012851']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
 version: 1

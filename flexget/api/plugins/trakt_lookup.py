@@ -14,24 +14,25 @@ trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 
 class ObjectsContainer(object):
     internal_image_object = {
-        "type": "object",
-        "properties": {
-            "full": {"type": ["string", "null"]},
-            "medium": {"type": ["string", "null"]},
-            "thumb": {"type": ["string", "null"]}
+        'type': 'object',
+        'properties': {
+            'full': {'type': ['string', 'null']},
+            'medium': {'type': ['string', 'null']},
+            'thumb': {'type': ['string', 'null']}
         },
+        'required': ['full'],
         'additionalProperties': False
     }
 
     images_object = {
-        "type": "object",
-        "properties": {
-            "banner": internal_image_object,
-            "clearart": internal_image_object,
-            "fanart": internal_image_object,
-            "logo": internal_image_object,
-            "poster": internal_image_object,
-            "thumb": internal_image_object
+        'type': 'object',
+        'properties': {
+            'banner': internal_image_object,
+            'clearart': internal_image_object,
+            'fanart': internal_image_object,
+            'logo': internal_image_object,
+            'poster': internal_image_object,
+            'thumb': internal_image_object
         },
         'additionalProperties': False
     }
@@ -39,33 +40,36 @@ class ObjectsContainer(object):
     translation_object = {
         'type': 'object',
         'patternProperties': {
-            "^[/d]$": {'type': 'object',
+            '^[/d]$': {'type': 'object',
                        'properties': {
-                           "overview": {'type': 'string'},
-                           "tagline": {'type': 'string'},
-                           "title": {'type': 'string'},
+                           'overview': {'type': 'string'},
+                           'tagline': {'type': 'string'},
+                           'title': {'type': 'string'},
                        },
+                       'required': ['overview', 'tagline', 'title'],
                        'additionalProperties': False}
         }
     }
 
     actor_object = {
-        "type": "object",
-        "patternProperties": {
-            "^[/d]$": {
+        'type': 'object',
+        'patternProperties': {
+            '^[/d]$': {
                 'type': 'object',
                 'properties': {
-                    "imdb_id": {'type': 'string'},
-                    "name": {'type': 'string'},
-                    "tmdb_id": {'type': 'integer'},
-                    "trakt_id": {'type': 'integer'},
-                    "images": images_object,
-                    "trakt_slug": {'type': 'string'},
-                    "birthday": {'type': 'string'},
-                    "biography": {'type': ['string', 'null']},
-                    "homepage": {'type': 'string'},
-                    "death": {'type': ['string', 'null']}
+                    'imdb_id': {'type': 'string'},
+                    'name': {'type': 'string'},
+                    'tmdb_id': {'type': 'integer'},
+                    'trakt_id': {'type': 'integer'},
+                    'images': images_object,
+                    'trakt_slug': {'type': 'string'},
+                    'birthday': {'type': 'string'},
+                    'biography': {'type': ['string', 'null']},
+                    'homepage': {'type': 'string'},
+                    'death': {'type': ['string', 'null']}
                 },
+                'required': ['imdb_id', 'name', 'tmdb_id', 'trakt_id', 'images', 'trakt_slug', 'birthday', 'biography',
+                             'homepage', 'death'],
                 'additionalProperties': False
             }}
     }
@@ -92,8 +96,9 @@ class ObjectsContainer(object):
             'slug': {'type': ['string', 'null']},
             'tmdb_id': {'type': ['integer', 'null']},
             'imdb_id': {'type': ['string', 'null']}
-
         },
+        'required': ['cached_at', 'genres', 'id', 'overview', 'runtime', 'rating', 'votes', 'language', 'updated_at',
+                     'images', 'main_image', 'title', 'year', 'homepage', 'slug', 'tmdb_id', 'imdb_id'],
         'additionalProperties': False
     }
 
@@ -109,11 +114,14 @@ class ObjectsContainer(object):
     series_return_object['properties']['status'] = {'type': 'string'}
     series_return_object['properties']['timezone'] = {'type': ['string', 'null']}
     series_return_object['properties']['number_of_aired_episodes'] = {'type': ['integer', 'null']}
+    series_return_object['required'] += ['tvdb_id', 'tvrage_id', 'first_aired', 'air_day', 'air_time', 'certification',
+                                         'network', 'country', 'status', 'timezone', 'number_of_aired_episodes']
 
     movie_return_object = copy.deepcopy(base_return_object)
     movie_return_object['properties']['tagline'] = {'type': 'string'}
     movie_return_object['properties']['released'] = {'type': 'string'}
-    movie_return_object['properties']['trailer'] = {'type': 'string'}
+    movie_return_object['properties']['trailer'] = {'type': ['string', 'null']}
+    movie_return_object['required'] += ['tagline', 'released', 'trailer']
 
 
 series_return_schema = api.schema('series_return_schema', ObjectsContainer.series_return_object)

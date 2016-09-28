@@ -383,4 +383,292 @@ interactions:
       x-runtime: ['0.012565']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?id_type=tmdb&id=60735
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":null,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
+        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
+        is struck by lightning and falls into a coma. Months later he awakens with
+        the power of super speed, granting him the ability to move through Central
+        City like an unseen guardian angel. Though initially excited by his newfound
+        powers, Barry is shocked to discover he is not the only \\\"meta-human\\\"
+        who was created in the wake of the accelerator explosion \u2013 and not everyone
+        is using their new powers for good. Barry partners with S.T.A.R. Labs and
+        dedicates his life to protect the innocent. For now, only a few close friends
+        and associates know that Barry is literally the fastest man alive, but it
+        won't be long before the world learns what Barry Allen has become... The Flash.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/posters/thumb/79bd96a4d3.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"}},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}},{\"type\":\"movie\",\"score\":null,\"movie\":{\"title\":\"Jul
+        i Mummidalen\",\"overview\":\"Mummifamilien har ligget i vinterdvale i flere
+        m\xE5neder og dr\xF8mt om sol og sommer. Men s\xE5 kommer en hemul p\xE5 bes\xF8k
+        \u2013 og vekker dem for \xE5 fortelle at julen er her! Men ingen i Mummifamilien
+        har h\xF8rt om julen f\xF8r. \u201CHvem er julen?\u201D sp\xF8r de. Ingen
+        har tid til \xE5 fortelle dem hvem julen er, men de skj\xF8nner at de m\xE5
+        ha b\xE5de juletre og mat. Mummitrollet, Mummimamma og Mummipappa lager i
+        stand massevis av deilig mat og pynter juletreet vidunderlig vakkert. Og s\xE5
+        kommer det uventet noen p\xE5 bes\xF8k.\",\"year\":null,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/043/506/posters/medium/37997f7277.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/043/506/posters/medium/37997f7277.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/043/506/posters/thumb/37997f7277.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43506,\"slug\":\"jul-i-mummidalen-1969\",\"imdb\":\"\",\"tmdb\":60735}}},{\"type\":\"episode\",\"score\":null,\"episode\":{\"season\":1,\"number\":25,\"title\":\"Episode
+        25\",\"images\":{\"screenshot\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":72174,\"tvdb\":4596853,\"imdb\":\"\",\"tmdb\":60735,\"tvrage\":556554}},\"show\":{\"title\":\"At
+        the Threshold of an Era\",\"year\":\"1999\",\"ids\":{\"trakt\":1350,\"slug\":\"at-the-threshold-of-an-era\"},\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/350/posters/medium/2244ceffd7.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/350/posters/medium/2244ceffd7.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/350/posters/thumb/2244ceffd7.jpg\"},\"fanart\":{\"full\":null,\"medium\":\"https://walter.trakt.us/images/shows/000/001/350/fanarts/medium/f9bc6cdebe.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/350/fanarts/thumb/f9bc6cdebe.jpg\"}}}},{\"type\":\"person\",\"score\":null,\"person\":{\"name\":\"Hannah
+        Farr\",\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":46056,\"slug\":\"hannah-farr\",\"imdb\":\"nm2698630\",\"tmdb\":60735,\"tvrage\":null}}}]"}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [EXPIRED]
+      cf-ray: [2e9606eeae732732-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:04:18 GMT']
+      etag: [W/"43be9afd36f61dda3e2554b3c00069ae"]
+      expires: ['Wed, 28 Sep 2016 17:04:18 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=dacd887ee3d5cbd6f44397fe1d866b5471475053457; expires=Thu,
+          28-Sep-17 09:04:17 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['4']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['1']
+      x-request-id: [e05f8fd7-2636-47d4-8dc1-2bcaa74f90de]
+      x-runtime: ['0.088005']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=dacd887ee3d5cbd6f44397fe1d866b5471475053457]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/60300?extended=full%2Cimages
+  response:
+    body: {string: "{\"title\":\"The Flash\",\"year\":2014,\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939},\"overview\":\"After
+        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
+        is struck by lightning and falls into a coma. Months later he awakens with
+        the power of super speed, granting him the ability to move through Central
+        City like an unseen guardian angel. Though initially excited by his newfound
+        powers, Barry is shocked to discover he is not the only \\\"meta-human\\\"
+        who was created in the wake of the accelerator explosion \u2013 and not everyone
+        is using their new powers for good. Barry partners with S.T.A.R. Labs and
+        dedicates his life to protect the innocent. For now, only a few close friends
+        and associates know that Barry is literally the fastest man alive, but it
+        won't be long before the world learns what Barry Allen has become... The Flash.\",\"first_aired\":\"2014-10-08T00:00:00.000Z\",\"airs\":{\"day\":\"Tuesday\",\"time\":\"20:00\",\"timezone\":\"America/New_York\"},\"runtime\":44,\"certification\":\"TV-14\",\"network\":\"The
+        CW\",\"country\":\"us\",\"trailer\":\"http://youtube.com/watch?v=aZxhA_Jihmw\",\"homepage\":\"http://www.cwtv.com/shows/the-flash/\",\"status\":\"returning
+        series\",\"rating\":8.32168,\"votes\":11266,\"updated_at\":\"2016-09-26T19:20:49.000Z\",\"language\":\"en\",\"available_translations\":[\"ar\",\"bg\",\"bs\",\"cs\",\"da\",\"de\",\"el\",\"en\",\"es\",\"fa\",\"fr\",\"he\",\"hr\",\"hu\",\"id\",\"it\",\"ko\",\"lb\",\"lb\",\"lt\",\"ml\",\"ms\",\"nl\",\"pl\",\"pt\",\"ro\",\"ru\",\"sk\",\"sr\",\"sv\",\"te\",\"th\",\"tr\",\"uk\",\"vi\",\"za\",\"zh\"],\"genres\":[\"drama\",\"fantasy\",\"science-fiction\"],\"aired_episodes\":46,\"images\":{\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"},\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/posters/thumb/79bd96a4d3.jpg\"},\"logo\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/logos/original/ab151d1043.png\"},\"clearart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/cleararts/original/660e6efe67.png\"},\"banner\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/banners/original/b2c305a2dc.jpg\"},\"thumb\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/thumbs/original/eab955a39c.jpg\"}}}"}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e9606f29fc42732-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:04:18 GMT']
+      etag: [W/"30769aad93ee100a9a5ee2d71ec2b712"]
+      expires: ['Wed, 28 Sep 2016 17:04:18 GMT']
+      last-modified: ['Mon, 26 Sep 2016 19:20:49 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [b8ff19b8-3e85-4511-b9e6-89a58e77ac8a]
+      x-runtime: ['0.015706']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?id_type=tmdb&id=60735
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":null,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
+        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
+        is struck by lightning and falls into a coma. Months later he awakens with
+        the power of super speed, granting him the ability to move through Central
+        City like an unseen guardian angel. Though initially excited by his newfound
+        powers, Barry is shocked to discover he is not the only \\\"meta-human\\\"
+        who was created in the wake of the accelerator explosion \u2013 and not everyone
+        is using their new powers for good. Barry partners with S.T.A.R. Labs and
+        dedicates his life to protect the innocent. For now, only a few close friends
+        and associates know that Barry is literally the fastest man alive, but it
+        won't be long before the world learns what Barry Allen has become... The Flash.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/posters/thumb/79bd96a4d3.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"}},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}},{\"type\":\"movie\",\"score\":null,\"movie\":{\"title\":\"Jul
+        i Mummidalen\",\"overview\":\"Mummifamilien har ligget i vinterdvale i flere
+        m\xE5neder og dr\xF8mt om sol og sommer. Men s\xE5 kommer en hemul p\xE5 bes\xF8k
+        \u2013 og vekker dem for \xE5 fortelle at julen er her! Men ingen i Mummifamilien
+        har h\xF8rt om julen f\xF8r. \u201CHvem er julen?\u201D sp\xF8r de. Ingen
+        har tid til \xE5 fortelle dem hvem julen er, men de skj\xF8nner at de m\xE5
+        ha b\xE5de juletre og mat. Mummitrollet, Mummimamma og Mummipappa lager i
+        stand massevis av deilig mat og pynter juletreet vidunderlig vakkert. Og s\xE5
+        kommer det uventet noen p\xE5 bes\xF8k.\",\"year\":null,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/043/506/posters/medium/37997f7277.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/043/506/posters/medium/37997f7277.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/043/506/posters/thumb/37997f7277.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43506,\"slug\":\"jul-i-mummidalen-1969\",\"imdb\":\"\",\"tmdb\":60735}}},{\"type\":\"episode\",\"score\":null,\"episode\":{\"season\":1,\"number\":25,\"title\":\"Episode
+        25\",\"images\":{\"screenshot\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":72174,\"tvdb\":4596853,\"imdb\":\"\",\"tmdb\":60735,\"tvrage\":556554}},\"show\":{\"title\":\"At
+        the Threshold of an Era\",\"year\":\"1999\",\"ids\":{\"trakt\":1350,\"slug\":\"at-the-threshold-of-an-era\"},\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/350/posters/medium/2244ceffd7.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/350/posters/medium/2244ceffd7.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/350/posters/thumb/2244ceffd7.jpg\"},\"fanart\":{\"full\":null,\"medium\":\"https://walter.trakt.us/images/shows/000/001/350/fanarts/medium/f9bc6cdebe.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/350/fanarts/thumb/f9bc6cdebe.jpg\"}}}},{\"type\":\"person\",\"score\":null,\"person\":{\"name\":\"Hannah
+        Farr\",\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":46056,\"slug\":\"hannah-farr\",\"imdb\":\"nm2698630\",\"tmdb\":60735,\"tvrage\":null}}}]"}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e960901b9f72702-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:05:42 GMT']
+      etag: [W/"43be9afd36f61dda3e2554b3c00069ae"]
+      expires: ['Wed, 28 Sep 2016 17:05:42 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=dcc1050cc8e50b9c961a25848e6cd7aac1475053542; expires=Thu,
+          28-Sep-17 09:05:42 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['4']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['1']
+      x-request-id: [e05f8fd7-2636-47d4-8dc1-2bcaa74f90de]
+      x-runtime: ['0.088005']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=dcc1050cc8e50b9c961a25848e6cd7aac1475053542]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/60300?extended=full%2Cimages
+  response:
+    body: {string: "{\"title\":\"The Flash\",\"year\":2014,\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939},\"overview\":\"After
+        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
+        is struck by lightning and falls into a coma. Months later he awakens with
+        the power of super speed, granting him the ability to move through Central
+        City like an unseen guardian angel. Though initially excited by his newfound
+        powers, Barry is shocked to discover he is not the only \\\"meta-human\\\"
+        who was created in the wake of the accelerator explosion \u2013 and not everyone
+        is using their new powers for good. Barry partners with S.T.A.R. Labs and
+        dedicates his life to protect the innocent. For now, only a few close friends
+        and associates know that Barry is literally the fastest man alive, but it
+        won't be long before the world learns what Barry Allen has become... The Flash.\",\"first_aired\":\"2014-10-08T00:00:00.000Z\",\"airs\":{\"day\":\"Tuesday\",\"time\":\"20:00\",\"timezone\":\"America/New_York\"},\"runtime\":44,\"certification\":\"TV-14\",\"network\":\"The
+        CW\",\"country\":\"us\",\"trailer\":\"http://youtube.com/watch?v=aZxhA_Jihmw\",\"homepage\":\"http://www.cwtv.com/shows/the-flash/\",\"status\":\"returning
+        series\",\"rating\":8.32168,\"votes\":11266,\"updated_at\":\"2016-09-26T19:20:49.000Z\",\"language\":\"en\",\"available_translations\":[\"ar\",\"bg\",\"bs\",\"cs\",\"da\",\"de\",\"el\",\"en\",\"es\",\"fa\",\"fr\",\"he\",\"hr\",\"hu\",\"id\",\"it\",\"ko\",\"lb\",\"lb\",\"lt\",\"ml\",\"ms\",\"nl\",\"pl\",\"pt\",\"ro\",\"ru\",\"sk\",\"sr\",\"sv\",\"te\",\"th\",\"tr\",\"uk\",\"vi\",\"za\",\"zh\"],\"genres\":[\"drama\",\"fantasy\",\"science-fiction\"],\"aired_episodes\":46,\"images\":{\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"},\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/posters/thumb/79bd96a4d3.jpg\"},\"logo\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/logos/original/ab151d1043.png\"},\"clearart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/cleararts/original/660e6efe67.png\"},\"banner\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/banners/original/b2c305a2dc.jpg\"},\"thumb\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/thumbs/original/eab955a39c.jpg\"}}}"}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e9609029a422702-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:05:42 GMT']
+      etag: [W/"30769aad93ee100a9a5ee2d71ec2b712"]
+      expires: ['Wed, 28 Sep 2016 17:05:42 GMT']
+      last-modified: ['Mon, 26 Sep 2016 19:20:49 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [b8ff19b8-3e85-4511-b9e6-89a58e77ac8a]
+      x-runtime: ['0.015706']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?id_type=tmdb&id=60735
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":null,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
+        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
+        is struck by lightning and falls into a coma. Months later he awakens with
+        the power of super speed, granting him the ability to move through Central
+        City like an unseen guardian angel. Though initially excited by his newfound
+        powers, Barry is shocked to discover he is not the only \\\"meta-human\\\"
+        who was created in the wake of the accelerator explosion \u2013 and not everyone
+        is using their new powers for good. Barry partners with S.T.A.R. Labs and
+        dedicates his life to protect the innocent. For now, only a few close friends
+        and associates know that Barry is literally the fastest man alive, but it
+        won't be long before the world learns what Barry Allen has become... The Flash.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/posters/thumb/79bd96a4d3.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"}},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}},{\"type\":\"movie\",\"score\":null,\"movie\":{\"title\":\"Jul
+        i Mummidalen\",\"overview\":\"Mummifamilien har ligget i vinterdvale i flere
+        m\xE5neder og dr\xF8mt om sol og sommer. Men s\xE5 kommer en hemul p\xE5 bes\xF8k
+        \u2013 og vekker dem for \xE5 fortelle at julen er her! Men ingen i Mummifamilien
+        har h\xF8rt om julen f\xF8r. \u201CHvem er julen?\u201D sp\xF8r de. Ingen
+        har tid til \xE5 fortelle dem hvem julen er, men de skj\xF8nner at de m\xE5
+        ha b\xE5de juletre og mat. Mummitrollet, Mummimamma og Mummipappa lager i
+        stand massevis av deilig mat og pynter juletreet vidunderlig vakkert. Og s\xE5
+        kommer det uventet noen p\xE5 bes\xF8k.\",\"year\":null,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/043/506/posters/medium/37997f7277.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/043/506/posters/medium/37997f7277.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/043/506/posters/thumb/37997f7277.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43506,\"slug\":\"jul-i-mummidalen-1969\",\"imdb\":\"\",\"tmdb\":60735}}},{\"type\":\"episode\",\"score\":null,\"episode\":{\"season\":1,\"number\":25,\"title\":\"Episode
+        25\",\"images\":{\"screenshot\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":72174,\"tvdb\":4596853,\"imdb\":\"\",\"tmdb\":60735,\"tvrage\":556554}},\"show\":{\"title\":\"At
+        the Threshold of an Era\",\"year\":\"1999\",\"ids\":{\"trakt\":1350,\"slug\":\"at-the-threshold-of-an-era\"},\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/350/posters/medium/2244ceffd7.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/350/posters/medium/2244ceffd7.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/350/posters/thumb/2244ceffd7.jpg\"},\"fanart\":{\"full\":null,\"medium\":\"https://walter.trakt.us/images/shows/000/001/350/fanarts/medium/f9bc6cdebe.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/350/fanarts/thumb/f9bc6cdebe.jpg\"}}}},{\"type\":\"person\",\"score\":null,\"person\":{\"name\":\"Hannah
+        Farr\",\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":46056,\"slug\":\"hannah-farr\",\"imdb\":\"nm2698630\",\"tmdb\":60735,\"tvrage\":null}}}]"}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e960a04ca162702-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:06:24 GMT']
+      etag: [W/"43be9afd36f61dda3e2554b3c00069ae"]
+      expires: ['Wed, 28 Sep 2016 17:06:24 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=dfc103bd601a915175045591b897cf6041475053584; expires=Thu,
+          28-Sep-17 09:06:24 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['4']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['1']
+      x-request-id: [e05f8fd7-2636-47d4-8dc1-2bcaa74f90de]
+      x-runtime: ['0.088005']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=dfc103bd601a915175045591b897cf6041475053584]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/60300?extended=full%2Cimages
+  response:
+    body: {string: "{\"title\":\"The Flash\",\"year\":2014,\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939},\"overview\":\"After
+        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
+        is struck by lightning and falls into a coma. Months later he awakens with
+        the power of super speed, granting him the ability to move through Central
+        City like an unseen guardian angel. Though initially excited by his newfound
+        powers, Barry is shocked to discover he is not the only \\\"meta-human\\\"
+        who was created in the wake of the accelerator explosion \u2013 and not everyone
+        is using their new powers for good. Barry partners with S.T.A.R. Labs and
+        dedicates his life to protect the innocent. For now, only a few close friends
+        and associates know that Barry is literally the fastest man alive, but it
+        won't be long before the world learns what Barry Allen has become... The Flash.\",\"first_aired\":\"2014-10-08T00:00:00.000Z\",\"airs\":{\"day\":\"Tuesday\",\"time\":\"20:00\",\"timezone\":\"America/New_York\"},\"runtime\":44,\"certification\":\"TV-14\",\"network\":\"The
+        CW\",\"country\":\"us\",\"trailer\":\"http://youtube.com/watch?v=aZxhA_Jihmw\",\"homepage\":\"http://www.cwtv.com/shows/the-flash/\",\"status\":\"returning
+        series\",\"rating\":8.32168,\"votes\":11266,\"updated_at\":\"2016-09-26T19:20:49.000Z\",\"language\":\"en\",\"available_translations\":[\"ar\",\"bg\",\"bs\",\"cs\",\"da\",\"de\",\"el\",\"en\",\"es\",\"fa\",\"fr\",\"he\",\"hr\",\"hu\",\"id\",\"it\",\"ko\",\"lb\",\"lb\",\"lt\",\"ml\",\"ms\",\"nl\",\"pl\",\"pt\",\"ro\",\"ru\",\"sk\",\"sr\",\"sv\",\"te\",\"th\",\"tr\",\"uk\",\"vi\",\"za\",\"zh\"],\"genres\":[\"drama\",\"fantasy\",\"science-fiction\"],\"aired_episodes\":46,\"images\":{\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"},\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/posters/thumb/79bd96a4d3.jpg\"},\"logo\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/logos/original/ab151d1043.png\"},\"clearart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/cleararts/original/660e6efe67.png\"},\"banner\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/banners/original/b2c305a2dc.jpg\"},\"thumb\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/thumbs/original/eab955a39c.jpg\"}}}"}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e960a05aa452702-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:06:24 GMT']
+      etag: [W/"30769aad93ee100a9a5ee2d71ec2b712"]
+      expires: ['Wed, 28 Sep 2016 17:06:24 GMT']
+      last-modified: ['Mon, 26 Sep 2016 19:20:49 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [b8ff19b8-3e85-4511-b9e6-89a58e77ac8a]
+      x-runtime: ['0.015706']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
 version: 1
