@@ -118,15 +118,8 @@ class SeenSearchAPI(APIResource):
         if page > total_pages and total_pages != 0:
             raise NotFoundError('page %s does not exist' % page)
 
-        # Build pagination kwargs
-        pkwargs = {
-            'total_pages': total_pages,
-            'total_items': total_items,
-            'page_count': actual_size,
-            'request': request
-        }
-
-        pagination = pagination_headers(**pkwargs)
+        # Get pagination headers
+        pagination = pagination_headers(total_pages, total_items, actual_size, request)
 
         # Create response
         rsp = jsonify(converted_seen_entry_list)

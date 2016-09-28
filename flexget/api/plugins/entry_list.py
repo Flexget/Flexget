@@ -173,32 +173,25 @@ class EntryListEntriesAPI(APIResource):
             el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             raise NotFoundError('list_id %d does not exist' % list_id)
-        count = el.get_entries_by_list_id(count=True, **kwargs)
+        total_items = el.get_entries_by_list_id(count=True, **kwargs)
 
-        if not count:
+        if not total_items:
             return jsonify([])
 
-        log.debug('entry lists entries count is %d', count)
+        log.debug('entry lists entries count is %d', total_items)
         entries = [entry.to_dict() for entry in el.get_entries_by_list_id(**kwargs)]
 
         # Total number of pages
-        pages = int(ceil(count / float(per_page)))
+        total_pages = int(ceil(total_items / float(per_page)))
 
-        if page > pages:
+        if page > total_pages:
             raise NotFoundError('page %s does not exist' % page)
 
         # Actual results in page
         actual_size = min(len(entries), per_page)
 
-        # Create Link header
-        full_url = self.api.base_url + entry_list_api.path.lstrip('/') + '/' + str(list_id) + '/entries/'
-
-        # Add all other params
-        params = {
-            'sort_by': sort_by,
-            'order': sort_order
-        }
-        pagination = pagination_headers(full_url, page, per_page, pages, count, actual_size, params)
+        # Get pagination headers
+        pagination = pagination_headers(total_pages, total_items, actual_size, request)
 
         # Create response
         rsp = jsonify(entries)

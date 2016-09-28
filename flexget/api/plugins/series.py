@@ -354,14 +354,14 @@ class SeriesAPI(APIResource):
             'session': session
         }
 
-        total_count = series.get_series_summary(count=True, **kwargs)
+        total_items = series.get_series_summary(count=True, **kwargs)
 
         converted_series_list = [get_series_details(show) for show in series.get_series_summary(**kwargs)]
 
         # Total number of pages
-        pages = int(ceil(total_count / float(per_page)))
+        total_pages = int(ceil(total_items / float(per_page)))
 
-        if page > pages and pages != 0:
+        if page > total_pages and total_pages != 0:
             raise NotFoundError('page %s does not exist' % page)
 
         # Actual results in page
@@ -379,16 +379,8 @@ class SeriesAPI(APIResource):
                     result = api_client.get_endpoint(url)
                     converted_series_list[pos]['lookup'].update({endpoint: result})
 
-        # Build pagination kwargs
-        pkwargs = {
-            'total_pages': pages,
-            'total_items': total_count,
-            'page_count': actual_size,
-            'request': request
-        }
-
-        # Get pagination header
-        pagination = pagination_headers(**pkwargs)
+        # Get pagination headers
+        pagination = pagination_headers(total_pages, total_items, actual_size, request)
 
         # Created response
         rsp = jsonify(converted_series_list)

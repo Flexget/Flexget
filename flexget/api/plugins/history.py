@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 from math import ceil
 
-from flask import jsonify
+from flask import jsonify, request
 from sqlalchemy import desc, asc
 
 from flexget.api import api, APIResource
@@ -72,14 +72,14 @@ class HistoryAPI(APIResource):
         if task:
             query = query.filter(History.task == task)
 
-        count = query.count()
+        total_items = query.count()
 
-        if not count:
+        if not total_items:
             return jsonify([])
 
-        pages = int(ceil(count / float(per_page)))
+        total_pages = int(ceil(total_items / float(per_page)))
 
-        if page > pages:
+        if page > total_pages:
             raise NotFoundError('page %s does not exist' % page)
 
         start = (page - 1) * per_page
@@ -97,15 +97,8 @@ class HistoryAPI(APIResource):
         # Actual results in page
         actual_size = min(items.count(), per_page)
 
-        # Create Link header
-        full_url = self.api.base_url + history_api.path.lstrip('/') + '/'
-
-        # Pass a list of all relevant request params
-        params = dict(sort_by=sort_by, order=sort_order)
-        if task:
-            params.update(task=task)
-
-        pagination = pagination_headers(full_url, page, per_page, pages, count, actual_size, params)
+        # Get pagination headers
+        pagination = pagination_headers(total_pages, total_items, actual_size, request)
 
         # Create response
         rsp = jsonify([item.to_dict() for item in items])
