@@ -37,7 +37,7 @@ class TestPluginsAPI(object):
 
         errors = schema_match(OC.plugin_list_reply, data)
         assert not errors
-        assert data['plugin_list'] == []
+        assert data == []
 
         rsp = api_client.get('/plugins/?phase=fgfg')
         assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code

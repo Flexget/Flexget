@@ -38,13 +38,7 @@ class ObjectsContainer(object):
         }
     }
 
-    plugin_list_reply = {
-        'type': 'object',
-        'properties': {
-            'plugin_list': {'type': 'array', 'items': plugin_object},
-            'number_of_plugins': {'type': 'integer'}
-        }
-    }
+    plugin_list_reply = {'type': 'array', 'items': plugin_object}
 
 
 plugin_schema = api.schema('plugin_object', ObjectsContainer.plugin_object)
@@ -92,8 +86,7 @@ class PluginsAPI(APIResource):
                 plugin_list.append(p)
         except ValueError as e:
             raise BadRequest(str(e))
-        return jsonify({'plugin_list': plugin_list,
-                'number_of_plugins': len(plugin_list)})
+        return jsonify(plugin_list)
 
 
 @plugins_api.route('/<string:plugin_name>/')
