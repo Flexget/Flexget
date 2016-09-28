@@ -493,13 +493,13 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
             days = 365
         query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
     if count:
-        return query.count()
+        return query.group_by(Series).count()
     if sort_by == 'show_name':
         order_by = Series.name
     elif sort_by == 'last_download_date':
         order_by = func.max(Release.first_seen)
     query = query.order_by(desc(order_by)) if descending else query.order_by(order_by)
-    query = query.slice(start, stop).from_self()
+
     return query
 
 

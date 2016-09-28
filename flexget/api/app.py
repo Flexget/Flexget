@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 import json
 import logging
 import os
+import re
 from collections import deque
 from functools import wraps
 
@@ -11,7 +12,6 @@ from flask_compress import Compress
 from flask_cors import CORS
 from flask_restplus import Model, Api as RestPlusAPI
 from flask_restplus import Resource
-from flask_restplus.reqparse import RequestParser
 from flexget import manager
 from flexget.config_schema import process_config
 from flexget.utils.database import with_session
@@ -225,7 +225,7 @@ class API(RestPlusAPI):
 
 
 api_app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__path__[0]), 'templates'))
-api_app.config['REMEMBER_COOKIE_NAME'] = 'flexgetToken'
+api_app.config['REMEMBER_COOKIE_NAME'] = 'flexget.token'
 api_app.config['DEBUG'] = True
 api_app.config['ERROR_404_HELP'] = False
 
@@ -415,7 +415,7 @@ def etag(f):
     return wrapped
 
 
-def pagination_headers(url, page, per_page, total_pages, total_items, page_count, params=None):
+def pagination_headers(total_pages, total_items, page_count, request):
     """
     Creates the `Link`. 'Count' and  'Total-Count' headers, to be used for pagination traversing
 
@@ -428,16 +428,19 @@ def pagination_headers(url, page, per_page, total_pages, total_items, page_count
     :param params: All other original request params that would be added to the Link header
     :return: Dict representing the full Link, Count and the Total-Count headers
     """
+    url = request.url_root + request.path.lstrip('/')
+    per_page = re.search('per_page=(\d+)', request.query_string).group(1)
+    page = int(re.search('page=(\d+)', request.query_string).group(1))
 
     # Build the base template
-    LINKTEMPLATE = '<{}?per_page={}'.format(url, per_page)
+    LINKTEMPLATE = '<{}?per_page={}&'.format(url, per_page)
 
-    # Add all params to string
-    if params:
-        for key, value in params.items():
-            LINKTEMPLATE += '&{}={}'.format(key, value)
+    # Removed page and per_page from query string
+    query_string = re.sub('&?per_page=\d+&?', '', request.query_string)
+    query_string = re.sub('&?page=\d+&?', '', query_string)
 
-    LINKTEMPLATE += '&page={}>; rel="{}"'
+    # Add all original q
+    LINKTEMPLATE += query_string + '&page={}>; rel="{}"'
 
     link_string = ''
 

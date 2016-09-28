@@ -79,7 +79,6 @@ class SeenSearchAPI(APIResource):
         if per_page > 100:
             per_page = 100
 
-        # Handles default if it explicitly called
         descending = bool(sort_order == 'desc')
 
         # Unquotes and prepares value for DB lookup

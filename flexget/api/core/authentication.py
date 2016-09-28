@@ -116,5 +116,5 @@ class LogoutAPI(APIResource):
         """ Logout and clear session cookies """
         flask_session.clear()
         resp = success_response('User logged out')
-        resp.set_cookie('flexgetToken', '', expires=0)
+        resp.set_cookie('flexget.token', '', expires=0)
         return resp

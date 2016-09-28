@@ -10,10 +10,14 @@ from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIClient, APIResource
-from flexget.api.app import NotFoundError, CannotAddResource, BadRequest, base_message_schema, success_response, etag
+from flexget.api.app import NotFoundError, CannotAddResource, BadRequest, base_message_schema, success_response, etag, \
+    pagination_headers
 from flexget.event import fire_event
 from flexget.plugin import PluginError
 from flexget.plugins.filter import series
+
+from flexget.api.plugins.tvmaze_lookup import ObjectsContainer as tvmaze
+from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
 
 series_api = api.namespace('series', description='Flexget Series operations')
 
@@ -152,25 +156,19 @@ class ObjectsContainer(object):
             'alternate_names': {'type': 'array', 'items': {'type': 'string'}},
             'begin_episode': begin_object,
             'latest_downloaded_episode': latest_object,
-            'in_tasks': {'type': 'array', 'items': {'type': 'string'}}
+            'in_tasks': {'type': 'array', 'items': {'type': 'string'}},
+            'lookup':
+                {'anyOf': [
+                    tvmaze.tvmaze_series_object,
+                    tvdb.tvdb_series_object
+                ]
+                },
         },
         'required': ['series_id', 'series_name', 'alternate_names', 'begin_episode', 'latest_downloaded_episode',
                      'in_tasks']
     }
 
-    series_list_schema = {
-        'type': 'object',
-        'properties': {
-            'shows': {
-                'type': 'array',
-                'items': single_series_object
-            },
-            'total_number_of_shows': {'type': 'integer'},
-            'page_size': {'type': 'integer'},
-            'total_number_of_pages': {'type': 'integer'},
-            'page': {'type': 'integer'}
-        }
-    }
+    series_list_schema = {'type': 'array', 'items': single_series_object}
 
     episode_list_schema = {
         'type': 'object',
@@ -291,7 +289,8 @@ show_details_schema = api.schema('show_details', ObjectsContainer.single_series_
 series_search_schema = api.schema('list_of_shows', ObjectsContainer.series_search_object)
 episode_schema = api.schema('episode_item', ObjectsContainer.episode_schema)
 
-series_list_parser = api.parser()
+sort_choices = ('show_name', 'last_download_date')
+series_list_parser = api.pagination_parser(sort_choices=sort_choices)
 series_list_parser.add_argument('in_config', choices=('configured', 'unconfigured', 'all'), default='configured',
                                 help="Filter list if shows are currently in configuration.")
 series_list_parser.add_argument('premieres', type=inputs.boolean, default=False,
@@ -299,14 +298,6 @@ series_list_parser.add_argument('premieres', type=inputs.boolean, default=False,
 series_list_parser.add_argument('status', choices=('new', 'stale'), help="Filter by status")
 series_list_parser.add_argument('days', type=int,
                                 help="Filter status by number of days.")
-series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
-series_list_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Max is 100.')
-
-series_list_parser.add_argument('sort_by', choices=('show_name', 'last_download_date'),
-                                default='last_download_date',
-                                help="Sort response by attribute.")
-series_list_parser.add_argument('descending', type=inputs.boolean, default=True, store_missing=True,
-                                help="Sorting order.")
 series_list_parser.add_argument('lookup', choices=('tvdb', 'tvmaze'), action='append',
                                 help="Get lookup result for every show by sending another request to lookup API")
 
@@ -322,60 +313,89 @@ class SeriesAPI(APIResource):
     def get(self, session=None):
         """ List existing shows """
         args = series_list_parser.parse_args()
+
+        # Filter params
+        configured = args['in_config']
+        premieres = args['premieres']
+        status = args['status']
+        days = args['days']
+
+        # Pagination and sorting params
         page = args['page']
-        page_size = args['page_size']
+        per_page = args['per_page']
+        sort_by = args['sort_by']
+        sort_order = args['order']
+
+        # Handle max size limit
+        if per_page > 100:
+            per_page = 100
+
+        descending = bool(sort_order == 'desc')
+
+        # Lookup param
         lookup = args.get('lookup')
 
         # Handle max size limit
-        if page_size > 100:
-            page_size = 100
+        if per_page > 100:
+            per_page = 100
 
-        start = page_size * (page - 1)
-        stop = start + page_size
+        start = per_page * (page - 1)
+        stop = start + per_page
 
         kwargs = {
-            'configured': args.get('in_config'),
-            'premieres': args.get('premieres'),
-            'status': args.get('status'),
-            'days': args.get('days'),
+            'configured': configured,
+            'premieres': premieres,
+            'status': status,
+            'days': days,
             'start': start,
             'stop': stop,
-            'sort_by': args.get('sort_by'),
-            'descending': args.get('descending'),
+            'sort_by': sort_by,
+            'descending': descending,
             'session': session
         }
 
-        num_of_shows = series.get_series_summary(count=True, **kwargs)
+        total_count = series.get_series_summary(count=True, **kwargs)
 
-        raw_series_list = series.get_series_summary(**kwargs)
-        converted_series_list = [get_series_details(show) for show in raw_series_list]
+        converted_series_list = [get_series_details(show) for show in series.get_series_summary(**kwargs)]
 
-        pages = int(ceil(num_of_shows / float(page_size)))
+        # Total number of pages
+        pages = int(ceil(total_count / float(per_page)))
 
         if page > pages and pages != 0:
             raise NotFoundError('page %s does not exist' % page)
 
-        number_of_shows = min(page_size, num_of_shows)
+        # Actual results in page
+        actual_size = min(per_page, len(converted_series_list))
 
-        response = {
-            'shows': converted_series_list,
-            'page_size': number_of_shows,
-            'total_number_of_shows': num_of_shows,
-            'page': page,
-            'total_number_of_pages': pages
-        }
-
+        # Do relevant lookups
         if lookup:
             api_client = APIClient()
             for endpoint in lookup:
                 base_url = '/%s/series/' % endpoint
-                for show in response['shows']:
-                    pos = response['shows'].index(show)
-                    response['shows'][pos].setdefault('lookup', {})
+                for show in converted_series_list:
+                    pos = converted_series_list.index(show)
+                    converted_series_list[pos].setdefault('lookup', {})
                     url = base_url + show['series_name'] + '/'
                     result = api_client.get_endpoint(url)
-                    response['shows'][pos]['lookup'].update({endpoint: result})
-        return jsonify(response)
+                    converted_series_list[pos]['lookup'].update({endpoint: result})
+
+        # Build pagination kwargs
+        pkwargs = {
+            'total_pages': pages,
+            'total_items': total_count,
+            'page_count': actual_size,
+            'request': request
+        }
+
+        # Get pagination header
+        pagination = pagination_headers(**pkwargs)
+
+        # Created response
+        rsp = jsonify(converted_series_list)
+
+        # Add link header to response
+        rsp.headers.extend(pagination)
+        return rsp
 
     @api.response(201, model=show_details_schema)
     @api.response(CannotAddResource)
