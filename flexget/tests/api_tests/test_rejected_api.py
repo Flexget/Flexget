@@ -60,7 +60,7 @@ class TestRejectedAPI(object):
         }
 
         for field, value in values.items():
-            assert data['rejected_entries'][0].get(field) == value
+            assert data[0].get(field) == value
 
     def test_rejected_delete_all(self, api_client, schema_match):
         add_rejected_entry(self.entry)

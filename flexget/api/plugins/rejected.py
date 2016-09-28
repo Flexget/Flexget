@@ -40,14 +40,7 @@ class ObjectsContainer(object):
             'rejected_by': {'type': 'string'}
         }
     }
-    rejected_entries_list_object = {
-        'type': 'object',
-        'properties': {
-            'rejected_entries': {'type': 'array', 'items': rejected_entry_object},
-            'number_of_rejected_entries': {'type': 'integer'}
-        }
-    }
-
+    rejected_entries_list_object =  {'type': 'array', 'items': rejected_entry_object}
 
 rejected_entry_schema = api.schema('rejected_failed_entry_schema', ObjectsContainer.rejected_entry_object)
 rejected_entries_list_schema = api.schema('rejected_entries_list_schema', ObjectsContainer.rejected_entries_list_object)
@@ -60,8 +53,7 @@ class Rejected(APIResource):
     def get(self, session=None):
         """ List all rejected entries """
         entries = session.query(RememberEntry).all()
-        return jsonify(rejected_entries=[rejected_entry_to_dict(e) for e in entries],
-                       number_of_rejected_entries=len(entries))
+        return jsonify([rejected_entry_to_dict(e) for e in entries])
 
     @api.response(200, model=base_message_schema)
     def delete(self, session=None):
