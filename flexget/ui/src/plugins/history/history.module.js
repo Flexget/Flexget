@@ -4,7 +4,7 @@
 
     angular
         .module('plugins.history', [
-            'angular-cache',
+            'http-etag',
             'angular.filter',
 
             'blocks.exception',
