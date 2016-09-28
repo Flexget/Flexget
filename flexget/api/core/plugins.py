@@ -2,13 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
+from math import ceil
 
-from flask import jsonify
+from flask import jsonify, request
 from flask_restplus import inputs
 
 from flexget.plugin import get_plugins, get_plugin_by_name, DependencyError
 from flexget.api import api, APIResource
-from flexget.api.app import BadRequest, etag
+from flexget.api.app import BadRequest, NotFoundError, etag, pagination_headers
 
 log = logging.getLogger('plugins')
 
@@ -48,7 +49,7 @@ plugin_parser = api.parser()
 plugin_parser.add_argument('include_schema', type=inputs.boolean, default=False,
                            help='Include plugin schema. This will increase response size')
 
-plugins_parser = plugin_parser.copy()
+plugins_parser = api.pagination_parser(plugin_parser)
 
 plugins_parser.add_argument('group', case_sensitive=False, help='Show plugins belonging to this group')
 plugins_parser.add_argument('phase', case_sensitive=False, help='Show plugins that act on this phase')
@@ -73,10 +74,23 @@ class PluginsAPI(APIResource):
     @etag
     @api.response(200, model=plugin_list_reply_schema)
     @api.response(BadRequest)
+    @api.response(NotFoundError)
     @api.doc(parser=plugins_parser)
     def get(self, session=None):
         """ Get list of registered plugins """
         args = plugins_parser.parse_args()
+
+        # Pagination and sorting params
+        page = args['page']
+        per_page = args['per_page']
+
+        # Handle max size limit
+        if per_page > 100:
+            per_page = 100
+
+        start = per_page * (page - 1)
+        stop = start + per_page
+
         plugin_list = []
         try:
             for plugin in get_plugins(phase=args['phase'], group=args['group']):
@@ -86,7 +100,28 @@ class PluginsAPI(APIResource):
                 plugin_list.append(p)
         except ValueError as e:
             raise BadRequest(str(e))
-        return jsonify(plugin_list)
+
+        total_items = len(plugin_list)
+
+        sliced_list = plugin_list[start:stop]
+
+        # Total number of pages
+        total_pages = int(ceil(total_items / float(per_page)))
+
+        if page > total_pages and total_pages != 0:
+            raise NotFoundError('page %s does not exist' % page)
+
+        # Actual results in page
+        actual_size = min(per_page, len(sliced_list))
+
+        # Get pagination headers
+        pagination = pagination_headers(total_pages, total_items, actual_size, request)
+
+        rsp = jsonify(sliced_list)
+
+        # Add link header to response
+        rsp.headers.extend(pagination)
+        return rsp
 
 
 @plugins_api.route('/<string:plugin_name>/')

@@ -216,10 +216,10 @@ class API(RestPlusAPI):
         pagination = parser.copy() if parser else api.parser()
         pagination.add_argument('page', type=int, default=1, help='Page number')
         pagination.add_argument('per_page', type=int, default=50, help='Results per page')
-        pagination.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
         if sort_choices:
             pagination.add_argument('sort_by', choices=sort_choices, default=default or sort_choices[0],
                                     help='Sort by attribute')
+            pagination.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
         return pagination
 
 
@@ -428,7 +428,7 @@ def pagination_headers(total_pages, total_items, page_count, request):
     # Build constant variables from request data
     url = request.url_root + request.path.lstrip('/')
     per_page = request.args.get('per_page') or 50
-    page = request.args.get('page') or 1
+    page = int(request.args.get('page')) or 1
 
     # Build the base template
     LINKTEMPLATE = '<{}?per_page={}&'.format(url, per_page)
@@ -437,7 +437,7 @@ def pagination_headers(total_pages, total_items, page_count, request):
     query_string = re.sub(b'&?per_page=\d+&?', b'', request.query_string)
     query_string = re.sub(b'&?page=\d+&?', b'', query_string)
 
-    # Add all original q
+    # Add all original query params
     LINKTEMPLATE += query_string.decode() + '&page={}>; rel="{}"'
 
     link_string = ''
