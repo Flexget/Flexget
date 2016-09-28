@@ -199,10 +199,7 @@ class WebServer(threading.Thread):
         except socket.gaierror:
             host = '127.0.0.1'
 
-        if self.ssl_certificate and self.ssl_private_key:
-            protocol = 'https'
-        else:
-            protocol = 'http'
+        protocol = 'https' if self.ssl_certificate and self.ssl_private_key else 'http'
 
         log.info('Web interface available at %s://%s:%s', protocol, host, self.port)
 

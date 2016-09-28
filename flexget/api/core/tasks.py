@@ -142,7 +142,7 @@ task_execution_schema = api.schema('task_execution_input', ObjectsContainer.task
 task_api_desc = 'Task config schema too large to display, you can view the schema using the schema API'
 
 tasks_parser = api.parser()
-tasks_parser.add_argument('include_config', type=inputs.boolean, default=False, help='Include task config')
+tasks_parser.add_argument('include_config', type=inputs.boolean, default=True, help='Include task config')
 
 
 @tasks_api.route('/')
