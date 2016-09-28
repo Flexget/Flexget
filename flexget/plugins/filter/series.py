@@ -851,7 +851,7 @@ def get_releases(episode, downloaded=None, start=None, stop=None, count=False, d
                  session=None):
     """ Return all releases for a given episode """
     releases = session.query(Release).filter(Release.episode_id == episode.id)
-    if downloaded:
+    if downloaded is not None:
         releases = releases.filter(Release.downloaded == downloaded)
     if count:
         return releases.count()

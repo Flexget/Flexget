@@ -27,7 +27,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert data['shows'] == []
+        assert data == []
 
         with Session() as session:
             series = Series()
@@ -44,7 +44,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        show = data['shows'][0]
+        show = data[0]
         errors = schema_match(OC.single_series_object, show)
         assert not errors
 
@@ -64,7 +64,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert data['shows'] == []
+        assert data == []
 
         # Get unconfigured series
         rsp = api_client.get('/series/?in_config=unconfigured')
@@ -74,11 +74,11 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        show = data['shows'][0]
+        show = data[0]
         errors = schema_match(OC.single_series_object, show)
         assert not errors
 
-        assert len(data['shows']) == 1
+        assert len(data) == 1
         assert show['series_name'] == 'test series'
 
         # Add a configured series
@@ -98,11 +98,11 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        show = data['shows'][0]
+        show = data[0]
         errors = schema_match(OC.single_series_object, show)
         assert not errors
 
-        assert len(data['shows']) == 1
+        assert len(data) == 1
         assert show['series_name'] == 'test series 2'
 
         # Get all series
@@ -113,7 +113,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 2
+        assert len(data) == 2
 
     def test_series_premieres_param(self, api_client, schema_match):
         # Add a series with an episode of S02E05, not a premiere
@@ -147,7 +147,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 1
+        assert len(data) == 1
 
         # Get only premieres
         rsp = api_client.get('/series/?premieres=true')
@@ -157,7 +157,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 0
+        assert len(data) == 0
 
         # Add a premiere episode to another series
         with Session() as session:
@@ -188,7 +188,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 1
+        assert len(data) == 1
 
     def test_series_status_param(self, api_client, schema_match):
         # Add an episode with a release created now
@@ -246,7 +246,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 2
+        assert len(data) == 2
 
         # Just new
         rsp = api_client.get('/series/?status=new')
@@ -256,7 +256,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 1
+        assert len(data) == 1
 
         # New with days param
         rsp = api_client.get('/series/?status=new&days=9')
@@ -266,7 +266,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 2
+        assert len(data) == 2
 
         # Just stale
         rsp = api_client.get('/series/?status=stale')
@@ -276,7 +276,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 0
+        assert len(data) == 0
 
         # Add an episode with a release created over a year ago
         with Session() as session:
@@ -310,7 +310,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 1
+        assert len(data) == 1
 
     @pytest.mark.online
     def test_series_lookup_param(self, api_client, schema_match):
@@ -331,9 +331,9 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 2
+        assert len(data) == 2
 
-        for show in data['shows']:
+        for show in data:
             tvdb_lookup = show['lookup']['tvdb']
             assert tvdb_lookup
             errors = schema_match(tvdb.tvdb_series_object, tvdb_lookup)
@@ -423,28 +423,28 @@ class TestSeriesSearchAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.series_search_object, data)
+        errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 2
+        assert len(data) == 2
 
         rsp = api_client.get('/series/search/series1/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.series_search_object, data)
+        errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 1
+        assert len(data) == 1
 
         rsp = api_client.get('/series/search/bla/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.series_search_object, data)
+        errors = schema_match(OC.series_list_schema, data)
         assert not errors
 
-        assert len(data['shows']) == 0
+        assert len(data) == 0
 
 
 class TestSeriesSingleAPI(object):
@@ -604,7 +604,7 @@ class TestSeriesEpisodesAPI(object):
         errors = schema_match(OC.episode_list_schema, data)
         assert not errors
 
-        assert len(data['episodes']) == data['number_of_episodes'] == 2
+        assert len(data) == 2
 
         # Delete all episodes
         rsp = api_client.delete('/series/1/episodes/')
@@ -621,7 +621,7 @@ class TestSeriesEpisodesAPI(object):
         errors = schema_match(OC.episode_list_schema, data)
         assert not errors
 
-        assert len(data['episodes']) == data['number_of_episodes'] == 0
+        assert len(data) == 0
 
 
 class TestSeriesEpisodeAPI(object):
@@ -669,14 +669,14 @@ class TestSeriesEpisodeAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.episode_schema, data)
+        errors = schema_match(OC.episode_object, data)
         assert not errors
 
-        assert data['episode']['identifier'] == 'S01E01'
-        assert data['episode']['identified_by'] == 'ep'
-        assert data['episode']['season'] == 1
-        assert data['episode']['number'] == 1
-        assert data['episode']['premiere_type'] == 'Series Premiere'
+        assert data['identifier'] == 'S01E01'
+        assert data['identified_by'] == 'ep'
+        assert data['season'] == 1
+        assert data['number'] == 1
+        assert data['premiere_type'] == 'Series Premiere'
 
         # No series ID
         rsp = api_client.get('/series/10/episodes/1/')
@@ -789,7 +789,7 @@ class TestSeriesReleasesAPI(object):
         errors = schema_match(OC.release_list_schema, data)
         assert not errors
 
-        assert len(data['releases']) == data['number_of_releases'] == 2
+        assert len(data) == 2
 
         # Just downloaded releases
         rsp = api_client.get('/series/1/episodes/1/releases/?downloaded=true')
@@ -799,8 +799,8 @@ class TestSeriesReleasesAPI(object):
         errors = schema_match(OC.release_list_schema, data)
         assert not errors
 
-        assert len(data['releases']) == data['number_of_releases'] == 1
-        assert data['releases'][0]['title'] == 'downloaded release'
+        assert len(data) == 1
+        assert data[0]['title'] == 'downloaded release'
 
         # Just un-downloaded releases
         rsp = api_client.get('/series/1/episodes/1/releases/?downloaded=false')
@@ -810,8 +810,8 @@ class TestSeriesReleasesAPI(object):
         errors = schema_match(OC.release_list_schema, data)
         assert not errors
 
-        assert len(data['releases']) == data['number_of_releases'] == 1
-        assert data['releases'][0]['title'] == 'un-downloaded release'
+        assert len(data) == 1
+        assert data[0]['title'] == 'un-downloaded release'
 
         # No series
         rsp = api_client.get('/series/10/episodes/1/releases/?downloaded=false')
@@ -888,8 +888,8 @@ class TestSeriesReleasesAPI(object):
         errors = schema_match(OC.release_list_schema, data)
         assert not errors
 
-        assert len(data['releases']) == data['number_of_releases'] == 1
-        assert data['releases'][0]['title'] == 'un-downloaded release'
+        assert len(data) == 1
+        assert data[0]['title'] == 'un-downloaded release'
 
         rsp = api_client.delete('/series/1/episodes/1/releases/?downloaded=false')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -905,7 +905,7 @@ class TestSeriesReleasesAPI(object):
         errors = schema_match(OC.release_list_schema, data)
         assert not errors
 
-        assert len(data['releases']) == data['number_of_releases'] == 0
+        assert len(data) == 0
 
         # No series
         rsp = api_client.delete('/series/10/episodes/1/releases/?downloaded=false')
@@ -982,7 +982,7 @@ class TestSeriesReleasesAPI(object):
         errors = schema_match(OC.release_list_schema, data)
         assert not errors
 
-        assert len(data['releases']) == data['number_of_releases'] == 0
+        assert len(data) == 0
 
         rsp = api_client.get('/series/1/episodes/1/releases/?downloaded=false')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -991,7 +991,7 @@ class TestSeriesReleasesAPI(object):
         errors = schema_match(OC.release_list_schema, data)
         assert not errors
 
-        assert len(data['releases']) == data['number_of_releases'] == 2
+        assert len(data) == 2
 
         # No series
         rsp = api_client.json_put('/series/10/episodes/1/releases/')
@@ -1077,21 +1077,21 @@ class TestSeriesReleaseAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_schema, data)
+        errors = schema_match(OC.release_object, data)
         assert not errors
 
-        assert data['release']['downloaded'] == True
-        assert data['release']['title'] == 'downloaded release'
+        assert data['downloaded'] is True
+        assert data['title'] == 'downloaded release'
 
         rsp = api_client.get('/series/1/episodes/1/releases/2/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_schema, data)
+        errors = schema_match(OC.release_object, data)
         assert not errors
 
-        assert data['release']['downloaded'] == False
-        assert data['release']['title'] == 'un-downloaded release'
+        assert data['downloaded'] is False
+        assert data['title'] == 'un-downloaded release'
 
         # No series
         rsp = api_client.get('/series/10/episodes/1/releases/1/')
@@ -1195,7 +1195,7 @@ class TestSeriesReleaseAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.release_schema, data)
+        errors = schema_match(OC.release_object, data)
         assert not errors
 
         # Cannot reset if already downloaded

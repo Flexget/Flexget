@@ -144,6 +144,11 @@ class EntryListEntriesAPI(APIResource):
     @api.doc(params={'list_id': 'ID of the list'}, parser=entries_parser)
     def get(self, list_id, session=None):
         """ Get entries by list ID """
+        try:
+            el.get_list_by_id(list_id=list_id, session=session)
+        except NoResultFound:
+            raise NotFoundError('list_id %d does not exist' % list_id)
+
         args = entries_parser.parse_args()
 
         # Pagination and sorting params
@@ -169,10 +174,6 @@ class EntryListEntriesAPI(APIResource):
             'session': session
         }
 
-        try:
-            el.get_list_by_id(list_id=list_id, session=session)
-        except NoResultFound:
-            raise NotFoundError('list_id %d does not exist' % list_id)
         total_items = el.get_entries_by_list_id(count=True, **kwargs)
 
         if not total_items:

@@ -134,12 +134,14 @@ class ObjectsContainer(object):
             'begin_episode': begin_object,
             'latest_downloaded_episode': latest_object,
             'in_tasks': {'type': 'array', 'items': {'type': 'string'}},
-            'lookup':
-                {'anyOf': [
-                    tvmaze.tvmaze_series_object,
-                    tvdb.tvdb_series_object
-                ]
-                },
+            'lookup': {
+                'type': 'object',
+                'properties': {
+                    'tvmaze': tvmaze.tvmaze_series_object,
+                    'tvdb': tvdb.tvdb_series_object
+                }
+            },
+
         },
         'required': ['series_id', 'series_name', 'alternate_names', 'begin_episode', 'latest_downloaded_episode',
                      'in_tasks']
@@ -148,16 +150,6 @@ class ObjectsContainer(object):
     series_list_schema = {'type': 'array', 'items': single_series_object}
 
     episode_list_schema = {'type': 'array', 'items': episode_object}
-
-    episode_schema = {
-        'type': 'object',
-        'properties': {
-            'episode': episode_object,
-            'series_id': {'type': 'integer'},
-            'series_name': {'type': 'string'}
-        },
-        'required': ['episode', 'series_id', 'series_name']
-    }
 
     series_edit_object = {
         'type': 'object',
@@ -213,7 +205,7 @@ series_input_schema = api.schema('series_input_schema', ObjectsContainer.series_
 show_details_schema = api.schema('show_details', ObjectsContainer.single_series_object)
 
 episode_list_schema = api.schema('episode_list', ObjectsContainer.episode_list_schema)
-episode_schema = api.schema('episode_item', ObjectsContainer.episode_schema)
+episode_schema = api.schema('episode_item', ObjectsContainer.episode_object)
 
 release_schema = api.schema('release_schema', ObjectsContainer.release_object)
 release_list_schema = api.schema('release_list_schema', ObjectsContainer.release_list_schema)
@@ -602,7 +594,7 @@ class SeriesReleasesAPI(APIResource):
 
         args = release_list_parser.parse_args()
         # Filter params
-        downloaded = args.get('downloaded') == True if args.get('downloaded') is not None else None
+        downloaded = args.get('downloaded')
 
         # Pagination and sorting params
         page = args['page']

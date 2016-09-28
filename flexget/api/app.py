@@ -428,8 +428,11 @@ def pagination_headers(total_pages, total_items, page_count, request):
 
     # Build constant variables from request data
     url = request.url_root + request.path.lstrip('/')
-    per_page = re.search('per_page=(\d+)', request.query_string).group(1)
-    page = int(re.search('page=(\d+)', request.query_string).group(1))
+    per_page_match = re.search('per_page=(\d+)', request.query_string)
+    per_page = per_page_match.group(1) if per_page_match else 50
+
+    page_match = re.search('page=(\d+)', request.query_string)
+    page = int(page_match.group(1)) if page_match else 1
 
     # Build the base template
     LINKTEMPLATE = '<{}?per_page={}&'.format(url, per_page)

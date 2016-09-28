@@ -48,7 +48,7 @@ class TestRejectedAPI(object):
         errors = schema_match(OC.rejected_entries_list_object, data)
         assert not errors
 
-        errors = schema_match(OC.rejected_entry_object, data['rejected_entries'][0])
+        errors = schema_match(OC.rejected_entry_object, data[0])
         assert not errors
 
         values = {
@@ -70,7 +70,7 @@ class TestRejectedAPI(object):
 
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.rejected_entry_object, data['rejected_entries'][0])
+        errors = schema_match(OC.rejected_entry_object, data[0])
         assert not errors
 
         rsp = api_client.delete('/rejected/')
