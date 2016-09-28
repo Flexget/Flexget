@@ -66,9 +66,7 @@ class APIEndpoint(object):
 
 
 def api_version(f):
-    """
-    Add the 'X-API-Version' header to all responses
-    """
+    """ Add the 'X-API-Version' header to all responses """
 
     @wraps(f)
     def wrapped(*args, **kwargs):
