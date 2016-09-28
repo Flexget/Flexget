@@ -13,7 +13,6 @@ from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.tools import parse_timedelta
 
-
 SCHEMA_VER = 3
 
 log = logging.getLogger('failed')
@@ -193,3 +192,15 @@ class PluginFailed(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginFailed, 'retry_failed', builtin=True, api_ver=2)
+
+
+def get_failures(count=None, start=None, stop=None, sort_by=None, descending=None):
+    with Session() as session:
+        query = session.query(FailedEntry)
+        if count:
+            return query.count()
+        if descending:
+            query = query.order_by(getattr(FailedEntry, sort_by).desc())
+        else:
+            query = query.order_by(getattr(FailedEntry, sort_by))
+        return query.slice(start, stop).all()

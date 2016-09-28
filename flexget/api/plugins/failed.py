@@ -2,13 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
+from math import ceil
 
-from flask import jsonify
+from flask import jsonify, request
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
-from flexget.api.app import base_message_schema, success_response, NotFoundError, etag
-from flexget.plugins.filter.retry_failed import FailedEntry
+from flexget.api.app import base_message_schema, success_response, NotFoundError, etag, pagination_headers
+from flexget.plugins.filter.retry_failed import FailedEntry, get_failures
 
 log = logging.getLogger('failed_api')
 
@@ -36,15 +37,70 @@ class ObjectsContainer(object):
 retry_failed_entry_schema = api.schema('retry_failed_entry_schema', ObjectsContainer.retry_failed_entry_object)
 retry_entries_list_schema = api.schema('retry_entries_list_schema', ObjectsContainer.retry_entries_list_object)
 
+sort_choices = ('failure_time', 'id', 'title', 'url', 'reason', 'count', 'retry_time')
+failed_parser = api.pagination_parser(sort_choices=sort_choices)
+
 
 @retry_failed_api.route('/')
 class RetryFailed(APIResource):
     @etag
     @api.response(200, model=retry_entries_list_schema)
+    @api.doc(parser=failed_parser)
     def get(self, session=None):
         """ List all failed entries """
-        failed_entries = [failed.to_dict() for failed in session.query(FailedEntry).all()]
-        return jsonify(failed_entries)
+        args = failed_parser.parse_args()
+
+        # Pagination and sorting params
+        page = args['page']
+        per_page = args['per_page']
+        sort_by = args['sort_by']
+        sort_order = args['order']
+
+        if sort_by == 'failure_time':
+            sort_by = 'tof'
+
+        # Handle max size limit
+        if per_page > 100:
+            per_page = 100
+
+        descending = bool(sort_order == 'desc')
+
+        # Handle max size limit
+        if per_page > 100:
+            per_page = 100
+
+        start = per_page * (page - 1)
+        stop = start + per_page
+
+        kwargs = {
+            'start': start,
+            'stop': stop,
+            'descending': descending,
+            'session': session
+        }
+
+        total_items = get_failures(count=True)
+
+        if not total_items:
+            return jsonify([])
+
+        failed_entries = [failed.to_dict() for failed in get_failures(**kwargs)]
+
+        total_pages = int(ceil(total_items / float(per_page)))
+
+        # Actual results in page
+        actual_size = min(per_page, len(failed_entries))
+
+        # Get pagination headers
+        pagination = pagination_headers(total_pages, total_items, actual_size, request)
+
+        # Created response
+        rsp = jsonify(failed_entries)
+
+        # Add link header to response
+        rsp.headers.extend(pagination)
+
+        return rsp
 
     @api.response(200, 'successfully deleted failed entry', model=base_message_schema)
     def delete(self, session=None):
