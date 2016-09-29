@@ -3,12 +3,13 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
-from flask import jsonify
+from flask import jsonify, request
+from math import ceil
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
-from flexget.api.app import base_message_schema, success_response, etag, NotFoundError
-from flexget.plugins.filter.remember_rejected import RememberEntry
+from flexget.api.app import base_message_schema, success_response, etag, NotFoundError, pagination_headers
+from flexget.plugins.filter.remember_rejected import RememberEntry, get_rejected
 
 log = logging.getLogger('rejected')
 
@@ -49,15 +50,72 @@ class ObjectsContainer(object):
 rejected_entry_schema = api.schema('rejected_failed_entry_schema', ObjectsContainer.rejected_entry_object)
 rejected_entries_list_schema = api.schema('rejected_entries_list_schema', ObjectsContainer.rejected_entries_list_object)
 
+sort_choices = ('added', 'id', 'title', 'url', 'expires', 'rejected_by', 'reason')
+rejected_parser = api.pagination_parser(sort_choices=sort_choices)
+
 
 @rejected_api.route('/')
 class Rejected(APIResource):
     @etag
+    @api.response(NotFoundError)
     @api.response(200, model=rejected_entries_list_schema)
+    @api.doc(parser=rejected_parser)
     def get(self, session=None):
         """ List all rejected entries """
-        entries = session.query(RememberEntry).all()
-        return jsonify([rejected_entry_to_dict(e) for e in entries])
+        args = rejected_parser.parse_args()
+
+        # Pagination and sorting params
+        page = args['page']
+        per_page = args['per_page']
+        sort_by = args['sort_by']
+        sort_order = args['order']
+
+        # Handle max size limit
+        if per_page > 100:
+            per_page = 100
+
+        descending = bool(sort_order == 'desc')
+
+        # Handle max size limit
+        if per_page > 100:
+            per_page = 100
+
+        start = per_page * (page - 1)
+        stop = start + per_page
+
+        kwargs = {
+            'start': start,
+            'stop': stop,
+            'descending': descending,
+            'sort_by': sort_by,
+            'session': session
+        }
+
+        total_items = get_rejected(session, count=True)
+
+        if not total_items:
+            return jsonify([])
+
+        failed_entries = [rejected_entry_to_dict(reject) for reject in get_rejected(**kwargs)]
+
+        total_pages = int(ceil(total_items / float(per_page)))
+
+        if page > total_pages:
+            raise NotFoundError('page %s does not exist' % page)
+
+        # Actual results in page
+        actual_size = min(per_page, len(failed_entries))
+
+        # Get pagination headers
+        pagination = pagination_headers(total_pages, total_items, actual_size, request)
+
+        # Created response
+        rsp = jsonify(failed_entries)
+
+        # Add link header to response
+        rsp.headers.extend(pagination)
+
+        return rsp
 
     @api.response(200, model=base_message_schema)
     def delete(self, session=None):

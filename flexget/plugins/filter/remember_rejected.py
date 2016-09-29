@@ -15,7 +15,6 @@ from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
 from flexget.utils.tools import parse_timedelta
 
-
 log = logging.getLogger('remember_rej')
 Base = db_schema.versioned_base('remember_rejected', 3)
 
@@ -165,3 +164,14 @@ def db_cleanup(manager, session):
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
+
+
+def get_rejected(session, count=None, start=None, stop=None, sort_by=None, descending=None):
+    query = session.query(RememberEntry)
+    if count:
+        return query.count()
+    if descending:
+        query = query.order_by(getattr(RememberEntry, sort_by).desc())
+    else:
+        query = query.order_by(getattr(RememberEntry, sort_by))
+    return query.slice(start, stop).all()

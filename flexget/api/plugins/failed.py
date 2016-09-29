@@ -44,6 +44,7 @@ failed_parser = api.pagination_parser(sort_choices=sort_choices)
 @retry_failed_api.route('/')
 class RetryFailed(APIResource):
     @etag
+    @api.response(NotFoundError)
     @api.response(200, model=retry_entries_list_schema)
     @api.doc(parser=failed_parser)
     def get(self, session=None):
@@ -88,6 +89,9 @@ class RetryFailed(APIResource):
         failed_entries = [failed.to_dict() for failed in get_failures(**kwargs)]
 
         total_pages = int(ceil(total_items / float(per_page)))
+
+        if page > total_pages:
+            raise NotFoundError('page %s does not exist' % page)
 
         # Actual results in page
         actual_size = min(per_page, len(failed_entries))
