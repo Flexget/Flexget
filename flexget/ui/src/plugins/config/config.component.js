@@ -37,11 +37,15 @@
         }
 
         function loadConfig() {
-            configService.getRawConfig().then(function (data) {
-                var encoded = data.raw_config;
-                vm.config = base64.decode(encoded);
-                saveOriginalConfig();
-            });
+            configService.getRawConfig()
+                .then(setConfig)
+                .cached(setConfig);
+        }
+
+        function setConfig(data) {
+            var encoded = data.raw_config;
+            vm.config = base64.decode(encoded);
+            saveOriginalConfig();
         }
 
         function saveOriginalConfig() {

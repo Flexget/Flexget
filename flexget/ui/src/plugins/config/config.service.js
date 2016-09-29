@@ -13,7 +13,7 @@
         };
 
         function getRawConfig() {
-            return $http.get('/api/server/raw_config')
+            return $http.get('/api/server/raw_config', { etagCache: true })
                 .then(getRawConfigComplete)
                 .catch(callFailed);
 
@@ -26,12 +26,7 @@
             return $http.post('/api/server/raw_config', {
                 'raw_config': encoded
             })
-                .then(saveRawConfigComplete)
                 .catch(saveRawConfigFailed);
-
-            function saveRawConfigComplete() {
-                return;
-            }
 
             function saveRawConfigFailed(response) {
                 return $q.reject(response.data);

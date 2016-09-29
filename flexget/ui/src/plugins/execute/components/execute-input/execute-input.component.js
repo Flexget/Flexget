@@ -10,19 +10,18 @@
             controller: executeInputController,
             bindings: {
                 running: '<',
-                execute: '<'
+                execute: '<',
+                tasks: '<'
             }
         });
 
     function executeInputController(executeService) {
         var vm = this;
 
-        vm.$onInit = activate;
         vm.searchTask = searchTask;
         vm.startExecute = startExecute;
 
         vm.searchTerm = '';
-        vm.tasks = [];
         vm.selectedTasks = [];
 
         var options = [
@@ -64,18 +63,6 @@
             }
         ];
         vm.options = options;
-
-        function activate() {
-            getTasks();
-        }
-
-        function getTasks() {
-            executeService.getTasks().then(function (data) {
-                for (var i = 0; i < data.tasks.length; i++) {
-                    vm.tasks.push(data.tasks[i].name);
-                }
-            });
-        }
 
         function searchTask() {
             var filter = function () {

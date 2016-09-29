@@ -13,24 +13,20 @@
             executeTasks: executeTasks
         };
 
-        function getTasks() {
-            return $http.get('/api/tasks/')
-                .then(getTasksComplete)
+        function getTasks(params) {
+            return $http.get('/api/tasks/', { params: params, etagCache: true })
+                .then(callCompleted)
                 .catch(callFailed);
-
-            function getTasksComplete(response) {
-                return response.data;
-            }
         }
 
         function getQueue() {
             return $http.get('/api/tasks/queue/', { ignoreLoadingBar: true })
-                .then(getQueueComplete)
+                .then(callCompleted)
                 .catch(callFailed);
+        }
 
-            function getQueueComplete(response) {
-                return response.data;
-            }
+        function callCompleted(response) {
+            return response.data;
         }
 
         function executeTasks(options) {

@@ -17,20 +17,39 @@
         vm.$onDestroy = destroy;
         vm.execute = execute;
         vm.stopStream = stopStream;
+        
         vm.streaming = false;
+        vm.tasks = [];
 
         var taskInterval;
 
         function activate() {
             getRunning();
+            getTasks();
 
             taskInterval = $interval(getRunning, 3000);
         }
 
         function getRunning() {
             executeService.getQueue().then(function (data) {
-                vm.running = data.tasks;
+                vm.running = data;
             });
+        }
+
+        function getTasks() {
+            var params = {
+                include_config: false
+            }
+
+            executeService.getTasks(params)
+                .then(setTasks)
+                .cached(setTasks);
+        }
+            
+        function setTasks(data) {
+            for (var i = 0; i < data.length; i++) {
+                vm.tasks.push(data[i]);
+            }
         }
 
         function execute(options, tasks) {
