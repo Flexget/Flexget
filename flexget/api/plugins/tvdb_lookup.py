@@ -121,6 +121,7 @@ episode_parser = api.parser()
 episode_parser.add_argument('season_number', type=int, help='Season number')
 episode_parser.add_argument('ep_number', type=int, help='Episode number')
 episode_parser.add_argument('absolute_number', type=int, help='Absolute episode number')
+episode_parser.add_argument('air_date', type=inputs.date, help='Episode airdate in `YYYY-mm-dd` format')
 
 
 @tvdb_api.route('/episode/<int:tvdb_id>/')
@@ -132,10 +133,13 @@ class TVDBEpisodeSearchAPI(APIResource):
     @api.response(BadRequest)
     def get(self, tvdb_id, session=None):
         args = episode_parser.parse_args()
+
         absolute_number = args.get('absolute_number')
         season_number = args.get('season_number')
         ep_number = args.get('ep_number')
-        if not ((season_number and ep_number) or absolute_number):
+        air_date = args.get('air_date')
+
+        if not ((season_number and ep_number) or absolute_number or air_date):
             raise BadRequest('not enough parameters for lookup. Either season and episode number or absolute number '
                              'are required.')
         kwargs = {'tvdb_id': tvdb_id,
@@ -146,6 +150,8 @@ class TVDBEpisodeSearchAPI(APIResource):
         if season_number and ep_number:
             kwargs['season_number'] = season_number
             kwargs['episode_number'] = ep_number
+        if air_date:
+            kwargs['first_aired'] = air_date
 
         try:
             episode = lookup_episode(**kwargs)
