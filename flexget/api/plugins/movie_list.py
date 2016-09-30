@@ -196,8 +196,14 @@ class MovieListMoviesAPI(APIResource):
             ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             raise NotFoundError('list_id %d does not exist' % list_id)
+
         total_items = ml.get_movies_by_list_id(count=True, **kwargs)
+
+        if not total_items:
+            return jsonify([])
+
         movies = [movie.to_dict() for movie in ml.get_movies_by_list_id(**kwargs)]
+
         total_pages = int(ceil(total_items / float(per_page)))
 
         if page > total_pages:
