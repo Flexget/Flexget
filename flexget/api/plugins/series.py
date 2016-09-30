@@ -277,6 +277,9 @@ class SeriesAPI(APIResource):
 
         total_items = series.get_series_summary(count=True, **kwargs)
 
+        if not total_items:
+            return jsonify([])
+
         converted_series_list = [get_series_details(show) for show in series.get_series_summary(**kwargs)]
 
         # Total number of pages
