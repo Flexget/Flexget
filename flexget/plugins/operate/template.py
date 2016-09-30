@@ -9,7 +9,8 @@ from sqlalchemy import Column, Integer, String, Unicode
 from flexget import options, plugin, db_schema
 from flexget.event import event
 from flexget.config_schema import register_config_key
-from flexget.utils.tools import MergeException, merge_dict_from_to, is_config_modified
+from flexget.manager import Session
+from flexget.utils.tools import MergeException, merge_dict_from_to
 
 log = logging.getLogger('template')
 Base = db_schema.versioned_base('template_hash', 0)
@@ -130,7 +131,11 @@ class PluginTemplate(object):
                                          (template, task.name, exc.value))
 
         # TODO: Better handling of config_modified flag for templates???
-        task.config_modified = is_config_modified(task, TemplateConfigHash)
+        with Session() as session:
+            last_hash = session.query(TemplateConfigHash).filter(TemplateConfigHash.task == task.name).first()
+            task.config_modified, config_hash = task.is_config_modified(last_hash)
+            if task.config_modified:
+                session.add(TemplateConfigHash(task=task.name, hash=config_hash))
 
         log.trace('templates: %s' % config)
 

@@ -22,7 +22,7 @@ from flexget.plugin import (
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
-from flexget.utils.tools import is_config_modified
+from flexget.utils.tools import get_config_hash
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
@@ -535,6 +535,32 @@ class Task(object):
         """
         self.config_modified = True
 
+    def is_config_modified(self, last_hash):
+        """
+        Checks the task's config hash. Returns True/False depending on config has been modified and the config hash
+
+        :param str last_hash:
+        :return bool, str: config modified and config hash
+        """
+        # Save current config hash and set config_modified flag
+        config_modified = False
+        config_hash = get_config_hash(self.config)
+        if self.is_rerun:
+            # Restore the config to state right after start phase
+            if self.prepared_config:
+                self.config = copy.deepcopy(self.prepared_config)
+            else:
+                log.error('BUG: No prepared_config on rerun, please report.')
+                config_modified = False
+        elif not last_hash:
+            config_modified = True
+        elif last_hash.hash != config_hash:
+            config_modified = True
+            last_hash.hash = config_hash
+        else:
+            config_modified = False
+        return config_modified, config_hash
+
     def _execute(self):
         """Executes the task without rerunning."""
         if not self.enabled:
@@ -555,7 +581,11 @@ class Task(object):
             self.disable_phase('input')
             self.all_entries.extend(copy.deepcopy(self.options.inject))
 
-        self.config_modified = is_config_modified(self, TaskConfigHash)
+        with Session() as session:
+            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
+            self.config_modified, config_hash = self.is_config_modified(last_hash)
+            if self.config_modified:
+                session.add(TaskConfigHash(task=self.name, hash=config_hash))
 
         # run phases
         try:

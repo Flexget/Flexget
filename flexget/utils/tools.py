@@ -20,7 +20,6 @@ from datetime import timedelta, datetime
 from pprint import pformat
 
 import flexget
-from flexget.manager import Session
 import queue
 import requests
 
@@ -472,28 +471,3 @@ def get_config_hash(config):
         return hashlib.md5(pformat(config).encode('utf-8')).hexdigest()
     else:
         return hashlib.md5(str(config).encode('utf-8')).hexdigest()
-
-
-def is_config_modified(task, table):
-    # Save current config hash and set config_modified flag
-    config_modified = False
-    with Session() as session:
-        config_hash = get_config_hash(task.config)
-        last_hash = session.query(table).filter(table.task == task.name).first()
-        if task.is_rerun:
-            # Restore the config to state right after start phase
-            if task.prepared_config:
-                task.config = copy.deepcopy(task.prepared_config)
-            else:
-                log.error('BUG: No prepared_config on rerun, please report.')
-                config_modified = False
-        elif not last_hash:
-            config_modified = True
-            last_hash = table(task=task.name, hash=config_hash)
-            session.add(last_hash)
-        elif last_hash.hash != config_hash:
-            config_modified = True
-            last_hash.hash = config_hash
-        else:
-            config_modified = False
-    return config_modified
