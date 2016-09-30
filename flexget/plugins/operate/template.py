@@ -114,7 +114,11 @@ class PluginTemplate(object):
                                          (template, task.name, exc.value))
 
         # TODO: Better handling of config_modified flag for templates???
-        task.is_config_modified()
+        config_modified = task.config_modified
+        task.set_config_modified()
+        # Have to make sure the config modified flag is not wrongly set to false
+        if config_modified and not task.config_modified:
+            task.config_changed()
         log.trace('templates: %s' % config)
 
 

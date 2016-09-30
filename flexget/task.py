@@ -537,7 +537,7 @@ class Task(object):
         self.config_modified = True
 
     def set_config_modified(self):
-        # Save current config hash and set config_modidied flag
+        # Save current config hash and set config_modified flag
         with Session() as session:
             config_hash = get_config_hash(self.config)
             last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
