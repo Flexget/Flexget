@@ -51,9 +51,13 @@
         }
 
         function getMovieLists() {
-            moviesService.getLists().then(function (data) {
-                vm.lists = data.movie_lists;
-            });
+            moviesService.getLists()
+                .then(setLists)
+                .cached(setLists);
+        }
+        
+        function setLists(data) {
+            vm.lists = data;
         }
 
         function deleteList($event, list) {

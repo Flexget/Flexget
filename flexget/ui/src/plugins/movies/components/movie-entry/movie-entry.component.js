@@ -28,15 +28,21 @@
                 year: vm.movie.year
             };
 
+            console.log(vm.movie);
+
             vm.movie.movies_list_ids.forEach(function (id) {
                 var newid = {};
                 newid[id.id_name] = id.id_value;
                 params = angular.extend(params, newid);
             });
 
-            moviesService.getMovieMetadata(vm.movie.title, params).then(function (data) {
-                vm.metadata = data;
-            });
+            moviesService.getMovieMetadata(vm.movie.title, params)
+                .then(setMetadata)
+                .cached(setMetadata);
+        }
+          
+        function setMetadata(data) {
+            vm.metadata = data;
         }
     }
 }());

@@ -29,15 +29,19 @@
                     vm.loading = true;
                     
                     updatePosition();
-                    searchMovies(val).then(function (data) {
-                        vm.foundMovies = data;
-                        
-                        vm.loading = false;
 
-                        updatePosition();
-                    });
+                    var lowercaseSearchText = angular.lowercase(val);
+                    moviesService.searchMovies(lowercaseSearchText)
+                        .then(setFoundMovies)
+                        .cached(setFoundMovies);
                 }
             }, 1000);
+        }
+
+        function setFoundMovies(data) {
+            vm.foundMovies = data;
+            vm.loading = false;
+            updatePosition();
         }
 
         function updatePosition() {

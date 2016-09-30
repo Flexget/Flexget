@@ -67,13 +67,12 @@
 
         function loadMovies() {
             moviesService.getListMovies(vm.list.id, options)
-                .then(function (data) {
-                    vm.movies = data.movies;
+                .then(setMovies)
+                .cached(setMovies);
+        }
 
-                    vm.currentPage = data.page;
-                    vm.totalMovies = data.total_number_of_movies;
-                    vm.pageSize = data.number_of_movies;
-                });
+        function setMovies(data) {
+            vm.movies = data;
         }
 
         function deleteMovie(list, movie) {
@@ -86,8 +85,7 @@
             $mdDialog.show(confirm).then(function () {
                 moviesService.deleteMovie(list.id, movie.id)
                     .then(function () {
-                        var index = vm.movies.indexOf(movie);
-                        vm.movies.splice(index, 1);
+                        loadMovies();
                     });
             });
         }
