@@ -32,6 +32,7 @@
                     ignoreAuthModule: true
                 })
                     .then(function () {
+                        isLoggedIn = true;
                         def.resolve();
                     }, function () {
                         def.reject();
