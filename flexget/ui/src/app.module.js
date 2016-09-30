@@ -8,7 +8,6 @@
             'ngMaterial',
             'ngMessages',
 
-            'angular-cache',
             'angular-loading-bar',
             'http-etag',
             
