@@ -536,7 +536,7 @@ class Task(object):
         """
         self.config_modified = True
 
-    def is_config_modified(self):
+    def set_config_modified(self):
         # Save current config hash and set config_modidied flag
         with Session() as session:
             config_hash = get_config_hash(self.config)
@@ -578,7 +578,7 @@ class Task(object):
             self.disable_phase('input')
             self.all_entries.extend(copy.deepcopy(self.options.inject))
 
-        self.is_config_modified()
+        self.set_config_modified()
 
         # run phases
         try:
