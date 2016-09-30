@@ -113,6 +113,8 @@ class PluginTemplate(object):
                 raise plugin.PluginError('Failed to merge template %s to task %s. Error: %s' %
                                          (template, task.name, exc.value))
 
+        # TODO: Better handling of config_modified flag for templates???
+        task.is_config_modified()
         log.trace('templates: %s' % config)
 
 
