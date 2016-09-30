@@ -4,12 +4,28 @@ from past.builtins import basestring
 
 import logging
 
-from flexget import options, plugin
+from sqlalchemy import Column, Integer, String, Unicode
+
+from flexget import options, plugin, db_schema
 from flexget.event import event
 from flexget.config_schema import register_config_key
-from flexget.utils.tools import MergeException, merge_dict_from_to
+from flexget.utils.tools import MergeException, merge_dict_from_to, is_config_modified
 
 log = logging.getLogger('template')
+Base = db_schema.versioned_base('template_hash', 0)
+
+
+class TemplateConfigHash(Base):
+    """Stores the config hash for tasks so that we can tell if the config has changed since last run."""
+
+    __tablename__ = 'template_config_hash'
+
+    id = Column(Integer, primary_key=True)
+    task = Column('name', Unicode, index=True, nullable=False)
+    hash = Column('hash', String)
+
+    def __repr__(self):
+        return '<TemplateConfigHash(task=%s,hash=%s)>' % (self.task, self.hash)
 
 
 class PluginTemplate(object):
@@ -114,10 +130,8 @@ class PluginTemplate(object):
                                          (template, task.name, exc.value))
 
         # TODO: Better handling of config_modified flag for templates???
-        config_modified = task.config_modified
-        task.set_config_modified()
-        # Have to make sure the config modified flag is not wrongly set to false
-        if config_modified and not task.config_modified:
+        config_modified = is_config_modified(task, TemplateConfigHash)
+        if not task.config_modified and config_modified:
             task.config_changed()
         log.trace('templates: %s' % config)
 

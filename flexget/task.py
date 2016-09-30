@@ -12,7 +12,6 @@ from functools import wraps, total_ordering
 from sqlalchemy import Column, Integer, String, Unicode
 
 from flexget import config_schema, db_schema
-from flexget.plugin import get_plugin_by_name
 from flexget.entry import EntryUnicodeError
 from flexget.event import event, fire_event
 from flexget.logger import capture_output
@@ -23,7 +22,7 @@ from flexget.plugin import (
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
-from flexget.utils.tools import get_config_hash
+from flexget.utils.tools import is_config_modified
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
@@ -536,28 +535,6 @@ class Task(object):
         """
         self.config_modified = True
 
-    def set_config_modified(self):
-        # Save current config hash and set config_modified flag
-        with Session() as session:
-            config_hash = get_config_hash(self.config)
-            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
-            if self.is_rerun:
-                # Restore the config to state right after start phase
-                if self.prepared_config:
-                    self.config = copy.deepcopy(self.prepared_config)
-                else:
-                    log.error('BUG: No prepared_config on rerun, please report.')
-                self.config_modified = False
-            elif not last_hash:
-                self.config_modified = True
-                last_hash = TaskConfigHash(task=self.name, hash=config_hash)
-                session.add(last_hash)
-            elif last_hash.hash != config_hash:
-                self.config_modified = True
-                last_hash.hash = config_hash
-            else:
-                self.config_modified = False
-
     def _execute(self):
         """Executes the task without rerunning."""
         if not self.enabled:
@@ -578,7 +555,7 @@ class Task(object):
             self.disable_phase('input')
             self.all_entries.extend(copy.deepcopy(self.options.inject))
 
-        self.set_config_modified()
+        self.config_modified = is_config_modified(self, TaskConfigHash)
 
         # run phases
         try:
