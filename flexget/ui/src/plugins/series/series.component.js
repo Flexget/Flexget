@@ -15,7 +15,7 @@
 
         var options = {
             page: 1,
-            'page_size': 10,
+            'per_page': 10,
             'in_config': 'all',
             'sort_by': 'show_name',
             'descending': false
@@ -38,19 +38,34 @@
         }
 
         function getSeriesList() {
-            seriesService.getShows(options).then(function (data) {
-                vm.series = data.shows;
+            seriesService.getShows(options)
+                .then(setSeries)
+                .cached(setSeries);
+        }
 
-                vm.currentPage = data.page;
-                vm.totalShows = data['total_number_of_shows'];
-                vm.pageSize = data['page_size'];
-            });
+        function search() {
+            vm.searchTerm ? searchShows() : emptySearch();
+
+            function searchShows() {
+                seriesService.searchShows(vm.searchTerm)
+                    .then(setSeries)
+                    .cached(setSeries);
+            }
+
+            function emptySearch() {
+                options.page = 1;
+                getSeriesList();
+            }
+        }
+
+        function setSeries(data) {
+            vm.series = data;
         }
 
         function forgetShow(show) {
             var confirm = $mdDialog.confirm()
                 .title('Confirm forgetting show.')
-                .htmlContent($sce.trustAsHtml('Are you sure you want to completely forget <b>' + show['show_name'] + '</b>?<br /> This will also forget all downloaded releases.'))
+                .htmlContent($sce.trustAsHtml('Are you sure you want to completely forget <b>' + show['series_name'] + '</b>?<br /> This will also forget all downloaded releases.'))
                 .ok('Forget')
                 .cancel('No');
 
@@ -69,20 +84,7 @@
         };
 
 
-        function search() {
-            vm.searchTerm ? searchShows() : emptySearch();
-
-            function searchShows() {
-                seriesService.searchShows(vm.searchTerm).then(function (data) {
-                    vm.series = data.shows;
-                });
-            }
-
-            function emptySearch() {
-                options.page = 1;
-                getSeriesList();
-            }
-        }
+        
 
         function toggleEpisodes(show) {
             show === vm.selectedShow ? clearShow() : setSelectedShow();

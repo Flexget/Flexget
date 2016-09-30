@@ -32,7 +32,7 @@
 
         var options = {
             page: 1,
-            'page_size': 10,
+            'per_page': 10,
             order: 'asc'
         };
 

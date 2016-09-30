@@ -1,7 +1,7 @@
 <md-list-item layout="row" layout-align="space-between" class="series-episode">
-    <h3 flex> {{ ::vm.episode.episode_identifier }} </h3>
+    <h3 flex> {{ ::vm.episode.identifier }} </h3>
 
-    <md-button ng-disabled="vm.episode.episode_number_of_releases == 0" ng-click="vm.showReleases()">
+    <md-button ng-disabled="vm.episode.number_of_releases == 0" ng-click="vm.showReleases()">
         Releases
     </md-button>
 

@@ -2,7 +2,7 @@
     <img ng-src="/api/cached/?url={{ ::vm.show.metadata.banner }}" class="md-card-image">
     <md-card-title flex="initial">
         <md-card-title-text>
-            <span class="md-headline">{{ ::vm.show.show_name }}
+            <span class="md-headline">{{ ::vm.show.series_name }}
                 <span class="rating">
                     <md-icon md-font-set="fa" md-font-icon="fa-star"></md-icon>
                     <span class="md-suhead">
@@ -11,9 +11,8 @@
                 </span>
             </span>
             <md-divider></md-divider>
-            <span class="md-subhead">Latest: {{ ::(vm.show.latest_downloaded_episode.episode_identifier ? vm.show.latest_downloaded_episode.episode_identifier : 'No episode downloaded') }}</span>
-            <span class="md-subhead second-subhead">Begin Episode: {{ (vm.show.begin_episode.episode_identifier ? vm.show.begin_episode.episode_identifier : 'No begin set')
-            }}</span>
+            <span class="md-subhead">Latest: {{ ::vm.show.latest_downloaded_episode.identifier || 'No episode downloaded' }}</span>
+            <span class="md-subhead second-subhead">Begin Episode: {{ vm.show.begin_episode.identifier || 'No begin set' }}</span>
             <md-divider></md-divider>
             <md-chips ng-model="vm.show.metadata.genres" readonly="true">
                 <md-chip-template>

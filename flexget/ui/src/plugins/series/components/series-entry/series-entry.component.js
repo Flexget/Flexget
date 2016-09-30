@@ -35,9 +35,12 @@
 
         function loadMetadata() {
             seriesService.getShowMetadata(vm.show)
-                .then(function (data) {
-                    vm.show.metadata = data;
-                });
+                .then(setMetadata)
+                .cached(setMetadata);
+        }
+
+        function setMetadata(data) {
+            vm.show.metadata = data;
         }
 
         function setBegin() {
@@ -47,7 +50,7 @@
 
             $mdDialog.show(dialog).then(function (begin) {
                 if (begin) {
-                    vm.show['begin_episode']['episode_identifier'] = begin;
+                    vm.show['begin_episode']['identifier'] = begin;
                 }
             });
         }
