@@ -500,7 +500,7 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         order_by = func.max(Release.first_seen)
     query = query.order_by(desc(order_by)) if descending else query.order_by(order_by)
 
-    return query
+    return query.slice(start, stop).from_self()
 
 
 def get_latest_episode(series):
