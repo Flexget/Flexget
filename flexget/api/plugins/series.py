@@ -50,62 +50,27 @@ def get_episode_details(episode):
     return episode_item
 
 
-def get_series_details(show):
-    latest_ep = series.get_latest_release(show)
-    begin_ep = show.begin
-
-    if begin_ep:
-        begin_ep_id = begin_ep.id
-        begin_ep_identifier = begin_ep.identifier
-    else:
-        begin_ep_id = begin_ep_identifier = None
-
-    begin = {
-        'id': begin_ep_id,
-        'identifier': begin_ep_identifier
+def series_details(serie, begin=None, latest=None):
+    series_dict = {
+        'id': serie.id,
+        'name': serie.name,
+        'alternate_names': [n.alt_name for n in serie.alternate_names],
+        'in_tasks': [_show.name for _show in serie.in_tasks]
     }
-
-    if latest_ep:
-        latest_ep_id = latest_ep.id
-        latest_ep_identifier = latest_ep.identifier
-        latest_ep_age = latest_ep.age
-        new_eps_after_latest_ep = series.new_eps_after(latest_ep)
-        release = get_release_details(
-            sorted(latest_ep.downloaded_releases,
-                   key=lambda rel: rel.first_seen if rel.downloaded else None, reverse=True)[0])
-    else:
-        latest_ep_id = latest_ep_identifier = latest_ep_age = new_eps_after_latest_ep = release = None
-
-    latest = {
-        'episode_id': latest_ep_id,
-        'episode_identifier': latest_ep_identifier,
-        'episode_age': latest_ep_age,
-        'number_of_episodes_behind': new_eps_after_latest_ep,
-        'last_downloaded_release': release
-    }
-
-    show_item = {
-        'series_id': show.id,
-        'series_name': show.name,
-        'alternate_names': [n.alt_name for n in show.alternate_names],
-        'begin_episode': begin,
-        'latest_downloaded_episode': latest,
-        'in_tasks': [_show.name for _show in show.in_tasks]
-    }
-    return show_item
+    if begin:
+        series_dict['begin_episode'] = get_episode_details(serie.begin) if serie.begin else None
+    if latest:
+        latest_ep = series.get_latest_release(serie)
+        series_dict['latest_episode'] = get_episode_details(latest_ep) if latest_ep else None
+        if latest_ep:
+            latest_release = get_release_details(
+                sorted(latest_ep.downloaded_releases,
+                       key=lambda rel: rel.first_seen if rel.downloaded else None, reverse=True)[0])
+            series_dict['latest_episode']['latest_release'] = latest_release
+    return series_dict
 
 
 class ObjectsContainer(object):
-    begin_object = {
-        'type': 'object',
-        'properties': {
-            'id': {'type': ['integer', 'null']},
-            'identifier': {'type': ['string', 'null']}
-        },
-        'required': ['id', 'identifier']
-
-    }
-
     release_object = {
         'type': 'object',
         'properties': {
@@ -122,20 +87,6 @@ class ObjectsContainer(object):
 
     release_list_schema = {'type': 'array', 'items': release_object}
 
-    latest_object = {
-        'type': 'object',
-        'properties': {
-            'episode_id': {'type': ['integer', 'null']},
-            'episode_identifier': {'type': ['string', 'null']},
-            'episode_age': {'type': ['string', 'null']},
-            'number_of_episodes_behind': {'type': ['integer', 'null']},
-            'downloaded_releases': {
-                'type': 'array',
-                'items': release_object
-            }
-        }
-    }
-
     episode_object = {
         'type': 'object',
         'properties': {
@@ -147,7 +98,8 @@ class ObjectsContainer(object):
             "number": {'type': 'integer'},
             "season": {'type': 'integer'},
             "series_id": {'type': 'integer'},
-            "number_of_releases": {'type': 'integer'}
+            "number_of_releases": {'type': 'integer'},
+            'latest_release': release_object
         },
         'required': ['first_seen', 'id', 'identified_by', 'identifier', 'premiere_type', 'number', 'season',
                      'series_id', 'number_of_releases']
@@ -159,8 +111,6 @@ class ObjectsContainer(object):
             'series_id': {'type': 'integer'},
             'series_name': {'type': 'string'},
             'alternate_names': {'type': 'array', 'items': {'type': 'string'}},
-            'begin_episode': begin_object,
-            'latest_downloaded_episode': latest_object,
             'in_tasks': {'type': 'array', 'items': {'type': 'string'}},
             'lookup': {
                 'type': 'object',
@@ -169,7 +119,8 @@ class ObjectsContainer(object):
                     'tvdb': tvdb.tvdb_series_object
                 }
             },
-
+            'latest': episode_object,
+            'begin': episode_object
         },
         'required': ['series_id', 'series_name', 'alternate_names', 'begin_episode', 'latest_downloaded_episode',
                      'in_tasks']
@@ -210,8 +161,13 @@ episode_schema = api.schema('episode_item', ObjectsContainer.episode_object)
 release_schema = api.schema('release_schema', ObjectsContainer.release_object)
 release_list_schema = api.schema('release_list_schema', ObjectsContainer.release_list_schema)
 
+base_series_parser = api.parser()
+base_series_parser.add_argument('begin', type=inputs.boolean, default=True, help='Show series begin episode')
+base_series_parser.add_argument('latest', type=inputs.boolean, default=True,
+                                help='Show series latest downloaded episode and release')
+
 sort_choices = ('show_name', 'last_download_date')
-series_list_parser = api.pagination_parser(sort_choices=sort_choices)
+series_list_parser = api.pagination_parser(base_series_parser, sort_choices=sort_choices)
 series_list_parser.add_argument('in_config', choices=('configured', 'unconfigured', 'all'), default='configured',
                                 help="Filter list if shows are currently in configuration.")
 series_list_parser.add_argument('premieres', type=inputs.boolean, default=False,
@@ -253,8 +209,10 @@ class SeriesAPI(APIResource):
 
         descending = bool(sort_order == 'desc')
 
-        # Lookup param
+        # Data params
         lookup = args.get('lookup')
+        begin = args.get('begin')
+        latest = args.get('latest')
 
         # Handle max size limit
         if per_page > 100:
@@ -280,7 +238,10 @@ class SeriesAPI(APIResource):
         if not total_items:
             return jsonify([])
 
-        converted_series_list = [get_series_details(show) for show in series.get_series_summary(**kwargs)]
+        series_list = []
+        for s in series.get_series_summary(**kwargs):
+            series_object = series_details(s, begin, latest)
+            series_list.append(series_object)
 
         # Total number of pages
         total_pages = int(ceil(total_items / float(per_page)))
@@ -289,25 +250,25 @@ class SeriesAPI(APIResource):
             raise NotFoundError('page %s does not exist' % page)
 
         # Actual results in page
-        actual_size = min(per_page, len(converted_series_list))
+        actual_size = min(per_page, len(series_list))
 
         # Do relevant lookups
         if lookup:
             api_client = APIClient()
             for endpoint in lookup:
                 base_url = '/%s/series/' % endpoint
-                for show in converted_series_list:
-                    pos = converted_series_list.index(show)
-                    converted_series_list[pos].setdefault('lookup', {})
+                for show in series_list:
+                    pos = series_list.index(show)
+                    series_list[pos].setdefault('lookup', {})
                     url = base_url + show['series_name'] + '/'
                     result = api_client.get_endpoint(url)
-                    converted_series_list[pos]['lookup'].update({endpoint: result})
+                    series_list[pos]['lookup'].update({endpoint: result})
 
         # Get pagination headers
         pagination = pagination_headers(total_pages, total_items, actual_size, request)
 
         # Created response
-        rsp = jsonify(converted_series_list)
+        rsp = jsonify(series_list)
 
         # Add link header to response
         rsp.headers.extend(pagination)
@@ -339,7 +300,7 @@ class SeriesAPI(APIResource):
             except PluginError as e:
                 # Alternate name already exist for a different show
                 raise CannotAddResource(e.value)
-        rsp = jsonify(get_series_details(show))
+        rsp = jsonify(series_details(show, begin=ep_id is not None))
         rsp.status_code = 201
         return rsp
 
@@ -349,15 +310,19 @@ class SeriesAPI(APIResource):
 class SeriesGetShowsAPI(APIResource):
     @etag
     @api.response(200, 'Show list retrieved successfully', series_list_schema)
-    @api.doc(params={'name': 'Name of the show(s) to search'})
+    @api.doc(params={'name': 'Name of the show(s) to search'}, parser=base_series_parser)
     def get(self, name, session):
         """ List of shows matching lookup name """
         name = series.normalize_series_name(name)
         matches = series.shows_by_name(name, session=session)
 
+        args = series_list_parser.parse_args()
+        begin = args.get('begin')
+        latest = args.get('latest')
+
         shows = []
         for match in matches:
-            shows.append(get_series_details(match))
+            shows.append(series_details(match, begin, latest))
 
         return jsonify(shows)
 
@@ -374,16 +339,19 @@ delete_parser.add_argument('forget', type=inputs.boolean, default=False,
 class SeriesShowAPI(APIResource):
     @etag
     @api.response(200, 'Show information retrieved successfully', show_details_schema)
-    @api.doc(description='Get a specific show using its ID')
+    @api.doc(description='Get a specific show using its ID', parser=base_series_parser)
     def get(self, show_id, session):
         """ Get show details by ID """
         try:
             show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             raise NotFoundError('Show with ID %s not found' % show_id)
-        show = get_series_details(show)
 
-        return jsonify(show)
+        args = series_list_parser.parse_args()
+        begin = args.get('begin')
+        latest = args.get('latest')
+
+        return jsonify(series_details(show, begin, latest))
 
     @api.response(200, 'Removed series from DB', model=base_message_schema)
     @api.doc(description='Delete a specific show using its ID',
@@ -423,7 +391,7 @@ class SeriesShowAPI(APIResource):
             except PluginError as e:
                 # Alternate name already exist for a different show
                 raise CannotAddResource(e.value)
-        return jsonify(get_series_details(show))
+        return jsonify(series_details(show))
 
 
 episode_parser = api.pagination_parser(add_sort=True)
