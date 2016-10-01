@@ -69,7 +69,7 @@ class UrlRewriteSerienjunkies(object):
         self.config.setdefault('hoster', DEFAULT_HOSTER)
         self.config.setdefault('language', DEFAULT_LANGUAGE)
 
-        download_urls = self.parse_downloads(series_url, search_title)
+        download_urls = self.parse_downloads(task, series_url, search_title)
         if not download_urls:
             entry.reject('No Episode found')
         else:
@@ -82,8 +82,8 @@ class UrlRewriteSerienjunkies(object):
         log.debug('Download URL: %s', download_urls)
 
     @plugin.internet(log)
-    def parse_downloads(self, series_url, search_title):
-        page = requests.get(series_url).content
+    def parse_downloads(self, task, series_url, search_title):
+        page = task.requests.get(series_url).content
         try:
             soup = get_soup(page)
         except Exception as e:
