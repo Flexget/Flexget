@@ -56,7 +56,7 @@
         function deleteEpisode(episode) {
             var confirm = $mdDialog.confirm()
                 .title('Confirm forgetting episode.')
-                .htmlContent($sce.trustAsHtml('Are you sure you want to forget episode <b>' + episode.identifier + '</b> from show <b>' + vm.show['series_name'] + '</b>?<br /> This also removes all downloaded releases for this episode!'))
+                .htmlContent($sce.trustAsHtml('Are you sure you want to forget episode <b>' + episode.identifier + '</b> from show <b>' + vm.show.name + '</b>?<br /> This also removes all downloaded releases for this episode!'))
                 .ok('Forget')
                 .cancel('No');
 

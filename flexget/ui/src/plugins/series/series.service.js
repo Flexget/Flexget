@@ -34,13 +34,13 @@
 
 
         function getShowMetadata(show) {
-            return $http.get('/api/tvdb/series/' + show.series_name + '/', { etagCache: true })
+            return $http.get('/api/tvdb/series/' + show.name + '/', { etagCache: true })
                 .then(callComplete)
                 .catch(callFailed);
         }
 
         function deleteShow(show, params) {
-            return $http.delete('/api/series/' + show.series_id + '/',
+            return $http.delete('/api/series/' + show.id + '/',
                 {
                     params: params
                 })
@@ -49,7 +49,7 @@
 
         //TODO: Test
         function updateShow(show, params) {
-            return $http.put('/api/series/' + show.series_id + '/', params)
+            return $http.put('/api/series/' + show.id + '/', params)
                 .then(callComplete)
                 .catch(callFailed);
         }
@@ -61,31 +61,31 @@
         }
 
         function getEpisodes(show, params) {
-            return $http.get('/api/series/' + show.series_id + '/episodes/', { params: params, etagCache: true })
+            return $http.get('/api/series/' + show.id + '/episodes/', { params: params, etagCache: true })
                 .then(callComplete)
                 .catch(callFailed);
         }
 
         function deleteEpisode(show, episode, params) {
-            return $http.delete('/api/series/' + show.series_id + '/episodes/' + episode.id + '/', { params: params })
+            return $http.delete('/api/series/' + show.id + '/episodes/' + episode.id + '/', { params: params })
                 .then(callComplete)
                 .catch(callFailed);
         }
 
         function resetReleases(show, episode) {
-            return $http.put('/api/series/' + show.series_id + '/episodes/' + episode.id + '/releases/')
+            return $http.put('/api/series/' + show.id + '/episodes/' + episode.id + '/releases/')
                 .then(callComplete)
                 .catch(callFailed);
         }
 
         function forgetRelease(show, episode, release, params) {
-            return $http.delete('/api/series/' + show.series_id + '/episodes/' + episode.id + '/releases/' + release.id + '/', { params: params })
+            return $http.delete('/api/series/' + show.id + '/episodes/' + episode.id + '/releases/' + release.id + '/', { params: params })
                 .then(callComplete)
                 .catch(callFailed);
         }
 
         function resetRelease(show, episode, release) {
-            return $http.put('/api/series/' + show.series_id + '/episodes/' + episode.id + '/releases/' + release.id + '/')
+            return $http.put('/api/series/' + show.id + '/episodes/' + episode.id + '/releases/' + release.id + '/')
                 .then(resetReleaseComplete)
                 .catch(callFailed);
 
@@ -95,7 +95,7 @@
         }
 
         function deleteReleases(show, episode, params) {
-            return $http.delete('/api/series/' + show.series_id + '/episodes/' + episode.id + '/releases/', { params: params })
+            return $http.delete('/api/series/' + show.id + '/episodes/' + episode.id + '/releases/', { params: params })
                 .then(deleteReleasesComplete)
                 .catch(callFailed);
 
@@ -106,7 +106,7 @@
 
         function loadReleases(show, episode) {
             console.log(show, episode);
-            return $http.get('/api/series/' + show.series_id + '/episodes/' + episode.id + '/releases/', { etagCache: true })
+            return $http.get('/api/series/' + show.id + '/episodes/' + episode.id + '/releases/', { etagCache: true })
                 .then(callComplete)
                 .catch(callFailed);
         }

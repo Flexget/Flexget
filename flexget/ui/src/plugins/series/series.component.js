@@ -65,7 +65,7 @@
         function forgetShow(show) {
             var confirm = $mdDialog.confirm()
                 .title('Confirm forgetting show.')
-                .htmlContent($sce.trustAsHtml('Are you sure you want to completely forget <b>' + show['series_name'] + '</b>?<br /> This will also forget all downloaded releases.'))
+                .htmlContent($sce.trustAsHtml('Are you sure you want to completely forget <b>' + show.name + '</b>?<br /> This will also forget all downloaded releases.'))
                 .ok('Forget')
                 .cancel('No');
 
