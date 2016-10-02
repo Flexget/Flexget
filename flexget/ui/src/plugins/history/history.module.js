@@ -7,6 +7,10 @@
             'http-etag',
             'angular.filter',
 
+            'ig.linkHeaderParser',
+
+            'components.pagination',
+
             'blocks.exception',
             'blocks.router'
         ]);

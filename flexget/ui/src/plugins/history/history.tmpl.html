@@ -1,4 +1,5 @@
-<md-content flex>
+<div layout="column" flex>
+    <md-content flex>
     <md-input-container>
         <label>Search</label>
         <input ng-model="vm.taskName" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }">
@@ -17,4 +18,6 @@
             </md-list-item>
         </md-list>
     </section>
+</md-content>
+<fg-pagination load-data="vm.loadData(page)" links="vm.headers"></fg-pagination>
 </div>

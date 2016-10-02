@@ -1,0 +1,12 @@
+<section layout="row" layout-align="center-center" class="pagination-group">
+    <md-button class="md-raised left" ng-disabled="!vm.links.first"><<</md-button>
+    <md-button class="md-raised middle" ng-disabled="!vm.links.prev" ng-click="vm.setPage(vm.links.prev.page)"><</md-button>
+    
+    <!-- TODO: range -->
+    <md-button class="md-raised middle">-1</md-button>
+    <md-button class="md-raised middle">0</md-button>
+    <md-button class="md-raised middle">1</md-button>
+
+    <md-button class="md-raised middle" ng-disabled="!vm.links.next" ng-click="vm.setPage(vm.links.next.page)">></md-button>
+    <md-button class="md-raised right" ng-disabled="!vm.links.last" ng-click="vm.setPage(vm.links.last.page)">>></md-button>
+</section>

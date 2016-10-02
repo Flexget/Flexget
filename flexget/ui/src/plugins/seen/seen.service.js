@@ -6,7 +6,7 @@
         .module('plugins.seen')
         .factory('seenService', seenService);
 
-    function seenService($http, $q, exception) {
+    function seenService($http, exception) {
         return {
             getSeen: getSeen,
             deleteEntryById: deleteEntryById

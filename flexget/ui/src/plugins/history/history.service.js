@@ -12,8 +12,8 @@
             getHistoryForTask: getHistoryForTask
         };
 
-        function getHistory() {
-            return $http.get('/api/history/', { etagCache: true })
+        function getHistory(options) {
+            return $http.get('/api/history/', { params: options, etagCache: true })
                 .then(callComplete)
                 .catch(callFailed);
         }
@@ -24,8 +24,12 @@
                 .catch(callFailed);
         }
                 
-        function callComplete(response) {
-            return response.data;
+        function callComplete(response, itemCache) {
+            var values = {
+                data: response.data,
+                headers: response.headers()
+            }
+            return values;
         }
         
         function callFailed(error) {
