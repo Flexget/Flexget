@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from dateutil import parser
 from future.utils import native
@@ -10,6 +10,7 @@ from requests.exceptions import RequestException
 from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, Table, or_, \
     and_
 from sqlalchemy.orm import relation
+from sqlalchemy.orm.exc import MultipleResultsFound
 
 from flexget import db_schema, plugin
 from flexget.event import event
@@ -444,14 +445,27 @@ class APITVMaze(object):
                                                                                       series.tvmaze_id))
             tvmaze_episode = get_episode(series.tvmaze_id, season=season_number, number=episode_number)
         # See if episode exists in DB
-        episode = session.query(TVMazeEpisodes).filter(
-            or_(TVMazeEpisodes.tvmaze_id == tvmaze_episode['id'],
+        try:
+            episode = session.query(TVMazeEpisodes).filter(
+                or_(TVMazeEpisodes.tvmaze_id == tvmaze_episode['id'],
+                    and_(
+                        TVMazeEpisodes.number == tvmaze_episode['number'],
+                        TVMazeEpisodes.season_number == tvmaze_episode['season'],
+                        TVMazeEpisodes.series_id == series.tvmaze_id)
+                    )
+            ).one_or_none()
+        except MultipleResultsFound:
+            # TVMaze must have fucked up and now we have to clean up that mess. Delete any row for this season
+            # that hasn't been updated in the last hour. Can't trust any of the cached data, but deleting new data
+            # might have some unintended consequences.
+            log.warning('Episode lookup in cache returned multiple results. Deleting the cached data.')
+            deleted_rows = session.query(TVMazeEpisodes).filter(
                 and_(
-                    TVMazeEpisodes.number == tvmaze_episode['number'],
                     TVMazeEpisodes.season_number == tvmaze_episode['season'],
                     TVMazeEpisodes.series_id == series.tvmaze_id)
-                )
-        ).one_or_none()
+            ).filter(TVMazeEpisodes.last_update <= datetime.now() - timedelta(hours=1)).delete()
+            log.debug('Deleted %s rows', deleted_rows)
+            episode = None
 
         if episode:
             log.debug('found expired episode {0} in cache, refreshing data.'.format(episode.tvmaze_id))
