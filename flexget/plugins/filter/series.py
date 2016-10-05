@@ -438,6 +438,17 @@ class Release(Base):
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'downloaded': self.downloaded,
+            'quality': self.quality.name,
+            'proper_count': self.proper_count,
+            'first_seen': self.first_seen,
+            'episode_id': self.episode_id,
+        }
+
 
 class SeriesTask(Base):
     __tablename__ = 'series_tasks'

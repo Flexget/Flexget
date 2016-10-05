@@ -22,19 +22,6 @@ from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
 series_api = api.namespace('series', description='Flexget Series operations')
 
 
-def get_release_details(release):
-    release_item = {
-        'id': release.id,
-        'title': release.title,
-        'downloaded': release.downloaded,
-        'quality': release.quality.name,
-        'proper_count': release.proper_count,
-        'first_seen': release.first_seen,
-        'episode_id': release.episode_id,
-    }
-    return release_item
-
-
 def series_details(serie, begin=None, latest=None):
     series_dict = {
         'id': serie.id,
@@ -48,9 +35,9 @@ def series_details(serie, begin=None, latest=None):
         latest_ep = series.get_latest_release(serie)
         series_dict['latest_episode'] = latest_ep.to_dict() if latest_ep else None
         if latest_ep:
-            latest_release = get_release_details(
-                sorted(latest_ep.downloaded_releases,
-                       key=lambda rel: rel.first_seen if rel.downloaded else None, reverse=True)[0])
+            latest_release = \
+                sorted(latest_ep.downloaded_releases, key=lambda rel: rel.first_seen if rel.downloaded else None,
+                       reverse=True)[0].to_dict()
             series_dict['latest_episode']['latest_release'] = latest_release
     return series_dict
 
@@ -581,7 +568,7 @@ class SeriesReleasesAPI(APIResource):
         total_items = series.get_releases(count=True, **kwargs)
 
         # Release items
-        release_items = [get_release_details(release) for release in series.get_releases(**kwargs)]
+        release_items = [release.to_dict() for release in series.get_releases(**kwargs)]
 
         # Total number of pages
         total_pages = int(ceil(total_items / float(per_page)))
@@ -686,7 +673,7 @@ class SeriesReleaseAPI(APIResource):
         if not series.release_in_episode(ep_id, rel_id):
             raise BadRequest('release id %s does not belong to episode %s' % (rel_id, ep_id))
 
-        rsp = jsonify(get_release_details(release))
+        rsp = jsonify(release.to_dict())
         rsp.headers.extend({
             'Series-ID': show_id,
             'Episode-ID': ep_id
@@ -746,7 +733,7 @@ class SeriesReleaseAPI(APIResource):
             raise BadRequest('release with id %s is not set as downloaded' % rel_id)
         release.downloaded = False
 
-        rsp = jsonify(get_release_details(release))
+        rsp = jsonify(release.to_dict())
         rsp.headers.extend({
             'Series-ID': show_id,
             'Episode-ID': ep_id
