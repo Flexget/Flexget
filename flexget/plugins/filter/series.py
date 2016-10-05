@@ -363,6 +363,16 @@ class Episode(Base):
     def downloaded_releases(self):
         return [release for release in self.releases if release.downloaded]
 
+    @property
+    def latest_release(self):
+        """
+        :return: Latest downloaded Release or None
+        """
+        if not self.releases:
+            return None
+        return \
+        sorted(self.downloaded_releases, key=lambda rel: rel.first_seen if rel.downloaded else None, reverse=True)[0]
+
     def __str__(self):
         return '<Episode(id=%s,identifier=%s,season=%s,number=%s)>' % \
                (self.id, self.identifier, self.season, self.number)

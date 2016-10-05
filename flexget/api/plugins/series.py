@@ -35,10 +35,7 @@ def series_details(serie, begin=None, latest=None):
         latest_ep = series.get_latest_release(serie)
         series_dict['latest_episode'] = latest_ep.to_dict() if latest_ep else None
         if latest_ep:
-            latest_release = \
-                sorted(latest_ep.downloaded_releases, key=lambda rel: rel.first_seen if rel.downloaded else None,
-                       reverse=True)[0].to_dict()
-            series_dict['latest_episode']['latest_release'] = latest_release
+            series_dict['latest_episode']['latest_release'] = latest_ep.latest_release.to_dict()
     return series_dict
 
 
