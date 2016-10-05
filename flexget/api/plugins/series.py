@@ -22,17 +22,17 @@ from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
 series_api = api.namespace('series', description='Flexget Series operations')
 
 
-def series_details(serie, begin=None, latest=None):
+def series_details(show, begin=False, latest=False):
     series_dict = {
-        'id': serie.id,
-        'name': serie.name,
-        'alternate_names': [n.alt_name for n in serie.alternate_names],
-        'in_tasks': [_show.name for _show in serie.in_tasks]
+        'id': show.id,
+        'name': show.name,
+        'alternate_names': [n.alt_name for n in show.alternate_names],
+        'in_tasks': [_show.name for _show in show.in_tasks]
     }
     if begin:
-        series_dict['begin_episode'] = serie.begin.to_dict() if serie.begin else None
+        series_dict['begin_episode'] = show.begin.to_dict() if show.begin else None
     if latest:
-        latest_ep = series.get_latest_release(serie)
+        latest_ep = series.get_latest_release(show)
         series_dict['latest_episode'] = latest_ep.to_dict() if latest_ep else None
         if latest_ep:
             series_dict['latest_episode']['latest_release'] = latest_ep.latest_release.to_dict()
@@ -214,7 +214,7 @@ class SeriesAPI(APIResource):
         # Total number of pages
         total_pages = int(ceil(total_items / float(per_page)))
 
-        if page > total_pages and total_pages != 0:
+        if total_pages < page and total_pages != 0:
             raise NotFoundError('page %s does not exist' % page)
 
         # Actual results in page
@@ -412,7 +412,7 @@ class SeriesEpisodesAPI(APIResource):
 
         total_pages = int(ceil(total_items / float(per_page)))
 
-        if page > total_pages and total_pages != 0:
+        if total_pages < page and total_pages != 0:
             raise NotFoundError('page %s does not exist' % page)
 
         # Actual results in page
@@ -458,7 +458,7 @@ class SeriesEpisodeAPI(APIResource):
     def get(self, show_id, ep_id, session):
         """ Get episode by show ID and episode ID"""
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
         try:
@@ -570,7 +570,7 @@ class SeriesReleasesAPI(APIResource):
         # Total number of pages
         total_pages = int(ceil(total_items / float(per_page)))
 
-        if page > total_pages and total_pages != 0:
+        if total_pages < page and total_pages != 0:
             raise NotFoundError('page %s does not exist' % page)
 
         # Actual results in page
@@ -607,7 +607,7 @@ class SeriesReleasesAPI(APIResource):
             raise BadRequest('episode with id %s does not belong to show %s' % (ep_id, show_id))
 
         args = release_delete_parser.parse_args()
-        downloaded = args.get('downloaded') == True if args.get('downloaded') is not None else None
+        downloaded = args.get('downloaded') is True if args.get('downloaded') is not None else None
         release_items = []
         for release in episode.releases:
             if downloaded and release.downloaded or downloaded is False and not release.downloaded or not downloaded:
@@ -652,9 +652,9 @@ class SeriesReleaseAPI(APIResource):
     @api.response(200, 'Release retrieved successfully for episode', release_schema)
     @api.doc(description='Get a specific downloaded release for a specific episode of a specific show')
     def get(self, show_id, ep_id, rel_id, session):
-        ''' Get episode release by show ID, episode ID and release ID '''
+        """ Get episode release by show ID, episode ID and release ID """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
         try:
@@ -681,7 +681,7 @@ class SeriesReleaseAPI(APIResource):
     @api.doc(description='Delete a specific releases for a specific episode of a specific show.',
              parser=delete_parser)
     def delete(self, show_id, ep_id, rel_id, session):
-        ''' Delete episode release by show ID, episode ID and release ID '''
+        """ Delete episode release by show ID, episode ID and release ID """
         try:
             series.show_by_id(show_id, session=session)
         except NoResultFound:
@@ -710,7 +710,7 @@ class SeriesReleaseAPI(APIResource):
     def put(self, show_id, ep_id, rel_id, session):
         """ Resets a downloaded release status """
         try:
-            show = series.show_by_id(show_id, session=session)
+            series.show_by_id(show_id, session=session)
         except NoResultFound:
             raise NotFoundError('show with ID %s not found' % show_id)
         try:
