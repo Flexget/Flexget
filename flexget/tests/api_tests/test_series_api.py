@@ -48,7 +48,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.single_series_object, show)
         assert not errors
 
-        assert show['series_name'] == 'test series'
+        assert show['name'] == 'test series'
 
     def test_series_configured_param(self, api_client, schema_match):
         with Session() as session:
@@ -79,7 +79,7 @@ class TestSeriesRootAPI(object):
         assert not errors
 
         assert len(data) == 1
-        assert show['series_name'] == 'test series'
+        assert show['name'] == 'test series'
 
         # Add a configured series
         with Session() as session:
@@ -103,7 +103,7 @@ class TestSeriesRootAPI(object):
         assert not errors
 
         assert len(data) == 1
-        assert show['series_name'] == 'test series 2'
+        assert show['name'] == 'test series 2'
 
         # Get all series
         rsp = api_client.get('/series/?in_config=all')
@@ -345,7 +345,7 @@ class TestSeriesRootAPI(object):
             assert not errors
 
     def test_series_post(self, api_client, schema_match):
-        payload = {'series_name': 'test series'}
+        payload = {'name': 'test series'}
 
         # Minimal payload
         rsp = api_client.json_post('/series/', data=json.dumps(payload))
@@ -363,7 +363,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-        payload2 = {'series_name': 'test series 2',
+        payload2 = {'name': 'test series 2',
                     'begin_episode': 'bla'}
 
         # Invalid begin episode
@@ -374,7 +374,7 @@ class TestSeriesRootAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-        payload3 = {'series_name': 'test series 2',
+        payload3 = {'name': 'test series 2',
                     'begin_episode': 's01e01',
                     'alternate_names': [
                         'show1', 'show2'
@@ -388,11 +388,11 @@ class TestSeriesRootAPI(object):
         errors = schema_match(OC.single_series_object, data)
         assert not errors
 
-        assert data['series_name'] == payload3['series_name']
+        assert data['name'] == payload3['name']
         assert data['alternate_names'] == payload3['alternate_names']
         assert data['begin_episode']['identifier'].lower() == payload3['begin_episode']
 
-        payload4 = {'series_name': 'test series 3',
+        payload4 = {'name': 'test series 3',
                     'alternate_names': ['show1']}
 
         # Alternate name already added to different show
@@ -465,7 +465,7 @@ class TestSeriesSingleAPI(object):
         errors = schema_match(OC.single_series_object, data)
         assert not errors
 
-        assert data['series_name'] == 'test series1'
+        assert data['name'] == 'test series1'
 
         # No existing ID
         rsp = api_client.get('/series/10/')
@@ -676,7 +676,7 @@ class TestSeriesEpisodeAPI(object):
         assert data['identified_by'] == 'ep'
         assert data['season'] == 1
         assert data['number'] == 1
-        assert data['premiere_type'] == 'Series Premiere'
+        assert data['premiere'] == 'Series Premiere'
 
         # No series ID
         rsp = api_client.get('/series/10/episodes/1/')

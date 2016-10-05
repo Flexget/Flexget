@@ -392,6 +392,19 @@ class Episode(Base):
     def __hash__(self):
         return self.id
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'identifier': self.identifier,
+            'season': self.season,
+            'identified_by': self.identified_by,
+            'number': self.number,
+            'series_id': self.series_id,
+            'first_seen': self.first_seen,
+            'premiere': self.is_premiere,
+            'number_of_releases': len(self.releases)
+        }
+
 
 Index('episode_series_identifier', Episode.series_id, Episode.identifier)
 

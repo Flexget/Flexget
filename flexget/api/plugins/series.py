@@ -35,21 +35,6 @@ def get_release_details(release):
     return release_item
 
 
-def get_episode_details(episode):
-    episode_item = {
-        'id': episode.id,
-        'identifier': episode.identifier,
-        'season': episode.season,
-        'identified_by': episode.identified_by,
-        'number': episode.number,
-        'series_id': episode.series_id,
-        'first_seen': episode.first_seen,
-        'premiere_type': episode.is_premiere,
-        'number_of_releases': len(episode.releases)
-    }
-    return episode_item
-
-
 def series_details(serie, begin=None, latest=None):
     series_dict = {
         'id': serie.id,
@@ -58,10 +43,10 @@ def series_details(serie, begin=None, latest=None):
         'in_tasks': [_show.name for _show in serie.in_tasks]
     }
     if begin:
-        series_dict['begin_episode'] = get_episode_details(serie.begin) if serie.begin else None
+        series_dict['begin_episode'] = serie.begin.to_dict() if serie.begin else None
     if latest:
         latest_ep = series.get_latest_release(serie)
-        series_dict['latest_episode'] = get_episode_details(latest_ep) if latest_ep else None
+        series_dict['latest_episode'] = latest_ep.to_dict() if latest_ep else None
         if latest_ep:
             latest_release = get_release_details(
                 sorted(latest_ep.downloaded_releases,
@@ -88,28 +73,28 @@ class ObjectsContainer(object):
     release_list_schema = {'type': 'array', 'items': release_object}
 
     episode_object = {
-        'type': 'object',
+        'type': ['object', 'null'],
         'properties': {
             "first_seen": {'type': ['string', 'null'], 'format': 'date-time'},
             "id": {'type': 'integer'},
             "identified_by": {'type': 'string'},
             "identifier": {'type': 'string'},
-            "premiere_type": {'type': 'string'},
+            "premiere": {'type': ['string', 'boolean']},
             "number": {'type': 'integer'},
             "season": {'type': 'integer'},
             "series_id": {'type': 'integer'},
             "number_of_releases": {'type': 'integer'},
             'latest_release': release_object
         },
-        'required': ['first_seen', 'id', 'identified_by', 'identifier', 'premiere_type', 'number', 'season',
+        'required': ['first_seen', 'id', 'identified_by', 'identifier', 'premiere', 'number', 'season',
                      'series_id', 'number_of_releases']
     }
 
     single_series_object = {
         'type': 'object',
         'properties': {
-            'series_id': {'type': 'integer'},
-            'series_name': {'type': 'string'},
+            'id': {'type': 'integer'},
+            'name': {'type': 'string'},
             'alternate_names': {'type': 'array', 'items': {'type': 'string'}},
             'in_tasks': {'type': 'array', 'items': {'type': 'string'}},
             'lookup': {
@@ -119,11 +104,10 @@ class ObjectsContainer(object):
                     'tvdb': tvdb.tvdb_series_object
                 }
             },
-            'latest': episode_object,
-            'begin': episode_object
+            'latest_episode': episode_object,
+            'begin_episode': episode_object
         },
-        'required': ['series_id', 'series_name', 'alternate_names', 'begin_episode', 'latest_downloaded_episode',
-                     'in_tasks']
+        'required': ['id', 'name', 'alternate_names', 'in_tasks']
     }
 
     series_list_schema = {'type': 'array', 'items': single_series_object}
@@ -145,9 +129,9 @@ class ObjectsContainer(object):
     }
 
     series_input_object = copy.deepcopy(series_edit_object)
-    series_input_object['properties']['series_name'] = {'type': 'string'}
+    series_input_object['properties']['name'] = {'type': 'string'}
     del series_input_object['anyOf']
-    series_input_object['required'] = ['series_name']
+    series_input_object['required'] = ['name']
 
 
 series_list_schema = api.schema('list_series', ObjectsContainer.series_list_schema)
@@ -260,7 +244,7 @@ class SeriesAPI(APIResource):
                 for show in series_list:
                     pos = series_list.index(show)
                     series_list[pos].setdefault('lookup', {})
-                    url = base_url + show['series_name'] + '/'
+                    url = base_url + show['name'] + '/'
                     result = api_client.get_endpoint(url)
                     series_list[pos]['lookup'].update({endpoint: result})
 
@@ -280,7 +264,7 @@ class SeriesAPI(APIResource):
     def post(self, session):
         """ Create a new show and set its first accepted episode and/or alternate names """
         data = request.json
-        series_name = data.get('series_name')
+        series_name = data.get('name')
 
         normalized_name = series.normalize_series_name(series_name)
         matches = series.shows_by_exact_name(normalized_name, session=session)
@@ -300,6 +284,7 @@ class SeriesAPI(APIResource):
             except PluginError as e:
                 # Alternate name already exist for a different show
                 raise CannotAddResource(e.value)
+        session.commit()
         rsp = jsonify(series_details(show, begin=ep_id is not None))
         rsp.status_code = 201
         return rsp
@@ -391,7 +376,7 @@ class SeriesShowAPI(APIResource):
             except PluginError as e:
                 # Alternate name already exist for a different show
                 raise CannotAddResource(e.value)
-        return jsonify(series_details(show))
+        return jsonify(series_details(show, begin=ep_id is not None))
 
 
 episode_parser = api.pagination_parser(add_sort=True)
@@ -439,7 +424,7 @@ class SeriesEpisodesAPI(APIResource):
         if not total_items:
             return jsonify([])
 
-        episodes = [get_episode_details(episode) for episode in series.show_episodes(show, **kwargs)]
+        episodes = [episode.to_dict() for episode in series.show_episodes(show, **kwargs)]
 
         total_pages = int(ceil(total_items / float(per_page)))
 
@@ -499,7 +484,7 @@ class SeriesEpisodeAPI(APIResource):
         if not series.episode_in_show(show_id, ep_id):
             raise BadRequest('episode with id %s does not belong to show %s' % (ep_id, show_id))
 
-        rsp = jsonify(get_episode_details(episode))
+        rsp = jsonify(episode.to_dict())
 
         # Add Series-ID header
         rsp.headers.extend({'Series-ID': show_id})
