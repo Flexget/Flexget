@@ -10,7 +10,8 @@
             controller: paginationController,
             bindings: {
                 loadData: '&',
-                links: '<'
+                links: '<',
+                currentPage: '<'
             }
         });
     

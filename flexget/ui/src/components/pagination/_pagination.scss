@@ -1,34 +1,30 @@
 .pagination-group {
     > .md-button {
         font-size: 16px;
-        margin: 20px 0;
-        padding: 3px 15px 3px 15px;
-        color: rgb(49, 46, 46);
-        background-color: rgba(224, 224, 224, 0.96);
-        text-transform: none;
-        font-weight: 400;
-        min-width:50px;
+        margin: 15px 0;
+        padding: 2px 12px 2px 12px;
+        background-color: $flexget-orange;
+        min-width: 50px;
         max-width: 50px;
+        border-radius: 0;
+        border-right: 1px solid rgba(0, 0, 0, 0.25);
     }
 
     > .md-button.left {
         border-radius: 10px 0 0 10px;
-        border-right: 1px solid rgba(0, 0, 0, 0.26);
-    }
-
-    > .md-button.middle {
-        border-radius: 0;
-        border-right: 1px solid rgba(0, 0, 0, 0.26);
     }
 
     > .md-button.right {
         border-radius: 0 10px 10px 0;
+        border-right: none;
+    }
+
+    .md-button:disabled {
+        opacity: 0.6;
     }
 
     .md-button:not([disabled]):hover {
-        background-color: rgba(193, 193, 193, 0.96);
-        color: $flexget-orange;
+        background-color: $flexget-red;
         transition: 0.3s;
     }
 }
-

@@ -54,12 +54,6 @@
                 value: false,
                 help: 'run task(s) even if the interval plugin would normally prevent it',
                 display: 'Now'
-            },
-            {
-                name: 'test',
-                value: false,
-                help: 'enables test mode',
-                display: 'Test Mode'
             }
         ];
         vm.options = options;

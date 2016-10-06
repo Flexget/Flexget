@@ -49,6 +49,11 @@
         "src-min-noconflict/mode-yaml.js",
         "src-min-noconflict/theme*"
       ]
+    },
+    "angular-link-header-parser": {
+      "main": [
+        "release/angular-link-header-parser.js"
+      ]
     }
   }
 }

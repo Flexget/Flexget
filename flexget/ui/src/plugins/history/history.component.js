@@ -15,14 +15,14 @@
 
         vm.$onInit = activate;
         vm.search = search;
-
+        
         vm.loadData = function (page) {
             options.page = page;
             getHistory();
         }
 
         var options = {
-            page: 10
+            page: 1
         }
 
         function activate() {
@@ -38,7 +38,10 @@
         function getHistory() {
             historyService.getHistory(options)
                 .then(setEntries)
-                .cached(setEntries);
+                .cached(setEntries)
+                .finally(function (data) {
+                    vm.currentPage = options.page;
+                });;
         }
 
         function setEntries(values) {
