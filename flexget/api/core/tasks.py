@@ -458,7 +458,10 @@ def setup_params(mgr):
         if isinstance(action, argparse._StoreConstAction):
             property_type = {'type': 'boolean'}
         elif isinstance(action, argparse._StoreAction):
-            property_type = {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1}
+            if action.nargs in ['+', '*']:
+                property_type = {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1}
+            else:
+                property_type = {'type': 'string'}
         else:
             # Unknown actions should not be added to schema
             property_type = None
