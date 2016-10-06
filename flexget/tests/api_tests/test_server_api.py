@@ -76,6 +76,19 @@ class TestServerAPI(object):
             }
         }
 
+    def test_get_raw_config(self, manager, api_client, schema_match):
+        manager.config_path = os.path.join(os.path.dirname(__file__), 'raw_config.yml')
+
+        rsp = api_client.get('/server/raw_config/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.raw_config_object, data)
+        assert not errors
+
+        assert data['raw_config'] == 'dGFza3M6CiAgdGVzdDoKICAgIHJzczoKICAgICAgdXJsOiBodHRwOi8vdGVzdC9yc3MKICAgIG1' \
+                                     'vY2s6CiAgICAgIC0gdGl0bGU6IGVudHJ5IDE='
+
     @pytest.mark.online
     def test_version(self, api_client, schema_match):
         latest = get_latest_flexget_version_number()
