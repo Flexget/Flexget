@@ -23,8 +23,13 @@
         opacity: 0.6;
     }
 
-    .md-button:not([disabled]):hover {
+    .md-button:not([disabled]):not(.active):hover {
         background-color: $flexget-red;
+        opacity: 0.9;
         transition: 0.3s;
+    }
+
+    .md-button.active {
+        background-color: $flexget-red;
     }
 }

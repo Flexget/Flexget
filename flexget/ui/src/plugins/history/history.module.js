@@ -9,7 +9,7 @@
 
             'ig.linkHeaderParser',
 
-            'components.pagination',
+            'blocks.pagination',
 
             'blocks.exception',
             'blocks.router'

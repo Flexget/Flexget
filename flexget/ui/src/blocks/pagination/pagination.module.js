@@ -3,5 +3,5 @@
     'use strict';
 
     angular
-        .module('components.pagination', []);
+        .module('blocks.pagination', []);
 }());

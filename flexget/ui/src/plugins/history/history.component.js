@@ -41,13 +41,10 @@
                 .cached(setEntries)
                 .finally(function (data) {
                     vm.currentPage = options.page;
-                });;
+                });
         }
 
         function setEntries(values) {
-            console.log(linkHeaderParser.parse(values.headers.link));
-            console.log(values);
-
             vm.headers = linkHeaderParser.parse(values.headers.link);
             vm.entries = values.data;
         }
