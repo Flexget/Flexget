@@ -26,6 +26,8 @@ from flexget.utils.lazy_dict import LazyLookup
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
 
+params = {}
+
 
 class ObjectsContainer(object):
     tasks_list_object = {'oneOf': [
@@ -131,6 +133,8 @@ class ObjectsContainer(object):
 
     }
 
+    params_return_schema = {'type': 'array', 'items': {'type': 'object'}}
+
 
 tasks_list_schema = api.schema('tasks.list', ObjectsContainer.tasks_list_object)
 task_input_schema = api.schema('tasks.task', ObjectsContainer.task_input_object)
@@ -138,6 +142,7 @@ task_return_schema = api.schema('tasks.task', ObjectsContainer.task_return_objec
 task_api_queue_schema = api.schema('task.queue', ObjectsContainer.task_queue_schema)
 task_api_execute_schema = api.schema('task.execution', ObjectsContainer.task_execution_results_schema)
 task_execution_schema = api.schema('task_execution_input', ObjectsContainer.task_execution_input)
+task_execution_params = api.schema('tasks.execution_params', ObjectsContainer.params_return_schema)
 
 task_api_desc = 'Task config schema too large to display, you can view the schema using the schema API'
 
@@ -300,32 +305,62 @@ class ExecuteLog(Queue):
 
 _streams = {}
 
-execution_doc = "'tasks': Array of tasks to be execute. Required<br>" \
-                "'progress': Include task progress updates<br>" \
-                "'summary': Include task summary<br>" \
-                "'entry_dump': Include dump of entries including fields<br>" \
-                "'inject': A List of entry objects. See payload description for additional information<br>" \
-                "'loglevel': Specify log level. One of 'critical', 'error', 'warning', 'info', 'verbose', " \
-                "'debug', 'trace'. Default is 'none'<br>"
-
-entry_doc = "Entry object:<br>" \
-            "'title': Title of the entry. If not supplied it will be attempted to retrieve it from URL headers<br>" \
-            "'url': URL of the entry, mandatory<br>" \
-            "'accept': Accept this entry immediately upon injection<br>" \
-            "'force': Prevent any plugins from rejecting this entry<br>" \
-            "'fields': A list of objects that can contain any other value for the entry"
-
+# Another namespace for the same endpoint
 inject_api = api.namespace('inject', description='Entry injection API')
+
+
+@inject_api.route('/params/')
+@tasks_api.route('/execute/params/')
+@api.doc(description='Available payload parameters for task execute')
+class TaskExecutionParams(APIResource):
+    @etag
+    @api.response(200, model=task_execution_params)
+    def get(self, session=None):
+        """ Execute payload parameters """
+
+        # Add hardcoded params
+        execute_params = [
+            {'progress': {'description': 'Include task progress updates', 'type': 'boolean'}},
+            {'summary': {'description': 'Include task summary', 'type': 'boolean'}},
+            {'entry_dump': {'description': 'Include dump of entries including fields', 'type': 'boolean'}},
+            {'inject': {
+                'description': 'A List of entry objects',
+                'type': 'array', 'items': {
+                    'type': 'object',
+                    'properties': {
+                        'title': {
+                            'description': 'Title of the entry. If not supplied it will be attempted to retrieve it from'
+                                           ' URL headers',
+                            'type': 'string'},
+                        'url': {'description': 'URL of the entry. Required', 'type': 'string', 'format': 'uri'},
+                        'accept': {
+                            'description': 'Accept this entry immediately upon injection (disregard task filters)',
+                            'type': 'boolean'},
+                        'force': {'description': 'Prevent any plugins from rejecting this entry',
+                                  'type': 'boolean'},
+                        'fields': {'description': 'A array of objects that can contain any other value for the entry',
+                                   'type': 'array', 'items': {'type': 'object'}}
+                    }, }, 'minItems': 1
+            }},
+            {'loglevel': {
+                'description': 'Specify log level. One of \'critical\', \'error\', \'warning\', \'info\', \'verbose\','
+                               ' \'debug\', \'trace\'',
+                'type': 'array', 'items': {'type': 'string'}, 'minItems': 1}}
+        ]
+
+        for key, value in params.items():
+            execute_params.append({key: value})
+        return jsonify(execute_params)
 
 
 @inject_api.route('/')
 @tasks_api.route('/execute/')
-@api.doc(description=execution_doc)
+@api.doc(description='For details on available parameters query /params/ endpoint')
 class TaskExecutionAPI(APIResource):
     @api.response(NotFoundError)
     @api.response(BadRequest)
     @api.response(200, model=task_api_execute_schema)
-    @api.validate(task_execution_schema, description=entry_doc)
+    @api.validate(task_execution_schema)
     def post(self, session=None):
         """ Execute task and stream results """
         data = request.json
@@ -425,11 +460,19 @@ def setup_params(mgr):
         elif isinstance(action, argparse._StoreAction):
             property_type = {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1}
         else:
+            # Unknown actions should not be added to schema
             property_type = None
 
+        # Some options maybe pre-added to schema with additional options, don't override them
         if property_type and name not in ObjectsContainer.task_execution_input['properties']:
             ObjectsContainer.task_execution_input['properties'][name] = property_type
-            TaskExecutionAPI.__apidoc__['description'] += "'{0}': {1}<br>".format(name, action.help)
+
+            global params
+            params.setdefault(name, {'description': action.help, 'type': property_type['type']})
+            if property_type.get('items'):
+                params[name].update({'items': {'type': 'string'}, 'minItems': 1})
+
+    ObjectsContainer.task_execution_input['additionalProperties'] = False
 
 
 class EntryDecoder(JSONEncoder):
