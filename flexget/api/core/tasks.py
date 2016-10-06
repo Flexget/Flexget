@@ -412,13 +412,23 @@ def setup_params(mgr):
     parser = get_parser('execute')
 
     for action in parser._optionals._actions:
-        ignore = ['v', 's', 'try-regexp', 'dump-config']
-        name = action.option_strings[0].strip('--')
-        if name in ignore:
+        # Ignore list for irrelevant actions
+        ignore = ['help', 'verbose', 'silent', 'try-regexp', 'dump-config', 'dump']
+
+        name = action.option_strings[-1].strip('--')
+        if name in ignore or action.help == '==SUPPRESS==':
             continue
-        if isinstance(action, argparse._StoreConstAction) and action.help != '==SUPPRESS==':
-            name = name.replace('-', '_')
-            ObjectsContainer.task_execution_input['properties'][name] = {'type': 'boolean'}
+
+        name = name.replace('-', '_')
+        if isinstance(action, argparse._StoreConstAction):
+            property_type = {'type': 'boolean'}
+        elif isinstance(action, argparse._StoreAction):
+            property_type = {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1}
+        else:
+            property_type = None
+
+        if property_type and name not in ObjectsContainer.task_execution_input['properties']:
+            ObjectsContainer.task_execution_input['properties'][name] = property_type
             TaskExecutionAPI.__apidoc__['description'] += "'{0}': {1}<br>".format(name, action.help)
 
 
