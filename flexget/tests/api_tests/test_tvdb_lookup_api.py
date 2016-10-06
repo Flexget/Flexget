@@ -138,6 +138,30 @@ class TestTVDBEpisodeABSLookupAPI(object):
 
 
 @pytest.mark.online
+class TestTVDBEpisodeAirDateLookupAPI(object):
+    config = 'tasks: {}'
+
+    def test_tvdb_episode_lookup_by_air_date(self, api_client, schema_match):
+        values = {
+            'episode_number': 23,
+            'id': 5598674,
+            'season_number': 2,
+            'series_id': 279121,
+            'absolute_number': 46
+        }
+
+        rsp = api_client.get('/tvdb/episode/279121/?air_date=2016-05-24')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(OC.episode_object, data)
+        assert not errors
+
+        for field, value in values.items():
+            assert data.get(field) == value
+
+
+@pytest.mark.online
 class TestTVDSearchNameLookupAPI(object):
     config = 'tasks: {}'
 
