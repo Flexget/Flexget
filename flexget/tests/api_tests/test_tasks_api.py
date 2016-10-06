@@ -165,7 +165,6 @@ class TestTaskAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-
     @patch.object(Manager, 'save_config')
     def test_rename_task(self, mocked_save_config, api_client, manager, schema_match):
         updated_task = {
@@ -208,3 +207,62 @@ class TestTaskAPI(object):
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(base_message, data)
         assert not errors
+
+
+class TestTaskQueue(object):
+    config = """
+            tasks:
+              test_task:
+                mock:
+                  - title: accept_me
+                  - title: reject_me
+                regexp:
+                  accept:
+                    - accept
+                  reject:
+                    - reject
+            """
+
+    def test_task_queue(self, api_client, schema_match, manager):
+        entry = {
+            'title': "injected",
+            'url': 'http://test.com',
+            'accept': True,
+            'tasks': ['test_task']
+        }
+
+        payload = {
+            "inject": [entry],
+            'tasks': ['test_task']
+        }
+
+        rsp = api_client.json_post('/tasks/execute/', data=json.dumps(payload))
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.task_execution_results_schema, data)
+        assert not errors
+
+        # Get task queue
+        rsp = api_client.get('/tasks/queue/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.task_queue_schema, data)
+        assert not errors
+
+        assert len(data) == 1
+
+        # Execute tasj
+        task = manager.task_queue.run_queue.get(timeout=0.5)
+        assert task
+
+        # Check queue again
+        rsp = api_client.get('/tasks/queue/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.task_queue_schema, data)
+        assert not errors
+
+        assert data == []

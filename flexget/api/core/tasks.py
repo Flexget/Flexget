@@ -57,8 +57,8 @@ class ObjectsContainer(object):
             'properties': {
                 'id': {'type': 'integer'},
                 'name': {'type': 'string'},
-                'current_phase': {'type': 'string'},
-                'current_plugin': {'type': 'string'},
+                'current_phase': {'type': ['string', 'null']},
+                'current_plugin': {'type': ['string', 'null']},
             }}
     }
 
