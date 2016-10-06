@@ -22,7 +22,8 @@ class TestRetryFailedAPI(object):
         failed_entry_dict_1 = dict(title='Failed title1', url='http://123.com', reason='Test reason1')
         failed_entry_dict_2 = dict(title='Failed title2', url='http://124.com', reason='Test reason2')
         failed_entry_dict_3 = dict(title='Failed title3', url='http://125.com', reason='Test reason3')
-        failed_entries = [failed_entry_dict_1, failed_entry_dict_2, failed_entry_dict_3]
+        failed_entries = sorted([failed_entry_dict_1, failed_entry_dict_2, failed_entry_dict_3],
+                                key=lambda x: x['title'])
 
         with Session() as session:
             failed_entry1 = FailedEntry(**failed_entry_dict_1)
@@ -37,6 +38,9 @@ class TestRetryFailedAPI(object):
 
         errors = schema_match(OC.retry_entries_list_object, data)
         assert not errors
+
+        # Sorted for result comparison
+        data = sorted(data, key=lambda x: x['title'])
         for idx, entry in enumerate(failed_entries):
             for key, value in entry.items():
                 assert data[idx].get(key) == failed_entries[idx].get(key)
