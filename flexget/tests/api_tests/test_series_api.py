@@ -4,6 +4,8 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import pytest
 from datetime import datetime, timedelta
 
+from flexget.plugins.filter.seen import SeenEntry
+
 from flexget.api.app import base_message
 from flexget.api.plugins.series import ObjectsContainer as OC
 from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
@@ -1348,3 +1350,57 @@ class TestSeriesReleaseAPI(object):
 
         errors = schema_match(base_message, data)
         assert not errors
+
+
+class TestSeriesForgetFlag(object):
+    config = """
+            tasks:
+              series_data:
+                mock:
+                  - {title: 'series.foo.s01e01.720p.hdtv-flexget'}
+                  - {title: 'series.foo.s01e02.720p.hdtv-flexget'}
+                series:
+                  - series foo
+    """
+
+    def test_delete_series_with_forget_flag(self, execute_task, api_client, schema_match):
+        task = execute_task('series_data')
+        assert len(task.accepted) == 2
+
+        # Get series
+        rsp = api_client.get('/series/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.series_list_schema, data)
+        assert not errors
+
+        assert len(data) == 1
+
+        # Get seen object
+        with Session() as session:
+            seen = session.query(SeenEntry).all()
+            assert len(seen) == 2
+
+        # Delete with forget flag
+        rsp = api_client.delete('/series/1/?forget=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Get series
+        rsp = api_client.get('/series/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.series_list_schema, data)
+        assert not errors
+
+        assert len(data) == 0
+
+        # Get seen object
+        with Session() as session:
+            seen = session.query(SeenEntry).all()
+            assert len(seen) == 0

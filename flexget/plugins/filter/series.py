@@ -371,7 +371,8 @@ class Episode(Base):
         if not self.releases:
             return None
         return \
-        sorted(self.downloaded_releases, key=lambda rel: rel.first_seen if rel.downloaded else None, reverse=True)[0]
+            sorted(self.downloaded_releases, key=lambda rel: rel.first_seen if rel.downloaded else None, reverse=True)[
+                0]
 
     def __str__(self):
         return '<Episode(id=%s,identifier=%s,season=%s,number=%s)>' % \
@@ -776,7 +777,8 @@ def remove_series(name, forget=False):
             for s in series:
                 if forget:
                     for episode in s.episodes:
-                        downloaded_releases = [release.title for release in episode.downloaded_releases]
+                        for release in episode.downloaded_releases:
+                            downloaded_releases.append(release.title)
                 session.delete(s)
             session.commit()
             log.debug('Removed series %s from database.', name)
