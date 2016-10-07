@@ -13,7 +13,10 @@
         };
 
         function getHistory(options) {
-            return $http.get('/api/history/', { params: options, etagCache: true })
+            return $http.get('/api/history/', {
+                params: options,
+                etagCache: true
+            })
                 .then(callComplete)
                 .catch(callFailed);
         }
@@ -25,11 +28,10 @@
         }
                 
         function callComplete(response, itemCache) {
-            var values = {
-                data: response.data,
-                headers: response.headers()
+            return {
+                entries: response.data,
+                pagination: link
             }
-            return values;
         }
         
         function callFailed(error) {

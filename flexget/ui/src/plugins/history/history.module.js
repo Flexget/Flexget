@@ -10,7 +10,6 @@
             'ig.linkHeaderParser',
 
             'blocks.pagination',
-
             'blocks.exception',
             'blocks.router'
         ]);

@@ -2,7 +2,6 @@
     <md-button class="left" ng-disabled="vm.currentPage == 1" ng-click="vm.setPage(1)">&lt;&lt;</md-button>
     <md-button ng-disabled="!vm.links.prev" ng-click="vm.setPage(vm.links.prev.page)">&lt;</md-button>
     
-    <!-- TODO: range -->
     <md-button 
         ng-repeat="p in [vm.linkGroupFirst(), vm.linkGroupLast()] | makeRange"
         ng-class="{ 'active': p == vm.currentPage }"
@@ -13,5 +12,3 @@
     <md-button ng-disabled="!vm.links.next" ng-click="vm.setPage(vm.links.next.page)">&gt;</md-button>
     <md-button class="right" ng-disabled="vm.currentPage === vm.links.last.page" ng-click="vm.setPage(vm.links.last.page)">&gt;&gt;</md-button>
 </section>
-
-{{ vm.linkGroupFirst() }}

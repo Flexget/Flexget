@@ -45,8 +45,8 @@
         }
 
         function setEntries(values) {
-            vm.headers = linkHeaderParser.parse(values.headers.link);
-            vm.entries = values.data;
+            vm.pagination = linkHeaderParser.parse(values.pagination);
+            vm.entries = values.entries;
         }
     }
 }());
