@@ -17,7 +17,6 @@
                 params: options,
                 etagCache: true
             })
-                .then(callComplete)
                 .catch(callFailed);
         }
 
@@ -25,13 +24,6 @@
             return $http.get('/api/history/', { params: params, etagCache: true })
                 .then(callComplete)
                 .catch(callFailed);
-        }
-                
-        function callComplete(response, itemCache) {
-            return {
-                entries: response.data,
-                pagination: link
-            }
         }
         
         function callFailed(error) {

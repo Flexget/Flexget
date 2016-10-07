@@ -21,7 +21,7 @@
     "angular-utf8-base64": "~0.0.5",
     "angular-messages": "~1.5.6",
     "ngclipboard": "~1.1.1",
-    "angular-http-etag": "^2.0.13",
+    "angular-http-etag": "https://github.com/Tommatheussen/angular-http-etag.git#^2.0.13",
     "angular-link-header-parser": "^1.0.2"
   },
   "resolutions": {

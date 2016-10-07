@@ -43,10 +43,10 @@
                     vm.currentPage = options.page;
                 });
         }
-
-        function setEntries(values) {
-            vm.pagination = linkHeaderParser.parse(values.pagination);
-            vm.entries = values.entries;
+        
+        function setEntries(response, itemCache) {
+            vm.entries = response.data;
+            vm.pagination = linkHeaderParser.parse(response.headers().link);
         }
     }
 }());

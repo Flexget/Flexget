@@ -4,9 +4,11 @@
 
     angular
         .module('components.core')
-        .config(themesConfig);
+        .config(coreConfig);
 
-    function themesConfig($mdThemingProvider) {
+    function coreConfig($httpProvider, $mdThemingProvider) {
+        $httpProvider.useLegacyPromiseExtensions(false);
+
         $mdThemingProvider.theme('default')
             .primaryPalette('orange', {
                 default: '800'
