@@ -1404,3 +1404,57 @@ class TestSeriesForgetFlag(object):
         with Session() as session:
             seen = session.query(SeenEntry).all()
             assert len(seen) == 0
+
+    def test_delete_series_episode_with_forget_flag(self, execute_task, api_client, schema_match):
+        task = execute_task('series_data')
+        assert len(task.accepted) == 2
+
+        # Get episode 1
+        rsp = api_client.get('/series/1/episodes/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.episode_object, data)
+        assert not errors
+
+        # Get episode 2
+        rsp = api_client.get('/series/1/episodes/2/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.episode_object, data)
+        assert not errors
+
+        # Get seen object
+        with Session() as session:
+            seen = session.query(SeenEntry).all()
+            assert len(seen) == 2
+
+        # Delete with forget flag
+        rsp = api_client.delete('/series/1/episodes/1/?forget=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Get episode 1
+        rsp = api_client.get('/series/1/episodes/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        # Get episode 2
+        rsp = api_client.get('/series/1/episodes/2/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.episode_object, data)
+        assert not errors
+
+        # Get seen object
+        with Session() as session:
+            seen = session.query(SeenEntry).all()
+            assert len(seen) == 1
