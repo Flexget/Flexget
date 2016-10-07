@@ -15,27 +15,22 @@
 
         vm.$onInit = activate;
         vm.search = search;
-        
-        vm.loadData = function (page) {
-            options.page = page;
-            getHistory();
-        }
+        vm.getHistory = getHistory;
 
-        var options = {
-            page: 1
-        }
+        var options = {}
 
         function activate() {
-            getHistory();
+            getHistory(1);
         }
 
-        function search() {
-            historyService.getHistoryForTask({ task: vm.taskName })
-                .then(setEntries)
-                .cached(setEntries);
+        function search(taskName) {
+            options.task = taskName || undefined;
+
+            getHistory(1);
         }
 
-        function getHistory() {
+        function getHistory(page) {
+            options.page = page;
             historyService.getHistory(options)
                 .then(setEntries)
                 .cached(setEntries)

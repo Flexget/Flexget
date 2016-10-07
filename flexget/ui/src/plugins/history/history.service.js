@@ -8,8 +8,7 @@
 
     function historyService($http, exception) {
         return {
-            getHistory: getHistory,
-            getHistoryForTask: getHistoryForTask
+            getHistory: getHistory
         };
 
         function getHistory(options) {
@@ -17,12 +16,6 @@
                 params: options,
                 etagCache: true
             })
-                .catch(callFailed);
-        }
-
-        function getHistoryForTask(params) {
-            return $http.get('/api/history/', { params: params, etagCache: true })
-                .then(callComplete)
                 .catch(callFailed);
         }
         
