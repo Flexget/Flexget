@@ -530,7 +530,7 @@ class IRCConnection(IRCBot):
                             log.error('Missing variable %s from config, skipping rule', varname)
                             break
                         if element.tag == 'varenc':
-                            value = urllib.quote(value)
+                            value = urllib.quote(value.encode('utf-8'))
                         result += value
                     else:
                         log.error('Unsupported var operation %s, skipping rule', element.tag)
