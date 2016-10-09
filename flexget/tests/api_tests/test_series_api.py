@@ -1358,14 +1358,20 @@ class TestSeriesForgetFlag(object):
               series_data:
                 mock:
                   - {title: 'series.foo.s01e01.720p.hdtv-flexget'}
+                  - {title: 'series.foo.s01e01.1080p.hdtv-flexget'}
                   - {title: 'series.foo.s01e02.720p.hdtv-flexget'}
+                  - {title: 'series.foo.s01e02.1080p.hdtv-flexget'}
                 series:
-                  - series foo
+                  - series foo:
+                      qualities:
+                        - 720p
+                        - 1080p
+
     """
 
     def test_delete_series_with_forget_flag(self, execute_task, api_client, schema_match):
         task = execute_task('series_data')
-        assert len(task.accepted) == 2
+        assert len(task.accepted) == 4
 
         # Get series
         rsp = api_client.get('/series/')
@@ -1380,7 +1386,7 @@ class TestSeriesForgetFlag(object):
         # Get seen object
         with Session() as session:
             seen = session.query(SeenEntry).all()
-            assert len(seen) == 2
+            assert len(seen) == 4
 
         # Delete with forget flag
         rsp = api_client.delete('/series/1/?forget=true')
@@ -1407,7 +1413,7 @@ class TestSeriesForgetFlag(object):
 
     def test_delete_series_episode_with_forget_flag(self, execute_task, api_client, schema_match):
         task = execute_task('series_data')
-        assert len(task.accepted) == 2
+        assert len(task.accepted) == 4
 
         # Get episode 1
         rsp = api_client.get('/series/1/episodes/1/')
@@ -1428,7 +1434,7 @@ class TestSeriesForgetFlag(object):
         # Get seen object
         with Session() as session:
             seen = session.query(SeenEntry).all()
-            assert len(seen) == 2
+            assert len(seen) == 4
 
         # Delete with forget flag
         rsp = api_client.delete('/series/1/episodes/1/?forget=true')
@@ -1457,4 +1463,39 @@ class TestSeriesForgetFlag(object):
         # Get seen object
         with Session() as session:
             seen = session.query(SeenEntry).all()
-            assert len(seen) == 1
+            assert len(seen) == 2
+
+    def test_delete_series_release_with_forget_flag(self, execute_task, api_client, schema_match):
+        task = execute_task('series_data')
+        assert len(task.accepted) == 4
+
+        # Get release 1 for episode 1
+        rsp = api_client.get('/series/1/episodes/1/releases/1/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.release_object, data)
+        assert not errors
+
+        # Get seen object
+        with Session() as session:
+            seen = session.query(SeenEntry).all()
+            assert len(seen) == 4
+
+        rsp = api_client.delete('/series/1/episodes/1/releases/1/?forget=true')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        rsp = api_client.get('/series/1/episodes/1/releases/1/')
+        assert rsp.status_code == 404, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(base_message, data)
+        assert not errors
+
+        with Session() as session:
+            seen = session.query(SeenEntry).all()
+            assert len(seen) == 3
