@@ -145,10 +145,13 @@ class UrlRewritePirateBay(object):
                 entry['torrent_leeches'] = int(tds[-1].contents[0])
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
                 # Parse content_size
-                size = link.find_next(attrs={'class': 'detDesc'}).get_text()
-                size = re.search('Size (\d+(\.\d+)?\xa0(?:[PTGMK])iB)', size)
-
-                entry['content_size'] = parse_filesize(size.group(1))
+                sizeText = link.find_next(attrs={'class': 'detDesc'}).get_text()
+                if sizeText:
+                    size = re.search('Size (\d+(\.\d+)?\xa0(?:[PTGMK])?i?B)', sizeText)
+                    if size:
+                        entry['content_size'] = parse_filesize(size.group(1))
+                    else:
+                        log.error('Malformed search result? Title: "%s", No size? %s' % (entry['title'], sizeText))
 
                 entries.add(entry)
 
