@@ -320,7 +320,7 @@ def search(count=None, value=None, status=None, start=None, stop=None, order_by=
         query = query.order_by(getattr(SeenEntry, order_by).desc())
     else:
         query = query.order_by(getattr(SeenEntry, order_by))
-    return query.slice(start, stop).from_self()
+    return query.group_by(SeenEntry).slice(start, stop).from_self()
 
 
 @with_session
