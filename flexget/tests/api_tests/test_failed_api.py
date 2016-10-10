@@ -111,18 +111,13 @@ class TestFailedPaginationAPI(object):
     def test_failed_pagination(self, api_client, schema_match, link_headers):
         base_failed_entry = dict(title='Failed title_', url='http://123.com/', reason='Test reason_')
         num_of_entries = 200
-        failed = []
-
-        for i in range(num_of_entries):
-            failed_entry = copy.deepcopy(base_failed_entry)
-            for key in failed_entry:
-                failed_entry[key] += str(i)
-            failed.append(failed_entry)
 
         with Session() as session:
-            for entry in failed:
-                failed = FailedEntry(**entry)
-                session.add(failed)
+            for i in range(num_of_entries):
+                failed_entry = copy.deepcopy(base_failed_entry)
+                for key in failed_entry:
+                    failed_entry[key] += str(i)
+                session.add(FailedEntry(**failed_entry))
 
         # Default values
         rsp = api_client.get('/failed/')
