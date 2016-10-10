@@ -6,10 +6,28 @@ import io
 import os
 import socket
 
+try:
+    import mechanize
+except ImportError:
+    mechanize = None
+
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('formlogin')
+
+
+if mechanize:
+    class SanitizeHandler(mechanize.BaseHandler):
+        def http_response(self, request, response):
+            if not hasattr(response, "seek"):
+                response = mechanize.response_seek_wrapper(response)
+            # Run HTML through BeautifulSoup for sanitizing
+            if 'html' in response.info().get('content-type', ''):
+                soup = get_soup(response.get_data())
+                response.set_data(soup.prettify())
+            return response
 
 
 class FormLogin(object):
@@ -31,9 +49,7 @@ class FormLogin(object):
     }
 
     def on_task_start(self, task, config):
-        try:
-            from mechanize import Browser
-        except ImportError:
+        if not mechanize:
             raise plugin.PluginError('mechanize required (python module), please install it.', log)
 
         userfield = config.get('userfield', 'username')
@@ -43,7 +59,8 @@ class FormLogin(object):
         username = config['username']
         password = config['password']
 
-        br = Browser()
+        br = mechanize.Browser()
+        br.add_handler(SanitizeHandler())
         br.set_handle_robots(False)
         try:
             br.open(url)
@@ -72,7 +89,7 @@ class FormLogin(object):
                 filename = os.path.join(received, '%s.formlogin.html' % task.name)
                 with io.open(filename, 'wb') as f:
                     f.write(br.response().get_data())
-                log.critical('I have saved the login page content to %s for you to view' % filename)
+                log.critical('I have saved the login page content to %s for you to view', filename)
                 raise plugin.PluginError('Unable to find login fields', log)
         except socket.timeout:
             raise plugin.PluginError('Timed out on url %s' % url)
