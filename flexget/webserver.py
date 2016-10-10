@@ -38,11 +38,13 @@ web_config_schema = {
                 'port': {'type': 'integer', 'default': 3539},
                 'ssl_certificate': {'type': 'string', 'format': 'string', 'default': ''},
                 'ssl_private_key': {'type': 'string', 'format': 'string', 'default': ''},
+                'ssl_certificate_chain': {'type': 'string', 'format': 'string', 'default': ''},
             },
             'additionalProperties': False,
             'dependencies': {
                 'ssl_certificate': ['ssl_private_key'],
                 'ssl_private_key': ['ssl_certificate'],
+                'ssl_certificate_chain': ['ssl_certificate', 'ssl_private_key'],
             }
         }
     ]
@@ -161,6 +163,7 @@ def setup_server(manager, session=None):
         port=web_server_config['port'],
         ssl_certificate=web_server_config['ssl_certificate'],
         ssl_private_key=web_server_config['ssl_private_key'],
+        ssl_certificate_chain=web_server_config['ssl_certificate_chain'],
     )
 
     _default_app.secret_key = get_secret()
@@ -192,17 +195,18 @@ class WebServer(threading.Thread):
     # We use a regular list for periodic jobs, so you must hold this lock while using it
     triggers_lock = threading.Lock()
 
-    def __init__(self, bind='0.0.0.0', port=5050, ssl_certificate=None, ssl_private_key=None):
+    def __init__(self, bind='0.0.0.0', port=5050, ssl_certificate=None, ssl_private_key=None, ssl_certificate_chain=None):
         threading.Thread.__init__(self, name='web_server')
         self.bind = str(bind)  # String to remove unicode warning from cherrypy startup
         self.port = port
         self.ssl_certificate = ssl_certificate
         self.ssl_private_key = ssl_private_key
+        self.ssl_certificate_chain = ssl_certificate_chain
 
     def start(self):
         # If we have already started and stopped a thread, we need to reinitialize it to create a new one
         if not self.is_alive():
-            self.__init__(bind=self.bind, port=self.port, ssl_certificate=self.ssl_certificate, ssl_private_key=self.ssl_private_key)
+            self.__init__(bind=self.bind, port=self.port, ssl_certificate=self.ssl_certificate, ssl_private_key=self.ssl_private_key, ssl_certificate_chain=self.ssl_certificate_chain)
         threading.Thread.start(self)
 
     def _start_server(self):
@@ -228,6 +232,9 @@ class WebServer(threading.Thread):
                 'server.ssl_certificate': self.ssl_certificate,
                 'server.ssl_private_key': self.ssl_private_key,
             })
+
+            if self.ssl_certificate_chain:
+                cherrypy.config.update({'server.ssl_certificate_chain': self.ssl_certificate_chain})
 
         try:
             host = self.bind if self.bind != "0.0.0.0" else socket.gethostbyname(socket.gethostname())
