@@ -108,7 +108,7 @@ class TestRetryFailedAPI(object):
 class TestFailedPaginationAPI(object):
     config = 'tasks: {}'
 
-    def test_failed_pagination(self, api_client, schema_match, link_headers):
+    def add_failed_entries(self):
         base_failed_entry = dict(title='Failed title_', url='http://123.com/', reason='Test reason_')
         num_of_entries = 200
 
@@ -119,13 +119,13 @@ class TestFailedPaginationAPI(object):
                     failed_entry[key] += str(i)
                 session.add(FailedEntry(**failed_entry))
 
+    def test_failed_pagination(self, api_client, link_headers):
+        self.add_failed_entries()
+
         # Default values
         rsp = api_client.get('/failed/')
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
-
-        errors = schema_match(OC.retry_entries_list_object, data)
-        assert not errors
 
         assert len(data) == 50  # Default page size
         assert int(rsp.headers['total-count']) == 200
@@ -140,9 +140,6 @@ class TestFailedPaginationAPI(object):
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
 
-        errors = schema_match(OC.retry_entries_list_object, data)
-        assert not errors
-
         assert len(data) == 100
         assert int(rsp.headers['total-count']) == 200
         assert int(rsp.headers['count']) == 100
@@ -155,9 +152,6 @@ class TestFailedPaginationAPI(object):
         rsp = api_client.get('/failed/?page=2')
         assert rsp.status_code == 200
         data = json.loads(rsp.get_data(as_text=True))
-
-        errors = schema_match(OC.retry_entries_list_object, data)
-        assert not errors
 
         assert len(data) == 50  # Default page size
         assert int(rsp.headers['total-count']) == 200
