@@ -306,30 +306,21 @@ def db_cleanup(manager, session):
     #    log.verbose('Removed %d seen fields older than 1 year.' % result)
 
 
-def count(value=None, status=None):
-    with Session() as session:
-        query = session.query(SeenEntry)
-        if status is not None:
-            query = query.filter(SeenEntry.local == status)
-            if value:
-                query = query.join(SeenField).filter(SeenField.value.like(value))
-        return query.group_by(SeenEntry).count()
-
-
 @with_session
-def search(value=None, status=None, start=None, stop=None, order_by='added', descending=False,
+def search(count=None, value=None, status=None, start=None, stop=None, order_by='added', descending=False,
            session=None):
-    query = session.query(SeenEntry)
-    if descending:
-        query = query.order_by(getattr(SeenEntry, order_by).desc())
-    else:
-        query = query.order_by(getattr(SeenEntry, order_by))
-    query = query.slice(start, stop).from_self().join(SeenField)
+    query = session.query(SeenEntry).join(SeenField)
     if value:
         query = query.filter(SeenField.value.like(value))
     if status is not None:
         query = query.filter(SeenEntry.local == status)
-    return query
+    if count:
+        return query.group_by(SeenEntry).count()
+    if descending:
+        query = query.order_by(getattr(SeenEntry, order_by).desc())
+    else:
+        query = query.order_by(getattr(SeenEntry, order_by))
+    return query.slice(start, stop).from_self()
 
 
 @with_session

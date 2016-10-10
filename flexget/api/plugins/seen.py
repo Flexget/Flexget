@@ -51,7 +51,7 @@ seen_base_parser.add_argument('value', help='Filter by any field value or leave 
 seen_base_parser.add_argument('local', type=inputs.boolean, default=None,
                               help='Filter results by seen locality.')
 
-sort_choices = ('title', 'task', 'added', 'local', 'id')
+sort_choices = ('title', 'task', 'added', 'local', 'reason', 'id')
 seen_search_parser = api.pagination_parser(seen_base_parser, sort_choices)
 
 
@@ -99,7 +99,7 @@ class SeenSearchAPI(APIResource):
             'session': session
         }
 
-        total_items = seen.count(value=value, status=local)
+        total_items = seen.search(count=True, **kwargs)
 
         if not total_items:
             return jsonify([])
