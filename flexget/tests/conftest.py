@@ -5,11 +5,13 @@ import jsonschema
 from future.utils import PY2
 from future.backports.http import client as backport_client
 
+import re
 import os
 import sys
 import yaml
 import logging
 import shutil
+import requests
 
 import itertools
 
@@ -156,6 +158,22 @@ def schema_match(manager):
         return [dict(value=list(e.path), message=e.message) for e in errors]
 
     return match
+
+
+@pytest.fixture()
+def link_headers(manager):
+    """
+    Parses link headers and return them in dict form
+    """
+    def headers(response):
+        links = {}
+        for link in requests.utils.parse_header_links(response.headers.get('link')):
+            url = link['url']
+            page = int(re.search('(?<!per_)page=(\d)', url).group(1))
+            links[link['rel']] = dict(url=url, page=page)
+        return links
+
+    return headers
 
 
 # --- End Public Fixtures ---

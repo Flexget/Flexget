@@ -64,7 +64,7 @@ class TestHistoryAPI(object):
 class TestHistoryPaginationAPI(object):
     config = "{'tasks': {}}"
 
-    def test_history_pagination(self, api_client, schema_match):
+    def test_history_pagination(self, api_client, schema_match, link_headers):
         history_entry = dict(task='test_task_', title='test_title_', url='test_url_', filename='test_filename_',
                              details='test_details_')
         num_of_entries = 200
@@ -86,6 +86,10 @@ class TestHistoryPaginationAPI(object):
         assert len(data) == 50  # Default page size
         assert int(rsp.headers['total-count']) == 200
         assert int(rsp.headers['count']) == 50
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 2
 
         rsp = api_client.get('/history/?per_page=100')
         assert rsp.status_code == 200
@@ -124,7 +128,7 @@ class TestHistoryPaginationAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-    def test_history_sorting(self, api_client, schema_match):
+    def test_history_sorting(self, api_client, schema_match, link_headers):
         history_entry1 = dict(task='test_task_1', title='test_title_a', url='test_url_1', filename='test_filename_a',
                               details='test_details_1')
 
