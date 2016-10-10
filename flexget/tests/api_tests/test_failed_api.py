@@ -211,3 +211,10 @@ class TestFailedPaginationAPI(object):
         data = json.loads(rsp.get_data(as_text=True))
 
         assert data[0]['reason'] == 'Test reason_1'
+
+        # Combine sorting and pagination
+        rsp = api_client.get('/failed/?sort_by=reason&per_page=2&page=2')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['reason'] == 'Test reason_1'
