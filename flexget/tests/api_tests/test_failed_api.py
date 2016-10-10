@@ -161,3 +161,53 @@ class TestFailedPaginationAPI(object):
         assert links['last']['page'] == 4
         assert links['next']['page'] == 3
         assert links['prev']['page'] == 1
+
+    def test_failed_sorting(self, api_client):
+        failed_entry_dict_1 = dict(title='Failed title_1', url='http://jhb.com', reason='Test reason_3')
+        failed_entry_dict_2 = dict(title='Failed title_2', url='http://def.com', reason='Test reason_1')
+        failed_entry_dict_3 = dict(title='Failed title_3', url='http://abc.com', reason='Test reason_2')
+
+        with Session() as session:
+            failed_entry1 = FailedEntry(**failed_entry_dict_1)
+            failed_entry2 = FailedEntry(**failed_entry_dict_2)
+            failed_entry3 = FailedEntry(**failed_entry_dict_3)
+            session.bulk_save_objects([failed_entry1, failed_entry2, failed_entry3])
+
+        # Sort by title
+        rsp = api_client.get('/failed/?sort_by=title')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['title'] == 'Failed title_3'
+
+        rsp = api_client.get('/failed/?sort_by=title&order=asc')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['title'] == 'Failed title_1'
+
+        # Sort by url
+        rsp = api_client.get('/failed/?sort_by=url')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['url'] == 'http://jhb.com'
+
+        rsp = api_client.get('/failed/?sort_by=url&order=asc')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['url'] == 'http://abc.com'
+
+        # Sort by reason
+        rsp = api_client.get('/failed/?sort_by=reason')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['reason'] == 'Test reason_3'
+
+        rsp = api_client.get('/failed/?sort_by=reason&order=asc')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['reason'] == 'Test reason_1'
