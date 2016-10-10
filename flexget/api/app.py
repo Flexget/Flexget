@@ -440,7 +440,7 @@ def pagination_headers(total_pages, total_items, page_count, request):
     query_string = re.sub(b'&?page=\d+&?', b'', query_string)
 
     # Add all original query params
-    LINKTEMPLATE += query_string.decode() + '&page={}>; rel="{}"'
+    LINKTEMPLATE = LINKTEMPLATE.rstrip('&') + query_string.decode() + '&page={}>; rel="{}"'
 
     link_string = ''
 
