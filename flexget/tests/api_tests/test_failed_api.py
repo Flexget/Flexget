@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+import copy
+
 from flexget.api.app import base_message
 from flexget.api.plugins.failed import ObjectsContainer as OC
 from flexget.manager import Session
@@ -101,3 +103,72 @@ class TestRetryFailedAPI(object):
 
         errors = schema_match(base_message, data)
         assert not errors
+
+
+class TestFailedPaginationAPI(object):
+    config = 'tasks: {}'
+
+    def test_failed_pagination(self, api_client, schema_match, link_headers):
+        base_failed_entry = dict(title='Failed title_', url='http://123.com/', reason='Test reason_')
+        num_of_entries = 200
+        failed = []
+
+        for i in range(num_of_entries):
+            failed_entry = copy.deepcopy(base_failed_entry)
+            for key in failed_entry:
+                failed_entry[key] += str(i)
+            failed.append(failed_entry)
+
+        with Session() as session:
+            for entry in failed:
+                failed = FailedEntry(**entry)
+                session.add(failed)
+
+        # Default values
+        rsp = api_client.get('/failed/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.retry_entries_list_object, data)
+        assert not errors
+
+        assert len(data) == 50  # Default page size
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 50
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 2
+
+        # Change page size
+        rsp = api_client.get('/failed/?per_page=100')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.retry_entries_list_object, data)
+        assert not errors
+
+        assert len(data) == 100
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 100
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 2
+        assert links['next']['page'] == 2
+
+        # Get different page
+        rsp = api_client.get('/failed/?page=2')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.retry_entries_list_object, data)
+        assert not errors
+
+        assert len(data) == 50  # Default page size
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 50
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 3
+        assert links['prev']['page'] == 1
