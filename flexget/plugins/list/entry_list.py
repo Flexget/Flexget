@@ -232,8 +232,7 @@ def get_entries_by_list_id(list_id, count=False, start=None, stop=None, order_by
         query = query.order_by(getattr(EntryListEntry, order_by).desc())
     else:
         query = query.order_by(getattr(EntryListEntry, order_by))
-    query = query.slice(start, stop)
-    return query.all()
+    return query.slice(start, stop).all()
 
 
 @with_session
