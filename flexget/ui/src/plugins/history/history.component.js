@@ -10,14 +10,14 @@
             controller: historyController
         });
 
-    function historyController(historyService, linkHeaderParser) {
+    function historyController(historyService) {
         var vm = this;
 
         vm.$onInit = activate;
         vm.search = search;
         vm.getHistory = getHistory;
 
-        var options = {}
+        var options = {};
 
         function activate() {
             getHistory(1);
@@ -41,7 +41,7 @@
         
         function setEntries(response, itemCache) {
             vm.entries = response.data;
-            vm.pagination = linkHeaderParser.parse(response.headers().link);
+            vm.linkHeader = response.headers().link;
         }
     }
 }());
