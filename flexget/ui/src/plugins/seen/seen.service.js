@@ -12,14 +12,12 @@
             deleteEntryById: deleteEntryById
         };
 
-        function getSeen() {
-            return $http.get('/api/seen/', { etagCache: true })
-                .then(getSeenComplete)
+        function getSeen(options) {
+            return $http.get('/api/seen/', {
+                params: options,
+                etagCache: true
+            })
                 .catch(callFailed);
-                
-            function getSeenComplete(response) {
-                return response.data;
-            }
         }
 
         function deleteEntryById(id) {

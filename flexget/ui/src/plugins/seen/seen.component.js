@@ -15,24 +15,32 @@
 
         vm.$onInit = activate;
         vm.deleteEntry = deleteEntry;
+        vm.getSeen = getSeen;
+        
+        var options = {};
 
         function activate() {
-            getSeen();
+            getSeen(1);
         }
 
-        function getSeen() {
-            seenService.getSeen()
+        function getSeen(page) {
+            options.page = page;
+            seenService.getSeen(options)
                 .then(setEntries)
-                .cached(setEntries);
+                .cached(setEntries)
+                .finally(function (data) {
+                    vm.currentPage = options.page;
+                });
             
-            function setEntries(data) {
-                vm.entries = data;
+            function setEntries(response) {
+                vm.entries = response.data;
+                vm.linkHeader = response.headers().link;
             };
         }
 
         function deleteEntry(entry) {
             seenService.deleteEntryById(entry.id).then(function () {
-                getSeen();
+                getSeen(options.page);
             });
         }
     }

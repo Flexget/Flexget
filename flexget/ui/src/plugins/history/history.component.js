@@ -39,7 +39,7 @@
                 });
         }
         
-        function setEntries(response, itemCache) {
+        function setEntries(response) {
             vm.entries = response.data;
             vm.linkHeader = response.headers().link;
         }
