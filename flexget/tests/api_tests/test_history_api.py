@@ -101,6 +101,10 @@ class TestHistoryPaginationAPI(object):
         assert len(data) == 100
         assert int(rsp.headers['count']) == 100
 
+        links = link_headers(rsp)
+        assert links['last']['page'] == 2
+        assert links['next']['page'] == 2
+
         # Per page is limited to 100
         rsp = api_client.get('/history/?per_page=200')
         assert rsp.status_code == 200
@@ -119,6 +123,11 @@ class TestHistoryPaginationAPI(object):
         assert not errors
 
         assert data[0]['task'] == 'test_task_50'
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 3
+        assert links['prev']['page'] == 1
 
         # Non existent page
         rsp = api_client.get('/history/?page=5')
