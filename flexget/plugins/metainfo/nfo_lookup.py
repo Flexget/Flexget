@@ -8,8 +8,6 @@ import xml.etree.ElementTree as ET
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.metainfo.imdb_lookup import ImdbLookup
-# from flexget.utils.imdb import make_url as make_imdb_url
-# from flexget.utils.imdb import ImdbSearch
 
 log = logging.getLogger('nfo_lookup')
 
@@ -142,7 +140,7 @@ class NfoLookup(object):
                 if value is not None:
                     d[nfo_field_name] = value
 
-            # Multiple value fields
+            # Multiple value fields (genres, actors, directors)
             for field_name in NfoLookup.multiple_value_fields:
                 nfo_field_name = u'nfo_{0}'.format(field_name)
                 values = self._extract_multiple_field(root, field_name)
@@ -230,12 +228,7 @@ class NfoLookup(object):
         else:
             return None
 
-    @property
-    def movie_identifier(self):
-        """Returns the plugin main identifier type"""
-        return 'nfo_id'
-
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(NfoLookup, 'nfo_lookup', api_ver=2, groups=['movie_metainfo'])
+    plugin.register(NfoLookup, 'nfo_lookup', api_ver=2)
