@@ -5,7 +5,8 @@ import copy
 
 from flexget.api.app import empty_response, base_message
 from flexget.api.plugins.movie_list import ObjectsContainer as OC
-from flexget.plugins.list.movie_list import MovieListBase
+from flexget.manager import Session
+from flexget.plugins.list.movie_list import MovieListBase, MovieListList, MovieListMovie
 from flexget.utils import json
 
 
@@ -325,3 +326,103 @@ class TestMovieListUseCases(object):
 
         identifiers = MovieListBase().supported_ids
         assert data == identifiers
+
+
+class TestMovieListPagination(object):
+    config = 'tasks: {}'
+
+    def test_movie_list_pagination(self, api_client, link_headers):
+        base_movie = dict(title='title_', year=1900)
+        number_of_movies = 200
+
+        with Session() as session:
+            movie_list = MovieListList(name='test_list')
+            session.add(movie_list)
+
+            for i in range(number_of_movies):
+                movie = copy.deepcopy(base_movie)
+                movie['title'] += str(i)
+                movie['year'] += i
+                movie_list.movies.append(MovieListMovie(**movie))
+
+        # Default values
+        rsp = api_client.get('/movie_list/1/movies/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 50  # Default page size
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 50
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 2
+
+        # Change page size
+        rsp = api_client.get('/movie_list/1/movies/?per_page=100')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 100
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 100
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 2
+        assert links['next']['page'] == 2
+
+        # Get different page
+        rsp = api_client.get('/movie_list/1/movies/?page=2')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 50  # Default page size
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 50
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 3
+        assert links['prev']['page'] == 1
+
+    def test_movie_list_sorting(self, api_client):
+        with Session() as session:
+            movie_list = MovieListList(name='test_list')
+            session.add(movie_list)
+
+            movie_list.movies.append(MovieListMovie(title='movie a', year=2005))
+            movie_list.movies.append(MovieListMovie(title='movie b', year=2004))
+            movie_list.movies.append(MovieListMovie(title='movie c', year=2003))
+
+        # Sort by title
+        rsp = api_client.get('/movie_list/1/movies/?sort_by=title')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['title'] == 'movie c'
+
+        rsp = api_client.get('/movie_list/1/movies/?sort_by=title&order=asc')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['title'] == 'movie a'
+
+        # Sort by year
+        rsp = api_client.get('/movie_list/1/movies/?sort_by=year')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['year'] == 2005
+
+        rsp = api_client.get('/movie_list/1/movies/?sort_by=year&order=asc')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['year'] == 2003
+
+        # Combine sorting and pagination
+        rsp = api_client.get('/movie_list/1/movies/?sort_by=year&per_page=2&page=2')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['year'] == 2003

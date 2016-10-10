@@ -78,14 +78,13 @@ class MovieListMovie(Base):
         return entry
 
     def to_dict(self):
-        movies_list_ids = [movie_list_id.to_dict() for movie_list_id in self.ids]
         return {
             'id': self.id,
             'added_on': self.added,
             'title': self.title,
             'year': self.year,
             'list_id': self.list_id,
-            'movies_list_ids': movies_list_ids
+            'movies_list_ids': [movie_list_id.to_dict() for movie_list_id in self.ids]
         }
 
     @property
