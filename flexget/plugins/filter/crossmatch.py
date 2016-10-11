@@ -30,7 +30,7 @@ class CrossMatch(object):
             'fields': {'type': 'array', 'items': {'type': 'string'}},
             'action': {'enum': ['accept', 'reject']},
             'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
-            'exact': {'type': 'boolean'}
+            'exact': {'type': 'boolean', 'default': True}
 
         },
         'required': ['fields', 'action', 'from'],
@@ -69,7 +69,7 @@ class CrossMatch(object):
         for entry in task.entries:
             for generated_entry in match_entries:
                 log.trace('checking if %s matches %s' % (entry['title'], generated_entry['title']))
-                common = self.entry_intersects(entry, generated_entry, fields, config.get('exact', True))
+                common = self.entry_intersects(entry, generated_entry, fields, config.get('exact'))
                 if common:
                     msg = 'intersects with %s on field(s) %s' % \
                           (generated_entry['title'], ', '.join(common))
