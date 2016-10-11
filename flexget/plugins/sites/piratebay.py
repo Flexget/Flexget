@@ -151,7 +151,7 @@ class UrlRewritePirateBay(object):
                     if size:
                         entry['content_size'] = parse_filesize(size.group(1))
                     else:
-                        log.error('Malformed search result? Title: "%s", No size? %s' % (entry['title'], sizeText))
+                        log.error('Malformed search result? Title: "%s", No size? %s', (entry['title'], sizeText))
 
                 entries.add(entry)
 
