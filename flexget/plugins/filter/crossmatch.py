@@ -81,7 +81,7 @@ class CrossMatch(object):
                     if action == 'accept':
                         entry.accept(msg)
 
-    def entry_intersects(self, e1, e2, fields=None, exact=None):
+    def entry_intersects(self, e1, e2, fields=None, exact=True):
         """
         :param e1: First :class:`flexget.entry.Entry`
         :param e2: Second :class:`flexget.entry.Entry`
