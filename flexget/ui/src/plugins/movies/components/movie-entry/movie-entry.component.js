@@ -28,7 +28,6 @@
                 year: vm.movie.year
             };
 
-            console.log(vm.movie);
 
             vm.movie.movies_list_ids.forEach(function (id) {
                 var newid = {};

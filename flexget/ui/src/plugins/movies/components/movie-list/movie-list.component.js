@@ -13,8 +13,7 @@
                 deleteMovieList: '&',
                 tabIndex: '<',
                 linkHeader: '=',
-                currentPage: '=',
-                loadMovies: '='
+                currentPage: '='
             }
         });
 
@@ -26,12 +25,9 @@
         vm.$onDestroy = destroy;
         vm.tabSelected = tabSelected;
         vm.tabDeselected = tabDeselected;
-        vm.loadMovies = loadMovies;
         vm.deleteMovie = deleteMovie;
 
-        var listener;
-        var currentTab = false;
-
+        var loadMoviesListener, addMovieToListListener;
         var options = {
             'per_page': 10,
             order: 'asc'
@@ -39,31 +35,29 @@
 
         function tabSelected() {
             loadMovies(1);
-            currentTab = true;
+            loadMoviesListener = $rootScope.$on('load-movies', function (event, args) {
+                loadMovies(args.page);
+            });
+            addMovieToListListener = $rootScope.$on('movie-added-list:' + vm.list.id, function () {
+                loadMovies(vm.currentPage);
+            })
         }
 
         function tabDeselected() {
-            currentTab = false;
+            loadMoviesListener();
+            addMovieToListListener();
         }
         
         function activate() {
             //Hack to make the movies from the first tab load (md-on-select not firing for initial tab)
             if (vm.tabIndex === 0) {
-                loadMovies(1);
-                currentTab = true;
+                tabSelected();
             }
-
-            listener = $rootScope.$on('movie-added-list:' + vm.list.id, function () {
-                if (currentTab) {
-                    loadMovies(vm.currentPage);
-                }
-            });
         }
 
         function destroy() {
-            if (listener) {
-                listener();
-            }
+            loadMoviesListener ? loadMoviesListener() : null;
+            addMovieToListListener ? addMovieToListListener() : null;
         }
 
         function loadMovies(page) {
