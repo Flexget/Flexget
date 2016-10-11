@@ -36,16 +36,16 @@ class NfoLookup(object):
     # Fields that appear only once in the nfo file
     single_value_fields = ["title", "originaltitle", "sorttitle", "rating",
                            "year", "votes", "plot", "runtime",
-                           "id", "filenameandpath", "trailer",
-                           # thumb has multiple values, but we will get the first one
-                           "thumb"]
+                           "id", "filenameandpath", "trailer"]
+
     # Fields that can appear multiple times in the nfo file
-    multiple_value_fields = [
-        # "thumb",
-        "genre", "director", "actor"]
+    multiple_value_fields = ["thumb", "genre", "director", "actor"]
     # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
     schema = {'type': 'boolean'}
+
+    # TODO: Maybe refactor this to allow an option specifying a different extension
+    nfo_file_extension = '.nfo'
 
     # Run before the imdb_lookup plugin
     @plugin.priority(150)
@@ -71,8 +71,8 @@ class NfoLookup(object):
                 # Stop if there is no nfo file
                 if nfo_filename is None:
                     log.warning(
-                        "Entry '{0}' has no corresponding '.nfo' file".format(
-                            entry.get('title')))
+                        "Entry '{0}' has no corresponding '{1}' file".format(
+                            entry.get('title'), self.nfo_file_extension))
                     # continue
 
             # Populate the fields from the information in the .nfo file
@@ -95,7 +95,8 @@ class NfoLookup(object):
             fields = {}
         else:
             # Get all values we can from the nfo file
-            fields = self.get_fields_from_nfo_file(nfo_filename)
+            nfo_reader = NfoReader()
+            fields = nfo_reader.get_fields_from_nfo_file(nfo_filename)
 
             # Update the entry with the just the imdb_id. This is enouth so that we
             # can search with ImdbLookup and be sure to get the same movie pointed
@@ -120,62 +121,6 @@ class NfoLookup(object):
         # the ones from the nfo file.
         self.add_imdb_fields_to_dict(fields)
         entry.update(fields)
-
-    def get_fields_from_nfo_file(self, nfo_filename):
-        d = {}
-        if os.path.exists(nfo_filename):
-            tree = ET.parse(nfo_filename)
-            root = tree.getroot()
-
-            # TODO: Right now it only works for movies
-            if root.tag != 'movie':
-                return d
-
-            # TODO: Get more metadata from the nfo file
-
-            # Single value fields
-            for field_name in NfoLookup.single_value_fields:
-                nfo_field_name = u'nfo_{0}'.format(field_name)
-                value = self._extract_single_field(root, field_name)
-                if value is not None:
-                    d[nfo_field_name] = value
-
-            # Multiple value fields (genres, actors, directors)
-            for field_name in NfoLookup.multiple_value_fields:
-                nfo_field_name = u'nfo_{0}'.format(field_name)
-                values = self._extract_multiple_field(root, field_name)
-                if values is not None:
-                    d[nfo_field_name] = values
-
-        return d
-
-    @staticmethod
-    def _extract_single_field(root, name):
-        """
-        Use this method to get fields from the root XML tree that only appear once,
-        such as 'title', 'year', etc.
-        """
-        f = root.find(name)
-        if f is not None:
-            return f.text
-        else:
-            return None
-
-    @staticmethod
-    def _extract_multiple_field(root, name):
-        """
-        Use this method to get fields from the root XML tree that can appear more
-        than once, such as 'actor', 'genre', 'director', etc.
-        """
-        if name == 'actor':
-            values = []
-        else:
-            values = [i.text for i in root.findall(name)]
-
-        if len(values) > 0:
-            return values
-        else:
-            return None
 
     def add_imdb_fields_to_dict(self, fields):
         """
@@ -219,14 +164,82 @@ class NfoLookup(object):
         # replacing the the values we got from the IMDB lookup.
 
     def get_nfo_filename(self, entry):
+        """
+        Get the filename of the nfo file from the 'location' in the entry.
+
+        Returns
+        -------
+        str | None
+            The file name of the 'nfo' file, or None it there is no 'nfo' file.
+        """
         location = entry.get('location')
-        # TODO: maybe create an option to set a different extension than just .nfo
-        nfo_full_filename = os.path.splitext(location)[0] + '.nfo'
+        nfo_full_filename = os.path.splitext(location)[0] + self.nfo_file_extension
 
         if os.path.isfile(nfo_full_filename):
             return nfo_full_filename
         else:
             return None
+
+
+class NfoReader(object):
+    """
+    Class in charge of reading the nfo file and getting a dictionary of fields.
+    """
+    @staticmethod
+    def _extract_single_field(root, name):
+        """
+        Use this method to get fields from the root XML tree that only appear once,
+        such as 'title', 'year', etc.
+        """
+        f = root.find(name)
+        if f is not None:
+            return f.text
+        else:
+            return None
+
+    @staticmethod
+    def _extract_multiple_field(root, name):
+        """
+        Use this method to get fields from the root XML tree that can appear more
+        than once, such as 'actor', 'genre', 'director', etc.
+        """
+        if name == 'actor':
+            values = []
+        else:
+            values = [i.text for i in root.findall(name)]
+
+        if len(values) > 0:
+            return values
+        else:
+            return None
+
+    def get_fields_from_nfo_file(self, nfo_filename):
+        d = {}
+        if os.path.exists(nfo_filename):
+            tree = ET.parse(nfo_filename)
+            root = tree.getroot()
+
+            # TODO: Right now it only works for movies
+            if root.tag != 'movie':
+                return d
+
+            # TODO: Get more metadata from the nfo file
+
+            # Single value fields
+            for field_name in NfoLookup.single_value_fields:
+                nfo_field_name = u'nfo_{0}'.format(field_name)
+                value = NfoReader._extract_single_field(root, field_name)
+                if value is not None:
+                    d[nfo_field_name] = value
+
+            # Multiple value fields (genres, actors, directors)
+            for field_name in NfoLookup.multiple_value_fields:
+                nfo_field_name = u'nfo_{0}'.format(field_name)
+                values = NfoReader._extract_multiple_field(root, field_name)
+                if values is not None:
+                    d[nfo_field_name] = values
+
+        return d
 
 
 @event('plugin.register')
