@@ -683,7 +683,7 @@ class Manager(object):
                                                    echo=self.options.debug_sql,
                                                    connect_args={'check_same_thread': False, 'timeout': 10})
         except ImportError as e:
-            print('FATAL: Unable to use SQLite. Are you running Python 2.5 - 2.7 ?\n'
+            print('FATAL: Unable to use SQLite. Are you running Python 2.7, 3.3 or newer ?\n'
                   'Python should normally have SQLite support built in.\n'
                   'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
                   'You can try installing `pysqlite`. If you have compiled python yourself, '
