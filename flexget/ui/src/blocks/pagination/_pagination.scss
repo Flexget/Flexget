@@ -1,7 +1,9 @@
 .pagination-group {
+    margin-top: -45px;
+
     > .md-button {
         font-size: 16px;
-        margin: 15px 0;
+        margin: 0 0 5px 0;
         padding: 2px 12px 2px 12px;
         background-color: $flexget-orange;
         min-width: 50px;
