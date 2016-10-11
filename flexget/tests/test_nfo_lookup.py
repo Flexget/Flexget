@@ -58,6 +58,21 @@ class TestNfoLookupWithMovies(object):
               path: {0}/test_9
               mask: '*.mkv'
             nfo_lookup: no
+          test_10:  # Test with ID, title and actors
+            filesystem:
+              path: {0}/test_10
+              mask: '*.mkv'
+            nfo_lookup: yes
+          test_11:  # Test with all fields
+            filesystem:
+              path: {0}/test_11
+              mask: '*.mkv'
+            nfo_lookup: yes
+          test_12:  # Test with an invalid file
+            filesystem:
+              path: {0}/test_12
+              mask: '*.mkv'
+            nfo_lookup: yes
     """.format(base)
 
     def test_nfo_with_only_id(self, execute_task):
@@ -214,8 +229,100 @@ class TestNfoLookupWithMovies(object):
             imdb_keys = [i for i in entry.keys() if i[:4] == 'imdb']
             assert imdb_keys == []
 
+    def test_nfo_with_id_title_and_actors(self, execute_task):
+        # run the task
+        task = execute_task('test_10')
+        for entry in task.entries:
+            # Get all 'nfo' keys in the entry
+            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            assert nfo_keys == [u'nfo_actor', u'nfo_id', u'nfo_title']
 
-# TODO: Test with other fields, such as actors
+            # Check that the 'nfo_id' field is set to the correct movie
+            assert entry['nfo_id'] == 'tt2316801'
+            assert entry['nfo_title'] == 'A Bela e a Fera'
 
+            # Check the actors. They are in the same order from the nfo file
+            assert entry['nfo_actor'][0]['name'] == u"Vincent Cassel"
+            assert entry['nfo_actor'][0]['role'] == u"La bête"
 
+            assert entry['nfo_actor'][1]['name'] == u"Léa Seydoux"
+            assert entry['nfo_actor'][1]['role'] == u"La belle"
+
+            assert entry['nfo_actor'][2]['name'] == u"André Dussollier"
+            assert entry['nfo_actor'][2]['role'] == u"Belle's father"
+
+            assert entry['nfo_actor'][3]['name'] == u"Eduardo Noriega"
+            assert entry['nfo_actor'][3]['role'] == u"Perducas"
+
+            assert entry['nfo_actor'][4]['name'] == u"Myriam Charleins"
+            assert entry['nfo_actor'][4]['role'] == u"Astrid"
+
+            # assert entry['nfo_genre'] == ['Fantasia', 'Romance']
+            assert entry['imdb_id'] == 'tt2316801'
+
+    def test_nfo_with_all_fields(self, execute_task):
+        # run the task
+        task = execute_task('test_11')
+        for entry in task.entries:
+            # Get all 'nfo' keys in the entry
+            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            assert nfo_keys == ['nfo_actor', 'nfo_country', 'nfo_director',
+                                'nfo_genre', 'nfo_id', 'nfo_originaltitle',
+                                'nfo_plot', 'nfo_rating', 'nfo_runtime',
+                                'nfo_studio', 'nfo_thumb', 'nfo_title',
+                                'nfo_trailer', 'nfo_votes', 'nfo_year']
+
+            # Check that the 'nfo_id' field is set to the correct movie
+            assert entry['nfo_id'] == 'tt2316801'
+            assert entry['nfo_title'] == 'A Bela e a Fera'
+
+            # Check the actors. They are in the same order from the nfo file
+            assert entry['nfo_actor'][0]['name'] == u"Vincent Cassel"
+            assert entry['nfo_actor'][0]['role'] == u"La bête"
+
+            assert entry['nfo_actor'][1]['name'] == u"Léa Seydoux"
+            assert entry['nfo_actor'][1]['role'] == u"La belle"
+
+            assert entry['nfo_actor'][2]['name'] == u"André Dussollier"
+            assert entry['nfo_actor'][2]['role'] == u"Belle's father"
+
+            assert entry['nfo_actor'][3]['name'] == u"Eduardo Noriega"
+            assert entry['nfo_actor'][3]['role'] == u"Perducas"
+
+            assert entry['nfo_actor'][4]['name'] == u"Myriam Charleins"
+            assert entry['nfo_actor'][4]['role'] == u"Astrid"
+
+            assert entry['nfo_country'] == ["France", "Germany"]
+            # Single director, but still a list
+            assert entry['nfo_director'] == ["Christophe Gans"]
+            assert entry['nfo_genre'] == ["Fantasia", "Romance"]
+            assert entry['nfo_originaltitle'] == u"La Belle et la Bête"
+            assert entry['nfo_plot'] == u"Um romance inesperado floresce depois que a filha mais nova de um mercador em dificuldades se oferece para uma misteriosa besta com a qual seu pai ficou endividado."
+            assert entry['nfo_rating'] == "6"
+            assert entry['nfo_runtime'] == "153"
+            assert entry['nfo_studio'] == ["Canal Plus", "Studio Babelsberg", "Eskwad"]
+
+            # There are 3 'thumb's in the nfo file
+            assert len(entry['nfo_thumb']) == 3
+
+            assert entry['nfo_trailer'] == "http://www.youtube.com/watch?v=P-WF6ugqIY8"
+
+            assert entry['nfo_votes'] == '210'
+            assert entry['nfo_year'] == '2014'
+
+            # assert entry['nfo_genre'] == ['Fantasia', 'Romance']
+            assert entry['imdb_id'] == 'tt2316801'
+
+    def test_nfo_with_invalid_file(self, execute_task):
+        # run the task
+        task = execute_task('test_12')
+        for entry in task.entries:
+            # Get all 'nfo' keys in the entry. In this test the info file only
+            # has the 'id' field
+            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            # Since the nfo file is invalid (there was some parse error) then
+            # there is no nfo fields.
+            assert nfo_keys == []
+
+# TODO: Test with an invalid XML file
 # TODO: Test with series

@@ -7,7 +7,6 @@ import xml.etree.ElementTree as ET
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.metainfo.imdb_lookup import ImdbLookup
 
 log = logging.getLogger('nfo_lookup')
 
@@ -40,6 +39,7 @@ class NfoLookup(object):
     # TODO: Maybe refactor this to allow an option specifying a different extension
     nfo_file_extension = '.nfo'
 
+    @plugin.priority(150)
     def on_task_metainfo(self, task, config):
         # check if disabled (value set to false)
         if not config:
@@ -56,7 +56,7 @@ class NfoLookup(object):
             # If there is no 'filename' field there is also no nfo file
             if filename is None or location is None:
                 log.warning("Entry '{0}' didn't come from the filesystem plugin".format(entry.get('title')))
-                nfo_filename = None
+                return
             else:
                 # This will be None if there is no nfo file
                 nfo_filename = self.get_nfo_filename(entry)
@@ -67,76 +67,39 @@ class NfoLookup(object):
                             entry.get('title'), self.nfo_file_extension))
                     return
 
-            # Populate the fields from the information in the .nfo file
+            # Populate the fields from the information in the .nfo file Note
+            # that at this point `nfo_filename` has the name of an existing
+            # '.nfo' file
             self.lookup(entry, nfo_filename)
 
     def lookup(self, entry, nfo_filename):
         # If there is already data from a previous parse then we don't need to
         # do anything
         if entry.get('nfo_id') is not None:
-            log.warning("Entry '{0}' was already parsed by nfo_lookup. "
-                        "I won't do anything.".format(entry.get('title')))
+            log.warning("Entry '{0}' was already parsed by nfo_lookup and it "
+                        "will be skipped. ".format(entry.get('title')))
             return
 
-        # In case there is no nfo file, `nfo_filename` will be None at this point
-        if nfo_filename is None:
-            # Setting the fields dictionary to be an empty dictionary here
-            # means that no new information will be added to the entry in this
-            # lookup function. We will still perform an IMDB lookup later, but
-            # it will be the same as if we had used the imdb_lookup plugin.
-            fields = {}
-        else:
-            # Get all values we can from the nfo file
-            fields = NfoReader.get_fields_from_nfo_file(nfo_filename)
+        # nfo_filename Should not be None at this point
+        assert nfo_filename is not None
 
-            # Update the entry with the just the imdb_id. This will help the
-            # imdb_lookup plugin to get the correct data if it is also used
-            if 'nfo_id' in fields:
-                entry.update({u'imdb_id': fields['nfo_id']})
+        # Get all values we can from the nfo file. It the nfo file can't be
+        # parsed then a warning is logged and we return without changing the
+        # entry
+        try:
+            nfo_reader = NfoReader(nfo_filename)
+            fields = nfo_reader.get_fields_from_nfo_file()
+        except BadXmlFile:
+            log.warning("Invalid '.nfo' file for entry '{0}'".format(entry.get('title')))
+            return
 
         entry.update(fields)
 
-    # TODO: Remove this method
-    def add_imdb_fields_to_dict(self, fields):
-        """
-        Take the dictionary of 'nfo fields' and add extra keys with 'imdb fields'
-        corresponding to the 'nfo fields'
-        """
-        single_field_mapping = {
-            # u'nfo_id': u'imdb_id',
-            u'nfo_title': u'imdb_name',
-            u'nfo_originaltitle': u'imdb_original_name',
-            # u'nfo_votes' u'imdb_votes',
-            # u'nfo_year': u'imdb_year',
-            u'nfo_plot': u'imdb_plot_outline',
-            # u'nfo_rating': u'imdb_score',
-            # u'nfo_thumb': u'imdb_photo'
-        }
-
-        # multiple_field_mapping = {
-        #     # List of imdb genres
-        #     u'nfo_genre': u'imdb_genres',
-        #     # Directors dictionary (imdbid, name)
-        #     u'nfo_director': u'imdb_directors',
-        #     # Actors dictionary (key: imdbid, value: name)
-        #     u'nfo_actor': u'imdb_actors',
-        # }
-
-        # extra_imdb_fields = ['imdb_url',
-        #                      # 'imdb_photo',
-        #                      'imdb_languages']
-
-        # Add imdb entries with single value
-        for nfo_name, imdb_name in single_field_mapping.items():
-            if nfo_name in fields:
-                fields[imdb_name] = fields[nfo_name]
-
-        # Add imdb fields with multiple values
-        if 'nfo_genre' in fields:
-            fields[u'imdb_genres'] = fields[u'nfo_genre']
-
-        # The nfo file can also have actors and directors, but there is no gain
-        # replacing the the values we got from the IMDB lookup.
+        # If the IMDB id was found in the nfo file, set the imdb_id field of
+        # the entry. This will help the imdb_lookup plugin to get the correct
+        # data if it is also used.
+        if 'nfo_id' in fields:
+            entry.update({u'imdb_id': fields['nfo_id']})
 
     def get_nfo_filename(self, entry):
         """
@@ -156,97 +119,130 @@ class NfoLookup(object):
             return None
 
 
+class BadXmlFile(Exception):
+    """
+    Exception that is raised if the nfo file can't be parsed due to some
+    invalid nfo file.
+    """
+    pass
+
+
 class NfoReader(object):
     """
-    Class in charge of reading the '.nfo' file and getting a dictionary of
+    Class in charge of parsing the '.nfo' file and getting a dictionary of
     fields.
 
     The '.nfo' file is an XML file. Some fields can only appear once, such as
-    'title', 'id', 'plot', etc. These fields are listed in the
-    `single_value_fields` class attribute. Other fields can appear multiple
-    times (with different values), such as 'thumb', 'genre', etc. These fields
-    are listed in the `multiple_value_fields` class attribute.
+    'title', 'id', 'plot', etc., while other fields can appear multiple times
+    (with different values), such as 'thumb', 'genre', etc. These fields are
+    listed in the `_fields` attribute.
     """
+    def __init__(self, filename):
+        from xml.etree.ElementTree import ParseError
 
-    # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    # Fields that will be read from the nfo file. The corresponding field in
-    # the entry will be nfo_{0} for each field name in these two lists.
+        try:
+            tree = ET.parse(filename)
+            root = tree.getroot()
+        except ParseError:
+            raise BadXmlFile()
 
-    # Fields that appear only once in the nfo file
-    single_value_fields = ["title", "originaltitle", "sorttitle", "rating",
-                           "year", "votes", "plot", "runtime",
-                           "id", "filenameandpath", "trailer"]
+        if os.path.exists(filename):
+            self._nfo_filename = filename
+            self._root = root
+        else:
+            raise BadXmlFile()
 
-    # Fields that can appear multiple times in the nfo file
-    multiple_value_fields = ["thumb", "genre", "director", "actor"]
-    # xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        # Each key in the dictionary correspond to a field that should be read from
+        # the nfo file. he values are a tuple with a boolean and a callable. The
+        # boolean indicates if the field can appear multiple times, while the
+        # callable is a function to read the field value from the XML element.
+        self._fields = {"title": (False, NfoReader._single_elem_getter_func),
+                        "originaltitle": (False, NfoReader._single_elem_getter_func),
+                        "sorttitle": (False, NfoReader._single_elem_getter_func),
+                        "rating": (False, NfoReader._single_elem_getter_func),
+                        "year": (False, NfoReader._single_elem_getter_func),
+                        "votes": (False, NfoReader._single_elem_getter_func),
+                        "plot": (False, NfoReader._single_elem_getter_func),
+                        "runtime": (False, NfoReader._single_elem_getter_func),
+                        "id": (False, NfoReader._single_elem_getter_func),
+                        "filenameandpath": (False, NfoReader._single_elem_getter_func),
+                        "trailer": (False, NfoReader._single_elem_getter_func),
+                        "thumb": (True, NfoReader._single_elem_getter_func),
+                        "genre": (True, NfoReader._single_elem_getter_func),
+                        "director": (True, NfoReader._single_elem_getter_func),
+                        # Actor field has child elements, such as 'name' and 'role'
+                        "actor": (True, NfoReader._composite_elem_getter_func),
+                        "studio": (True, NfoReader._single_elem_getter_func),
+                        "country": (True, NfoReader._single_elem_getter_func)}
 
     @staticmethod
-    def _extract_single_field(root, name, getter_func=lambda x: x.text):
+    def _single_elem_getter_func(x):
+        """
+        Method to get the text value of simple XML element that does not contain
+        child nodes.
+        """
+        return x.text
+
+    @staticmethod
+    def _composite_elem_getter_func(x):
+        """
+        Method to get the strucured XML element as a dictionary.
+        """
+        return {i.tag: i.text for i in x.getchildren()}
+
+    def _extract_single_field(self, name, getter_func):
         """
         Use this method to get fields from the root XML tree that only appear once,
         such as 'title', 'year', etc.
         """
-        f = root.find(name)
+        f = self._root.find(name)
         if f is not None:
             return getter_func(f)
         else:
             return None
 
-    @staticmethod
-    def _extract_multiple_field(root, name, getter_func=lambda x: x.text):
+    def _extract_multiple_field(self, name, getter_func):
         """
         Use this method to get fields from the root XML tree that can appear more
         than once, such as 'actor', 'genre', 'director', etc. The result will
         be a list of values.
         """
-        if name == 'actor':
-            values = []
-        else:
-            values = [getter_func(i) for i in root.findall(name)]
+        values = [getter_func(i) for i in self._root.findall(name)]
 
         if len(values) > 0:
             return values
         else:
             return None
 
-    @staticmethod
-    def get_fields_from_nfo_file(nfo_filename):
+    def get_fields_from_nfo_file(self):
         """
         Returns a dictionary with all firlds read from the '.nfo' file.
 
         The keys are named as 'nfo_something'.
         """
         d = {}
-        if os.path.exists(nfo_filename):
-            tree = ET.parse(nfo_filename)
-            root = tree.getroot()
+        if self._root is None:
+            return d
 
-            # TODO: Right now it only works for movies
-            if root.tag != 'movie':
-                return d
+        # TODO: Right now it only works for movies
+        if self._root.tag != 'movie':
+            return d
 
-            # TODO: Get more metadata from the nfo file
+        for name, values in self._fields.items():
+            multiple_bool = values[0]
+            getter_func = values[1]
 
-            # Single value fields
-            for field_name in NfoReader.single_value_fields:
-                nfo_field_name = u'nfo_{0}'.format(field_name)
-                value = NfoReader._extract_single_field(root, field_name)
-                if value is not None:
-                    d[nfo_field_name] = value
+            nfo_field_name = u'nfo_{0}'.format(name)
 
-            # Multiple value fields (genres, actors, directors)
-            for field_name in NfoReader.multiple_value_fields:
-                nfo_field_name = u'nfo_{0}'.format(field_name)
-                values = NfoReader._extract_multiple_field(root, field_name)
-                if values is not None:
-                    d[nfo_field_name] = values
+            if multiple_bool:
+                v = self._extract_multiple_field(name, getter_func)
+            else:
+                v = self._extract_single_field(name, getter_func)
+
+            if v is not None:
+                d[nfo_field_name] = v
+
         return d
-
-
-class _ImdbFiller(object):
-
-    pass
 
 
 @event('plugin.register')
