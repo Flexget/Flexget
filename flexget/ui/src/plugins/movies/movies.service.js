@@ -44,9 +44,15 @@
         }
 
         function createList(name) {
-            return $http.post('/api/movie_list/', { name: name })
-                .then(callCompleted)    
+            return $http.post('/api/movie_list/', {
+                name: name
+            })
+                .then(callCompleted)
                 .catch(callFailed);
+            
+            function callCompleted(response) {
+                return response.data;
+            }
         }
 
         function getMovieMetadata(title, params) {
@@ -67,10 +73,6 @@
                 etagCache: true
             })
                 .catch(callFailed);
-        }
-
-        function callCompleted(response) {
-            return response.data;
         }
 
         function callFailed(error) {
