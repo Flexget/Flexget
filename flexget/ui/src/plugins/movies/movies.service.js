@@ -54,7 +54,6 @@
                 params: params,
                 etagCache: true
             })
-                .then(callCompleted)
                 .catch(callFailed);
         }
 
@@ -64,8 +63,9 @@
         }
 
         function searchMovies(searchText) {
-            return $http.get('/api/imdb/search/' + searchText, { etagCache: true })
-                .then(callCompleted)
+            return $http.get('/api/imdb/search/' + searchText, {
+                etagCache: true
+            })
                 .catch(callFailed);
         }
 

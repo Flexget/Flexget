@@ -38,8 +38,8 @@
             }, 1000);
         }
 
-        function setFoundMovies(data) {
-            vm.foundMovies = data;
+        function setFoundMovies(response) {
+            vm.foundMovies = response.data;
             vm.loading = false;
             updatePosition();
         }

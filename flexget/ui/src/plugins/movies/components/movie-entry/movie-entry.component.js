@@ -40,8 +40,8 @@
                 .cached(setMetadata);
         }
           
-        function setMetadata(data) {
-            vm.metadata = data;
+        function setMetadata(response) {
+            vm.metadata = response.data;
         }
     }
 }());
