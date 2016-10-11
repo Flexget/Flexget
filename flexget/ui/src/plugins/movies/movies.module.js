@@ -7,6 +7,7 @@
             'ngMaterial',
             'ngSanitize',
 
+            'blocks.pagination',            
             'blocks.exception',
             'blocks.router'
         ]);

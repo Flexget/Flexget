@@ -11,7 +11,10 @@
             bindings: {
                 list: '<',
                 deleteMovieList: '&',
-                tabIndex: '<'
+                tabIndex: '<',
+                linkHeader: '=',
+                currentPage: '=',
+                loadMovies: '='
             }
         });
 
@@ -25,19 +28,17 @@
         vm.tabDeselected = tabDeselected;
         vm.loadMovies = loadMovies;
         vm.deleteMovie = deleteMovie;
-        vm.updateListPage = updateListPage;
 
         var listener;
         var currentTab = false;
 
         var options = {
-            page: 1,
             'per_page': 10,
             order: 'asc'
         };
 
         function tabSelected() {
-            loadMovies();
+            loadMovies(1);
             currentTab = true;
         }
 
@@ -48,13 +49,13 @@
         function activate() {
             //Hack to make the movies from the first tab load (md-on-select not firing for initial tab)
             if (vm.tabIndex === 0) {
-                loadMovies();
+                loadMovies(1);
                 currentTab = true;
             }
 
             listener = $rootScope.$on('movie-added-list:' + vm.list.id, function () {
                 if (currentTab) {
-                    loadMovies();
+                    loadMovies(vm.currentPage);
                 }
             });
         }
@@ -65,14 +66,19 @@
             }
         }
 
-        function loadMovies() {
+        function loadMovies(page) {
+            options.page = page;
             moviesService.getListMovies(vm.list.id, options)
                 .then(setMovies)
-                .cached(setMovies);
+                .cached(setMovies)
+                .finally(function () {
+                    vm.currentPage = options.page;
+                });
         }
 
-        function setMovies(data) {
-            vm.movies = data;
+        function setMovies(response) {
+            vm.movies = response.data;
+            vm.linkHeader = response.headers().link;
         }
 
         function deleteMovie(list, movie) {
@@ -85,16 +91,9 @@
             $mdDialog.show(confirm).then(function () {
                 moviesService.deleteMovie(list.id, movie.id)
                     .then(function () {
-                        loadMovies();
+                        loadMovies(vm.currentPage);
                     });
             });
-        }
-
-        //Call from the pagination to update the page to the selected page
-        function updateListPage (index) {
-            options.page = index;
-
-            loadMovies();
         }
     }
 }());

@@ -19,8 +19,9 @@
         };
 
         function getLists() {
-            return $http.get('/api/movie_list/', { etagCache: true })
-                .then(callCompleted)
+            return $http.get('/api/movie_list/', {
+                etagCache: true
+            })
                 .catch(callFailed);
         }
 
@@ -30,8 +31,10 @@
         }
 
         function getListMovies(listId, options) {
-            return $http.get('/api/movie_list/' + listId + '/movies/', { params: options, etagCache: true })
-                .then(callCompleted)
+            return $http.get('/api/movie_list/' + listId + '/movies/', {
+                params: options,
+                etagCache: true
+            })
                 .catch(callFailed);
         }
 
@@ -42,7 +45,7 @@
 
         function createList(name) {
             return $http.post('/api/movie_list/', { name: name })
-                .then(callCompleted)
+                .then(callCompleted)    
                 .catch(callFailed);
         }
 

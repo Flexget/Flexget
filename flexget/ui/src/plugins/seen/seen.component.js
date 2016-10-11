@@ -28,7 +28,7 @@
             seenService.getSeen(options)
                 .then(setEntries)
                 .cached(setEntries)
-                .finally(function (data) {
+                .finally(function () {
                     vm.currentPage = options.page;
                 });
             

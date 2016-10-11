@@ -56,8 +56,8 @@
                 .cached(setLists);
         }
         
-        function setLists(data) {
-            vm.lists = data;
+        function setLists(response) {
+            vm.lists = response.data;
         }
 
         function deleteList($event, list) {
