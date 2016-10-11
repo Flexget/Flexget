@@ -17,6 +17,7 @@ class TestNfoLookupWithMovies(object):
               path: {0}/test_1
               mask: '*.mkv'
             nfo_lookup: yes
+            imdb_lookup: yes
           test_2:  # ID and Title
             filesystem:
               path: {0}/test_2
@@ -42,10 +43,12 @@ class TestNfoLookupWithMovies(object):
               path: {0}/test_6
               mask: '*.mkv'
             nfo_lookup: yes
+            imdb_lookup: yes
           test_7:  # Use the nfo_lookup plugin with entries not from the filesystem plugin
             mock:
               - {{title: 'A Bela e a Fera'}}
             nfo_lookup: yes
+            imdb_lookup: yes
           test_8:  # Call the plugin twice. The second time won't do anything
             mock:
               - {{title: 'A Bela e a Fera', filename: 'beast_beauty.mkv', nfo_id: 'tt2316801'}}
@@ -61,20 +64,23 @@ class TestNfoLookupWithMovies(object):
         # run the task
         task = execute_task('test_1')
         for entry in task.entries:
-            # Get all 'nfo' keys in the entry
+            # Get all 'nfo' keys in the entry. In this test the info file only
+            # has the 'id' field
             nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
             assert nfo_keys == [u'nfo_id']
+
+            assert entry['title'] == u'A Bela e a Fera'  # This will be == to filename
 
             # Check that the 'nfo_id' field is set to the correct movie
             assert entry['nfo_id'] == 'tt2316801'
             assert entry['imdb_id'] == 'tt2316801'
 
-            # The IMDB search was able to get the correct movie even though
-            # there are many versions of (Beauty and the Beast). This
-            # particular version is french
+            # The imdb_lookup plugin was able to get the correct movie metadata
+            # even though there are many versions of (Beauty and the
+            # Beast). That is because the nfo_lookup plugin sets the 'imdb_id'
+            # field in the entry.
             assert entry['imdb_name'] == 'Beauty and the Beast'
             assert entry['imdb_original_name'] == u"La belle et la bête"
-            assert entry['title'] == u'A Bela e a Fera'  # This will be == to filename
             assert entry['imdb_year'] == 2014
             assert entry['imdb_genres'] == [u'fantasy', u'romance']
 
@@ -86,39 +92,30 @@ class TestNfoLookupWithMovies(object):
             nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
             assert nfo_keys == [u'nfo_id', u'nfo_title']
 
+            assert entry['title'] == u'Bela e Fera'  # This will be == to filename
+
             # Check that the 'nfo_id' field is set to the correct movie
             assert entry['nfo_id'] == 'tt2316801'
+            assert entry['nfo_title'] == 'A Bela e a Fera'
             assert entry['imdb_id'] == 'tt2316801'
-
-            # The IMDB search was able to get the correct movie even though
-            # there are many versions of (Beauty and the Beast). This
-            # particular version is french
-            assert entry['imdb_name'] == 'A Bela e a Fera'  # From title tag in nfo file
-            assert entry['imdb_original_name'] == u"La belle et la bête"
-            assert entry['title'] == u'Bela e Fera'  # This will be == to filename
-            assert entry['imdb_year'] == 2014
-            assert entry['imdb_genres'] == [u'fantasy', u'romance']
 
     def test_nfo_with_id_title_originaltitle(self, execute_task):
         # run the task
         task = execute_task('test_3')
         for entry in task.entries:
+            assert entry['title'] == u'A Bela e a Fera'  # This will be == to filename
+
             # Get all 'nfo' keys in the entry
             nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
             assert nfo_keys == [u'nfo_id', u'nfo_originaltitle', u'nfo_title']
 
+            assert entry['title'] == u'A Bela e a Fera'  # This will be == to filename
+
             # Check that the 'nfo_id' field is set to the correct movie
             assert entry['nfo_id'] == 'tt2316801'
+            assert entry['nfo_title'] == 'A Bela e a Fera'
+            assert entry['nfo_originaltitle'] == 'La belle et la bête (French)'
             assert entry['imdb_id'] == 'tt2316801'
-
-            # The IMDB search was able to get the correct movie even though
-            # there are many versions of (Beauty and the Beast). This
-            # particular version is french
-            assert entry['imdb_name'] == 'A Bela e a Fera'  # From title tag in nfo file
-            assert entry['imdb_original_name'] == u"La belle et la bête (French)"
-            assert entry['title'] == u'A Bela e a Fera'  # This will be == to filename
-            assert entry['imdb_year'] == 2014
-            assert entry['imdb_genres'] == [u'fantasy', u'romance']
 
     def test_nfo_with_id_title_plot(self, execute_task):
         # run the task
@@ -128,21 +125,13 @@ class TestNfoLookupWithMovies(object):
             nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
             assert nfo_keys == [u'nfo_id', u'nfo_plot', u'nfo_title']
 
+            assert entry['title'] == u'A Bela e a Fera'  # This will be == to filename
+
             # Check that the 'nfo_id' field is set to the correct movie
             assert entry['nfo_id'] == 'tt2316801'
-            assert entry['imdb_id'] == 'tt2316801'
-
             assert entry['nfo_title'] == 'A Bela e a Fera'
-
-            # The IMDB search was able to get the correct movie even though
-            # there are many versions of (Beauty and the Beast). This
-            # particular version is french
-            assert entry['imdb_name'] == 'A Bela e a Fera'  # From title tag in nfo file
-            assert entry['imdb_original_name'] == u"La belle et la bête" # From IMDB
-            assert entry['title'] == u'A Bela e a Fera'  # This will be == to filename
-            assert entry['imdb_year'] == 2014
-            assert entry['imdb_genres'] == [u'fantasy', u'romance']
-            assert entry['imdb_plot_outline'] == u"Um romance inesperado floresce depois que a filha mais nova de um mercador em dificuldades se oferece para uma misteriosa besta com a qual seu pai ficou endividado."
+            assert entry['nfo_plot'] == u"Um romance inesperado floresce depois que a filha mais nova de um mercador em dificuldades se oferece para uma misteriosa besta com a qual seu pai ficou endividado."
+            assert entry['imdb_id'] == 'tt2316801'
 
     def test_nfo_with_id_genres(self, execute_task):
         # run the task
@@ -154,11 +143,8 @@ class TestNfoLookupWithMovies(object):
 
             # Check that the 'nfo_id' field is set to the correct movie
             assert entry['nfo_id'] == 'tt2316801'
-            assert entry['imdb_id'] == 'tt2316801'
-            # Check the genres from the nfo file
-
-            assert entry['imdb_genres'] == ['Fantasia', 'Romance']
             assert entry['nfo_genre'] == ['Fantasia', 'Romance']
+            assert entry['imdb_id'] == 'tt2316801'
 
     def test_nfo_with_no_nfo_file(self, execute_task):
         # run the task
@@ -168,12 +154,14 @@ class TestNfoLookupWithMovies(object):
             nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
             assert nfo_keys == []
 
+            assert entry['title'] == u'A Bela e a Fera'  # This will be == to filename
+
             # Since there is no nfo file then an IMDB search is performed only
             # with the filename. That means that we will get a different
             # version of the "Beauty and the Beast" movie, with a different ID
             assert entry['imdb_id'] != 'tt2316801'
             # Filename (it is in portuguese)
-            assert entry['title'] == u'A Bela e a Fera'  # This will be == to filename
+
             # IMDB is able to find the movie from the Portuguese title,
             # although it is not the correct one
             assert entry['imdb_name'] == 'Beauty and the Beast'
@@ -225,6 +213,9 @@ class TestNfoLookupWithMovies(object):
 
             imdb_keys = [i for i in entry.keys() if i[:4] == 'imdb']
             assert imdb_keys == []
+
+
+# TODO: Test with other fields, such as actors
 
 
 # TODO: Test with series
