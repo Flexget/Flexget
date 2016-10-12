@@ -35,10 +35,11 @@ class NfoLookup(object):
     Use this only with nfo files you have created yourself.
     """
     schema = {'type': 'boolean'}
-
-    # TODO: Maybe refactor this to allow an option specifying a different extension
     nfo_file_extension = '.nfo'
 
+    # This priority makes sure this plugin runs before the imdb_lookup plugin,
+    # if it is also used. That way setting imdb_id here will help imdb_lookup
+    # find the correct movie.
     @plugin.priority(150)
     def on_task_metainfo(self, task, config):
         # check if disabled (value set to false)
@@ -55,16 +56,16 @@ class NfoLookup(object):
 
             # If there is no 'filename' field there is also no nfo file
             if filename is None or location is None:
-                log.warning("Entry '{0}' didn't come from the filesystem plugin".format(entry.get('title')))
+                log.warning("Entry %s didn't come from the filesystem plugin",
+                            entry.get('title'))
                 return
             else:
                 # This will be None if there is no nfo file
                 nfo_filename = self.get_nfo_filename(entry)
-                # Stop if there is no nfo file
                 if nfo_filename is None:
                     log.warning(
-                        "Entry '{0}' has no corresponding '{1}' file".format(
-                            entry.get('title'), self.nfo_file_extension))
+                        "Entry %s has no corresponding %s file",
+                        entry.get('title'), self.nfo_file_extension)
                     return
 
             # Populate the fields from the information in the .nfo file Note
@@ -76,21 +77,21 @@ class NfoLookup(object):
         # If there is already data from a previous parse then we don't need to
         # do anything
         if entry.get('nfo_id') is not None:
-            log.warning("Entry '{0}' was already parsed by nfo_lookup and it "
-                        "will be skipped. ".format(entry.get('title')))
+            log.warning("Entry %s was already parsed by nfo_lookup and it "
+                        "will be skipped. ", entry.get('title'))
             return
 
         # nfo_filename Should not be None at this point
         assert nfo_filename is not None
 
-        # Get all values we can from the nfo file. It the nfo file can't be
+        # Get all values we can from the nfo file. If the nfo file can't be
         # parsed then a warning is logged and we return without changing the
         # entry
         try:
             nfo_reader = NfoReader(nfo_filename)
             fields = nfo_reader.get_fields_from_nfo_file()
         except BadXmlFile:
-            log.warning("Invalid '.nfo' file for entry '{0}'".format(entry.get('title')))
+            log.warning("Invalid '.nfo' file for entry %s", entry.get('title'))
             return
 
         entry.update(fields)
@@ -107,7 +108,7 @@ class NfoLookup(object):
 
         Returns
         -------
-        str | None
+        str
             The file name of the 'nfo' file, or None it there is no 'nfo' file.
         """
         location = entry.get('location')
@@ -152,10 +153,15 @@ class NfoReader(object):
         else:
             raise BadXmlFile()
 
-        # Each key in the dictionary correspond to a field that should be read from
-        # the nfo file. he values are a tuple with a boolean and a callable. The
-        # boolean indicates if the field can appear multiple times, while the
-        # callable is a function to read the field value from the XML element.
+        # Each key in the dictionary correspond to a field that should be read
+        # from the nfo file. The values are a tuple with a boolean and a
+        # callable. The boolean indicates if the field can appear multiple
+        # times, while the callable is a function to read the field value from
+        # the XML element.
+        #
+        # In the future we could extend the nfo_lookup plugin to accept 'set'
+        # in its configuration to add new entries to this dictionary to handle
+        # other tags in the nfo file and add the data to the entry.
         self._fields = {"title": (False, NfoReader._single_elem_getter_func),
                         "originaltitle": (False, NfoReader._single_elem_getter_func),
                         "sorttitle": (False, NfoReader._single_elem_getter_func),
@@ -186,7 +192,7 @@ class NfoReader(object):
     @staticmethod
     def _composite_elem_getter_func(x):
         """
-        Method to get the strucured XML element as a dictionary.
+        Method to get XML elements that have children as a dictionary.
         """
         return {i.tag: i.text for i in x.getchildren()}
 
