@@ -19,9 +19,9 @@
 
         vm.$onInit = activate;
         vm.deleteEpisode = deleteEpisode;
-
+        vm.getEpisodes = getEpisodesList;
+        
         var options = {
-            page: 1,
             'per_page': 10
         };
 
@@ -30,26 +30,24 @@
         };
 
         function activate() {
-            getEpisodesList();
+            getEpisodesList(1);
         }
 
-        //Call from the pagination directive, which triggers other episodes to load
-        vm.updateListPage = function (index) {
-            options.page = index;
-
-            getEpisodesList();
-        };
-
         //Cal the episodes based on the options
-        function getEpisodesList() {
+        function getEpisodesList(page) {
+            options.page = page;
             seriesService.getEpisodes(vm.show, options)
                 .then(setEpisodes)
-                .cached(setEpisodes);
+                .cached(setEpisodes)
+                .finally(function () {
+                    vm.currentPage = options.page;
+                });
         }
         
         function setEpisodes(response) {
             //Set the episodes in the vm scope to the loaded episodes
             vm.episodes = response.data;
+            vm.linkHeader = response.headers().link;
         }
 
         //action called from the series-episode component
@@ -63,7 +61,7 @@
             $mdDialog.show(confirm).then(function () {
                 seriesService.deleteEpisode(vm.show, episode, params)
                     .then(function () {
-                        getEpisodesList();
+                        getEpisodesList(options.page);
                     });
             });
         }
