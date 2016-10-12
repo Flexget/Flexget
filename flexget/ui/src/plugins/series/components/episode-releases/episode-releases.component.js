@@ -30,8 +30,8 @@
                 .cached(setReleases);
         }
         
-        function setReleases(data) {
-            vm.releases = data;
+        function setReleases(response) {
+            vm.releases = response.data;
         }
 
         function cancel() {

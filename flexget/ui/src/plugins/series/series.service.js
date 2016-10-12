@@ -61,8 +61,10 @@
         }
 
         function getEpisodes(show, params) {
-            return $http.get('/api/series/' + show.id + '/episodes/', { params: params, etagCache: true })
-                .then(callComplete)
+            return $http.get('/api/series/' + show.id + '/episodes/', {
+                params: params,
+                etagCache: true
+            })
                 .catch(callFailed);
         }
 
@@ -105,9 +107,9 @@
         }
 
         function loadReleases(show, episode) {
-            console.log(show, episode);
-            return $http.get('/api/series/' + show.id + '/episodes/' + episode.id + '/releases/', { etagCache: true })
-                .then(callComplete)
+            return $http.get('/api/series/' + show.id + '/episodes/' + episode.id + '/releases/', {
+                etagCache: true
+            })
                 .catch(callFailed);
         }
 

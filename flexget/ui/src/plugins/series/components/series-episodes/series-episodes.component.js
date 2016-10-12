@@ -47,9 +47,9 @@
                 .cached(setEpisodes);
         }
         
-        function setEpisodes(data) {
+        function setEpisodes(response) {
             //Set the episodes in the vm scope to the loaded episodes
-            vm.episodes = data;
+            vm.episodes = response.data;
         }
 
         //action called from the series-episode component
