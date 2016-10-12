@@ -28,14 +28,14 @@
                     etagCache: true,
                     params: options
                 })
-                .then(callComplete)
                 .catch(callFailed);
         }
 
 
         function getShowMetadata(show) {
-            return $http.get('/api/tvdb/series/' + show.name + '/', { etagCache: true })
-                .then(callComplete)
+            return $http.get('/api/tvdb/series/' + show.name + '/', {
+                etagCache: true
+            })
                 .catch(callFailed);
         }
 

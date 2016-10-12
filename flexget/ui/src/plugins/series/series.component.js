@@ -58,8 +58,8 @@
             }
         }
 
-        function setSeries(data) {
-            vm.series = data;
+        function setSeries(response) {
+            vm.series = response.data;
         }
 
         function forgetShow(show) {

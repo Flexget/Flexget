@@ -39,8 +39,8 @@
                 .cached(setMetadata);
         }
 
-        function setMetadata(data) {
-            vm.show.metadata = data;
+        function setMetadata(response) {
+            vm.show.metadata = response.data;
         }
 
         function setBegin() {
