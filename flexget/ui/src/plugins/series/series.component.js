@@ -14,7 +14,6 @@
         var vm = this;
 
         var options = {
-            page: 1,
             'per_page': 10,
             'in_config': 'all',
             'sort_by': 'show_name',
@@ -32,15 +31,20 @@
         vm.search = search;
         vm.toggleEpisodes = toggleEpisodes;
         vm.areEpisodesOnShowRow = areEpisodesOnShowRow;
+        vm.getSeries = getSeriesList;
 
         function activate() {
-            getSeriesList();
+            getSeriesList(1);
         }
 
-        function getSeriesList() {
+        function getSeriesList(page) {
+            options.page = page;
             seriesService.getShows(options)
                 .then(setSeries)
-                .cached(setSeries);
+                .cached(setSeries)
+                .finally(function () {
+                    vm.currentPage = options.page;
+                });
         }
 
         function search() {
@@ -54,12 +58,13 @@
 
             function emptySearch() {
                 options.page = 1;
-                getSeriesList();
+                getSeriesList(1);
             }
         }
 
         function setSeries(response) {
             vm.series = response.data;
+            vm.linkHeader = response.headers().link;
         }
 
         function forgetShow(show) {
@@ -71,18 +76,10 @@
 
             $mdDialog.show(confirm).then(function () {
                 seriesService.deleteShow(show, params).then(function () {
-                    getSeriesList();
+                    getSeriesList(options.page);
                 });
             });
         }
-
-        //Call from the pagination to update the page to the selected page
-        vm.updateListPage = function (index) {
-            options.page = index;
-
-            getSeriesList();
-        };
-
 
         
 
