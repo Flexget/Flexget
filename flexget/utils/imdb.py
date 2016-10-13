@@ -37,6 +37,26 @@ def is_imdb_url(url):
     return re.match(r'https?://[^/]*imdb\.com/', url)
 
 
+def is_valid_imdb_title_id(value=None):
+    """
+    Return True if `value` is a valid IMDB ID for titles (movies, series, etc).
+    """
+    if not isinstance(value, basestring):
+        return False
+    # IMDB IDs for titles have 'tt' followed by 7 digits
+    return re.match('tt[\d]{7}', value) is not None
+
+
+def is_valid_imdb_person_id(value=None):
+    """
+    Return True if `value` is a valid IMDB ID for a person.
+    """
+    if not isinstance(value, basestring):
+        return False
+    # An IMDB ID for a person is formed by 'nm' followed by 7 digits
+    return re.match('nm[\d]{7}', value) is not None
+
+
 def extract_id(url):
     """Return IMDb ID of the given URL. Return None if not valid or if URL is not a string."""
     if not isinstance(url, basestring):
