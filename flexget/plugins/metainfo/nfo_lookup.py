@@ -4,6 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 import os
 import xml.etree.ElementTree as ET
+import re
 
 from flexget import plugin
 from flexget.event import event
@@ -84,10 +85,13 @@ class NfoLookup(object):
 
         entry.update(fields)
 
-        # If the IMDB id was found in the nfo file, set the imdb_id field of the entry. This will help the imdb_lookup
-        # plugin to get the correct data if it is also used.
+        # If a valid IMDB id was found in the nfo file, set the imdb_id field of the entry. This will help the
+        # imdb_lookup plugin to get the correct data if it is also used.
         if 'nfo_id' in fields:
-            entry.update({'imdb_id': fields['nfo_id']})
+            if self.is_valid_imdb_title_id(entry.get('nfo_id')):
+                entry.update({'imdb_id': fields['nfo_id']})
+            else:
+                log.warning("ID found in nfo file for entry '%s', but it was not a valid IMDB ID", entry.get('title'))
 
     def get_nfo_filename(self, entry):
         """
@@ -103,6 +107,13 @@ class NfoLookup(object):
 
         if os.path.isfile(nfo_full_filename):
             return nfo_full_filename
+
+    @staticmethod
+    def is_valid_imdb_title_id(value=None):
+        if not isinstance(value, basestring):
+            return False
+        # IMDB IDs for titles have 'tt' followed by 7 digits
+        return re.match('tt[\d]{7}', value) is not None
 
 
 class BadXmlFile(Exception):

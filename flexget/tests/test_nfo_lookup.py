@@ -72,6 +72,11 @@ class TestNfoLookupWithMovies(object):
               path: {0}/test_12
               mask: '*.mkv'
             nfo_lookup: yes
+          test_13:  # Test with an nfo file containing invalid IMDB ID
+            filesystem:
+              path: {0}/test_13
+              mask: '*.mkv'
+            nfo_lookup: yes
     """.format(base)
 
     def test_nfo_with_only_id(self, execute_task):
@@ -299,5 +304,23 @@ class TestNfoLookupWithMovies(object):
             # Since the nfo file is invalid (there was some parse error) then there is no nfo fields.
             assert nfo_keys == []
 
+    def test_nfo_with_invalid_imdb_id(self, execute_task):
+        task = execute_task('test_13')
+        for entry in task.entries:
+            nfo_keys = sorted([i for i in entry.keys() if i[:3] == 'nfo'])
+            assert nfo_keys == ['nfo_id', 'nfo_title']
+
+            # Since the id in the nfo file is not a valid IMDB Id then it was not added to the entry
+            imdb_keys = sorted([i for i in entry.keys() if i[:4] == 'imdb'])
+            assert imdb_keys == []
+
+            assert entry['title'] == 'A Bela e a Fera'  # This will be == to filename
+
+            # Valid IMDB IDs for titles are formed by 'tt' and 7 digits
+            # Not that even if the value
+            # in the "id" tag is not a valid IMDB ID it is still added as the
+            # 'nfo_id'. However, it is not added as the 'imdb_id' field.
+            assert entry['nfo_id'] == 'tt1234'
+            assert entry['nfo_title'] == 'A Bela e a Fera'
 
 # TODO: Test with series
