@@ -131,7 +131,7 @@ class OutputPushbullet(object):
 
         # Make the request
         headers = {
-            'Authorization': b'Basic %s' % base64.b64encode(api_key.encode('ascii')),
+            'Authorization': b'Basic ' + base64.b64encode(api_key.encode('ascii')),
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'User-Agent': 'Flexget'
