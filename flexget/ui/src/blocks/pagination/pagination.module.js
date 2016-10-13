@@ -3,5 +3,7 @@
     'use strict';
 
     angular
-        .module('blocks.pagination', []);
+        .module('blocks.pagination', [
+            'ig.linkHeaderParser'
+        ]);
 }());

@@ -44,3 +44,4 @@ npm-debug.log
 *.yml
 node_modules/
 !raw_config.yml
+cached_resources/

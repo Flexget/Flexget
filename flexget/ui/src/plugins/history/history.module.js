@@ -7,8 +7,6 @@
             'http-etag',
             'angular.filter',
 
-            'ig.linkHeaderParser',
-
             'blocks.pagination',
             'blocks.exception',
             'blocks.router'
