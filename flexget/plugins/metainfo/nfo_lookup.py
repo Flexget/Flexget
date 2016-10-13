@@ -181,7 +181,7 @@ class NfoReader(object):
         """
         Method to get XML elements that have children as a dictionary.
         """
-        return {i.tag: i.text for i in x.getchildren()}
+        return {i.tag: i.text for i in x}
 
     def _extract_single_field(self, name, getter_func):
         """
