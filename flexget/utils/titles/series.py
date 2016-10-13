@@ -342,7 +342,7 @@ class SeriesParser(TitleParser):
                 # ressu: Added matching for 0101, 0102... It will fail on
                 #        season 11 though
                 log.debug('ep identifier expected. Attempting SEE format parsing.')
-                match = re.search(self.re_not_in_word(r'(\d\d)(\d\d)'), data_stripped, re.IGNORECASE | re.UNICODE)
+                match = re.search(self.re_not_in_word(r'(\d?\d)(\d\d)'), data_stripped, re.IGNORECASE | re.UNICODE)
                 if match:
                     # strict_name
                     if self.strict_name:
