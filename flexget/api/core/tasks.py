@@ -26,8 +26,6 @@ from flexget.utils.lazy_dict import LazyLookup
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
 
-params = {}
-
 
 class ObjectsContainer(object):
     tasks_list_object = {'oneOf': [
@@ -105,11 +103,18 @@ class ObjectsContainer(object):
     inject_input = {
         'type': 'object',
         'properties': {
-            'title': {'type': 'string'},
-            'url': {'type': 'string', 'format': 'url'},
-            'force': {'type': 'boolean'},
-            'accept': {'type': 'boolean'},
-            'fields': {'type': 'object'}
+            'title': {'type': 'string',
+                      'description': 'Title of the entry. If not supplied it will be attempted to retrieve it from '
+                                     'URL headers'},
+            'url': {'type': 'string',
+                    'format': 'url',
+                    'description': 'URL of the entry'},
+            'force': {'type': 'boolean',
+                      'description': 'Prevent any plugins from rejecting this entry'},
+            'accept': {'type': 'boolean',
+                       'description': 'Accept this entry immediately upon injection (disregard task filters)'},
+            'fields': {'type': 'object',
+                       'description': 'A array of objects that can contain any other value for the entry'}
         },
         'required': ['url']
     }
@@ -121,12 +126,23 @@ class ObjectsContainer(object):
                       'items': {'type': 'string'},
                       'minItems': 1,
                       'uniqueItems': True},
-            'progress': {'type': 'boolean', 'default': True},
-            'summary': {'type': 'boolean', 'default': True},
-            'entry_dump': {'type': 'boolean', 'default': True},
+            'progress': {
+                'type': 'boolean',
+                'default': True,
+                'description': 'Include task progress updates'},
+            'summary': {
+                'type': 'boolean',
+                'default': True,
+                'description': 'Include task summary'},
+            'entry_dump': {
+                'type': 'boolean',
+                'default': True,
+                'description': 'Include dump of entries including fields'},
             'inject': {'type': 'array',
-                       'items': inject_input},
+                       'items': inject_input,
+                       'description': 'A List of entry objects'},
             'loglevel': {'type': "string",
+                         'description': 'Specify log level',
                          "enum": ['critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace']}
         },
         'required': ['tasks']
@@ -317,40 +333,7 @@ class TaskExecutionParams(APIResource):
     @api.response(200, model=task_execution_params)
     def get(self, session=None):
         """ Execute payload parameters """
-
-        # Add hardcoded params
-        execute_params = [
-            {'progress': {'description': 'Include task progress updates', 'type': 'boolean'}},
-            {'summary': {'description': 'Include task summary', 'type': 'boolean'}},
-            {'entry_dump': {'description': 'Include dump of entries including fields', 'type': 'boolean'}},
-            {'inject': {
-                'description': 'A List of entry objects',
-                'type': 'array', 'items': {
-                    'type': 'object',
-                    'properties': {
-                        'title': {
-                            'description': 'Title of the entry. If not supplied it will be attempted to retrieve it from'
-                                           ' URL headers',
-                            'type': 'string'},
-                        'url': {'description': 'URL of the entry. Required', 'type': 'string', 'format': 'uri'},
-                        'accept': {
-                            'description': 'Accept this entry immediately upon injection (disregard task filters)',
-                            'type': 'boolean'},
-                        'force': {'description': 'Prevent any plugins from rejecting this entry',
-                                  'type': 'boolean'},
-                        'fields': {'description': 'A array of objects that can contain any other value for the entry',
-                                   'type': 'array', 'items': {'type': 'object'}}
-                    }, }, 'minItems': 1
-            }},
-            {'loglevel': {
-                'description': 'Specify log level. One of \'critical\', \'error\', \'warning\', \'info\', \'verbose\','
-                               ' \'debug\', \'trace\'',
-                'type': 'array', 'items': {'type': 'string'}, 'minItems': 1}}
-        ]
-
-        for key, value in params.items():
-            execute_params.append({key: value})
-        return jsonify(execute_params)
+        return jsonify(ObjectsContainer.task_execution_input)
 
 
 @inject_api.route('/')
@@ -455,25 +438,23 @@ def setup_params(mgr):
             continue
 
         name = name.replace('-', '_')
+        property_data = {'description': action.help.capitalize()}
         if isinstance(action, argparse._StoreConstAction):
-            property_type = {'type': 'boolean'}
+            property_data['type'] = 'boolean'
         elif isinstance(action, argparse._StoreAction):
             if action.nargs in ['+', '*']:
-                property_type = {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1}
+                property_data['type'] = 'array'
+                property_data['items'] = {'type': 'string'}
+                property_data['minItems'] = 1
             else:
-                property_type = {'type': 'string'}
+                property_data['type'] = 'string'
         else:
             # Unknown actions should not be added to schema
-            property_type = None
+            property_data = None
 
         # Some options maybe pre-added to schema with additional options, don't override them
-        if property_type and name not in ObjectsContainer.task_execution_input['properties']:
-            ObjectsContainer.task_execution_input['properties'][name] = property_type
-
-            global params
-            params.setdefault(name, {'description': action.help, 'type': property_type['type']})
-            if property_type.get('items'):
-                params[name].update({'items': {'type': 'string'}, 'minItems': 1})
+        if property_data and name not in ObjectsContainer.task_execution_input['properties']:
+            ObjectsContainer.task_execution_input['properties'][name] = property_data
 
     ObjectsContainer.task_execution_input['additionalProperties'] = False
 
