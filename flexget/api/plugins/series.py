@@ -182,10 +182,6 @@ class SeriesAPI(APIResource):
         begin = args.get('begin')
         latest = args.get('latest')
 
-        # Handle max size limit
-        if per_page > 100:
-            per_page = 100
-
         start = per_page * (page - 1)
         stop = start + per_page
 

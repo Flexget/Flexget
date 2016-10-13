@@ -1499,3 +1499,191 @@ class TestSeriesForgetFlag(object):
         with Session() as session:
             seen = session.query(SeenEntry).all()
             assert len(seen) == 3
+
+
+class TestSeriesPagination(object):
+    config = 'tasks: {}'
+
+    def test_series_pagination(self, api_client, link_headers):
+        number_of_series = 200
+        with Session() as session:
+            for i in range(number_of_series):
+                series = Series()
+                session.add(series)
+
+                series.name = 'test series {}'.format(i)
+                task = SeriesTask('test task')
+                series.in_tasks = [task]
+
+        # Default values
+        rsp = api_client.get('/series/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 50  # Default page size
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 50
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 2
+
+        # Change page size
+        rsp = api_client.get('/series/?per_page=100')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 100
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 100
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 2
+        assert links['next']['page'] == 2
+
+        # Get different page
+        rsp = api_client.get('series/?page=2')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 50
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 50
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 3
+        assert links['prev']['page'] == 1
+
+    def test_episodes_pagination(self, api_client, link_headers):
+        number_of_episodes = 200
+        with Session() as session:
+            series = Series()
+            session.add(series)
+
+            series.name = 'test series'
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            for i in range(number_of_episodes):
+                episode = Episode()
+                episode.identifier = 'S01E0{}'.format(i)
+                episode.identified_by = 'ep'
+                episode.season = 1
+                episode.number = i
+                episode.series_id = series.id
+                series.episodes.append(episode)
+
+        # Default values
+        rsp = api_client.get('/series/1/episodes/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 50  # Default page size
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 50
+        assert int(rsp.headers['Series-ID']) == 1
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 2
+
+        # Change page size
+        rsp = api_client.get('/series/1/episodes/?per_page=100')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 100
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 100
+        assert int(rsp.headers['Series-ID']) == 1
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 2
+        assert links['next']['page'] == 2
+
+        # Get different page
+        rsp = api_client.get('series/1/episodes/?page=2')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 50
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 50
+        assert int(rsp.headers['Series-ID']) == 1
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 3
+        assert links['prev']['page'] == 1
+
+    def test_releases_pagination(self, api_client, link_headers):
+        number_of_releases = 200
+        with Session() as session:
+            series = Series()
+            session.add(series)
+
+            series.name = 'test series'
+            task = SeriesTask('test task')
+            series.in_tasks = [task]
+
+            episode = Episode()
+            episode.identifier = 'S01E01'
+            episode.identified_by = 'ep'
+            episode.season = 1
+            episode.number = 1
+            episode.series_id = series.id
+            series.episodes.append(episode)
+
+            for i in range(number_of_releases):
+                release = Release()
+                release.title = 'test release {}'.format(i)
+                release.downloaded = True
+
+                episode.releases.append(release)
+
+        # Default values
+        rsp = api_client.get('/series/1/episodes/1/releases/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 50  # Default page size
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 50
+        assert int(rsp.headers['Series-ID']) == 1
+        assert int(rsp.headers['Episode-ID']) == 1
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 2
+
+        # Change page size
+        rsp = api_client.get('/series/1/episodes/1/releases/?per_page=100')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 100
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 100
+        assert int(rsp.headers['Series-ID']) == 1
+        assert int(rsp.headers['Episode-ID']) == 1
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 2
+        assert links['next']['page'] == 2
+
+        # Get different page
+        rsp = api_client.get('series/1/episodes/1/releases/?page=2')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 50
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 50
+        assert int(rsp.headers['Series-ID']) == 1
+        assert int(rsp.headers['Episode-ID']) == 1
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 3
+        assert links['prev']['page'] == 1

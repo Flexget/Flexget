@@ -794,7 +794,7 @@ def remove_series_episode(name, identifier, forget=False):
 
     :param name: Name of series to be removed
     :param identifier: Series identifier to be deleted,
-        supports case insensitive startwith matching
+        supports case insensitive start with matching
     :param forget: Indication whether or not to fire a 'forget' event
     """
     downloaded_releases = []
