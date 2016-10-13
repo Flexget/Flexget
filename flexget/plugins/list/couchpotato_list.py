@@ -112,6 +112,7 @@ class CouchPotatoBase(object):
         entries = []
         for movie in active_movies_json['movies']:
             quality_req = ''
+            log.debug('movie data: {}'.format(movie))
             if movie['status'] == 'active':
                 if config.get('include_data') and profile_json:
                     for profile in profile_json['list']:
