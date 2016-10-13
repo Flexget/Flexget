@@ -51,7 +51,14 @@ def after_flush(session, flush_context):
     if session.new or session.deleted or session.dirty:
         caller_info = find_caller(inspect.stack()[1:])
         with open_transactions_lock:
-            tid = next(id(t) for t in session.transaction._iterate_parents() if t in open_transactions)
+            # Dirty hack to support SQLAlchemy 1.1 without breaking backwards compatibility
+            # _iterate_parents was renamed to _iterate_self_and_parents in 1.1
+            try:
+                _iterate_parents = session.transaction._iterate_parents
+            except AttributeError:
+                _iterate_parents = session.transaction._iterate_self_and_parents
+
+            tid = next(id(t) for t in _iterate_parents() if t in open_transactions)
             log.debug('Transaction 0x%08X writing %s new: %s deleted: %s dirty: %s',
                       tid, caller_info, tuple(session.new), tuple(session.deleted), tuple(session.dirty))
 
