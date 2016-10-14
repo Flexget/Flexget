@@ -46,9 +46,9 @@
                 .cached(setTasks);
         }
             
-        function setTasks(data) {
-            for (var i = 0; i < data.length; i++) {
-                vm.tasks.push(data[i]);
+        function setTasks(response) {
+            for (var i = 0; i < response.data.length; i++) {
+                vm.tasks.push(response.data[i]);
             }
         }
 

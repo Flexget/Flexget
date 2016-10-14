@@ -14,19 +14,23 @@
         };
 
         function getTasks(params) {
-            return $http.get('/api/tasks/', { params: params, etagCache: true })
-                .then(callCompleted)
+            return $http.get('/api/tasks/', {
+                params: params,
+                etagCache: true
+            })
                 .catch(callFailed);
         }
 
         function getQueue() {
-            return $http.get('/api/tasks/queue/', { ignoreLoadingBar: true })
+            return $http.get('/api/tasks/queue/', {
+                ignoreLoadingBar: true
+            })
                 .then(callCompleted)
                 .catch(callFailed);
-        }
-
-        function callCompleted(response) {
-            return response.data;
+            
+            function callCompleted(response) {
+                return response.data;
+            }
         }
 
         function executeTasks(options) {
