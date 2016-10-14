@@ -89,7 +89,7 @@ class NfoLookup(object):
         # If a valid IMDB id was found in the nfo file, set the imdb_id field of the entry. This will help the
         # imdb_lookup plugin to get the correct data if it is also used.
         if 'nfo_id' in fields:
-            if is_valid_imdb_title_id(entry.get('nfo_id')):
+            if is_valid_imdb_title_id(entry.get('nfo_id', '')):
                 entry.update({'imdb_id': fields['nfo_id']})
             else:
                 log.warning("ID found in nfo file for entry '%s', but it was not a valid IMDB ID", entry.get('title'))
