@@ -6,7 +6,11 @@
         .module('components.core')
         .config(coreConfig);
 
-    function coreConfig($httpProvider, $mdThemingProvider) {
+    function coreConfig($httpProvider, $mdThemingProvider, httpEtagProvider) {
+        httpEtagProvider.setDefaultCacheConfig({
+            cacheResponseHeaders: true
+        })
+            .defineCache('httpEtagCache');
         $httpProvider.useLegacyPromiseExtensions(false);
 
         $mdThemingProvider.theme('default')

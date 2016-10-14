@@ -4,7 +4,6 @@
 
     angular
         .module('plugins.history', [
-            'http-etag',
             'angular.filter',
 
             'blocks.pagination',
