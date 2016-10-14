@@ -42,8 +42,8 @@
                 .cached(setConfig);
         }
 
-        function setConfig(data) {
-            var encoded = data.raw_config;
+        function setConfig(response) {
+            var encoded = response.data.raw_config;
             vm.config = base64.decode(encoded);
             saveOriginalConfig();
         }
@@ -107,10 +107,13 @@
 
                     delete vm.errorMessage;
                     delete vm.errors;
-
+                    delete vm.yamlError;
+                    
                     saveOriginalConfig();
                 }, function (error) {
-                    vm.errors = error.errors;
+                    delete vm.errors;
+                    delete vm.yamlError;
+                    error.errors ? vm.errors = error.errors : vm.yamlError = error;
                 });
         }
     }

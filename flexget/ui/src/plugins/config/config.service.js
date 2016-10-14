@@ -13,13 +13,10 @@
         };
 
         function getRawConfig() {
-            return $http.get('/api/server/raw_config', { etagCache: true })
-                .then(getRawConfigComplete)
+            return $http.get('/api/server/raw_config', {
+                etagCache: true
+            })
                 .catch(callFailed);
-
-            function getRawConfigComplete(response) {
-                return response.data;
-            }
         }
 
         function saveRawConfig(encoded) {
