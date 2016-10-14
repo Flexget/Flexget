@@ -42,7 +42,7 @@ class MovieListList(Base):
     movies = relationship('MovieListMovie', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
 
     def __repr__(self):
-        return '<MovieListList name=%d>' % (self.id)
+        return '<MovieListList,name={}id={}>'.format(self.name, self.id)
 
     def to_dict(self):
         return {

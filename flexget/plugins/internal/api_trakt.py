@@ -137,7 +137,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
         if acc and datetime.now() < acc.expires and not refresh and not re_auth:
             return acc.access_token
         else:
-            if acc and (refresh or datetime.now() >= acc.expires) and not re_auth:
+            if acc and (refresh or datetime.now() >= acc.expires - timedelta(days=5)) and not re_auth:
                 log.debug('Using refresh token to re-authorize account %s.', account)
                 data['refresh_token'] = acc.refresh_token
                 data['grant_type'] = 'refresh_token'
@@ -647,10 +647,11 @@ class TraktShow(Base):
                     'runtime', 'certification', 'network', 'country', 'status', 'aired_episodes',
                     'trailer', 'homepage']:
             setattr(self, col, trakt_show.get(col))
-
-        self.genres = [TraktGenre(name=g.replace(' ', '-')) for g in trakt_show.get('genres', [])]
+        
+        # Sometimes genres and translations are None but we really do want a list, hence the "or []"
+        self.genres = [TraktGenre(name=g.replace(' ', '-')) for g in trakt_show.get('genres') or []]
         self.cached_at = datetime.now()
-        self.translation_languages = trakt_show.get('available_translations', [])
+        self.translation_languages = trakt_show.get('available_translations') or []
 
     def get_episode(self, season, number, session, only_cached=False):
         # TODO: Does series data being expired mean all episode data should be refreshed?

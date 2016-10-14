@@ -43,16 +43,13 @@ def normalize_scene(text):
     and removes special chars.
     https://en.wikipedia.org/wiki/Standard_(warez)#Naming for more information
     """
-    if not isinstance(text, str):
-        text = str(text, "unicode-escape")
-
     # Allowed chars in scene releases are:
     #     ABCDEFGHIJKLMNOPQRSTUVWXYZ
     #     abcdefghijklmnopqrstuvwxyz
     #     0123456789-._()
     return re.sub(r'[^a-zA-Z0-9 \-._()]',
-                  "",
-                  normalize('NFKD', text).encode('ASCII', 'ignore'))
+                  '',
+                  normalize('NFKD', text).encode('ASCII', 'ignore').decode())
 
 
 def torrent_availability(seeds, leeches):

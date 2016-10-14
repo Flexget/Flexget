@@ -1,5 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
+
+# This needs to remain before the builtins import!
 native_int = int
+
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import atexit
@@ -221,15 +224,6 @@ class Manager(object):
     def has_lock(self):
         return self._has_lock
 
-    @property
-    def should_reload(self):
-        """ Add triggers to the list to trigger a config reload from memory. Needed for some options to work while
-         daemon is running """
-        reload_triggers = ['execute.cli_config']
-        if any(getattr(self.options, trigger, False) for trigger in reload_triggers):
-            return True
-        return False
-
     def execute(self, options=None, output=None, loglevel=None, priority=1):
         """
         Run all (can be limited with options) tasks from the config.
@@ -271,9 +265,6 @@ class Manager(object):
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
         task_names = sorted(task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535))
 
-        # A hack to make specific option work by revalidating the config
-        if self.should_reload:
-            self.update_config(self.validate_config())
         finished_events = []
         for task_name in task_names:
             task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority)
@@ -337,7 +328,6 @@ class Manager(object):
         """
         if not options:
             options = self.options
-        self.options = options
         command = options.cli_command
         command_options = getattr(options, command)
         # First check for built-in commands
@@ -692,12 +682,13 @@ class Manager(object):
             self.engine = sqlalchemy.create_engine(self.database_uri,
                                                    echo=self.options.debug_sql,
                                                    connect_args={'check_same_thread': False, 'timeout': 10})
-        except ImportError:
-            print('FATAL: Unable to use SQLite. Are you running Python 2.5 - 2.7 ?\n'
+        except ImportError as e:
+            print('FATAL: Unable to use SQLite. Are you running Python 2.7, 3.3 or newer ?\n'
                   'Python should normally have SQLite support built in.\n'
                   'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
                   'You can try installing `pysqlite`. If you have compiled python yourself, '
-                  'recompile it with SQLite support.', file=sys.stderr)
+                  'recompile it with SQLite support.\n'
+                  'Error: %s' % e, file=sys.stderr)
             sys.exit(1)
         Session.configure(bind=self.engine)
         # create all tables, doesn't do anything to existing tables

@@ -40,7 +40,7 @@ CATEGORIES = {
     'gamespc': 'filter_cat[12]',
     'gamesxbox': 'filter_cat[13]',
     'gamesps3': 'filter_cat[14]',
-    'gameswii':  'filter_cat[15]',
+    'gameswii': 'filter_cat[15]',
     'appspc': 'filter_cat[16]',
     'appsmac': 'filter_cat[17]',
     'appslinux': 'filter_cat[18]',
@@ -97,8 +97,8 @@ class SearchAlphaRatio(object):
         """
         Wrapper to allow refreshing the cookie if it is invalid for some reason
 
-        :param str url:
-        :param list params:
+        :param unicode url:
+        :param dict params:
         :param str username:
         :param str password:
         :param bool force: flag used to refresh the cookie forcefully ie. forgo DB lookup
@@ -198,7 +198,8 @@ class SearchAlphaRatio(object):
                     group_info.find('a', href=re.compile('torrents.php\?action=download(?!usetoken)'))['href']
 
                 torrent_info = result.findAll('td')
-                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', torrent_info[5].text)
+                log.debug('AlphaRatio size: %s', torrent_info[5].text)
+                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', torrent_info[4].text)
                 torrent_tags = ', '.join([tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})])
 
                 e = Entry()
@@ -207,9 +208,9 @@ class SearchAlphaRatio(object):
                 e['url'] = url
                 e['torrent_tags'] = torrent_tags
                 e['content_size'] = parse_filesize(size.group(0))
-                e['torrent_snatches'] = int(torrent_info[6].text)
-                e['torrent_seeds'] = int(torrent_info[7].text)
-                e['torrent_leeches'] = int(torrent_info[8].text)
+                e['torrent_snatches'] = int(torrent_info[5].text)
+                e['torrent_seeds'] = int(torrent_info[6].text)
+                e['torrent_leeches'] = int(torrent_info[7].text)
 
                 entries.add(e)
 

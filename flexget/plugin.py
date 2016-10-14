@@ -374,12 +374,13 @@ def _check_phase_queue():
             log.error('Plugin %s requested new phase %s, but it could not be created at requested '
                       'point (before, after). Plugin is not working properly.', args[0], phase)
 
+
 def _load_plugins_from_dirs(dirs):
     """
     :param list dirs: Directories from where plugins are loaded from
     """
 
-    log.debug('Trying to load plugins from: %s' % dirs)
+    log.debug('Trying to load plugins from: %s', dirs)
     dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
     plugins_pkg.__path__ = list(map(_strip_trailing_sep, dirs))
@@ -401,12 +402,12 @@ def _load_plugins_from_dirs(dirs):
                     log.warning(msg)
                 else:
                     log.debug(msg)
-            except ImportError as e:
+            except ImportError:
                 log.critical('Plugin `%s` failed to import dependencies', module_name, exc_info=True)
             except ValueError as e:
                 # Debugging #2755
                 log.error('ValueError attempting to import `%s` (from %s): %s', module_name, plugin_path, e)
-            except Exception as e:
+            except Exception:
                 log.critical('Exception while loading plugin %s', module_name, exc_info=True)
                 raise
             else:
@@ -428,15 +429,14 @@ def _load_plugins_from_packages():
                 log.warning(msg)
             else:
                 log.debug(msg)
-        except ImportError as e:
+        except ImportError:
             log.critical('Plugin `%s` failed to import dependencies', entrypoint.module_name, exc_info=True)
-        except Exception as e:
+        except Exception:
             log.critical('Exception while loading plugin %s', entrypoint.module_name, exc_info=True)
             raise
         else:
             log.trace('Loaded packaged module %s from %s', entrypoint.module_name, plugin_module.__file__)
     _check_phase_queue()
-
 
 
 def load_plugins(extra_dirs=None):

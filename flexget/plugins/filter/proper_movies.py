@@ -93,7 +93,9 @@ class FilterProperMovies(object):
                 try:
                     # TODO: fix imdb_id_lookup, cumbersome that it returns None and or throws exception
                     # Also it's crappy name!
-                    imdb_id = imdb_lookup.imdb_id_lookup(movie_title=parser.name, raw_title=entry['title'])
+                    imdb_id = imdb_lookup.imdb_id_lookup(movie_title=parser.name,
+                                                         movie_year=parser.year,
+                                                         raw_title=entry['title'])
                     if imdb_id is None:
                         continue
                     entry['imdb_id'] = imdb_id

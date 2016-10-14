@@ -24,7 +24,7 @@ months = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 
 class NPOWatchlist(object):
     """
         Produces entries for every episode on the user's npo.nl watchlist (Dutch public television).
-        Entries can be downloaded using https://bitbucket.org/Carpetsmoker/download-npo
+        Entries can be downloaded using http://arp242.net/code/download-npo
 
         If 'remove_accepted' is set to 'yes', the plugin will delete accepted entries from the watchlist after download
             is complete.

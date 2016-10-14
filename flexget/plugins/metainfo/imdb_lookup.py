@@ -232,7 +232,7 @@ class ImdbLookup(object):
             log_once(str(e.value).capitalize(), logger=log)
 
     @with_session
-    def imdb_id_lookup(self, movie_title=None, raw_title=None, session=None):
+    def imdb_id_lookup(self, movie_title=None, movie_year=None, raw_title=None, session=None):
         """
         Perform faster lookup providing just imdb_id.
         Falls back to using basic lookup if data cannot be found from cache.
@@ -249,7 +249,10 @@ class ImdbLookup(object):
         """
         if movie_title:
             log.debug('imdb_id_lookup: trying with title: %s' % movie_title)
-            movie = session.query(Movie).filter(Movie.title == movie_title).first()
+            query = session.query(Movie).filter(Movie.title == movie_title)
+            if movie_year is not None:
+                query = query.filter(Movie.year == movie_year)
+            movie = query.first()
             if movie:
                 log.debug('--> success! got %s returning %s' % (movie, movie.imdb_id))
                 return movie.imdb_id
@@ -318,8 +321,6 @@ class ImdbLookup(object):
                         log.trace('Setting imdb url for %s from db' % entry['title'])
                         entry['imdb_id'] = result.imdb_id
                         entry['imdb_url'] = result.url
-
-        movie = None
 
         # no imdb url, but information required, try searching
         if not entry.get('imdb_url', eval_lazy=False) and search_allowed:

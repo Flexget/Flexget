@@ -341,8 +341,8 @@ class SeriesParser(TitleParser):
                 # try to look up idiotic numbering scheme 101,102,103,201,202
                 # ressu: Added matching for 0101, 0102... It will fail on
                 #        season 11 though
-                log.debug('expect_ep enabled')
-                match = re.search(self.re_not_in_word(r'(0?\d)(\d\d)'), data_stripped, re.IGNORECASE | re.UNICODE)
+                log.debug('ep identifier expected. Attempting SEE format parsing.')
+                match = re.search(self.re_not_in_word(r'(\d?\d)(\d\d)'), data_stripped, re.IGNORECASE | re.UNICODE)
                 if match:
                     # strict_name
                     if self.strict_name:
@@ -356,7 +356,7 @@ class SeriesParser(TitleParser):
                     self.valid = True
                     return
                 else:
-                    log.debug('-> no luck with the expect_ep')
+                    log.debug('-> no luck with SEE')
 
         # Check id regexps
         if self.identified_by in ['id', 'auto'] and not self.valid:

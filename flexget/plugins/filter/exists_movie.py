@@ -130,6 +130,7 @@ class FilterExistsMovie(object):
                 if config.get('lookup') == 'imdb':
                     try:
                         imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
+                                                             movie_year=movie.year,
                                                              raw_title=item,
                                                              session=task.session)
                         if imdb_id in path_ids:

@@ -10,7 +10,7 @@
             controller: seenController
         });
 
-    function seenController(seenService) {
+    function seenController($mdDialog, $sce, seenService) {
         var vm = this;
 
         vm.$onInit = activate;
@@ -39,8 +39,16 @@
         }
 
         function deleteEntry(entry) {
-            seenService.deleteEntryById(entry.id).then(function () {
-                getSeen(options.page);
+            var confirm = $mdDialog.confirm()
+                .title('Confirm forgetting Seen Entry.')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to delete <b>' + entry.title + '</b>?'))
+                .ok('Forget')
+                .cancel('No');
+
+            $mdDialog.show(confirm).then(function () {
+                seenService.deleteEntryById(entry.id).then(function () {
+                    getSeen(options.page);
+                });
             });
         }
     }
