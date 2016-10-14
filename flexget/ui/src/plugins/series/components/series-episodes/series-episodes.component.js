@@ -9,7 +9,8 @@
             controllerAs: 'vm',
             controller: episodesController,
             bindings: {
-                show: '<'
+                show: '<',
+                hideEpisodes: '&'
             },
             transclude: true
         });
