@@ -24,8 +24,8 @@
         vm.$onChanges = handleChanges;
         
         function handleChanges(changesObj) {
-            if (changesObj.linkHeader && changesObj.linkHeader.currentValue) {
-                var links = linkHeaderParser.parse(vm.linkHeader);
+            if (changesObj.linkHeader) {
+                var links = changesObj.linkHeader.currentValue ? linkHeaderParser.parse(vm.linkHeader) : {};
 
                 vm.prev = links.prev;
                 vm.next = links.next;

@@ -53,11 +53,13 @@
             function searchShows() {
                 seriesService.searchShows(vm.searchTerm)
                     .then(setSeries)
-                    .cached(setSeries);
+                    .cached(setSeries)
+                    .finally(function () {
+                        vm.currentPage = 1;
+                    });
             }
 
             function emptySearch() {
-                options.page = 1;
                 getSeriesList(1);
             }
         }

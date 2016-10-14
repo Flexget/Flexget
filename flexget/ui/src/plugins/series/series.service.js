@@ -55,8 +55,9 @@
         }
 
         function searchShows(searchTerm) {
-            return $http.get('/api/series/search/' + searchTerm + '/', { etagCache: true })
-                .then(callComplete)
+            return $http.get('/api/series/search/' + searchTerm + '/', {
+                etagCache: true
+            })
                 .catch(callFailed);
         }
 
