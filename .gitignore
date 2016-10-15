@@ -46,3 +46,5 @@ npm-debug.log
 *.yml
 *.sqlite
 node_modules/
+config/
+tcl/
