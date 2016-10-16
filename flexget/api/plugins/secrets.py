@@ -19,12 +19,14 @@ class SecretsAPI(APIResource):
     @etag
     @api.response(200, model=empty_response)
     def get(self, session=None):
+        """ Get secrets data from DB """
         return jsonify(secrets_from_db())
 
     @api.response(201, 'Successfully updated secrets file')
     @api.validate(empty_response)
     @api.doc(description='Note that editing secrets may not be persistent, depending on user config')
     def put(self, session=None):
+        """ Store secrets data to DB """
         data = request.json
         secrets_to_db(data)
         # This will trigger reloading the secrets file
