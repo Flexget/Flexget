@@ -478,7 +478,7 @@ class PluginDownload(object):
                     # ignore permission errors, see ticket #555
                     import errno
                     if not os.path.exists(destfile):
-                        raise plugin.PluginError('Unable to write %s' % destfile)
+                        raise plugin.PluginError('Unable to write %s: %s' % (destfile, err))
                     if err.errno != errno.EPERM and err.errno != errno.EACCES:
                         raise
 
