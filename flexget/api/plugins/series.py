@@ -364,7 +364,8 @@ episode_parser = api.pagination_parser(add_sort=True)
 
 @api.response(NotFoundError)
 @series_api.route('/<int:show_id>/episodes/')
-@api.doc(params={'show_id': 'ID of the show'})
+@api.doc(params={'show_id': 'ID of the show'},
+         description='The \'Series-ID\' header will be appended to the result headers')
 class SeriesEpisodesAPI(APIResource):
     @etag
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
@@ -509,7 +510,9 @@ release_delete_parser.add_argument('forget', type=inputs.boolean, default=False,
 @api.response(BadRequest)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
-         description='Releases are any seen entries that match the episode. ')
+         description='Releases are any seen entries that match the episode. \n'
+                     'The \'Series-ID\' header will be appended to the result headers.\n'
+                     'The \'Episode-ID\' header will be appended to the result headers.')
 class SeriesReleasesAPI(APIResource):
     @etag
     @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
@@ -642,7 +645,11 @@ class SeriesReleasesAPI(APIResource):
 @api.response(NotFoundError)
 @api.response(BadRequest)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/<int:rel_id>/')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'})
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'},
+         description='Releases are any seen entries that match the episode. \n'
+                     'The \'Series-ID\' header will be appended to the result headers.\n'
+                     'The \'Episode-ID\' header will be appended to the result headers.'
+         )
 class SeriesReleaseAPI(APIResource):
     @etag
     @api.response(200, 'Release retrieved successfully for episode', release_schema)

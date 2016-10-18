@@ -237,7 +237,8 @@ api = API(
     api_app,
     title='Flexget API v{}'.format(__version__),
     version=__version__,
-    description='View and manage flexget core operations and plugins'
+    description='View and manage flexget core operations and plugins. Open each endpoint for detailed usage or'
+                ' navigate to http://flexget.com/API for more details.'
 )
 
 base_message = {
