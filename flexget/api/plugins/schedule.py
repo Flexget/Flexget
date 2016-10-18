@@ -5,9 +5,9 @@ import copy
 
 from flask import request, jsonify
 
-from flexget.plugins.daemon.scheduler import schedule_schema, scheduler, scheduler_job_map
+from flexget.plugins.daemon.scheduler import schedule_schema, scheduler, scheduler_job_map, DEFAULT_SCHEDULES
 from flexget.api import api, APIResource
-from flexget.api.app import NotFoundError, APIError, base_message_schema, success_response, etag
+from flexget.api.app import NotFoundError, APIError, base_message_schema, success_response, etag, BadRequest
 
 schedule_api = api.namespace('schedules', description='Task Scheduler')
 
@@ -45,13 +45,20 @@ schedule_desc = "Schedule ID changes upon daemon restart. The schedules object s
 class SchedulesAPI(APIResource):
     @etag
     @api.response(200, model=api_schedules_list_schema)
+    @api.response(BadRequest)
     def get(self, session=None):
         """ List schedules """
         schedule_list = []
-        if 'schedules' not in self.manager.config or not self.manager.config['schedules']:
-            return jsonify(schedule_list)
 
-        for schedule in self.manager.config['schedules']:
+        schedules = self.manager.config.get('schedules', [])
+
+        # Checks for boolean config
+        if schedules is True:
+            schedules = DEFAULT_SCHEDULES
+        elif schedules is False:
+            raise BadRequest('Schedules are disables in config')
+
+        for schedule in schedules:
             # Copy the object so we don't apply id to the config
             schedule_id = id(schedule)
             schedule = schedule.copy()
@@ -67,9 +74,13 @@ class SchedulesAPI(APIResource):
         """ Add new schedule """
         data = request.json
 
-        if 'schedules' not in self.manager.config or not self.manager.config['schedules']:
-            # Schedules not defined or are disabled, enable as one is being created
-            self.manager.config['schedules'] = []
+        schedules = self.manager.config.get('schedules', [])
+
+        # Checks for boolean config
+        if schedules is True:
+            self.manager.config['schedules'] = DEFAULT_SCHEDULES
+        elif schedules is False:
+            raise BadRequest('Schedules are disables in config')
 
         self.manager.config['schedules'].append(data)
         schedules = self.manager.config['schedules']
@@ -95,6 +106,13 @@ class ScheduleAPI(APIResource):
     def get(self, schedule_id, session=None):
         """ Get schedule details """
         schedules = self.manager.config.get('schedules', [])
+
+        # Checks for boolean config
+        if schedules is True:
+            schedules = DEFAULT_SCHEDULES
+        elif schedules is False:
+            raise BadRequest('Schedules are disables in config')
+
         schedule, _ = _schedule_by_id(schedule_id, schedules)
         if schedule is None:
             raise NotFoundError('schedule %d not found' % schedule_id)
@@ -125,7 +143,14 @@ class ScheduleAPI(APIResource):
         new_schedule = request.json
 
         schedules = self.manager.config.get('schedules', [])
-        schedule, idx = _schedule_by_id(schedule_id, schedules)
+
+        # Checks for boolean config
+        if schedules is True:
+            self.manager.config['schedules'] = DEFAULT_SCHEDULES
+        elif schedules is False:
+            raise BadRequest('Schedules are disables in config')
+
+        schedule, idx = _schedule_by_id(schedule_id, self.manager.config['schedules'])
         if not schedule:
             raise NotFoundError('schedule %d not found' % schedule_id)
 
@@ -141,6 +166,14 @@ class ScheduleAPI(APIResource):
     @api.response(200, description='Schedule deleted', model=base_message_schema)
     def delete(self, schedule_id, session=None):
         """ Delete a schedule """
+        schedules = self.manager.config.get('schedules')
+
+        # Checks for boolean config
+        if schedules is True:
+            raise BadRequest('Schedules usage is set to default, cannot delete')
+        elif schedules is False:
+            raise BadRequest('Schedules are disables in config')
+
         for i in range(len(self.manager.config.get('schedules', []))):
             if id(self.manager.config['schedules'][i]) == schedule_id:
                 del self.manager.config['schedules'][i]
