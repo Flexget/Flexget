@@ -20,7 +20,7 @@
         vm.saveBegin = saveBegin;
 
         function activate() {
-            vm.begin = vm.show['begin_episode']['episode_identifier'];
+            vm.begin = vm.show['begin_episode'] ? vm.show['begin_episode'].identifier : undefined;
             vm.originalBegin = angular.copy(vm.begin);
         }
 
@@ -29,9 +29,8 @@
         }
 
         function saveBegin() {
-            //TODO: Error handling
             var params = {
-                'episode_identifier': vm.begin
+                'begin_episode': vm.begin
             };
 
             seriesService.updateShow(vm.show, params).then(function () {

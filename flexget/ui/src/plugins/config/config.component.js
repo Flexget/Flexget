@@ -37,11 +37,15 @@
         }
 
         function loadConfig() {
-            configService.getRawConfig().then(function (data) {
-                var encoded = data.raw_config;
-                vm.config = base64.decode(encoded);
-                saveOriginalConfig();
-            });
+            configService.getRawConfig()
+                .then(setConfig)
+                .cached(setConfig);
+        }
+
+        function setConfig(response) {
+            var encoded = response.data.raw_config;
+            vm.config = base64.decode(encoded);
+            saveOriginalConfig();
         }
 
         function saveOriginalConfig() {
@@ -103,10 +107,13 @@
 
                     delete vm.errorMessage;
                     delete vm.errors;
-
+                    delete vm.yamlError;
+                    
                     saveOriginalConfig();
                 }, function (error) {
-                    vm.errors = error.errors;
+                    delete vm.errors;
+                    delete vm.yamlError;
+                    error.errors ? vm.errors = error.errors : vm.yamlError = error;
                 });
         }
     }

@@ -15,21 +15,33 @@
 
         vm.$onInit = activate;
         vm.search = search;
+        vm.getHistory = getHistory;
+
+        var options = {};
 
         function activate() {
-            getHistory();
+            getHistory(1);
         }
 
-        function search() {
-            return historyService.getHistoryForTask({ task: vm.taskName }).then(function (data) {
-                vm.entries = data.entries;
-            });
+        function search(taskName) {
+            options.task = taskName || undefined;
+
+            getHistory(1);
         }
 
-        function getHistory() {
-            return historyService.getHistory().then(function (data) {
-                vm.entries = data.entries;
-            });
+        function getHistory(page) {
+            options.page = page;
+            historyService.getHistory(options)
+                .then(setEntries)
+                .cached(setEntries)
+                .finally(function (data) {
+                    vm.currentPage = options.page;
+                });
+        }
+        
+        function setEntries(response) {
+            vm.entries = response.data;
+            vm.linkHeader = response.headers().link;
         }
     }
 }());

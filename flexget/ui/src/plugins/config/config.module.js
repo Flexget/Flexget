@@ -7,7 +7,6 @@
             'ngMaterial',
 
             'ab-base64',
-            'angular-cache',
 
             'blocks.exception',
             'blocks.router',

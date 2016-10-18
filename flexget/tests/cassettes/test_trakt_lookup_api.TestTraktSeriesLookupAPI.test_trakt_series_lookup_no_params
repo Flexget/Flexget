@@ -1,233 +1,1129 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: [2]
-      method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
-    response:
-      body: {string: "[{\"type\":\"show\",\"score\":83.553276,\"show\":{\"title\"\
-          :\"The X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI\
-          \ Agents Fox Mulder, Dana Scully, John Doggett and Monica Reyes and their\
-          \ investigations into the paranormal. From genetic mutants and killer insects\
-          \ to a global conspiracy concerning the colonization of Earth by an alien\
-          \ species, this mind-boggling, humorous and occasionally frightening series\
-          \ created by Chris Carter has been one of the world's most popular sci-fi/drama\
-          \ shows since its humble beginnings in 1993.\",\"year\":1993,\"status\"\
-          :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/posters/original/034cc070a9.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/original/1f0b461052.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg\"\
-          }},\"ids\":{\"trakt\":4063,\"slug\":\"the-x-files\",\"tvdb\":77398,\"imdb\"\
-          :\"tt0106179\",\"tmdb\":4087,\"tvrage\":6312}}},{\"type\":\"show\",\"score\"\
-          :80.89894,\"show\":{\"title\":\"NASA's X-Files\",\"overview\":\"Soar beyond\
-          \ the horizon and into the future of aviation with unprecedented behind\
-          \ the scenes access to NASA's Dryden Flight Research Center. Experience\
-          \ never-before-seen test flight footage, from the first supersonic X-1 to\
-          \ the ultimate hypersonic aircraft, the X-43. \",\"year\":null,\"status\"\
-          :\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"\
-          thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"\
-          ids\":{\"trakt\":21742,\"slug\":\"nasa-s-x-files\",\"tvdb\":150181,\"imdb\"\
-          :\"\",\"tmdb\":21843,\"tvrage\":19772}}},{\"type\":\"show\",\"score\":80.89839,\"\
-          show\":{\"title\":\"Ancient X-Files\",\"overview\":\"Ancient X Files travels\
-          \ around the world to solve some intriguing riddles. Each story is a piece\
-          \ of detective work by an expert trying to make sense of some puzzling ancient\
-          \ artefact, to find the truth behind some extraordinary legend, to discover\
-          \ the origins of a bizarre myth or to establish the authenticity of a venerated\
-          \ religious relic. This series explores the bits of archaeology and history\
-          \ which seem to defy explanation.Our experts are following chains of clues\
-          \ and putting theories to the test, in an effort to explain the unexplained.\
-          \ Ancient X Files investigates claims about the whereabouts of the lost\
-          \ Ark of the Covenant; attempts to establish the authenticity of a cup some\
-          \ believe to be the Holy Grail; tries to de-code the mysterious Phaistos\
-          \ disc; investigates a cloth which is believed to carry traces of the DNA\
-          \ of Jesus Christ; and deciphers an encrypted book of alchemy written by\
-          \ the great Sir Isaac Newton.\",\"year\":2010,\"status\":\"ended\",\"images\"\
-          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/075/posters/original/6eb48ec869.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/061/075/posters/thumb/6eb48ec869.jpg\"\
-          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
-          trakt\":61075,\"slug\":\"ancient-x-files\",\"tvdb\":214961,\"imdb\":\"tt1734568\"\
-          ,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":60.678684,\"\
-          show\":{\"title\":\"National Geographic Wild X Files\",\"overview\":\"From\
-          \ the odd and amusing to the downright creepy, mysteries found in nature\
-          \ are no less weird than anything found in popular science fiction!In a\
-          \ brand new series of Wild X Files, Wednesdays at 8pm from 22 August, see\
-          \ real-life cases from the natural world that will baffle and fascinate\
-          \ you.On Shark Attack Beach, where 7% of the world\u2019s shark attacks\
-          \ occur, experts try to understand why the full moon seems to increase attacks.In\
-          \ the Cotswolds, a weird creature appears to be stalking dog walkers.And,\
-          \ in an apocalyptic scene right out of a sci-fi thriller, 5,000 blackbirds\
-          \ suddenly fall out of the sky in Arkansas on New Year\u2019s Eve.Other\
-          \ cases covered include the hundreds of elk who dropped dead for no apparent\
-          \ reason and the strange appearance of Star Jelly which left locals scratching\
-          \ their heads in the Scottish Highlands.Experts attempt to find the answers\
-          \ to these bizarre mysteries.\",\"year\":2001,\"status\":\"returning series\"\
-          ,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"\
-          fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\"\
-          :67848,\"slug\":\"national-geographic-wild-x-files\",\"tvdb\":262652,\"\
-          imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :60.659443,\"show\":{\"title\":\"Joseon X-Files: Mystery Investigation Record\"\
-          ,\"overview\":\"Joseon X-Files is based on cases detailed in the Annals\
-          \ of Joseon History with a bizarre twist; these incidents incorporate mysterious,\
-          \ supernatural elements that cannot be explained through science. Kim Hyung\
-          \ Do is an inspector of the state whose single-minded focus on his investigations\
-          \ into administrative misdeeds bring him into direct contact with these\
-          \ strange mysteries. Heo Yoon Yi is a government employee who aids him and\
-          \ attempts to understand these scientific impossibilities with an open mind,\
-          \ in contrast to his cynicism.\",\"year\":2010,\"status\":\"ended\",\"images\"\
-          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/posters/original/cb681cfdba.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/posters/thumb/cb681cfdba.jpg\"\
-          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
-          trakt\":62570,\"slug\":\"joseon-x-files-mystery-investigation-record\",\"\
-          tvdb\":204501,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"\
-          show\",\"score\":4.6396394,\"show\":{\"title\":\"The After\",\"overview\"\
-          :\"An Amazon Original Pilot: From Chris Carter, creator of The X-Files.\
-          \ Eight strangers are thrown together by mysterious forces and must help\
-          \ each other survive in a violent world that defies explanation.\",\"year\"\
-          :2014,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
-          thumb\":null}},\"ids\":{\"trakt\":96230,\"slug\":\"the-after-2014\",\"tvdb\"\
-          :292193,\"imdb\":\"tt3145422\",\"tmdb\":null,\"tvrage\":null}}},{\"type\"\
-          :\"show\",\"score\":3.7730274,\"show\":{\"title\":\"Poltergeist: The Legacy\"\
-          ,\"overview\":\"'Since the beginning of time mankind has existed between\
-          \ the world of light and the world of darkness. This journal chronicles\
-          \ the work of our secret society, known as The Legacy. Created to protect\
-          \ the innocent from those creatures that inhabit the shadows and the night.'\
-          \ So the opening credits of 'Poltergeist: The Legacy' announced. 'Poltergeist\
-          \ was a show that tried to mix the style and success of X-Files and transport\
-          \ it to a more horror based genre. Mostly it succeeded and, while not having\
-          \ the plaudits of X-Files, managed to create and interesting group of characters\
-          \ and story ideas.\",\"year\":1996,\"status\":\"ended\",\"images\":{\"poster\"\
-          :{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/posters/original/b2f42c0749.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/posters/thumb/b2f42c0749.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/original/f5295c0053.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/thumb/f5295c0053.jpg\"\
-          }},\"ids\":{\"trakt\":11131,\"slug\":\"poltergeist-the-legacy\",\"tvdb\"\
-          :77952,\"imdb\":\"tt0115317\",\"tmdb\":11183,\"tvrage\":null}}},{\"type\"\
-          :\"show\",\"score\":3.3326561,\"show\":{\"title\":\"The Lone Gunmen\",\"\
-          overview\":\"Spin-off of The X-Files featuring the trio of computer-hacking\
-          \ conspiracy geeks popularly known as The Lone Gunmen. Never ones to stray\
-          \ far from the center of corporate and government intrigue, the threesome\
-          \ of John Byers, Melvin Frohike, and Richard Langly play like a misguided\
-          \ Mission Impossible team, embarking on a series of comic adventures that\
-          \ simultaneously highlight their genius and ineptitude. While their newfound\
-          \ independence inspires them to investigate even the most shadowy of conspiracies,\
-          \ their social skills remain stagnant, which only makes their lives more\
-          \ difficult when they learn their chief competitor in the \\\"information\
-          \ business\\\" is the brilliant and beautiful Yves Adele Harlow. Perpetually\
-          \ short of funds to publish The Lone Gunmen newspaper, Byers, Frohike and\
-          \ Langly begrudgingly take on Jimmy Bond as an unlikely benefactor who bankrolls\
-          \ their missions and joins them in their investigations to uncover the truth.\"\
-          ,\"year\":2001,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"\
-          https://walter.trakt.us/images/shows/000/005/686/posters/original/b83d3fad63.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/posters/thumb/b83d3fad63.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/original/4cbf0c5a4b.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/thumb/4cbf0c5a4b.jpg\"\
-          }},\"ids\":{\"trakt\":5686,\"slug\":\"the-lone-gunmen\",\"tvdb\":76245,\"\
-          imdb\":\"tt0243069\",\"tmdb\":5715,\"tvrage\":5939}}},{\"type\":\"show\"\
-          ,\"score\":2.53108,\"show\":{\"title\":\"The Imaginatively Titled Punt &\
-          \ Dennis Show\",\"overview\":\"The Imaginatively Titled Punt and Dennis\
-          \ show featured Steve Punt and Hugh Dennis in a vast array of studio gags,\
-          \ filmed sketches and parodies of famous TV dramas such as the X-Files,\
-          \ Baywatch and ER. Each show would focus on a theme, be it crime, holidays,\
-          \ sports etc. and would have amusing insights into each subject which carried\
-          \ on into most parts of the show. The show sported an array of characters\
-          \ (mostly performed by Hugh Dennis) who would appear in either their own\
-          \ sketches, or would regularly turn up without warning in the studio, the\
-          \ filmed sketches and even the drama parodies. &lt;u&gt;Characters&lt;/u&gt;\
-          \ Kurt Wenker German tourist from hell who was always out to steal 'puny\
-          \ British boys' girlfriends. Right Hon. Hector Sleazy MP Scandal-riddled\
-          \ member of parliament who gave long non-sensical speeches and constantly\
-          \ insisted he wouldn't be resigning. Norris the Weatherman Habitual criminal\
-          \ assigned to the BBC as a part of a reformation scheme by the govenrme\"\
-          ,\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
-          thumb\":null}},\"ids\":{\"trakt\":9082,\"slug\":\"the-imaginatively-titled-punt-dennis-show\"\
-          ,\"tvdb\":78570,\"imdb\":\"\",\"tmdb\":9129,\"tvrage\":5867}}},{\"type\"\
-          :\"show\",\"score\":0.92165494,\"show\":{\"title\":\"Kumail Nanjiani\",\"\
-          overview\":\"Kumail Nanjiani; born 21 February 1978) is a Pakistani-American\
-          \ stand-up comedian, actor and podcast host. He starred on the TNT series\
-          \ Franklin & Bash and co-hosts the show The Meltdown with Jonah and Kumail.\
-          \ Nanjiani is also a regular on HBO's Silicon Valley. On top of his television\
-          \ and film work, he hosts two podcasts: The Indoor Kids and The X-Files\
-          \ Files.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\"\
-          :\"https://walter.trakt.us/images/shows/000/075/141/posters/original/887b33e932.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/posters/thumb/887b33e932.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/original/887b33e932.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/thumb/887b33e932.jpg\"\
-          }},\"ids\":{\"trakt\":75141,\"slug\":\"kumail-nanjiani\",\"tvdb\":276450,\"\
-          imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
-      headers:
-        CF-Cache-Status: [HIT]
-        CF-RAY: [2c4c2a396eb10b1a-SYD]
-        Cache-Control: ['public, max-age=14400']
-        Connection: [keep-alive]
-        Content-Type: [application/json; charset=utf-8]
-        Date: ['Tue, 19 Jul 2016 06:37:27 GMT']
-        ETag: [W/"4f2c7e9ac3662918fb8324aea7f6572f"]
-        Expires: ['Tue, 19 Jul 2016 10:37:27 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=d36bd6f6aa6eb95cb95d3a242be460e561468910247; expires=Wed,
-            19-Jul-17 06:37:27 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        Vary: [Accept-Encoding]
-        X-Content-Type-Options: [nosniff]
-        X-Frame-Options: [SAMEORIGIN]
-        X-Pagination-Item-Count: ['15']
-        X-Pagination-Limit: ['10']
-        X-Pagination-Page: ['1']
-        X-Pagination-Page-Count: ['2']
-        X-Request-Id: [441b5d7f-318d-4327-9ecf-68cf0c6244b8]
-        X-Runtime: ['0.020362']
-        X-XSS-Protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Content-Type: [application/json]
-        Cookie: [__cfduid=d36bd6f6aa6eb95cb95d3a242be460e561468910247]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: [2]
-      method: GET
-      uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
-    response:
-      body: {string: '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
-          X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
-          Doggett and Monica Reyes and their investigations into the paranormal. From
-          genetic mutants and killer insects to a global conspiracy concerning the
-          colonization of Earth by an alien species, this mind-boggling, humorous
-          and occasionally frightening series created by Chris Carter has been one
-          of the world''s most popular sci-fi/drama shows since its humble beginnings
-          in 1993.","first_aired":"1993-09-10T07:00:00.000Z","airs":{"day":"Monday","time":"20:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
-          (US)","country":"us","trailer":"http://youtube.com/watch?v=rsBX-8vWgCc","homepage":"http://www.fox.com/the-x-files","status":"returning
-          series","rating":8.80334,"votes":6280,"updated_at":"2016-07-14T10:41:47.000Z","language":"en","available_translations":["en","hu","ru","pt","es","bg","nl","it","el","fr","he","de","ar","ja","ro","uk","bs","cs","tr","da","fi","ko","pl","zh"],"genres":["drama","mystery","science-fiction","fantasy"],"aired_episodes":208,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/004/063/fanarts/original/1f0b461052.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/004/063/posters/original/034cc070a9.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/004/063/logos/original/ba7ac727c2.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/004/063/cleararts/original/a4a0db2c8d.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/004/063/banners/original/0927751ec8.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/004/063/thumbs/original/74d4f3d798.jpg"}}}'}
-      headers:
-        CF-Cache-Status: [HIT]
-        CF-RAY: [2c4c2a39deb40b1a-SYD]
-        Cache-Control: ['public, max-age=14400']
-        Connection: [keep-alive]
-        Content-Type: [application/json; charset=utf-8]
-        Date: ['Tue, 19 Jul 2016 06:37:27 GMT']
-        ETag: [W/"faa04f686917eaf5bfe956f7985f77ac"]
-        Expires: ['Tue, 19 Jul 2016 10:37:27 GMT']
-        Last-Modified: ['Thu, 14 Jul 2016 10:41:47 GMT']
-        Server: [cloudflare-nginx]
-        Vary: [Accept-Encoding]
-        X-Content-Type-Options: [nosniff]
-        X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [4edfee1d-55a9-42c2-9f2b-4578f09517ce]
-        X-Runtime: ['0.014491']
-        X-XSS-Protection: [1; mode=block]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":83.553276,\"show\":{\"title\":\"The
+        X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
+        Fox Mulder, Dana Scully, John Doggett and Monica Reyes and their investigations
+        into the paranormal. From genetic mutants and killer insects to a global conspiracy
+        concerning the colonization of Earth by an alien species, this mind-boggling,
+        humorous and occasionally frightening series created by Chris Carter has been
+        one of the world's most popular sci-fi/drama shows since its humble beginnings
+        in 1993.\",\"year\":1993,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/posters/original/034cc070a9.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/original/1f0b461052.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg\"}},\"ids\":{\"trakt\":4063,\"slug\":\"the-x-files\",\"tvdb\":77398,\"imdb\":\"tt0106179\",\"tmdb\":4087,\"tvrage\":6312}}},{\"type\":\"show\",\"score\":80.89894,\"show\":{\"title\":\"NASA's
+        X-Files\",\"overview\":\"Soar beyond the horizon and into the future of aviation
+        with unprecedented behind the scenes access to NASA's Dryden Flight Research
+        Center. Experience never-before-seen test flight footage, from the first supersonic
+        X-1 to the ultimate hypersonic aircraft, the X-43. \",\"year\":null,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":21742,\"slug\":\"nasa-s-x-files\",\"tvdb\":150181,\"imdb\":\"\",\"tmdb\":21843,\"tvrage\":19772}}},{\"type\":\"show\",\"score\":80.89839,\"show\":{\"title\":\"Ancient
+        X-Files\",\"overview\":\"Ancient X Files travels around the world to solve
+        some intriguing riddles. Each story is a piece of detective work by an expert
+        trying to make sense of some puzzling ancient artefact, to find the truth
+        behind some extraordinary legend, to discover the origins of a bizarre myth
+        or to establish the authenticity of a venerated religious relic. This series
+        explores the bits of archaeology and history which seem to defy explanation.Our
+        experts are following chains of clues and putting theories to the test, in
+        an effort to explain the unexplained. Ancient X Files investigates claims
+        about the whereabouts of the lost Ark of the Covenant; attempts to establish
+        the authenticity of a cup some believe to be the Holy Grail; tries to de-code
+        the mysterious Phaistos disc; investigates a cloth which is believed to carry
+        traces of the DNA of Jesus Christ; and deciphers an encrypted book of alchemy
+        written by the great Sir Isaac Newton.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/075/posters/original/6eb48ec869.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/061/075/posters/thumb/6eb48ec869.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61075,\"slug\":\"ancient-x-files\",\"tvdb\":214961,\"imdb\":\"tt1734568\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":60.678684,\"show\":{\"title\":\"National
+        Geographic Wild X Files\",\"overview\":\"From the odd and amusing to the downright
+        creepy, mysteries found in nature are no less weird than anything found in
+        popular science fiction!In a brand new series of Wild X Files, Wednesdays
+        at 8pm from 22 August, see real-life cases from the natural world that will
+        baffle and fascinate you.On Shark Attack Beach, where 7% of the world\u2019s
+        shark attacks occur, experts try to understand why the full moon seems to
+        increase attacks.In the Cotswolds, a weird creature appears to be stalking
+        dog walkers.And, in an apocalyptic scene right out of a sci-fi thriller, 5,000
+        blackbirds suddenly fall out of the sky in Arkansas on New Year\u2019s Eve.Other
+        cases covered include the hundreds of elk who dropped dead for no apparent
+        reason and the strange appearance of Star Jelly which left locals scratching
+        their heads in the Scottish Highlands.Experts attempt to find the answers
+        to these bizarre mysteries.\",\"year\":2001,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":67848,\"slug\":\"national-geographic-wild-x-files\",\"tvdb\":262652,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":60.659443,\"show\":{\"title\":\"Joseon
+        X-Files: Mystery Investigation Record\",\"overview\":\"Joseon X-Files is based
+        on cases detailed in the Annals of Joseon History with a bizarre twist; these
+        incidents incorporate mysterious, supernatural elements that cannot be explained
+        through science. Kim Hyung Do is an inspector of the state whose single-minded
+        focus on his investigations into administrative misdeeds bring him into direct
+        contact with these strange mysteries. Heo Yoon Yi is a government employee
+        who aids him and attempts to understand these scientific impossibilities with
+        an open mind, in contrast to his cynicism.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/posters/original/cb681cfdba.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/posters/thumb/cb681cfdba.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":62570,\"slug\":\"joseon-x-files-mystery-investigation-record\",\"tvdb\":204501,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.6396394,\"show\":{\"title\":\"The
+        After\",\"overview\":\"An Amazon Original Pilot: From Chris Carter, creator
+        of The X-Files. Eight strangers are thrown together by mysterious forces and
+        must help each other survive in a violent world that defies explanation.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":96230,\"slug\":\"the-after-2014\",\"tvdb\":292193,\"imdb\":\"tt3145422\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.7730274,\"show\":{\"title\":\"Poltergeist:
+        The Legacy\",\"overview\":\"'Since the beginning of time mankind has existed
+        between the world of light and the world of darkness. This journal chronicles
+        the work of our secret society, known as The Legacy. Created to protect the
+        innocent from those creatures that inhabit the shadows and the night.' So
+        the opening credits of 'Poltergeist: The Legacy' announced. 'Poltergeist was
+        a show that tried to mix the style and success of X-Files and transport it
+        to a more horror based genre. Mostly it succeeded and, while not having the
+        plaudits of X-Files, managed to create and interesting group of characters
+        and story ideas.\",\"year\":1996,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/posters/original/b2f42c0749.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/posters/thumb/b2f42c0749.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/original/f5295c0053.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/thumb/f5295c0053.jpg\"}},\"ids\":{\"trakt\":11131,\"slug\":\"poltergeist-the-legacy\",\"tvdb\":77952,\"imdb\":\"tt0115317\",\"tmdb\":11183,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.3326561,\"show\":{\"title\":\"The
+        Lone Gunmen\",\"overview\":\"Spin-off of The X-Files featuring the trio of
+        computer-hacking conspiracy geeks popularly known as The Lone Gunmen. Never
+        ones to stray far from the center of corporate and government intrigue, the
+        threesome of John Byers, Melvin Frohike, and Richard Langly play like a misguided
+        Mission Impossible team, embarking on a series of comic adventures that simultaneously
+        highlight their genius and ineptitude. While their newfound independence inspires
+        them to investigate even the most shadowy of conspiracies, their social skills
+        remain stagnant, which only makes their lives more difficult when they learn
+        their chief competitor in the \\\"information business\\\" is the brilliant
+        and beautiful Yves Adele Harlow. Perpetually short of funds to publish The
+        Lone Gunmen newspaper, Byers, Frohike and Langly begrudgingly take on Jimmy
+        Bond as an unlikely benefactor who bankrolls their missions and joins them
+        in their investigations to uncover the truth.\",\"year\":2001,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/posters/original/b83d3fad63.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/posters/thumb/b83d3fad63.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/original/4cbf0c5a4b.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/thumb/4cbf0c5a4b.jpg\"}},\"ids\":{\"trakt\":5686,\"slug\":\"the-lone-gunmen\",\"tvdb\":76245,\"imdb\":\"tt0243069\",\"tmdb\":5715,\"tvrage\":5939}}},{\"type\":\"show\",\"score\":2.53108,\"show\":{\"title\":\"The
+        Imaginatively Titled Punt & Dennis Show\",\"overview\":\"The Imaginatively
+        Titled Punt and Dennis show featured Steve Punt and Hugh Dennis in a vast
+        array of studio gags, filmed sketches and parodies of famous TV dramas such
+        as the X-Files, Baywatch and ER. Each show would focus on a theme, be it crime,
+        holidays, sports etc. and would have amusing insights into each subject which
+        carried on into most parts of the show. The show sported an array of characters
+        (mostly performed by Hugh Dennis) who would appear in either their own sketches,
+        or would regularly turn up without warning in the studio, the filmed sketches
+        and even the drama parodies. &lt;u&gt;Characters&lt;/u&gt; Kurt Wenker German
+        tourist from hell who was always out to steal 'puny British boys' girlfriends.
+        Right Hon. Hector Sleazy MP Scandal-riddled member of parliament who gave
+        long non-sensical speeches and constantly insisted he wouldn't be resigning.
+        Norris the Weatherman Habitual criminal assigned to the BBC as a part of a
+        reformation scheme by the govenrme\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9082,\"slug\":\"the-imaginatively-titled-punt-dennis-show\",\"tvdb\":78570,\"imdb\":\"\",\"tmdb\":9129,\"tvrage\":5867}}},{\"type\":\"show\",\"score\":0.92165494,\"show\":{\"title\":\"Kumail
+        Nanjiani\",\"overview\":\"Kumail Nanjiani; born 21 February 1978) is a Pakistani-American
+        stand-up comedian, actor and podcast host. He starred on the TNT series Franklin
+        & Bash and co-hosts the show The Meltdown with Jonah and Kumail. Nanjiani
+        is also a regular on HBO's Silicon Valley. On top of his television and film
+        work, he hosts two podcasts: The Indoor Kids and The X-Files Files.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/posters/original/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/posters/thumb/887b33e932.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/original/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/thumb/887b33e932.jpg\"}},\"ids\":{\"trakt\":75141,\"slug\":\"kumail-nanjiani\",\"tvdb\":276450,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [2c4c2a396eb10b1a-SYD]
+      Cache-Control: ['public, max-age=14400']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Tue, 19 Jul 2016 06:37:27 GMT']
+      ETag: [W/"4f2c7e9ac3662918fb8324aea7f6572f"]
+      Expires: ['Tue, 19 Jul 2016 10:37:27 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d36bd6f6aa6eb95cb95d3a242be460e561468910247; expires=Wed,
+          19-Jul-17 06:37:27 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['15']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['2']
+      X-Request-Id: [441b5d7f-318d-4327-9ecf-68cf0c6244b8]
+      X-Runtime: ['0.020362']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=d36bd6f6aa6eb95cb95d3a242be460e561468910247]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
+        X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
+        Doggett and Monica Reyes and their investigations into the paranormal. From
+        genetic mutants and killer insects to a global conspiracy concerning the colonization
+        of Earth by an alien species, this mind-boggling, humorous and occasionally
+        frightening series created by Chris Carter has been one of the world''s most
+        popular sci-fi/drama shows since its humble beginnings in 1993.","first_aired":"1993-09-10T07:00:00.000Z","airs":{"day":"Monday","time":"20:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
+        (US)","country":"us","trailer":"http://youtube.com/watch?v=rsBX-8vWgCc","homepage":"http://www.fox.com/the-x-files","status":"returning
+        series","rating":8.80334,"votes":6280,"updated_at":"2016-07-14T10:41:47.000Z","language":"en","available_translations":["en","hu","ru","pt","es","bg","nl","it","el","fr","he","de","ar","ja","ro","uk","bs","cs","tr","da","fi","ko","pl","zh"],"genres":["drama","mystery","science-fiction","fantasy"],"aired_episodes":208,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/004/063/fanarts/original/1f0b461052.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/004/063/posters/original/034cc070a9.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/004/063/logos/original/ba7ac727c2.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/004/063/cleararts/original/a4a0db2c8d.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/004/063/banners/original/0927751ec8.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/004/063/thumbs/original/74d4f3d798.jpg"}}}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [2c4c2a39deb40b1a-SYD]
+      Cache-Control: ['public, max-age=14400']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Tue, 19 Jul 2016 06:37:27 GMT']
+      ETag: [W/"faa04f686917eaf5bfe956f7985f77ac"]
+      Expires: ['Tue, 19 Jul 2016 10:37:27 GMT']
+      Last-Modified: ['Thu, 14 Jul 2016 10:41:47 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [4edfee1d-55a9-42c2-9f2b-4578f09517ce]
+      X-Runtime: ['0.014491']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":96.78512,\"show\":{\"title\":\"The
+        X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
+        Fox Mulder, Dana Scully, John Doggett and Monica Reyes and their investigations
+        into the paranormal. From genetic mutants and killer insects to a global conspiracy
+        concerning the colonization of Earth by an alien species, this mind-boggling,
+        humorous and occasionally frightening series created by Chris Carter has been
+        one of the world's most popular sci-fi/drama shows since its humble beginnings
+        in 1993.\",\"year\":1993,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/posters/original/034cc070a9.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/original/1f0b461052.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg\"}},\"ids\":{\"trakt\":4063,\"slug\":\"the-x-files\",\"tvdb\":77398,\"imdb\":\"tt0106179\",\"tmdb\":4087,\"tvrage\":6312}}},{\"type\":\"show\",\"score\":93.63627,\"show\":{\"title\":\"NASA's
+        X-Files\",\"overview\":\"Soar beyond the horizon and into the future of aviation
+        with unprecedented behind the scenes access to NASA's Dryden Flight Research
+        Center. Experience never-before-seen test flight footage, from the first supersonic
+        X-1 to the ultimate hypersonic aircraft, the X-43. \",\"year\":null,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":21742,\"slug\":\"nasa-s-x-files\",\"tvdb\":150181,\"imdb\":null,\"tmdb\":21843,\"tvrage\":19772}}},{\"type\":\"show\",\"score\":93.63556,\"show\":{\"title\":\"Ancient
+        X-Files\",\"overview\":\"Ancient X Files travels around the world to solve
+        some intriguing riddles. Each story is a piece of detective work by an expert
+        trying to make sense of some puzzling ancient artefact, to find the truth
+        behind some extraordinary legend, to discover the origins of a bizarre myth
+        or to establish the authenticity of a venerated religious relic. This series
+        explores the bits of archaeology and history which seem to defy explanation.Our
+        experts are following chains of clues and putting theories to the test, in
+        an effort to explain the unexplained. Ancient X Files investigates claims
+        about the whereabouts of the lost Ark of the Covenant; attempts to establish
+        the authenticity of a cup some believe to be the Holy Grail; tries to de-code
+        the mysterious Phaistos disc; investigates a cloth which is believed to carry
+        traces of the DNA of Jesus Christ; and deciphers an encrypted book of alchemy
+        written by the great Sir Isaac Newton.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/075/posters/original/6eb48ec869.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/061/075/posters/thumb/6eb48ec869.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61075,\"slug\":\"ancient-x-files\",\"tvdb\":214961,\"imdb\":\"tt1734568\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":70.232994,\"show\":{\"title\":\"National
+        Geographic Wild X Files\",\"overview\":\"From the odd and amusing to the downright
+        creepy, mysteries found in nature are no less weird than anything found in
+        popular science fiction!In a brand new series of Wild X Files, Wednesdays
+        at 8pm from 22 August, see real-life cases from the natural world that will
+        baffle and fascinate you.On Shark Attack Beach, where 7% of the world\u2019s
+        shark attacks occur, experts try to understand why the full moon seems to
+        increase attacks.In the Cotswolds, a weird creature appears to be stalking
+        dog walkers.And, in an apocalyptic scene right out of a sci-fi thriller, 5,000
+        blackbirds suddenly fall out of the sky in Arkansas on New Year\u2019s Eve.Other
+        cases covered include the hundreds of elk who dropped dead for no apparent
+        reason and the strange appearance of Star Jelly which left locals scratching
+        their heads in the Scottish Highlands.Experts attempt to find the answers
+        to these bizarre mysteries.\",\"year\":2001,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":67848,\"slug\":\"national-geographic-wild-x-files\",\"tvdb\":262652,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":70.20813,\"show\":{\"title\":\"Joseon
+        X-Files: Mystery Investigation Record\",\"overview\":\"Joseon X-Files is based
+        on cases detailed in the Annals of Joseon History with a bizarre twist; these
+        incidents incorporate mysterious, supernatural elements that cannot be explained
+        through science. Kim Hyung Do is an inspector of the state whose single-minded
+        focus on his investigations into administrative misdeeds bring him into direct
+        contact with these strange mysteries. Heo Yoon Yi is a government employee
+        who aids him and attempts to understand these scientific impossibilities with
+        an open mind, in contrast to his cynicism.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/posters/original/cb681cfdba.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/posters/thumb/cb681cfdba.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/original/738975c089.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/medium/738975c089.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/thumb/738975c089.jpg\"}},\"ids\":{\"trakt\":62570,\"slug\":\"joseon-x-files-mystery-investigation-record\",\"tvdb\":204501,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":5.4849772,\"show\":{\"title\":\"The
+        After\",\"overview\":\"An Amazon Original Pilot: From Chris Carter, creator
+        of The X-Files. Eight strangers are thrown together by mysterious forces and
+        must help each other survive in a violent world that defies explanation.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":96230,\"slug\":\"the-after-2014\",\"tvdb\":292193,\"imdb\":\"tt3145422\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.4594975,\"show\":{\"title\":\"Poltergeist:
+        The Legacy\",\"overview\":\"'Since the beginning of time mankind has existed
+        between the world of light and the world of darkness. This journal chronicles
+        the work of our secret society, known as The Legacy. Created to protect the
+        innocent from those creatures that inhabit the shadows and the night.' So
+        the opening credits of 'Poltergeist: The Legacy' announced. 'Poltergeist was
+        a show that tried to mix the style and success of X-Files and transport it
+        to a more horror based genre. Mostly it succeeded and, while not having the
+        plaudits of X-Files, managed to create and interesting group of characters
+        and story ideas.\",\"year\":1996,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/posters/original/b2f42c0749.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/posters/thumb/b2f42c0749.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/original/f5295c0053.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/thumb/f5295c0053.jpg\"}},\"ids\":{\"trakt\":11131,\"slug\":\"poltergeist-the-legacy\",\"tvdb\":77952,\"imdb\":\"tt0115317\",\"tmdb\":11183,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.9458742,\"show\":{\"title\":\"The
+        Lone Gunmen\",\"overview\":\"Spin-off of The X-Files featuring the trio of
+        computer-hacking conspiracy geeks popularly known as The Lone Gunmen. Never
+        ones to stray far from the center of corporate and government intrigue, the
+        threesome of John Byers, Melvin Frohike, and Richard Langly play like a misguided
+        Mission Impossible team, embarking on a series of comic adventures that simultaneously
+        highlight their genius and ineptitude. While their newfound independence inspires
+        them to investigate even the most shadowy of conspiracies, their social skills
+        remain stagnant, which only makes their lives more difficult when they learn
+        their chief competitor in the \\\"information business\\\" is the brilliant
+        and beautiful Yves Adele Harlow. Perpetually short of funds to publish The
+        Lone Gunmen newspaper, Byers, Frohike and Langly begrudgingly take on Jimmy
+        Bond as an unlikely benefactor who bankrolls their missions and joins them
+        in their investigations to uncover the truth.\",\"year\":2001,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/posters/original/b83d3fad63.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/posters/thumb/b83d3fad63.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/original/4cbf0c5a4b.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/thumb/4cbf0c5a4b.jpg\"}},\"ids\":{\"trakt\":5686,\"slug\":\"the-lone-gunmen\",\"tvdb\":76245,\"imdb\":\"tt0243069\",\"tmdb\":5715,\"tvrage\":5939}}},{\"type\":\"show\",\"score\":2.996248,\"show\":{\"title\":\"The
+        Imaginatively Titled Punt & Dennis Show\",\"overview\":\"The Imaginatively
+        Titled Punt and Dennis show featured Steve Punt and Hugh Dennis in a vast
+        array of studio gags, filmed sketches and parodies of famous TV dramas such
+        as the X-Files, Baywatch and ER. Each show would focus on a theme, be it crime,
+        holidays, sports etc. and would have amusing insights into each subject which
+        carried on into most parts of the show. The show sported an array of characters
+        (mostly performed by Hugh Dennis) who would appear in either their own sketches,
+        or would regularly turn up without warning in the studio, the filmed sketches
+        and even the drama parodies. &lt;u&gt;Characters&lt;/u&gt; Kurt Wenker German
+        tourist from hell who was always out to steal 'puny British boys' girlfriends.
+        Right Hon. Hector Sleazy MP Scandal-riddled member of parliament who gave
+        long non-sensical speeches and constantly insisted he wouldn't be resigning.
+        Norris the Weatherman Habitual criminal assigned to the BBC as a part of a
+        reformation scheme by the govenrme\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9082,\"slug\":\"the-imaginatively-titled-punt-dennis-show\",\"tvdb\":78570,\"imdb\":\"\",\"tmdb\":9129,\"tvrage\":5867}}},{\"type\":\"show\",\"score\":1.0796558,\"show\":{\"title\":\"Kumail
+        Nanjiani\",\"overview\":\"Kumail Nanjiani; born 21 February 1978) is a Pakistani-American
+        stand-up comedian, actor and podcast host. He starred on the TNT series Franklin
+        & Bash and co-hosts the show The Meltdown with Jonah and Kumail. Nanjiani
+        is also a regular on HBO's Silicon Valley. On top of his television and film
+        work, he hosts two podcasts: The Indoor Kids and The X-Files Files.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/posters/original/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/posters/thumb/887b33e932.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/original/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/thumb/887b33e932.jpg\"}},\"ids\":{\"trakt\":75141,\"slug\":\"kumail-nanjiani\",\"tvdb\":276450,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [MISS]
+      cf-ray: [2e657a9e2e032702-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 22 Sep 2016 11:39:54 GMT']
+      etag: [W/"8a87a46c5f4ab7de346aa3438d2402f9"]
+      expires: ['Thu, 22 Sep 2016 19:39:54 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=de82701716cae2777025888c3be06e5931474544393; expires=Fri,
+          22-Sep-17 11:39:53 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['15']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['2']
+      x-request-id: [0b299690-1425-44a7-9393-a1729b3d9954]
+      x-runtime: ['0.022430']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=de82701716cae2777025888c3be06e5931474544393]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
+        X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
+        Doggett and Monica Reyes and their investigations into the paranormal. From
+        genetic mutants and killer insects to a global conspiracy concerning the colonization
+        of Earth by an alien species, this mind-boggling, humorous and occasionally
+        frightening series created by Chris Carter has been one of the world''s most
+        popular sci-fi/drama shows since its humble beginnings in 1993.","first_aired":"1993-09-11T00:00:00.000Z","airs":{"day":"Monday","time":"20:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
+        (US)","country":"us","trailer":"http://youtube.com/watch?v=rsBX-8vWgCc","homepage":"http://www.fox.com/the-x-files","status":"returning
+        series","rating":8.79778,"votes":6483,"updated_at":"2016-09-21T11:29:35.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hu","it","ja","ko","nl","pl","pt","ro","ru","sv","tr","uk","zh"],"genres":["drama","mystery","science-fiction","fantasy"],"aired_episodes":208,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/004/063/fanarts/original/1f0b461052.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/004/063/posters/original/034cc070a9.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/004/063/logos/original/ba7ac727c2.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/004/063/cleararts/original/a4a0db2c8d.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/004/063/banners/original/0927751ec8.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/004/063/thumbs/original/74d4f3d798.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e657aa23fa42702-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 22 Sep 2016 11:39:54 GMT']
+      etag: [W/"c4e712da1d745371731312a0967c24a3"]
+      expires: ['Thu, 22 Sep 2016 19:39:54 GMT']
+      last-modified: ['Wed, 21 Sep 2016 11:29:35 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [110178db-e659-43d9-983c-6b23682ed61c]
+      x-runtime: ['0.015255']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":98.26889,\"show\":{\"title\":\"The
+        X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
+        Fox Mulder, Dana Scully, John Doggett and Monica Reyes and their investigations
+        into the paranormal. From genetic mutants and killer insects to a global conspiracy
+        concerning the colonization of Earth by an alien species, this mind-boggling,
+        humorous and occasionally frightening series created by Chris Carter has been
+        one of the world's most popular sci-fi/drama shows since its humble beginnings
+        in 1993.\",\"year\":1993,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg\"}},\"ids\":{\"trakt\":4063,\"slug\":\"the-x-files\",\"tvdb\":77398,\"imdb\":\"tt0106179\",\"tmdb\":4087,\"tvrage\":6312}}},{\"type\":\"show\",\"score\":95.13265,\"show\":{\"title\":\"NASA's
+        X-Files\",\"overview\":\"Soar beyond the horizon and into the future of aviation
+        with unprecedented behind the scenes access to NASA's Dryden Flight Research
+        Center. Experience never-before-seen test flight footage, from the first supersonic
+        X-1 to the ultimate hypersonic aircraft, the X-43. \",\"year\":null,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":21742,\"slug\":\"nasa-s-x-files\",\"tvdb\":150181,\"imdb\":null,\"tmdb\":21843,\"tvrage\":19772}}},{\"type\":\"show\",\"score\":95.13197,\"show\":{\"title\":\"Ancient
+        X-Files\",\"overview\":\"Ancient X Files travels around the world to solve
+        some intriguing riddles. Each story is a piece of detective work by an expert
+        trying to make sense of some puzzling ancient artefact, to find the truth
+        behind some extraordinary legend, to discover the origins of a bizarre myth
+        or to establish the authenticity of a venerated religious relic. This series
+        explores the bits of archaeology and history which seem to defy explanation.Our
+        experts are following chains of clues and putting theories to the test, in
+        an effort to explain the unexplained. Ancient X Files investigates claims
+        about the whereabouts of the lost Ark of the Covenant; attempts to establish
+        the authenticity of a cup some believe to be the Holy Grail; tries to de-code
+        the mysterious Phaistos disc; investigates a cloth which is believed to carry
+        traces of the DNA of Jesus Christ; and deciphers an encrypted book of alchemy
+        written by the great Sir Isaac Newton.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/061/075/posters/thumb/6eb48ec869.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61075,\"slug\":\"ancient-x-files\",\"tvdb\":214961,\"imdb\":\"tt1734568\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":71.355064,\"show\":{\"title\":\"National
+        Geographic Wild X Files\",\"overview\":\"From the odd and amusing to the downright
+        creepy, mysteries found in nature are no less weird than anything found in
+        popular science fiction!In a brand new series of Wild X Files, Wednesdays
+        at 8pm from 22 August, see real-life cases from the natural world that will
+        baffle and fascinate you.On Shark Attack Beach, where 7% of the world\u2019s
+        shark attacks occur, experts try to understand why the full moon seems to
+        increase attacks.In the Cotswolds, a weird creature appears to be stalking
+        dog walkers.And, in an apocalyptic scene right out of a sci-fi thriller, 5,000
+        blackbirds suddenly fall out of the sky in Arkansas on New Year\u2019s Eve.Other
+        cases covered include the hundreds of elk who dropped dead for no apparent
+        reason and the strange appearance of Star Jelly which left locals scratching
+        their heads in the Scottish Highlands.Experts attempt to find the answers
+        to these bizarre mysteries.\",\"year\":2001,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":67848,\"slug\":\"national-geographic-wild-x-files\",\"tvdb\":262652,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":71.33113,\"show\":{\"title\":\"Joseon
+        X-Files: Mystery Investigation Record\",\"overview\":\"Joseon X-Files is based
+        on cases detailed in the Annals of Joseon History with a bizarre twist; these
+        incidents incorporate mysterious, supernatural elements that cannot be explained
+        through science. Kim Hyung Do is an inspector of the state whose single-minded
+        focus on his investigations into administrative misdeeds bring him into direct
+        contact with these strange mysteries. Heo Yoon Yi is a government employee
+        who aids him and attempts to understand these scientific impossibilities with
+        an open mind, in contrast to his cynicism.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/posters/thumb/cb681cfdba.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/medium/738975c089.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/medium/738975c089.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/thumb/738975c089.jpg\"}},\"ids\":{\"trakt\":62570,\"slug\":\"joseon-x-files-mystery-investigation-record\",\"tvdb\":204501,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":5.4884505,\"show\":{\"title\":\"The
+        After\",\"overview\":\"An Amazon Original Pilot: From Chris Carter, creator
+        of The X-Files. Eight strangers are thrown together by mysterious forces and
+        must help each other survive in a violent world that defies explanation.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":96230,\"slug\":\"the-after-2014\",\"tvdb\":292193,\"imdb\":\"tt3145422\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.4633474,\"show\":{\"title\":\"Poltergeist:
+        The Legacy\",\"overview\":\"'Since the beginning of time mankind has existed
+        between the world of light and the world of darkness. This journal chronicles
+        the work of our secret society, known as The Legacy. Created to protect the
+        innocent from those creatures that inhabit the shadows and the night.' So
+        the opening credits of 'Poltergeist: The Legacy' announced. 'Poltergeist was
+        a show that tried to mix the style and success of X-Files and transport it
+        to a more horror based genre. Mostly it succeeded and, while not having the
+        plaudits of X-Files, managed to create and interesting group of characters
+        and story ideas.\",\"year\":1996,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/posters/thumb/b2f42c0749.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/thumb/f5295c0053.jpg\"}},\"ids\":{\"trakt\":11131,\"slug\":\"poltergeist-the-legacy\",\"tvdb\":77952,\"imdb\":\"tt0115317\",\"tmdb\":11183,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.9420266,\"show\":{\"title\":\"The
+        Lone Gunmen\",\"overview\":\"Spin-off of The X-Files featuring the trio of
+        computer-hacking conspiracy geeks popularly known as The Lone Gunmen. Never
+        ones to stray far from the center of corporate and government intrigue, the
+        threesome of John Byers, Melvin Frohike, and Richard Langly play like a misguided
+        Mission Impossible team, embarking on a series of comic adventures that simultaneously
+        highlight their genius and ineptitude. While their newfound independence inspires
+        them to investigate even the most shadowy of conspiracies, their social skills
+        remain stagnant, which only makes their lives more difficult when they learn
+        their chief competitor in the \\\"information business\\\" is the brilliant
+        and beautiful Yves Adele Harlow. Perpetually short of funds to publish The
+        Lone Gunmen newspaper, Byers, Frohike and Langly begrudgingly take on Jimmy
+        Bond as an unlikely benefactor who bankrolls their missions and joins them
+        in their investigations to uncover the truth.\",\"year\":2001,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/posters/thumb/b83d3fad63.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/thumb/4cbf0c5a4b.jpg\"}},\"ids\":{\"trakt\":5686,\"slug\":\"the-lone-gunmen\",\"tvdb\":76245,\"imdb\":\"tt0243069\",\"tmdb\":5715,\"tvrage\":5939}}},{\"type\":\"show\",\"score\":2.9939144,\"show\":{\"title\":\"The
+        Imaginatively Titled Punt & Dennis Show\",\"overview\":\"The Imaginatively
+        Titled Punt and Dennis show featured Steve Punt and Hugh Dennis in a vast
+        array of studio gags, filmed sketches and parodies of famous TV dramas such
+        as the X-Files, Baywatch and ER. Each show would focus on a theme, be it crime,
+        holidays, sports etc. and would have amusing insights into each subject which
+        carried on into most parts of the show. The show sported an array of characters
+        (mostly performed by Hugh Dennis) who would appear in either their own sketches,
+        or would regularly turn up without warning in the studio, the filmed sketches
+        and even the drama parodies. &lt;u&gt;Characters&lt;/u&gt; Kurt Wenker German
+        tourist from hell who was always out to steal 'puny British boys' girlfriends.
+        Right Hon. Hector Sleazy MP Scandal-riddled member of parliament who gave
+        long non-sensical speeches and constantly insisted he wouldn't be resigning.
+        Norris the Weatherman Habitual criminal assigned to the BBC as a part of a
+        reformation scheme by the govenrme\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9082,\"slug\":\"the-imaginatively-titled-punt-dennis-show\",\"tvdb\":78570,\"imdb\":\"\",\"tmdb\":9129,\"tvrage\":5867}}},{\"type\":\"show\",\"score\":1.0932952,\"show\":{\"title\":\"Kumail
+        Nanjiani\",\"overview\":\"Kumail Nanjiani; born 21 February 1978) is a Pakistani-American
+        stand-up comedian, actor and podcast host. He starred on the TNT series Franklin
+        & Bash and co-hosts the show The Meltdown with Jonah and Kumail. Nanjiani
+        is also a regular on HBO's Silicon Valley. On top of his television and film
+        work, he hosts two podcasts: The Indoor Kids and The X-Files Files.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/posters/thumb/887b33e932.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/thumb/887b33e932.jpg\"}},\"ids\":{\"trakt\":75141,\"slug\":\"kumail-nanjiani\",\"tvdb\":276450,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [EXPIRED]
+      cf-ray: [2e7f1cc08be726cc-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Sun, 25 Sep 2016 14:19:39 GMT']
+      etag: [W/"304c00a5f0af323b5bf15dced19f4431"]
+      expires: ['Sun, 25 Sep 2016 22:19:39 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d9bf09db95f3969d5d375d34e3a2f632c1474813178; expires=Mon,
+          25-Sep-17 14:19:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['15']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['2']
+      x-request-id: [1c46fc60-074c-4843-9298-66d3642bd34f]
+      x-runtime: ['0.040786']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=d9bf09db95f3969d5d375d34e3a2f632c1474813178]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
+        X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
+        Doggett and Monica Reyes and their investigations into the paranormal. From
+        genetic mutants and killer insects to a global conspiracy concerning the colonization
+        of Earth by an alien species, this mind-boggling, humorous and occasionally
+        frightening series created by Chris Carter has been one of the world''s most
+        popular sci-fi/drama shows since its humble beginnings in 1993.","first_aired":"1993-09-11T00:00:00.000Z","airs":{"day":"Monday","time":"20:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
+        (US)","country":"us","trailer":"http://youtube.com/watch?v=rsBX-8vWgCc","homepage":"http://www.fox.com/the-x-files","status":"returning
+        series","rating":8.79821,"votes":6492,"updated_at":"2016-09-25T10:31:53.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hu","it","ja","ko","nl","pl","pt","ro","ru","sv","tr","uk","zh"],"genres":["drama","mystery","science-fiction","fantasy"],"aired_episodes":208,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/004/063/logos/original/ba7ac727c2.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/004/063/cleararts/original/a4a0db2c8d.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/004/063/banners/original/0927751ec8.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/004/063/thumbs/original/74d4f3d798.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e7f1cc2bca026cc-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Sun, 25 Sep 2016 14:19:39 GMT']
+      etag: [W/"af33ab927c1b2bc19fc868774b797df1"]
+      expires: ['Sun, 25 Sep 2016 22:19:39 GMT']
+      last-modified: ['Sun, 25 Sep 2016 10:31:53 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [f7ea6147-dd7d-40c5-b338-a70f26784d69]
+      x-runtime: ['0.011068']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":96.30489,\"show\":{\"title\":\"The
+        X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
+        Fox Mulder, Dana Scully, John Doggett and Monica Reyes and their investigations
+        into the paranormal. From genetic mutants and killer insects to a global conspiracy
+        concerning the colonization of Earth by an alien species, this mind-boggling,
+        humorous and occasionally frightening series created by Chris Carter has been
+        one of the world's most popular sci-fi/drama shows since its humble beginnings
+        in 1993.\",\"year\":1993,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg\"}},\"ids\":{\"trakt\":4063,\"slug\":\"the-x-files\",\"tvdb\":77398,\"imdb\":\"tt0106179\",\"tmdb\":4087,\"tvrage\":6312}}},{\"type\":\"show\",\"score\":93.19982,\"show\":{\"title\":\"NASA's
+        X-Files\",\"overview\":\"Soar beyond the horizon and into the future of aviation
+        with unprecedented behind the scenes access to NASA's Dryden Flight Research
+        Center. Experience never-before-seen test flight footage, from the first supersonic
+        X-1 to the ultimate hypersonic aircraft, the X-43. \",\"year\":null,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":21742,\"slug\":\"nasa-s-x-files\",\"tvdb\":150181,\"imdb\":null,\"tmdb\":21843,\"tvrage\":19772}}},{\"type\":\"show\",\"score\":93.19913,\"show\":{\"title\":\"Ancient
+        X-Files\",\"overview\":\"Ancient X Files travels around the world to solve
+        some intriguing riddles. Each story is a piece of detective work by an expert
+        trying to make sense of some puzzling ancient artefact, to find the truth
+        behind some extraordinary legend, to discover the origins of a bizarre myth
+        or to establish the authenticity of a venerated religious relic. This series
+        explores the bits of archaeology and history which seem to defy explanation.Our
+        experts are following chains of clues and putting theories to the test, in
+        an effort to explain the unexplained. Ancient X Files investigates claims
+        about the whereabouts of the lost Ark of the Covenant; attempts to establish
+        the authenticity of a cup some believe to be the Holy Grail; tries to de-code
+        the mysterious Phaistos disc; investigates a cloth which is believed to carry
+        traces of the DNA of Jesus Christ; and deciphers an encrypted book of alchemy
+        written by the great Sir Isaac Newton.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/061/075/posters/thumb/6eb48ec869.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61075,\"slug\":\"ancient-x-files\",\"tvdb\":214961,\"imdb\":\"tt1734568\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":69.90549,\"show\":{\"title\":\"National
+        Geographic Wild X Files\",\"overview\":\"From the odd and amusing to the downright
+        creepy, mysteries found in nature are no less weird than anything found in
+        popular science fiction!In a brand new series of Wild X Files, Wednesdays
+        at 8pm from 22 August, see real-life cases from the natural world that will
+        baffle and fascinate you.On Shark Attack Beach, where 7% of the world\u2019s
+        shark attacks occur, experts try to understand why the full moon seems to
+        increase attacks.In the Cotswolds, a weird creature appears to be stalking
+        dog walkers.And, in an apocalyptic scene right out of a sci-fi thriller, 5,000
+        blackbirds suddenly fall out of the sky in Arkansas on New Year\u2019s Eve.Other
+        cases covered include the hundreds of elk who dropped dead for no apparent
+        reason and the strange appearance of Star Jelly which left locals scratching
+        their heads in the Scottish Highlands.Experts attempt to find the answers
+        to these bizarre mysteries.\",\"year\":2001,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":67848,\"slug\":\"national-geographic-wild-x-files\",\"tvdb\":262652,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":69.88135,\"show\":{\"title\":\"Joseon
+        X-Files: Mystery Investigation Record\",\"overview\":\"Joseon X-Files is based
+        on cases detailed in the Annals of Joseon History with a bizarre twist; these
+        incidents incorporate mysterious, supernatural elements that cannot be explained
+        through science. Kim Hyung Do is an inspector of the state whose single-minded
+        focus on his investigations into administrative misdeeds bring him into direct
+        contact with these strange mysteries. Heo Yoon Yi is a government employee
+        who aids him and attempts to understand these scientific impossibilities with
+        an open mind, in contrast to his cynicism.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/posters/thumb/cb681cfdba.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/medium/738975c089.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/medium/738975c089.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/thumb/738975c089.jpg\"}},\"ids\":{\"trakt\":62570,\"slug\":\"joseon-x-files-mystery-investigation-record\",\"tvdb\":204501,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":5.4264946,\"show\":{\"title\":\"The
+        After\",\"overview\":\"An Amazon Original Pilot: From Chris Carter, creator
+        of The X-Files. Eight strangers are thrown together by mysterious forces and
+        must help each other survive in a violent world that defies explanation.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":96230,\"slug\":\"the-after-2014\",\"tvdb\":292193,\"imdb\":\"tt3145422\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.412635,\"show\":{\"title\":\"Poltergeist:
+        The Legacy\",\"overview\":\"'Since the beginning of time mankind has existed
+        between the world of light and the world of darkness. This journal chronicles
+        the work of our secret society, known as The Legacy. Created to protect the
+        innocent from those creatures that inhabit the shadows and the night.' So
+        the opening credits of 'Poltergeist: The Legacy' announced. 'Poltergeist was
+        a show that tried to mix the style and success of X-Files and transport it
+        to a more horror based genre. Mostly it succeeded and, while not having the
+        plaudits of X-Files, managed to create and interesting group of characters
+        and story ideas.\",\"year\":1996,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/posters/thumb/b2f42c0749.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/thumb/f5295c0053.jpg\"}},\"ids\":{\"trakt\":11131,\"slug\":\"poltergeist-the-legacy\",\"tvdb\":77952,\"imdb\":\"tt0115317\",\"tmdb\":11183,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.8995595,\"show\":{\"title\":\"The
+        Lone Gunmen\",\"overview\":\"Spin-off of The X-Files featuring the trio of
+        computer-hacking conspiracy geeks popularly known as The Lone Gunmen. Never
+        ones to stray far from the center of corporate and government intrigue, the
+        threesome of John Byers, Melvin Frohike, and Richard Langly play like a misguided
+        Mission Impossible team, embarking on a series of comic adventures that simultaneously
+        highlight their genius and ineptitude. While their newfound independence inspires
+        them to investigate even the most shadowy of conspiracies, their social skills
+        remain stagnant, which only makes their lives more difficult when they learn
+        their chief competitor in the \\\"information business\\\" is the brilliant
+        and beautiful Yves Adele Harlow. Perpetually short of funds to publish The
+        Lone Gunmen newspaper, Byers, Frohike and Langly begrudgingly take on Jimmy
+        Bond as an unlikely benefactor who bankrolls their missions and joins them
+        in their investigations to uncover the truth.\",\"year\":2001,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/posters/thumb/b83d3fad63.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/thumb/4cbf0c5a4b.jpg\"}},\"ids\":{\"trakt\":5686,\"slug\":\"the-lone-gunmen\",\"tvdb\":76245,\"imdb\":\"tt0243069\",\"tmdb\":5715,\"tvrage\":5939}}},{\"type\":\"show\",\"score\":2.9614725,\"show\":{\"title\":\"The
+        Imaginatively Titled Punt & Dennis Show\",\"overview\":\"The Imaginatively
+        Titled Punt and Dennis show featured Steve Punt and Hugh Dennis in a vast
+        array of studio gags, filmed sketches and parodies of famous TV dramas such
+        as the X-Files, Baywatch and ER. Each show would focus on a theme, be it crime,
+        holidays, sports etc. and would have amusing insights into each subject which
+        carried on into most parts of the show. The show sported an array of characters
+        (mostly performed by Hugh Dennis) who would appear in either their own sketches,
+        or would regularly turn up without warning in the studio, the filmed sketches
+        and even the drama parodies. &lt;u&gt;Characters&lt;/u&gt; Kurt Wenker German
+        tourist from hell who was always out to steal 'puny British boys' girlfriends.
+        Right Hon. Hector Sleazy MP Scandal-riddled member of parliament who gave
+        long non-sensical speeches and constantly insisted he wouldn't be resigning.
+        Norris the Weatherman Habitual criminal assigned to the BBC as a part of a
+        reformation scheme by the govenrme\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9082,\"slug\":\"the-imaginatively-titled-punt-dennis-show\",\"tvdb\":78570,\"imdb\":\"\",\"tmdb\":9129,\"tvrage\":5867}}},{\"type\":\"show\",\"score\":1.0771496,\"show\":{\"title\":\"Kumail
+        Nanjiani\",\"overview\":\"Kumail Nanjiani; born 21 February 1978) is a Pakistani-American
+        stand-up comedian, actor and podcast host. He starred on the TNT series Franklin
+        & Bash and co-hosts the show The Meltdown with Jonah and Kumail. Nanjiani
+        is also a regular on HBO's Silicon Valley. On top of his television and film
+        work, he hosts two podcasts: The Indoor Kids and The X-Files Files.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/posters/thumb/887b33e932.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/thumb/887b33e932.jpg\"}},\"ids\":{\"trakt\":75141,\"slug\":\"kumail-nanjiani\",\"tvdb\":276450,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [EXPIRED]
+      cf-ray: [2e85891a8d1e26a8-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 26 Sep 2016 09:02:11 GMT']
+      etag: [W/"7faf8395a269bd35eada3acad1519657"]
+      expires: ['Mon, 26 Sep 2016 17:02:11 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d36f9eb6c83cc5dbbba46f0eb104a8b291474880531; expires=Tue,
+          26-Sep-17 09:02:11 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['15']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['2']
+      x-request-id: [faad7ef5-c679-45c1-a63b-a821d2db2cf5]
+      x-runtime: ['0.101786']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=d36f9eb6c83cc5dbbba46f0eb104a8b291474880531]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
+        X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
+        Doggett and Monica Reyes and their investigations into the paranormal. From
+        genetic mutants and killer insects to a global conspiracy concerning the colonization
+        of Earth by an alien species, this mind-boggling, humorous and occasionally
+        frightening series created by Chris Carter has been one of the world''s most
+        popular sci-fi/drama shows since its humble beginnings in 1993.","first_aired":"1993-09-11T00:00:00.000Z","airs":{"day":"Monday","time":"20:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
+        (US)","country":"us","trailer":"http://youtube.com/watch?v=rsBX-8vWgCc","homepage":"http://www.fox.com/the-x-files","status":"returning
+        series","rating":8.79821,"votes":6492,"updated_at":"2016-09-25T10:31:53.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hu","it","ja","ko","nl","pl","pt","ro","ru","sv","tr","uk","zh"],"genres":["drama","mystery","science-fiction","fantasy"],"aired_episodes":208,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/004/063/logos/original/ba7ac727c2.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/004/063/cleararts/original/a4a0db2c8d.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/004/063/banners/original/0927751ec8.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/004/063/thumbs/original/74d4f3d798.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [REVALIDATED]
+      cf-ray: [2e85891d1dd626a8-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 26 Sep 2016 09:02:12 GMT']
+      etag: [W/"af33ab927c1b2bc19fc868774b797df1"]
+      expires: ['Mon, 26 Sep 2016 17:02:12 GMT']
+      last-modified: ['Sun, 25 Sep 2016 10:31:53 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [f7ea6147-dd7d-40c5-b338-a70f26784d69]
+      x-runtime: ['0.011068']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":98.97211,\"show\":{\"title\":\"The
+        X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
+        Fox Mulder, Dana Scully, John Doggett and Monica Reyes and their investigations
+        into the paranormal. From genetic mutants and killer insects to a global conspiracy
+        concerning the colonization of Earth by an alien species, this mind-boggling,
+        humorous and occasionally frightening series created by Chris Carter has been
+        one of the world's most popular sci-fi/drama shows since its humble beginnings
+        in 1993.\",\"year\":1993,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg\"}},\"ids\":{\"trakt\":4063,\"slug\":\"the-x-files\",\"tvdb\":77398,\"imdb\":\"tt0106179\",\"tmdb\":4087,\"tvrage\":6312}}},{\"type\":\"show\",\"score\":95.84272,\"show\":{\"title\":\"NASA's
+        X-Files\",\"overview\":\"Soar beyond the horizon and into the future of aviation
+        with unprecedented behind the scenes access to NASA's Dryden Flight Research
+        Center. Experience never-before-seen test flight footage, from the first supersonic
+        X-1 to the ultimate hypersonic aircraft, the X-43. \",\"year\":null,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":21742,\"slug\":\"nasa-s-x-files\",\"tvdb\":150181,\"imdb\":null,\"tmdb\":21843,\"tvrage\":19772}}},{\"type\":\"show\",\"score\":95.84205,\"show\":{\"title\":\"Ancient
+        X-Files\",\"overview\":\"Ancient X Files travels around the world to solve
+        some intriguing riddles. Each story is a piece of detective work by an expert
+        trying to make sense of some puzzling ancient artefact, to find the truth
+        behind some extraordinary legend, to discover the origins of a bizarre myth
+        or to establish the authenticity of a venerated religious relic. This series
+        explores the bits of archaeology and history which seem to defy explanation.Our
+        experts are following chains of clues and putting theories to the test, in
+        an effort to explain the unexplained. Ancient X Files investigates claims
+        about the whereabouts of the lost Ark of the Covenant; attempts to establish
+        the authenticity of a cup some believe to be the Holy Grail; tries to de-code
+        the mysterious Phaistos disc; investigates a cloth which is believed to carry
+        traces of the DNA of Jesus Christ; and deciphers an encrypted book of alchemy
+        written by the great Sir Isaac Newton.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/061/075/posters/thumb/6eb48ec869.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61075,\"slug\":\"ancient-x-files\",\"tvdb\":214961,\"imdb\":\"tt1734568\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":71.887474,\"show\":{\"title\":\"National
+        Geographic Wild X Files\",\"overview\":\"From the odd and amusing to the downright
+        creepy, mysteries found in nature are no less weird than anything found in
+        popular science fiction!In a brand new series of Wild X Files, Wednesdays
+        at 8pm from 22 August, see real-life cases from the natural world that will
+        baffle and fascinate you.On Shark Attack Beach, where 7% of the world\u2019s
+        shark attacks occur, experts try to understand why the full moon seems to
+        increase attacks.In the Cotswolds, a weird creature appears to be stalking
+        dog walkers.And, in an apocalyptic scene right out of a sci-fi thriller, 5,000
+        blackbirds suddenly fall out of the sky in Arkansas on New Year\u2019s Eve.Other
+        cases covered include the hundreds of elk who dropped dead for no apparent
+        reason and the strange appearance of Star Jelly which left locals scratching
+        their heads in the Scottish Highlands.Experts attempt to find the answers
+        to these bizarre mysteries.\",\"year\":2001,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":67848,\"slug\":\"national-geographic-wild-x-files\",\"tvdb\":262652,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":71.86413,\"show\":{\"title\":\"Joseon
+        X-Files: Mystery Investigation Record\",\"overview\":\"Joseon X-Files is based
+        on cases detailed in the Annals of Joseon History with a bizarre twist; these
+        incidents incorporate mysterious, supernatural elements that cannot be explained
+        through science. Kim Hyung Do is an inspector of the state whose single-minded
+        focus on his investigations into administrative misdeeds bring him into direct
+        contact with these strange mysteries. Heo Yoon Yi is a government employee
+        who aids him and attempts to understand these scientific impossibilities with
+        an open mind, in contrast to his cynicism.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/posters/thumb/cb681cfdba.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/medium/738975c089.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/medium/738975c089.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/thumb/738975c089.jpg\"}},\"ids\":{\"trakt\":62570,\"slug\":\"joseon-x-files-mystery-investigation-record\",\"tvdb\":204501,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":5.47719,\"show\":{\"title\":\"The
+        After\",\"overview\":\"An Amazon Original Pilot: From Chris Carter, creator
+        of The X-Files. Eight strangers are thrown together by mysterious forces and
+        must help each other survive in a violent world that defies explanation.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":96230,\"slug\":\"the-after-2014\",\"tvdb\":292193,\"imdb\":\"tt3145422\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.454295,\"show\":{\"title\":\"Poltergeist:
+        The Legacy\",\"overview\":\"'Since the beginning of time mankind has existed
+        between the world of light and the world of darkness. This journal chronicles
+        the work of our secret society, known as The Legacy. Created to protect the
+        innocent from those creatures that inhabit the shadows and the night.' So
+        the opening credits of 'Poltergeist: The Legacy' announced. 'Poltergeist was
+        a show that tried to mix the style and success of X-Files and transport it
+        to a more horror based genre. Mostly it succeeded and, while not having the
+        plaudits of X-Files, managed to create and interesting group of characters
+        and story ideas.\",\"year\":1996,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/posters/thumb/b2f42c0749.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/thumb/f5295c0053.jpg\"}},\"ids\":{\"trakt\":11131,\"slug\":\"poltergeist-the-legacy\",\"tvdb\":77952,\"imdb\":\"tt0115317\",\"tmdb\":11183,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.933294,\"show\":{\"title\":\"The
+        Lone Gunmen\",\"overview\":\"Spin-off of The X-Files featuring the trio of
+        computer-hacking conspiracy geeks popularly known as The Lone Gunmen. Never
+        ones to stray far from the center of corporate and government intrigue, the
+        threesome of John Byers, Melvin Frohike, and Richard Langly play like a misguided
+        Mission Impossible team, embarking on a series of comic adventures that simultaneously
+        highlight their genius and ineptitude. While their newfound independence inspires
+        them to investigate even the most shadowy of conspiracies, their social skills
+        remain stagnant, which only makes their lives more difficult when they learn
+        their chief competitor in the \\\"information business\\\" is the brilliant
+        and beautiful Yves Adele Harlow. Perpetually short of funds to publish The
+        Lone Gunmen newspaper, Byers, Frohike and Langly begrudgingly take on Jimmy
+        Bond as an unlikely benefactor who bankrolls their missions and joins them
+        in their investigations to uncover the truth.\",\"year\":2001,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/posters/thumb/b83d3fad63.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/thumb/4cbf0c5a4b.jpg\"}},\"ids\":{\"trakt\":5686,\"slug\":\"the-lone-gunmen\",\"tvdb\":76245,\"imdb\":\"tt0243069\",\"tmdb\":5715,\"tvrage\":5939}}},{\"type\":\"show\",\"score\":2.9873421,\"show\":{\"title\":\"The
+        Imaginatively Titled Punt & Dennis Show\",\"overview\":\"The Imaginatively
+        Titled Punt and Dennis show featured Steve Punt and Hugh Dennis in a vast
+        array of studio gags, filmed sketches and parodies of famous TV dramas such
+        as the X-Files, Baywatch and ER. Each show would focus on a theme, be it crime,
+        holidays, sports etc. and would have amusing insights into each subject which
+        carried on into most parts of the show. The show sported an array of characters
+        (mostly performed by Hugh Dennis) who would appear in either their own sketches,
+        or would regularly turn up without warning in the studio, the filmed sketches
+        and even the drama parodies. &lt;u&gt;Characters&lt;/u&gt; Kurt Wenker German
+        tourist from hell who was always out to steal 'puny British boys' girlfriends.
+        Right Hon. Hector Sleazy MP Scandal-riddled member of parliament who gave
+        long non-sensical speeches and constantly insisted he wouldn't be resigning.
+        Norris the Weatherman Habitual criminal assigned to the BBC as a part of a
+        reformation scheme by the govenrme\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9082,\"slug\":\"the-imaginatively-titled-punt-dennis-show\",\"tvdb\":78570,\"imdb\":\"\",\"tmdb\":9129,\"tvrage\":5867}}},{\"type\":\"show\",\"score\":1.0915146,\"show\":{\"title\":\"Kumail
+        Nanjiani\",\"overview\":\"Kumail Nanjiani; born 21 February 1978) is a Pakistani-American
+        stand-up comedian, actor and podcast host. He starred on the TNT series Franklin
+        & Bash and co-hosts the show The Meltdown with Jonah and Kumail. Nanjiani
+        is also a regular on HBO's Silicon Valley. On top of his television and film
+        work, he hosts two podcasts: The Indoor Kids and The X-Files Files.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/posters/thumb/887b33e932.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/thumb/887b33e932.jpg\"}},\"ids\":{\"trakt\":75141,\"slug\":\"kumail-nanjiani\",\"tvdb\":276450,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [MISS]
+      cf-ray: [2e9606781c981577-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:03:58 GMT']
+      etag: [W/"299d85f872850c74eb1d54e6d19e6ec6"]
+      expires: ['Wed, 28 Sep 2016 17:03:58 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=df0c58737ee6058f33d16be5b78068a151475053438; expires=Thu,
+          28-Sep-17 09:03:58 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['15']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['2']
+      x-request-id: [82467b95-0bd5-4584-813f-7e9dd7672195]
+      x-runtime: ['0.027042']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=df0c58737ee6058f33d16be5b78068a151475053438]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
+        X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
+        Doggett and Monica Reyes and their investigations into the paranormal. From
+        genetic mutants and killer insects to a global conspiracy concerning the colonization
+        of Earth by an alien species, this mind-boggling, humorous and occasionally
+        frightening series created by Chris Carter has been one of the world''s most
+        popular sci-fi/drama shows since its humble beginnings in 1993.","first_aired":"1993-09-11T00:00:00.000Z","airs":{"day":"Monday","time":"20:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
+        (US)","country":"us","trailer":"http://youtube.com/watch?v=rsBX-8vWgCc","homepage":"http://www.fox.com/the-x-files","status":"returning
+        series","rating":8.79821,"votes":6492,"updated_at":"2016-09-25T10:31:53.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hu","it","ja","ko","nl","pl","pt","ro","ru","sv","tr","uk","zh"],"genres":["drama","mystery","science-fiction","fantasy"],"aired_episodes":208,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/004/063/logos/original/ba7ac727c2.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/004/063/cleararts/original/a4a0db2c8d.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/004/063/banners/original/0927751ec8.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/004/063/thumbs/original/74d4f3d798.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [REVALIDATED]
+      cf-ray: [2e96067a4d991577-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:04:12 GMT']
+      etag: [W/"af33ab927c1b2bc19fc868774b797df1"]
+      expires: ['Wed, 28 Sep 2016 17:04:11 GMT']
+      last-modified: ['Sun, 25 Sep 2016 10:31:53 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [f7ea6147-dd7d-40c5-b338-a70f26784d69]
+      x-runtime: ['0.011068']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":98.97211,\"show\":{\"title\":\"The
+        X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
+        Fox Mulder, Dana Scully, John Doggett and Monica Reyes and their investigations
+        into the paranormal. From genetic mutants and killer insects to a global conspiracy
+        concerning the colonization of Earth by an alien species, this mind-boggling,
+        humorous and occasionally frightening series created by Chris Carter has been
+        one of the world's most popular sci-fi/drama shows since its humble beginnings
+        in 1993.\",\"year\":1993,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg\"}},\"ids\":{\"trakt\":4063,\"slug\":\"the-x-files\",\"tvdb\":77398,\"imdb\":\"tt0106179\",\"tmdb\":4087,\"tvrage\":6312}}},{\"type\":\"show\",\"score\":95.84272,\"show\":{\"title\":\"NASA's
+        X-Files\",\"overview\":\"Soar beyond the horizon and into the future of aviation
+        with unprecedented behind the scenes access to NASA's Dryden Flight Research
+        Center. Experience never-before-seen test flight footage, from the first supersonic
+        X-1 to the ultimate hypersonic aircraft, the X-43. \",\"year\":null,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":21742,\"slug\":\"nasa-s-x-files\",\"tvdb\":150181,\"imdb\":null,\"tmdb\":21843,\"tvrage\":19772}}},{\"type\":\"show\",\"score\":95.84205,\"show\":{\"title\":\"Ancient
+        X-Files\",\"overview\":\"Ancient X Files travels around the world to solve
+        some intriguing riddles. Each story is a piece of detective work by an expert
+        trying to make sense of some puzzling ancient artefact, to find the truth
+        behind some extraordinary legend, to discover the origins of a bizarre myth
+        or to establish the authenticity of a venerated religious relic. This series
+        explores the bits of archaeology and history which seem to defy explanation.Our
+        experts are following chains of clues and putting theories to the test, in
+        an effort to explain the unexplained. Ancient X Files investigates claims
+        about the whereabouts of the lost Ark of the Covenant; attempts to establish
+        the authenticity of a cup some believe to be the Holy Grail; tries to de-code
+        the mysterious Phaistos disc; investigates a cloth which is believed to carry
+        traces of the DNA of Jesus Christ; and deciphers an encrypted book of alchemy
+        written by the great Sir Isaac Newton.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/061/075/posters/thumb/6eb48ec869.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61075,\"slug\":\"ancient-x-files\",\"tvdb\":214961,\"imdb\":\"tt1734568\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":71.887474,\"show\":{\"title\":\"National
+        Geographic Wild X Files\",\"overview\":\"From the odd and amusing to the downright
+        creepy, mysteries found in nature are no less weird than anything found in
+        popular science fiction!In a brand new series of Wild X Files, Wednesdays
+        at 8pm from 22 August, see real-life cases from the natural world that will
+        baffle and fascinate you.On Shark Attack Beach, where 7% of the world\u2019s
+        shark attacks occur, experts try to understand why the full moon seems to
+        increase attacks.In the Cotswolds, a weird creature appears to be stalking
+        dog walkers.And, in an apocalyptic scene right out of a sci-fi thriller, 5,000
+        blackbirds suddenly fall out of the sky in Arkansas on New Year\u2019s Eve.Other
+        cases covered include the hundreds of elk who dropped dead for no apparent
+        reason and the strange appearance of Star Jelly which left locals scratching
+        their heads in the Scottish Highlands.Experts attempt to find the answers
+        to these bizarre mysteries.\",\"year\":2001,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":67848,\"slug\":\"national-geographic-wild-x-files\",\"tvdb\":262652,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":71.86413,\"show\":{\"title\":\"Joseon
+        X-Files: Mystery Investigation Record\",\"overview\":\"Joseon X-Files is based
+        on cases detailed in the Annals of Joseon History with a bizarre twist; these
+        incidents incorporate mysterious, supernatural elements that cannot be explained
+        through science. Kim Hyung Do is an inspector of the state whose single-minded
+        focus on his investigations into administrative misdeeds bring him into direct
+        contact with these strange mysteries. Heo Yoon Yi is a government employee
+        who aids him and attempts to understand these scientific impossibilities with
+        an open mind, in contrast to his cynicism.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/posters/thumb/cb681cfdba.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/medium/738975c089.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/medium/738975c089.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/thumb/738975c089.jpg\"}},\"ids\":{\"trakt\":62570,\"slug\":\"joseon-x-files-mystery-investigation-record\",\"tvdb\":204501,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":5.47719,\"show\":{\"title\":\"The
+        After\",\"overview\":\"An Amazon Original Pilot: From Chris Carter, creator
+        of The X-Files. Eight strangers are thrown together by mysterious forces and
+        must help each other survive in a violent world that defies explanation.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":96230,\"slug\":\"the-after-2014\",\"tvdb\":292193,\"imdb\":\"tt3145422\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.454295,\"show\":{\"title\":\"Poltergeist:
+        The Legacy\",\"overview\":\"'Since the beginning of time mankind has existed
+        between the world of light and the world of darkness. This journal chronicles
+        the work of our secret society, known as The Legacy. Created to protect the
+        innocent from those creatures that inhabit the shadows and the night.' So
+        the opening credits of 'Poltergeist: The Legacy' announced. 'Poltergeist was
+        a show that tried to mix the style and success of X-Files and transport it
+        to a more horror based genre. Mostly it succeeded and, while not having the
+        plaudits of X-Files, managed to create and interesting group of characters
+        and story ideas.\",\"year\":1996,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/posters/thumb/b2f42c0749.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/thumb/f5295c0053.jpg\"}},\"ids\":{\"trakt\":11131,\"slug\":\"poltergeist-the-legacy\",\"tvdb\":77952,\"imdb\":\"tt0115317\",\"tmdb\":11183,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.933294,\"show\":{\"title\":\"The
+        Lone Gunmen\",\"overview\":\"Spin-off of The X-Files featuring the trio of
+        computer-hacking conspiracy geeks popularly known as The Lone Gunmen. Never
+        ones to stray far from the center of corporate and government intrigue, the
+        threesome of John Byers, Melvin Frohike, and Richard Langly play like a misguided
+        Mission Impossible team, embarking on a series of comic adventures that simultaneously
+        highlight their genius and ineptitude. While their newfound independence inspires
+        them to investigate even the most shadowy of conspiracies, their social skills
+        remain stagnant, which only makes their lives more difficult when they learn
+        their chief competitor in the \\\"information business\\\" is the brilliant
+        and beautiful Yves Adele Harlow. Perpetually short of funds to publish The
+        Lone Gunmen newspaper, Byers, Frohike and Langly begrudgingly take on Jimmy
+        Bond as an unlikely benefactor who bankrolls their missions and joins them
+        in their investigations to uncover the truth.\",\"year\":2001,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/posters/thumb/b83d3fad63.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/thumb/4cbf0c5a4b.jpg\"}},\"ids\":{\"trakt\":5686,\"slug\":\"the-lone-gunmen\",\"tvdb\":76245,\"imdb\":\"tt0243069\",\"tmdb\":5715,\"tvrage\":5939}}},{\"type\":\"show\",\"score\":2.9873421,\"show\":{\"title\":\"The
+        Imaginatively Titled Punt & Dennis Show\",\"overview\":\"The Imaginatively
+        Titled Punt and Dennis show featured Steve Punt and Hugh Dennis in a vast
+        array of studio gags, filmed sketches and parodies of famous TV dramas such
+        as the X-Files, Baywatch and ER. Each show would focus on a theme, be it crime,
+        holidays, sports etc. and would have amusing insights into each subject which
+        carried on into most parts of the show. The show sported an array of characters
+        (mostly performed by Hugh Dennis) who would appear in either their own sketches,
+        or would regularly turn up without warning in the studio, the filmed sketches
+        and even the drama parodies. &lt;u&gt;Characters&lt;/u&gt; Kurt Wenker German
+        tourist from hell who was always out to steal 'puny British boys' girlfriends.
+        Right Hon. Hector Sleazy MP Scandal-riddled member of parliament who gave
+        long non-sensical speeches and constantly insisted he wouldn't be resigning.
+        Norris the Weatherman Habitual criminal assigned to the BBC as a part of a
+        reformation scheme by the govenrme\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9082,\"slug\":\"the-imaginatively-titled-punt-dennis-show\",\"tvdb\":78570,\"imdb\":\"\",\"tmdb\":9129,\"tvrage\":5867}}},{\"type\":\"show\",\"score\":1.0915146,\"show\":{\"title\":\"Kumail
+        Nanjiani\",\"overview\":\"Kumail Nanjiani; born 21 February 1978) is a Pakistani-American
+        stand-up comedian, actor and podcast host. He starred on the TNT series Franklin
+        & Bash and co-hosts the show The Meltdown with Jonah and Kumail. Nanjiani
+        is also a regular on HBO's Silicon Valley. On top of his television and film
+        work, he hosts two podcasts: The Indoor Kids and The X-Files Files.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/posters/thumb/887b33e932.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/thumb/887b33e932.jpg\"}},\"ids\":{\"trakt\":75141,\"slug\":\"kumail-nanjiani\",\"tvdb\":276450,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e9608e9ce6c2732-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:05:38 GMT']
+      etag: [W/"299d85f872850c74eb1d54e6d19e6ec6"]
+      expires: ['Wed, 28 Sep 2016 17:05:38 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d7aa5fac80b6860a1b5e0024d0934d3591475053538; expires=Thu,
+          28-Sep-17 09:05:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['15']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['2']
+      x-request-id: [82467b95-0bd5-4584-813f-7e9dd7672195]
+      x-runtime: ['0.027042']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=d7aa5fac80b6860a1b5e0024d0934d3591475053538]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
+        X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
+        Doggett and Monica Reyes and their investigations into the paranormal. From
+        genetic mutants and killer insects to a global conspiracy concerning the colonization
+        of Earth by an alien species, this mind-boggling, humorous and occasionally
+        frightening series created by Chris Carter has been one of the world''s most
+        popular sci-fi/drama shows since its humble beginnings in 1993.","first_aired":"1993-09-11T00:00:00.000Z","airs":{"day":"Monday","time":"20:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
+        (US)","country":"us","trailer":"http://youtube.com/watch?v=rsBX-8vWgCc","homepage":"http://www.fox.com/the-x-files","status":"returning
+        series","rating":8.79871,"votes":6493,"updated_at":"2016-09-25T10:31:53.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hu","it","ja","ko","nl","pl","pt","ro","ru","sv","tr","uk","zh"],"genres":["drama","mystery","science-fiction","fantasy"],"aired_episodes":208,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/004/063/logos/original/ba7ac727c2.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/004/063/cleararts/original/a4a0db2c8d.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/004/063/banners/original/0927751ec8.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/004/063/thumbs/original/74d4f3d798.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e9608eb1f062732-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:05:39 GMT']
+      etag: [W/"af33ab927c1b2bc19fc868774b797df1"]
+      expires: ['Wed, 28 Sep 2016 17:05:39 GMT']
+      last-modified: ['Sun, 25 Sep 2016 10:31:53 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [de31fb0a-251a-4954-9136-7a9fb5f79b52]
+      x-runtime: ['0.049687']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":98.97211,\"show\":{\"title\":\"The
+        X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
+        Fox Mulder, Dana Scully, John Doggett and Monica Reyes and their investigations
+        into the paranormal. From genetic mutants and killer insects to a global conspiracy
+        concerning the colonization of Earth by an alien species, this mind-boggling,
+        humorous and occasionally frightening series created by Chris Carter has been
+        one of the world's most popular sci-fi/drama shows since its humble beginnings
+        in 1993.\",\"year\":1993,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg\"}},\"ids\":{\"trakt\":4063,\"slug\":\"the-x-files\",\"tvdb\":77398,\"imdb\":\"tt0106179\",\"tmdb\":4087,\"tvrage\":6312}}},{\"type\":\"show\",\"score\":95.84272,\"show\":{\"title\":\"NASA's
+        X-Files\",\"overview\":\"Soar beyond the horizon and into the future of aviation
+        with unprecedented behind the scenes access to NASA's Dryden Flight Research
+        Center. Experience never-before-seen test flight footage, from the first supersonic
+        X-1 to the ultimate hypersonic aircraft, the X-43. \",\"year\":null,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":21742,\"slug\":\"nasa-s-x-files\",\"tvdb\":150181,\"imdb\":null,\"tmdb\":21843,\"tvrage\":19772}}},{\"type\":\"show\",\"score\":95.84205,\"show\":{\"title\":\"Ancient
+        X-Files\",\"overview\":\"Ancient X Files travels around the world to solve
+        some intriguing riddles. Each story is a piece of detective work by an expert
+        trying to make sense of some puzzling ancient artefact, to find the truth
+        behind some extraordinary legend, to discover the origins of a bizarre myth
+        or to establish the authenticity of a venerated religious relic. This series
+        explores the bits of archaeology and history which seem to defy explanation.Our
+        experts are following chains of clues and putting theories to the test, in
+        an effort to explain the unexplained. Ancient X Files investigates claims
+        about the whereabouts of the lost Ark of the Covenant; attempts to establish
+        the authenticity of a cup some believe to be the Holy Grail; tries to de-code
+        the mysterious Phaistos disc; investigates a cloth which is believed to carry
+        traces of the DNA of Jesus Christ; and deciphers an encrypted book of alchemy
+        written by the great Sir Isaac Newton.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/061/075/posters/medium/6eb48ec869.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/061/075/posters/thumb/6eb48ec869.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61075,\"slug\":\"ancient-x-files\",\"tvdb\":214961,\"imdb\":\"tt1734568\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":71.887474,\"show\":{\"title\":\"National
+        Geographic Wild X Files\",\"overview\":\"From the odd and amusing to the downright
+        creepy, mysteries found in nature are no less weird than anything found in
+        popular science fiction!In a brand new series of Wild X Files, Wednesdays
+        at 8pm from 22 August, see real-life cases from the natural world that will
+        baffle and fascinate you.On Shark Attack Beach, where 7% of the world\u2019s
+        shark attacks occur, experts try to understand why the full moon seems to
+        increase attacks.In the Cotswolds, a weird creature appears to be stalking
+        dog walkers.And, in an apocalyptic scene right out of a sci-fi thriller, 5,000
+        blackbirds suddenly fall out of the sky in Arkansas on New Year\u2019s Eve.Other
+        cases covered include the hundreds of elk who dropped dead for no apparent
+        reason and the strange appearance of Star Jelly which left locals scratching
+        their heads in the Scottish Highlands.Experts attempt to find the answers
+        to these bizarre mysteries.\",\"year\":2001,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":67848,\"slug\":\"national-geographic-wild-x-files\",\"tvdb\":262652,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":71.86413,\"show\":{\"title\":\"Joseon
+        X-Files: Mystery Investigation Record\",\"overview\":\"Joseon X-Files is based
+        on cases detailed in the Annals of Joseon History with a bizarre twist; these
+        incidents incorporate mysterious, supernatural elements that cannot be explained
+        through science. Kim Hyung Do is an inspector of the state whose single-minded
+        focus on his investigations into administrative misdeeds bring him into direct
+        contact with these strange mysteries. Heo Yoon Yi is a government employee
+        who aids him and attempts to understand these scientific impossibilities with
+        an open mind, in contrast to his cynicism.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/posters/medium/cb681cfdba.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/posters/thumb/cb681cfdba.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/medium/738975c089.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/medium/738975c089.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/062/570/fanarts/thumb/738975c089.jpg\"}},\"ids\":{\"trakt\":62570,\"slug\":\"joseon-x-files-mystery-investigation-record\",\"tvdb\":204501,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":5.47719,\"show\":{\"title\":\"The
+        After\",\"overview\":\"An Amazon Original Pilot: From Chris Carter, creator
+        of The X-Files. Eight strangers are thrown together by mysterious forces and
+        must help each other survive in a violent world that defies explanation.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":96230,\"slug\":\"the-after-2014\",\"tvdb\":292193,\"imdb\":\"tt3145422\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":4.454295,\"show\":{\"title\":\"Poltergeist:
+        The Legacy\",\"overview\":\"'Since the beginning of time mankind has existed
+        between the world of light and the world of darkness. This journal chronicles
+        the work of our secret society, known as The Legacy. Created to protect the
+        innocent from those creatures that inhabit the shadows and the night.' So
+        the opening credits of 'Poltergeist: The Legacy' announced. 'Poltergeist was
+        a show that tried to mix the style and success of X-Files and transport it
+        to a more horror based genre. Mostly it succeeded and, while not having the
+        plaudits of X-Files, managed to create and interesting group of characters
+        and story ideas.\",\"year\":1996,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/posters/medium/b2f42c0749.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/posters/thumb/b2f42c0749.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/medium/f5295c0053.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/011/131/fanarts/thumb/f5295c0053.jpg\"}},\"ids\":{\"trakt\":11131,\"slug\":\"poltergeist-the-legacy\",\"tvdb\":77952,\"imdb\":\"tt0115317\",\"tmdb\":11183,\"tvrage\":null}}},{\"type\":\"show\",\"score\":3.933294,\"show\":{\"title\":\"The
+        Lone Gunmen\",\"overview\":\"Spin-off of The X-Files featuring the trio of
+        computer-hacking conspiracy geeks popularly known as The Lone Gunmen. Never
+        ones to stray far from the center of corporate and government intrigue, the
+        threesome of John Byers, Melvin Frohike, and Richard Langly play like a misguided
+        Mission Impossible team, embarking on a series of comic adventures that simultaneously
+        highlight their genius and ineptitude. While their newfound independence inspires
+        them to investigate even the most shadowy of conspiracies, their social skills
+        remain stagnant, which only makes their lives more difficult when they learn
+        their chief competitor in the \\\"information business\\\" is the brilliant
+        and beautiful Yves Adele Harlow. Perpetually short of funds to publish The
+        Lone Gunmen newspaper, Byers, Frohike and Langly begrudgingly take on Jimmy
+        Bond as an unlikely benefactor who bankrolls their missions and joins them
+        in their investigations to uncover the truth.\",\"year\":2001,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/posters/medium/b83d3fad63.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/posters/thumb/b83d3fad63.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/medium/4cbf0c5a4b.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/005/686/fanarts/thumb/4cbf0c5a4b.jpg\"}},\"ids\":{\"trakt\":5686,\"slug\":\"the-lone-gunmen\",\"tvdb\":76245,\"imdb\":\"tt0243069\",\"tmdb\":5715,\"tvrage\":5939}}},{\"type\":\"show\",\"score\":2.9873421,\"show\":{\"title\":\"The
+        Imaginatively Titled Punt & Dennis Show\",\"overview\":\"The Imaginatively
+        Titled Punt and Dennis show featured Steve Punt and Hugh Dennis in a vast
+        array of studio gags, filmed sketches and parodies of famous TV dramas such
+        as the X-Files, Baywatch and ER. Each show would focus on a theme, be it crime,
+        holidays, sports etc. and would have amusing insights into each subject which
+        carried on into most parts of the show. The show sported an array of characters
+        (mostly performed by Hugh Dennis) who would appear in either their own sketches,
+        or would regularly turn up without warning in the studio, the filmed sketches
+        and even the drama parodies. &lt;u&gt;Characters&lt;/u&gt; Kurt Wenker German
+        tourist from hell who was always out to steal 'puny British boys' girlfriends.
+        Right Hon. Hector Sleazy MP Scandal-riddled member of parliament who gave
+        long non-sensical speeches and constantly insisted he wouldn't be resigning.
+        Norris the Weatherman Habitual criminal assigned to the BBC as a part of a
+        reformation scheme by the govenrme\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9082,\"slug\":\"the-imaginatively-titled-punt-dennis-show\",\"tvdb\":78570,\"imdb\":\"\",\"tmdb\":9129,\"tvrage\":5867}}},{\"type\":\"show\",\"score\":1.0915146,\"show\":{\"title\":\"Kumail
+        Nanjiani\",\"overview\":\"Kumail Nanjiani; born 21 February 1978) is a Pakistani-American
+        stand-up comedian, actor and podcast host. He starred on the TNT series Franklin
+        & Bash and co-hosts the show The Meltdown with Jonah and Kumail. Nanjiani
+        is also a regular on HBO's Silicon Valley. On top of his television and film
+        work, he hosts two podcasts: The Indoor Kids and The X-Files Files.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/posters/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/posters/thumb/887b33e932.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/medium/887b33e932.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/075/141/fanarts/thumb/887b33e932.jpg\"}},\"ids\":{\"trakt\":75141,\"slug\":\"kumail-nanjiani\",\"tvdb\":276450,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e9609eb6a570f5d-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:06:20 GMT']
+      etag: [W/"299d85f872850c74eb1d54e6d19e6ec6"]
+      expires: ['Wed, 28 Sep 2016 17:06:20 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d9bdd39f70b2dba3779baca7675b1ab641475053580; expires=Thu,
+          28-Sep-17 09:06:20 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['15']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['2']
+      x-request-id: [82467b95-0bd5-4584-813f-7e9dd7672195]
+      x-runtime: ['0.027042']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=d9bdd39f70b2dba3779baca7675b1ab641475053580]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
+        X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
+        Doggett and Monica Reyes and their investigations into the paranormal. From
+        genetic mutants and killer insects to a global conspiracy concerning the colonization
+        of Earth by an alien species, this mind-boggling, humorous and occasionally
+        frightening series created by Chris Carter has been one of the world''s most
+        popular sci-fi/drama shows since its humble beginnings in 1993.","first_aired":"1993-09-11T00:00:00.000Z","airs":{"day":"Monday","time":"20:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
+        (US)","country":"us","trailer":"http://youtube.com/watch?v=rsBX-8vWgCc","homepage":"http://www.fox.com/the-x-files","status":"returning
+        series","rating":8.79821,"votes":6492,"updated_at":"2016-09-25T10:31:53.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fi","fr","he","hu","it","ja","ko","nl","pl","pt","ro","ru","sv","tr","uk","zh"],"genres":["drama","mystery","science-fiction","fantasy"],"aired_episodes":208,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/fanarts/medium/1f0b461052.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/fanarts/thumb/1f0b461052.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","medium":"https://walter.trakt.us/images/shows/000/004/063/posters/medium/034cc070a9.jpg","thumb":"https://walter.trakt.us/images/shows/000/004/063/posters/thumb/034cc070a9.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/004/063/logos/original/ba7ac727c2.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/004/063/cleararts/original/a4a0db2c8d.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/004/063/banners/original/0927751ec8.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/004/063/thumbs/original/74d4f3d798.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e9609eccab20f5d-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:06:20 GMT']
+      etag: [W/"af33ab927c1b2bc19fc868774b797df1"]
+      expires: ['Wed, 28 Sep 2016 17:06:20 GMT']
+      last-modified: ['Sun, 25 Sep 2016 10:31:53 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [f7ea6147-dd7d-40c5-b338-a70f26784d69]
+      x-runtime: ['0.011068']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
 version: 1

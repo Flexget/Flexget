@@ -31,6 +31,8 @@ def is_cron_schedule(instance):
         raise ValueError('Invalid key for schedule.')
 
 
+DEFAULT_SCHEDULES = [{'tasks': ['*'], 'interval': {'hours': 1}}]
+
 UNITS = ['minutes', 'hours', 'days', 'weeks']
 interval_schema = {
     'type': 'object',
@@ -156,7 +158,7 @@ def setup_jobs(manager):
         log.info('No schedules defined in config. Defaulting to run all tasks on a 1 hour interval.')
     config = manager.config.get('schedules', True)
     if config is True:
-        config = [{'tasks': ['*'], 'interval': {'hours': 1}}]
+        config = DEFAULT_SCHEDULES
     elif not config:  # Schedules are disabled with `schedules: no`
         if scheduler.running:
             log.info('Shutting down scheduler')

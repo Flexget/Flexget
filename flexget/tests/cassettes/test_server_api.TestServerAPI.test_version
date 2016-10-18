@@ -1,0 +1,232 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: http://download.flexget.com/latestversion
+  response:
+    body: {string: !!python/unicode '2.3.23
+
+'}
+    headers:
+      accept-ranges: [bytes]
+      connection: [keep-alive]
+      content-length: ['7']
+      content-type: [application/octet-stream]
+      date: ['Sun, 11 Sep 2016 09:14:59 GMT']
+      etag: ['"57d4af9e-7"']
+      last-modified: ['Sun, 11 Sep 2016 01:13:02 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: http://download.flexget.com/latestversion
+  response:
+    body: {string: !!python/unicode '2.3.23
+
+'}
+    headers:
+      accept-ranges: [bytes]
+      connection: [keep-alive]
+      content-length: ['7']
+      content-type: [application/octet-stream]
+      date: ['Sun, 11 Sep 2016 09:15:00 GMT']
+      etag: ['"57d4af9e-7"']
+      last-modified: ['Sun, 11 Sep 2016 01:13:02 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: http://download.flexget.com/latestversion
+  response:
+    body: {string: !!python/unicode '2.3.32
+
+'}
+    headers:
+      accept-ranges: [bytes]
+      connection: [keep-alive]
+      content-length: ['7']
+      content-type: [application/octet-stream]
+      date: ['Thu, 22 Sep 2016 11:39:48 GMT']
+      etag: ['"57e32ffa-7"']
+      last-modified: ['Thu, 22 Sep 2016 01:12:26 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: http://download.flexget.com/latestversion
+  response:
+    body: {string: !!python/unicode '2.3.32
+
+'}
+    headers:
+      accept-ranges: [bytes]
+      connection: [keep-alive]
+      content-length: ['7']
+      content-type: [application/octet-stream]
+      date: ['Thu, 22 Sep 2016 11:39:49 GMT']
+      etag: ['"57e32ffa-7"']
+      last-modified: ['Thu, 22 Sep 2016 01:12:26 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: http://download.flexget.com/latestversion
+  response:
+    body: {string: !!python/unicode '2.3.33
+
+'}
+    headers:
+      accept-ranges: [bytes]
+      connection: [keep-alive]
+      content-length: ['7']
+      content-type: [application/octet-stream]
+      date: ['Sun, 25 Sep 2016 14:19:32 GMT']
+      etag: ['"57e5d326-7"']
+      last-modified: ['Sat, 24 Sep 2016 01:13:10 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: http://download.flexget.com/latestversion
+  response:
+    body: {string: !!python/unicode '2.3.33
+
+'}
+    headers:
+      accept-ranges: [bytes]
+      connection: [keep-alive]
+      content-length: ['7']
+      content-type: [application/octet-stream]
+      date: ['Sun, 25 Sep 2016 14:19:34 GMT']
+      etag: ['"57e5d326-7"']
+      last-modified: ['Sat, 24 Sep 2016 01:13:10 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: http://download.flexget.com/latestversion
+  response:
+    body: {string: !!python/unicode '2.3.33
+
+'}
+    headers:
+      accept-ranges: [bytes]
+      connection: [keep-alive]
+      content-length: ['7']
+      content-type: [application/octet-stream]
+      date: ['Sun, 25 Sep 2016 14:21:10 GMT']
+      etag: ['"57e5d326-7"']
+      last-modified: ['Sat, 24 Sep 2016 01:13:10 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: http://download.flexget.com/latestversion
+  response:
+    body: {string: !!python/unicode '2.3.33
+
+'}
+    headers:
+      accept-ranges: [bytes]
+      connection: [keep-alive]
+      content-length: ['7']
+      content-type: [application/octet-stream]
+      date: ['Sun, 25 Sep 2016 14:21:10 GMT']
+      etag: ['"57e5d326-7"']
+      last-modified: ['Sat, 24 Sep 2016 01:13:10 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: http://download.flexget.com/latestversion
+  response:
+    body: {string: !!python/unicode '2.3.34
+
+'}
+    headers:
+      accept-ranges: [bytes]
+      connection: [keep-alive]
+      content-length: ['7']
+      content-type: [application/octet-stream]
+      date: ['Mon, 26 Sep 2016 09:02:05 GMT']
+      etag: ['"57e875ef-7"']
+      last-modified: ['Mon, 26 Sep 2016 01:12:15 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.10.0]
+    method: GET
+    uri: http://download.flexget.com/latestversion
+  response:
+    body: {string: !!python/unicode '2.3.34
+
+'}
+    headers:
+      accept-ranges: [bytes]
+      connection: [keep-alive]
+      content-length: ['7']
+      content-type: [application/octet-stream]
+      date: ['Mon, 26 Sep 2016 09:02:06 GMT']
+      etag: ['"57e875ef-7"']
+      last-modified: ['Mon, 26 Sep 2016 01:12:15 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+    status: {code: 200, message: OK}
+version: 1

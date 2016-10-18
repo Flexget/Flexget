@@ -3,18 +3,19 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib import request
 from future.utils import PY2
-from html.entities import name2codepoint
 from past.builtins import basestring
 
+import logging
 import ast
 import copy
-import locale
-import logging
 import hashlib
+import locale
+import mimetypes
 import operator
-import sys
 import os
 import re
+import sys
+import io
 from collections import MutableMapping
 from datetime import timedelta, datetime
 from pprint import pformat
@@ -22,6 +23,8 @@ from pprint import pformat
 import flexget
 import queue
 import requests
+
+from html.entities import name2codepoint
 
 log = logging.getLogger('utils')
 
@@ -471,3 +474,35 @@ def get_config_hash(config):
         return hashlib.md5(pformat(config).encode('utf-8')).hexdigest()
     else:
         return hashlib.md5(str(config).encode('utf-8')).hexdigest()
+
+
+def parse_episode_identifier(ep_id):
+    """
+    Parses series episode identifier, raises ValueError if it fails
+
+    :param ep_id: Value to parse
+    :return: Return identifier type: `sequence`, `ep` or `date`
+    :raises ValueError: If ep_id does not match any valid types
+    """
+    error = None
+    identified_by = None
+    if isinstance(ep_id, int):
+        if ep_id <= 0:
+            error = 'sequence type episode must be higher than 0'
+        identified_by = 'sequence'
+    elif re.match(r'(?i)^S\d{1,4}E\d{1,3}$', ep_id):
+        identified_by = 'ep'
+    elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
+        identified_by = 'date'
+    else:
+        # Check if a sequence identifier was passed as a string
+        try:
+            ep_id = int(ep_id)
+            if ep_id <= 0:
+                error = 'sequence type episode must be higher than 0'
+            identified_by = 'sequence'
+        except ValueError:
+            error = '`%s` is not a valid episode identifier.' % ep_id
+    if error:
+        raise ValueError(error)
+    return identified_by

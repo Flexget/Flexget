@@ -4,9 +4,15 @@
 
     angular
         .module('components.core')
-        .config(themesConfig);
+        .config(coreConfig);
 
-    function themesConfig($mdThemingProvider) {
+    function coreConfig($httpProvider, $mdThemingProvider, httpEtagProvider) {
+        httpEtagProvider.setDefaultCacheConfig({
+            cacheResponseHeaders: true
+        })
+            .defineCache('httpEtagCache');
+        $httpProvider.useLegacyPromiseExtensions(false);
+
         $mdThemingProvider.theme('default')
             .primaryPalette('orange', {
                 default: '800'

@@ -6,8 +6,7 @@
         .module('plugins.series', [
             'ngMaterial',
 
-            'angular-cache',
-
+            'blocks.pagination',            
             'blocks.exception',
             'blocks.router'
         ]);

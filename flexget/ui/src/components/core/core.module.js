@@ -6,6 +6,7 @@
         .module('components.core', [
             'ngMaterial',
 
+            'http-etag',            
             'blocks.router'
         ]);
 }());

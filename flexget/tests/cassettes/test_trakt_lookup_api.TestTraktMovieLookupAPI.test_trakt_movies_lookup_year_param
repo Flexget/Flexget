@@ -106,4 +106,539 @@ interactions:
       x-runtime: ['0.011407']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie&year=2003
+  response:
+    body: {string: !!python/unicode '[{"type":"movie","score":56.564133,"movie":{"title":"The
+        Matrix Revolutions","overview":"The human city of Zion defends itself against
+        the massive invasion of the machines as Neo fights to end the war at another
+        front while also opposing the rogue Agent Smith.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/483/posters/original/2483b4ee5c.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/483/fanarts/original/b3f7b1ce55.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg"}},"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605}}},{"type":"movie","score":56.564133,"movie":{"title":"The
+        Matrix Reloaded","overview":"Six months after the events depicted in The Matrix,
+        Neo has proved to be a good omen for the free humans, as more and more humans
+        are being freed from the matrix and brought to Zion, the one and only stronghold
+        of the Resistance.  Neo himself has discovered his superpowers including super
+        speed, ability to see the codes of the things inside the matrix and a certain
+        degree of pre-cognition. But a nasty piece of news hits the human resistance:
+        250,000 machine sentinels are digging to Zion and would reach them in 72 hours.
+        As Zion prepares for the ultimate war, Neo, Morpheus and Trinity are advised
+        by the Oracle to find the Keymaker who would help them reach the Source.  Meanwhile
+        Neo''s recurrent dreams depicting Trinity''s death have got him worried and
+        as if it was not enough, Agent Smith has somehow escaped deletion, has become
+        more powerful than before and has fixed Neo as his next target.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/482/posters/original/b908a87fb1.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/482/fanarts/original/4928db3308.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg"}},"ids":{"trakt":482,"slug":"the-matrix-reloaded-2003","imdb":"tt0234215","tmdb":604}}},{"type":"movie","score":52.334797,"movie":{"title":"Matrix
+        of Evil","overview":"is a dynamic 2 hour video featuring some of the most
+        informed minds in the world today who expose the latest revelations of the
+        New World Order''s agenda in shocking detail.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/133/876/posters/original/43387dbf3b.jpg","medium":"https://walter.trakt.us/images/movies/000/133/876/posters/medium/43387dbf3b.jpg","thumb":"https://walter.trakt.us/images/movies/000/133/876/posters/thumb/43387dbf3b.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":133876,"slug":"matrix-of-evil-2003","imdb":"tt2121323","tmdb":217056}}},{"type":"movie","score":9.863456,"movie":{"title":"The
+        Animatrix","overview":"Straight from the creators of the groundbreaking Matrix
+        trilogy, this collection of short animated films from the world''s leading
+        anime directors fuses computer graphics and Japanese anime to provide the
+        background of the Matrix universe and the conflict between man and machines.
+        The shorts include Final Flight of the Osiris, The Second Renaissance, Kid''s
+        Story, Program, World Record, Beyond, A Detective Story and Matriculated.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/039/822/posters/original/91fee646f8.jpg","medium":"https://walter.trakt.us/images/movies/000/039/822/posters/medium/91fee646f8.jpg","thumb":"https://walter.trakt.us/images/movies/000/039/822/posters/thumb/91fee646f8.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/039/822/fanarts/original/5a7df99684.jpg","medium":"https://walter.trakt.us/images/movies/000/039/822/fanarts/medium/5a7df99684.jpg","thumb":"https://walter.trakt.us/images/movies/000/039/822/fanarts/thumb/5a7df99684.jpg"}},"ids":{"trakt":39822,"slug":"the-animatrix-2003","imdb":"tt0328832","tmdb":55931}}},{"type":"movie","score":4.489309,"movie":{"title":"The
+        Fanimatrix: Run Program","overview":"Imitation is the Sincerest form of flattery.  A
+        short film written in the prison world of the Matrix our heroes Dante and
+        Medusa undertake a mission. called Run Program, using classic bait and switch
+        tactics.  Of course nothing ever goes right when an Agent gets involved...","year":2003,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":138531,"slug":"the-fanimatrix-run-program-2003","imdb":"","tmdb":226403}}},{"type":"movie","score":3.950327,"movie":{"title":"Final
+        Flight of the Osiris","overview":"Immediately before the events of The Matrix
+        Reloaded, the crew of the hovercraft Osiris discovers a quarter of a million
+        sentinels drilling through the surface of the earth towards the last human
+        city of Zion. But can the Osiris survive long enough to warn Zion?","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/014/652/posters/original/0de11822f9.jpg","medium":"https://walter.trakt.us/images/movies/000/014/652/posters/medium/0de11822f9.jpg","thumb":"https://walter.trakt.us/images/movies/000/014/652/posters/thumb/0de11822f9.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/014/652/fanarts/original/d156431271.jpg","medium":"https://walter.trakt.us/images/movies/000/014/652/fanarts/medium/d156431271.jpg","thumb":"https://walter.trakt.us/images/movies/000/014/652/fanarts/thumb/d156431271.jpg"}},"ids":{"trakt":14652,"slug":"final-flight-of-the-osiris-2003","imdb":"tt0350934","tmdb":24357}}},{"type":"movie","score":2.5929015,"movie":{"title":"World
+        Record","overview":"A record-breaking competitive runner begins to stretch
+        the limits of the Matrix. Part of the Animatrix collection of animated shorts
+        set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/060/posters/original/2a3f256e53.jpg","medium":"https://walter.trakt.us/images/movies/000/015/060/posters/medium/2a3f256e53.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/060/posters/thumb/2a3f256e53.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/060/fanarts/original/8342af3f96.jpg","medium":"https://walter.trakt.us/images/movies/000/015/060/fanarts/medium/8342af3f96.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/060/fanarts/thumb/8342af3f96.jpg"}},"ids":{"trakt":15060,"slug":"world-record-2003","imdb":"tt0368576","tmdb":24960}}},{"type":"movie","score":2.339603,"movie":{"title":"Kid''s
+        Story","overview":"A high school student is haunted by thoughts of \"The Matrix\"
+        and a person named \"Neo\". Part of the Animatrix collection of animated shorts
+        set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/017/posters/original/2e5f6a51db.jpg","medium":"https://walter.trakt.us/images/movies/000/015/017/posters/medium/2e5f6a51db.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/017/posters/thumb/2e5f6a51db.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/017/fanarts/original/b68895c8bc.jpg","medium":"https://walter.trakt.us/images/movies/000/015/017/fanarts/medium/b68895c8bc.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/017/fanarts/thumb/b68895c8bc.jpg"}},"ids":{"trakt":15017,"slug":"kid-s-story-2003","imdb":"tt0368574","tmdb":24914}}},{"type":"movie","score":2.1477647,"movie":{"title":"Program","overview":"Cis
+        and Duo discuss leaving the real world while during a samurai sword fight.
+        Part of the Animatrix collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/059/posters/original/6edf908f74.jpg","medium":"https://walter.trakt.us/images/movies/000/015/059/posters/medium/6edf908f74.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/059/posters/thumb/6edf908f74.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/059/fanarts/original/a1248c9047.jpg","medium":"https://walter.trakt.us/images/movies/000/015/059/fanarts/medium/a1248c9047.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/059/fanarts/thumb/a1248c9047.jpg"}},"ids":{"trakt":15059,"slug":"program-2003","imdb":"tt0366178","tmdb":24959}}},{"type":"movie","score":2.1477647,"movie":{"title":"Matriculated","overview":"The
+        human resistance works to convert a sentinel to their side. Part of the Animatrix
+        collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/050/posters/original/e379c3b4a3.jpg","medium":"https://walter.trakt.us/images/movies/000/015/050/posters/medium/e379c3b4a3.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/050/posters/thumb/e379c3b4a3.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/050/fanarts/original/2d76c3fa30.jpg","medium":"https://walter.trakt.us/images/movies/000/015/050/fanarts/medium/2d76c3fa30.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/050/fanarts/thumb/2d76c3fa30.jpg"}},"ids":{"trakt":15050,"slug":"matriculated-2003","imdb":"tt0372765","tmdb":24950}}}]'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [MISS]
+      cf-ray: [2e657b1f890d15cb-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 22 Sep 2016 11:40:14 GMT']
+      etag: [W/"c90904fa42264574f569651486edcec4"]
+      expires: ['Thu, 22 Sep 2016 19:40:14 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=df63c8f8dcb61c866dc72700df63973551474544414; expires=Fri,
+          22-Sep-17 11:40:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['12']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['2']
+      x-request-id: [29e17738-7061-46e5-bb3c-e3297d0d9297]
+      x-runtime: ['0.019066']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=df63c8f8dcb61c866dc72700df63973551474544414]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/movies/483?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
+        that has a beginning has an end.","overview":"The human city of Zion defends
+        itself against the massive invasion of the machines as Neo fights to end the
+        war at another front while also opposing the rogue Agent Smith.","released":"2003-11-05","runtime":129,"trailer":"http://youtube.com/watch?v=Kw3IQpnVtvo","homepage":"http://whatisthematrix.warnerbros.com/","rating":7.13794,"votes":8018,"updated_at":"2016-09-10T08:54:04.000Z","language":"en","available_translations":["en","de","cs","hu","ru","fr","zh","it","tr","es","pt","sv","fi","nl","pl","sk","he","da","ja","el","bg","th","ko","uk","ro","fa"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/483/fanarts/original/b3f7b1ce55.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/483/posters/original/2483b4ee5c.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/483/logos/original/98bfe58407.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/483/cleararts/original/e5776fde87.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/483/banners/original/fa9cd8cef0.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/483/thumbs/original/9ad6643c3a.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [REVALIDATED]
+      cf-ray: [2e657b2189f215cb-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 22 Sep 2016 11:40:15 GMT']
+      etag: [W/"79bb8395920c9864926f2e4e0668525c"]
+      expires: ['Thu, 22 Sep 2016 19:40:15 GMT']
+      last-modified: ['Sat, 10 Sep 2016 08:54:04 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [31fca15c-b28b-483a-b506-81c6926c96bc]
+      x-runtime: ['0.011598']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie&year=2003
+  response:
+    body: {string: !!python/unicode '[{"type":"movie","score":56.805824,"movie":{"title":"The
+        Matrix Revolutions","overview":"The human city of Zion defends itself against
+        the massive invasion of the machines as Neo fights to end the war at another
+        front while also opposing the rogue Agent Smith.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg"}},"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605}}},{"type":"movie","score":56.805824,"movie":{"title":"The
+        Matrix Reloaded","overview":"Six months after the events depicted in The Matrix,
+        Neo has proved to be a good omen for the free humans, as more and more humans
+        are being freed from the matrix and brought to Zion, the one and only stronghold
+        of the Resistance.  Neo himself has discovered his superpowers including super
+        speed, ability to see the codes of the things inside the matrix and a certain
+        degree of pre-cognition. But a nasty piece of news hits the human resistance:
+        250,000 machine sentinels are digging to Zion and would reach them in 72 hours.
+        As Zion prepares for the ultimate war, Neo, Morpheus and Trinity are advised
+        by the Oracle to find the Keymaker who would help them reach the Source.  Meanwhile
+        Neo''s recurrent dreams depicting Trinity''s death have got him worried and
+        as if it was not enough, Agent Smith has somehow escaped deletion, has become
+        more powerful than before and has fixed Neo as his next target.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg"}},"ids":{"trakt":482,"slug":"the-matrix-reloaded-2003","imdb":"tt0234215","tmdb":604}}},{"type":"movie","score":52.58452,"movie":{"title":"Matrix
+        of Evil","overview":"is a dynamic 2 hour video featuring some of the most
+        informed minds in the world today who expose the latest revelations of the
+        New World Order''s agenda in shocking detail.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/133/876/posters/medium/43387dbf3b.jpg","medium":"https://walter.trakt.us/images/movies/000/133/876/posters/medium/43387dbf3b.jpg","thumb":"https://walter.trakt.us/images/movies/000/133/876/posters/thumb/43387dbf3b.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":133876,"slug":"matrix-of-evil-2003","imdb":"tt2121323","tmdb":217056}}},{"type":"movie","score":9.767528,"movie":{"title":"The
+        Animatrix","overview":"Straight from the creators of the groundbreaking Matrix
+        trilogy, this collection of short animated films from the world''s leading
+        anime directors fuses computer graphics and Japanese anime to provide the
+        background of the Matrix universe and the conflict between man and machines.
+        The shorts include Final Flight of the Osiris, The Second Renaissance, Kid''s
+        Story, Program, World Record, Beyond, A Detective Story and Matriculated.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/039/822/posters/medium/91fee646f8.jpg","medium":"https://walter.trakt.us/images/movies/000/039/822/posters/medium/91fee646f8.jpg","thumb":"https://walter.trakt.us/images/movies/000/039/822/posters/thumb/91fee646f8.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/039/822/fanarts/medium/5a7df99684.jpg","medium":"https://walter.trakt.us/images/movies/000/039/822/fanarts/medium/5a7df99684.jpg","thumb":"https://walter.trakt.us/images/movies/000/039/822/fanarts/thumb/5a7df99684.jpg"}},"ids":{"trakt":39822,"slug":"the-animatrix-2003","imdb":"tt0328832","tmdb":55931}}},{"type":"movie","score":4.483893,"movie":{"title":"The
+        Fanimatrix: Run Program","overview":"Imitation is the Sincerest form of flattery.  A
+        short film written in the prison world of the Matrix our heroes Dante and
+        Medusa undertake a mission. called Run Program, using classic bait and switch
+        tactics.  Of course nothing ever goes right when an Agent gets involved...","year":2003,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":138531,"slug":"the-fanimatrix-run-program-2003","imdb":"","tmdb":226403}}},{"type":"movie","score":3.946283,"movie":{"title":"Final
+        Flight of the Osiris","overview":"Immediately before the events of The Matrix
+        Reloaded, the crew of the hovercraft Osiris discovers a quarter of a million
+        sentinels drilling through the surface of the earth towards the last human
+        city of Zion. But can the Osiris survive long enough to warn Zion?","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/014/652/posters/medium/0de11822f9.jpg","medium":"https://walter.trakt.us/images/movies/000/014/652/posters/medium/0de11822f9.jpg","thumb":"https://walter.trakt.us/images/movies/000/014/652/posters/thumb/0de11822f9.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/014/652/fanarts/medium/d156431271.jpg","medium":"https://walter.trakt.us/images/movies/000/014/652/fanarts/medium/d156431271.jpg","thumb":"https://walter.trakt.us/images/movies/000/014/652/fanarts/thumb/d156431271.jpg"}},"ids":{"trakt":14652,"slug":"final-flight-of-the-osiris-2003","imdb":"tt0350934","tmdb":24357}}},{"type":"movie","score":2.551059,"movie":{"title":"World
+        Record","overview":"A record-breaking competitive runner begins to stretch
+        the limits of the Matrix. Part of the Animatrix collection of animated shorts
+        set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/060/posters/medium/2a3f256e53.jpg","medium":"https://walter.trakt.us/images/movies/000/015/060/posters/medium/2a3f256e53.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/060/posters/thumb/2a3f256e53.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/060/fanarts/medium/8342af3f96.jpg","medium":"https://walter.trakt.us/images/movies/000/015/060/fanarts/medium/8342af3f96.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/060/fanarts/thumb/8342af3f96.jpg"}},"ids":{"trakt":15060,"slug":"world-record-2003","imdb":"tt0368576","tmdb":24960}}},{"type":"movie","score":2.29628,"movie":{"title":"Kid''s
+        Story","overview":"A high school student is haunted by thoughts of \"The Matrix\"
+        and a person named \"Neo\". Part of the Animatrix collection of animated shorts
+        set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/017/posters/medium/2e5f6a51db.jpg","medium":"https://walter.trakt.us/images/movies/000/015/017/posters/medium/2e5f6a51db.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/017/posters/thumb/2e5f6a51db.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/017/fanarts/medium/b68895c8bc.jpg","medium":"https://walter.trakt.us/images/movies/000/015/017/fanarts/medium/b68895c8bc.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/017/fanarts/thumb/b68895c8bc.jpg"}},"ids":{"trakt":15017,"slug":"kid-s-story-2003","imdb":"tt0368574","tmdb":24914}}},{"type":"movie","score":2.1033208,"movie":{"title":"Program","overview":"Cis
+        and Duo discuss leaving the real world while during a samurai sword fight.
+        Part of the Animatrix collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/059/posters/medium/6edf908f74.jpg","medium":"https://walter.trakt.us/images/movies/000/015/059/posters/medium/6edf908f74.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/059/posters/thumb/6edf908f74.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/059/fanarts/medium/a1248c9047.jpg","medium":"https://walter.trakt.us/images/movies/000/015/059/fanarts/medium/a1248c9047.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/059/fanarts/thumb/a1248c9047.jpg"}},"ids":{"trakt":15059,"slug":"program-2003","imdb":"tt0366178","tmdb":24959}}},{"type":"movie","score":2.1033208,"movie":{"title":"Matriculated","overview":"The
+        human resistance works to convert a sentinel to their side. Part of the Animatrix
+        collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/050/posters/medium/e379c3b4a3.jpg","medium":"https://walter.trakt.us/images/movies/000/015/050/posters/medium/e379c3b4a3.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/050/posters/thumb/e379c3b4a3.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/050/fanarts/medium/2d76c3fa30.jpg","medium":"https://walter.trakt.us/images/movies/000/015/050/fanarts/medium/2d76c3fa30.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/050/fanarts/thumb/2d76c3fa30.jpg"}},"ids":{"trakt":15050,"slug":"matriculated-2003","imdb":"tt0372765","tmdb":24950}}}]'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [EXPIRED]
+      cf-ray: [2e7f1d438ac92786-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Sun, 25 Sep 2016 14:20:00 GMT']
+      etag: [W/"ac7e15c392459d3f9939f7744d3f9c91"]
+      expires: ['Sun, 25 Sep 2016 22:20:00 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=dce71a8e21df20939944e11c85986cfa71474813199; expires=Mon,
+          25-Sep-17 14:19:59 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['12']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['2']
+      x-request-id: [ef74466b-cc19-4e5e-9fcf-778cd1ee3391]
+      x-runtime: ['0.025777']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=dce71a8e21df20939944e11c85986cfa71474813199]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/movies/483?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
+        that has a beginning has an end.","overview":"The human city of Zion defends
+        itself against the massive invasion of the machines as Neo fights to end the
+        war at another front while also opposing the rogue Agent Smith.","released":"2003-11-05","runtime":129,"trailer":"http://youtube.com/watch?v=Kw3IQpnVtvo","homepage":"http://whatisthematrix.warnerbros.com/","rating":7.13794,"votes":8018,"updated_at":"2016-09-10T08:54:04.000Z","language":"en","available_translations":["en","de","cs","hu","ru","fr","zh","it","tr","es","pt","sv","fi","nl","pl","sk","he","da","ja","el","bg","th","ko","uk","ro","fa"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/483/fanarts/original/b3f7b1ce55.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/483/posters/original/2483b4ee5c.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/483/logos/original/98bfe58407.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/483/cleararts/original/e5776fde87.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/483/banners/original/fa9cd8cef0.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/483/thumbs/original/9ad6643c3a.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e7f1d47ad552786-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Sun, 25 Sep 2016 14:20:00 GMT']
+      etag: [W/"79bb8395920c9864926f2e4e0668525c"]
+      expires: ['Sun, 25 Sep 2016 22:20:00 GMT']
+      last-modified: ['Sat, 10 Sep 2016 08:54:04 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [31fca15c-b28b-483a-b506-81c6926c96bc]
+      x-runtime: ['0.011598']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie&year=2003
+  response:
+    body: {string: !!python/unicode '[{"type":"movie","score":57.174686,"movie":{"title":"The
+        Matrix Revolutions","overview":"The human city of Zion defends itself against
+        the massive invasion of the machines as Neo fights to end the war at another
+        front while also opposing the rogue Agent Smith.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg"}},"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605}}},{"type":"movie","score":57.174686,"movie":{"title":"The
+        Matrix Reloaded","overview":"Six months after the events depicted in The Matrix,
+        Neo has proved to be a good omen for the free humans, as more and more humans
+        are being freed from the matrix and brought to Zion, the one and only stronghold
+        of the Resistance.  Neo himself has discovered his superpowers including super
+        speed, ability to see the codes of the things inside the matrix and a certain
+        degree of pre-cognition. But a nasty piece of news hits the human resistance:
+        250,000 machine sentinels are digging to Zion and would reach them in 72 hours.
+        As Zion prepares for the ultimate war, Neo, Morpheus and Trinity are advised
+        by the Oracle to find the Keymaker who would help them reach the Source.  Meanwhile
+        Neo''s recurrent dreams depicting Trinity''s death have got him worried and
+        as if it was not enough, Agent Smith has somehow escaped deletion, has become
+        more powerful than before and has fixed Neo as his next target.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg"}},"ids":{"trakt":482,"slug":"the-matrix-reloaded-2003","imdb":"tt0234215","tmdb":604}}},{"type":"movie","score":53.008457,"movie":{"title":"Matrix
+        of Evil","overview":"is a dynamic 2 hour video featuring some of the most
+        informed minds in the world today who expose the latest revelations of the
+        New World Order''s agenda in shocking detail.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/133/876/posters/medium/43387dbf3b.jpg","medium":"https://walter.trakt.us/images/movies/000/133/876/posters/medium/43387dbf3b.jpg","thumb":"https://walter.trakt.us/images/movies/000/133/876/posters/thumb/43387dbf3b.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":133876,"slug":"matrix-of-evil-2003","imdb":"tt2121323","tmdb":217056}}},{"type":"movie","score":9.629199,"movie":{"title":"The
+        Animatrix","overview":"Straight from the creators of the groundbreaking Matrix
+        trilogy, this collection of short animated films from the world''s leading
+        anime directors fuses computer graphics and Japanese anime to provide the
+        background of the Matrix universe and the conflict between man and machines.
+        The shorts include Final Flight of the Osiris, The Second Renaissance, Kid''s
+        Story, Program, World Record, Beyond, A Detective Story and Matriculated.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/039/822/posters/medium/91fee646f8.jpg","medium":"https://walter.trakt.us/images/movies/000/039/822/posters/medium/91fee646f8.jpg","thumb":"https://walter.trakt.us/images/movies/000/039/822/posters/thumb/91fee646f8.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/039/822/fanarts/medium/5a7df99684.jpg","medium":"https://walter.trakt.us/images/movies/000/039/822/fanarts/medium/5a7df99684.jpg","thumb":"https://walter.trakt.us/images/movies/000/039/822/fanarts/thumb/5a7df99684.jpg"}},"ids":{"trakt":39822,"slug":"the-animatrix-2003","imdb":"tt0328832","tmdb":55931}}},{"type":"movie","score":4.4359274,"movie":{"title":"The
+        Fanimatrix: Run Program","overview":"Imitation is the Sincerest form of flattery.  A
+        short film written in the prison world of the Matrix our heroes Dante and
+        Medusa undertake a mission. called Run Program, using classic bait and switch
+        tactics.  Of course nothing ever goes right when an Agent gets involved...","year":2003,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":138531,"slug":"the-fanimatrix-run-program-2003","imdb":"","tmdb":226403}}},{"type":"movie","score":3.9055529,"movie":{"title":"Final
+        Flight of the Osiris","overview":"Immediately before the events of The Matrix
+        Reloaded, the crew of the hovercraft Osiris discovers a quarter of a million
+        sentinels drilling through the surface of the earth towards the last human
+        city of Zion. But can the Osiris survive long enough to warn Zion?","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/014/652/posters/medium/0de11822f9.jpg","medium":"https://walter.trakt.us/images/movies/000/014/652/posters/medium/0de11822f9.jpg","thumb":"https://walter.trakt.us/images/movies/000/014/652/posters/thumb/0de11822f9.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/014/652/fanarts/medium/d156431271.jpg","medium":"https://walter.trakt.us/images/movies/000/014/652/fanarts/medium/d156431271.jpg","thumb":"https://walter.trakt.us/images/movies/000/014/652/fanarts/thumb/d156431271.jpg"}},"ids":{"trakt":14652,"slug":"final-flight-of-the-osiris-2003","imdb":"tt0350934","tmdb":24357}}},{"type":"movie","score":2.5373755,"movie":{"title":"World
+        Record","overview":"A record-breaking competitive runner begins to stretch
+        the limits of the Matrix. Part of the Animatrix collection of animated shorts
+        set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/060/posters/medium/2a3f256e53.jpg","medium":"https://walter.trakt.us/images/movies/000/015/060/posters/medium/2a3f256e53.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/060/posters/thumb/2a3f256e53.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/060/fanarts/medium/8342af3f96.jpg","medium":"https://walter.trakt.us/images/movies/000/015/060/fanarts/medium/8342af3f96.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/060/fanarts/thumb/8342af3f96.jpg"}},"ids":{"trakt":15060,"slug":"world-record-2003","imdb":"tt0368576","tmdb":24960}}},{"type":"movie","score":2.2816477,"movie":{"title":"Kid''s
+        Story","overview":"A high school student is haunted by thoughts of \"The Matrix\"
+        and a person named \"Neo\". Part of the Animatrix collection of animated shorts
+        set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/017/posters/medium/2e5f6a51db.jpg","medium":"https://walter.trakt.us/images/movies/000/015/017/posters/medium/2e5f6a51db.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/017/posters/thumb/2e5f6a51db.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/017/fanarts/medium/b68895c8bc.jpg","medium":"https://walter.trakt.us/images/movies/000/015/017/fanarts/medium/b68895c8bc.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/017/fanarts/thumb/b68895c8bc.jpg"}},"ids":{"trakt":15017,"slug":"kid-s-story-2003","imdb":"tt0368574","tmdb":24914}}},{"type":"movie","score":2.0879703,"movie":{"title":"Program","overview":"Cis
+        and Duo discuss leaving the real world while during a samurai sword fight.
+        Part of the Animatrix collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/059/posters/medium/6edf908f74.jpg","medium":"https://walter.trakt.us/images/movies/000/015/059/posters/medium/6edf908f74.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/059/posters/thumb/6edf908f74.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/059/fanarts/medium/a1248c9047.jpg","medium":"https://walter.trakt.us/images/movies/000/015/059/fanarts/medium/a1248c9047.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/059/fanarts/thumb/a1248c9047.jpg"}},"ids":{"trakt":15059,"slug":"program-2003","imdb":"tt0366178","tmdb":24959}}},{"type":"movie","score":2.0879703,"movie":{"title":"Matriculated","overview":"The
+        human resistance works to convert a sentinel to their side. Part of the Animatrix
+        collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/050/posters/medium/e379c3b4a3.jpg","medium":"https://walter.trakt.us/images/movies/000/015/050/posters/medium/e379c3b4a3.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/050/posters/thumb/e379c3b4a3.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/050/fanarts/medium/2d76c3fa30.jpg","medium":"https://walter.trakt.us/images/movies/000/015/050/fanarts/medium/2d76c3fa30.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/050/fanarts/thumb/2d76c3fa30.jpg"}},"ids":{"trakt":15050,"slug":"matriculated-2003","imdb":"tt0372765","tmdb":24950}}}]'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [EXPIRED]
+      cf-ray: [2e960757fbac2702-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:04:34 GMT']
+      etag: [W/"2c112971da9ad9b5687c9cc30036096c"]
+      expires: ['Wed, 28 Sep 2016 17:04:34 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d19cc679c25712319dc9cf0b6885ab6c21475053474; expires=Thu,
+          28-Sep-17 09:04:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['12']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['2']
+      x-request-id: [ec556110-bfb4-45d4-b58e-cc2d0162ca64]
+      x-runtime: ['0.019723']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=d19cc679c25712319dc9cf0b6885ab6c21475053474]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/movies/483?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
+        that has a beginning has an end.","overview":"The human city of Zion defends
+        itself against the massive invasion of the machines as Neo fights to end the
+        war at another front while also opposing the rogue Agent Smith.","released":"2003-11-05","runtime":129,"trailer":"http://youtube.com/watch?v=Kw3IQpnVtvo","homepage":"http://whatisthematrix.warnerbros.com/","rating":7.13794,"votes":8018,"updated_at":"2016-09-10T08:54:04.000Z","language":"en","available_translations":["en","de","cs","hu","ru","fr","zh","it","tr","es","pt","sv","fi","nl","pl","sk","he","da","ja","el","bg","th","ko","uk","ro","fa"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/483/fanarts/original/b3f7b1ce55.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/483/posters/original/2483b4ee5c.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/483/logos/original/98bfe58407.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/483/cleararts/original/e5776fde87.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/483/banners/original/fa9cd8cef0.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/483/thumbs/original/9ad6643c3a.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [REVALIDATED]
+      cf-ray: [2e96075bccfc2702-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:04:35 GMT']
+      etag: [W/"79bb8395920c9864926f2e4e0668525c"]
+      expires: ['Wed, 28 Sep 2016 17:04:35 GMT']
+      last-modified: ['Sat, 10 Sep 2016 08:54:04 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [31fca15c-b28b-483a-b506-81c6926c96bc]
+      x-runtime: ['0.011598']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie&year=2003
+  response:
+    body: {string: !!python/unicode '[{"type":"movie","score":57.174686,"movie":{"title":"The
+        Matrix Revolutions","overview":"The human city of Zion defends itself against
+        the massive invasion of the machines as Neo fights to end the war at another
+        front while also opposing the rogue Agent Smith.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg"}},"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605}}},{"type":"movie","score":57.174686,"movie":{"title":"The
+        Matrix Reloaded","overview":"Six months after the events depicted in The Matrix,
+        Neo has proved to be a good omen for the free humans, as more and more humans
+        are being freed from the matrix and brought to Zion, the one and only stronghold
+        of the Resistance.  Neo himself has discovered his superpowers including super
+        speed, ability to see the codes of the things inside the matrix and a certain
+        degree of pre-cognition. But a nasty piece of news hits the human resistance:
+        250,000 machine sentinels are digging to Zion and would reach them in 72 hours.
+        As Zion prepares for the ultimate war, Neo, Morpheus and Trinity are advised
+        by the Oracle to find the Keymaker who would help them reach the Source.  Meanwhile
+        Neo''s recurrent dreams depicting Trinity''s death have got him worried and
+        as if it was not enough, Agent Smith has somehow escaped deletion, has become
+        more powerful than before and has fixed Neo as his next target.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg"}},"ids":{"trakt":482,"slug":"the-matrix-reloaded-2003","imdb":"tt0234215","tmdb":604}}},{"type":"movie","score":53.008457,"movie":{"title":"Matrix
+        of Evil","overview":"is a dynamic 2 hour video featuring some of the most
+        informed minds in the world today who expose the latest revelations of the
+        New World Order''s agenda in shocking detail.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/133/876/posters/medium/43387dbf3b.jpg","medium":"https://walter.trakt.us/images/movies/000/133/876/posters/medium/43387dbf3b.jpg","thumb":"https://walter.trakt.us/images/movies/000/133/876/posters/thumb/43387dbf3b.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":133876,"slug":"matrix-of-evil-2003","imdb":"tt2121323","tmdb":217056}}},{"type":"movie","score":9.629199,"movie":{"title":"The
+        Animatrix","overview":"Straight from the creators of the groundbreaking Matrix
+        trilogy, this collection of short animated films from the world''s leading
+        anime directors fuses computer graphics and Japanese anime to provide the
+        background of the Matrix universe and the conflict between man and machines.
+        The shorts include Final Flight of the Osiris, The Second Renaissance, Kid''s
+        Story, Program, World Record, Beyond, A Detective Story and Matriculated.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/039/822/posters/medium/91fee646f8.jpg","medium":"https://walter.trakt.us/images/movies/000/039/822/posters/medium/91fee646f8.jpg","thumb":"https://walter.trakt.us/images/movies/000/039/822/posters/thumb/91fee646f8.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/039/822/fanarts/medium/5a7df99684.jpg","medium":"https://walter.trakt.us/images/movies/000/039/822/fanarts/medium/5a7df99684.jpg","thumb":"https://walter.trakt.us/images/movies/000/039/822/fanarts/thumb/5a7df99684.jpg"}},"ids":{"trakt":39822,"slug":"the-animatrix-2003","imdb":"tt0328832","tmdb":55931}}},{"type":"movie","score":4.4359274,"movie":{"title":"The
+        Fanimatrix: Run Program","overview":"Imitation is the Sincerest form of flattery.  A
+        short film written in the prison world of the Matrix our heroes Dante and
+        Medusa undertake a mission. called Run Program, using classic bait and switch
+        tactics.  Of course nothing ever goes right when an Agent gets involved...","year":2003,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":138531,"slug":"the-fanimatrix-run-program-2003","imdb":"","tmdb":226403}}},{"type":"movie","score":3.9055529,"movie":{"title":"Final
+        Flight of the Osiris","overview":"Immediately before the events of The Matrix
+        Reloaded, the crew of the hovercraft Osiris discovers a quarter of a million
+        sentinels drilling through the surface of the earth towards the last human
+        city of Zion. But can the Osiris survive long enough to warn Zion?","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/014/652/posters/medium/0de11822f9.jpg","medium":"https://walter.trakt.us/images/movies/000/014/652/posters/medium/0de11822f9.jpg","thumb":"https://walter.trakt.us/images/movies/000/014/652/posters/thumb/0de11822f9.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/014/652/fanarts/medium/d156431271.jpg","medium":"https://walter.trakt.us/images/movies/000/014/652/fanarts/medium/d156431271.jpg","thumb":"https://walter.trakt.us/images/movies/000/014/652/fanarts/thumb/d156431271.jpg"}},"ids":{"trakt":14652,"slug":"final-flight-of-the-osiris-2003","imdb":"tt0350934","tmdb":24357}}},{"type":"movie","score":2.5373755,"movie":{"title":"World
+        Record","overview":"A record-breaking competitive runner begins to stretch
+        the limits of the Matrix. Part of the Animatrix collection of animated shorts
+        set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/060/posters/medium/2a3f256e53.jpg","medium":"https://walter.trakt.us/images/movies/000/015/060/posters/medium/2a3f256e53.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/060/posters/thumb/2a3f256e53.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/060/fanarts/medium/8342af3f96.jpg","medium":"https://walter.trakt.us/images/movies/000/015/060/fanarts/medium/8342af3f96.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/060/fanarts/thumb/8342af3f96.jpg"}},"ids":{"trakt":15060,"slug":"world-record-2003","imdb":"tt0368576","tmdb":24960}}},{"type":"movie","score":2.2816477,"movie":{"title":"Kid''s
+        Story","overview":"A high school student is haunted by thoughts of \"The Matrix\"
+        and a person named \"Neo\". Part of the Animatrix collection of animated shorts
+        set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/017/posters/medium/2e5f6a51db.jpg","medium":"https://walter.trakt.us/images/movies/000/015/017/posters/medium/2e5f6a51db.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/017/posters/thumb/2e5f6a51db.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/017/fanarts/medium/b68895c8bc.jpg","medium":"https://walter.trakt.us/images/movies/000/015/017/fanarts/medium/b68895c8bc.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/017/fanarts/thumb/b68895c8bc.jpg"}},"ids":{"trakt":15017,"slug":"kid-s-story-2003","imdb":"tt0368574","tmdb":24914}}},{"type":"movie","score":2.0879703,"movie":{"title":"Program","overview":"Cis
+        and Duo discuss leaving the real world while during a samurai sword fight.
+        Part of the Animatrix collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/059/posters/medium/6edf908f74.jpg","medium":"https://walter.trakt.us/images/movies/000/015/059/posters/medium/6edf908f74.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/059/posters/thumb/6edf908f74.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/059/fanarts/medium/a1248c9047.jpg","medium":"https://walter.trakt.us/images/movies/000/015/059/fanarts/medium/a1248c9047.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/059/fanarts/thumb/a1248c9047.jpg"}},"ids":{"trakt":15059,"slug":"program-2003","imdb":"tt0366178","tmdb":24959}}},{"type":"movie","score":2.0879703,"movie":{"title":"Matriculated","overview":"The
+        human resistance works to convert a sentinel to their side. Part of the Animatrix
+        collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/050/posters/medium/e379c3b4a3.jpg","medium":"https://walter.trakt.us/images/movies/000/015/050/posters/medium/e379c3b4a3.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/050/posters/thumb/e379c3b4a3.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/050/fanarts/medium/2d76c3fa30.jpg","medium":"https://walter.trakt.us/images/movies/000/015/050/fanarts/medium/2d76c3fa30.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/050/fanarts/thumb/2d76c3fa30.jpg"}},"ids":{"trakt":15050,"slug":"matriculated-2003","imdb":"tt0372765","tmdb":24950}}}]'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e960942ede2231e-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:05:53 GMT']
+      etag: [W/"2c112971da9ad9b5687c9cc30036096c"]
+      expires: ['Wed, 28 Sep 2016 17:05:53 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=db7cb0ecc542926021b3057fe09de1a461475053553; expires=Thu,
+          28-Sep-17 09:05:53 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['12']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['2']
+      x-request-id: [ec556110-bfb4-45d4-b58e-cc2d0162ca64]
+      x-runtime: ['0.019723']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=db7cb0ecc542926021b3057fe09de1a461475053553]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/movies/483?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
+        that has a beginning has an end.","overview":"The human city of Zion defends
+        itself against the massive invasion of the machines as Neo fights to end the
+        war at another front while also opposing the rogue Agent Smith.","released":"2003-11-05","runtime":129,"trailer":"http://youtube.com/watch?v=Kw3IQpnVtvo","homepage":"http://whatisthematrix.warnerbros.com/","rating":7.13794,"votes":8018,"updated_at":"2016-09-10T08:54:04.000Z","language":"en","available_translations":["en","de","cs","hu","ru","fr","zh","it","tr","es","pt","sv","fi","nl","pl","sk","he","da","ja","el","bg","th","ko","uk","ro","fa"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/483/fanarts/original/b3f7b1ce55.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/483/posters/original/2483b4ee5c.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/483/logos/original/98bfe58407.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/483/cleararts/original/e5776fde87.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/483/banners/original/fa9cd8cef0.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/483/thumbs/original/9ad6643c3a.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e9609442e6a231e-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:05:53 GMT']
+      etag: [W/"79bb8395920c9864926f2e4e0668525c"]
+      expires: ['Wed, 28 Sep 2016 17:05:53 GMT']
+      last-modified: ['Sat, 10 Sep 2016 08:54:04 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [31fca15c-b28b-483a-b506-81c6926c96bc]
+      x-runtime: ['0.011598']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie&year=2003
+  response:
+    body: {string: !!python/unicode '[{"type":"movie","score":57.174686,"movie":{"title":"The
+        Matrix Revolutions","overview":"The human city of Zion defends itself against
+        the massive invasion of the machines as Neo fights to end the war at another
+        front while also opposing the rogue Agent Smith.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg"}},"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605}}},{"type":"movie","score":57.174686,"movie":{"title":"The
+        Matrix Reloaded","overview":"Six months after the events depicted in The Matrix,
+        Neo has proved to be a good omen for the free humans, as more and more humans
+        are being freed from the matrix and brought to Zion, the one and only stronghold
+        of the Resistance.  Neo himself has discovered his superpowers including super
+        speed, ability to see the codes of the things inside the matrix and a certain
+        degree of pre-cognition. But a nasty piece of news hits the human resistance:
+        250,000 machine sentinels are digging to Zion and would reach them in 72 hours.
+        As Zion prepares for the ultimate war, Neo, Morpheus and Trinity are advised
+        by the Oracle to find the Keymaker who would help them reach the Source.  Meanwhile
+        Neo''s recurrent dreams depicting Trinity''s death have got him worried and
+        as if it was not enough, Agent Smith has somehow escaped deletion, has become
+        more powerful than before and has fixed Neo as his next target.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","medium":"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg"}},"ids":{"trakt":482,"slug":"the-matrix-reloaded-2003","imdb":"tt0234215","tmdb":604}}},{"type":"movie","score":53.008457,"movie":{"title":"Matrix
+        of Evil","overview":"is a dynamic 2 hour video featuring some of the most
+        informed minds in the world today who expose the latest revelations of the
+        New World Order''s agenda in shocking detail.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/133/876/posters/medium/43387dbf3b.jpg","medium":"https://walter.trakt.us/images/movies/000/133/876/posters/medium/43387dbf3b.jpg","thumb":"https://walter.trakt.us/images/movies/000/133/876/posters/thumb/43387dbf3b.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":133876,"slug":"matrix-of-evil-2003","imdb":"tt2121323","tmdb":217056}}},{"type":"movie","score":9.629199,"movie":{"title":"The
+        Animatrix","overview":"Straight from the creators of the groundbreaking Matrix
+        trilogy, this collection of short animated films from the world''s leading
+        anime directors fuses computer graphics and Japanese anime to provide the
+        background of the Matrix universe and the conflict between man and machines.
+        The shorts include Final Flight of the Osiris, The Second Renaissance, Kid''s
+        Story, Program, World Record, Beyond, A Detective Story and Matriculated.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/039/822/posters/medium/91fee646f8.jpg","medium":"https://walter.trakt.us/images/movies/000/039/822/posters/medium/91fee646f8.jpg","thumb":"https://walter.trakt.us/images/movies/000/039/822/posters/thumb/91fee646f8.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/039/822/fanarts/medium/5a7df99684.jpg","medium":"https://walter.trakt.us/images/movies/000/039/822/fanarts/medium/5a7df99684.jpg","thumb":"https://walter.trakt.us/images/movies/000/039/822/fanarts/thumb/5a7df99684.jpg"}},"ids":{"trakt":39822,"slug":"the-animatrix-2003","imdb":"tt0328832","tmdb":55931}}},{"type":"movie","score":4.4359274,"movie":{"title":"The
+        Fanimatrix: Run Program","overview":"Imitation is the Sincerest form of flattery.  A
+        short film written in the prison world of the Matrix our heroes Dante and
+        Medusa undertake a mission. called Run Program, using classic bait and switch
+        tactics.  Of course nothing ever goes right when an Agent gets involved...","year":2003,"images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":138531,"slug":"the-fanimatrix-run-program-2003","imdb":"","tmdb":226403}}},{"type":"movie","score":3.9055529,"movie":{"title":"Final
+        Flight of the Osiris","overview":"Immediately before the events of The Matrix
+        Reloaded, the crew of the hovercraft Osiris discovers a quarter of a million
+        sentinels drilling through the surface of the earth towards the last human
+        city of Zion. But can the Osiris survive long enough to warn Zion?","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/014/652/posters/medium/0de11822f9.jpg","medium":"https://walter.trakt.us/images/movies/000/014/652/posters/medium/0de11822f9.jpg","thumb":"https://walter.trakt.us/images/movies/000/014/652/posters/thumb/0de11822f9.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/014/652/fanarts/medium/d156431271.jpg","medium":"https://walter.trakt.us/images/movies/000/014/652/fanarts/medium/d156431271.jpg","thumb":"https://walter.trakt.us/images/movies/000/014/652/fanarts/thumb/d156431271.jpg"}},"ids":{"trakt":14652,"slug":"final-flight-of-the-osiris-2003","imdb":"tt0350934","tmdb":24357}}},{"type":"movie","score":2.5373755,"movie":{"title":"World
+        Record","overview":"A record-breaking competitive runner begins to stretch
+        the limits of the Matrix. Part of the Animatrix collection of animated shorts
+        set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/060/posters/medium/2a3f256e53.jpg","medium":"https://walter.trakt.us/images/movies/000/015/060/posters/medium/2a3f256e53.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/060/posters/thumb/2a3f256e53.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/060/fanarts/medium/8342af3f96.jpg","medium":"https://walter.trakt.us/images/movies/000/015/060/fanarts/medium/8342af3f96.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/060/fanarts/thumb/8342af3f96.jpg"}},"ids":{"trakt":15060,"slug":"world-record-2003","imdb":"tt0368576","tmdb":24960}}},{"type":"movie","score":2.2816477,"movie":{"title":"Kid''s
+        Story","overview":"A high school student is haunted by thoughts of \"The Matrix\"
+        and a person named \"Neo\". Part of the Animatrix collection of animated shorts
+        set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/017/posters/medium/2e5f6a51db.jpg","medium":"https://walter.trakt.us/images/movies/000/015/017/posters/medium/2e5f6a51db.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/017/posters/thumb/2e5f6a51db.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/017/fanarts/medium/b68895c8bc.jpg","medium":"https://walter.trakt.us/images/movies/000/015/017/fanarts/medium/b68895c8bc.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/017/fanarts/thumb/b68895c8bc.jpg"}},"ids":{"trakt":15017,"slug":"kid-s-story-2003","imdb":"tt0368574","tmdb":24914}}},{"type":"movie","score":2.0879703,"movie":{"title":"Program","overview":"Cis
+        and Duo discuss leaving the real world while during a samurai sword fight.
+        Part of the Animatrix collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/059/posters/medium/6edf908f74.jpg","medium":"https://walter.trakt.us/images/movies/000/015/059/posters/medium/6edf908f74.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/059/posters/thumb/6edf908f74.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/059/fanarts/medium/a1248c9047.jpg","medium":"https://walter.trakt.us/images/movies/000/015/059/fanarts/medium/a1248c9047.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/059/fanarts/thumb/a1248c9047.jpg"}},"ids":{"trakt":15059,"slug":"program-2003","imdb":"tt0366178","tmdb":24959}}},{"type":"movie","score":2.0879703,"movie":{"title":"Matriculated","overview":"The
+        human resistance works to convert a sentinel to their side. Part of the Animatrix
+        collection of animated shorts set in the Matrix universe.","year":2003,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/015/050/posters/medium/e379c3b4a3.jpg","medium":"https://walter.trakt.us/images/movies/000/015/050/posters/medium/e379c3b4a3.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/050/posters/thumb/e379c3b4a3.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/015/050/fanarts/medium/2d76c3fa30.jpg","medium":"https://walter.trakt.us/images/movies/000/015/050/fanarts/medium/2d76c3fa30.jpg","thumb":"https://walter.trakt.us/images/movies/000/015/050/fanarts/thumb/2d76c3fa30.jpg"}},"ids":{"trakt":15050,"slug":"matriculated-2003","imdb":"tt0372765","tmdb":24950}}}]'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e960a43ef3526a8-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:06:34 GMT']
+      etag: [W/"2c112971da9ad9b5687c9cc30036096c"]
+      expires: ['Wed, 28 Sep 2016 17:06:34 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d2048decb6f5cfb1f746d5b48916f106f1475053594; expires=Thu,
+          28-Sep-17 09:06:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['12']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['2']
+      x-request-id: [ec556110-bfb4-45d4-b58e-cc2d0162ca64]
+      x-runtime: ['0.019723']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=d2048decb6f5cfb1f746d5b48916f106f1475053594]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [!!python/unicode 2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/movies/483?extended=full%2Cimages
+  response:
+    body: {string: !!python/unicode '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
+        that has a beginning has an end.","overview":"The human city of Zion defends
+        itself against the massive invasion of the machines as Neo fights to end the
+        war at another front while also opposing the rogue Agent Smith.","released":"2003-11-05","runtime":129,"trailer":"http://youtube.com/watch?v=Kw3IQpnVtvo","homepage":"http://whatisthematrix.warnerbros.com/","rating":7.13794,"votes":8018,"updated_at":"2016-09-10T08:54:04.000Z","language":"en","available_translations":["en","de","cs","hu","ru","fr","zh","it","tr","es","pt","sv","fi","nl","pl","sk","he","da","ja","el","bg","th","ko","uk","ro","fa"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/483/fanarts/original/b3f7b1ce55.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/483/posters/original/2483b4ee5c.jpg","medium":"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/483/logos/original/98bfe58407.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/483/cleararts/original/e5776fde87.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/483/banners/original/fa9cd8cef0.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/483/thumbs/original/9ad6643c3a.jpg"}}}'}
+    headers:
+      cache-control: ['public, max-age=28800']
+      cf-cache-status: [HIT]
+      cf-ray: [2e960a454fa526a8-FRA]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 09:06:35 GMT']
+      etag: [W/"79bb8395920c9864926f2e4e0668525c"]
+      expires: ['Wed, 28 Sep 2016 17:06:35 GMT']
+      last-modified: ['Sat, 10 Sep 2016 08:54:04 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [31fca15c-b28b-483a-b506-81c6926c96bc]
+      x-runtime: ['0.011598']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
 version: 1

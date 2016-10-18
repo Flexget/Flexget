@@ -1,15 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import jsonschema
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from future.utils import PY2
 from future.backports.http import client as backport_client
 
+import re
 import os
 import sys
 import yaml
 import logging
 import shutil
+import requests
 
 import itertools
 
@@ -27,7 +29,7 @@ from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from flexget.webserver import User
 from flexget.manager import Session
-from flexget.api import app
+from flexget.api import api_app
 
 log = logging.getLogger('tests')
 
@@ -149,12 +151,29 @@ def schema_match(manager):
     This fixture enables verifying JSON Schema. Return a list of validation error dicts. List is empty if no errors
     occurred.
     """
+
     def match(schema, response):
         validator = jsonschema.Draft4Validator(schema)
         errors = list(validator.iter_errors(response))
         return [dict(value=list(e.path), message=e.message) for e in errors]
 
     return match
+
+
+@pytest.fixture()
+def link_headers(manager):
+    """
+    Parses link headers and return them in dict form
+    """
+    def headers(response):
+        links = {}
+        for link in requests.utils.parse_header_links(response.headers.get('link')):
+            url = link['url']
+            page = int(re.search('(?<!per_)page=(\d)', url).group(1))
+            links[link['rel']] = dict(url=url, page=page)
+        return links
+
+    return headers
 
 
 # --- End Public Fixtures ---
@@ -243,13 +262,13 @@ def no_requests(monkeypatch):
 
 @pytest.fixture(scope='session', autouse=True)
 def setup_once(pytestconfig, request):
-#    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'flexget', 'tests'))
+    #    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'flexget', 'tests'))
     flexget.logger.initialize(True)
     m = MockManager('tasks: {}', 'init')  # This makes sure our template environment is set up before any tests are run
     m.shutdown()
     logging.getLogger().setLevel(logging.DEBUG)
     load_plugins()
-    
+
 
 @pytest.fixture(autouse=True)
 def chdir(pytestconfig, request):
@@ -321,7 +340,7 @@ class MockManager(Manager):
 class APIClient(object):
     def __init__(self, api_key):
         self.api_key = api_key
-        self.client = app.test_client()
+        self.client = api_app.test_client()
 
     def _append_header(self, key, value, kwargs):
         if 'headers' not in kwargs:
@@ -352,3 +371,9 @@ class APIClient(object):
             self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
 
         return self.client.delete(*args, **kwargs)
+
+    def head(self, *args, **kwargs):
+        if kwargs.get('auth', True):
+            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+
+        return self.client.head(*args, **kwargs)

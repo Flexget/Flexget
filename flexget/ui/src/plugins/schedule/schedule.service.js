@@ -6,26 +6,19 @@
         .module('plugins.schedule')
         .factory('schedulesService', schedulesService);
 
-    function schedulesService($http, CacheFactory, exception) {
-        // If cache doesn't exist, create it
-        if (!CacheFactory.get('scheduleCache')) {
-            CacheFactory.createCache('scheduleCache');
-        }
-
-        var scheduleCache = CacheFactory.get('scheduleCache');
-
+    function schedulesService($http, exception) {
         return {
             getSchedules: getSchedules
         };
 
         function getSchedules() {
-            return $http.get('/api/schedules/', { cache: scheduleCache })
-                .then(getSchedulesComplete)
+            return $http.get('/api/schedules/', { etagCache: true })
+                .then(callComplete)
                 .catch(callFailed);
+        }
 
-            function getSchedulesComplete(response) {
-                return response.data;
-            }
+        function callComplete(response) {
+            return response.data;
         }
 
         function callFailed(error) {

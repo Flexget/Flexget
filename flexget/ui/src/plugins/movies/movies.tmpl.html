@@ -35,9 +35,13 @@
 		<md-tabs md-dynamic-height md-border-bottom class="movie-tabs" md-selected="vm.selectedlist">
 			<movie-list ng-repeat="list in vm.lists" 
 				list="::list"
-				tab-index="$index">
+				tab-index="$index"
+                link-header="vm.linkHeader"
+                current-page="vm.currentPage">
 			</movie-list>
 		</md-tabs>
 	</md-content>
+
+    <fg-pagination load-data="vm.loadMovies(page)" link-header="vm.linkHeader" current-page="vm.currentPage"></fg-pagination>
 	<!-- TODO: Add screen that allows users to create their first list -->
 </div>

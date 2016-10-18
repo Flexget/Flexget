@@ -45,7 +45,7 @@
         function startStream() {
             vm.options.progress = true;
             vm.options.summary = true;
-            vm.options.log = true;
+            //vm.options['loglevel'] = 'info';
             vm.options['entry_dump'] = true;
 
             stream = executeService.executeTasks(vm.options);

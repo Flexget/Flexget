@@ -82,8 +82,8 @@ $episodes-list-backdrop-overlay-color: rgba(0, 0, 0, .65);
 
         transform: translate(-50%, -50%);
     }
+}
 
-    fg-material-pagination {
-
-    }
+.episodes-pager > .pagination-group {
+    margin-top: 5px;
 }

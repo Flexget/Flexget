@@ -14,8 +14,6 @@ lib/
 local
 .idea/
 *.iml
-config.yml
-db-config.sqlite
 flexget.log
 flexget.log.*
 received/
@@ -44,5 +42,6 @@ npm-debug.log
 .config-lock
 .cache/
 *.yml
-*.sqlite
 node_modules/
+!raw_config.yml
+cached_resources/

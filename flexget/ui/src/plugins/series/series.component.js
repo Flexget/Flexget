@@ -14,8 +14,7 @@
         var vm = this;
 
         var options = {
-            page: 1,
-            'page_size': 10,
+            'per_page': 10,
             'in_config': 'all',
             'sort_by': 'show_name',
             'descending': false
@@ -32,57 +31,59 @@
         vm.search = search;
         vm.toggleEpisodes = toggleEpisodes;
         vm.areEpisodesOnShowRow = areEpisodesOnShowRow;
+        vm.getSeries = getSeriesList;
 
         function activate() {
-            getSeriesList();
+            getSeriesList(1);
         }
 
-        function getSeriesList() {
-            seriesService.getShows(options).then(function (data) {
-                vm.series = data.shows;
-
-                vm.currentPage = data.page;
-                vm.totalShows = data['total_number_of_shows'];
-                vm.pageSize = data['page_size'];
-            });
-        }
-
-        function forgetShow(show) {
-            var confirm = $mdDialog.confirm()
-                .title('Confirm forgetting show.')
-                .htmlContent($sce.trustAsHtml('Are you sure you want to completely forget <b>' + show['show_name'] + '</b>?<br /> This will also forget all downloaded releases.'))
-                .ok('Forget')
-                .cancel('No');
-
-            $mdDialog.show(confirm).then(function () {
-                seriesService.deleteShow(show, params).then(function () {
-                    getSeriesList();
+        function getSeriesList(page) {
+            options.page = page;
+            seriesService.getShows(options)
+                .then(setSeries)
+                .cached(setSeries)
+                .finally(function () {
+                    vm.currentPage = options.page;
                 });
-            });
         }
-
-        //Call from the pagination to update the page to the selected page
-        vm.updateListPage = function (index) {
-            options.page = index;
-
-            getSeriesList();
-        };
-
 
         function search() {
             vm.searchTerm ? searchShows() : emptySearch();
 
             function searchShows() {
-                seriesService.searchShows(vm.searchTerm).then(function (data) {
-                    vm.series = data.shows;
-                });
+                seriesService.searchShows(vm.searchTerm)
+                    .then(setSeries)
+                    .cached(setSeries)
+                    .finally(function () {
+                        vm.currentPage = 1;
+                    });
             }
 
             function emptySearch() {
-                options.page = 1;
-                getSeriesList();
+                getSeriesList(1);
             }
         }
+
+        function setSeries(response) {
+            vm.series = response.data;
+            vm.linkHeader = response.headers().link;
+        }
+
+        function forgetShow(show) {
+            var confirm = $mdDialog.confirm()
+                .title('Confirm forgetting show.')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to completely forget <b>' + show.name + '</b>?<br /> This will also forget all downloaded releases.'))
+                .ok('Forget')
+                .cancel('No');
+
+            $mdDialog.show(confirm).then(function () {
+                seriesService.deleteShow(show, params).then(function () {
+                    getSeriesList(options.page);
+                });
+            });
+        }
+
+        
 
         function toggleEpisodes(show) {
             show === vm.selectedShow ? clearShow() : setSelectedShow();

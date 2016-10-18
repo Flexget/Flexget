@@ -15,15 +15,27 @@
 
         vm.$onInit = activate;
         vm.deleteEntry = deleteEntry;
+        vm.getSeen = getSeen;
+        
+        var options = {};
 
         function activate() {
-            getSeen();
+            getSeen(1);
         }
 
-        function getSeen() {
-            return seenService.getSeen().then(function (data) {
-                vm.entries = data.seen_entries;
-            });
+        function getSeen(page) {
+            options.page = page;
+            seenService.getSeen(options)
+                .then(setEntries)
+                .cached(setEntries)
+                .finally(function () {
+                    vm.currentPage = options.page;
+                });
+            
+            function setEntries(response) {
+                vm.entries = response.data;
+                vm.linkHeader = response.headers().link;
+            };
         }
 
         function deleteEntry(entry) {
@@ -35,7 +47,7 @@
 
             $mdDialog.show(confirm).then(function () {
                 seenService.deleteEntryById(entry.id).then(function () {
-                    getSeen();
+                    getSeen(options.page);
                 });
             });
         }

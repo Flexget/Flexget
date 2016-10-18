@@ -513,7 +513,7 @@ def tvmaze_lookup(lookup_type, lookup_values):
     try:
         result = requests.get(lookup_url).json()
     except RequestException as e:
-        raise LookupError(e)
+        raise LookupError(e.args[0])
     return result
 
 

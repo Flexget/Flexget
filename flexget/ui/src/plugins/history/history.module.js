@@ -4,9 +4,9 @@
 
     angular
         .module('plugins.history', [
-            'angular-cache',
             'angular.filter',
 
+            'blocks.pagination',
             'blocks.exception',
             'blocks.router'
         ]);

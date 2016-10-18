@@ -14,7 +14,6 @@ from flask_login import UserMixin
 from sqlalchemy import Column, Integer, Unicode
 from werkzeug.security import generate_password_hash
 
-from flexget.config_schema import register_config_key
 from flexget.event import event
 from flexget.manager import Base
 from flexget.utils.database import with_session
@@ -27,26 +26,6 @@ _app_register = {}
 _default_app = Flask(__name__)
 
 random = random.SystemRandom()
-
-web_config_schema = {
-    'oneOf': [
-        {'type': 'boolean'},
-        {
-            'type': 'object',
-            'properties': {
-                'bind': {'type': 'string', 'format': 'ipv4', 'default': '0.0.0.0'},
-                'port': {'type': 'integer', 'default': 3539},
-                'ssl_certificate': {'type': 'string', 'format': 'string', 'default': ''},
-                'ssl_private_key': {'type': 'string', 'format': 'string', 'default': ''},
-            },
-            'additionalProperties': False,
-            'dependencies': {
-                'ssl_certificate': ['ssl_private_key'],
-                'ssl_private_key': ['ssl_certificate'],
-            }
-        }
-    ]
-}
 
 
 def generate_key():
@@ -119,11 +98,6 @@ class WebSecret(Base):
     value = Column(Unicode)
 
 
-@event('config.register')
-def register_config():
-    register_config_key('web_server', web_config_schema)
-
-
 def register_app(path, application):
     if path in _app_register:
         raise ValueError('path %s already registered')
@@ -144,23 +118,13 @@ def start_page():
     return redirect(_home)
 
 
-@event('manager.daemon.started', -255)  # Low priority so plugins can register apps
-@with_session
-def setup_server(manager, session=None):
+def setup_server(config):
     """ Sets up and starts/restarts the web service. """
-    if not manager.is_daemon:
-        return
-
-    web_server_config = manager.config.get('web_server')
-
-    if not web_server_config:
-        return
-
     web_server = WebServer(
-        bind=web_server_config['bind'],
-        port=web_server_config['port'],
-        ssl_certificate=web_server_config['ssl_certificate'],
-        ssl_private_key=web_server_config['ssl_private_key'],
+        bind=config['bind'],
+        port=config['port'],
+        ssl_certificate=config['ssl_certificate'],
+        ssl_private_key=config['ssl_private_key'],
     )
 
     _default_app.secret_key = get_secret()
@@ -202,7 +166,8 @@ class WebServer(threading.Thread):
     def start(self):
         # If we have already started and stopped a thread, we need to reinitialize it to create a new one
         if not self.is_alive():
-            self.__init__(bind=self.bind, port=self.port, ssl_certificate=self.ssl_certificate, ssl_private_key=self.ssl_private_key)
+            self.__init__(bind=self.bind, port=self.port, ssl_certificate=self.ssl_certificate,
+                          ssl_private_key=self.ssl_private_key)
         threading.Thread.start(self)
 
     def _start_server(self):
@@ -234,10 +199,7 @@ class WebServer(threading.Thread):
         except socket.gaierror:
             host = '127.0.0.1'
 
-        if self.ssl_certificate and self.ssl_private_key:
-            protocol = 'https'
-        else:
-            protocol = 'http'
+        protocol = 'https' if self.ssl_certificate and self.ssl_private_key else 'http'
 
         log.info('Web interface available at %s://%s:%s', protocol, host, self.port)
 

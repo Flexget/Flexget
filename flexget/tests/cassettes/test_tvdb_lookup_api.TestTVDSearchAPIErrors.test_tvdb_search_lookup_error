@@ -1,0 +1,63 @@
+interactions:
+- request:
+    body: !!python/unicode '{"apikey": "4D297D8CFDE0E105"}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['30']
+      Content-Type: [application/json]
+      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
+    method: POST
+    uri: https://api.thetvdb.com/login
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAwTByZKiMAAA0Ht/heWdLoiIMLcWIiRgcMFmuVAYgoRFUBaBqfn3ee/v12q17puS
+        Pdd/Vms24/xuUu5yfL0tSCIcdeh52VIdKahsg18da99sxhWzfrhbQJEst4l4D5EUtEN1VaKi4Zd6
+        qhhMq1RHHaq1OfHTLPEPIiqaiRhUOhp0PhrhJjt/b9BN8kih5/o93tWJkqo9LSWkiiFHMqb7qhFO
+        Rmy3aFTd/FpaSq0IdnLmzDn7mPgvcjlaO1SxR9PcAuGlNkkSfjiMigAXhY5kWOXekZXbFIN0KVTa
+        5u4wFX5rJkB6x/V53oRGmdmKrPnYjuGWOKI5B7ujfgEIZm3Qd5P6dupQJVPj5cND+ZVfUbl02INV
+        brZOHTuqqPpPV4nBFH8u4SwN2KysW0AC2wPhhmk/J9wH/fUTgcTdcrgzRG6PFO73B4tpkN3lh0eB
+        1OiCp1P0Gj7g7WYna79EGRliOZ8OGw1SwRljBcyiMEqHRWjvme/HkdzzKC/3KW5o/h7Z28gMszr0
+        4LP++vcfAAD//wMAC2gLg9cBAAA=
+    headers:
+      cf-ray: [2e97cd4578a70f81-FRA]
+      connection: [keep-alive]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 14:14:28 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d1ecf42a869fda7d71b17dca8d4395f711475072067; expires=Thu,
+          28-Sep-17 14:14:27 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      vary: [Accept-Language]
+      x-powered-by: [Thundar!]
+      x-thetvdb-api-version: [2.1.1]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Authorization: [!!python/unicode Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0NzUxNTg0NjcsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDc1MDcyMDY3fQ.3IU1TNjChCb_7ma6d8tck1I80YiI4JcBlo-PD_KpIv8OhSkH6m6-KaQieLQWJNWqNRMH7IlegooUX-q8oaaYwiEZjXJjjCI4ElhTMek5dJ2dzj8cphOuxjWpGa21r_mQy3YDkfK649WJK_E5NL0GyX7MCR2IEfpXtsx8rLmY8NxoThug6V4qZkzsJTElhGpLm_L808WnO6_2x_wRYy1uJGlHUXNXKT2Y3e9APJtXtSwZ2aO5iE7D0iKvcEBBFHe9Eeb4gTc21oC-TCcIquw2rOfPHBzZfNu_4hxF39Ec-Lv_62y0-v1Fz-pbfWW_Z4tiZhkBdJochrverDfDGlFt2w]
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
+    method: GET
+    uri: https://api.thetvdb.com/search/series?name=sdfgsdfgsdfgsdfg
+  response:
+    body: {string: !!python/unicode "{\n  \"Error\": \"Resource not found\"\n}"}
+    headers:
+      cache-control: ['private, max-age=600']
+      cf-ray: [2e97cd4c2daf15bf-FRA]
+      connection: [keep-alive]
+      content-length: ['35']
+      content-type: [application/json; charset=utf-8]
+      date: ['Wed, 28 Sep 2016 14:14:28 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=df24a96f11b2fc6ad0ca599841ca8d2c81475072068; expires=Thu,
+          28-Sep-17 14:14:28 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+      vary: [Accept-Language]
+      x-powered-by: [Thundar!]
+      x-thetvdb-api-version: [2.1.1]
+    status: {code: 404, message: Not Found}
+version: 1

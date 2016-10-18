@@ -1,6 +1,6 @@
 <md-card class="movie-entry">
   <div class="movie-poster">
-    <img ng-src="/api/cached/?url={{ ::vm.metadata.main_image }}"/>
+    <img ng-src="{{ vm.metadata.main_image ? '/api/cached/?url=' + vm.metadata.main_image : null }}"/>
   </div>
   <div class="movie-info">
     <h3>{{ ::vm.movie.title }} ({{ ::vm.movie.year }})

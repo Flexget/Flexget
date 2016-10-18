@@ -26,7 +26,7 @@ from flexget.utils.database import quality_property, with_session
 from flexget.utils.log import log_once
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
-from flexget.utils.tools import merge_dict_from_to, parse_timedelta
+from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_episode_identifier
 
 SCHEMA_VER = 13
 
@@ -226,7 +226,6 @@ def normalize_series_name(name):
 
 
 class NormalizedComparator(Comparator):
-
     def operate(self, op, other):
         return op(self.__clause_element__(), normalize_series_name(other))
 
@@ -350,7 +349,7 @@ class Episode(Base):
         """
         if not self.first_seen:
             return None
-        return  datetime.now() - self.first_seen
+        return datetime.now() - self.first_seen
 
     @property
     def is_premiere(self):
@@ -363,6 +362,17 @@ class Episode(Base):
     @property
     def downloaded_releases(self):
         return [release for release in self.releases if release.downloaded]
+
+    @property
+    def latest_release(self):
+        """
+        :return: Latest downloaded Release or None
+        """
+        if not self.releases:
+            return None
+        return \
+            sorted(self.downloaded_releases, key=lambda rel: rel.first_seen if rel.downloaded else None, reverse=True)[
+                0]
 
     def __str__(self):
         return '<Episode(id=%s,identifier=%s,season=%s,number=%s)>' % \
@@ -392,6 +402,19 @@ class Episode(Base):
 
     def __hash__(self):
         return self.id
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'identifier': self.identifier,
+            'season': self.season,
+            'identified_by': self.identified_by,
+            'number': self.number,
+            'series_id': self.series_id,
+            'first_seen': self.first_seen,
+            'premiere': self.is_premiere,
+            'number_of_releases': len(self.releases)
+        }
 
 
 Index('episode_series_identifier', Episode.series_id, Episode.identifier)
@@ -425,6 +448,17 @@ class Release(Base):
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'downloaded': self.downloaded,
+            'quality': self.quality.name,
+            'proper_count': self.proper_count,
+            'first_seen': self.first_seen,
+            'episode_id': self.episode_id,
+        }
 
 
 class SeriesTask(Base):
@@ -483,8 +517,8 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
     elif configured == 'unconfigured':
         query = query.having(func.count(SeriesTask.id) < 1)
     if premieres:
-        query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2).
-                 having(func.count(SeriesTask.id) < 1)).filter(Release.downloaded == True)
+        query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2)).filter(
+            Release.downloaded == True)
     if status == 'new':
         if not days:
             days = 7
@@ -494,14 +528,14 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
             days = 365
         query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
     if count:
-        return query.count()
+        return query.group_by(Series).count()
     if sort_by == 'show_name':
         order_by = Series.name
-    elif sort_by == 'last_download_date':
+    else:
         order_by = func.max(Release.first_seen)
     query = query.order_by(desc(order_by)) if descending else query.order_by(order_by)
-    query = query.slice(start, stop).from_self()
-    return query
+
+    return query.slice(start, stop).from_self()
 
 
 def get_latest_episode(series):
@@ -700,20 +734,9 @@ def set_series_begin(series, ep_id):
     # If identified_by is not explicitly specified, auto-detect it based on begin identifier
     # TODO: use some method of series parser to do the identifier parsing
     session = Session.object_session(series)
-    if isinstance(ep_id, int):
-        identified_by = 'sequence'
-    elif re.match(r'(?i)^S\d{1,4}E\d{1,3}$', ep_id):
-        identified_by = 'ep'
+    identified_by = parse_episode_identifier(ep_id)
+    if identified_by == 'ep':
         ep_id = ep_id.upper()
-    elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
-        identified_by = 'date'
-    else:
-        # Check if a sequence identifier was passed as a string
-        try:
-            ep_id = int(ep_id)
-            identified_by = 'sequence'
-        except ValueError:
-            raise ValueError('`%s` is not a valid episode identifier' % ep_id)
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
@@ -754,7 +777,8 @@ def remove_series(name, forget=False):
             for s in series:
                 if forget:
                     for episode in s.episodes:
-                        downloaded_releases = [release.title for release in episode.downloaded_releases]
+                        for release in episode.downloaded_releases:
+                            downloaded_releases.append(release.title)
                 session.delete(s)
             session.commit()
             log.debug('Removed series %s from database.', name)
@@ -770,7 +794,7 @@ def remove_series_episode(name, identifier, forget=False):
 
     :param name: Name of series to be removed
     :param identifier: Series identifier to be deleted,
-        supports case insensitive startwith matching
+        supports case insensitive start with matching
     :param forget: Indication whether or not to fire a 'forget' event
     """
     downloaded_releases = []
@@ -855,8 +879,23 @@ def show_episodes(series, start=None, stop=None, count=False, descending=False, 
             Episode.season, Episode.number)
     else:
         episodes = episodes.order_by(Episode.identifier.desc()) if descending else episodes.order_by(Episode.identifier)
-    episodes = episodes.slice(start, stop).from_self()
-    return episodes.all()
+    return episodes.slice(start, stop).from_self().all()
+
+
+def get_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
+                 session=None):
+    """ Return all releases for a given episode """
+    releases = session.query(Release).filter(Release.episode_id == episode.id)
+    if downloaded is not None:
+        releases = releases.filter(Release.downloaded == downloaded)
+    if count:
+        return releases.count()
+    releases = releases.slice(start, stop).from_self()
+    if descending:
+        releases = releases.order_by(getattr(Release, sort_by).desc())
+    else:
+        releases = releases.order_by(getattr(Release, sort_by))
+    return releases.all()
 
 
 def episode_in_show(series_id, episode_id):
@@ -957,15 +996,7 @@ class FilterSeriesBase(object):
                 # Strict naming
                 'exact': {'type': 'boolean'},
                 # Begin takes an ep, sequence or date identifier
-                'begin': {
-                    'oneOf': [
-                        {'name': 'ep identifier', 'type': 'string', 'pattern': r'(?i)^S\d{2,4}E\d{2,3}$',
-                         'error_pattern': 'episode identifiers should be in the form `SxxEyy`'},
-                        {'name': 'date identifier', 'type': 'string', 'pattern': r'^\d{4}-\d{2}-\d{2}$',
-                         'error_pattern': 'date identifiers must be in the form `YYYY-MM-DD`'},
-                        {'name': 'sequence identifier', 'type': 'integer', 'minimum': 0}
-                    ]
-                },
+                'begin': {'type': ['string', 'integer'], 'format': 'episode_identifier'},
                 'from_group': one_or_more({'type': 'string'}),
                 'parse_only': {'type': 'boolean'},
                 'special_ids': one_or_more({'type': 'string'}),
@@ -1264,7 +1295,7 @@ class FilterSeries(FilterSeriesBase):
         for entry in entries:
             # skip processed entries
             if (entry.get('series_parser') and entry['series_parser'].valid and entry[
-                    'series_parser'].name.lower() != series_name.lower()):
+                'series_parser'].name.lower() != series_name.lower()):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
@@ -1450,7 +1481,7 @@ class FilterSeries(FilterSeriesBase):
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
             if (entry['quality'] in downloaded_qualities and entry['series_parser'].proper_count > downloaded_qualities[
-                    entry['quality']]):
+                entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
@@ -1513,7 +1544,7 @@ class FilterSeries(FilterSeriesBase):
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
             if (not backfill and (episode.season < latest.season or (
-                    episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
+                            episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)

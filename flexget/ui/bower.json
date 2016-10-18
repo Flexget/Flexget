@@ -5,6 +5,7 @@
     "angular-material": "~1.1.0",
     "angular-ui-router": "~1.0.0-alpha.5",
     "angular-filter": "~0.5.8",
+    "angular-sanitize": "~1.5.8",
     "angular-schema-form": "~0.8.13",
     "font-awesome": "~4.6.3",
     "angular-ui-grid": "~3.1.1",
@@ -20,8 +21,10 @@
     "angular-ui-ace": "~0.2.3",
     "angular-utf8-base64": "~0.0.5",
     "angular-messages": "~1.5.6",
-    "angular-cache": "~4.6.0",
-    "ngclipboard": "~1.1.1"
+    "ngclipboard": "~1.1.1",
+    "angular-http-etag": "git://github.com/Tommatheussen/angular-http-etag.git#c047ec6",
+    "angular-link-header-parser": "^1.0.2",
+    "angular-cache": "^4.6.0"
   },
   "resolutions": {
     "angular": "~1.5.6"
@@ -47,6 +50,11 @@
         "src-min-noconflict/ext-searchbox.js",
         "src-min-noconflict/mode-yaml.js",
         "src-min-noconflict/theme*"
+      ]
+    },
+    "angular-link-header-parser": {
+      "main": [
+        "release/angular-link-header-parser.js"
       ]
     }
   }
