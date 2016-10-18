@@ -17,7 +17,7 @@
         vm.updateTheme = updateTheme;
         vm.saveConfig = saveConfig;
 
-        var aceThemeCache;
+        var aceThemeCache, editor;
 
         function activate() {
             loadConfig();
@@ -64,6 +64,7 @@
         }
 
         function aceLoaded(_editor) {
+            editor = _editor;
             //Get all commands, but keep the find command
             var commandsToRemove = [
                 'transposeletters',
@@ -103,7 +104,9 @@
                         .ok('Ok')
                         .textContent('Your config file has been successfully updated');
 
-                    $mdDialog.show(dialog);
+                    $mdDialog.show(dialog).then(function () {
+                        editor.focus();
+                    });;
 
                     delete vm.errorMessage;
                     delete vm.errors;
