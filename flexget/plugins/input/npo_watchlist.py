@@ -16,7 +16,7 @@ import re
 
 log = logging.getLogger('search_npo')
 fragment_regex = re.compile('[A-Z][^/]+/')
-date_regex = re.compile('([1-3]?[0-9]) ([a-z]{3}) ([0-9]{4})')
+date_regex = re.compile('([1-3]?[0-9]) ([a-z]{3})(?: ([0-9]{4})|\W)')
 days_ago_regex = re.compile('([0-9]+) dagen geleden')
 months = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec']
 
@@ -78,7 +78,13 @@ class NPOWatchlist(object):
         if date_match:
             day = int(date_match.group(1))
             month = months.index(date_match.group(2))+1
-            year = int(date_match.group(3))
+            
+            year = date_match.group(3)
+            if year is None:
+                year = date.today().year
+            else:
+                year = int(year)
+            
             return date(year, month, day)
         elif days_ago_match:
             days_ago = int(days_ago_match.group(1))
