@@ -10,7 +10,7 @@ from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIClient, APIResource
-from flexget.api.app import NotFoundError, CannotAddResource, BadRequest, base_message_schema, success_response, etag, \
+from flexget.api.app import NotFoundError, Conflict, BadRequest, base_message_schema, success_response, etag, \
     pagination_headers
 from flexget.event import fire_event
 from flexget.plugin import PluginError
@@ -239,7 +239,7 @@ class SeriesAPI(APIResource):
         return rsp
 
     @api.response(201, model=show_details_schema)
-    @api.response(CannotAddResource)
+    @api.response(Conflict)
     @api.validate(series_input_schema, description=ep_identifier_doc)
     def post(self, session):
         """ Create a new show and set its first accepted episode and/or alternate names """
@@ -249,7 +249,7 @@ class SeriesAPI(APIResource):
         normalized_name = series.normalize_series_name(series_name)
         matches = series.shows_by_exact_name(normalized_name, session=session)
         if matches:
-            raise CannotAddResource('Show `%s` already exist in DB' % series_name)
+            raise Conflict('Show `%s` already exist in DB' % series_name)
         show = series.Series()
         show.name = series_name
         session.add(show)
@@ -263,7 +263,7 @@ class SeriesAPI(APIResource):
                 series.set_alt_names(alt_names, show, session)
             except PluginError as e:
                 # Alternate name already exist for a different show
-                raise CannotAddResource(e.value)
+                raise Conflict(e.value)
         session.commit()
         rsp = jsonify(series_details(show, begin=ep_id is not None))
         rsp.status_code = 201
@@ -335,7 +335,7 @@ class SeriesShowAPI(APIResource):
         return success_response('successfully removed series %s from DB' % show_id)
 
     @api.response(200, 'Episodes for series will be accepted starting with ep_id', show_details_schema)
-    @api.response(CannotAddResource)
+    @api.response(Conflict)
     @api.validate(series_edit_schema, description=ep_identifier_doc)
     @api.doc(description='Set a begin episode or alternate names using a show ID. Note that alternate names override '
                          'the existing names (if name does not belong to a different show).')
@@ -355,7 +355,7 @@ class SeriesShowAPI(APIResource):
                 series.set_alt_names(alt_names, show, session)
             except PluginError as e:
                 # Alternate name already exist for a different show
-                raise CannotAddResource(e.value)
+                raise Conflict(e.value)
         return jsonify(series_details(show, begin=ep_id is not None))
 
 

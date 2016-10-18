@@ -12,7 +12,7 @@ from flask_restplus import inputs
 from queue import Queue, Empty
 
 from flexget.api import api, APIResource
-from flexget.api.app import APIError, NotFoundError, CannotAddResource, BadRequest, success_response, \
+from flexget.api.app import APIError, NotFoundError, Conflict, BadRequest, success_response, \
     base_message_schema, etag
 from flexget.config_schema import process_config
 from flexget.entry import Entry
@@ -186,7 +186,7 @@ class TasksAPI(APIResource):
 
     @api.validate(task_input_schema, description='New task object')
     @api.response(201, description='Newly created task', model=task_return_schema)
-    @api.response(CannotAddResource)
+    @api.response(Conflict)
     @api.response(APIError)
     def post(self, session=None):
         """ Add new task """
@@ -195,7 +195,7 @@ class TasksAPI(APIResource):
         task_name = data['name']
 
         if task_name in self.manager.user_config.get('tasks', {}):
-            raise CannotAddResource('task already exists')
+            raise Conflict('task already exists')
 
         if 'tasks' not in self.manager.user_config:
             self.manager.user_config['tasks'] = {}

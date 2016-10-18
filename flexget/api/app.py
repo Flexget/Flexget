@@ -289,7 +289,7 @@ class BadRequest(APIError):
     description = 'Bad request'
 
 
-class CannotAddResource(APIError):
+class Conflict(APIError):
     status_code = 409
     description = 'Conflict'
 
@@ -368,7 +368,7 @@ def success_response(message, status_code=200, status='success'):
 @api.errorhandler(ValidationError)
 @api.errorhandler(BadRequest)
 @api.errorhandler(Unauthorized)
-@api.errorhandler(CannotAddResource)
+@api.errorhandler(Conflict)
 @api.errorhandler(NotModified)
 @api.errorhandler(PreconditionFailed)
 def api_errors(error):

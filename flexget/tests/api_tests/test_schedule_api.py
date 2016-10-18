@@ -308,7 +308,7 @@ class TestNegativeBooleanSchedule(object):
 
     def test_schedules_get(self, api_client, schema_match):
         rsp = api_client.get('/schedules/')
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -321,7 +321,7 @@ class TestNegativeBooleanSchedule(object):
         }
 
         rsp = api_client.json_post('/schedules/', data=json.dumps(payload))
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -329,7 +329,7 @@ class TestNegativeBooleanSchedule(object):
 
     def test_schedules_id_get(self, api_client, schema_match):
         rsp = api_client.get('/schedules/1/')
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -341,7 +341,7 @@ class TestNegativeBooleanSchedule(object):
             'interval': {'minutes': 10}
         }
         rsp = api_client.json_put('/schedules/1/', data=json.dumps(payload))
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)
@@ -349,8 +349,8 @@ class TestNegativeBooleanSchedule(object):
 
     def test_schedules_id_delete(self, api_client, schema_match):
         # Get schedules to get their IDs
-        rsp = api_client.get('/schedules/')
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        rsp = api_client.delete('/schedules/1/')
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)

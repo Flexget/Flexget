@@ -10,7 +10,7 @@ from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
-from flexget.api.app import CannotAddResource, NotFoundError, base_message_schema, success_response, BadRequest, etag, \
+from flexget.api.app import Conflict, NotFoundError, base_message_schema, success_response, BadRequest, etag, \
     pagination_headers
 from flexget.plugins.list import movie_list as ml
 from flexget.plugins.list.movie_list import MovieListBase
@@ -113,7 +113,7 @@ class MovieListAPI(APIResource):
 
     @api.validate(new_list_schema)
     @api.response(201, model=list_object_schema)
-    @api.response(CannotAddResource)
+    @api.response(Conflict)
     def post(self, session=None):
         """ Create a new list """
         data = request.json
@@ -123,7 +123,7 @@ class MovieListAPI(APIResource):
         except NoResultFound:
             movie_list = None
         if movie_list:
-            raise CannotAddResource('list with name \'%s\' already exists' % name)
+            raise Conflict('list with name \'%s\' already exists' % name)
         movie_list = ml.MovieListList(name=name)
         session.add(movie_list)
         session.commit()
@@ -225,7 +225,7 @@ class MovieListMoviesAPI(APIResource):
     @api.validate(model=input_movie_entry_schema, description=movie_identifiers_doc)
     @api.response(201, model=movie_list_object_schema)
     @api.response(NotFoundError)
-    @api.response(CannotAddResource)
+    @api.response(Conflict)
     @api.response(BadRequest)
     def post(self, list_id, session=None):
         """ Add movies to list by ID """
@@ -242,7 +242,7 @@ class MovieListMoviesAPI(APIResource):
         title, year = data['movie_name'], data.get('movie_year')
         movie = ml.get_movie_by_title_and_year(list_id=list_id, title=title, year=year, session=session)
         if movie:
-            raise CannotAddResource('movie with name "%s" already exist in list %d' % (title, list_id))
+            raise Conflict('movie with name "%s" already exist in list %d' % (title, list_id))
         movie = ml.MovieListMovie()
         movie.title = title
         movie.year = year

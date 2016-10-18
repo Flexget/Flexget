@@ -7,7 +7,7 @@ from flask import request, jsonify
 
 from flexget.plugins.daemon.scheduler import schedule_schema, scheduler, scheduler_job_map, DEFAULT_SCHEDULES
 from flexget.api import api, APIResource
-from flexget.api.app import NotFoundError, APIError, base_message_schema, success_response, etag, BadRequest
+from flexget.api.app import NotFoundError, APIError, base_message_schema, success_response, etag, Conflict
 
 schedule_api = api.namespace('schedules', description='Task Scheduler')
 
@@ -42,10 +42,10 @@ schedule_desc = "Schedule ID changes upon daemon restart. The schedules object s
 
 @schedule_api.route('/')
 @api.doc(description=schedule_desc)
+@api.response(Conflict)
 class SchedulesAPI(APIResource):
     @etag
     @api.response(200, model=api_schedules_list_schema)
-    @api.response(BadRequest)
     def get(self, session=None):
         """ List schedules """
         schedule_list = []
@@ -56,7 +56,7 @@ class SchedulesAPI(APIResource):
         if schedules is True:
             schedules = DEFAULT_SCHEDULES
         elif schedules is False:
-            raise BadRequest('Schedules are disables in config')
+            raise Conflict('Schedules are disables in config')
 
         for schedule in schedules:
             # Copy the object so we don't apply id to the config
@@ -80,7 +80,7 @@ class SchedulesAPI(APIResource):
         if schedules is True:
             self.manager.config['schedules'] = DEFAULT_SCHEDULES
         elif schedules is False:
-            raise BadRequest('Schedules are disables in config')
+            raise Conflict('Schedules are disables in config')
 
         self.manager.config['schedules'].append(data)
         schedules = self.manager.config['schedules']
@@ -100,6 +100,7 @@ class SchedulesAPI(APIResource):
 @api.doc(params={'schedule_id': 'ID of Schedule'})
 @api.doc(description=schedule_desc)
 @api.response(NotFoundError)
+@api.response(Conflict)
 class ScheduleAPI(APIResource):
     @etag
     @api.response(200, model=api_schedule_schema)
@@ -111,7 +112,7 @@ class ScheduleAPI(APIResource):
         if schedules is True:
             schedules = DEFAULT_SCHEDULES
         elif schedules is False:
-            raise BadRequest('Schedules are disables in config')
+            raise Conflict('Schedules are disables in config')
 
         schedule, _ = _schedule_by_id(schedule_id, schedules)
         if schedule is None:
@@ -148,7 +149,7 @@ class ScheduleAPI(APIResource):
         if schedules is True:
             self.manager.config['schedules'] = DEFAULT_SCHEDULES
         elif schedules is False:
-            raise BadRequest('Schedules are disables in config')
+            raise Conflict('Schedules are disables in config')
 
         schedule, idx = _schedule_by_id(schedule_id, self.manager.config['schedules'])
         if not schedule:
@@ -170,9 +171,9 @@ class ScheduleAPI(APIResource):
 
         # Checks for boolean config
         if schedules is True:
-            raise BadRequest('Schedules usage is set to default, cannot delete')
+            raise Conflict('Schedules usage is set to default, cannot delete')
         elif schedules is False:
-            raise BadRequest('Schedules are disables in config')
+            raise Conflict('Schedules are disables in config')
 
         for i in range(len(self.manager.config.get('schedules', []))):
             if id(self.manager.config['schedules'][i]) == schedule_id:
