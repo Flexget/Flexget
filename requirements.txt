@@ -18,7 +18,7 @@ path.py>=8.1.1
 pathlib>=1.0
 guessit<=2.0.4
 apscheduler>=3.2.0
-terminaltables>=3.0.0
+terminaltables>=3.1.0
 colorclass>=2.2.0
 # WebUI Requirements
 cherrypy>=3.7.0

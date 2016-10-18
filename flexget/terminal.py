@@ -10,7 +10,7 @@ from colorclass.toggles import disable_if_no_tty
 from flexget.logger import local_context
 from flexget.options import ArgumentParser
 from flexget.utils.tools import io_encoding
-from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable
+from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable, PorcelainTable
 from terminaltables.terminal_io import terminal_size
 
 # Enable terminal colors on windows
@@ -81,11 +81,6 @@ class TerminalTable(object):
     @property
     def output(self):
         self.table.title = self.title
-        if self.type == 'porcelain':
-            # porcelain is a special case of AsciiTable
-            self.table.inner_footing_row_border = False
-            self.table.inner_heading_row_border = False
-            self.table.outer_border = False
         return '\n' + self.table.table
 
     @staticmethod
@@ -93,7 +88,7 @@ class TerminalTable(object):
         """This method hold the dict for supported table type."""
         return {
             'plain': AsciiTable,
-            'porcelain': AsciiTable,
+            'porcelain': PorcelainTable,
             'single': SingleTable,
             'double': DoubleTable,
             'github': GithubFlavoredMarkdownTable
