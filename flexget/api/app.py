@@ -437,11 +437,12 @@ def pagination_headers(total_pages, total_items, page_count, request):
     LINKTEMPLATE = '<{}?per_page={}&'.format(url, per_page)
 
     # Removed page and per_page from query string
-    query_string = re.sub(b'&?per_page=\d+&?', b'', request.query_string)
-    query_string = re.sub(b'&?page=\d+&?', b'', query_string)
+    query_string = re.sub(b'per_page=\d+', b'', request.query_string)
+    query_string = re.sub(b'page=\d+', b'', query_string)
+    query_string = re.sub(b'&{2,}', b'&', query_string)
 
     # Add all original query params
-    LINKTEMPLATE = LINKTEMPLATE.rstrip('&') + query_string.decode() + '&page={}>; rel="{}"'
+    LINKTEMPLATE += query_string.decode().lstrip('&') + '&page={}>; rel="{}"'
 
     link_string = ''
 
