@@ -152,6 +152,7 @@ class NPOWatchlist(object):
             e['series_name'] = series_name
             e['series_name_plain'] = self._strip_accents(series_name)
             e['series_date'] = entry_date
+            e['series_id_type'] = 'date'
             e['description'] = listItem.find('p').text
             e['remove_url'] = self._prefix_url('https://mijn.npo.nl', remove_url)
 
@@ -202,6 +203,7 @@ class NPOWatchlist(object):
             e['series_name'] = series_name
             e['series_name_plain'] = self._strip_accents(series_name)
             e['series_date'] = entry_date
+            e['series_id_type'] = 'date'
             e['description'] = listItem.find('p').text
 
             entries.append(e)
@@ -238,6 +240,7 @@ class NPOWatchlist(object):
             e['series_name'] = series_name
             e['series_name_plain'] = self._strip_accents(series_name)
             e['series_date'] = entry_date
+            e['series_id_type'] = 'date'
             e['description'] = listItem.find('p').text
 
             entries.append(e)
