@@ -288,7 +288,7 @@ class TestPositiveBooleanSchedule(object):
         schedule_id = data[0]['id']
 
         rsp = api_client.delete('/schedules/{}/'.format(schedule_id))
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        assert rsp.status_code == 409, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(base_message, data)

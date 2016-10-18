@@ -78,9 +78,11 @@ class SchedulesAPI(APIResource):
 
         # Checks for boolean config
         if schedules is True:
-            self.manager.config['schedules'] = DEFAULT_SCHEDULES
+            schedules = DEFAULT_SCHEDULES
         elif schedules is False:
             raise Conflict('Schedules are disables in config')
+
+        self.manager.config['schedules'] = schedules
 
         self.manager.config['schedules'].append(data)
         schedules = self.manager.config['schedules']
