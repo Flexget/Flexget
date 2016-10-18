@@ -4,19 +4,20 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, func, or_
+from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, Date, func, or_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
+from dateutil.parser import parse as dateutil_parse
 
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
-from flexget.utils.database import text_date_synonym, year_property, with_session
+from flexget.utils.database import year_property, with_session
 
 log = logging.getLogger('api_tmdb')
-Base = db_schema.versioned_base('api_tmdb', 2)
+Base = db_schema.versioned_base('api_tmdb', 3)
 
 # This is a FlexGet API key
 API_KEY = 'bdfc018dbdb7c243dc7cb1454ff74b95'
@@ -41,7 +42,7 @@ def tmdb_request(endpoint, **params):
 
 @db_schema.upgrade('api_tmdb')
 def upgrade(ver, session):
-    if ver is None or ver <= 1:
+    if ver is None or ver <= 2:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -62,8 +63,7 @@ class TMDBMovie(Base):
     name = Column(Unicode)
     original_name = Column(Unicode)
     alternative_name = Column(Unicode)
-    _released = Column('released', DateTime)
-    released = text_date_synonym('_released')
+    released = Column(Date)
     year = year_property('released')
     certification = Column(Unicode)
     runtime = Column(Integer)
@@ -95,7 +95,7 @@ class TMDBMovie(Base):
         self.imdb_id = movie['imdb_id']
         self.name = movie['title']
         self.original_name = movie['original_title']
-        self.released = movie['release_date']
+        self.released = dateutil_parse(movie['release_date']).date()
         self.runtime = movie['runtime']
         self.language = movie['original_language']
         self.overview = movie['overview']
@@ -216,11 +216,11 @@ class ApiTmdb(object):
             # Movie found in cache, check if cache has expired.
             refresh_time = timedelta(days=2)
             if movie.released:
-                if movie.released > datetime.now() - timedelta(days=7):
+                if movie.released > datetime.now().date() - timedelta(days=7):
                     # Movie is less than a week old, expire after 1 day
                     refresh_time = timedelta(days=1)
                 else:
-                    age_in_years = (datetime.now() - movie.released).days / 365
+                    age_in_years = (datetime.now().date() - movie.released).days / 365
                     refresh_time += timedelta(days=age_in_years * 5)
             if movie.updated < datetime.now() - refresh_time and not only_cached:
                 log.debug('Cache has expired for %s, attempting to refresh from TMDb.', movie.name)
