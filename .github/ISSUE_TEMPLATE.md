@@ -28,7 +28,7 @@ use paste service if log is too long
 <!---
 Please verify that the following data is present before submitting your issue:
 
-- Paste or link to a paste service (http://pastebin.com/ for example) of relevant config (preferably full config including templates if present. Remember to redact any personal information!
+- Paste or link to a paste service (http://pastebin.com/ for example) of relevant config (preferably full config including templates if present. Remember to redact any personal information! Please make sure the paste does not expire, if possible.
 - Paste or link to a paste service of debug level logs of relevant task/s. Use `flexget -L debug execute --tasks <Task_name>`
 - Flexget version (Use `flexget -V` to get it).
 - Full Python version (`2.7.11` for example). Run `python -V` to get it.
