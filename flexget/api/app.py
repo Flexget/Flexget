@@ -213,7 +213,7 @@ class API(RestPlusAPI):
         :param default: The default sort string, used `sort_choices[0]` if not given
         :return: An api.parser() instance with pagination and sorting arguments.
         """
-        pagination = parser.copy() if parser else api.parser()
+        pagination = parser.copy() if parser else self.parser()
         pagination.add_argument('page', type=int, default=1, help='Page number')
         pagination.add_argument('per_page', type=int, default=50, help='Results per page')
         if sort_choices or add_sort:
@@ -235,9 +235,9 @@ Compress(api_app)
 
 api = API(
     api_app,
-    title='API',
+    title='Flexget API v{}'.format(__version__),
     version=__version__,
-    description='<font color="red"><b>Warning: under development, subject to change without notice.<b/></font>'
+    description='View and manage flexget core operations and plugins'
 )
 
 base_message = {
