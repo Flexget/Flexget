@@ -20,6 +20,7 @@ import hashlib
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 import io
+import string
 
 import sqlalchemy
 import yaml
@@ -685,7 +686,7 @@ class Manager(object):
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
         try:
-            if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 7, 0]:
+            if [int(part) for part in sqlalchemy.__version__.translate(None, string.letters).split('.')] < [0, 7, 0]:
                 print('FATAL: SQLAlchemy 0.7.0 or newer required. Please upgrade your SQLAlchemy.', file=sys.stderr)
                 sys.exit(1)
         except ValueError as e:
