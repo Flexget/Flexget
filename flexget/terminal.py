@@ -67,7 +67,7 @@ class TerminalTable(object):
 
         # Force table type to be ASCII when not TTY and type isn't already ASCII
         if table_type not in self.ASCII_TYPES and not sys.stdout.isatty():
-            self.type = 'plain'
+            self.type = 'porcelain'
         else:
             self.type = table_type
 
