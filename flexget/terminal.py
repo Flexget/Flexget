@@ -57,6 +57,7 @@ class TerminalTable(object):
     """
 
     MIN_WIDTH = 10
+    ASCII_TYPES = ['plain', 'porcelain']
 
     def __init__(self, table_type, table_data, title=None, wrap_columns=None, drop_columns=None):
         self.title = title
@@ -64,8 +65,8 @@ class TerminalTable(object):
         self.drop_columns = drop_columns or []
         self.table_data = table_data
 
-        # Force table type to be ASCII when not TTY
-        if not sys.stdout.isatty() or not sys.stderr.isatty():
+        # Force table type to be ASCII when not TTY and type isn't already ASCII
+        if table_type not in self.ASCII_TYPES and not sys.stdout.isatty():
             self.type = 'plain'
         else:
             self.type = table_type
