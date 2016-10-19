@@ -21,6 +21,7 @@ class CrossMatch(object):
         fields:
           - title
         action: reject
+        exact: yes
     """
 
     schema = {
@@ -28,7 +29,9 @@ class CrossMatch(object):
         'properties': {
             'fields': {'type': 'array', 'items': {'type': 'string'}},
             'action': {'enum': ['accept', 'reject']},
-            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}}
+            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
+            'exact': {'type': 'boolean', 'default': True}
+
         },
         'required': ['fields', 'action', 'from'],
         'additionalProperties': False
@@ -66,7 +69,7 @@ class CrossMatch(object):
         for entry in task.entries:
             for generated_entry in match_entries:
                 log.trace('checking if %s matches %s' % (entry['title'], generated_entry['title']))
-                common = self.entry_intersects(entry, generated_entry, fields)
+                common = self.entry_intersects(entry, generated_entry, fields, config.get('exact'))
                 if common:
                     msg = 'intersects with %s on field(s) %s' % \
                           (generated_entry['title'], ', '.join(common))
@@ -78,7 +81,7 @@ class CrossMatch(object):
                     if action == 'accept':
                         entry.accept(msg)
 
-    def entry_intersects(self, e1, e2, fields=None):
+    def entry_intersects(self, e1, e2, fields=None, exact=True):
         """
         :param e1: First :class:`flexget.entry.Entry`
         :param e2: Second :class:`flexget.entry.Entry`
@@ -99,10 +102,17 @@ class CrossMatch(object):
             log.trace('v1: %r' % v1)
             log.trace('v2: %r' % v2)
 
-            if v1 == v2:
-                common_fields.append(field)
+            if not exact:
+                if v2 in v1:
+                    common_fields.append(field)
+                else:
+                    log.trace('not matching')
             else:
-                log.trace('not matching')
+                if v1 == v2:
+                    common_fields.append(field)
+                else:
+                    log.trace('not matching')
+
         return common_fields
 
 
