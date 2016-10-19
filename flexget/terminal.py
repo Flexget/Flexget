@@ -13,12 +13,12 @@ from flexget.utils.tools import io_encoding
 from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable, PorcelainTable
 from terminaltables.terminal_io import terminal_size
 
-# Enable terminal colors on windows
-if sys.platform == 'win32':
-    Windows.enable(auto_colors=True)
-
 # Disables colors on no TTY output
-disable_if_no_tty()
+color_disabled = disable_if_no_tty()
+
+# Enable terminal colors on windows
+if sys.platform == 'win32' and color_disabled is False:
+    Windows.enable(auto_colors=True)
 
 
 class TerminalTable(object):
@@ -60,10 +60,16 @@ class TerminalTable(object):
 
     def __init__(self, table_type, table_data, title=None, wrap_columns=None, drop_columns=None):
         self.title = title
-        self.type = table_type
         self.wrap_columns = wrap_columns or []
         self.drop_columns = drop_columns or []
         self.table_data = table_data
+
+        # Force table type to be ASCII when not TTY
+        if not sys.stdout.isatty() or not sys.stderr.isatty():
+            self.type = 'plain'
+        else:
+            self.type = table_type
+
         self.init_table()
 
     def init_table(self):
@@ -236,6 +242,8 @@ def colorize(color, text, auto=True):
     :param auto: Whether to apply auto colors
     :return: Colored text
     """
+    if color_disabled is True:
+        return text
     return Color.colorize(color, text, auto)
 
 
