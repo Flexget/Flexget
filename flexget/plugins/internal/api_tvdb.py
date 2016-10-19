@@ -56,7 +56,9 @@ class TVDBRequest(object):
 
     def _request(self, method, endpoint, **params):
         url = TVDBRequest.BASE_URL + endpoint
-        headers = {'Authorization': 'Bearer %s' % self.get_auth_token()}
+        language = params.pop('language', 'en')
+        headers = {'Authorization': 'Bearer %s' % self.get_auth_token(),
+                   'Accept-Language': language}
         data = params.pop('data', None)
 
         result = requests.request(method, url, params=params, headers=headers, raise_status=False, json=data)
@@ -140,7 +142,7 @@ class TVDBSeries(Base):
 
     episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
-    def __init__(self, tvdb_id):
+    def __init__(self, tvdb_id, language):
         """
         Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
@@ -148,11 +150,11 @@ class TVDBSeries(Base):
         self.id = tvdb_id
 
         try:
-            series = TVDBRequest().get('series/%s' % self.id)
+            series = TVDBRequest().get('series/%s' % self.id, language=language)
         except requests.RequestException as e:
             raise LookupError('Error updating data from tvdb: %s' % e)
 
-        self.language = 'en'
+        self.language = language
         self.last_updated = series['lastUpdated']
         self.name = series['seriesName']
         self.rating = float(series['siteRating']) if series['siteRating'] else 0.0
@@ -405,10 +407,10 @@ class TVDBSeriesSearchResult(Base):
         return False
 
 
-def find_series_id(name):
+def find_series_id(name, language=None):
     """Looks up the tvdb id for a series"""
     try:
-        series = TVDBRequest().get('search/series', name=name)
+        series = TVDBRequest().get('search/series', name=name, language=language)
     except requests.RequestException as e:
         raise LookupError('Unable to get search results for %s: %s' % (name, e))
 
@@ -461,7 +463,7 @@ def _update_search_strings(series, session, search=None):
 
 
 @with_session
-def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
+def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, language=None):
     """
     Look up information on a series. Will be returned from cache if available, and looked up online and cached if not.
 
@@ -500,7 +502,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         if not only_cached and series.expired:
             log.verbose('Data for %s has expired, refreshing from tvdb', series.name)
             try:
-                updated_series = TVDBSeries(series.id)
+                updated_series = TVDBSeries(series.id, language)
                 series = session.merge(updated_series)
                 _update_search_strings(series, session, search=name)
             except LookupError as e:
@@ -513,13 +515,13 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         # There was no series found in the cache, do a lookup from tvdb
         log.debug('Series %s not found in cache, looking up from tvdb.', id_str())
         if tvdb_id:
-            series = session.merge(TVDBSeries(tvdb_id))
+            series = session.merge(TVDBSeries(tvdb_id, language))
         elif name:
-            tvdb_id = find_series_id(name)
+            tvdb_id = find_series_id(name, language=language)
             if tvdb_id:
                 series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
                 if not series:
-                    series = session.merge(TVDBSeries(tvdb_id))
+                    series = session.merge(TVDBSeries(tvdb_id, language))
         if series:
             _update_search_strings(series, session, search=name)
 
@@ -533,7 +535,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
 
 @with_session
 def lookup_episode(name=None, season_number=None, episode_number=None, absolute_number=None,
-                   tvdb_id=None, first_aired=None, only_cached=False, session=None):
+                   tvdb_id=None, first_aired=None, only_cached=False, session=None, language=None):
     """
     Look up information on an episode. Will be returned from cache if available, and looked up online and cached if not.
 
@@ -603,7 +605,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
         # There was no episode found in the cache, do a lookup from tvdb
         log.debug('Episode %s not found in cache, looking up from tvdb.', ep_description)
         try:
-            results = TVDBRequest().get('series/%s/episodes/query' % series.id, **query_params)
+            results = TVDBRequest().get('series/%s/episodes/query' % series.id, language=language, **query_params)
             if results:
                 # Check if this episode id is already in our db
                 episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == results[0]['id']).first()
