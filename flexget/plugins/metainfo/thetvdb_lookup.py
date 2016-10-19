@@ -102,7 +102,7 @@ class PluginThetvdbLookup(object):
         {'type': 'boolean'},
         {'type': 'object',
          'properties': {
-             'language': {'type': 'string'}
+             'language': {'type': 'string', 'default': 'en'}
          }}
     ]}
 
