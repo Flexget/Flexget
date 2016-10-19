@@ -474,6 +474,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
         in the cache.
     :param session: An sqlalchemy session to be used to lookup and store to cache. Commit(s) may occur when passing in
         a session. If one is not supplied it will be created.
+    :param language: Language abbreviation string to be sent to API
 
     :return: Instance of :class:`TVDBSeries` populated with series information. If session was not supplied, this will
         be a detached from the database, so relationships cannot be loaded.
@@ -553,6 +554,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
     :param session: An sqlalchemy session to be used to lookup and store to cache. Commit(s) may occur when passing in
         a session. If one is not supplied it will be created, however if you need to access relationships you should
         pass one in.
+    :param language: Language abbreviation string to be sent to API
 
     :return: Instance of :class:`TVDBEpisode` populated with series information.
     :raises: :class:`LookupError` if episode cannot be looked up.
