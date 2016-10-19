@@ -17,14 +17,14 @@
         vm.getHistory = getHistory;
         vm.changeOrder = changeOrder;
 
-         vm.sortOptions = [
+        vm.sortOptions = [
             "Task",
             "Filename",
             "Url",
             "Title",
             "Time",
             "Details"
-        ]
+        ];
 
         vm.sortOption = "Time";
         vm.searchTerm = "";

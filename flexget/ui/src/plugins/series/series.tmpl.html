@@ -4,11 +4,24 @@
     	Please note that performed operations on this page might not be persistent. Depending on your config, settings might get overriden and data might be recreated.
     </span>
 	</md-toolbar>
+	<md-toolbar class="md-warn md-hue-3">
+        <div class="md-toolbar-tools operation-toolbar">
+           <md-input-container md-no-float>
+                <input ng-model="vm.searchTerm" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }" placeholder="Search for a show">
+            </md-input-container>
+            <span flex></span>
+            <md-input-container>
+                <md-select ng-model="vm.sortOption" ng-change="vm.getSeries()">
+                    <md-option ng-value="option.small" ng-repeat="option in vm.sortOptions | orderBy: 'nice'">{{ option.nice }}</md-option>
+                </md-select>
+            </md-input-container>
+            <md-button class="md-icon-button" aria-label="Order" ng-click="vm.changeOrder()">
+                <md-icon md-font-icon="fa-chevron-down" class="fa fa-lg" ng-if="vm.order === 'desc'"></md-icon>
+                <md-icon md-font-icon="fa-chevron-up" class="fa fa-lg" ng-if="vm.order === 'asc'"></md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
 	<md-content layout="column" flex layout-padding>
-		<md-input-container>
-			<label>Search</label>
-			<input ng-model="vm.searchTerm" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }">
-		</md-input-container>
 		<div layout="row" layout-wrap layout-padding>
 			<series-entry show="show" 
 				forget-show="vm.forgetShow(show)" 
