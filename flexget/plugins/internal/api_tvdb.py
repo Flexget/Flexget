@@ -154,7 +154,7 @@ class TVDBSeries(Base):
         except requests.RequestException as e:
             raise LookupError('Error updating data from tvdb: %s' % e)
 
-        self.language = language
+        self.language = language or 'en'
         self.last_updated = series['lastUpdated']
         self.name = series['seriesName']
         self.rating = float(series['siteRating']) if series['siteRating'] else 0.0
@@ -624,7 +624,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
 
 
 @with_session
-def search_for_series(search_name=None, imdb_id=None, zap2it_id=None, force_search=None, session=None):
+def search_for_series(search_name=None, imdb_id=None, zap2it_id=None, force_search=None, session=None, language=None):
     """
     Search IMDB using a an identifier, return a list of cached search results. One if `search_name`, `imdb_id` or
     `zap2it_id` is required.
@@ -655,7 +655,7 @@ def search_for_series(search_name=None, imdb_id=None, zap2it_id=None, force_sear
     if not series_search_results or any(series.expired for series in series_search_results):
         try:
             log.debug('trying to fetch TVDB search results from TVDB')
-            fetched_results = TVDBRequest().get(lookup_url)
+            fetched_results = TVDBRequest().get(lookup_url, language=language)
         except requests.RequestException as e:
             raise LookupError('Error searching series from TVDb (%s)' % e)
         series_search_results = [session.merge(TVDBSeriesSearchResult(series, lookup_term)) for series in
