@@ -45,6 +45,11 @@
             }).fail(function (error) {
                 deferred.reject(error);
             });
+            
+            deferred.promise.tasks = function (callback) {
+                stream.on('node', 'tasks', callback);
+                return deferred.promise;
+            };
 
             deferred.promise.log = function (callback) {
                 stream.on('node', 'log', callback);
