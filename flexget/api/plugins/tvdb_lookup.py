@@ -56,7 +56,7 @@ class ObjectsContainer(object):
             'overview': {'type': 'string'},
             'director': {'type': 'string'},
             'rating': {'type': 'number'},
-            'image': {'type': 'string'},
+            'image': {'type': ['string', 'null']},
             'first_aired': {'type': 'string'},
             'series_id': {'type': 'integer'}
         },
