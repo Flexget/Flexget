@@ -2,22 +2,17 @@ from __future__ import unicode_literals, division, absolute_import, print_functi
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import sys
-import math
 from textwrap import wrap
 
 from colorclass import Windows, Color
-from colorclass.toggles import disable_if_no_tty
 from flexget.logger import local_context
 from flexget.options import ArgumentParser
 from flexget.utils.tools import io_encoding
 from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable, PorcelainTable
 from terminaltables.terminal_io import terminal_size
 
-# Disables colors on no TTY output
-color_disabled = disable_if_no_tty()
-
 # Enable terminal colors on windows
-if sys.platform == 'win32' and color_disabled is False:
+if sys.platform == 'win32':
     Windows.enable(auto_colors=True)
 
 
@@ -51,7 +46,7 @@ class TerminalTable(object):
     :param table_data: Table data as a list of lists of strings. See `terminaltables` doc.
     :param title: Optional title for table
     :param wrap_columns: A list of column numbers which will can be wrapped.
-        In case of multuple values even split is used.
+        In case of multiple values even split is used.
     :param drop_columns: A list of column numbers which can be dropped if needed.
         List in order of priority.
     """
@@ -237,13 +232,15 @@ def word_wrap(text, max_length):
 def colorize(color, text, auto=True):
     """
     A simple override of Color.colorize which sets the default auto colors value to True, since it's the more common
-    use case.
+    use case. When output isn't TTY just return text
+
     :param color: Color tag to use
     :param text: Text to color
     :param auto: Whether to apply auto colors
-    :return: Colored text
+
+    :return: Colored text or text
     """
-    if color_disabled is True:
+    if not sys.stdout.isatty():
         return text
     return Color.colorize(color, text, auto)
 
