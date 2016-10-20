@@ -56,7 +56,7 @@ class ObjectsContainer(object):
             'overview': {'type': 'string'},
             'director': {'type': 'string'},
             'rating': {'type': 'number'},
-            'image': {'type': 'string'},
+            'image': {'type': ['string', 'null']},
             'first_aired': {'type': 'string'},
             'series_id': {'type': 'integer'}
         },
@@ -87,7 +87,10 @@ tvdb_series_schema = api.schema('tvdb_series_schema', ObjectsContainer.tvdb_seri
 tvdb_episode_schema = api.schema('tvdb_episode_schema', ObjectsContainer.episode_object)
 search_results_schema = api.schema('tvdb_search_results_schema', ObjectsContainer.search_results_object)
 
-series_parser = api.parser()
+base_parser = api.parser()
+base_parser.add_argument('language', default='en', help='Language abbreviation string for different language support')
+
+series_parser = base_parser.copy()
 series_parser.add_argument('include_actors', type=inputs.boolean, help='Include actors in response')
 
 
@@ -99,25 +102,33 @@ class TVDBSeriesLookupAPI(APIResource):
     @api.response(NotFoundError)
     def get(self, title, session=None):
         args = series_parser.parse_args()
+        language = args['language']
+
         try:
             tvdb_id = int(title)
         except ValueError:
             tvdb_id = None
 
+        kwargs = {'session': session,
+                  'language': language}
+
+        if tvdb_id:
+            kwargs['tvdb_id'] = tvdb_id
+        else:
+            kwargs['name'] = title
+
         try:
-            if tvdb_id:
-                series = lookup_series(tvdb_id=tvdb_id, session=session)
-            else:
-                series = lookup_series(name=title, session=session)
+            series = lookup_series(**kwargs)
         except LookupError as e:
             raise NotFoundError(e.args[0])
+
         result = series.to_dict()
         if args.get('include_actors'):
             result['actors'] = series.actors
         return jsonify(result)
 
 
-episode_parser = api.parser()
+episode_parser = base_parser.copy()
 episode_parser.add_argument('season_number', type=int, help='Season number')
 episode_parser.add_argument('ep_number', type=int, help='Episode number')
 episode_parser.add_argument('absolute_number', type=int, help='Absolute episode number')
@@ -133,6 +144,7 @@ class TVDBEpisodeSearchAPI(APIResource):
     @api.response(BadRequest)
     def get(self, tvdb_id, session=None):
         args = episode_parser.parse_args()
+        language = args['language']
 
         absolute_number = args.get('absolute_number')
         season_number = args.get('season_number')
@@ -143,7 +155,8 @@ class TVDBEpisodeSearchAPI(APIResource):
             raise BadRequest('not enough parameters for lookup. Either season and episode number or absolute number '
                              'are required.')
         kwargs = {'tvdb_id': tvdb_id,
-                  'session': session}
+                  'session': session,
+                  'language': language}
 
         if absolute_number:
             kwargs['absolute_number'] = absolute_number
@@ -160,7 +173,7 @@ class TVDBEpisodeSearchAPI(APIResource):
         return jsonify(episode.to_dict())
 
 
-search_parser = api.parser()
+search_parser = base_parser.copy()
 search_parser.add_argument('search_name', help='Series Name')
 search_parser.add_argument('imdb_id', help='Series IMDB ID')
 search_parser.add_argument('zap2it_id', help='Series ZAP2IT ID')
@@ -177,6 +190,7 @@ class TVDBSeriesSearchAPI(APIResource):
     @api.response(NotFoundError)
     def get(self, session=None):
         args = search_parser.parse_args()
+        language = args['language']
 
         search_name = args.get('search_name')
         imdb_id = args.get('imdb_id')
@@ -190,7 +204,8 @@ class TVDBSeriesSearchAPI(APIResource):
             'imdb_id': imdb_id,
             'zap2it_id': zap2it_id,
             'force_search': force_search,
-            'session': session
+            'session': session,
+            'language': language
         }
         try:
             search_results = search_for_series(**kwargs)

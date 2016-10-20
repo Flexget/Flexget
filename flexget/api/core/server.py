@@ -231,7 +231,7 @@ class ServerVersionAPI(APIResource):
                         'latest_version': latest})
 
 
-@server_api.route('/dump_threads/')
+@server_api.route('/dump_threads/', doc=False)
 class ServerDumpThreads(APIResource):
     @api.response(200, description='Flexget threads dump', model=dump_threads_schema)
     def get(self, session=None):
@@ -250,7 +250,7 @@ class ServerDumpThreads(APIResource):
                 'dump': dump
             })
 
-        return {'threads': threads}
+        return jsonify(threads=threads)
 
 
 server_log_parser = api.parser()

@@ -13,12 +13,18 @@
     function seriesController($mdMedia, $mdDialog, $sce, $timeout, seriesService) {
         var vm = this;
 
-        var options = {
-            'per_page': 10,
-            'in_config': 'all',
-            'sort_by': 'show_name',
-            'descending': false
-        };
+        vm.sortOptions = [
+            {
+                nice: "Show name",
+                small: "show_name"
+            }, {
+                nice: "Latest download date",
+                small: "last_download_date"
+            }
+        ];
+
+        vm.sortOption = "show_name";
+        vm.order = "asc";
 
         var params = {
             forget: true
@@ -31,14 +37,30 @@
         vm.search = search;
         vm.toggleEpisodes = toggleEpisodes;
         vm.areEpisodesOnShowRow = areEpisodesOnShowRow;
-        vm.getSeries = getSeriesList;
+        vm.getSeries = getSeries;
+        vm.changeOrder = changeOrder;
 
         function activate() {
-            getSeriesList(1);
+            getSeries();
         }
 
-        function getSeriesList(page) {
-            options.page = page;
+        function changeOrder() {
+            vm.order === 'desc' ? setOrder('asc') : setOrder('desc');
+
+            function setOrder(direction) {
+                vm.order = direction;
+                getSeries();
+            }
+        }
+
+        function getSeries(page) {
+            var options = {
+                'page': page || 1,
+                'per_page': 10,
+                'in_config': 'all',
+                'sort_by': vm.sortOption,
+                'order': vm.order
+            }
             seriesService.getShows(options)
                 .then(setSeries)
                 .cached(setSeries)
@@ -60,7 +82,7 @@
             }
 
             function emptySearch() {
-                getSeriesList(1);
+                getSeries();
             }
         }
 
@@ -78,7 +100,7 @@
 
             $mdDialog.show(confirm).then(function () {
                 seriesService.deleteShow(show, params).then(function () {
-                    getSeriesList(options.page);
+                    getSeries(vm.currentPage);
                 });
             });
         }

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
@@ -8,7 +9,8 @@ import mock
 import pytest
 
 from flexget.manager import Session
-from flexget.plugins.internal.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, TVDBEpisode, \
+from flexget.plugins.internal.api_tvdb import persist, TVDBSearchResult, lookup_series, mark_expired, TVDBRequest, \
+    TVDBEpisode, \
     find_series_id
 
 
@@ -165,6 +167,10 @@ class TestTVDBLookup(object):
         assert find_series_id('Once Upon A Time 2011') == 248835
         assert find_series_id('House M.D.') == 73255
         assert find_series_id('House') == 73255
+
+    def test_find_series_with_languages(self, mocked_expired, execute_task):
+        assert find_series_id('Tegenlicht', 'nl') == 252712
+        assert find_series_id('החממה', 'he') == 270698
 
 
 @pytest.mark.online
@@ -369,3 +375,61 @@ class TestTVDBFavorites(object):
         task = execute_task('test_strip_dates')
         assert task.find_entry(title='Hawaii Five-0'), \
             'series Hawaii Five-0 (2010) should have date stripped'
+
+
+@mock.patch('flexget.plugins.internal.api_tvdb.mark_expired')
+@pytest.mark.online
+class TestTheTVDBLanguages(object):
+    config = """
+            templates:
+              global:
+                thetvdb_lookup:
+                  language: nl
+                # Access a tvdb field to cause lazy loading to occur
+                set:
+                  afield: "{{ tvdb_id }}{{ tvdb_ep_name }}"
+            tasks:
+              test:
+                mock:
+                  - {title: 'Tegenlicht.S010E01.HDTV.XViD-FlexGet'}
+                series:
+                  - Tegenlicht
+    """
+
+    def test_language_lookup(self, mocked_expired, execute_task):
+        """thetvdb: Test Lookup (ONLINE)"""
+        persist['auth_tokens'] = {'default': None}
+
+        task = execute_task('test')
+
+        entry = task.find_entry(title='Tegenlicht.S010E01.HDTV.XViD-FlexGet')
+        assert entry['tvdb_id'] == 252712
+        assert entry['tvdb_runtime'] == 50
+        assert entry['tvdb_season'] == 10
+        assert entry['tvdb_series_name'] == 'Tegenlicht'
+        assert entry['tvdb_air_time'] == '21:00'
+        assert entry['tvdb_airs_day_of_week'] == 'Sunday'
+        assert entry['tvdb_episode'] == 1
+        assert entry['tvdb_first_air_date'] == datetime(2002, 9, 8, 0, 0)
+        assert entry['tvdb_network'] == 'VPRO'
+        assert entry['tvdb_genres'] == ['Documentary']
+        assert entry['tvdb_overview'] == 'Tegenlicht is de reeks informatieve programma\'s van VPRO Televisie, ' \
+                                         'waarin nieuwe ideeën en trends worden onderzocht binnen de wereld van' \
+                                         ' politiek, economie, maatschappij en wetenschap. \r\nTegenlicht beschouwt ' \
+                                         'zichzelf nadrukkelijk als de eerste en enige future affairs-rubriek binnen ' \
+                                         'het bestel. Het programma nestelt zich daarmee aan de frontlinie, en zoekt' \
+                                         ' zijn verhalen op die plekken waar ideeën worden ontwikkeld, getest en ' \
+                                         'bekritiseerd. Via niet voor de hand liggende, controversiële en ' \
+                                         'tegelijkertijd gedegen analyses wil Tegenlicht zijn kijk geven op de ' \
+                                         'wereld; zowel op nationale als op internationale ontwikkelingen die' \
+                                         ' onze wereld in de 21ste eeuw vormgeven.\r\n\r\nTegenlicht is een programma' \
+                                         ' zonder een vast \'format\'. Afhankelijk van het onderwerp wordt steeds een ' \
+                                         'passende vorm gekozen, waardoor langere reportages uit binnen- en buitenland ' \
+                                         'worden afgewisseld met debatten, en met uitzendingen waarbij één persoon ' \
+                                         'alle ruimte krijgt zijn of haar visie op een onderwerp te geven.'
+
+        assert entry['tvdb_ep_air_date'] == datetime(2011, 9, 4, 0, 0)
+        assert entry['tvdb_ep_id'] == 'S10E01'
+        assert entry['tvdb_ep_name'] == 'Gasland'
+        assert entry['tvdb_ep_overview'] == 'Indrukwekkende documentaire over de gevolgen van schaliegaswinning in ' \
+                                            'de VS\r\n'

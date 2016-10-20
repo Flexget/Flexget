@@ -10,27 +10,46 @@
             controller: historyController
         });
 
-    function historyController(historyService) {
+    function historyController($filter, historyService) {
         var vm = this;
 
         vm.$onInit = activate;
-        vm.search = search;
         vm.getHistory = getHistory;
+        vm.changeOrder = changeOrder;
 
-        var options = {};
+        vm.sortOptions = [
+            "Task",
+            "Filename",
+            "Url",
+            "Title",
+            "Time",
+            "Details"
+        ];
+
+        vm.sortOption = "Time";
+        vm.searchTerm = "";
+        vm.order = "desc";
 
         function activate() {
-            getHistory(1);
+            getHistory();
         }
 
-        function search(taskName) {
-            options.task = taskName || undefined;
+        function changeOrder() {
+            vm.order === 'desc' ? setOrder('asc') : setOrder('desc');
 
-            getHistory(1);
+            function setOrder(direction) {
+                vm.order = direction;
+                getHistory();
+            }
         }
 
         function getHistory(page) {
-            options.page = page;
+            var options = {
+                page: page || 1,
+                task: vm.searchTerm || undefined,
+                sort_by: $filter('lowercase')(vm.sortOption),
+                order: vm.order
+            }
             historyService.getHistory(options)
                 .then(setEntries)
                 .cached(setEntries)
