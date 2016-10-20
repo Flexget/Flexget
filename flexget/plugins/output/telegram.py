@@ -288,20 +288,21 @@ class SendTelegram(object):
             msg = self._render_msg(entry, self._tmpl)
             for chat_id in (x.id for x in chat_ids):
                 try:
+                    self.log.debug('sending msg to telegram servers: %s', msg)
                     self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
                 except TelegramError as e:
                     if kwargs.get('parse_mode'):
                         self.log.warning(
-                            'Failed to render message using parse mode %s. Falling back to basic parsing: %s' % (
-                                kwargs['parse_mode'], e.message))
+                            'Failed to render message using parse mode %s. Falling back to basic parsing: %s',
+                            kwargs['parse_mode'], e.message)
                         del kwargs['parse_mode']
                         try:
                             self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
                         except TelegramError as e:
-                            self.log.error('Cannot send message, : %s' % e.message)
+                            self.log.error('Cannot send message, : %s', e.message)
                             continue
                     else:
-                        self.log.error('Cannot send message, : %s' % e.message)
+                        self.log.error('Cannot send message, : %s', e.message)
                         continue
 
     def _render_msg(self, entry, tmpl):
