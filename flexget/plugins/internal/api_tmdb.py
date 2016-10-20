@@ -117,6 +117,32 @@ class TMDBMovie(Base):
         self.posters = [TMDBPoster(**p) for p in movie['images']['posters'][:5]]
         self.updated = datetime.now()
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'imdb_id': self.imdb_id,
+            'url': self.url,
+            'name': self.name,
+            'original_name': self.original_name,
+            'alternative_name': self.alternative_name,
+            'year': self.year,
+            'certification': self.certification,
+            'runtime': self.runtime,
+            'language': self.language,
+            'overview': self.overview,
+            'tagline': self.tagline,
+            'rating': self.rating,
+            'votes': self.votes,
+            'popularity': self.popularity,
+            'adult': self.adult,
+            'budget': self.budget,
+            'revenue': self.revenue,
+            'homepage': self.homepage,
+            'posters': [p.to_dict() for p in self.posters],
+            'genres': [g for g in self.genres],
+            'updated': self.updated
+        }
+
 
 class TMDBGenre(Base):
     __tablename__ = 'tmdb_genres'
@@ -141,6 +167,20 @@ class TMDBPoster(Base):
     @property
     def url(self):
         return get_tmdb_config()['images']['base_url'] + 'original' + self.file_path
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'url': self.url,
+            'movie_id': self.movie_id,
+            'file_path': self.file_path,
+            'width': self.width,
+            'height': self.height,
+            'aspect_ratio': self.aspect_ratio,
+            'vote_average': self.vote_average,
+            'vote_count': self.vote_count,
+            'language_code': self.iso_639_1
+        }
 
 
 class TMDBSearchResult(Base):
@@ -207,7 +247,7 @@ class ApiTmdb(object):
                 movie_filter = movie_filter.filter(TMDBMovie.year == year)
             movie = movie_filter.first()
             if not movie:
-                search_string = title + ' ({})'.format(year) if year else ''
+                search_string = title + ' ({})'.format(year) if year else title
                 found = session.query(TMDBSearchResult). \
                     filter(TMDBSearchResult.search == search_string.lower()).first()
                 if found and found.movie:
@@ -245,7 +285,7 @@ class ApiTmdb(object):
                 if result['movie_results']:
                     tmdb_id = result['movie_results'][0]['id']
             if not tmdb_id:
-                search_string = title + ' ({})'.format(year) if year else ''
+                search_string = title + ' ({})'.format(year) if year else title
                 searchparams = {'query': title}
                 if year:
                     searchparams['year'] = year
