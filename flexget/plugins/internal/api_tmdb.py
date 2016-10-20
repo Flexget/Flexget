@@ -17,7 +17,7 @@ from flexget.utils import requests
 from flexget.utils.database import year_property, with_session
 
 log = logging.getLogger('api_tmdb')
-Base = db_schema.versioned_base('api_tmdb', 3)
+Base = db_schema.versioned_base('api_tmdb', 4)
 
 # This is a FlexGet API key
 API_KEY = 'bdfc018dbdb7c243dc7cb1454ff74b95'
@@ -42,7 +42,7 @@ def tmdb_request(endpoint, **params):
 
 @db_schema.upgrade('api_tmdb')
 def upgrade(ver, session):
-    if ver is None or ver <= 2:
+    if ver is None or ver <= 3:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -65,7 +65,6 @@ class TMDBMovie(Base):
     alternative_name = Column(Unicode)
     released = Column(Date)
     year = year_property('released')
-    certification = Column(Unicode)
     runtime = Column(Integer)
     language = Column(Unicode)
     overview = Column(Unicode)
@@ -78,6 +77,7 @@ class TMDBMovie(Base):
     revenue = Column(Integer)
     homepage = Column(Unicode)
     posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
+    backdrops = relation('TMDBBackdrop', backref='movie', cascade='all, delete, delete-orphan')
     _genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
     genres = association_proxy('_genres', 'name')
     updated = Column(DateTime, default=datetime.now, nullable=False)
@@ -114,6 +114,7 @@ class TMDBMovie(Base):
             self.alternative_name = None
         self._genres = [TMDBGenre(**g) for g in movie['genres']]
         self.posters = [TMDBPoster(**p) for p in movie['images']['posters']]
+        self.backdrops = [TMDBBackdrop(**p) for p in movie['images']['backdrops']]
         self.updated = datetime.now()
 
     def to_dict(self):
@@ -136,7 +137,6 @@ class TMDBMovie(Base):
             'budget': self.budget,
             'revenue': self.revenue,
             'homepage': self.homepage,
-            'posters': [p.to_dict() for p in self.posters],
             'genres': [g for g in self.genres],
             'updated': self.updated
         }
@@ -151,6 +151,38 @@ class TMDBGenre(Base):
 
 class TMDBPoster(Base):
     __tablename__ = 'tmdb_posters'
+
+    id = Column(Integer, primary_key=True)
+    movie_id = Column(Integer, ForeignKey('tmdb_movies.id'))
+    file_path = Column(Unicode)
+    width = Column(Integer)
+    height = Column(Integer)
+    aspect_ratio = Column(Float)
+    vote_average = Column(Float)
+    vote_count = Column(Integer)
+    iso_639_1 = Column(Unicode)
+
+    @property
+    def url(self):
+        return get_tmdb_config()['images']['base_url'] + 'original' + self.file_path
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'url': self.url,
+            'movie_id': self.movie_id,
+            'file_path': self.file_path,
+            'width': self.width,
+            'height': self.height,
+            'aspect_ratio': self.aspect_ratio,
+            'vote_average': self.vote_average,
+            'vote_count': self.vote_count,
+            'language_code': self.iso_639_1
+        }
+
+
+class TMDBBackdrop(Base):
+    __tablename__ = 'tmdb_backdrops'
 
     id = Column(Integer, primary_key=True)
     movie_id = Column(Integer, ForeignKey('tmdb_movies.id'))

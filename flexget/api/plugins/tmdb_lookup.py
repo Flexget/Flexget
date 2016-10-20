@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
 from flask import jsonify
+from flask_restplus import inputs
 
 from flexget.api import api, APIResource
 from flexget.api.app import etag, BadRequest, NotFoundError
@@ -50,12 +51,13 @@ class ObjectsContainer(object):
             'revenue': {'type': ['integer', 'null']},
             'homepage': {'type': ['integer', 'null'], 'format': 'uri'},
             'posters': {'type': 'array', 'items': poster_object},
+            'backdrops': {'type': 'array', 'items': poster_object},
             'genres': {'type': 'array', 'items': {'type': 'string'}},
             'updated': {'type': 'string', 'format': 'date-time'},
         },
-        'required': ['id', 'match', 'name', 'url', 'year', 'original_name', 'alternative_name',
-                     'runtime', 'language', 'overview', 'tagline', 'rating', 'votes', 'popularity', 'adult', 'budget',
-                     'revenue', 'homepage', 'posters', 'genres', 'updated'],
+        'required': ['id', 'match', 'name', 'url', 'year', 'original_name', 'alternative_name', 'runtime', 'language',
+                     'overview', 'tagline', 'rating', 'votes', 'popularity', 'adult', 'budget', 'revenue', 'homepage',
+                     'genres', 'updated'],
         'additionalProperties': False
     }
 
@@ -70,6 +72,8 @@ tmdb_parser.add_argument('tmdb_id', help='TMDB ID')
 tmdb_parser.add_argument('imdb_id', help='IMDB ID')
 tmdb_parser.add_argument('year', type=int, help='Movie year')
 tmdb_parser.add_argument('only_cached', type=int, help='Return only cached results')
+tmdb_parser.add_argument('include_posters', type=inputs.boolean, default=False, help='Include posters in response')
+tmdb_parser.add_argument('include_backdrops', type=inputs.boolean, default=False, help='Include backdrops in response')
 
 
 @tmdb_api.route('/movies/')
@@ -87,6 +91,9 @@ class TMDBMoviesAPI(APIResource):
         tmdb_id = args.get('tmdb_id')
         imdb_id = args.get('imdb_id')
 
+        posters = args.pop('include_posters', False)
+        backdrops = args.pop('include_backdrops', False)
+
         if not (title or tmdb_id or imdb_id):
             raise BadRequest(description)
 
@@ -95,4 +102,10 @@ class TMDBMoviesAPI(APIResource):
             movie = lookup(session=session, **args)
         except LookupError as e:
             raise NotFoundError(e.args[0])
-        return jsonify(movie.to_dict())
+
+        return_movie = movie.to_dict()
+        if posters:
+            return_movie['posters'] = [p.to_dict() for p in movie.posters]
+        if backdrops:
+            return_movie['backdrops'] = [p.to_dict() for p in movie.backdrops]
+        return jsonify(return_movie)
