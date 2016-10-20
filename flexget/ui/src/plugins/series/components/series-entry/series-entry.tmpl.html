@@ -3,7 +3,7 @@
     <md-card-title flex="initial">
         <md-card-title-text>
             <span class="md-headline">{{ ::vm.show.name }}
-                <span class="rating">
+                <span class="rating" ng-if="::vm.show.metadata">
                     <md-icon md-font-set="fa" md-font-icon="fa-star"></md-icon>
                     <span class="md-suhead">
                         {{ ::vm.show.metadata.rating }}
@@ -14,7 +14,7 @@
             <span class="md-subhead">Latest: {{ ::vm.show.latest_episode.identifier || 'No episode downloaded' }}</span>
             <span class="md-subhead second-subhead">Begin Episode: {{ vm.show.begin_episode.identifier || 'No begin set' }}</span>
             <md-divider></md-divider>
-            <md-chips ng-model="vm.show.metadata.genres" readonly="true">
+            <md-chips ng-model="vm.show.metadata.genres" readonly="true" ng-if="::vm.show.metadata">
                 <md-chip-template>
                     {{ $chip }}
                 </md-chip-template>
@@ -22,7 +22,8 @@
         </md-card-title-text>
     </md-card-title>
     <md-card-content flex layout-gt-xs="row" layout-xs="column" class="custom-card">
-        <p>{{ ::vm.show.metadata.overview }}</p>
+        <p ng-if="::vm.show.metadata">{{ ::vm.show.metadata.overview }}</p>
+        <p ng-if="::!vm.show.metadata">No metadata found</p>
     </md-card-content>
 	<md-card-actions layout="row" layout-align="start center">
 		<md-button class="md-primary md-raised" ng-click="vm.toggleEpisodes(show)">Episodes</md-button>

@@ -36,7 +36,11 @@
             return $http.get('/api/tvdb/series/' + show.name + '/', {
                 etagCache: true
             })
-                .catch(callFailed);
+                .catch(metadataCallFailed);
+            
+            function metadataCallFailed(response) {
+                return response.status === 404 ? {} : callFailed(response); 
+            }
         }
 
         function deleteShow(show, params) {
