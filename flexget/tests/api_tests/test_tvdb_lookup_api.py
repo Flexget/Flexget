@@ -244,3 +244,63 @@ class TestTVDSearchAPIErrors(object):
         data = json.loads(rsp.get_data(as_text=True))
         errors = schema_match(base_message, data)
         assert not errors
+
+
+@pytest.mark.online
+class TestTVDBLanguages(object):
+    config = 'tasks: {}'
+
+    def test_series_lookup_with_language(self, api_client, schema_match):
+        values = {
+            'tvdb_id': 252712,
+            'imdb_id': 'tt0913290',
+            'language': 'nl',
+            'series_name': 'Tegenlicht',
+            'network': 'VPRO'
+        }
+
+        rsp = api_client.get('/tvdb/series/Tegenlicht/?language=nl')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+
+        errors = schema_match(OC.tvdb_series_object, data)
+        assert not errors
+
+        for field, value in values.items():
+            assert data.get(field) == value
+
+    def test_episode_lookup_with_language(self, api_client, schema_match):
+        values = {
+            'episode_number': 1,
+            'id': 4532248,
+            'season_number': 10,
+            'series_id': 252712,
+            'episode_name': 'Gasland'
+        }
+
+        rsp = api_client.get('/tvdb/episode/252712/?season_number=10&ep_number=1&language=nl')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(OC.episode_object, data)
+        assert not errors
+
+        for field, value in values.items():
+            assert data.get(field) == value
+
+    def test_tvdb_search_with_language(self, api_client, schema_match):
+        rsp = api_client.get('/tvdb/search/?language=nl&search_name=Tegenlicht')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        data = json.loads(rsp.get_data(as_text=True))
+        errors = schema_match(OC.search_results_object, data)
+        assert not errors
+
+        values = {
+            'series_name': "Tegenlicht",
+            'tvdb_id': 252712
+        }
+
+        for field, value in values.items():
+            assert data[0].get(field) == value
