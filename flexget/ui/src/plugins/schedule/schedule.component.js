@@ -48,8 +48,8 @@
                 .cached(setSchedule);
         }
         
-        function setSchedule(data) {
-            vm.models = data;
+        function setSchedule(response) {
+            vm.models = response.data;
         }
     }
 }());

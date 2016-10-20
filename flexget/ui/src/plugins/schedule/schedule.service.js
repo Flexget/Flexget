@@ -13,8 +13,11 @@
 
         function getSchedules() {
             return $http.get('/api/schedules/', { etagCache: true })
-                .then(callComplete)
-                .catch(callFailed);
+                .catch(handleDisabledSchedules);
+            
+            function handleDisabledSchedules(response) {
+                return response.status === 409 ? {} : callFailed(response);
+            }
         }
 
         function callComplete(response) {
