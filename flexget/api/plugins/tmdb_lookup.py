@@ -38,7 +38,6 @@ class ObjectsContainer(object):
             'original_name': {'type': ['string', 'null']},
             'alternative_name': {'type': ['string', 'null']},
             'year': {'type': 'integer'},
-            'certification': {'type': ['string', 'null']},
             'runtime': {'type': 'integer'},
             'language': {'type': 'string'},
             'overview': {'type': 'string'},
@@ -54,7 +53,7 @@ class ObjectsContainer(object):
             'genres': {'type': 'array', 'items': {'type': 'string'}},
             'updated': {'type': 'string', 'format': 'date-time'},
         },
-        'required': ['id', 'match', 'name', 'url', 'year', 'original_name', 'alternative_name', 'certification',
+        'required': ['id', 'match', 'name', 'url', 'year', 'original_name', 'alternative_name',
                      'runtime', 'language', 'overview', 'tagline', 'rating', 'votes', 'popularity', 'adult', 'budget',
                      'revenue', 'homepage', 'posters', 'genres', 'updated'],
         'additionalProperties': False

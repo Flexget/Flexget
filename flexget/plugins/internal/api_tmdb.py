@@ -107,14 +107,13 @@ class TMDBMovie(Base):
         self.budget = movie['budget']
         self.revenue = movie['revenue']
         self.homepage = movie['homepage']
-        self.alternative_name = None
         try:
             self.alternative_name = movie['alternative_titles']['titles'][0]['title']
         except (KeyError, IndexError):
-            pass  # No alternate titles
+            # No alternate titles
+            self.alternative_name = None
         self._genres = [TMDBGenre(**g) for g in movie['genres']]
-        # Just grab the top 5 posters
-        self.posters = [TMDBPoster(**p) for p in movie['images']['posters'][:5]]
+        self.posters = [TMDBPoster(**p) for p in movie['images']['posters']]
         self.updated = datetime.now()
 
     def to_dict(self):
@@ -126,7 +125,6 @@ class TMDBMovie(Base):
             'original_name': self.original_name,
             'alternative_name': self.alternative_name,
             'year': self.year,
-            'certification': self.certification,
             'runtime': self.runtime,
             'language': self.language,
             'overview': self.overview,
