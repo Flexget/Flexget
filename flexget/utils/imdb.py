@@ -248,6 +248,7 @@ class ImdbParser(object):
         self.languages = []
         self.actors = {}
         self.directors = {}
+        self.writers = {}
         self.score = 0.0
         self.votes = 0
         self.year = 0
@@ -328,6 +329,15 @@ class ImdbParser(object):
             if isinstance(director_name, Tag):
                 director_name = None
             self.directors[director_id] = director_name
+
+        # get writer(s)
+        for writer in title_overview.select('[itemprop="creator"] > a'):
+            writer_id = extract_id(writer['href'])
+            writer_name = writer.text
+            # tag instead of name
+            if isinstance(writer_name, Tag):
+                writer_name = None
+            self.writers[writer_id] = writer_name
 
         # Details section
         title_details = soup.find('div', attrs={'id': 'titleDetails'})

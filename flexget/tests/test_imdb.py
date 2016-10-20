@@ -76,6 +76,17 @@ class TestImdb(object):
               reject_directors:
                 - nm0000116
 
+          writer:
+            mock:
+              - {title: 'Hot Fuzz', imdb_url: 'http://www.imdb.com/title/tt0425112/'}
+              - {title: 'The Terminator', imdb_url: 'http://www.imdb.com/title/tt0088247/'}
+            imdb:
+              accept_writers:
+                - nm0942367
+                - nm0670408
+              reject_writers:
+                - nm0000116
+
           score:
             mock:
               - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
@@ -190,6 +201,23 @@ class TestImdb(object):
             'The Matrix should\'ve been accepted'
         assert not task.find_entry('rejected', imdb_name='The Terminator'), \
             'The The Terminator have been rejected'
+
+    def test_writers(self, execute_task):
+        task = execute_task('writer')
+
+        # check that writers have been parsed properly
+        hotfuzz = task.find_entry(imdb_name='Hot Fuzz')
+        assert hotfuzz, 'entry for Hot Fuzz missing'
+
+        assert 'nm0942367' in hotfuzz['imdb_writers'], \
+            'Edgar Wright is missing'
+        assert hotfuzz['imdb_writers']['nm0942367'] == 'Edgar Wright', \
+            'Edgar Wright name is missing'
+
+        assert task.find_entry('accepted', imdb_name='Hot Fuzz'), \
+            'Hot Fuzz should\'ve been accepted'
+        assert not task.find_entry('rejected', imdb_name='The Terminator'), \
+            'The Terminator have been rejected'
 
     def test_score(self, execute_task):
         task = execute_task('score')

@@ -16,7 +16,7 @@ from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
 from flexget.utils.database import with_session
 
-SCHEMA_VER = 7
+SCHEMA_VER = 8
 
 Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
@@ -39,6 +39,12 @@ directors_table = Table('imdb_movie_directors', Base.metadata,
                         Index('ix_imdb_movie_directors', 'movie_id', 'director_id'))
 Base.register_table(directors_table)
 
+writers_table = Table('imdb_movie_writers', Base.metadata,
+                        Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+                        Column('writer_id', Integer, ForeignKey('imdb_writers.id')),
+                        Index('ix_imdb_movie_writers', 'movie_id', 'writer_id'))
+Base.register_table(writers_table)
+
 
 class Movie(Base):
     __tablename__ = 'imdb_movies'
@@ -52,6 +58,7 @@ class Movie(Base):
     genres = relation('Genre', secondary=genres_table, backref='movies')
     actors = relation('Actor', secondary=actors_table, backref='movies')
     directors = relation('Director', secondary=directors_table, backref='movies')
+    writers = relation('Writer', secondary=writers_table, backref='movies')
     languages = relation('MovieLanguage', order_by='MovieLanguage.prominence')
 
     score = Column(Float)
@@ -146,6 +153,17 @@ class Director(Base):
         self.imdb_id = imdb_id
         self.name = name
 
+class Writer(Base):
+    __tablename__ = 'imdb_writers'
+
+    id = Column(Integer, primary_key=True)
+    imdb_id = Column(String)
+    name = Column(Unicode)
+
+    def __init__(self, imdb_id, name=None):
+        self.imdb_id = imdb_id
+        self.name = name
+
 
 class SearchResult(Base):
     __tablename__ = 'imdb_search'
@@ -177,7 +195,8 @@ def upgrade(ver, session):
     # v5 We may have cached bad data due to imdb changes, just wipe everything. GitHub #697
     # v6 The association tables were not cleared on the last upgrade, clear again. GitHub #714
     # v7 Another layout change cached bad data. GitHub #729
-    if ver is None or ver <= 6:
+    # v8 Added writers to the DB Schema
+    if ver is None or ver <= 7:
         raise UpgradeImpossible('Resetting imdb_lookup caches because bad data may have been cached.')
     return ver
 
@@ -207,6 +226,7 @@ class ImdbLookup(object):
         'imdb_languages': lambda movie: [lang.language.name for lang in movie.languages],
         'imdb_actors': lambda movie: dict((actor.imdb_id, actor.name) for actor in movie.actors),
         'imdb_directors': lambda movie: dict((director.imdb_id, director.name) for director in movie.directors),
+        'imdb_writers': lambda movie: dict((writer.imdb_id, writer.name) for writer in movie.writers),
         'imdb_mpaa_rating': 'mpaa_rating',
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'title',
@@ -383,7 +403,7 @@ class ImdbLookup(object):
                 log.exception(e)
             raise plugin.PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
 
-        for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'mpaa_rating']:
+        for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'writers', 'mpaa_rating']:
             log.trace('movie.%s: %s' % (att, getattr(movie, att)))
 
         # Update the entry fields
@@ -430,6 +450,11 @@ class ImdbLookup(object):
             if not director:
                 director = Director(imdb_id, name)
             movie.directors.append(director)  # pylint:disable=E1101
+        for imdb_id, name in parser.writers.items():
+            writer = session.query(Writer).filter(Writer.imdb_id == imdb_id).first()
+            if not writer:
+                writer = Writer(imdb_id, name)
+            movie.writers.append(writer)  # pylint:disable=E1101
             # so that we can track how long since we've updated the info later
         movie.updated = datetime.now()
         session.add(movie)
