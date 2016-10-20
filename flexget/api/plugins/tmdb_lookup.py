@@ -14,19 +14,19 @@ class ObjectsContainer(object):
     poster_object = {
         'type': 'object',
         'properties': {
-            'id': {'type': 'integer'},
-            'movie_id': {'type': 'integer'},
-            'url': {'type': 'integer', 'format': 'uri'},
+            'id': {'type': ['integer', 'null']},
+            'movie_id': {'type': ['integer', 'null']},
+            'url': {'type': 'string', 'format': 'uri'},
             'file_path': {'type': 'string'},
             'width': {'type': 'integer'},
             'height': {'type': 'integer'},
             'aspect_ratio': {'type': 'number'},
             'vote_average': {'type': 'number'},
             'vote_count': {'type': 'integer'},
-            'language': {'type': 'string'}
+            'language_code': {'type': ['string', 'null']}
         },
         'required': ['id', 'movie_id', 'url', 'file_path', 'width', 'height', 'aspect_ratio', 'vote_average',
-                     'vote_count', 'language'],
+                     'vote_count', 'language_code'],
         'additionalProperties': False
     }
     movie_object = {
@@ -45,17 +45,17 @@ class ObjectsContainer(object):
             'tagline': {'type': 'string'},
             'rating': {'type': ['number', 'null']},
             'votes': {'type': ['integer', 'null']},
-            'popularity': {'type': ['integer', 'null']},
+            'popularity': {'type': ['number', 'null']},
             'adult': {'type': 'boolean'},
             'budget': {'type': ['integer', 'null']},
             'revenue': {'type': ['integer', 'null']},
-            'homepage': {'type': ['integer', 'null'], 'format': 'uri'},
+            'homepage': {'type': ['string', 'null'], 'format': 'uri'},
             'posters': {'type': 'array', 'items': poster_object},
             'backdrops': {'type': 'array', 'items': poster_object},
             'genres': {'type': 'array', 'items': {'type': 'string'}},
             'updated': {'type': 'string', 'format': 'date-time'},
         },
-        'required': ['id', 'match', 'name', 'url', 'year', 'original_name', 'alternative_name', 'runtime', 'language',
+        'required': ['id', 'name', 'url', 'year', 'original_name', 'alternative_name', 'runtime', 'language',
                      'overview', 'tagline', 'rating', 'votes', 'popularity', 'adult', 'budget', 'revenue', 'homepage',
                      'genres', 'updated'],
         'additionalProperties': False

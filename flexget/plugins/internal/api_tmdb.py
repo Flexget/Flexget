@@ -71,7 +71,7 @@ class TMDBMovie(Base):
     tagline = Column(Unicode)
     rating = Column(Float)
     votes = Column(Integer)
-    popularity = Column(Integer)
+    popularity = Column(Float)
     adult = Column(Boolean)
     budget = Column(Integer)
     revenue = Column(Integer)
