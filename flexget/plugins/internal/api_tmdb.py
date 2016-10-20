@@ -17,7 +17,7 @@ from flexget.utils import requests
 from flexget.utils.database import year_property, with_session
 
 log = logging.getLogger('api_tmdb')
-Base = db_schema.versioned_base('api_tmdb', 3)
+Base = db_schema.versioned_base('api_tmdb', 4)
 
 # This is a FlexGet API key
 API_KEY = 'bdfc018dbdb7c243dc7cb1454ff74b95'
@@ -42,7 +42,7 @@ def tmdb_request(endpoint, **params):
 
 @db_schema.upgrade('api_tmdb')
 def upgrade(ver, session):
-    if ver is None or ver <= 2:
+    if ver is None or ver <= 3:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -65,19 +65,19 @@ class TMDBMovie(Base):
     alternative_name = Column(Unicode)
     released = Column(Date)
     year = year_property('released')
-    certification = Column(Unicode)
     runtime = Column(Integer)
     language = Column(Unicode)
     overview = Column(Unicode)
     tagline = Column(Unicode)
     rating = Column(Float)
     votes = Column(Integer)
-    popularity = Column(Integer)
+    popularity = Column(Float)
     adult = Column(Boolean)
     budget = Column(Integer)
     revenue = Column(Integer)
     homepage = Column(Unicode)
     posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
+    backdrops = relation('TMDBBackdrop', backref='movie', cascade='all, delete, delete-orphan')
     _genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
     genres = association_proxy('_genres', 'name')
     updated = Column(DateTime, default=datetime.now, nullable=False)
@@ -107,15 +107,39 @@ class TMDBMovie(Base):
         self.budget = movie['budget']
         self.revenue = movie['revenue']
         self.homepage = movie['homepage']
-        self.alternative_name = None
         try:
             self.alternative_name = movie['alternative_titles']['titles'][0]['title']
         except (KeyError, IndexError):
-            pass  # No alternate titles
+            # No alternate titles
+            self.alternative_name = None
         self._genres = [TMDBGenre(**g) for g in movie['genres']]
-        # Just grab the top 5 posters
-        self.posters = [TMDBPoster(**p) for p in movie['images']['posters'][:5]]
+        self.posters = [TMDBPoster(**p) for p in movie['images']['posters']]
+        self.backdrops = [TMDBBackdrop(**p) for p in movie['images']['backdrops']]
         self.updated = datetime.now()
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'imdb_id': self.imdb_id,
+            'url': self.url,
+            'name': self.name,
+            'original_name': self.original_name,
+            'alternative_name': self.alternative_name,
+            'year': self.year,
+            'runtime': self.runtime,
+            'language': self.language,
+            'overview': self.overview,
+            'tagline': self.tagline,
+            'rating': self.rating,
+            'votes': self.votes,
+            'popularity': self.popularity,
+            'adult': self.adult,
+            'budget': self.budget,
+            'revenue': self.revenue,
+            'homepage': self.homepage,
+            'genres': [g for g in self.genres],
+            'updated': self.updated
+        }
 
 
 class TMDBGenre(Base):
@@ -141,6 +165,52 @@ class TMDBPoster(Base):
     @property
     def url(self):
         return get_tmdb_config()['images']['base_url'] + 'original' + self.file_path
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'url': self.url,
+            'movie_id': self.movie_id,
+            'file_path': self.file_path,
+            'width': self.width,
+            'height': self.height,
+            'aspect_ratio': self.aspect_ratio,
+            'vote_average': self.vote_average,
+            'vote_count': self.vote_count,
+            'language_code': self.iso_639_1
+        }
+
+
+class TMDBBackdrop(Base):
+    __tablename__ = 'tmdb_backdrops'
+
+    id = Column(Integer, primary_key=True)
+    movie_id = Column(Integer, ForeignKey('tmdb_movies.id'))
+    file_path = Column(Unicode)
+    width = Column(Integer)
+    height = Column(Integer)
+    aspect_ratio = Column(Float)
+    vote_average = Column(Float)
+    vote_count = Column(Integer)
+    iso_639_1 = Column(Unicode)
+
+    @property
+    def url(self):
+        return get_tmdb_config()['images']['base_url'] + 'original' + self.file_path
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'url': self.url,
+            'movie_id': self.movie_id,
+            'file_path': self.file_path,
+            'width': self.width,
+            'height': self.height,
+            'aspect_ratio': self.aspect_ratio,
+            'vote_average': self.vote_average,
+            'vote_count': self.vote_count,
+            'language_code': self.iso_639_1
+        }
 
 
 class TMDBSearchResult(Base):
@@ -207,7 +277,7 @@ class ApiTmdb(object):
                 movie_filter = movie_filter.filter(TMDBMovie.year == year)
             movie = movie_filter.first()
             if not movie:
-                search_string = title + ' ({})'.format(year) if year else ''
+                search_string = title + ' ({})'.format(year) if year else title
                 found = session.query(TMDBSearchResult). \
                     filter(TMDBSearchResult.search == search_string.lower()).first()
                 if found and found.movie:
@@ -245,7 +315,7 @@ class ApiTmdb(object):
                 if result['movie_results']:
                     tmdb_id = result['movie_results'][0]['id']
             if not tmdb_id:
-                search_string = title + ' ({})'.format(year) if year else ''
+                search_string = title + ' ({})'.format(year) if year else title
                 searchparams = {'query': title}
                 if year:
                     searchparams['year'] = year

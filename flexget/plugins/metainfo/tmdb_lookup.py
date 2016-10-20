@@ -38,8 +38,8 @@ class PluginTmdbLookup(object):
         'tmdb_genres': lambda movie: list(movie.genres),
         'tmdb_released': 'released',
         'tmdb_votes': 'votes',
-        'tmdb_certification': 'certification',
-        'tmdb_posters': lambda movie: [poster.url for poster in movie.posters],
+        # Just grab the top 5 posters
+        'tmdb_posters': lambda movie: [poster.url for poster in movie.posters[:5]],
         'tmdb_runtime': 'runtime',
         'tmdb_tagline': 'tagline',
         'tmdb_budget': 'budget',
