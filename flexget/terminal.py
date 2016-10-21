@@ -16,6 +16,14 @@ if sys.platform == 'win32':
     Windows.enable(auto_colors=True)
 
 
+def terminal_info():
+    """
+    Returns info we need about the output terminal.
+    When called over IPC, this function is monkeypatched to return the info about the client terminal.
+    """
+    return {'size': terminal_size(), 'isatty': sys.stdout.isatty()}
+
+
 class TerminalTable(object):
     """
     A data table suited for CLI output, created via its sent parameters. For example::
@@ -61,7 +69,7 @@ class TerminalTable(object):
         self.table_data = table_data
 
         # Force table type to be ASCII when not TTY and type isn't already ASCII
-        if table_type not in self.ASCII_TYPES and not sys.stdout.isatty():
+        if table_type not in self.ASCII_TYPES and not terminal_info()['isatty']:
             self.type = 'porcelain'
         else:
             self.type = table_type
@@ -120,7 +128,7 @@ class TerminalTable(object):
     def valid_table(self):
         # print('self.table.table_width: %s' % self.table.table_width)
         # print('terminal_size()[0]: %s' % terminal_size()[0])
-        return self.table.table_width <= terminal_size()[0]
+        return self.table.table_width <= terminal_info()['size'][0]
 
     def _calc_wrap(self):
         """
@@ -134,7 +142,7 @@ class TerminalTable(object):
         static_columns = sum(longest.values())
         for wrap in self.wrap_columns:
             static_columns -= longest[wrap]
-        space_left = terminal_size()[0] - static_columns - margin
+        space_left = terminal_info()['size'][0] - static_columns - margin
         """
         print('margin: %s' % margin)
         print('static_columns: %s' % static_columns)
@@ -240,7 +248,7 @@ def colorize(color, text, auto=True):
 
     :return: Colored text or text
     """
-    if not sys.stdout.isatty():
+    if not terminal_info()['isatty']:
         return text
     return Color.colorize(color, text, auto)
 
