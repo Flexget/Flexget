@@ -118,6 +118,7 @@ class Manager(object):
             # Decode all arguments to unicode before parsing
             args = unicode_argv()[1:]
         self.args = args
+        self.config_autoreload = False
         self.config_file_hash = None
         self.config_base = None
         self.config_name = None
@@ -247,7 +248,7 @@ class Manager(object):
         task_names = self.tasks
         # Only reload config if daemon
         config_hash = self.hash_config()
-        if self.is_daemon and self.config_file_hash != config_hash:
+        if self.is_daemon and self.config_autoreload and self.config_file_hash != config_hash:
             log.info('Config change detected. Reloading.')
             try:
                 self.load_config(output_to_console=False, config_file_hash=config_hash)
@@ -405,6 +406,8 @@ class Manager(object):
                 return
             if options.daemonize:
                 self.daemonize()
+            if options.config_autoreload:
+                self.config_autoreload = True
             try:
                 signal.signal(signal.SIGTERM, self._handle_sigterm)
             except ValueError as e:
@@ -417,7 +420,7 @@ class Manager(object):
             self.ipc_server.start()
             self.task_queue.wait()
             fire_event('manager.daemon.completed', self)
-        elif options.action in ['stop', 'reload', 'status']:
+        elif options.action in ['stop', 'reload', 'status', 'enable-autoreload', 'disable-autoreload']:
             if not self.is_daemon:
                 log.error('There does not appear to be a daemon running.')
                 return
@@ -435,6 +438,12 @@ class Manager(object):
                     log.error('Error loading config: %s' % e.args[0])
                 else:
                     log.info('Config successfully reloaded from disk.')
+            elif options.action == 'enable-autoreload':
+                log.info('Enabled automatic config reloading')
+                self.config_autoreload = True
+            elif options.action == 'disable-autoreload':
+                log.info('Disabled automatic config reloading')
+                self.config_autoreload = False
 
     def _handle_sigterm(self, signum, frame):
         log.info('Got SIGTERM. Shutting down.')
