@@ -563,7 +563,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
     series = lookup_series(name=name, tvdb_id=tvdb_id, only_cached=only_cached, session=session)
 
     if not series:
-        LookupError('Series %s (%s) not found from' % (name, tvdb_id))
+        raise LookupError('Series %s (%s) not found from' % (name, tvdb_id))
 
     ep_description = series.name
     query_params = {}
