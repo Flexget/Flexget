@@ -34,14 +34,20 @@ def action_status(options, irc_manager):
         console('ERROR: %s' % e.args[0])
         return
 
-    header = ['IRC Connection', 'Thread', 'Channels', 'Connected Channels', 'Server']
+    header = ['Name', 'Status', 'Channels', 'Server']
     table_data = [header]
+
     for name, info in status.items():
-        table_data.append([name, info['thread'], ', '.join(info['channels']), ', '.join(info['connected_channels']),
-                           '%s:%s' % info['server']])
+        channels = []
+        for channel in info['channels'].keys():
+            channels.append(channel)
+            if channel in info['connected_channels']:
+                channels[-1] = '*' + channels[-1]
+        table_data.append([name, info['thread'], ', '.join(channels), '%s:%s' % info['server']])
     table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
+        console(' * Connected channel')
     except TerminalTableError as e:
         console('ERROR: %s' % e)
 

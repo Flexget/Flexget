@@ -907,7 +907,7 @@ class IRCConnectionManager(object):
             raise ValueError('%s is not a valid irc connection' % name)
         status = {name: {}}
         connection = irc_connections[name]
-        status[name]['thread'] = 'alive' if connection.is_alive() else 'dead'
+        status[name]['thread'] = 'OK' if connection.is_alive() else 'dead'
         status[name]['channels'] = connection.channels
         status[name]['connected_channels'] = connection.connected_channels
         status[name]['server'] = (connection.servers[0], connection.port)
