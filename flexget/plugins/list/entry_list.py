@@ -114,6 +114,7 @@ class DBEntrySet(MutableSet):
     def __iter__(self):
         with Session() as session:
             for e in self._db_list(session).entries.order_by(EntryListEntry.added.desc()).all():
+                log.debug('returning %s', e.entry)
                 yield e.entry
 
     def __contains__(self, entry):
