@@ -28,6 +28,7 @@ class InputPlex(object):
         - recentlyViewedShows   : Series only.
       'all' and 'recentlyViewedShows' will only produce a list of show names while the other three will produce
       filename and download url.
+    'token'             Plex access token, used to connect to PMS
     'username'          Myplex (http://my.plexapp.com) username, used to connect to shared PMS'.
     'password'          Myplex (http://my.plexapp.com) password, used to connect to shared PMS'.
     'server'            Host/IP of PMS to connect to.
@@ -76,6 +77,7 @@ class InputPlex(object):
             'port': {'type': 'integer', 'default': 32400},
             'username': {'type': 'string', 'default': ''},
             'password': {'type': 'string', 'default': ''},
+            'token': {'type': 'string', 'default': ''},
             'section': {'type': ['string', 'integer']},
             'selection': {'type': 'string', 'default': 'all'},
             'lowercase_title': {'type': 'boolean', 'default': False},
@@ -149,7 +151,11 @@ class InputPlex(object):
         entries = []
         if config['unwatched_only'] and config['section'] != 'recentlyViewedShows' and config['section'] != 'all':
             urlconfig['unwatched'] = '1'
-        if config['username'] and config['password']:
+        if config['token']:
+            accesstoken = config['token']
+            log.debug("Using accesstoken: %s" % accesstoken)
+            urlconfig['X-Plex-Token'] = accesstoken
+        elif config['username'] and config['password']:
             accesstoken = self.plex_get_accesstoken(config)
             log.debug("Got accesstoken: %s" % accesstoken)
             urlconfig['X-Plex-Token'] = accesstoken
@@ -270,8 +276,13 @@ class InputPlex(object):
             else:
                 e['plex_status'] = "unwatched"
             for media in node.getElementsByTagName('Media'):
+                entry = Entry(e)
                 vcodec = media.getAttribute('videoCodec')
                 acodec = media.getAttribute('audioCodec')
+                if media.hasAttribute('title'):
+                    entry['plex_media_title'] = media.getAttribute('title')
+                if media.hasAttribute('optimizedForStreaming'):
+                    entry['plex_stream_optimized'] = media.getAttribute('optimizedForStreaming')
                 if config['fetch'] == "file" or not config['fetch']:
                     container = media.getAttribute('container')
                 else:
@@ -290,31 +301,32 @@ class InputPlex(object):
                         key = node.getAttribute(thumbtag)
                     # key = part.getAttribute('key')
                     duration = part.getAttribute('duration')
-                    e['plex_title'] = title
+                    entry['plex_title'] = title
+                    entry['title'] = title
                     if config['original_filename']:
                         filename, fileext = os.path.splitext(basename(part.getAttribute('file')))
+                        log.debug("filename=%s,fileext=%s" % (filename, fileext))
                         if config['fetch'] != 'file':
                             filename += ".jpg"
                         else:
-                            filename = "%s.%s" % (filename, fileext)
+                            filename = "%s%s" % (filename, fileext)
                     else:
                         if viewgroup == "episode":
                             filename = filenamemap % (title.replace(" ", "."), season, episode, resolution, vcodec,
                                                       acodec, container)
-                            title = filename
+                            entry['title'] = filename
                         elif viewgroup == "movie":
                             filename = filenamemap % (title.replace(" ", "."), resolution, vcodec,
                                                       acodec, container)
-                    e['plex_url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, urlappend)
-                    e['plex_path'] = key
-                    e['url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, urlappend)
-                    e['plex_duration'] = duration
-                    e['filename'] = filename
-                    e['title'] = title
-            if key == "":
-                log.debug("Could not find anything in PMS to download. Next!")
-            else:
-                entries.append(e)
+                    entry['plex_url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, urlappend)
+                    entry['plex_path'] = key
+                    entry['url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, urlappend)
+                    entry['plex_duration'] = duration
+                    entry['filename'] = filename
+                    if key == "":
+                        log.debug("Could not find anything in PMS to download. Next!")
+                    else:
+                        entries.append(entry)
         return entries
 
 
