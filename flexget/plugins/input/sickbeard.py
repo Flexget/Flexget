@@ -94,7 +94,7 @@ class Sickbeard(object):
                                      % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e))
         entries = []
         for _, show in list(json['data'].items()):
-            log.deubg('processing show: {}'.format(show))
+            log.debug('processing show: {}'.format(show))
             fg_qualities = ''  # Initializes the quality parameter
             if show['paused'] and config.get('only_monitored'):
                 continue
