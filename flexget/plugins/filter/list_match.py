@@ -45,6 +45,10 @@ class ListMatch(object):
                         if config['single_match']:
                             if result not in already_accepted:
                                 already_accepted.append(result)
+                                # Add all new result data to entry
+                                for key in result:
+                                    if key not in entry:
+                                        entry[key] = result[key]
                                 entry.accept()
                         else:
                             entry.accept()
