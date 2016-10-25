@@ -28,7 +28,8 @@ from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_ta
                                             create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_episode_identifier
 
-SCHEMA_VER = 13
+SCHEMA_VER = 14
+DEFAULT_SERIES_LIST_NAME = 'series_list'
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -154,6 +155,12 @@ def upgrade(ver, session):
         series_table = table_schema('series', session)
         session.execute(update(series_table, series_table.c.identified_by == None, {'identified_by': 'auto'}))
         ver = 13
+    if ver == 13:
+        # Create default series list
+        series_list_table = table_schema('series_list_lists', session)
+        result = session.execute(series_list_table.insert().values(list_name=DEFAULT_SERIES_LIST_NAME), added=datetime.now)
+        table_add_column('series', 'list_id', Integer, session, result.inserted_primary_key[0])
+        ver = 14
     return ver
 
 
@@ -270,6 +277,7 @@ class Series(Base):
     __tablename__ = 'series'
 
     id = Column(Integer, primary_key=True)
+    list_id = Column(Integer, ForeignKey('series_list_lists.id'), nullable=False)
     _name = Column('name', Unicode)
     _name_normalized = Column('name_lower', Unicode, index=True, unique=True)
     identified_by = Column(String)
