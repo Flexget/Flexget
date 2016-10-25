@@ -158,7 +158,7 @@ def upgrade(ver, session):
     if ver == 13:
         # Create default series list
         series_list_table = table_schema('series_list_lists', session)
-        result = session.execute(series_list_table.insert().values(list_name=DEFAULT_SERIES_LIST_NAME), added=datetime.now)
+        result = session.execute(series_list_table.insert().values(name=DEFAULT_SERIES_LIST_NAME, added=datetime.now()))
         table_add_column('series', 'list_id', Integer, session, result.inserted_primary_key[0])
         ver = 14
     return ver
