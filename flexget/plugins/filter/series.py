@@ -262,6 +262,17 @@ class PluginSeriesList(object):
         return list(SeriesListSet(config))
 
 
+def default_list_id():
+    with Session() as session:
+        default_list = session.query(SeriesListList).filter(
+            SeriesListList.name == DEFAULT_SERIES_LIST_NAME).one_or_none()
+        if not default_list:
+            default_list = SeriesListList(DEFAULT_SERIES_LIST_NAME)
+        session.merge(default_list)
+        session.flush()
+        return default_list.id
+
+
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     # Clean up old undownloaded releases
@@ -744,8 +755,7 @@ def new_eps_after(since_ep):
         filter(Series.id == series.id)
     if series.identified_by == 'ep':
         if since_ep.season is None or since_ep.number is None:
-            log.debug('new_eps_after for %s falling back to timestamp because latest dl in non-ep format' %
-                      series.name)
+            log.debug('new_eps_after for %s falling back to timestamp because latest dl in non-ep format', series.name)
             return series_eps.filter(Episode.first_seen > since_ep.first_seen).count()
         return series_eps.filter((Episode.identified_by == 'ep') &
                                  (((Episode.season == since_ep.season) & (Episode.number > since_ep.number)) |
@@ -780,8 +790,9 @@ def store_parser(session, parser, series=None, quality=None):
             log.debug('adding series %s into db', parser.name)
             series = Series()
             series.name = parser.name
+            series.list_id = default_list_id()
             session.add(series)
-            log.debug('-> added %s' % series)
+            log.debug('-> added %s', series)
 
     releases = []
     for ix, identifier in enumerate(parser.identifiers):
@@ -802,7 +813,7 @@ def store_parser(session, parser, series=None, quality=None):
                 episode.season = 0
                 episode.number = parser.id + ix
             series.episodes.append(episode)  # pylint:disable=E1103
-            log.debug('-> added %s' % episode)
+            log.debug('-> added %s', episode)
 
         # if release does not exists in episode, add new
         #
@@ -823,7 +834,7 @@ def store_parser(session, parser, series=None, quality=None):
             release.proper_count = parser.proper_count
             release.title = parser.data
             episode.releases.append(release)  # pylint:disable=E1103
-            log.debug('-> added %s' % release)
+            log.debug('-> added %s', release)
         releases.append(release)
     session.flush()  # Make sure autonumber ids are populated
     return releases
@@ -845,8 +856,8 @@ def set_series_begin(series, ep_id):
         ep_id = ep_id.upper()
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
-            raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
-                             (ep_id, series.identified_by))
+            raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`', ep_id,
+                             series.identified_by)
     series.identified_by = identified_by
     episode = (session.query(Episode).filter(Episode.series_id == series.id).
                filter(Episode.identified_by == series.identified_by).
@@ -940,7 +951,7 @@ def delete_release_by_id(release_id):
         if release:
             session.delete(release)
             session.commit()
-            log.debug('Deleted release ID %s' % release_id)
+            log.debug('Deleted release ID %s', release_id)
         else:
             raise ValueError('Unknown identifier %s for release' % release_id)
 
@@ -1029,8 +1040,8 @@ def populate_entry_fields(entry, parser, config):
     # add series, season and episode to entry
     entry['series_name'] = parser.name
     if 'quality' in entry and entry['quality'] != parser.quality:
-        log.verbose('Found different quality for %s. Was %s, overriding with %s.' %
-                    (entry['title'], entry['quality'], parser.quality))
+        log.verbose('Found different quality for %s. Was %s, overriding with %s.', entry['title'], entry['quality'],
+                    parser.quality)
     entry['quality'] = parser.quality
     entry['proper'] = parser.proper
     entry['proper_count'] = parser.proper_count
@@ -1318,9 +1329,10 @@ class FilterSeries(FilterSeriesBase):
                     log.debug('adding series %s into db', series_name)
                     db_series = Series()
                     db_series.name = series_name
+                    db_series.list_id = default_list_id()
                     db_series.identified_by = series_config.get('identified_by', 'auto')
                     session.add(db_series)
-                    log.debug('-> added %s' % db_series)
+                    log.debug('-> added %s', db_series)
                     session.flush()  # Flush to get an id on series before adding alternate names.
                     alts = series_config.get('alternate_name', [])
                     if not isinstance(alts, list):
@@ -1582,7 +1594,7 @@ class FilterSeries(FilterSeriesBase):
                 return pass_filter
 
         downloaded_qualities = dict((d.quality, d.proper_count) for d in episode.downloaded_releases)
-        log.debug('propers - downloaded qualities: %s' % downloaded_qualities)
+        log.debug('propers - downloaded qualities: %s', downloaded_qualities)
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
@@ -1644,8 +1656,8 @@ class FilterSeries(FilterSeriesBase):
         latest = get_latest_release(episode.series)
         if episode.series.begin and (not latest or episode.series.begin > latest):
             latest = episode.series.begin
-        log.debug('latest download: %s' % latest)
-        log.debug('current: %s' % episode)
+        log.debug('latest download: %s', latest)
+        log.debug('current: %s', episode)
 
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
@@ -1706,8 +1718,8 @@ class FilterSeries(FilterSeriesBase):
             hours += diff.days * 24
             minutes, _ = divmod(remainder, 60)
 
-            log.info('Timeframe waiting %s for %sh:%smin, currently best is %s' %
-                     (episode.series.name, hours, minutes, best['title']))
+            log.info('Timeframe waiting %s for %sh:%smin, currently best is %s', episode.series.name, hours, minutes,
+                     best['title'])
 
             # add best entry to backlog (backlog is able to handle duplicate adds)
             if self.backlog:
@@ -1803,9 +1815,10 @@ class SeriesDBManager(FilterSeriesBase):
                     log.debug('adding series %s into db (on_task_start)', series_name)
                     db_series = Series()
                     db_series.name = series_name
+                    db_series.list_id = default_list_id()
                     session.add(db_series)
                     session.flush()  # flush to get id on series before creating alternate names
-                    log.debug('-> added %s' % db_series)
+                    log.debug('-> added %s', db_series)
                 for alt in alts:
                     _add_alt_name(alt, db_series, series_name, session)
                 log.debug('connecting series %s to task %s', db_series.name, task.name)
@@ -1830,7 +1843,7 @@ def _add_alt_name(alt, db_series, series_name, session):
     elif db_series_alt:
         if not db_series_alt.series:
             # Not sure how this can happen
-            log.debug('Found an alternate name not attached to series. Re-attatching %s to %s' % (alt, series_name))
+            log.debug('Found an alternate name not attached to series. Re-attatching %s to %s', alt, series_name)
             db_series.alternate_names.append(db_series_alt)
         else:
             # Alternate name already exists for another series. Not good.
@@ -1840,7 +1853,7 @@ def _add_alt_name(alt, db_series, series_name, session):
         log.debug('adding alternate name %s for %s into db' % (alt, series_name))
         db_series_alt = AlternateNames(alt)
         db_series.alternate_names.append(db_series_alt)
-        log.debug('-> added %s' % db_series_alt)
+        log.debug('-> added %s', db_series_alt)
 
 
 def set_alt_names(alt_names, db_series, session):
