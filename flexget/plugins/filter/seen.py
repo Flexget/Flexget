@@ -125,6 +125,25 @@ class SeenField(Base):
         }
 
 
+@with_session
+def add(title, task_name, fields, reason=None, local=None, session=None):
+    """
+    Adds seen entries to DB
+
+    :param title: name of title to be added
+    :param task_name: name of task to be added
+    :param fields: Dict of fields to be added to seen object
+    :return: Seen Entry object as committed to DB
+    """
+    se = SeenEntry(title, task_name, reason, local)
+    for field, value in list(fields.items()):
+        sf = SeenField(field, value)
+        se.fields.append(sf)
+    session.add(se)
+    session.commit()
+    return se.to_dict()
+
+
 @event('forget')
 def forget(value):
     """
