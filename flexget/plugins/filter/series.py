@@ -30,7 +30,7 @@ from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.orm import relation, backref, object_session
 
 SCHEMA_VER = 14
-DEFAULT_SERIES_LIST_NAME = 'series_list'
+DEFAULT_SERIES_LIST_NAME = 'series'
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
