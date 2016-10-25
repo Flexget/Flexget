@@ -13,7 +13,8 @@ from flexget.terminal import TerminalTable, TerminalTableError, table_parser, co
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
                                                normalize_series_name, new_eps_after, get_latest_release,
-                                               get_series_summary, shows_by_name, show_episodes, shows_by_exact_name)
+                                               get_series_summary, shows_by_name, show_episodes, shows_by_exact_name,
+                                               DEFAULT_SERIES_LIST_NAME, get_list, default_list_id)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
@@ -39,8 +40,8 @@ def do_cli(manager, options):
         remove(manager, options)
     elif options.series_action == 'forget':
         remove(manager, options, forget=True)
-    elif options.series_action == 'begin':
-        begin(manager, options)
+    elif options.series_action == 'add':
+        add(manager, options)
 
 
 def display_summary(options):
@@ -48,13 +49,19 @@ def display_summary(options):
     Display series summary.
     :param options: argparse options from the CLI
     """
-    porcelain = options.table_type == 'porcelain'
     with Session() as session:
+        list = get_list(options.list_name, session)
+        if not list:
+            console('Could not find list with name: `%s`' % options.list_name)
+            return
+        list_id = list.id
+        porcelain = options.table_type == 'porcelain'
         kwargs = {'configured': options.configured,
                   'premieres': options.premieres,
                   'session': session,
                   'sort_by': options.sort_by,
-                  'descending': options.order}
+                  'descending': options.order,
+                  'list_id': list_id}
         if options.new:
             kwargs['status'] = 'new'
             kwargs['days'] = options.new
@@ -113,27 +120,37 @@ def display_summary(options):
         console(footer)
 
 
-def begin(manager, options):
+def add(manager, options):
     series_name = options.series_name
     series_name = series_name.replace(r'\!', '!')
-    ep_id = options.episode_id
+    ep_id = options.begin
     normalized_name = normalize_series_name(series_name)
     with Session() as session:
+        list = get_list(options.list_name, session)
+        if not list:
+            console('Could not find list with name: `%s`' % options.list_name)
+            return
+        list_id = list.id
         series = shows_by_exact_name(normalized_name, session)
         if not series:
+            if options.update:
+                console('Series `%s` does not exist yet, use ADD command first' % series_name)
+                return
             console('Series not yet in database, adding `%s`' % series_name)
             series = Series()
             series.name = series_name
+            series.list_id = list_id
             session.add(series)
         else:
             series = series[0]
-        try:
-            set_series_begin(series, ep_id)
-        except ValueError as e:
-            console(e)
-        else:
-            console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
-            session.commit()
+        if ep_id:
+            try:
+                set_series_begin(series, ep_id)
+            except ValueError as e:
+                console(e)
+            else:
+                console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
+                session.commit()
         manager.config_changed()
 
 
@@ -260,11 +277,17 @@ def register_parser_arguments():
     series_parser = argparse.ArgumentParser(add_help=False)
     series_parser.add_argument('series_name', help='The name of the series', metavar='<series name>')
 
+    list_name_parser = argparse.ArgumentParser(add_help=False)
+    list_name_parser.add_argument('list_name', nargs='?', default=DEFAULT_SERIES_LIST_NAME,
+                                  help='Name of series list to operate on. Default is %s' % DEFAULT_SERIES_LIST_NAME)
+
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='series_action')
-    list_parser = subparsers.add_parser('list', parents=[table_parser],
-                                        help='List a summary of the different series being tracked')
-    list_parser.add_argument('configured', nargs='?', choices=['configured', 'unconfigured', 'all'],
+
+    # List subparser
+    list_parser = subparsers.add_parser('list', parents=[list_name_parser, table_parser],
+                                        help='List a summary of the different series being tracked in a series list.')
+    list_parser.add_argument('--configured', nargs='?', choices=['configured', 'unconfigured', 'all'],
                              default='configured',
                              help='Limit list to series that are currently in the config or not (default: %(default)s)')
     list_parser.add_argument('--premieres', action='store_true',
@@ -281,17 +304,30 @@ def register_parser_arguments():
     order.add_argument('--descending', dest='order', action='store_true', help='Sort in descending order')
     order.add_argument('--ascending', dest='order', action='store_false', help='Sort in ascending order')
 
+    # Show subparser
     subparsers.add_parser('show', parents=[series_parser, table_parser],
                           help='Show the releases FlexGet has seen for a given series ')
-    begin_parser = subparsers.add_parser('begin', parents=[series_parser],
-                                         help='set the episode to start getting a series from')
+
+    # Begin subparser
+    begin_parser = subparsers.add_parser('begin', parents=[list_name_parser, series_parser],
+                                         help='Set the episode to start getting a series from')
     begin_parser.add_argument('episode_id', metavar='<episode ID>',
                               help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
                                    'depending on how the series is numbered)')
+
+    # Forger subparser
     forget_parser = subparsers.add_parser('forget', parents=[series_parser],
                                           help='Removes episodes or whole series from the entire database '
                                                '(including seen plugin)')
     forget_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
+
+    # Remove subparser
     delete_parser = subparsers.add_parser('remove', parents=[series_parser],
                                           help='Removes episodes or whole series from the series database only')
     delete_parser.add_argument('episode_id', nargs='?', default=None, help='Episode ID to forget (optional)')
+
+    # Add subparser
+    subparsers.add_parser('add', parents=[list_name_parser, series_parser], help='Add a show to a series list.')
+
+    # Update parser
+    subparsers.add_parser('update', parents=[list_name_parser, series_parser], help='Update an show in a series list.')

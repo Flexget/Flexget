@@ -609,7 +609,7 @@ def get_latest_status(episode):
 
 @with_session
 def get_series_summary(configured=None, premieres=None, status=None, days=None, start=None, stop=None, count=False,
-                       sort_by='show_name', descending=None, session=None):
+                       sort_by='show_name', descending=None, list_id=None, session=None):
     """
     Return a query with results for all series.
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
@@ -627,7 +627,7 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         configured = 'configured'
     elif configured not in ['configured', 'unconfigured', 'all']:
         raise LookupError('"configured" parameter must be either "configured", "unconfigured", or "all"')
-    query = session.query(Series)
+    query = session.query(Series).filter(Series.list_id == list_id)
     query = query.outerjoin(Series.episodes).outerjoin(Episode.releases).outerjoin(Series.in_tasks).group_by(Series.id)
     if configured == 'configured':
         query = query.having(func.count(SeriesTask.id) >= 1)
@@ -1027,6 +1027,10 @@ def release_in_episode(episode_id, release_id):
     with Session() as session:
         release = session.query(Release).filter(Release.id == release_id).one()
         return release.episode_id == episode_id
+
+
+def get_list(list_name, session):
+    return session.query(SeriesListList).filter(SeriesListList.name == list_name).first()
 
 
 def populate_entry_fields(entry, parser, config):
