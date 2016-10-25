@@ -268,8 +268,8 @@ def default_list_id():
             SeriesListList.name == DEFAULT_SERIES_LIST_NAME).one_or_none()
         if not default_list:
             default_list = SeriesListList(DEFAULT_SERIES_LIST_NAME)
-        session.merge(default_list)
-        session.flush()
+            session.add(default_list)
+        session.commit()
         return default_list.id
 
 
