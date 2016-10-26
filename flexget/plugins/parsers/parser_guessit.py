@@ -16,7 +16,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
 from .parser_common import old_assume_quality
-from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie
+from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, MovieParseResult, SeriesParseResult
 
 log = logging.getLogger('parser_guessit')
 
@@ -306,7 +306,8 @@ guessit_api = GuessItApi(rebulk_builder().rebulk(_id_regexps))
 
 class ParserGuessit(object):
 
-    def _guessit_options(self, options):
+    @staticmethod
+    def _guessit_options(options):
         settings = {'name_only': True, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
         # 'clean_function': clean_value
         options['episode_prefer_number'] = not options.get('identified_by') == 'ep'
@@ -319,6 +320,51 @@ class ParserGuessit(object):
         settings.update(options)
         return settings
 
+    @staticmethod
+    def _proper_count(guessit_result):
+        """Calculate a FlexGet style proper_count from a guessit result."""
+        version = guessit_result.get('version')
+        if version is None:
+            version = 0
+        elif version <= 0:
+            version = -1
+        else:
+            version -= 1
+        proper_count = guessit_result.get('proper_count', 0)
+        fastsub = 'Fastsub' in guessit_result.get('other', [])
+        return version + proper_count - (5 if fastsub else 0)
+
+
+    @staticmethod
+    def _quality(guessit_result):
+        """Generate a FlexGet Quality from a guessit result."""
+        resolution = guessit_result.get('screen_size', '')
+        if not resolution and 'HR' in guessit_result.get('other', []):
+            resolution = 'hr'
+
+        source = guessit_result.get('format', '').replace('-', '')
+        if 'Preair' in guessit_result.get('other', {}):
+            source = 'preair'
+        if 'Screener' in guessit_result.get('other', {}):
+            if source == 'BluRay':
+                source = 'bdscr'
+            else:
+                source = 'dvdscr'
+        if 'R5' in guessit_result.get('other', {}):
+            source = 'r5'
+
+        codec = guessit_result.get('video_codec', '')
+        if guessit_result.get('video_profile') == '10bit':
+            codec = '10bit'
+
+        audio = guessit_result.get('audio_codec', '')
+        if audio == 'DTS' and guessit_result.get('audio_profile') in ['HD', 'HDMA']:
+            audio = 'dtshd'
+        elif guessit_result.get('audio_channels') == '5.1' and not audio or audio == 'DolbyDigital':
+            audio = 'dd5.1'
+
+        return qualities.Quality(' '.join([resolution, source, codec, audio]))
+
     # movie_parser API
     def parse_movie(self, data, **kwargs):
         log.debug('Parsing movie: `%s` [options: %s]', data, kwargs)
@@ -327,7 +373,13 @@ class ParserGuessit(object):
         guessit_options['type'] = 'movie'
         guess_result = guessit_api.guessit(data, options=guessit_options)
         # NOTE: Guessit expects str on PY3 and unicode on PY2 hence the use of future.utils.native
-        parsed = GuessitParsedMovie(native(data), kwargs.pop('name', None), guess_result, **kwargs)
+        parsed = MovieParseResult(
+            data=data,
+            name=guess_result.get('title'),
+            year=guess_result.get('year'),
+            proper_count=self._proper_count(guess_result),
+            quality=self._quality(guess_result)
+        )
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed

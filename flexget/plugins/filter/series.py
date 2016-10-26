@@ -1257,7 +1257,6 @@ class FilterSeries(FilterSeriesBase):
         """
         Search for `series_name` and populate all `series_*` fields in entries when successfully parsed
 
-        :param session: SQLAlchemy session
         :param entries: List of entries to process
         :param series_name: Series name which is being processed
         :param config: Series config being processed
@@ -1294,8 +1293,8 @@ class FilterSeries(FilterSeriesBase):
 
         for entry in entries:
             # skip processed entries
-            if (entry.get('series_parser') and entry['series_parser'].valid and entry[
-                'series_parser'].name.lower() != series_name.lower()):
+            if (entry.get('series_parser') and entry['series_parser'].valid and
+                        entry['series_parser'].name.lower() != series_name.lower()):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.

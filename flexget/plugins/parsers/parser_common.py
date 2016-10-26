@@ -111,6 +111,51 @@ def normalize_name(name):
     return name
 
 
+class MovieParseResult(object):
+    def __init__(self, data=None, name=None, year=None, quality=None, proper_count=0, valid=True):
+        self.name = name
+        self.data = data
+        self.year = year
+        self.quality = quality
+        self.proper_count = proper_count
+        self.valid = valid
+
+
+class SeriesParseResult(object):
+    def __init__(self,
+                 data=None,
+                 name=None,
+                 season=None,
+                 episode=None,
+                 episodes=None,
+                 id=None,
+                 id_type=None,
+                 identifier=None,
+                 quality=None,
+                 proper_count=0,
+                 special=False,
+                 group=None,
+                 valid=True
+                 ):
+        self.name = name
+        self.data = data
+        self.season = season
+        self.episode = episode
+        self.episodes = episodes
+        self.id = id
+        self.id_type = id_type
+        self.identifier = identifier
+        self.quality = quality
+        self.proper_count = proper_count
+        self.special = special
+        self.group = group
+        self.valid = valid
+
+    @property
+    def proper(self):
+        return self.proper_count > 0
+
+
 class ParsedEntry(ABCMeta(native_str('ParsedEntryABCMeta'), (object,), {})):
     """
     A parsed entry, containing parsed data like name, year, episodeNumber and season.

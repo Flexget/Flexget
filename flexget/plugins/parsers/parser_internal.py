@@ -9,14 +9,13 @@ from flexget.event import event
 from flexget.utils.log import log_once
 from flexget.utils.titles.movie import MovieParser
 from flexget.utils.titles.series import SeriesParser
-from .parser_common import ParseWarning
+from .parser_common import ParseWarning, MovieParseResult, SeriesParseResult
 
 log = logging.getLogger('parser_internal')
 
 
 class ParserInternal(object):
     # movie_parser API
-
     @plugin.priority(1)
     def parse_movie(self, data, **kwargs):
         log.debug('Parsing movie: `%s` kwargs: %s', data, kwargs)
@@ -26,9 +25,16 @@ class ParserInternal(object):
             parser.parse(data)
         except ParseWarning as pw:
             log_once(pw.value, logger=log)
+        result = MovieParseResult(
+            data=data,
+            name=parser.name,
+            year=parser.year,
+            quality=parser.quality,
+            proper_count=parser.proper_count
+        )
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parser, (end - start) * 1000)
-        return parser
+        return result
 
     # series_parser API
     @plugin.priority(1)
@@ -40,9 +46,26 @@ class ParserInternal(object):
             parser.parse(data)
         except ParseWarning as pw:
             log_once(pw.value, logger=log)
+        # TODO: Returning this invalid object seems a bit silly, raise an exception is probably better
+        if not parser.valid:
+            return SeriesParseResult(valid=False)
+        result = SeriesParseResult(
+            data=data,
+            name=parser.name,
+            season=parser.season,
+            episode=parser.episode,
+            episodes=parser.episodes,
+            id=parser.id,
+            id_type=parser.id_type,
+            identifier=parser.identifier,
+            quality=parser.quality,
+            proper_count=parser.proper_count,
+            special=parser.special,
+            group=parser.group
+        )
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parser, (end - start) * 1000)
-        return parser
+        return result
 
 
 @event('plugin.register')
