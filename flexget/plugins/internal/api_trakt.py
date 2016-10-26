@@ -817,7 +817,7 @@ class TraktMovie(Base):
                     'language', 'tagline', 'year', 'trailer', 'homepage']:
             setattr(self, col, trakt_movie.get(col))
         if trakt_movie.get('released'):
-            self.released = dateutil_parse(trakt_movie.get('released'), ignoretz=True)
+            self.released = dateutil_parse(trakt_movie.get('released'), ignoretz=True).date()
         self.updated_at = dateutil_parse(trakt_movie.get('updated_at'), ignoretz=True)
         self.genres = [TraktGenre(name=g.replace(' ', '-')) for g in trakt_movie.get('genres', [])]
         self.cached_at = datetime.now()
