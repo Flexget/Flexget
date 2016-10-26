@@ -403,6 +403,44 @@ class ParserGuessit(object):
 
         # NOTE: Guessit expects str on PY3 and unicode on PY2 hence the use of future.utils.native
         guess_result = guessit_api.guessit(native(data), options=guessit_options)
+        if guess_result.get('type') != 'episode':
+            return SeriesParseResult(data=data, valid=False)
+
+        name = kwargs.get('name')
+        if not name:
+            name = guess_result.get('title')
+            if guess_result.get('country') and hasattr(guess_result.get('country'), 'alpha2'):
+                name += ' (%s)' % guess_result.get('country').alpha2
+
+        season = guess_result.get('season')
+        episode = guess_result.get('episode')
+        if 'episode' not in guess_result.values_list:
+            episodes = len(guess_result.values_list.get('part', []))
+        else:
+            episodes = len(guess_result.values_list['episode'])
+        if guess_result.matches['regexpId']:
+            id_type = 'id'
+            id = '-'.join(match.value for match in guess_result.matches['regexpId'])
+            identifier = id
+            identifiers = [id]
+        ###
+
+        parsed = SeriesParseResult(
+            data=data,
+            name=name,
+            season=season,
+            episode=episode,
+            episodes=episodes,
+            id=id,
+            id_type=id_type,
+            identifiers=identifiers,
+            pack_identifier=pack_identifier,
+            quality=quality,
+            proper_count=proper_count,
+            special=special,
+            group=group
+        )
+
         parsed = GuessitParsedSerie(data, kwargs.pop('name', None), guess_result, **kwargs)
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)

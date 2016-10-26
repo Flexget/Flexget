@@ -8,6 +8,7 @@ import re
 from abc import abstractproperty, abstractmethod, ABCMeta
 from string import capwords
 
+from flexget.utils.qualities import Quality
 from flexget.utils.tools import ReList
 
 log = logging.getLogger('parser')
@@ -116,7 +117,7 @@ class MovieParseResult(object):
         self.name = name
         self.data = data
         self.year = year
-        self.quality = quality
+        self.quality = quality if quality is not None else Quality()
         self.proper_count = proper_count
         self.valid = valid
 
@@ -149,7 +150,7 @@ class SeriesParseResult(object):
         self.identifier = identifier
         self.identifiers = identifiers
         self.pack_identifier = pack_identifier
-        self.quality = quality
+        self.quality = quality if quality is not None else Quality()
         self.proper_count = proper_count
         self.special = special
         self.group = group
