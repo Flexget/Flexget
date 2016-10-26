@@ -58,6 +58,8 @@ class ParserInternal(object):
             id=parser.id,
             id_type=parser.id_type,
             identifier=parser.identifier,
+            identifiers=parser.identifiers,
+            pack_identifier=parser.pack_identifier,
             quality=parser.quality,
             proper_count=parser.proper_count,
             special=parser.special,

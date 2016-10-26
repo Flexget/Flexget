@@ -131,6 +131,8 @@ class SeriesParseResult(object):
                  id=None,
                  id_type=None,
                  identifier=None,
+                 identifiers=None,
+                 pack_identifier=None,
                  quality=None,
                  proper_count=0,
                  special=False,
@@ -145,6 +147,8 @@ class SeriesParseResult(object):
         self.id = id
         self.id_type = id_type
         self.identifier = identifier
+        self.identifiers = identifiers
+        self.pack_identifier = pack_identifier
         self.quality = quality
         self.proper_count = proper_count
         self.special = special
