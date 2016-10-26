@@ -26,7 +26,7 @@ flask>=0.7
 flask-restful>=0.3.3
 flask-restplus==0.8.6
 flask-compress>=1.2.1
-flask-login>=0.3.2
+flask-login>=0.3.2, <0.4.0
 flask-cors>=2.1.2
 pyparsing>=2.0.3
 Safe>=0.4
