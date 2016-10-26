@@ -1,9 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
-import functools
 import logging
 import time
+
+try:
+    from functools import lru_cache
+except ImportError:
+    from backports.functools_lru_cache import lru_cache
 
 from flexget import plugin
 from flexget.event import event
@@ -14,7 +18,7 @@ from .parser_common import ParseWarning
 
 log = logging.getLogger('parser_internal')
 
-series_parser_cache = functools.lru_cache()(SeriesParser)
+series_parser_cache = lru_cache()(SeriesParser)
 
 
 def series_parser_factory(**kwargs):

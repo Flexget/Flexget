@@ -31,3 +31,4 @@ flask-cors>=2.1.2
 pyparsing>=2.0.3
 Safe>=0.4
 future>=0.15.2
+backports.functools_lru_cache; python_version <= '2.7'
