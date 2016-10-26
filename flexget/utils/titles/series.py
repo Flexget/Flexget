@@ -103,7 +103,7 @@ class SeriesParser(TitleParser):
         """
 
         self.name = name
-        self.alternate_names = alternate_names or []
+        self.alternate_names = list(alternate_names or ())
         self.data = ''
         self.identified_by = identified_by
         # Stores the type of identifier found, 'ep', 'date', 'sequence' or 'special'
@@ -114,7 +114,9 @@ class SeriesParser(TitleParser):
         for mode in ID_TYPES:
             listname = mode + '_regexps'
             if locals()[listname]:
-                setattr(self, listname, ReList(locals()[listname] + getattr(SeriesParser, listname)))
+                newrelist = ReList(locals()[listname])
+                newrelist.extend(getattr(SeriesParser, listname))
+                setattr(self, listname, newrelist)
         self.specials = self.specials + [i.lower() for i in (special_ids or [])]
         self.prefer_specials = prefer_specials
         self.assume_special = assume_special
