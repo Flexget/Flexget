@@ -28,11 +28,13 @@
 
         function cleanup() {
             return $http.get('/api/database/cleanup/')
+                .then(callSucceeded)
                 .catch(callFailed);;
         }
 
         function vacuum() {
             return $http.get('/api/database/vacuum/')
+                .then(callSucceeded)
                 .catch(callFailed);
         }
 
@@ -40,7 +42,12 @@
             return $http.get('/api/database/reset_plugin', {
                 params: params
             })
+                .then(callSucceeded)
                 .catch(callFailed);
+        }
+
+        function callSucceeded(response) {
+            return response.data;
         }
 
         function callFailed(error) {

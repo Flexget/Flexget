@@ -10,7 +10,7 @@
             controller: databaseController
         });
 
-    function databaseController(databaseService) {
+    function databaseController($mdDialog, $sce, $mdToast, databaseService) {
         var vm = this;
 
         vm.$onInit = activate;
@@ -30,11 +30,23 @@
         }
 
         function cleanup() {
-            databaseService.cleanup();
+            databaseService.cleanup()
+                .then(openSuccess);
         }
 
         function vacuum() {
-            databaseService.vacuum();
+            databaseService.vacuum()
+                .then(openSuccess);
+        }
+
+        function openSuccess(data) {
+            var toast = $mdToast.simple()
+                .textContent(data.message)
+                .position('bottom right')
+                .capsule(true)
+                .toastClass('success');
+
+            $mdToast.show(toast);
         }
 
         function searchPlugin(query) {
@@ -51,13 +63,19 @@
         }
 
         function resetPlugin() {
-            var params = {
-                plugin_name: vm.selectedPlugin
-            }
-            databaseService.resetPlugin(params)
-                .then(function (response) {
-                    console.log('yay, success!', response);
-                });
+            var confirm = $mdDialog.confirm()
+                .title('Confirm resetting plugin.')
+                .htmlContent($sce.trustAsHtml('Are you sure you want to reset the database for <b>' + vm.selectedPlugin + '</b>?'))
+                .ok('Reset')
+                .cancel('No');
+
+            $mdDialog.show(confirm).then(function () {
+                var params = {
+                    plugin_name: vm.selectedPlugin
+                }
+                databaseService.resetPlugin(params)
+                    .then(openSuccess);
+            });
         }
     }
 }());
