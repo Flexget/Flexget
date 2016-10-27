@@ -229,14 +229,14 @@ def display_details(options):
             ep_data.append('\n'.join(release_qualities))
             ep_data.append('\n'.join(release_propers))
             table_data.append(ep_data)
-        index = ' %s \n' % (colorize(DOWNLOADED_RELEASE_COLOR, '* Downloaded'))
+        footer = ' %s \n' % (colorize(DOWNLOADED_RELEASE_COLOR, '* Downloaded'))
         if not series.identified_by:
-            footer = (' Series plugin is still learning which episode numbering mode is \n'
+            footer += ('\n Series plugin is still learning which episode numbering mode is \n'
                       ' correct for this series (identified_by: auto).\n'
                       ' Few duplicate downloads can happen with different numbering schemes\n'
                       ' during this time.')
         else:
-            footer = ' Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by
+            footer += '\n Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by
         footer += ' \n See option `identified_by` for more information.\n'
         if series.begin:
             footer += ' Begin episode for this series set to `%s`.' % series.begin.identifier
@@ -246,7 +246,6 @@ def display_details(options):
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
         return
-    console(index)
     if not options.table_type == 'porcelain':
         console(footer)
 
