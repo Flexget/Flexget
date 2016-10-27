@@ -11,7 +11,8 @@
             toggle: toggle,
             getPlugins: getPlugins,
             cleanup: cleanup,
-            vacuum: vacuum
+            vacuum: vacuum,
+            resetPlugin: resetPlugin
         };
 
         function toggle() {
@@ -32,6 +33,13 @@
 
         function vacuum() {
             return $http.get('/api/database/vacuum/')
+                .catch(callFailed);
+        }
+
+        function resetPlugin(params) {
+            return $http.get('/api/database/reset_plugin', {
+                params: params
+            })
                 .catch(callFailed);
         }
 

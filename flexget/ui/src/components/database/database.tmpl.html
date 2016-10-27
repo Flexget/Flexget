@@ -34,7 +34,8 @@
                 md-items="plugin in vm.searchPlugin(searchText)"
                 md-search-text="searchText"
                 md-selected-item="vm.selectedPlugin"
-                md-floating-label="Select plugin">
+                md-floating-label="Select plugin"
+                md-min-length="0">
                 <md-item-template>
                     <span md-highlight-text="searchText">{{ plugin }}</span>
                 </md-item-template>

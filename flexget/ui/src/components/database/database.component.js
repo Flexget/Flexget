@@ -17,7 +17,8 @@
         vm.cleanup = cleanup;
         vm.vacuum = vacuum;
         vm.searchPlugin = searchPlugin;
-
+        vm.resetPlugin = resetPlugin;
+        
         function activate() {
             databaseService.getPlugins()
                 .then(setPlugins)
@@ -47,6 +48,16 @@
                     return angular.lowercase(plugin).indexOf(lowercaseQuery) != -1;
                 }
             }
+        }
+
+        function resetPlugin() {
+            var params = {
+                plugin_name: vm.selectedPlugin
+            }
+            databaseService.resetPlugin(params)
+                .then(function (response) {
+                    console.log('yay, success!', response);
+                });
         }
     }
 }());
