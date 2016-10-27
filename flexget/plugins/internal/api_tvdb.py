@@ -523,7 +523,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
                 series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
                 if not series:
                     series = session.merge(TVDBSeries(tvdb_id, language))
-        if series:
+        if series and series.name:
             _update_search_strings(series, session, search=name)
 
     if not series:
