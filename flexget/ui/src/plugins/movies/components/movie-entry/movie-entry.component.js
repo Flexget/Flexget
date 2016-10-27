@@ -25,9 +25,10 @@
 
         function getMetadata() {
             var params = {
-                year: vm.movie.year
+                year: vm.movie.year,
+                title: vm.movie.title,
+                include_posters: true
             };
-
 
             vm.movie.movies_list_ids.forEach(function (id) {
                 var newid = {};
@@ -35,7 +36,7 @@
                 params = angular.extend(params, newid);
             });
 
-            moviesService.getMovieMetadata(vm.movie.title, params)
+            moviesService.getMovieMetadata(params)
                 .then(setMetadata)
                 .cached(setMetadata);
         }
