@@ -70,7 +70,7 @@ class TVDBRequest(object):
         result = result.json()
 
         if result.get('errors'):
-            log.debug(result['errors'])
+            log.debug('Result contains errors: %s', result['errors'])
             # a hack to make sure it doesn't raise exception on a simple invalidLanguage. This is because tvdb
             # has a tendency to contain bad data and randomly return this error for no reason
             if len(result['errors']) > 1 or 'invalidLanguage' not in result['errors']:
