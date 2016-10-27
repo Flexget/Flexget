@@ -70,7 +70,7 @@ class TVDBRequest(object):
         result = result.json()
 
         if result.get('errors'):
-            log.debug(result['errors'])
+            log.debug('Result contains errors: %s', result['errors'])
             # a hack to make sure it doesn't raise exception on a simple invalidLanguage. This is because tvdb
             # has a tendency to contain bad data and randomly return this error for no reason
             if len(result['errors']) > 1 or 'invalidLanguage' not in result['errors']:
@@ -523,7 +523,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
                 series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
                 if not series:
                     series = session.merge(TVDBSeries(tvdb_id, language))
-        if series:
+        if series and series.name:
             _update_search_strings(series, session, search=name)
 
     if not series:

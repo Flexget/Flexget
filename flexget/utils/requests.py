@@ -55,7 +55,6 @@ def set_unresponsive(url):
 
 
 class DomainLimiter(object):
-
     def __init__(self, domain):
         self.domain = domain
 
@@ -237,7 +236,7 @@ class Session(requests.Session):
             return _wrap_urlopen(url, timeout=kwargs['timeout'])
 
         try:
-            log.debug('Fetching %s' % url)
+            log.debug('Fetching URL %s with args %s and kwargs %s', url, args, kwargs)
             result = super(Session, self).request(method, url, *args, **kwargs)
         except requests.Timeout:
             # Mark this site in known unresponsive list

@@ -236,6 +236,7 @@ def display_details(options):
                     title = colorize(UNDOWNLOADED_RELEASE_COLOR, title)
                     quality = quality
                 else:
+                    title += ' *'
                     title = colorize(DOWNLOADED_RELEASE_COLOR, title)
                     quality = quality
                 release_titles.append(title)
@@ -245,16 +246,14 @@ def display_details(options):
             ep_data.append('\n'.join(release_qualities))
             ep_data.append('\n'.join(release_propers))
             table_data.append(ep_data)
-        footer = (' %s %s\n' % (colorize(DOWNLOADED_RELEASE_COLOR, 'Downloaded'),
-                                colorize(UNDOWNLOADED_RELEASE_COLOR, 'Un-downloaded')))
+        footer = ' %s \n' % (colorize(DOWNLOADED_RELEASE_COLOR, '* Downloaded'))
         if not series.identified_by:
-            footer += ('\n'
-                       ' Series plugin is still learning which episode numbering mode is \n'
-                       ' correct for this series (identified_by: auto).\n'
-                       ' Few duplicate downloads can happen with different numbering schemes\n'
-                       ' during this time.')
+            footer += ('\n Series plugin is still learning which episode numbering mode is \n'
+                      ' correct for this series (identified_by: auto).\n'
+                      ' Few duplicate downloads can happen with different numbering schemes\n'
+                      ' during this time.')
         else:
-            footer += ' \n Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by
+            footer += '\n Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by
         footer += ' \n See option `identified_by` for more information.\n'
         if series.begin:
             footer += ' Begin episode for this series set to `%s`.' % series.begin.identifier

@@ -55,8 +55,8 @@
             }
         }
 
-        function getMovieMetadata(title, params) {
-            return $http.get('/api/trakt/movies/' + title + '/', {
+        function getMovieMetadata(params) {
+            return $http.get('/api/tmdb/movies/', {
                 params: params,
                 etagCache: true
             })
