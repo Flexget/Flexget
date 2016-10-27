@@ -30,11 +30,17 @@
             <span>
                 Reset the database of a specific plugin.
             </span>
-            <md-select ng-model="selectedPlugin">
-                <md-option ng-repeat="plugin in vm.plugins">{{ plugin }}</md-option>
-            </md-select>
-            <md-button class="md-primary md-raised" flex>
-                Reset
+            <md-autocomplete
+                md-items="plugin in vm.searchPlugin(searchText)"
+                md-search-text="searchText"
+                md-selected-item="vm.selectedPlugin"
+                md-floating-label="Select plugin">
+                <md-item-template>
+                    <span md-highlight-text="searchText">{{ plugin }}</span>
+                </md-item-template>
+            </md-autocomplete>
+            <md-button class="md-primary md-raised" flex ng-disabled="!vm.selectedPlugin" ng-click="vm.resetPlugin()">
+                Reset plugin
             </md-button>
         </section>
     </section>

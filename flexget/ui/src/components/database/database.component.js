@@ -16,6 +16,7 @@
         vm.$onInit = activate;
         vm.cleanup = cleanup;
         vm.vacuum = vacuum;
+        vm.searchPlugin = searchPlugin;
 
         function activate() {
             databaseService.getPlugins()
@@ -33,6 +34,19 @@
 
         function vacuum() {
             databaseService.vacuum();
+        }
+
+        function searchPlugin(query) {
+            var results = query ? vm.plugins.filter(createFilterFor(query)) : vm.plugins;
+            return results;
+
+            function createFilterFor(query) {
+                var lowercaseQuery = angular.lowercase(query);
+
+                return function filterFn(plugin) {
+                    return angular.lowercase(plugin).indexOf(lowercaseQuery) != -1;
+                }
+            }
         }
     }
 }());
