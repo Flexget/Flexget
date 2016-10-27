@@ -9,6 +9,7 @@ from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
+from flexget.utils.tools import parse_episode_identifier
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
@@ -29,6 +30,14 @@ DOWNLOADED_RELEASE_COLOR = 'white'
 ERROR_COLOR = 'red'
 
 
+def episode_type(value):
+    try:
+        parse_episode_identifier(value)
+    except LookupError as e:
+        raise argparse.ArgumentTypeError(e.args[0])
+    return value
+
+
 def do_cli(manager, options):
     if hasattr(options, 'table_type') and options.table_type == 'porcelain':
         disable_all_colors()
@@ -41,7 +50,9 @@ def do_cli(manager, options):
     elif options.series_action == 'forget':
         remove(manager, options, forget=True)
     elif options.series_action == 'add':
-        add(manager, options)
+        manage(manager, options)
+    elif options.series_action == 'update':
+        manage(manager, options, update=True)
 
 
 def display_summary(options):
@@ -120,7 +131,7 @@ def display_summary(options):
         console(footer)
 
 
-def add(manager, options):
+def manage(manager, options, update=False):
     series_name = options.series_name
     series_name = series_name.replace(r'\!', '!')
     ep_id = options.begin
@@ -133,8 +144,8 @@ def add(manager, options):
         list_id = list.id
         series = shows_by_exact_name(normalized_name, session)
         if not series:
-            if options.update:
-                console('Series `%s` does not exist yet, use ADD command first' % series_name)
+            if update and options.series_action == 'update':
+                console('ERROR: Series `%s` does not exist yet, use ADD command first' % series_name)
                 return
             console('Series not yet in database, adding `%s`' % series_name)
             series = Series()
@@ -142,6 +153,9 @@ def add(manager, options):
             series.list_id = list_id
             session.add(series)
         else:
+            if options.series_action == 'add':
+                console('ERROR: Series `%s` already exist, use UPDATE command' % series_name)
+                return
             series = series[0]
         if ep_id:
             try:
@@ -249,9 +263,9 @@ def display_details(options):
         footer = ' %s \n' % (colorize(DOWNLOADED_RELEASE_COLOR, '* Downloaded'))
         if not series.identified_by:
             footer += ('\n Series plugin is still learning which episode numbering mode is \n'
-                      ' correct for this series (identified_by: auto).\n'
-                      ' Few duplicate downloads can happen with different numbering schemes\n'
-                      ' during this time.')
+                       ' correct for this series (identified_by: auto).\n'
+                       ' Few duplicate downloads can happen with different numbering schemes\n'
+                       ' during this time.')
         else:
             footer += '\n Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by
         footer += ' \n See option `identified_by` for more information.\n'
@@ -277,7 +291,7 @@ def register_parser_arguments():
     series_parser.add_argument('series_name', help='The name of the series', metavar='<series name>')
 
     list_name_parser = argparse.ArgumentParser(add_help=False)
-    list_name_parser.add_argument('list_name', nargs='?', default=DEFAULT_SERIES_LIST_NAME,
+    list_name_parser.add_argument('--list_name', nargs='?', default=DEFAULT_SERIES_LIST_NAME,
                                   help='Name of series list to operate on. Default is %s' % DEFAULT_SERIES_LIST_NAME)
 
     # Set up our subparsers
@@ -286,7 +300,7 @@ def register_parser_arguments():
     # List subparser
     list_parser = subparsers.add_parser('list', parents=[list_name_parser, table_parser],
                                         help='List a summary of the different series being tracked in a series list.')
-    list_parser.add_argument('--configured', nargs='?', choices=['configured', 'unconfigured', 'all'],
+    list_parser.add_argument('configured', nargs='?', choices=['configured', 'unconfigured', 'all'],
                              default='configured',
                              help='Limit list to series that are currently in the config or not (default: %(default)s)')
     list_parser.add_argument('--premieres', action='store_true',
@@ -307,13 +321,6 @@ def register_parser_arguments():
     subparsers.add_parser('show', parents=[series_parser, table_parser],
                           help='Show the releases FlexGet has seen for a given series ')
 
-    # Begin subparser
-    begin_parser = subparsers.add_parser('begin', parents=[list_name_parser, series_parser],
-                                         help='Set the episode to start getting a series from')
-    begin_parser.add_argument('episode_id', metavar='<episode ID>',
-                              help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
-                                   'depending on how the series is numbered)')
-
     # Forger subparser
     forget_parser = subparsers.add_parser('forget', parents=[series_parser],
                                           help='Removes episodes or whole series from the entire database '
@@ -326,7 +333,16 @@ def register_parser_arguments():
     delete_parser.add_argument('episode_id', nargs='?', default=None, help='Episode ID to forget (optional)')
 
     # Add subparser
-    subparsers.add_parser('add', parents=[list_name_parser, series_parser], help='Add a show to a series list.')
+    add_parser = subparsers.add_parser('add', parents=[list_name_parser, series_parser],
+                                       help='Add a show to a series list.')
+    add_parser.add_argument('--begin', metavar='<episode ID>', type=episode_type,
+                            help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
+                                 'depending on how the series is numbered)')
 
     # Update parser
-    subparsers.add_parser('update', parents=[list_name_parser, series_parser], help='Update an show in a series list.')
+    update_parser = subparsers.add_parser('update', parents=[list_name_parser, series_parser],
+                                          help='Update an show in a series list.')
+    group = update_parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--begin', metavar='<episode ID>', type=episode_type,
+                       help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
+                            'depending on how the series is numbered)')
