@@ -69,4 +69,4 @@ class DBPluginsSchemas(APIResource):
     @api.response(200, model=plugins_schema)
     def get(self, session=None):
         """ Get a list of plugin names available to reset """
-        return jsonify(list(plugin_schemas))
+        return jsonify(sorted(list(plugin_schemas)))
