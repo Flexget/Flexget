@@ -7,6 +7,7 @@
             'ngCookies',
             'ngMaterial',
             'ngMessages',
+            'ngSanitize',
 
             'angular-loading-bar',
             'http-etag',
