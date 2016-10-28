@@ -108,7 +108,7 @@ class Discover(object):
                 try:
                     result = method(task, input_config)
                 except PluginError as e:
-                    log.warning('Error during input plugin %s: %s', (input_name, e))
+                    log.warning('Error during input plugin %s: %s', input_name, e)
                     continue
                 if not result:
                     log.warning('Input %s did not return anything', input_name)
