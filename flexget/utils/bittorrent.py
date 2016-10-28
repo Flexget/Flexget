@@ -139,7 +139,7 @@ def bdecode(text):
         data = decode_item(functools.partial(next, src), next(src))  # pylint:disable=E1101
         for _ in src:  # look for more tokens
             raise SyntaxError("trailing junk")
-    except (AttributeError, ValueError, StopIteration) as e:
+    except (AttributeError, ValueError, StopIteration, TypeError) as e:
         raise SyntaxError("syntax error: %s" % e)
     return data
 
