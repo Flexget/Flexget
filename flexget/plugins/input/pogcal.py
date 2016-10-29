@@ -60,8 +60,7 @@ class InputPogDesign(object):
 
             e = Entry()
             e['title'] = t
-            # url = row.find_next('a', {'class': 'slink'})
-            # e['url'] = 'http://www.pogdesign.co.uk' + url['href']
+            e['url'] = 'http://www.pogdesign.co.uk/{0}'.format(row.find_next('a')['href'].lstrip('/'))
             entries.append(e)
 
         return entries

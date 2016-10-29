@@ -41,7 +41,7 @@ class PogcalAcquired(object):
         if not task.accepted and not task.options.test:
             return
         try:
-            result = session.post('http://www.pogdesign.co.uk/cat/',
+            result = session.post('http://www.pogdesign.co.uk/cat/login',
                                   data={'username': config['username'],
                                         'password': config['password'],
                                         'sub_login': 'Account Login'})
@@ -86,12 +86,12 @@ class PogcalAcquired(object):
             log.error('Error looking up show show list from pogdesign calendar: %s' % e)
             return
         # Try to find the show id from pogdesign show list
-        show_re = name_to_re(None, show_name)
+        show_re = name_to_re(show_name)
         soup = get_soup(page.content)
         search = re.compile(show_re, flags=re.I)
         show = soup.find(text=search)
         if show:
-            id = int(show.previous['value'])
+            id = int(show.find_previous('input')['value'])
             db_sess.add(PogcalShow(id=id, name=show_name))
             return id
         else:
