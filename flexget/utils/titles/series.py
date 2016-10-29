@@ -329,6 +329,7 @@ class SeriesParser(TitleParser):
                     self.episodes = (ep_match['end_episode'] - ep_match['episode']) + 1
                 else:
                     self.episodes = 1
+                self.id = (self.season, self.episode)
                 self.id_type = 'ep'
                 self.valid = True
                 if not (self.special and self.prefer_specials):
@@ -351,6 +352,7 @@ class SeriesParser(TitleParser):
 
                     self.season = int(match.group(1))
                     self.episode = int(match.group(2))
+                    self.id = (self.season, self.episode)
                     log.debug(self)
                     self.id_type = 'ep'
                     self.valid = True

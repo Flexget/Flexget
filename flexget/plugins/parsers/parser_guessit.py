@@ -414,52 +414,62 @@ class ParserGuessit(object):
 
         season = guess_result.get('season')
         episode = guess_result.get('episode')
+        if episode is None and 'part' in guess_result:
+            episode = guess_result['part']
         date = guess_result.get('date')
         quality = self._quality(guess_result)
         proper_count = self._proper_count(guess_result)
+        group = guess_result.get('release_group')
+        special = guess_result.get('episode_details', '').lower() == 'special'
         if 'episode' not in guess_result.values_list:
             episodes = len(guess_result.values_list.get('part', []))
         else:
             episodes = len(guess_result.values_list['episode'])
-        if guess_result.matches['regexpId']:
-            id_type = 'id'
-            id = '-'.join(match.value for match in guess_result.matches['regexpId'])
-            identifier = id
-            identifiers = [id]
-        elif season is not None and episode is not None:
-            id_type = 'ep'
-            id = None
-            identifier = 'S%02dE%02d' % (season, episode)
-            # TODO: support multiple properly
-            identifiers = [identifier]
-        elif episode is not None:
-            id_type = 'sequence'
-            id = episode
-            identifier = episode
-            identifiers = [identifier]
-        elif date:
-            id_type = 'date'
-            id = date
-            identifier = date.strftime('%Y-%m-%d')
-            identifiers = [identifier]
-        else:
+        if episodes > 3:
+            return SeriesParseResult(data=data, valid=False)
+        identified_by = kwargs.get('identified_by', 'auto')
+        id_type, id = None, None
+        if identified_by in ['date', 'auto']:
+            if date:
+                id_type = 'date'
+                id = date
+        if not id_type and identified_by in ['ep', 'auto']:
+            if episode is not None:
+                if season is None and kwargs.get('allow_seasonless', True):
+                    if 'part' in guess_result:
+                        season = 1
+                    else:
+                        episode_raw = guess_result.matches['episode'][0].initiator.raw
+                        if episode_raw and any(c.isalpha() and c.lower() != 'v' for c in episode_raw):
+                            season = 1
+                if season is not None:
+                    id_type = 'ep'
+                    id = (season, episode)
+
+        if not id_type and identified_by in ['id', 'auto']:
+            if guess_result.matches['regexpId']:
+                id_type = 'id'
+                id = '-'.join(match.value for match in guess_result.matches['regexpId'])
+        if not id_type and identified_by in ['sequence', 'auto']:
+            if episode is not None:
+                id_type = 'sequence'
+                id = episode
+        if not id_type and special:
+            id_type = 'special'
+            id = guess_result.get('title', 'special')
+        if not id_type:
             return SeriesParseResult(data=data, valid=False)
 
         parsed = SeriesParseResult(
             data=data,
             name=name,
-            season=season,
-            episode=episode,
             episodes=episodes,
             id=id,
             id_type=id_type,
-            identifier=identifier,
-            identifiers=identifiers,
-            # pack_identifier=pack_identifier,
             quality=quality,
             proper_count=proper_count,
-            # special=special,
-            # group=group
+            special=special,
+            group=group
         )
 
         end = time.clock()

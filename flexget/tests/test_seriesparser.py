@@ -67,7 +67,6 @@ class TestSeriesParser(object):
         """SeriesParser: confusing (invalid) numbering scheme"""
         s = parse(name='Something', data='Something.2008x12.13-FlexGet')
         assert not s.episode, 'Should not have episode'
-        assert not s.season, 'Should not have season'
         assert s.id_type == 'date'
         assert s.identifier == '2008-12-13', 'invalid id'
         assert s.valid, 'should be valid'
@@ -404,12 +403,12 @@ class TestSeriesParser(object):
     def test_from_groups(self, parse):
         """SeriesParser: test from groups"""
         s = parse('Test.S01E01-Group', name='Test', allow_groups=['xxxx', 'group'])
-        assert s.group == 'group', 'did not get group'
+        assert s.group.lower() == 'group', 'did not get group'
 
     def test_group_dashes(self, parse):
         """SeriesParser: group name around extra dashes"""
         s = parse('Test.S01E01-FooBar-Group', name='Test', allow_groups=['xxxx', 'group'])
-        assert s.group == 'group', 'did not get group with extra dashes'
+        assert s.group.lower() == 'group', 'did not get group with extra dashes'
 
     def test_id_and_hash(self, parse):
         """SeriesParser: Series with confusing hash"""

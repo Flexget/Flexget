@@ -126,30 +126,20 @@ class SeriesParseResult(object):
     def __init__(self,
                  data=None,
                  name=None,
-                 season=None,
-                 episode=None,
-                 episodes=None,
-                 id=None,
                  id_type=None,
-                 identifier=None,
-                 identifiers=None,
-                 pack_identifier=None,
+                 id=None,
+                 episodes=1,
                  quality=None,
                  proper_count=0,
                  special=False,
                  group=None,
                  valid=True
                  ):
-        self.name = name
         self.data = data
-        self.season = season
-        self.episode = episode
-        self.episodes = episodes
-        self.id = id
+        self.name = name
         self.id_type = id_type
-        self.identifier = identifier
-        self.identifiers = identifiers
-        self.pack_identifier = pack_identifier
+        self.id = id
+        self.episodes = episodes
         self.quality = quality if quality is not None else Quality()
         self.proper_count = proper_count
         self.special = special
@@ -159,6 +149,55 @@ class SeriesParseResult(object):
     @property
     def proper(self):
         return self.proper_count > 0
+
+    @property
+    def season(self):
+        if self.id_type == 'ep':
+            return self.id[0]
+        if self.id_type == 'date':
+            return self.id.year
+        if self.id_type == 'sequence':
+            return 0
+        return None
+
+    @property
+    def episode(self):
+        if self.id_type == 'ep':
+            return self.id[1]
+        if self.id_type == 'sequence':
+            return self.id
+        return None
+
+    @property
+    def identifiers(self):
+        if self.id_type == 'ep':
+            return ['S%02dE%02d' % (self.season, self.episode + x) for x in range(self.episodes)]
+        elif self.id_type == 'date':
+            return [self.id.strftime('%Y-%m-%d')]
+        elif self.id_type == 'sequence':
+            return [self.id + x for x in range(self.episode)]
+        if self.id is None:
+            raise Exception('Series is missing identifier')
+        else:
+            return [self.id]
+
+    @property
+    def identifier(self):
+        """Return String identifier for parsed episode, eg. S01E02
+        (will be the first identifier if this is a pack)
+        """
+        return self.identifiers[0]
+
+    @property
+    def pack_identifier(self):
+        """Return a combined identifier for the whole pack if this has more than one episode."""
+        if self.episodes > 1:
+            if self.id_type == 'ep':
+                return 'S%02dE%02d-E%02d' % (self.season, self.episode, self.episode + self.episodes - 1)
+            if self.id_type == 'sequence':
+                return '%d-%d' % (self.id, self.id + self.episodes - 1)
+        return self.identifier
+
 
 
 class ParsedEntry(ABCMeta(native_str('ParsedEntryABCMeta'), (object,), {})):
