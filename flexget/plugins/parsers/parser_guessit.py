@@ -8,7 +8,7 @@ import re
 import time
 
 from guessit.rules import rebulk_builder
-from guessit.api import GuessItApi
+from guessit.api import GuessItApi, GuessitException
 from rebulk import Rebulk
 from rebulk.pattern import RePattern
 
@@ -350,7 +350,11 @@ class ParserGuessit(object):
             guessit_options['type'] = parse_type
 
         # NOTE: Guessit expects str on PY3 and unicode on PY2 hence the use of future.utils.native
-        guess_result = guessit_api.guessit(native(data), options=guessit_options)
+        try:
+            guess_result = guessit_api.guessit(native(data), options=guessit_options)
+        except GuessitException:
+            log.warning('Parsing %s with guessit failed. Most likely a unicode error.', data)
+            guess_result = {}
         parsed = GuessitParsedSerie(data, kwargs.pop('name', None), guess_result, **kwargs)
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
