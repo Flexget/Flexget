@@ -569,41 +569,6 @@ class SeriesParser(TitleParser):
                 i += len(numeral)
         return result
 
-    @property
-    def identifiers(self):
-        """Return all identifiers this parser represents. (for packs)"""
-        # Currently 'ep' is the only id type that supports packs
-        if not self.valid:
-            raise Exception('Series flagged invalid')
-        if self.id_type == 'ep':
-            return ['S%02dE%02d' % (self.season, self.episode + x) for x in range(self.episodes)]
-        elif self.id_type == 'date':
-            return [self.id.strftime('%Y-%m-%d')]
-        if self.id is None:
-            raise Exception('Series is missing identifier')
-        else:
-            return [self.id]
-
-    @property
-    def identifier(self):
-        """Return String identifier for parsed episode, eg. S01E02
-        (will be the first identifier if this is a pack)
-        """
-        return self.identifiers[0]
-
-    @property
-    def pack_identifier(self):
-        """Return a combined identifier for the whole pack if this has more than one episode."""
-        # Currently only supports ep mode
-        if self.id_type == 'ep' and self.episodes > 1:
-            return 'S%02dE%02d-E%02d' % (self.season, self.episode, self.episode + self.episodes - 1)
-        else:
-            return self.identifier
-
-    @property
-    def proper(self):
-        return self.proper_count > 0
-
     def __str__(self):
         # for some fucking reason it's impossible to print self.field here, if someone figures out why please
         # tell me!
