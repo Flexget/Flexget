@@ -414,6 +414,9 @@ class ParserGuessit(object):
 
         season = guess_result.get('season')
         episode = guess_result.get('episode')
+        date = guess_result.get('date')
+        quality = self._quality(guess_result)
+        proper_count = self._proper_count(guess_result)
         if 'episode' not in guess_result.values_list:
             episodes = len(guess_result.values_list.get('part', []))
         else:
@@ -423,7 +426,24 @@ class ParserGuessit(object):
             id = '-'.join(match.value for match in guess_result.matches['regexpId'])
             identifier = id
             identifiers = [id]
-        ###
+        elif season is not None and episode is not None:
+            id_type = 'ep'
+            id = None
+            identifier = 'S%02dE%02d' % (season, episode)
+            # TODO: support multiple properly
+            identifiers = [identifier]
+        elif episode is not None:
+            id_type = 'sequence'
+            id = episode
+            identifier = episode
+            identifiers = [identifier]
+        elif date:
+            id_type = 'date'
+            id = date
+            identifier = date.strftime('%Y-%m-%d')
+            identifiers = [identifier]
+        else:
+            return SeriesParseResult(data=data, valid=False)
 
         parsed = SeriesParseResult(
             data=data,
@@ -433,15 +453,15 @@ class ParserGuessit(object):
             episodes=episodes,
             id=id,
             id_type=id_type,
+            identifier=identifier,
             identifiers=identifiers,
-            pack_identifier=pack_identifier,
+            # pack_identifier=pack_identifier,
             quality=quality,
             proper_count=proper_count,
-            special=special,
-            group=group
+            # special=special,
+            # group=group
         )
 
-        parsed = GuessitParsedSerie(data, kwargs.pop('name', None), guess_result, **kwargs)
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed
