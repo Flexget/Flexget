@@ -37,13 +37,17 @@ def action_status(options, irc_manager):
     header = ['Name', 'Alive', 'Channels', 'Server']
     table_data = [header]
 
-    for name, info in status.items():
-        channels = []
-        for channel in info['channels'].keys():
-            channels.append(channel)
-            if channel in info['connected_channels']:
-                channels[-1] = '*' + channels[-1]
-        table_data.append([name, info['alive'], ', '.join(channels), '%s:%s' % (info['server'], info['port'])])
+    if not isinstance(status, list):
+        status = [status]
+
+    for connection in status:
+        for name, info in connection.items():
+            channels = []
+            for channel in info['channels'].keys():
+                channels.append(channel)
+                if channel in info['connected_channels']:
+                    channels[-1] = '*' + channels[-1]
+            table_data.append([name, info['alive'], ', '.join(channels), '%s:%s' % (info['server'], info['port'])])
     table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)

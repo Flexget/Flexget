@@ -897,9 +897,9 @@ class IRCConnectionManager(object):
         self.shutdown_event.set()
 
     def status_all(self):
-        status = {}
+        status = []
         for name in irc_connections.keys():
-            status.update(self.status(name))
+            status.append(self.status(name))
         return status
 
     def status(self, name):
