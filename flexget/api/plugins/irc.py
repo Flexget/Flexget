@@ -4,7 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
 from flask_restplus import inputs
 from flexget.api import api, APIResource
-from flexget.api.app import BadRequest, NotFoundError, success_response, base_message_schema
+from flexget.api.app import BadRequest, NotFoundError, success_response, base_message_schema, empty_response
 
 irc_api = api.namespace('irc', description='View and manage IRC connections')
 
@@ -34,6 +34,18 @@ class IRCStatus(APIResource):
         else:
             status = irc_manager.status_all()
         return jsonify(status)
+
+
+@irc_api.route('/connections/enums/')
+class IRCEnums(APIResource):
+    @api.response(200, model=empty_response)
+    def get(self, session=None):
+        """Get channel status enumeration meaning"""
+        try:
+            from irc_bot import irc_bot
+        except ImportError:
+            raise BadRequest('irc_bot dep is not installed')
+        return jsonify(irc_bot.IRCChannelStatus().enum_dict)
 
 
 @irc_api.route('/restart/')
