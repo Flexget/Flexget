@@ -65,7 +65,7 @@ irc_stop_parser.add_argument('wait', type=inputs.boolean, default=False, help='W
 
 
 @irc_api.route('/stop/')
-@api.doc(parser=irc_parser)
+@api.doc(parser=irc_stop_parser)
 class IRCStop(APIResource):
     @api.response(200, model=base_message_schema)
     @api.response(NotFoundError)
@@ -76,7 +76,7 @@ class IRCStop(APIResource):
         if irc_manager is None:
             raise BadRequest('IRC daemon does not appear to be running')
 
-        args = irc_parser.parse_args()
+        args = irc_stop_parser.parse_args()
         connection = args.get('name')
         wait = args.get('wait')
         try:
