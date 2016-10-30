@@ -406,7 +406,7 @@ class Manager(object):
                 return
             if options.daemonize:
                 self.daemonize()
-            if options.config_autoreload:
+            if options.autoreload_config:
                 self.config_autoreload = True
             try:
                 signal.signal(signal.SIGTERM, self._handle_sigterm)
@@ -420,7 +420,7 @@ class Manager(object):
             self.ipc_server.start()
             self.task_queue.wait()
             fire_event('manager.daemon.completed', self)
-        elif options.action in ['stop', 'reload', 'status', 'enable-autoreload', 'disable-autoreload']:
+        elif options.action in ['stop', 'config-reload', 'status']:
             if not self.is_daemon:
                 log.error('There does not appear to be a daemon running.')
                 return
@@ -430,7 +430,7 @@ class Manager(object):
                 tasks = 'all queued tasks (if any) have' if options.wait else 'currently running task (if any) has'
                 log.info('Daemon shutdown requested. Shutdown will commence when %s finished executing.' % tasks)
                 self.shutdown(options.wait)
-            elif options.action == 'reload':
+            elif options.action == 'reload-config':
                 log.info('Reloading config from disk.')
                 try:
                     self.load_config()
@@ -438,12 +438,6 @@ class Manager(object):
                     log.error('Error loading config: %s' % e.args[0])
                 else:
                     log.info('Config successfully reloaded from disk.')
-            elif options.action == 'enable-autoreload':
-                log.info('Enabled automatic config reloading')
-                self.config_autoreload = True
-            elif options.action == 'disable-autoreload':
-                log.info('Disabled automatic config reloading')
-                self.config_autoreload = False
 
     def _handle_sigterm(self, signum, frame):
         log.info('Got SIGTERM. Shutting down.')
