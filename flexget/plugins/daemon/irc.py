@@ -313,8 +313,8 @@ class IRCConnection(IRCBot):
                 # Try to see if it's not found due to case sensitivity
                 trackers = requests.get('https://api.github.com/repos/autodl-community/'
                                         'autodl-trackers/git/trees/master?recursive=1').json().get('tree', [])
-                for tracker in trackers:
-                    name = tracker.get('path', '')
+                for t in trackers:
+                    name = t.get('path', '')
                     if not name.endswith('.tracker') or name.lower() != tracker_name.lower():
                         continue
                     tracker = requests.get(base_url + name)
@@ -323,7 +323,8 @@ class IRCConnection(IRCBot):
             except (requests.RequestException, IOError) as e:
                 raise TrackerFileError(e)
         if not tracker:
-            raise TrackerFileError('Unable to find %s on disk or Github' % tracker_config_file)
+            raise TrackerFileError('Unable to find %s on disk or Github. Did you spell it correctly?' %
+                                   tracker_config_file)
 
         # If we got this far, let's save our work :)
         save_path = os.path.join(base_dir, tracker_name)
