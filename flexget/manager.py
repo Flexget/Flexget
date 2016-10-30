@@ -420,7 +420,7 @@ class Manager(object):
             self.ipc_server.start()
             self.task_queue.wait()
             fire_event('manager.daemon.completed', self)
-        elif options.action in ['stop', 'config-reload', 'status']:
+        elif options.action in ['stop', 'reload-config', 'status']:
             if not self.is_daemon:
                 log.error('There does not appear to be a daemon running.')
                 return
