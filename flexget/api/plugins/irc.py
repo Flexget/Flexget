@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from flask import jsonify
-from flask.ext.restplus import inputs
+from flask_restplus import inputs
 from flexget.api import api, APIResource
 from flexget.api.app import BadRequest, NotFoundError, success_response, base_message_schema
 

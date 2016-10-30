@@ -43,7 +43,7 @@ def action_status(options, irc_manager):
             channels.append(channel)
             if channel in info['connected_channels']:
                 channels[-1] = '*' + channels[-1]
-        table_data.append([name, info['thread'], ', '.join(channels), '%s:%s' % (info['server'], info['port'])])
+        table_data.append([name, info['alive'], ', '.join(channels), '%s:%s' % (info['server'], info['port'])])
     table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
