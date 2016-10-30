@@ -118,7 +118,7 @@ class Manager(object):
             # Decode all arguments to unicode before parsing
             args = unicode_argv()[1:]
         self.args = args
-        self.config_autoreload = False
+        self.autoreload_config = False
         self.config_file_hash = None
         self.config_base = None
         self.config_name = None
@@ -248,7 +248,7 @@ class Manager(object):
         task_names = self.tasks
         # Only reload config if daemon
         config_hash = self.hash_config()
-        if self.is_daemon and self.config_autoreload and self.config_file_hash != config_hash:
+        if self.is_daemon and self.autoreload_config and self.config_file_hash != config_hash:
             log.info('Config change detected. Reloading.')
             try:
                 self.load_config(output_to_console=False, config_file_hash=config_hash)
@@ -407,7 +407,7 @@ class Manager(object):
             if options.daemonize:
                 self.daemonize()
             if options.autoreload_config:
-                self.config_autoreload = True
+                self.autoreload_config = True
             try:
                 signal.signal(signal.SIGTERM, self._handle_sigterm)
             except ValueError as e:
