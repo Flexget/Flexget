@@ -33,6 +33,8 @@ class IRCStatus(APIResource):
                 raise NotFoundError(e.args[0])
         else:
             status = irc_manager.status_all()
+        if not isinstance(status, list):
+            status = [status]
         return jsonify(status)
 
 
