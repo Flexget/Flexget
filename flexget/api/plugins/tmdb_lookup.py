@@ -102,7 +102,7 @@ class TMDBMoviesAPI(APIResource):
             movie = lookup(session=session, **args)
         except LookupError as e:
             raise NotFoundError(e.args[0])
-
+        session.commit()
         return_movie = movie.to_dict()
         if posters:
             return_movie['posters'] = [p.to_dict() for p in movie.posters]

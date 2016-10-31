@@ -4,6 +4,7 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import logging
 from datetime import datetime, timedelta
 
+from flexget.manager import Session
 from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, Date, func, or_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.schema import ForeignKey
@@ -14,10 +15,10 @@ from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
-from flexget.utils.database import year_property, with_session
+from flexget.utils.database import year_property, with_session, json_synonym
 
 log = logging.getLogger('api_tmdb')
-Base = db_schema.versioned_base('api_tmdb', 4)
+Base = db_schema.versioned_base('api_tmdb', 5)
 
 # This is a FlexGet API key
 API_KEY = 'bdfc018dbdb7c243dc7cb1454ff74b95'
@@ -26,11 +27,39 @@ BASE_URL = 'https://api.themoviedb.org/3/'
 _tmdb_config = None
 
 
+class TMDBConfig(Base):
+    __tablename__ = 'tmdb_configuration'
+
+    id = Column(Integer, primary_key=True)
+    _configuration = Column('configuration', Unicode)
+    configuration = json_synonym('_configuration')
+    updated = Column(DateTime, default=datetime.now, nullable=False)
+
+    def __init__(self):
+        try:
+            configuration = tmdb_request('configuration')
+        except requests.RequestException as e:
+            raise LookupError('Error updating data from tmdb: %s' % e)
+        self.configuration = configuration
+
+    @property
+    def expired(self):
+        if self.updated < datetime.now() - timedelta(days=5):
+            return True
+        return False
+
+
 def get_tmdb_config():
-    """Gets and caches tmdb config on first call."""
+    """Loads TMDB config and caches it in DB and memory"""
     global _tmdb_config
-    if not _tmdb_config:
-        _tmdb_config = tmdb_request('configuration')
+    if _tmdb_config is None:
+        log.debug('no tmdb configuration in memory, checking cache')
+        with Session() as session:
+            config = session.query(TMDBConfig).first()
+            if not config or config.expired:
+                log.debug('no config cached or config expired, refreshing')
+                config = session.merge(TMDBConfig())
+            _tmdb_config = config.configuration
     return _tmdb_config
 
 
@@ -42,7 +71,7 @@ def tmdb_request(endpoint, **params):
 
 @db_schema.upgrade('api_tmdb')
 def upgrade(ver, session):
-    if ver is None or ver <= 3:
+    if ver is None or ver <= 4:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -89,7 +118,7 @@ class TMDBMovie(Base):
         """
         self.id = id
         try:
-            movie = tmdb_request('movie/{}'.format(self.id), append_to_response='alternative_titles,images')
+            movie = tmdb_request('movie/{}'.format(self.id), append_to_response='alternative_titles')
         except requests.RequestException as e:
             raise LookupError('Error updating data from tmdb: %s' % e)
         self.imdb_id = movie['imdb_id']
@@ -114,15 +143,27 @@ class TMDBMovie(Base):
             # No alternate titles
             self.alternative_name = None
         self._genres = [TMDBGenre(**g) for g in movie['genres']]
-        self.posters = [TMDBPoster(**p) for p in movie['images']['posters']]
-        self.backdrops = [TMDBBackdrop(**p) for p in movie['images']['backdrops']]
         self.updated = datetime.now()
+
+    def images(self, type):
+        try:
+            images = tmdb_request('movie/{}/images'.format(self.id))
+        except requests.RequestException as e:
+            raise LookupError('Error updating data from tmdb: %s' % e)
+        return images[type]
+
+    @property
+    def posters(self):
+        return [TMDBPoster(movie_id=self.id, **p) for p in self.images('posters')]
+
+    @property
+    def backdrops(self):
+        return [TMDBBackdrop(movie_id=self.id ** p) for p in self.images('backdrops')]
 
     def to_dict(self):
         return {
             'id': self.id,
             'imdb_id': self.imdb_id,
-            'url': self.url,
             'name': self.name,
             'original_name': self.original_name,
             'alternative_name': self.alternative_name,
