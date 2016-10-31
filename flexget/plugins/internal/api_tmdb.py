@@ -210,7 +210,7 @@ class TMDBPoster(Base):
     def to_dict(self):
         return {
             'id': self.id,
-            'urls': [{size: self.url(size)} for size in get_tmdb_config()['images']['poster_sizes']],
+            'urls': {size: self.url(size) for size in get_tmdb_config()['images']['poster_sizes']},
             'movie_id': self.movie_id,
             'file_path': self.file_path,
             'width': self.width,
@@ -241,7 +241,7 @@ class TMDBBackdrop(Base):
     def to_dict(self):
         return {
             'id': self.id,
-            'urls': [{size: self.url(size)} for size in get_tmdb_config()['images']['backdrop_sizes']],
+            'urls': {size: self.url(size) for size in get_tmdb_config()['images']['backdrop_sizes']},
             'movie_id': self.movie_id,
             'file_path': self.file_path,
             'width': self.width,

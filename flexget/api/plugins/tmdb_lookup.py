@@ -16,7 +16,7 @@ class ObjectsContainer(object):
         'properties': {
             'id': {'type': ['integer', 'null']},
             'movie_id': {'type': ['integer', 'null']},
-            'urls': {'type': 'array', 'items': {'type': 'object'}},
+            'urls': {'type': 'object'},
             'file_path': {'type': 'string'},
             'width': {'type': 'integer'},
             'height': {'type': 'integer'},
