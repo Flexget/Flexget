@@ -22,8 +22,7 @@ from flexget.utils import requests
 from flexget.utils.tools import get_config_hash
 
 try:
-    from irc_bot.irc_bot import IRCBot
-    from irc_bot.irc_bot import partial
+    from irc_bot.irc_bot import IRCBot, partial
     from irc_bot import irc_bot
 except ImportError as e:
     irc_bot = None

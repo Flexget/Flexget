@@ -7,17 +7,29 @@ from colorclass.toggles import disable_all_colors
 from flexget import options
 from flexget.event import event
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
+try:
+    from irc_bot.irc_bot import IRCChannelStatus
+    from irc_bot import irc_bot
+except ImportError:
+    irc_bot = None
 
 
 def do_cli(manager, options):
     """Handle irc cli"""
+
+    if irc_bot is None:
+        console('irc_bot is not installed. install using `pip install irc_bot`.')
+        return
+
     if hasattr(options, 'table_type') and options.table_type == 'porcelain':
         disable_all_colors()
+
     action_map = {
         'status': action_status,
         'restart': action_restart,
         'stop': action_stop
     }
+
     from flexget.plugins.daemon.irc import irc_manager
     if irc_manager is None:
         console('IRC daemon does not appear to be running.')
@@ -44,7 +56,7 @@ def action_status(options, irc_manager):
             for channel in info['channels']:
                 for channel_name, channel_status in channel.items():
                     channels.append(channel_name)
-                    if channel_status == 2:
+                    if channel_status == IRCChannelStatus.CONNECTED:
                         channels[-1] = colorize('green', '* ' + channels[-1])
             table_data.append([name, alive, ', '.join(channels), '%s:%s' % (info['server'], info['port'])])
     table = TerminalTable(options.table_type, table_data)
