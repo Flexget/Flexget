@@ -25,16 +25,11 @@ class IRCStatus(APIResource):
             raise BadRequest('IRC daemon does not appear to be running')
 
         args = irc_parser.parse_args()
-        connection = args.get('name')
-        if connection:
-            try:
-                status = irc_manager.status(connection)
-            except ValueError as e:
-                raise NotFoundError(e.args[0])
-        else:
-            status = irc_manager.status_all()
-        if not isinstance(status, list):
-            status = [status]
+        name = args.get('name')
+        try:
+            status = irc_manager.status(name)
+        except ValueError as e:
+            raise NotFoundError(e.args[0])
         return jsonify(status)
 
 

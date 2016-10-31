@@ -896,15 +896,19 @@ class IRCConnectionManager(object):
         self.wait = wait
         self.shutdown_event.set()
 
-    def status_all(self):
+    def status(self, name=None):
         status = []
-        for name in irc_connections.keys():
-            status.append(self.status(name))
+        if name:
+            if name not in irc_connections:
+                raise ValueError('%s is not a valid irc connection' % name)
+            else:
+                status.append(self.status_dict(name))
+        else:
+            for n in irc_connections.keys():
+                status.append(self.status_dict(n))
         return status
 
-    def status(self, name):
-        if name not in irc_connections:
-            raise ValueError('%s is not a valid irc connection' % name)
+    def status_dict(self, name):
         status = {name: {}}
         connection = irc_connections[name]
         status[name]['alive'] = connection.is_alive()

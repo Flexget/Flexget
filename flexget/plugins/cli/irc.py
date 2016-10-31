@@ -26,19 +26,13 @@ def do_cli(manager, options):
 def action_status(options, irc_manager):
     connection = options.irc_connection
     try:
-        if connection == 'all':
-            status = irc_manager.status_all()
-        else:
-            status = irc_manager.status(connection)
+        status = irc_manager.status(connection)
     except ValueError as e:
         console('ERROR: %s' % e.args[0])
         return
 
     header = ['Name', 'Alive', 'Channels', 'Server']
     table_data = [header]
-
-    if not isinstance(status, list):
-        status = [status]
 
     for connection in status:
         for name, info in connection.items():
@@ -86,7 +80,7 @@ def action_stop(options, irc_manager):
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
     irc_parser = ArgumentParser(add_help=False)
-    irc_parser.add_argument('irc_connection', help="Title of the irc connection")
+    irc_parser.add_argument('irc_connection', nargs='?', help="Title of the irc connection")
 
     # Register subcommand
     parser = options.register_command('irc', do_cli, help='View and manage irc connections')
