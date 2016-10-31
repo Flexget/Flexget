@@ -163,14 +163,13 @@ class TMDBPoster(Base):
     vote_count = Column(Integer)
     iso_639_1 = Column(Unicode)
 
-    @property
-    def url(self):
-        return get_tmdb_config()['images']['base_url'] + 'original' + self.file_path
+    def url(self, size):
+        return get_tmdb_config()['images']['base_url'] + size + self.file_path
 
     def to_dict(self):
         return {
             'id': self.id,
-            'url': self.url,
+            'urls': [{size: self.url(size)} for size in get_tmdb_config()['images']['poster_sizes']],
             'movie_id': self.movie_id,
             'file_path': self.file_path,
             'width': self.width,
@@ -195,14 +194,13 @@ class TMDBBackdrop(Base):
     vote_count = Column(Integer)
     iso_639_1 = Column(Unicode)
 
-    @property
-    def url(self):
-        return get_tmdb_config()['images']['base_url'] + 'original' + self.file_path
+    def url(self, type):
+        return get_tmdb_config()['images']['base_url'] + type + self.file_path
 
     def to_dict(self):
         return {
             'id': self.id,
-            'url': self.url,
+            'urls': [{size: self.url(size)} for size in get_tmdb_config()['images']['backdrop_sizes']],
             'movie_id': self.movie_id,
             'file_path': self.file_path,
             'width': self.width,
