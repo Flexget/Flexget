@@ -849,9 +849,12 @@ class IRCConnectionManager(object):
         self.stop_connections(self.wait)
         irc_connections = {}
 
-    def restart_connections(self):
-        for name, connection in irc_connections.items():
-            self.restart_connection(name, connection.config)
+    def restart_connections(self, name=None):
+        if name:
+            self.restart_connection(name)
+        else:
+            for name, connection in irc_connections.items():
+                self.restart_connection(name, connection.config)
 
     def restart_connection(self, name, config=None):
         if not config:
@@ -883,9 +886,12 @@ class IRCConnectionManager(object):
         for conn_name, connection in irc_connections.items():
             connection.thread.start()
 
-    def stop_connections(self, wait):
-        for name in irc_connections.keys():
+    def stop_connections(self, wait, name=None):
+        if name:
             self.stop_connection(name, wait)
+        else:
+            for name in irc_connections.keys():
+                self.stop_connection(name, wait)
 
     def stop_connection(self, name, wait=False):
         if irc_connections[name].is_alive():

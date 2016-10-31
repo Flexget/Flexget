@@ -59,10 +59,7 @@ def action_restart(options, irc_manager):
     connection = options.irc_connection
     try:
         console('Restarting irc connection %s. It may take a short while.' % connection)
-        if connection == 'all':
-            irc_manager.restart_connections()
-        else:
-            irc_manager.restart_connection(connection)
+        irc_manager.restart_connections(connection)
         console('Successfully restarted {0}. Use `flexget irc status {0}` to check its status.'.format(connection))
     except KeyError:
         console('ERROR: %s is not a valid irc connection' % connection)
@@ -72,10 +69,7 @@ def action_stop(options, irc_manager):
     connection = options.irc_connection
     try:
         console('Stopping irc connection %s. It may take a short while.' % connection)
-        if connection == 'all':
-            irc_manager.stop_connections(False)
-        else:
-            irc_manager.stop_connection(connection)
+        irc_manager.stop_connections(wait=False, name=connection)
         console('Successfully stopped {0}. Use `flexget irc status {0}` to check its status.'.format(connection))
     except KeyError:
         console('ERROR: %s is not a valid irc connection' % connection)

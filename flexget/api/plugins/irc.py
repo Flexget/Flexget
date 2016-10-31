@@ -92,10 +92,7 @@ class IRCRestart(APIResource):
         args = irc_parser.parse_args()
         connection = args.get('name')
         try:
-            if connection:
-                irc_manager.restart_connection(connection)
-            else:
-                irc_manager.restart_connections()
+            irc_manager.restart_connections(connection)
         except KeyError:
             raise NotFoundError('Connection {} is not a valid IRC connection'.format(connection))
         return success_response('Successfully restarted connection(s)')
@@ -118,13 +115,10 @@ class IRCStop(APIResource):
             raise BadRequest('IRC daemon does not appear to be running')
 
         args = irc_stop_parser.parse_args()
-        connection = args.get('name')
+        name = args.get('name')
         wait = args.get('wait')
         try:
-            if connection:
-                irc_manager.stop_connection(connection)
-            else:
-                irc_manager.stop_connections(wait)
+            irc_manager.stop_connections(wait=wait, name=name)
         except KeyError:
-            raise NotFoundError('Connection {} is not a valid IRC connection'.format(connection))
+            raise NotFoundError('Connection {} is not a valid IRC connection'.format(name))
         return success_response('Successfully stopped connection(s)')
