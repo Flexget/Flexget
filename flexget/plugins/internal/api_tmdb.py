@@ -158,7 +158,7 @@ class TMDBMovie(Base):
 
     @property
     def backdrops(self):
-        return [TMDBBackdrop(movie_id=self.id ** p) for p in self.images('backdrops')]
+        return [TMDBBackdrop(movie_id=self.id, **p) for p in self.images('backdrops')]
 
     def to_dict(self):
         return {

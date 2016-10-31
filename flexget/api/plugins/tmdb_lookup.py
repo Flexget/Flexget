@@ -16,7 +16,7 @@ class ObjectsContainer(object):
         'properties': {
             'id': {'type': ['integer', 'null']},
             'movie_id': {'type': ['integer', 'null']},
-            'url': {'type': 'string', 'format': 'uri'},
+            'urls': {'type': 'array', 'items': {'type': 'object'}},
             'file_path': {'type': 'string'},
             'width': {'type': 'integer'},
             'height': {'type': 'integer'},
@@ -25,7 +25,7 @@ class ObjectsContainer(object):
             'vote_count': {'type': 'integer'},
             'language_code': {'type': ['string', 'null']}
         },
-        'required': ['id', 'movie_id', 'url', 'file_path', 'width', 'height', 'aspect_ratio', 'vote_average',
+        'required': ['id', 'movie_id', 'urls', 'file_path', 'width', 'height', 'aspect_ratio', 'vote_average',
                      'vote_count', 'language_code'],
         'additionalProperties': False
     }
@@ -34,7 +34,6 @@ class ObjectsContainer(object):
         'properties': {
             'id': {'type': 'integer'},
             'imdb_id': {'type': 'string'},
-            'url': {'type': ['integer', 'null'], 'format': 'uri'},
             'name': {'type': 'string'},
             'original_name': {'type': ['string', 'null']},
             'alternative_name': {'type': ['string', 'null']},
@@ -55,7 +54,7 @@ class ObjectsContainer(object):
             'genres': {'type': 'array', 'items': {'type': 'string'}},
             'updated': {'type': 'string', 'format': 'date-time'},
         },
-        'required': ['id', 'name', 'url', 'year', 'original_name', 'alternative_name', 'runtime', 'language',
+        'required': ['id', 'name', 'year', 'original_name', 'alternative_name', 'runtime', 'language',
                      'overview', 'tagline', 'rating', 'votes', 'popularity', 'adult', 'budget', 'revenue', 'homepage',
                      'genres', 'updated'],
         'additionalProperties': False
