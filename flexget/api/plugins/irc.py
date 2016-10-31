@@ -12,10 +12,42 @@ irc_parser = api.parser()
 irc_parser.add_argument('name', help='Name of connection. Leave empty to apply to all connections.')
 
 
+class ObjectsContainer(object):
+    connection_object = {
+        'type': 'object',
+        'properties': {
+            'alive': {'type': 'boolean'},
+            'channels': {
+                'type': 'array', 'items': {
+                    'type': 'object',
+                    'patternProperties': {
+                        '\w': {'type': 'integer'}
+                    }
+                }
+            },
+            'connected_channels': {'type': 'array', 'items': {'type': 'string'}},
+            'port': {'type': 'integer'},
+            'server': {'type': 'string'}
+        }
+    }
+
+    connection = {
+        'type': 'object',
+        'patternProperties': {
+            '\w': connection_object
+        }
+    }
+
+    return_response = {'type': 'array', 'items': connection}
+
+
+return_schema = api.schema('irc.connections', ObjectsContainer.return_response)
+
+
 @irc_api.route('/connections/')
 @api.doc(parser=irc_parser)
 class IRCStatus(APIResource):
-    @api.response(200)
+    @api.response(200, model=return_schema)
     @api.response(NotFoundError)
     @api.response(BadRequest)
     def get(self, session=None):

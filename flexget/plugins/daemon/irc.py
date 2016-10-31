@@ -912,7 +912,7 @@ class IRCConnectionManager(object):
         status = {name: {}}
         connection = irc_connections[name]
         status[name]['alive'] = connection.is_alive()
-        status[name]['channels'] = connection.channels
+        status[name]['channels'] = [{key: value} for key, value in connection.channels.items()]
         status[name]['connected_channels'] = connection.connected_channels
         status[name]['server'] = connection.servers[0]
         status[name]['port'] = connection.port

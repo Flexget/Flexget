@@ -3,13 +3,16 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser
 
+from colorclass.toggles import disable_all_colors
 from flexget import options
 from flexget.event import event
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
 
 
 def do_cli(manager, options):
     """Handle irc cli"""
+    if hasattr(options, 'table_type') and options.table_type == 'porcelain':
+        disable_all_colors()
     action_map = {
         'status': action_status,
         'restart': action_restart,
@@ -36,16 +39,18 @@ def action_status(options, irc_manager):
 
     for connection in status:
         for name, info in connection.items():
+            alive = colorize('green', 'Yes') if info['alive'] else colorize('red', 'No')
             channels = []
-            for channel in info['channels'].keys():
-                channels.append(channel)
-                if channel in info['connected_channels']:
-                    channels[-1] = '*' + channels[-1]
-            table_data.append([name, info['alive'], ', '.join(channels), '%s:%s' % (info['server'], info['port'])])
+            for channel in info['channels']:
+                for channel_name, channel_status in channel.items():
+                    channels.append(channel_name)
+                    if channel_status == 2:
+                        channels[-1] = colorize('green', '* ' + channels[-1])
+            table_data.append([name, alive, ', '.join(channels), '%s:%s' % (info['server'], info['port'])])
     table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
-        console(' * Connected channel')
+        console(colorize('green', ' * Connected channel'))
     except TerminalTableError as e:
         console('ERROR: %s' % e)
 
