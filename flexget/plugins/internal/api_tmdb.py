@@ -354,7 +354,7 @@ class ApiTmdb(object):
                 except requests.RequestException as e:
                     raise LookupError('Error searching for tmdb item {}: {}'.format(search_string, e))
                 if not results['results']:
-                    raise LookupError('No resuts for {} from tmdb'.format(search_string))
+                    raise LookupError('No results for {} from tmdb'.format(search_string))
                 tmdb_id = results['results'][0]['id']
                 session.add(TMDBSearchResult(search=search_string, movie_id=tmdb_id))
             if tmdb_id:
