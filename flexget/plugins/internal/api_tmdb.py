@@ -146,19 +146,44 @@ class TMDBMovie(Base):
         self.updated = datetime.now()
 
     def images(self, type):
-        try:
-            images = tmdb_request('movie/{}/images'.format(self.id))
-        except requests.RequestException as e:
-            raise LookupError('Error updating data from tmdb: %s' % e)
-        return images[type]
+        with Session() as session:
+            db_images = session.query(TMDBImage).filter(TMDBImage.movie_id == self.id).filter(
+                TMDBImage.type == type).all()
+            if not db_images:
+                log.debug('images for movie %s not found in DB, fetching from TMDB', self.name)
+                posters = []
+                backdrops = []
+                try:
+                    images = tmdb_request('movie/{}/images'.format(self.id))
+                except requests.RequestException as e:
+                    raise LookupError('Error updating data from tmdb: %s' % e)
+
+                for p in images['posters']:
+                    log.debug('saving poster image to DB')
+                    poster = TMDBImage(movie_id=self.id, type='poster', **p)
+                    session.add(poster)
+                    posters.append(poster)
+
+                for b in images['backdrops']:
+                    log.debug('saving backdrop image to DB')
+                    backdrop = TMDBImage(movie_id=self.id, type='backdrop', **b)
+                    session.add(backdrop)
+                    backdrops.append(backdrop)
+
+                if type == 'posters':
+                    db_images = posters
+                elif type == 'backdrops':
+                    db_images = backdrops
+
+            return db_images
 
     @property
     def posters(self):
-        return [TMDBPoster(movie_id=self.id, **p) for p in self.images('posters')]
+        return self.images('poster')
 
     @property
     def backdrops(self):
-        return [TMDBBackdrop(movie_id=self.id, **p) for p in self.images('backdrops')]
+        return self.images('backdrop')
 
     def to_dict(self):
         return {
@@ -194,7 +219,7 @@ class TMDBGenre(Base):
 class TMDBImage(Base):
     __tablename__ = 'tmdb_images'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     movie_id = Column(Integer, ForeignKey('tmdb_movies.id'))
     file_path = Column(Unicode)
     width = Column(Integer)
@@ -204,11 +229,6 @@ class TMDBImage(Base):
     vote_count = Column(Integer)
     iso_639_1 = Column(Unicode)
     type = Column(Unicode)
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'tmdb_images',
-        'polymorphic_on': type
-    }
 
     def url(self, size):
         return get_tmdb_config()['images']['base_url'] + size + self.file_path
@@ -226,24 +246,6 @@ class TMDBImage(Base):
             'vote_count': self.vote_count,
             'language_code': self.iso_639_1
         }
-
-
-class TMDBPoster(TMDBImage):
-    __tablename__ = 'tmdb_posters'
-
-    id = Column(Integer, ForeignKey('tmdb_images.id'), primary_key=True)
-    __mapper_args__ = {
-        'polymorphic_identity': 'poster',
-    }
-
-
-class TMDBBackdrop(TMDBImage):
-    __tablename__ = 'tmdb_backdrops'
-
-    id = Column(Integer, ForeignKey('tmdb_images.id'), primary_key=True)
-    __mapper_args__ = {
-        'polymorphic_identity': 'backdrop',
-    }
 
 
 class TMDBSearchResult(Base):

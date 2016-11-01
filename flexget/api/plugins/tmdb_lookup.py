@@ -97,14 +97,21 @@ class TMDBMoviesAPI(APIResource):
             raise BadRequest(description)
 
         lookup = get_plugin_by_name('api_tmdb').instance.lookup
+
         try:
             movie = lookup(session=session, **args)
+            session.commit()
         except LookupError as e:
             raise NotFoundError(e.args[0])
-        session.commit()
+
         return_movie = movie.to_dict()
+
         if posters:
-            return_movie['posters'] = [p.to_dict() for p in movie.posters]
+            movie_posters = [session.merge(p) for p in movie.posters]
+            return_movie['posters'] = [p.to_dict() for p in movie_posters]
+
         if backdrops:
-            return_movie['backdrops'] = [p.to_dict() for p in movie.backdrops]
+            movie_backdrops = [session.merge(p) for p in movie.backdrops]
+            return_movie['backdrops'] = [p.to_dict() for p in movie_backdrops]
+
         return jsonify(return_movie)
