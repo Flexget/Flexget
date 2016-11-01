@@ -107,11 +107,9 @@ class TMDBMoviesAPI(APIResource):
         return_movie = movie.to_dict()
 
         if posters:
-            movie_posters = [session.merge(p) for p in movie.posters]
-            return_movie['posters'] = [p.to_dict() for p in movie_posters]
+            return_movie['posters'] = [p.to_dict() for p in movie.posters]
 
         if backdrops:
-            movie_backdrops = [session.merge(p) for p in movie.backdrops]
-            return_movie['backdrops'] = [p.to_dict() for p in movie_backdrops]
+            return_movie['backdrops'] = [p.to_dict() for p in movie.backdrops]
 
         return jsonify(return_movie)

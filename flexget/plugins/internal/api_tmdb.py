@@ -105,8 +105,8 @@ class TMDBMovie(Base):
     budget = Column(Integer)
     revenue = Column(Integer)
     homepage = Column(Unicode)
-    posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
-    backdrops = relation('TMDBBackdrop', backref='movie', cascade='all, delete, delete-orphan')
+    _posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
+    _backdrops = relation('TMDBBackdrop', backref='movie', cascade='all, delete, delete-orphan')
     _genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
     genres = association_proxy('_genres', 'name')
     updated = Column(DateTime, default=datetime.now, nullable=False)
@@ -145,45 +145,27 @@ class TMDBMovie(Base):
         self._genres = [TMDBGenre(**g) for g in movie['genres']]
         self.updated = datetime.now()
 
-    def images(self, type):
-        with Session() as session:
-            db_images = session.query(TMDBImage).filter(TMDBImage.movie_id == self.id).filter(
-                TMDBImage.type == type).all()
-            if not db_images:
-                log.debug('images for movie %s not found in DB, fetching from TMDB', self.name)
-                posters = []
-                backdrops = []
-                try:
-                    images = tmdb_request('movie/{}/images'.format(self.id))
-                except requests.RequestException as e:
-                    raise LookupError('Error updating data from tmdb: %s' % e)
+    def get_images(self):
+        log.debug('images for movie %s not found in DB, fetching from TMDB', self.name)
+        try:
+            images = tmdb_request('movie/{}/images'.format(self.id))
+        except requests.RequestException as e:
+            raise LookupError('Error updating data from tmdb: %s' % e)
 
-                for p in images['posters']:
-                    log.debug('saving poster image to DB')
-                    poster = TMDBImage(movie_id=self.id, type='poster', **p)
-                    session.add(poster)
-                    posters.append(poster)
-
-                for b in images['backdrops']:
-                    log.debug('saving backdrop image to DB')
-                    backdrop = TMDBImage(movie_id=self.id, type='backdrop', **b)
-                    session.add(backdrop)
-                    backdrops.append(backdrop)
-
-                if type == 'posters':
-                    db_images = posters
-                elif type == 'backdrops':
-                    db_images = backdrops
-
-            return db_images
+        self._posters = [TMDBPoster(movie_id=self.id, **p) for p in images['posters']]
+        self._backdrops = [TMDBBackdrop(movie_id=self.id, **b) for b in images['backdrops']]
 
     @property
     def posters(self):
-        return self.images('poster')
+        if not self._posters:
+            self.get_images()
+        return self._posters
 
     @property
     def backdrops(self):
-        return self.images('backdrop')
+        if not self._backdrops:
+            self.get_images()
+        return self._backdrops
 
     def to_dict(self):
         return {
@@ -229,6 +211,7 @@ class TMDBImage(Base):
     vote_count = Column(Integer)
     iso_639_1 = Column(Unicode)
     type = Column(Unicode)
+    __mapper_args__ = {'polymorphic_on': type}
 
     def url(self, size):
         return get_tmdb_config()['images']['base_url'] + size + self.file_path
@@ -246,6 +229,14 @@ class TMDBImage(Base):
             'vote_count': self.vote_count,
             'language_code': self.iso_639_1
         }
+
+
+class TMDBPoster(TMDBImage):
+    __mapper_args__ = {'polymorphic_identity': 'poster'}
+
+
+class TMDBBackdrop(TMDBImage):
+    __mapper_args__ = {'polymorphic_identity': 'backdrop'}
 
 
 class TMDBSearchResult(Base):
@@ -288,6 +279,10 @@ class ApiTmdb(object):
 
         :raises: :class:`LookupError` if a match cannot be found or there are other problems with the lookup
         """
+
+        # Populate tmdb config
+        get_tmdb_config()
+
         if smart_match and not (title or tmdb_id or imdb_id):
             # If smart_match was specified, parse it into a title and year
             title_parser = get_plugin_by_name('parsing').instance.parse_movie(smart_match)
