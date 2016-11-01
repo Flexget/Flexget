@@ -191,8 +191,8 @@ class TMDBGenre(Base):
     name = Column(Unicode, nullable=False)
 
 
-class TMDBPoster(Base):
-    __tablename__ = 'tmdb_posters'
+class TMDBImage(Base):
+    __tablename__ = 'tmdb_images'
 
     id = Column(Integer, primary_key=True)
     movie_id = Column(Integer, ForeignKey('tmdb_movies.id'))
@@ -203,6 +203,12 @@ class TMDBPoster(Base):
     vote_average = Column(Float)
     vote_count = Column(Integer)
     iso_639_1 = Column(Unicode)
+    type = Column(Unicode)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'tmdb_images',
+        'polymorphic_on': type
+    }
 
     def url(self, size):
         return get_tmdb_config()['images']['base_url'] + size + self.file_path
@@ -210,7 +216,7 @@ class TMDBPoster(Base):
     def to_dict(self):
         return {
             'id': self.id,
-            'urls': {size: self.url(size) for size in get_tmdb_config()['images']['poster_sizes']},
+            'urls': {size: self.url(size) for size in get_tmdb_config()['images'][self.type + '_sizes']},
             'movie_id': self.movie_id,
             'file_path': self.file_path,
             'width': self.width,
@@ -222,35 +228,22 @@ class TMDBPoster(Base):
         }
 
 
-class TMDBBackdrop(Base):
+class TMDBPoster(TMDBImage):
+    __tablename__ = 'tmdb_posters'
+
+    id = Column(Integer, ForeignKey('tmdb_images.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'poster',
+    }
+
+
+class TMDBBackdrop(TMDBImage):
     __tablename__ = 'tmdb_backdrops'
 
-    id = Column(Integer, primary_key=True)
-    movie_id = Column(Integer, ForeignKey('tmdb_movies.id'))
-    file_path = Column(Unicode)
-    width = Column(Integer)
-    height = Column(Integer)
-    aspect_ratio = Column(Float)
-    vote_average = Column(Float)
-    vote_count = Column(Integer)
-    iso_639_1 = Column(Unicode)
-
-    def url(self, type):
-        return get_tmdb_config()['images']['base_url'] + type + self.file_path
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'urls': {size: self.url(size) for size in get_tmdb_config()['images']['backdrop_sizes']},
-            'movie_id': self.movie_id,
-            'file_path': self.file_path,
-            'width': self.width,
-            'height': self.height,
-            'aspect_ratio': self.aspect_ratio,
-            'vote_average': self.vote_average,
-            'vote_count': self.vote_count,
-            'language_code': self.iso_639_1
-        }
+    id = Column(Integer, ForeignKey('tmdb_images.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'backdrop',
+    }
 
 
 class TMDBSearchResult(Base):
