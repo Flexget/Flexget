@@ -100,7 +100,6 @@ class TMDBMoviesAPI(APIResource):
 
         try:
             movie = lookup(session=session, **args)
-            session.commit()
         except LookupError as e:
             raise NotFoundError(e.args[0])
 
