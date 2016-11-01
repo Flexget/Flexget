@@ -31,7 +31,7 @@ BASE_URL = 'http://m.blu-ray.com/'
 
 def bluray_request(endpoint, **params):
     full_url = BASE_URL + endpoint
-    return requests.get(full_url, params=params).json()
+    return requests.get(full_url, params=params).json(strict=False)
 
 
 def extract_release_date(release_date):
