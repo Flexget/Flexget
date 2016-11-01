@@ -29,6 +29,15 @@ class StatusTask(Base):
     name = Column('task', String)
     executions = relation('TaskExecution', backref='task', cascade='all, delete, delete-orphan', lazy='dynamic')
 
+    def __repr__(self):
+        return '<StatusTask(id=%s,name=%s)>' % (self.id, self.name)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
+
 
 class TaskExecution(Base):
     __tablename__ = 'status_execution'
@@ -49,6 +58,20 @@ class TaskExecution(Base):
         return ('<TaskExecution(task_id=%s,start=%s,end=%s,succeeded=%s,p=%s,a=%s,r=%s,f=%s,reason=%s)>' %
                 (self.task_id, self.start, self.end, self.succeeded, self.produced, self.accepted,
                  self.rejected, self.failed, self.abort_reason))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'task_id': self.task_id,
+            'start': self.start,
+            'end': self.end,
+            'succeeded': self.succeeded,
+            'produced': self.produced,
+            'accepted': self.accepted,
+            'rejected': self.rejected,
+            'failed': self.failed,
+            'abort_reason': self.abort_reason
+        }
 
 
 class Status(object):
