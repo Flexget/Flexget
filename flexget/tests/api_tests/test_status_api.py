@@ -167,3 +167,66 @@ class TestTaskStatusPagination(object):
         assert links['last']['page'] == 4
         assert links['next']['page'] == 3
         assert links['prev']['page'] == 1
+
+    def test_executions_sorting(self, api_client):
+        ex1 = dict(start=datetime.now() - timedelta(days=7),
+                   end=datetime.now() - timedelta(days=6),
+                   produced=10,
+                   accepted=5,
+                   rejected=2,
+                   failed=0)
+
+        ex2 = dict(start=datetime.now() - timedelta(days=2),
+                   end=datetime.now() - timedelta(days=1),
+                   produced=1,
+                   accepted=50,
+                   rejected=7,
+                   failed=8,
+                   succeeded=True,
+                   abort_reason='test reason 1')
+
+        ex3 = dict(start=datetime.now() - timedelta(days=365),
+                   end=datetime.now() - timedelta(days=300),
+                   produced=2,
+                   accepted=1,
+                   rejected=3,
+                   failed=5,
+                   succeeded=False,
+                   abort_reason='test reason 2')
+
+        with Session() as session:
+            st1 = StatusTask()
+            st1.name = 'status task 1'
+            session.add(st1)
+
+            for e in [ex1, ex2, ex3]:
+                db_e = TaskExecution()
+                db_e.task = st1
+
+                for k, v in e.items():
+                    setattr(db_e, k, v)
+
+        # Default sort - by start
+        rsp = api_client.get('/status/1/executions/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['produced'] == 1
+
+        rsp = api_client.get('/status/1/executions/?order=asc')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['produced'] == 10
+
+        rsp = api_client.get('/status/1/executions/?sort_by=end')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['produced'] == 1
+
+        rsp = api_client.get('/status/1/executions/?sort_by=end&order=asc')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['produced'] == 10

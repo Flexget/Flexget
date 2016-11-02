@@ -135,9 +135,10 @@ def register_plugin():
 
 @with_session
 def get_executions_by_task_id(task_id, start=None, stop=None, order_by='start', descending=True,
-                              succeeded=True, produced=True, start_date=None, end_date=None, session=None):
-    query = session.query(TaskExecution).filter(TaskExecution.task_id == task_id)\
-        .filter(TaskExecution.succeeded == succeeded)
+                              succeeded=None, produced=True, start_date=None, end_date=None, session=None):
+    query = session.query(TaskExecution).filter(TaskExecution.task_id == task_id)
+    if succeeded:
+        query = query.filter(TaskExecution.succeeded == succeeded)
     if produced:
         query = query.filter(TaskExecution.produced > 0)
     if start_date:
