@@ -141,7 +141,7 @@ class SearchRarBG(object):
                 query_url_fragment = query.encode('utf8')
                 params['search_string'] = query_url_fragment
                 if config['use_tvdb']:
-                    plugin.get_plugin_by_name('thetvdb_lookup').instance.lazy_series_lookup(entry)
+                    plugin.get_plugin_by_name('thetvdb_lookup').instance.lazy_series_lookup(entry, 'en')
                     params['search_tvdb'] = entry.get('tvdb_id')
                     log.debug('Using tvdb id %s', entry.get('tvdb_id'))
             try:
