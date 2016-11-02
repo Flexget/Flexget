@@ -369,6 +369,8 @@ class Manager(object):
         fire_event('manager.execute.started', self, options)
         if self.task_queue.is_alive() or self.is_daemon:
             if not self.task_queue.is_alive():
+                log.error('Task queue has died unexpectedly. Restarting it. Please open an issue on Github and include'
+                          'any previous error logs.')
                 self.task_queue = TaskQueue()
                 self.task_queue.start()
             if len(self.task_queue):
