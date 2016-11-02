@@ -87,6 +87,7 @@ class TaskStatusAPI(APIResource):
     @api.response(200, model=task_status)
     @api.response(NotFoundError)
     def get(self, task_id, session=None):
+        """Get status task by ID"""
         try:
             task = session.query(StatusTask).filter(StatusTask.id == task_id).one()
         except NoResultFound:
@@ -102,6 +103,7 @@ class TaskStatusExecutionsAPI(APIResource):
     @api.response(200, model=task_executions)
     @api.response(NotFoundError)
     def get(self, task_id, session=None):
+        """Get task executions by ID"""
         try:
             task = session.query(StatusTask).filter(StatusTask.id == task_id).one()
         except NoResultFound:
