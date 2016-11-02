@@ -106,3 +106,64 @@ class TestStatusAPI(object):
         assert not errors
 
         assert len(data) == 1
+
+
+class TestTaskStatusPagination(object):
+    config = "'tasks': {}"
+
+    def test_status_task_executions_pagination(self, api_client, link_headers):
+        base_start_time = datetime.now() - timedelta(days=7)
+        number_of_entries = 200
+
+        with Session() as session:
+            st1 = StatusTask()
+            st1.name = 'status task 1'
+            session.add(st1)
+
+            for i in range(number_of_entries):
+                ex = TaskExecution()
+                ex.task = st1
+                ex.produced = i
+                ex.rejected = i
+                ex.accepted = i
+                ex.start = base_start_time + timedelta(hours=i)
+                ex.end = datetime.now()
+
+        rsp = api_client.get('/status/1/executions/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 50
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 50
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 2
+
+        # Change page size
+        rsp = api_client.get('/status/1/executions/?per_page=100')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 100
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 100
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 2
+        assert links['next']['page'] == 2
+
+        # Get different page
+        rsp = api_client.get('/status/1/executions/?page=2')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert len(data) == 50
+        assert int(rsp.headers['total-count']) == 200
+        assert int(rsp.headers['count']) == 50
+
+        links = link_headers(rsp)
+        assert links['last']['page'] == 4
+        assert links['next']['page'] == 3
+        assert links['prev']['page'] == 1
