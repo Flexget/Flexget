@@ -152,39 +152,6 @@ class ObjectsContainer(object):
 
     params_return_schema = {'type': 'array', 'items': {'type': 'object'}}
 
-    task_status_execute_schema = {
-        'type': 'object',
-        'properties': {
-            'abort_reason': {'type': ['string', 'null']},
-            'accepted': {'type': 'integer'},
-            'end': {'type': 'string', 'format': 'date-time'},
-            'failed': {'type': 'integer'},
-            'id': {'type': 'integer'},
-            'produced': {'type': 'integer'},
-            'rejected': {'type': 'integer'},
-            'start': {'type': 'string', 'format': 'date-time'},
-            'succeeded': {'type': 'boolean'},
-            'task_id': {'type': 'integer'}
-        },
-        'required': ['abort_reason', 'accepted', 'end', 'failed', 'id', 'produced', 'rejected', 'start', 'succeeded',
-                     'task_id'],
-        'additionalProperties': False
-    }
-
-    task_status_schema = {
-        'type': 'object',
-        'properties': {
-            'executions': {'type': 'array', 'items': task_status_execute_schema},
-            'id': {'type': 'integer'},
-            'name': {'type': 'string'},
-            'total_executions': {'type': 'integer'}
-        },
-        'required': ['executions', 'id', 'name', 'total_executions'],
-        'additionalProperties': False
-    }
-
-    task_status_list_schema = {'type': 'array', 'items': task_status_schema}
-
 
 tasks_list_schema = api.schema('tasks.list', ObjectsContainer.tasks_list_object)
 task_input_schema = api.schema('tasks.task', ObjectsContainer.task_input_object)
@@ -193,7 +160,6 @@ task_api_queue_schema = api.schema('task.queue', ObjectsContainer.task_queue_sch
 task_api_execute_schema = api.schema('task.execution', ObjectsContainer.task_execution_results_schema)
 task_execution_schema = api.schema('task_execution_input', ObjectsContainer.task_execution_input)
 task_execution_params = api.schema('tasks.execution_params', ObjectsContainer.params_return_schema)
-task_status_list = api.schema('tasks.tasks_status_list', ObjectsContainer.task_status_list_schema)
 
 task_api_desc = 'Task config schema too large to display, you can view the schema using the schema API'
 
@@ -337,39 +303,6 @@ status_parser.add_argument('end_date', type=inputs.datetime_from_iso8601,
                            help='Filter by maximal end date. Example: \'2012-01-01\'')
 status_parser.add_argument('limit', default=100, type=int,
                            help='Limit return of executions per task, as that number can be huge')
-
-
-@tasks_api.route('/status/')
-@api.doc(parser=status_parser)
-class TaskStatusAPI(APIResource):
-    @api.response(200, model=task_status_list)
-    def get(self, session=None):
-        """Get tasks execution status"""
-        args = status_parser.parse_args()
-        succeeded = args.get('succeeded')
-        produced = args.get('produced')
-        start_date = args.get('start_date')
-        end_date = args.get('end_date')
-        limit = args.get('limit')
-
-        if limit > 1000:
-            limit = 1000
-
-        status_tasks = []
-        for task in session.query(StatusTask).all():
-            status_task = task.to_dict()
-            status_task['total_executions'] = task.executions.count()
-            executions = task.executions.filter(TaskExecution.succeeded == succeeded)
-            if produced is True:
-                executions = executions.filter(TaskExecution.produced > 1)
-            if start_date:
-                executions = executions.filter(TaskExecution.start >= start_date)
-            if end_date:
-                executions = executions.filter(TaskExecution.start <= end_date)
-            executions = executions.order_by(TaskExecution.start.desc()).limit(limit)
-            status_task['executions'] = [e.to_dict() for e in executions.all()]
-            status_tasks.append(status_task)
-        return jsonify(status_tasks)
 
 
 def _task_info_dict(task):
