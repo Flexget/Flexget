@@ -399,11 +399,9 @@ def etag(f):
         rv = make_response(rv)
 
         # Some headers can change without data change for specific page
-        content_headers = str(rv.headers.get('link')) + \
-                          str(rv.headers.get('count')) + \
-                          str(rv.headers.get('total-count'))
-
-        etag = generate_etag(rv.get_data() + content_headers)
+        content_headers = rv.headers.get('link', '') + rv.headers.get('count', '') + rv.headers.get('total-count', '')
+        data = (rv.get_data().decode() + content_headers).encode()
+        etag = generate_etag(data)
         rv.headers['Cache-Control'] = 'max-age=86400'
         rv.headers['ETag'] = etag
         if_match = request.headers.get('If-Match')
