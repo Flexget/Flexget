@@ -55,20 +55,6 @@ task_status = api.schema('tasks.tasks_status', ObjectsContainer.task_status_sche
 task_status_list = api.schema('tasks.tasks_status_list', ObjectsContainer.task_status_list_schema)
 task_executions = api.schema('tasks.tasks_executions_list', ObjectsContainer.executions_list)
 
-default_start_date = (datetime.now() - timedelta(weeks=1)).strftime('%Y-%m-%d')
-
-executions_parser = api.parser()
-executions_parser.add_argument('succeeded', type=inputs.boolean, default=True, help='Filter by success status')
-executions_parser.add_argument('produced', type=inputs.boolean, default=True, store_missing=False,
-                               help='Filter by tasks that produced entries')
-executions_parser.add_argument('start_date', type=inputs.datetime_from_iso8601, default=default_start_date,
-                               help='Filter by minimal start date. Example: \'2012-01-01\'. Default is 1 week ago.')
-executions_parser.add_argument('end_date', type=inputs.datetime_from_iso8601,
-                               help='Filter by maximal end date. Example: \'2012-01-01\'')
-
-sort_choices = ('start', 'end', 'succeeded', 'produced', 'accepted', 'rejected', 'failed', 'abort_reason')
-executions_parser = api.pagination_parser(executions_parser, sort_choices=sort_choices)
-
 
 @tasks_api.route('/status/')
 @status_api.route('/')
@@ -93,6 +79,21 @@ class TaskStatusAPI(APIResource):
         except NoResultFound:
             raise NotFoundError('task status with id %d not found' % task_id)
         return jsonify(task.to_dict())
+
+
+default_start_date = (datetime.now() - timedelta(weeks=1)).strftime('%Y-%m-%d')
+
+executions_parser = api.parser()
+executions_parser.add_argument('succeeded', type=inputs.boolean, default=True, help='Filter by success status')
+executions_parser.add_argument('produced', type=inputs.boolean, default=True, store_missing=False,
+                               help='Filter by tasks that produced entries')
+executions_parser.add_argument('start_date', type=inputs.datetime_from_iso8601, default=default_start_date,
+                               help='Filter by minimal start date. Example: \'2012-01-01\'. Default is 1 week ago.')
+executions_parser.add_argument('end_date', type=inputs.datetime_from_iso8601,
+                               help='Filter by maximal end date. Example: \'2012-01-01\'')
+
+sort_choices = ('start', 'end', 'succeeded', 'produced', 'accepted', 'rejected', 'failed', 'abort_reason')
+executions_parser = api.pagination_parser(executions_parser, sort_choices=sort_choices)
 
 
 @tasks_api.route('/status/<int:task_id>/executions/')
