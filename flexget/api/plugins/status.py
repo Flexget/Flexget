@@ -68,6 +68,7 @@ class TasksStatusAPI(APIResource):
 
 @tasks_api.route('/status/<int:task_id>/')
 @status_api.route('/<int:task_id>/')
+@api.doc(params={'task_id': 'ID of the status task'})
 class TaskStatusAPI(APIResource):
     @etag
     @api.response(200, model=task_status)
@@ -98,7 +99,7 @@ executions_parser = api.pagination_parser(executions_parser, sort_choices=sort_c
 
 @tasks_api.route('/status/<int:task_id>/executions/')
 @status_api.route('/<int:task_id>/executions/')
-@api.doc(parser=executions_parser)
+@api.doc(parser=executions_parser, params={'task_id': 'ID of the status task'})
 class TaskStatusExecutionsAPI(APIResource):
     @etag
     @api.response(200, model=task_executions)
