@@ -2,16 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from datetime import datetime, timedelta
+from math import ceil
 
 from flask import jsonify, request
 from flask_restplus import inputs
+from flexget.api.app import NotFoundError, etag, pagination_headers, api, APIResource
 from flexget.api.core.tasks import tasks_api
 from flexget.plugins.operate.status import StatusTask, get_executions_by_task_id
-from math import ceil
-
-from flexget.api import api, APIResource
 from sqlalchemy.orm.exc import NoResultFound
-from flexget.api.app import NotFoundError, etag, pagination_headers
 
 status_api = api.namespace('status', description='View and manage task execution status')
 
