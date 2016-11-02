@@ -34,7 +34,7 @@ class ObjectsContainer(object):
         'additionalProperties': False
     }
 
-    executions_list = {'type': 'array', 'items': task_status_execution_schema},
+    executions_list = {'type': 'array', 'items': task_status_execution_schema}
 
     task_status_schema = {
         'type': 'object',
@@ -42,7 +42,7 @@ class ObjectsContainer(object):
             'id': {'type': 'integer'},
             'name': {'type': 'string'}
         },
-        'required': ['executions', 'id', 'name', 'total_executions'],
+        'required': ['id', 'name'],
         'additionalProperties': False
     }
 
