@@ -208,9 +208,11 @@ class API(RestPlusAPI):
         """
         Return a standardized pagination parser, to be used for any endpoint that has pagination.
 
-        :param parser: Can extend a given parser or create a new one
-        :param sort_choices: A tuple of strings, to be used as server side attribute searches
-        :param default: The default sort string, used `sort_choices[0]` if not given
+        :param RequestParser parser: Can extend a given parser or create a new one
+        :param tuple sort_choices: A tuple of strings, to be used as server side attribute searches
+        :param str default: The default sort string, used `sort_choices[0]` if not given
+        :param bool add_sort: Add sort order choices without adding specific sort choices
+
         :return: An api.parser() instance with pagination and sorting arguments.
         """
         pagination = parser.copy() if parser else self.parser()

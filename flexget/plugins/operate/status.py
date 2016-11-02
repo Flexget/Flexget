@@ -3,6 +3,7 @@ import logging
 import datetime
 from datetime import timedelta
 
+from flexget.utils.database import with_session
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
@@ -130,3 +131,21 @@ def db_cleanup(manager, session):
 @event('plugin.register')
 def register_plugin():
     plugin.register(Status, 'status', builtin=True, api_ver=2)
+
+
+@with_session
+def get_executions_by_task_id(task_id, start=None, stop=None, order_by='start', descending=True,
+                              succeeded=True, produced=True, start_date=None, end_date=None, session=None):
+    query = session.query(TaskExecution).filter(TaskExecution.task_id == task_id)\
+        .filter(TaskExecution.succeeded == succeeded)
+    if produced:
+        query = query.filter(TaskExecution.produced > 0)
+    if start_date:
+        query = query.filter(TaskExecution.start >= start_date)
+    if end_date:
+        query = query.filter(TaskExecution.start <= end_date)
+    if descending:
+        query = query.order_by(getattr(TaskExecution, order_by).desc())
+    else:
+        query = query.order_by(getattr(TaskExecution, order_by))
+    return query.slice(start, stop).all()
