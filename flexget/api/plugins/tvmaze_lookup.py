@@ -98,6 +98,7 @@ class TVDBSeriesSearchApi(APIResource):
     @api.response(200, 'Successfully found show', model=tvmaze_series_schema)
     @api.response(NotFoundError)
     def get(self, title, session=None):
+        """TVMaze series lookup"""
         try:
             tvmaze_id = int(title)
         except ValueError:
@@ -127,6 +128,7 @@ class TVDBEpisodeSearchAPI(APIResource):
     @api.response(NotFoundError)
     @api.response(BadRequest)
     def get(self, tvmaze_id, session=None):
+        """TVMaze episode lookup"""
         args = episode_parser.parse_args()
         air_date = args.get('air_date')
         season_num = args.get('season_num')

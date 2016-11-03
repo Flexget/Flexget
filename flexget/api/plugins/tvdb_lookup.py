@@ -101,6 +101,7 @@ class TVDBSeriesLookupAPI(APIResource):
     @api.response(200, 'Successfully found show', tvdb_series_schema)
     @api.response(NotFoundError)
     def get(self, title, session=None):
+        """TheTVDB series lookup"""
         args = series_parser.parse_args()
         language = args['language']
 
@@ -143,6 +144,7 @@ class TVDBEpisodeSearchAPI(APIResource):
     @api.response(NotFoundError)
     @api.response(BadRequest)
     def get(self, tvdb_id, session=None):
+        """TheTVDB episode lookup"""
         args = episode_parser.parse_args()
         language = args['language']
 
@@ -189,6 +191,7 @@ class TVDBSeriesSearchAPI(APIResource):
     @api.response(BadRequest)
     @api.response(NotFoundError)
     def get(self, session=None):
+        """TheTVDB series search"""
         args = search_parser.parse_args()
         language = args['language']
 
