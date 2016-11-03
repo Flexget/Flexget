@@ -685,7 +685,7 @@ class PluginTransmissionClean(TransmissionBase):
                                 is_minratio_reached or
                                 (is_torrent_seed_only and is_torrent_idlelimit_since_added_reached) or
                                 (not is_torrent_seed_only and is_torrent_idlelimit_since_finished_reached))
-                    and is_directories_matching (not is_preserve_tracker_matching and is_tracker_matching)):
+                    and is_directories_matching and (not is_preserve_tracker_matching and is_tracker_matching)):
                 if task.options.test:
                     log.info('Would remove finished torrent `%s` from transmission', torrent.name)
                     continue
