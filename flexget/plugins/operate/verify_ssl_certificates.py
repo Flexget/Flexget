@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
-from  requests.packages import urllib3
+from requests.packages import urllib3
 
 from flexget import plugin
 from flexget.event import event
