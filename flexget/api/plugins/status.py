@@ -8,7 +8,7 @@ from flask import jsonify, request
 from flask_restplus import inputs
 from flexget.api.app import NotFoundError, etag, pagination_headers, api, APIResource
 from flexget.api.core.tasks import tasks_api
-from flexget.plugins.operate.status import StatusTask, get_executions_by_task_id
+from flexget.plugins.operate.status import StatusTask, TaskExecution, get_executions_by_task_id
 from sqlalchemy.orm.exc import NoResultFound
 
 status_api = api.namespace('status', description='View and manage task execution status')
@@ -29,8 +29,6 @@ class ObjectsContainer(object):
             'succeeded': {'type': 'boolean'},
             'task_id': {'type': 'integer'}
         },
-        'required': ['abort_reason', 'accepted', 'end', 'failed', 'id', 'produced', 'rejected', 'start', 'succeeded',
-                     'task_id'],
         'additionalProperties': False
     }
 
@@ -40,7 +38,8 @@ class ObjectsContainer(object):
         'type': 'object',
         'properties': {
             'id': {'type': 'integer'},
-            'name': {'type': 'string'}
+            'name': {'type': 'string'},
+            'last_execution': task_status_execution_schema
         },
         'required': ['id', 'name'],
         'additionalProperties': False
@@ -53,20 +52,36 @@ task_status = api.schema('tasks.tasks_status', ObjectsContainer.task_status_sche
 task_status_list = api.schema('tasks.tasks_status_list', ObjectsContainer.task_status_list_schema)
 task_executions = api.schema('tasks.tasks_executions_list', ObjectsContainer.executions_list)
 
+tasks_parser = api.parser()
+tasks_parser.add_argument('include_execution', type=inputs.boolean, default=True,
+                          help='Include the last execution of the task')
+
 
 @tasks_api.route('/status/')
 @status_api.route('/')
+@api.doc(parser=tasks_parser)
 class TasksStatusAPI(APIResource):
     @etag
     @api.response(200, model=task_status_list)
     def get(self, session=None):
         """Get status tasks"""
-        return jsonify([task.to_dict() for task in session.query(StatusTask).all()])
+        args = tasks_parser.parse_args()
+        include_execution = args.get('include_execution')
+
+        tasks = []
+        for task in session.query(StatusTask).all():
+            st_task = task.to_dict()
+            if include_execution:
+                execution = task.executions.order_by(TaskExecution.start.desc()).first()
+                st_task['last_execution'] = execution.to_dict() if execution else {}
+            tasks.append(st_task)
+
+        return jsonify(tasks)
 
 
 @tasks_api.route('/status/<int:task_id>/')
 @status_api.route('/<int:task_id>/')
-@api.doc(params={'task_id': 'ID of the status task'})
+@api.doc(params={'task_id': 'ID of the status task'}, parser=tasks_parser)
 class TaskStatusAPI(APIResource):
     @etag
     @api.response(200, model=task_status)
@@ -77,7 +92,15 @@ class TaskStatusAPI(APIResource):
             task = session.query(StatusTask).filter(StatusTask.id == task_id).one()
         except NoResultFound:
             raise NotFoundError('task status with id %d not found' % task_id)
-        return jsonify(task.to_dict())
+
+        args = tasks_parser.parse_args()
+        include_execution = args.get('include_execution')
+
+        st_task = task.to_dict()
+        if include_execution:
+            execution = task.executions.order_by(TaskExecution.start.desc()).first()
+            st_task['last_execution'] = execution.to_dict() if execution else {}
+        return jsonify(st_task)
 
 
 default_start_date = (datetime.now() - timedelta(weeks=1)).strftime('%Y-%m-%d')
