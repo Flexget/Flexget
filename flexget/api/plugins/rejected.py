@@ -74,7 +74,7 @@ class Rejected(APIResource):
         if per_page > 100:
             per_page = 100
 
-        descending = bool(sort_order == 'desc')
+        descending = sort_order == 'desc'
 
         # Handle max size limit
         if per_page > 100:

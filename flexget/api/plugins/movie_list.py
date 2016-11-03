@@ -182,7 +182,7 @@ class MovieListMoviesAPI(APIResource):
 
         start = per_page * (page - 1)
         stop = start + per_page
-        descending = bool(sort_order == 'desc')
+        descending = sort_order == 'desc'
 
         kwargs = {
             'start': start,

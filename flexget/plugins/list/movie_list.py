@@ -257,11 +257,9 @@ def register_plugin():
 
 
 @with_session
-def get_movies_by_list_id(list_id, count=False, start=None, stop=None, order_by='added', descending=False,
+def get_movies_by_list_id(list_id, start=None, stop=None, order_by='added', descending=False,
                           session=None):
     query = session.query(MovieListMovie).filter(MovieListMovie.list_id == list_id)
-    if count:
-        return query.count()
     if descending:
         query = query.order_by(getattr(MovieListMovie, order_by).desc())
     else:
