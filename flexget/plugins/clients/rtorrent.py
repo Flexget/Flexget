@@ -18,7 +18,6 @@ from flexget.entry import Entry
 from flexget.config_schema import one_or_more
 from flexget.utils.bittorrent import Torrent, is_torrent_file
 
-import requests
 from requests.auth import HTTPDigestAuth, HTTPBasicAuth
 
 log = logging.getLogger('rtorrent')
