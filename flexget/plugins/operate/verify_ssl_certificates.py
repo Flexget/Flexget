@@ -33,7 +33,7 @@ class VerifySSLCertificates(object):
             # verification and the warning is not beneficial.
             # This change is permanent rather than task scoped, but there won't
             # be any warnings to disable when verification is enabled.
-            urllib3.disable_warnings()
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 @event('plugin.register')
