@@ -24,7 +24,8 @@
     "ngclipboard": "~1.1.1",
     "angular-http-etag": "git://github.com/Tommatheussen/angular-http-etag.git#c047ec6",
     "angular-link-header-parser": "^1.0.2",
-    "angular-cache": "^4.6.0"
+    "angular-cache": "^4.6.0",
+    "md-data-table": "^2.1.0"
   },
   "resolutions": {
     "angular": "~1.5.6"
