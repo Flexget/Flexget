@@ -273,10 +273,7 @@ class RTorrent(object):
 
         # Use a special transport if http(s)
         if parsed_uri.scheme in ['http', 'https']:
-            try:
-                self._server = sp(self.uri, transport=HTTPDigestTransport(parsed_uri.scheme, session))
-            except requests.HTTPError as e:
-                log.error(dir(e))
+            self._server = sp(self.uri, transport=HTTPDigestTransport(parsed_uri.scheme, session))
         else:
             self._server = sp(self.uri)
 
