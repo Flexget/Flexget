@@ -31,7 +31,8 @@ class SNSNotification(object):
 
       notify_sns:
         [aws_access_key_id: <AWS ACCESS KEY ID>] (will be taken from AWS_ACCESS_KEY_ID environment if not provided)
-        [aws_secret_access_key: <AWS SECRET ACCESS KEY>] (will be taken from AWS_SECRET_ACCESS_KEY environment if not provided)
+        [aws_secret_access_key: <AWS SECRET ACCESS KEY>] (will be taken from AWS_SECRET_ACCESS_KEY environment if
+            not provided)
         [profile_name: <AWS PROFILE NAME>] (If provided, use this profile name instead of the default.)
         aws_region: <REGION>
         sns_topic_arn: <SNS ARN>

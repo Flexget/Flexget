@@ -28,7 +28,6 @@ class Symlink(object):
         ]
     }
 
-
     @plugin.priority(0)
     def on_task_output(self, task, config):
         if not config:

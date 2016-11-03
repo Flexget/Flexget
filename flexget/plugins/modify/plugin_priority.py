@@ -31,10 +31,10 @@ class PluginPriority(object):
         for name, priority in config.items():
             names.append(name)
             originals = self.priorities.setdefault(name, {})
-            for phase, event in plugin.plugins[name].phase_handlers.items():
-                originals[phase] = event.priority
-                log.debug('stored %s original value %s' % (phase, event.priority))
-                event.priority = priority
+            for phase, phase_event in plugin.plugins[name].phase_handlers.items():
+                originals[phase] = phase_event.priority
+                log.debug('stored %s original value %s' % (phase, phase_event.priority))
+                phase_event.priority = priority
                 log.debug('set %s new value %s' % (phase, priority))
         log.debug('Changed priority for: %s' % ', '.join(names))
 

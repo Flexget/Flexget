@@ -62,6 +62,3 @@ class TestETAG(object):
 
         # Verify all 3 lists are received as payload
         assert len(data) == 3
-
-
-

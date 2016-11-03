@@ -105,7 +105,10 @@ class PluginCookies(object):
                     log.trace('Adding cookie for %s. key: %s value: %s' % (item[0], item[4], item[5]))
                     count += 1
                 except IOError:
-                    to_hex = lambda x: ''.join([hex(ord(c))[2:].zfill(2) for c in x])
+
+                    def to_hex(x):
+                        return ''.join([hex(ord(c))[2:].zfill(2) for c in x])
+
                     i = 0
                     for val in item:
                         if isinstance(val, basestring):

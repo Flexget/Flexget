@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import pytest
+import sys
 
 
 # TODO more checks: fail_html, etc.
@@ -46,7 +47,6 @@ class TestDownload(object):
         assert not task.aborted, 'Task should not have aborted'
 
 
-
 # TODO: Fix this test
 @pytest.mark.usefixtures('tmpdir')
 @pytest.mark.skip(reason='TODO: These are really just config validation tests, and I have config validation turned off'
@@ -79,10 +79,10 @@ class TestDownloadTemp(object):
               temp:
         """
 
+    @pytest.mark.skipif(sys.platform.startswith('win'),
+                        reason='Windows does not have a guaranteed "private" directory afaik')
     def test_wrong_permission(self, execute_task):
         """Download plugin: Temp directory has wrong permissions"""
-        if sys.platform.startswith('win'):
-            raise SkipTest  # TODO: Windows doesn't have a guaranteed 'private' directory afaik
         task = execute_task('temp_wrong_permission', abort_ok=True)
         assert task.aborted
 

@@ -107,7 +107,7 @@ class ConfigureSeries(FilterSeriesBase):
 
         # Make a series config with the found series
         # Turn our dict of series with settings into a list of one item dicts
-        series_config = {'generated_series': [dict([s]) for s in series.items()]}
+        series_config = {'generated_series': [dict([x]) for x in series.items()]}
         # If options were specified, add them to the series config
         if 'settings' in config:
             series_config['settings'] = {'generated_series': config['settings']}

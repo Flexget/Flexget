@@ -67,7 +67,10 @@ def trim_dir(directory):
 
     :param directory: Directory to check
     """
-    access_time = lambda f: os.stat(os.path.join(directory, f)).st_atime
+
+    def access_time(f):
+        return os.stat(os.path.join(directory, f)).st_atime
+
     files = sorted(os.listdir(directory), key=access_time)
     file_name = os.path.join(directory, files[0])
     log.debug('removing least accessed file: %s', file_name)

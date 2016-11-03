@@ -109,9 +109,9 @@ def run_job(tasks):
     """Add the execution to the queue and waits until it is finished"""
     log.debug('executing tasks: %s', tasks)
     finished_events = manager.execute(options={'tasks': tasks, 'cron': True, 'allow_manual': False}, priority=5)
-    for _, task_name, event in finished_events:
+    for _, task_name, event_ in finished_events:
         log.debug('task finished executing: %s', task_name)
-        event.wait()
+        event_.wait()
     log.debug('all tasks in schedule finished executing')
 
 

@@ -83,7 +83,7 @@ class SearchAlphaRatio(object):
             'order_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'time', 'size', 'year', 'snatched'],
                          'default': 'time'},
             'order_desc': {'type': 'boolean', 'default': True},
-            'scene':  {'type': 'boolean'},
+            'scene': {'type': 'boolean'},
             'leechstatus': {'type': 'string', 'enum': list(LEECHSTATUS.keys()), 'default': 'normal'},
         },
         'required': ['username', 'password'],

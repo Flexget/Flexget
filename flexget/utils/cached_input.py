@@ -155,7 +155,7 @@ class cached(object):
                             if db_cache and db_cache.entries:
                                 log.error('There was an error during %s input (%s), using cache instead.' %
                                           (self.name, e))
-                                entries = [e.entry for e in db_cache.entries]
+                                entries = [ent.entry for ent in db_cache.entries]
                                 log.verbose('Restored %s entries from db cache' % len(entries))
                                 # Store to in memory cache
                                 self.cache[cache_name] = copy.deepcopy(entries)
@@ -183,7 +183,7 @@ class cached(object):
                             filter(InputCache.hash == hash).first()
                         if not db_cache:
                             db_cache = InputCache(name=self.name, hash=hash)
-                        db_cache.entries = [InputCacheEntry(entry=e) for e in response]
+                        db_cache.entries = [InputCacheEntry(entry=ent) for ent in response]
                         db_cache.added = datetime.now()
                         session.merge(db_cache)
                 return response

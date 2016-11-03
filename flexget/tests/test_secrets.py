@@ -48,5 +48,3 @@ class TestSecretsFromDB(object):
 
         task = execute_task('test_secret_from_db')
         assert len(task.accepted) == 1
-
-

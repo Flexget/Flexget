@@ -473,6 +473,3 @@ class CoreArgumentParser(ArgumentParser):
         # Set the 'allow_manual' flag to True for any usage of the CLI
         setattr(result, 'allow_manual', True)
         return result
-
-
-

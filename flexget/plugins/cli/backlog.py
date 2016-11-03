@@ -30,5 +30,6 @@ def do_cli(manager, options):
 def register_options():
     parser = options.register_command('backlog', do_cli, help='View or clear entries from backlog plugin',
                                       parents=[table_parser])
-    parser.add_argument('action', choices=['list', 'clear'], help='Choose to show items in backlog, or clear all of them')
+    parser.add_argument('action', choices=['list', 'clear'],
+                        help='Choose to show items in backlog, or clear all of them')
     parser.add_argument('task', nargs='?', help='Limit to specific task (if supplied)')

@@ -5,7 +5,8 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 import pytest
 
 from flexget.manager import Session
-from flexget.plugins.internal.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow
+from flexget.plugins.internal.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult
+from flexget.plugins.internal.api_trakt import TraktShow
 
 lookup_series = ApiTrakt.lookup_series
 

@@ -53,7 +53,6 @@ def reset_plugin(options):
         console('Unable to reset %s: %s' % (plugin, e.message))
 
 
-
 @event('options.register')
 def register_parser_arguments():
     plugins_parser = ArgumentParser(add_help=False)

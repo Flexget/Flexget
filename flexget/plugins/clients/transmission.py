@@ -182,7 +182,9 @@ class PluginTransmissionInput(TransmissionBase):
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             if not config['onlycomplete'] or (downloaded and
                                               ((
-                                                  torrent.status == 'stopped' and seed_ratio_ok is None and idle_limit_ok is None) or
+                                                  torrent.status == 'stopped' and
+                                                  seed_ratio_ok is None and
+                                                  idle_limit_ok is None) or
                                                (seed_ratio_ok is True or idle_limit_ok is True))):
                 entry = Entry(title=torrent.name,
                               url='file://%s' % torrent.torrentFile,
@@ -681,8 +683,8 @@ class PluginTransmissionClean(TransmissionBase):
                                 is_transmission_idlelimit_reached or
                                 is_minratio_reached or
                                 (is_torrent_seed_only and is_torrent_idlelimit_since_added_reached) or
-                                (not is_torrent_seed_only and is_torrent_idlelimit_since_finished_reached))
-                    and is_tracker_matching and is_directories_matching):
+                                (not is_torrent_seed_only and is_torrent_idlelimit_since_finished_reached)) and
+                    is_tracker_matching and is_directories_matching):
                 if task.options.test:
                     log.info('Would remove finished torrent `%s` from transmission', torrent.name)
                     continue

@@ -28,7 +28,8 @@ class TestDisableBuiltins(object):
 
           test2:
             mock:
-              - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5, description: 'http://www.imdb.com/title/tt0409459/'}
+              - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5,
+                description: 'http://www.imdb.com/title/tt0409459/'}
               - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
             accept_all: yes
             disable:

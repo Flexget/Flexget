@@ -142,7 +142,7 @@ class TestTVDBLookup(object):
 
             # No requests should be sent as we restore from cache
             with mock.patch('requests.sessions.Session.request',
-                            side_effect=Exception('TVDB should restore from cache')) as _:
+                            side_effect=Exception('TVDB should restore from cache')):
                 lookup_series('house m.d.', session=session)
 
     def test_unknown_series(self, mocked_expired, execute_task):
@@ -208,7 +208,7 @@ class TestTVDBExpire(object):
         # Should not expire as it was checked less then an hour ago
         persist['last_check'] = datetime.utcnow() - timedelta(hours=1)
         with mock.patch('requests.sessions.Session.request',
-                        side_effect=Exception('Tried to expire or lookup, less then an hour since last check')) as _:
+                        side_effect=Exception('Tried to expire or lookup, less then an hour since last check')):
             # Ensure series is not marked as expired
             with Session() as session:
                 mark_expired(session)
@@ -247,7 +247,7 @@ class TestTVDBExpire(object):
         ]
 
         # Ensure series is marked as expired
-        with mock.patch.object(TVDBRequest, 'get', side_effect=[expired_data]) as _:
+        with mock.patch.object(TVDBRequest, 'get', side_effect=[expired_data]):
             with Session() as session:
                 mark_expired(session)
                 ep = session.query(TVDBEpisode) \
@@ -425,10 +425,10 @@ class TestTheTVDBLanguages(object):
                                          'tegelijkertijd gedegen analyses wil Tegenlicht zijn kijk geven op de ' \
                                          'wereld; zowel op nationale als op internationale ontwikkelingen die' \
                                          ' onze wereld in de 21ste eeuw vormgeven.\r\n\r\nTegenlicht is een programma' \
-                                         ' zonder een vast \'format\'. Afhankelijk van het onderwerp wordt steeds een ' \
-                                         'passende vorm gekozen, waardoor langere reportages uit binnen- en buitenland ' \
-                                         'worden afgewisseld met debatten, en met uitzendingen waarbij één persoon ' \
-                                         'alle ruimte krijgt zijn of haar visie op een onderwerp te geven.'
+                                         ' zonder een vast \'format\'. Afhankelijk van het onderwerp wordt steeds ' \
+                                         'een passende vorm gekozen, waardoor langere reportages uit binnen- en ' \
+                                         'buitenland worden afgewisseld met debatten, en met uitzendingen waarbij ' \
+                                         'één persoon alle ruimte krijgt zijn of haar visie op een onderwerp te geven.'
 
         assert entry['tvdb_ep_air_date'] == datetime(2011, 9, 4, 0, 0)
         assert entry['tvdb_ep_id'] == 'S10E01'

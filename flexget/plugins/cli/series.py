@@ -76,7 +76,6 @@ def display_summary(options):
         for series in query:
             name_column = series.name
 
-            new_ep = False
             behind = 0
             latest_release = '-'
             age_col = '-'

@@ -144,8 +144,10 @@ class TestRegexp(object):
 
     def test_numeric(self, execute_task):
         task = execute_task('test_numeric')
-        assert task.find_entry('accepted', title = 'regexp9'), '\'regexp9\' should have been accepted because of score regexp'
-        assert not task.find_entry('accepted', title = 'regexp8'), '\'regexp8\' should NOT have been accepted because of score regexp'
+        msg = '\'regexp9\' should have been accepted because of score regexp'
+        assert task.find_entry('accepted', title='regexp9'), msg
+        msg = '\'regexp8\' should NOT have been accepted because of score regexp'
+        assert not task.find_entry('accepted', title='regexp8'), msg
 
     def test_match_in_list(self, execute_task):
         task = execute_task('test_match_in_list')
