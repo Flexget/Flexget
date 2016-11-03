@@ -193,11 +193,11 @@ class MovieListMoviesAPI(APIResource):
             'session': session
         }
         try:
-            ml.get_list_by_id(list_id=list_id, session=session)
+            list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             raise NotFoundError('list_id %d does not exist' % list_id)
 
-        total_items = ml.get_movies_by_list_id(count=True, **kwargs)
+        total_items = list.movies.count()
 
         if not total_items:
             return jsonify([])
