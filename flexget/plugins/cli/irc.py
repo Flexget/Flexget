@@ -3,18 +3,33 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser
 
+from colorclass.toggles import disable_all_colors
 from flexget import options
 from flexget.event import event
-from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
+from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
+try:
+    from irc_bot.irc_bot import IRCChannelStatus
+    from irc_bot import irc_bot
+except ImportError:
+    irc_bot = None
 
 
 def do_cli(manager, options):
     """Handle irc cli"""
+
+    if irc_bot is None:
+        console('irc_bot is not installed. install using `pip install irc_bot`.')
+        return
+
+    if hasattr(options, 'table_type') and options.table_type == 'porcelain':
+        disable_all_colors()
+
     action_map = {
         'status': action_status,
         'restart': action_restart,
         'stop': action_stop
     }
+
     from flexget.plugins.daemon.irc import irc_manager
     if irc_manager is None:
         console('IRC daemon does not appear to be running.')
@@ -26,28 +41,28 @@ def do_cli(manager, options):
 def action_status(options, irc_manager):
     connection = options.irc_connection
     try:
-        if connection == 'all':
-            status = irc_manager.status_all()
-        else:
-            status = irc_manager.status(connection)
+        status = irc_manager.status(connection)
     except ValueError as e:
         console('ERROR: %s' % e.args[0])
         return
 
-    header = ['Name', 'Status', 'Channels', 'Server']
+    header = ['Name', 'Alive', 'Channels', 'Server']
     table_data = [header]
 
-    for name, info in status.items():
-        channels = []
-        for channel in info['channels'].keys():
-            channels.append(channel)
-            if channel in info['connected_channels']:
-                channels[-1] = '*' + channels[-1]
-        table_data.append([name, info['thread'], ', '.join(channels), '%s:%s' % info['server']])
+    for connection in status:
+        for name, info in connection.items():
+            alive = colorize('green', 'Yes') if info['alive'] else colorize('red', 'No')
+            channels = []
+            for channel in info['channels']:
+                for channel_name, channel_status in channel.items():
+                    channels.append(channel_name)
+                    if channel_status == IRCChannelStatus.CONNECTED:
+                        channels[-1] = colorize('green', '* ' + channels[-1])
+            table_data.append([name, alive, ', '.join(channels), '%s:%s' % (info['server'], info['port'])])
     table = TerminalTable(options.table_type, table_data)
     try:
         console(table.output)
-        console(' * Connected channel')
+        console(colorize('green', ' * Connected channel'))
     except TerminalTableError as e:
         console('ERROR: %s' % e)
 
@@ -56,11 +71,9 @@ def action_restart(options, irc_manager):
     connection = options.irc_connection
     try:
         console('Restarting irc connection %s. It may take a short while.' % connection)
-        if connection == 'all':
-            irc_manager.restart_connections()
-        else:
-            irc_manager.restart_connection(connection)
-        console('Successfully restarted {0}. Use `flexget irc status {0}` to check its status.'.format(connection))
+        irc_manager.restart_connections(connection)
+        console(
+            'Successfully restarted {0}. Use `flexget irc status {0}` to check its status.'.format(connection or 'all'))
     except KeyError:
         console('ERROR: %s is not a valid irc connection' % connection)
 
@@ -69,11 +82,9 @@ def action_stop(options, irc_manager):
     connection = options.irc_connection
     try:
         console('Stopping irc connection %s. It may take a short while.' % connection)
-        if connection == 'all':
-            irc_manager.stop_connections(False)
-        else:
-            irc_manager.stop_connection(connection)
-        console('Successfully stopped {0}. Use `flexget irc status {0}` to check its status.'.format(connection))
+        irc_manager.stop_connections(wait=False, name=connection)
+        console(
+            'Successfully stopped {0}. Use `flexget irc status {0}` to check its status.'.format(connection or 'all'))
     except KeyError:
         console('ERROR: %s is not a valid irc connection' % connection)
 
@@ -82,7 +93,7 @@ def action_stop(options, irc_manager):
 def register_parser_arguments():
     # Common option to be used in multiple subparsers
     irc_parser = ArgumentParser(add_help=False)
-    irc_parser.add_argument('irc_connection', help="Title of the irc connection")
+    irc_parser.add_argument('irc_connection', nargs='?', help="Title of the irc connection")
 
     # Register subcommand
     parser = options.register_command('irc', do_cli, help='View and manage irc connections')

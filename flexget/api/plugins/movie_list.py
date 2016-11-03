@@ -182,7 +182,7 @@ class MovieListMoviesAPI(APIResource):
 
         start = per_page * (page - 1)
         stop = start + per_page
-        descending = bool(sort_order == 'desc')
+        descending = sort_order == 'desc'
 
         kwargs = {
             'start': start,
@@ -193,11 +193,11 @@ class MovieListMoviesAPI(APIResource):
             'session': session
         }
         try:
-            ml.get_list_by_id(list_id=list_id, session=session)
+            list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             raise NotFoundError('list_id %d does not exist' % list_id)
 
-        total_items = ml.get_movies_by_list_id(count=True, **kwargs)
+        total_items = list.movies.count()
 
         if not total_items:
             return jsonify([])

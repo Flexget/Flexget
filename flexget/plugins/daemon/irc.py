@@ -22,8 +22,7 @@ from flexget.utils import requests
 from flexget.utils.tools import get_config_hash
 
 try:
-    from irc_bot.irc_bot import IRCBot
-    from irc_bot.irc_bot import partial
+    from irc_bot.irc_bot import IRCBot, partial
     from irc_bot import irc_bot
 except ImportError as e:
     irc_bot = None
@@ -313,8 +312,8 @@ class IRCConnection(IRCBot):
                 # Try to see if it's not found due to case sensitivity
                 trackers = requests.get('https://api.github.com/repos/autodl-community/'
                                         'autodl-trackers/git/trees/master?recursive=1').json().get('tree', [])
-                for tracker in trackers:
-                    name = tracker.get('path', '')
+                for t in trackers:
+                    name = t.get('path', '')
                     if not name.endswith('.tracker') or name.lower() != tracker_name.lower():
                         continue
                     tracker = requests.get(base_url + name)
@@ -323,7 +322,8 @@ class IRCConnection(IRCBot):
             except (requests.RequestException, IOError) as e:
                 raise TrackerFileError(e)
         if not tracker:
-            raise TrackerFileError('Unable to find %s on disk or Github' % tracker_config_file)
+            raise TrackerFileError('Unable to find %s on disk or Github. Did you spell it correctly?' %
+                                   tracker_config_file)
 
         # If we got this far, let's save our work :)
         save_path = os.path.join(base_dir, tracker_name)
@@ -849,9 +849,12 @@ class IRCConnectionManager(object):
         self.stop_connections(self.wait)
         irc_connections = {}
 
-    def restart_connections(self):
-        for name, connection in irc_connections.items():
-            self.restart_connection(name, connection.config)
+    def restart_connections(self, name=None):
+        if name:
+            self.restart_connection(name)
+        else:
+            for name, connection in irc_connections.items():
+                self.restart_connection(name, connection.config)
 
     def restart_connection(self, name, config=None):
         if not config:
@@ -883,9 +886,12 @@ class IRCConnectionManager(object):
         for conn_name, connection in irc_connections.items():
             connection.thread.start()
 
-    def stop_connections(self, wait):
-        for name in irc_connections.keys():
+    def stop_connections(self, wait, name=None):
+        if name:
             self.stop_connection(name, wait)
+        else:
+            for name in irc_connections.keys():
+                self.stop_connection(name, wait)
 
     def stop_connection(self, name, wait=False):
         if irc_connections[name].is_alive():
@@ -896,21 +902,26 @@ class IRCConnectionManager(object):
         self.wait = wait
         self.shutdown_event.set()
 
-    def status_all(self):
-        status = {}
-        for name in irc_connections.keys():
-            status.update(self.status(name))
+    def status(self, name=None):
+        status = []
+        if name:
+            if name not in irc_connections:
+                raise ValueError('%s is not a valid irc connection' % name)
+            else:
+                status.append(self.status_dict(name))
+        else:
+            for n in irc_connections.keys():
+                status.append(self.status_dict(n))
         return status
 
-    def status(self, name):
-        if name not in irc_connections:
-            raise ValueError('%s is not a valid irc connection' % name)
+    def status_dict(self, name):
         status = {name: {}}
         connection = irc_connections[name]
-        status[name]['thread'] = 'OK' if connection.is_alive() else 'dead'
-        status[name]['channels'] = connection.channels
+        status[name]['alive'] = connection.is_alive()
+        status[name]['channels'] = [{key: value} for key, value in connection.channels.items()]
         status[name]['connected_channels'] = connection.connected_channels
-        status[name]['server'] = (connection.servers[0], connection.port)
+        status[name]['server'] = connection.servers[0]
+        status[name]['port'] = connection.port
 
         return status
 

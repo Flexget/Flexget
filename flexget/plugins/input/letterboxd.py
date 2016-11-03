@@ -11,7 +11,6 @@ from flexget.utils.requests import RequestException, Session, TimedLimiter
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('letterboxd')
-logging.getLogger('api_tmdb').setLevel(logging.CRITICAL)
 
 requests = Session(max_retries=5)
 requests.add_domain_limiter(TimedLimiter('letterboxd.com', '1 seconds'))

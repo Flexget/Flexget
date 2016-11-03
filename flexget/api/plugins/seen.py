@@ -79,7 +79,7 @@ class SeenSearchAPI(APIResource):
         if per_page > 100:
             per_page = 100
 
-        descending = bool(sort_order == 'desc')
+        descending = sort_order == 'desc'
 
         # Unquotes and prepares value for DB lookup
         if value:
