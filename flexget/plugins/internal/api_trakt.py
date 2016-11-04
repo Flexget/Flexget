@@ -141,6 +141,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
                 log.debug('Using refresh token to re-authorize account %s.', account)
                 data['refresh_token'] = acc.refresh_token
                 data['grant_type'] = 'refresh_token'
+                data['redirect_uri'] = 'urn:ietf:wg:oauth:2.0:oob'
                 token_dict = token_auth(data)
             elif token:
                 # We are only in here if a pin was specified, so it's safe to use console instead of logging
