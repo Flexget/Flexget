@@ -16,6 +16,18 @@
         vm.$onInit = activate;
         vm.numberSorter = numberSorter;
         vm.timeSorter = timeSorter;
+        vm.titleSorter = titleSorter;
+
+        function titleSorter(a, b) {
+            var aName = a.filter(function () {
+                return angular.element(this).is('#taskName');
+            }).html();
+
+            var bName = b.filter(function () {
+                return angular.element(this).is('#taskName');
+            }).html();
+            return aName > bName;
+        }
 
         function timeSorter(a, b) {
             return new Date(b) - new Date(a);

@@ -1,7 +1,7 @@
 <div layout="column" flex layout-margin>
     <mdt-table table-card="{ title: 'Latest task executions', actionIcons: true }" animate-sort-icon="true" >
         <mdt-header-row>
-            <mdt-column column-sort="true" sortable-rows-default  align-rule="left">Task name</mdt-column>
+            <mdt-column align-rule="left" column-sort="{ comparator: vm.titleSorter }" sortable-rows-default>Task name</mdt-column>
             <mdt-column align-rule="left" column-sort="{ comparator: vm.timeSorter }">Start time</mdt-column>
             <mdt-column align-rule="left" column-sort="{ comparator: vm.numberSorter }">Produced</mdt-column>
             <mdt-column align-rule="left" column-sort="{ comparator: vm.numberSorter }">Accepted</mdt-column>
@@ -12,7 +12,7 @@
         <mdt-row ng-repeat="task in ::vm.tasks">
             <mdt-cell html-content="true">
                 <md-icon class="fa fa-lg" ng-class="task.last_execution.succeeded ? 'fa-check-circle success' : 'fa-times-circle failure'"></md-icon>
-                {{ task.name }}
+                <span id="taskName">{{ task.name }}</span>
             </mdt-cell>
             <mdt-cell>{{ task.last_execution.start }}</mdt-cell>
             <mdt-cell>{{ task.last_execution.produced }}</mdt-cell>
