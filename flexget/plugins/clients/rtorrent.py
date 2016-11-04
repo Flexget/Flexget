@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.xmlrpc import client as xmlrpc_client
 from future.moves.urllib.parse import urlparse
 from future.utils import native_str

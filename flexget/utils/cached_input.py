@@ -5,7 +5,7 @@ import logging
 import pickle
 from datetime import datetime, timedelta
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flexget import db_schema
 from flexget.event import event
 from flexget.manager import Session

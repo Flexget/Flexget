@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import sys
 from textwrap import wrap
