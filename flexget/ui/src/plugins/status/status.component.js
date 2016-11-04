@@ -13,19 +13,39 @@
     function statusController(statusService) {
         var vm = this;
         
-        vm.data = {
-            data: [],
-            'column-keys': [
-                'name',
-                'last_execution.start',
-                'last_execution.produced',
-                'last_execution.accepted',
-                'last_execution.rejected',
-                'last_execution.failed',
-            ]
+        vm.$onInit = activate;
+        vm.numberSorter = numberSorter;
+        vm.timeSorter = timeSorter;
+        vm.titleSorter = titleSorter;
+
+        function titleSorter(a, b) {
+            var aName = a.filter(function () {
+                return angular.element(this).is('#taskName');
+            }).html();
+
+            var bName = b.filter(function () {
+                return angular.element(this).is('#taskName');
+            }).html();
+            return aName > bName;
         }
 
-        vm.$onInit = activate;
+        function timeSorter(a, b) {
+            return new Date(b) - new Date(a);
+        }
+
+        function numberSorter(a, b) {
+            var numberA = parseInt(a);
+            var numberB = parseInt(b);
+        
+            if (isNaN(numberA)) {
+                return 1;
+            } else if (isNaN(numberB)) {
+                return -1;
+            } else if (numberA === numberB) {
+                return 0;
+            }
+            return (numberA > numberB ? -1 : 1);
+        }
 
         function activate() {
             getStatus();
@@ -38,7 +58,7 @@
         }
         
         function setStatuses(response) {
-            vm.data.data = response.data;
+            vm.tasks = response.data;
         }
     }
 }());
