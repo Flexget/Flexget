@@ -9,7 +9,6 @@ from json import JSONEncoder
 
 from flask import jsonify, Response, request
 from flask_restplus import inputs
-from flexget.plugins.operate.status import StatusTask, TaskExecution
 from queue import Queue, Empty
 
 from flexget.api import api, APIResource

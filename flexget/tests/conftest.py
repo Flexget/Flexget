@@ -243,8 +243,8 @@ def no_requests(monkeypatch):
 
     # Don't monkey patch HTTPSConnection if ssl not installed as it won't exist in backports
     try:
-        import ssl
-        from ssl import SSLContext
+        import ssl  # noqa
+        from ssl import SSLContext  # noqa
         online_funcs.append('future.backports.http.client.HTTPSConnection.request')
     except ImportError:
         pass

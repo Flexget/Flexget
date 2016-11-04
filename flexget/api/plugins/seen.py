@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from flexget.plugins.filter.seen import forget_by_id, SeenEntry
+from flexget.plugins.filter.seen import forget_by_id
 from future.moves.urllib.parse import unquote
 
 from math import ceil

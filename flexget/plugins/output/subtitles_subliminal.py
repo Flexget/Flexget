@@ -77,12 +77,12 @@ class PluginSubliminal(object):
         if list(sys.version_info) < [2, 7]:
             raise plugin.DependencyError('subliminal', 'Python 2.7', 'Subliminal plugin requires python 2.7.')
         try:
-            import babelfish
+            import babelfish  # noqa
         except ImportError as e:
             log.debug('Error importing Babelfish: %s', e)
             raise plugin.DependencyError('subliminal', 'babelfish', 'Babelfish module required. ImportError: %s' % e)
         try:
-            import subliminal
+            import subliminal  # noqa
         except ImportError as e:
             log.debug('Error importing Subliminal: %s', e)
             raise plugin.DependencyError('subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e)

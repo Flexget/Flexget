@@ -10,12 +10,10 @@ import ast
 import copy
 import hashlib
 import locale
-import mimetypes
 import operator
 import os
 import re
 import sys
-import io
 from collections import MutableMapping
 from datetime import timedelta, datetime
 from pprint import pformat

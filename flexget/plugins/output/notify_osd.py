@@ -36,7 +36,7 @@ class OutputNotifyOsd(object):
 
     def on_task_start(self, task, config):
         try:
-            from gi.repository import Notify
+            from gi.repository import Notify  # noqa
         except ImportError as e:
             log.debug('Error importing Notify: %s' % e)
             raise plugin.DependencyError('notify_osd', 'gi.repository', 'Notify module required. ImportError: %s' % e)

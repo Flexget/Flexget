@@ -4,7 +4,6 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 import os
 import xml.etree.ElementTree as ET
-import re
 
 from flexget import plugin
 from flexget.utils.imdb import is_valid_imdb_title_id

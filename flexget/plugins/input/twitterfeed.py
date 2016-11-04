@@ -65,7 +65,7 @@ class TwitterFeed(object):
 
     def on_task_start(self, task, config):
         try:
-            import twitter
+            import twitter  # noqa
         except ImportError:
             raise plugin.PluginError('twitter module required', logger=log)
 

@@ -124,8 +124,8 @@ class TransmissionBase(object):
     def on_task_start(self, task, config):
         try:
             import transmissionrpc
-            from transmissionrpc import TransmissionError
-            from transmissionrpc import HTTPHandlerError
+            from transmissionrpc import TransmissionError  # noqa
+            from transmissionrpc import HTTPHandlerError  # noqa
         except:
             raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required.', log)
         if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 11]:
