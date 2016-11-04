@@ -2,7 +2,7 @@
     <mdt-table table-card="{ title: 'Latest task executions', actionIcons: true }" animate-sort-icon="true" >
         <mdt-header-row>
             <mdt-column column-sort="true" sortable-rows-default  align-rule="left">Task name</mdt-column>
-            <mdt-column align-rule="left" column-sort="true">Start time</mdt-column>
+            <mdt-column align-rule="left" column-sort="{ comparator: vm.timeSorter }">Start time</mdt-column>
             <mdt-column align-rule="left" column-sort="{ comparator: vm.numberSorter }">Produced</mdt-column>
             <mdt-column align-rule="left" column-sort="{ comparator: vm.numberSorter }">Accepted</mdt-column>
             <mdt-column align-rule="left" column-sort="{ comparator: vm.numberSorter }">Rejected</mdt-column>

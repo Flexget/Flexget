@@ -15,6 +15,11 @@
         
         vm.$onInit = activate;
         vm.numberSorter = numberSorter;
+        vm.timeSorter = timeSorter;
+
+        function timeSorter(a, b) {
+            return new Date(b) - new Date(a);
+        }
 
         function numberSorter(a, b) {
             var numberA = parseInt(a);
