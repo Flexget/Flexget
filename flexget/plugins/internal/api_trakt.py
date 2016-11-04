@@ -104,7 +104,7 @@ def device_auth():
         raise plugin.PluginError('Device authorization with Trakt.tv failed: {0}'.format(e))
 
 
-def token_auth(data):
+def token_oauth(data):
     try:
         return requests.post(get_api_url('oauth/token'), data=data).json()
     except requests.RequestException as e:
@@ -142,13 +142,13 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
                 log.debug('Using refresh token to re-authorize account %s.', account)
                 data['refresh_token'] = acc.refresh_token
                 data['grant_type'] = 'refresh_token'
-                token_dict = token_auth(data)
+                token_dict = token_oauth(data)
             elif token:
                 # We are only in here if a pin was specified, so it's safe to use console instead of logging
                 console('Warning: PIN authorization has been deprecated. Use Device Authorization instead.')
                 data['code'] = token
                 data['grant_type'] = 'authorization_code'
-                token_dict = token_auth(data)
+                token_dict = token_oauth(data)
             elif called_from_cli:
                 log.debug('No pin specified for an unknown account %s. Attempting to authorize device.', account)
                 token_dict = device_auth()
