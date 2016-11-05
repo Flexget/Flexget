@@ -3,6 +3,7 @@
 import re
 import logging
 import os
+from datetime import datetime
 from os.path import basename
 from socket import gethostbyname
 from xml.dom.minidom import parseString
@@ -242,6 +243,7 @@ class InputPlex(object):
                 e['plex_thumb'] = "http://%s:%d%s%s" % (
                     config['server'], config['port'], node.getAttribute('thumb'), urlappend)
                 e['series_name'] = title
+                e['plex_ep_name'] = node.getAttribute('title')
                 season = int(node.getAttribute('parentIndex'))
                 if node.getAttribute('parentIndex') == node.getAttribute('year'):
                     season = node.getAttribute('originallyAvailableAt')
@@ -263,6 +265,8 @@ class InputPlex(object):
             elif viewgroup == "movie":
                 filenamemap = "%s_%s_%s_%s.%s"
 
+            e['plex_year'] = node.getAttribute('year')
+            e['plex_added'] = datetime.fromtimestamp(int(node.getAttribute('addedAt')))
             e['plex_duration'] = node.getAttribute('duration')
             e['plex_summary'] = node.getAttribute('summary')
             e['plex_userrating'] = node.getAttribute('userrating')
