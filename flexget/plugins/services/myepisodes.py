@@ -13,12 +13,6 @@ from flexget.utils import requests
 from flexget.db_schema import versioned_base
 
 
-try:
-    from flexget.plugins.internal.api_tvdb import lookup_series
-except ImportError:
-    raise plugin.DependencyError(issued_by='myepisodes',
-                                 missing='api_tvdb',
-                                 message='myepisodes requires the `api_tvdb` plugin')
 
 log = logging.getLogger('myepisodes')
 Base = versioned_base('myepisodes', 0)
@@ -218,7 +212,7 @@ class MyEpisodes(object):
             search_value = entry['tvdb_series_name']
         else:
             try:
-                series = lookup_series(name=entry['series_name'], tvdb_id=entry.get('tvdb_id'))
+                series = plugin.get_plugin_by_name('api_tvdb').instance.lookup_series(name=entry['series_name'], tvdb_id=entry.get('tvdb_id'))
                 search_value = series.name
             except LookupError:
                 log.warning('Unable to lookup series `%s` from tvdb, using raw name.', entry['series_name'])
