@@ -322,6 +322,7 @@ class InputPlex(object):
                         elif viewgroup == "movie":
                             filename = filenamemap % (title.replace(" ", "."), resolution, vcodec,
                                                       acodec, container)
+                            entry['title'] = filename
                     entry['plex_url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, urlappend)
                     entry['plex_path'] = key
                     entry['url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, urlappend)
