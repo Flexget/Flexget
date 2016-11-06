@@ -91,7 +91,6 @@ class Status(object):
                 st = StatusTask()
                 st.name = task.name
                 session.add(st)
-                # TODO: purge removed tasks
 
         self.execution = TaskExecution()
         self.execution.start = datetime.datetime.now()
@@ -122,6 +121,13 @@ class Status(object):
 
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
+    # Purge all status data for non existing tasks
+    for status_task in session.query(StatusTask).all():
+        if status_task.name not in manager.config['tasks']:
+            log.verbose('Purging obsolete status data for task %s', status_task.name)
+            session.delete(status_task)
+
+    # Purge task executions older than 1 year
     result = session.query(TaskExecution).filter(
         TaskExecution.start < datetime.datetime.now() - timedelta(days=365)).delete()
     if result:
