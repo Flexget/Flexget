@@ -4,7 +4,8 @@ import datetime
 from datetime import timedelta
 
 from flexget.utils.database import with_session
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, select, func
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
@@ -33,10 +34,22 @@ class StatusTask(Base):
     def __repr__(self):
         return '<StatusTask(id=%s,name=%s)>' % (self.id, self.name)
 
+    @hybrid_property
+    def last_execution_time(self):
+        if not self.executions:
+            return None
+        return max(execution.start for execution in self.executions)
+
+    @last_execution_time.expression
+    def last_execution_time(cls):
+        return select([func.max(TaskExecution.start)]).where(TaskExecution.task_id == cls.id). \
+            correlate(StatusTask.__table__).label('last_execution_time')
+
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
+            'last_execution_time': self.last_execution_time
         }
 
 
