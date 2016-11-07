@@ -1600,7 +1600,7 @@ class FilterSeries(FilterSeriesBase):
             hours += diff.days * 24
             minutes, _ = divmod(remainder, 60)
 
-            log.info('Timeframe waiting %s for %sh:%smin, currently best is %s' %
+            log.info('Timeframe waiting %s for %02dh:%02dmin, currently best is %s' %
                      (episode.series.name, hours, minutes, best['title']))
 
             # add best entry to backlog (backlog is able to handle duplicate adds)
