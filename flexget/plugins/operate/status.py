@@ -153,6 +153,16 @@ def register_plugin():
 
 
 @with_session
+def get_status_tasks(start=None, stop=None, order_by='last_execution_time', descending=True, session=None):
+    query = session.query(StatusTask)
+    if descending:
+        query = query.order_by(getattr(StatusTask, order_by).desc())
+    else:
+        query = query.order_by(getattr(StatusTask, order_by))
+    return query.slice(start, stop).all()
+
+
+@with_session
 def get_executions_by_task_id(task_id, start=None, stop=None, order_by='start', descending=True,
                               succeeded=None, produced=True, start_date=None, end_date=None, session=None):
     query = session.query(TaskExecution).filter(TaskExecution.task_id == task_id)

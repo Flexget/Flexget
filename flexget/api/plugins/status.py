@@ -8,7 +8,7 @@ from flask import jsonify, request
 from flask_restplus import inputs
 from flexget.api.app import NotFoundError, etag, pagination_headers, api, APIResource
 from flexget.api.core.tasks import tasks_api
-from flexget.plugins.operate.status import StatusTask, TaskExecution, get_executions_by_task_id
+from flexget.plugins.operate.status import StatusTask, TaskExecution, get_executions_by_task_id, get_status_tasks
 from sqlalchemy.orm.exc import NoResultFound
 
 status_api = api.namespace('status', description='View and manage task execution status')
@@ -52,7 +52,8 @@ task_status = api.schema('tasks.tasks_status', ObjectsContainer.task_status_sche
 task_status_list = api.schema('tasks.tasks_status_list', ObjectsContainer.task_status_list_schema)
 task_executions = api.schema('tasks.tasks_executions_list', ObjectsContainer.executions_list)
 
-tasks_parser = api.parser()
+sort_choices = ('last_execution_time', 'name', 'id')
+tasks_parser = api.pagination_parser(sort_choices=sort_choices)
 tasks_parser.add_argument('include_execution', type=inputs.boolean, default=True,
                           help='Include the last execution of the task')
 
@@ -66,17 +67,63 @@ class TasksStatusAPI(APIResource):
     def get(self, session=None):
         """Get status tasks"""
         args = tasks_parser.parse_args()
+
+        # Pagination and sorting params
+        page = args['page']
+        per_page = args['per_page']
+        sort_by = args['sort_by']
+        sort_order = args['order']
+
+        # Additional data
         include_execution = args.get('include_execution')
 
-        tasks = []
-        for task in session.query(StatusTask).all():
+        if per_page > 100:
+            per_page = 100
+
+        start = per_page * (page - 1)
+        stop = start + per_page
+        descending = sort_order == 'desc'
+
+        kwargs = {
+            'start': start,
+            'stop': stop,
+            'order_by': sort_by,
+            'descending': descending,
+            'session': session
+        }
+
+        total_items = session.query(StatusTask).count()
+
+        if not total_items:
+            return jsonify([])
+
+        db_status_tasks = get_status_tasks(**kwargs)
+
+        total_pages = int(ceil(total_items / float(per_page)))
+
+        if page > total_pages:
+            raise NotFoundError('page %s does not exist' % page)
+
+        # Actual results in page
+        actual_size = min(len(db_status_tasks), per_page)
+
+        # Get pagination headers
+        pagination = pagination_headers(total_pages, total_items, actual_size, request)
+
+        status_tasks = []
+        for task in db_status_tasks:
             st_task = task.to_dict()
             if include_execution:
                 execution = task.executions.order_by(TaskExecution.start.desc()).first()
                 st_task['last_execution'] = execution.to_dict() if execution else {}
-            tasks.append(st_task)
+            status_tasks.append(st_task)
 
-        return jsonify(tasks)
+        # Create response
+        rsp = jsonify(status_tasks)
+
+        # Add link header to response
+        rsp.headers.extend(pagination)
+        return rsp
 
 
 @tasks_api.route('/status/<int:task_id>/')
@@ -139,6 +186,8 @@ class TaskStatusExecutionsAPI(APIResource):
         per_page = args['per_page']
         sort_by = args['sort_by']
         sort_order = args['order']
+
+        # Filter params
         succeeded = args.get('succeeded')
         produced = args.get('produced')
         start_date = args.get('start_date')
