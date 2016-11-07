@@ -1,8 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib import request
-from future.moves.urllib import parse
-from future.moves.urllib.error import URLError
 
 import logging
 import re
@@ -14,7 +11,6 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import requests
 from flexget.db_schema import versioned_base
-
 
 
 log = logging.getLogger('myepisodes')
@@ -215,7 +211,8 @@ class MyEpisodes(object):
             search_value = entry['tvdb_series_name']
         else:
             try:
-                series = plugin.get_plugin_by_name('api_tvdb').instance.lookup_series(name=entry['series_name'], tvdb_id=entry.get('tvdb_id'))
+                series = plugin.get_plugin_by_name('api_tvdb').instance.lookup_series(
+                    name=entry['series_name'], tvdb_id=entry.get('tvdb_id'))
                 search_value = series.name
             except LookupError:
                 log.warning('Unable to lookup series `%s` from tvdb, using raw name.', entry['series_name'])
