@@ -42,6 +42,7 @@ class ObjectsContainer(object):
         'properties': {
             'id': {'type': 'integer'},
             'name': {'type': 'string'},
+            'last_execution_time': {'type': ['string', 'null'], 'format': 'date-time'},
             'last_execution': task_status_execution_schema
         },
         'required': ['id', 'name'],

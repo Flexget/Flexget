@@ -36,7 +36,7 @@ class StatusTask(Base):
 
     @hybrid_property
     def last_execution_time(self):
-        if not self.executions:
+        if self.executions.count() == 0:
             return None
         return max(execution.start for execution in self.executions)
 
