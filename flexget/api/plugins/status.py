@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
+import logging
 from datetime import datetime, timedelta
 from math import ceil
 
@@ -10,6 +11,8 @@ from flexget.api.app import NotFoundError, etag, pagination_headers, api, APIRes
 from flexget.api.core.tasks import tasks_api
 from flexget.plugins.operate.status import StatusTask, TaskExecution, get_executions_by_task_id, get_status_tasks
 from sqlalchemy.orm.exc import NoResultFound
+
+log = logging.getLogger('status_api')
 
 status_api = api.namespace('status', description='View and manage task execution status')
 
@@ -78,6 +81,7 @@ class TasksStatusAPI(APIResource):
         include_execution = args.get('include_execution')
 
         if per_page > 100:
+            log.debug('per_page is higher than max value of 100, setting 100')
             per_page = 100
 
         start = per_page * (page - 1)
@@ -93,6 +97,7 @@ class TasksStatusAPI(APIResource):
         }
 
         total_items = session.query(StatusTask).count()
+        log.debug('db has a total of %s status tasks', total_items)
 
         if not total_items:
             return jsonify([])
