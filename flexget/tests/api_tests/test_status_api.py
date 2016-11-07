@@ -159,6 +159,49 @@ class TestTaskStatusPagination(object):
         assert links['next']['page'] == 3
         assert links['prev']['page'] == 1
 
+    def test_status_tasks_sorting(self, api_client):
+        base_name = 'test task '
+        base_start_time = datetime.now() - timedelta(days=7)
+
+        hours = 10
+        for i in range(3):
+            with Session() as session:
+                st = StatusTask()
+                st.name = base_name + str(i)
+                session.add(st)
+
+                for ix in range(2):
+                    ex1 = TaskExecution()
+                    ex1.task = st
+                    ex1.start = base_start_time + timedelta(hours=hours)
+                    hours -= 1
+
+        # Default sorting - Last execution time desc
+        rsp = api_client.get('/status/')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['name'] == 'test task 0'
+
+        rsp = api_client.get('/status/?order=asc')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['name'] == 'test task 2'
+
+        # Sort by name
+        rsp = api_client.get('/status/?sort_by=name')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['name'] == 'test task 2'
+
+        rsp = api_client.get('/status/?sort_by=name&order=asc')
+        assert rsp.status_code == 200
+        data = json.loads(rsp.get_data(as_text=True))
+
+        assert data[0]['name'] == 'test task 0'
+
     def test_executions_pagination(self, api_client, link_headers):
         base_start_time = datetime.now() - timedelta(days=7)
         number_of_entries = 200
