@@ -89,16 +89,14 @@ def pending_list_show(options):
         try:
             entry = get_entry_by_id(pending_list.id, int(options.entry), session=session)
         except NoResultFound:
-            console(
-                'Could not find matching pending entry with ID {} in list `{}`'.format(int(options.entry),
-                                                                                       options.list_name))
+            console('Could not find matching pending entry with ID {} in list `{}`'.format(int(options.entry),
+                                                                                           options.list_name))
             return
         except ValueError:
             entry = get_entry_by_title(pending_list.id, options.entry, session=session)
             if not entry:
-                console(
-                    'Could not find matching pending entry with title `{}` in list `{}`'.format(options.entry,
-                                                                                                options.list_name))
+                console('Could not find matching pending entry with title `{}` in list `{}`'.format(options.entry,
+                                                                                                    options.list_name))
                 return
         header = ['Field name', 'Value']
         table_data = [header]
@@ -128,7 +126,7 @@ def pending_list_add(options):
         if db_entry:
             console("Entry with the title `{}` already exist with list `{}`. Will replace identifiers if given".format(
                 title, pending_list.name))
-            output = 'Successfully updated entry `{}` to pending list `{}` '.format(title, pending_list.name)
+            operation = 'updated'
         else:
             console("Adding entry with title `{}` to list `{}`".format(title, pending_list.name))
             db_entry = PendingListEntry(entry=entry, pending_list_id=pending_list.id)
@@ -136,14 +134,14 @@ def pending_list_add(options):
                 console('marking entry as approved')
                 db_entry.approved = True
             session.add(db_entry)
-            output = 'Successfully added entry `{}` to pending list `{}` '.format(title, pending_list.name)
+            operation = 'added'
         if options.attributes:
             console('Adding attributes to entry `{}`'.format(title))
             for identifier in options.attributes:
                 for k, v in identifier.items():
                     entry[k] = v
             db_entry.entry = entry
-        console(output)
+        console('Successfully {} entry `{}` to pending list `{}` '.format(operation, title, pending_list.name))
 
 
 def pending_list_approve(options, approve=None):
