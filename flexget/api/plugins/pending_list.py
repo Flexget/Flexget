@@ -276,26 +276,3 @@ class PendingListEntryAPI(APIResource):
         resp = jsonify(entry.to_dict())
         resp.status_code = 201
         return resp
-
-
-@pending_list_api.route('/<int:list_id>/entries/<int:entry_id>/approve/')
-@api.doc(params={'list_id': 'ID of the list', 'entry_id': 'ID of the entry'},
-         description='A convenience method that allows to easily approve entries via standard GET requests')
-class PendingListEntryApproveAPI(APIResource):
-    @etag
-    @api.response(201, model=pending_list_entry_base_schema)
-    @api.response(NotFoundError)
-    @api.response(BadRequest)
-    def get(self, list_id, entry_id, session=None):
-        """ Set an entry as approved """
-        try:
-            entry = get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session)
-        except NoResultFound:
-            raise NotFoundError('could not find entry with id %d in list %d' % (entry_id, list_id))
-        if entry.approved is True:
-            raise BadRequest('entry is already approved')
-        entry.approved = True
-        session.commit()
-        rsp = jsonify(entry.to_dict())
-        rsp.status_code = 201
-        return rsp

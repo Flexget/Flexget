@@ -261,54 +261,6 @@ class TestPendingListAPI(object):
         errors = schema_match(base_message, data)
         assert not errors
 
-    def test_pending_list_entry_approve(self, api_client, schema_match):
-        payload = {'name': 'test_list'}
-
-        # Create list
-        rsp = api_client.json_post('/pending_list/', data=json.dumps(payload))
-        assert rsp.status_code == 201
-        data = json.loads(rsp.get_data(as_text=True))
-
-        errors = schema_match(OC.pending_list_base_object, data)
-        assert not errors
-
-        for field, value in payload.items():
-            assert data.get(field) == value
-
-        entry_data = {'title': 'title', 'original_url': 'http://test.com'}
-
-        # Add entry to list
-        rsp = api_client.json_post('/pending_list/1/entries/', data=json.dumps(entry_data))
-        assert rsp.status_code == 201
-        data = json.loads(rsp.get_data(as_text=True))
-
-        errors = schema_match(OC.pending_list_entry_base_object, data)
-        assert not errors
-
-        for field, value in entry_data.items():
-            assert data.get(field) == value
-
-        # Mark entry as approved
-        rsp = api_client.get('/pending_list/1/entries/1/approve/')
-        assert rsp.status_code == 201
-        data = json.loads(rsp.get_data(as_text=True))
-
-        errors = schema_match(OC.pending_list_entry_base_object, data)
-        assert not errors
-
-        for field, value in entry_data.items():
-            assert data.get(field) == value
-
-        assert data['approved'] is True
-
-        # Try to mark as approved again
-        rsp = api_client.get('/pending_list/1/entries/1/approve/')
-        assert rsp.status_code == 400
-        data = json.loads(rsp.get_data(as_text=True))
-
-        errors = schema_match(base_message, data)
-        assert not errors
-
 
 class TestPendingListPagination(object):
     config = 'tasks: {}'
