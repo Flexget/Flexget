@@ -17,22 +17,22 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import entry_synonym, with_session
 
-log = logging.getLogger('wait_list')
-Base = versioned_base('wait_list', 0)
+log = logging.getLogger('pending_list')
+Base = versioned_base('pending_list', 0)
 
 
-@db_schema.upgrade('wait_list')
+@db_schema.upgrade('pending_list')
 def upgrade(ver, session):
     ver = 0
     return ver
 
 
-class WaitListList(Base):
-    __tablename__ = 'wait_list_lists'
+class PendingListList(Base):
+    __tablename__ = 'pending_list_lists'
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, unique=True)
     added = Column(DateTime, default=datetime.now)
-    entries = relationship('WaitListEntry', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
+    entries = relationship('PendingListEntry', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
 
     def to_dict(self):
         return {
@@ -42,10 +42,10 @@ class WaitListList(Base):
         }
 
 
-class WaitListEntry(Base):
+class PendingListEntry(Base):
     __tablename__ = 'wait_list_entries'
     id = Column(Integer, primary_key=True)
-    list_id = Column(Integer, ForeignKey(WaitListList.id), nullable=False)
+    list_id = Column(Integer, ForeignKey(PendingListList.id), nullable=False)
     added = Column(DateTime, default=datetime.now)
     title = Column(Unicode)
     original_url = Column(Unicode)
@@ -53,15 +53,16 @@ class WaitListEntry(Base):
     entry = entry_synonym('_json')
     approved = Column(Boolean)
 
-    def __init__(self, entry, wait_list_id):
+    def __init__(self, entry, pending_list_id):
         self.title = entry['title']
         self.original_url = entry.get('original_url') or entry['url']
         self.entry = entry
-        self.list_id = wait_list_id
+        self.list_id = pending_list_id
         self.approved = False
 
     def __repr__(self):
-        return '<WaitListEntry,title=%s,original_url=%s,approved=%s>' % (self.title, self.original_url, self.approved)
+        return '<PendingListEntry,title=%s,original_url=%s,approved=%s>' % (
+        self.title, self.original_url, self.approved)
 
     def to_dict(self):
         return {
@@ -75,28 +76,28 @@ class WaitListEntry(Base):
         }
 
 
-class WaitListSet(MutableSet):
+class PendingListSet(MutableSet):
     def _db_list(self, session):
-        return session.query(WaitListList).filter(WaitListList.name == self.config).first()
+        return session.query(PendingListList).filter(PendingListList.name == self.config).first()
 
     def __init__(self, config):
         self.config = config
         with Session() as session:
             if not self._db_list(session):
-                session.add(WaitListList(name=self.config))
+                session.add(PendingListList(name=self.config))
 
     def _entry_query(self, session, entry, approved=None):
-        query = session.query(WaitListEntry).filter(WaitListEntry.list_id == self._db_list(session).id). \
-            filter(or_(WaitListEntry.title == entry['title'],
-                       and_(WaitListEntry.original_url, WaitListEntry.original_url == entry['original_url'])))
+        query = session.query(PendingListEntry).filter(PendingListEntry.list_id == self._db_list(session).id). \
+            filter(or_(PendingListEntry.title == entry['title'],
+                       and_(PendingListEntry.original_url, PendingListEntry.original_url == entry['original_url'])))
         if approved:
-            query = query.filter(WaitListEntry.approved == True)
+            query = query.filter(PendingListEntry.approved == True)
         return query.first()
 
     def __iter__(self):
         with Session() as session:
-            for e in self._db_list(session).entries.filter(WaitListEntry.approved == True).order_by(
-                    WaitListEntry.added.desc()).all():
+            for e in self._db_list(session).entries.filter(PendingListEntry.approved == True).order_by(
+                    PendingListEntry.added.desc()).all():
                 log.debug('returning %s', e.entry)
                 yield e.entry
 
@@ -112,7 +113,7 @@ class WaitListSet(MutableSet):
         with Session() as session:
             db_entry = self._entry_query(session=session, entry=entry)
             if db_entry:
-                log.debug('deleting wait entry %s', db_entry)
+                log.debug('deleting entry %s', db_entry)
                 session.delete(db_entry)
 
     def add(self, entry):
@@ -123,11 +124,11 @@ class WaitListSet(MutableSet):
             stored_entry = self._entry_query(session, entry)
             if stored_entry:
                 # Refresh all the fields if we already have this entry
-                log.debug('refreshing wait entry %s', entry)
+                log.debug('refreshing entry %s', entry)
                 stored_entry.entry = entry
             else:
-                log.debug('adding wait entry %s to list %s', entry, self._db_list(session).name)
-                stored_entry = WaitListEntry(entry=entry, wait_list_id=self._db_list(session).id)
+                log.debug('adding entry %s to list %s', entry, self._db_list(session).name)
+                stored_entry = PendingListEntry(entry=entry, pending_list_id=self._db_list(session).id)
             session.add(stored_entry)
 
     def __ior__(self, other):
@@ -158,76 +159,77 @@ class WaitListSet(MutableSet):
             return Entry(match.entry) if match else None
 
 
-class WaitList(object):
+class PendingList(object):
     schema = {'type': 'string'}
 
     @staticmethod
     def get_list(config):
-        return WaitListSet(config)
+        return PendingListSet(config)
 
     def on_task_input(self, task, config):
-        return list(WaitListSet(config))
+        return list(PendingListSet(config))
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(WaitList, 'wait_list', api_ver=2, groups=['list'])
+    plugin.register(PendingList, 'pending_list', api_ver=2, groups=['list'])
 
 
 @with_session
-def get_wait_lists(name=None, session=None):
-    log.debug('retrieving wait lists')
-    query = session.query(WaitListList)
+def get_pending_lists(name=None, session=None):
+    log.debug('retrieving pending lists')
+    query = session.query(PendingListList)
     if name:
-        log.debug('searching for entry lists with name %s', name)
-        query = query.filter(WaitListList.name.contains(name))
+        log.debug('searching for pending lists with name %s', name)
+        query = query.filter(PendingListList.name.contains(name))
     return query.all()
 
 
 @with_session
 def get_list_by_exact_name(name, session=None):
-    log.debug('returning wait list with name %s', name)
-    return session.query(WaitListList).filter(func.lower(WaitListList.name) == name.lower()).one()
+    log.debug('returning pending list with name %s', name)
+    return session.query(PendingListList).filter(func.lower(PendingListList.name) == name.lower()).one()
 
 
 @with_session
 def get_list_by_id(list_id, session=None):
-    log.debug('fetching wait list with id %d', list_id)
-    return session.query(WaitListList).filter(WaitListList.id == list_id).one()
+    log.debug('returning pending list with id %d', list_id)
+    return session.query(PendingListList).filter(PendingListList.id == list_id).one()
 
 
 @with_session
 def delete_list_by_id(list_id, session=None):
     entry_list = get_list_by_id(list_id=list_id, session=session)
     if entry_list:
-        log.debug('deleting entry list with id %d', list_id)
+        log.debug('deleting pending list with id %d', list_id)
         session.delete(entry_list)
 
 
 @with_session
-def get_wait_entries_by_list_id(list_id, start=None, stop=None, order_by='title', descending=False, approved=False,
-                                session=None):
-    log.debug('querying entries from entry list with id %d', list_id)
-    query = session.query(WaitListEntry).filter(WaitListEntry.list_id == list_id)
+def get_entries_by_list_id(list_id, start=None, stop=None, order_by='title', descending=False, approved=False,
+                           session=None):
+    log.debug('querying entries from pending list with id %d', list_id)
+    query = session.query(PendingListEntry).filter(PendingListEntry.list_id == list_id)
     if approved:
-        query = query.filter(WaitListEntry.approved is approved)
+        query = query.filter(PendingListEntry.approved is approved)
     if descending:
-        query = query.order_by(getattr(WaitListEntry, order_by).desc())
+        query = query.order_by(getattr(PendingListEntry, order_by).desc())
     else:
-        query = query.order_by(getattr(WaitListEntry, order_by))
+        query = query.order_by(getattr(PendingListEntry, order_by))
     return query.slice(start, stop).all()
 
 
 @with_session
-def get_wait_entry_by_title(list_id, title, session=None):
+def get_entry_by_title(list_id, title, session=None):
     entry_list = get_list_by_id(list_id=list_id, session=session)
     if entry_list:
-        return session.query(WaitListEntry).filter(and_(
-            WaitListEntry.title == title, WaitListEntry.list_id == list_id)).first()
+        log.debug('fetching entry with title `%s` from list id %d', title, list_id)
+        return session.query(PendingListEntry).filter(and_(
+            PendingListEntry.title == title, PendingListEntry.list_id == list_id)).first()
 
 
 @with_session
 def get_wait_entry_by_id(list_id, entry_id, session=None):
-    log.debug('fetching wait entry with id %d from list id %d', entry_id, list_id)
-    return session.query(WaitListEntry).filter(
-        and_(WaitListEntry.id == entry_id, WaitListEntry.list_id == list_id)).one()
+    log.debug('fetching entry with id %d from list id %d', entry_id, list_id)
+    return session.query(PendingListEntry).filter(
+        and_(PendingListEntry.id == entry_id, PendingListEntry.list_id == list_id)).one()
