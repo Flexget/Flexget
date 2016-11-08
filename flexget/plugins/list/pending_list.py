@@ -229,7 +229,7 @@ def get_entry_by_title(list_id, title, session=None):
 
 
 @with_session
-def get_wait_entry_by_id(list_id, entry_id, session=None):
+def get_entry_by_id(list_id, entry_id, session=None):
     log.debug('fetching entry with id %d from list id %d', entry_id, list_id)
     return session.query(PendingListEntry).filter(
         and_(PendingListEntry.id == entry_id, PendingListEntry.list_id == list_id)).one()
