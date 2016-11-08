@@ -81,6 +81,7 @@ class PluginExec(object):
                     'for_entries': one_or_more({'type': 'string'}),
                     'for_accepted': one_or_more({'type': 'string'}),
                     'for_rejected': one_or_more({'type': 'string'}),
+                    'for_undecided': one_or_more({'type': 'string'}),
                     'for_failed': one_or_more({'type': 'string'})
                 },
                 'additionalProperties': False
@@ -123,7 +124,8 @@ class PluginExec(object):
             return
 
         name_map = {'for_entries': task.entries, 'for_accepted': task.accepted,
-                    'for_rejected': task.rejected, 'for_failed': task.failed}
+                    'for_rejected': task.rejected, 'for_undecided': task.undecided,
+                    'for_failed': task.failed}
 
         allow_background = config.get('allow_background')
         for operation, entries in name_map.items():
