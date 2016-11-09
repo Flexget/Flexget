@@ -15,6 +15,7 @@
         
         vm.$onInit = activate;
         vm.timeSorter = timeSorter;
+        vm.getStatus = getStatus;
 
         vm.tableData = {
             data: [],
@@ -45,14 +46,24 @@
             getStatus();
         }
 
-        function getStatus() {
-            statusService.getStatus()
+        function getStatus(page) {
+            var options = {
+                'page': page || 1,
+                'per_page': 10,
+                'sort_by': 'name',
+                'order': 'asc'
+            }
+            statusService.getStatus(options)
                 .then(setStatuses)
-                .cached(setStatuses);
+                .cached(setStatuses)
+                .finally(function () {
+                    vm.currentPage = options.page;
+                });
         }
         
         function setStatuses(response) {
             vm.tableData.data = response.data;
+            vm.linkHeader = response.headers().link;
         }
     }
 }());
