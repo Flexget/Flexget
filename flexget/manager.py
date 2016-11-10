@@ -324,7 +324,7 @@ class Manager(object):
         with self.acquire_lock():
             self.initialize()
             self.handle_cli()
-            self._shutdown()
+            self._cleanup()
 
     def handle_cli(self, options=None):
         """
@@ -425,7 +425,7 @@ class Manager(object):
             self.ipc_server.start()
             self.task_queue.wait()
             fire_event('manager.daemon.completed', self)
-        elif options.action in ['stop', 'reload', 'status', 'enable-autoreload', 'disable-autoreload']:
+        elif options.action in ['stop', 'reload', 'status', 'enable-autoreload', 'disable-autoreload', 'restart']:
             if not self.is_daemon:
                 log.error('There does not appear to be a daemon running.')
                 return
@@ -449,6 +449,8 @@ class Manager(object):
             elif options.action == 'disable-autoreload':
                 log.info('Disabled automatic config reloading')
                 self.config_autoreload = False
+            elif options.action == 'restart':
+                self.restart(options.wait)
 
     def _handle_sigterm(self, signum, frame):
         log.info('Got SIGTERM. Shutting down.')
@@ -916,7 +918,7 @@ class Manager(object):
         fire_event('manager.shutdown_requested', self)
         self.task_queue.shutdown(finish_queue)
 
-    def _shutdown(self):
+    def _cleanup(self):
         """Runs when the manager is done processing everything."""
         if self.ipc_server:
             self.ipc_server.shutdown()
@@ -933,6 +935,17 @@ class Manager(object):
                 log.info('Removed test database')
         global manager
         manager = None
+
+    def restart(self, finish_queue=True):
+        """
+        Request manager restart
+
+        :param bool finish_queue: Should scheduler finish the task queue
+        """
+        log.info('Restart requested, shutting down and restarting')
+        self.shutdown(finish_queue)
+        self._cleanup()
+        os.execv(sys.executable, ['python'] + sys.argv)
 
     def crash_report(self):
         """

@@ -440,6 +440,10 @@ class CoreArgumentParser(ArgumentParser):
         if not sys.platform.startswith('win'):
             daemonize_help = 'causes process to daemonize after starting'
 
+        kill_parser = ArgumentParser(add_help=False)
+        kill_parser.add_argument('--wait', action='store_true',
+                                 help='wait for all queued tasks to finish before stopping daemon')
+
         # The parser for the daemon command
         daemon_parser = self.add_subparser('daemon', parent_defaults={'loglevel': 'info'},
                                            help='run continuously, executing tasks according to schedules defined '
@@ -449,13 +453,12 @@ class CoreArgumentParser(ArgumentParser):
         start_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
         start_parser.add_argument('--config-autoreload', action='store_true',
                                   help='automatically reload the config from disk if the daemon detects any changes')
-        stop_parser = daemon_parser.add_subparser('stop', help='shutdown the running daemon')
-        stop_parser.add_argument('--wait', action='store_true',
-                                 help='wait for all queued tasks to finish before stopping daemon')
+        daemon_parser.add_subparser('stop', help='shutdown the running daemon', parents=[kill_parser])
         daemon_parser.add_subparser('status', help='check if a daemon is running')
         daemon_parser.add_subparser('reload', help='causes a running daemon to reload the config from disk')
         daemon_parser.add_subparser('enable-autoreload', help='enables automatic config reload from disk')
         daemon_parser.add_subparser('disable-autoreload', help='disables automatic config reload from disk')
+        daemon_parser.add_subparser('restart', help='restart the daemon', parents=[kill_parser])
 
     def add_subparsers(self, **kwargs):
         # The subparsers should not be CoreArgumentParsers
