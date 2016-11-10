@@ -4,7 +4,8 @@ import datetime
 from datetime import timedelta
 
 from flexget.utils.database import with_session
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, select, func
+from flexget.utils.sqlalchemy_utils import create_index
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, select, func, Index
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
@@ -15,13 +16,15 @@ from flexget.event import event
 from flexget.manager import Session
 
 log = logging.getLogger('status')
-Base = db_schema.versioned_base('status', 1)
+Base = db_schema.versioned_base('status', 2)
 
 
 @db_schema.upgrade('status')
 def upgrade(ver, session):
-    ver = 1
-    # migrations
+    if ver < 2:
+        # Creates the executions table index
+        create_index('status_execution', session, 'task_id', 'start', 'end', 'succeeded')
+        ver = 2
     return ver
 
 
@@ -86,6 +89,10 @@ class TaskExecution(Base):
             'failed': self.failed,
             'abort_reason': self.abort_reason
         }
+
+
+Index('ix_status_execution_task_id_start_end_succeeded', TaskExecution.task_id, TaskExecution.start, TaskExecution.end,
+      TaskExecution.succeeded)
 
 
 class Status(object):
