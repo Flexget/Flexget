@@ -4,7 +4,9 @@ import datetime
 from datetime import timedelta
 
 from flexget.utils.database import with_session
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from flexget.utils.sqlalchemy_utils import create_index
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, select, func, Index
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
@@ -14,13 +16,15 @@ from flexget.event import event
 from flexget.manager import Session
 
 log = logging.getLogger('status')
-Base = db_schema.versioned_base('status', 1)
+Base = db_schema.versioned_base('status', 2)
 
 
 @db_schema.upgrade('status')
 def upgrade(ver, session):
-    ver = 1
-    # migrations
+    if ver < 2:
+        # Creates the executions table index
+        create_index('status_execution', session, 'task_id', 'start', 'end', 'succeeded')
+        ver = 2
     return ver
 
 
@@ -33,10 +37,22 @@ class StatusTask(Base):
     def __repr__(self):
         return '<StatusTask(id=%s,name=%s)>' % (self.id, self.name)
 
+    @hybrid_property
+    def last_execution_time(self):
+        if self.executions.count() == 0:
+            return None
+        return max(execution.start for execution in self.executions)
+
+    @last_execution_time.expression
+    def last_execution_time(cls):
+        return select([func.max(TaskExecution.start)]).where(TaskExecution.task_id == cls.id). \
+            correlate(StatusTask.__table__).label('last_execution_time')
+
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
+            'last_execution_time': self.last_execution_time
         }
 
 
@@ -73,6 +89,10 @@ class TaskExecution(Base):
             'failed': self.failed,
             'abort_reason': self.abort_reason
         }
+
+
+Index('ix_status_execution_task_id_start_end_succeeded', TaskExecution.task_id, TaskExecution.start, TaskExecution.end,
+      TaskExecution.succeeded)
 
 
 class Status(object):
@@ -140,8 +160,22 @@ def register_plugin():
 
 
 @with_session
+def get_status_tasks(start=None, stop=None, order_by='last_execution_time', descending=True, session=None):
+    log.debug('querying status tasks: start=%s, stop=%s, order_by=%s, descending=%s', start, stop, order_by, descending)
+    query = session.query(StatusTask)
+    if descending:
+        query = query.order_by(getattr(StatusTask, order_by).desc())
+    else:
+        query = query.order_by(getattr(StatusTask, order_by))
+    return query.slice(start, stop).all()
+
+
+@with_session
 def get_executions_by_task_id(task_id, start=None, stop=None, order_by='start', descending=True,
                               succeeded=None, produced=True, start_date=None, end_date=None, session=None):
+    log.debug('querying task executions: task_id=%s, start=%s, stop=%s, order_by=%s, descending=%s, succeeded=%s,'
+              ' produced=%s, start_date=%s, end_date=%s', task_id, start, stop, order_by, descending, succeeded,
+              produced, start_date, end_date)
     query = session.query(TaskExecution).filter(TaskExecution.task_id == task_id)
     if succeeded:
         query = query.filter(TaskExecution.succeeded == succeeded)

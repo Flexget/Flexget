@@ -11,8 +11,11 @@
             getStatus: getStatus
         };
 
-        function getStatus() {
-            return $http.get('/api/status/', { etagCache: true })
+        function getStatus(options) {
+            return $http.get('/api/status/', {
+                etagCache: true,
+                params: options
+            })
                 .catch(callFailed);
         }
 

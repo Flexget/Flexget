@@ -64,7 +64,7 @@ def do_cli_task(manager, options):
 
 
 def do_cli_summary(manager, options):
-    header = ['Task', 'Last success', 'Produced', 'Accepted', 'Rejected', 'Failed', 'Duration']
+    header = ['Task', 'Last execution', 'Last success', 'Produced', 'Accepted', 'Rejected', 'Failed', 'Duration']
     table_data = [header]
 
     with Session() as session:
@@ -90,6 +90,7 @@ def do_cli_summary(manager, options):
 
             table_data.append([
                 task.name,
+                task.last_execution_time.strftime('%Y-%m-%d %H:%M'),
                 last_success,
                 ok.produced if ok is not None else '-',
                 ok.accepted if ok is not None else '-',
