@@ -43,10 +43,10 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
     Transport that uses requests to support Digest authentication.
     """
 
-    def __init__(self, scheme, session, *args, **kwargs):
+    def __init__(self, scheme, digest_auth, session, *args, **kwargs):
         self.__scheme = scheme
         self.__session = session
-        self.__digest_auth = False
+        self.__digest_auth = digest_auth
         self.verbose = 0
         xmlrpc_client.Transport.__init__(self, *args, **kwargs)  # old style class
 
@@ -56,23 +56,30 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
     def single_request(self, host, handler, request_body, verbose=0):
         parsed_url = urlparse('{0}://{1}'.format(self.__scheme, host))
         url = urljoin('{0}://{1}'.format(self.__scheme, parsed_url.hostname), handler)
-        if not self.__digest_auth:
-            auth = HTTPBasicAuth(parsed_url.username, parsed_url.password)
-        else:
-            auth = HTTPDigestAuth(parsed_url.username, parsed_url.password)
-        
+
+        auth = self.get_auth(parsed_url.username, parsed_url.password, self.__digest_auth)
         response = self.send_request(url, auth, request_body)
 
-        # if status code is 401, it means we have to use Digest Authentication
-        if response.status_code == 401 and not self.__digest_auth:
-            log.debug('Basic auth failed. Attempting Digest auth instead.')
-            auth = HTTPDigestAuth(parsed_url.username, parsed_url.password)
+        # if status code is 401, it means we used the wrong auth method
+        if response.status_code == 401:
+            log.warning('%s auth failed. Retrying with %s. Please change your config.',
+                        'Digest' if self.__digest_auth else 'Basic',
+                        'Basic' if self.__digest_auth else 'Digest')
+            self.__digest_auth = not self.__digest_auth
+
+            auth = self.get_auth(parsed_url.username, parsed_url.password, self.__digest_auth)
             response = self.send_request(url, auth, request_body)
-            self.__digest_auth = True
 
         response.raise_for_status()
 
         return self.parse_response(response)
+
+    @staticmethod
+    def get_auth(username, password, digest=False):
+        if digest:
+            return HTTPDigestAuth(username, password)
+
+        return HTTPBasicAuth(username, password)
     
     def send_request(self, url, auth, data):
         return self.__session.post(url, auth=auth, data=data, raise_status=False)
@@ -238,7 +245,7 @@ class RTorrent(object):
         'base_path'
     )
 
-    def __init__(self, uri, username=None, password=None, session=None):
+    def __init__(self, uri, username=None, password=None, digest_auth=None, session=None):
         """
         New connection to rTorrent
 
@@ -249,6 +256,7 @@ class RTorrent(object):
         self.uri = uri
         self.username = username
         self.password = password
+        self.digest_auth = digest_auth
         self._version = None
 
         parsed_uri = urlparse(uri)
@@ -282,7 +290,7 @@ class RTorrent(object):
 
         # Use a special transport if http(s)
         if parsed_uri.scheme in ['http', 'https']:
-            self._server = sp(self.uri, transport=HTTPDigestTransport(parsed_uri.scheme, session))
+            self._server = sp(self.uri, transport=HTTPDigestTransport(parsed_uri.scheme, self.digest_auth, session))
         else:
             self._server = sp(self.uri)
 
@@ -460,6 +468,7 @@ class RTorrentPluginBase(object):
             client = RTorrent(os.path.expanduser(config['uri']),
                               username=config.get('username'),
                               password=config.get('password'),
+                              digest_auth=config['digest_auth'],
                               session=task.requests)
             if client.version < [0, 9, 2]:
                 log.error('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
@@ -476,6 +485,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             'uri': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
+            'digest_auth': {'type': 'boolean', 'default': False},
             'start': {'type': 'boolean', 'default': True},
             'mkdir': {'type': 'boolean', 'default': True},
             'action': {'type': 'string', 'emun': ['update', 'delete', 'add'], 'default': 'add'},
@@ -515,6 +525,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         client = RTorrent(os.path.expanduser(config['uri']),
                           username=config.get('username'),
                           password=config.get('password'),
+                          digest_auth=config['digest_auth'],
                           session=task.requests)
 
         for entry in task.accepted:
@@ -673,6 +684,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
             'uri': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
+            'digest_auth': {'type': 'boolean', 'default': False},
             'view': {'type': 'string', 'default': 'main'},
             'fields': one_or_more({'type': 'string', 'enum': list(RTorrent.default_fields)}),
         },
@@ -684,6 +696,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
         client = RTorrent(os.path.expanduser(config['uri']),
                           username=config.get('username'),
                           password=config.get('password'),
+                          digest_auth=config['digest_auth'],
                           session=task.requests)
 
         fields = config.get('fields')
