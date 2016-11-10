@@ -1,12 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from hashlib import md5
-
 import logging
 
 from flexget.manager import Session
-from sqlalchemy import Column, String, Unicode, Boolean
+from sqlalchemy import Column, String, Unicode, Boolean, Integer
 from flexget import db_schema, plugin
 from flexget.event import event
 
@@ -17,7 +15,7 @@ Base = db_schema.versioned_base('pending_approval', 0)
 class PendingEntry(Base):
     __tablename__ = 'pending_entries'
 
-    uid = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     task_name = Column(Unicode)
     title = Column(Unicode)
     url = Column(String)
@@ -28,9 +26,6 @@ class PendingEntry(Base):
         self.title = title
         self.url = url
         self.approved = False
-
-        uid = task_name.encode('utf-8') + title.encode('utf-8') + url.encode('utf-8')
-        self.uid = md5(uid).hexdigest()
 
     def __repr__(self):
         return '<PendingEntry(task_name={},title={},url={},approved={})>' \
