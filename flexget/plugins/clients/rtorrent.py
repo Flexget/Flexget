@@ -46,6 +46,7 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
     def __init__(self, scheme, session, *args, **kwargs):
         self.__scheme = scheme
         self.__session = session
+        self.__digest_auth = False
         self.verbose = 0
         xmlrpc_client.Transport.__init__(self, *args, **kwargs)  # old style class
 
@@ -55,17 +56,26 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
     def single_request(self, host, handler, request_body, verbose=0):
         parsed_url = urlparse('{0}://{1}'.format(self.__scheme, host))
         url = urljoin('{0}://{1}'.format(self.__scheme, parsed_url.hostname), handler)
-        response = self.__session.post(url, auth=HTTPBasicAuth(parsed_url.username, parsed_url.password),
-                                       data=request_body, raise_status=False)
+        if not self.__digest_auth:
+            auth = HTTPBasicAuth(parsed_url.username, parsed_url.password)
+        else:
+            auth = HTTPDigestAuth(parsed_url.username, parsed_url.password)
+        
+        response = self.send_request(url, auth, request_body)
 
         # if status code is 401, it means we have to use Digest Authentication
-        if response.status_code == 401:
-            response = self.__session.post(url, auth=HTTPDigestAuth(parsed_url.username, parsed_url.password),
-                                           data=request_body, raise_status=False)
+        if response.status_code == 401 and not self.__digest_auth:
+            log.debug('Basic auth failed. Attempting Digest auth instead.')
+            auth = HTTPDigestAuth(parsed_url.username, parsed_url.password)
+            response = self.send_request(url, auth, request_body)
+            self.__digest_auth = True
 
         response.raise_for_status()
 
         return self.parse_response(response)
+    
+    def send_request(self, url, auth, data):
+        return self.__session.post(url, auth=auth, data=data, raise_status=False)
 
     def parse_response(self, response):
         p, u = self.getparser()
