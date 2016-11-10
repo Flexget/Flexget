@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 from future.moves.urllib.parse import urlparse
 from future.utils import text_to_native_str
@@ -124,8 +124,8 @@ class TransmissionBase(object):
     def on_task_start(self, task, config):
         try:
             import transmissionrpc
-            from transmissionrpc import TransmissionError
-            from transmissionrpc import HTTPHandlerError
+            from transmissionrpc import TransmissionError  # noqa
+            from transmissionrpc import HTTPHandlerError  # noqa
         except:
             raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required.', log)
         if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 11]:
@@ -182,7 +182,9 @@ class PluginTransmissionInput(TransmissionBase):
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             if not config['onlycomplete'] or (downloaded and
                                               ((
-                                                  torrent.status == 'stopped' and seed_ratio_ok is None and idle_limit_ok is None) or
+                                                  torrent.status == 'stopped' and
+                                                  seed_ratio_ok is None and
+                                                  idle_limit_ok is None) or
                                                (seed_ratio_ok is True or idle_limit_ok is True))):
                 entry = Entry(title=torrent.name,
                               url='file://%s' % torrent.torrentFile,
@@ -684,8 +686,8 @@ class PluginTransmissionClean(TransmissionBase):
                                 is_transmission_idlelimit_reached or
                                 is_minratio_reached or
                                 (is_torrent_seed_only and is_torrent_idlelimit_since_added_reached) or
-                                (not is_torrent_seed_only and is_torrent_idlelimit_since_finished_reached))
-                    and is_directories_matching and (not is_preserve_tracker_matching and is_tracker_matching)):
+                                (not is_torrent_seed_only and is_torrent_idlelimit_since_finished_reached)) and
+                    is_directories_matching and (not is_preserve_tracker_matching and is_tracker_matching)):
                 if task.options.test:
                     log.info('Would remove finished torrent `%s` from transmission', torrent.name)
                     continue

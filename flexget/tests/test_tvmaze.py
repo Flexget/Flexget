@@ -4,7 +4,7 @@ from __future__ import unicode_literals, division, absolute_import
 from datetime import timedelta, datetime
 
 import pytest
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget.manager import Session
 from flexget.plugins.internal.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries, TVMazeEpisodes

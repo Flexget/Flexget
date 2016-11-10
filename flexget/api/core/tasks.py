@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import cgi
@@ -9,7 +9,6 @@ from json import JSONEncoder
 
 from flask import jsonify, Response, request
 from flask_restplus import inputs
-from flexget.plugins.operate.status import StatusTask, TaskExecution
 from queue import Queue, Empty
 
 from flexget.api import api, APIResource

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import logging
@@ -1100,7 +1100,7 @@ class FilterSeriesBase(object):
                     unique_series[series].update(series_settings)
         # Turn our all_series dict back into a list
         # sort by reverse alpha, so that in the event of 2 series with common prefix, more specific is parsed first
-        return [{series: unique_series[series]} for series in sorted(unique_series, reverse=True)]
+        return [{s: unique_series[s]} for s in sorted(unique_series, reverse=True)]
 
     def merge_config(self, task, config):
         """Merges another series config dict in with the current one."""
@@ -1294,8 +1294,8 @@ class FilterSeries(FilterSeriesBase):
 
         for entry in entries:
             # skip processed entries
-            if (entry.get('series_parser') and entry['series_parser'].valid and entry[
-                'series_parser'].name.lower() != series_name.lower()):
+            if (entry.get('series_parser') and entry['series_parser'].valid and
+                    entry['series_parser'].name.lower() != series_name.lower()):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
@@ -1480,8 +1480,8 @@ class FilterSeries(FilterSeriesBase):
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
-            if (entry['quality'] in downloaded_qualities and entry['series_parser'].proper_count > downloaded_qualities[
-                entry['quality']]):
+            if (entry['quality'] in downloaded_qualities and
+                    entry['series_parser'].proper_count > downloaded_qualities[entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
@@ -1543,8 +1543,8 @@ class FilterSeries(FilterSeriesBase):
 
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
-            if (not backfill and (episode.season < latest.season or (
-                            episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
+            if (not backfill and (episode.season < latest.season or
+                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)

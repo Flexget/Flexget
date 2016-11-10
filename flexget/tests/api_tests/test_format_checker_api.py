@@ -1,15 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget.api.app import base_message
 from flexget.utils import json
+
 
 class TestFormatChecker(object):
     config = 'tasks: {}'
 
     def test_quality(self, api_client, schema_match):
-        payload1= {'quality': '720p'}
+        payload1 = {'quality': '720p'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload1))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -28,7 +29,7 @@ class TestFormatChecker(object):
         assert not errors
 
     def test_quality_req(self, api_client, schema_match):
-        payload1= {'quality_requirements': '720p-1080p'}
+        payload1 = {'quality_requirements': '720p-1080p'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload1))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -47,7 +48,7 @@ class TestFormatChecker(object):
         assert not errors
 
     def test_time(self, api_client, schema_match):
-        payload= {'time': '10:00'}
+        payload = {'time': '10:00'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -66,7 +67,7 @@ class TestFormatChecker(object):
         assert not errors
 
     def test_interval(self, api_client, schema_match):
-        payload1= {'interval': '1 day'}
+        payload1 = {'interval': '1 day'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload1))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -85,7 +86,7 @@ class TestFormatChecker(object):
         assert not errors
 
     def test_percent(self, api_client, schema_match):
-        payload1= {'percent': '79%'}
+        payload1 = {'percent': '79%'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload1))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -104,7 +105,7 @@ class TestFormatChecker(object):
         assert not errors
 
     def test_size(self, api_client, schema_match):
-        payload1= {'size': '4GB'}
+        payload1 = {'size': '4GB'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload1))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -123,7 +124,7 @@ class TestFormatChecker(object):
         assert not errors
 
     def test_regex(self, api_client, schema_match):
-        payload1= {'regex': 'bla'}
+        payload1 = {'regex': 'bla'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload1))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -142,7 +143,7 @@ class TestFormatChecker(object):
         assert not errors
 
     def test_file(self, api_client, schema_match):
-        payload1= {'file': 'test_format_checker_api.py'}
+        payload1 = {'file': 'test_format_checker_api.py'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload1))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -161,7 +162,7 @@ class TestFormatChecker(object):
         assert not errors
 
     def test_path(self, api_client, schema_match):
-        payload1= {'path': '../api_tests'}
+        payload1 = {'path': '../api_tests'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload1))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -180,7 +181,7 @@ class TestFormatChecker(object):
         assert not errors
 
     def test_url(self, api_client, schema_match):
-        payload1= {'url': 'http://google.com'}
+        payload1 = {'url': 'http://google.com'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload1))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -199,7 +200,7 @@ class TestFormatChecker(object):
         assert not errors
 
     def test_episode_identifier(self, api_client, schema_match):
-        payload1= {'episode_identifier': 's01e01'}
+        payload1 = {'episode_identifier': 's01e01'}
 
         rsp = api_client.json_post('/format_check/', data=json.dumps(payload1))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code

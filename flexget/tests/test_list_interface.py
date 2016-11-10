@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 
 class TestListInterface(object):
@@ -116,9 +116,15 @@ class TestListInterface(object):
 
           test_list_queue:
             mock:
-              - {title: 'Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD', url: "http://mock.url/Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent", imdb_id: "tt0303933"}
-              - {title: 'Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD', url: "http://mock.url/Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent", imdb_id: "tt0303933"}
-              - {title: 'Drumline 2002 DVDRip x264-FuzerHD', url: "http://mock.url/Drumline 2002 DVDRip x264-FuzerHD.torrent", imdb_id: "tt0303933"}
+              - {title: 'Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD',
+                 url: "http://mock.url/Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent",
+                 imdb_id: "tt0303933"}
+              - {title: 'Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD',
+                 url: "http://mock.url/Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent",
+                 imdb_id: "tt0303933"}
+              - {title: 'Drumline 2002 DVDRip x264-FuzerHD',
+                 url: "http://mock.url/Drumline 2002 DVDRip x264-FuzerHD.torrent",
+                 imdb_id: "tt0303933"}
             list_match:
               from:
                 - movie_list: test_list_queue

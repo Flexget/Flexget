@@ -3,32 +3,32 @@ from __future__ import unicode_literals, division, absolute_import, print_functi
 # This needs to remain before the builtins import!
 native_int = int
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa  pylint: disable=unused-import, redefined-builtin
 
-import atexit
-import codecs
-import copy
-import fnmatch
-import logging
-import os
-import shutil
-import signal
-import sys
-import threading
-import traceback
-import hashlib
-from contextlib import contextmanager
-from datetime import datetime, timedelta
-import io
+import atexit  # noqa
+import codecs  # noqa
+import copy  # noqa
+import fnmatch  # noqa
+import logging  # noqa
+import os  # noqa
+import shutil  # noqa
+import signal  # noqa
+import sys  # noqa
+import threading  # noqa
+import traceback  # noqa
+import hashlib  # noqa
+from contextlib import contextmanager  # noqa
+from datetime import datetime, timedelta  # noqa
+import io  # noqa
 
-import sqlalchemy
-import yaml
-from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import sqlalchemy  # noqa
+import yaml  # noqa
+from sqlalchemy.exc import OperationalError  # noqa
+from sqlalchemy.ext.declarative import declarative_base  # noqa
+from sqlalchemy.orm import sessionmaker  # noqa
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
-from flexget.utils.sqlalchemy_utils import ContextSession
+from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
 
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)

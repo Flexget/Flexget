@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -28,8 +28,8 @@ class NPOWatchlist(object):
 
         If 'remove_accepted' is set to 'yes', the plugin will delete accepted entries from the watchlist after download
             is complete.
-        If 'max_episode_age_days' is set (and not 0), entries will only be generated for episodes broadcast in the last x days.
-            This only applies to episodes related to series the user is following.
+        If 'max_episode_age_days' is set (and not 0), entries will only be generated for episodes broadcast in the last
+            x days.  This only applies to episodes related to series the user is following.
 
         For example:
             npo_watchlist:
@@ -43,7 +43,8 @@ class NPOWatchlist(object):
               auto_escape: yes
               on_output:
                 for_accepted:
-                  - download-npo -o "path/to/directory/{{series_name_plain}}" -f "{serie_titel} - {datum} {aflevering_titel} ({episode_id})" -t {{url}}
+                  - download-npo -o "path/to/directory/{{series_name_plain}}" -f "{serie_titel} - {datum} \
+                      {aflevering_titel} ({episode_id})" -t {{url}}
         """
 
     schema = {

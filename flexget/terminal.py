@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import sys
 from textwrap import wrap
@@ -140,8 +140,8 @@ class TerminalTable(object):
         longest = self._longest_rows()
         margin = self._columns * 2 + self._columns + 1
         static_columns = sum(longest.values())
-        for wrap in self.wrap_columns:
-            static_columns -= longest[wrap]
+        for wrap_c in self.wrap_columns:
+            static_columns -= longest[wrap_c]
         space_left = terminal_info()['size'][0] - static_columns - margin
         """
         print('margin: %s' % margin)

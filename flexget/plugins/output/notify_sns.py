@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import json
 import logging
@@ -31,7 +31,8 @@ class SNSNotification(object):
 
       notify_sns:
         [aws_access_key_id: <AWS ACCESS KEY ID>] (will be taken from AWS_ACCESS_KEY_ID environment if not provided)
-        [aws_secret_access_key: <AWS SECRET ACCESS KEY>] (will be taken from AWS_SECRET_ACCESS_KEY environment if not provided)
+        [aws_secret_access_key: <AWS SECRET ACCESS KEY>] (will be taken from AWS_SECRET_ACCESS_KEY environment if
+            not provided)
         [profile_name: <AWS PROFILE NAME>] (If provided, use this profile name instead of the default.)
         aws_region: <REGION>
         sns_topic_arn: <SNS ARN>
@@ -56,7 +57,7 @@ class SNSNotification(object):
     def on_task_start(self, task, config):
         # verify that we actually support Boto 3
         try:
-            import boto3
+            import boto3  # noqa
         except ImportError as e:
             log.debug("Error importing boto3: %s", e)
             raise plugin.DependencyError("sns", "boto3", "Boto3 module required. ImportError: %s" % e)
