@@ -544,9 +544,7 @@ class PluginTransmission(TransmissionBase):
                             # fl[r.id][index]['name'] = os.path.basename(pathscrub(filename + file_ext).encode('utf-8'))
                             try:
                                 cli.rename_torrent_path(r.id, fl[r.id][index]['name'],
-                                                        os.path.basename(
-                                                            pathscrub(filename + file_ext)).encode('utf-8')
-                                                        )
+                                                        os.path.basename(str(pathscrub(filename + file_ext))))
                             except TransmissionError:
                                 log.error('content_filename only supported with transmission 2.8+')
 
