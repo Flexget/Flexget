@@ -32,7 +32,7 @@ class OutputAria2(object):
             'secret': {'type': 'string', 'default': ''},
             'username': {'type': 'string', 'default': ''}, # NOTE: To be deprecated by aria2
             'password': {'type': 'string', 'default': ''},
-            'path': {'type': 'string', 'format': 'path'},
+            'path': {'type': 'string'},
             'options': {
                 'type': 'object',
                 'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
