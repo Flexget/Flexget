@@ -41,12 +41,11 @@ class PendingApproval(object):
 
     @staticmethod
     def _item_query(entry, task, session):
-        db_entry = session.query(PendingEntry) \
+        return session.query(PendingEntry) \
             .filter(PendingEntry.task_name == task.name) \
             .filter(PendingEntry.title == entry['title']) \
             .filter(PendingEntry.url == entry['url']) \
             .first()
-        return db_entry
 
     @plugin.priority(-1)
     def on_task_input(self, task, config):
@@ -68,9 +67,10 @@ class PendingApproval(object):
             task.all_entries[:] = []
 
             # Pass all entries marked as approved
-            for approved_entry in session.query(PendingEntry)\
-                    .filter(PendingEntry.task_name == task.name)\
-                    .filter(PendingEntry.approved == True).all():
+            for approved_entry in session.query(PendingEntry) \
+                    .filter(PendingEntry.task_name == task.name) \
+                    .filter(PendingEntry.approved == True) \
+                    .all():
                 e = approved_entry.entry
                 e['approved'] = True
                 approved_entries.append(e)
