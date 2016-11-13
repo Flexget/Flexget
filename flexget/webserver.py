@@ -14,10 +14,8 @@ from flask_login import UserMixin
 from sqlalchemy import Column, Integer, Unicode
 from werkzeug.security import generate_password_hash
 
-from flexget.event import event
 from flexget.manager import Base
 from flexget.utils.database import with_session
-from flexget.utils.tools import singleton
 
 log = logging.getLogger('web_server')
 
@@ -100,7 +98,7 @@ class WebSecret(Base):
 
 def register_app(path, application):
     if path in _app_register:
-        raise ValueError('path %s already registered')
+        raise ValueError('path %s already registered' % path)
     _app_register[path] = application
 
 
@@ -134,24 +132,12 @@ def setup_server(config):
         log.warning('No password set for web server, create one by using'
                     ' `flexget web passwd <password>`')
 
-    if web_server.is_alive():
-        web_server.stop()
-
     if _app_register:
         web_server.start()
 
-
-@event('manager.shutdown')
-def stop_server(manager):
-    """ Sets up and starts/restarts the webui. """
-    if not manager.is_daemon:
-        return
-    web_server = WebServer()
-    if web_server.is_alive():
-        web_server.stop()
+    return web_server
 
 
-@singleton
 class WebServer(threading.Thread):
     # We use a regular list for periodic jobs, so you must hold this lock while using it
     triggers_lock = threading.Lock()
@@ -211,8 +197,13 @@ class WebServer(threading.Thread):
         self._start_server()
 
     def stop(self):
+        global _app_register
+
         log.info('Shutting down web server')
         cherrypy.engine.exit()
+
+        # Unregister apps
+        _app_register = {}
 
 
 @with_session
