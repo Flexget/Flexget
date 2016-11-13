@@ -68,7 +68,9 @@ class PendingApproval(object):
             task.all_entries[:] = []
 
             # Pass all entries marked as approved
-            for approved_entry in session.query(PendingEntry).filter(PendingEntry.approved == True).all():
+            for approved_entry in session.query(PendingEntry)\
+                    .filter(PendingEntry.task_name == task.name)\
+                    .filter(PendingEntry.approved == True).all():
                 e = approved_entry.entry
                 e['approved'] = True
                 approved_entries.append(e)
@@ -80,7 +82,7 @@ class PendingApproval(object):
             return
         with Session() as session:
             # Delete all entries that have passed the pending phase
-            for entry in task.entries:
+            for entry in task.accepted:
                 if entry.get('approved', False) is True:
                     db_entry = self._item_query(entry, task, session)
                     if db_entry and db_entry.approved:
