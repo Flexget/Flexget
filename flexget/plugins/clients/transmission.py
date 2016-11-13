@@ -675,7 +675,9 @@ class PluginTransmissionClean(TransmissionBase):
             is_torrent_idlelimit_since_added_reached = nfor and (torrent.date_added + nfor) <= datetime.now()
             is_torrent_idlelimit_since_finished_reached = nfor and (torrent.date_done + nfor) <= datetime.now()
             is_tracker_matching = not tracker_re or any(tracker_re.search(host) for host in tracker_hosts)
-            is_preserve_tracker_matching = not preserve_tracker_re or any(preserve_tracker_re.search(host) for host in tracker_hosts)
+            is_preserve_tracker_matching = False
+            if preserve_tracker_re is not None:
+                is_preserve_tracker_matching = any(preserve_tracker_re.search(host) for host in tracker_hosts)
             is_directories_matching = not directories_re or any(
                 re.compile(directory, re.IGNORECASE).search(torrent.downloadDir) for directory in directories_re)
             if (downloaded and (is_clean_all or
