@@ -9,6 +9,8 @@ from flexget.event import event
 
 log = logging.getLogger('notify')
 
+HANDLED_PHASES = ['start', 'input', 'filter', 'output', 'exit']
+
 
 class Notify(object):
     schema = {
@@ -22,31 +24,69 @@ class Notify(object):
                                             '2 more spaces than the first letter of the plugin name.',
                      'minProperties': 1}]}},
             'scope': {'type': 'string', 'enum': ['task', 'entries']},
-            'what': one_or_more({'type': 'string', 'enum': ['entries', 'accepted', 'rejected', 'failed', 'undecided']})
+            'what': one_or_more({'type': 'string', 'enum': ['entries', 'accepted', 'rejected', 'failed', 'undecided']}),
+            'phase': one_or_more({'type': 'string', 'enum': HANDLED_PHASES, 'default': 'output'})
         },
         'required': ['to'],
         'additionalProperties': False
     }
 
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
+    @staticmethod
+    def prepare_config(config):
+        if not isinstance(config['phase'], list):
+            config['phase'] = [config['phase']]
+        if not isinstance(config['what'], list):
+            config['what'] = [config['what']]
+        config.setdefault('what', ['accepted'])
+        config.setdefault('scope', 'entries')
+        config.setdefault('phase', ['output'])
+        return config
+
+    def send_notification(self, task, phase, config):
+        config = self.prepare_config(config)
+
+        if phase not in config['phase']:
+            log.debug('phase %s not configured', phase)
+            return
+
+        scope = config['scope']
+        # In case the request notification scope is `task`, skip all phases other than exit in order not to send
+        # more than 1 notification
+        if scope == 'task' and phase != 'exit':
+            log.debug('skipping phase on_task_%s since scope is `task`', phase)
+            return
+
+        what = config['what']
+        iterate_on = [getattr(task, container) for container in what]
         for item in config['to']:
             for plugin_name, plugin_config in item.items():
                 notifier = plugin.get_plugin_by_name(plugin_name).instance
-                scope = config.get('scope', 'entries')
-                what = config.get('what', ['accepted'])
 
-                if not isinstance(what, list):
-                    what = [what]
-
-                iterate_on = [getattr(task, container) for container in what]
                 kwargs = {'task': task,
                           'scope': scope,
                           'iterate_on': iterate_on,
                           'test': task.options.test,
                           'config': plugin_config}
+
                 log.debug('sending a notification to %s', plugin_name)
                 notifier.notify(**kwargs)
+
+    def __getattr__(self, item):
+        """Creates methods to handle task phases."""
+        for phase in HANDLED_PHASES:
+            if item == plugin.phase_methods[phase]:
+                # A phase method we handle has been requested
+                break
+        else:
+            # We don't handle this phase
+            raise AttributeError(item)
+
+        def phase_handler(task, config):
+            self.send_notification(task, phase, config)
+
+        # Make sure we run after other plugins
+        phase_handler.priority = 100
+        return phase_handler
 
 
 @event('plugin.register')
