@@ -190,7 +190,7 @@ def render(template, context):
         result = template.render(context)
     except Exception as e:
         error = RenderError('(%s) %s' % (type(e).__name__, e))
-        log.debug('Error during rendering: %s' % error)
+        log.debug('Error during rendering: %s', error)
         raise error
 
     return result
@@ -205,6 +205,7 @@ def render_from_entry(template_string, entry):
     # Add task name to variables, usually it's there because metainfo_task plugin, but not always
     if 'task' not in variables and hasattr(entry, 'task'):
         variables['task'] = entry.task.name
+    variables['task_name'] = variables.get('task', entry.task.name)
     result = render(template_string, variables)
 
     # Only try string replacement if jinja didn't do anything
@@ -229,4 +230,17 @@ def render_from_task(template, task):
     :param task: Task to render the template from.
     :return: The rendered template text.
     """
-    return render(template, {'task': task, 'now': datetime.now()})
+    variables = {'task': task, 'now': datetime.now(), 'task_name': task.name}
+    result = render(template, variables)
+    # Only try string replacement if jinja didn't do anything
+    if result == template:
+        try:
+            result = template % task
+        except KeyError as e:
+            raise RenderError('Does not contain the field `%s` for string replacement.' % e)
+        except ValueError as e:
+            raise RenderError('Invalid string replacement template: %s (%s)' % (template, e))
+        except TypeError as e:
+            raise RenderError('Error during string replacement: %s' % e.message)
+
+    return result

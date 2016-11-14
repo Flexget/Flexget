@@ -9,6 +9,7 @@ import random
 import string
 from functools import wraps, total_ordering
 
+from flexget.utils.template import render_from_task
 from sqlalchemy import Column, Integer, String, Unicode
 
 from flexget import config_schema, db_schema
@@ -671,6 +672,20 @@ class Task(object):
         return new
 
     copy = __copy__
+
+    def render(self, template):
+        """
+        Renders a template string based on fields in the entry.
+
+        :param string template: A template string that uses jinja2 or python string replacement format.
+        :return: The result of the rendering.
+        :rtype: string
+        :raises RenderError: If there is a problem.
+        """
+        if not isinstance(template, str):
+            raise ValueError('Trying to render non string template, got %s' % repr(template))
+        log.trace('rendering: %s' % template)
+        return render_from_task(template, self)
 
 
 @event('config.register')

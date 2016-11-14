@@ -36,7 +36,7 @@ class Pushover(Notifier):
                    '{{title}}'
                    '{% endif %}',
         'url': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}',
-        'title': '{{task}}'
+        'title': '{{task_name}}'
     }
 
     def prepare_config(self, config):
@@ -61,7 +61,7 @@ class Pushover(Notifier):
 
         data = {'token': self.config['apikey']}
         # Loop through the provided entities
-        for entry in self.iterate_on:
+        for entity in self.iterate_on:
             for key, value in list(self.config.items()):
                 if key in ['apikey', 'userkey']:
                     continue
@@ -73,7 +73,7 @@ class Pushover(Notifier):
 
                 # Tried to render data in field
                 try:
-                    data[key] = entry.render(value)
+                    data[key] = entity.render(value)
                 except RenderError as e:
                     log.warning('Problem rendering {0}: {1}'.format(key, e))
                     data[key] = None
@@ -83,7 +83,7 @@ class Pushover(Notifier):
                 # If field is empty or rendering fails, try to render field default if exists
                 if not data[key]:
                     try:
-                        data[key] = entry.render(self.defaults.get(key))
+                        data[key] = entity.render(self.defaults.get(key))
                     except ValueError:
                         if value:
                             data[key] = value
