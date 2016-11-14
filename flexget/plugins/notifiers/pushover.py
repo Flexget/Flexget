@@ -175,7 +175,7 @@ class OutputPushover(object):
     @plugin.priority(0)
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility
-        return Pushover(task, 'entries', 'accepted', task.options.test, config).notify()
+        return Pushover(task, 'entries', [task.accepted], task.options.test, config).notify()
 
     def notify(self, task, scope, iterate_on, test, config):
         return Pushover(task, scope, iterate_on, test, config).notify()
