@@ -50,6 +50,7 @@ class Notify(object):
             return
 
         scope = config['scope']
+
         # In case the request notification scope is `task`, skip all phases other than exit in order not to send
         # more than 1 notification
         if scope == 'task' and phase != 'exit':
@@ -57,7 +58,10 @@ class Notify(object):
             return
 
         what = config['what']
+
+        # Build a list of entry containers or just uses task, depending on the scope
         iterate_on = [getattr(task, container) for container in what]
+
         for item in config['to']:
             for plugin_name, plugin_config in item.items():
                 notifier = plugin.get_plugin_by_name(plugin_name).instance
@@ -85,7 +89,7 @@ class Notify(object):
             self.send_notification(task, phase, config)
 
         # Make sure we run after other plugins
-        phase_handler.priority = 100
+        phase_handler.priority = 255
         return phase_handler
 
 

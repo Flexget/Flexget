@@ -62,7 +62,8 @@ class Pushover(Notifier):
             return
 
         data = {'token': self.config['apikey']}
-        # Loop through the provided cotainers and entities
+
+        # Loop through the provided containers and entities
         for container in self.iterate_on:
             for entity in container:
                 for key, value in list(self.config.items()):
