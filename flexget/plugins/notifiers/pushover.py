@@ -8,7 +8,6 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.notifier import Notifier
-from flexget.utils import json
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from flexget.utils.template import RenderError
 from requests.exceptions import RequestException
@@ -115,8 +114,8 @@ class Pushover(Notifier):
                             int(e.response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
                         message = 'Monthly pushover message limit reached. Next reset: %s', reset_time
                     else:
-                        message = 'Could not send notification to Pushover: %s', e.args[0]
-                    log.error(message)
+                        message = 'Could not send notification to Pushover: %s', e.response.json()['errors']
+                    log.error(*message)
                     return
 
                 reset_time = datetime.datetime.fromtimestamp(
