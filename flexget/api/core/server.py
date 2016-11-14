@@ -148,6 +148,17 @@ class ServerShutdownAPI(APIResource):
         return success_response('Shutdown requested')
 
 
+@server_api.route('/restart/')
+class ServerRestartAPI(APIResource):
+    @api.doc(parser=shutdown_parser)
+    @api.response(200, model=base_message_schema, description='Shutdown requested')
+    def get(self, session=None):
+        """Restart Flexget Daemon"""
+        args = shutdown_parser.parse_args()
+        self.manager.restart(args['force'])
+        return success_response('Shutdown requested')
+
+
 @server_api.route('/config/')
 class ServerConfigAPI(APIResource):
     @etag
