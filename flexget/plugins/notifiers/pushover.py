@@ -4,6 +4,9 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 
 import datetime
+import requests
+
+from flexget.notifier import Notifier
 from requests.exceptions import RequestException
 
 from flexget import plugin
@@ -18,24 +21,11 @@ PUSHOVER_URL = 'https://api.pushover.net/1/messages.json'
 NUMBER_OF_RETRIES = 3
 
 
-class OutputPushover(object):
-    """
-    Example::
+class Pushover(Notifier):
+    def __init__(self, task, scope, iterate_on, test, config):
+        super(Pushover, self).__init__(task, scope, iterate_on, test)
+        self.config = self.prepare_config(config)
 
-      pushover:
-        userkey: <USER_KEY> (can also be a list of userkeys)
-        apikey: <API_KEY>
-        [device: <DEVICE_STRING>] (default: (none))
-        [title: <MESSAGE_TITLE>] (default: "Download started" -- accepts Jinja2)
-        [message: <MESSAGE_BODY>] (default uses series/tvdb name and imdb if available -- accepts Jinja2)
-        [priority: <PRIORITY>] (default = 0 -- normal = 0, high = 1, silent = -1, emergency = 2)
-        [url: <URL>] (default: "{{imdb_url}}" -- accepts Jinja2)
-        [urltitle: <URL_TITLE>] (default: (none) -- accepts Jinja2)
-        [sound: <SOUND>] (default: pushover default)
-        [retry]: <RETRY>]
-
-    Configuration parameters are also supported from entries (eg. through set).
-    """
     defaults = {
         'message': '{% if series_name is defined %}'
                    '{{tvdb_series_name|d(series_name)}} '
@@ -49,41 +39,17 @@ class OutputPushover(object):
         'title': '{{task}}'
     }
 
-    schema = {
-        'type': 'object',
-        'properties': {
-            'userkey': one_or_more({'type': 'string'}),
-            'apikey': {'type': 'string'},
-            'device': {'type': 'string'},
-            'title': {'type': 'string'},
-            'message': {'type': 'string'},
-            'priority': {'oneOf': [
-                {'type': 'number', 'minimum': -2, 'maximum': 2},
-                {'type': 'string'}]},
-            'url': {'type': 'string'},
-            'url_title': {'type': 'string'},
-            'sound': {'type': 'string'},
-            'retry': {'type': 'integer', 'minimum': 30},
-            'expire': {'type': 'integer', 'maximum': 86400},
-            'callback': {'type': 'string', 'format': 'url'},
-            'html': {'type': 'boolean'}
-        },
-        'required': ['userkey', 'apikey'],
-        'additionalProperties': False
-    }
-
     last_request = datetime.datetime.strptime('2000-01-01', '%Y-%m-%d')
 
-    @staticmethod
-    def pushover_request(task, data):
-        time_dif = (datetime.datetime.now() - OutputPushover.last_request).seconds
+    def pushover_request(self, data):
+        time_dif = (datetime.datetime.now() - self.last_request).seconds
 
         # Require at least 5 seconds of waiting between API calls
         while time_dif < 5:
-            time_dif = (datetime.datetime.now() - OutputPushover.last_request).seconds
+            time_dif = (datetime.datetime.now() - self.last_request).seconds
         try:
-            response = task.requests.post(PUSHOVER_URL, data=data, raise_status=False)
-            OutputPushover.last_request = datetime.datetime.now()
+            response = requests.post(PUSHOVER_URL, data=data)
+            self.last_request = datetime.datetime.now()
         except RequestException:
             raise
         return response
@@ -103,16 +69,15 @@ class OutputPushover(object):
 
         return config
 
-    # Run last to make sure other outputs are successful before sending notification
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
-        config = self.prepare_config(config)
-        data = {'token': config['apikey']}
+    def notify(self):
+        if not self.iterate_on:
+            log.debug('did not have any entities to iterate on')
+            return
 
-        # Loop through the provided entries
-        for entry in task.accepted:
-
-            for key, value in list(config.items()):
+        data = {'token': self.config['apikey']}
+        # Loop through the provided entities
+        for entry in self.iterate_on:
+            for key, value in list(self.config.items()):
                 if key in ['apikey', 'userkey']:
                     continue
 
@@ -144,12 +109,12 @@ class OutputPushover(object):
                             ' Lowering priority to 1')
                 data['priority'] = 1
 
-            for userkey in config['userkey']:
+            for userkey in self.config['userkey']:
                 # Build the request
                 data['user'] = userkey
 
                 # Check for test mode
-                if task.options.test:
+                if self.test:
                     log.info('Test mode.  Pushover notification would be:')
                     for key, value in list(data.items()):
                         log.verbose('{0:>5}{1}: {2}'.format('', key.capitalize(), value))
@@ -158,7 +123,7 @@ class OutputPushover(object):
 
                 for retry in range(NUMBER_OF_RETRIES):
                     try:
-                        response = self.pushover_request(task, data)
+                        response = self.pushover_request(data)
                     except RequestException as e:
                         log.warning('Could not get response from Pushover: %s. Try %s out of %s', e, retry + 1,
                                     NUMBER_OF_RETRIES)
@@ -169,7 +134,7 @@ class OutputPushover(object):
                     # error codes and messages from Pushover API
                     if request_status == 200:
                         remaining = response.headers['X-Limit-App-Remaining']
-                        log.debug(
+                        log.verbose(
                             'Pushover notification sent. Notification remaining until next resets: %s. '
                             'Next reset at: %s',
                             remaining, reset_time)
@@ -190,9 +155,60 @@ class OutputPushover(object):
                         break
                 else:
                     log.error(
-                        'Could not get response from Pushover after %s retries, aborting.', NUMBER_OF_RETRIES)
+                        'Could not get response from Pushover after %s retries', NUMBER_OF_RETRIES)
+
+
+class OutputPushover(object):
+    """
+    Example::
+
+      pushover:
+        userkey: <USER_KEY> (can also be a list of userkeys)
+        apikey: <API_KEY>
+        [device: <DEVICE_STRING>] (default: (none))
+        [title: <MESSAGE_TITLE>] (default: "Download started" -- accepts Jinja2)
+        [message: <MESSAGE_BODY>] (default uses series/tvdb name and imdb if available -- accepts Jinja2)
+        [priority: <PRIORITY>] (default = 0 -- normal = 0, high = 1, silent = -1, emergency = 2)
+        [url: <URL>] (default: "{{imdb_url}}" -- accepts Jinja2)
+        [urltitle: <URL_TITLE>] (default: (none) -- accepts Jinja2)
+        [sound: <SOUND>] (default: pushover default)
+        [retry]: <RETRY>]
+
+    Configuration parameters are also supported from entries (eg. through set).
+    """
+
+    schema = {
+        'type': 'object',
+        'properties': {
+            'userkey': one_or_more({'type': 'string'}),
+            'apikey': {'type': 'string'},
+            'device': {'type': 'string'},
+            'title': {'type': 'string'},
+            'message': {'type': 'string'},
+            'priority': {'oneOf': [
+                {'type': 'number', 'minimum': -2, 'maximum': 2},
+                {'type': 'string'}]},
+            'url': {'type': 'string'},
+            'url_title': {'type': 'string'},
+            'sound': {'type': 'string'},
+            'retry': {'type': 'integer', 'minimum': 30},
+            'expire': {'type': 'integer', 'maximum': 86400},
+            'callback': {'type': 'string', 'format': 'url'},
+            'html': {'type': 'boolean'}
+        },
+        'required': ['userkey', 'apikey'],
+        'additionalProperties': False
+    }
+
+    # Run last to make sure other outputs are successful before sending notification
+    @plugin.priority(0)
+    def on_task_output(self, task, config):
+        return Pushover(task, 'entries', 'accepted', task.options.test, config).notify()
+
+    def notify(self, task, scope, iterate_on, test, config):
+        return Pushover(task, scope, iterate_on, test, config).notify()
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OutputPushover, 'pushover', api_ver=2)
+    plugin.register(OutputPushover, 'pushover', api_ver=2, groups=['notifiers'])
