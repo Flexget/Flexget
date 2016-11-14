@@ -28,15 +28,17 @@ class Pushover(Notifier):
 
     defaults = {
         'message': '{% if series_name is defined %}'
-                   '{{tvdb_series_name|d(series_name)}} '
+                   '{{ tvdb_series_name|d(series_name) }} '
                    '{{series_id}} {{tvdb_ep_name|d('')}}'
                    '{% elif imdb_name is defined %}'
                    '{{imdb_name}} {{imdb_year}}'
+                   '{% elif title is defined %}'
+                   '{{ title }}'
                    '{% else %}'
-                   '{{title}}'
+                   'Task has {{ task.accepted|length }} accepted entries'
                    '{% endif %}',
         'url': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}',
-        'title': '{{task_name}}'
+        'title': '{{ task_name }}'
     }
 
     def prepare_config(self, config):
@@ -60,69 +62,70 @@ class Pushover(Notifier):
             return
 
         data = {'token': self.config['apikey']}
-        # Loop through the provided entities
-        for entity in self.iterate_on:
-            for key, value in list(self.config.items()):
-                if key in ['apikey', 'userkey']:
-                    continue
+        # Loop through the provided cotainers and entities
+        for container in self.iterate_on:
+            for entity in container:
+                for key, value in list(self.config.items()):
+                    if key in ['apikey', 'userkey']:
+                        continue
 
-                # Special case for html key
-                if key == 'html' and value is True:
-                    data['html'] = 1
-                    continue
+                    # Special case for html key
+                    if key == 'html' and value is True:
+                        data['html'] = 1
+                        continue
 
-                # Tried to render data in field
-                try:
-                    data[key] = entity.render(value)
-                except RenderError as e:
-                    log.warning('Problem rendering {0}: {1}'.format(key, e))
-                    data[key] = None
-                except ValueError:
-                    data[key] = None
-
-                # If field is empty or rendering fails, try to render field default if exists
-                if not data[key]:
+                    # Tried to render data in field
                     try:
-                        data[key] = entity.render(self.defaults.get(key))
+                        data[key] = entity.render(value)
+                    except RenderError as e:
+                        log.warning('Problem rendering {0}: {1}'.format(key, e))
+                        data[key] = None
                     except ValueError:
-                        if value:
-                            data[key] = value
+                        data[key] = None
 
-            # Special case, verify certain fields exists if priority is 2
-            if data.get('priority') == 2 and not all([data.get('expire'), data.get('retry')]):
-                log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.'
-                            ' Lowering priority to 1')
-                data['priority'] = 1
+                    # If field is empty or rendering fails, try to render field default if exists
+                    if not data[key]:
+                        try:
+                            data[key] = entity.render(self.defaults.get(key))
+                        except ValueError:
+                            if value:
+                                data[key] = value
 
-            for userkey in self.config['userkey']:
-                # Build the request
-                data['user'] = userkey
+                # Special case, verify certain fields exists if priority is 2
+                if data.get('priority') == 2 and not all([data.get('expire'), data.get('retry')]):
+                    log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.'
+                                ' Lowering priority to 1')
+                    data['priority'] = 1
 
-                # Check for test mode
-                if self.test:
-                    log.info('Test mode. Pushover notification would be:')
-                    for key, value in list(data.items()):
-                        log.verbose('%10s: %s', key.capitalize(), value)
-                    # Test mode.  Skip remainder.
-                    continue
+                for userkey in self.config['userkey']:
+                    # Build the request
+                    data['user'] = userkey
 
-                try:
-                    response = requests.post(PUSHOVER_URL, data=data)
-                except RequestException as e:
-                    if e.response.status_code == 429:
-                        reset_time = datetime.datetime.fromtimestamp(
-                            int(e.response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
-                        message = 'Monthly pushover message limit reached. Next reset: %s', reset_time
-                    else:
-                        message = 'Could not send notification to Pushover: %s', e.response.json()['errors']
-                    log.error(*message)
-                    return
+                    # Check for test mode
+                    if self.test:
+                        log.info('Test mode. Pushover notification would be:')
+                        for key, value in list(data.items()):
+                            log.verbose('%10s: %s', key.capitalize(), value)
+                        # Test mode.  Skip remainder.
+                        continue
 
-                reset_time = datetime.datetime.fromtimestamp(
-                    int(response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
-                remaining = response.headers['X-Limit-App-Remaining']
-                log.verbose('Pushover notification sent. Notifications remaining until next reset: %s. '
-                            'Next reset at: %s', remaining, reset_time)
+                    try:
+                        response = requests.post(PUSHOVER_URL, data=data)
+                    except RequestException as e:
+                        if e.response.status_code == 429:
+                            reset_time = datetime.datetime.fromtimestamp(
+                                int(e.response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
+                            message = 'Monthly pushover message limit reached. Next reset: %s', reset_time
+                        else:
+                            message = 'Could not send notification to Pushover: %s', e.response.json()['errors']
+                        log.error(*message)
+                        return
+
+                    reset_time = datetime.datetime.fromtimestamp(
+                        int(response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
+                    remaining = response.headers['X-Limit-App-Remaining']
+                    log.verbose('Pushover notification sent. Notifications remaining until next reset: %s. '
+                                'Next reset at: %s', remaining, reset_time)
 
 
 class OutputPushover(object):

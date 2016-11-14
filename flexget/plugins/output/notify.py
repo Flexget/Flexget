@@ -4,6 +4,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 
 log = logging.getLogger('notify')
@@ -21,7 +22,7 @@ class Notify(object):
                                             '2 more spaces than the first letter of the plugin name.',
                      'minProperties': 1}]}},
             'scope': {'type': 'string', 'enum': ['task', 'entries']},
-            'what': {'type': 'string', 'enum': ['all', 'accepted', 'rejected', 'failed', 'undecided']}
+            'what': one_or_more({'type': 'string', 'enum': ['entries', 'accepted', 'rejected', 'failed', 'undecided']})
         },
         'required': ['to'],
         'additionalProperties': False
@@ -33,10 +34,12 @@ class Notify(object):
             for plugin_name, plugin_config in item.items():
                 notifier = plugin.get_plugin_by_name(plugin_name).instance
                 scope = config.get('scope', 'entries')
-                what = config.get('what', 'accepted')
-                if what == 'all':
-                    what = 'entries'
-                iterate_on = getattr(task, what)
+                what = config.get('what', ['accepted'])
+
+                if not isinstance(what, list):
+                    what = [what]
+
+                iterate_on = [getattr(task, container) for container in what]
                 kwargs = {'task': task,
                           'scope': scope,
                           'iterate_on': iterate_on,

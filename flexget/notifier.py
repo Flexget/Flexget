@@ -18,7 +18,7 @@ class Notifier(object):
         if scope == 'entries':
             self.iterate_on = iterate_on
         elif scope == 'task':
-            self.iterate_on = [task]
+            self.iterate_on = [[task]]
         else:
             raise ValueError('scope must be \'entries\' or \'task\'')
         self.test = test
