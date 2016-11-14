@@ -1,29 +1,30 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-import logging
-
 import datetime
-import requests
-
-from flexget.notifier import Notifier
-from requests.exceptions import RequestException
+import logging
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
+from flexget.notifier import Notifier
 from flexget.utils import json
+from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from flexget.utils.template import RenderError
+from requests.exceptions import RequestException
 
 log = logging.getLogger('pushover')
 
 PUSHOVER_URL = 'https://api.pushover.net/1/messages.json'
 NUMBER_OF_RETRIES = 3
 
+requests = RequestSession(max_retries=5)
+requests.add_domain_limiter(TimedLimiter('api.pushover.net.cc', '5 seconds'))
+
 
 class Pushover(Notifier):
     def __init__(self, task, scope, iterate_on, test, config):
-        super(Pushover, self).__init__(task, scope, iterate_on, test)
+        super(Pushover, self).__init__(task, scope, iterate_on, test, config)
         self.config = self.prepare_config(config)
 
     defaults = {
@@ -38,21 +39,6 @@ class Pushover(Notifier):
         'url': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}',
         'title': '{{task}}'
     }
-
-    last_request = datetime.datetime.strptime('2000-01-01', '%Y-%m-%d')
-
-    def pushover_request(self, data):
-        time_dif = (datetime.datetime.now() - self.last_request).seconds
-
-        # Require at least 5 seconds of waiting between API calls
-        while time_dif < 5:
-            time_dif = (datetime.datetime.now() - self.last_request).seconds
-        try:
-            response = requests.post(PUSHOVER_URL, data=data)
-            self.last_request = datetime.datetime.now()
-        except RequestException:
-            raise
-        return response
 
     def prepare_config(self, config):
         """
@@ -115,47 +101,29 @@ class Pushover(Notifier):
 
                 # Check for test mode
                 if self.test:
-                    log.info('Test mode.  Pushover notification would be:')
+                    log.info('Test mode. Pushover notification would be:')
                     for key, value in list(data.items()):
-                        log.verbose('{0:>5}{1}: {2}'.format('', key.capitalize(), value))
+                        log.verbose('%10s: %s', key.capitalize(), value)
                     # Test mode.  Skip remainder.
                     continue
 
-                for retry in range(NUMBER_OF_RETRIES):
-                    try:
-                        response = self.pushover_request(data)
-                    except RequestException as e:
-                        log.warning('Could not get response from Pushover: %s. Try %s out of %s', e, retry + 1,
-                                    NUMBER_OF_RETRIES)
-                        continue
-                    request_status = response.status_code
-                    reset_time = datetime.datetime.fromtimestamp(
-                        int(response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
-                    # error codes and messages from Pushover API
-                    if request_status == 200:
-                        remaining = response.headers['X-Limit-App-Remaining']
-                        log.verbose(
-                            'Pushover notification sent. Notification remaining until next resets: %s. '
-                            'Next reset at: %s',
-                            remaining, reset_time)
-                        break
-                    elif request_status == 500:
-                        log.debug('Pushover notification failed, Pushover API having issues. Try %s out of %s',
-                                  retry + 1, NUMBER_OF_RETRIES)
-                        continue
-                    elif request_status == 429:
-                        log.error('Monthly pushover message limit reached. Next reset: %s', reset_time)
-                        break
-                    elif request_status >= 400:
-                        errors = json.loads(response.content)['errors']
-                        log.error('Pushover API error: %s', errors[0])
-                        break
+                try:
+                    response = requests.post(PUSHOVER_URL, data=data)
+                except RequestException as e:
+                    if e.response.status_code == 429:
+                        reset_time = datetime.datetime.fromtimestamp(
+                            int(e.response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
+                        message = 'Monthly pushover message limit reached. Next reset: %s', reset_time
                     else:
-                        log.error('Unknown error when sending Pushover notification')
-                        break
-                else:
-                    log.error(
-                        'Could not get response from Pushover after %s retries', NUMBER_OF_RETRIES)
+                        message = 'Could not send notification to Pushover: %s', e.args[0]
+                    log.error(message)
+                    return
+
+                reset_time = datetime.datetime.fromtimestamp(
+                    int(response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
+                remaining = response.headers['X-Limit-App-Remaining']
+                log.verbose('Pushover notification sent. Notifications remaining until next reset: %s. '
+                            'Next reset at: %s', remaining, reset_time)
 
 
 class OutputPushover(object):
@@ -203,6 +171,7 @@ class OutputPushover(object):
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
+        # Send default values for backwards comparability
         return Pushover(task, 'entries', 'accepted', task.options.test, config).notify()
 
     def notify(self, task, scope, iterate_on, test, config):
