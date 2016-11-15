@@ -5,7 +5,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import RenderError, render_from_task
+from flexget.utils.template import RenderError
 
 log = logging.getLogger('notify_osd')
 
