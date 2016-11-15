@@ -144,7 +144,7 @@ class Pushover(object):
                                 'Next reset at: %s', remaining, reset_time)
 
 
-class OutputPushover(object):
+class PushoverNotifier(object):
     """
     Example::
 
@@ -198,4 +198,4 @@ class OutputPushover(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OutputPushover, 'pushover', api_ver=2, groups=['notifiers'])
+    plugin.register(PushoverNotifier, 'pushover', api_ver=2, groups=['notifiers'])
