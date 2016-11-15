@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -104,7 +104,7 @@ def device_auth():
         raise plugin.PluginError('Device authorization with Trakt.tv failed: {0}'.format(e))
 
 
-def token_auth(data):
+def token_oauth(data):
     try:
         return requests.post(get_api_url('oauth/token'), data=data).json()
     except requests.RequestException as e:
@@ -130,7 +130,8 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
     """
     data = {
         'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET
+        'client_secret': CLIENT_SECRET,
+        'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob'
     }
     with Session() as session:
         acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == account).first()
@@ -141,14 +142,13 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
                 log.debug('Using refresh token to re-authorize account %s.', account)
                 data['refresh_token'] = acc.refresh_token
                 data['grant_type'] = 'refresh_token'
-                token_dict = token_auth(data)
+                token_dict = token_oauth(data)
             elif token:
                 # We are only in here if a pin was specified, so it's safe to use console instead of logging
                 console('Warning: PIN authorization has been deprecated. Use Device Authorization instead.')
                 data['code'] = token
                 data['grant_type'] = 'authorization_code'
-                data['redirect_uri'] = 'urn:ietf:wg:oauth:2.0:oob'
-                token_dict = token_auth(data)
+                token_dict = token_oauth(data)
             elif called_from_cli:
                 log.debug('No pin specified for an unknown account %s. Attempting to authorize device.', account)
                 token_dict = device_auth()
@@ -156,20 +156,10 @@ def get_access_token(account, token=None, refresh=False, re_auth=False, called_f
                 raise plugin.PluginError('Account %s has not been authorized. See `flexget trakt auth -h` on how to.' %
                                          account)
             try:
-                access_token = token_dict['access_token']
-                refresh_token = token_dict['refresh_token']
-                created_at = token_dict.get('created_at', time.time())
-                expires_in = token_dict['expires_in']
-                if acc:
-                    acc.access_token = access_token
-                    acc.refresh_token = refresh_token
-                    acc.created = token_created_date(created_at)
-                    acc.expires = token_expire_date(expires_in)
-                else:
-                    acc = TraktUserAuth(account, access_token, refresh_token, created_at,
-                                        expires_in)
-                    session.add(acc)
-                return access_token
+                new_acc = TraktUserAuth(account, token_dict['access_token'], token_dict['refresh_token'],
+                                        token_dict.get('created_at', time.time()), token_dict['expires_in'])
+                session.merge(new_acc)
+                return new_acc.access_token
             except requests.RequestException as e:
                 raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e))
 

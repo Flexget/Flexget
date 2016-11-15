@@ -1,7 +1,7 @@
 # pylint: disable=no-self-use
 
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import text_type
 
 import os
@@ -28,7 +28,8 @@ class TestDisableBuiltins(object):
 
           test2:
             mock:
-              - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5, description: 'http://www.imdb.com/title/tt0409459/'}
+              - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5,
+                description: 'http://www.imdb.com/title/tt0409459/'}
               - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
             accept_all: yes
             disable:

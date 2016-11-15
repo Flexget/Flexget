@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 
 class TestFilterSeen(object):
@@ -180,9 +180,9 @@ class TestFilterSeenMovies(object):
         assert task.find_entry('accepted', title='Seen movie title 11'), 'local should have passed movie 11'
         # execute again
         task.execute()
-        assert task.find_entry('rejected',
-                               title='Seen movie title 12'), 'Test movie entry 12 should be rejected in second execution'
+        msg = 'Test movie entry 12 should be rejected in second execution'
+        assert task.find_entry('rejected', title='Seen movie title 12'), msg
         # test a global scope after
         task = execute_task('test_2')
-        assert not task.find_entry('rejected',
-                                   title='Seen movie title 13'), 'Changing scope should not have rejected Seen movie title 13'
+        msg = 'Changing scope should not have rejected Seen movie title 13'
+        assert not task.find_entry('rejected', title='Seen movie title 13'), msg

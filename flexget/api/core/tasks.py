@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import cgi
 import copy
-from datetime import datetime
+from datetime import datetime, timedelta
 from json import JSONEncoder
 
 from flask import jsonify, Response, request
@@ -29,8 +29,8 @@ tasks_api = api.namespace('tasks', description='Manage Tasks')
 
 class ObjectsContainer(object):
     tasks_list_object = {'oneOf': [
-        {"type": "array",
-         "items": {'$ref': '#/definitions/tasks.task'}},
+        {'type': 'array',
+         'items': {'$ref': '#/definitions/tasks.task'}},
         {'type': 'array', 'items': {'type': 'string'}}
     ]
     }
@@ -122,7 +122,7 @@ class ObjectsContainer(object):
     task_execution_input = {
         'type': 'object',
         'properties': {
-            'tasks': {'type': "array",
+            'tasks': {'type': 'array',
                       'items': {'type': 'string'},
                       'minItems': 1,
                       'uniqueItems': True},
@@ -141,9 +141,9 @@ class ObjectsContainer(object):
             'inject': {'type': 'array',
                        'items': inject_input,
                        'description': 'A List of entry objects'},
-            'loglevel': {'type': "string",
+            'loglevel': {'type': 'string',
                          'description': 'Specify log level',
-                         "enum": ['critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace']}
+                         'enum': ['critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace']}
         },
         'required': ['tasks']
 
@@ -288,6 +288,20 @@ class TaskAPI(APIResource):
         self.manager.save_config()
         self.manager.config_changed()
         return success_response('successfully deleted task')
+
+
+default_start_date = (datetime.now() - timedelta(weeks=1)).strftime('%Y-%m-%d')
+
+status_parser = api.parser()
+status_parser.add_argument('succeeded', type=inputs.boolean, default=True, help='Filter by success status')
+status_parser.add_argument('produced', type=inputs.boolean, default=True, store_missing=False,
+                           help='Filter by tasks that produced entries')
+status_parser.add_argument('start_date', type=inputs.datetime_from_iso8601, default=default_start_date,
+                           help='Filter by minimal start date. Example: \'2012-01-01\'')
+status_parser.add_argument('end_date', type=inputs.datetime_from_iso8601,
+                           help='Filter by maximal end date. Example: \'2012-01-01\'')
+status_parser.add_argument('limit', default=100, type=int,
+                           help='Limit return of executions per task, as that number can be huge')
 
 
 def _task_info_dict(task):

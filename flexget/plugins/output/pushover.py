@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -12,9 +12,9 @@ from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
 
-log = logging.getLogger("pushover")
+log = logging.getLogger('pushover')
 
-PUSHOVER_URL = "https://api.pushover.net/1/messages.json"
+PUSHOVER_URL = 'https://api.pushover.net/1/messages.json'
 NUMBER_OF_RETRIES = 3
 
 
@@ -37,14 +37,14 @@ class OutputPushover(object):
     Configuration parameters are also supported from entries (eg. through set).
     """
     defaults = {
-        'message': "{% if series_name is defined %}"
-                   "{{tvdb_series_name|d(series_name)}} "
-                   "{{series_id}} {{tvdb_ep_name|d('')}}"
-                   "{% elif imdb_name is defined %}"
-                   "{{imdb_name}} {{imdb_year}}"
-                   "{% else %}"
-                   "{{title}}"
-                   "{% endif %}",
+        'message': '{% if series_name is defined %}'
+                   '{{tvdb_series_name|d(series_name)}} '
+                   '{{series_id}} {{tvdb_ep_name|d('')}}'
+                   '{% elif imdb_name is defined %}'
+                   '{{imdb_name}} {{imdb_year}}'
+                   '{% else %}'
+                   '{{title}}'
+                   '{% endif %}',
         'url': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}',
         'title': '{{task}}'
     }
@@ -65,7 +65,8 @@ class OutputPushover(object):
             'sound': {'type': 'string'},
             'retry': {'type': 'integer', 'minimum': 30},
             'expire': {'type': 'integer', 'maximum': 86400},
-            'callback': {'type': 'string', 'format': 'url'}
+            'callback': {'type': 'string', 'format': 'url'},
+            'html': {'type': 'boolean'}
         },
         'required': ['userkey', 'apikey'],
         'additionalProperties': False
@@ -106,7 +107,7 @@ class OutputPushover(object):
     @plugin.priority(0)
     def on_task_output(self, task, config):
         config = self.prepare_config(config)
-        data = {"token": config["apikey"]}
+        data = {'token': config['apikey']}
 
         # Loop through the provided entries
         for entry in task.accepted:
@@ -114,6 +115,12 @@ class OutputPushover(object):
             for key, value in list(config.items()):
                 if key in ['apikey', 'userkey']:
                     continue
+
+                # Special case for html key
+                if key == 'html' and value is True:
+                    data['html'] = 1
+                    continue
+
                 # Tried to render data in field
                 try:
                     data[key] = entry.render(value)
@@ -139,11 +146,11 @@ class OutputPushover(object):
 
             for userkey in config['userkey']:
                 # Build the request
-                data["user"] = userkey
+                data['user'] = userkey
 
                 # Check for test mode
                 if task.options.test:
-                    log.info("Test mode.  Pushover notification would be:")
+                    log.info('Test mode.  Pushover notification would be:')
                     for key, value in list(data.items()):
                         log.verbose('{0:>5}{1}: {2}'.format('', key.capitalize(), value))
                     # Test mode.  Skip remainder.
@@ -153,30 +160,39 @@ class OutputPushover(object):
                     try:
                         response = self.pushover_request(task, data)
                     except RequestException as e:
-                        log.warning('Could not get response from Pushover: {0}.'
-                                    ' Try {1} out of {2}'.format(e, retry + 1, NUMBER_OF_RETRIES))
+                        log.warning('Could not get response from Pushover: %s. Try %s out of %s', e, retry + 1,
+                                    NUMBER_OF_RETRIES)
                         continue
                     request_status = response.status_code
+                    reset_time = datetime.datetime.fromtimestamp(
+                        int(response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
                     # error codes and messages from Pushover API
                     if request_status == 200:
-                        log.debug("Pushover notification sent")
+                        remaining = response.headers['X-Limit-App-Remaining']
+                        log.debug(
+                            'Pushover notification sent. Notification remaining until next resets: %s. '
+                            'Next reset at: %s',
+                            remaining, reset_time)
                         break
                     elif request_status == 500:
-                        log.debug("Pushover notification failed, Pushover API having issues. Try {0} out of {1}".format(
-                            retry + 1, NUMBER_OF_RETRIES))
+                        log.debug('Pushover notification failed, Pushover API having issues. Try %s out of %s',
+                                  retry + 1, NUMBER_OF_RETRIES)
                         continue
+                    elif request_status == 429:
+                        log.error('Monthly pushover message limit reached. Next reset: %s', reset_time)
+                        break
                     elif request_status >= 400:
                         errors = json.loads(response.content)['errors']
-                        log.error("Pushover API error: {0}".format(errors[0]))
+                        log.error('Pushover API error: %s', errors[0])
                         break
                     else:
-                        log.error("Unknown error when sending Pushover notification")
+                        log.error('Unknown error when sending Pushover notification')
                         break
                 else:
                     log.error(
-                        'Could not get response from Pushover after {0} retries, aborting.'.format(NUMBER_OF_RETRIES))
+                        'Could not get response from Pushover after %s retries, aborting.', NUMBER_OF_RETRIES)
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OutputPushover, "pushover", api_ver=2)
+    plugin.register(OutputPushover, 'pushover', api_ver=2)

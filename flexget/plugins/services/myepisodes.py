@@ -1,27 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from future.moves.urllib import request
-from future.moves.urllib import parse
-from future.moves.urllib.error import URLError
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
 from datetime import datetime
-import http.cookiejar
 
 from sqlalchemy import Column, Integer, String, DateTime
 
-from flexget import db_schema, plugin
+from flexget import plugin
 from flexget.event import event
+from flexget.utils import requests
+from flexget.db_schema import versioned_base
 
-try:
-    from flexget.plugins.internal.api_tvdb import lookup_series
-except ImportError:
-    raise plugin.DependencyError(issued_by='myepisodes', missing='api_tvdb',
-                                 message='myepisodes requires the `api_tvdb` plugin')
 
 log = logging.getLogger('myepisodes')
-Base = db_schema.versioned_base('myepisodes', 0)
+Base = versioned_base('myepisodes', 0)
 
 
 class MyEpisodesInfo(Base):
@@ -88,99 +81,159 @@ class MyEpisodes(object):
         'additionalProperties': False
     }
 
+    def __init__(self):
+        self.plugin_config = None
+        self.db_session = None
+        self.test_mode = None
+        self.http_session = None
+
     @plugin.priority(-255)
     def on_task_output(self, task, config):
-        """Mark all accepted episodes as acquired on MyEpisodes"""
+        """
+        Mark all accepted episodes as acquired on MyEpisodes
+        """
+
         if not task.accepted:
             # Nothing accepted, don't do anything
             return
 
-        username = config['username']
-        password = config['password']
-
-        cookiejar = http.cookiejar.CookieJar()
-        opener = request.build_opener(request.HTTPCookieProcessor(cookiejar))
-        baseurl = request.Request('http://www.myepisodes.com/login.php?')
-        loginparams = parse.urlencode({'username': username,
-                                       'password': password,
-                                       'action': 'Login'})
         try:
-            logincon = opener.open(baseurl, loginparams)
-            loginsrc = logincon.read()
-        except URLError as e:
-            log.error('Error logging in to myepisodes: %s' % e)
+            self.plugin_config = config
+            self.db_session = task.session
+            self.test_mode = task.options.test
+
+            # attempt authentication
+            self.http_session = self._login(config)
+
+        except plugin.PluginWarning as w:
+            log.warning(w)
             return
 
-        if str(username) not in loginsrc:
-            raise plugin.PluginWarning(('Login to myepisodes.com failed, please check '
-                                        'your account data or see if the site is down.'), log)
+        except plugin.PluginError as e:
+            log.error(e)
+            return
 
         for entry in task.accepted:
+            # mark the accepted entries as acquired
             try:
-                self.mark_episode(task, entry, opener)
+                self._validate_entry(entry)
+                entry['myepisodes_id'] = self._lookup_myepisodes_id(entry)
+                self._mark_episode_acquired(entry)
+
             except plugin.PluginWarning as w:
-                log.warning(str(w))
+                log.warning(w)
 
-    def lookup_myepisodes_id(self, entry, opener, session):
-        """Populates myepisodes_id field for an entry, and returns the id.
+    def _validate_entry(self, entry):
+        """
+        Checks an entry for all of the fields needed to comunicate with myepidoes
+        Return: boolean
+        """
+        if 'series_season' not in entry \
+                or 'series_episode' not in entry \
+                or 'series_name' not in entry:
 
-        Call will also set entry field `myepisode_id` if successful.
+            raise plugin.PluginWarning(
+                'Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name '
+                'fields' % entry['title'], log)
 
-        Return:
-            myepisode id
-
-        Raises:
-            LookupError if entry does not have field series_name
+    def _lookup_myepisodes_id(self, entry):
+        """
+        Attempts to find the myepisodes id for the series
+        Return: myepisode id or None
         """
 
-        # Don't need to look it up if we already have it.
-        if entry.get('myepisodes_id'):
-            return entry['myepisodes_id']
+        # Do we already have the id?
+        myepisodes_id = entry.get('myepisodes_id')
+        if myepisodes_id:
+            return myepisodes_id
 
-        if not entry.get('series_name'):
-            raise LookupError('Cannot lookup myepisodes id for entries without series_name')
-        series_name = entry['series_name']
+        # have we previously recorded the id for this series?
+        myepisodes_id = self._retrieve_id_from_database(entry)
+        if myepisodes_id:
+            return myepisodes_id
 
-        # First check if we already have a myepisodes id stored for this series
-        myepisodes_info = session.query(MyEpisodesInfo). \
-            filter(MyEpisodesInfo.series_name == series_name.lower()).first()
-        if myepisodes_info:
-            entry['myepisodes_id'] = myepisodes_info.myepisodes_id
-            return myepisodes_info.myepisodes_id
+        # We don't know the id for this series, so it's time to search myepisodes.com for it
+        myepisodes_id = self._retrieve_id_from_website(entry)
+        if myepisodes_id:
+            return myepisodes_id
+
+        raise plugin.PluginWarning('Unable to determine the myepisodes id for: `%s`' % entry['title'], log)
+
+    def _retrieve_id_from_database(self, entry):
+        """
+        Attempts to find the myepisodes id in the database
+        Return: myepisode id or None
+        """
+        lc_series_name = entry['series_name'].lower()
+        info = self.db_session.query(MyEpisodesInfo).filter(MyEpisodesInfo.series_name == lc_series_name).first()
+        if info:
+            return info.myepisodes_id
+
+    def _retrieve_id_from_website(self, entry):
+        """
+        Attempts to find the myepisodes id for the series for the website itself
+        Return: myepisode id or None
+        """
+        myepisodes_id = None
+        baseurl = 'http://www.myepisodes.com/search/'
+        search_value = self._generate_search_value(entry)
+
+        payload = {
+            'tvshow': search_value,
+            'action': 'Search',
+        }
+
+        try:
+            response = self.http_session.post(baseurl, data=payload)
+            regex = r'"/epsbyshow\/([0-9]*)\/.*">' + search_value + '</a>'
+            match_obj = re.search(regex, response.text, re.MULTILINE | re.IGNORECASE)
+            if match_obj:
+                myepisodes_id = match_obj.group(1)
+                self._save_id(search_value, myepisodes_id)
+
+        except requests.RequestException as e:
+            raise plugin.PluginError('Error searching for myepisodes id: %s' % e)
+
+        return myepisodes_id
+
+    def _generate_search_value(self, entry):
+        """
+        Find the TVDB name for searching myepisodes with.
+
+        myepisodes.com is backed by tvrage, so this will not be perfect.
+
+        Return: myepisode id or None
+        """
+        search_value = entry['series_name']
 
         # Get the series name from thetvdb to increase match chance on myepisodes
         if entry.get('tvdb_series_name'):
-            query_name = entry['tvdb_series_name']
+            search_value = entry['tvdb_series_name']
         else:
             try:
-                series = lookup_series(name=series_name, tvdb_id=entry.get('tvdb_id'))
-                query_name = series.name
-            except LookupError as e:
-                log.warning('Unable to lookup series `%s` from tvdb, using raw name.' % series_name)
-                query_name = series_name
+                series = plugin.get_plugin_by_name('api_tvdb').instance.lookup_series(
+                    name=entry['series_name'], tvdb_id=entry.get('tvdb_id'))
+                search_value = series.name
+            except LookupError:
+                log.warning('Unable to lookup series `%s` from tvdb, using raw name.', entry['series_name'])
 
-        baseurl = request.Request('http://www.myepisodes.com/search.php?')
-        params = parse.urlencode({'tvshow': query_name, 'action': 'Search myepisodes.com'})
-        try:
-            con = opener.open(baseurl, params)
-            txt = con.read()
-        except URLError as e:
-            log.error('Error searching for myepisodes id: %s' % e)
+        return search_value
 
-        matchObj = re.search(r'&showid=([0-9]*)">' + query_name + '</a>', txt, re.MULTILINE | re.IGNORECASE)
-        if matchObj:
-            myepisodes_id = matchObj.group(1)
-            db_item = session.query(MyEpisodesInfo).filter(MyEpisodesInfo.myepisodes_id == myepisodes_id).first()
-            if db_item:
-                log.info('Changing name to `%s` for series with myepisodes_id %s' %
-                         (series_name.lower(), myepisodes_id))
-                db_item.series_name = series_name.lower()
-            else:
-                session.add(MyEpisodesInfo(series_name.lower(), myepisodes_id))
-            entry['myepisodes_id'] = myepisodes_id
-            return myepisodes_id
+    def _save_id(self, series_name, myepisodes_id):
+        """
+        Save the myepisodes id in the database.
+        This will help prevent unecceary communication with the website
+        """
 
-    def mark_episode(self, task, entry, opener):
+        # if we already have the a record for that id, update the name so that we find it next time
+        db_item = self.db_session.query(MyEpisodesInfo).filter(MyEpisodesInfo.myepisodes_id == myepisodes_id).first()
+        if db_item:
+            log.info('Changing name to `%s` for series with myepisodes_id %s', series_name.lower(), myepisodes_id)
+            db_item.series_name = series_name.lower()
+        else:
+            self.db_session.add(MyEpisodesInfo(series_name.lower(), myepisodes_id))
+
+    def _mark_episode_acquired(self, entry):
         """Mark episode as acquired.
 
         Required entry fields:
@@ -192,26 +245,60 @@ class MyEpisodes(object):
             PluginWarning if operation fails
         """
 
-        if 'series_season' not in entry or 'series_episode' not in entry or 'series_name' not in entry:
-            raise plugin.PluginWarning(
-                'Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name fields' %
-                entry['title'], log)
-
-        if not self.lookup_myepisodes_id(entry, opener, session=task.session):
-            raise plugin.PluginWarning('Couldn\'t get myepisodes id for `%s`' % entry['title'], log)
-
+        url = "http://www.myepisodes.com/ajax/service.php?mode=eps_update"
         myepisodes_id = entry['myepisodes_id']
         season = entry['series_season']
         episode = entry['series_episode']
 
-        if task.options.test:
-            log.info('Would mark %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
-        else:
-            baseurl2 = request.Request(
-                'http://www.myepisodes.com/myshows.php?action=Update&showid=%s&season=%s&episode=%s&seen=0' %
-                (myepisodes_id, season, episode))
-            opener.open(baseurl2)
-            log.info('Marked %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
+        super_secret_code = "A%s-%s-%s" % (str(myepisodes_id), str(season), str(episode))
+
+        payload = {
+            super_secret_code: "true"
+        }
+
+        if self.test_mode:
+            log.info('Would mark %s of `%s` as acquired.', entry['series_id'], entry['series_name'])
+            return
+
+        try:
+            self.http_session.post(url, data=payload)
+
+        except requests.RequestException:
+            raise plugin.PluginError('Failed to mark %s of `%s` as acquired.' % (entry['series_id'],
+                                                                                 entry['series_name']))
+
+        log.info('Marked %s of `%s` as acquired.', entry['series_id'], entry['series_name'])
+
+    def _login(self, config):
+        """Authenicate with the myepisodes service and return a requests session
+
+        Return:
+            requests session
+
+        Raises:
+            PluginWarning if login fails
+            PluginError if http communication fails
+        """
+
+        url = "https://www.myepisodes.com/login.php"
+        session = requests.Session()
+
+        payload = {
+            'username': config['username'],
+            'password': config['password'],
+            'action': 'Login',
+        }
+
+        try:
+            response = session.post(url, data=payload)
+
+            if config['username'] not in response.text:
+                raise plugin.PluginWarning(('Login to myepisodes.com failed, please see if the site is down and verify '
+                                            'your credentials.'), log)
+        except requests.RequestException as e:
+            raise plugin.PluginError('Error logging in to myepisodes: %s' % e)
+
+        return session
 
 
 @event('plugin.register')

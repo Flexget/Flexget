@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -11,7 +11,6 @@ from flexget.utils.requests import RequestException, Session, TimedLimiter
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('letterboxd')
-logging.getLogger('api_tmdb').setLevel(logging.CRITICAL)
 
 requests = Session(max_retries=5)
 requests.add_domain_limiter(TimedLimiter('letterboxd.com', '1 seconds'))

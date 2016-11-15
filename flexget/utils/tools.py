@@ -1,6 +1,6 @@
 """Contains miscellaneous helpers"""
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib import request
 from future.utils import PY2
 from past.builtins import basestring
@@ -10,12 +10,10 @@ import ast
 import copy
 import hashlib
 import locale
-import mimetypes
 import operator
 import os
 import re
 import sys
-import io
 from collections import MutableMapping
 from datetime import timedelta, datetime
 from pprint import pformat
@@ -100,7 +98,8 @@ def _htmldecode(text):
     if isinstance(text, str):
         uchr = chr
     else:
-        uchr = lambda value: value > 127 and chr(value) or chr(value)
+        def uchr(value):
+            value > 127 and chr(value) or chr(value)
 
     def entitydecode(match, uchr=uchr):
         entity = match.group(1)
@@ -166,7 +165,7 @@ def merge_dict_from_to(d1, d2):
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
             elif (isinstance(v, (basestring, bool, int, float, type(None))) and
-                      isinstance(d2[k], (basestring, bool, int, float, type(None)))):
+                  isinstance(d2[k], (basestring, bool, int, float, type(None)))):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:

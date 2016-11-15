@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import os
@@ -46,7 +46,7 @@ class PluginPeriscope(object):
 
     def on_task_start(self, task, config):
         try:
-            import periscope
+            import periscope  # noqa
         except ImportError as e:
             log.debug('Error importing Periscope: %s' % e)
             raise plugin.DependencyError('periscope', 'periscope',

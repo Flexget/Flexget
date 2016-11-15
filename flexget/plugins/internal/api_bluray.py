@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 from datetime import datetime, timedelta
@@ -31,7 +31,7 @@ BASE_URL = 'http://m.blu-ray.com/'
 
 def bluray_request(endpoint, **params):
     full_url = BASE_URL + endpoint
-    return requests.get(full_url, params=params).json()
+    return requests.get(full_url, params=params).json(strict=False)
 
 
 def extract_release_date(release_date):

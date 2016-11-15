@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
+import re
 
 from flexget import options, plugin
 from flexget.event import event
@@ -21,7 +22,6 @@ class PluginTryRegexp(object):
 
     def matches(self, entry, regexp):
         """Return True if any of the entry string fields match given regexp"""
-        import re
         for field, value in entry.items():
             if not isinstance(value, basestring):
                 continue

@@ -23,7 +23,7 @@
     </md-card-title>
     <md-card-content flex layout-gt-xs="row" layout-xs="column" class="custom-card">
         <p ng-if="::vm.show.metadata">{{ ::vm.show.metadata.overview }}</p>
-        <p ng-if="::!vm.show.metadata">No metadata found</p>
+        <p ng-hide="::vm.show.metadata">No metadata found</p>
     </md-card-content>
 	<md-card-actions layout="row" layout-align="start center">
 		<md-button class="md-primary md-raised" ng-click="vm.toggleEpisodes(show)">Episodes</md-button>

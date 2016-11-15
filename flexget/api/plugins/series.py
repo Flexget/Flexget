@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import copy
 from math import ceil
@@ -175,7 +175,7 @@ class SeriesAPI(APIResource):
         if per_page > 100:
             per_page = 100
 
-        descending = bool(sort_order == 'desc')
+        descending = sort_order == 'desc'
 
         # Data params
         lookup = args.get('lookup')
@@ -383,7 +383,7 @@ class SeriesEpisodesAPI(APIResource):
         if per_page > 100:
             per_page = 100
 
-        descending = bool(sort_order == 'desc')
+        descending = sort_order == 'desc'
 
         start = per_page * (page - 1)
         stop = start + per_page
@@ -541,7 +541,7 @@ class SeriesReleasesAPI(APIResource):
         sort_by = args['sort_by']
         sort_order = args['order']
 
-        descending = bool(sort_order == 'desc')
+        descending = sort_order == 'desc'
 
         # Handle max size limit
         if per_page > 100:

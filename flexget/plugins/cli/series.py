@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
 from datetime import timedelta
@@ -76,7 +76,6 @@ def display_summary(options):
         for series in query:
             name_column = series.name
 
-            new_ep = False
             behind = 0
             latest_release = '-'
             age_col = '-'
