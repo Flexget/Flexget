@@ -48,7 +48,7 @@ class ImdbWatchlist(object):
         'error_anyOf': 'user_id is required if not using a custom list (lsXXXXXXXXX format)'
     }
 
-    @cached('imdb_list', persist='2 hours')
+    @cached('imdb_watchlist', persist='2 hours')
     def on_task_input(self, task, config):
         # Create movie entries by parsing imdb list page(s) html using beautifulsoup
         log.verbose('Retrieving imdb list: %s', config['list'])
