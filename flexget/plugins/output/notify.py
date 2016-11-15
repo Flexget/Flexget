@@ -61,7 +61,8 @@ class Notify(object):
 
     def on_task_start(self, task, config):
         # Suppress warnings about missing output plugins
-        task.suppress_warnings = ['output']
+        if 'output' not in task.suppress_warnings:
+            task.suppress_warnings.append('output')
 
     def on_task_exit(self, task, config):
         self.send_notification(task, config)
