@@ -447,15 +447,13 @@ class CoreArgumentParser(ArgumentParser):
         daemon_parser.add_subparsers(title='actions', metavar='<action>', dest='action')
         start_parser = daemon_parser.add_subparser('start', help='start the daemon')
         start_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
-        start_parser.add_argument('--config-autoreload', action='store_true',
+        start_parser.add_argument('--autoreload-config', action='store_true',
                                   help='automatically reload the config from disk if the daemon detects any changes')
         stop_parser = daemon_parser.add_subparser('stop', help='shutdown the running daemon')
         stop_parser.add_argument('--wait', action='store_true',
                                  help='wait for all queued tasks to finish before stopping daemon')
         daemon_parser.add_subparser('status', help='check if a daemon is running')
-        daemon_parser.add_subparser('reload', help='causes a running daemon to reload the config from disk')
-        daemon_parser.add_subparser('enable-autoreload', help='enables automatic config reload from disk')
-        daemon_parser.add_subparser('disable-autoreload', help='disables automatic config reload from disk')
+        daemon_parser.add_subparser('reload-config', help='causes a running daemon to reload the config from disk')
 
     def add_subparsers(self, **kwargs):
         # The subparsers should not be CoreArgumentParsers
