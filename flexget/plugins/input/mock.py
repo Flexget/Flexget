@@ -40,6 +40,8 @@ class Mock(object):
         entries = []
         for line in config:
             entry = Entry(line)
+            if entry['break']:
+                pass
             # no url specified, add random one based on title (ie. test)
             if 'url' not in entry:
                 entry['url'] = 'mock://localhost/mock/%s' % hash(entry['title'])

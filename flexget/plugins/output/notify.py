@@ -38,11 +38,7 @@ class Notify(object):
         config.setdefault('scope', 'entries')
         return config
 
-    def on_task_start(self, task, config):
-        # Suppress warnings about missing output plugins
-        task.suppress_warnings = ['output']
-
-    def on_task_exit(self, task, config):
+    def send_notification(self, task, config):
         config = self.prepare_config(config)
         scope = config['scope']
         what = config['what']
@@ -62,6 +58,13 @@ class Notify(object):
 
                 log.info('Sending a notification to %s', plugin_name)
                 notifier.notify(**kwargs)
+
+    def on_task_start(self, task, config):
+        # Suppress warnings about missing output plugins
+        task.suppress_warnings = ['output']
+
+    def on_task_exit(self, task, config):
+        self.send_notification(task, config)
 
 
 @event('plugin.register')
