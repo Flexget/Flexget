@@ -186,7 +186,8 @@ class Task(object):
     RERUN_DEFAULT = 5
     RERUN_MAX = 100
 
-    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None):
+    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None,
+                 suppress_warnings=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
@@ -196,6 +197,7 @@ class Task(object):
         :param loglevel: Custom loglevel, only log messages at this level will be sent to `output`
         :param priority: If multiple tasks are waiting to run, the task with the lowest priority will be run first.
             The default is 0, if the cron option is set though, the default is lowered to 10.
+        :param suppress_warnings: Allows suppressing log warning about missing plugin in key phases
 
         """
         self.name = str(name)
@@ -217,6 +219,7 @@ class Task(object):
         self.options = options
         self.output = output
         self.loglevel = loglevel
+        self.suppress_warnings = suppress_warnings or []
         if priority is None:
             self.priority = 10 if self.options.cron else 0
         else:
@@ -418,11 +421,12 @@ class Task(object):
                     if not p.builtin:
                         break
                 else:
-                    if phase == 'filter':
-                        log.warning('Task does not have any filter plugins to accept entries. '
-                                    'You need at least one to accept the entries you  want.')
-                    else:
-                        log.warning('Task doesn\'t have any %s plugins, you should add (at least) one!' % phase)
+                    if phase not in self.suppress_warnings:
+                        if phase == 'filter':
+                            log.warning('Task does not have any filter plugins to accept entries. '
+                                        'You need at least one to accept the entries you  want.')
+                        else:
+                            log.warning('Task doesn\'t have any %s plugins, you should add (at least) one!' % phase)
 
         for plugin in self.plugins(phase):
             # Abort this phase if one of the plugins disables it

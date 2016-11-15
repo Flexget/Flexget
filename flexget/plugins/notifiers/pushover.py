@@ -7,7 +7,6 @@ import logging
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
-from flexget.notifier import Notifier
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from flexget.utils.template import RenderError
 from requests.exceptions import RequestException
@@ -21,10 +20,27 @@ requests = RequestSession(max_retries=5)
 requests.add_domain_limiter(TimedLimiter('api.pushover.net.cc', '5 seconds'))
 
 
-class Pushover(Notifier):
-    def __init__(self, task, scope, iterate_on, test, config):
-        super(Pushover, self).__init__(task, scope, iterate_on, test, config)
-        self.config = self.prepare_config(config)
+class Pushover(object):
+    def __init__(self, task, scope, iterate_on, test, plugin_config):
+        """
+        Pushover notifier. Send notifications to Pushover service.
+
+        :param task: The task instance
+        :param scope: Notification scope, can be either "entries" or "task"
+        :param iterate_on: The entry container to iterate on (such as task.accepted). If scope is "task" it is unneeded.
+        :param test: Test mode, task.options.test
+        :param plugin_config: The notifier plugin config
+        """
+        self.task = task
+        self.scope = scope
+        if scope == 'entries':
+            self.iterate_on = iterate_on
+        elif scope == 'task':
+            self.iterate_on = [[task]]
+        else:
+            raise ValueError('scope must be \'entries\' or \'task\'')
+        self.test_mode = test
+        self.config = self.prepare_config(plugin_config)
 
     defaults = {
         'message': '{% if series_name is defined %}'
@@ -47,7 +63,6 @@ class Pushover(Notifier):
         :param config: User config
         :return: Config with defaults
         """
-        config = config
         if not isinstance(config['userkey'], list):
             config['userkey'] = [config['userkey']]
         config.setdefault('message', self.defaults['message'])
@@ -103,7 +118,7 @@ class Pushover(Notifier):
                     data['user'] = userkey
 
                     # Check for test mode
-                    if self.test:
+                    if self.test_mode is True:
                         log.info('Test mode. Pushover notification would be:')
                         for key, value in list(data.items()):
                             log.verbose('%10s: %s', key.capitalize(), value)
