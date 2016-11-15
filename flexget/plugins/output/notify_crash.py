@@ -17,7 +17,7 @@ class NotifyCrash(object):
                 {'allOf': [
                     {'$ref': '/schema/plugins?group=notifiers'},
                     {'maxProperties': 1,
-                     'error_maxProperties': 'Plugin options within notify plugin must be indented '
+                     'error_maxProperties': 'Plugin options within notify_crash plugin must be indented '
                                             '2 more spaces than the first letter of the plugin name.',
                      'minProperties': 1}]}}
 
