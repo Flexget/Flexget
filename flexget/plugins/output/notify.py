@@ -64,8 +64,7 @@ class Notify(object):
         if 'output' not in task.suppress_warnings:
             task.suppress_warnings.append('output')
 
-    def on_task_exit(self, task, config):
-        self.send_notification(task, config)
+    on_task_exit = send_notification
 
 
 @event('plugin.register')
