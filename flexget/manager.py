@@ -950,3 +950,4 @@ class Manager(object):
                          ' at http://flexget.com/wiki/Plugins/version_checker. You are currently using'
                          ' version %s', filename, get_current_flexget_version())
         log.debug('Traceback:', exc_info=True)
+        return traceback.format_exc()

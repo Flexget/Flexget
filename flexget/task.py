@@ -357,11 +357,12 @@ class Task(object):
             log.debug('Disabling %s phase' % phase)
             self.disabled_phases.append(phase)
 
-    def abort(self, reason='Unknown', silent=False):
+    def abort(self, reason='Unknown', silent=False, traceback=None):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
         self.aborted = True
         self.abort_reason = reason
         self.silent_abort = silent
+        self.traceback = traceback
         if not self.silent_abort:
             log.warning('Aborting task (plugin: %s)' % self.current_plugin)
         else:
@@ -511,8 +512,8 @@ class Task(object):
         except Exception as e:
             msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
             log.critical(msg)
-            self.manager.crash_report()
-            self.abort(msg)
+            traceback = self.manager.crash_report()
+            self.abort(msg, traceback=traceback)
 
     def rerun(self, plugin=None, reason=None):
         """

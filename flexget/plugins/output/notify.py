@@ -32,9 +32,9 @@ class Notify(object):
 
     @staticmethod
     def prepare_config(config):
+        config.setdefault('what', ['accepted'])
         if not isinstance(config['what'], list):
             config['what'] = [config['what']]
-        config.setdefault('what', ['accepted'])
         config.setdefault('scope', 'entries')
         return config
 
@@ -44,7 +44,6 @@ class Notify(object):
 
     def on_task_exit(self, task, config):
         config = self.prepare_config(config)
-
         scope = config['scope']
         what = config['what']
 
