@@ -217,7 +217,7 @@ def render_from_entry(template_string, entry):
         except ValueError as e:
             raise RenderError('Invalid string replacement template: %s (%s)' % (template_string, e))
         except TypeError as e:
-            raise RenderError('Error during string replacement: %s' % e.message)
+            raise RenderError('Error during string replacement: %s' % e.args[0])
 
     return result
 
@@ -241,6 +241,6 @@ def render_from_task(template, task):
         except ValueError as e:
             raise RenderError('Invalid string replacement template: %s (%s)' % (template, e))
         except TypeError as e:
-            raise RenderError('Error during string replacement: %s' % e.message)
+            raise RenderError('Error during string replacement: %s' % e.args[0])
 
     return result
