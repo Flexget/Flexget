@@ -11,26 +11,27 @@ from flexget.utils.template import RenderError
 log = logging.getLogger('notify')
 
 ENTRY_CONTAINERS = ['entries', 'accepted', 'rejected', 'failed', 'undecided']
+DEFAULT_DICTS = {
+    'task': {
+        'message': 'Task returned {{ task.accepted|length }} accepted entries',
+        'title': '{{ task_name }}'},
+    'entries': {
+        'message': '{% if series_name is defined %}'
+                   '{{ tvdb_series_name|d(series_name) }} '
+                   '{{series_id}} {{tvdb_ep_name|d('')}}'
+                   '{% elif imdb_name is defined %}'
+                   '{{imdb_name}} {{imdb_year}}'
+                   '{% elif title is defined %}'
+                   '{{ title }}',
+        'url': '{% if imdb_url is defined %}'
+               '{{imdb_url}}'
+               '{% endif %}',
+        'title': '{{ task_name }}'
+    }
+}
 
 
 class Notify(object):
-    defaults = {
-        'task': {
-            'message': 'Task returned {{ task.accepted|length }} accepted entries'
-        },
-        'entries': {
-            'message': '{% if series_name is defined %}'
-                       '{{ tvdb_series_name|d(series_name) }} '
-                       '{{series_id}} {{tvdb_ep_name|d('')}}'
-                       '{% elif imdb_name is defined %}'
-                       '{{imdb_name}} {{imdb_year}}'
-                       '{% elif title is defined %}'
-                       '{{ title }}',
-            'url': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}',
-            'title': '{{ task_name }}'
-        }
-    }
-
     schema = {
         'type': 'object',
         'properties': {
@@ -58,6 +59,15 @@ class Notify(object):
 
     @staticmethod
     def render_value(entity, template, attribute, default):
+        """
+        Tries to render a template, fallback to default template and just value if unsuccessful
+
+        :param entity: The entity to operate on, either `Entry` or `Task`
+        :param template: The text to be rendered
+        :param attribute: Attribute name to be fetched from the defaults
+        :param default: The default dict, depending on entity type
+        :return: A rendered value or original value
+        """
         result = template
         try:
             result = entity.render(template)
@@ -90,14 +100,15 @@ class Notify(object):
                     for entity in container:
                         message_data = plugin_config
                         for attribute, value in message_data.items():
-                            message_data[attribute] = self.render_value(entity, value, attribute, self.defaults[scope])
+                            message_data[attribute] = self.render_value(entity, value, attribute, DEFAULT_DICTS[scope])
 
                         if not task.options.test:
                             log.info('Sending a notification to %s', plugin_name)
                             notifier.notify(message_data)
                         else:
-                            log.info('Test mode, would have sent notification with data %s to %s', message_data,
-                                     plugin_name)
+                            log.info('Test mode, would have sent notification to %s:', plugin_name)
+                            for attribute, data in message_data.items():
+                                log.info('%10s: %s', attribute, data)
 
     def on_task_start(self, task, config):
         # Suppress warnings about missing output plugins
