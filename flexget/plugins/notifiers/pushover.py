@@ -20,130 +20,6 @@ requests = RequestSession(max_retries=5)
 requests.add_domain_limiter(TimedLimiter('api.pushover.net.cc', '5 seconds'))
 
 
-class Pushover(object):
-    def __init__(self, task, scope, iterate_on, test, plugin_config):
-        """
-        Pushover notifier. Send notifications to Pushover service.
-
-        :param task: The task instance
-        :param scope: Notification scope, can be either "entries" or "task"
-        :param iterate_on: The entry container to iterate on (such as task.accepted). If scope is "task" it is unneeded.
-        :param test: Test mode, task.options.test
-        :param plugin_config: The notifier plugin config
-        """
-        self.task = task
-        self.scope = scope
-        if scope == 'entries':
-            self.iterate_on = iterate_on
-        elif scope == 'task':
-            self.iterate_on = [[task]]
-        else:
-            raise ValueError('scope must be \'entries\' or \'task\'')
-        self.test_mode = test
-        self.config = self.prepare_config(plugin_config)
-
-    defaults = {
-        'message': '{% if series_name is defined %}'
-                   '{{ tvdb_series_name|d(series_name) }} '
-                   '{{series_id}} {{tvdb_ep_name|d('')}}'
-                   '{% elif imdb_name is defined %}'
-                   '{{imdb_name}} {{imdb_year}}'
-                   '{% elif title is defined %}'
-                   '{{ title }}'
-                   '{% else %}'
-                   'Task has {{ task.accepted|length }} accepted entries'
-                   '{% endif %}',
-        'url': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}',
-        'title': '{{ task_name }}'
-    }
-
-    def prepare_config(self, config):
-        """
-        Returns prepared config with Flexget default values
-        :param config: User config
-        :return: Config with defaults
-        """
-        if not isinstance(config['userkey'], list):
-            config['userkey'] = [config['userkey']]
-        config.setdefault('message', self.defaults['message'])
-        config.setdefault('title', self.defaults['title'])
-        config.setdefault('url', self.defaults['url'])
-
-        return config
-
-    def notify(self):
-        if not self.iterate_on:
-            log.debug('did not have any entities to iterate on')
-            return
-
-        data = {'token': self.config['apikey']}
-
-        # Loop through the provided containers and entities
-        for container in self.iterate_on:
-            for entity in container:
-                for key, value in list(self.config.items()):
-                    if key in ['apikey', 'userkey']:
-                        continue
-
-                    # Special case for html key
-                    if key == 'html' and value is True:
-                        data['html'] = 1
-                        continue
-
-                    # Tried to render data in field
-                    try:
-                        data[key] = entity.render(value)
-                    except RenderError as e:
-                        log.warning('Problem rendering {0}: {1}'.format(key, e))
-                        data[key] = None
-                    except ValueError:
-                        data[key] = None
-
-                    # If field is empty or rendering fails, try to render field default if exists
-                    if not data[key]:
-                        try:
-                            data[key] = entity.render(self.defaults.get(key))
-                        except ValueError:
-                            if value:
-                                data[key] = value
-
-                # Special case, verify certain fields exists if priority is 2
-                if data.get('priority') == 2 and not all([data.get('expire'), data.get('retry')]):
-                    log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.'
-                                ' Lowering priority to 1')
-                    data['priority'] = 1
-
-                for userkey in self.config['userkey']:
-                    # Build the request
-                    data['user'] = userkey
-
-                    # Check for test mode
-                    if self.test_mode is True:
-                        log.info('Test mode. Pushover notification would be:')
-                        for key, value in list(data.items()):
-                            log.verbose('%10s: %s', key.capitalize(), value)
-                        # Test mode.  Skip remainder.
-                        continue
-
-                    try:
-                        response = requests.post(PUSHOVER_URL, data=data)
-                    except RequestException as e:
-                        if e.response.status_code == 429:
-                            reset_time = datetime.datetime.fromtimestamp(
-                                int(e.response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
-                            message = 'Monthly pushover message limit reached. Next reset: %s', reset_time
-                        else:
-                            message = 'Could not send notification to Pushover: %s', e.response.json()['errors']
-                        log.error(*message)
-                        return
-
-                    reset_time = datetime.datetime.fromtimestamp(
-                        int(response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
-                    remaining = response.headers['X-Limit-App-Remaining']
-                    log.verbose('Pushover notification sent. Notifications remaining until next reset: %s. '
-                                'Next reset at: %s', remaining, reset_time)
-
-
 class PushoverNotifier(object):
     """
     Example::
@@ -160,14 +36,13 @@ class PushoverNotifier(object):
         [sound: <SOUND>] (default: pushover default)
         [retry]: <RETRY>]
 
-    Configuration parameters are also supported from entries (eg. through set).
     """
 
     schema = {
         'type': 'object',
         'properties': {
             'userkey': one_or_more({'type': 'string'}),
-            'apikey': {'type': 'string'},
+            'token': {'type': 'string'},
             'device': {'type': 'string'},
             'title': {'type': 'string'},
             'message': {'type': 'string'},
@@ -182,7 +57,7 @@ class PushoverNotifier(object):
             'callback': {'type': 'string', 'format': 'url'},
             'html': {'type': 'boolean'}
         },
-        'required': ['userkey', 'apikey'],
+        'required': ['userkey', 'token'],
         'additionalProperties': False
     }
 
@@ -190,10 +65,48 @@ class PushoverNotifier(object):
     @plugin.priority(0)
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility
-        return Pushover(task, 'entries', [task.accepted], task.options.test, config).notify()
+        notify_config = {
+            'to': [{'pushover': config}],
+            'scope': 'entries',
+            'what': 'accepted'
+        }
+        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
 
-    def notify(self, task, scope, iterate_on, test, config):
-        return Pushover(task, scope, iterate_on, test, config).notify()
+    @staticmethod
+    def notify(data):
+        # Special case for html key
+        if data.get('html'):
+            data['html'] = 1
+
+        # Special case, verify certain fields exists if priority is 2
+        if data.get('priority') == 2 and not all([data.get('expire'), data.get('retry')]):
+            log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.'
+                        ' Lowering priority to 1')
+            data['priority'] = 1
+
+        if not isinstance(data['userkey'], list):
+            data['userkey'] = [data['userkey']]
+
+        message_data = data
+        for user in data['userkey']:
+            message_data['user'] = user
+            try:
+                response = requests.post(PUSHOVER_URL, data=message_data)
+            except RequestException as e:
+                if e.response.status_code == 429:
+                    reset_time = datetime.datetime.fromtimestamp(
+                        int(e.response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
+                    message = 'Monthly pushover message limit reached. Next reset: %s', reset_time
+                else:
+                    message = 'Could not send notification to Pushover: %s', e.response.json()['errors']
+                log.error(*message)
+                return
+
+            reset_time = datetime.datetime.fromtimestamp(
+                int(response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
+            remaining = response.headers['X-Limit-App-Remaining']
+            log.verbose('Pushover notification sent. Notifications remaining until next reset: %s. '
+                        'Next reset at: %s', remaining, reset_time)
 
 
 @event('plugin.register')
