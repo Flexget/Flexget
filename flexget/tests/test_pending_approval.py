@@ -12,7 +12,6 @@ class TestPendingApproval(object):
             mock:
               - {title: 'title 1', url: 'http://localhost/title1', other_attribute: 'bla'}
             pending_approval: yes
-            accept_all: yes
     """
 
     def test_pending_approval(self, execute_task, manager):

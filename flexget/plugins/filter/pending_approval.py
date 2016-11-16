@@ -2,12 +2,13 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+from datetime import datetime
 
-from flexget.manager import Session
-from flexget.utils.database import entry_synonym
-from sqlalchemy import Column, String, Unicode, Boolean, Integer
 from flexget import db_schema, plugin
 from flexget.event import event
+from flexget.manager import Session
+from flexget.utils.database import entry_synonym
+from sqlalchemy import Column, String, Unicode, Boolean, Integer, DateTime
 
 log = logging.getLogger('pending_approval')
 Base = db_schema.versioned_base('pending_approval', 0)
@@ -23,6 +24,7 @@ class PendingEntry(Base):
     approved = Column(Boolean)
     _json = Column('json', Unicode)
     entry = entry_synonym('_json')
+    added = Column(DateTime, default=datetime.now)
 
     def __init__(self, task_name, entry):
         self.task_name = task_name
@@ -88,3 +90,18 @@ class PendingApproval(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(PendingApproval, 'pending_approval', api_ver=2)
+
+
+def list_pending_entries(session, task_name=None, approved=None, start=None, stop=None, order_by='added',
+                         descending=True):
+    log.debug('querying pending entries')
+    query = session.query(PendingEntry)
+    if task_name:
+        query = query.filter(PendingEntry.task_name == task_name)
+    if approved is not None:
+        query = query.filter(PendingEntry.approved == approved)
+    if descending:
+        query = query.order_by(getattr(PendingEntry, order_by).desc())
+    else:
+        query = query.order_by(getattr(PendingEntry, order_by))
+    return query.slice(start, stop).all()
