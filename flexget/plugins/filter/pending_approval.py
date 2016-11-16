@@ -48,23 +48,18 @@ class PendingApproval(object):
             .first()
 
     @plugin.priority(-1)
-    def on_task_input(self, task, config):
+    def on_task_filter(self, task, config):
         if not config:
             return
 
         approved_entries = []
         with Session() as session:
-            # Let details plugin know that it is ok if this task doesn't produce any entries
-            task.no_entries_ok = True
-
             for entry in task.entries:
                 # Cache all new task entries
                 if not self._item_query(entry, task, session):
                     log.verbose('creating new pending entry %s', entry)
                     session.add(PendingEntry(task_name=task.name, entry=entry))
-
-            # Clear the current entries from the task now that they are stored
-            task.all_entries[:] = []
+                    entry.reject('new unapproved entry, caching and waiting for approval')
 
             # Pass all entries marked as approved
             for approved_entry in session.query(PendingEntry) \
