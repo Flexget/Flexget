@@ -98,8 +98,8 @@ class Notify(object):
 
                 for container in iterate_on:
                     for entity in container:
-                        message_data = plugin_config
-                        for attribute, value in message_data.items():
+                        message_data = {}
+                        for attribute, value in plugin_config.items():
                             message_data[attribute] = self.render_value(entity, value, attribute, DEFAULT_DICTS[scope])
 
                         if not task.options.test:
