@@ -105,3 +105,7 @@ def list_pending_entries(session, task_name=None, approved=None, start=None, sto
     else:
         query = query.order_by(getattr(PendingEntry, order_by))
     return query.slice(start, stop).all()
+
+
+def get_entry_by_id(session, entry_id):
+    return session.query(PendingEntry).filter(PendingEntry.id == entry_id).one()
