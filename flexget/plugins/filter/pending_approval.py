@@ -49,8 +49,7 @@ class PendingApproval(object):
             .filter(PendingEntry.url == entry['url']) \
             .first()
 
-    @plugin.priority(-1)
-    def on_task_filter(self, task, config):
+    def on_task_input(self, task, config):
         if not config:
             return
 
@@ -63,6 +62,9 @@ class PendingApproval(object):
                     session.add(PendingEntry(task_name=task.name, entry=entry))
                     entry.reject('new unapproved entry, caching and waiting for approval')
 
+            # Clear the current entries from the task now that they are stored
+            task.all_entries[:] = []
+
             # Pass all entries marked as approved
             for approved_entry in session.query(PendingEntry) \
                     .filter(PendingEntry.task_name == task.name) \
@@ -74,13 +76,19 @@ class PendingApproval(object):
 
         return approved_entries
 
+    @plugin.priority(-1)
+    def on_task_filter(self, task, config):
+        for entry in task.entries:
+            if entry.get('approved'):
+                entry.accept('entry is marked as approved')
+
     def on_task_learn(self, task, config):
         if not config:
             return
         with Session() as session:
-            # Delete all entries that have passed the pending phase
+            # Delete all accepted entries that have passed the pending phase
             for entry in task.accepted:
-                if entry.get('approved', False) is True:
+                if entry.get('approved'):
                     db_entry = self._item_query(entry, task, session)
                     if db_entry and db_entry.approved:
                         log.debug('deleting approved entry %s', db_entry)
