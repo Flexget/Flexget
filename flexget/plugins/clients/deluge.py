@@ -262,6 +262,22 @@ class InputDeluge(DelugePlugin):
                             }
                         },
                         'additionalProperties': False
+                    },
+                    'keys': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'string',
+                            'enum': [
+                                'active_time', 'compact', 'distributed_copies', 'download_payload_rate', 'file_progress',
+                                'is_auto_managed', 'is_seed', 'max_connections', 'max_download_speed', 'max_upload_slots',
+                                'max_upload_speed', 'message', 'move_on_completed', 'next_announce', 'num_files',
+                                'num_pieces', 'paused', 'peers', 'piece_length', 'prioritize_first_last',
+                                'queue', 'remove_at_ratio', 'seed_rank', 'stop_at_ratio', 'stop_ratio',
+                                'total_done', 'total_payload_download', 'total_payload_upload', 'total_peers', 'total_seeds', 
+                                'total_uploaded', 'total_wanted', 'tracker', 'tracker_host', 'tracker_status',
+                                'trackers', 'upload_payload_rate'
+                            ]
+                        }
                     }
                 },
                 'additionalProperties': False
