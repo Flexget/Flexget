@@ -88,6 +88,8 @@ class PendingApproval(object):
 
     @plugin.priority(-1)
     def on_task_filter(self, task, config):
+        if not config:
+            return
         for entry in task.entries:
             if entry.get('approved'):
                 entry.accept('entry is marked as approved')
