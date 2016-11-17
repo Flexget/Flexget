@@ -8,7 +8,6 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from flexget.utils.template import RenderError
 from requests.exceptions import RequestException
 
 log = logging.getLogger('pushover')
