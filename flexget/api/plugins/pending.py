@@ -32,9 +32,9 @@ class ObjectsContainer(object):
     operation_object = {
         'type': 'object',
         'properties': {
-            'approved': {'type': 'boolean'}
+            'operation': {'type': 'string', 'enum': ['approve', 'reject']}
         },
-        'required': ['approved'],
+        'required': ['operation'],
         'additionalProperties': False
     }
 
@@ -45,12 +45,15 @@ operation_schema = api.schema('pending.operation', ObjectsContainer.operation_ob
 
 filter_parser = api.parser()
 filter_parser.add_argument('task_name', help='Filter by task name')
+filter_parser.add_argument('approved', type=inputs.boolean, help='Filter by approval status')
 
 sort_choices = ('added', 'task_name', 'title', 'url', 'approved')
 pending_parser = api.pagination_parser(parser=filter_parser, sort_choices=sort_choices)
-pending_parser.add_argument('approved', type=inputs.boolean, help='Filter by approval status')
 
-description = '\'True\' to approve, \'False\' to reject'
+just_task_parser = filter_parser.copy()
+just_task_parser.remove_argument('approved')
+
+description = 'Either \'approve\' or \'reject\''
 
 
 @pending_api.route('/')
@@ -125,13 +128,13 @@ class PendingEntriesAPI(APIResource):
     @api.validate(operation_schema, description=description)
     @api.response(201, model=pending_entry_list_schema)
     @api.response(204, 'No entries modified')
-    @api.doc(parser=filter_parser)
+    @api.doc(parser=just_task_parser)
     def put(self, session=None):
         """Approve/Reject the status of pending entries"""
         args = filter_parser.parse_args()
 
         data = request.json
-        approved = data['approved']
+        approved = data['operation'] == 'approve'
         task_name = args.get('task_name')
 
         pending_entries = []
@@ -145,6 +148,7 @@ class PendingEntriesAPI(APIResource):
         return rsp
 
     @api.response(200, model=base_message_schema)
+    @api.doc(parser=filter_parser)
     def delete(self, session=None):
         """Delete pending entries"""
         args = filter_parser.parse_args()
@@ -153,18 +157,14 @@ class PendingEntriesAPI(APIResource):
         task_name = args.get('task_name')
         approved = args.get('approved')
 
-        kwargs = {
-            'task_name': task_name,
-            'approved': approved,
-            'session': session
-        }
+        deleted = session.query(PendingEntry)
+        if task_name:
+            deleted = deleted.filter(PendingEntry.task_name == task_name)
+        if approved:
+            deleted = deleted.filter(PendingEntry.approved == approved)
+        deleted = deleted.delete()
 
-        counter = 0
-        for entry in list_pending_entries(**kwargs):
-            session.delete(entry)
-            counter += 1
-
-        return success_response('deleted %s pending entries'.format(counter))
+        return success_response('deleted %s pending entries'.format(deleted))
 
 
 @pending_api.route('/<int:entry_id>/')
@@ -192,7 +192,7 @@ class PendingEntryAPI(APIResource):
             raise NotFoundError('No pending entry with ID %s' % entry_id)
 
         data = request.json
-        approved = data['approved']
+        approved = data['operation'] == 'approve'
         operation_text = 'approved' if approved else 'pending'
         if entry.approved is approved:
             raise BadRequest('Entry with id {} is already {}'.format(entry_id, operation_text))
