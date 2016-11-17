@@ -238,6 +238,46 @@ class InputDeluge(DelugePlugin):
         'total_size': ('content_size', lambda size: size / 1024 / 1024),
         'files': ('content_files', lambda file_dicts: [f['path'] for f in file_dicts])}
 
+    extra_settings_map = {
+        'active_time': ('active_time', lambda time: time / 3600),
+        'compact': 'compact',
+        'distributed_copies': 'distributed_copies',
+        'download_payload_rate': 'download_payload_rate',
+        'file_progress': 'file_progress',
+        'is_auto_managed': 'is_auto_managed',
+        'is_seed': 'is_seed',
+        'max_connections': 'max_connections',
+        'max_download_speed': 'max_download_speed',
+        'max_upload_slots': 'max_upload_slots',
+        'max_upload_speed':  'max_upload_speed',
+        'message': 'message',
+        'move_on_completed': 'move_on_completed',
+        'next_announce': 'next_announce',
+        'num_files': 'num_files',
+        'num_pieces': 'num_pieces',
+        'paused': 'paused',
+        'peers': 'peers',
+        'piece_length': 'piece_length',
+        'prioritize_first_last': 'prioritize_first_last',
+        'queue': 'queue',
+        'remove_at_ratio': 'remove_at_ratio',
+        'seed_rank': 'seed_rank',
+        'stop_at_ratio': 'stop_at_ratio',
+        'stop_ratio': 'stop_ratio',
+        'total_done': 'total_done',
+        'total_payload_download': 'total_payload_download',
+        'total_payload_upload': 'total_payload_upload',
+        'total_peers': 'total_peers',
+        'total_seeds': 'total_seeds', 
+        'total_uploaded': 'total_uploaded',
+        'total_wanted': 'total_wanted', 
+        'tracker': 'tracker',
+        'tracker_host': 'tracker_host',
+        'tracker_status': 'tracker_status',
+        'trackers': 'trackers',
+        'upload_payload_rate': 'upload_payload_rate'
+    }
+
     def __init__(self):
         self.entries = []
 
@@ -267,16 +307,7 @@ class InputDeluge(DelugePlugin):
                         'type': 'array',
                         'items': {
                             'type': 'string',
-                            'enum': [
-                                'active_time', 'compact', 'distributed_copies', 'download_payload_rate', 'file_progress',
-                                'is_auto_managed', 'is_seed', 'max_connections', 'max_download_speed', 'max_upload_slots',
-                                'max_upload_speed', 'message', 'move_on_completed', 'next_announce', 'num_files',
-                                'num_pieces', 'paused', 'peers', 'piece_length', 'prioritize_first_last',
-                                'queue', 'remove_at_ratio', 'seed_rank', 'stop_at_ratio', 'stop_ratio',
-                                'total_done', 'total_payload_download', 'total_payload_upload', 'total_peers', 'total_seeds', 
-                                'total_uploaded', 'total_wanted', 'tracker', 'tracker_host', 'tracker_status',
-                                'trackers', 'upload_payload_rate'
-                            ]
+                            'enum': extra_settings_map.keys()
                         }
                     }
                 },
