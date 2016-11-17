@@ -58,27 +58,26 @@ class Notify(object):
         return config
 
     @staticmethod
-    def render_value(entity, template, attribute, default):
+    def render_value(entity, template, attribute, default_dict):
         """
         Tries to render a template, fallback to default template and just value if unsuccessful
 
         :param entity: The entity to operate on, either `Entry` or `Task`
         :param template: The text to be rendered
         :param attribute: Attribute name to be fetched from the defaults
-        :param default: The default dict, depending on entity type
+        :param default_dict: The default dict, depending on entity type
         :return: A rendered value or original value
         """
         result = template
         try:
             result = entity.render(template)
         except (RenderError, ValueError) as e:
-            log.debug('failed to render: %s', e.args[0])
+            log.debug('failed to render: %s. Trying to fall back to default', e.args[0])
             try:
-                result = entity.render(default[attribute])
+                if attribute in default_dict:
+                    result = entity.render(default_dict[attribute])
             except RenderError as e:
-                log.warning('failed to render: %s', e.args[0])
-            except KeyError as e:
-                log.debug('tried to render a non existing value `%s` from defaults, skipping', attribute)
+                log.warning('failed to render: %s. Reverting to original value.', e.args[0])
         return result
 
     def send_notification(self, task, config):
