@@ -14,10 +14,9 @@ from requests.exceptions import RequestException
 log = logging.getLogger('pushover')
 
 PUSHOVER_URL = 'https://api.pushover.net/1/messages.json'
-NUMBER_OF_RETRIES = 3
 
-requests = RequestSession(max_retries=5)
-requests.add_domain_limiter(TimedLimiter('api.pushover.net.cc', '5 seconds'))
+requests = RequestSession(max_retries=3)
+requests.add_domain_limiter(TimedLimiter('pushover.net', '5 seconds'))
 
 
 class PushoverNotifier(object):
@@ -42,7 +41,7 @@ class PushoverNotifier(object):
         'type': 'object',
         'properties': {
             'userkey': one_or_more({'type': 'string'}),
-            'token': {'type': 'string'},
+            'apikey': {'type': 'string'},
             'device': {'type': 'string'},
             'title': {'type': 'string'},
             'message': {'type': 'string'},
@@ -57,7 +56,7 @@ class PushoverNotifier(object):
             'callback': {'type': 'string', 'format': 'url'},
             'html': {'type': 'boolean'}
         },
-        'required': ['userkey', 'token'],
+        'required': ['userkey', 'apikey'],
         'additionalProperties': False
     }
 
