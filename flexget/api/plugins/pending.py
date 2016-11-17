@@ -50,6 +50,8 @@ sort_choices = ('added', 'task_name', 'title', 'url', 'approved')
 pending_parser = api.pagination_parser(parser=filter_parser, sort_choices=sort_choices)
 pending_parser.add_argument('approved', type=inputs.boolean, help='Filter by approval status')
 
+description = '\'True\' to approve, \'False\' to reject'
+
 
 @pending_api.route('/')
 class PendingEntriesAPI(APIResource):
@@ -120,7 +122,7 @@ class PendingEntriesAPI(APIResource):
 
         return rsp
 
-    @api.validate(operation_schema)
+    @api.validate(operation_schema, description=description)
     @api.response(201, model=pending_entry_list_schema)
     @api.response(204, 'No entries modified')
     @api.doc(parser=filter_parser)
@@ -181,7 +183,7 @@ class PendingEntryAPI(APIResource):
 
     @api.response(201, model=pending_entry_schema)
     @api.response(BadRequest)
-    @api.validate(operation_schema)
+    @api.validate(operation_schema, description=description)
     def put(self, entry_id, session=None):
         """Approve/Reject the status of a pending entry"""
         try:
@@ -192,10 +194,10 @@ class PendingEntryAPI(APIResource):
         data = request.json
         approved = data['approved']
         operation_text = 'approved' if approved else 'pending'
-        if entry.approved == approved:
+        if entry.approved is approved:
             raise BadRequest('Entry with id {} is already {}'.format(entry_id, operation_text))
 
-        entry.approved = not approved
+        entry.approved = approved
         session.commit()
         rsp = jsonify(entry.to_dict())
         rsp.status_code = 201
