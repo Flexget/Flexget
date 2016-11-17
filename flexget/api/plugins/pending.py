@@ -5,10 +5,11 @@ from math import ceil
 
 from flask import jsonify, request
 from flask_restplus import inputs
-from flexget.plugins.filter.pending_approval import list_pending_entries, PendingEntry
+from flexget.plugins.filter.pending_approval import list_pending_entries, PendingEntry, get_entry_by_id
 
 from flexget.api import api, APIResource
-from flexget.api.app import base_message_schema, success_response, NotFoundError, etag, pagination_headers
+from flexget.api.app import base_message_schema, success_response, NotFoundError, etag, pagination_headers, BadRequest
+from sqlalchemy.orm.exc import NoResultFound
 
 pending_api = api.namespace('pending', description='View and manage pending entries')
 
@@ -28,22 +29,34 @@ class ObjectsContainer(object):
 
     pending_entry_list = {'type': 'array', 'items': pending_entry_object}
 
+    operation_object = {
+        'type': 'object',
+        'properties': {
+            'approved': {'type': 'boolean'}
+        },
+        'required': ['approved'],
+        'additionalProperties': False
+    }
+
 
 pending_entry_schema = api.schema('pending.entry', ObjectsContainer.pending_entry_object)
 pending_entry_list_schema = api.schema('pending.entry_list', ObjectsContainer.pending_entry_list)
+operation_schema = api.schema('pending.operation', ObjectsContainer.operation_object)
+
+filter_parser = api.parser()
+filter_parser.add_argument('task_name', help='Filter by task name')
 
 sort_choices = ('added', 'task_name', 'title', 'url', 'approved')
-pending_parser = api.pagination_parser(sort_choices=sort_choices)
-pending_parser.add_argument('task_name', help='Filter by task name')
+pending_parser = api.pagination_parser(parser=filter_parser, sort_choices=sort_choices)
 pending_parser.add_argument('approved', type=inputs.boolean, help='Filter by approval status')
 
 
 @pending_api.route('/')
-@api.response(NotFoundError)
-@api.response(200, model=pending_entry_list_schema)
-@api.doc(parser=pending_parser)
 class PendingEntriesAPI(APIResource):
     @etag
+    @api.response(NotFoundError)
+    @api.response(200, model=pending_entry_list_schema)
+    @api.doc(parser=pending_parser)
     def get(self, session=None):
         """List all pending entries"""
         args = pending_parser.parse_args()
@@ -106,3 +119,94 @@ class PendingEntriesAPI(APIResource):
         rsp.headers.extend(pagination)
 
         return rsp
+
+    @api.validate(operation_schema)
+    @api.response(201, model=pending_entry_list_schema)
+    @api.response(204, 'No entries modified')
+    @api.doc(parser=filter_parser)
+    def put(self, session=None):
+        """Approve/Reject the status of pending entries"""
+        args = filter_parser.parse_args()
+
+        data = request.json
+        approved = data['approved']
+        task_name = args.get('task_name')
+
+        pending_entries = []
+        for entry in list_pending_entries(session, task_name=task_name):
+            if entry.approved is not approved:
+                entry.approved = approved
+                pending_entries.append(entry.to_dict())
+
+        rsp = jsonify(pending_entries)
+        rsp.status_code = 201 if pending_entries else 204
+        return rsp
+
+    @api.response(200, model=base_message_schema)
+    def delete(self, session=None):
+        """Delete pending entries"""
+        args = filter_parser.parse_args()
+
+        # Filter params
+        task_name = args.get('task_name')
+        approved = args.get('approved')
+
+        kwargs = {
+            'task_name': task_name,
+            'approved': approved,
+            'session': session
+        }
+
+        counter = 0
+        for entry in list_pending_entries(**kwargs):
+            session.delete(entry)
+            counter += 1
+
+        return success_response('deleted %s pending entries'.format(counter))
+
+
+@pending_api.route('/<int:entry_id>/')
+@api.doc(params={'entry_id': 'ID of the entry'})
+@api.response(NotFoundError)
+class PendingEntryAPI(APIResource):
+    @etag
+    @api.response(200, model=pending_entry_schema)
+    def get(self, entry_id, session=None):
+        """Get a pending entry by ID"""
+        try:
+            entry = get_entry_by_id(session, entry_id)
+        except NoResultFound:
+            raise NotFoundError('No pending entry with ID %s' % entry_id)
+        return jsonify(entry.to_dict())
+
+    @api.response(201, model=pending_entry_schema)
+    @api.response(BadRequest)
+    @api.validate(operation_schema)
+    def put(self, entry_id, session=None):
+        """Approve/Reject the status of a pending entry"""
+        try:
+            entry = get_entry_by_id(session, entry_id)
+        except NoResultFound:
+            raise NotFoundError('No pending entry with ID %s' % entry_id)
+
+        data = request.json
+        approved = data['approved']
+        operation_text = 'approved' if approved else 'pending'
+        if entry.approved == approved:
+            raise BadRequest('Entry with id {} is already {}'.format(entry_id, operation_text))
+
+        entry.approved = not approved
+        session.commit()
+        rsp = jsonify(entry.to_dict())
+        rsp.status_code = 201
+        return rsp
+
+    @api.response(200, model=base_message_schema)
+    def delete(self, entry_id, session=None):
+        """Delete a pending entry"""
+        try:
+            entry = get_entry_by_id(session, entry_id)
+        except NoResultFound:
+            raise NotFoundError('No pending entry with ID %s' % entry_id)
+        session.delete(entry)
+        return success_response('successfully deleted entry with ID %s' % entry_id)
