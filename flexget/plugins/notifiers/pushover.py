@@ -73,6 +73,9 @@ class PushoverNotifier(object):
 
     @staticmethod
     def notify(data):
+        # Pretty redundant, but maintains backwards comparability and avoids upgrade actions
+        data['token'] = data['apikey']
+
         # Special case for html key
         if data.get('html'):
             data['html'] = 1
@@ -97,7 +100,7 @@ class PushoverNotifier(object):
                         int(e.response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
                     message = 'Monthly pushover message limit reached. Next reset: %s', reset_time
                 else:
-                    message = 'Could not send notification to Pushover: %s', e.response.json()['errors']
+                    message = 'Could not send notification to Pushover: %s', e.response.json()['errors'][0]
                 log.error(*message)
                 return
 
