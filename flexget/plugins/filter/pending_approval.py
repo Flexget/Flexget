@@ -37,6 +37,16 @@ class PendingEntry(Base):
         return '<PendingEntry(task_name={},title={},url={},approved={})>' \
             .format(self.task_name, self.title, self.url, self.approved)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'task_name': self.task_name,
+            'title': self.title,
+            'url': self.url,
+            'approved': self.approved,
+            'added': self.added
+        }
+
 
 class PendingApproval(object):
     schema = {'type': 'boolean'}
@@ -100,7 +110,7 @@ def register_plugin():
     plugin.register(PendingApproval, 'pending_approval', api_ver=2)
 
 
-def list_pending_entries(session, task_name=None, approved=None, start=None, stop=None, order_by='added',
+def list_pending_entries(session, task_name=None, approved=None, start=None, stop=None, sort_by='added',
                          descending=True):
     log.debug('querying pending entries')
     query = session.query(PendingEntry)
@@ -109,9 +119,9 @@ def list_pending_entries(session, task_name=None, approved=None, start=None, sto
     if approved is not None:
         query = query.filter(PendingEntry.approved == approved)
     if descending:
-        query = query.order_by(getattr(PendingEntry, order_by).desc())
+        query = query.order_by(getattr(PendingEntry, sort_by).desc())
     else:
-        query = query.order_by(getattr(PendingEntry, order_by))
+        query = query.order_by(getattr(PendingEntry, sort_by))
     return query.slice(start, stop).all()
 
 
