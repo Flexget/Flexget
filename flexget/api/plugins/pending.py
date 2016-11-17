@@ -6,7 +6,6 @@ from math import ceil
 from flask import jsonify, request
 from flask_restplus import inputs
 from flexget.plugins.filter.pending_approval import list_pending_entries, PendingEntry, get_entry_by_id
-
 from flexget.api import api, APIResource
 from flexget.api.app import base_message_schema, success_response, NotFoundError, etag, pagination_headers, BadRequest
 from sqlalchemy.orm.exc import NoResultFound

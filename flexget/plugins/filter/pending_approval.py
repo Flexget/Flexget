@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flexget import db_schema, plugin
 from flexget.event import event
@@ -107,9 +107,12 @@ class PendingApproval(object):
                         session.delete(db_entry)
 
 
-@event('plugin.register')
-def register_plugin():
-    plugin.register(PendingApproval, 'pending_approval', api_ver=2)
+@event('manager.db_cleanup')
+def db_cleanup(manager, session):
+    # Clean unapproved entries older than 1 year
+    deleted = session.query(PendingEntry).filter(PendingEntry.added < datetime.now() - timedelta(days=365)).delete()
+    if deleted:
+        log.info('Purged %i pending entries older than 1 year', deleted)
 
 
 def list_pending_entries(session, task_name=None, approved=None, start=None, stop=None, sort_by='added',
@@ -129,3 +132,8 @@ def list_pending_entries(session, task_name=None, approved=None, start=None, sto
 
 def get_entry_by_id(session, entry_id):
     return session.query(PendingEntry).filter(PendingEntry.id == entry_id).one()
+
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PendingApproval, 'pending_approval', api_ver=2)
