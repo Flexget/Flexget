@@ -1,14 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from argparse import ArgumentTypeError
+from argparse import ArgumentTypeError, ArgumentParser
 
+from colorclass.toggles import disable_all_colors
 from flexget import options
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugins.filter.pending_approval import list_pending_entries, get_entry_by_id
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console, colorize
-from colorclass.toggles import disable_all_colors
 from sqlalchemy.orm.exc import NoResultFound
 
 
@@ -24,11 +24,13 @@ def valid_entry(value):
 def do_cli(manager, options):
     if hasattr(options, 'table_type') and options.table_type == 'porcelain':
         disable_all_colors()
-    action_map = {
-        'list': list_entries,
-        'approve': approve_entries
-    }
-    action_map[options.action](options)
+
+    if options.action == 'list':
+        list_entries(options)
+    elif options.action == 'approve':
+        manage_entries(options, options.selection, True)
+    elif options.action == 'reject':
+        manage_entries(options, options.selection, False)
 
 
 def list_entries(options):
@@ -56,31 +58,38 @@ def list_entries(options):
             console('ERROR: %s' % str(e))
 
 
-def approve_entries(options):
-    """Approved pending entries"""
-    approve = options.approve
+def manage_entries(options, selection, approved):
+    """Manage pending entries"""
+    approved_text = 'approved' if approved else 'pending'
     with Session() as session:
-        if approve == 'all':
-            entries = list_pending_entries(session=session, approved=False)
+        if selection == 'all':
+            entries = list_pending_entries(session=session, approved=not approved)
         else:
             try:
-                entry = get_entry_by_id(session, approve)
-                if entry.approved is True:
-                    console('ERROR: Entry with ID %s is already approved' % entry.id)
+                entry = get_entry_by_id(session, selection)
+                if entry.approved is approved:
+                    console(colorize('red', 'ERROR: ') + 'Entry with ID %s is already %s' % (entry.id, approved_text))
                     sys.exit(1)
             except NoResultFound:
-                console('Pending entry with ID %s does not exist' % approve)
+                console('Pending entry with ID %s does not exist' % selection)
                 sys.exit(1)
             else:
                 entries = [entry]
+        if not entries:
+            console('All entries are already %s' % approved_text)
+            return
         for entry in entries:
-            if entry.approved is False:
-                console('Setting pending entry with ID %s status to approved' % entry.id)
-                entry.approved = True
+            if entry.approved is not approved:
+                console('Setting pending entry with ID %s status to %s' % (entry.id, approved_text))
+                entry.approved = approved
 
 
 @event('options.register')
 def register_parser_arguments():
+    selection_parser = ArgumentParser(add_help=False)
+    selection_parser.add_argument('selection', type=valid_entry,
+                                  help='Entity ID or \'all\' to approve all pending entries')
+
     parser = options.register_command('pending', do_cli, help='View and pending')
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='action')
 
@@ -92,5 +101,5 @@ def register_parser_arguments():
     list_group.add_argument('--approved', action='store_true', help='Show only approved entries', dest='approved',
                             default=None)
 
-    approve_parser = subparsers.add_parser('approve', help='Approved pending entries')
-    approve_parser.add_argument('approve', type=valid_entry, help='Entity ID or \'all\' to approve all pending entries')
+    subparsers.add_parser('approve', help='Approve pending entries', parents=[selection_parser])
+    subparsers.add_parser('reject', help='Reject pending entries', parents=[selection_parser])
