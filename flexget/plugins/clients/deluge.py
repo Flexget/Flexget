@@ -355,7 +355,10 @@ class InputDeluge(DelugePlugin):
                     else:
                         log.warning('Did not find torrent file at %s' % torrent_path)
                 for key, value in torrent_dict.items():
-                    flexget_key = self.settings_map[key]
+                    if key in self.settings_map:
+                        flexget_key = self.settings_map[key]
+                    else:
+                        flexget_key = self.extra_settings_map[key]
                     if isinstance(flexget_key, tuple):
                         flexget_key, format_func = flexget_key
                         value = format_func(value)
@@ -364,8 +367,12 @@ class InputDeluge(DelugePlugin):
             client.disconnect()
 
         filter = config.get('filter', {})
+
+        extraKeys = config.get('keys', [])
+        combinedList = self.settings_map.keys() + extraKeys
+
         # deluge client lib chokes on future's newlist, make sure we have a native python list here
-        client.core.get_torrents_status(filter, native(list(self.settings_map.keys()))).addCallback(
+        client.core.get_torrents_status(filter, native(list(combinedList))).addCallback(
             on_get_torrents_status)
 
 
