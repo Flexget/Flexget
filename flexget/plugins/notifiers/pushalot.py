@@ -17,7 +17,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('pushalot.com', '5 seconds'))
 
 
-class OutputPushalot(object):
+class PushalotNotifier(object):
     """
     Example::
 
@@ -65,8 +65,8 @@ class OutputPushalot(object):
                 requests.post(PUSHALOT_URL, json=data)
             except RequestException as e:
                 log.error('Pushalot notification failed: %s', e.response.json()['Description'])
-                return
-            log.verbose('Pushalot notification send')
+            else:
+                log.verbose('Pushalot notification sent')
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
@@ -82,4 +82,4 @@ class OutputPushalot(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OutputPushalot, 'pushalot', api_ver=2, groups=['notifiers'])
+    plugin.register(PushalotNotifier, 'pushalot', api_ver=2, groups=['notifiers'])
