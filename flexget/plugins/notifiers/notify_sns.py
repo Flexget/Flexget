@@ -71,7 +71,7 @@ class SNSNotifier(object):
         try:
             topic.publish(Message=data['sns_notification_template'])
         except Exception as e:
-            log.error("Error publishing %s: %s", e.args[0])
+            log.error("Error publishing %s: ", e.args[0])
             return
         else:
             log.verbose('SNS notification sent')
