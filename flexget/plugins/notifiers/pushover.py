@@ -70,8 +70,7 @@ class PushoverNotifier(object):
         }
         plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
 
-    @staticmethod
-    def notify(data):
+    def notify(self, data):
         # Pretty redundant, but maintains backwards comparability and avoids upgrade actions
         data['token'] = data['apikey']
 
