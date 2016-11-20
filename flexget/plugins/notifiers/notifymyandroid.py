@@ -46,9 +46,9 @@ class OutputNotifyMyAndroid(object):
 
     @staticmethod
     def notify(data):
-        if not isinstance(data['apikey'], list):
-            data['apikey'] = [data['apikey']]
-        data['apikey'] = ','.join(data['apikey'])
+        # Handle multiple API keys
+        if isinstance(data['apikey'], list):
+            data['apikey'] = ','.join(data['apikey'])
 
         # Special case for html handling
         html = data.pop('html', None)
