@@ -15,7 +15,7 @@ log = logging.getLogger('notifymyandroid')
 url = 'https://www.notifymyandroid.com/publicapi/notify'
 
 
-class OutputNotifyMyAndroid(object):
+class NotifyMyAndroidNotifier(object):
     """
     Example::
 
@@ -44,8 +44,7 @@ class OutputNotifyMyAndroid(object):
         'additionalProperties': False
     }
 
-    @staticmethod
-    def notify(data):
+    def notify(self, data):
         # Handle multiple API keys
         if isinstance(data['apikey'], list):
             data['apikey'] = ','.join(data['apikey'])
@@ -83,4 +82,4 @@ class OutputNotifyMyAndroid(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OutputNotifyMyAndroid, 'notifymyandroid', api_ver=2, groups=['notifiers'])
+    plugin.register(NotifyMyAndroidNotifier, 'notifymyandroid', api_ver=2, groups=['notifiers'])
