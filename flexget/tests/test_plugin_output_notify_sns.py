@@ -3,13 +3,13 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from mock import patch
 
-from flexget.plugins.notifiers import notify_sns
+from flexget.plugins.notifiers import sns
 
 
 class TestNotifySNS(object):
     @patch('boto3.Session')
     def test_emitter_build_session_from_empty_config(self, Session):
-        notify_sns.SNSNotifier().notify({'aws_region': 'test', 'sns_topic_arn': 'test'})
+        sns.SNSNotifier().notify({'aws_region': 'test', 'sns_topic_arn': 'test'})
         Session.assert_called_once_with(
             region_name='test',
             aws_access_key_id=None,
@@ -19,7 +19,7 @@ class TestNotifySNS(object):
 
     @patch('boto3.Session')
     def test_emitter_uses_config_credentials(self, Session):
-        notify_sns.SNSNotifier().notify({
+        sns.SNSNotifier().notify({
             'aws_region': None,
             'aws_access_key_id': 'DUMMY',
             'aws_secret_access_key': 'DUMMYKEY',

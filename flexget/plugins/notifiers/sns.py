@@ -7,7 +7,9 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('notify_sns')
+PLUGIN_NAME = 'sns'
+
+log = logging.getLogger(PLUGIN_NAME)
 
 DEFAULT_TEMPLATE_VALUE = json.dumps({
     'entry': {
@@ -29,7 +31,7 @@ class SNSNotifier(object):
 
     Example configuration::
 
-      notify_sns:
+      sns:
         [aws_access_key_id: <AWS ACCESS KEY ID>] (will be taken from AWS_ACCESS_KEY_ID environment if not provided)
         [aws_secret_access_key: <AWS SECRET ACCESS KEY>] (will be taken from AWS_SECRET_ACCESS_KEY environment if
             not provided)
@@ -82,7 +84,7 @@ class SNSNotifier(object):
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility
         notify_config = {
-            'to': [{'notify_sns': config}],
+            'to': [{PLUGIN_NAME: config}],
             'scope': 'entries',
             'what': 'accepted'
         }
@@ -91,4 +93,4 @@ class SNSNotifier(object):
 
 @event('plugin.register')
 def register_sns_plugin():
-    plugin.register(SNSNotifier, 'notify_sns', api_ver=2, groups=['notifiers'])
+    plugin.register(SNSNotifier, PLUGIN_NAME, api_ver=2, groups=['notifiers'])
