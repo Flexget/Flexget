@@ -46,7 +46,7 @@ class Notify(object):
             'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS})
         },
         'required': ['to'],
-        'additionalProperties': True
+        'additionalProperties': False
     }
 
     @staticmethod

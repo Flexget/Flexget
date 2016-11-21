@@ -4,12 +4,11 @@ from future.utils import native_str
 
 from distutils.version import LooseVersion
 
-from sqlalchemy import Column, Integer, String
-
 from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.terminal import console
-from flexget.utils.template import RenderError
+from flexget.manager import Session
+
+from sqlalchemy import Column, Integer, String
 
 try:
     import telegram
@@ -59,7 +58,7 @@ class ChatIdEntry(ChatIdsBase):
         return ' '.join(x)
 
 
-class SendTelegram(object):
+class TelegramNotifier(object):
     """Send a message to one or more Telegram users or groups upon accepting a download.
 
 
@@ -119,7 +118,6 @@ class SendTelegram(object):
     """:type: flexget.logger.FlexGetLogger"""
     _token = None
     _tmpl = None
-    _use_markdown = False
     _usernames = None
     _fullnames = None
     _groups = None
@@ -136,38 +134,35 @@ class SendTelegram(object):
                 'minItems': 1,
                 'items': {
                     'oneOf': [
-                        {
-                            'type': 'object',
-                            'properties': {
-                                _USERNAME_ATTR: {'type': 'string'},
-                            },
-                            'required': [_USERNAME_ATTR],
-                            'additionalProperties': False,
-                        },
-                        {
-                            'type': 'object',
-                            'properties': {
-                                _FULLNAME_ATTR: {
-                                    'type': 'object',
-                                    'properties': {
-                                        _FIRSTNAME_ATTR: {'type': 'string'},
-                                        _SURNAME_ATTR: {'type': 'string'},
-                                    },
-                                    'required': [_FIRSTNAME_ATTR, _SURNAME_ATTR],
-                                    'additionalProperties': False,
-                                },
-                            },
-                            'required': [_FULLNAME_ATTR],
-                            'additionalProperties': False,
-                        },
-                        {
-                            'type': 'object',
-                            'properties': {
-                                _GROUP_ATTR: {'type': 'string'},
-                            },
-                            'required': [_GROUP_ATTR],
-                            'additionalProperties': False,
-                        },
+                        {'type': 'object',
+                         'properties': {
+                             _USERNAME_ATTR: {'type': 'string'},
+                         },
+                         'required': [_USERNAME_ATTR],
+                         'additionalProperties': False,
+                         },
+                        {'type': 'object',
+                         'properties': {
+                             _FULLNAME_ATTR: {
+                                 'type': 'object',
+                                 'properties': {
+                                     _FIRSTNAME_ATTR: {'type': 'string'},
+                                     _SURNAME_ATTR: {'type': 'string'},
+                                 },
+                                 'required': [_FIRSTNAME_ATTR, _SURNAME_ATTR],
+                                 'additionalProperties': False,
+                             },
+                         },
+                         'required': [_FULLNAME_ATTR],
+                         'additionalProperties': False,
+                         },
+                        {'type': 'object',
+                         'properties': {
+                             _GROUP_ATTR: {'type': 'string'},
+                         },
+                         'required': [_GROUP_ATTR],
+                         'additionalProperties': False,
+                         },
                     ],
                 },
             },
@@ -199,62 +194,23 @@ class SendTelegram(object):
             elif _GROUP_ATTR in i:
                 self._groups.append(i[_GROUP_ATTR])
 
-    def on_task_output(self, task, config):
-        """Send telegram message(s) at exit"""
-        session = task.session
-        chat_ids = self._real_init(session, config)
+    def notify(self, data):
+        session = Session()
+        chat_ids = self._real_init(session, data)
 
         if not chat_ids:
             return
+        message = data[_TMPL_ATTR]
+        self._send_msgs(message, chat_ids)
 
-        self._send_msgs(task, chat_ids)
-
-    def _real_init(self, session, config, ):
+    def _real_init(self, session, config):
         self._enforce_telegram_plugin_ver()
         self._parse_config(config)
-        self.log.debug('token={0} parse_mode={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
-            self._token, self._usernames, self._fullnames, self._groups, self._tmpl, self._parse_mode))
+        self.log.debug('token=%s, parse_mode=%s, tmpl=%s, usernames=%s, fullnames=%s, groups=%s', self._token,
+                       self._parse_mode, self._tmpl, self._usernames, self._fullnames, self._groups)
         self._init_bot()
         chat_ids = self._get_chat_ids_n_update_db(session)
         return chat_ids
-
-    def bootstrap(self, session, config):
-        """bootstrap the plugin configuration and update db with cached chat_ids"""
-        console('{0} - bootstrapping...'.format(_PLUGIN_NAME))
-        chat_ids = self._real_init(session, config)
-
-        found_usernames = [x.username for x in chat_ids if x.username]
-        found_fullnames = [(x.firstname, x.surname) for x in chat_ids if x.firstname]
-        found_grps = [x.group for x in chat_ids if x.group]
-
-        missing_usernames = [x for x in self._usernames if x not in found_usernames]
-        missing_fullnames = [x for x in self._fullnames if x not in found_fullnames]
-        missing_grps = [x for x in self._groups if x not in found_grps]
-
-        if missing_usernames or missing_fullnames or missing_grps:
-            for i in missing_usernames:
-                console('ERR: could not find chat_id for username: {0}'.format(i))
-            for i in missing_fullnames:
-                console('ERR: could not find chat_id for fullname: {0} {1}'.format(*i))
-            for i in missing_grps:
-                console('ERR: could not find chat_id for group: {0}'.format(i))
-            res = False
-        else:
-            console('{0} - bootstrap was successful'.format(_PLUGIN_NAME))
-            res = True
-
-        return res
-
-    def test_msg(self, session, config):
-        """send test message to configured recipients"""
-        console('{0} loading chat_ids...'.format(_PLUGIN_NAME))
-        chat_ids = self._real_init(session, config)
-
-        console('{0} sending test message(s)...'.format(_PLUGIN_NAME))
-        for chat_id in (x.id for x in chat_ids):
-            self._bot.sendMessage(chat_id=chat_id, text='test message from flexget')
-
-        return True
 
     def _init_bot(self):
         self._bot = telegram.Bot(self._token)
@@ -264,7 +220,7 @@ class SendTelegram(object):
         try:
             self._bot.getMe()
         except UnicodeDecodeError as e:
-            self.log.trace('bot.getMe() raised: {!r}'.format(e))
+            self.log.trace('bot.getMe() raised: %s', repr(e))
             raise plugin.PluginWarning('invalid bot token')
         except (NetworkError, TelegramError) as e:
             self.log.error('Could not connect Telegram servers at this time, please try again later: %s', e.message)
@@ -278,47 +234,30 @@ class SendTelegram(object):
         elif LooseVersion(telegram.__version__) < native_str(_MIN_TELEGRAM_VER):
             raise plugin.PluginWarning('old python-telegram-bot ({0})'.format(telegram.__version__))
 
-    def _send_msgs(self, task, chat_ids):
+    def _send_msgs(self, msg, chat_ids):
         kwargs = dict()
         if self._parse_mode == 'markdown':
             kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
         elif self._parse_mode == 'html':
             kwargs['parse_mode'] = telegram.ParseMode.HTML
-        for entry in task.accepted:
-            msg = self._render_msg(entry, self._tmpl)
-            for chat_id in (x.id for x in chat_ids):
-                try:
-                    self.log.debug('sending msg to telegram servers: %s', msg)
-                    self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
-                except TelegramError as e:
-                    if kwargs.get('parse_mode'):
-                        self.log.warning(
-                            'Failed to render message using parse mode %s. Falling back to basic parsing: %s',
-                            kwargs['parse_mode'], e.message)
-                        del kwargs['parse_mode']
-                        try:
-                            self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
-                        except TelegramError as e:
-                            self.log.error('Cannot send message, : %s', e.message)
-                            continue
-                    else:
+        for chat_id in (x.id for x in chat_ids):
+            try:
+                self.log.debug('sending msg to telegram servers: %s', msg)
+                self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
+            except TelegramError as e:
+                if kwargs.get('parse_mode'):
+                    self.log.warning(
+                        'Failed to render message using parse mode %s. Falling back to basic parsing: %s',
+                        kwargs['parse_mode'], e.message)
+                    del kwargs['parse_mode']
+                    try:
+                        self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
+                    except TelegramError as e:
                         self.log.error('Cannot send message, : %s', e.message)
                         continue
-
-    def _render_msg(self, entry, tmpl):
-        """
-        :type entry: flexget.entry.Entry
-        :type tmpl: str
-        :rtype: str
-
-        """
-        try:
-            msg = entry.render(tmpl)
-        except RenderError as e:
-            title = entry.get('title')
-            self.log.error('render error; title={0} err={1}'.format(title, e))
-            msg = title
-        return msg
+                else:
+                    self.log.error('Cannot send message, : %s', e.message)
+                    continue
 
     def _get_chat_ids_n_update_db(self, session):
         """
@@ -330,17 +269,17 @@ class SendTelegram(object):
         fullnames = self._fullnames[:]
         groups = self._groups[:]
         chat_ids, has_new_chat_ids = self._get_chat_ids(session, usernames, fullnames, groups)
-        self.log.debug('chat_ids={0}'.format(chat_ids))
+        self.log.debug('chat_ids=%s', chat_ids)
 
         if not chat_ids:
             self.log.warning('no chat id found, try manually sending the bot any message to initialize the chat')
         else:
             if usernames:
-                self.log.warning('no chat id found for usernames: {0}'.format(usernames))
+                self.log.warning('no chat id found for usernames: %s', usernames)
             if fullnames:
-                self.log.warning('no chat id found for fullnames: {0}'.format(fullnames))
+                self.log.warning('no chat id found for fullnames: %s', fullnames)
             if groups:
-                self.log.warning('no chat id found for groups: {0}'.format(groups))
+                self.log.warning('no chat id found for groups: %s', groups)
             if has_new_chat_ids:
                 self._update_db(session, chat_ids)
 
@@ -358,8 +297,6 @@ class SendTelegram(object):
         :rtype: list[ChatIdEntry], bool
 
         """
-        chat_ids = list()
-
         self.log.debug('loading cached chat ids')
         chat_ids = self._get_cached_chat_ids(session, usernames, fullnames, groups)
         self.log.debug('found {0} cached chat_ids: {1}'.format(len(chat_ids), ['{0}'.format(x) for x in chat_ids]))
@@ -481,7 +418,7 @@ class SendTelegram(object):
             elif chat.type in ('group', 'supergroup' or 'channel'):
                 groups[chat.title] = chat
             else:
-                self.log.warning('unknown chat type: {0}'.format(type(chat)))
+                self.log.warning('unknown chat type: %s}', type(chat))
 
         return usernames, fullnames, groups
 
@@ -499,7 +436,18 @@ class SendTelegram(object):
         session.add_all(iter(chat_ids_d.values()))
         session.commit()
 
+    # Run last to make sure other outputs are successful before sending notification
+    @plugin.priority(0)
+    def on_task_output(self, task, config):
+        # Send default values for backwards compatibility
+        notify_config = {
+            'to': [{_PLUGIN_NAME: config}],
+            'scope': 'entries',
+            'what': 'accepted'
+        }
+        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SendTelegram, _PLUGIN_NAME, api_ver=2)
+    plugin.register(TelegramNotifier, _PLUGIN_NAME, api_ver=2, groups=['notifiers'])
