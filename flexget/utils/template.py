@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from future.utils import text_to_native_str
+from flexget.utils.tools import native_str_to_text
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
@@ -75,7 +77,7 @@ def filter_formatdate(val, format):
     encoding = locale.getpreferredencoding()
     if not isinstance(val, (datetime, date, time)):
         return val
-    return val.strftime(format.encode(encoding)).decode(encoding)
+    return native_str_to_text(val.strftime(text_to_native_str(format, encoding=encoding)), encoding=encoding)
 
 
 def filter_parsedate(val):
