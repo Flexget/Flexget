@@ -9,6 +9,8 @@ from flexget.config_schema import one_or_more
 
 log = logging.getLogger('notify_xmpp')
 
+PLUGIN_NAME = 'xmpp'
+
 
 class XMPPNotifier(object):
     schema = {
@@ -39,8 +41,7 @@ class XMPPNotifier(object):
                 import dnspython  # noqa
             except ImportError as e:
                 log.debug('Error importing dnspython: %s', e)
-                raise plugin.DependencyError('notify_xmpp', 'dnspython',
-                                             'dnspython module required. ImportError: %s' % e)
+                raise plugin.DependencyError(PLUGIN_NAME, 'dnspython', 'dnspython module required. ImportError: %s' % e)
 
         class SendMsgBot(sleekxmpp.ClientXMPP):
             def __init__(self, jid, password, recipients, message):
@@ -75,7 +76,7 @@ class XMPPNotifier(object):
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility
         notify_config = {
-            'to': [{'notify_xmpp': config}],
+            'to': [{PLUGIN_NAME: config}],
             'scope': 'entries',
             'what': 'accepted'
         }
@@ -84,4 +85,4 @@ class XMPPNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(XMPPNotifier, 'notify_xmpp', api_ver=2, groups=['notifiers'])
+    plugin.register(XMPPNotifier, PLUGIN_NAME, api_ver=2, groups=['notifiers'])
