@@ -31,6 +31,9 @@ class FilterRequireField(object):
                 if field not in entry:
                     entry.reject('Required field %s is not present' % field)
                     break
+                if entry[field] is None:
+                    entry.reject('Required field %s is `None`' % field)
+                    break
 
 
 @event('plugin.register')
