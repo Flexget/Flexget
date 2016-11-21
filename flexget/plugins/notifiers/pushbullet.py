@@ -11,7 +11,8 @@ from flexget.config_schema import one_or_more
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-log = logging.getLogger('pushbullet')
+__name__ = 'pushbullet'
+log = logging.getLogger(__name__)
 
 PUSHBULLET_URL = 'https://api.pushbullet.com/v2/pushes'
 
@@ -118,7 +119,7 @@ class PushbulletNotifier(object):
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility
         notify_config = {
-            'to': [{'pushbullet': config}],
+            'to': [{__name__: config}],
             'scope': 'entries',
             'what': 'accepted'
         }
@@ -127,4 +128,4 @@ class PushbulletNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PushbulletNotifier, 'pushbullet', api_ver=2, groups=['notifiers'])
+    plugin.register(PushbulletNotifier, __name__, api_ver=2, groups=['notifiers'])

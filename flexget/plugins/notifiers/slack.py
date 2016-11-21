@@ -10,7 +10,9 @@ from flexget.utils.requests import Session as RequestSession
 
 requests = RequestSession(max_retries=3)
 
-log = logging.getLogger('slack')
+__name__ = 'slack'
+
+log = logging.getLogger(__name__)
 
 
 class SlackNotifier(object):
@@ -71,7 +73,7 @@ class SlackNotifier(object):
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility
         notify_config = {
-            'to': [{'slack': config}],
+            'to': [{__name__: config}],
             'scope': 'entries',
             'what': 'accepted'
         }
@@ -80,4 +82,4 @@ class SlackNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SlackNotifier, 'slack', api_ver=2, groups=['notifiers'])
+    plugin.register(SlackNotifier, __name__, api_ver=2, groups=['notifiers'])

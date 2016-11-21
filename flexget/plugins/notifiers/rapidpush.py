@@ -9,7 +9,8 @@ from flexget.config_schema import one_or_more
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-log = logging.getLogger('rapidpush')
+__name__ = 'rapidpush'
+log = logging.getLogger(__name__)
 
 RAPIDPUSH_URL = 'https://rapidpush.net/api'
 
@@ -106,7 +107,7 @@ class RapidpushNotifer(object):
             what.append('undecided')
 
         notify_config = {
-            'to': [{'rapidpush': config}],
+            'to': [{__name__: config}],
             'scope': 'entries',
             'what': what
         }
@@ -115,4 +116,4 @@ class RapidpushNotifer(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(RapidpushNotifer, 'rapidpush', api_ver=2, groups=['notifiers'])
+    plugin.register(RapidpushNotifer, __name__, api_ver=2, groups=['notifiers'])

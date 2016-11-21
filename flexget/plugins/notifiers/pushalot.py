@@ -9,7 +9,8 @@ from flexget.event import event
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-log = logging.getLogger('pushalot')
+__name__ = 'pushalot'
+log = logging.getLogger(__name__)
 
 PUSHALOT_URL = 'https://pushalot.com/api/sendmessage'
 
@@ -73,7 +74,7 @@ class PushalotNotifier(object):
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility
         notify_config = {
-            'to': [{'pushalot': config}],
+            'to': [{__name__: config}],
             'scope': 'entries',
             'what': 'accepted'
         }
@@ -82,4 +83,4 @@ class PushalotNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PushalotNotifier, 'pushalot', api_ver=2, groups=['notifiers'])
+    plugin.register(PushalotNotifier, __name__, api_ver=2, groups=['notifiers'])

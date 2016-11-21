@@ -9,10 +9,11 @@ from flexget.event import event
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-log = logging.getLogger("sms_ru")
+__name__ = 'sms_ru'
+log = logging.getLogger(__name__)
 
-SMS_SEND_URL = "http://sms.ru/sms/send"
-SMS_TOKEN_URL = "http://sms.ru/auth/get_token"
+SMS_SEND_URL = 'http://sms.ru/sms/send'
+SMS_TOKEN_URL = 'http://sms.ru/auth/get_token'
 
 requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('sms.ru', '5 seconds'))
@@ -26,9 +27,9 @@ class SMSRuNotifier(object):
     Example:
 
       sms_ru:
-        phonenumber: <PHONE_NUMBER> (accepted format example: "79997776655")
+        phonenumber: <PHONE_NUMBER> (accepted format example: '79997776655')
         password: <PASSWORD>
-        [message: <MESSAGE_TEXT>] (default: "accepted {{title}}" -- accepts Jinja)
+        [message: <MESSAGE_TEXT>] (default: 'accepted {{title}}' -- accepts Jinja)
 
     Configuration parameters are also supported from entries (eg. through set).
 
@@ -45,9 +46,9 @@ class SMSRuNotifier(object):
     }
 
     def notify(self, data):
-        phone_number = data["phonenumber"]
-        password = data["password"]
-        message = data["message"]
+        phone_number = data['phonenumber']
+        password = data['password']
+        message = data['message']
 
         try:
             token_response = requests.get(SMS_TOKEN_URL)
@@ -70,17 +71,17 @@ class SMSRuNotifier(object):
             log.error('Could not get auth token: %s', e.args[0])
             return
         else:
-            if response.text.find("100") == 0:
-                log.verbose("SMS notification for %s sent", phone_number)
+            if response.text.find('100') == 0:
+                log.verbose('SMS notification for %s sent', phone_number)
             else:
-                log.error("SMS was not sent. Server response was %s", response.text)
+                log.error('SMS was not sent. Server response was %s', response.text)
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility
         notify_config = {
-            'to': [{'sms_ru': config}],
+            'to': [{__name__: config}],
             'scope': 'entries',
             'what': 'accepted'
         }
@@ -89,4 +90,4 @@ class SMSRuNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SMSRuNotifier, "sms_ru", api_ver=2, groups=['notifiers'])
+    plugin.register(SMSRuNotifier, __name__, api_ver=2, groups=['notifiers'])

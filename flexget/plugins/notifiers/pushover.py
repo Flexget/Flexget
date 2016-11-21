@@ -10,7 +10,8 @@ from flexget.event import event
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-log = logging.getLogger('pushover')
+__name__ = 'pushover'
+log = logging.getLogger(__name__)
 
 PUSHOVER_URL = 'https://api.pushover.net/1/messages.json'
 
@@ -59,17 +60,6 @@ class PushoverNotifier(object):
         'additionalProperties': False
     }
 
-    # Run last to make sure other outputs are successful before sending notification
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
-        # Send default values for backwards compatibility
-        notify_config = {
-            'to': [{'pushover': config}],
-            'scope': 'entries',
-            'what': 'accepted'
-        }
-        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
-
     def notify(self, data):
         # Pretty redundant, but maintains backwards comparability and avoids upgrade actions
         data['token'] = data['apikey']
@@ -108,7 +98,19 @@ class PushoverNotifier(object):
             log.verbose('Pushover notification sent. Notifications remaining until next reset: %s. '
                         'Next reset at: %s', remaining, reset_time)
 
+            # Run last to make sure other outputs are successful before sending notification
+
+    @plugin.priority(0)
+    def on_task_output(self, task, config):
+        # Send default values for backwards compatibility
+        notify_config = {
+            'to': [{__name__: config}],
+            'scope': 'entries',
+            'what': 'accepted'
+        }
+        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PushoverNotifier, 'pushover', api_ver=2, groups=['notifiers'])
+    plugin.register(PushoverNotifier, __name__, api_ver=2, groups=['notifiers'])

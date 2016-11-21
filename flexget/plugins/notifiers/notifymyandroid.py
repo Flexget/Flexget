@@ -10,9 +10,10 @@ from flexget.config_schema import one_or_more
 from flexget.event import event
 from requests.exceptions import RequestException
 
-log = logging.getLogger('notifymyandroid')
+__name__ = 'notifymyandroid'
+log = logging.getLogger(__name__)
 
-url = 'https://www.notifymyandroid.com/publicapi/notify'
+NOTIFYMYANDROID_URL = 'https://www.notifymyandroid.com/publicapi/notify'
 
 
 class NotifyMyAndroidNotifier(object):
@@ -55,7 +56,7 @@ class NotifyMyAndroidNotifier(object):
             data['content-type'] = 'text/html'
 
         try:
-            response = requests.post(url, data=data)
+            response = requests.post(NOTIFYMYANDROID_URL, data=data)
         except RequestException as e:
             log.error('Could not connect to notifymyandroid: %s', e.args[0])
             return
@@ -73,7 +74,7 @@ class NotifyMyAndroidNotifier(object):
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility
         notify_config = {
-            'to': [{'notifymyandroid': config}],
+            'to': [{__name__: config}],
             'scope': 'entries',
             'what': 'accepted'
         }
@@ -82,4 +83,4 @@ class NotifyMyAndroidNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(NotifyMyAndroidNotifier, 'notifymyandroid', api_ver=2, groups=['notifiers'])
+    plugin.register(NotifyMyAndroidNotifier, __name__, api_ver=2, groups=['notifiers'])

@@ -4,7 +4,9 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('notify_osd')
+__name__ = 'notify_osd'
+
+log = logging.getLogger(__name__)
 
 
 class OutputNotifyOsd(object):
@@ -23,7 +25,7 @@ class OutputNotifyOsd(object):
             from gi.repository import Notify
         except ImportError as e:
             log.debug('Error importing Notify: %s', e)
-            raise plugin.DependencyError('notify_osd', 'gi.repository', 'Notify module required. ImportError: %s' % e)
+            raise plugin.DependencyError(__name__, 'gi.repository', 'Notify module required. ImportError: %s' % e)
 
         title = data['title_template']
         body = data['item_template']
@@ -47,7 +49,7 @@ class OutputNotifyOsd(object):
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility
         notify_config = {
-            'to': [{'notify_osd': config}],
+            'to': [{__name__: config}],
             'scope': 'entries',
             'what': 'accepted'
         }
@@ -56,4 +58,4 @@ class OutputNotifyOsd(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OutputNotifyOsd, 'notify_osd', api_ver=2, groups=['notifiers'])
+    plugin.register(OutputNotifyOsd, __name__, api_ver=2, groups=['notifiers'])

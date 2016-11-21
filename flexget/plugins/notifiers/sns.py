@@ -7,9 +7,9 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-PLUGIN_NAME = 'sns'
+__name__ = 'sns'
 
-log = logging.getLogger(PLUGIN_NAME)
+log = logging.getLogger(__name__)
 
 DEFAULT_TEMPLATE_VALUE = json.dumps({
     'entry': {
@@ -84,7 +84,7 @@ class SNSNotifier(object):
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility
         notify_config = {
-            'to': [{PLUGIN_NAME: config}],
+            'to': [{__name__: config}],
             'scope': 'entries',
             'what': 'accepted'
         }
@@ -93,4 +93,4 @@ class SNSNotifier(object):
 
 @event('plugin.register')
 def register_sns_plugin():
-    plugin.register(SNSNotifier, PLUGIN_NAME, api_ver=2, groups=['notifiers'])
+    plugin.register(SNSNotifier, __name__, api_ver=2, groups=['notifiers'])
