@@ -9,7 +9,6 @@ import random
 import string
 from functools import wraps, total_ordering
 
-from flexget.utils.template import render_from_task
 from sqlalchemy import Column, Integer, String, Unicode
 
 from flexget import config_schema, db_schema
@@ -24,6 +23,7 @@ from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 from flexget.utils.tools import get_config_hash
+from flexget.utils.template import render_from_task, FlexGetTemplate
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
@@ -682,14 +682,15 @@ class Task(object):
         """
         Renders a template string based on fields in the entry.
 
-        :param string template: A template string that uses jinja2 or python string replacement format.
+        :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
         :return: The result of the rendering.
         :rtype: string
         :raises RenderError: If there is a problem.
         """
-        if not isinstance(template, str):
-            raise ValueError('Trying to render non string template, got %s' % repr(template))
-        log.trace('rendering: %s' % template)
+        if not isinstance(template, (str, FlexGetTemplate)):
+            raise ValueError(
+                'Trying to render non string template or unrecognized template format, got %s' % repr(template))
+        log.trace('rendering: %s', template)
         return render_from_task(template, self)
 
 

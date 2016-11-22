@@ -6,7 +6,7 @@ import logging
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
-from flexget.utils.template import RenderError
+from flexget.utils.template import RenderError, get_template
 
 log = logging.getLogger('notify')
 
@@ -58,7 +58,7 @@ class Notify(object):
         return config
 
     @staticmethod
-    def render_value(entity, template, attribute, default_dict):
+    def render_value(entity, template, attribute, default_dict, plugin_name=None):
         """
         Tries to render a template, fallback to default template and just value if unsuccessful
 
@@ -69,6 +69,11 @@ class Notify(object):
         :return: A rendered value or original value
         """
         result = template
+        if attribute == 'template':
+            try:
+                template = get_template(template, plugin_name)
+            except ValueError:
+                log.warning('could not find template %s', template)
         try:
             result = entity.render(template)
         except (RenderError, ValueError) as e:
@@ -99,7 +104,8 @@ class Notify(object):
                     for entity in container:
                         message_data = {}
                         for attribute, value in plugin_config.items():
-                            message_data[attribute] = self.render_value(entity, value, attribute, DEFAULT_DICTS[scope])
+                            message_data[attribute] = self.render_value(entity, value, attribute, DEFAULT_DICTS[scope],
+                                                                        plugin_name)
 
                         if not task.options.test:
                             log.info('Sending a notification to %s', plugin_name)
