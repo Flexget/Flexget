@@ -59,6 +59,8 @@ class PendingApproval(object):
             .filter(PendingEntry.url == entry['url']) \
             .first()
 
+    # Have to run this input last to make sure all input have created entries
+    @plugin.priority(-255)
     def on_task_input(self, task, config):
         if not config:
             return
