@@ -1,0 +1,7 @@
+<md-content layout="column" flex>
+    <section ng-repeat="pending in vm.entries">
+        <md-button class="md-raised" ng-click="vm.updateEntry(pending.id, 'approve')">Approve</md-button>
+        <md-button class="md-raised md-warn">Reject</md-button>
+        <pre>{{ pending | json }}</pre>
+    </section>
+</md-content>
