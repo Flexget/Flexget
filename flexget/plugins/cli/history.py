@@ -41,10 +41,11 @@ def do_cli(manager, options):
     title = 'Showing {} entries from History'.format(query.count())
     if options.table_type != 'porcelain' and not options.short:
         del table_data[-1]
-    table = TerminalTable(options.table_type, table_data, title=title, wrap_columns=[1])
-    if not options.short:
-        table.table.inner_heading_row_border = False
+
     try:
+        table = TerminalTable(options.table_type, table_data, title=title, wrap_columns=[1])
+        if not options.short:
+            table.table.inner_heading_row_border = False
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))

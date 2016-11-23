@@ -51,11 +51,11 @@ def list_entries(options):
                 colorize('green', 'Yes') if entry.approved else 'No',
                 entry.added.strftime("%c"),
             ])
+    try:
         table = TerminalTable(options.table_type, table_data, wrap_columns=[1, 2, 3], drop_columns=[5, 1, 3])
-        try:
-            console(table.output)
-        except TerminalTableError as e:
-            console('ERROR: %s' % str(e))
+        console(table.output)
+    except TerminalTableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def manage_entries(options, selection, approved):

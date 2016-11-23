@@ -72,10 +72,10 @@ def seen_search(options, session=None):
         return
     if options.table_type != 'porcelain':
         del table_data[-1]
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
-    table.table.inner_heading_row_border = False
 
     try:
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
+        table.table.inner_heading_row_border = False
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))

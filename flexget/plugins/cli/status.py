@@ -56,8 +56,8 @@ def do_cli_task(manager, options):
                     ]
                 )
 
-    table = TerminalTable(options.table_type, table_data)
     try:
+        table = TerminalTable(options.table_type, table_data)
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))

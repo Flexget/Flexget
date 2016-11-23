@@ -102,8 +102,8 @@ def display_summary(options):
                     name_column += colorize(BEHIND_EP_COLOR, ' {} behind'.format(behind))
 
             table_data.append([name_column, episode_id, age_col, latest_release, identifier_type])
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[3], drop_columns=[4, 3, 2])
     try:
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[3], drop_columns=[4, 3, 2])
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))

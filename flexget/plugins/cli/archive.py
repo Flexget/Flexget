@@ -152,9 +152,10 @@ def cli_search(options):
     if not table_data:
         console('No results found for search')
         return
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
-    table.table.inner_heading_row_border = False
+
     try:
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
+        table.table.inner_heading_row_border = False
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))

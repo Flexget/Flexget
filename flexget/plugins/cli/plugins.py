@@ -38,8 +38,8 @@ def plugins_summary(manager, options):
         name = colorize('green', plugin.name) if 'builtin' in flags else plugin.name
         table_data.append([name, ', '.join(roles), ', '.join(flags)])
 
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[1, 2])
     try:
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[1, 2])
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
