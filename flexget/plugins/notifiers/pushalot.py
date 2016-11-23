@@ -35,17 +35,13 @@ class PushalotNotifier(object):
         timetolive: <integer>
 
     """
-    default_body = ('{% if series_name is defined %}{{tvdb_series_name|d(series_name)}}' +
-                    '{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}' +
-                    '{{imdb_name}} {{imdb_year}}{% else %}{{title}}{% endif %}')
-
     schema = {'type': 'object',
               'properties': {
                   'token': one_or_more({'type': 'string'}),
-                  'title': {'type': 'string', 'default': 'Task {{task_name}}'},
-                  'message': {'type': 'string', 'default': default_body},
-                  'url': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
-                  'url_title': {'type': 'string', 'default': ''},
+                  'title': {'type': 'string'},
+                  'message': {'type': 'string'},
+                  'url': {'type': 'string'},
+                  'url_title': {'type': 'string'},
                   'important': {'type': 'boolean', 'default': False},
                   'silent': {'type': 'boolean', 'default': False},
                   'image': {'type': 'string', 'default': ''},

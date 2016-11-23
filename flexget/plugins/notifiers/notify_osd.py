@@ -13,8 +13,8 @@ class OutputNotifyOsd(object):
     schema = {
         'type': 'object',
         'properties': {
-            'title': {'type': 'string', 'default': '{{task_name}}'},
-            'message': {'type': 'string', 'default': '{{title}}'},
+            'title': {'type': 'string'},
+            'message': {'type': 'string'},
             'timeout': {'type': 'integer', 'default': 4}
         },
         'additionalProperties': False

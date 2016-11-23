@@ -38,7 +38,7 @@ class ProwlNotifier(object):
         'properties': {
             'apikey': {'type': 'string'},
             'application': {'type': 'string', 'default': 'FlexGet'},
-            'title': {'type': 'string', 'default': 'New Release'},
+            'title': {'type': 'string'},
             'priority': {'type': 'integer', 'default': 0},
             'message': {'type': 'string'},
             'url': {'type': 'string'}

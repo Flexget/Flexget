@@ -36,19 +36,11 @@ class SlackNotifier(object):
 
     Configuration parameters are also supported from entries (e.g., through set).
     """
-    default_body = ('{{task}} - Download started: '
-                    '{% if series_name is defined %}'
-                    '{{tvdb_series_name|d(series_name)}} {{series_id}} {{tvdb_ep_name|d('')}}'
-                    '{% elif imdb_name is defined %}'
-                    '{{imdb_name}} {{imdb_year}}'
-                    '{% else %}'
-                    '{{title}}'
-                    '{% endif %}')
     schema = {
         'type': 'object',
         'properties': {
             'webhook-url': {'type': 'string'},
-            'message': {'type': 'string', 'default': default_body},
+            'message': {'type': 'string'},
             'channel': {'type': 'string'},
             'username': {'type': 'string'},
             'icon-emoji': {'type': 'string'},

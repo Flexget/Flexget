@@ -34,8 +34,8 @@ class NotifyMyAndroidNotifier(object):
         'properties': {
             'apikey': one_or_more({'type': 'string'}),
             'application': {'type': 'string', 'default': 'FlexGet'},
-            'title': {'type': 'string', 'default': 'New release'},
-            'message': {'type': 'string', 'default': '{{task_name}}'},
+            'title': {'type': 'string'},
+            'message': {'type': 'string'},
             'priority': {'type': 'integer', 'default': 0},
             'developerkey': {'type': 'string'},
             'url': {'type': 'string'},

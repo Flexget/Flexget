@@ -34,17 +34,14 @@ class PushbulletNotifier(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-    default_body = ('{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} {{series_id}} '
-                    '{{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} '
-                    '{{imdb_year}}{% else %}{{title}}{% endif %}')
     schema = {
         'type': 'object',
         'properties': {
             'apikey': one_or_more({'type': 'string'}),
             'device': one_or_more({'type': 'string'}),
             'email': one_or_more({'type': 'string'}),
-            'title': {'type': 'string', 'default': '{{task}} - Download started'},
-            'message': {'type': 'string', 'default': default_body},
+            'title': {'type': 'string'},
+            'message': {'type': 'string'},
             'url': {'type': 'string'},
             'channel': {'type': 'string'}
         },

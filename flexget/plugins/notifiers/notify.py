@@ -22,7 +22,8 @@ DEFAULT_DICTS = {
                    '{% elif imdb_name is defined %}'
                    '{{imdb_name}} {{imdb_year}}'
                    '{% elif title is defined %}'
-                   '{{ title }}',
+                   '{{ title }}'
+                   '{% endif %}',
         'url': '{% if imdb_url is defined %}'
                '{{imdb_url}}'
                '{% endif %}',
@@ -43,10 +44,13 @@ class Notify(object):
                                             '2 more spaces than the first letter of the plugin name.',
                      'minProperties': 1}]}},
             'scope': {'type': 'string', 'enum': ['task', 'entries']},
-            'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS})
+            'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS}),
+            'title': {'type': 'string', 'default': DEFAULT_DICTS['entries']['title']},
+            'message': {'type': 'string', 'default': DEFAULT_DICTS['entries']['message']},
+            'url': {'type': 'string', 'default': DEFAULT_DICTS['entries']['url']},
         },
         'required': ['to'],
-        'additionalProperties': False
+        'additionalProperties': True
     }
 
     @staticmethod
@@ -69,6 +73,8 @@ class Notify(object):
         :return: A rendered value or original value
         """
         result = template
+
+        # Template attribute is used to render file templates for `/templates` dir
         if attribute == 'template':
             try:
                 template = get_template(template, plugin_name)
@@ -103,12 +109,24 @@ class Notify(object):
                 for container in iterate_on:
                     for entity in container:
                         message_data = {}
+
+                        # Iterate over all of Notify plugin attributes first
+                        for attribute, value in config.items():
+                            message_data[attribute] = self.render_value(entity, value, attribute, DEFAULT_DICTS[scope],
+                                                                        'default')
+
+                        # Iterate over specific plugin config, overriding any previously set attribute in message data
                         for attribute, value in plugin_config.items():
                             message_data[attribute] = self.render_value(entity, value, attribute, DEFAULT_DICTS[scope],
                                                                         plugin_name)
 
+                        # If a template was used, pass it to `message` attribute. This will allow all plugin to use
+                        # templates generically
+                        if message_data.get('template'):
+                            message_data['message'] = message_data.pop('template')
+
                         if not task.options.test:
-                            log.info('Sending a notification to %s', plugin_name)
+                            log.info('Sending a notification to `%s`', plugin_name)
                             notifier.notify(message_data)
                         else:
                             log.info('Test mode, would have sent notification to %s:', plugin_name)

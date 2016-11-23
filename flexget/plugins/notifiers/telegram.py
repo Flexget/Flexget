@@ -127,7 +127,7 @@ class TelegramNotifier(object):
         'type': 'object',
         'properties': {
             _TOKEN_ATTR: {'type': 'string'},
-            _TMPL_ATTR: {'type': 'string', 'default': '{{title}}'},
+            _TMPL_ATTR: {'type': 'string'},
             _PARSE_ATTR: {'type': 'string', 'enum': _PARSERS},
             _RCPTS_ATTR: {
                 'type': 'array',

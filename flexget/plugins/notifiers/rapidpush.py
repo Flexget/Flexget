@@ -42,7 +42,7 @@ class RapidpushNotifer(object):
         'properties': {
             'apikey': one_or_more({'type': 'string'}),
             'category': {'type': 'string', 'default': 'Flexget'},
-            'title': {'type': 'string', 'default': 'New Release'},
+            'title': {'type': 'string'},
             'group': {'type': 'string'},
             'channel': {'type': 'string'},
             'priority': {'type': 'integer', 'minimum': 0, 'maximum': 6},

@@ -91,7 +91,7 @@ class EmailNotifier(object):
             'smtp_ssl': {'type': 'boolean', 'default': False},
             'message': {'type': 'string'},
             'template': {'type': 'string', 'default': 'default.template'},
-            'title': {'type': 'string', 'default': '{{ task_name }}'},
+            'title': {'type': 'string'},
             'html': {'type': 'boolean', 'default': False},
         },
         'required': ['to', 'from'],
@@ -110,7 +110,7 @@ class EmailNotifier(object):
         title = data['title']
         from_ = data['from']
         html = data['html']
-        body = data.get('message', data['template'])
+        body = data.get('message')
         host = data['smtp_host']
         port = data['smtp_port']
 

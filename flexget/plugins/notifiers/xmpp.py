@@ -19,8 +19,8 @@ class XMPPNotifier(object):
             'sender': {'type': 'string', 'format': 'email'},
             'password': {'type': 'string'},
             'recipients': one_or_more({'type': 'string', 'format': 'email'}),
-            'title': {'type': 'string', 'default': '{{task.name}}'},
-            'message': {'type': 'string', 'default': '{{title}}'}
+            'title': {'type': 'string'},
+            'message': {'type': 'string'}
         },
         'required': ['sender', 'password', 'recipients'],
         'additionalProperties': False
