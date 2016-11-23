@@ -47,6 +47,7 @@ class PushalotNotifier(object):
                   'image': {'type': 'string', 'default': ''},
                   'source': {'type': 'string', 'default': 'FlexGet'},
                   'timetolive': {'type': 'integer', 'maximum': 43200, 'default': 0},
+                  'template': {'type': 'string', 'format': 'template'},
               },
               'required': ['token'],
               'additionalProperties': False}

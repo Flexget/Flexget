@@ -39,7 +39,8 @@ class NotifyMyAndroidNotifier(object):
             'priority': {'type': 'integer', 'default': 0},
             'developerkey': {'type': 'string'},
             'url': {'type': 'string'},
-            'html': {'type': 'boolean'}
+            'html': {'type': 'boolean'},
+            'template': {'type': 'string', 'format': 'template'}
         },
         'required': ['apikey'],
         'additionalProperties': False

@@ -155,24 +155,26 @@ def make_environment(manager):
 # TODO: list_templates function
 
 
-def get_template(templatename, pluginname=None):
+def get_template(template_name, plugin_name=None):
     """Loads a template from disk. Looks in both included plugins and users custom plugin dir."""
 
-    if not templatename.endswith('.template'):
-        templatename += '.template'
+    if not template_name.endswith('.template'):
+        template_name += '.template'
     locations = []
-    if pluginname:
-        locations.append(pluginname + '/' + templatename)
-    locations.append(templatename)
+    if plugin_name:
+        locations.append(plugin_name + '/' + template_name)
+    locations.append(template_name)
     for location in locations:
         try:
             return environment.get_template(location)
         except TemplateNotFound:
             pass
     else:
-        # TODO: Plugins need to catch and reraise this as PluginError, or perhaps we should have
-        # a validator for template files
-        raise ValueError('Template not found: %s (%s)' % (templatename, pluginname))
+        if plugin_name:
+            err = 'Template not found in templates dir: %s (%s)' % (template_name, plugin_name)
+        else:
+            err = 'Template not found in templates dir: %s' % template_name
+        raise ValueError(err)
 
 
 def render(template, context):

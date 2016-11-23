@@ -46,7 +46,8 @@ class RapidpushNotifer(object):
             'group': {'type': 'string'},
             'channel': {'type': 'string'},
             'priority': {'type': 'integer', 'minimum': 0, 'maximum': 6},
-            'message': {'type': 'string', 'default': '{{title}}'}
+            'message': {'type': 'string'},
+            'template': {'type': 'string', 'format': 'template'}
         },
         'additionalProperties': False,
         'required': ['apikey']

@@ -39,11 +39,12 @@ class PushbulletNotifier(object):
         'properties': {
             'apikey': one_or_more({'type': 'string'}),
             'device': one_or_more({'type': 'string'}),
-            'email': one_or_more({'type': 'string'}),
+            'email': one_or_more({'type': 'string', 'format': 'email'}),
             'title': {'type': 'string'},
             'message': {'type': 'string'},
             'url': {'type': 'string'},
-            'channel': {'type': 'string'}
+            'channel': {'type': 'string'},
+            'template': {'type': 'string', 'format': 'template'},
         },
         'required': ['apikey'],
         'additionalProperties': False

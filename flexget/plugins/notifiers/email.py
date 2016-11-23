@@ -81,8 +81,8 @@ class EmailNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'to': one_or_more({'type': 'string'}),
-            'from': {'type': 'string', 'default': 'flexget_notifer@flexget.com'},
+            'to': one_or_more({'type': 'string', 'format': 'email'}),
+            'from': {'type': 'string', 'default': 'flexget_notifer@flexget.com', 'format': 'email'},
             'smtp_host': {'type': 'string', 'default': 'localhost'},
             'smtp_port': {'type': 'integer', 'default': 25},
             'smtp_username': {'type': 'string'},
@@ -90,7 +90,7 @@ class EmailNotifier(object):
             'smtp_tls': {'type': 'boolean', 'default': False},
             'smtp_ssl': {'type': 'boolean', 'default': False},
             'message': {'type': 'string'},
-            'template': {'type': 'string', 'default': 'default.template'},
+            'template': {'type': 'string', 'format': 'template'},
             'title': {'type': 'string'},
             'html': {'type': 'boolean', 'default': False},
         },

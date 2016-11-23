@@ -15,7 +15,8 @@ class OutputNotifyOsd(object):
         'properties': {
             'title': {'type': 'string'},
             'message': {'type': 'string'},
-            'timeout': {'type': 'integer', 'default': 4}
+            'timeout': {'type': 'integer', 'default': 4},
+            'template': {'type': 'string', 'format': 'template'}
         },
         'additionalProperties': False
     }

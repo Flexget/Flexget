@@ -41,7 +41,8 @@ class ProwlNotifier(object):
             'title': {'type': 'string'},
             'priority': {'type': 'integer', 'default': 0},
             'message': {'type': 'string'},
-            'url': {'type': 'string'}
+            'url': {'type': 'string'},
+            'template': {'type': 'string', 'format': 'template'}
         },
         'required': ['apikey'],
         'additionalProperties': False

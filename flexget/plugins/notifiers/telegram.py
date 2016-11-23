@@ -24,8 +24,9 @@ _PLUGIN_NAME = 'telegram'
 _PARSERS = ['markdown', 'html']
 
 _TOKEN_ATTR = 'bot_token'
-_TMPL_ATTR = 'message'
+_MSG_ATTR = 'message'
 _PARSE_ATTR = 'parse_mode'
+_TEMPLATE_ATTR = 'template'
 _RCPTS_ATTR = 'recipients'
 _USERNAME_ATTR = 'username'
 _FULLNAME_ATTR = 'fullname'
@@ -127,8 +128,9 @@ class TelegramNotifier(object):
         'type': 'object',
         'properties': {
             _TOKEN_ATTR: {'type': 'string'},
-            _TMPL_ATTR: {'type': 'string'},
+            _MSG_ATTR: {'type': 'string'},
             _PARSE_ATTR: {'type': 'string', 'enum': _PARSERS},
+            _TEMPLATE_ATTR: {'type': 'string', 'format': 'template'},
             _RCPTS_ATTR: {
                 'type': 'array',
                 'minItems': 1,
@@ -177,7 +179,7 @@ class TelegramNotifier(object):
 
         """
         self._token = config[_TOKEN_ATTR]
-        self._tmpl = config[_TMPL_ATTR]
+        self._tmpl = config[_MSG_ATTR]
         self._parse_mode = config.get(_PARSE_ATTR)
         self._usernames = []
         self._fullnames = []
@@ -200,7 +202,7 @@ class TelegramNotifier(object):
 
         if not chat_ids:
             return
-        message = data[_TMPL_ATTR]
+        message = data[_MSG_ATTR]
         self._send_msgs(message, chat_ids)
 
     def _real_init(self, session, config):

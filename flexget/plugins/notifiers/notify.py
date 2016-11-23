@@ -47,14 +47,25 @@ class Notify(object):
                                             '2 more spaces than the first letter of the plugin name.',
                      'minProperties': 1}]}},
             'scope': {'type': 'string', 'enum': ['task', 'entries'], 'default': 'entries'},
-            'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS, 'default': 'accepted'}),
+            'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS}),
             'title': {'type': 'string', 'default': DEFAULT_DICTS['entries']['title']},
             'message': {'type': 'string', 'default': DEFAULT_DICTS['entries']['message']},
             'url': {'type': 'string', 'default': DEFAULT_DICTS['entries']['url']},
+            'template': {'type': 'string', 'format': 'template'}
         },
         'required': ['to'],
         'additionalProperties': True
     }
+
+    def prepare_config(self, config):
+        config.setdefault('what', ['accepted'])
+        if not isinstance(config['what'], list):
+            config['what'] = [config['what']]
+        config.setdefault('title', DEFAULT_DICTS['entries']['title'])
+        config.setdefault('message', DEFAULT_DICTS['entries']['message'])
+        config.setdefault('url', DEFAULT_DICTS['entries']['url'])
+        return config
+
 
     @staticmethod
     def render_value(entity, template, attribute, default_dict, plugin_name=None):
@@ -87,6 +98,7 @@ class Notify(object):
         return result
 
     def send_notification(self, task, config):
+        config.setdefault('what', ['accepted'])
         if not isinstance(config['what'], list):
             config['what'] = [config['what']]
         scope = config.pop('scope')
