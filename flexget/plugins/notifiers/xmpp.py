@@ -20,7 +20,7 @@ class XMPPNotifier(object):
             'password': {'type': 'string'},
             'recipients': one_or_more({'type': 'string', 'format': 'email'}),
             'title': {'type': 'string', 'default': '{{task.name}}'},
-            'text': {'type': 'string', 'default': '{{title}}'}
+            'message': {'type': 'string', 'default': '{{title}}'}
         },
         'required': ['sender', 'password', 'recipients'],
         'additionalProperties': False
@@ -59,7 +59,7 @@ class XMPPNotifier(object):
                 self.disconnect(wait=True)
 
         title = data['title']
-        text = data['text']
+        text = data['message']
         text = '%s\n%s' % (title, text)
         log.debug('Sending XMPP notification about: %s', text)
         logging.getLogger('sleekxmpp').setLevel(logging.CRITICAL)

@@ -44,7 +44,7 @@ class PushbulletNotifier(object):
             'device': one_or_more({'type': 'string'}),
             'email': one_or_more({'type': 'string'}),
             'title': {'type': 'string', 'default': '{{task}} - Download started'},
-            'body': {'type': 'string', 'default': default_body},
+            'message': {'type': 'string', 'default': default_body},
             'url': {'type': 'string'},
             'channel': {'type': 'string'}
         },
@@ -66,7 +66,7 @@ class PushbulletNotifier(object):
             apikeys = [apikeys]
 
         title = data['title']
-        body = data['body']
+        body = data['message']
         url = data.get('url')
         channel = data.get('channel')
 

@@ -48,7 +48,7 @@ class SlackNotifier(object):
         'type': 'object',
         'properties': {
             'webhook-url': {'type': 'string'},
-            'text': {'type': 'string', 'default': default_body},
+            'message': {'type': 'string', 'default': default_body},
             'channel': {'type': 'string'},
             'username': {'type': 'string'},
             'icon-emoji': {'type': 'string'},
@@ -62,6 +62,7 @@ class SlackNotifier(object):
         if data.get('icon-emoji'):
             data['icon-emoji'] = ":%s:" % data.get('icon-emoji')
 
+        data['text'] = data.pop('message')
         try:
             requests.post(url, json=data)
         except RequestException as e:

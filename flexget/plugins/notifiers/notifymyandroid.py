@@ -34,8 +34,8 @@ class NotifyMyAndroidNotifier(object):
         'properties': {
             'apikey': one_or_more({'type': 'string'}),
             'application': {'type': 'string', 'default': 'FlexGet'},
-            'event': {'type': 'string', 'default': 'New release'},
-            'description': {'type': 'string', 'default': '{{task_name}}'},
+            'title': {'type': 'string', 'default': 'New release'},
+            'message': {'type': 'string', 'default': '{{task_name}}'},
             'priority': {'type': 'integer', 'default': 0},
             'developerkey': {'type': 'string'},
             'url': {'type': 'string'},
@@ -49,6 +49,9 @@ class NotifyMyAndroidNotifier(object):
         # Handle multiple API keys
         if isinstance(data['apikey'], list):
             data['apikey'] = ','.join(data['apikey'])
+
+        data['event'] = data.pop('title')
+        data['description'] = data.pop('message')
 
         # Special case for html handling
         html = data.pop('html', None)

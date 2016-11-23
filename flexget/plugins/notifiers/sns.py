@@ -45,14 +45,14 @@ class SNSNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'sns_topic_arn': {'type': 'string'},
-            'sns_notification_template': {'type': 'string', 'default': DEFAULT_TEMPLATE_VALUE},
+            'title': {'type': 'string'},
+            'message': {'type': 'string', 'default': DEFAULT_TEMPLATE_VALUE},
             'aws_access_key_id': {'type': 'string'},
             'aws_secret_access_key': {'type': 'string'},
             'aws_region': {'type': 'string'},
             'profile_name': {'type': 'string'},
         },
-        'required': ['sns_topic_arn', 'aws_region'],
+        'required': ['title', 'aws_region'],
         'additionalProperties': False,
     }
 
@@ -68,10 +68,10 @@ class SNSNotifier(object):
                                 profile_name=data.get('profile_name'),
                                 region_name=data['aws_region'])
         sns = session.resource('sns')
-        topic = sns.Topic(data['sns_topic_arn'])
+        topic = sns.Topic(data['title'])
 
         try:
-            topic.publish(Message=data['sns_notification_template'])
+            topic.publish(Message=data['message'])
         except Exception as e:
             log.error("Error publishing %s: ", e.args[0])
             return

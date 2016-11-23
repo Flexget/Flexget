@@ -91,7 +91,7 @@ class EmailNotifier(object):
             'smtp_ssl': {'type': 'boolean', 'default': False},
             'message': {'type': 'string'},
             'template': {'type': 'string', 'default': 'default.template'},
-            'subject': {'type': 'string', 'default': '{{ task_name }}'},
+            'title': {'type': 'string', 'default': '{{ task_name }}'},
             'html': {'type': 'boolean', 'default': False},
         },
         'required': ['to', 'from'],
@@ -107,7 +107,7 @@ class EmailNotifier(object):
         to = data['to']
         if not isinstance(to, list):
             to = [to]
-        subject = data['subject']
+        title = data['title']
         from_ = data['from']
         html = data['html']
         body = data.get('message', data['template'])
@@ -117,7 +117,7 @@ class EmailNotifier(object):
         message = MIMEMultipart('alternative')
         message['To'] = ','.join(to)
         message['From'] = from_
-        message['Subject'] = subject
+        message['Subject'] = title
         message['Date'] = formatdate(localtime=True)
         content_type = 'html' if html else 'plain'
         message.attach(MIMEText(body.encode('utf-8'), content_type, _charset='utf-8'))

@@ -38,9 +38,9 @@ class ProwlNotifier(object):
         'properties': {
             'apikey': {'type': 'string'},
             'application': {'type': 'string', 'default': 'FlexGet'},
-            'event': {'type': 'string', 'default': 'New Release'},
+            'title': {'type': 'string', 'default': 'New Release'},
             'priority': {'type': 'integer', 'default': 0},
-            'description': {'type': 'string'},
+            'message': {'type': 'string'},
             'url': {'type': 'string'}
         },
         'required': ['apikey'],
@@ -50,12 +50,12 @@ class ProwlNotifier(object):
     def notify(self, data):
         apikey = data.get('apikey')
         application = data.get('application')
-        event = data.get('event')
+        event = data.get('title')
         priority = data.get('priority')
-        description = data.get('description')
+        description = data.get('message')
         message_url = data.get('url', '')
 
-        data = {'priority': priority,
+        message_data = {'priority': priority,
                 'application': application,
                 'apikey': apikey,
                 'event': event,
@@ -63,7 +63,7 @@ class ProwlNotifier(object):
                 'url': message_url}
 
         try:
-            response = requests.post(PROWL_URL, data=data)
+            response = requests.post(PROWL_URL, data=message_data)
         except RequestException as e:
             log.error('Could not connect to prowl: %s', e.args[0])
             return

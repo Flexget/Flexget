@@ -13,8 +13,8 @@ class OutputNotifyOsd(object):
     schema = {
         'type': 'object',
         'properties': {
-            'title_template': {'type': 'string', 'default': '{{task_name}}'},
-            'item_template': {'type': 'string', 'default': '{{title}}'},
+            'title': {'type': 'string', 'default': '{{task_name}}'},
+            'message': {'type': 'string', 'default': '{{title}}'},
             'timeout': {'type': 'integer', 'default': 4}
         },
         'additionalProperties': False
@@ -27,8 +27,8 @@ class OutputNotifyOsd(object):
             log.debug('Error importing Notify: %s', e)
             raise plugin.DependencyError(__name__, 'gi.repository', 'Notify module required. ImportError: %s' % e)
 
-        title = data['title_template']
-        body = data['item_template']
+        title = data['title']
+        body = data['message']
 
         if not Notify.init("Flexget"):
             log.error('Unable to init libnotify.')

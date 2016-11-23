@@ -24,7 +24,7 @@ _PLUGIN_NAME = 'telegram'
 _PARSERS = ['markdown', 'html']
 
 _TOKEN_ATTR = 'bot_token'
-_TMPL_ATTR = 'template'
+_TMPL_ATTR = 'message'
 _PARSE_ATTR = 'parse_mode'
 _RCPTS_ATTR = 'recipients'
 _USERNAME_ATTR = 'username'

@@ -43,9 +43,9 @@ class PushalotNotifier(object):
               'properties': {
                   'token': one_or_more({'type': 'string'}),
                   'title': {'type': 'string', 'default': 'Task {{task_name}}'},
-                  'body': {'type': 'string', 'default': default_body},
-                  'link': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
-                  'linktitle': {'type': 'string', 'default': ''},
+                  'message': {'type': 'string', 'default': default_body},
+                  'url': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
+                  'url_title': {'type': 'string', 'default': ''},
                   'important': {'type': 'boolean', 'default': False},
                   'silent': {'type': 'boolean', 'default': False},
                   'image': {'type': 'string', 'default': ''},
@@ -59,6 +59,10 @@ class PushalotNotifier(object):
         token = data.pop('token')
         if not isinstance(token, list):
             token = [token]
+
+        data['body'] = data.pop('message')
+        data['link'] = data.pop('url', None)
+        data['linktitle'] = data.pop('url_title', None)
 
         for key in token:
             data['AuthorizationToken'] = key

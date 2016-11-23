@@ -46,11 +46,7 @@ class RapidpushNotifer(object):
             'group': {'type': 'string'},
             'channel': {'type': 'string'},
             'priority': {'type': 'integer', 'minimum': 0, 'maximum': 6},
-            'message': {'type': 'string', 'default': '{{title}}'},
-            'notify_accepted': {'type': 'boolean', 'default': True},
-            'notify_rejected': {'type': 'boolean', 'default': False},
-            'notify_failed': {'type': 'boolean', 'default': False},
-            'notify_undecided': {'type': 'boolean', 'default': False}
+            'message': {'type': 'string', 'default': '{{title}}'}
         },
         'additionalProperties': False,
         'required': ['apikey']
@@ -96,20 +92,10 @@ class RapidpushNotifer(object):
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
-        what = []
-        if config['notify_accepted']:
-            what.append('accepted')
-        if config['notify_rejected']:
-            what.append('rejected')
-        if config['notify_failed']:
-            what.append('failed')
-        if config['notify_undecided']:
-            what.append('undecided')
-
         notify_config = {
             'to': [{__name__: config}],
             'scope': 'entries',
-            'what': what
+            'what': 'accepted'
         }
         plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
 
