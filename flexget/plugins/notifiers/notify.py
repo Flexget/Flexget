@@ -64,6 +64,7 @@ class Notify(object):
         config.setdefault('title', DEFAULT_DICTS['entries']['title'])
         config.setdefault('message', DEFAULT_DICTS['entries']['message'])
         config.setdefault('url', DEFAULT_DICTS['entries']['url'])
+        config.setdefault('scope', 'entries')
         return config
 
 
@@ -80,12 +81,6 @@ class Notify(object):
         """
         result = template
 
-        # Template attribute is used to render file templates for `/templates` dir
-        if attribute == 'template':
-            try:
-                template = get_template(template, plugin_name)
-            except ValueError:
-                log.warning('could not find template %s', template)
         try:
             result = entity.render(template)
         except (RenderError, ValueError) as e:
@@ -98,9 +93,7 @@ class Notify(object):
         return result
 
     def send_notification(self, task, config):
-        config.setdefault('what', ['accepted'])
-        if not isinstance(config['what'], list):
-            config['what'] = [config['what']]
+        config = self.prepare_config(config)
         scope = config.pop('scope')
         what = config.pop('what')
         notifiers = config.pop('to')
