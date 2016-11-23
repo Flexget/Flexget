@@ -27,26 +27,24 @@ class SMSRuNotifier(object):
     Example:
 
       sms_ru:
-        phonenumber: <PHONE_NUMBER> (accepted format example: '79997776655')
+        phone_number: <PHONE_NUMBER> (accepted format example: '79997776655')
         password: <PASSWORD>
-        [message: <MESSAGE_TEXT>] (default: 'accepted {{title}}' -- accepts Jinja)
-
-    Configuration parameters are also supported from entries (eg. through set).
+        [message: <MESSAGE_TEXT>]
 
     """
     schema = {
         'type': 'object',
         'properties': {
-            'phonenumber': {'type': 'string'},
+            'phone_number': {'type': 'string'},
             'password': {'type': 'string'},
             'message': {'type': 'string'}
         },
         'additionalProperties': False,
-        'required': ['phonenumber', 'password']
+        'required': ['phone_number', 'password']
     }
 
     def notify(self, data):
-        phone_number = data['phonenumber']
+        phone_number = data['phone_number']
         password = data['password']
         message = data['message']
 

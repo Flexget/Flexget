@@ -14,7 +14,10 @@ ENTRY_CONTAINERS = ['entries', 'accepted', 'rejected', 'failed', 'undecided']
 DEFAULT_DICTS = {
     'task': {
         'message': 'Task returned {{ task.accepted|length }} accepted entries',
-        'title': '{{ task_name }}'},
+        'title': '{{ task_name }}',
+        'url': ''
+    },
+
     'entries': {
         'message': '{% if series_name is defined %}'
                    '{{ tvdb_series_name|d(series_name) }} '
@@ -43,8 +46,8 @@ class Notify(object):
                      'error_maxProperties': 'Plugin options within notify plugin must be indented '
                                             '2 more spaces than the first letter of the plugin name.',
                      'minProperties': 1}]}},
-            'scope': {'type': 'string', 'enum': ['task', 'entries']},
-            'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS}),
+            'scope': {'type': 'string', 'enum': ['task', 'entries'], 'default': 'entries'},
+            'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS, 'default': 'accepted'}),
             'title': {'type': 'string', 'default': DEFAULT_DICTS['entries']['title']},
             'message': {'type': 'string', 'default': DEFAULT_DICTS['entries']['message']},
             'url': {'type': 'string', 'default': DEFAULT_DICTS['entries']['url']},
@@ -52,14 +55,6 @@ class Notify(object):
         'required': ['to'],
         'additionalProperties': True
     }
-
-    @staticmethod
-    def prepare_config(config):
-        config.setdefault('what', ['accepted'])
-        if not isinstance(config['what'], list):
-            config['what'] = [config['what']]
-        config.setdefault('scope', 'entries')
-        return config
 
     @staticmethod
     def render_value(entity, template, attribute, default_dict, plugin_name=None):
@@ -92,7 +87,8 @@ class Notify(object):
         return result
 
     def send_notification(self, task, config):
-        config = self.prepare_config(config)
+        if not isinstance(config['what'], list):
+            config['what'] = [config['what']]
         scope = config.pop('scope')
         what = config.pop('what')
         notifiers = config.pop('to')
@@ -120,7 +116,7 @@ class Notify(object):
                             message_data[attribute] = self.render_value(entity, value, attribute, DEFAULT_DICTS[scope],
                                                                         plugin_name)
 
-                        # If a template was used, pass it to `message` attribute. This will allow all plugin to use
+                        # If a template was used, pass it to `message` attribute. This will allow all notifiers to use
                         # templates generically
                         if message_data.get('template'):
                             message_data['message'] = message_data.pop('template')
