@@ -193,6 +193,10 @@ class TerminalTable(object):
             self._drop_columns_with_wrap()
             wrapped_width = self._calc_wrap()
 
+        # This probably shouldn't happen, can be caused by wrong parameters sent to drop_columns and wrap_columns
+        if wrapped_width <= 0:
+            raise TerminalTableError('Table could not be rendered correctly using it given data')
+
         # construct new table
         output_table = []
         for row in self.table_data:
