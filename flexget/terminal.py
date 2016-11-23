@@ -208,7 +208,7 @@ class TerminalTable(object):
                 output_value = value
                 if col_num in self.wrap_columns:
                     # print('wrapping val %s col: %s' %  (value, col_num))
-                    output_value = word_wrap(value, wrapped_width)
+                    output_value = word_wrap(str(value), wrapped_width)
                 output_row.append(output_value)
             output_table.append(output_row)
         return self.build_table(self.type, output_table)
