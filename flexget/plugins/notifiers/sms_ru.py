@@ -38,7 +38,7 @@ class SMSRuNotifier(object):
             'phone_number': {'type': 'string'},
             'password': {'type': 'string'},
             'message': {'type': 'string'},
-            'file_template': {'type': 'string', 'format': 'file_template'},
+            'file_template': {'type': 'string'},
         },
         'additionalProperties': False,
         'required': ['phone_number', 'password']

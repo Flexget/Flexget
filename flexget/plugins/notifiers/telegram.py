@@ -130,7 +130,7 @@ class TelegramNotifier(object):
             _TOKEN_ATTR: {'type': 'string'},
             _MSG_ATTR: {'type': 'string'},
             _PARSE_ATTR: {'type': 'string', 'enum': _PARSERS},
-            _TEMPLATE_ATTR: {'type': 'string', 'format': 'file_template'},
+            _TEMPLATE_ATTR: {'type': 'string'},
             _RCPTS_ATTR: {
                 'type': 'array',
                 'minItems': 1,

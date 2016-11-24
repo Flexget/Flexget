@@ -47,7 +47,7 @@ class RapidpushNotifer(object):
             'channel': {'type': 'string'},
             'priority': {'type': 'integer', 'minimum': 0, 'maximum': 6},
             'message': {'type': 'string'},
-            'file_template': {'type': 'string', 'format': 'file_template'}
+            'file_template': {'type': 'string'}
         },
         'additionalProperties': False,
         'required': ['apikey']

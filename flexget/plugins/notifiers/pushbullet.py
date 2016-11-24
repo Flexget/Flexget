@@ -44,7 +44,7 @@ class PushbulletNotifier(object):
             'message': {'type': 'string'},
             'url': {'type': 'string'},
             'channel': {'type': 'string'},
-            'file_template': {'type': 'string', 'format': 'file_template'},
+            'file_template': {'type': 'string'},
         },
         'required': ['apikey'],
         'additionalProperties': False

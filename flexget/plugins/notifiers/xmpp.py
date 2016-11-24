@@ -21,7 +21,7 @@ class XMPPNotifier(object):
             'recipients': one_or_more({'type': 'string', 'format': 'email'}),
             'title': {'type': 'string'},
             'message': {'type': 'string'},
-            'file_template': {'type': 'string', 'format': 'file_template'},
+            'file_template': {'type': 'string'},
         },
         'required': ['sender', 'password', 'recipients'],
         'additionalProperties': False

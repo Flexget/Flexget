@@ -44,7 +44,7 @@ class SlackNotifier(object):
             'channel': {'type': 'string'},
             'username': {'type': 'string'},
             'icon-emoji': {'type': 'string'},
-            'file_template': {'type': 'string', 'format': 'file_template'},
+            'file_template': {'type': 'string'},
         },
         'required': ['webhook-url'],
         'additionalProperties': False

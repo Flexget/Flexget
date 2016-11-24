@@ -69,20 +69,27 @@ class Notify(object):
 
 
     @staticmethod
-    def render_value(entity, template, attribute, default_dict, plugin_name=None):
+    def render_value(entity, data, attribute, default_dict, plugin_name=None):
         """
         Tries to render a template, fallback to default template and just value if unsuccessful
 
         :param entity: The entity to operate on, either `Entry` or `Task`
-        :param template: The text to be rendered
+        :param data: The text to be rendered
         :param attribute: Attribute name to be fetched from the defaults
         :param default_dict: The default dict, depending on entity type
         :return: A rendered value or original value
         """
-        result = template
+        result = data
+
+        # Handles file templates
+        if attribute == 'file_template':
+            try:
+                data = get_template(data, plugin_name)
+            except ValueError as e:
+                log.warning(e.args[0])
 
         try:
-            result = entity.render(template)
+            result = entity.render(data)
         except (RenderError, ValueError) as e:
             log.debug('failed to render: %s. Trying to fall back to default', e.args[0])
             try:

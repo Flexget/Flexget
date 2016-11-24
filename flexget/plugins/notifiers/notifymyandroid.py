@@ -40,7 +40,7 @@ class NotifyMyAndroidNotifier(object):
             'developerkey': {'type': 'string'},
             'url': {'type': 'string'},
             'html': {'type': 'boolean'},
-            'file_template': {'type': 'string', 'format': 'file_template'}
+            'file_template': {'type': 'string'}
         },
         'required': ['apikey'],
         'additionalProperties': False
