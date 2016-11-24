@@ -90,7 +90,7 @@ class EmailNotifier(object):
             'smtp_tls': {'type': 'boolean', 'default': False},
             'smtp_ssl': {'type': 'boolean', 'default': False},
             'message': {'type': 'string'},
-            'template': {'type': 'string', 'format': 'template'},
+            'file_template': {'type': 'string', 'format': 'file_template'},
             'title': {'type': 'string'},
             'html': {'type': 'boolean', 'default': False},
         },

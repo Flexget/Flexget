@@ -26,7 +26,7 @@ _PARSERS = ['markdown', 'html']
 _TOKEN_ATTR = 'bot_token'
 _MSG_ATTR = 'message'
 _PARSE_ATTR = 'parse_mode'
-_TEMPLATE_ATTR = 'template'
+_TEMPLATE_ATTR = 'file_template'
 _RCPTS_ATTR = 'recipients'
 _USERNAME_ATTR = 'username'
 _FULLNAME_ATTR = 'fullname'
@@ -130,7 +130,7 @@ class TelegramNotifier(object):
             _TOKEN_ATTR: {'type': 'string'},
             _MSG_ATTR: {'type': 'string'},
             _PARSE_ATTR: {'type': 'string', 'enum': _PARSERS},
-            _TEMPLATE_ATTR: {'type': 'string', 'format': 'template'},
+            _TEMPLATE_ATTR: {'type': 'string', 'format': 'file_template'},
             _RCPTS_ATTR: {
                 'type': 'array',
                 'minItems': 1,

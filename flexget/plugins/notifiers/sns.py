@@ -51,7 +51,7 @@ class SNSNotifier(object):
             'aws_secret_access_key': {'type': 'string'},
             'aws_region': {'type': 'string'},
             'profile_name': {'type': 'string'},
-            'template': {'type': 'string', 'format': 'template'},
+            'file_template': {'type': 'string', 'format': 'file_template'},
         },
         'required': ['title', 'aws_region'],
         'additionalProperties': False,

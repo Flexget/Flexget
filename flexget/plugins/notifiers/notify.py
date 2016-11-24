@@ -51,7 +51,7 @@ class Notify(object):
             'title': {'type': 'string', 'default': DEFAULT_DICTS['entries']['title']},
             'message': {'type': 'string', 'default': DEFAULT_DICTS['entries']['message']},
             'url': {'type': 'string', 'default': DEFAULT_DICTS['entries']['url']},
-            'template': {'type': 'string', 'format': 'template'}
+            'file_template': {'type': 'string', 'format': 'file_template'}
         },
         'required': ['to'],
         'additionalProperties': True
@@ -123,8 +123,8 @@ class Notify(object):
 
                         # If a template was used, pass it to `message` attribute. This will allow all notifiers to use
                         # templates generically
-                        if message_data.get('template'):
-                            message_data['message'] = message_data.pop('template')
+                        if message_data.get('file_template'):
+                            message_data['message'] = message_data.pop('file_template')
 
                         if not task.options.test:
                             log.info('Sending a notification to `%s`', plugin_name)

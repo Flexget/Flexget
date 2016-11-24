@@ -263,7 +263,7 @@ def is_episode_identifier(instance):
     return parse_episode_identifier(instance) is not None
 
 
-@format_checker.checks('template', raises=ValueError)
+@format_checker.checks('file_template', raises=ValueError)
 def is_valid_template(instance):
     if not isinstance(instance, str_types):
         return True
