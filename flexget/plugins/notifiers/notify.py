@@ -49,23 +49,23 @@ class Notify(object):
                      'minProperties': 1}]}},
             'scope': {'type': 'string', 'enum': ['task', 'entries'], 'default': 'entries'},
             'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS}),
-            'title': {'type': 'string', 'default': DEFAULT_DICTS['entries']['title']},
-            'message': {'type': 'string', 'default': DEFAULT_DICTS['entries']['message']},
-            'url': {'type': 'string', 'default': DEFAULT_DICTS['entries']['url']},
-            'file_template': {'type': 'string', 'format': 'file_template'}
+            'title': {'type': 'string'},
+            'message': {'type': 'string'},
+            'url': {'type': 'string'},
+            'file_template': {'type': 'string'}
         },
         'required': ['to'],
         'additionalProperties': True
     }
 
     def prepare_config(self, config):
+        config.setdefault('scope', 'entries')
         config.setdefault('what', ['accepted'])
         if not isinstance(config['what'], list):
             config['what'] = [config['what']]
-        config.setdefault('title', DEFAULT_DICTS['entries']['title'])
-        config.setdefault('message', DEFAULT_DICTS['entries']['message'])
-        config.setdefault('url', DEFAULT_DICTS['entries']['url'])
-        config.setdefault('scope', 'entries')
+        config.setdefault('title', DEFAULT_DICTS[config['scope']]['title'])
+        config.setdefault('message', DEFAULT_DICTS[config['scope']]['message'])
+        config.setdefault('url', DEFAULT_DICTS[config['scope']]['url'])
         return config
 
     @staticmethod
@@ -87,6 +87,7 @@ class Notify(object):
                 data = get_template(data, plugin_name)
             except ValueError as e:
                 log.warning(e.args[0])
+                return
 
         try:
             result = entity.render(data)
@@ -131,7 +132,7 @@ class Notify(object):
 
                         # If a template was used, pass it to `message` attribute. This will allow all notifiers to use
                         # templates generically
-                        if notification_data.get('file_template'):
+                        if notification_data.get('file_template') is not None:
                             notification_data['message'] = notification_data.pop('file_template')
 
                         if not task.options.test:
