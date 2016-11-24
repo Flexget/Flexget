@@ -369,7 +369,7 @@ class InputDeluge(DelugePlugin):
         filter = config.get('filter', {})
 
         # deluge client lib chokes on future's newlist, make sure we have a native python list here
-        client.core.get_torrents_status(filter, native(list(self.settings_map.keys() + config.get('keys', [])))).addCallback(
+        client.core.get_torrents_status(filter, native(list(self.settings_map.keys()) + config.get('keys', []))).addCallback(
             on_get_torrents_status)
 
 
