@@ -27,7 +27,6 @@ class TestNotify(object):
         task = execute_task('test_basic_notify')
 
         assert len(task.accepted) == 1
-        assert mocked_request.called
         assert mocked_request.call_count == 3
 
         for k, v in params.items():
