@@ -6,6 +6,7 @@ import logging
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
+from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
@@ -66,9 +67,7 @@ class PushalotNotifier(object):
             try:
                 requests.post(PUSHALOT_URL, json=data)
             except RequestException as e:
-                log.error('Pushalot notification failed: %s', e.response.json()['Description'])
-            else:
-                log.verbose('Pushalot notification sent')
+                raise PluginWarning(repr(e))
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)

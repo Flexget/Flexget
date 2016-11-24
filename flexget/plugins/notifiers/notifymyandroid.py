@@ -8,6 +8,7 @@ import requests
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
+from flexget.plugin import PluginWarning
 from requests.exceptions import RequestException
 
 __name__ = 'notifymyandroid'
@@ -62,15 +63,15 @@ class NotifyMyAndroidNotifier(object):
         try:
             response = requests.post(NOTIFYMYANDROID_URL, data=data)
         except RequestException as e:
-            log.error('Could not connect to notifymyandroid: %s', e.args[0])
-            return
+            raise PluginWarning(e.args[0])
+
         request_status = ET.fromstring(response.content)
         error = request_status.find('error')
         if error is not None:
-            log.error('Could not send notification: %s', error.text)
+            raise PluginWarning(error.text)
         else:
             success = request_status.find('success').attrib
-            log.verbose('notifymyandroid notification sent. Notifications remaining until next reset: %s. '
+            log.debug('notifymyandroid notification sent. Notifications remaining until next reset: %s. '
                         'Next reset will occur in %s minutes', success['remaining'], success['resettimer'])
 
     # Run last to make sure other outputs are successful before sending notification

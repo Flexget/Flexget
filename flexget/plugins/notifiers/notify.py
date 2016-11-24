@@ -6,6 +6,7 @@ import logging
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
+from flexget.plugin import PluginWarning
 from flexget.utils.template import RenderError, get_template
 
 log = logging.getLogger('notify')
@@ -67,7 +68,6 @@ class Notify(object):
         config.setdefault('scope', 'entries')
         return config
 
-
     @staticmethod
     def render_value(entity, data, attribute, default_dict, plugin_name=None):
         """
@@ -95,8 +95,11 @@ class Notify(object):
             try:
                 if attribute in default_dict:
                     result = entity.render(default_dict[attribute])
+            # Render error on defaults should not happen
             except RenderError as e:
-                log.warning('failed to render: %s. Reverting to original value.', e.args[0])
+                log.warning('default dict failed to render: %s. Reverting to original value.', e.args[0])
+        else:
+            log.debug('successfully rendered `%s` to %s', attribute, result)
         return result
 
     def send_notification(self, task, config):
@@ -105,40 +108,43 @@ class Notify(object):
         what = config.pop('what')
         notifiers = config.pop('to')
 
-        if scope == 'entries':
-            iterate_on = [getattr(task, container) for container in what]
-        else:
-            iterate_on = [[task]]
+        # Creating iterator based on config scope
+        iterate_on = [getattr(task, container) for container in what] if scope == 'entries' else [[task]]
 
-        for item in notifiers:
-            for plugin_name, plugin_config in item.items():
-                notifier = plugin.get_plugin_by_name(plugin_name).instance
+        for notifier in notifiers:
+            for notifier_name, notifier_config in notifier.items():
+                notifier = plugin.get_plugin_by_name(notifier_name).instance
 
                 for container in iterate_on:
                     for entity in container:
-                        message_data = {}
+                        notification_data = {}
 
                         # Iterate over all of Notify plugin attributes first
                         for attribute, value in config.items():
-                            message_data[attribute] = self.render_value(entity, value, attribute, DEFAULT_DICTS[scope],
-                                                                        'default')
+                            notification_data[attribute] = self.render_value(entity, value, attribute,
+                                                                             DEFAULT_DICTS[scope])
 
                         # Iterate over specific plugin config, overriding any previously set attribute in message data
-                        for attribute, value in plugin_config.items():
-                            message_data[attribute] = self.render_value(entity, value, attribute, DEFAULT_DICTS[scope],
-                                                                        plugin_name)
+                        for attribute, value in notifier_config.items():
+                            notification_data[attribute] = self.render_value(entity, value, attribute,
+                                                                             DEFAULT_DICTS[scope], notifier_name)
 
                         # If a template was used, pass it to `message` attribute. This will allow all notifiers to use
                         # templates generically
-                        if message_data.get('file_template'):
-                            message_data['message'] = message_data.pop('file_template')
+                        if notification_data.get('file_template'):
+                            notification_data['message'] = notification_data.pop('file_template')
 
                         if not task.options.test:
-                            log.info('Sending a notification to `%s`', plugin_name)
-                            notifier.notify(message_data)
+                            log.debug('Sending a notification to `%s`', notifier_name)
+                            try:
+                                notifier.notify(notification_data)
+                            except PluginWarning as e:
+                                log.warning('Error while sending notification to `%s`: %s', notifier_name, e.value)
+                            else:
+                                log.verbose('Successfully sent a notification to `%s`', notifier_name)
                         else:
-                            log.info('Test mode, would have sent notification to %s:', plugin_name)
-                            for attribute, data in message_data.items():
+                            log.info('Test mode, would have sent notification to `%s`:', notifier_name)
+                            for attribute, data in notification_data.items():
                                 log.info('%10s: %s', attribute, data)
 
     def on_task_start(self, task, config):

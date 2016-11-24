@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from flexget.plugin import PluginWarning
 from future.utils import native_str
 
 from distutils.version import LooseVersion
@@ -248,18 +249,15 @@ class TelegramNotifier(object):
                 self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
             except TelegramError as e:
                 if kwargs.get('parse_mode'):
-                    self.log.warning(
-                        'Failed to render message using parse mode %s. Falling back to basic parsing: %s',
-                        kwargs['parse_mode'], e.message)
+                    self.log.warning('Failed to render message using parse mode %s. Falling back to basic parsing: %s',
+                                     kwargs['parse_mode'], e.message)
                     del kwargs['parse_mode']
                     try:
                         self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
                     except TelegramError as e:
-                        self.log.error('Cannot send message, : %s', e.message)
-                        continue
+                        raise PluginWarning(e.message)
                 else:
-                    self.log.error('Cannot send message, : %s', e.message)
-                    continue
+                    raise PluginWarning(e.message)
 
     def _get_chat_ids_n_update_db(self, session):
         """

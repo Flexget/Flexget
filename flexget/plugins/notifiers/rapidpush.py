@@ -6,6 +6,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
@@ -81,14 +82,10 @@ class RapidpushNotifer(object):
             try:
                 response = requests.post(RAPIDPUSH_URL, json=wrapper)
             except RequestException as e:
-                log.error('Rapidpush notification failed: %s', e.args[0])
+                raise PluginWarning(e.args[0])
             else:
-                code = response.json()['code']
-                if code > 400:
-                    log.error('Rapidpush notification failed: %s. Additional data: %s'
-                              , response.json()['desc'], response.json()['data'])
-                else:
-                    log.verbose('Rapidpush notification successfully sent')
+                if response.json()['code'] > 400:
+                    raise PluginWarning(response.json()['desc'])
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)

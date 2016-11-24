@@ -6,6 +6,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.plugin import DependencyError, PluginWarning
 
 __name__ = 'xmpp'
 
@@ -34,7 +35,7 @@ class XMPPNotifier(object):
             import sleekxmpp  # noqa
         except ImportError as e:
             log.debug('Error importing SleekXMPP: %s', e)
-            raise plugin.DependencyError('notify_xmpp', 'sleekxmpp', 'SleekXMPP module required. ImportError: %s', e)
+            raise DependencyError(__name__, 'sleekxmpp', 'SleekXMPP module required. ImportError: %s', e)
         try:
             import dns  # noqa
         except ImportError:
@@ -42,7 +43,7 @@ class XMPPNotifier(object):
                 import dnspython  # noqa
             except ImportError as e:
                 log.debug('Error importing dnspython: %s', e)
-                raise plugin.DependencyError(__name__, 'dnspython', 'dnspython module required. ImportError: %s' % e)
+                raise DependencyError(__name__, 'dnspython', 'dnspython module required. ImportError: %s' % e)
 
         class SendMsgBot(sleekxmpp.ClientXMPP):
             def __init__(self, jid, password, recipients, message):

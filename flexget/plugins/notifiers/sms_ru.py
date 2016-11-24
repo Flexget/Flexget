@@ -6,6 +6,7 @@ import hashlib
 
 from flexget import plugin
 from flexget.event import event
+from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
@@ -52,8 +53,7 @@ class SMSRuNotifier(object):
         try:
             token_response = requests.get(SMS_TOKEN_URL)
         except RequestException as e:
-            log.error('Could not get auth token: %s', e.args[0])
-            return
+            raise PluginWarning('Could not get auth token: %s' % repr(e))
 
         sha512 = hashlib.sha512(password + token_response.text).hexdigest()
 
@@ -67,13 +67,10 @@ class SMSRuNotifier(object):
         try:
             response = requests.get(SMS_SEND_URL, params=send_params)
         except RequestException as e:
-            log.error('Could not get auth token: %s', e.args[0])
-            return
+            raise PluginWarning(e.args[0])
         else:
-            if response.text.find('100') == 0:
-                log.verbose('SMS notification for %s sent', phone_number)
-            else:
-                log.error('SMS was not sent. Server response was %s', response.text)
+            if not response.text.find('100') == 0:
+                raise PluginWarning(response.text)
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)

@@ -12,6 +12,7 @@ from email.utils import formatdate
 from flexget import plugin
 from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.plugin import PluginWarning
 
 __name__ = 'email'
 log = logging.getLogger(__name__)
@@ -123,7 +124,7 @@ class EmailNotifier(object):
         message.attach(MIMEText(body.encode('utf-8'), content_type, _charset='utf-8'))
 
         try:
-            log.verbose('sending email notification to %s:%s', host, port)
+            log.debug('sending email notification to %s:%s', host, port)
             mailServer = smtplib.SMTP_SSL if data.get('smtp_ssl') else smtplib.SMTP
             mailServer = mailServer(host, port)
             if data.get('smtp_tls'):
@@ -131,8 +132,7 @@ class EmailNotifier(object):
                 mailServer.starttls()
                 mailServer.ehlo()
         except (socket.error, OSError) as e:
-            log.error('Unable to send email: %s', e)
-            return
+            raise PluginWarning(e.args[0])
 
         try:
             if data.get('smtp_username'):
@@ -141,8 +141,7 @@ class EmailNotifier(object):
                 mailServer.login(str(data['smtp_username']), str(data['smtp_password']))
             mailServer.sendmail(message['From'], to, message.as_string())
         except IOError as e:
-            log.error('Unable to send email. IOError: %s', e)
-            return
+            raise PluginWarning(e.args[0])
 
         mailServer.quit()
 

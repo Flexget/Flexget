@@ -5,6 +5,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+from flexget.plugin import PluginWarning
 from requests.exceptions import RequestException
 from flexget.utils.requests import Session as RequestSession
 
@@ -59,9 +60,7 @@ class SlackNotifier(object):
         try:
             requests.post(url, json=data)
         except RequestException as e:
-            log.error('Slack notification failed: %s', e.args[0])
-        else:
-            log.verbose('Slack notification sent')
+            raise PluginWarning(e.args[0])
 
     @plugin.priority(0)
     def on_task_output(self, task, config):

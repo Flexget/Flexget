@@ -8,6 +8,7 @@ import datetime
 from flexget import plugin
 from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
@@ -100,16 +101,15 @@ class PushbulletNotifier(object):
             if e.response.status_code == 429:
                 reset_time = datetime.datetime.fromtimestamp(
                     int(e.response.headers['X-Ratelimit-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
-                message = 'Monthly Pushbullet database operations  limit reached. Next reset: %s', reset_time
+                message = 'Monthly Pushbullet database operations  limit reached. Next reset: %s' % reset_time
             else:
-                message = 'Could not send notification to Pushbullet: %s', e.response.json()['error']['message']
-            log.error(*message)
-            return
+                message = e.response.json()['error']['message']
+            raise PluginWarning(message)
 
         reset_time = datetime.datetime.fromtimestamp(
             int(response.headers['X-Ratelimit-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
         remaining = response.headers['X-Ratelimit-Remaining']
-        log.verbose('Pushbullet notification sent. Database operations remaining until next reset: %s. '
+        log.debug('Pushbullet notification sent. Database operations remaining until next reset: %s. '
                     'Next reset at: %s', remaining, reset_time)
 
     # Run last to make sure other outputs are successful before sending notification

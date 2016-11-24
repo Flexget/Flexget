@@ -6,6 +6,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+from flexget.plugin import PluginWarning
 
 __name__ = 'sns'
 
@@ -74,13 +75,9 @@ class SNSNotifier(object):
         try:
             topic.publish(Message=data['message'])
         except Exception as e:
-            log.error("Error publishing %s: ", e.args[0])
-            return
-        else:
-            log.verbose('SNS notification sent')
+            raise PluginWarning("Error publishing %s: ", e.args[0])
 
-            # Run last to make sure other outputs are successful before sending notification
-
+    # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility

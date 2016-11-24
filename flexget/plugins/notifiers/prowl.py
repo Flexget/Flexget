@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 
 from flexget import plugin
 from flexget.event import event
+from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
@@ -66,15 +67,15 @@ class ProwlNotifier(object):
         try:
             response = requests.post(PROWL_URL, data=message_data)
         except RequestException as e:
-            log.error('Could not connect to prowl: %s', e.args[0])
-            return
+            raise PluginWarning(repr(e))
+
         request_status = ET.fromstring(response.content)
         error = request_status.find('error')
         if error is not None:
-            log.error('Could not send notification: %s', error.text)
+            raise PluginWarning(error.text)
         else:
             success = request_status.find('success').attrib
-            log.verbose('prowl notification sent. Notifications remaining until next reset: %s. '
+            log.debug('prowl notification sent. Notifications remaining until next reset: %s. '
                         'Next reset will occur in %s minutes', success['remaining'], success['resetdate'])
 
     @plugin.priority(0)

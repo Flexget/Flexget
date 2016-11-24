@@ -3,6 +3,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+from flexget.plugin import PluginWarning, DependencyError
 
 __name__ = 'notify_osd'
 
@@ -26,24 +27,20 @@ class OutputNotifyOsd(object):
             from gi.repository import Notify
         except ImportError as e:
             log.debug('Error importing Notify: %s', e)
-            raise plugin.DependencyError(__name__, 'gi.repository', 'Notify module required. ImportError: %s' % e)
+            raise DependencyError(__name__, 'gi.repository', 'Notify module required. ImportError: %s' % e)
 
         title = data['title']
         body = data['message']
 
         if not Notify.init("Flexget"):
-            log.error('Unable to init libnotify.')
-            return
+            raise PluginWarning('Unable to init libnotify.')
 
         n = Notify.Notification.new(title, body, None)
         timeout = (data['timeout'] * 1000)
         n.set_timeout(timeout)
 
         if not n.show():
-            log.error('Unable to send notification for %s', title)
-            return
-
-        log.verbose('NotifyOSD notification sent.')
+            raise PluginWarning('Unable to send notification for %s' % title)
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)

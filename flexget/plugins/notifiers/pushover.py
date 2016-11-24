@@ -7,6 +7,7 @@ import logging
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
+from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
@@ -87,20 +88,18 @@ class PushoverNotifier(object):
                 if e.response.status_code == 429:
                     reset_time = datetime.datetime.fromtimestamp(
                         int(e.response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
-                    message = 'Monthly pushover message limit reached. Next reset: %s', reset_time
+                    message = 'Monthly pushover message limit reached. Next reset: %s' % reset_time
                 else:
-                    message = 'Could not send notification to Pushover: %s', e.response.json()['errors'][0]
-                log.error(*message)
-                return
+                    message = e.response.json()['errors'][0]
+                raise PluginWarning(message)
 
             reset_time = datetime.datetime.fromtimestamp(
                 int(response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
             remaining = response.headers['X-Limit-App-Remaining']
-            log.verbose('Pushover notification sent. Notifications remaining until next reset: %s. '
-                        'Next reset at: %s', remaining, reset_time)
+            log.debug('Pushover notification sent. Notifications remaining until next reset: %s. '
+                      'Next reset at: %s', remaining, reset_time)
 
-            # Run last to make sure other outputs are successful before sending notification
-
+    # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
         # Send default values for backwards compatibility
