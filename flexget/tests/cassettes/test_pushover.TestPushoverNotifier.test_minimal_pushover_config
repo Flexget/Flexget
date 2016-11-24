@@ -1,0 +1,66 @@
+interactions:
+- request:
+    body: !!python/unicode user_key=ua2g3vqjyvqpkyntx19zeruqrn3eim&token=aPwSHwkLcNaavShxktBpgJH4bRWc3m&message=test&user=ua2g3vqjyvqpkyntx19zeruqrn3eim
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['125']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [!!python/unicode FlexGet/2.6.4.dev (www.flexget.com)]
+    method: POST
+    uri: https://api.pushover.net/1/messages.json
+  response:
+    body: {string: !!python/unicode '{"status":1,"request":"5474062fc01af1ed4195d1cc3af2f89c"}'}
+    headers:
+      access-control-allow-headers: ['X-Requested-With, X-Prototype-Version, Origin,
+          Accept, Content-Type, X-CSRF-Token, X-Pushover-App']
+      access-control-allow-methods: ['POST, OPTIONS']
+      access-control-allow-origin: ['*']
+      access-control-max-age: ['1728000']
+      cache-control: ['max-age=0, private, must-revalidate']
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 24 Nov 2016 15:03:07 GMT']
+      etag: ['"2d31fe0378f3db8999101934420ec964"']
+      strict-transport-security: [max-age=31536000]
+      x-frame-options: [DENY]
+      x-limit-app-limit: ['7500']
+      x-limit-app-remaining: ['7360']
+      x-limit-app-reset: ['1480572000']
+      x-request-id: [5474062fc01af1ed4195d1cc3af2f89c]
+      x-runtime: ['0.023371']
+      x-ua-compatible: ['IE=Edge,chrome=1']
+    status: {code: 200, message: OK}
+- request:
+    body: !!python/unicode user_key=crash&token=aPwSHwkLcNaavShxktBpgJH4bRWc3m&message=test&user=crash
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['75']
+      Content-Type: [application/x-www-form-urlencoded]
+      User-Agent: [!!python/unicode FlexGet/2.6.4.dev (www.flexget.com)]
+    method: POST
+    uri: https://api.pushover.net/1/messages.json
+  response:
+    body: {string: !!python/unicode '{"user":"invalid","errors":["user identifier
+        is not a valid user, group, or subscribed user key"],"status":0,"request":"134329d0499d817a3d75ac5f7b7e6df9"}'}
+    headers:
+      access-control-allow-headers: ['X-Requested-With, X-Prototype-Version, Origin,
+          Accept, Content-Type, X-CSRF-Token, X-Pushover-App']
+      access-control-allow-methods: ['POST, OPTIONS']
+      access-control-allow-origin: ['*']
+      access-control-max-age: ['1728000']
+      cache-control: [no-cache]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 24 Nov 2016 15:03:12 GMT']
+      x-limit-app-limit: ['7500']
+      x-limit-app-remaining: ['7360']
+      x-limit-app-reset: ['1480572000']
+      x-request-id: [134329d0499d817a3d75ac5f7b7e6df9]
+      x-runtime: ['0.010230']
+      x-ua-compatible: ['IE=Edge,chrome=1']
+    status: {code: 400, message: Bad Request}
+version: 1
