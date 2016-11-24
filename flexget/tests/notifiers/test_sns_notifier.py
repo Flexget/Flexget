@@ -9,7 +9,7 @@ from flexget.plugins.notifiers import sns
 class TestNotifySNS(object):
     @patch('boto3.Session')
     def test_emitter_build_session_from_empty_config(self, Session):
-        sns.SNSNotifier().notify({'aws_region': 'test', 'title': 'test'})
+        sns.SNSNotifier().notify({'aws_region': 'test', 'title': 'test', 'message': 'test'})
         Session.assert_called_once_with(
             region_name='test',
             aws_access_key_id=None,
@@ -24,7 +24,8 @@ class TestNotifySNS(object):
             'aws_access_key_id': 'DUMMY',
             'aws_secret_access_key': 'DUMMYKEY',
             'profile_name': 'profile-name',
-            'title': 'test'
+            'title': 'test',
+            'message': 'test'
         })
         Session.assert_called_once_with(
             region_name=None,
