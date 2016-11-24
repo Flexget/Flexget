@@ -41,8 +41,8 @@ class PushoverNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'userkey': one_or_more({'type': 'string'}),
-            'apikey': {'type': 'string'},
+            'user_key': one_or_more({'type': 'string'}),
+            'token': {'type': 'string'},
             'device': {'type': 'string'},
             'title': {'type': 'string'},
             'message': {'type': 'string'},
@@ -58,14 +58,11 @@ class PushoverNotifier(object):
             'callback': {'type': 'string', 'format': 'url'},
             'html': {'type': 'boolean'}
         },
-        'required': ['userkey', 'apikey'],
+        'required': ['token', 'user_key'],
         'additionalProperties': False
     }
 
     def notify(self, data):
-        # Pretty redundant, but maintains backwards comparability and avoids upgrade actions
-        data['token'] = data['apikey']
-
         # Special case for html key
         if data.get('html'):
             data['html'] = 1
@@ -76,11 +73,11 @@ class PushoverNotifier(object):
                         ' Lowering priority to 1')
             data['priority'] = 1
 
-        if not isinstance(data['userkey'], list):
-            data['userkey'] = [data['userkey']]
+        if not isinstance(data['user_key'], list):
+            data['user_key'] = [data['user_key']]
 
         message_data = data
-        for user in data['userkey']:
+        for user in data['user_key']:
             message_data['user'] = user
             try:
                 response = requests.post(PUSHOVER_URL, data=message_data)
