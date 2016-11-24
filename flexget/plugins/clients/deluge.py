@@ -307,7 +307,7 @@ class InputDeluge(DelugePlugin):
                         'type': 'array',
                         'items': {
                             'type': 'string',
-                            'enum': extra_settings_map.keys()
+                            'enum': list(extra_settings_map.keys())
                         }
                     }
                 },
