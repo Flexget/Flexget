@@ -14,7 +14,7 @@
         var vm = this;
 
         vm.$onInit = activate;
-        vm.approveEntry = approveEntry;
+        vm.updateEntry = updateEntry;
         vm.deleteEntry = deleteEntry;
             
         function activate() {
@@ -27,10 +27,10 @@
                 .cached(setEntries);
         }
 
-        function approveEntry(id) {
-            pendingService.approveEntry(id)
+        function updateEntry(entry) {
+            pendingService.updateEntry(entry.id, (entry.approved ? "reject" : "approve"))
                 .then(function (response) {
-                    var filtered = $filter('filter')(vm.entries, { id: id });
+                    var filtered = $filter('filter')(vm.entries, { id: entry.id });
                     var index = vm.entries.indexOf(filtered[0]);
                     vm.entries[index] = response.data;
                 });

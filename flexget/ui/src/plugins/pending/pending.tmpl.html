@@ -3,7 +3,7 @@
         No pending items
     </h3>
     <section ng-repeat="pending in vm.entries track by $index">
-        <md-button class="md-raised" ng-click="vm.approveEntry(pending.id)" ng-disabled="pending.approved">Approve</md-button>
+        <md-button class="md-raised md-primary" ng-click="vm.updateEntry(pending)"> {{ pending.approved ? "Reject" : "Approve" }}</md-button>
         <md-button class="md-raised md-warn" ng-click="vm.deleteEntry(pending.id)">Delete</md-button>
         <pre>{{ pending | json }}</pre>
     </section>

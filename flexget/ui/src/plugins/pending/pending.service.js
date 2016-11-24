@@ -9,7 +9,7 @@
     function pendingService($http, exception) {
         return {
             getPending: getPending,
-            approveEntry: approveEntry,
+            updateEntry: updateEntry,
             deleteEntry: deleteEntry
         };
 
@@ -20,9 +20,9 @@
                 .catch(callFailed);
         }
 
-        function approveEntry(entryId) {
+        function updateEntry(entryId, operation) {
             return $http.put('/api/pending/' + entryId + '/', {
-                operation: "approve"
+                operation: operation
             })
                 .catch(callFailed);
         }
