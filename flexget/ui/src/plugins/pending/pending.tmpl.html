@@ -2,9 +2,18 @@
     <h3 ng-if="vm.entries.length == 0">
         No pending items
     </h3>
-    <section ng-repeat="pending in vm.entries track by $index">
-        <md-button class="md-raised md-primary" ng-click="vm.updateEntry(pending)"> {{ pending.approved ? "Reject" : "Approve" }}</md-button>
-        <md-button class="md-raised md-warn" ng-click="vm.deleteEntry(pending.id)">Delete</md-button>
-        <pre>{{ pending | json }}</pre>
-    </section>
+    <md-list>
+        <md-list-item class="md-2-line" ng-repeat="pending in vm.entries track by $index">
+            <div class="pending-actions">
+                <md-button class="md-raised" ng-class="pending.approved ? 'md-accent': 'md-primary'" ng-click="vm.updateEntry(pending)"> {{ pending.approved ? "Reject" : "Approve" }}</md-button>
+                <md-button class="md-raised md-warn" ng-click="vm.deleteEntry(pending.id)">Delete</md-button>
+            </div>
+            <div class="md-list-item-text" layout="column">
+                <p>{{ pending.title }}</p>
+                <p>{{ pending.task_name }}</p>
+                <p>{{ pending.added }}</p>
+            </div>
+            <md-divider ng-if="!$last"></md-divider>
+        </md-list-item>
+    </md-list>
 </md-content>
