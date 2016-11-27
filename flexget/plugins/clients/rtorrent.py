@@ -43,10 +43,12 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
     Transport that uses requests to support Digest authentication.
     """
 
-    def __init__(self, scheme, digest_auth, session, *args, **kwargs):
+    def __init__(self, scheme, digest_auth, username, password, session, *args, **kwargs):
         self.__scheme = scheme
         self.__session = session
         self.__digest_auth = digest_auth
+        self.__username = username
+        self.__password = password
         self.verbose = 0
         xmlrpc_client.Transport.__init__(self, *args, **kwargs)  # old style class
 
@@ -54,10 +56,9 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
         return self.single_request(host, handler, request_body, verbose)
 
     def single_request(self, host, handler, request_body, verbose=0):
-        parsed_url = urlparse('{0}://{1}'.format(self.__scheme, host))
-        url = urljoin('{0}://{1}'.format(self.__scheme, parsed_url.hostname), handler)
+        url = urljoin('{0}://{1}'.format(self.__scheme, host), handler)
 
-        auth = self.get_auth(parsed_url.username, parsed_url.password, self.__digest_auth)
+        auth = self.get_auth()
         response = self.send_request(url, auth, request_body)
 
         # if status code is 401, it means we used the wrong auth method
@@ -67,19 +68,17 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
                         'Basic' if self.__digest_auth else 'Digest')
             self.__digest_auth = not self.__digest_auth
 
-            auth = self.get_auth(parsed_url.username, parsed_url.password, self.__digest_auth)
+            auth = self.get_auth()
             response = self.send_request(url, auth, request_body)
 
         response.raise_for_status()
 
         return self.parse_response(response)
 
-    @staticmethod
-    def get_auth(username, password, digest=False):
-        if digest:
-            return HTTPDigestAuth(username, password)
-
-        return HTTPBasicAuth(username, password)
+    def get_auth(self):
+        if self.__digest_auth:
+            return HTTPDigestAuth(self.__username, self.__password)
+        return HTTPBasicAuth(self.__username, self.__password)
     
     def send_request(self, url, auth, data):
         return self.__session.post(url, auth=auth, data=data, raise_status=False)
@@ -261,21 +260,8 @@ class RTorrent(object):
 
         parsed_uri = urlparse(uri)
 
-        # Reformat uri with username and password for HTTP(s) Auth
-        if self.username and self.password:
-            if parsed_uri.scheme not in ['http', 'https']:
-                raise IOError('Username and password only supported on http(s)')
-
-            data = {
-                'scheme': parsed_uri.scheme,
-                'hostname': parsed_uri.hostname,
-                'port': parsed_uri.port,
-                'path': parsed_uri.path,
-                'query': parsed_uri.query,
-                'username': self.username,
-                'password': self.password,
-            }
-            self.uri = '%(scheme)s://%(username)s:%(password)s@%(hostname)s%(path)s%(query)s' % data
+        if self.username and self.password and parsed_uri.scheme not in ['http', 'https']:
+            raise IOError('Username and password only supported on http(s)')
 
         # Determine the proxy server
         if parsed_uri.scheme in ['http', 'https']:
@@ -290,7 +276,8 @@ class RTorrent(object):
 
         # Use a special transport if http(s)
         if parsed_uri.scheme in ['http', 'https']:
-            self._server = sp(self.uri, transport=HTTPDigestTransport(parsed_uri.scheme, self.digest_auth, session))
+            self._server = sp(self.uri, transport=HTTPDigestTransport(parsed_uri.scheme, self.digest_auth,
+                                                                      self.username, self.password, session))
         else:
             self._server = sp(self.uri)
 
