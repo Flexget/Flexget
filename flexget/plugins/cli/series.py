@@ -231,16 +231,16 @@ def display_details(options):
         footer = ' %s \n' % (colorize(DOWNLOADED_RELEASE_COLOR, '* Downloaded'))
         if not series.identified_by:
             footer += ('\n Series plugin is still learning which episode numbering mode is \n'
-                      ' correct for this series (identified_by: auto).\n'
-                      ' Few duplicate downloads can happen with different numbering schemes\n'
-                      ' during this time.')
+                       ' correct for this series (identified_by: auto).\n'
+                       ' Few duplicate downloads can happen with different numbering schemes\n'
+                       ' during this time.')
         else:
             footer += '\n Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by
         footer += ' \n See option `identified_by` for more information.\n'
         if series.begin:
             footer += ' Begin episode for this series set to `%s`.' % series.begin.identifier
-    table = TerminalTable(options.table_type, table_data, table_title, drop_columns=[4, 3, 1])
     try:
+        table = TerminalTable(options.table_type, table_data, table_title, drop_columns=[4, 3, 1])
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
