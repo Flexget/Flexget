@@ -59,42 +59,38 @@ class PendingApproval(object):
             .filter(PendingEntry.url == entry['url']) \
             .first()
 
-    # Have to run this input last to make sure all input have created entries
-    @plugin.priority(-255)
     def on_task_input(self, task, config):
         if not config:
             return
 
         approved_entries = []
         with Session() as session:
-            for entry in task.entries:
-                # Cache all new task entries
-                if not self._item_query(entry, task, session):
-                    log.verbose('creating new pending entry %s', entry)
-                    session.add(PendingEntry(task_name=task.name, entry=entry))
-                    entry.reject('new unapproved entry, caching and waiting for approval')
-
-            # Clear the current entries from the task now that they are stored
-            task.all_entries[:] = []
-
-            # Pass all entries marked as approved
             for approved_entry in session.query(PendingEntry) \
                     .filter(PendingEntry.task_name == task.name) \
                     .filter(PendingEntry.approved == True) \
                     .all():
                 e = approved_entry.entry
                 e['approved'] = True
+                e['immortal'] = True
                 approved_entries.append(e)
 
         return approved_entries
 
-    @plugin.priority(-1)
+    # Run after all other filters
+    @plugin.priority(-255)
     def on_task_filter(self, task, config):
         if not config:
             return
-        for entry in task.entries:
-            if entry.get('approved'):
-                entry.accept('entry is marked as approved')
+
+        with Session() as session:
+            for entry in task.entries:
+                # Cache all new task entries
+                if entry.get('approved'):
+                    entry.accept('entry is marked as approved')
+                elif not self._item_query(entry, task, session):
+                    log.verbose('creating new pending entry %s', entry)
+                    session.add(PendingEntry(task_name=task.name, entry=entry))
+                    entry.reject('new unapproved entry, caching and waiting for approval')
 
     def on_task_learn(self, task, config):
         if not config:
