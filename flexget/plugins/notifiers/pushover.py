@@ -25,17 +25,19 @@ class PushoverNotifier(object):
     Example::
 
       pushover:
-        userkey: <USER_KEY> (can also be a list of userkeys)
+        user_key: <USER_KEY> (can also be a list of userkeys)
         apikey: <API_KEY>
-        [device: <DEVICE_STRING>] (default: (none))
-        [title: <MESSAGE_TITLE>] (default: "Download started" -- accepts Jinja2)
-        [message: <MESSAGE_BODY>] (default uses series/tvdb name and imdb if available -- accepts Jinja2)
-        [priority: <PRIORITY>] (default = 0 -- normal = 0, high = 1, silent = -1, emergency = 2)
-        [url: <URL>] (default: "{{imdb_url}}" -- accepts Jinja2)
-        [urltitle: <URL_TITLE>] (default: (none) -- accepts Jinja2)
-        [sound: <SOUND>] (default: pushover default)
+        [device: <DEVICE_STRING>]
+        [title: <MESSAGE_TITLE>]
+        [message: <MESSAGE_BODY>]
+        [priority: <PRIORITY>]
+        [url: <URL>]
+        [url_title: <URL_TITLE>]
+        [sound: <SOUND>]
         [retry]: <RETRY>]
-
+        [expire]: <EXPIRE>]
+        [callback]: <CALLBACK>]
+        [html]: <HTML>]
     """
 
     schema = {
@@ -43,7 +45,7 @@ class PushoverNotifier(object):
         'properties': {
             'user_key': one_or_more({'type': 'string'}),
             'token': {'type': 'string'},
-            'device': {'type': 'string'},
+            'device': one_or_more({'type': 'string'}),
             'title': {'type': 'string'},
             'message': {'type': 'string'},
             'priority': {'oneOf': [
@@ -62,34 +64,54 @@ class PushoverNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, user_key, token, message, title, **kwargs):
+    def notify(self, user_key, token, message, title=None, device=None, priority=None, url=None, url_title=None,
+               sound=None, retry=None, expire=None, callback=None, html=None):
         """
-        Send a notification to Pushover service
-        :param user_key: Single or list of user keys
-        :param token: App token
-        :param message: Message to send
-        :param title: Title of message
-        :param kwargs: All other passed attributed that notifier support in schema
-        """
-        message_data = {'token': token, 'message': message, 'title': title}
-        message_data.update({key: value for key, value in kwargs.items()})
+        Sends a Pushover notification
 
-        # Special case for html key
-        if message_data.get('html'):
-            message_data['html'] = 1
+        :param str user_key: the user/group key or list of them
+        :param str token: your application's API token
+        :param str message: the message to send
+        :param str title: your message's title, otherwise your app's name is used
+        :param str device: your user's device name to send the message directly to that device,
+         rather than all of the user's devices. Can be a list
+        :param int priority: send as -2 to generate no notification/alert, -1 to always send as a quiet notification,
+         1 to display as high-priority and bypass the user's quiet hours, or 2 to also require confirmation from
+         the user
+        :param str url: a supplementary URL to show with your message
+        :param str url_title: a title for your supplementary URL, otherwise just the URL is shown
+        :param str sound: the name of one of the sounds supported by device clients to override the user's default
+         sound choice
+        :param int retry: how often (in seconds) the Pushover servers will send the same notification to the user
+        :param int expire: how many seconds your notification will continue to be retried for (every retry seconds).
+        :param str callback: a publicly-accessible URL that our servers will send a request to when the user has
+         acknowledged your notification
+        :param bool html: enable HTML parsing
+        """
+        notification = {'token': token, 'message': message, 'title': title, 'device': device, 'priority': priority,
+                        'url': url, 'url_title': url_title, 'sound': sound, 'retry': retry, 'expire': expire,
+                        'callback': callback}
+
+        # HTML parsing mode
+        if html:
+            notification['html'] = 1
+
+        # Support multiple devices
+        if isinstance(device, list):
+            notification['device'] = ','.join(device)
 
         # Special case, verify certain fields exists if priority is 2
-        if message_data.get('priority') == 2 and not all([message_data.get('expire'), message_data.get('retry')]):
-            log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.'
-                        ' Lowering priority to 1')
-            message_data['priority'] = 1
+        if priority == 2 and not all([expire, retry]):
+            log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.Lowering priority to 1')
+            notification['priority'] = 1
 
         if not isinstance(user_key, list):
             user_key = [user_key]
+
         for user in user_key:
-            message_data['user'] = user
+            notification['user'] = user
             try:
-                response = requests.post(PUSHOVER_URL, data=message_data)
+                response = requests.post(PUSHOVER_URL, data=notification)
             except RequestException as e:
                 if e.response.status_code == 429:
                     reset_time = datetime.datetime.fromtimestamp(

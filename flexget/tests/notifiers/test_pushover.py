@@ -22,16 +22,18 @@ class TestPushoverNotifier(object):
         data2 = {
             'user_key': 'ua2g3vqjyvqpkyntx19zeruqrn3eim',
             'token': 'aPwSHwkLcNaavShxktBpgJH4bRWc3m',
-            'message': 'test'
+            'message': 'test',
+            'title': 'test'
         }
 
         # No exception should be raised
-        PushoverNotifier().notify(data2)
+        PushoverNotifier().notify(**data2)
 
         data1 = {
             'user_key': 'crash',
             'token': 'aPwSHwkLcNaavShxktBpgJH4bRWc3m',
-            'message': 'test'
+            'message': 'test',
+            'title': 'test'
         }
         with pytest.raises(PluginWarning):
-            PushoverNotifier().notify(data1)
+            PushoverNotifier().notify(**data1)
