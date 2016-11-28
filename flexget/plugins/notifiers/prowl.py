@@ -2,10 +2,10 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
-
 import xml.etree.ElementTree as ET
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
@@ -37,10 +37,10 @@ class ProwlNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'apikey': {'type': 'string'},
+            'apikey': one_or_more({'type': 'string'}),
             'application': {'type': 'string', 'default': 'FlexGet'},
             'title': {'type': 'string'},
-            'priority': {'type': 'integer', 'default': 0},
+            'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2},
             'message': {'type': 'string'},
             'url': {'type': 'string'},
             'file_template': {'type': 'string'}
@@ -49,23 +49,27 @@ class ProwlNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, data):
-        apikey = data.get('apikey')
-        application = data.get('application')
-        event = data.get('title')
-        priority = data.get('priority')
-        description = data.get('message')
-        message_url = data.get('url', '')
+    def notify(self, apikey, application, title, message, priority=None, providerkey=None, url=None):
+        """
+        Send a Prowl notification
 
-        message_data = {'priority': priority,
-                'application': application,
-                'apikey': apikey,
-                'event': event,
-                'description': description,
-                'url': message_url}
+        :param str apikey: One or more API keys
+        :param str application: Application name
+        :param str title: Notification subject
+        :param str message: Notification message
+        :param priority: Notification priority
+        :param str providerkey: Your provider API key. Only necessary if you have been whitelisted.
+        :param str url: The URL which should be attached to the notification.
+        """
+        notification = {'application': application, 'event': title, 'description': message, 'url': url,
+                        'priority': priority, 'providerkey': providerkey}
+
+        if isinstance(apikey, list):
+            apikey = [apikey]
+        notification['apikey'] = apikey
 
         try:
-            response = requests.post(PROWL_URL, data=message_data)
+            response = requests.post(PROWL_URL, data=notification)
         except RequestException as e:
             raise PluginWarning(repr(e))
 
@@ -76,7 +80,7 @@ class ProwlNotifier(object):
         else:
             success = request_status.find('success').attrib
             log.debug('prowl notification sent. Notifications remaining until next reset: %s. '
-                        'Next reset will occur in %s minutes', success['remaining'], success['resetdate'])
+                      'Next reset will occur in %s minutes', success['remaining'], success['resetdate'])
 
     @plugin.priority(0)
     def on_task_output(self, task, config):

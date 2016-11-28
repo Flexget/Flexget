@@ -44,7 +44,7 @@ class PushoverNotifier(object):
         'type': 'object',
         'properties': {
             'user_key': one_or_more({'type': 'string'}),
-            'token': {'type': 'string'},
+            'apikey': {'type': 'string'},
             'device': one_or_more({'type': 'string'}),
             'title': {'type': 'string'},
             'message': {'type': 'string'},
@@ -60,17 +60,17 @@ class PushoverNotifier(object):
             'callback': {'type': 'string', 'format': 'url'},
             'html': {'type': 'boolean'}
         },
-        'required': ['token', 'user_key'],
+        'required': ['apikey', 'user_key'],
         'additionalProperties': False
     }
 
-    def notify(self, user_key, token, message, title=None, device=None, priority=None, url=None, url_title=None,
+    def notify(self, user_key, apikey, message, title=None, device=None, priority=None, url=None, url_title=None,
                sound=None, retry=None, expire=None, callback=None, html=None):
         """
         Sends a Pushover notification
 
         :param str user_key: the user/group key or list of them
-        :param str token: your application's API token
+        :param str apikey: your application's API apikey
         :param str message: the message to send
         :param str title: your message's title, otherwise your app's name is used
         :param str device: your user's device name to send the message directly to that device,
@@ -86,7 +86,7 @@ class PushoverNotifier(object):
             acknowledged your notification
         :param bool html: enable HTML parsing
         """
-        notification = {'token': token, 'message': message, 'title': title, 'device': device, 'priority': priority,
+        notification = {'token': apikey, 'message': message, 'title': title, 'device': device, 'priority': priority,
                         'url': url, 'url_title': url_title, 'sound': sound, 'retry': retry, 'expire': expire,
                         'callback': callback}
 
