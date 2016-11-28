@@ -51,7 +51,7 @@ class PushbulletNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, apikey, title, message, device=None, email=None, url=None, channel=None):
+    def notify(self, apikey, title, message, device=None, email=None, url=None, channel=None, **kwargs):
         """
         Send a Pushbullet notification
 

@@ -42,7 +42,7 @@ class SlackNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, web_hook_url, message, channel=None, username=None, icon_emoji=None):
+    def notify(self, web_hook_url, message, channel=None, username=None, icon_emoji=None, **kwargs):
         """
         Send a Slack notification
 

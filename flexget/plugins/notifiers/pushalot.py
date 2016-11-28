@@ -54,7 +54,7 @@ class PushalotNotifier(object):
               'additionalProperties': False}
 
     def notify(self, apikey, message, title, url=None, url_title=None, important=None, silent=None, image=None,
-               source=None, timetolive=None):
+               source=None, timetolive=None, **kwargs):
         """
         Send a Pushalot notification
 

@@ -49,7 +49,7 @@ class RapidpushNotifer(object):
         'required': ['apikey']
     }
 
-    def notify(self, apikey, title, message, category, group=None, channel=None, priority=None):
+    def notify(self, apikey, title, message, category, group=None, channel=None, priority=None, **kwargs):
         wrapper = {}
         notification = {'title': title, 'message': message}
         if not isinstance(apikey, list):

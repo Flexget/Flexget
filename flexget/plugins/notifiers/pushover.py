@@ -65,7 +65,7 @@ class PushoverNotifier(object):
     }
 
     def notify(self, user_key, apikey, message, title=None, device=None, priority=None, url=None, url_title=None,
-               sound=None, retry=None, expire=None, callback=None, html=None):
+               sound=None, retry=None, expire=None, callback=None, html=None, **kwargs):
         """
         Sends a Pushover notification
 

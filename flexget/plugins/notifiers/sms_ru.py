@@ -45,11 +45,14 @@ class SMSRuNotifier(object):
         'required': ['phone_number', 'password']
     }
 
-    def notify(self, data):
-        phone_number = data['phone_number']
-        password = data['password']
-        message = data['message']
+    def notify(self, phone_number, password, message, **kwargs):
+        """
+        Send an SMS RU notification
 
+        :param str phone_number: Phone number to send to
+        :param str password: Password
+        :param str message: Message to send
+        """
         try:
             token_response = requests.get(SMS_TOKEN_URL)
         except RequestException as e:
@@ -58,14 +61,14 @@ class SMSRuNotifier(object):
         sha512 = hashlib.sha512(password + token_response.text).hexdigest()
 
         # Build request params
-        send_params = {'login': phone_number,
+        notification = {'login': phone_number,
                        'sha512': sha512,
                        'token': token_response.text,
                        'to': phone_number,
                        'text': message}
 
         try:
-            response = requests.get(SMS_SEND_URL, params=send_params)
+            response = requests.get(SMS_SEND_URL, params=notification)
         except RequestException as e:
             raise PluginWarning(e.args[0])
         else:

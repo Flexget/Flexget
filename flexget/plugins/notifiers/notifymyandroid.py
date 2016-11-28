@@ -47,7 +47,8 @@ class NotifyMyAndroidNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, apikey, title, message, application, priority=None, developer_key=None, url=None, html=None):
+    def notify(self, apikey, title, message, application, priority=None, developer_key=None, url=None, html=None,
+               **kwargs):
         """
         Send a Notifymyandroid notification
 

@@ -22,7 +22,7 @@ class OutputNotifyOsd(object):
         'additionalProperties': False
     }
 
-    def notify(self, title, message, timeout):
+    def notify(self, title, message, timeout, **kwargs):
         """
         Send a notification to NotifyOSD
 

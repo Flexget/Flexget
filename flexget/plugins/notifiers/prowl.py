@@ -49,7 +49,7 @@ class ProwlNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, apikey, application, title, message, priority=None, providerkey=None, url=None):
+    def notify(self, apikey, application, title, message, priority=None, providerkey=None, url=None, **kwargs):
         """
         Send a Prowl notification
 
