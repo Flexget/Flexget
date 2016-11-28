@@ -43,7 +43,7 @@ class PushbulletNotifier(object):
             'email': one_or_more({'type': 'string', 'format': 'email'}),
             'title': {'type': 'string'},
             'message': {'type': 'string'},
-            'url': {'type': 'string'},
+            'url': {'type': 'string', 'format': 'url'},
             'channel': {'type': 'string'},
             'file_template': {'type': 'string'},
         },
@@ -51,42 +51,45 @@ class PushbulletNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, data):
-        devices = data.get('device', [])
-        if not isinstance(devices, list):
-            devices = [devices]
+    def notify(self, apikey, title, message, device=None, email=None, url=None, channel=None):
+        """
+        Send a Pushbullet notification
 
-        emails = data.get('email', [])
-        if not isinstance(emails, list):
-            emails = [emails]
+        :param str apikey: one or more api keys
+        :param str title: title of notification
+        :param str message: message of notification
+        :param str device: one or more devices to send to
+        :param str email: one or more emails to send to
+        :param str url: URL to attach to notification
+        :param str channel: Channel to send to
+        """
+        if device and not isinstance(device, list):
+            device = [device]
 
-        apikeys = data.get('apikey', [])
-        if not isinstance(apikeys, list):
-            apikeys = [apikeys]
+        if email and not isinstance(email, list):
+            email = [email]
 
-        title = data['title']
-        body = data['message']
-        url = data.get('url')
-        channel = data.get('channel')
+        if not isinstance(apikey, list):
+            apikey = [apikey]
 
-        for apikey in apikeys:
+        for key in apikey:
             if channel:
-                self.send_push(apikey, title, body, url, channel, 'channel_tag')
-            elif devices or emails:
-                for device in devices:
-                    self.send_push(apikey, title, body, url, device, 'device_iden')
-                for email in emails:
-                    self.send_push(apikey, title, body, url, email, 'email')
+                self.send_push(key, title, message, url, channel, 'channel_tag')
+            elif device or email:
+                for d in device:
+                    self.send_push(key, title, message, url, d, 'device_iden')
+                for e in email:
+                    self.send_push(key, title, message, url, e, 'email')
             else:
-                self.send_push(apikey, title, body, url)
+                self.send_push(key, title, message, url)
 
     def send_push(self, api_key, title, body, url=None, destination=None, destination_type=None):
         push_type = 'link' if url else 'note'
-        data = {'type': push_type, 'title': title, 'body': body}
+        notification = {'type': push_type, 'title': title, 'body': body}
         if url:
-            data['url'] = url
+            notification['url'] = url
         if destination:
-            data[destination_type] = destination
+            notification[destination_type] = destination
 
         # Make the request
         headers = {
@@ -96,12 +99,12 @@ class PushbulletNotifier(object):
             'User-Agent': 'Flexget'
         }
         try:
-            response = requests.post(PUSHBULLET_URL, headers=headers, json=data)
+            response = requests.post(PUSHBULLET_URL, headers=headers, json=notification)
         except RequestException as e:
             if e.response.status_code == 429:
                 reset_time = datetime.datetime.fromtimestamp(
                     int(e.response.headers['X-Ratelimit-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
-                message = 'Monthly Pushbullet database operations  limit reached. Next reset: %s' % reset_time
+                message = 'Monthly Pushbullet database operations limit reached. Next reset: %s' % reset_time
             else:
                 message = e.response.json()['error']['message']
             raise PluginWarning(message)
@@ -110,7 +113,7 @@ class PushbulletNotifier(object):
             int(response.headers['X-Ratelimit-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
         remaining = response.headers['X-Ratelimit-Remaining']
         log.debug('Pushbullet notification sent. Database operations remaining until next reset: %s. '
-                    'Next reset at: %s', remaining, reset_time)
+                  'Next reset at: %s', remaining, reset_time)
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
