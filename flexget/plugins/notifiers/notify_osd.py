@@ -22,21 +22,25 @@ class OutputNotifyOsd(object):
         'additionalProperties': False
     }
 
-    def notify(self, data):
+    def notify(self, title, message, timeout):
+        """
+        Send a notification to NotifyOSD
+
+        :param str title: Notification title
+        :param message: Notification message
+        :param timeout: Notification timeout
+        """
         try:
             from gi.repository import Notify
         except ImportError as e:
             log.debug('Error importing Notify: %s', e)
             raise DependencyError(__name__, 'gi.repository', 'Notify module required. ImportError: %s' % e)
 
-        title = data['title']
-        body = data['message']
-
         if not Notify.init("Flexget"):
             raise PluginWarning('Unable to init libnotify.')
 
-        n = Notify.Notification.new(title, body, None)
-        timeout = (data['timeout'] * 1000)
+        n = Notify.Notification.new(title, message, None)
+        timeout = (timeout * 1000)
         n.set_timeout(timeout)
 
         if not n.show():
