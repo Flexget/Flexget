@@ -74,18 +74,16 @@ class PushoverNotifier(object):
         :param str message: the message to send
         :param str title: your message's title, otherwise your app's name is used
         :param str device: your user's device name to send the message directly to that device,
-         rather than all of the user's devices. Can be a list
-        :param int priority: send as -2 to generate no notification/alert, -1 to always send as a quiet notification,
-         1 to display as high-priority and bypass the user's quiet hours, or 2 to also require confirmation from
-         the user
+            rather than all of the user's devices. Can be a list
+        :param int priority: notification priority, int between -2 and 2
         :param str url: a supplementary URL to show with your message
         :param str url_title: a title for your supplementary URL, otherwise just the URL is shown
         :param str sound: the name of one of the sounds supported by device clients to override the user's default
-         sound choice
+            sound choice
         :param int retry: how often (in seconds) the Pushover servers will send the same notification to the user
         :param int expire: how many seconds your notification will continue to be retried for (every retry seconds).
         :param str callback: a publicly-accessible URL that our servers will send a request to when the user has
-         acknowledged your notification
+            acknowledged your notification
         :param bool html: enable HTML parsing
         """
         notification = {'token': token, 'message': message, 'title': title, 'device': device, 'priority': priority,
