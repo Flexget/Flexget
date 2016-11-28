@@ -62,22 +62,31 @@ class PushoverNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, data):
+    def notify(self, user_key, token, message, title, **kwargs):
+        """
+        Send a notification to Pushover service
+        :param user_key: Single or list of user keys
+        :param token: App token
+        :param message: Message to send
+        :param title: Title of message
+        :param kwargs: All other passed attributed that notifier support in schema
+        """
+        message_data = {'token': token, 'message': message, 'title': title}
+        message_data.update({key: value for key, value in kwargs.items()})
+
         # Special case for html key
-        if data.get('html'):
-            data['html'] = 1
+        if message_data.get('html'):
+            message_data['html'] = 1
 
         # Special case, verify certain fields exists if priority is 2
-        if data.get('priority') == 2 and not all([data.get('expire'), data.get('retry')]):
+        if message_data.get('priority') == 2 and not all([message_data.get('expire'), message_data.get('retry')]):
             log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.'
                         ' Lowering priority to 1')
-            data['priority'] = 1
+            message_data['priority'] = 1
 
-        if not isinstance(data['user_key'], list):
-            data['user_key'] = [data['user_key']]
-
-        message_data = data
-        for user in data['user_key']:
+        if not isinstance(user_key, list):
+            user_key = [user_key]
+        for user in user_key:
             message_data['user'] = user
             try:
                 response = requests.post(PUSHOVER_URL, data=message_data)

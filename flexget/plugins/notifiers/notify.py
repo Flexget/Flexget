@@ -138,7 +138,7 @@ class Notify(object):
                         if not task.options.test:
                             log.debug('Sending a notification to `%s`', notifier_name)
                             try:
-                                notifier.notify(notification_data)
+                                notifier.notify(**notification_data)
                             except PluginWarning as e:
                                 log.warning('Error while sending notification to `%s`: %s', notifier_name, e.value)
                             else:
