@@ -32,11 +32,6 @@ class RapidpushNotifer(object):
         [channel: the broadcast notification channel, if provided it will be send to the channel subscribers instead of
             your devices, default no channel]
         [priority: 0 - 6 (6 = highest), default 2 (normal)]
-        [notify_accepted: boolean true or false, default true]
-        [notify_rejected: boolean true or false, default false]
-        [notify_failed: boolean true or false, default false]
-        [notify_undecided: boolean true or false, default false]
-
     """
     schema = {
         'type': 'object',
@@ -54,29 +49,23 @@ class RapidpushNotifer(object):
         'required': ['apikey']
     }
 
-    def notify(self, data):
-        apikey = data['apikey']
+    def notify(self, apikey, title, message, category, group=None, channel=None, priority=None, **kwargs):
+        wrapper = {}
+        notification = {'title': title, 'message': message}
         if not isinstance(apikey, list):
             apikey = [apikey]
 
-        title = data['title']
-        message = data['message']
-
-        wrapper = {}
-        message_data = {'title': title, 'message': message}
-
-        channel = data.get('channel')
         if channel:
             wrapper['command'] = 'broadcast'
         else:
             wrapper['command'] = 'notify'
-            message_data['category'] = data['category']
-            if data.get('group'):
-                message_data['group'] = data.get('group')
-            if data.get('priority'):
-                message_data['priority'] = data.get('priority')
+            notification['category'] = category
+            if group:
+                notification['group'] = group
+            if priority:
+                notification['priority'] = priority
 
-        wrapper['data'] = message_data
+        wrapper['data'] = notification
         for key in apikey:
             wrapper['apikey'] = key
             try:
