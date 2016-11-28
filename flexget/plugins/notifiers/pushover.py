@@ -26,7 +26,7 @@ class PushoverNotifier(object):
 
       pushover:
         user_key: <USER_KEY> (can also be a list of userkeys)
-        apikey: <API_KEY>
+        token: <TOKEN>
         [device: <DEVICE_STRING>]
         [title: <MESSAGE_TITLE>]
         [message: <MESSAGE_BODY>]
