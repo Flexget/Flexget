@@ -104,30 +104,40 @@ class EmailNotifier(object):
         'additionalProperties': False,
     }
 
-    def notify(self, data):
-        to = data['to']
+    def notify(self, to, message, title, smtp_host, smtp_port, smtp_username=None, smtp_password=None, smtp_tls=None,
+               smtp_ssl=None, html=None, **kwargs):
+        """
+        Send an email notification
+
+        :param str to: email `to` address
+        :param str message: message body
+        :param str title: message subject
+        :param str smtp_host: smtp_host to use
+        :param int smtp_port: port to use
+        :param str smtp_username: smtp username if authentication is required
+        :param str smtp_password: smtp password if authentication is required
+        :param bool smtp_tls: enable tls
+        :param bool smtp_ssl: enable ssl
+        :param bool html: set content type to `html`
+        :param kwargs: contains the `from` attribute since that is a reserved keyword
+        """
+
         if not isinstance(to, list):
             to = [to]
-        title = data['title']
-        from_ = data['from']
-        html = data['html']
-        body = data.get('message')
-        host = data['smtp_host']
-        port = data['smtp_port']
 
-        message = MIMEMultipart('alternative')
-        message['To'] = ','.join(to)
-        message['From'] = from_
-        message['Subject'] = title
-        message['Date'] = formatdate(localtime=True)
+        email = MIMEMultipart('alternative')
+        email['To'] = ','.join(to)
+        email['From'] = kwargs['from']
+        email['Subject'] = title
+        email['Date'] = formatdate(localtime=True)
         content_type = 'html' if html else 'plain'
-        message.attach(MIMEText(body.encode('utf-8'), content_type, _charset='utf-8'))
+        email.attach(MIMEText(message.encode('utf-8'), content_type, _charset='utf-8'))
 
         try:
-            log.debug('sending email notification to %s:%s', host, port)
-            mailServer = smtplib.SMTP_SSL if data.get('smtp_ssl') else smtplib.SMTP
-            mailServer = mailServer(host, port)
-            if data.get('smtp_tls'):
+            log.debug('sending email notification to %s:%s', smtp_host, smtp_port)
+            mailServer = smtplib.SMTP_SSL if smtp_ssl else smtplib.SMTP
+            mailServer = mailServer(smtp_host, smtp_port)
+            if smtp_tls:
                 mailServer.ehlo()
                 mailServer.starttls()
                 mailServer.ehlo()
@@ -135,11 +145,11 @@ class EmailNotifier(object):
             raise PluginWarning(e.args[0])
 
         try:
-            if data.get('smtp_username'):
+            if smtp_username:
                 # Forcing to use `str` type
-                log.debug('logging in to smtp server using username: %s', data['smtp_username'])
-                mailServer.login(str(data['smtp_username']), str(data['smtp_password']))
-            mailServer.sendmail(message['From'], to, message.as_string())
+                log.debug('logging in to smtp server using username: %s', smtp_username)
+                mailServer.login(str(smtp_username), str(smtp_password))
+            mailServer.sendmail(email['From'], to, email.as_string())
         except IOError as e:
             raise PluginWarning(e.args[0])
 
