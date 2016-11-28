@@ -65,7 +65,6 @@ class Notify(object):
             config['what'] = [config['what']]
         config.setdefault('title', DEFAULT_DICTS[config['scope']]['title'])
         config.setdefault('message', DEFAULT_DICTS[config['scope']]['message'])
-        config.setdefault('url', DEFAULT_DICTS[config['scope']]['url'])
         return config
 
     @staticmethod
