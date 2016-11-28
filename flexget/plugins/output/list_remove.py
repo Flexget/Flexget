@@ -27,6 +27,10 @@ class ListRemove(object):
     }
 
     def on_task_output(self, task, config):
+        if not len(task.accepted) > 0:
+            log.debug('no accepted entries, nothing to remove')
+            return
+
         for item in config:
             for plugin_name, plugin_config in item.items():
                 try:
