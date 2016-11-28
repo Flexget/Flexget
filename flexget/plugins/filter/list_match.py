@@ -56,7 +56,7 @@ class ListMatch(object):
                         entry.reject()
 
     def on_task_learn(self, task, config):
-        if not config['remove_on_match']:
+        if not config['remove_on_match'] or not len(task.accepted) > 0:
             return
         for item in config['from']:
             for plugin_name, plugin_config in item.items():
