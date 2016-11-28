@@ -50,6 +50,17 @@ class RapidpushNotifer(object):
     }
 
     def notify(self, apikey, title, message, category, group=None, channel=None, priority=None, **kwargs):
+        """
+        Send a Rapidpush notification
+
+        :param str apikey: one or more api keys
+        :param str title: title of notification
+        :param str message: message of notification
+        :param str category: category of notification
+        :param str group: group of notification
+        :param str channel: channel of notification
+        :param int priority: priority of notification
+        """
         wrapper = {}
         notification = {'title': title, 'message': message}
         if not isinstance(apikey, list):

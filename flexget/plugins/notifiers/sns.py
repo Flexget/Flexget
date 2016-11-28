@@ -58,22 +58,34 @@ class SNSNotifier(object):
         'additionalProperties': False,
     }
 
-    def notify(self, data):
+    def notify(self, title, message, aws_region, aws_access_key_id=None, aws_secret_access_key=None, profile_name=None):
+        """
+        Send an Amazon SNS notification
+
+        :param str title: Notification title
+        :param str message: Notification message
+        :param str aws_region: AWS region
+        :param str aws_access_key_id: AWS access key ID. Will be taken from AWS_ACCESS_KEY_ID environment if not
+            provided.
+        :param str aws_secret_access_key: AWS secret access key ID. Will be taken from AWS_SECRET_ACCESS_KEY
+            environment if not provided.
+        :param profile_name: If provided, use this profile name instead of the default.
+        """
         try:
             import boto3  # noqa
         except ImportError as e:
             log.debug("Error importing boto3: %s", e)
             raise plugin.DependencyError("sns", "boto3", "Boto3 module required. ImportError: %s" % e)
 
-        session = boto3.Session(aws_access_key_id=data.get('aws_access_key_id'),
-                                aws_secret_access_key=data.get('aws_secret_access_key'),
-                                profile_name=data.get('profile_name'),
-                                region_name=data['aws_region'])
+        session = boto3.Session(aws_access_key_id=aws_access_key_id,
+                                aws_secret_access_key=aws_secret_access_key,
+                                profile_name=profile_name,
+                                region_name=aws_region)
         sns = session.resource('sns')
-        topic = sns.Topic(data['title'])
+        topic = sns.Topic(title)
 
         try:
-            topic.publish(Message=data['message'])
+            topic.publish(Message=message)
         except Exception as e:
             raise PluginWarning("Error publishing %s: ", e.args[0])
 
