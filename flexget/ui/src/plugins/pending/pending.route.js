@@ -20,7 +20,7 @@
                     settings: {
                         weight: 3,
                         icon: 'check',
-                        caption: 'pending'
+                        caption: 'Pending'
                     }
                 }
             }
