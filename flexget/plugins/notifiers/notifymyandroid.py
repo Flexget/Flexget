@@ -37,8 +37,8 @@ class NotifyMyAndroidNotifier(object):
             'application': {'type': 'string', 'default': 'FlexGet'},
             'title': {'type': 'string'},
             'message': {'type': 'string'},
-            'priority': {'type': 'integer', 'default': 0},
-            'developerkey': {'type': 'string'},
+            'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2},
+            'developer_key': {'type': 'string'},
             'url': {'type': 'string'},
             'html': {'type': 'boolean'},
             'file_template': {'type': 'string'}
@@ -47,21 +47,34 @@ class NotifyMyAndroidNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, data):
-        # Handle multiple API keys
-        if isinstance(data['apikey'], list):
-            data['apikey'] = ','.join(data['apikey'])
+    def notify(self, apikey, title, message, application, priority=None, developer_key=None, url=None, html=None):
+        """
+        Send a Notifymyandroid notification
 
-        data['event'] = data.pop('title')
-        data['description'] = data.pop('message')
+        :param str apikey: One or more API keys
+        :param str title: Event name
+        :param str message: Notification message
+        :param str application: Application name
+        :param int priority: Notification priority
+        :param str developer_key: Optional developer key
+        :param str url: Notification URL
+        :param bool html: Sets `content-type` to `text/html` if True
+        """
+        notification = {'event': title, 'description': message, 'application': application, 'priority': priority,
+                        'developerkey': developer_key, 'url': url}
+
+        # Handle multiple API keys
+        if isinstance(apikey, list):
+            apikey = ','.join(apikey)
+
+        notification['apikey'] = apikey
 
         # Special case for html handling
-        html = data.pop('html', None)
         if html:
-            data['content-type'] = 'text/html'
+            notification['content-type'] = 'text/html'
 
         try:
-            response = requests.post(NOTIFYMYANDROID_URL, data=data)
+            response = requests.post(NOTIFYMYANDROID_URL, data=notification)
         except RequestException as e:
             raise PluginWarning(e.args[0])
 
@@ -72,7 +85,7 @@ class NotifyMyAndroidNotifier(object):
         else:
             success = request_status.find('success').attrib
             log.debug('notifymyandroid notification sent. Notifications remaining until next reset: %s. '
-                        'Next reset will occur in %s minutes', success['remaining'], success['resettimer'])
+                      'Next reset will occur in %s minutes', success['remaining'], success['resettimer'])
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
