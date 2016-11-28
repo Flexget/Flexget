@@ -38,34 +38,48 @@ class PushalotNotifier(object):
     """
     schema = {'type': 'object',
               'properties': {
-                  'token': one_or_more({'type': 'string'}),
+                  'apikey': one_or_more({'type': 'string'}),
                   'title': {'type': 'string'},
                   'message': {'type': 'string'},
-                  'url': {'type': 'string'},
+                  'url': {'type': 'string', 'format': 'url'},
                   'url_title': {'type': 'string'},
                   'important': {'type': 'boolean', 'default': False},
                   'silent': {'type': 'boolean', 'default': False},
-                  'image': {'type': 'string', 'default': ''},
+                  'image': {'type': 'string', 'format': 'url'},
                   'source': {'type': 'string', 'default': 'FlexGet'},
-                  'timetolive': {'type': 'integer', 'maximum': 43200, 'default': 0},
+                  'timetolive': {'type': 'integer', 'maximum': 43200, 'minimum': 0},
                   'file_template': {'type': 'string'},
               },
-              'required': ['token'],
+              'required': ['apikey'],
               'additionalProperties': False}
 
-    def notify(self, data):
-        token = data.pop('token')
-        if not isinstance(token, list):
-            token = [token]
+    def notify(self, apikey, message, title, url=None, url_title=None, important=None, silent=None, image=None,
+               source=None, timetolive=None):
+        """
+        Send a Pushalot notification
 
-        data['body'] = data.pop('message')
-        data['link'] = data.pop('url', None)
-        data['linktitle'] = data.pop('url_title', None)
+        :param str apikey: one or more API keys
+        :param str message: Notification message
+        :param str title: Notification title
+        :param str url: Enclosed url link
+        :param str url_title: Title for enclosed link in the Link field
+        :param bool important: Indicator whether the message should be visually marked as important within client app
+        :param bool silent: If set to True will prevent sending toast notifications to connected devices, resulting in
+            silent delivery
+        :param str image: Image thumbnail URL link
+        :param str source: Notification source name that will be displayed instead of authorization token's app name.
+        :param int timetolive: Time in minutes after which message automatically gets purged
+        """
+        notification = {'Title': title, 'Body': message, 'LinkTitle': url_title, 'Link': url, 'IsImportant': important,
+                        'IsSilent': silent, 'Image': image, 'Source': source, 'TimeToLive': timetolive}
 
-        for key in token:
-            data['AuthorizationToken'] = key
+        if not isinstance(apikey, list):
+            apikey = [apikey]
+
+        for key in apikey:
+            notification['AuthorizationToken'] = key
             try:
-                requests.post(PUSHALOT_URL, json=data)
+                requests.post(PUSHALOT_URL, json=notification)
             except RequestException as e:
                 raise PluginWarning(repr(e))
 
