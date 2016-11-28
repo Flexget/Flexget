@@ -21,44 +21,43 @@ class SlackNotifier(object):
     Example:
 
       slack:
-        webhook-url: <string>
-        [text: <string>] (default: "{{task}} - Download started:
-                                    {% if series_name is defined %}
-                                    {{tvdb_series_name|d(series_name)}} {{series_id}} {{tvdb_ep_name|d('')}}
-                                    {% elif imdb_name is defined %}
-                                    {{imdb_name}} {{imdb_year}}
-                                    {% else %}
-                                    {{title}}
-                                    {% endif %}"
+        web_hook_url: <string>
+        [message: <string>]
         [channel: <string>] (override channel, use "@username" or "#channel")
         [username: <string>] (override username)
-        [icon-emoji: <string>] (override emoji icon, do not include the colons:
-                                e.g., use "tv" instead of ":tv:")
+        [icon_emoji: <string>] (override emoji icon
 
-    Configuration parameters are also supported from entries (e.g., through set).
     """
     schema = {
         'type': 'object',
         'properties': {
-            'webhook-url': {'type': 'string'},
+            'web_hook_url': {'type': 'string', 'format': 'url'},
             'message': {'type': 'string'},
             'channel': {'type': 'string'},
             'username': {'type': 'string'},
-            'icon-emoji': {'type': 'string'},
+            'icon_emoji': {'type': 'string'},
             'file_template': {'type': 'string'},
         },
-        'required': ['webhook-url'],
+        'required': ['web_hook_url'],
         'additionalProperties': False
     }
 
-    def notify(self, data):
-        url = data.pop('webhook-url')
-        if data.get('icon-emoji'):
-            data['icon-emoji'] = ":%s:" % data.get('icon-emoji')
+    def notify(self, web_hook_url, message, channel=None, username=None, icon_emoji=None):
+        """
+        Send a Slack notification
 
-        data['text'] = data.pop('message')
+        :param str web_hook_url: WebHook URL
+        :param str message: Notification message
+        :param str channel: Notification Channel
+        :param str username: Notification username
+        :param str icon_emoji: Notification icon_emoji
+        """
+        notification = {'text': message, 'channel': channel, 'username': username}
+        if icon_emoji:
+            notification['icon-emoji'] = ":%s:" % icon_emoji.strip(':')
+
         try:
-            requests.post(url, json=data)
+            requests.post(web_hook_url, json=notification)
         except RequestException as e:
             raise PluginWarning(e.args[0])
 
