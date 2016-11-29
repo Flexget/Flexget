@@ -174,6 +174,23 @@ class TelegramNotifier(object):
         'additionalProperties': False,
     }
 
+    def notify(self, message, bot_token, recipients, parse_mode=None, title=None, url=None):
+        """
+        Send a Telegram notification
+
+        :param str message: The message to send
+        :param bot_token: Bot token to use
+        :param dict recipients: Recipients object
+        :param str parse_mode: telegram parse mode, can be `html` or `markdown`
+        """
+        telegram_config = {'message': message, 'bot_token': bot_token, 'recipients': recipients,
+                           'parse_mode': parse_mode}
+        chat_ids = self._real_init(Session(), telegram_config)
+
+        if not chat_ids:
+            return
+        self._send_msgs(message, chat_ids)
+
     def _parse_config(self, config):
         """
         :type config: dict
@@ -196,15 +213,6 @@ class TelegramNotifier(object):
                 self._fullnames.append((firstname, surname))
             elif _GROUP_ATTR in i:
                 self._groups.append(i[_GROUP_ATTR])
-
-    def notify(self, data):
-        session = Session()
-        chat_ids = self._real_init(session, data)
-
-        if not chat_ids:
-            return
-        message = data[_MSG_ATTR]
-        self._send_msgs(message, chat_ids)
 
     def _real_init(self, session, config):
         self._enforce_telegram_plugin_ver()
