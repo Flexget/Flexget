@@ -38,7 +38,7 @@ class PushbulletNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'apikey': one_or_more({'type': 'string'}),
+            'api_key': one_or_more({'type': 'string'}),
             'device': one_or_more({'type': 'string'}),
             'email': one_or_more({'type': 'string', 'format': 'email'}),
             'title': {'type': 'string'},
@@ -47,15 +47,15 @@ class PushbulletNotifier(object):
             'channel': {'type': 'string'},
             'file_template': {'type': 'string'},
         },
-        'required': ['apikey'],
+        'required': ['api_key'],
         'additionalProperties': False
     }
 
-    def notify(self, apikey, title, message, device=None, email=None, url=None, channel=None, **kwargs):
+    def notify(self, api_key, title, message, device=None, email=None, url=None, channel=None, **kwargs):
         """
         Send a Pushbullet notification
 
-        :param str apikey: one or more api keys
+        :param str api_key: one or more api keys
         :param str title: title of notification
         :param str message: message of notification
         :param str device: one or more devices to send to
@@ -69,10 +69,10 @@ class PushbulletNotifier(object):
         if email and not isinstance(email, list):
             email = [email]
 
-        if not isinstance(apikey, list):
-            apikey = [apikey]
+        if not isinstance(api_key, list):
+            api_key = [api_key]
 
-        for key in apikey:
+        for key in api_key:
             if channel:
                 self.send_push(key, title, message, url, channel, 'channel_tag')
             elif device or email:

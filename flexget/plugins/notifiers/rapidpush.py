@@ -36,7 +36,7 @@ class RapidpushNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'apikey': one_or_more({'type': 'string'}),
+            'api_key': one_or_more({'type': 'string'}),
             'category': {'type': 'string', 'default': 'Flexget'},
             'title': {'type': 'string'},
             'group': {'type': 'string'},
@@ -46,14 +46,14 @@ class RapidpushNotifier(object):
             'file_template': {'type': 'string'}
         },
         'additionalProperties': False,
-        'required': ['apikey']
+        'required': ['api_key']
     }
 
-    def notify(self, apikey, title, message, category, group=None, channel=None, priority=None, **kwargs):
+    def notify(self, api_key, title, message, category, group=None, channel=None, priority=None, **kwargs):
         """
         Send a Rapidpush notification
 
-        :param str apikey: one or more api keys
+        :param str api_key: one or more api keys
         :param str title: title of notification
         :param str message: message of notification
         :param str category: category of notification
@@ -63,8 +63,8 @@ class RapidpushNotifier(object):
         """
         wrapper = {}
         notification = {'title': title, 'message': message}
-        if not isinstance(apikey, list):
-            apikey = [apikey]
+        if not isinstance(api_key, list):
+            api_key = [api_key]
 
         if channel:
             wrapper['command'] = 'broadcast'
@@ -77,7 +77,7 @@ class RapidpushNotifier(object):
                 notification['priority'] = priority
 
         wrapper['data'] = notification
-        for key in apikey:
+        for key in api_key:
             wrapper['apikey'] = key
             try:
                 response = requests.post(RAPIDPUSH_URL, json=wrapper)

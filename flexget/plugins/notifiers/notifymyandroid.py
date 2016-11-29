@@ -33,7 +33,7 @@ class NotifyMyAndroidNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'apikey': one_or_more({'type': 'string'}),
+            'api_key': one_or_more({'type': 'string'}),
             'application': {'type': 'string', 'default': 'FlexGet'},
             'title': {'type': 'string'},
             'message': {'type': 'string'},
@@ -43,16 +43,16 @@ class NotifyMyAndroidNotifier(object):
             'html': {'type': 'boolean'},
             'file_template': {'type': 'string'}
         },
-        'required': ['apikey'],
+        'required': ['api_key'],
         'additionalProperties': False
     }
 
-    def notify(self, apikey, title, message, application, priority=None, developer_key=None, url=None, html=None,
+    def notify(self, api_key, title, message, application, priority=None, developer_key=None, url=None, html=None,
                **kwargs):
         """
         Send a Notifymyandroid notification
 
-        :param str apikey: One or more API keys
+        :param str api_key: One or more API keys
         :param str title: Event name
         :param str message: Notification message
         :param str application: Application name
@@ -65,10 +65,10 @@ class NotifyMyAndroidNotifier(object):
                         'developerkey': developer_key, 'url': url}
 
         # Handle multiple API keys
-        if isinstance(apikey, list):
-            apikey = ','.join(apikey)
+        if isinstance(api_key, list):
+            api_key = ','.join(api_key)
 
-        notification['apikey'] = apikey
+        notification['apikey'] = api_key
 
         # Special case for html handling
         if html:

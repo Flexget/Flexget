@@ -27,7 +27,7 @@ class ProwlNotifier(object):
     Example::
 
       prowl:
-        apikey: xxxxxxx
+        api_key: xxxxxxx
         [application: application name, default FlexGet]
         [event: event title, default New Release]
         [priority: -2 - 2 (2 = highest), default 0]
@@ -37,7 +37,7 @@ class ProwlNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'apikey': one_or_more({'type': 'string'}),
+            'api_key': one_or_more({'type': 'string'}),
             'application': {'type': 'string', 'default': 'FlexGet'},
             'title': {'type': 'string'},
             'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2},
@@ -45,15 +45,15 @@ class ProwlNotifier(object):
             'url': {'type': 'string'},
             'file_template': {'type': 'string'}
         },
-        'required': ['apikey'],
+        'required': ['api_key'],
         'additionalProperties': False
     }
 
-    def notify(self, apikey, application, title, message, priority=None, providerkey=None, url=None, **kwargs):
+    def notify(self, api_key, application, title, message, priority=None, providerkey=None, url=None, **kwargs):
         """
         Send a Prowl notification
 
-        :param str apikey: One or more API keys
+        :param str api_key: One or more API keys
         :param str application: Application name
         :param str title: Notification subject
         :param str message: Notification message
@@ -64,9 +64,9 @@ class ProwlNotifier(object):
         notification = {'application': application, 'event': title, 'description': message, 'url': url,
                         'priority': priority, 'providerkey': providerkey}
 
-        if isinstance(apikey, list):
-            apikey = [apikey]
-        notification['apikey'] = apikey
+        if isinstance(api_key, list):
+            api_key = [api_key]
+        notification['apikey'] = api_key
 
         try:
             response = requests.post(PROWL_URL, data=notification)

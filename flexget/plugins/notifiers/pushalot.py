@@ -38,7 +38,7 @@ class PushalotNotifier(object):
     """
     schema = {'type': 'object',
               'properties': {
-                  'apikey': one_or_more({'type': 'string'}),
+                  'api_key': one_or_more({'type': 'string'}),
                   'title': {'type': 'string'},
                   'message': {'type': 'string'},
                   'url': {'type': 'string', 'format': 'url'},
@@ -50,15 +50,15 @@ class PushalotNotifier(object):
                   'timetolive': {'type': 'integer', 'maximum': 43200, 'minimum': 0},
                   'file_template': {'type': 'string'},
               },
-              'required': ['apikey'],
+              'required': ['api_key'],
               'additionalProperties': False}
 
-    def notify(self, apikey, message, title, url=None, url_title=None, important=None, silent=None, image=None,
+    def notify(self, api_key, message, title, url=None, url_title=None, important=None, silent=None, image=None,
                source=None, timetolive=None, **kwargs):
         """
         Send a Pushalot notification
 
-        :param str apikey: one or more API keys
+        :param str api_key: one or more API keys
         :param str message: Notification message
         :param str title: Notification title
         :param str url: Enclosed url link
@@ -73,10 +73,10 @@ class PushalotNotifier(object):
         notification = {'Title': title, 'Body': message, 'LinkTitle': url_title, 'Link': url, 'IsImportant': important,
                         'IsSilent': silent, 'Image': image, 'Source': source, 'TimeToLive': timetolive}
 
-        if not isinstance(apikey, list):
-            apikey = [apikey]
+        if not isinstance(api_key, list):
+            api_key = [api_key]
 
-        for key in apikey:
+        for key in api_key:
             notification['AuthorizationToken'] = key
             try:
                 requests.post(PUSHALOT_URL, json=notification)
