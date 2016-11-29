@@ -7,7 +7,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('output.sns')
+log = logging.getLogger('notify_sns')
 
 DEFAULT_TEMPLATE_VALUE = json.dumps({
     'entry': {
@@ -17,11 +17,11 @@ DEFAULT_TEMPLATE_VALUE = json.dumps({
         'series': '{{series_name}}',
         'series_id': '{{series_id}}',
     },
-    'task': '{{task}}',
+    'task': '{{task_name}}'
 })
 
 
-class SNSNotification(object):
+class SNSNotifier(object):
     """
     Emits SNS notifications of entries
 
@@ -54,64 +54,41 @@ class SNSNotification(object):
         'additionalProperties': False,
     }
 
-    def on_task_start(self, task, config):
-        # verify that we actually support Boto 3
+    def notify(self, data):
         try:
             import boto3  # noqa
         except ImportError as e:
             log.debug("Error importing boto3: %s", e)
             raise plugin.DependencyError("sns", "boto3", "Boto3 module required. ImportError: %s" % e)
 
-    # this has to run near the end of the plugin chain, because we
-    # should notify after all other outputs.
+        session = boto3.Session(aws_access_key_id=data.get('aws_access_key_id'),
+                                aws_secret_access_key=data.get('aws_secret_access_key'),
+                                profile_name=data.get('profile_name'),
+                                region_name=data['aws_region'])
+        sns = session.resource('sns')
+        topic = sns.Topic(data['sns_topic_arn'])
+
+        try:
+            topic.publish(Message=data['sns_notification_template'])
+        except Exception as e:
+            log.error("Error publishing %s: ", e.args[0])
+            return
+        else:
+            log.verbose('SNS notification sent')
+
+            # Run last to make sure other outputs are successful before sending notification
+
     @plugin.priority(0)
     def on_task_output(self, task, config):
-        sender = SNSNotificationEmitter(config)
-        sender.send_notifications(task)
-
-
-class SNSNotificationEmitter(object):
-
-    def __init__(self, config):
-        self.config = config
-        import boto3
-        self.boto3 = boto3
-
-        self.sns_notification_template = self.config.get('sns_notification_template', DEFAULT_TEMPLATE_VALUE)
-
-    def build_session(self):
-        self.session = self.boto3.Session(
-            aws_access_key_id=self.config.get('aws_access_key_id', None),
-            aws_secret_access_key=self.config.get('aws_secret_access_key', None),
-            profile_name=self.config.get('profile_name', None),
-            region_name=self.config['aws_region'],
-        )
-
-    def get_topic(self):
-        self.build_session()
-        sns = self.session.resource('sns')
-        topic = sns.Topic(self.config['sns_topic_arn'])
-        return topic
-
-    def send_notifications(self, task):
-        topic = self.get_topic()
-
-        for entry in task.accepted:
-            message = entry.render(self.sns_notification_template)
-            if task.options.test:
-                log.info("SNS publication: region=%s, arn=%s", self.config['aws_region'], topic.arn)
-                log.info("Message: %s", message)
-                continue
-
-            try:
-                response = topic.publish(Message=message)
-            except Exception as e:
-                log.error("Error publishing %s: %s", entry['title'], e)
-                continue
-            else:
-                log.debug("Published %s: %s", entry, response)
+        # Send default values for backwards compatibility
+        notify_config = {
+            'to': [{'notify_sns': config}],
+            'scope': 'entries',
+            'what': 'accepted'
+        }
+        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
 
 
 @event('plugin.register')
 def register_sns_plugin():
-    plugin.register(SNSNotification, 'notify_sns', api_ver=2)
+    plugin.register(SNSNotifier, 'notify_sns', api_ver=2, groups=['notifiers'])
