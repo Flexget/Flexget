@@ -17,14 +17,12 @@ class TestNotifyCrash(object):
             notify_crash:
               to:
                 - pushover:
-                    token: token
                     user_key: user_key
           no_crash:
             disable: builtins
             notify_crash:
               to:
                 - pushover:
-                    token: token
                     user_key: user_key
     """
 

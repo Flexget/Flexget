@@ -21,7 +21,7 @@ class TestPushoverNotifier(object):
         """
         data2 = {
             'user_key': 'ua2g3vqjyvqpkyntx19zeruqrn3eim',
-            'token': 'aPwSHwkLcNaavShxktBpgJH4bRWc3m',
+            'api_key': 'aPwSHwkLcNaavShxktBpgJH4bRWc3m',
             'message': 'test',
             'title': 'test'
         }
@@ -31,7 +31,7 @@ class TestPushoverNotifier(object):
 
         data1 = {
             'user_key': 'crash',
-            'token': 'aPwSHwkLcNaavShxktBpgJH4bRWc3m',
+            'api_key': 'aPwSHwkLcNaavShxktBpgJH4bRWc3m',
             'message': 'test',
             'title': 'test'
         }
