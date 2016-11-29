@@ -1,0 +1,20 @@
+{% if task.aborted -%}
+Task '{{task.name}}' was aborted because: {{task.abort_reason}}
+
+{% endif -%}
+{% if task.accepted -%}
+{%- for group in task.accepted|groupby('task') %}
+FlexGet has just downloaded {{group.list|length}} new entries for task {{group.grouper}}:
+  {%- for entry in group.list %}
+- {{entry.title}} ({{entry.url}}){% if entry.output|d(false) %} => {{entry.output}}{% endif %}
+  {% endfor %}
+{% endfor %}
+{% endif -%}
+{% if task.failed -%}
+{%- for group in task.failed|groupby('task') %}
+The following entries have failed for task {{group.grouper}}:
+  {%- for entry in group.list %}
+- {{entry.title}} ({{entry.url}}) Reason: {{entry.reason|d('unknown')}}
+  {% endfor %}
+{% endfor %}
+{% endif %}

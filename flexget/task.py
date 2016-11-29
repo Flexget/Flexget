@@ -23,6 +23,7 @@ from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 from flexget.utils.tools import get_config_hash
+from flexget.utils.template import render_from_task, FlexGetTemplate
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
@@ -185,7 +186,8 @@ class Task(object):
     RERUN_DEFAULT = 5
     RERUN_MAX = 100
 
-    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None):
+    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None,
+                 suppress_warnings=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
@@ -195,6 +197,7 @@ class Task(object):
         :param loglevel: Custom loglevel, only log messages at this level will be sent to `output`
         :param priority: If multiple tasks are waiting to run, the task with the lowest priority will be run first.
             The default is 0, if the cron option is set though, the default is lowered to 10.
+        :param suppress_warnings: Allows suppressing log warning about missing plugin in key phases
 
         """
         self.name = str(name)
@@ -216,6 +219,7 @@ class Task(object):
         self.options = options
         self.output = output
         self.loglevel = loglevel
+        self.suppress_warnings = suppress_warnings or []
         if priority is None:
             self.priority = 10 if self.options.cron else 0
         else:
@@ -353,11 +357,12 @@ class Task(object):
             log.debug('Disabling %s phase' % phase)
             self.disabled_phases.append(phase)
 
-    def abort(self, reason='Unknown', silent=False):
+    def abort(self, reason='Unknown', silent=False, traceback=None):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
         self.aborted = True
         self.abort_reason = reason
         self.silent_abort = silent
+        self.traceback = traceback
         if not self.silent_abort:
             log.warning('Aborting task (plugin: %s)' % self.current_plugin)
         else:
@@ -417,11 +422,12 @@ class Task(object):
                     if not p.builtin:
                         break
                 else:
-                    if phase == 'filter':
-                        log.warning('Task does not have any filter plugins to accept entries. '
-                                    'You need at least one to accept the entries you  want.')
-                    else:
-                        log.warning('Task doesn\'t have any %s plugins, you should add (at least) one!' % phase)
+                    if phase not in self.suppress_warnings:
+                        if phase == 'filter':
+                            log.warning('Task does not have any filter plugins to accept entries. '
+                                        'You need at least one to accept the entries you  want.')
+                        else:
+                            log.warning('Task doesn\'t have any %s plugins, you should add (at least) one!' % phase)
 
         for plugin in self.plugins(phase):
             # Abort this phase if one of the plugins disables it
@@ -506,8 +512,8 @@ class Task(object):
         except Exception as e:
             msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
             log.critical(msg)
-            self.manager.crash_report()
-            self.abort(msg)
+            traceback = self.manager.crash_report()
+            self.abort(msg, traceback=traceback)
 
     def rerun(self, plugin=None, reason=None):
         """
@@ -671,6 +677,21 @@ class Task(object):
         return new
 
     copy = __copy__
+
+    def render(self, template):
+        """
+        Renders a template string based on fields in the entry.
+
+        :param template: A template string or FlexGetTemplate that uses jinja2 or python string replacement format.
+        :return: The result of the rendering.
+        :rtype: string
+        :raises RenderError: If there is a problem.
+        """
+        if not isinstance(template, (str, FlexGetTemplate)):
+            raise ValueError(
+                'Trying to render non string template or unrecognized template format, got %s' % repr(template))
+        log.trace('rendering: %s', template)
+        return render_from_task(template, self)
 
 
 @event('config.register')
