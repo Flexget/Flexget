@@ -15,11 +15,11 @@ class TestNotify(object):
             notify:
               to:
                 - pushbullet:
-                    apikey: "apikey"
+                    api_key: "apikey"
                 - pushbullet:
-                    apikey: "apikey"
+                    api_key: "apikey"
                 - pushbullet:
-                    apikey: "apikey"
+                    api_key: "apikey"
         """
 
     def test_basic_notify(self, mocked_request, execute_task):

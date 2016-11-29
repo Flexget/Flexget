@@ -69,7 +69,7 @@ class SNSNotifier(object):
             provided.
         :param str aws_secret_access_key: AWS secret access key ID. Will be taken from AWS_SECRET_ACCESS_KEY
             environment if not provided.
-        :param profile_name: If provided, use this profile name instead of the default.
+        :param str profile_name: If provided, use this profile name instead of the default.
         """
         try:
             import boto3  # noqa
