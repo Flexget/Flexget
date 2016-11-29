@@ -44,7 +44,7 @@ class PushoverNotifier(object):
         'type': 'object',
         'properties': {
             'user_key': one_or_more({'type': 'string'}),
-            'api_key': {'type': 'string'},
+            'api_key': {'type': 'string', 'default': 'aPwSHwkLcNaavShxktBpgJH4bRWc3m'},
             'device': one_or_more({'type': 'string'}),
             'title': {'type': 'string'},
             'message': {'type': 'string'},
@@ -60,7 +60,7 @@ class PushoverNotifier(object):
             'callback': {'type': 'string', 'format': 'url'},
             'html': {'type': 'boolean'}
         },
-        'required': ['api_key', 'user_key'],
+        'required': ['user_key'],
         'additionalProperties': False
     }
 
@@ -70,7 +70,8 @@ class PushoverNotifier(object):
         Sends a Pushover notification
 
         :param str user_key: the user/group key or list of them
-        :param str api_key: your application's API api_key
+        :param str api_key: your application's API api_key. Default is 'aPwSHwkLcNaavShxktBpgJH4bRWc3m',
+            official Flexget's API key
         :param str message: the message to send
         :param str title: your message's title, otherwise your app's name is used
         :param str device: your user's device name to send the message directly to that device,
