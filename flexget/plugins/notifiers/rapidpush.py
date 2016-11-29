@@ -19,7 +19,7 @@ requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('rapidpush.net', '5 seconds'))
 
 
-class RapidpushNotifer(object):
+class RapidpushNotifier(object):
     """
     Example::
 
@@ -100,4 +100,4 @@ class RapidpushNotifer(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(RapidpushNotifer, __name__, api_ver=2, groups=['notifiers'])
+    plugin.register(RapidpushNotifier, __name__, api_ver=2, groups=['notifiers'])
