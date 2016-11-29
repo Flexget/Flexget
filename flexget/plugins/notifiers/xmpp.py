@@ -28,9 +28,9 @@ class XMPPNotifier(object):
         'additionalProperties': False
     }
 
-    __version__ = '0.2'
+    __version__ = '1.0'
 
-    def notify(self, data):
+    def notify(self, title, message, sender, password, recipients, url=None):
         try:
             import sleekxmpp  # noqa
         except ImportError as e:
@@ -60,17 +60,14 @@ class XMPPNotifier(object):
                     self.send_message(mto=recipient, mbody=self.msg, mtype='chat')
                 self.disconnect(wait=True)
 
-        title = data['title']
-        text = data['message']
-        text = '%s\n%s' % (title, text)
-        log.debug('Sending XMPP notification about: %s', text)
+        message = '%s\n%s' % (title, message)
+        log.debug('Sending XMPP notification about: %s', message)
         logging.getLogger('sleekxmpp').setLevel(logging.CRITICAL)
 
-        recipients = data['recipients']
         if not isinstance(recipients, list):
             recipients = [recipients]
 
-        xmpp = SendMsgBot(data['sender'], data['password'], recipients, text)
+        xmpp = SendMsgBot(sender, password, recipients, message)
         if xmpp.connect():
             xmpp.process(block=True)
 
