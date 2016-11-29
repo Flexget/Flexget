@@ -48,6 +48,7 @@ class JoinNotifier(object):
             'sms_number': {'type': 'string'},
             'icon': {'type': 'string', 'format': 'url'},
             'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2},
+            'file_template': {'type': 'string'}
         },
         'oneOf': [
             {'required': ['device']},
