@@ -45,6 +45,9 @@ class JoinNotifier(object):
             'title': {'type': 'string'},
             'body': {'type': 'string'},
             'url': {'type': 'string'},
+            'icon': {'type': 'string'},
+            'sms_number': {'type': 'string'},
+            'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2}
         },
         'dependencies': {
             'group': ['api_key']
