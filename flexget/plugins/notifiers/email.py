@@ -95,7 +95,7 @@ class EmailNotifier(object):
             'title': {'type': 'string'},
             'html': {'type': 'boolean', 'default': False},
         },
-        'required': ['to', 'from'],
+        'required': ['to'],
         'dependencies': {
             'smtp_username': ['smtp_password'],
             'smtp_password': ['smtp_username'],

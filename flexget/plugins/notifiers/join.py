@@ -39,8 +39,7 @@ class JoinNotifier(object):
             'api_key': {'type': 'string'},
             'group': {
                 'type': 'string',
-                'enum': ['all', 'android', 'chrome', 'windows10', 'phone', 'tablet', 'pc'],
-                'default': 'all'
+                'enum': ['all', 'android', 'chrome', 'windows10', 'phone', 'tablet', 'pc']
             },
             'device': one_or_more({'type': 'string'}),
             'title': {'type': 'string'},
@@ -77,6 +76,8 @@ class JoinNotifier(object):
         """
         notification = {'title': title, 'text': message, 'url': url, 'icon': icon, 'priority': priority}
         if api_key:
+            if not group:
+                group = 'all'
             notification['apikey'] = api_key
             notification['deviceId'] = 'group.' + group
         else:
