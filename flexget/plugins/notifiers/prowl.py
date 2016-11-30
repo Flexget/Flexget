@@ -43,13 +43,14 @@ class ProwlNotifier(object):
             'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2},
             'message': {'type': 'string'},
             'url': {'type': 'string'},
+            'provider_key':{'type': 'string'},
             'file_template': {'type': 'string'}
         },
         'required': ['api_key'],
         'additionalProperties': False
     }
 
-    def notify(self, api_key, application, title, message, priority=None, providerkey=None, url=None, **kwargs):
+    def notify(self, api_key, application, title, message, priority=None, provider_key=None, url=None, **kwargs):
         """
         Send a Prowl notification
 
@@ -58,11 +59,11 @@ class ProwlNotifier(object):
         :param str title: Notification subject
         :param str message: Notification message
         :param priority: Notification priority
-        :param str providerkey: Your provider API key. Only necessary if you have been whitelisted.
+        :param str provider_key: Your provider API key. Only necessary if you have been whitelisted.
         :param str url: The URL which should be attached to the notification.
         """
         notification = {'application': application, 'event': title, 'description': message, 'url': url,
-                        'priority': priority, 'providerkey': providerkey}
+                        'priority': priority, 'providerkey': provider_key}
 
         if isinstance(api_key, list):
             api_key = [api_key]
