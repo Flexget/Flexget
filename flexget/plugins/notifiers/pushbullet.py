@@ -47,12 +47,7 @@ class PushbulletNotifier(object):
             'channel': {'type': 'string'},
             'file_template': {'type': 'string'},
         },
-        'oneOf': [
-            {'required': ['api_key', 'device']},
-            {'required': ['api_key', 'email']},
-            {'required': ['api_key', 'channel']},
-        ],
-        'error_oneOf': 'Only one of `channel`, `device` or `email` can be used',
+        'required': ['apikey'],
         'additionalProperties': False
     }
 
