@@ -27,7 +27,12 @@ class NotifyCrash(object):
     }
 
     def on_task_abort(self, task, config):
-        notify_config = {'to': config['to'], 'scope': 'task'}
+        title = 'Task {{ task_name }} has crashed!'
+        message = 'Reason: {{ task.abort_reason }}'
+        notify_config = {'to': config['to'],
+                         'scope': 'task',
+                         'title': title,
+                         'message': message}
         log.debug('sending crash notification')
         plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
 
