@@ -31,7 +31,7 @@ class SlackNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'web_hook_url': {'type': 'string', 'format': 'url'},
+            'web_hook_url': {'type': 'string'},
             'message': {'type': 'string'},
             'channel': {'type': 'string'},
             'username': {'type': 'string'},

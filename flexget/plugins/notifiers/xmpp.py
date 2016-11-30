@@ -17,9 +17,9 @@ class XMPPNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'sender': {'type': 'string', 'format': 'email'},
+            'sender': {'type': 'string'},
             'password': {'type': 'string'},
-            'recipients': one_or_more({'type': 'string', 'format': 'email'}),
+            'recipients': one_or_more({'type': 'string'}),
             'title': {'type': 'string'},
             'message': {'type': 'string'},
             'file_template': {'type': 'string'},

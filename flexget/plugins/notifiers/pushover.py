@@ -57,7 +57,7 @@ class PushoverNotifier(object):
             'file_template': {'type': 'string'},
             'retry': {'type': 'integer', 'minimum': 30},
             'expire': {'type': 'integer', 'maximum': 86400},
-            'callback': {'type': 'string', 'format': 'url'},
+            'callback': {'type': 'string'},
             'html': {'type': 'boolean'}
         },
         'required': ['user_key'],
