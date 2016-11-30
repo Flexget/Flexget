@@ -60,6 +60,7 @@ class PushbulletNotifier(object):
             {'required': ['api_key', 'channel']},
             {'required': ['api_key']}
         ],
+        'error_anyOf': '`api_key` is required',
         'additionalProperties': False
     }
 
