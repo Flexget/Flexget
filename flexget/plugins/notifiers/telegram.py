@@ -174,7 +174,7 @@ class TelegramNotifier(object):
         'additionalProperties': False,
     }
 
-    def notify(self, message, bot_token, recipients, parse_mode=None, title=None, url=None):
+    def notify(self, message, bot_token, recipients, parse_mode=None, title=None, url=None, **kwargs):
         """
         Send a Telegram notification
 

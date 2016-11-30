@@ -30,7 +30,7 @@ class XMPPNotifier(object):
 
     __version__ = '1.0'
 
-    def notify(self, title, message, sender, password, recipients, url=None):
+    def notify(self, title, message, sender, password, recipients, url=None, **kwargs):
         try:
             import sleekxmpp  # noqa
         except ImportError as e:

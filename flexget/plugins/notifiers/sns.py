@@ -58,7 +58,8 @@ class SNSNotifier(object):
         'additionalProperties': False,
     }
 
-    def notify(self, title, message, aws_region, aws_access_key_id=None, aws_secret_access_key=None, profile_name=None):
+    def notify(self, title, message, aws_region, aws_access_key_id=None, aws_secret_access_key=None, profile_name=None,
+               **kwargs):
         """
         Send an Amazon SNS notification
 

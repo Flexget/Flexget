@@ -60,7 +60,7 @@ class JoinNotifier(object):
     }
 
     def notify(self, title, message, url, api_key=None, device=None, group=None, sms_number=None, icon=None,
-               priority=None):
+               priority=None, **kwargs):
         """
         Send Join notifications.
 
