@@ -28,7 +28,7 @@ class TestNotifyCrash(object):
 
     def test_abort(self, mocked_request, execute_task):
         execute_task('test_crash', abort=True)
-        data = {'message': 'Task returned 0 accepted entries', 'title': 'test_crash'}
+        data = {'message': 'Reason: abort plugin', 'title': 'Task test_crash has crashed!'}
 
         assert mocked_request.called
 
