@@ -50,8 +50,9 @@ class PushbulletNotifier(object):
         'oneOf': [
             {'required': ['api_key', 'device']},
             {'required': ['api_key', 'email']},
+            {'required': ['api_key', 'channel']},
         ],
-        'error_oneOf': 'Either a `device` or `email` can be specified, but not both',
+        'error_oneOf': 'Only one of `channel`, `device` or `email` can be used',
         'additionalProperties': False
     }
 
