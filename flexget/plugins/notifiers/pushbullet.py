@@ -43,11 +43,15 @@ class PushbulletNotifier(object):
             'email': one_or_more({'type': 'string', 'format': 'email'}),
             'title': {'type': 'string'},
             'message': {'type': 'string'},
-            'url': {'type': 'string', 'format': 'url'},
+            'url': {'type': 'string'},
             'channel': {'type': 'string'},
             'file_template': {'type': 'string'},
         },
-        'required': ['api_key'],
+        'oneOf': [
+            {'required': ['api_key', 'device']},
+            {'required': ['api_key', 'email']},
+        ],
+        'error_oneOf': 'Either a `device` or `email` can be specified, but not both',
         'additionalProperties': False
     }
 
@@ -75,9 +79,10 @@ class PushbulletNotifier(object):
         for key in api_key:
             if channel:
                 self.send_push(key, title, message, url, channel, 'channel_tag')
-            elif device or email:
+            elif device:
                 for d in device:
                     self.send_push(key, title, message, url, d, 'device_iden')
+            elif email:
                 for e in email:
                     self.send_push(key, title, message, url, e, 'email')
             else:
