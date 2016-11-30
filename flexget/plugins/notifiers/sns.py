@@ -47,22 +47,24 @@ class SNSNotifier(object):
         'type': 'object',
         'properties': {
             'title': {'type': 'string'},
-            'message': {'type': 'string', 'default': DEFAULT_TEMPLATE_VALUE},
+            'sns_topic_arn': {'type': 'string'},
+            'message': {'type': 'string'},
             'aws_access_key_id': {'type': 'string'},
             'aws_secret_access_key': {'type': 'string'},
             'aws_region': {'type': 'string'},
             'profile_name': {'type': 'string'},
             'file_template': {'type': 'string'},
         },
-        'required': ['title', 'aws_region'],
+        'required': ['sns_topic_arn', 'aws_region'],
         'additionalProperties': False,
     }
 
-    def notify(self, title, message, aws_region, aws_access_key_id=None, aws_secret_access_key=None, profile_name=None,
-               **kwargs):
+    def notify(self, sns_topic_arn, title, message, url, aws_region, aws_access_key_id=None, aws_secret_access_key=None,
+               profile_name=None, **kwargs):
         """
         Send an Amazon SNS notification
 
+        :param str sns_topic_arn: SNS Topic ARN
         :param str title: Notification title
         :param str message: Notification message
         :param str aws_region: AWS region
@@ -84,11 +86,16 @@ class SNSNotifier(object):
                                 region_name=aws_region)
         sns = session.resource('sns')
         topic = sns.Topic(title)
-
+        sns_message = json.dumps({
+            'entry': {
+                'title': title,
+                'url': url,
+            }
+        })
         try:
-            topic.publish(Message=message)
+            topic.publish(Message=sns_message)
         except Exception as e:
-            raise PluginWarning("Error publishing %s: ", e.args[0])
+            raise PluginWarning("Error publishing %s: " % e.args[0])
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
