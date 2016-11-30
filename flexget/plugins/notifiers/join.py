@@ -11,7 +11,7 @@ from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
 __name__ = 'join'
-log = logging.getLogger('__name__')
+log = logging.getLogger(__name__)
 
 requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('appspot.com', '5 seconds'))
@@ -39,22 +39,23 @@ class JoinNotifier(object):
             'api_key': {'type': 'string'},
             'group': {
                 'type': 'string',
-                'enum': ['all', 'android', 'chrome', 'windows10', 'phone', 'tablet', 'pc']
+                'enum': ['all', 'android', 'chrome', 'windows10', 'phone', 'tablet', 'pc'],
+                'default': 'all'
             },
             'device': one_or_more({'type': 'string'}),
             'title': {'type': 'string'},
-            'message': {'type': 'string'},
+            'body': {'type': 'string'},
             'url': {'type': 'string'},
-            'sms_number': {'type': 'string'},
-            'icon': {'type': 'string', 'format': 'url'},
-            'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2},
-            'file_template': {'type': 'string'}
         },
+        'dependencies': {
+            'group': ['api_key']
+        },
+        'error_dependencies': '`api_key` is required to use Join `group` notifications',
         'oneOf': [
             {'required': ['device']},
             {'required': ['api_key']},
         ],
-        'error_oneOf': 'Either a `device`, or `api_key` must be specified.',
+        'error_oneOf': 'Either a `device` to notify, or an `api_key` must be specified, and not both',
         'additionalProperties': False
     }
 
@@ -76,8 +77,6 @@ class JoinNotifier(object):
         """
         notification = {'title': title, 'text': message, 'url': url, 'icon': icon, 'priority': priority}
         if api_key:
-            if not group:
-                group = 'all'
             notification['apikey'] = api_key
             notification['deviceId'] = 'group.' + group
         else:
