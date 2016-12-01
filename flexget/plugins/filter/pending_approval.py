@@ -90,7 +90,7 @@ class PendingApproval(object):
                 elif not self._item_query(entry, task, session):
                     log.verbose('creating new pending entry %s', entry)
                     session.add(PendingEntry(task_name=task.name, entry=entry))
-                    entry.reject('new unapproved entry, caching and waiting for approval')
+                    entry.reject('entry is unapproved, caching and waiting for approval')
                     fire_event('learn', task, entry, reason='pending entry already added', local=True)
 
     def on_task_learn(self, task, config):
