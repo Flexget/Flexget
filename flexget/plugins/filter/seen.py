@@ -155,18 +155,18 @@ def forget(value):
         log.debug('forget called with %s', value)
         count = 0
         field_count = 0
-        for se in session.query(SeenEntry).filter(or_(SeenEntry.title == value, SeenEntry.task == value)).all():
-            field_count += len(se.fields)
+        for seen_entry in session.query(SeenEntry).filter(or_(SeenEntry.title == value, SeenEntry.task == value)).all():
+            field_count += len(seen_entry.fields)
             count += 1
-            log.debug('forgetting %s', se)
-            session.delete(se)
+            log.debug('forgetting %s', seen_entry)
+            session.delete(seen_entry)
 
-        for sf in session.query(SeenField).filter(SeenField.value == value).all():
-            se = session.query(SeenEntry).filter(SeenEntry.id == sf.seen_entry_id).first()
-            field_count += len(se.fields)
+        for seen_field in session.query(SeenField).filter(SeenField.value == value).all():
+            seen_entry = session.query(SeenEntry).filter(SeenEntry.id == seen_field.seen_entry_id).first()
+            field_count += len(seen_entry.fields)
             count += 1
-            log.debug('forgetting %s', se)
-            session.delete(se)
+            log.debug('forgetting %s', seen_entry)
+            session.delete(seen_entry)
     return count, field_count
 
 
@@ -176,7 +176,7 @@ def learn(task, entry, fields=None, reason=None, local=False):
     # no explicit fields given, use default
     if not fields:
         fields = ['title', 'url', 'original_url']
-    se = SeenEntry(entry['title'], str(task.name), reason, local)
+    seen_entry = SeenEntry(entry['title'], str(task.name), reason, local)
     remembered = []
     for field in fields:
         if field not in entry:
@@ -185,12 +185,12 @@ def learn(task, entry, fields=None, reason=None, local=False):
         if entry[field] in remembered:
             continue
         remembered.append(entry[field])
-        sf = SeenField(str(field), str(entry[field]))
-        se.fields.append(sf)
+        seen_field = SeenField(str(field), str(entry[field]))
+        seen_entry.fields.append(seen_field)
         log.debug("Learned '%s' (field: %s, local: %d)", entry[field], field, local)
     # Only add the entry to the session if it has one of the required fields
-    if se.fields:
-        task.session.add(se)
+    if seen_entry.fields:
+        task.session.add(seen_entry)
 
 
 @with_session
