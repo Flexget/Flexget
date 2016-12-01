@@ -81,9 +81,10 @@ def movie_list_lists(options):
         table_data.append([movie_list.id, movie_list.name])
     try:
         table = TerminalTable(options.table_type, table_data)
-        console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
+    else:
+        console(table.output)
 
 
 def movie_list_list(options):
@@ -92,7 +93,7 @@ def movie_list_list(options):
         try:
             movie_list = get_list_by_exact_name(options.list_name)
         except NoResultFound:
-            console('Could not find movie list with name {}'.format(options.list_name))
+            console('Could not find movie list with name `{}`'.format(options.list_name))
             return
     header = ['Movie Name', 'Movie year']
     header += MovieListBase().supported_ids
@@ -106,9 +107,10 @@ def movie_list_list(options):
     title = '{} Movies in movie list: `{}`'.format(len(movies), options.list_name)
     try:
         table = TerminalTable(options.table_type, table_data, title, drop_columns=[5, 2, 4])
-        console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
+    else:
+        console(table.output)
 
 
 def movie_list_add(options):
@@ -116,7 +118,7 @@ def movie_list_add(options):
         try:
             movie_list = get_list_by_exact_name(options.list_name, session=session)
         except NoResultFound:
-            console('Could not find movie list with name {}, creating'.format(options.list_name))
+            console('Could not find movie list with name `{}`, creating'.format(options.list_name))
             movie_list = MovieListList(name=options.list_name)
             session.add(movie_list)
             session.commit()
@@ -129,10 +131,10 @@ def movie_list_add(options):
         title = entry['movie_name']
         movie = get_movie_by_title_and_year(list_id=movie_list.id, title=title, year=year, session=session)
         if not movie:
-            console("Adding movie with title {} to list {}".format(title, movie_list.name))
+            console("Adding movie with title `{}` to list `{}`".format(title, movie_list.name))
             movie = MovieListMovie(title=entry['movie_name'], year=year, list_id=movie_list.id)
         else:
-            console("Movie with title {} already exist in list {}".format(title, movie_list.name))
+            console("Movie with title `{}` already exist in list `{}`".format(title, movie_list.name))
 
         id_list = []
         if options.identifiers:
@@ -148,7 +150,7 @@ def movie_list_add(options):
                     console('{}: {}'.format(key, ident[key]))
             movie.ids = get_db_movie_identifiers(identifier_list=id_list, session=session)
         session.merge(movie)
-        console('Successfully added movie {} to movie list {} '.format(title, movie_list.name))
+        console('Successfully added movie `{}` to movie list `{}`'.format(title, movie_list.name))
 
 
 def movie_list_del(options):
@@ -156,15 +158,15 @@ def movie_list_del(options):
         try:
             movie_list = get_list_by_exact_name(options.list_name)
         except NoResultFound:
-            console('Could not find movie list with name {}'.format(options.list_name))
+            console('Could not find movie list with name `{}`'.format(options.list_name))
             return
         title, year = split_title_year(options.movie_title)
         movie_exist = get_movie_by_title_and_year(list_id=movie_list.id, title=title, year=year, session=session)
         if movie_exist:
-            console('Removing movie %s from list %s' % (options.movie_title, options.list_name))
+            console('Removing movie `{}` from list `{}`'.format(options.movie_title, options.list_name))
             session.delete(movie_exist)
         else:
-            console('Could not find movie with title %s in list %s' % (options.movie_title, options.list_name))
+            console('Could not find movie with title `{}` in list `{}`'.format(options.movie_title, options.list_name))
             return
 
 
@@ -175,7 +177,7 @@ def movie_list_purge(options):
         except NoResultFound:
             console('Could not find movie list with name {}'.format(options.list_name))
             return
-        console('Deleting list %s' % options.list_name)
+        console('Deleting list `{}`'.format(options.list_name))
         session.delete(movie_list)
 
 
