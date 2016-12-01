@@ -301,10 +301,12 @@ def get_movie_by_title_and_year(list_id, title, year=None, session=None):
     movie_list = get_list_by_id(list_id=list_id, session=session)
     if movie_list:
         log.debug('searching for movie %s in list %d', title, list_id)
-        result = session.query(MovieListMovie).filter(func.lower(MovieListMovie.title) == title.lower())
-        if year:
-            result = result.filter(MovieListMovie.year == year)
-        return result.one_or_none()
+        return session.query(MovieListMovie).filter(
+            and_(
+                func.lower(MovieListMovie.title) == title.lower(),
+                MovieListMovie.year == year,
+                MovieListMovie.list_id == list_id)
+        ).one_or_none()
 
 
 @with_session
