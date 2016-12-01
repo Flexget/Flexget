@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta
 
 from flexget import db_schema, plugin
-from flexget.event import event
+from flexget.event import event, fire_event
 from flexget.manager import Session
 from flexget.utils.database import entry_synonym
 from sqlalchemy import Column, String, Unicode, Boolean, Integer, DateTime
@@ -91,6 +91,7 @@ class PendingApproval(object):
                     log.verbose('creating new pending entry %s', entry)
                     session.add(PendingEntry(task_name=task.name, entry=entry))
                     entry.reject('new unapproved entry, caching and waiting for approval')
+                    fire_event('learn', task, entry, reason='pending entry already added', local=True)
 
     def on_task_learn(self, task, config):
         if not config:

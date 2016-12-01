@@ -36,3 +36,8 @@ class TestPendingApproval(object):
         assert len(task.all_entries) == 1
         assert len(task.rejected) == 1
         assert len(task.accepted) == 0
+
+        # Verify that pending entry is not re-added on another execution
+        with Session() as session:
+            pnd_entry = session.query(PendingEntry).first()
+            assert pnd_entry is None
