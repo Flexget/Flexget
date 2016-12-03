@@ -111,6 +111,7 @@ NAMESPACE_NAME = 'newznab'
 NAMESPACE_URL = 'http://www.newznab.com/DTD/2010/feeds/attributes/'
 NAMESPACE_TAGNAME = 'attr'
 NAMESPACE_PREFIX = 'newznab_'
+ENCLOSURE_TYPE = 'application/x-nzb'
 
 class Newznab(object):
     """
@@ -349,9 +350,9 @@ class Newznab(object):
             new_entry['url'] = xml_entry.link
             if xml_entry.enclosures:
                 for link in xml_entry.enclosures:
-                    if link.length and link.type == 'application/x-nzb':
+                    if link.length and link.type == ENCLOSURE_TYPE:
                         new_entry['content_size'] = int(int(link.length) / 1024 / 1024)  # MB
-            if 'content_size' not in new_entry:
+            if 'content_size' not in new_entry or new_entry['content_size'] == 0:
                 log.warning('Could not get valid filesize for entry: %s' % xml_entry.title)
 
             # store some usefully data in the namespace
