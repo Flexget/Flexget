@@ -337,7 +337,7 @@ class Newznab(object):
     #         log.verbose('Entry: [%s] = %s' % (key, entry[key]))
     #     log.verbose('#####################################################################################')
 
-    def parse_newznab_from_xml(self, xml_entries):
+    def parse_from_xml(self, xml_entries):
         entries = []
         for xml_entry in xml_entries:
             new_entry = Entry()
@@ -354,7 +354,7 @@ class Newznab(object):
             if 'content_size' not in new_entry:
                 log.warning('Could not get valid filesize for entry: %s' % xml_entry.title)
 
-            # store some usefully data in the 'newznab' namespace
+            # store some usefully data in the namespace
             if xml_entry.id:
                 guid_splits = re.split('[/=]', xml_entry.id)
                 new_entry[NAMESPACE_PREFIX + 'guid'] = guid_splits.pop()
@@ -373,7 +373,7 @@ class Newznab(object):
                         new_entry[NAMESPACE_PREFIX + 'pubdate'], xml_entry.title, ex))
 
             # add some usefully attributes to the namespace
-            self.fill_newznab_attributes(xml_entry, new_entry)
+            self.fill_namespace_attributes(xml_entry, new_entry)
             entries.append(new_entry)
             # self.dump_entry(new_entry)
         return entries
@@ -415,7 +415,7 @@ class Newznab(object):
             else:
                 log.warning('Unsupported attribute type: %s via name: %s' % (type, tagname))
 
-    def fill_newznab_attributes(self, xml_entry, entry):
+    def fill_namespace_attributes(self, xml_entry, entry):
         for key in NAMESPACE_ATTRIBUTE_MAP:
             self.set_ns_attribute(key, xml_entry, entry, NAMESPACE_ATTRIBUTE_MAP[key])
 
@@ -470,7 +470,7 @@ class Newznab(object):
             log.info('No entries returned from xml.')
             return []
 
-        entries = self.parse_newznab_from_xml(parsed_xml.entries)
+        entries = self.parse_from_xml(parsed_xml.entries)
         if len(entries) == 0:
             log.verbose('No entries parsed from xml.')
         #else:
