@@ -120,7 +120,7 @@ class Newznab(object):
     'newznab_password'  - if the release uses a password
 
     Config example:
-    # simple: uses the (series_name or title) to search in the 'tv' category
+    # simple: uses the 'title' to search in the 'tv' category
     newznab:
         api_server_url: https://api.nzbindexer.com
         api_key: my_apikey
@@ -208,23 +208,23 @@ class Newznab(object):
         if config['search_type'] == 'tv' or do_show_lookup:
             if task.config.get('trakt_lookup'):
                 plugin.get_plugin_by_name('trakt_lookup').instance.lazy_series_lookup(entry)
-                log.verbose('Doing trakt_lookup for < %s >' % entry.get('series_name', entry['title']))
+                log.verbose('Doing trakt_lookup for: %s' % entry.get('series_name', entry['title']))
             if task.config.get('tvmaze_lookup'):
                 plugin.get_plugin_by_name('tvmaze_lookup').instance.lazy_series_lookup(entry)
-                log.verbose('Doing tvmaze_lookup for < %s >' % entry.get('series_name', entry['title']))
+                log.verbose('Doing tvmaze_lookup for: %s' % entry.get('series_name', entry['title']))
             if task.config.get('thetvdb_lookup') or not entry.get('tvdb_id'):  # default fallback
                 plugin.get_plugin_by_name('thetvdb_lookup').instance.lazy_series_lookup(entry, 'en')
-                log.verbose('Doing thetvdb_lookup for < %s >' % entry.get('series_name', entry['title']))
+                log.verbose('Doing thetvdb_lookup for: %s' % entry.get('series_name', entry['title']))
         elif config['search_type'] == 'movie' or do_movie_lookup:
             if task.config.get('trakt_lookup'):
                 plugin.get_plugin_by_name('trakt_lookup').instance.lazy_movie_lookup(entry)
-                log.verbose('Doing trakt_lookup for < %s >' % entry.get('title'))
+                log.verbose('Doing trakt_lookup for: %s' % entry.get('title'))
             if task.config.get('tmdb_lookup'):
                 plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
-                log.verbose('Doing tmdb_lookup for < %s >' % entry.get('title'))
+                log.verbose('Doing tmdb_lookup for: %s' % entry.get('title'))
             if task.config.get('imdb_lookup') or not entry.get('imdb_id'):  # default fallback
                 plugin.get_plugin_by_name('imdb_lookup').instance.lookup(entry)
-                log.verbose('Doing imdb_lookup for < %s >' % entry.get('title'))
+                log.verbose('Doing imdb_lookup for: %s' % entry.get('title'))
 
     def get_metaid_url_parameter(self, task, entry, config):
         # only use for tv/movie search type
@@ -246,13 +246,13 @@ class Newznab(object):
             # elif entry.get('trakt_id'):
             #    url_param = '&traktid=%s' % entry.get('trakt_id')
             if not url_param:
-                log.error('Could not get valid meta id for series < %s >' % (entry.get('series_name', entry['title'])))
+                log.error('Could not get valid meta id for series: %s' % (entry.get('series_name', entry['title'])))
         elif config['search_type'] == 'movie':
             if entry.get('imdb_id'):
                 url_param = '&imdbid=%s' % str(entry['imdb_id']).replace('tt', '')
                 # tmdb is not supported for move lookups by indexers!
             if not url_param:
-                log.error('Could not get imdb_id for movie < %s >' % (entry.get('movie_name', entry['title'])))
+                log.error('Could not get imdb_id for movie: %s' % (entry.get('movie_name', entry['title'])))
 
         return url_param
 
@@ -295,9 +295,9 @@ class Newznab(object):
             except ValueError:
                 parsed_date = parsed_date.replace(tzinfo=None)
         except ValueError:
-            log.warning('Invalid time format < %s > in Entry < %s >' % value)
+            log.warning('Invalid time format: %s in Entry: %s' % value)
         except Exception as ex:
-            log.trace('Unexpected time field < %s > error: <%s>' % (value, ex))
+            log.trace('Unexpected time field: %s error: %s' % (value, ex))
 
         return parsed_date
 
@@ -309,20 +309,20 @@ class Newznab(object):
             try:
                 number = float(valuestring)
             except ValueError:
-                log.trace('Invalid number field < %s >' % valuestring)
+                log.trace('Invalid number field: %s' % valuestring)
         except Exception as ex:
-            log.trace('Invalid number field < %s > error: <%s>' % (valuestring, ex))
+            log.trace('Invalid number field: %s error: %s' % (valuestring, ex))
 
         return number
 
     def string_to_bool(self, value):
         return value.lower() in ('yes', 'true', 't', '1', 'y')
 
-    def dump_entry(self, entry):
-        log.verbose('#####################################################################################')
-        for key in entry:
-            log.verbose('Entry: [%s] = %s' % (key, entry[key]))
-        log.verbose('#####################################################################################')
+    # def dump_entry(self, entry):
+    #     log.verbose('#####################################################################################')
+    #     for key in entry:
+    #         log.verbose('Entry: [%s] = %s' % (key, entry[key]))
+    #     log.verbose('#####################################################################################')
 
     def parse_newznab_from_xml(self, xml_entries):
         entries = []
@@ -339,7 +339,7 @@ class Newznab(object):
                     if link.length and link.type == 'application/x-nzb':
                         new_entry['content_size'] = int(int(link.length) / 1024 / 1024)  # MB
             if 'content_size' not in new_entry:
-                log.warning('Could not get valid filesize for entry < %s >' % xml_entry.title)
+                log.warning('Could not get valid filesize for entry: %s' % xml_entry.title)
 
             # store some usefully data in the 'newznab' namespace
             if xml_entry.id:
@@ -356,7 +356,7 @@ class Newznab(object):
                     tdelta = datetime.now() - new_entry[NEWSNAB_NS_PREFIX + 'pubdate']
                     new_entry[NEWSNAB_NS_PREFIX + 'age'] = max(0, int(tdelta.days))  # store simple age value in days
                 except Exception as ex:
-                    log.trace('Cant calculate Age via pubdate < %s > in Entry < %s > error <%s>' % (
+                    log.trace('Cant calculate Age via pubdate: %s in Entry: %s error : %s' % (
                         new_entry[NEWSNAB_NS_PREFIX + 'pubdate'], xml_entry.title, ex))
 
             # add some usefully attributes to the namespace
@@ -398,7 +398,7 @@ class Newznab(object):
                         boolvalue = False
                 entry[tagname] = boolvalue
             else:
-                log.warning('Unsupported attribute type < %s > via name < %s >' % (type, tagname))
+                log.warning('Unsupported attribute type: %s via name: %s' % (type, tagname))
 
     def fill_newznab_attributes(self, xml_entry, entry):
         self.set_ns_attribute('grabs', xml_entry, entry, int)
@@ -421,7 +421,7 @@ class Newznab(object):
                         node.name = node.attributes['name'].value
                         node.value = node.attributes['value'].value
         except Exception as ex:
-            log.trace('Unable to rename nodes in XML < %s >' % ex)
+            log.trace('Unable to rename nodes in XML: %s' % ex)
             return None
         return dom.toxml()
 
@@ -431,11 +431,11 @@ class Newznab(object):
         try:
             r = task.requests.get(url + '&o=xml', timeout=20)
         except Exception as ex:
-            log.error("Failed fetching '%s': %s" % (url, ex))
+            log.error("Failed fetching urk: %s error: %s" % (url, ex))
             return []
 
         if r and r.status_code != 200:
-            raise plugin.PluginError('Unable to reach indexer url < %s >' % url)
+            raise plugin.PluginError('Unable to reach indexer url: %s' % url)
 
         fixed_xml = self.make_feedparser_friendly(r.content)
         try:
@@ -449,11 +449,11 @@ class Newznab(object):
                 if 'code' in xml_feed['error']:
                     if 'description' in xml_feed['error']:
                         log.error(
-                            'Error code [%s] : < %s >' % (xml_feed['error']['code'], xml_feed['error']['description']))
+                            'Error code: %s detail: %s' % (xml_feed['error']['code'], xml_feed['error']['description']))
                     else:
-                        log.error('Error code [%s]' % xml_feed['error']['code'])
+                        log.error('Error code: %s' % xml_feed['error']['code'])
         except Exception as ex:
-            log.error('Unable to parse the XML from url < %s >: %s' % (url, ex))
+            log.error('Unable to parse the XML from url: %s: %s' % (url, ex))
             return []
 
         if not len(parsed_xml.entries) > 0:
@@ -476,7 +476,7 @@ class Newznab(object):
                 entry.task = task
                 query = render_from_entry(custom_query, entry)
             except RenderError as e:
-                log.warning('Could not build custom_query string for %s: %s' % (entry['title'], e))
+                log.warning('Could not build custom_query string for: %s error: %s' % (entry['title'], e))
 
         query = normalize_unicode(query)
         # query = normalize_scene(query)
@@ -502,7 +502,7 @@ class Newznab(object):
 
         query = self.get_query_param(entry['title'], entry, task, config)
         if not query:
-            log.verbose('Skipping Entry < %s >, because invalid search query string found.' % entry['title'])
+            log.verbose('Skipping Entry: %s, because invalid search query string found.' % entry['title'])
             return []
 
         url += query
@@ -523,7 +523,7 @@ class Newznab(object):
                     entry['series_season'] = parsed.season
 
         if not entry.get('series_episode'):
-            log.error('Could not get valid episode numbering for series lookup, skipping < %s >' % entry['title'])
+            log.error('Could not get valid episode numbering for series lookup, skipping: %s' % entry['title'])
             return []
 
         # build final url
@@ -538,7 +538,7 @@ class Newznab(object):
                 url += self.get_query_param(parsed_name, entry, task, config)
             else:
                 url += self.get_query_param(entry['title'], entry, task, config)
-            log.verbose('Doing fallback search via name for series < %s >' % entry['title'])
+            log.verbose('Doing fallback search via name for series: %s' % entry['title'])
 
         if entry.get('series_episode'):
             url += '&ep=%s' % entry['series_episode']
@@ -554,7 +554,7 @@ class Newznab(object):
         else:  # fallback to name (do we use the 'search_strings' array?)
             query_name = entry.get('movie_name', entry['title'])
             url += self.get_query_param(query_name, entry, task, config)
-            log.verbose('Doing fallback search via name for movie < %s >' % query_name)
+            log.verbose('Doing fallback search via name for movie: %s' % query_name)
             # TODO @Andy: maybe do a clean (plugin_parsing) call instead of title?
         return self.fill_entries_for_url(url, task)
 
