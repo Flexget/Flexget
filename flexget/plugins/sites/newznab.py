@@ -98,8 +98,19 @@ CATEGORIES = {
     'not-determined': 7900
 }
 
-NEWSNAB_NS_PREFIX = 'newznab_'
+NAMESPACE_ATTRIBUTE_MAP = {
+    'grabs': int,
+    'size':	int,
+    'files': int,
+    'usenetdate': datetime,
+    'password':	bool,
+    'guid': basestring
+}
 
+NAMESPACE_NAME = 'newznab'
+NAMESPACE_URL = 'http://www.newznab.com/DTD/2010/feeds/attributes/'
+NAMESPACE_TAGNAME = 'attr'
+NAMESPACE_PREFIX = 'newznab_'
 
 class Newznab(object):
     """
@@ -259,6 +270,8 @@ class Newznab(object):
     def build_base_url(self, config):
         log.debug(type(config))
 
+        # TODO @Andy: do 't=caps' check (many indexers wont correctly handle this, nzbhydra uses 'brute force' since 0.2.169)
+
         api_url = config['api_server_url'] + '/api?' + '&extended=1'
 
         if config.get('api_key'):
@@ -344,20 +357,20 @@ class Newznab(object):
             # store some usefully data in the 'newznab' namespace
             if xml_entry.id:
                 guid_splits = re.split('[/=]', xml_entry.id)
-                new_entry[NEWSNAB_NS_PREFIX + 'guid'] = guid_splits.pop()
+                new_entry[NAMESPACE_PREFIX + 'guid'] = guid_splits.pop()
             if xml_entry.published_parsed:
-                new_entry[NEWSNAB_NS_PREFIX + 'pubdate'] = datetime.fromtimestamp(mktime(xml_entry.published_parsed))
+                new_entry[NAMESPACE_PREFIX + 'pubdate'] = datetime.fromtimestamp(mktime(xml_entry.published_parsed))
             elif xml_entry.published:
                 parsed_date = self.convert_to_naive_utc(xml_entry.published)
                 if parsed_date:
-                    new_entry[NEWSNAB_NS_PREFIX + 'pubdate'] = parsed_date
-            if (NEWSNAB_NS_PREFIX + 'pubdate') in new_entry:
+                    new_entry[NAMESPACE_PREFIX + 'pubdate'] = parsed_date
+            if (NAMESPACE_PREFIX + 'pubdate') in new_entry:
                 try:
-                    tdelta = datetime.now() - new_entry[NEWSNAB_NS_PREFIX + 'pubdate']
-                    new_entry[NEWSNAB_NS_PREFIX + 'age'] = max(0, int(tdelta.days))  # store simple age value in days
+                    tdelta = datetime.now() - new_entry[NAMESPACE_PREFIX + 'pubdate']
+                    new_entry[NAMESPACE_PREFIX + 'age'] = max(0, int(tdelta.days))  # store simple age value in days
                 except Exception as ex:
                     log.trace('Cant calculate Age via pubdate: %s in Entry: %s error : %s' % (
-                        new_entry[NEWSNAB_NS_PREFIX + 'pubdate'], xml_entry.title, ex))
+                        new_entry[NAMESPACE_PREFIX + 'pubdate'], xml_entry.title, ex))
 
             # add some usefully attributes to the namespace
             self.fill_newznab_attributes(xml_entry, new_entry)
@@ -366,9 +379,11 @@ class Newznab(object):
         return entries
 
     def set_ns_attribute(self, name, xml_entry, entry, type=basestring):
-        tagname = NEWSNAB_NS_PREFIX + name
+        tagname = NAMESPACE_PREFIX + name
         value = None
-        if tagname in xml_entry:
+        if tagname in entry and entry.get(tagname):
+            value = entry.get(tagname)  # use existing, but do type check
+        elif tagname in xml_entry:
             if isinstance(xml_entry[tagname], dict) and 'value' in xml_entry[tagname]:
                 value = xml_entry[tagname]['value']
             elif isinstance(xml_entry[tagname], basestring):
@@ -401,23 +416,18 @@ class Newznab(object):
                 log.warning('Unsupported attribute type: %s via name: %s' % (type, tagname))
 
     def fill_newznab_attributes(self, xml_entry, entry):
-        self.set_ns_attribute('grabs', xml_entry, entry, int)
-        self.set_ns_attribute('size', xml_entry, entry, int)
-        self.set_ns_attribute('files', xml_entry, entry, int)
-        self.set_ns_attribute('usenetdate', xml_entry, entry, datetime)
-        self.set_ns_attribute('password', xml_entry, entry, bool)
-        if not (NEWSNAB_NS_PREFIX + 'guid') in entry:
-            self.set_ns_attribute('guid', xml_entry, entry)
+        for key in NAMESPACE_ATTRIBUTE_MAP:
+            self.set_ns_attribute(key, xml_entry, entry, NAMESPACE_ATTRIBUTE_MAP[key])
 
     # feedparser cant handle namespace attributes with same tagname, so rename those nodes.
     def make_feedparser_friendly(self, data):
         try:
             dom = minidom.parseString(data)
-            items_ns = dom.getElementsByTagNameNS('http://www.newznab.com/DTD/2010/feeds/attributes/', 'attr')
+            items_ns = dom.getElementsByTagNameNS(NAMESPACE_URL, NAMESPACE_TAGNAME)
             if items_ns:
                 for node in items_ns:
                     if node.attributes and 'name' in node.attributes and 'value' in node.attributes:
-                        node.tagName = 'newznab:%s' % node.attributes['name'].value
+                        node.tagName = NAMESPACE_NAME + ':%s' % node.attributes['name'].value
                         node.name = node.attributes['name'].value
                         node.value = node.attributes['value'].value
         except Exception as ex:
@@ -463,8 +473,8 @@ class Newznab(object):
         entries = self.parse_newznab_from_xml(parsed_xml.entries)
         if len(entries) == 0:
             log.verbose('No entries parsed from xml.')
-        # else:
-        #    self.dump_entry(entries[0])
+        #else:
+        #   self.dump_entry(entries[0])
 
         return entries
 
@@ -532,7 +542,7 @@ class Newznab(object):
         if url_metaid_param:
             url += url_metaid_param
         else:  # fallback to name (do we use the 'search_strings' array?)
-            if 'series_name' in entry:
+            if 'series_name' in entry and entry.get('series_name'):
                 url += self.get_query_param(entry.get('series_name'), entry, task, config)
             elif parsed_name:
                 url += self.get_query_param(parsed_name, entry, task, config)
