@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=harry+potter+and+the+philosopher%27s+stone&type=movie
+      uri: https://api.trakt.tv/search?query=harry+potter+and+the+philosopher%27s+stone&type=movie
     response:
       body: {string: '[{"type":"movie","score":89.6801,"movie":{"title":"Harry Potter
           and the Philosopher''s Stone","overview":"Harry Potter has lived under the
@@ -61,7 +61,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/movies/545?extended=full%2Cimages
+      uri: https://api.trakt.tv/movies/545?extended=full%2Cimages
     response:
       body: {string: '{"title":"Harry Potter and the Philosopher''s Stone","year":2001,"ids":{"trakt":545,"slug":"harry-potter-and-the-philosopher-s-stone-2001","imdb":"tt0241527","tmdb":671},"tagline":"Let
           the Magic Begin.","overview":"Harry Potter has lived under the stairs at

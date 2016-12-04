@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+      uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
     response:
       body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
           to the Real World.","overview":"Thomas A. Anderson is a man living two lives.

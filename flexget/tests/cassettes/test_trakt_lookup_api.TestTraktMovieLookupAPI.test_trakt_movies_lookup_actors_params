@@ -6,7 +6,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":68.05593,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -100,7 +100,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -133,7 +133,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481/people?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481/people?extended=full%2Cimages
   response:
     body: {string: "{\"cast\":[{\"character\":\"Neo\",\"person\":{\"name\":\"Keanu
         Reeves\",\"ids\":{\"trakt\":7134,\"slug\":\"keanu-reeves\",\"imdb\":\"nm0000206\",\"tmdb\":6384,\"tvrage\":19449},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/headshots/original/88d0ee35f6.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/88d0ee35f6.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/headshots/thumb/88d0ee35f6.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/original/6a31c3ef56.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/medium/6a31c3ef56.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/thumb/6a31c3ef56.jpg\"}},\"biography\":\"Keanu
@@ -341,7 +341,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":70.7786,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -437,7 +437,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -470,7 +470,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481/people?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481/people?extended=full%2Cimages
   response:
     body: {string: "{\"cast\":[{\"character\":\"Neo\",\"person\":{\"name\":\"Keanu
         Reeves\",\"ids\":{\"trakt\":7134,\"slug\":\"keanu-reeves\",\"imdb\":\"nm0000206\",\"tmdb\":6384,\"tvrage\":19449},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/headshots/original/c28cd98987.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/c28cd98987.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/headshots/thumb/c28cd98987.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/original/6a31c3ef56.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/medium/6a31c3ef56.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/thumb/6a31c3ef56.jpg\"}},\"biography\":\"Keanu
@@ -678,7 +678,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":71.00695,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -774,7 +774,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -807,7 +807,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481/people?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481/people?extended=full%2Cimages
   response:
     body: {string: "{\"cast\":[{\"character\":\"Neo\",\"person\":{\"name\":\"Keanu
         Reeves\",\"ids\":{\"trakt\":7134,\"slug\":\"keanu-reeves\",\"imdb\":\"nm0000206\",\"tmdb\":6384,\"tvrage\":19449},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/c28cd98987.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/c28cd98987.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/headshots/thumb/c28cd98987.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/full/6a31c3ef56.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/medium/6a31c3ef56.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/thumb/6a31c3ef56.jpg\"}},\"biography\":\"Keanu
@@ -1015,7 +1015,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":71.46832,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -1111,7 +1111,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -1144,7 +1144,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481/people?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481/people?extended=full%2Cimages
   response:
     body: {string: "{\"cast\":[{\"character\":\"Neo\",\"person\":{\"name\":\"Keanu
         Reeves\",\"ids\":{\"trakt\":7134,\"slug\":\"keanu-reeves\",\"imdb\":\"nm0000206\",\"tmdb\":6384,\"tvrage\":19449},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/c28cd98987.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/c28cd98987.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/headshots/thumb/c28cd98987.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/medium/6a31c3ef56.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/medium/6a31c3ef56.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/thumb/6a31c3ef56.jpg\"}},\"biography\":\"Keanu
@@ -1352,7 +1352,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":71.46832,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -1448,7 +1448,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -1481,7 +1481,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481/people?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481/people?extended=full%2Cimages
   response:
     body: {string: "{\"cast\":[{\"character\":\"Neo\",\"person\":{\"name\":\"Keanu
         Reeves\",\"ids\":{\"trakt\":7134,\"slug\":\"keanu-reeves\",\"imdb\":\"nm0000206\",\"tmdb\":6384,\"tvrage\":19449},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/c28cd98987.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/c28cd98987.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/headshots/thumb/c28cd98987.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/medium/6a31c3ef56.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/medium/6a31c3ef56.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/thumb/6a31c3ef56.jpg\"}},\"biography\":\"Keanu
@@ -1689,7 +1689,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":71.46832,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -1785,7 +1785,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -1818,7 +1818,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481/people?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481/people?extended=full%2Cimages
   response:
     body: {string: "{\"cast\":[{\"character\":\"Neo\",\"person\":{\"name\":\"Keanu
         Reeves\",\"ids\":{\"trakt\":7134,\"slug\":\"keanu-reeves\",\"imdb\":\"nm0000206\",\"tmdb\":6384,\"tvrage\":19449},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/c28cd98987.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/c28cd98987.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/headshots/thumb/c28cd98987.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/medium/6a31c3ef56.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/medium/6a31c3ef56.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/thumb/6a31c3ef56.jpg\"}},\"biography\":\"Keanu
@@ -2026,7 +2026,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":71.46832,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -2122,7 +2122,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -2155,7 +2155,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481/people?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481/people?extended=full%2Cimages
   response:
     body: {string: "{\"cast\":[{\"character\":\"Neo\",\"person\":{\"name\":\"Keanu
         Reeves\",\"ids\":{\"trakt\":7134,\"slug\":\"keanu-reeves\",\"imdb\":\"nm0000206\",\"tmdb\":6384,\"tvrage\":19449},\"images\":{\"headshot\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/c28cd98987.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/headshots/medium/c28cd98987.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/headshots/thumb/c28cd98987.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/medium/6a31c3ef56.jpg\",\"medium\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/medium/6a31c3ef56.jpg\",\"thumb\":\"https://walter.trakt.us/images/people/000/007/134/fanarts/thumb/6a31c3ef56.jpg\"}},\"biography\":\"Keanu

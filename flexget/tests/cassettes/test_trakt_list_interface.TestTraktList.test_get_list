@@ -7,7 +7,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/users/me/lists/testlist/items
+    uri: https://api.trakt.tv/users/me/lists/testlist/items
   response:
     body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-04-06T01:08:39.000Z","type":"show","show":{"title":"The
         Walking Dead","year":2010,"ids":{"trakt":1393,"slug":"the-walking-dead","tvdb":153021,"imdb":"tt1520211","tmdb":1402,"tvrage":25056}}},{"rank":2,"listed_at":"2016-04-06T01:08:56.000Z","type":"movie","movie":{"title":"Deadpool","year":2016,"ids":{"trakt":190430,"slug":"deadpool-2016","imdb":"tt1431045","tmdb":293660}}},{"rank":3,"listed_at":"2016-04-06T01:09:11.000Z","type":"episode","episode":{"season":8,"number":15,"title":"Fidelis

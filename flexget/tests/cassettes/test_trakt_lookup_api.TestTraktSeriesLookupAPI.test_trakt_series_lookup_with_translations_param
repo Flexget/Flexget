@@ -6,7 +6,7 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=game+of+thrones&type=show
+    uri: https://api.trakt.tv/search?query=game+of+thrones&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":58.480095,\"show\":{\"title\":\"Game
         of Thrones\",\"overview\":\"Seven noble families fight for control of the
@@ -84,7 +84,7 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"Game of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493},"overview":"Seven
         noble families fight for control of the mythical land of Westeros. Friction
@@ -118,7 +118,7 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390/translations?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390/translations?extended=full%2Cimages
   response:
     body: {string: "[{\"title\":\"Game of Thrones\",\"overview\":\"Seven noble families
         fight for control of the mythical land of Westeros. Friction between the houses
@@ -542,7 +542,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=game+of+thrones&type=show
+    uri: https://api.trakt.tv/search?query=game+of+thrones&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":60.96788,\"show\":{\"title\":\"Game
         of Thrones\",\"overview\":\"Seven noble families fight for control of the
@@ -620,7 +620,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"Game of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493},"overview":"Seven
         noble families fight for control of the mythical land of Westeros. Friction
@@ -654,7 +654,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390/translations?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390/translations?extended=full%2Cimages
   response:
     body: {string: "[{\"title\":\"\u0635\u0631\u0627\u0639 \u0627\u0644\u0639\u0631\u0648\u0634\",\"overview\":\"\u0635\u0631\u0627\u0639
         \u0627\u0644\u0639\u0631\u0648\u0634 \u0645\u0628\u0646\u064A\u0651 \u0639\u0644\u0649
@@ -1096,7 +1096,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=game+of+thrones&type=show
+    uri: https://api.trakt.tv/search?query=game+of+thrones&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":60.414883,\"show\":{\"title\":\"Game
         of Thrones\",\"overview\":\"Seven noble families fight for control of the
@@ -1174,7 +1174,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"Game of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493},"overview":"Seven
         noble families fight for control of the mythical land of Westeros. Friction
@@ -1208,7 +1208,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390/translations?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390/translations?extended=full%2Cimages
   response:
     body: {string: "[{\"title\":\"\u0635\u0631\u0627\u0639 \u0627\u0644\u0639\u0631\u0648\u0634\",\"overview\":\"\u0635\u0631\u0627\u0639
         \u0627\u0644\u0639\u0631\u0648\u0634 \u0645\u0628\u0646\u064A\u0651 \u0639\u0644\u0649
@@ -1650,7 +1650,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=game+of+thrones&type=show
+    uri: https://api.trakt.tv/search?query=game+of+thrones&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":61.374203,\"show\":{\"title\":\"Game
         of Thrones\",\"overview\":\"Seven noble families fight for control of the
@@ -1728,7 +1728,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"Game of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493},"overview":"Seven
         noble families fight for control of the mythical land of Westeros. Friction
@@ -1762,7 +1762,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390/translations?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390/translations?extended=full%2Cimages
   response:
     body: {string: "[{\"title\":\"\u0635\u0631\u0627\u0639 \u0627\u0644\u0639\u0631\u0648\u0634\",\"overview\":\"\u0635\u0631\u0627\u0639
         \u0627\u0644\u0639\u0631\u0648\u0634 \u0645\u0628\u0646\u064A\u0651 \u0639\u0644\u0649
@@ -2204,7 +2204,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=game+of+thrones&type=show
+    uri: https://api.trakt.tv/search?query=game+of+thrones&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":61.310566,\"show\":{\"title\":\"Game
         of Thrones\",\"overview\":\"Seven noble families fight for control of the
@@ -2282,7 +2282,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"Game of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493},"overview":"Seven
         noble families fight for control of the mythical land of Westeros. Friction
@@ -2316,7 +2316,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390/translations?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390/translations?extended=full%2Cimages
   response:
     body: {string: "[{\"title\":\"\u0635\u0631\u0627\u0639 \u0627\u0644\u0639\u0631\u0648\u0634\",\"overview\":\"\u0635\u0631\u0627\u0639
         \u0627\u0644\u0639\u0631\u0648\u0634 \u0645\u0628\u0646\u064A\u0651 \u0639\u0644\u0649
@@ -2758,7 +2758,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=game+of+thrones&type=show
+    uri: https://api.trakt.tv/search?query=game+of+thrones&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":61.310566,\"show\":{\"title\":\"Game
         of Thrones\",\"overview\":\"Seven noble families fight for control of the
@@ -2836,7 +2836,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"Game of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493},"overview":"Seven
         noble families fight for control of the mythical land of Westeros. Friction
@@ -2870,7 +2870,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390/translations?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390/translations?extended=full%2Cimages
   response:
     body: {string: "[{\"title\":\"\u0635\u0631\u0627\u0639 \u0627\u0644\u0639\u0631\u0648\u0634\",\"overview\":\"\u0635\u0631\u0627\u0639
         \u0627\u0644\u0639\u0631\u0648\u0634 \u0645\u0628\u0646\u064A\u0651 \u0639\u0644\u0649
@@ -3312,7 +3312,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=game+of+thrones&type=show
+    uri: https://api.trakt.tv/search?query=game+of+thrones&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":61.310566,\"show\":{\"title\":\"Game
         of Thrones\",\"overview\":\"Seven noble families fight for control of the
@@ -3390,7 +3390,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"Game of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493},"overview":"Seven
         noble families fight for control of the mythical land of Westeros. Friction
@@ -3424,7 +3424,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/1390/translations?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/1390/translations?extended=full%2Cimages
   response:
     body: {string: "[{\"title\":\"\u0635\u0631\u0627\u0639 \u0627\u0644\u0639\u0631\u0648\u0634\",\"overview\":\"\u0635\u0631\u0627\u0639
         \u0627\u0644\u0639\u0631\u0648\u0634 \u0645\u0628\u0646\u064A\u0651 \u0639\u0644\u0649
