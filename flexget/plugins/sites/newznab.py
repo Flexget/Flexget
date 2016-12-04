@@ -232,10 +232,10 @@ class Newznab(object):
                 continue
             # TODO @Andy: double check int case for {'key': 0} -> get() is None
             found = in_object.get(key)
-            if not found and lazy:
+            if found is None and lazy is True:
                 found = in_object.get(key.lower())
             for thetype in types:
-                if found and isinstance(found, thetype):
+                if found is not None and isinstance(found, thetype):
                     if isinstance(found, basestring) and found.isspace():
                         continue
                     return found
@@ -321,11 +321,11 @@ class Newznab(object):
     def get_metaid_url_parameter(self, task, entry, config):
         # only use for tv/movie search type
         if config['search_type'] != 'tv' and config['search_type'] != 'movie':
-            return ''
+            return None
 
         self.update_metadata(task, entry, config)
 
-        url_param = ''
+        url_param = None
         # use first valid meta id
         if self.safe_get(config, 'search_type') == 'tv':
             if self.safe_get(entry, 'tvdb_id', [basestring, int]):
@@ -428,7 +428,7 @@ class Newznab(object):
     def set_ns_attribute(self, name, xml_entry, entry, in_type=basestring):
         tagname = NAMESPACE_PREFIX + name
         value = None
-        if tagname in entry and entry.get(tagname):
+        if tagname in entry and entry.get(tagname) is not None:
             value = entry.get(tagname)  # use existing, but do type check
         elif tagname in xml_entry:
             if isinstance(xml_entry[tagname], dict) and 'value' in xml_entry[tagname]:
@@ -436,16 +436,16 @@ class Newznab(object):
             elif isinstance(xml_entry[tagname], basestring):
                 value = xml_entry[tagname]
 
-        if value:
+        if value is not None:
             if isinstance(value, in_type):
                 entry[tagname] = value
             elif in_type == int or in_type == float:
                 number = self.convert_to_number(value)
-                if number:
+                if number is not None:
                     entry[tagname] = number
             elif in_type == datetime:
                 date = self.convert_to_naive_utc(value)
-                if date:
+                if date is not None:
                     entry[tagname] = date
             elif in_type == bool:
                 boolvalue = None
@@ -454,7 +454,7 @@ class Newznab(object):
                         boolvalue = True
                 if not boolvalue:
                     number = self.convert_to_number(value)
-                    if number and number > 0:
+                    if number is not None and number > 0:
                         boolvalue = True
                     else:
                         boolvalue = False
@@ -567,7 +567,7 @@ class Newznab(object):
 
     def do_search_tv(self, entry, task, config):
         # normally this should be used with next_series_episodes who has provided season and episodenumber
-        parsed_name = ''
+        parsed_name = None
         # carefull episode 0 is valid
         if 'series_episode' not in entry:
             # try to fix
