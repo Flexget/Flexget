@@ -36,13 +36,14 @@ class PluginSortByWeighted(object):
     weight:         The sort weight used, values between 10-200 are good starts
     weight_default: The default weight used if a sort 'field' could not be found or had a invalid entry (default is: 0)
     inverse:        Use inverse weighting for the field, example: Date/Age fields
-    limits_min_max: The minimum cutoff and maximum cutoff value, that will be used for weighting.
+    upper_limit:    The upper value limit or upper cutoff value, that will be used for weighting.
                     This will change the slot distribution, which helps narrow down to more meaningfully weighting results.
 
                     Example: Entry1 is 100 days old, Entry2 is 7 days old, Entry3 is 1000 days old
-                    Without a max cutoff the weights will be distributed between 0-1000 days, with a limits_min_max: [0, 100]
-                    Weights will be distributed between 0-100 and any value larger than max, gets the lowest weight,
-                    while we can smoothly distribute the rest between 0-100 days.
+                    Without a upper_limit the weights will be distributed between 0-1000 days, with a upper_limit: 100
+                    weights will be distributed between 0-100 and any value larger than upper_limit, gets the highest score.
+                    So we can smoothly distribute the rest between 0-100 days.
+    lower_limit:    Similar to upper_limit, so each field value under this limit gets the lowest weight score.
 
     delta_distance: The distance, step until a new slot is used for weighting.
                     Think of this like: Any value that is within this distance will get the same weight for the slot.
@@ -60,11 +61,11 @@ class PluginSortByWeighted(object):
           - field: newznab_pubdate
             weight: 25              # we still like new releases
             delta_distance: 7       # anything within 7 days is similar
-            limits_min_max: [0,60]  # confine results to 0-60 days
+            upper_limit: 60         # confine results to 0-60 days
             inverse: yes            # reverse weight order for date/age fields
           - field: newznab_grabs
             weight: 25              # we like releases that others already downloaded aka safeguard against crap
-            limits_min_max: [0,100] # anything over 100 grabs is fine and gets maximum weight
+            upper_limit: 100        # anything over 100 grabs is fine and gets maximum weight
             weight_default: 5       # if entry has no 'newznab_grabs' field, still use 5 as weight so they don't sink to the bottom to quickly.
 
             In this example the best result can have a 'sort_by_weight_sum' of sum = 80 + 25 + 25
@@ -79,7 +80,8 @@ class PluginSortByWeighted(object):
                 'weight_default': {'type': 'integer', 'default': 0},
                 'inverse': {'type': 'boolean', 'default': False},
                 'delta_distance': {'type': 'integer', 'minimum': 1},
-                'limits_min_max': {'type': 'array', 'items': {'type': 'integer'}, 'minItems': 2, 'maxItems': 2},
+                'lower_limit':  {'type': 'integer', 'minimum': 0, 'default': 0},
+                'upper_limit': {'type': 'integer', 'minimum': 1},
             },
             'required': ['field', 'weight'],
             'additionalProperties': False,
@@ -89,19 +91,19 @@ class PluginSortByWeighted(object):
 
     #    def on_task_start(self, task, config):
     def on_task_filter(self, task, config):
-        # [field] = [weight, weight_default, delta, inverse, [min,max]]
+        # [field] = [weight, weight_default, delta, inverse, lower_limit, upper_limit]
         settings = {}
-        for centry in config:
-            if isinstance(centry, dict):
-                if centry.get('field') and not centry.get('field').isspace():
-                    key = centry.get('field')
-                    settings[key] = [centry.get('weight', 25),
-                                     centry.get('weight_default', 0),
-                                     centry.get('delta_distance', -1),
-                                     centry.get('inverse', False)]
-                    if 'limits_min_max' in centry and isinstance(centry['limits_min_max'], list):
-                        if len(centry['limits_min_max']) == 2:
-                            settings[key].append(centry['limits_min_max'])
+        for entry in config:
+            if isinstance(entry, dict):
+                if entry.get('field') and not entry.get('field').isspace():
+                    key = entry.get('field')
+                    settings[key] = [entry.get('weight', 25),
+                                     entry.get('weight_default', 0),
+                                     entry.get('delta_distance', -1),
+                                     entry.get('inverse', False),
+                                     entry.get('lower_limit', 0)]
+                    if entry.get('upper_limit'):
+                       settings[key].append(entry['upper_limit'])
 
         # update delta_distance, add limits_min_max
         max_values = self.get_max_values(settings, task)
@@ -110,7 +112,7 @@ class PluginSortByWeighted(object):
             if settings[key][2] == -1:
                 if key in max_values and max_values[key] > 0:
                     settings[key][2] = max_values[key] / DEFAULT_SLOTS
-        # calcu/fill result in ENTRY_NAME
+        # calc/fill result in ENTRY_NAME
         self.calculate_weights(task, settings, max_values)
         log.debug('sorting entries by weight: %s' % config)
         task.all_entries.sort(key=lambda e: e.get(ENTRY_NAME, 0), reverse=True)
@@ -126,14 +128,14 @@ class PluginSortByWeighted(object):
                 value = value.days
             elif isinstance(value, bool):
                 value = int(value)
-            if len(settings[key]) == 5:
-                value = min(value, settings[key][4][1])
-                if value < settings[key][4][0]:
-                    value = 0
+            if len(settings[key]) == 6:
+                value = min(value, settings[key][5])
+            if value < settings[key][4]:
+                value = 0
         return value
 
     def calculate_weights(self, task, settings, max_values):
-        # [field] = [weight, weight_default, delta, inverse, [min,max]]
+        # [field] = [weight, weight_default, delta, inverse, lower_limit, upper_limit]
         for entry in task.all_entries:
             # entry['weights'] = dict()
             weight_sum = 0
@@ -168,13 +170,13 @@ class PluginSortByWeighted(object):
                         if value is None:
                             continue
                         if key not in max_values:
-                            if len(settings[key]) == 5:
-                                max_value = min(value, settings[key][4][1])
+                            if len(settings[key]) == 6:
+                                max_value = min(value, settings[key][5])
                             else:
                                 max_value = value
                         else:
-                            if len(settings[key]) == 5:
-                                max_value = max(max_values[key], min(value, settings[key][4][1]))
+                            if len(settings[key]) == 6:
+                                max_value = max(max_values[key], min(value, settings[key][5]))
                             else:
                                 max_value = max(max_values[key], value)
                         max_values[key] = max_value
