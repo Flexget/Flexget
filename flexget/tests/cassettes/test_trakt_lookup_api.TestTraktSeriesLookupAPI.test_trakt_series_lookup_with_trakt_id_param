@@ -6,7 +6,7 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/75481?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/75481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1967,"ids":{"trakt":75481,"slug":"the-flash-1967","tvdb":272094,"imdb":null,"tmdb":null,"tvrage":null},"overview":"The
         Flash is- of course!- the fastest man alive. Barry Allen, otherwise known
@@ -42,7 +42,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/75481?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/75481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1967,"ids":{"trakt":75481,"slug":"the-flash-1967","tvdb":272094,"imdb":null,"tmdb":null,"tvrage":null},"overview":"The
         Flash is- of course!- the fastest man alive. Barry Allen, otherwise known
@@ -78,7 +78,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/75481?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/75481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1967,"ids":{"trakt":75481,"slug":"the-flash-1967","tvdb":272094,"imdb":null,"tmdb":null,"tvrage":null},"overview":"The
         Flash is- of course!- the fastest man alive. Barry Allen, otherwise known
@@ -114,7 +114,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/75481?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/75481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1967,"ids":{"trakt":75481,"slug":"the-flash-1967","tvdb":272094,"imdb":null,"tmdb":null,"tvrage":null},"overview":"The
         Flash is- of course!- the fastest man alive. Barry Allen, otherwise known
@@ -150,7 +150,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/75481?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/75481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1967,"ids":{"trakt":75481,"slug":"the-flash-1967","tvdb":272094,"imdb":null,"tmdb":null,"tvrage":null},"overview":"The
         Flash is- of course!- the fastest man alive. Barry Allen, otherwise known
@@ -186,7 +186,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/75481?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/75481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1967,"ids":{"trakt":75481,"slug":"the-flash-1967","tvdb":272094,"imdb":null,"tmdb":null,"tvrage":null},"overview":"The
         Flash is- of course!- the fastest man alive. Barry Allen, otherwise known

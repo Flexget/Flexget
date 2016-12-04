@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/users/flexgettest/watchlist/movies
+      uri: https://api.trakt.tv/users/flexgettest/watchlist/movies
     response:
       body: {string: '[{"rank":1,"listed_at":"2015-01-02T02:37:24.000Z","type":"movie","movie":{"title":"12
           Angry Men","year":1957,"ids":{"trakt":309,"slug":"12-angry-men-1957","imdb":"tt0050083","tmdb":389}}}]'}

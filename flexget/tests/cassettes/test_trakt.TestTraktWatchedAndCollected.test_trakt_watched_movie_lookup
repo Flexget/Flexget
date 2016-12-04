@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=Inside+Out&type=movie&year=2015
+      uri: https://api.trakt.tv/search?query=Inside+Out&type=movie&year=2015
     response:
       body: {string: '[{"type":"movie","score":52.100258,"movie":{"title":"Inside
           Out","overview":"Growing up can be a bumpy road, and it''s no exception
@@ -101,7 +101,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/movies/98998?extended=full%2Cimages
+      uri: https://api.trakt.tv/movies/98998?extended=full%2Cimages
     response:
       body: {string: '{"title":"Inside Out","year":2015,"ids":{"trakt":98998,"slug":"inside-out-2015","imdb":"tt2096673","tmdb":150540},"tagline":"Meet
           the little voices inside your head.","overview":"Growing up can be a bumpy
@@ -139,7 +139,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/users/flexgettest/watched/movies
+      uri: https://api.trakt.tv/users/flexgettest/watched/movies
     response:
       body: {string: '[{"plays":1,"last_watched_at":"2015-06-19T00:00:00.000Z","movie":{"title":"Inside
           Out","year":2015,"ids":{"trakt":98998,"slug":"inside-out-2015","imdb":"tt2096673","tmdb":150540}}}]'}
@@ -169,7 +169,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=The+Matrix&type=movie&year=1999
+      uri: https://api.trakt.tv/search?query=The+Matrix&type=movie&year=1999
     response:
       body: {string: "[{\"type\":\"movie\",\"score\":69.41414,\"movie\":{\"title\"\
           :\"The Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives.\
@@ -266,7 +266,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+      uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
     response:
       body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
           to the Real World.","overview":"Thomas A. Anderson is a man living two lives.

@@ -6,7 +6,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=sdfgsdfgsdfgsdfgsdfg&type=movie
+    uri: https://api.trakt.tv/search?query=sdfgsdfgsdfgsdfgsdfg&type=movie
   response:
     body: {string: !!python/unicode '[]'}
     headers:
@@ -39,7 +39,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=sdfgsdfgsdfgsdfgsdfg&type=movie
+    uri: https://api.trakt.tv/search?query=sdfgsdfgsdfgsdfgsdfg&type=movie
   response:
     body: {string: !!python/unicode '[]'}
     headers:

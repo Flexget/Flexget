@@ -6,7 +6,7 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?id_type=tmdb&id=60735
+    uri: https://api.trakt.tv/search?id_type=tmdb&id=60735
   response:
     body: {string: "[{\"type\":\"show\",\"score\":null,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -62,7 +62,7 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/60300?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/60300?extended=full%2Cimages
   response:
     body: {string: "{\"title\":\"The Flash\",\"year\":2014,\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939},\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -102,7 +102,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?id_type=tmdb&id=60735
+    uri: https://api.trakt.tv/search?id_type=tmdb&id=60735
   response:
     body: {string: "[{\"type\":\"show\",\"score\":null,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -158,7 +158,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/60300?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/60300?extended=full%2Cimages
   response:
     body: {string: "{\"title\":\"The Flash\",\"year\":2014,\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939},\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -198,7 +198,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?id_type=tmdb&id=60735
+    uri: https://api.trakt.tv/search?id_type=tmdb&id=60735
   response:
     body: {string: "[{\"type\":\"show\",\"score\":null,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -254,7 +254,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/60300?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/60300?extended=full%2Cimages
   response:
     body: {string: "{\"title\":\"The Flash\",\"year\":2014,\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939},\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -294,7 +294,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?id_type=tmdb&id=60735
+    uri: https://api.trakt.tv/search?id_type=tmdb&id=60735
   response:
     body: {string: "[{\"type\":\"show\",\"score\":null,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -350,7 +350,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/60300?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/60300?extended=full%2Cimages
   response:
     body: {string: "{\"title\":\"The Flash\",\"year\":2014,\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939},\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -390,7 +390,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?id_type=tmdb&id=60735
+    uri: https://api.trakt.tv/search?id_type=tmdb&id=60735
   response:
     body: {string: "[{\"type\":\"show\",\"score\":null,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -446,7 +446,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/60300?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/60300?extended=full%2Cimages
   response:
     body: {string: "{\"title\":\"The Flash\",\"year\":2014,\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939},\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -486,7 +486,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?id_type=tmdb&id=60735
+    uri: https://api.trakt.tv/search?id_type=tmdb&id=60735
   response:
     body: {string: "[{\"type\":\"show\",\"score\":null,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -542,7 +542,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/60300?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/60300?extended=full%2Cimages
   response:
     body: {string: "{\"title\":\"The Flash\",\"year\":2014,\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939},\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -582,7 +582,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?id_type=tmdb&id=60735
+    uri: https://api.trakt.tv/search?id_type=tmdb&id=60735
   response:
     body: {string: "[{\"type\":\"show\",\"score\":null,\"show\":{\"title\":\"The Flash\",\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
@@ -638,7 +638,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/60300?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/60300?extended=full%2Cimages
   response:
     body: {string: "{\"title\":\"The Flash\",\"year\":2014,\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939},\"overview\":\"After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen

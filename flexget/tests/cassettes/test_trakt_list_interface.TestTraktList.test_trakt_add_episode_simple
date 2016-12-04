@@ -7,7 +7,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/users/me/watchlist/episodes
+      uri: https://api.trakt.tv/users/me/watchlist/episodes
     response:
       body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-08-31T07:26:14.000Z","type":"episode","episode":{"season":4,"number":5,"title":"First
           of His Name","ids":{"trakt":73674,"tvdb":4801605,"imdb":"tt3060856","tmdb":63098,"tvrage":1065501369}},"show":{"title":"Game
@@ -45,7 +45,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: POST
-      uri: https://api-v2launch.trakt.tv/sync/watchlist/remove
+      uri: https://api.trakt.tv/sync/watchlist/remove
     response:
       body: {string: !!python/unicode '{"deleted":{"movies":0,"shows":0,"seasons":0,"episodes":1},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
@@ -72,7 +72,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/users/me/watchlist/episodes
+      uri: https://api.trakt.tv/users/me/watchlist/episodes
     response:
       body: {string: !!python/unicode '[]'}
       headers:
@@ -105,7 +105,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: POST
-      uri: https://api-v2launch.trakt.tv/sync/watchlist
+      uri: https://api.trakt.tv/sync/watchlist
     response:
       body: {string: !!python/unicode '{"added":{"movies":0,"shows":0,"seasons":0,"episodes":1},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
@@ -132,7 +132,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/users/me/watchlist/episodes
+      uri: https://api.trakt.tv/users/me/watchlist/episodes
     response:
       body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-08-31T17:25:57.000Z","type":"episode","episode":{"season":4,"number":5,"title":"First
           of His Name","ids":{"trakt":73674,"tvdb":4801605,"imdb":"tt3060856","tmdb":63098,"tvrage":1065501369}},"show":{"title":"Game

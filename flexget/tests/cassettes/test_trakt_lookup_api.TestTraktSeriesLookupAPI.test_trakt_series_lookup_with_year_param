@@ -6,7 +6,7 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?year=1990&query=the+flash&type=show
+    uri: https://api.trakt.tv/search?year=1990&query=the+flash&type=show
   response:
     body: {string: !!python/unicode '[{"type":"show","score":61.058533,"show":{"title":"The
         Flash","overview":"Central City Police forensic scientist Barry Allen''s crime
@@ -47,7 +47,7 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/235?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/235?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1990,"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781},"overview":"Central
         City Police forensic scientist Barry Allen''s crime lab is struck by lightning.
@@ -82,7 +82,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+flash&type=show&year=1990
+    uri: https://api.trakt.tv/search?query=the+flash&type=show&year=1990
   response:
     body: {string: !!python/unicode '[{"type":"show","score":68.546455,"show":{"title":"The
         Flash","overview":"Central City Police forensic scientist Barry Allen''s crime
@@ -123,7 +123,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/235?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/235?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1990,"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781},"overview":"Central
         City Police forensic scientist Barry Allen''s crime lab is struck by lightning.
@@ -158,7 +158,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+flash&type=show&year=1990
+    uri: https://api.trakt.tv/search?query=the+flash&type=show&year=1990
   response:
     body: {string: !!python/unicode '[{"type":"show","score":68.26157,"show":{"title":"The
         Flash","overview":"Central City Police forensic scientist Barry Allen''s crime
@@ -199,7 +199,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/235?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/235?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1990,"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781},"overview":"Central
         City Police forensic scientist Barry Allen''s crime lab is struck by lightning.
@@ -234,7 +234,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+flash&type=show&year=1990
+    uri: https://api.trakt.tv/search?query=the+flash&type=show&year=1990
   response:
     body: {string: !!python/unicode '[{"type":"show","score":68.8198,"show":{"title":"The
         Flash","overview":"Central City Police forensic scientist Barry Allen''s crime
@@ -275,7 +275,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/235?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/235?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1990,"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781},"overview":"Central
         City Police forensic scientist Barry Allen''s crime lab is struck by lightning.
@@ -310,7 +310,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+flash&type=show&year=1990
+    uri: https://api.trakt.tv/search?query=the+flash&type=show&year=1990
   response:
     body: {string: !!python/unicode '[{"type":"show","score":68.256355,"show":{"title":"The
         Flash","overview":"Central City Police forensic scientist Barry Allen''s crime
@@ -351,7 +351,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/235?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/235?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1990,"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781},"overview":"Central
         City Police forensic scientist Barry Allen''s crime lab is struck by lightning.
@@ -386,7 +386,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+flash&type=show&year=1990
+    uri: https://api.trakt.tv/search?query=the+flash&type=show&year=1990
   response:
     body: {string: !!python/unicode '[{"type":"show","score":68.256355,"show":{"title":"The
         Flash","overview":"Central City Police forensic scientist Barry Allen''s crime
@@ -427,7 +427,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/235?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/235?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1990,"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781},"overview":"Central
         City Police forensic scientist Barry Allen''s crime lab is struck by lightning.
@@ -462,7 +462,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+flash&type=show&year=1990
+    uri: https://api.trakt.tv/search?query=the+flash&type=show&year=1990
   response:
     body: {string: !!python/unicode '[{"type":"show","score":68.256355,"show":{"title":"The
         Flash","overview":"Central City Police forensic scientist Barry Allen''s crime
@@ -503,7 +503,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/235?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/235?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Flash","year":1990,"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781},"overview":"Central
         City Police forensic scientist Barry Allen''s crime lab is struck by lightning.

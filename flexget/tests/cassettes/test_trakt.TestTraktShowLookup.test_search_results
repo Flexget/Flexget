@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=Shameless&type=show&year=2011
+      uri: https://api.trakt.tv/search?query=Shameless&type=show&year=2011
     response:
       body: {string: '[{"type":"show","score":123.05202,"show":{"title":"Shameless","overview":"Chicagoan
           Frank Gallagher is the proud single dad of six smart, industrious, independent
@@ -46,7 +46,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/34160?extended=full%2Cimages
+      uri: https://api.trakt.tv/shows/34160?extended=full%2Cimages
     response:
       body: {string: '{"title":"Shameless","year":2011,"ids":{"trakt":34160,"slug":"shameless-2011","tvdb":161511,"imdb":"tt1586680","tmdb":34307,"tvrage":25117},"overview":"Chicagoan
           Frank Gallagher is the proud single dad of six smart, industrious, independent
