@@ -3,9 +3,6 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from datetime import datetime, timedelta
 
-from flexget.config_schema import one_or_more
-from past.builtins import basestring
-
 import logging
 
 from flexget import plugin
@@ -32,13 +29,18 @@ class PluginSortByWeighted(object):
     Sort task entries based on a field
 
     Example::
-
-      sort_by: title
-
-    More complex::
-
-      sort_by:
-        field: imdb_score
+        sort_by_weighted:
+          - field: content_size
+            weight: 80
+            delta_distance: 500
+          - field: newznab_pubdate
+            weight: 25
+            delta_distance: 14
+            limits_min_max: [0,60]
+            inverse: yes
+          - field: newznab_grabs
+            weight: 25
+            limits_min_max: [0,100]
     """
 
     schema = {
@@ -84,12 +86,12 @@ class PluginSortByWeighted(object):
         # calcu/fill result in ENTRY_NAME
         self.calculate_weights(task, settings, max_values)
         log.debug('sorting entries by weight: %s' % config)
-        task.all_entries.sort(key=lambda e: e.get(ENTRY_NAME, 0))
+        task.all_entries.sort(key=lambda e: e.get(ENTRY_NAME, 0), reverse=True)
 
     @staticmethod
     def get_value(key, entry, settings):
         value = None
-        if isinstance(entry[key], SUPPORTED_TYPES):
+        if key in entry and isinstance(entry[key], SUPPORTED_TYPES):
             value = entry[key]
             if isinstance(value, datetime):
                 value = (datetime.now() - value).days
