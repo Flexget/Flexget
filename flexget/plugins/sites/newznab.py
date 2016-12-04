@@ -98,13 +98,17 @@ CATEGORIES = {
     'not-determined': 7900
 }
 
+# NOTE: all lowercase only
 NAMESPACE_ATTRIBUTE_MAP = {
     'grabs': int,
     'size': int,
     'files': int,
     'usenetdate': datetime,
     'password': bool,
-    'guid': basestring
+    'guid': basestring,
+    'hydraindexername': basestring,
+    'hydraindexerhost': basestring,
+    'hydraindexerscore': int
 }
 
 NAMESPACE_NAME = 'newznab'
@@ -123,14 +127,17 @@ class Newznab(object):
     TIP: Use nzbhydra to perform searches on multiple indexers with one config https://github.com/theotherp/nzbhydra
 
     NOTE: will populate those newznab fields if available:
-    'newznab_age'       - age in days of this release
-    'newznab_pubdate'   - date the indexer added the nzb to its database (aka age)
-    'newznab_guid'      - unique guid of this release
-    'newznab_grabs'     - number of grabs
-    'newznab_size'      - size in bytes of the release
-    'newznab_files'     - number of files this release (archive) has
-    'newznab_usenetdate'- date the release was posted on usenet
-    'newznab_password'  - if the release uses a password
+    'newznab_age'               - age in days of this release
+    'newznab_pubdate'           - date the indexer added the nzb to its database (aka age)
+    'newznab_guid'              - unique guid of this release
+    'newznab_grabs'             - number of grabs
+    'newznab_size'              - size in bytes of the release
+    'newznab_files'             - number of files this release (archive) has
+    'newznab_usenetdate'        - date the release was posted on usenet
+    'newznab_password'          - if the release uses a password
+    'newznab_hydraindexername'  - the name set in nzbhydra
+    'newznab_hydraindexerhost'  - the host url used by nzbhydra
+    'newznab_hydraindexerscore' - the priority score set by nzbhydra config for this indexer
 
     Config example:
     # simple: uses the 'title' to search in the 'tv' category
@@ -415,7 +422,7 @@ class Newznab(object):
             # add some usefully attributes to the namespace
             self.fill_namespace_attributes(xml_entry, new_entry)
             entries.append(new_entry)
-            # self.dump_entry(new_entry)
+            #self.dump_entry(new_entry)
         return entries
 
     def set_ns_attribute(self, name, xml_entry, entry, in_type=basestring):
