@@ -26,21 +26,48 @@ DEFAULT_SLOTS = 10
 
 class PluginSortByWeighted(object):
     """
-    Sort task entries based on a field
+    Sort task entries based on multiple fields using a sort weight per field.
+    Result per entry is stored in 'sort_by_weight_sum'.
+
+    Basic Concept:
+    For each field we calculate a weight based on given parameters and than sum the weights up and do a sort based on it.
+
+    field:          Name of the sort field
+    weight:         The sort weight used, values between 10-200 are good starts
+    weight_default: The default weight used if a sort 'field' could not be found or had a invalid entry (default is: 0)
+    inverse:        Use inverse weighting for the field, example: Date/Age fields
+    limits_min_max: The minimum cutoff and maximum cutoff value, that will be used for weighting.
+                    This will change the slot distribution, which helps narrow down to more meaningfully weighting results.
+
+                    Example: Entry1 is 100 days old, Entry2 is 7 days old, Entry3 is 1000 days old
+                    Without a max cutoff the weights will be distributed between 0-1000 days, with a limits_min_max: [0, 100]
+                    Weights will be distributed between 0-100 and any value larger than max, gets the lowest weight,
+                    while we can smoothly distribute the rest between 0-100 days.
+
+    delta_distance: The distance, step until a new slot is used for weighting.
+                    Think of this like: Any value that is within this distance will get the same weight for the slot.
+                    NOTE: If not given the delta_distance will be distributed over 10 slots/steps
+
+                    Example: Size1 = 4000 MB, Size2 = 3000 MB, Size3 = 700 MB
+                             With a weight: 50 and delta_distance: 1000
+                             Size1 and Size2 both get the maximum weight of 50, while Size3 gets the weight for the 0-1000 MB slot.
 
     Example::
         sort_by_weighted:
           - field: content_size
-            weight: 80
-            delta_distance: 500
+            weight: 80              # we want large files mainly = good quality
+            delta_distance: 500     # anything within 500 MB gets the same weight
           - field: newznab_pubdate
-            weight: 25
-            delta_distance: 14
-            limits_min_max: [0,60]
-            inverse: yes
+            weight: 25              # we still like new releases
+            delta_distance: 7       # anything within 7 days is similar
+            limits_min_max: [0,60]  # confine results to 0-60 days
+            inverse: yes            # reverse weight order for date/age fields
           - field: newznab_grabs
-            weight: 25
-            limits_min_max: [0,100]
+            weight: 25              # we like releases that others already downloaded aka safeguard against crap
+            limits_min_max: [0,100] # anything over 100 grabs is fine and gets maximum weight
+            weight_default: 5       # if entry has no 'newznab_grabs' field, still use 5 as weight so they don't sink to the bottom to quickly.
+
+            In this example the best result can have a 'sort_by_weight_sum' of sum = 80 + 25 + 25
     """
 
     schema = {
@@ -82,7 +109,7 @@ class PluginSortByWeighted(object):
         for key in settings.keys():
             if settings[key][2] == -1:
                 if key in max_values and max_values[key] > 0:
-                    settings[key][2] == max_values[key] / DEFAULT_SLOTS
+                    settings[key][2] = max_values[key] / DEFAULT_SLOTS
         # calcu/fill result in ENTRY_NAME
         self.calculate_weights(task, settings, max_values)
         log.debug('sorting entries by weight: %s' % config)
