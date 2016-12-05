@@ -6,11 +6,11 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-__name__ = 'notify_abort'
+__name__ = 'notify_crash'
 log = logging.getLogger(__name__)
 
 
-class NotifyAbort(object):
+class NotifyCrash(object):
     schema = {
         'type': 'object',
         'properties': {
@@ -18,7 +18,7 @@ class NotifyAbort(object):
                 {'allOf': [
                     {'$ref': '/schema/plugins?group=notifiers'},
                     {'maxProperties': 1,
-                     'error_maxProperties': 'Plugin options within notify_abort plugin must be indented '
+                     'error_maxProperties': 'Plugin options within notify_crash plugin must be indented '
                                             '2 more spaces than the first letter of the plugin name.',
                      'minProperties': 1}]}}
         },
@@ -27,19 +27,20 @@ class NotifyAbort(object):
     }
 
     def on_task_abort(self, task, config):
-        if task.silent_abort:
+        # task.traceback is populated on any unhandled crash
+        if task.traceback is None:
             return
 
-        title = 'Task {{ task_name }} has aborted!'
+        title = 'Task {{ task_name }} has crashed!'
         message = 'Reason: {{ task.abort_reason }}'
         notify_config = {'to': config['to'],
                          'scope': 'task',
                          'title': title,
                          'message': message}
-        log.debug('sending abort notification')
+        log.debug('sending crash notification')
         plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(NotifyAbort, __name__, api_ver=2)
+    plugin.register(NotifyCrash, __name__, api_ver=2)
