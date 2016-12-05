@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
 from flask_restplus import inputs
 

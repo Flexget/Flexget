@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -30,7 +30,7 @@ log = logging.getLogger('api_trakt')
 # Production Site
 CLIENT_ID = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
 CLIENT_SECRET = 'db4af7531e8df678b134dbc22445a2c04ebdbdd7213be7f5b6d17dfdfabfcdc2'
-API_URL = 'https://api-v2launch.trakt.tv/'
+API_URL = 'https://api.trakt.tv/'
 PIN_URL = 'http://trakt.tv/pin/346'
 # Stores the last time we checked for updates for shows/movies
 updated = SimplePersistence('api_trakt')

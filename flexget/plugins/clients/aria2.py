@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import os
@@ -32,7 +32,7 @@ class OutputAria2(object):
             'secret': {'type': 'string', 'default': ''},
             'username': {'type': 'string', 'default': ''}, # NOTE: To be deprecated by aria2
             'password': {'type': 'string', 'default': ''},
-            'path': {'type': 'string', 'format': 'path'},
+            'path': {'type': 'string'},
             'options': {
                 'type': 'object',
                 'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}

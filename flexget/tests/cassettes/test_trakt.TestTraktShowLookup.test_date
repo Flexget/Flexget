@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?type=show&query=the+daily+show+%28with+trevor+noah%29
+      uri: https://api.trakt.tv/search?type=show&query=the+daily+show+%28with+trevor+noah%29
     response:
       body: {string: "[{\"type\":\"show\",\"score\":30.438444,\"show\":{\"title\"\
           :\"The Daily Show\",\"overview\":\"Forget trying to keep pace with 24 hour\
@@ -181,7 +181,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/2211?extended=full%2Cimages
+      uri: https://api.trakt.tv/shows/2211?extended=full%2Cimages
     response:
       body: {string: '{"title":"The Daily Show","year":1996,"ids":{"trakt":2211,"slug":"the-daily-show","tvdb":71256,"imdb":"tt0115147","tmdb":2224,"tvrage":5714},"overview":"Forget
           trying to keep pace with 24 hour news networks- the best fake news show

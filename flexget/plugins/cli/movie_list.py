@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser, ArgumentTypeError
 
@@ -79,8 +79,8 @@ def movie_list_lists(options):
     table_data = [header]
     for movie_list in lists:
         table_data.append([movie_list.id, movie_list.name])
-    table = TerminalTable(options.table_type, table_data)
     try:
+        table = TerminalTable(options.table_type, table_data)
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
@@ -104,8 +104,8 @@ def movie_list_list(options):
             movie_row.append(movie.identifiers.get(identifier, ''))
         table_data.append(movie_row)
     title = '{} Movies in movie list: `{}`'.format(len(movies), options.list_name)
-    table = TerminalTable(options.table_type, table_data, title, drop_columns=[5, 2, 4])
     try:
+        table = TerminalTable(options.table_type, table_data, title, drop_columns=[5, 2, 4])
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))

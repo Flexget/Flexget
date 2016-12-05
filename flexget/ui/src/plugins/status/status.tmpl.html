@@ -1,24 +1,20 @@
 <div layout="column" flex layout-margin>
-    <mdt-table table-card="{ title: 'Latest task executions', actionIcons: true }" animate-sort-icon="true" >
+    <mdt-table class="data-table" flex table-card="{ title: 'Latest task executions', actionIcons: true }" animate-sort-icon="true"
+        mdt-row="vm.tableData" >
         <mdt-header-row>
-            <mdt-column align-rule="left" column-sort="{ comparator: vm.titleSorter }" sortable-rows-default>Task name</mdt-column>
+            <mdt-column align-rule="left" column-sort="true" sortable-rows-default>Task name</mdt-column>
             <mdt-column align-rule="left" column-sort="{ comparator: vm.timeSorter }">Start time</mdt-column>
-            <mdt-column align-rule="left" column-sort="{ comparator: vm.numberSorter }">Produced</mdt-column>
-            <mdt-column align-rule="left" column-sort="{ comparator: vm.numberSorter }">Accepted</mdt-column>
-            <mdt-column align-rule="left" column-sort="{ comparator: vm.numberSorter }">Rejected</mdt-column>
-            <mdt-column align-rule="left" column-sort="{ comparator: vm.numberSorter }">Failed</mdt-column>
+            <mdt-column align-rule="left" column-sort="true">Produced</mdt-column>
+            <mdt-column align-rule="left" column-sort="true">Accepted</mdt-column>
+            <mdt-column align-rule="left" column-sort="true">Rejected</mdt-column>
+            <mdt-column align-rule="left" column-sort="true">Failed</mdt-column>
         </mdt-header-row>
 
-        <mdt-row ng-repeat="task in ::vm.tasks">
-            <mdt-cell html-content="true">
-                <md-icon class="fa fa-lg" ng-class="task.last_execution.succeeded ? 'fa-check-circle success' : 'fa-times-circle failure'"></md-icon>
-                <span id="taskName">{{ task.name }}</span>
+        <mdt-custom-cell html-content="true" column-key="name">
+            <md-icon class="fa fa-lg" ng-class="::clientScope.getSuccess(rowId) ? 'fa-check-circle success' : 'fa-times-circle failure'"></md-icon>
+                <span id="taskName">{{ ::value }}</span>
             </mdt-cell>
-            <mdt-cell>{{ task.last_execution.start }}</mdt-cell>
-            <mdt-cell>{{ task.last_execution.produced }}</mdt-cell>
-            <mdt-cell>{{ task.last_execution.accepted }}</mdt-cell>
-            <mdt-cell>{{ task.last_execution.rejected }}</mdt-cell>
-            <mdt-cell>{{ task.last_execution.failed }}</mdt-cell>
-        </mdt-row>
+        </mdt-custom-cell>
     </mdt-table>
+    <fg-pagination load-data="vm.getStatus(page)" link-header="vm.linkHeader" current-page="vm.currentPage"></fg-pagination>
 </div>

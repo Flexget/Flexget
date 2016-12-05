@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
@@ -24,9 +24,9 @@ def list_failed(options):
             table_data.append(
                 [entry.id, entry.title, entry.count, '' if entry.reason == 'None' else entry.reason,
                  entry.tof.strftime('%Y-%m-%d %H:%M')])
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[3])
-    table.table.justify_columns[0] = 'center'
     try:
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[3])
+        table.table.justify_columns[0] = 'center'
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -125,5 +125,6 @@ def register_plugin():
 def register_parser_arguments():
     options.get_parser('execute').add_argument('--dump', nargs='*', choices=['eval', 'trace', 'accepted', 'rejected',
                                                                              'undecided', 'title'], dest='dump_entries',
-                                               help='display all entries in task with fields they contain, '
-                                                    'use `--dump eval` to evaluate all lazy fields. Specify an entry state/states to only dump matching entries.')
+                                               help=('display all entries in task with fields they contain, '
+                                                     'use `--dump eval` to evaluate all lazy fields. Specify an entry '
+                                                     'state/states to only dump matching entries.'))

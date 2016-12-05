@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=naruto&type=show
+      uri: https://api.trakt.tv/search?query=naruto&type=show
     response:
       body: {string: '[{"type":"show","score":109.72761,"show":{"title":"Naruto","overview":"In
           another world, ninja are the ultimate power, and in the Village Hidden in
@@ -88,7 +88,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/46003?extended=full%2Cimages
+      uri: https://api.trakt.tv/shows/46003?extended=full%2Cimages
     response:
       body: {string: '{"title":"Naruto","year":2002,"ids":{"trakt":46003,"slug":"naruto","tvdb":78857,"imdb":"tt0409591","tmdb":46260,"tvrage":4620},"overview":"In
           another world, ninja are the ultimate power, and in the Village Hidden in

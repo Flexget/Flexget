@@ -29,7 +29,7 @@
         function cleanup() {
             return $http.get('/api/database/cleanup/')
                 .then(callSucceeded)
-                .catch(callFailed);;
+                .catch(callFailed);
         }
 
         function vacuum() {

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 from jinja2 import Template
@@ -202,8 +202,9 @@ class TestNextSeriesEpisodes(object):
         assert len(task.mock_output) == 1
         # There should be 2 alternate names
         assert len(task.mock_output[0].get('series_alternate_names')) == 2
-        assert ['Testing Series 8', 'Tests Series 8'].sort() == \
-               task.mock_output[0].get('series_alternate_names').sort(), 'Alternate names do not match (how?).'
+        expected = task.mock_output[0].get('series_alternate_names').sort()
+        actual = ['Testing Series 8', 'Tests Series 8'].sort()
+        assert expected == actual, 'Alternate names do not match (how?).'
 
     def test_next_series_episodes_alternate_name_duplicates(self, execute_task):
         task = execute_task('test_next_series_episodes_alternate_name_duplicates')

@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from future.utils import text_to_native_str
+from flexget.utils.tools import native_str_to_text
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -75,7 +77,7 @@ def filter_formatdate(val, format):
     encoding = locale.getpreferredencoding()
     if not isinstance(val, (datetime, date, time)):
         return val
-    return val.strftime(format.encode(encoding)).decode(encoding)
+    return native_str_to_text(val.strftime(text_to_native_str(format, encoding=encoding)), encoding=encoding)
 
 
 def filter_parsedate(val):
@@ -153,24 +155,26 @@ def make_environment(manager):
 # TODO: list_templates function
 
 
-def get_template(templatename, pluginname=None):
+def get_template(template_name, plugin_name=None):
     """Loads a template from disk. Looks in both included plugins and users custom plugin dir."""
 
-    if not templatename.endswith('.template'):
-        templatename += '.template'
+    if not template_name.endswith('.template'):
+        template_name += '.template'
     locations = []
-    if pluginname:
-        locations.append(pluginname + '/' + templatename)
-    locations.append(templatename)
+    if plugin_name:
+        locations.append(plugin_name + '/' + template_name)
+    locations.append(template_name)
     for location in locations:
         try:
             return environment.get_template(location)
         except TemplateNotFound:
             pass
     else:
-        # TODO: Plugins need to catch and reraise this as PluginError, or perhaps we should have
-        # a validator for template files
-        raise ValueError('Template not found: %s (%s)' % (templatename, pluginname))
+        if plugin_name:
+            err = 'Template not found in templates dir: %s (%s)' % (template_name, plugin_name)
+        else:
+            err = 'Template not found in templates dir: %s' % template_name
+        raise ValueError(err)
 
 
 def render(template, context):
@@ -190,7 +194,7 @@ def render(template, context):
         result = template.render(context)
     except Exception as e:
         error = RenderError('(%s) %s' % (type(e).__name__, e))
-        log.debug('Error during rendering: %s' % error)
+        log.debug('Error during rendering: %s', error)
         raise error
 
     return result
@@ -205,6 +209,7 @@ def render_from_entry(template_string, entry):
     # Add task name to variables, usually it's there because metainfo_task plugin, but not always
     if 'task' not in variables and hasattr(entry, 'task'):
         variables['task'] = entry.task.name
+    variables['task_name'] = variables.get('task', entry.task.name)
     result = render(template_string, variables)
 
     # Only try string replacement if jinja didn't do anything
@@ -216,7 +221,7 @@ def render_from_entry(template_string, entry):
         except ValueError as e:
             raise RenderError('Invalid string replacement template: %s (%s)' % (template_string, e))
         except TypeError as e:
-            raise RenderError('Error during string replacement: %s' % e.message)
+            raise RenderError('Error during string replacement: %s' % e.args[0])
 
     return result
 
@@ -229,4 +234,17 @@ def render_from_task(template, task):
     :param task: Task to render the template from.
     :return: The rendered template text.
     """
-    return render(template, {'task': task, 'now': datetime.now()})
+    variables = {'task': task, 'now': datetime.now(), 'task_name': task.name}
+    result = render(template, variables)
+    # Only try string replacement if jinja didn't do anything
+    if result == template:
+        try:
+            result = template % task
+        except KeyError as e:
+            raise RenderError('Does not contain the field `%s` for string replacement.' % e)
+        except ValueError as e:
+            raise RenderError('Invalid string replacement template: %s (%s)' % (template, e))
+        except TypeError as e:
+            raise RenderError('Error during string replacement: %s' % e.args[0])
+
+    return result

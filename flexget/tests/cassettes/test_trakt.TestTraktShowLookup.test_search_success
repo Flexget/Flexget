@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?type=show&query=11-22-63
+      uri: https://api.trakt.tv/search?type=show&query=11-22-63
     response:
       body: {string: '[{"type":"show","score":17.174925,"show":{"title":"11.22.63","overview":"Imagine
           having the power to change history. Would you journey down the \"rabbit
@@ -48,7 +48,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/102771?extended=full%2Cimages
+      uri: https://api.trakt.tv/shows/102771?extended=full%2Cimages
     response:
       body: {string: '{"title":"11.22.63","year":2016,"ids":{"trakt":102771,"slug":"11-22-63","tvdb":301824,"imdb":"tt2879552","tmdb":64464,"tvrage":45210},"overview":"Imagine
           having the power to change history. Would you journey down the \"rabbit

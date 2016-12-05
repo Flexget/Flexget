@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -36,14 +36,14 @@ CATEGORIES = {
 
     # Music
     'MusicMP3': 23,
-    'MusicFLAC':25,
+    'MusicFLAC': 25,
 
     # Games
     'Games/PC ISO': 27,
     'Games/PC RIP': 28,
     'Games/PS3': 40,
     'Games/XBOX-360': 32,
-    'Software/PC ISO':33,
+    'Software/PC ISO': 33,
 
     # E-Books
     'e-Books': 35

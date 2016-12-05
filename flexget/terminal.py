@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import sys
 from textwrap import wrap
@@ -140,16 +140,9 @@ class TerminalTable(object):
         longest = self._longest_rows()
         margin = self._columns * 2 + self._columns + 1
         static_columns = sum(longest.values())
-        for wrap in self.wrap_columns:
-            static_columns -= longest[wrap]
+        for wrap_c in self.wrap_columns:
+            static_columns -= longest[wrap_c]
         space_left = terminal_info()['size'][0] - static_columns - margin
-        """
-        print('margin: %s' % margin)
-        print('static_columns: %s' % static_columns)
-        print('space_left: %s' % space_left)
-        print('self.table.table_width: %s' % self.table.table_width)
-        print(longest)
-        """
         # TODO: This is a bit dumb if wrapped columns have huge disparity
         # for example in flexget plugins the phases and flags
         return int(space_left / len(self.wrap_columns))
@@ -207,8 +200,11 @@ class TerminalTable(object):
             for col_num, value in enumerate(row):
                 output_value = value
                 if col_num in self.wrap_columns:
-                    # print('wrapping val %s col: %s' %  (value, col_num))
-                    output_value = word_wrap(value, wrapped_width)
+                    # This probably shouldn't happen, can be caused by wrong parameters sent to drop_columns and
+                    # wrap_columns
+                    if wrapped_width <= 0:
+                        raise TerminalTableError('Table could not be rendered correctly using it given data')
+                    output_value = word_wrap(str(value), wrapped_width)
                 output_row.append(output_value)
             output_table.append(output_row)
         return self.build_table(self.type, output_table)

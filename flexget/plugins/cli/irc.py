@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser
 
@@ -59,8 +59,8 @@ def action_status(options, irc_manager):
                     if channel_status == IRCChannelStatus.CONNECTED:
                         channels[-1] = colorize('green', '* ' + channels[-1])
             table_data.append([name, alive, ', '.join(channels), '%s:%s' % (info['server'], info['port'])])
-    table = TerminalTable(options.table_type, table_data)
     try:
+        table = TerminalTable(options.table_type, table_data)
         console(table.output)
         console(colorize('green', ' * Connected channel'))
     except TerminalTableError as e:

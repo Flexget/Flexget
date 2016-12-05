@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import os
 import time
 import logging
@@ -63,7 +63,7 @@ class ConvertMagnet(object):
         if config is False:
             return
         try:
-            import libtorrent
+            import libtorrent  # noqa
         except ImportError:
             raise plugin.DependencyError('convert_magnet', 'libtorrent', 'libtorrent package required', log)
 

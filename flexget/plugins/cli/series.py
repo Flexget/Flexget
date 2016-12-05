@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
 from datetime import timedelta
@@ -76,7 +76,6 @@ def display_summary(options):
         for series in query:
             name_column = series.name
 
-            new_ep = False
             behind = 0
             latest_release = '-'
             age_col = '-'
@@ -103,8 +102,8 @@ def display_summary(options):
                     name_column += colorize(BEHIND_EP_COLOR, ' {} behind'.format(behind))
 
             table_data.append([name_column, episode_id, age_col, latest_release, identifier_type])
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[3], drop_columns=[4, 3, 2])
     try:
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[3], drop_columns=[4, 3, 2])
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
@@ -232,16 +231,16 @@ def display_details(options):
         footer = ' %s \n' % (colorize(DOWNLOADED_RELEASE_COLOR, '* Downloaded'))
         if not series.identified_by:
             footer += ('\n Series plugin is still learning which episode numbering mode is \n'
-                      ' correct for this series (identified_by: auto).\n'
-                      ' Few duplicate downloads can happen with different numbering schemes\n'
-                      ' during this time.')
+                       ' correct for this series (identified_by: auto).\n'
+                       ' Few duplicate downloads can happen with different numbering schemes\n'
+                       ' during this time.')
         else:
             footer += '\n Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by
         footer += ' \n See option `identified_by` for more information.\n'
         if series.begin:
             footer += ' Begin episode for this series set to `%s`.' % series.begin.identifier
-    table = TerminalTable(options.table_type, table_data, table_title, drop_columns=[4, 3, 1])
     try:
+        table = TerminalTable(options.table_type, table_data, table_title, drop_columns=[4, 3, 1])
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))

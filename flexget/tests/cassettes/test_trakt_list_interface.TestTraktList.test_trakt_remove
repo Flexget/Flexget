@@ -7,7 +7,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+      uri: https://api.trakt.tv/users/me/watchlist/shows
     response:
       body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-08-27T21:12:29.000Z","type":"show","show":{"title":"White
           Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
@@ -43,7 +43,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: POST
-      uri: https://api-v2launch.trakt.tv/sync/watchlist/remove
+      uri: https://api.trakt.tv/sync/watchlist/remove
     response:
       body: {string: !!python/unicode '{"deleted":{"movies":0,"shows":1,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
@@ -70,7 +70,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+      uri: https://api.trakt.tv/users/me/watchlist/shows
     response:
       body: {string: !!python/unicode '[]'}
       headers:
@@ -99,7 +99,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=White+Collar&type=show&year=2009
+      uri: https://api.trakt.tv/search?query=White+Collar&type=show&year=2009
     response:
       body: {string: !!python/unicode '[{"type":"show","score":80.98222,"show":{"title":"White
           Collar","overview":"A white collar criminal agrees to help the FBI catch
@@ -136,7 +136,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/21410?extended=full%2Cimages
+      uri: https://api.trakt.tv/shows/21410?extended=full%2Cimages
     response:
       body: {string: !!python/unicode '{"title":"White Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720},"overview":"A
           white collar criminal agrees to help the FBI catch other white collar criminals
@@ -171,7 +171,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: POST
-      uri: https://api-v2launch.trakt.tv/sync/watchlist
+      uri: https://api.trakt.tv/sync/watchlist
     response:
       body: {string: !!python/unicode '{"added":{"movies":0,"shows":1,"seasons":0,"episodes":0},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
@@ -198,7 +198,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+      uri: https://api.trakt.tv/users/me/watchlist/shows
     response:
       body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-08-27T21:13:06.000Z","type":"show","show":{"title":"White
           Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}}]'}
@@ -232,7 +232,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: POST
-      uri: https://api-v2launch.trakt.tv/sync/watchlist/remove
+      uri: https://api.trakt.tv/sync/watchlist/remove
     response:
       body: {string: !!python/unicode '{"deleted":{"movies":0,"shows":1,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
@@ -259,7 +259,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/users/me/watchlist/shows
+      uri: https://api.trakt.tv/users/me/watchlist/shows
     response:
       body: {string: !!python/unicode '[]'}
       headers:

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import native
 
 import base64
@@ -152,14 +152,14 @@ class DelugePlugin(object):
     def on_task_start(self, task, config):
         """Raise a DependencyError if our dependencies aren't available"""
         try:
-            from deluge.ui.client import client
+            from deluge.ui.client import client  # noqa
         except ImportError as e:
             log.debug('Error importing deluge: %s' % e)
             raise plugin.DependencyError('deluge', 'deluge',
                                          'Deluge >=1.2 module and it\'s dependencies required. ImportError: %s' % e,
                                          log)
         try:
-            from twisted.internet import reactor
+            from twisted.internet import reactor  # noqa
         except:
             raise plugin.DependencyError('deluge', 'twisted.internet', 'Twisted.internet package required', log)
 

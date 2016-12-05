@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import os
 import xml.etree.ElementTree as ET
-import re
 
 from flexget import plugin
 from flexget.utils.imdb import is_valid_imdb_title_id

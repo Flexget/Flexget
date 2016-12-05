@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 
@@ -48,5 +48,3 @@ class TestSecretsFromDB(object):
 
         task = execute_task('test_secret_from_db')
         assert len(task.accepted) == 1
-
-

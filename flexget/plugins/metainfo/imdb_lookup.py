@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 from datetime import datetime, timedelta
@@ -40,9 +40,9 @@ directors_table = Table('imdb_movie_directors', Base.metadata,
 Base.register_table(directors_table)
 
 writers_table = Table('imdb_movie_writers', Base.metadata,
-                        Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-                        Column('writer_id', Integer, ForeignKey('imdb_writers.id')),
-                        Index('ix_imdb_movie_writers', 'movie_id', 'writer_id'))
+                      Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+                      Column('writer_id', Integer, ForeignKey('imdb_writers.id')),
+                      Index('ix_imdb_movie_writers', 'movie_id', 'writer_id'))
 Base.register_table(writers_table)
 
 
@@ -152,6 +152,7 @@ class Director(Base):
     def __init__(self, imdb_id, name=None):
         self.imdb_id = imdb_id
         self.name = name
+
 
 class Writer(Base):
     __tablename__ = 'imdb_writers'
@@ -403,7 +404,8 @@ class ImdbLookup(object):
                 log.exception(e)
             raise plugin.PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
 
-        for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'writers', 'mpaa_rating']:
+        for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'writers',
+                    'mpaa_rating']:
             log.trace('movie.%s: %s' % (att, getattr(movie, att)))
 
         # Update the entry fields

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 from datetime import datetime, timedelta
@@ -274,7 +274,7 @@ class TVDBEpisode(Base):
 
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=False)
 
-    def __init__(self, series_id, ep_id):
+    def __init__(self, series_id, ep_id, language=None):
         """
         Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
@@ -283,7 +283,7 @@ class TVDBEpisode(Base):
         self.id = ep_id
         self.expired = False
         try:
-            episode = TVDBRequest().get('episodes/%s' % self.id)
+            episode = TVDBRequest().get('episodes/%s' % self.id, language=language)
         except requests.RequestException as e:
             raise LookupError('Error updating data from tvdb: %s' % e)
 
@@ -612,7 +612,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
                 # Check if this episode id is already in our db
                 episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == results[0]['id']).first()
                 if not episode or (episode and episode.expired is not False):
-                    updated_episode = TVDBEpisode(series.id, results[0]['id'])
+                    updated_episode = TVDBEpisode(series.id, results[0]['id'], language=language)
                     episode = session.merge(updated_episode)
 
         except requests.RequestException as e:
