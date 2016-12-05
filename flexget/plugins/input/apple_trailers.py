@@ -100,7 +100,6 @@ class AppleTrailers(object):
             entry = Entry()
             movie_url = item['link']
             entry['title'] = item['title']
-            log.error(entry['title'])
             entry['movie_name'], entry['apple_trailers_name'] = entry['title'].split(' - ', 1)
             if not trailers.get(movie_url):
                 try:
