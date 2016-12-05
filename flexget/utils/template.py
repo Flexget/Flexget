@@ -217,18 +217,6 @@ def render_from_entry(template_string, entry):
         variables['task'] = entry.task.name
     variables['task_name'] = variables.get('task', entry.task.name)
     result = render(template_string, variables)
-
-    # Only try string replacement if jinja didn't do anything
-    if result == template_string:
-        try:
-            result = template_string % entry
-        except KeyError as e:
-            raise RenderError('Does not contain the field `%s` for string replacement.' % e)
-        except ValueError as e:
-            raise RenderError('Invalid string replacement template: %s (%s)' % (template_string, e))
-        except TypeError as e:
-            raise RenderError('Error during string replacement: %s' % e.args[0])
-
     return result
 
 
@@ -242,15 +230,4 @@ def render_from_task(template, task):
     """
     variables = {'task': task, 'now': datetime.now(), 'task_name': task.name}
     result = render(template, variables)
-    # Only try string replacement if jinja didn't do anything
-    if result == template:
-        try:
-            result = template % task
-        except KeyError as e:
-            raise RenderError('Does not contain the field `%s` for string replacement.' % e)
-        except ValueError as e:
-            raise RenderError('Invalid string replacement template: %s (%s)' % (template, e))
-        except TypeError as e:
-            raise RenderError('Error during string replacement: %s' % e.args[0])
-
     return result
