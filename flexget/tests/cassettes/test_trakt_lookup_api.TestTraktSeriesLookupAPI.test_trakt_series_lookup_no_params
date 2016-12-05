@@ -6,7 +6,7 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+    uri: https://api.trakt.tv/search?query=the+x-files&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":83.553276,\"show\":{\"title\":\"The
         X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
@@ -131,7 +131,7 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/4063?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
         X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
@@ -167,7 +167,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+    uri: https://api.trakt.tv/search?query=the+x-files&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":96.78512,\"show\":{\"title\":\"The
         X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
@@ -292,7 +292,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/4063?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
         X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
@@ -328,7 +328,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+    uri: https://api.trakt.tv/search?query=the+x-files&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":98.26889,\"show\":{\"title\":\"The
         X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
@@ -453,7 +453,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/4063?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
         X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
@@ -489,7 +489,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+    uri: https://api.trakt.tv/search?query=the+x-files&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":96.30489,\"show\":{\"title\":\"The
         X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
@@ -614,7 +614,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/4063?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
         X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
@@ -650,7 +650,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+    uri: https://api.trakt.tv/search?query=the+x-files&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":98.97211,\"show\":{\"title\":\"The
         X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
@@ -775,7 +775,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/4063?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
         X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
@@ -811,7 +811,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+    uri: https://api.trakt.tv/search?query=the+x-files&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":98.97211,\"show\":{\"title\":\"The
         X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
@@ -936,7 +936,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/4063?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
         X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
@@ -972,7 +972,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+x-files&type=show
+    uri: https://api.trakt.tv/search?query=the+x-files&type=show
   response:
     body: {string: "[{\"type\":\"show\",\"score\":98.97211,\"show\":{\"title\":\"The
         X-Files\",\"overview\":\"The X-Files focused on the exploits of FBI Agents
@@ -1097,7 +1097,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/shows/4063?extended=full%2Cimages
+    uri: https://api.trakt.tv/shows/4063?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The X-Files","year":1993,"ids":{"trakt":4063,"slug":"the-x-files","tvdb":77398,"imdb":"tt0106179","tmdb":4087,"tvrage":6312},"overview":"The
         X-Files focused on the exploits of FBI Agents Fox Mulder, Dana Scully, John
