@@ -6,7 +6,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie&year=2003
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie&year=2003
   response:
     body: {string: !!python/unicode '[{"type":"movie","score":54.480927,"movie":{"title":"The
         Matrix Revolutions","overview":"The human city of Zion defends itself against
@@ -82,7 +82,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/483?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/483?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
         that has a beginning has an end.","overview":"The human city of Zion defends
@@ -113,7 +113,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie&year=2003
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie&year=2003
   response:
     body: {string: !!python/unicode '[{"type":"movie","score":56.564133,"movie":{"title":"The
         Matrix Revolutions","overview":"The human city of Zion defends itself against
@@ -189,7 +189,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/483?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/483?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
         that has a beginning has an end.","overview":"The human city of Zion defends
@@ -220,7 +220,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie&year=2003
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie&year=2003
   response:
     body: {string: !!python/unicode '[{"type":"movie","score":56.805824,"movie":{"title":"The
         Matrix Revolutions","overview":"The human city of Zion defends itself against
@@ -296,7 +296,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/483?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/483?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
         that has a beginning has an end.","overview":"The human city of Zion defends
@@ -327,7 +327,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie&year=2003
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie&year=2003
   response:
     body: {string: !!python/unicode '[{"type":"movie","score":57.174686,"movie":{"title":"The
         Matrix Revolutions","overview":"The human city of Zion defends itself against
@@ -403,7 +403,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/483?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/483?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
         that has a beginning has an end.","overview":"The human city of Zion defends
@@ -434,7 +434,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie&year=2003
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie&year=2003
   response:
     body: {string: !!python/unicode '[{"type":"movie","score":57.174686,"movie":{"title":"The
         Matrix Revolutions","overview":"The human city of Zion defends itself against
@@ -510,7 +510,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/483?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/483?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
         that has a beginning has an end.","overview":"The human city of Zion defends
@@ -541,7 +541,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie&year=2003
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie&year=2003
   response:
     body: {string: !!python/unicode '[{"type":"movie","score":57.174686,"movie":{"title":"The
         Matrix Revolutions","overview":"The human city of Zion defends itself against
@@ -617,7 +617,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/483?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/483?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix Revolutions","year":2003,"ids":{"trakt":483,"slug":"the-matrix-revolutions-2003","imdb":"tt0242653","tmdb":605},"tagline":"Everything
         that has a beginning has an end.","overview":"The human city of Zion defends

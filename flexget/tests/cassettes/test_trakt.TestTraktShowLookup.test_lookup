@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=House&type=show
+      uri: https://api.trakt.tv/search?query=House&type=show
     response:
       body: {string: "[{\"type\":\"show\",\"score\":49.270447,\"show\":{\"title\"\
           :\"House\",\"overview\":\"Go deeper into the medical mysteries of House,\
@@ -186,7 +186,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/1399?extended=full%2Cimages
+      uri: https://api.trakt.tv/shows/1399?extended=full%2Cimages
     response:
       body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
           deeper into the medical mysteries of House, TV''s most compelling drama.
@@ -222,7 +222,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/1399/seasons/1/episodes/2/?extended=full,images
+      uri: https://api.trakt.tv/shows/1399/seasons/1/episodes/2/?extended=full,images
     response:
       body: {string: '{"season":1,"number":2,"title":"Paternity","ids":{"trakt":74344,"tvdb":110995,"imdb":"tt0606034","tmdb":63739,"tvrage":84700},"number_abs":null,"overview":"When
           a teenage lacrosse player is stricken with an unidentifiable brain disease,
@@ -258,7 +258,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=Doctor+Who&type=show&year=2005
+      uri: https://api.trakt.tv/search?query=Doctor+Who&type=show&year=2005
     response:
       body: {string: "[{\"type\":\"show\",\"score\":64.115395,\"show\":{\"title\"\
           :\"Doctor Who\",\"overview\":\"The Doctor is an alien Time Lord from the\
@@ -436,7 +436,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/56872?extended=full%2Cimages
+      uri: https://api.trakt.tv/shows/56872?extended=full%2Cimages
     response:
       body: {string: "{\"title\":\"Doctor Who\",\"year\":2005,\"ids\":{\"trakt\":56872,\"\
           slug\":\"doctor-who-2005\",\"tvdb\":78804,\"imdb\":\"tt0436992\",\"tmdb\"\
@@ -491,7 +491,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/56872/seasons/2/episodes/3/?extended=full,images
+      uri: https://api.trakt.tv/shows/56872/seasons/2/episodes/3/?extended=full,images
     response:
       body: {string: "{\"season\":2,\"number\":3,\"title\":\"School Reunion\",\"ids\"\
           :{\"trakt\":951447,\"tvdb\":302431,\"imdb\":null,\"tmdb\":941480,\"tvrage\"\

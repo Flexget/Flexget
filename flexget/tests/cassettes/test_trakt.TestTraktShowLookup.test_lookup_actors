@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?type=show&query=House
+      uri: https://api.trakt.tv/search?type=show&query=House
     response:
       body: {string: "[{\"type\":\"show\",\"score\":53.453842,\"show\":{\"title\"\
           :\"House\",\"overview\":\"Go deeper into the medical mysteries of House,\
@@ -186,7 +186,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/1399?extended=full%2Cimages
+      uri: https://api.trakt.tv/shows/1399?extended=full%2Cimages
     response:
       body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
           deeper into the medical mysteries of House, TV''s most compelling drama.
@@ -222,7 +222,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/shows/1399/people?extended=full%2Cimages
+      uri: https://api.trakt.tv/shows/1399/people?extended=full%2Cimages
     response:
       body: {string: "{\"cast\":[{\"character\":\"Dr. Gregory House\",\"person\":{\"\
           name\":\"Hugh Laurie\",\"ids\":{\"trakt\":297390,\"slug\":\"hugh-laurie\"\

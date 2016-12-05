@@ -6,7 +6,7 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":67.13019,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -100,7 +100,7 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -133,7 +133,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":70.7786,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -229,7 +229,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -262,7 +262,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":71.00695,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -358,7 +358,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -391,7 +391,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":71.46832,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -487,7 +487,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -520,7 +520,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":71.46832,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -616,7 +616,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -649,7 +649,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":71.46832,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -745,7 +745,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
@@ -778,7 +778,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
   response:
     body: {string: "[{\"type\":\"movie\",\"score\":71.46832,\"movie\":{\"title\":\"The
         Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
@@ -874,7 +874,7 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [!!python/unicode 2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
   response:
     body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
         to the Real World.","overview":"Thomas A. Anderson is a man living two lives.

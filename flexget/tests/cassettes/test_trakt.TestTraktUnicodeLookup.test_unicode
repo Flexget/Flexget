@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=%D0%97%D0%B5%D1%80%D0%BA%D0%B0%D0%BB%D0%B0+Mirrors&type=movie&year=2008
+      uri: https://api.trakt.tv/search?query=%D0%97%D0%B5%D1%80%D0%BA%D0%B0%D0%BB%D0%B0+Mirrors&type=movie&year=2008
     response:
       body: {string: !!python/unicode '[{"type":"movie","score":51.708534,"movie":{"title":"Mirrors","overview":"An
           ex-cop and his family are the target of an evil force that is using mirrors
@@ -42,7 +42,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/movies/7970?extended=full%2Cimages
+      uri: https://api.trakt.tv/movies/7970?extended=full%2Cimages
     response:
       body: {string: !!python/unicode '{"title":"Mirrors","year":2008,"ids":{"trakt":7970,"slug":"mirrors-2008","imdb":"tt0790686","tmdb":13515},"tagline":"There
           is evil...On the other side.","overview":"An ex-cop and his family are the

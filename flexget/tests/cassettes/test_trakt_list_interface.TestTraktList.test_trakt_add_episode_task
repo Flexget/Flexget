@@ -7,7 +7,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/users/me/watchlist/episodes
+      uri: https://api.trakt.tv/users/me/watchlist/episodes
     response:
       body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-08-31T19:23:27.000Z","type":"episode","episode":{"season":1,"number":5,"title":"Chapter
           Five: The Flea and the Acrobat","ids":{"trakt":2124182,"tvdb":5621929,"imdb":"tt4593128","tmdb":1205904,"tvrage":1065933149}},"show":{"title":"Stranger
@@ -45,7 +45,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: POST
-      uri: https://api-v2launch.trakt.tv/sync/watchlist/remove
+      uri: https://api.trakt.tv/sync/watchlist/remove
     response:
       body: {string: !!python/unicode '{"deleted":{"movies":0,"shows":0,"seasons":0,"episodes":1},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
@@ -70,7 +70,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=Stranger+Things+S01E05&type=movie
+      uri: https://api.trakt.tv/search?query=Stranger+Things+S01E05&type=movie
     response:
       body: {string: !!python/unicode '[]'}
       headers:
@@ -103,7 +103,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=Stranger+Things+S01E06&type=movie
+      uri: https://api.trakt.tv/search?query=Stranger+Things+S01E06&type=movie
     response:
       body: {string: !!python/unicode '[]'}
       headers:
@@ -140,7 +140,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: POST
-      uri: https://api-v2launch.trakt.tv/sync/watchlist
+      uri: https://api.trakt.tv/sync/watchlist
     response:
       body: {string: !!python/unicode '{"added":{"movies":0,"shows":0,"seasons":0,"episodes":2},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
       headers:
@@ -168,7 +168,7 @@ interactions:
         trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
         trakt-api-version: [!!python/unicode '2']
       method: GET
-      uri: https://api-v2launch.trakt.tv/users/me/watchlist/episodes
+      uri: https://api.trakt.tv/users/me/watchlist/episodes
     response:
       body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-08-31T19:25:50.000Z","type":"episode","episode":{"season":1,"number":5,"title":"Chapter
           Five: The Flea and the Acrobat","ids":{"trakt":2124182,"tvdb":5621929,"imdb":"tt4593128","tmdb":1205904,"tvrage":1065933149}},"show":{"title":"Stranger
