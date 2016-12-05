@@ -36,27 +36,33 @@ DEFAULT_DICTS = {
 }
 
 
-class Notify(object):
+class NotifyBase(object):
     schema = {
         'type': 'object',
         'properties': {
-            'to': {'type': 'array', 'items':
-                {'allOf': [
-                    {'$ref': '/schema/plugins?group=notifiers'},
-                    {'maxProperties': 1,
-                     'error_maxProperties': 'Plugin options within notify plugin must be indented '
-                                            '2 more spaces than the first letter of the plugin name.',
-                     'minProperties': 1}]}},
-            'scope': {'type': 'string', 'enum': ['task', 'entries'], 'default': 'entries'},
-            'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS}),
-            'title': {'type': 'string'},
-            'message': {'type': 'string'},
-            'url': {'type': 'string'},
-            'file_template': {'type': 'string'}
+            'to': {
+                'type': 'array', 'items':
+                    {'allOf': [
+                        {'$ref': '/schema/plugins?group=notifiers'},
+                        {'maxProperties': 1,
+                         'error_maxProperties': 'Plugin options indented 2 more spaces than the first letter of the'
+                                                ' plugin name.',
+                         'minProperties': 1}]}}
         },
         'required': ['to'],
         'additionalProperties': True
     }
+
+
+class Notify(NotifyBase):
+    schema = NotifyBase.schema
+    schema['properties'].update(
+        {'scope': {'type': 'string', 'enum': ['task', 'entries'], 'default': 'entries'},
+         'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS}),
+         'title': {'type': 'string'},
+         'message': {'type': 'string'},
+         'url': {'type': 'string'},
+         'file_template': {'type': 'string'}})
 
     def prepare_config(self, config):
         config.setdefault('scope', 'entries')
@@ -156,6 +162,53 @@ class Notify(object):
     on_task_exit = send_notification
 
 
+class NotifyEntries(NotifyBase):
+    def on_task_exit(self, task, config):
+        config['scope'] = 'entries'
+        plugin.get_plugin_by_name('notify').instance.send_notification(task, config)
+
+
+class NotifyTask(NotifyBase):
+    def on_task_exit(self, task, config):
+        config['scope'] = 'task'
+        plugin.get_plugin_by_name('notify').instance.send_notification(task, config)
+
+
+class NotifyAbort(NotifyBase):
+    def on_task_abort(self, task, config):
+        if task.silent_abort:
+            return
+
+        title = 'Task {{ task_name }} has aborted!'
+        message = 'Reason: {{ task.abort_reason }}'
+        notify_config = {'to': config['to'],
+                         'scope': 'task',
+                         'title': title,
+                         'message': message}
+        log.debug('sending abort notification')
+        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
+
+
+class NotifyCrash(NotifyBase):
+    def on_task_abort(self, task, config):
+        # task.traceback is populated on any unhandled crash
+        if task.traceback is None:
+            return
+
+        title = 'Task {{ task_name }} has crash!'
+        message = 'Reason: {{ task.abort_reason }}'
+        notify_config = {'to': config['to'],
+                         'scope': 'task',
+                         'title': title,
+                         'message': message}
+        log.debug('sending abort notification')
+        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(Notify, 'notify', api_ver=2)
+    plugin.register(NotifyEntries, 'notify_entries', api_ver=2)
+    plugin.register(NotifyTask, 'notify_task', api_ver=2)
+    plugin.register(NotifyAbort, 'notify_abort', api_ver=2)
+    plugin.register(NotifyCrash, 'notify_crash', api_ver=2)
