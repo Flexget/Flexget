@@ -152,7 +152,13 @@ def make_environment(manager):
             environment.filters[name.split('_', 1)[1]] = filt
 
 
-# TODO: list_templates function
+def list_templates():
+    """
+    Returns all templates names that are configured under environment loader dirs
+    """
+    if environment is None or not hasattr(environment, 'loader'):
+        return
+    return environment.loader.list_templates()
 
 
 def get_template(template_name, plugin_name=None):
