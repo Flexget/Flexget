@@ -20,7 +20,7 @@ SUPPORTED_TYPES = (
     timedelta
 )
 
-ENTRY_NAME = 'sort_by_weight_sum'
+ENTRY_WEIGHT_FIELD_NAME = 'sort_by_weight_sum'
 DEFAULT_SLOTS = 10
 
 
@@ -115,7 +115,9 @@ class PluginSortByWeighted(object):
         # calc/fill result in ENTRY_NAME
         self.calculate_weights(task, settings, max_values)
         log.debug('sorting entries by weight: %s' % config)
-        task.all_entries.sort(key=lambda e: e.get(ENTRY_NAME, 0), reverse=True)
+        task.all_entries.sort(key=lambda e: e.get(ENTRY_WEIGHT_FIELD_NAME, 0), reverse=True)
+        #for entry in task.all_entries:
+        #    log.verbose('Entry: %s Weight: %s' % (entry, entry.get(ENTRY_WEIGHT_FIELD_NAME, -1)))
 
     @staticmethod
     def get_value(key, entry, settings):
@@ -136,7 +138,7 @@ class PluginSortByWeighted(object):
 
     def calculate_weights(self, task, settings, max_values):
         # [field] = [weight, weight_default, delta, inverse, lower_limit, upper_limit]
-        for entry in task.all_entries:
+        for entry in task.entries: # ['undecided', 'accepted']
             # entry['weights'] = dict()
             weight_sum = 0
             for key in settings.keys():
@@ -154,11 +156,11 @@ class PluginSortByWeighted(object):
                     weight_sum += settings[key][0] - int(weight)
                 else:
                     weight_sum += int(weight)
-            entry[ENTRY_NAME] = weight_sum
+            entry[ENTRY_WEIGHT_FIELD_NAME] = weight_sum
 
     def get_max_values(self, settings, task):
         max_values = {}
-        for entry in task.all_entries:
+        for entry in task.entries:  # ['undecided', 'accepted']
             for key in settings.keys():
                 if key in entry:
                     if not isinstance(entry[key], SUPPORTED_TYPES):
