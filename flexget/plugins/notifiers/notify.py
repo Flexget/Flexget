@@ -195,13 +195,13 @@ class NotifyCrash(NotifyBase):
         if task.traceback is None:
             return
 
-        title = 'Task {{ task_name }} has crash!'
+        title = 'Task {{ task_name }} has crashed!'
         message = 'Reason: {{ task.abort_reason }}'
         notify_config = {'to': config['to'],
                          'scope': 'task',
                          'title': title,
                          'message': message}
-        log.debug('sending abort notification')
+        log.debug('sending crash notification')
         plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
 
 
