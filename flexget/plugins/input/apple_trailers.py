@@ -100,7 +100,7 @@ class AppleTrailers(object):
             entry = Entry()
             movie_url = item['link']
             entry['title'] = item['title']
-            entry['movie_name'], entry['apple_trailers_name'] = entry['title'].split(' - ')
+            entry['movie_name'], entry['apple_trailers_name'] = entry['title'].split(' - ', 1)
             if not trailers.get(movie_url):
                 try:
                     movie_page = task.requests.get(movie_url).text
@@ -117,7 +117,7 @@ class AppleTrailers(object):
                     log.error('Failed to get trailer %s: %s', entry['title'], e.args[0])
                     continue
             else:
-                movie_data = trailers['movie_url']['json']
+                movie_data = trailers[movie_url]['json']
             genres = {genre.get('name') for genre in movie_data.get('details').get('genres')}
             config_genres = set(config.get('genres', []))
             if genres and config_genres and not set.intersection(config_genres, genres):
