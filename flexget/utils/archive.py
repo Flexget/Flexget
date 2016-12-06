@@ -209,6 +209,6 @@ def is_archive(path):
             archive.close()
             return True
     except (IOError, ArchiveError) as error:
-        log.debug('Failed to open file as archive: %s (%s)' % (path, error))
+        log.debug('Failed to open file as archive: %s (%s)', path, error)
 
     return False
