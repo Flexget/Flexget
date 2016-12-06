@@ -209,7 +209,9 @@ def render_from_entry(template_string, entry):
     # Add task name to variables, usually it's there because metainfo_task plugin, but not always
     if 'task' not in variables and hasattr(entry, 'task'):
         variables['task'] = entry.task.name
-    variables['task_name'] = variables.get('task', entry.task.name)
+        # Since `task` has different meaning between entry and task scope, the `task_name` field is create to be
+        # consistent
+        variables['task_name'] = entry.task.name
     result = render(template_string, variables)
 
     # Only try string replacement if jinja didn't do anything
