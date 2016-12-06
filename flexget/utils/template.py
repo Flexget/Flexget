@@ -207,8 +207,9 @@ def render_from_entry(template_string, entry):
     variables = copy(entry.store)
     variables['now'] = datetime.now()
     # Add task name to variables, usually it's there because metainfo_task plugin, but not always
-    if 'task' not in variables and hasattr(entry, 'task'):
-        variables['task'] = entry.task.name
+    if hasattr(entry, 'task'):
+        if 'task' not in variables:
+            variables['task'] = entry.task.name
         # Since `task` has different meaning between entry and task scope, the `task_name` field is create to be
         # consistent
         variables['task_name'] = entry.task.name
