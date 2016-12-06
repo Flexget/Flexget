@@ -18,9 +18,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.tools import parse_timedelta
-from flexget.utils.template import render_from_entry, RenderError
 from flexget.utils.search import normalize_unicode
-from flexget.plugins.parsers.parser_common import normalize_name, remove_dirt
 
 __author__ = 'andy (org. by deksan)'
 
@@ -111,6 +109,14 @@ NAMESPACE_ATTRIBUTE_MAP = {
     'hydraindexerscore': int
 }
 
+PLUGIN_LOOKUP_MAP = {
+    'tvdb': 'thetvdb_lookup',
+    'trakt': 'trakt_lookup',
+    'tvmaze': 'tvmaze_lookup',
+    'imdb': 'imdb_lookup',
+    'tmdb': 'tmdb_lookup'
+}
+
 NAMESPACE_NAME = 'newznab'
 NAMESPACE_URL = 'http://www.newznab.com/DTD/2010/feeds/attributes/'
 NAMESPACE_TAGNAME = 'attr'
@@ -121,9 +127,9 @@ ENCLOSURE_TYPE = 'application/x-nzb'
 class Newznab(object):
     """
     Newznab search plugin
-    Provide the 'api_server_url' + 'api_key and a 'search_type' and optionally newznab categories
-    'search_type' is any of: 'generic', 'movie', 'tv' can be combined with category
-    NOTE: If needed will do a metadata lookup for the search_types tv/movie
+    Provide the 'api_server_url' + 'api_key' and one or more search categories via 'category'
+    Most common categories are: 'tv', 'movie', 'tv/hd', 'movie/hd'
+    Valid meta names for 'use_metadata': 'tvdb', 'trakt', 'tvmaze', imdb', 'tmdb'
     TIP: Use nzbhydra to perform searches on multiple indexers with one config https://github.com/theotherp/nzbhydra
 
     NOTE: will populate those newznab fields if available:
@@ -140,47 +146,55 @@ class Newznab(object):
     'newznab_hydraindexerscore' - the priority score set by nzbhydra config for this indexer
 
     Config example:
-    # simple: uses the 'title' to search in the 'tv' category
+    # search by name: search in the 'tv' category, using existing names for the type ('title'...)
     newznab:
         api_server_url: https://api.nzbindexer.com
         api_key: my_apikey
-        search_type: generic
         category: tv
 
-    # meta id based: uses the (tvdb/ragetv id) to search only in the tv/hd,uhd categories, for results that are up-to 3 days old
+    # meta id based: try using existing metaid's (tvdb/ragetv/imdb) to search only in the tv/hd,uhd categories
     newznab:
         api_server_url: https://api.nzbindexer.com
         api_key: my_apikey
-        search_type: tv
         category:
             - tv/hd
             - tv/uhd
-        maxage: 3 days
+        use_metadata: yes
 
-    # meta id based: uses the (imdb id) to search only in the movie/uhd category, for results that are up-to 1 week old
+    # meta id based: try using metaid's (tvdb/ragetv/imdb) and if needed do a trakt/imdb lookup,
+                     only in the movie/uhd category for releases that are not older than 1 week
     newznab:
         api_server_url: https://api.nzbindexer.com
         api_key: my_apikey
-        search_type: movie
         category: movie/uhd
+        use_metadata:
+            - trakt
+            - imdb
         maxage: 1 week
 
     # custom search string: builds the search string and searches in the tv/hd and a custom 5999 category
     newznab:
         api_server_url: https://api.nzbindexer.com
         api_key: my_apikey
-        search_type:
-            custom_query: "{{trakt_series_name}} {{series_id}}"
+        custom_query: "{{trakt_series_name}} {{series_id}}"
         category:
             - tv/hd
             - 5999
+
+    # combined (meta id + custom search string): try using metaid's (tvdb/ragetv/imdb) and if needed does a tvdb lookup,
+                                                also builds/uses the custom search string.
+    newznab:
+        api_server_url: https://api.nzbindexer.com
+        api_key: my_apikey
+        custom_query: "{{trakt_series_name}} {{series_id}}"
+        category: tv
+        use_metadata: tvdb
 
     # forces quotes around the search query, some ill behaving indexers wont correctly handle multiterm queries like: 'title s01e01'
     # If you notice you get results of titles that are not in the search query or wrong season/episodes, try this.
     # NOTE: will most likely break well behaving indexers, so use in a separate task/entry or use nzbhydra
     newznab:
         api_server_url: https://api.nzbindexer.com
-        search_type: generic
         category: tv
         force_quotes: yes
     """
@@ -190,32 +204,48 @@ class Newznab(object):
         'properties': {
             'api_server_url': {'type': 'string', 'format': 'url'},
             'api_key': {'type': 'string'},
-            'search_type': {
-                'oneOf': [
-                    {'type': 'string', 'enum': ['generic', 'tv', 'movie']},
-                    {
-                        'type': 'object',
-                        'properties': {
-                            'custom_query': {'type': 'string'},
-                        },
-                        'required': ['custom_query']
-                    },
-                ],
-            },
             'category': one_or_more({
                 'oneOf': [
                     {'type': 'integer'},
                     {'type': 'string', 'enum': list(CATEGORIES)},
                 ]}, unique_items=True),
             'maxage': {'type': 'string', 'format': 'interval'},
+            'custom_query': {'type': 'string'},
             'force_quotes': {'type': 'boolean', 'default': False},
+            'use_metadata': {
+                'oneOf': [
+                    {'type': 'boolean'},
+                    one_or_more({'type': 'string', 'enum': list(PLUGIN_LOOKUP_MAP)}, unique_items=True)
+                ]
+            },
         },
-        'required': ['api_server_url', 'search_type'],
+        'required': ['api_server_url', 'category'],
         'additionalProperties': False
     }
 
+    def prepare_config(self, config):
+        if 'use_metadata' in config:
+            if 'plugins_list' not in config:
+                if isinstance(config['use_metadata'], basestring):
+                    config['use_metadata'] = [config['use_metadata']]
+                if isinstance(config['use_metadata'], list):
+                    plugins = []
+                    for name in config['use_metadata']:
+                        plugins.append(PLUGIN_LOOKUP_MAP[name])
+                        config['plugins_list'] = plugins
+        if 'category' in config:
+            if 'category_string' not in config:
+                if not isinstance(config['category'], list):
+                    config['category'] = [config['category']]
+                categories = config['category']
+                # Convert named categories to its respective categories id number
+                categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
+                if len(categories) > 0:
+                    config['category_string'] = ','.join(str(c) for c in categories)
+        return config
+
     @staticmethod
-    def safe_get(in_object, keynames, types=basestring, default=None, lazy=True):
+    def safe_get(in_object, keynames, types=basestring, default=None, try_lower=True):
         invert_op = getattr(in_object, "get", None)
         if not invert_op or not callable(invert_op):
             log.warning('Object has no get() function: %s' % in_object)
@@ -232,7 +262,7 @@ class Newznab(object):
                 continue
             # TODO @Andy: double check int case for {'key': 0} -> get() is None
             found = in_object.get(key)
-            if found is None and lazy is True:
+            if found is None and try_lower is True:
                 found = in_object.get(key.lower())
             for thetype in types:
                 if found is not None and isinstance(found, thetype):
@@ -281,107 +311,123 @@ class Newznab(object):
     #         log.verbose('Entry: [%s] = %s' % (key, entry[key]))
     #     log.verbose('#####################################################################################')
 
-    def update_metadata(self, task, entry, config):
-        # lets guess the generic type
-        do_show_lookup = False
-        do_movie_lookup = False
-        if self.safe_get(config, 'search_type', dict) and self.safe_get(config['search_type'], 'custom_query'):
-            if self.safe_get(entry, 'series_name') or self.safe_get(entry, 'tvdb_id'):
-                do_show_lookup = True
-            else:
-                do_movie_lookup = True  # imdb_id
-
-        # update entry metadata based on task config
-        if config['search_type'] == 'tv' or do_show_lookup:
-            if self.safe_get(task.config, 'trakt_lookup', [bool, dict]):
-                plugin.get_plugin_by_name('trakt_lookup').instance.lazy_series_lookup(entry)
-                log.verbose('Doing trakt_lookup for: %s' % self.safe_get(entry, 'title'))
-            if self.safe_get(task.config, 'tvmaze_lookup', bool):
-                plugin.get_plugin_by_name('tvmaze_lookup').instance.lazy_series_lookup(entry)
-                log.verbose('Doing tvmaze_lookup for: %s' % self.safe_get(entry, 'title'))
-            # default fallback
-            if self.safe_get(task.config, 'thetvdb_lookup', bool) or not self.safe_get(entry, 'tvdb_id', [basestring,
-                                                                                                          int]):
-                plugin.get_plugin_by_name('thetvdb_lookup').instance.lazy_series_lookup(entry, 'en')
-                log.verbose('Doing thetvdb_lookup for: %s' % self.safe_get(entry, 'title'))
-        elif config['search_type'] == 'movie' or do_movie_lookup:
-            if self.safe_get(task.config, 'trakt_lookup', [bool, dict]):
-                plugin.get_plugin_by_name('trakt_lookup').instance.lazy_movie_lookup(entry)
-                log.verbose('Doing trakt_lookup for: %s' % self.safe_get(entry, 'title'))
-            if self.safe_get(task.config, 'tmdb_lookup', bool):
-                plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
-                log.verbose('Doing tmdb_lookup for: %s' % self.safe_get(entry, 'title'))
-            # default fallback
-            if self.safe_get(task.config, 'imdb_lookup', bool) or not self.safe_get(entry, 'imdb_id', [basestring,
-                                                                                                       int]):
-                plugin.get_plugin_by_name('imdb_lookup').instance.lookup(entry)
-                log.verbose('Doing imdb_lookup for: %s' % self.safe_get(entry, 'title'))
-                # TODO @Andy: more robust fallback logic (clean title from dates ....)
-
-    def get_metaid_url_parameter(self, task, entry, config):
-        # only use for tv/movie search type
-        if config['search_type'] != 'tv' and config['search_type'] != 'movie':
+    def is_tv_entry(self, entry):
+        if self.safe_get(entry, ['series_name', 'tvdb_id', 'tvrage_id', 'tvmaze_series_id', 'trakt_id'], [basestring, int]):
+            return True
+        elif self.safe_get(entry, ['movie_name', 'tmdb_id', 'imdb_id', 'trakt_movie_id'], [basestring, int]):
+            return False
+        else:
             return None
 
-        self.update_metadata(task, entry, config)
+    def has_meta_id(self, entry):
+        return self.safe_get(entry, ['tvdb_id', 'tvrage_id', 'tvmaze_series_id', 'tmdb_id', 'imdb_id',
+                                     'trakt_movie_id', 'trakt_id'], [basestring, int])
 
-        url_param = None
-        # use first valid meta id
-        if self.safe_get(config, 'search_type') == 'tv':
-            if self.safe_get(entry, 'tvdb_id', [basestring, int]):
-                url_param = '&tvdbid=%s' % self.safe_get(entry, 'tvdb_id', [basestring, int])
-            elif self.safe_get(entry, 'tvrage_id', [basestring, int]):
-                url_param = '&rid=%s' % self.safe_get(entry, 'tvrage_id', [basestring, int])
-            # lets not use those for now, rarely supported!
-            # elif self.safe_get(entry, 'tvmaze_series_id', [basestring, int]):
-            #    url_param = '&tvmazeid=%s' % self.safe_get(entry, 'tvmaze_series_id', [basestring, int])
-            # elif self.safe_get(entry, 'trakt_id', [basestring, int]):
-            #    url_param = '&traktid=%s' % self.safe_get(entry, 'trakt_id', [basestring, int])
-            if not url_param:
-                log.error('Could not get valid meta id for series: %s' % self.safe_get(entry, ['series_name', 'title']))
-        elif self.safe_get(config, 'search_type') == 'movie':
-            if self.safe_get(entry, 'imdb_id', [basestring, int]):
-                imdb_str = str(self.safe_get(entry, 'imdb_id', [basestring, int]))
-                url_param = '&imdbid=%s' % imdb_str.replace('tt', '')
-                # tmdb is not supported for move lookups by indexers!
-            if not url_param:
-                log.error('Could not get imdb_id for movie: %s' % self.safe_get(entry, ['movie_name', 'title']))
+    def has_supported_meta_id(self, entry):
+        if self.is_tv_entry(entry) is True:
+            return self.safe_get(entry, ['tvdb_id', 'tvrage_id'], [basestring, int])
+        elif self.is_tv_entry(entry) is False:
+            return self.safe_get(entry, ['imdb_id'], [basestring, int])
+        else:
+            return False
 
-        return url_param
+    def build_unique_list(self, elements, type=basestring):
+        if not isinstance(elements, list):
+            elements = [elements]
+        out_list = []
+        for element in elements:
+            if isinstance(element, list):
+                for sub_element in element:
+                    if sub_element not in out_list and isinstance(sub_element, type):
+                        out_list.append(sub_element)
+            elif element not in out_list and isinstance(element, type):
+                out_list.append(element)
+        return out_list
+
+    def build_unique_list_from_entry(self, entry, keys, type=basestring):
+        if not isinstance(keys, list):
+            keys = [keys]
+        out_list = []
+        for key in keys:
+            value = self.safe_get(entry, key, [list, type])
+            if value:
+                out_list.append(value)
+        return self.build_unique_list(out_list, type)
+
+    def update_metadata(self, entry, config):
+        if not self.safe_get(config, 'plugins_list', list):
+            return entry
+
+        show_lookup = self.is_tv_entry(entry)
+        if show_lookup is None:
+            log.warning('Could not determine entry type (tv/movie) for meta lookup: %s' % entry)
+            return entry
+
+        search_list = []
+        if show_lookup is True:
+            search_list = self.build_unique_list_from_entry(entry, ['series_name', 'series_alternate_names', 'title'])
+            if self.safe_get(entry, 'series_name'):
+                name_short = re.sub(r'\s+\(\d{4}\)$', '', entry['series_name'])
+                if not name_short.isspace() and name_short not in search_list:
+                    search_list.append(name_short)
+        elif show_lookup is False:
+            search_list = self.build_unique_list_from_entry(entry, ['movie_name', 'search_strings', 'title'])
+            # TODO @Andy: test if this is better
+            #if self.safe_get(entry, 'movie_name'):
+            #    name_short = re.sub(r'\s+\(\d{4}\)$', '', entry['movie_name'])
+            #    search_list.insert(1, name_short)  # insert short name just after long
+
+        search_entry = Entry(entry)
+        for search_string in search_list:
+            if search_string is None or not isinstance(search_string, basestring) or search_string.isspace():
+                continue
+            search_entry['title'] = search_string
+            # update entry metadata
+            if show_lookup is True:
+                search_entry['series_name'] = search_string
+                for plugin_name in config['plugins_list']:
+                    if plugin_name == 'trakt_lookup':
+                        plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry)
+                        log.verbose('Doing trakt_lookup for series: %s' % search_string)
+                    elif plugin_name == 'tvmaze_lookup':
+                        plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry)
+                        log.verbose('Doing tvmaze_lookup for series: %s' % search_string)
+                    elif plugin_name == 'thetvdb_lookup':
+                        plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry, 'en')  # TODO @Andy: do we need language support?
+                        log.verbose('Doing thetvdb_lookup for series: %s' % search_string)
+            elif show_lookup is False:
+                for plugin_name in config['plugins_list']:
+                    if plugin_name == 'trakt_lookup':
+                        plugin.get_plugin_by_name('trakt_lookup').instance.lazy_movie_lookup(search_entry)
+                        log.verbose('Doing trakt_lookup for movie: %s' % search_string)
+                    elif plugin_name == 'tmdb_lookup':
+                        plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(search_entry)
+                        log.verbose('Doing tmdb_lookup for movie: %s' % search_string)
+                    elif plugin_name == 'imdb_lookup':
+                        plugin.get_plugin_by_name('imdb_lookup').instance.lookup(search_entry)
+                        log.verbose('Doing imdb_lookup for movie: %s' % search_string)
+            if self.has_meta_id(search_entry) is not None:
+                search_entry['title'] = entry['title']  # keep org. title
+                return search_entry
+        return entry
 
     def build_base_url(self, config):
         log.debug(type(config))
-
         # TODO @Andy: do 't=caps' check (many indexers wont correctly handle this, nzbhydra uses 'brute force' since 0.2.169)
-
         if not self.safe_get(config, 'api_server_url'):
-            raise plugin.PluginError('Invalid url: %s' % self.safe_get(config, 'api_server_url'))
+            raise plugin.PluginError('Invalid url in config: %s' % config)
 
         api_url = config['api_server_url'] + '/api?' + '&extended=1'
-
         if self.safe_get(config, 'api_key'):
-            api_url += '&apikey=%s' % self.safe_get(config, 'api_key')
-
-        if config['search_type'] == 'tv':
-            api_url += '&t=tvsearch'
-        elif config['search_type'] == 'movie':
-            api_url += '&t=movie'
-        else:
-            api_url += '&t=search'
-
-        if self.safe_get(config, 'category', [basestring, list]):
-            categories = self.safe_get(config, 'category', [basestring, list])
-            if categories and not isinstance(categories, list):
-                categories = [categories]
-            # Convert named categories to its respective categories id number
-            categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-            if len(categories) > 0:
-                categories_string = ','.join(str(c) for c in categories)
-                api_url += '&cat=%s' % categories_string
+            api_url += '&apikey=%s' % config['api_key']
+        if self.safe_get(config, 'category_string'):
+            api_url += '&cat=%s' % config['category_string']
         # carefull, 0 is defined!
-        if 'maxage' in config:
-            api_url += '&maxage=%s' % parse_timedelta(config['maxage']).days
-
+        if self.safe_get(config, 'maxage'):
+            try:
+                api_url += '&maxage=%s' % parse_timedelta(config['maxage']).days
+            except Exception as ex:
+                log.error('Invalid maxage given in config: %s' % ex)
         return api_url
 
     def parse_from_xml(self, xml_entries):
@@ -422,7 +468,7 @@ class Newznab(object):
             # add some usefully attributes to the namespace
             self.fill_namespace_attributes(xml_entry, new_entry)
             entries.append(new_entry)
-            #self.dump_entry(new_entry)
+            # self.dump_entry(new_entry)
         return entries
 
     def set_ns_attribute(self, name, xml_entry, entry, in_type=basestring):
@@ -525,17 +571,10 @@ class Newznab(object):
 
         return entries
 
-    def get_query_param(self, query_string, entry, task, config):
-        query = query_string
-        if self.safe_get(config, 'search_type', dict) and self.safe_get(config['search_type'], 'custom_query'):
-            custom_query = self.safe_get(config['search_type'], 'custom_query')
-            try:
-                entry.task = task
-                query = render_from_entry(custom_query, entry)
-            except RenderError as ex:
-                log.warning('Could not build custom_query string for: %s error: %s' % (entry['title'], ex))
-
-        query = normalize_unicode(query)
+    def build_query_url_fragment(self, query_string, config):
+        if query_string is None or not isinstance(query_string, basestring) or query_string.isspace():
+            return None
+        query = normalize_unicode(query_string)
         # query = normalize_scene(query)
         query = quote_plus(query.encode('utf8'))
         if config['force_quotes'] is True:
@@ -544,87 +583,132 @@ class Newznab(object):
             query = "&q=%s" % query
         return query
 
-    # API search entry
-    def search(self, task, entry, config):
-        if config['search_type'] == 'movie':
-            return self.do_search_movie(entry, task, config)
-        elif config['search_type'] == 'tv':
-            return self.do_search_tv(entry, task, config)
-        else:
-            return self.do_search_generic(entry, task, config)
+    def build_metaid_url_fragment(self, entry):
+        url_param = None
+        # use first valid meta id
+        if self.is_tv_entry(entry) is True:
+            if self.safe_get(entry, 'tvdb_id', [basestring, int]):
+                url_param = '&tvdbid=%s' % self.safe_get(entry, 'tvdb_id', [basestring, int])
+            elif self.safe_get(entry, 'tvrage_id', [basestring, int]):
+                url_param = '&rid=%s' % self.safe_get(entry, 'tvrage_id', [basestring, int])
+            # lets not use those for now, rarely supported!
+            # elif self.safe_get(entry, 'tvmaze_series_id', [basestring, int]):
+            #    url_param = '&tvmazeid=%s' % self.safe_get(entry, 'tvmaze_series_id', [basestring, int])
+            # elif self.safe_get(entry, 'trakt_id', [basestring, int]):
+            #    url_param = '&traktid=%s' % self.safe_get(entry, 'trakt_id', [basestring, int])
+        elif self.is_tv_entry(entry) is False:
+            if self.safe_get(entry, 'imdb_id', [basestring, int]):
+                imdb_str = str(self.safe_get(entry, 'imdb_id', [basestring, int]))
+                url_param = '&imdbid=%s' % imdb_str.replace('tt', '')
+                # tmdb_id is not supported for move lookups by indexers!
+        return url_param
 
-    def do_search_generic(self, entry, task, config):
-        url = self.build_base_url(config)
-        self.update_metadata(task, entry, config)
-
-        query = self.get_query_param(entry['title'], entry, task, config)
-        if not query:
-            log.verbose('Skipping Entry: %s, because invalid search query string found.' % entry['title'])
-            return []
-
-        url += query
-        return self.fill_entries_for_url(url, task)
-
-    def do_search_tv(self, entry, task, config):
-        # normally this should be used with next_series_episodes who has provided season and episodenumber
-        parsed_name = None
-        # carefull episode 0 is valid
-        if 'series_episode' not in entry:
+    def build_series_ep_season_url_fragment(self, entry):
+        url_param = None
+        if not self.safe_get(entry, 'series_episode', int):
+            if not self.safe_get(entry, 'title'):
+                return None
             # try to fix
             id_type = self.safe_get(entry, 'series_id_type', default='auto')
             parser = plugin.get_plugin_by_name('parsing').instance
-            parsed = parser.parse_series(data=entry['title'], identified_by=id_type, allow_seasonless=allow_seasonless)
-            if parsed and parsed.valid:
-                parsed_name = normalize_name(remove_dirt(parsed.name))
+            parsed = parser.parse_series(data=entry['title'], identified_by=id_type,
+                                         allow_seasonless=allow_seasonless)
+            if parsed and parsed.valid and parsed.episode is not None:
                 entry['series_episode'] = parsed.episode
-                if 'series_season' not in entry:
-                    if self.safe_get(entry, 'series_id_type') == 'ep':
-                        entry['series_season'] = parsed.season
+                if not self.safe_get(entry, 'series_season', int) and parsed.season is not None:
+                    entry['series_season'] = parsed.season
 
-        if 'series_episode' not in entry:
-            log.error('Could not get valid episode numbering for series lookup, skipping: %s' % entry['title'])
-            return []
+        if self.safe_get(entry, 'series_episode', int):
+            url_param = '&ep=%s' % self.safe_get(entry, 'series_episode', int)
+            # TODO @Andy: test if indexer support episode only search!
+            if self.safe_get(entry, 'series_season', int):
+                url_param += '&season=%s' % self.safe_get(entry, 'series_season', int)
+        return url_param
 
-        # build final url
+    def get_custom_query_string(self, entry, task, config):
+        if self.safe_get(config, 'custom_query'):
+            render_string = None
+            try:
+                render_string = entry.render(self.safe_get(config, 'custom_query'))
+            except Exception as ex:
+                log.trace('Could not render custom_query string for: %s error: %s' % (entry['title'], ex))
+            if render_string and not render_string.isspace():
+                return render_string
+        return None
+
+    # API search entry
+    def search(self, task, entry, config):
+        config = self.prepare_config(config)
+
+        # first check for custom_query
+        custom_query_url = None
+        custom_query_string = None
+        if self.safe_get(config, 'custom_query'):
+            custom_query_string = self.get_custom_query_string(entry, task, config)
+            if not custom_query_string:
+                entry = self.update_metadata(entry, config)  # update metadata and try again
+                custom_query_string = self.get_custom_query_string(entry, task, config)
+                if custom_query_string:
+                    custom_query_url = self.build_query_url_fragment(custom_query_string, config)
+                else:
+                    log.error('Could not build custom_query string for: %s ' % entry['title'])
+                    return []  # no fallback logic!
+
+        meta_url = None
+        ep_url = None
+        # build metadata url fragments
+        if 'use_metadata' in config:
+            meta_url = self.build_metaid_url_fragment(entry)
+            if meta_url is None:
+                entry = self.update_metadata(entry, config)
+                meta_url = self.build_metaid_url_fragment(entry)  # try again
+            if self.is_tv_entry(entry) is True:
+                ep_url = self.build_series_ep_season_url_fragment(entry)
+
+        query_list = []
+        # build meta and ep fragment
         url = self.build_base_url(config)
-        url_metaid_param = self.get_metaid_url_parameter(task, entry, config)
-        if url_metaid_param:
-            url += url_metaid_param
-        else:  # fallback to name (do we use the 'search_strings' array?)
-            if self.safe_get(entry, 'series_name'):
-                query_name = self.safe_get(entry, 'series_name')
-            elif parsed_name:
-                query_name = parsed_name
+        if meta_url and self.is_tv_entry(entry) is True and ep_url:
+            url += '&t=tvsearch' + meta_url + ep_url
+            # always add custom_query's (not 100% well defined behaviour per indexer!)
+            if custom_query_url:
+                url += custom_query_url
+        elif meta_url and self.is_tv_entry(entry) is False:
+            url += '&t=movie' + meta_url
+            if custom_query_url:
+                url += custom_query_url
+        else:
+            url += '&t=search'
+            # add custom query to list front
+            if custom_query_string:
+                query_list.insert(0, custom_query_string)
+            # append existing search_strings
+            if self.safe_get(entry, 'search_strings', list):
+                query_list = query_list + entry['search_strings']
+            # probe for possible missing names
+            if self.is_tv_entry(entry) is True:
+                if self.safe_get(entry, 'series_name') and self.safe_get(entry, 'series_id'):
+                    name_ep = '%s %s' % (entry['series_name'], entry['series_id'])
+                    if name_ep not in query_list:
+                        query_list.append(name_ep)
+            elif self.is_tv_entry(entry) is False:
+                if self.safe_get(entry, 'movie_name') and entry['movie_name'] not in query_list:
+                    query_list.append(entry['movie_name'])
             else:
-                query_name = self.safe_get(entry, 'title')
-            if query_name:
-                url += self.get_query_param(query_name, entry, task, config)
-                log.verbose('Doing fallback search via name: %s for: %s' % (query_name, entry['title']))
-            else:
-                log.error('Could not get valid fallback name for: %s' % entry['title'])
-                return []
+                if self.safe_get(entry, 'title') and entry['title'] not in query_list:
+                    query_list.append(entry['title'])
 
-        if 'series_episode' in entry:
-            url += '&ep=%s' % entry['series_episode']
-        if 'series_season' in entry:
-            url += '&season=%s' % entry['series_season']  # TODO @Andy: test if indexer support episode only search!
-        return self.fill_entries_for_url(url, task)
-
-    def do_search_movie(self, entry, task, config):
-        url = self.build_base_url(config)
-        url_metaid_param = self.get_metaid_url_parameter(task, entry, config)
-        if url_metaid_param:
-            url += url_metaid_param
-        else:  # fallback to name (do we use the 'search_strings' array?)
-            # TODO @Andy: maybe do a clean (plugin_parsing) call instead of title?
-            query_name = self.safe_get(entry, ['movie_name', 'title'])
-            if query_name:
-                url += self.get_query_param(query_name, entry, task, config)
-                log.verbose('Doing fallback search via name: %s for: %s' % (query_name, entry['title']))
-            else:
-                log.error('Could not get valid fallback name for: %s' % entry['title'])
-                return []
-        return self.fill_entries_for_url(url, task)
+        # do search without list
+        if query_list is None or len(query_list) == 0:
+            return self.fill_entries_for_url(url, task)
+        else:
+            for query_string in query_list:
+                query_url = self.build_query_url_fragment(query_string, config)
+                if query_url:
+                    results = self.fill_entries_for_url(url + query_url, task)
+                    if len(results) > 0:
+                        return results      # TODO @Andy: Do we combine results?
+        return []
 
 
 @event('plugin.register')
