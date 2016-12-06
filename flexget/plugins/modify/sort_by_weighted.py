@@ -89,7 +89,7 @@ class PluginSortByWeighted(object):
         'minItems': 2
     }
 
-    #    def on_task_start(self, task, config):
+    @plugin.priority(127)   # run after default filters
     def on_task_filter(self, task, config):
         # [field] = [weight, weight_default, delta, inverse, lower_limit, upper_limit]
         settings = {}
