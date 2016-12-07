@@ -17,7 +17,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.utils.tools import parse_timedelta
+from flexget.utils.tools import parse_timedelta, str_to_boolean, split_title_year
 from flexget.utils.search import normalize_unicode
 
 __author__ = 'andy (org. by deksan)'
@@ -122,6 +122,92 @@ NAMESPACE_URL = 'http://www.newznab.com/DTD/2010/feeds/attributes/'
 NAMESPACE_TAGNAME = 'attr'
 NAMESPACE_PREFIX = 'newznab_'
 ENCLOSURE_TYPE = 'application/x-nzb'
+
+
+# utils
+def list_insert_unique(in_list, idx, element, caseinsensitive=False):
+    if not isinstance(in_list, list) or element is None:
+        return
+    if isinstance(element, basestring):
+        if element.isspace() or element in in_list:
+            return
+        elif caseinsensitive is True and element.lower() in in_list:
+            return
+    elif element in in_list:
+        return
+    in_list.insert(idx, element)
+
+
+def list_append_unique(in_list, element, caseinsensitive=False):
+    list_insert_unique(in_list, len(in_list), element, caseinsensitive=caseinsensitive)
+
+
+def list_combine_unique(list_dst, list_source, caseinsensitive=False):
+    if not isinstance(list_dst, list) or not isinstance(list_source, list):
+        log.error('Cant combine lists, src/dst is not a listtype: %s %s' % (list_dst, list_source))
+    for item in list_source:
+        list_append_unique(list_dst, item, caseinsensitive=caseinsensitive)
+
+
+def safe_get(in_object, keynames, types=basestring, default=None, caseinsensitive=True):
+    invert_op = getattr(in_object, "get", None)
+    if not invert_op or not callable(invert_op):
+        log.warning('Object has no get() function: %s' % in_object)
+        return default
+
+    if not isinstance(keynames, list):
+        keynames = [keynames]
+    if not isinstance(types, list):
+        types = [types]
+
+    for key in keynames:
+        if not isinstance(key, basestring):
+            log.warning('Key is not a string: %s' % key)
+            continue
+        found = in_object.get(key)
+        if found is None and caseinsensitive is True:
+            found = in_object.get(key.lower())
+        for thetype in types:
+            if found is not None and isinstance(found, thetype):
+                if isinstance(found, basestring) and found.isspace():
+                    continue
+                return found
+    return default
+
+
+def convert_to_naive_utc(valuestring):
+    parsed_date = None
+    try:
+        parsed_date = dateutil_parse(valuestring, fuzzy=True)
+        try:
+            parsed_date = parsed_date.astimezone(tz.tzutc()).replace(tzinfo=None)
+        except ValueError:
+            parsed_date = parsed_date.replace(tzinfo=None)
+    except ValueError as ex:
+        log.warning('Invalid datetime field format: %s error: %s' % (valuestring, ex))
+    except Exception as ex:
+        log.trace('Unexpected datetime field: %s error: %s' % (valuestring, ex))
+    return parsed_date
+
+
+def convert_to_number(valuestring):
+    number = None
+    try:
+        number = int(valuestring)
+    except ValueError:
+        try:
+            number = float(valuestring)
+        except ValueError:
+            log.trace('Invalid number field: %s' % valuestring)
+    except Exception as ex:
+        log.trace('Invalid number field: %s error: %s' % (valuestring, ex))
+    return number
+
+    # def dump_entry(entry):
+    #     log.verbose('#####################################################################################')
+    #     for key in entry:
+    #         log.verbose('Entry: [%s] = %s' % (key, entry[key]))
+    #     log.verbose('#####################################################################################')
 
 
 class Newznab(object):
@@ -244,118 +330,29 @@ class Newznab(object):
                     config['category_string'] = ','.join(str(c) for c in categories)
         return config
 
-    @staticmethod
-    def safe_get(in_object, keynames, types=basestring, default=None, try_lower=True):
-        invert_op = getattr(in_object, "get", None)
-        if not invert_op or not callable(invert_op):
-            log.warning('Object has no get() function: %s' % in_object)
-            return default
-
-        if not isinstance(keynames, list):
-            keynames = [keynames]
-        if not isinstance(types, list):
-            types = [types]
-
-        for key in keynames:
-            if not isinstance(key, basestring):
-                log.warning('Key is not a string: %s' % key)
-                continue
-            # TODO @Andy: double check int case for {'key': 0} -> get() is None
-            found = in_object.get(key)
-            if found is None and try_lower is True:
-                found = in_object.get(key.lower())
-            for thetype in types:
-                if found is not None and isinstance(found, thetype):
-                    if isinstance(found, basestring) and found.isspace():
-                        continue
-                    return found
-        return default
-
-    @staticmethod
-    def convert_to_naive_utc(value):
-        parsed_date = None
-        try:
-            parsed_date = dateutil_parse(value, fuzzy=True)
-            try:
-                parsed_date = parsed_date.astimezone(tz.tzutc()).replace(tzinfo=None)
-            except ValueError:
-                parsed_date = parsed_date.replace(tzinfo=None)
-        except ValueError as ex:
-            log.warning('Invalid datetime field format: %s error: %s' % (value, ex))
-        except Exception as ex:
-            log.trace('Unexpected datetime field: %s error: %s' % (value, ex))
-        return parsed_date
-
-    @staticmethod
-    def convert_to_number(valuestring):
-        number = None
-        try:
-            number = int(valuestring)
-        except ValueError:
-            try:
-                number = float(valuestring)
-            except ValueError:
-                log.trace('Invalid number field: %s' % valuestring)
-        except Exception as ex:
-            log.trace('Invalid number field: %s error: %s' % (valuestring, ex))
-        return number
-
-    @staticmethod
-    def string_to_bool(value):
-        return value.lower() in ('yes', 'true', 't', '1', 'y')
-
-    # @staticmethod
-    # def dump_entry(entry):
-    #     log.verbose('#####################################################################################')
-    #     for key in entry:
-    #         log.verbose('Entry: [%s] = %s' % (key, entry[key]))
-    #     log.verbose('#####################################################################################')
-
     def is_tv_entry(self, entry):
-        if self.safe_get(entry, ['series_name', 'tvdb_id', 'tvrage_id', 'tvmaze_series_id', 'trakt_id'], [basestring, int]):
+        if safe_get(entry, ['series_name', 'tvdb_id', 'tvrage_id', 'tvmaze_series_id', 'trakt_id'],
+                    [basestring, int]):
             return True
-        elif self.safe_get(entry, ['movie_name', 'tmdb_id', 'imdb_id', 'trakt_movie_id'], [basestring, int]):
+        elif safe_get(entry, ['movie_name', 'tmdb_id', 'imdb_id', 'trakt_movie_id'], [basestring, int]):
             return False
         else:
             return None
 
     def has_meta_id(self, entry):
-        return self.safe_get(entry, ['tvdb_id', 'tvrage_id', 'tvmaze_series_id', 'tmdb_id', 'imdb_id',
-                                     'trakt_movie_id', 'trakt_id'], [basestring, int])
+        return safe_get(entry, ['tvdb_id', 'tvrage_id', 'tvmaze_series_id', 'tmdb_id', 'imdb_id',
+                                'trakt_movie_id', 'trakt_id'], [basestring, int])
 
     def has_supported_meta_id(self, entry):
         if self.is_tv_entry(entry) is True:
-            return self.safe_get(entry, ['tvdb_id', 'tvrage_id'], [basestring, int])
+            return safe_get(entry, ['tvdb_id', 'tvrage_id'], [basestring, int])
         elif self.is_tv_entry(entry) is False:
-            return self.safe_get(entry, ['imdb_id'], [basestring, int])
+            return safe_get(entry, ['imdb_id'], [basestring, int])
         else:
             return False
 
-    def build_unique_list(self, elements, type=basestring):
-        if not isinstance(elements, list):
-            elements = [elements]
-        out_list = []
-        for element in elements:
-            if isinstance(element, list):
-                for sub_element in element:
-                    if sub_element not in out_list and isinstance(sub_element, type):
-                        out_list.append(sub_element)
-            elif element not in out_list and isinstance(element, type):
-                out_list.append(element)
-        return out_list
-
-    def build_unique_list_from_entry(self, entry, keys, type=basestring):
-        if not isinstance(keys, list):
-            keys = [keys]
-        out_list = []
-        for key in keys:
-            value = self.safe_get(entry, key, [list, type])
-            if value:
-                out_list.append(value)
-        return self.build_unique_list(out_list, type)
-
     def update_metadata(self, entry, config):
-        if not self.safe_get(config, 'plugins_list', list):
+        if not safe_get(config, 'plugins_list', list):
             return entry
 
         show_lookup = self.is_tv_entry(entry)
@@ -365,17 +362,20 @@ class Newznab(object):
 
         search_list = []
         if show_lookup is True:
-            search_list = self.build_unique_list_from_entry(entry, ['series_name', 'series_alternate_names', 'title'])
-            if self.safe_get(entry, 'series_name'):
-                name_short = re.sub(r'\s+\(\d{4}\)$', '', entry['series_name'])
-                if not name_short.isspace() and name_short not in search_list:
-                    search_list.append(name_short)
+            if safe_get(entry, 'series_name'):
+                title, year = split_title_year(entry['series_name'])
+                if year:
+                    search_list.insert(0, '%s (%s)' % (title, year))
+                list_append_unique(search_list, title, caseinsensitive=True)
         elif show_lookup is False:
-            search_list = self.build_unique_list_from_entry(entry, ['movie_name', 'search_strings', 'title'])
-            # TODO @Andy: test if this is better
-            #if self.safe_get(entry, 'movie_name'):
-            #    name_short = re.sub(r'\s+\(\d{4}\)$', '', entry['movie_name'])
-            #    search_list.insert(1, name_short)  # insert short name just after long
+            search_list.insert(0, entry['title'])
+            if safe_get(entry, 'movie_name'):
+                title, year = split_title_year(entry['movie_name'])
+                if year:
+                    list_append_unique(search_list, '%s (%s)' % (title, year), caseinsensitive=True)
+                list_append_unique(search_list, title, caseinsensitive=True)
+                if safe_get(entry, 'search_strings', list):
+                    list_combine_unique(search_list, entry('search_strings'), caseinsensitive=True)
 
         search_entry = Entry(entry)
         for search_string in search_list:
@@ -388,42 +388,42 @@ class Newznab(object):
                 for plugin_name in config['plugins_list']:
                     if plugin_name == 'trakt_lookup':
                         plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry)
-                        log.verbose('Doing trakt_lookup for series: %s' % search_string)
+                        log.verbose('Doing `%s` for series: %s' % (plugin_name, search_string))
                     elif plugin_name == 'tvmaze_lookup':
                         plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry)
-                        log.verbose('Doing tvmaze_lookup for series: %s' % search_string)
+                        log.verbose('Doing `%s` for series: %s' % (plugin_name, search_string))
                     elif plugin_name == 'thetvdb_lookup':
-                        plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry, 'en')  # TODO @Andy: do we need language support?
-                        log.verbose('Doing thetvdb_lookup for series: %s' % search_string)
+                        # TODO @Andy: do we need language support?
+                        plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry, 'en')
+                        log.verbose('Doing `%s` for series: %s' % (plugin_name, search_string))
             elif show_lookup is False:
                 for plugin_name in config['plugins_list']:
                     if plugin_name == 'trakt_lookup':
                         plugin.get_plugin_by_name('trakt_lookup').instance.lazy_movie_lookup(search_entry)
-                        log.verbose('Doing trakt_lookup for movie: %s' % search_string)
+                        log.verbose('Doing `%s` for movie: %s' % (plugin_name, search_string))
                     elif plugin_name == 'tmdb_lookup':
                         plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(search_entry)
-                        log.verbose('Doing tmdb_lookup for movie: %s' % search_string)
+                        log.verbose('Doing `%s` for movie: %s' % (plugin_name, search_string))
                     elif plugin_name == 'imdb_lookup':
                         plugin.get_plugin_by_name('imdb_lookup').instance.lookup(search_entry)
-                        log.verbose('Doing imdb_lookup for movie: %s' % search_string)
+                        log.verbose('Doing `%s` for movie: %s' % (plugin_name, search_string))
             if self.has_meta_id(search_entry) is not None:
                 search_entry['title'] = entry['title']  # keep org. title
                 return search_entry
         return entry
 
     def build_base_url(self, config):
-        log.debug(type(config))
         # TODO @Andy: do 't=caps' check (many indexers wont correctly handle this, nzbhydra uses 'brute force' since 0.2.169)
-        if not self.safe_get(config, 'api_server_url'):
+        if not safe_get(config, 'api_server_url'):
             raise plugin.PluginError('Invalid url in config: %s' % config)
 
         api_url = config['api_server_url'] + '/api?' + '&extended=1'
-        if self.safe_get(config, 'api_key'):
+        if safe_get(config, 'api_key'):
             api_url += '&apikey=%s' % config['api_key']
-        if self.safe_get(config, 'category_string'):
+        if safe_get(config, 'category_string'):
             api_url += '&cat=%s' % config['category_string']
         # carefull, 0 is defined!
-        if self.safe_get(config, 'maxage'):
+        if safe_get(config, 'maxage'):
             try:
                 api_url += '&maxage=%s' % parse_timedelta(config['maxage']).days
             except Exception as ex:
@@ -454,7 +454,7 @@ class Newznab(object):
             if xml_entry.published_parsed:
                 new_entry[NAMESPACE_PREFIX + 'pubdate'] = datetime.fromtimestamp(mktime(xml_entry.published_parsed))
             elif xml_entry.published:
-                parsed_date = self.convert_to_naive_utc(xml_entry.published)
+                parsed_date = convert_to_naive_utc(xml_entry.published)
                 if parsed_date:
                     new_entry[NAMESPACE_PREFIX + 'pubdate'] = parsed_date
             if (NAMESPACE_PREFIX + 'pubdate') in new_entry:
@@ -486,20 +486,20 @@ class Newznab(object):
             if isinstance(value, in_type):
                 entry[tagname] = value
             elif in_type == int or in_type == float:
-                number = self.convert_to_number(value)
+                number = convert_to_number(value)
                 if number is not None:
                     entry[tagname] = number
             elif in_type == datetime:
-                date = self.convert_to_naive_utc(value)
+                date = convert_to_naive_utc(value)
                 if date is not None:
                     entry[tagname] = date
             elif in_type == bool:
                 boolvalue = None
                 if isinstance(value, basestring):
-                    if self.string_to_bool(value):
+                    if str_to_boolean(value):
                         boolvalue = True
                 if not boolvalue:
-                    number = self.convert_to_number(value)
+                    number = convert_to_number(value)
                     if number is not None and number > 0:
                         boolvalue = True
                     else:
@@ -534,7 +534,7 @@ class Newznab(object):
         try:
             r = task.requests.get(url + '&o=xml', timeout=20)
         except Exception as ex:
-            log.error("Failed fetching urk: %s error: %s" % (url, ex))
+            log.error("Failed fetching url: %s error: %s" % (url, ex))
             return []
 
         if r and r.status_code != 200:
@@ -587,49 +587,38 @@ class Newznab(object):
         url_param = None
         # use first valid meta id
         if self.is_tv_entry(entry) is True:
-            if self.safe_get(entry, 'tvdb_id', [basestring, int]):
-                url_param = '&tvdbid=%s' % self.safe_get(entry, 'tvdb_id', [basestring, int])
-            elif self.safe_get(entry, 'tvrage_id', [basestring, int]):
-                url_param = '&rid=%s' % self.safe_get(entry, 'tvrage_id', [basestring, int])
-            # lets not use those for now, rarely supported!
-            # elif self.safe_get(entry, 'tvmaze_series_id', [basestring, int]):
-            #    url_param = '&tvmazeid=%s' % self.safe_get(entry, 'tvmaze_series_id', [basestring, int])
-            # elif self.safe_get(entry, 'trakt_id', [basestring, int]):
-            #    url_param = '&traktid=%s' % self.safe_get(entry, 'trakt_id', [basestring, int])
+            if safe_get(entry, 'tvdb_id', [basestring, int]):
+                url_param = '&tvdbid=%s' % entry['tvdb_id']
+            elif safe_get(entry, 'tvrage_id', [basestring, int]):
+                url_param = '&rid=%s' % entry['tvrage_id']
+                # lets not use those for now, rarely supported!
+                # elif self.safe_get(entry, 'tvmaze_series_id', [basestring, int]):
+                #    url_param = '&tvmazeid=%s' % entry['tvmaze_series_id']
+                # elif self.safe_get(entry, 'trakt_id', [basestring, int]):
+                #    url_param = '&traktid=%s' % entry['trakt_id']
         elif self.is_tv_entry(entry) is False:
-            if self.safe_get(entry, 'imdb_id', [basestring, int]):
-                imdb_str = str(self.safe_get(entry, 'imdb_id', [basestring, int]))
+            if safe_get(entry, 'imdb_id', [basestring, int]):
+                imdb_str = str(entry['imdb_id'])
                 url_param = '&imdbid=%s' % imdb_str.replace('tt', '')
                 # tmdb_id is not supported for move lookups by indexers!
         return url_param
 
     def build_series_ep_season_url_fragment(self, entry):
         url_param = None
-        if not self.safe_get(entry, 'series_episode', int):
-            if not self.safe_get(entry, 'title'):
-                return None
-            # try to fix
-            id_type = self.safe_get(entry, 'series_id_type', default='auto')
-            parser = plugin.get_plugin_by_name('parsing').instance
-            parsed = parser.parse_series(data=entry['title'], identified_by=id_type,
-                                         allow_seasonless=allow_seasonless)
-            if parsed and parsed.valid and parsed.episode is not None:
-                entry['series_episode'] = parsed.episode
-                if not self.safe_get(entry, 'series_season', int) and parsed.season is not None:
-                    entry['series_season'] = parsed.season
-
-        if self.safe_get(entry, 'series_episode', int):
-            url_param = '&ep=%s' % self.safe_get(entry, 'series_episode', int)
+        if safe_get(entry, 'series_episode', [basestring, int]):
+            url_param = '&ep=%s' % entry['series_episode']
             # TODO @Andy: test if indexer support episode only search!
-            if self.safe_get(entry, 'series_season', int):
-                url_param += '&season=%s' % self.safe_get(entry, 'series_season', int)
+            if safe_get(entry, 'series_season', [basestring, int]):
+                url_param += '&season=%s' % entry['series_season']
         return url_param
 
     def get_custom_query_string(self, entry, task, config):
-        if self.safe_get(config, 'custom_query'):
+        if safe_get(config, 'custom_query'):
+            if hasattr(entry, 'task') and entry.task is None:
+                entry.task = task  # FIXME: remove if fixed in master
             render_string = None
             try:
-                render_string = entry.render(self.safe_get(config, 'custom_query'))
+                render_string = entry.render(config['custom_query'])
             except Exception as ex:
                 log.trace('Could not render custom_query string for: %s error: %s' % (entry['title'], ex))
             if render_string and not render_string.isspace():
@@ -641,16 +630,13 @@ class Newznab(object):
         config = self.prepare_config(config)
 
         # first check for custom_query
-        custom_query_url = None
         custom_query_string = None
-        if self.safe_get(config, 'custom_query'):
+        if safe_get(config, 'custom_query'):
             custom_query_string = self.get_custom_query_string(entry, task, config)
             if not custom_query_string:
                 entry = self.update_metadata(entry, config)  # update metadata and try again
                 custom_query_string = self.get_custom_query_string(entry, task, config)
-                if custom_query_string:
-                    custom_query_url = self.build_query_url_fragment(custom_query_string, config)
-                else:
+                if not custom_query_string:
                     log.error('Could not build custom_query string for: %s ' % entry['title'])
                     return []  # no fallback logic!
 
@@ -670,45 +656,27 @@ class Newznab(object):
         url = self.build_base_url(config)
         if meta_url and self.is_tv_entry(entry) is True and ep_url:
             url += '&t=tvsearch' + meta_url + ep_url
-            # always add custom_query's (not 100% well defined behaviour per indexer!)
-            if custom_query_url:
-                url += custom_query_url
         elif meta_url and self.is_tv_entry(entry) is False:
             url += '&t=movie' + meta_url
-            if custom_query_url:
-                url += custom_query_url
         else:
             url += '&t=search'
-            # add custom query to list front
-            if custom_query_string:
-                query_list.insert(0, custom_query_string)
-            # append existing search_strings
-            if self.safe_get(entry, 'search_strings', list):
-                query_list = query_list + entry['search_strings']
-            # probe for possible missing names
-            if self.is_tv_entry(entry) is True:
-                if self.safe_get(entry, 'series_name') and self.safe_get(entry, 'series_id'):
-                    name_ep = '%s %s' % (entry['series_name'], entry['series_id'])
-                    if name_ep not in query_list:
-                        query_list.append(name_ep)
-            elif self.is_tv_entry(entry) is False:
-                if self.safe_get(entry, 'movie_name') and entry['movie_name'] not in query_list:
-                    query_list.append(entry['movie_name'])
-            else:
-                if self.safe_get(entry, 'title') and entry['title'] not in query_list:
-                    query_list.append(entry['title'])
+            # use existing search_strings
+            query_list = safe_get(entry, 'search_strings', list, default=[entry['title']])
 
+        # use custom query in all cases (not 100% well defined behaviour in metaid cases)
+        list_insert_unique(query_list, 0, custom_query_string, caseinsensitive=True)
         # do search without list
         if query_list is None or len(query_list) == 0:
             return self.fill_entries_for_url(url, task)
         else:
+            results_set = set()
             for query_string in query_list:
                 query_url = self.build_query_url_fragment(query_string, config)
                 if query_url:
                     results = self.fill_entries_for_url(url + query_url, task)
                     if len(results) > 0:
-                        return results      # TODO @Andy: Do we combine results?
-        return []
+                        results_set.update(results)
+            return list(results_set)
 
 
 @event('plugin.register')
