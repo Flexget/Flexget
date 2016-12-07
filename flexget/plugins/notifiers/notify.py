@@ -95,13 +95,15 @@ class Notify(NotifyBase):
         try:
             result = entity.render(data)
         except (RenderError, ValueError) as e:
-            log.debug('failed to render: %s. Trying to fall back to default', e.args[0])
-            try:
-                if attribute in default_dict:
+            log.debug('cannot render: `%s: %s`, error: %s', attribute, data, e.args[0])
+            if attribute in default_dict:
+                try:
+                    log.debug('trying to render default value for `%s`', attribute)
                     result = entity.render(default_dict[attribute])
-            # Render error on defaults should not happen
-            except RenderError as e:
-                log.warning('default dict failed to render: %s. Reverting to original value.', e.args[0])
+                # Render error on defaults should not happen
+                except RenderError as e:
+                    log.warning('default dict failed to render: `%s: %s`. Error: %s. Reverting to original value.',
+                                attribute, data, e.args[0])
         else:
             log.debug('successfully rendered `%s` to %s', attribute, result)
         return result
