@@ -662,6 +662,7 @@ class Newznab(object):
             url += '&t=search'
             # use existing search_strings
             query_list = safe_get(entry, 'search_strings', list, default=[entry['title']])
+            list_append_unique(query_list, entry['title'], caseinsensitive=True)  # we trust external list?
 
         # use custom query in all cases (not 100% well defined behaviour in metaid cases)
         list_insert_unique(query_list, 0, custom_query_string, caseinsensitive=True)
