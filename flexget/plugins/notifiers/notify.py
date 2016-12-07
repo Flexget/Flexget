@@ -189,26 +189,9 @@ class NotifyAbort(NotifyBase):
         plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
 
 
-class NotifyCrash(NotifyBase):
-    def on_task_abort(self, task, config):
-        # task.traceback is populated on any unhandled crash
-        if task.traceback is None:
-            return
-
-        title = 'Task {{ task_name }} has crashed!'
-        message = 'Reason: {{ task.abort_reason }}'
-        notify_config = {'to': config['to'],
-                         'scope': 'task',
-                         'title': title,
-                         'message': message}
-        log.debug('sending crash notification')
-        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
-
-
 @event('plugin.register')
 def register_plugin():
     plugin.register(Notify, 'notify', api_ver=2)
     plugin.register(NotifyEntries, 'notify_entries', api_ver=2)
     plugin.register(NotifyTask, 'notify_task', api_ver=2)
     plugin.register(NotifyAbort, 'notify_abort', api_ver=2)
-    plugin.register(NotifyCrash, 'notify_crash', api_ver=2)
