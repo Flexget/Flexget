@@ -110,6 +110,7 @@ class TestTVDBLookup(object):
                                             'the paternity of the patient infuriates Dr. Cuddy and the teenager\'s ' \
                                             'parents, but may just pay off in spades.'
         assert entry['tvdb_ep_rating'] == 7.8
+        assert entry['tvdb_language'] == 'en'
 
     def test_no_posters_actors(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
@@ -168,7 +169,7 @@ class TestTVDBLookup(object):
         assert find_series_id('Once Upon A Time 2011') == 248835
         assert find_series_id('House M.D.') == 73255
         assert find_series_id('House') == 73255
-   
+
     @pytest.mark.skipif(not PY3, reason='VCRPY can\'t handle unicode in py2')
     def test_find_series_with_languages(self, mocked_expired, execute_task):
         assert find_series_id('Tegenlicht', 'nl') == 252712

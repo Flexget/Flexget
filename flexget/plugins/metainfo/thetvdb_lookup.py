@@ -69,6 +69,7 @@ class PluginThetvdbLookup(object):
         'tvdb_network': 'network',
         'tvdb_overview': 'overview',
         'tvdb_banner': 'banner',
+        'tvdb_language': 'language',
         'tvdb_airs_day_of_week': 'airs_dayofweek',
         'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
         'imdb_id': 'imdb_id',
