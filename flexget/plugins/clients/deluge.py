@@ -238,6 +238,46 @@ class InputDeluge(DelugePlugin):
         'total_size': ('content_size', lambda size: size / 1024 / 1024),
         'files': ('content_files', lambda file_dicts: [f['path'] for f in file_dicts])}
 
+    extra_settings_map = {
+        'active_time': ('active_time', lambda time: time / 3600),
+        'compact': 'compact',
+        'distributed_copies': 'distributed_copies',
+        'download_payload_rate': 'download_payload_rate',
+        'file_progress': 'file_progress',
+        'is_auto_managed': 'is_auto_managed',
+        'is_seed': 'is_seed',
+        'max_connections': 'max_connections',
+        'max_download_speed': 'max_download_speed',
+        'max_upload_slots': 'max_upload_slots',
+        'max_upload_speed':  'max_upload_speed',
+        'message': 'message',
+        'move_on_completed': 'move_on_completed',
+        'next_announce': 'next_announce',
+        'num_files': 'num_files',
+        'num_pieces': 'num_pieces',
+        'paused': 'paused',
+        'peers': 'peers',
+        'piece_length': 'piece_length',
+        'prioritize_first_last': 'prioritize_first_last',
+        'queue': 'queue',
+        'remove_at_ratio': 'remove_at_ratio',
+        'seed_rank': 'seed_rank',
+        'stop_at_ratio': 'stop_at_ratio',
+        'stop_ratio': 'stop_ratio',
+        'total_done': 'total_done',
+        'total_payload_download': 'total_payload_download',
+        'total_payload_upload': 'total_payload_upload',
+        'total_peers': 'total_peers',
+        'total_seeds': 'total_seeds', 
+        'total_uploaded': 'total_uploaded',
+        'total_wanted': 'total_wanted', 
+        'tracker': 'tracker',
+        'tracker_host': 'tracker_host',
+        'tracker_status': 'tracker_status',
+        'trackers': 'trackers',
+        'upload_payload_rate': 'upload_payload_rate'
+    }
+
     def __init__(self):
         self.entries = []
 
@@ -262,6 +302,13 @@ class InputDeluge(DelugePlugin):
                             }
                         },
                         'additionalProperties': False
+                    },
+                    'keys': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'string',
+                            'enum': list(extra_settings_map)
+                        }
                     }
                 },
                 'additionalProperties': False
@@ -308,7 +355,10 @@ class InputDeluge(DelugePlugin):
                     else:
                         log.warning('Did not find torrent file at %s' % torrent_path)
                 for key, value in torrent_dict.items():
-                    flexget_key = self.settings_map[key]
+                    if key in self.settings_map:
+                        flexget_key = self.settings_map[key]
+                    else:
+                        flexget_key = self.extra_settings_map[key]
                     if isinstance(flexget_key, tuple):
                         flexget_key, format_func = flexget_key
                         value = format_func(value)
@@ -317,8 +367,9 @@ class InputDeluge(DelugePlugin):
             client.disconnect()
 
         filter = config.get('filter', {})
+
         # deluge client lib chokes on future's newlist, make sure we have a native python list here
-        client.core.get_torrents_status(filter, native(list(self.settings_map.keys()))).addCallback(
+        client.core.get_torrents_status(filter, native(list(self.settings_map.keys()) + config.get('keys', []))).addCallback(
             on_get_torrents_status)
 
 

@@ -142,7 +142,7 @@ class EmailNotifier(object):
                 mailServer.starttls()
                 mailServer.ehlo()
         except (socket.error, OSError) as e:
-            raise PluginWarning(e.args[0])
+            raise PluginWarning(str(e))
 
         try:
             if smtp_username:
@@ -151,7 +151,7 @@ class EmailNotifier(object):
                 mailServer.login(str(smtp_username), str(smtp_password))
             mailServer.sendmail(email['From'], to, email.as_string())
         except IOError as e:
-            raise PluginWarning(e.args[0])
+            raise PluginWarning(str(e))
 
         mailServer.quit()
 
