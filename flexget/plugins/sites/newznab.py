@@ -671,7 +671,9 @@ class Newznab(object):
             return self.fill_entries_for_url(url, task)
         else:
             results_set = set()
-            for query_string in query_list:
+            if len(query_list) > 5:  # sanity check (no we don't trust external inputs)
+                log.warning('Flood protection, query_list capped to 5 entries, was: %s' % len(query_list))
+            for query_string in query_list[:5]:
                 query_url = self.build_query_url_fragment(query_string, config)
                 if query_url:
                     results = self.fill_entries_for_url(url + query_url, task)
