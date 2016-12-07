@@ -64,7 +64,7 @@ class Notify(NotifyBase):
          'url': {'type': 'string'},
          'file_template': {'type': 'string'}})
     schema['deprecated'] = '`notify` plugin is deprecated. Use `notify_entries` or `notify_task` instead.' \
-                           ' See Wik for details.'
+                           ' See Wiki for details.'
 
     def prepare_config(self, config):
         config.setdefault('scope', 'entries')
