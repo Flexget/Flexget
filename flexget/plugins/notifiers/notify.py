@@ -57,7 +57,7 @@ class NotifyBase(object):
 class Notify(NotifyBase):
     schema = NotifyBase.schema
     schema['properties'].update(
-        {'scope': {'type': 'string', 'enum': ['task', 'entries'], 'default': 'entries'},
+        {'scope': {'type': 'string', 'enum': ['task', 'entries']},
          'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS}),
          'title': {'type': 'string'},
          'message': {'type': 'string'},
@@ -171,6 +171,13 @@ class NotifyEntries(NotifyBase):
 
 
 class NotifyTask(NotifyBase):
+    schema = NotifyBase.schema
+    schema.update(
+        {'not': {
+            'required': ['what']},
+            'error_not': 'Cannot use `what` with `notify_task`, only with `notify_entries`'}
+    )
+
     def on_task_exit(self, task, config):
         config['scope'] = 'task'
         plugin.get_plugin_by_name('notify').instance.send_notification(task, config)
