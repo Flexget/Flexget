@@ -26,7 +26,7 @@ class TestNotifyAbort(object):
                     user_key: user_key
     """
 
-    def test_abort(self, mocked_request, execute_task):
+    def test_notify_abort(self, mocked_request, execute_task):
         execute_task('test_abort', abort=True)
         data = {'message': 'Reason: abort plugin', 'title': 'Task test_abort has aborted!'}
 
