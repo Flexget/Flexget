@@ -72,7 +72,7 @@ class Notify(NotifyBase):
         return config
 
     @staticmethod
-    def render_value(entity, data, attribute, default_dict, plugin_name=None):
+    def render_value(entity, data, attribute, default_dict, scope=None):
         """
         Tries to render a template, fallback to default template and just value if unsuccessful
 
@@ -87,7 +87,7 @@ class Notify(NotifyBase):
         # Handles file templates
         if attribute == 'file_template':
             try:
-                data = get_template(data, plugin_name)
+                data = get_template(data, scope)
             except ValueError as e:
                 log.warning(e.args[0])
                 return
@@ -105,7 +105,12 @@ class Notify(NotifyBase):
                     log.warning('default dict failed to render: `%s: %s`. Error: %s. Reverting to original value.',
                                 attribute, data, e.args[0])
         else:
-            log.debug('successfully rendered `%s` to %s', attribute, result)
+            # Even in debug level, showing contents of rendered file templates is super spammy
+            if attribute == 'file_template':
+                message = 'successfully rendered file_template %s', data
+            else:
+                message = 'successfully rendered `%s` to %s', attribute, result
+            log.debug(*message)
         return result
 
     def send_notification(self, task, config):
@@ -128,12 +133,12 @@ class Notify(NotifyBase):
                         # Iterate over all of Notify plugin attributes first
                         for attribute, value in config.items():
                             notification_data[attribute] = self.render_value(entity, value, attribute,
-                                                                             DEFAULT_DICTS[scope])
+                                                                             DEFAULT_DICTS[scope], scope)
 
                         # Iterate over specific plugin config, overriding any previously set attribute in message data
                         for attribute, value in notifier_config.items():
                             notification_data[attribute] = self.render_value(entity, value, attribute,
-                                                                             DEFAULT_DICTS[scope], notifier_name)
+                                                                             DEFAULT_DICTS[scope], scope)
 
                         # If a template was used, pass it to `message` attribute. This will allow all notifiers to use
                         # templates generically
