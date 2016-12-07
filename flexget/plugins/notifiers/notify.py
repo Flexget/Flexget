@@ -47,7 +47,9 @@ class NotifyBase(object):
                         {'maxProperties': 1,
                          'error_maxProperties': 'Plugin options indented 2 more spaces than the first letter of the'
                                                 ' plugin name.',
-                         'minProperties': 1}]}}
+                         'minProperties': 1}]}},
+            'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS}),
+            'scope': {'type': 'string', 'enum': ['task', 'entries']},
         },
         'required': ['to'],
         'additionalProperties': True
@@ -56,13 +58,6 @@ class NotifyBase(object):
 
 class Notify(NotifyBase):
     schema = NotifyBase.schema
-    schema['properties'].update(
-        {'scope': {'type': 'string', 'enum': ['task', 'entries']},
-         'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS}),
-         'title': {'type': 'string'},
-         'message': {'type': 'string'},
-         'url': {'type': 'string'},
-         'file_template': {'type': 'string'}})
     schema['deprecated'] = '`notify` plugin is deprecated. Use `notify_entries` or `notify_task` instead.' \
                            ' See Wiki for details.'
 
