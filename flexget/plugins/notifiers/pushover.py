@@ -112,13 +112,16 @@ class PushoverNotifier(object):
             try:
                 response = requests.post(PUSHOVER_URL, data=notification)
             except RequestException as e:
-                if e.response.status_code == 429:
-                    reset_time = datetime.datetime.fromtimestamp(
-                        int(e.response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
-                    message = 'Monthly pushover message limit reached. Next reset: %s' % reset_time
+                if e.response is not None:
+                    if e.response.status_code == 429:
+                        reset_time = datetime.datetime.fromtimestamp(
+                            int(e.response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
+                        error_message = 'Monthly pushover message limit reached. Next reset: %s' % reset_time
+                    else:
+                        error_message = e.response.json()['errors'][0]
                 else:
-                    message = e.response.json()['errors'][0]
-                raise PluginWarning(message)
+                    error_message = str(e)
+                raise PluginWarning(error_message)
 
             reset_time = datetime.datetime.fromtimestamp(
                 int(response.headers['X-Limit-App-Reset'])).strftime('%Y-%m-%d %H:%M:%S')
