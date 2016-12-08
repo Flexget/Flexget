@@ -152,17 +152,23 @@ def make_environment(manager):
             environment.filters[name.split('_', 1)[1]] = filt
 
 
-# TODO: list_templates function
+def list_templates(extensions=None):
+    """
+    Returns all templates names that are configured under environment loader dirs
+    """
+    if environment is None or not hasattr(environment, 'loader'):
+        return
+    return environment.list_templates(extensions=extensions)
 
 
-def get_template(template_name, plugin_name=None):
-    """Loads a template from disk. Looks in both included plugins and users custom plugin dir."""
+def get_template(template_name, scope='task'):
+    """Loads a template from disk. Looks in both included plugins and users custom scope dir."""
 
     if not template_name.endswith('.template'):
         template_name += '.template'
     locations = []
-    if plugin_name:
-        locations.append(plugin_name + '/' + template_name)
+    if scope:
+        locations.append(scope + '/' + template_name)
     locations.append(template_name)
     for location in locations:
         try:
@@ -170,8 +176,8 @@ def get_template(template_name, plugin_name=None):
         except TemplateNotFound:
             pass
     else:
-        if plugin_name:
-            err = 'Template not found in templates dir: %s (%s)' % (template_name, plugin_name)
+        if scope:
+            err = 'Template not found in templates dir: %s (%s)' % (template_name, scope)
         else:
             err = 'Template not found in templates dir: %s' % template_name
         raise ValueError(err)

@@ -36,27 +36,30 @@ DEFAULT_DICTS = {
 }
 
 
-class Notify(object):
+class NotifyBase(object):
     schema = {
         'type': 'object',
         'properties': {
-            'to': {'type': 'array', 'items':
-                {'allOf': [
-                    {'$ref': '/schema/plugins?group=notifiers'},
-                    {'maxProperties': 1,
-                     'error_maxProperties': 'Plugin options within notify plugin must be indented '
-                                            '2 more spaces than the first letter of the plugin name.',
-                     'minProperties': 1}]}},
-            'scope': {'type': 'string', 'enum': ['task', 'entries'], 'default': 'entries'},
+            'to': {
+                'type': 'array', 'items':
+                    {'allOf': [
+                        {'$ref': '/schema/plugins?group=notifiers'},
+                        {'maxProperties': 1,
+                         'error_maxProperties': 'Plugin options indented 2 more spaces than the first letter of the'
+                                                ' plugin name.',
+                         'minProperties': 1}]}},
             'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS}),
-            'title': {'type': 'string'},
-            'message': {'type': 'string'},
-            'url': {'type': 'string'},
-            'file_template': {'type': 'string'}
+            'scope': {'type': 'string', 'enum': ['task', 'entries']},
         },
         'required': ['to'],
         'additionalProperties': True
     }
+
+
+class Notify(NotifyBase):
+    schema = NotifyBase.schema
+    schema['deprecated'] = '`notify` plugin is deprecated. Use `notify_entries` or `notify_task` instead.' \
+                           ' See Wiki for details.'
 
     def prepare_config(self, config):
         config.setdefault('scope', 'entries')
@@ -69,7 +72,7 @@ class Notify(object):
         return config
 
     @staticmethod
-    def render_value(entity, data, attribute, default_dict, plugin_name=None):
+    def render_value(entity, data, attribute, default_dict, scope=None):
         """
         Tries to render a template, fallback to default template and just value if unsuccessful
 
@@ -84,7 +87,7 @@ class Notify(object):
         # Handles file templates
         if attribute == 'file_template':
             try:
-                data = get_template(data, plugin_name)
+                data = get_template(data, scope)
             except ValueError as e:
                 log.warning(e.args[0])
                 return
@@ -92,15 +95,22 @@ class Notify(object):
         try:
             result = entity.render(data)
         except (RenderError, ValueError) as e:
-            log.debug('failed to render: %s. Trying to fall back to default', e.args[0])
-            try:
-                if attribute in default_dict:
+            log.debug('cannot render: `%s: %s`, error: %s', attribute, data, e.args[0])
+            if attribute in default_dict:
+                try:
+                    log.debug('trying to render default value for `%s`', attribute)
                     result = entity.render(default_dict[attribute])
-            # Render error on defaults should not happen
-            except RenderError as e:
-                log.warning('default dict failed to render: %s. Reverting to original value.', e.args[0])
+                # Render error on defaults should not happen
+                except RenderError as e:
+                    log.warning('default dict failed to render: `%s: %s`. Error: %s. Reverting to original value.',
+                                attribute, data, e.args[0])
         else:
-            log.debug('successfully rendered `%s` to %s', attribute, result)
+            # Even in debug level, showing contents of rendered file templates is super spammy
+            if attribute == 'file_template':
+                message = 'successfully rendered file_template %s', data
+            else:
+                message = 'successfully rendered `%s` to %s', attribute, result
+            log.debug(*message)
         return result
 
     def send_notification(self, task, config):
@@ -123,12 +133,12 @@ class Notify(object):
                         # Iterate over all of Notify plugin attributes first
                         for attribute, value in config.items():
                             notification_data[attribute] = self.render_value(entity, value, attribute,
-                                                                             DEFAULT_DICTS[scope])
+                                                                             DEFAULT_DICTS[scope], scope)
 
                         # Iterate over specific plugin config, overriding any previously set attribute in message data
                         for attribute, value in notifier_config.items():
                             notification_data[attribute] = self.render_value(entity, value, attribute,
-                                                                             DEFAULT_DICTS[scope], notifier_name)
+                                                                             DEFAULT_DICTS[scope], scope)
 
                         # If a template was used, pass it to `message` attribute. This will allow all notifiers to use
                         # templates generically
@@ -156,6 +166,43 @@ class Notify(object):
     on_task_exit = send_notification
 
 
+class NotifyEntries(NotifyBase):
+    def on_task_exit(self, task, config):
+        config['scope'] = 'entries'
+        plugin.get_plugin_by_name('notify').instance.send_notification(task, config)
+
+
+class NotifyTask(NotifyBase):
+    schema = NotifyBase.schema
+    schema.update(
+        {'not': {
+            'required': ['what']},
+            'error_not': 'Cannot use `what` with `notify_task`, only with `notify_entries`'}
+    )
+
+    def on_task_exit(self, task, config):
+        config['scope'] = 'task'
+        plugin.get_plugin_by_name('notify').instance.send_notification(task, config)
+
+
+class NotifyAbort(NotifyBase):
+    def on_task_abort(self, task, config):
+        if task.silent_abort:
+            return
+
+        title = 'Task {{ task_name }} has aborted!'
+        message = 'Reason: {{ task.abort_reason }}'
+        notify_config = {'to': config['to'],
+                         'scope': 'task',
+                         'title': title,
+                         'message': message}
+        log.debug('sending abort notification')
+        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(Notify, 'notify', api_ver=2)
+    plugin.register(NotifyEntries, 'notify_entries', api_ver=2)
+    plugin.register(NotifyTask, 'notify_task', api_ver=2)
+    plugin.register(NotifyAbort, 'notify_abort', api_ver=2)
