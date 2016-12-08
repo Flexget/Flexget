@@ -10,18 +10,27 @@ from flexget.utils.template import list_templates, get_template
 
 
 def list_file_templates(manager, options):
-    header = ['Name', 'Full Path', 'Contents']
+    header = ['Name', 'Use with', 'Full Path', 'Contents']
     table_data = [header]
     console('Fetching all file templates, stand by...')
     for template_name in list_templates(extensions=['template']):
         if options.name and not options.name in template_name:
             continue
         template = get_template(template_name)
+        if 'entries' in template_name:
+            plugin = 'notify_entries'
+        elif 'task' in template_name:
+            plugin = 'notify_task'
+        else:
+            plugin = '-'
+        name = template_name.replace('.template', '').split('/')
+        if len(name) == 2:
+            name = name[1]
         with io.open(template.filename) as contents:
-            table_data.append([template_name, template.filename, contents.read()])
+            table_data.append([name, plugin, template.filename, contents.read()])
 
     try:
-        table = TerminalTable(options.table_type, table_data, wrap_columns=[1, 2], drop_columns=[1])
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[2, 3], drop_columns=[2, 3])
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
     else:
