@@ -459,8 +459,7 @@ class Newznab(object):
                     new_entry[NAMESPACE_PREFIX + 'pubdate'] = parsed_date
             if (NAMESPACE_PREFIX + 'pubdate') in new_entry:
                 try:
-                    tdelta = datetime.now() - new_entry[NAMESPACE_PREFIX + 'pubdate']
-                    new_entry[NAMESPACE_PREFIX + 'age'] = max(0, int(tdelta.days))  # store simple age value in days
+                    new_entry[NAMESPACE_PREFIX + 'age'] = datetime.now() - new_entry[NAMESPACE_PREFIX + 'pubdate']
                 except Exception as ex:
                     log.trace('Cant calculate Age via pubdate: %s in Entry: %s error : %s' % (
                         new_entry[NAMESPACE_PREFIX + 'pubdate'], xml_entry.title, ex))
