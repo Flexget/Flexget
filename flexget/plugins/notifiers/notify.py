@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+import copy
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -57,7 +58,7 @@ class NotifyBase(object):
 
 
 class Notify(NotifyBase):
-    schema = NotifyBase.schema
+    schema = copy.deepcopy(NotifyBase.schema)
     schema['deprecated'] = '`notify` plugin is deprecated. Use `notify_entries` or `notify_task` instead.' \
                            ' See Wiki for details.'
 
@@ -173,7 +174,7 @@ class NotifyEntries(NotifyBase):
 
 
 class NotifyTask(NotifyBase):
-    schema = NotifyBase.schema
+    schema = copy.deepcopy(NotifyBase.schema)
     schema.update(
         {'not': {
             'required': ['what']},
