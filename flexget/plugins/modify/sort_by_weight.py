@@ -18,7 +18,7 @@ __author__ = 'andy'
 log = logging.getLogger('sort_by_weight')
 
 ENTRY_WEIGHT_FIELD_NAME = 'sort_by_weight_sum'
-DEFAULT_STRIDE = 20  # its a design choice to allow 'similar' values to-be grouped under the same slot/weight
+DEFAULT_STRIDE = 10  # its a design choice to allow 'similar' values to-be grouped under the same slot/weight
 
 class PluginSortByWeight(object):
     """
@@ -30,16 +30,14 @@ class PluginSortByWeight(object):
 
     field:          Name of the sort field
     weight:         The sort weight used, values between 10-200 are good starts
-    weight_default: The default weight used if a sort 'field' could not be found or had a invalid entry (default is: 0)
     inverse:        Use inverse weighting for the field, example: Date/Age fields
     upper_limit:    The upper value limit or upper cutoff value, that will be used for weighting.
                     This will change the slot distribution, which helps narrow down to more meaningfully weighting results.
 
                     Example: Entry1 is 100 days old, Entry2 is 7 days old, Entry3 is 1000 days old
-                    Without a upper_limit the weights will be distributed between 0-1000 days, with a upper_limit: 100
-                    weights will be distributed between 0-100 and any value larger than upper_limit, gets the highest score.
+                    Without a upper_limit the weights will be distributed between 0-1000 days, with a upper_limit: 100 days
+                    weights will be distributed between 0-100 days and any value larger than upper_limit, gets the highest score.
                     So we can smoothly distribute the rest between 0-100 days.
-    lower_limit:    Similar to upper_limit, so each field value under this limit gets the lowest weight score.
 
     delta_distance: The distance, step until a new slot is used for weighting.
                     Think of this like: Any value that is within this distance will get the same weight for the slot.
@@ -115,24 +113,9 @@ class PluginSortByWeight(object):
             return
         config = self.prepare_config(config)
         log.info('sorting ´undecided´,´accepted´ entries by weight!')
-        # update delta_distance, calc 'max_value'
-        #self.calc_prepare_values(entries, config)
-        # calc/fill result in 'sort_by_weight_sum'
-        #self.calculate_weights(entries, config)
         self.calc_weights_new(entries, config)
 
         task.all_entries.sort(key=lambda e: e.get(ENTRY_WEIGHT_FIELD_NAME, 0), reverse=True)
-
-        for e in entries:
-            log.verbose(e['weights'])
-        # log.verbose('size: %s' % len(entries))
-        # for e in task.entries:
-        #     log.verbose('[%s] idx[%s] size[%s] age[%s] grabs[%s] title[%s]' % (e.get('sort_by_weight_sum', -1),
-        #                                                                        e['newznab_hydraindexerscore'],
-        #                                                                        e['content_size'],
-        #                                                                        e['newznab_age'],
-        #                                                                        e['newznab_grabs'],
-        #                                                                        e['title']))
 
     @staticmethod
     def get_lower_limit(value):
@@ -147,7 +130,8 @@ class PluginSortByWeight(object):
             min_value = timedelta(0)
         return min_value
 
-    def limit_value(self, key, value, config):
+    @staticmethod
+    def limit_value(key, value, config):
         if config[key].get('upper_limit'):
             limit = config[key]['upper_limit']
             try:
@@ -169,50 +153,56 @@ class PluginSortByWeight(object):
         delta = None
         stride = DEFAULT_STRIDE
         try:
-            max_value = max(entries, key=lambda e: e.get(key, 0))
-            min_value = min(entries, key=lambda e: e.get(key, 0))
+            max_entry = max(entries, key=lambda e, k=key: e.get(k, 0))
+            min_entry = min(entries, key=lambda e, k=key: e.get(k, 0))
+            max_value = max_entry[key]
+            max_value = self.limit_value(key, max_value, config)
+            min_value = min_entry[key]
             try:
                 min_value = min(min_value, 0)  # try normalize to natural lower bound
-            except Exception:
-                pass
-
+            except Exception as ex:
+                log.trace('Error min_value: %s' % ex)
 
             try:
                 value_range = max_value - min_value
-            except Exception:
-                pass
-        except Exception:
-            pass
+            except Exception as ex:
+                log.trace('Error value_range: %s' % ex)
+        except Exception as ex:
+            log.trace('Error max/min_value: %s' % ex)
 
         if value_range:
             try:
+                delta = value_range / DEFAULT_STRIDE
                 if 'delta_distance' in config[key]:
                     delta = config[key]['delta_distance']
                     stride = value_range / delta
-            except Exception:
-                delta = value_range / DEFAULT_STRIDE
-                stride = DEFAULT_STRIDE
-
+                    if isinstance(stride, timedelta):
+                        stride = stride.days
+            except Exception as ex:
+                log.trace('Error delta/stride: %s' % ex)
+        #log.trace('stride: %s, delta: %s' % (stride,delta))
         return stride, delta
 
     def calc_weights_new(self, entries, config):
         for key in config:
             if key not in entries[0]:
                 continue
-            entries.sort(key=lambda e: e.get(key, self.get_lower_limit(e[key])), reverse=True)  # largest-> smallest by default
             # stride = max / delta
             # step = max_weight / stride
             # weight = (entry / delta) * step
             stride, delta = self.calc_stride_delta(key, entries, config)
             if not stride:
                 continue
+            if not delta:
+                lower_default = self.get_lower_limit(entries[0][key])
+                entries.sort(key=lambda e, k=key,d=lower_default: e.get(k, d), reverse=True)  # largest-> smallest by default
             max_weight = config[key]['weight']
-            weight_step = max_weight / int(stride)
+            weight_step = max_weight / max(int(stride), 1)
             current_value = None
             weight = None
             for entry in entries:
-                if 'weights' not in entry:
-                    entry['weights'] = dict()
+                #if 'weights' not in entry:
+                #    entry['weights'] = dict()
                 if ENTRY_WEIGHT_FIELD_NAME not in entry:
                     entry[ENTRY_WEIGHT_FIELD_NAME] = 0
 
@@ -225,7 +215,8 @@ class PluginSortByWeight(object):
                 if weight is None:
                     weight = max_weight
 
-                if delta: # is not None and (value + delta) < current_value:
+                #log.verbose('value: %s, delta: %s, weight_step: %s' % (value, delta, weight_step))
+                if delta:
                     weight = (value / delta) * weight_step
                     weight = max(weight, 0)
                     current_value = value
@@ -234,54 +225,9 @@ class PluginSortByWeight(object):
                     current_value = value
 
                 if config[key]['inverse'] is True:
-                    weight = max_weight - weight
-                entry['weights'][key] = [entry[key], int(weight)]
+                    weight = max(max_weight - weight, 0)
+               # entry['weights'][key] = [entry[key], value, int(weight)]
                 entry[ENTRY_WEIGHT_FIELD_NAME] += int(weight)
-
-    def calculate_weights(self, entries, config):
-        # [field] = [weight, weight_default, delta, inverse, lower_limit, upper_limit]
-        for entry in entries:
-            entry['weights'] = dict()
-            weight_sum = 0
-            for key in config.keys():
-                if 'delta_distance' not in config[key] or 'max_value' not in config[key]:
-                    continue
-                value = self.get_value(key, entry, config)
-                if value is None:
-                    weight_sum += config[key]['weight_default']  # use default weight
-                    continue
-                # slots = max / delta
-                # step = max_weight / slots
-                # weight = (entry / delta) * step
-                slots = config[key]['max_value'] / config[key]['delta_distance']
-                step = config[key]['weight'] / slots
-                weight = int(int(value / config[key]['delta_distance']) * step)
-                if config[key]['inverse'] is True:
-                    weight = config[key]['weight'] - weight
-                weight_sum += weight
-                entry['weights'][key] = [value, weight]
-            entry[ENTRY_WEIGHT_FIELD_NAME] = weight_sum
-
-    def calc_prepare_values(self, entries, config):
-        # calc max values
-        for entry in entries:
-            for key in config:
-                if key in entry:
-                    if not isinstance(entry[key], SUPPORTED_TYPES):
-                        log.warning('Unsupported type detected in entry: %s field: %s' % (entry, key))
-                    else:
-                        value = self.get_value(key, entry, config)
-                        if value is None:
-                            continue
-                        if 'max_value' in config[key]:
-                            value = max(config[key]['max_value'], value)
-                        config[key]['max_value'] = value
-        # fix delta_distance
-        for key in config:
-            if 'delta_distance' not in config[key]:
-                if 'max_value' in config[key] and config[key]['max_value'] > 0:
-                    config[key]['delta_distance'] = config[key]['max_value'] / DEFAULT_STRIDE
-
 
 @event('plugin.register')
 def register_plugin():
