@@ -152,17 +152,23 @@ def make_environment(manager):
             environment.filters[name.split('_', 1)[1]] = filt
 
 
-# TODO: list_templates function
+def list_templates(extensions=None):
+    """
+    Returns all templates names that are configured under environment loader dirs
+    """
+    if environment is None or not hasattr(environment, 'loader'):
+        return
+    return environment.list_templates(extensions=extensions)
 
 
-def get_template(template_name, plugin_name=None):
-    """Loads a template from disk. Looks in both included plugins and users custom plugin dir."""
+def get_template(template_name, scope='task'):
+    """Loads a template from disk. Looks in both included plugins and users custom scope dir."""
 
     if not template_name.endswith('.template'):
         template_name += '.template'
     locations = []
-    if plugin_name:
-        locations.append(plugin_name + '/' + template_name)
+    if scope:
+        locations.append(scope + '/' + template_name)
     locations.append(template_name)
     for location in locations:
         try:
@@ -170,8 +176,8 @@ def get_template(template_name, plugin_name=None):
         except TemplateNotFound:
             pass
     else:
-        if plugin_name:
-            err = 'Template not found in templates dir: %s (%s)' % (template_name, plugin_name)
+        if scope:
+            err = 'Template not found in templates dir: %s (%s)' % (template_name, scope)
         else:
             err = 'Template not found in templates dir: %s' % template_name
         raise ValueError(err)
@@ -207,23 +213,13 @@ def render_from_entry(template_string, entry):
     variables = copy(entry.store)
     variables['now'] = datetime.now()
     # Add task name to variables, usually it's there because metainfo_task plugin, but not always
-    if 'task' not in variables and hasattr(entry, 'task'):
-        variables['task'] = entry.task.name
-    variables['task_name'] = variables.get('task', entry.task.name)
-    result = render(template_string, variables)
-
-    # Only try string replacement if jinja didn't do anything
-    if result == template_string:
-        try:
-            result = template_string % entry
-        except KeyError as e:
-            raise RenderError('Does not contain the field `%s` for string replacement.' % e)
-        except ValueError as e:
-            raise RenderError('Invalid string replacement template: %s (%s)' % (template_string, e))
-        except TypeError as e:
-            raise RenderError('Error during string replacement: %s' % e.args[0])
-
-    return result
+    if hasattr(entry, 'task'):
+        if 'task' not in variables:
+            variables['task'] = entry.task.name
+        # Since `task` has different meaning between entry and task scope, the `task_name` field is create to be
+        # consistent
+        variables['task_name'] = entry.task.name
+    return render(template_string, variables)
 
 
 def render_from_task(template, task):
@@ -235,16 +231,4 @@ def render_from_task(template, task):
     :return: The rendered template text.
     """
     variables = {'task': task, 'now': datetime.now(), 'task_name': task.name}
-    result = render(template, variables)
-    # Only try string replacement if jinja didn't do anything
-    if result == template:
-        try:
-            result = template % task
-        except KeyError as e:
-            raise RenderError('Does not contain the field `%s` for string replacement.' % e)
-        except ValueError as e:
-            raise RenderError('Invalid string replacement template: %s (%s)' % (template, e))
-        except TypeError as e:
-            raise RenderError('Error during string replacement: %s' % e.args[0])
-
-    return result
+    return render(template, variables)

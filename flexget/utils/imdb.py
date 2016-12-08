@@ -118,7 +118,7 @@ class ImdbSearch(object):
                     movies.remove(movie)
                     continue
             if movie['match'] < self.min_match:
-                log.debug('best_match removing %s (min_match)' % movie['name'])
+                log.debug('best_match removing %s (min_match)', movie['name'])
                 movies.remove(movie)
                 continue
 

@@ -167,24 +167,38 @@ class NPOWatchlist(object):
 
         return entries
 
-    def _get_series_episodes(self, task, config, series_name, series_url):
+    def _get_series_info(self, task, config, series_name, series_url):
+        log.info('Retrieving series info for %s', series_name)
+        response = task.requests.get(series_url)
+        page = get_soup(response.content)
+        tvseries = page.find('div', itemscope='itemscope', itemtype='http://schema.org/TVSeries')
+        series_info = Entry()  # create a stub to store the common values for all episodes of this series
+        series_info['npo_url'] = tvseries.find('a', itemprop='url')['href']
+        series_info['npo_name'] = tvseries.find('span', itemprop='name').contents[0]
+        series_info['npo_description'] = tvseries.find('span', itemprop='description').contents[0]
+        series_info['npo_language'] = tvseries.find('span', itemprop='inLanguage').contents[0]
+
+        return series_info
+
+
+    def _get_series_episodes(self, task, config, series_name, series_url, series_info):
         log.info('Retrieving new episodes for %s', series_name)
         response = task.requests.get(series_url + '/search?category=broadcasts')
         page = get_soup(response.content)
 
         if page.find('div', class_='npo3-show-items'):
             log.debug('Parsing as npo3')
-            entries = self._parse_episodes_npo3(task, config, series_name, page)
+            entries = self._parse_episodes_npo3(task, config, series_name, page, series_info)
         else:
             log.debug('Parsing as std')
-            entries = self._parse_episodes_std(task, config, series_name, page)
+            entries = self._parse_episodes_std(task, config, series_name, page, series_info)
 
         if not entries:
             log.warning('No episodes found for %s', series_name)
 
         return entries
 
-    def _parse_episodes_npo3(self, task, config, series_name, page):
+    def _parse_episodes_npo3(self, task, config, series_name, page, series_info):
         max_age = config.get('max_episode_age_days')
 
         entries = list()
@@ -209,12 +223,17 @@ class NPOWatchlist(object):
             e['series_date'] = entry_date
             e['series_id_type'] = 'date'
             e['description'] = listItem.find('p').text
+            e['npo_url'] = series_info['npo_url']
+            e['npo_name'] = series_info['npo_name']
+            e['npo_description'] = series_info['npo_description']
+            e['npo_language'] = series_info['npo_language']
+            e['language'] = series_info['npo_language']  # set language field for (tvdb_)lookup
 
             entries.append(e)
 
         return entries
 
-    def _parse_episodes_std(self, task, config, series_name, page):
+    def _parse_episodes_std(self, task, config, series_name, page, series_info):
         max_age = config.get('max_episode_age_days')
 
         entries = list()
@@ -246,6 +265,11 @@ class NPOWatchlist(object):
             e['series_date'] = entry_date
             e['series_id_type'] = 'date'
             e['description'] = listItem.find('p').text
+            e['npo_url'] = series_info['npo_url']
+            e['npo_name'] = series_info['npo_name']
+            e['npo_description'] = series_info['npo_description']
+            e['npo_language'] = series_info['npo_language']
+            e['language'] = series_info['npo_language']  # set language field for (tvdb_)lookup
 
             entries.append(e)
 
@@ -283,7 +307,9 @@ class NPOWatchlist(object):
             elif (date.today() - last_aired) > timedelta(days=365 * 2):
                 log.info('Series %s last aired on %s', series_name, last_aired)
 
-            entries += self._get_series_episodes(task, config, series_name, url)
+            series_info = self._get_series_info(task, config, series_name, url)
+
+            entries += self._get_series_episodes(task, config, series_name, url, series_info)
 
         return entries
 
