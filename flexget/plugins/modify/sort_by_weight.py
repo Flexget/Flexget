@@ -30,7 +30,8 @@ class PluginSortByWeight(object):
 
     field:          Name of the sort field
     weight:         The sort weight used, values between 10-200 are good starts
-    inverse:        Use inverse weighting for the field, example: Date/Age fields
+    inverse: yes    Use inverse weighting for the field, example: date, age fields that range in the past
+                    This means the lowest entry/value will get the highest weight
     upper_limit:    The upper value limit or upper cutoff value, that will be used for weighting.
                     This will change the slot distribution, which helps narrow down to more meaningfully weighting results.
 
@@ -40,27 +41,37 @@ class PluginSortByWeight(object):
                     So we can smoothly distribute the rest between 0-100 days.
 
     delta_distance: The distance, step until a new slot is used for weighting.
-                    Think of this like: Any value that is within this distance will get the same weight for the slot.
-                    NOTE: If not given the delta_distance will be distributed over 10 slots/steps
+                    Think of this like: Any value that is within this distance will get the same weight for the step.
+                    NOTE: If not given the delta_distance will be distributed over 10 distinct steps
 
                     Example: Size1 = 4000 MB, Size2 = 3000 MB, Size3 = 700 MB
-                             With a weight: 50 and delta_distance: 1000
-                             Size1 and Size2 both get the maximum weight of 50, while Size3 gets the weight for the 0-1000 MB slot.
+                             With a weight: 50 and delta_distance: 1200
+                             Size1 and Size2 both get the maximum weight of 50, while Size3 gets the weight for the 0-1200 MB step.
 
     Example::
+        simple:
+        sort_by_weight:
+            - field: quality
+                weight: 100         # quality is most important, use highest weight
+            - field: content_size
+                weight: 70          # size is still a good quality estimate so use a high weight
+            - field: newznab_pubdate
+                weight: 30          # age is somewhat important so use low weight
+                inverse: yes
+
+        advanced:
         sort_by_weight:
           - field: content_size
             weight: 80              # we want large files mainly = good quality
             delta_distance: 500     # anything within 500 MB gets the same weight
+            upper_limit: 8000       # anything over 8000 MB is fine and will get the max weight (80)
           - field: newznab_pubdate
-            weight: 25              # we still like new releases
-            delta_distance: 7       # anything within 7 days is similar
-            upper_limit: 60         # confine results to 0-60 days
+            weight: 30              # we still like new releases
+            upper_limit: 60 days    # anything older 60 days gets the lowest weight (because of inverse: yes)
             inverse: yes            # reverse weight order for date/age fields
           - field: newznab_grabs
-            weight: 25              # we like releases that others already downloaded aka safeguard against crap
+            weight: 25              # we like releases that others already downloaded
             upper_limit: 100        # anything over 100 grabs is fine and gets maximum weight
-            weight_default: 5       # if entry has no 'newznab_grabs' field, still use 5 as weight so they don't sink to the bottom to quickly.
 
             In this example the best result can have a 'sort_by_weight_sum' of sum = 80 + 25 + 25
     """
@@ -113,9 +124,11 @@ class PluginSortByWeight(object):
             return
         config = self.prepare_config(config)
         log.info('sorting ´undecided´,´accepted´ entries by weight!')
-        self.calc_weights_new(entries, config)
-
+        self.calc_weights(entries, config)
         task.all_entries.sort(key=lambda e: e.get(ENTRY_WEIGHT_FIELD_NAME, 0), reverse=True)
+        # debug
+        #for entry in task.all_entries:
+        #    log.verbose('sum[ %s ] weights: %s, title: %s' % (entry.get(ENTRY_WEIGHT_FIELD_NAME, -1), entry.get('weights', -1), entry['title']))
 
     @staticmethod
     def get_lower_limit(value):
@@ -125,7 +138,7 @@ class PluginSortByWeight(object):
         elif isinstance(value, bool):
             min_value = False
         elif isinstance(value, datetime):
-            min_value = datetime.min
+            min_value = datetime.now()  # assume date comparision vs now()
         elif isinstance(value, timedelta):
             min_value = timedelta(0)
         return min_value
@@ -138,11 +151,12 @@ class PluginSortByWeight(object):
                 # auto handle datetime
                 if isinstance(value, datetime) and isinstance(limit, timedelta):
                     if config[key]['inverse'] is True:
-                        limit = datetime.now() - limit
+                        if (datetime.now() - limit) > value:
+                            value = datetime.now() - limit
                     else:
-                        limit = datetime.now() + limit
-
-                if value > limit:
+                        if (datetime.now() + limit) < value:
+                            value = datetime.now() + limit
+                elif value > limit:
                     value = limit
             except Exception as ex:
                 raise plugin.PluginError('Limit failed, key: %s, value: %s, error: %s' % (key, value, ex))
@@ -153,13 +167,14 @@ class PluginSortByWeight(object):
         delta = None
         stride = DEFAULT_STRIDE
         try:
-            max_entry = max(entries, key=lambda e, k=key: e.get(k, 0))
-            min_entry = min(entries, key=lambda e, k=key: e.get(k, 0))
+            lower_default = self.get_lower_limit(entries[0][key])
+            max_entry = max(entries, key=lambda e, k=key, d=lower_default: e.get(k, d))
+            min_entry = min(entries, key=lambda e, k=key, d=lower_default: e.get(k, d))
             max_value = max_entry[key]
             max_value = self.limit_value(key, max_value, config)
             min_value = min_entry[key]
             try:
-                min_value = min(min_value, 0)  # try normalize to natural lower bound
+                min_value = min(min_value, lower_default)  # try normalize to natural lower bound
             except Exception as ex:
                 log.trace('Error min_value: %s' % ex)
 
@@ -180,10 +195,10 @@ class PluginSortByWeight(object):
                         stride = stride.days
             except Exception as ex:
                 log.trace('Error delta/stride: %s' % ex)
-        #log.trace('stride: %s, delta: %s' % (stride,delta))
+        #log.verbose('key: %s, stride: %s, delta: %s, range: %s' % (key, stride, delta, value_range))  # debug
         return stride, delta
 
-    def calc_weights_new(self, entries, config):
+    def calc_weights(self, entries, config):
         for key in config:
             if key not in entries[0]:
                 continue
@@ -200,9 +215,8 @@ class PluginSortByWeight(object):
             weight_step = max_weight / max(int(stride), 1)
             current_value = None
             weight = None
+            #log.verbose('*** key: `%s`, delta: %s, weight_step: %s' % (key, delta, weight_step))
             for entry in entries:
-                #if 'weights' not in entry:
-                #    entry['weights'] = dict()
                 if ENTRY_WEIGHT_FIELD_NAME not in entry:
                     entry[ENTRY_WEIGHT_FIELD_NAME] = 0
 
@@ -215,19 +229,45 @@ class PluginSortByWeight(object):
                 if weight is None:
                     weight = max_weight
 
-                #log.verbose('value: %s, delta: %s, weight_step: %s' % (value, delta, weight_step))
                 if delta:
-                    weight = (value / delta) * weight_step
-                    weight = max(weight, 0)
+                    try:
+                        weight = (value / delta) * weight_step
+                    except Exception as ex:
+                        #log.warning('1) Could not calc weight for key: %s, error: %s' % (key, ex))
+                        try:
+                            value_normalized = abs(value - self.get_lower_limit(value))  # convert value to distance from minimum
+                            weight = (value_normalized / delta) * weight_step
+                        except Exception as ex:
+                            log.warning('Could not calc weight for key: %s, error: %s' % (key, ex))
+                            continue
                     current_value = value
                 elif value < current_value:
-                    weight = max(weight - weight_step, 0)
+                    weight = weight - weight_step
                     current_value = value
-
                 if config[key]['inverse'] is True:
-                    weight = max(max_weight - weight, 0)
-               # entry['weights'][key] = [entry[key], value, int(weight)]
+                    weight = max_weight - weight
+
+                weight = int(max(weight, 0))
                 entry[ENTRY_WEIGHT_FIELD_NAME] += int(weight)
+                #self.add_debug_info(key, entry, weight, entry[key], value) # debug only
+
+    def add_debug_info(self, key, entry, weight, *args):
+        if 'weights' not in entry:
+            entry['weights'] = dict()
+        short_args = []
+        for arg in args:
+            if isinstance(arg, timedelta):
+                short_args.append(arg.days)
+            elif isinstance(arg, datetime):
+                date = arg.date()
+                short_args.append('%s-%s-%s' % (date.year, date.month, date.day))
+            elif isinstance(arg, Quality):
+                quality_string = '[ %s ]-%s-%s, [ %s ]' % (arg.resolution, arg.source, arg.codec, arg.audio)
+                if quality_string not in short_args:
+                    short_args.append(quality_string)
+            else:
+                short_args.append(arg)
+        entry['weights'][key] = '%s = %s' % (weight,  short_args)
 
 @event('plugin.register')
 def register_plugin():
