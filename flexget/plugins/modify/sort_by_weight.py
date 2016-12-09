@@ -70,10 +70,10 @@ class PluginSortByWeight(object):
             upper_limit: 60 days    # anything older 60 days gets the lowest weight (because of inverse: yes)
             inverse: yes            # reverse weight order for date/age fields
           - field: newznab_grabs
-            weight: 25              # we like releases that others already downloaded
+            weight: 20              # we like releases that others already downloaded
             upper_limit: 100        # anything over 100 grabs is fine and gets maximum weight
 
-            In this example the best result can have a 'sort_by_weight_sum' of sum = 80 + 25 + 25
+            In this example the best result can have a 'sort_by_weight_sum' of sum = 80 + 30 + 20
     """
 
     schema = {
@@ -248,7 +248,7 @@ class PluginSortByWeight(object):
                     weight = max_weight - weight
 
                 weight = int(max(weight, 0))
-                entry[ENTRY_WEIGHT_FIELD_NAME] += int(weight)
+                entry[ENTRY_WEIGHT_FIELD_NAME] += weight
                 #self.add_debug_info(key, entry, weight, entry[key], value) # debug only
 
     def add_debug_info(self, key, entry, weight, *args):
