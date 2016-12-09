@@ -123,7 +123,7 @@ class PluginSortByWeight(object):
         if len(entries) < 2:
             return
         config = self.prepare_config(config)
-        log.info('sorting undecided, accepted entries by weight')
+        log.verbose('Calculating weights for undecided, accepted entries and sorting by result field: %s' % ENTRY_WEIGHT_FIELD_NAME)
         self.calc_weights(entries, config)
         task.all_entries.sort(key=lambda e: e.get(ENTRY_WEIGHT_FIELD_NAME, 0), reverse=True)
         # debug
