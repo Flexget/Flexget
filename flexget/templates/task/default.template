@@ -1,7 +1,3 @@
-{% if task.aborted -%}
-Task '{{task.name}}' was aborted because: {{task.abort_reason}}
-
-{% endif -%}
 {% if task.accepted -%}
 {%- for group in task.accepted|groupby('task') %}
 FlexGet has just downloaded {{group.list|length}} new entries for task {{group.grouper}}:

@@ -176,6 +176,8 @@ div.clear {
 
     <div id="main">
 
+    {% if task.accepted %}
+    <h2>Accepted Entries:</h2>
     {% for entry in task.accepted %}
         {{ entry.title }}
         <!-- HANDLE SERIES -->
@@ -334,6 +336,15 @@ div.clear {
         {% endif %}
 
       {% endfor %}
+      {% endif %}
+      {% if task.failed %}
+        <h2>Failed Entries:<h2>
+        {% for entry in task.failed %}
+          <div class="other">
+          {{ entry.title }}
+          </div>
+        {% endfor %}
+      {% endif %}
       </div>
 
     </body>
