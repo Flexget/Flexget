@@ -37,6 +37,7 @@ class NotifyTask(object):
     def on_task_notify(self, task, config):
         if not (task.accepted or task.failed):
             log.verbose('No accepted or failed entries, not sending a notification.')
+            return
         plugin.get_plugin_by_name('notify').instance.send_notification(config['title'],
                                                                        get_template(config['template'], 'task'),
                                                                        template_renderer=task.render)
