@@ -18,7 +18,8 @@ from flexget.logger import capture_output
 from flexget.manager import Session
 from flexget.plugin import plugins as all_plugins
 from flexget.plugin import (
-    DependencyError, get_plugins, phase_methods, plugin_schemas, PluginError, PluginWarning, task_phases)
+    DependencyError, get_plugins, phase_methods, plugin_schemas, PluginError, PluginWarning, task_phases,
+    suppress_abort_phases)
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
@@ -477,12 +478,21 @@ class Task(object):
         if kwargs is None:
             kwargs = {}
 
+        def abort_or_suppress(msg, **kw):
+            if phase in suppress_abort_phases:
+                log.error('Suppressing task abort during %s phase: %s', phase, msg)
+                return
+            self.abort(msg, **kw)
+
         # log.trace('Running %s method %s' % (keyword, method))
         # call the plugin
         try:
             return method(*args, **kwargs)
-        except TaskAbort:
-            raise
+        except TaskAbort as e:
+            if phase in suppress_abort_phases:
+                abort_or_suppress(e.reason)
+            else:
+                raise
         except PluginWarning as warn:
             # check if this warning should be logged only once (may keep repeating)
             if warn.kwargs.get('log_once', False):
@@ -494,26 +504,26 @@ class Task(object):
             msg = ('Plugin %s tried to create non-unicode compatible entry (key: %s, value: %r)' %
                    (keyword, eue.key, eue.value))
             log.critical(msg)
-            self.abort(msg)
+            abort_or_suppress(msg)
         except PluginError as err:
             err.log.critical(err.value)
-            self.abort(err.value)
+            abort_or_suppress(err.value)
         except DependencyError as e:
             msg = ('Plugin `%s` cannot be used because dependency `%s` is missing.' %
                    (keyword, e.missing))
             log.critical(msg)
             log.debug(e.message)
-            self.abort(msg)
+            abort_or_suppress(msg)
         except Warning as e:
             # If warnings have been elevated to errors
             msg = 'Warning during plugin %s: %s' % (keyword, e)
             log.exception(msg)
-            self.abort(msg)
+            abort_or_suppress(msg)
         except Exception as e:
             msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
             log.critical(msg)
             traceback = self.manager.crash_report()
-            self.abort(msg, traceback=traceback)
+            abort_or_suppress(msg, traceback=traceback)
 
     def rerun(self, plugin=None, reason=None):
         """

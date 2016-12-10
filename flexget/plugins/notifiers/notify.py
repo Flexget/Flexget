@@ -65,4 +65,4 @@ class Notify(object):
 def register_plugin():
     plugin.register(Notify, 'notify', api_ver=2)
 
-    plugin.register_task_phase('notify', before='exit')  # TODO: something so this phase doesn't cause aborts
+    plugin.register_task_phase('notify', before='exit', suppress_abort=True)
