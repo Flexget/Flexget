@@ -8,19 +8,15 @@ from flexget.event import event
 from flexget.utils.template import get_template
 
 
-log = logging.getLogger('notify_task')
+log = logging.getLogger('notify_abort')
 
 
-class NotifyTask(object):
+class NotifyAbort(object):
     schema = {
         'type': 'object',
         'properties': {
-            'title': {
-                'type': 'string',
-                'default': '[FlexGet] {{task.name}}:'
-                           '{%if task.failed %} {{task.failed|length}} failed entries.{% endif %}'
-                           '{% if task.accepted %} {{task.accepted|length}} new entries downloaded.{% endif %}'},
-            'template': {'type': 'string', 'default': 'default.template'},
+            'title': {'type': 'string', 'default': 'Task {{ task.name }} has aborted!'},
+            'message': {'type': 'string', 'default': 'Reason: {{ task.abort_reason }}'},
             'to': {
                 'type': 'array', 'items':
                     {'allOf': [
@@ -34,17 +30,14 @@ class NotifyTask(object):
         'required': ['to']
     }
 
-    def on_task_notify(self, task, config):
+    def on_task_abort(self, task, config):
         send_notification = plugin.get_plugin_by_name('notify').instance.send_notification
-        if not (task.accepted or task.failed):
-            log.verbose('No accepted or failed entries, not sending a notification.')
+        if task.silent_abort:
             return
-        send_notification(config['title'],
-                          get_template(config['template'], 'task'),
-                          config['to'],
-                          template_renderer=task.render)
+        log.debug('sending abort notification')
+        send_notification(config['title'], config['message'], config['to'], template_renderer=task.render)
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(NotifyTask, 'notify_task', api_ver=2)
+    plugin.register(NotifyAbort, 'notify_abort', api_ver=2)
