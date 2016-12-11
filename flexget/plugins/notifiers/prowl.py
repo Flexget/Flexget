@@ -39,35 +39,25 @@ class ProwlNotifier(object):
         'properties': {
             'api_key': one_or_more({'type': 'string'}),
             'application': {'type': 'string', 'default': 'FlexGet'},
-            'title': {'type': 'string'},
             'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2},
-            'message': {'type': 'string'},
             'url': {'type': 'string'},
-            'provider_key':{'type': 'string'},
-            'file_template': {'type': 'string'}
+            'provider_key':{'type': 'string'}
         },
         'required': ['api_key'],
         'additionalProperties': False
     }
 
-    def notify(self, api_key, application, title, message, priority=None, provider_key=None, url=None, **kwargs):
+    def notify(self, title, message, config):
         """
         Send a Prowl notification
-
-        :param str api_key: One or more API keys
-        :param str application: Application name
-        :param str title: Notification subject
-        :param str message: Notification message
-        :param priority: Notification priority
-        :param str provider_key: Your provider API key. Only necessary if you have been whitelisted.
-        :param str url: The URL which should be attached to the notification.
         """
-        notification = {'application': application, 'event': title, 'description': message, 'url': url,
-                        'priority': priority, 'providerkey': provider_key}
+        notification = {'application': config.get('application'), 'event': title, 'description': message,
+                        'url': config.get('url'), 'priority': config.get('priority'),
+                        'providerkey': config.get('provider_key')}
 
-        if isinstance(api_key, list):
-            api_key = [api_key]
-        notification['apikey'] = api_key
+        if isinstance(config['api_key'], list):
+            config['api_key'] = [config['api_key']]
+        notification['apikey'] = config['api_key']
 
         try:
             response = requests.post(PROWL_URL, data=notification)
