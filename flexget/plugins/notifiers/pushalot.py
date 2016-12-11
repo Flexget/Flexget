@@ -39,8 +39,6 @@ class PushalotNotifier(object):
     schema = {'type': 'object',
               'properties': {
                   'api_key': one_or_more({'type': 'string'}),
-                  'title': {'type': 'string'},
-                  'message': {'type': 'string'},
                   'url': {'type': 'string'},
                   'url_title': {'type': 'string'},
                   'important': {'type': 'boolean', 'default': False},
@@ -48,7 +46,6 @@ class PushalotNotifier(object):
                   'image': {'type': 'string'},
                   'source': {'type': 'string', 'default': 'FlexGet'},
                   'timetolive': {'type': 'integer', 'maximum': 43200, 'minimum': 0},
-                  'file_template': {'type': 'string'},
               },
               'required': ['api_key'],
               'additionalProperties': False}

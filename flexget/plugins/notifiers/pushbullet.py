@@ -67,14 +67,6 @@ class PushbulletNotifier(object):
     def notify(self, api_key, title, message, device=None, email=None, url=None, channel=None, **kwargs):
         """
         Send a Pushbullet notification
-
-        :param str api_key: one or more api keys
-        :param str title: title of notification
-        :param str message: message of notification
-        :param str device: one or more devices to send to
-        :param str email: one or more emails to send to
-        :param str url: URL to attach to notification
-        :param str channel: Channel to send to
         """
         if device and not isinstance(device, list):
             device = [device]

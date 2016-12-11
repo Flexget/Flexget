@@ -35,13 +35,10 @@ class NotifyMyAndroidNotifier(object):
         'properties': {
             'api_key': one_or_more({'type': 'string'}),
             'application': {'type': 'string', 'default': 'FlexGet'},
-            'title': {'type': 'string'},
-            'message': {'type': 'string'},
             'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2},
             'developer_key': {'type': 'string'},
             'url': {'type': 'string'},
-            'html': {'type': 'boolean'},
-            'file_template': {'type': 'string'}
+            'html': {'type': 'boolean'}
         },
         'required': ['api_key'],
         'additionalProperties': False
