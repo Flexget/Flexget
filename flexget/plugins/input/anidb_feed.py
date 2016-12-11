@@ -153,7 +153,7 @@ class AnidbFeed(object):
     }
 
     # notification update interval is 15 minutes
-    @cached('anidb_feed', persist='15 minutes')
+    #@cached('anidb_feed', persist='15 minutes')
     def on_task_input(self, task, config):
         # Create entries by parsing AniDB feed
         log.verbose('Retrieving AniDB feed')
@@ -304,6 +304,12 @@ class AnidbFeed(object):
                         title_new += ' - [%s]' % group_tag  # TODO: do we always add group?
                 else:
                     log.error('No episode nr. found for series, should not happen: %s' % new_entry['title'])
+
+            # FIXME: mimics normal title naming (does not fully work for anime scene naming.)
+            # Add a custom entry.render() field, to allow customisation of final 'title'
+            if new_entry.get('quality') and hasattr(new_entry['quality'], 'resolution'):
+                if new_entry['quality'].resolution.name is not 'unknown':
+                    title_new += ' [%s]' % new_entry['quality'].resolution
 
             new_entry['title'] = title_new
             new_entry[NAMESPACE_PREFIX_MAIN + 'name'] = title_new  # used by anidb_list?
