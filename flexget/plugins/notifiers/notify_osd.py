@@ -14,22 +14,12 @@ class OutputNotifyOsd(object):
     schema = {
         'type': 'object',
         'properties': {
-            'title': {'type': 'string'},
-            'message': {'type': 'string'},
             'timeout': {'type': 'integer', 'default': 4},
-            'file_template': {'type': 'string'}
         },
         'additionalProperties': False
     }
 
-    def notify(self, title, message, timeout, **kwargs):
-        """
-        Send a notification to NotifyOSD
-
-        :param str title: Notification title
-        :param message: Notification message
-        :param timeout: Notification timeout
-        """
+    def notify(self, title, message, config):
         try:
             from gi.repository import Notify
         except ImportError as e:
@@ -40,7 +30,7 @@ class OutputNotifyOsd(object):
             raise PluginWarning('Unable to init libnotify.')
 
         n = Notify.Notification.new(title, message, None)
-        timeout = (timeout * 1000)
+        timeout = (config['timeout'] * 1000)
         n.set_timeout(timeout)
 
         if not n.show():
