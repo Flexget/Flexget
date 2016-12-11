@@ -1,5 +1,5 @@
 {% if series_name is defined %}
-  {% if tvdb_banner_url is defined %}<p><img src="{{tvdb_banner_url}}" /></p>{% endif %}
+  {% if tvdb_posters is defined %}<p><img src="{{tvdb_posters[0]}}" /></p>{% endif %}
   <p>{% if tvdb_series_name is defined %}{{tvdb_series_name}}{% else %}{{series_name}}{% endif %} {{series_id}} {{tvdb_ep_name|d('')}}</p>
   {% if tvdb_actors is defined %}<p><strong>Cast:</strong> {{tvdb_actors|join(', ')}}</p>{% endif %}
   {% if tvdb_ep_guest_stars is defined %}<p><strong>Guest Starring:</strong> {{ tvdb_ep_guest_stars|join(', ') }}</p>{% endif %}
