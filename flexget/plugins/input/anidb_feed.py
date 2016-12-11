@@ -212,9 +212,12 @@ class AnidbFeed(object):
                 match = re.search(r'\((([0-9]{1,3}\.|[0-9]{1,3}){1,5})\)', size)  # 344.18 MB (360.895.922)
                 if match and match.group(1):
                     bytes_string = match.group(1).replace('.', '')
-                    size_mb = int(int(bytes_string) / 1024 / 1024)  # MB
-                    if size_mb > 0:
-                        new_entry['content_size'] = size_mb  # FIXME: is this valid here or put in NAMESPACE_PREFIX_MAIN?
+                    try:
+                        size_mb = int(int(bytes_string) / 1024 / 1024)  # MB
+                        if size_mb > 0:
+                            new_entry['content_size'] = size_mb  # FIXME: is this valid here or put in NAMESPACE_PREFIX_MAIN?
+                    except Exception as ex:
+                        log.warning('Could not extract valid size from string: %s, error: %s' % (bytes_string, ex))
 
             group_tag = None
             if new_entry.get(NAMESPACE_PREFIX + 'group'):
