@@ -26,9 +26,7 @@ class RapidpushNotifier(object):
       rapidpush:
         apikey: xxxxxxx (can also be a list of api keys)
         [category: category, default FlexGet]
-        [title: title, default New release]
         [group: device group, default no group]
-        [message: the message, default {{title}}]
         [channel: the broadcast notification channel, if provided it will be send to the channel subscribers instead of
             your devices, default no channel]
         [priority: 0 - 6 (6 = highest), default 2 (normal)]
@@ -38,46 +36,35 @@ class RapidpushNotifier(object):
         'properties': {
             'api_key': one_or_more({'type': 'string'}),
             'category': {'type': 'string', 'default': 'Flexget'},
-            'title': {'type': 'string'},
             'group': {'type': 'string'},
             'channel': {'type': 'string'},
-            'priority': {'type': 'integer', 'minimum': 0, 'maximum': 6},
-            'message': {'type': 'string'},
-            'file_template': {'type': 'string'}
+            'priority': {'type': 'integer', 'minimum': 0, 'maximum': 6}
         },
         'additionalProperties': False,
         'required': ['api_key']
     }
 
-    def notify(self, api_key, title, message, category, group=None, channel=None, priority=None, **kwargs):
+    def notify(self, title, message, config):
         """
         Send a Rapidpush notification
-
-        :param str api_key: one or more api keys
-        :param str title: title of notification
-        :param str message: message of notification
-        :param str category: category of notification
-        :param str group: group of notification
-        :param str channel: channel of notification
-        :param int priority: priority of notification
         """
         wrapper = {}
         notification = {'title': title, 'message': message}
-        if not isinstance(api_key, list):
-            api_key = [api_key]
+        if not isinstance(config['api_key'], list):
+            config['api_key'] = [config['api_key']]
 
-        if channel:
+        if config.get('channel'):
             wrapper['command'] = 'broadcast'
         else:
             wrapper['command'] = 'notify'
-            notification['category'] = category
-            if group:
-                notification['group'] = group
-            if priority:
-                notification['priority'] = priority
+            notification['category'] = config['category']
+            if config.get('group'):
+                notification['group'] = config['group']
+            if config.get('priority') is not None:
+                notification['priority'] = config['priority']
 
         wrapper['data'] = notification
-        for key in api_key:
+        for key in config['api_key']:
             wrapper['apikey'] = key
             try:
                 response = requests.post(RAPIDPUSH_URL, json=wrapper)
