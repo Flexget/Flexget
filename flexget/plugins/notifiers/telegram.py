@@ -25,9 +25,7 @@ _PLUGIN_NAME = 'telegram'
 _PARSERS = ['markdown', 'html']
 
 _TOKEN_ATTR = 'bot_token'
-_MSG_ATTR = 'message'
 _PARSE_ATTR = 'parse_mode'
-_TEMPLATE_ATTR = 'file_template'
 _RCPTS_ATTR = 'recipients'
 _USERNAME_ATTR = 'username'
 _FULLNAME_ATTR = 'fullname'
@@ -119,7 +117,6 @@ class TelegramNotifier(object):
     log = None  # initialized during plugin.register
     """:type: flexget.logger.FlexGetLogger"""
     _token = None
-    _tmpl = None
     _usernames = None
     _fullnames = None
     _groups = None
@@ -129,9 +126,7 @@ class TelegramNotifier(object):
         'type': 'object',
         'properties': {
             _TOKEN_ATTR: {'type': 'string'},
-            _MSG_ATTR: {'type': 'string'},
             _PARSE_ATTR: {'type': 'string', 'enum': _PARSERS},
-            _TEMPLATE_ATTR: {'type': 'string'},
             _RCPTS_ATTR: {
                 'type': 'array',
                 'minItems': 1,
@@ -174,18 +169,11 @@ class TelegramNotifier(object):
         'additionalProperties': False,
     }
 
-    def notify(self, message, bot_token, recipients, parse_mode=None, title=None, url=None, **kwargs):
+    def notify(self, title, message, config):
         """
         Send a Telegram notification
-
-        :param str message: The message to send
-        :param bot_token: Bot token to use
-        :param dict recipients: Recipients object
-        :param str parse_mode: telegram parse mode, can be `html` or `markdown`
         """
-        telegram_config = {'message': message, 'bot_token': bot_token, 'recipients': recipients,
-                           'parse_mode': parse_mode}
-        chat_ids = self._real_init(Session(), telegram_config)
+        chat_ids = self._real_init(Session(), config)
 
         if not chat_ids:
             return
@@ -197,7 +185,6 @@ class TelegramNotifier(object):
 
         """
         self._token = config[_TOKEN_ATTR]
-        self._tmpl = config[_MSG_ATTR]
         self._parse_mode = config.get(_PARSE_ATTR)
         self._usernames = []
         self._fullnames = []
@@ -217,8 +204,8 @@ class TelegramNotifier(object):
     def _real_init(self, session, config):
         self._enforce_telegram_plugin_ver()
         self._parse_config(config)
-        self.log.debug('token=%s, parse_mode=%s, tmpl=%s, usernames=%s, fullnames=%s, groups=%s', self._token,
-                       self._parse_mode, self._tmpl, self._usernames, self._fullnames, self._groups)
+        self.log.debug('token=%s, parse_mode=%s, usernames=%s, fullnames=%s, groups=%s', self._token,
+                       self._parse_mode, self._usernames, self._fullnames, self._groups)
         self._init_bot()
         chat_ids = self._get_chat_ids_n_update_db(session)
         return chat_ids
