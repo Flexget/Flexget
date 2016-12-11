@@ -21,7 +21,7 @@ class NotifyTask(object):
                            '{%if task.failed %} {{task.failed|length}} failed entries.{% endif %}'
                            '{% if task.accepted %} {{task.accepted|length}} new entries downloaded.{% endif %}'},
             'template': {'type': 'string', 'default': 'default.template'},
-            'to': {
+            'via': {
                 'type': 'array', 'items':
                     {'allOf': [
                         {'$ref': '/schema/plugins?group=notifiers'},
@@ -31,7 +31,7 @@ class NotifyTask(object):
                          'minProperties': 1}]}}
 
         },
-        'required': ['to']
+        'required': ['via']
     }
 
     def on_task_notify(self, task, config):
@@ -41,7 +41,7 @@ class NotifyTask(object):
             return
         send_notification(config['title'],
                           get_template(config['template'], 'task'),
-                          config['to'],
+                          config['via'],
                           template_renderer=task.render)
 
 

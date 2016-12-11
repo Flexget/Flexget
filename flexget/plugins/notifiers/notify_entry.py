@@ -33,7 +33,7 @@ class NotifyEntry(object):
             },
             'template': {'type': 'string'},
             'what': one_or_more({'type': 'string', 'enum': ENTRY_CONTAINERS}),
-            'to': {
+            'via': {
                 'type': 'array', 'items':
                     {'allOf': [
                         {'$ref': '/schema/plugins?group=notifiers'},
@@ -43,7 +43,7 @@ class NotifyEntry(object):
                          'minProperties': 1}]}}
 
         },
-        'required': ['to'],
+        'required': ['via'],
         'additionalProperties': False
     }
 
@@ -66,7 +66,7 @@ class NotifyEntry(object):
         else:
             body = config['message']
         for entry in entries:
-            send_notification(config['title'], body, config['to'], template_renderer=entry.render)
+            send_notification(config['title'], body, config['via'], template_renderer=entry.render)
 
 
 @event('plugin.register')

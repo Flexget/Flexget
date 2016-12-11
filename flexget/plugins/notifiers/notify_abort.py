@@ -17,7 +17,7 @@ class NotifyAbort(object):
         'properties': {
             'title': {'type': 'string', 'default': 'Task {{ task.name }} has aborted!'},
             'message': {'type': 'string', 'default': 'Reason: {{ task.abort_reason }}'},
-            'to': {
+            'via': {
                 'type': 'array', 'items':
                     {'allOf': [
                         {'$ref': '/schema/plugins?group=notifiers'},
@@ -27,7 +27,7 @@ class NotifyAbort(object):
                          'minProperties': 1}]}}
 
         },
-        'required': ['to']
+        'required': ['via']
     }
 
     def on_task_abort(self, task, config):
@@ -35,7 +35,7 @@ class NotifyAbort(object):
         if task.silent_abort:
             return
         log.debug('sending abort notification')
-        send_notification(config['title'], config['message'], config['to'], template_renderer=task.render)
+        send_notification(config['title'], config['message'], config['via'], template_renderer=task.render)
 
 
 @event('plugin.register')
