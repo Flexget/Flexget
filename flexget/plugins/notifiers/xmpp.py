@@ -19,10 +19,7 @@ class XMPPNotifier(object):
         'properties': {
             'sender': {'type': 'string'},
             'password': {'type': 'string'},
-            'recipients': one_or_more({'type': 'string'}),
-            'title': {'type': 'string'},
-            'message': {'type': 'string'},
-            'file_template': {'type': 'string'},
+            'recipients': one_or_more({'type': 'string'})
         },
         'required': ['sender', 'password', 'recipients'],
         'additionalProperties': False
@@ -30,7 +27,7 @@ class XMPPNotifier(object):
 
     __version__ = '1.0'
 
-    def notify(self, title, message, sender, password, recipients, url=None, **kwargs):
+    def notify(self, title, message, config):
         try:
             import sleekxmpp  # noqa
         except ImportError as e:
@@ -64,10 +61,10 @@ class XMPPNotifier(object):
         log.debug('Sending XMPP notification about: %s', message)
         logging.getLogger('sleekxmpp').setLevel(logging.CRITICAL)
 
-        if not isinstance(recipients, list):
-            recipients = [recipients]
+        if not isinstance(config['recipients'], list):
+            config['recipients'] = [config['recipients']]
 
-        xmpp = SendMsgBot(sender, password, recipients, message)
+        xmpp = SendMsgBot(config['sender'], config['password'], config['recipients'], message)
         if xmpp.connect():
             xmpp.process(block=True)
 
