@@ -46,33 +46,20 @@ class SNSNotifier(object):
     schema = {
         'type': 'object',
         'properties': {
-            'title': {'type': 'string'},
             'sns_topic_arn': {'type': 'string'},
-            'message': {'type': 'string'},
             'aws_access_key_id': {'type': 'string'},
             'aws_secret_access_key': {'type': 'string'},
             'aws_region': {'type': 'string'},
             'profile_name': {'type': 'string'},
-            'file_template': {'type': 'string'},
+            'url': {'type': 'string'}
         },
         'required': ['sns_topic_arn', 'aws_region'],
         'additionalProperties': False,
     }
 
-    def notify(self, sns_topic_arn, title, message, url, aws_region, aws_access_key_id=None, aws_secret_access_key=None,
-               profile_name=None, **kwargs):
+    def notify(self, title, message, config):
         """
         Send an Amazon SNS notification
-
-        :param str sns_topic_arn: SNS Topic ARN
-        :param str title: Notification title
-        :param str message: Notification message
-        :param str aws_region: AWS region
-        :param str aws_access_key_id: AWS access key ID. Will be taken from AWS_ACCESS_KEY_ID environment if not
-            provided.
-        :param str aws_secret_access_key: AWS secret access key ID. Will be taken from AWS_SECRET_ACCESS_KEY
-            environment if not provided.
-        :param str profile_name: If provided, use this profile name instead of the default.
         """
         try:
             import boto3  # noqa
@@ -80,16 +67,18 @@ class SNSNotifier(object):
             log.debug("Error importing boto3: %s", e)
             raise plugin.DependencyError("sns", "boto3", "Boto3 module required. ImportError: %s" % e)
 
-        session = boto3.Session(aws_access_key_id=aws_access_key_id,
-                                aws_secret_access_key=aws_secret_access_key,
-                                profile_name=profile_name,
-                                region_name=aws_region)
+        session = boto3.Session(aws_access_key_id=config.get('aws_access_key_id'),
+                                aws_secret_access_key=config.get('aws_secret_access_key'),
+                                profile_name=config.get('profile_name'),
+                                region_name=config['aws_region'])
         sns = session.resource('sns')
-        topic = sns.Topic(title)
+        topic = sns.Topic(config['sns_topic_arn'])
+        # TODO: This is ignoring notification framework message and generating own?
+        # Maybe it should remain regular output plugin.
         sns_message = json.dumps({
             'entry': {
                 'title': title,
-                'url': url,
+                'url': config.get('url'),
             }
         })
         try:
