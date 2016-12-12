@@ -181,6 +181,7 @@ _new_phase_queue = {}
 def register_task_phase(name, before=None, after=None, suppress_abort=False):
     """
     Adds a new task phase to the available phases.
+
     :param suppress_abort: If True, errors during this phase will be suppressed, and not affect task result.
     """
     if before and after:

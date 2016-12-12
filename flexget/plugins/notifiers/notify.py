@@ -56,6 +56,7 @@ NOTIFY_VIA_SCHEMA = {
 def render_config(config, template_renderer, _path=''):
     """
     Recurse through config data structures attempting to render any string fields against a given context.
+
     :param config: Any simple data structure as retrieved from the FlexGet config.
     :param template_renderer: A function that should take a string or Template argument, and return the result of
         rendering it with the appropriate context.
