@@ -19,14 +19,14 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.entry import Entry
-from flexget.utils.requests import Session, TimedLimiter
+from flexget.utils.requests import TimedLimiter
 
 
 log = logging.getLogger('anidb_feed')
 
-requests = Session()
-requests.headers.update({'User-Agent': 'Mozilla/20.0'}) # needs valid header or we get '403 Client Error'
-requests.add_domain_limiter(TimedLimiter('anidb.net', '2 seconds'))
+HEADER = {'User-agent': 'Mozilla/5.0'}  # anidb needs valid header or we get '403 Client Error'
+LIMITER = TimedLimiter('anidb.net', '2 seconds')  # default anidb api limit
+
 
 NAMESPACE_NAME = 'xhtml'
 NAMESPACE_URL = 'http://www.w3.org/1999/xhtml'
@@ -110,7 +110,7 @@ def convert_to_number(valuestring):
 
 
 class AnidbFeed(object):
-    """"Creates an entry for each movie or series in the AniDB notification feed.
+    """ Creates an entry for each movie or series in the AniDB notification feed.
         Your personalized notification feed url is shown under [Account/Settings/Notifications/link to your personal atom feed]
         See: https://wiki.anidb.net/w/Notifications
         The general main anidb feed can also be used url: http://anidb.net/feeds/files.atom
@@ -153,8 +153,9 @@ class AnidbFeed(object):
     }
 
     # notification update interval is 15 minutes
-    #@cached('anidb_feed', persist='15 minutes')
+    @cached('anidb_feed', persist='15 minutes')
     def on_task_input(self, task, config):
+        task.requests.add_domain_limiter(LIMITER)
         # Create entries by parsing AniDB feed
         log.verbose('Retrieving AniDB feed')
         url = re.sub(r'&pri=[1-9]', '', config['url'])  # strip existing priority
@@ -177,6 +178,18 @@ class AnidbFeed(object):
             elif entry[key_name] in ['Raw/Unknown', 'N/A', 'Unchecked']:
                 return False
         return True
+
+    def get_value_via_regex(self, key, entry, re_string, group_nr=1):
+        result = None
+        if entry.get(key):
+            value_string = entry[key]
+            if isinstance(value_string, basestring) and not value_string.isspace():
+                match = re.search(re_string, value_string)
+                if match and match.group(group_nr) and not match.group(group_nr).isspace():
+                    result = match.group(group_nr)
+            else:
+                log.error('Expecting string for re lookup got: %s, tyep: %s' % (value_string, type(value_string)))
+        return result
 
     def parse_from_xml(self, xml_entries, config):
         entries = []
@@ -203,72 +216,46 @@ class AnidbFeed(object):
             self.fill_namespace_attributes(xml_entry, new_entry)
             if config['valid_only'] is True:
                 if self.is_valid_entry(new_entry, NAMESPACE_PREFIX) is False:
-                    new_entry = None
                     continue
-
             # now manually fix known fields
-            if new_entry.get(NAMESPACE_PREFIX + 'size'):
-                size = new_entry[NAMESPACE_PREFIX + 'size']
-                match = re.search(r'\((([0-9]{1,3}\.|[0-9]{1,3}){1,5})\)', size)  # 344.18 MB (360.895.922)
-                if match and match.group(1):
-                    bytes_string = match.group(1).replace('.', '')
-                    try:
-                        size_mb = int(int(bytes_string) / 1024 / 1024)  # MB
-                        if size_mb > 0:
-                            new_entry['content_size'] = size_mb  # FIXME: is this valid here or put in NAMESPACE_PREFIX_MAIN?
-                    except Exception as ex:
-                        log.warning('Could not extract valid size from string: %s, error: %s' % (bytes_string, ex))
-
-            group_tag = None
-            if new_entry.get(NAMESPACE_PREFIX + 'group'):
-                group_string = new_entry[NAMESPACE_PREFIX + 'group']
-                match = re.search(r'\((.*?)\)', group_string)  # "HorribleSubs (HorribleSubs)"
-                if match and match.group(1) and not match.group(1).isspace():
-                    group_tag = match.group(1)
-
-            title_name = None
-            match = re.search(r'^(.*?) -', new_entry['title'])  # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
-            if match and match.group(1) and not match.group(1).isspace():
-                title_name = match.group(1)
-
-            # FIXME: missing full v1-v5 handling!
+            # 344.18 MB (360.895.922)
+            size_string = self.get_value_via_regex(NAMESPACE_PREFIX + 'size', new_entry, r'\((([0-9]{1,3}\.|[0-9]{1,3}){1,5})\)')
+            if size_string:
+                bytes_string = size_string.replace('.', '')
+                try:
+                    size_mb = int(int(bytes_string) / 1024 / 1024)  # MB
+                    if size_mb > 0:
+                        new_entry['content_size'] = size_mb  # FIXME: is this valid here or put in NAMESPACE_PREFIX_MAIN?
+                except Exception as ex:
+                    log.warning('Could not extract valid size from string: %s, error: %s' % (size_string, ex))
+            # "HorribleSubs (HorribleSubs)"
+            group_tag = self.get_value_via_regex(NAMESPACE_PREFIX + 'group', new_entry, r'\((.*?)\)')
+            # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
+            title_name = self.get_value_via_regex('title', new_entry, r'^(.*?) -')
             episode_nr = None
-            version_nr = None
-            match = re.search(r'^.*? - ([0-9]{1,3}) -', new_entry['title'])
-            if match and match.group(1) and not match.group(1).isspace():
+            episode_string = self.get_value_via_regex('title', new_entry, r'^.*? - ([0-9]{1,3}) -')
+            if episode_string:
                 try:
                     # anidb always uses absolute ep numbering, even movies get "- 1 -" !!
                     # no Cx or Sx support (opening/ending/specials) anime naming is hard enough
-                    episode_nr = int(match.group(1))
+                    episode_nr = int(episode_string)
                 except Exception as ex:
                     log.warning('Expecting a episode nr as integer in: %s, error: %s' % (new_entry['title'], ex))
-            else:
-                match = re.search(r'^.*? - ([0-9]{1,3})v([0-5]) -', new_entry['title'])  # - 9v2 -
-                if match and match.group(1) and not match.group(1).isspace():
-                    try:
-                        episode_nr = int(match.group(1))
-                    except Exception as ex:
-                        log.warning('Expecting a episode nr as integer in: %s, error: %s' % (new_entry['title'], ex))
-                    if match and match.group(2) and not match.group(2).isspace():
-                        try:
-                            version_nr = int(match.group(2))
-                        except Exception as ex:
-                            log.warning('Expecting a version nr in: %s, error: %s' % (new_entry['title'], ex))
-
-            is_movie = False
-            match = re.search(r'- .*?(Complete Movie)$', new_entry['title'])  # "title - 1 - ... - Complete Movie"
-            if match and match.group(1) and not match.group(1).isspace():
-                is_movie = True  # FIXME: 'Complete Movie' is not guaranteed?
-
-            resolution_string = None
+            version_nr = None
+            version_string = self.get_value_via_regex('title', new_entry, r'^.*? - [0-9]{1,3}v([0-5]) -')  # - 9v2 -
+            if version_string:
+                try:
+                    version_nr = int(version_string)
+                except Exception as ex:
+                    log.warning('Expecting a version nr in: %s, error: %s' % (new_entry['title'], ex))
+            # "title - 1 - ... - Complete Movie"
+            # FIXME: 'Complete Movie' is not guaranteed?
+            is_movie = self.get_value_via_regex('title', new_entry, r'- .*?(Complete Movie)$')
+            # 1920x1080, 848x480, 1280x720
+            resolution_string = self.get_value_via_regex(NAMESPACE_PREFIX + 'resolution', new_entry, r'x([0-9]{3,4})$')
             source_string = None
             if new_entry.get(NAMESPACE_PREFIX + 'source'):
                 source_string = ANIDB_SOURCES_MAP.get(new_entry[NAMESPACE_PREFIX + 'source'])
-            if new_entry.get(NAMESPACE_PREFIX + 'resolution'):
-                resolution_field = new_entry[NAMESPACE_PREFIX + 'resolution']
-                match = re.search(r'x([0-9]{3,4})$', resolution_field)  # 1920x1080, 848x480, 1280x720
-                if match and match.group(1) and not match.group(1).isspace():
-                    resolution_string = match.group(1)
 
             # fix and add to new_entry()
             title_new = title_name
@@ -287,7 +274,7 @@ class AnidbFeed(object):
                 except Exception as ex:
                     log.error('Could not get Quality from string: %s, error: %s' % (quality_string, ex))
 
-            if is_movie is True:
+            if is_movie is not None:
                 new_entry['movie_name'] = title_name
                 if version_nr is not None:
                     title_new += ' v%s' % version_nr
@@ -321,7 +308,7 @@ class AnidbFeed(object):
         log.verbose('Fetching %s' % url)
 
         try:
-            r = requests.get(url, timeout=20)
+            r = task.requests.get(url, headers=HEADER, timeout=20)
         except Exception as ex:
             log.error("Failed fetching url: %s error: %s" % (url, ex))
             return []
