@@ -4,7 +4,7 @@ from time import mktime
 
 from xml.dom import minidom
 from past.builtins import basestring
-from datetime import datetime
+from datetime import datetime, timedelta, date, time
 from dateutil.parser import parse as dateutil_parse
 from dateutil.tz import tz
 from future.moves.urllib.parse import quote_plus
@@ -203,11 +203,20 @@ def convert_to_number(valuestring):
         log.trace('Invalid number field: %s error: %s' % (valuestring, ex))
     return number
 
-    # def dump_entry(entry):
-    #     log.verbose('#####################################################################################')
-    #     for key in entry:
-    #         log.verbose('Entry: [%s] = %s' % (key, entry[key]))
-    #     log.verbose('#####################################################################################')
+# def dump_entry(entry, types=None):
+#     if types and not isinstance(types, list):
+#         types = [types]
+#
+#     log.verbose('#####################################################################################')
+#     for key in entry:
+#         if types:
+#             for the_type in types:
+#                 if isinstance(entry[key], the_type):
+#                     log.verbose('Entry: [%s] = %s' % (key, entry[key]))
+#                     break
+#         else:
+#             log.verbose('Entry: [%s] = %s' % (key, entry[key]))
+#     log.verbose('#####################################################################################')
 
 
 class Newznab(object):
@@ -237,6 +246,14 @@ class Newznab(object):
         api_server_url: https://api.nzbindexer.com
         api_key: my_apikey
         category: tv
+
+    # search by name + age: search in the 'tv' category, using existing names for the type ('title'...)
+    # maxage: auto will try to calculate the maximum possible age for the release and use it to confine the search
+    newznab:
+        api_server_url: https://api.nzbindexer.com
+        api_key: my_apikey
+        category: tv
+        maxage: auto
 
     # meta id based: try using existing metaid's (tvdb/ragetv/imdb) to search only in the tv/hd,uhd categories
     newznab:
@@ -295,9 +312,14 @@ class Newznab(object):
                     {'type': 'integer'},
                     {'type': 'string', 'enum': list(CATEGORIES)},
                 ]}, unique_items=True),
-            'maxage': {'type': 'string', 'format': 'interval'},
             'custom_query': {'type': 'string'},
             'force_quotes': {'type': 'boolean', 'default': False},
+            'maxage': {
+                'oneOf': [
+                    {'type': 'string', 'format': 'interval'},
+                    {'type': 'string', 'enum': ['auto']}
+                ]
+            },
             'use_metadata': {
                 'oneOf': [
                     {'type': 'boolean'},
@@ -412,7 +434,7 @@ class Newznab(object):
                 return search_entry
         return entry
 
-    def build_base_url(self, config):
+    def build_base_url(self, entry, config):
         # TODO @Andy: do 't=caps' check (many indexers wont correctly handle this, nzbhydra uses 'brute force' since 0.2.169)
         if not safe_get(config, 'api_server_url'):
             raise plugin.PluginError('Invalid url in config: %s' % config)
@@ -422,12 +444,25 @@ class Newznab(object):
             api_url += '&apikey=%s' % config['api_key']
         if safe_get(config, 'category_string'):
             api_url += '&cat=%s' % config['category_string']
-        # carefull, 0 is defined!
         if safe_get(config, 'maxage'):
-            try:
-                api_url += '&maxage=%s' % parse_timedelta(config['maxage']).days
-            except Exception as ex:
-                log.error('Invalid maxage given in config: %s' % ex)
+            maxage = None
+            if config['maxage'] == 'auto':
+                estimator = plugin.get_plugin_by_name('estimate_release').instance
+                est_date = estimator.estimate(entry)
+                if est_date:
+                    if isinstance(est_date, date):
+                        est_date = datetime.combine(est_date, time())
+                    est_date = est_date - timedelta(hours=12)  # add a delta to compensate TZ
+                    maxage = datetime.now() - est_date
+            else:
+                try:
+                    maxage = parse_timedelta(config['maxage'])
+                except Exception as ex:
+                    log.error('Invalid maxage given in config or estimator: %s' % ex)
+
+            if maxage:
+                maxage = max(maxage, timedelta(days=1))  # cap to one day
+                api_url += '&maxage=%s' % maxage.days
         return api_url
 
     def parse_from_xml(self, xml_entries):
@@ -652,7 +687,7 @@ class Newznab(object):
 
         query_list = []
         # build meta and ep fragment
-        url = self.build_base_url(config)
+        url = self.build_base_url(entry, config)
         if meta_url and self.is_tv_entry(entry) is True and ep_url:
             url += '&t=tvsearch' + meta_url + ep_url
         elif meta_url and self.is_tv_entry(entry) is False:
