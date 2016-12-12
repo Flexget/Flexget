@@ -56,7 +56,7 @@ class NotifyEntry(object):
     def on_task_notify(self, task, config):
         send_notification = plugin.get_plugin_by_name('notify').instance.send_notification
         config = self.prepare_config(config)
-        entries = list(itertools.chain(getattr(task, what) for what in config['what']))
+        entries = list(itertools.chain(*(getattr(task, what) for what in config['what'])))
         if not entries:
             log.debug('No entries to notify about.')
             return
