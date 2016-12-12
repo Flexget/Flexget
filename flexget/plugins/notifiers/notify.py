@@ -12,6 +12,9 @@ A plugin who wishes to send messages using this notification framework should im
     send_notification = plugin.get_plugin_by_name('notify').instance.send_notification
     send_notification('the title', 'the message', the_notifiers)
 
+This plugin also adds the 'notify' task phase. If a plugin using the framework runs on the notify phase,
+(`on_task_notify`,) errors from the notification will not otherwise affect the task.
+
 Delivering Messages
 -------------------
 To implement a plugin that can deliver messages, it should implement a `notify` method, which takes
