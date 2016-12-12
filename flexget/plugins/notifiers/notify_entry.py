@@ -63,7 +63,7 @@ class NotifyEntry(object):
         # If a file template is defined, it overrides message
         if config.get('template'):
             try:
-                message = get_template(config['template'], scope='entries')
+                message = get_template(config['template'], scope='entry')
             except ValueError:
                 raise plugin.PluginError('Cannot locate template on disk: %s', config['template'])
         else:
