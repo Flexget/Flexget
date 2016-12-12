@@ -11,6 +11,8 @@ from dateutil.parser import parse as dateutil_parse
 from dateutil.tz import tz
 from datetime import datetime
 
+from flexget.config_schema import one_or_more
+
 from flexget.utils.qualities import Quality
 from past.builtins import basestring
 from flexget.utils.tools import str_to_boolean
@@ -72,6 +74,12 @@ ANIDB_SOURCES_MAP = {
     'www': 'webdl'
 }
 
+ANIDB_EXTRA_TYPES = [
+    'special',
+    'op-ending',
+    'trailer-promo'
+]
+
 
 def convert_to_naive_utc(valuestring):
     parsed_date = None
@@ -124,6 +132,10 @@ class AnidbFeed(object):
             # If enabled only 'valid' entries are returned, that have a size, release group, resolution and source field
             # This happens after the file was added to anidb and has passed some initial tests/parsing
 
+            # priority: can be one of (all, medium-high, high), which are the anidb notification priorities
+
+
+
         Adds those extra Entry fields if found:
         'content_size'
         'rss_pubdate'
@@ -147,14 +159,21 @@ class AnidbFeed(object):
             'url': {'type': 'string', 'format': 'url'},
             'priority': {'type': 'string', 'enum': ['all', 'medium-high', 'high'], 'default': 'all'},
             'valid_only': {'type': 'boolean', 'default': False},
+            'include': one_or_more({'type': 'string', 'enum': ANIDB_EXTRA_TYPES}, unique_items=True)
         },
         'additionalProperties': False,
         'required': ['url'],
     }
 
+    def prepare_config(self, config):
+        if 'include' in config and not isinstance(config['include'], list):
+            config['include'] = [config['include']]
+        return config
+
     # notification update interval is 15 minutes
-    @cached('anidb_feed', persist='15 minutes')
+    #@cached('anidb_feed', persist='15 minutes')
     def on_task_input(self, task, config):
+        config = self.prepare_config(config)
         task.requests.add_domain_limiter(LIMITER)
         # Create entries by parsing AniDB feed
         log.verbose('Retrieving AniDB feed')
@@ -190,6 +209,40 @@ class AnidbFeed(object):
             else:
                 log.error('Expecting string for re lookup got: %s, tyep: %s' % (value_string, type(value_string)))
         return result
+
+    def parse_episode_data(self, key, entry):
+        ep_nr = self.get_value_via_regex(key, entry, r'^.*? - ([0-9]{1,3})(v([1-5]))? -')
+        file_version = self.get_value_via_regex(key, entry, r'^.*? - T|S|C|ED|OP|[0-9]{1,3}[a-f]?v([1-5]) -')
+        is_special = self.get_value_via_regex(key, entry, r'^.*? - (S[0-9]{1,3})(v([1-5]))? -')
+        is_op_ed = self.get_value_via_regex(key, entry, r'^.*? - ((C|OP|ED)[0-9]{1,2}[a-f]?) -')
+        is_trailer = self.get_value_via_regex(key, entry, r'^.*? - (T[0-9]{1,2}) -')
+        if ep_nr:
+            try:
+                # anidb always uses absolute ep numbering, even movies get "- 1 -" !!
+                ep_nr = int(ep_nr)
+            except Exception as ex:
+                ep_nr = None
+                log.warning('Expecting a episode nr as integer in: %s, error: %s' % (entry[key], ex))
+        if file_version:
+            try:
+                file_version = int(file_version)
+            except Exception as ex:
+                file_version = None
+                log.warning('Expecting a file version nr as integer in: %s, error: %s' % (entry[key], ex))
+        out_list = dict()
+        out_list['extra'] = True
+        if ep_nr is not None:
+            out_list['ep'] = ep_nr
+            out_list['extra'] = False
+        if file_version:
+            out_list['version'] = file_version
+        if is_special:
+            out_list['special'] = is_special
+        if is_op_ed:
+            out_list['op-ending'] = is_op_ed
+        if is_trailer:
+            out_list['trailer-promo'] = is_trailer
+        return out_list
 
     def parse_from_xml(self, xml_entries, config):
         entries = []
@@ -232,22 +285,7 @@ class AnidbFeed(object):
             group_tag = self.get_value_via_regex(NAMESPACE_PREFIX + 'group', new_entry, r'\((.*?)\)')
             # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
             title_name = self.get_value_via_regex('title', new_entry, r'^(.*?) -')
-            episode_nr = None
-            episode_string = self.get_value_via_regex('title', new_entry, r'^.*? - ([0-9]{1,3}) -')
-            if episode_string:
-                try:
-                    # anidb always uses absolute ep numbering, even movies get "- 1 -" !!
-                    # no Cx or Sx support (opening/ending/specials) anime naming is hard enough
-                    episode_nr = int(episode_string)
-                except Exception as ex:
-                    log.warning('Expecting a episode nr as integer in: %s, error: %s' % (new_entry['title'], ex))
-            version_nr = None
-            version_string = self.get_value_via_regex('title', new_entry, r'^.*? - [0-9]{1,3}v([0-5]) -')  # - 9v2 -
-            if version_string:
-                try:
-                    version_nr = int(version_string)
-                except Exception as ex:
-                    log.warning('Expecting a version nr in: %s, error: %s' % (new_entry['title'], ex))
+            episode_data = self.parse_episode_data('title', new_entry)
             # "title - 1 - ... - Complete Movie"
             # FIXME: 'Complete Movie' is not guaranteed?
             is_movie = self.get_value_via_regex('title', new_entry, r'- .*?(Complete Movie)$')
@@ -259,8 +297,8 @@ class AnidbFeed(object):
 
             # fix and add to new_entry()
             title_new = title_name
-            if version_nr is not None:
-                new_entry[NAMESPACE_PREFIX_MAIN + 'fileversion'] = version_nr  # TODO: Is there a official field?
+            if episode_data.get('version'):
+                new_entry[NAMESPACE_PREFIX_MAIN + 'fileversion'] = episode_data['version']  # TODO: Is there a official field?
 
             quality_string = ''
             if resolution_string:
@@ -276,21 +314,31 @@ class AnidbFeed(object):
 
             if is_movie is not None:
                 new_entry['movie_name'] = title_name
-                if version_nr is not None:
-                    title_new += ' v%s' % version_nr
+                if episode_data.get('version'):
+                    title_new += ' v%s' % episode_data['version']
                 if group_tag is not None:
                     title_new += ' [%s]' % group_tag  # TODO: do we always add group?
             else:
                 new_entry['series_name'] = title_name
-                if episode_nr is not None:
-                    new_entry['series_episode'] = episode_nr
-                    title_new += ' - %s' % episode_nr  # FIXME: is there a valid way to encode anime episodes?
-                    if version_nr is not None:
-                        title_new += 'v%s' % version_nr
+                if 'ep' in episode_data:
+                    new_entry['series_episode'] = episode_data['ep']
+                    title_new += ' - %s' % episode_data['ep']  # FIXME: is there a valid way to encode anime episodes?
+                    if episode_data.get('version'):
+                        title_new += 'v%s' % episode_data['version']
                     if group_tag is not None:
                         title_new += ' - [%s]' % group_tag  # TODO: do we always add group?
-                else:
-                    log.error('No episode nr. found for series, should not happen: %s' % new_entry['title'])
+            # handle extras
+            if 'include' in config and any(key in episode_data for key in config['include']):
+                extra_string = episode_data.get('special', '')
+                extra_string += episode_data.get('op-ending', '')
+                extra_string += episode_data.get('trailer-promo', '')
+                title_new += ' - %s' % extra_string
+                if episode_data.get('version'):
+                    title_new += 'v%s' % episode_data['version']
+                if group_tag is not None:
+                    title_new += ' - [%s]' % group_tag  # TODO: do we always add group?
+            elif episode_data['extra'] is True:
+                continue
 
             # FIXME: mimics normal title naming (does not fully work for anime scene naming.)
             # Add a custom entry.render() field, to allow customisation of final 'title'
