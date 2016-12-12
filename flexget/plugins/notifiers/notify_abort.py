@@ -5,7 +5,6 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils.template import get_template
 
 
 log = logging.getLogger('notify_abort')
