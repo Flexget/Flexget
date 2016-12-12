@@ -39,10 +39,11 @@ class NotifyTask(object):
         if not (task.accepted or task.failed):
             log.verbose('No accepted or failed entries, not sending a notification.')
             return
-        send_notification(config['title'],
-                          get_template(config['template'], 'task'),
-                          config['via'],
-                          template_renderer=task.render)
+        try:
+            template = get_template(config['template'], scope='task')
+        except ValueError:
+            raise plugin.PluginError('Cannot locate template on disk: %s', config['template'])
+        send_notification(config['title'], template, config['via'], template_renderer=task.render)
 
 
 @event('plugin.register')
