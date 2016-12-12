@@ -232,3 +232,17 @@ def render_from_task(template, task):
     """
     variables = {'task': task, 'now': datetime.now(), 'task_name': task.name}
     return render(template, variables)
+
+
+def evaluate_expression(expression, context):
+    """
+    Evaluate a jinja `expression` using a given `context` with support for `LazyDict`s (`Entry`s.)
+
+    :param str expression:  A jinja expression to evaluate
+    :param context: dictlike, supporting LazyDicts
+    """
+    compiled_expr = environment.compile_expression(expression)
+    # If we have a LazyDict, grab the underlying store. Our environment supports LazyFields directly
+    if isinstance(context, LazyDict):
+        context = context.store
+    return compiled_expr(**context)
