@@ -320,4 +320,4 @@ class PluginSubtitleList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginSubtitleList, 'subtitle_list', api_ver=2, groups=['list'])
+    plugin.register(PluginSubtitleList, 'subtitle_list', api_ver=2, groups=['task', 'list'])

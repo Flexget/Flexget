@@ -189,7 +189,7 @@ class EntryList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EntryList, 'entry_list', api_ver=2, groups=['list'])
+    plugin.register(EntryList, 'entry_list', api_ver=2, groups=['task', 'list'])
 
 
 @with_session

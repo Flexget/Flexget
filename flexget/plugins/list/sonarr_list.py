@@ -278,4 +278,4 @@ class SonarrList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SonarrList, 'sonarr_list', api_ver=2, groups=['list'])
+    plugin.register(SonarrList, 'sonarr_list', api_ver=2, groups=['task', 'list'])

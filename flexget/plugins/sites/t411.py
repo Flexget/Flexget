@@ -154,5 +154,5 @@ class T411LookupPlugin(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(T411InputPlugin, 't411', groups=['search', 'input'], api_ver=2)
+    plugin.register(T411InputPlugin, 't411', groups=['task', 'search'], api_ver=2)
     plugin.register(T411LookupPlugin, 't411_lookup', api_ver=2)

@@ -61,7 +61,6 @@ def plugin_to_dict(plugin):
         'api_ver': plugin.api_ver,
         'builtin': plugin.builtin,
         'category': plugin.category,
-        'contexts': plugin.contexts,
         'debug': plugin.debug,
         'groups': plugin.groups,
         'phase_handlers': [dict(phase=handler, priority=event.priority) for handler, event in

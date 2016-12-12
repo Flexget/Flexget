@@ -197,4 +197,4 @@ def query_series(api_key, user_token, member_name=None):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(BetaSeriesList, 'betaseries_list', api_ver=2, groups=['list'])
+    plugin.register(BetaSeriesList, 'betaseries_list', api_ver=2, groups=['task', 'list'])

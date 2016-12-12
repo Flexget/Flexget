@@ -105,4 +105,4 @@ class TorrentScrub(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TorrentScrub, groups=["torrent"], api_ver=2)
+    plugin.register(TorrentScrub, groups=['task', 'torrent'], api_ver=2)

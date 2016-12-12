@@ -149,7 +149,7 @@ def register_plugin():
 def register_config():
     root_config_schema = {
         'type': 'object',
-        'additionalProperties': plugin.plugin_schemas(context='task')
+        'additionalProperties': plugin.plugin_schemas(group='task')
     }
     register_config_key('templates', root_config_schema)
 

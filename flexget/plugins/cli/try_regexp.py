@@ -66,7 +66,7 @@ class PluginTryRegexp(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTryRegexp, '--try-regexp', builtin=True, api_ver=2)
+    plugin.register(PluginTryRegexp, '--try-regexp', builtin=True, groups=[], api_ver=2)
 
 
 @event('options.register')
