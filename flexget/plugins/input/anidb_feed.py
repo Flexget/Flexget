@@ -134,7 +134,10 @@ class AnidbFeed(object):
 
             # priority: can be one of (all, medium-high, high), which are the anidb notification priorities
 
-
+            #include: include none regular files also 'special', 'op-ending', 'trailer-promo'
+            anidb_feed:
+                url: http://anidb.net/perl-bin/animedbfeed.pl?id=xxxxx................
+                include: special
 
         Adds those extra Entry fields if found:
         'content_size'
@@ -171,7 +174,7 @@ class AnidbFeed(object):
         return config
 
     # notification update interval is 15 minutes
-    #@cached('anidb_feed', persist='15 minutes')
+    @cached('anidb_feed', persist='15 minutes')
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
         task.requests.add_domain_limiter(LIMITER)
@@ -254,6 +257,13 @@ class AnidbFeed(object):
             # fill base data
             new_entry['title'] = xml_entry.title  # needs to-be fixed manually later
             new_entry['url'] = xml_entry.link  # file link
+            episode_data = self.parse_episode_data('title', new_entry)
+            if episode_data['extra'] is True:
+                if 'include' in config:
+                    if not any(key in episode_data for key in config['include']):
+                        continue  # is extra file
+                else:
+                    continue
             # store some usefully data in the namespace
             if xml_entry.id:
                 guid_splits = re.split('[/=]', xml_entry.id)
@@ -283,9 +293,6 @@ class AnidbFeed(object):
                     log.warning('Could not extract valid size from string: %s, error: %s' % (size_string, ex))
             # "HorribleSubs (HorribleSubs)"
             group_tag = self.get_value_via_regex(NAMESPACE_PREFIX + 'group', new_entry, r'\((.*?)\)')
-            # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
-            title_name = self.get_value_via_regex('title', new_entry, r'^(.*?) -')
-            episode_data = self.parse_episode_data('title', new_entry)
             # "title - 1 - ... - Complete Movie"
             # FIXME: 'Complete Movie' is not guaranteed?
             is_movie = self.get_value_via_regex('title', new_entry, r'- .*?(Complete Movie)$')
@@ -294,9 +301,9 @@ class AnidbFeed(object):
             source_string = None
             if new_entry.get(NAMESPACE_PREFIX + 'source'):
                 source_string = ANIDB_SOURCES_MAP.get(new_entry[NAMESPACE_PREFIX + 'source'])
-
+            # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
+            title_name = self.get_value_via_regex('title', new_entry, r'^(.*?) -')
             # fix and add to new_entry()
-            title_new = title_name
             if episode_data.get('version'):
                 new_entry[NAMESPACE_PREFIX_MAIN + 'fileversion'] = episode_data['version']  # TODO: Is there a official field?
 
@@ -311,41 +318,33 @@ class AnidbFeed(object):
                     new_entry['quality'] = quality
                 except Exception as ex:
                     log.error('Could not get Quality from string: %s, error: %s' % (quality_string, ex))
-
+            # build the new 'title' mimic general scene naming convention
+            title_new = '%s ' % title_name
             if is_movie is not None:
                 new_entry['movie_name'] = title_name
-                if episode_data.get('version'):
-                    title_new += ' v%s' % episode_data['version']
-                if group_tag is not None:
-                    title_new += ' [%s]' % group_tag  # TODO: do we always add group?
             else:
                 new_entry['series_name'] = title_name
-                if 'ep' in episode_data:
-                    new_entry['series_episode'] = episode_data['ep']
-                    title_new += ' - %s' % episode_data['ep']  # FIXME: is there a valid way to encode anime episodes?
-                    if episode_data.get('version'):
-                        title_new += 'v%s' % episode_data['version']
-                    if group_tag is not None:
-                        title_new += ' - [%s]' % group_tag  # TODO: do we always add group?
-            # handle extras
-            if 'include' in config and any(key in episode_data for key in config['include']):
+            if 'ep' in episode_data:
+                new_entry['series_episode'] = episode_data['ep']
+                title_new += '- %s' % episode_data['ep']  # FIXME: is there a valid way to encode anime episodes?
+                new_entry['series_id'] = '%02d' % episode_data['ep']  # Is this valid aka a single Integer?
+                if episode_data['ep'] > 99:
+                    new_entry['series_id'] = '%03d' % episode_data['ep']
+            elif episode_data['extra'] is True:
                 extra_string = episode_data.get('special', '')
                 extra_string += episode_data.get('op-ending', '')
                 extra_string += episode_data.get('trailer-promo', '')
-                title_new += ' - %s' % extra_string
-                if episode_data.get('version'):
-                    title_new += 'v%s' % episode_data['version']
-                if group_tag is not None:
-                    title_new += ' - [%s]' % group_tag  # TODO: do we always add group?
-            elif episode_data['extra'] is True:
-                continue
-
-            # FIXME: mimics normal title naming (does not fully work for anime scene naming.)
-            # Add a custom entry.render() field, to allow customisation of final 'title'
+                title_new += '- %s' % extra_string
+                new_entry['series_id'] = extra_string  # FIXME: is this the correct field for extras?
+            if episode_data.get('version'):
+                title_new += 'v%s' % episode_data['version']
+            if group_tag is not None:
+                title_new += ' - [%s]' % group_tag  # TODO: do we always add group?
             if new_entry.get('quality') and hasattr(new_entry['quality'], 'resolution'):
                 if new_entry['quality'].resolution.name is not 'unknown':
                     title_new += ' [%s]' % new_entry['quality'].resolution
 
+            # TODO: Add a custom entry.render() field, to allow customisation of final 'title'
             new_entry['title'] = title_new
             new_entry[NAMESPACE_PREFIX_MAIN + 'name'] = title_new  # used by anidb_list?
             entries.append(new_entry)
