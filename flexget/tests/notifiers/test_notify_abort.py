@@ -13,13 +13,13 @@ class TestNotifyAbort(object):
             abort: yes
 
             notify_abort:
-              to:
+              via:
                 - debug_notification:
                     user_key: user_key
           no_crash:
             disable: builtins
             notify_abort:
-              to:
+              via:
                 - debug_notification:
                     user_key: user_key
     """

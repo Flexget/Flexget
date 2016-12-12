@@ -11,14 +11,14 @@ class TestNotifyTask(object):
             - title: another entry
             accept_all: yes
             notify_task:
-              to:
+              via:
                 - debug_notification:
                     a: b
           test_nothing:
             mock:
             - title: an entry
             notify_task:
-              to:
+              via:
                 - debug_notification:
                     a: b
           test_jinja:
@@ -28,7 +28,7 @@ class TestNotifyTask(object):
             accept_all: yes
             notify_task:
               title: "{{task.name}} aoeu"
-              to:
+              via:
                 - debug_notification:
                     setting: 1{{task.name}}
     """
