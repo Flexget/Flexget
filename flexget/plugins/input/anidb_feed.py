@@ -118,23 +118,26 @@ def convert_to_number(valuestring):
 
 
 class AnidbFeed(object):
-    """ Creates an entry for each movie or series in the AniDB notification feed.
+    """ Creates an entry for each movie or series in the AniDB file notification feeds.
         Your personalized notification feed url is shown under [Account/Settings/Notifications/link to your personal atom feed]
         See: https://wiki.anidb.net/w/Notifications
-        The general main anidb feed can also be used url: http://anidb.net/feeds/files.atom
+        The general main anidb file feed can also be used url: http://anidb.net/feeds/files.atom
+        The feeds update every 15 minutes, which is the cache time we also use in Flexget.
 
         Example:
             anidb_feed:
                 url: http://anidb.net/perl-bin/animedbfeed.pl?id=xxxxx................
                 valid_only: yes
 
-            # valid_only: yes
+            valid_only: yes
             # If enabled only 'valid' entries are returned, that have a size, release group, resolution and source field
             # This happens after the file was added to anidb and has passed some initial tests/parsing
 
-            # priority: can be one of (all, medium-high, high), which are the anidb notification priorities
+            priority: (all, medium-high, high)
+            # defaults to 'all', which are the anidb notification priorities
 
-            #include: include none regular files also 'special', 'op-ending', 'trailer-promo'
+            include: ('special', 'op-ending', 'trailer-promo')
+            # Also report none regular feed file types, by default any none regular file is skipped.
             anidb_feed:
                 url: http://anidb.net/perl-bin/animedbfeed.pl?id=xxxxx................
                 include: special
@@ -150,6 +153,7 @@ class AnidbFeed(object):
         'anidb_feed_crc_status'
         'anidb_feed_language'
         'anidb_feed_group'
+        'anidb_feed_grouptag'
         'anidb_feed_subtitle_language'
         'anidb_feed_priority'
         'anidb_feed_quality'
@@ -184,9 +188,9 @@ class AnidbFeed(object):
         priority_fragment = ''
         if 'animedbfeed' in url:
             priority = 0
-            if config['priority'] is 'medium-high':
+            if config['priority'] == 'medium-high':
                 priority = 1
-            elif config['priority'] is 'high':
+            elif config['priority'] == 'high':
                 priority = 2
             priority_fragment = '&pri=%s' % priority
         return self.fill_entries_for_url(url + priority_fragment, task, config)
@@ -304,8 +308,6 @@ class AnidbFeed(object):
             # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
             title_name = self.get_value_via_regex('title', new_entry, r'^(.*?) -')
             # fix and add to new_entry()
-            if episode_data.get('version'):
-                new_entry[NAMESPACE_PREFIX_MAIN + 'fileversion'] = episode_data['version']  # TODO: Is there a official field?
 
             quality_string = ''
             if resolution_string:
@@ -338,10 +340,12 @@ class AnidbFeed(object):
                 new_entry['series_id'] = extra_string  # FIXME: is this the correct field for extras?
             if episode_data.get('version'):
                 title_new += 'v%s' % episode_data['version']
-            if group_tag is not None:
+                new_entry[NAMESPACE_PREFIX_MAIN + 'fileversion'] = episode_data['version']  # TODO: Is there a official field?
+            if group_tag:
                 title_new += ' - [%s]' % group_tag  # TODO: do we always add group?
+                new_entry[NAMESPACE_PREFIX + 'grouptag'] = group_tag
             if new_entry.get('quality') and hasattr(new_entry['quality'], 'resolution'):
-                if new_entry['quality'].resolution.name is not 'unknown':
+                if new_entry['quality'].resolution.name != 'unknown':
                     title_new += ' [%s]' % new_entry['quality'].resolution
 
             # TODO: Add a custom entry.render() field, to allow customisation of final 'title'
