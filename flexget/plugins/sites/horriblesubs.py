@@ -69,4 +69,4 @@ class HorribleSubs(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(HorribleSubs, 'horriblesubs', groups=['task', 'search'], api_ver=2)
+    plugin.register(HorribleSubs, 'horriblesubs', interfaces=['task', 'search'], api_ver=2)

@@ -216,13 +216,13 @@ class PluginInfo(dict):
     # Counts duplicate registrations
     dupe_counter = 0
 
-    def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1, category=None):
+    def __init__(self, plugin_class, name=None, interfaces=None, builtin=False, debug=False, api_ver=1, category=None):
         """
         Register a plugin.
 
         :param plugin_class: The plugin factory.
         :param string name: Name of the plugin (if not given, default to factory class name in underscore form).
-        :param list groups: Groups this plugin belongs to.
+        :param list interfaces: Interfaces this plugin implements.
         :param bool builtin: Auto-activated?
         :param bool debug: True if plugin is for debugging purposes.
         :param int api_ver: Signature of callback hooks (1=task; 2=task,config).
@@ -231,8 +231,8 @@ class PluginInfo(dict):
         """
         dict.__init__(self)
 
-        if groups is None:
-            groups = ['task']
+        if interfaces is None:
+            interfaces = ['task']
         if name is None:
             # Convention is to take camel-case class name and rewrite it to an underscore form,
             # e.g. 'PluginName' to 'plugin_name'
@@ -248,7 +248,7 @@ class PluginInfo(dict):
         # Set basic info attributes
         self.api_ver = api_ver
         self.name = name
-        self.groups = groups
+        self.interfaces = interfaces
         self.builtin = builtin
         self.debug = debug
         self.category = category
@@ -459,12 +459,12 @@ def load_plugins(extra_dirs=None):
     log.debug('Plugins took %.2f seconds to load. %s plugins in registry.', took, len(plugins.keys()))
 
 
-def get_plugins(phase=None, group=None, category=None, name=None, min_api=None):
+def get_plugins(phase=None, interface=None, category=None, name=None, min_api=None):
     """
     Query other plugins characteristics.
 
     :param string phase: Require phase
-    :param string group: Plugin must belong to this group.
+    :param string interface: Plugin must implement this interface.
     :param string category: Type of plugin, phase names.
     :param string name: Name of the plugin.
     :param int min_api: Minimum api version.
@@ -477,7 +477,7 @@ def get_plugins(phase=None, group=None, category=None, name=None, min_api=None):
             raise ValueError('Unknown phase %s' % phase)
         if phase and phase not in plugin.phase_handlers:
             return False
-        if group and group not in plugin.groups:
+        if interface and interface not in plugin.interfaces:
             return False
         if category and not category == plugin.category:
             return False

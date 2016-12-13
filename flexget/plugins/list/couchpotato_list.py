@@ -248,4 +248,4 @@ class CouchPotatoList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(CouchPotatoList, 'couchpotato_list', api_ver=2, groups=['task', 'list'])
+    plugin.register(CouchPotatoList, 'couchpotato_list', api_ver=2, interfaces=['task', 'list'])

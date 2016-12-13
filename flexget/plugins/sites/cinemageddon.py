@@ -23,4 +23,4 @@ class UrlRewriteCinemageddon(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteCinemageddon, 'cinemageddon', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteCinemageddon, 'cinemageddon', interfaces=['urlrewriter'], api_ver=2)

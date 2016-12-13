@@ -253,7 +253,7 @@ class PluginMovieList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginMovieList, 'movie_list', api_ver=2, groups=['task', 'list'])
+    plugin.register(PluginMovieList, 'movie_list', api_ver=2, interfaces=['task', 'list'])
 
 
 @with_session

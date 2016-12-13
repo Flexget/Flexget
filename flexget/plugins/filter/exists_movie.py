@@ -194,4 +194,4 @@ class FilterExistsMovie(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(FilterExistsMovie, 'exists_movie', groups=['task'], api_ver=2)
+    plugin.register(FilterExistsMovie, 'exists_movie', interfaces=['task'], api_ver=2)

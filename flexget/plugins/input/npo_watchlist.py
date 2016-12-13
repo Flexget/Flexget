@@ -347,4 +347,4 @@ class NPOWatchlist(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(NPOWatchlist, 'npo_watchlist', api_ver=2, groups=['task', 'list'])
+    plugin.register(NPOWatchlist, 'npo_watchlist', api_ver=2, interfaces=['task', 'list'])

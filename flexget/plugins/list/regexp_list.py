@@ -233,4 +233,4 @@ def add_to_list_by_name(list_name, regexp, session=None):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginRegexpList, 'regexp_list', api_ver=2, groups=['task', 'list'])
+    plugin.register(PluginRegexpList, 'regexp_list', api_ver=2, interfaces=['task', 'list'])

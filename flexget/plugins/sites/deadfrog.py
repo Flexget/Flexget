@@ -44,4 +44,4 @@ class UrlRewriteDeadFrog(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteDeadFrog, 'deadfrog', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteDeadFrog, 'deadfrog', interfaces=['urlrewriter'], api_ver=2)

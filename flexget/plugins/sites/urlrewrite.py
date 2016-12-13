@@ -74,4 +74,4 @@ class UrlRewrite(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewrite, 'urlrewrite', groups=['task', 'urlrewriter'], api_ver=2)
+    plugin.register(UrlRewrite, 'urlrewrite', interfaces=['task', 'urlrewriter'], api_ver=2)
