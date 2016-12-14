@@ -357,7 +357,7 @@ class AnidbFeed(object):
             new_entry['title'] = title_new
             new_entry[NAMESPACE_PREFIX_MAIN + 'name'] = anidb_name
             entries.append(new_entry)
-            _debug_dump_entry(new_entry)
+            #_debug_dump_entry(new_entry)
         return entries
 
     def fill_entries_for_url(self, url, task, config):
