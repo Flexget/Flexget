@@ -110,11 +110,10 @@ def convert_to_number(valuestring):
     return number
 
 
-# def dump_entry(entry):
-#     log.verbose('#####################################################################################')
-#     for key in entry:
-#         log.verbose('Entry: [%s] = %s' % (key, entry[key]))
-#     log.verbose('#####################################################################################')
+def _debug_dump_entry(entry):
+    log.verbose('#####################################################################################')
+    for key in entry:
+        log.verbose('%-8s [%-30s] = %s' % (type(entry[key]).__name__, key, entry[key]))
 
 
 class AnidbFeed(object):
@@ -269,9 +268,14 @@ class AnidbFeed(object):
                 else:
                     continue
             # store some usefully data in the namespace
-            if xml_entry.id:
-                guid_splits = re.split('[/=]', xml_entry.id)
-                new_entry[NAMESPACE_PREFIX_MAIN + 'fid'] = guid_splits.pop()  # andidb file id
+            fid_string = self.get_value_via_regex('url', new_entry, r'/f([0-9]{1,10})$')
+            if fid_string:
+                try:
+                    fid = int(fid_string)
+                    if fid is not None:
+                        new_entry[NAMESPACE_PREFIX_MAIN + 'fid'] = fid
+                except Exception as ex:
+                    log.error('Could not parse fid string: %s, error: %s' % (fid_string, ex))
             if xml_entry.updated_parsed:
                 new_entry['rss_pubdate'] = datetime.fromtimestamp(mktime(xml_entry.updated_parsed))
             elif xml_entry.updated:
@@ -290,9 +294,11 @@ class AnidbFeed(object):
             if size_string:
                 bytes_string = size_string.replace('.', '')
                 try:
-                    size_mb = int(int(bytes_string) / 1024 / 1024)  # MB
+                    size_bytes = int(bytes_string)
+                    size_mb = int(size_bytes / 1024 / 1024)  # MB
                     if size_mb > 0:
                         new_entry['content_size'] = size_mb  # FIXME: is this valid here or put in NAMESPACE_PREFIX_MAIN?
+                        new_entry[NAMESPACE_PREFIX + 'size'] = size_bytes  # update with parsed size
                 except Exception as ex:
                     log.warning('Could not extract valid size from string: %s, error: %s' % (size_string, ex))
             # "HorribleSubs (HorribleSubs)"
@@ -306,7 +312,7 @@ class AnidbFeed(object):
             if new_entry.get(NAMESPACE_PREFIX + 'source'):
                 source_string = ANIDB_SOURCES_MAP.get(new_entry[NAMESPACE_PREFIX + 'source'])
             # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
-            title_name = self.get_value_via_regex('title', new_entry, r'^(.*?) -')
+            anidb_name = self.get_value_via_regex('title', new_entry, r'^(.*?) -')
             # fix and add to new_entry()
 
             quality_string = ''
@@ -321,11 +327,11 @@ class AnidbFeed(object):
                 except Exception as ex:
                     log.error('Could not get Quality from string: %s, error: %s' % (quality_string, ex))
             # build the new 'title' mimic general scene naming convention
-            title_new = '%s ' % title_name
+            title_new = '%s ' % anidb_name
             if is_movie is not None:
-                new_entry['movie_name'] = title_name
+                new_entry['movie_name'] = anidb_name
             else:
-                new_entry['series_name'] = title_name
+                new_entry['series_name'] = anidb_name
             if 'ep' in episode_data:
                 new_entry['series_episode'] = episode_data['ep']
                 title_new += '- %s' % episode_data['ep']  # FIXME: is there a valid way to encode anime episodes?
@@ -348,11 +354,10 @@ class AnidbFeed(object):
                 if new_entry['quality'].resolution.name != 'unknown':
                     title_new += ' [%s]' % new_entry['quality'].resolution
 
-            # TODO: Add a custom entry.render() field, to allow customisation of final 'title'
             new_entry['title'] = title_new
-            new_entry[NAMESPACE_PREFIX_MAIN + 'name'] = title_new  # used by anidb_list?
+            new_entry[NAMESPACE_PREFIX_MAIN + 'name'] = anidb_name
             entries.append(new_entry)
-            #dump_entry(new_entry)
+            _debug_dump_entry(new_entry)
         return entries
 
     def fill_entries_for_url(self, url, task, config):
