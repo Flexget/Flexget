@@ -39,7 +39,7 @@ class PluginUrlRewriting(object):
     # API method
     def url_rewritable(self, task, entry):
         """Return True if entry is urlrewritable by registered rewriter."""
-        for urlrewriter in plugin.get_plugins(group='urlrewriter'):
+        for urlrewriter in plugin.get_plugins(interface='urlrewriter'):
             if urlrewriter.name in self.disabled_rewriters:
                 log.trace('Skipping rewriter %s since it\'s disabled' % urlrewriter.name)
                 continue
@@ -58,7 +58,7 @@ class PluginUrlRewriting(object):
             if tries > 20:
                 raise UrlRewritingError('URL rewriting was left in infinite loop while rewriting url for %s, '
                                         'some rewriter is returning always True' % entry)
-            for urlrewriter in plugin.get_plugins(group='urlrewriter'):
+            for urlrewriter in plugin.get_plugins(interface='urlrewriter'):
                 name = urlrewriter.name
                 if name in self.disabled_rewriters:
                     log.trace('Skipping rewriter %s since it\'s disabled' % name)

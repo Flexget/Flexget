@@ -17,7 +17,7 @@ def plugins_summary(manager, options):
         disable_all_colors()
     header = ['Keyword', 'Phases', 'Flags']
     table_data = [header]
-    for plugin in sorted(get_plugins(phase=options.phase, group=options.group)):
+    for plugin in sorted(get_plugins(phase=options.phase, interface=options.interface)):
         if options.builtins and not plugin.builtin:
             continue
         flags = []

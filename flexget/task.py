@@ -662,7 +662,7 @@ class Task(object):
 
     @staticmethod
     def validate_config(config):
-        schema = plugin_schemas(context='task')
+        schema = plugin_schemas(interface='task')
         # Don't validate commented out plugins
         schema['patternProperties'] = {'^_': {}}
         return config_schema.process_config(config, schema)
@@ -698,7 +698,7 @@ class Task(object):
 def register_config_key():
     task_config_schema = {
         'type': 'object',
-        'additionalProperties': plugin_schemas(group='task')
+        'additionalProperties': plugin_schemas(interface='task')
     }
 
     config_schema.register_config_key('tasks', task_config_schema, required=True)

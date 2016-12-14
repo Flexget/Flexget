@@ -51,7 +51,7 @@ plugin_parser.add_argument('include_schema', type=inputs.boolean, default=False,
 
 plugins_parser = api.pagination_parser(plugin_parser)
 
-plugins_parser.add_argument('group', case_sensitive=False, help='Show plugins belonging to this group')
+plugins_parser.add_argument('interface', case_sensitive=False, help='Show plugins which implement this interface')
 plugins_parser.add_argument('phase', case_sensitive=False, help='Show plugins that act on this phase')
 
 
@@ -62,7 +62,7 @@ def plugin_to_dict(plugin):
         'builtin': plugin.builtin,
         'category': plugin.category,
         'debug': plugin.debug,
-        'groups': plugin.groups,
+        'interfaces': plugin.interfaces,
         'phase_handlers': [dict(phase=handler, priority=event.priority) for handler, event in
                            plugin.phase_handlers.items()]
     }
@@ -92,7 +92,7 @@ class PluginsAPI(APIResource):
 
         plugin_list = []
         try:
-            for plugin in get_plugins(phase=args['phase'], group=args['group']):
+            for plugin in get_plugins(phase=args['phase'], interface=args['interface']):
                 p = plugin_to_dict(plugin)
                 if args['include_schema']:
                     p['schema'] = plugin.schema
