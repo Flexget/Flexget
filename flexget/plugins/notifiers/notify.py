@@ -37,7 +37,6 @@ from flexget.utils.template import RenderError
 
 log = logging.getLogger('notify')
 
-
 NOTIFY_VIA_SCHEMA = {
     'type': 'array',
     'items': {
@@ -61,7 +60,7 @@ def render_config(config, template_renderer, _path=''):
     :param template_renderer: A function that should take a string or Template argument, and return the result of
         rendering it with the appropriate context.
     :raises: If an error is raised, it will have the additional `config_path` property to indicate where in the config
-        the error occured.
+        the error occurred.
     """
     if isinstance(config, (str, Template)):
         try:
@@ -72,11 +71,11 @@ def render_config(config, template_renderer, _path=''):
     elif isinstance(config, list):
         if _path:
             _path += '/'
-        return [render_config(v, template_renderer, _path=_path+str(i)) for i, v in enumerate(config)]
+        return [render_config(v, template_renderer, _path=_path + str(i)) for i, v in enumerate(config)]
     elif isinstance(config, dict):
         if _path:
             _path += '/'
-        return {k: render_config(v, template_renderer, _path=_path+k) for k, v in config.items()}
+        return {k: render_config(v, template_renderer, _path=_path + k) for k, v in config.items()}
     else:
         return config
 
@@ -128,5 +127,4 @@ class Notify(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(Notify, 'notify', api_ver=2)
-
     plugin.register_task_phase('notify', before='exit', suppress_abort=True)

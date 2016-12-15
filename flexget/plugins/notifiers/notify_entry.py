@@ -9,7 +9,6 @@ from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils.template import get_template
 
-
 log = logging.getLogger('notify_entry')
 
 ENTRY_CONTAINERS = ['entries', 'accepted', 'rejected', 'failed', 'undecided']
@@ -65,7 +64,7 @@ class NotifyEntry(object):
             try:
                 message = get_template(config['template'], scope='entry')
             except ValueError:
-                raise plugin.PluginError('Cannot locate template on disk: %s', config['template'])
+                raise plugin.PluginError('Cannot locate template on disk: %s' % config['template'])
         else:
             message = config['message']
         for entry in entries:
