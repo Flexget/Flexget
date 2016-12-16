@@ -48,21 +48,34 @@ class HorribleSubs(object):
             entries.append(Entry(title=title, url=urls[0], urls=urls))
         return entries
 
+    @staticmethod
+    def scraper():
+        try:
+            import cfscrape
+        except ImportError as e:
+            log.debug('Error importing cfscrape: %s' % e)
+            raise plugin.DependencyError('cfscraper', 'cfscrape', 'cfscrape module required. ImportError: %s' % e)
+        else:
+            return cfscrape.create_scraper()
+
     @cached('horriblesubs')
     def on_task_input(self, task, config):
         if not config:
             return
+        scraper = HorribleSubs.scraper()
         return HorribleSubs.horrible_entries(
-            task.requests, 'http://horriblesubs.info/lib/latest.php')
+            scraper, 'http://horriblesubs.info/lib/latest.php')
 
+    # Search API method
     def search(self, task, entry, config):
         if not config:
             return
         entries = []
+        scraper = HorribleSubs.scraper()
         for search_string in entry.get('search_strings', [entry['title']]):
             log.debug('Searching `{0}`'.format(search_string))
             results = HorribleSubs.horrible_entries(
-                task.requests, 'http://horriblesubs.info/lib/search.php?value={0}'.format(search_string))
+                scraper, 'http://horriblesubs.info/lib/search.php?value={0}'.format(search_string))
             entries.extend(results)
         return entries
 
