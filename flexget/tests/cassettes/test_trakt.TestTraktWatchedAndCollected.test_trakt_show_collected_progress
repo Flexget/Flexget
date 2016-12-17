@@ -6,6 +6,38 @@ interactions:
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: ['2']
     method: GET
+    uri: https://api.trakt.tv/users/flexgettest/lists/test/items
+  response:
+    body: {string: '[{"rank":1,"listed_at":"2016-03-08T21:36:36.000Z","type":"show","show":{"title":"White
+        Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}}},{"rank":2,"listed_at":"2016-03-08T21:36:50.000Z","type":"show","show":{"title":"Chuck","year":2007,"ids":{"trakt":1395,"slug":"chuck","tvdb":80348,"imdb":"tt0934814","tmdb":1404,"tvrage":15614}}}]'}
+    headers:
+      CF-RAY: [312bdeaf6e9c3ce9-CPH]
+      Cache-Control: ['max-age=0, private, must-revalidate']
+      Cf-Railgun: [e20c855e1e 4.11 0.014909 0030 e6be]
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 16:49:42 GMT']
+      Etag: [W/"14bdfd17b19d28c1251ef11711e88666"]
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d88d93c886ebc5ffc86143b803ed7570f1481993382; expires=Sun,
+          17-Dec-17 16:49:42 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Private-User: ['false']
+      X-Request-Id: [c6c4f4ed-692c-4d33-ae4d-206c337203ea]
+      X-Runtime: ['0.012445']
+      X-Sort-By: [rank]
+      X-Sort-How: [asc]
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
     uri: https://api.trakt.tv/shows/21410?extended=full
   response:
     body: {string: '{"title":"White Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720},"overview":"A
@@ -14,23 +46,53 @@ interactions:
         Network","country":"us","trailer":null,"homepage":"http://www.usanetwork.com/series/whitecollar/","status":"ended","rating":8.43486,"votes":7876,"updated_at":"2016-12-14T10:43:04.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fr","he","hu","it","nl","pl","pt","ro","ru","zh"],"genres":["drama","mystery","action","adventure","comedy","crime"],"aired_episodes":81}'}
     headers:
       CF-Cache-Status: [HIT]
-      CF-RAY: [312a16b68ec73cc5-CPH]
+      CF-RAY: [312bdeb09b383d5b-CPH]
       Cache-Control: ['public, max-age=28800']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:25 GMT']
+      Date: ['Sat, 17 Dec 2016 16:49:42 GMT']
       ETag: [W/"afae4e798b84d8b739aa3187b65931e6"]
-      Expires: ['Sat, 17 Dec 2016 19:38:25 GMT']
+      Expires: ['Sun, 18 Dec 2016 00:49:42 GMT']
       Last-Modified: ['Wed, 14 Dec 2016 10:43:04 GMT']
       Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d0a31ee8beea210b735024211419972ba1481974705; expires=Sun,
-          17-Dec-17 11:38:25 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Set-Cookie: ['__cfduid=de96fb0b6ded3794273f515ba092618c41481993382; expires=Sun,
+          17-Dec-17 16:49:42 GMT; path=/; domain=.trakt.tv; HttpOnly']
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
       X-Request-Id: [84640520-515c-4392-b297-19995690ec40]
       X-Runtime: ['0.009784']
       X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/flexgettest/collection/shows
+  response:
+    body: {string: '[{"last_collected_at":"2016-03-08T21:36:33.000Z","show":{"title":"White
+        Collar","year":2009,"ids":{"trakt":21410,"slug":"white-collar","tvdb":108611,"imdb":"tt1358522","tmdb":21510,"tvrage":20720}},"seasons":[{"number":1,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":2,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":3,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":4,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":14,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":15,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":16,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":5,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":7,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":8,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":9,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":10,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":11,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":12,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":13,"collected_at":"2016-03-08T21:36:33.000Z"}]},{"number":6,"episodes":[{"number":1,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":2,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":3,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":4,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":5,"collected_at":"2016-03-08T21:36:33.000Z"},{"number":6,"collected_at":"2016-03-08T21:36:33.000Z"}]}]},{"last_collected_at":"2012-10-01T02:00:00.000Z","show":{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811}},"seasons":[{"number":2,"episodes":[{"number":1,"collected_at":"2012-10-01T02:00:00.000Z"}]}]}]'}
+    headers:
+      CF-RAY: [312bdeb1389b3d2b-CPH]
+      Cache-Control: ['max-age=0, private, must-revalidate']
+      Cf-Railgun: [75e439c2b9 stream 0.000000 0210 e6be]
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 16:49:42 GMT']
+      Etag: [W/"90b9b69e4382349902f5df0f8b28a61a"]
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=dfc58ae7d6110eab0664340bf182fb0761481993382; expires=Sun,
+          17-Dec-17 16:49:42 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Private-User: ['false']
+      X-Request-Id: [e835e59c-85fb-44d9-8eaf-54c74b1e5b0d]
+      X-Runtime: ['0.018708']
+      X-Xss-Protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -52,17 +114,17 @@ interactions:
         freelance.","first_aired":"2007-09-25T00:00:00.000Z","airs":{"day":"Friday","time":"20:00","timezone":"America/New_York"},"runtime":43,"certification":"TV-PG","network":"NBC","country":"us","trailer":null,"homepage":"http://www.nbc.com/Chuck/","status":"ended","rating":8.45796,"votes":9324,"updated_at":"2016-11-26T10:48:57.000Z","language":"en","available_translations":["bg","bs","cs","da","de","en","es","fi","fr","he","hu","it","ja","pl","pt","ru","sv","tr","zh"],"genres":["comedy","drama","action"],"aired_episodes":91}'}
     headers:
       CF-Cache-Status: [HIT]
-      CF-RAY: [312a16b72dac3d49-CPH]
+      CF-RAY: [312bdeb2892f3d49-CPH]
       Cache-Control: ['public, max-age=28800']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Sat, 17 Dec 2016 11:38:25 GMT']
+      Date: ['Sat, 17 Dec 2016 16:49:42 GMT']
       ETag: [W/"b88a5ba6aecb5262f4c33aef4d9b6608"]
-      Expires: ['Sat, 17 Dec 2016 19:38:25 GMT']
+      Expires: ['Sun, 18 Dec 2016 00:49:42 GMT']
       Last-Modified: ['Sat, 26 Nov 2016 10:48:57 GMT']
       Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=d50d008b726b58c91a51d84031e8828771481974705; expires=Sun,
-          17-Dec-17 11:38:25 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Set-Cookie: ['__cfduid=d0e0dec5bc34f89c58b5bd3d1eb47ca8f1481993382; expires=Sun,
+          17-Dec-17 16:49:42 GMT; path=/; domain=.trakt.tv; HttpOnly']
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
