@@ -1,0 +1,128 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?type=movie&query=the+matrix
+  response:
+    body: {string: "[{\"type\":\"movie\",\"score\":69.366,\"movie\":{\"title\":\"The
+        Matrix\",\"overview\":\"Set in the 22nd century, The Matrix tells the story
+        of a computer hacker who joins a group of underground insurgents fighting
+        the vast and powerful computers who now rule the earth.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":64.29628,\"movie\":{\"title\":\"Dot
+        Matrix\",\"overview\":\"In 2012, Richard Tuohy made \\\"Screen Tone\\\" using
+        patterns of dots printed straight to 16mm film. By doubling this principle
+        in \\\"Dot Matrix\\\", a third, dizzying moire pattern and a deafening noise
+        develops in the flicker (alternating black and white frames) because the dots
+        also pass by the sound head.\",\"year\":2013,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":182633,\"slug\":\"dot-matrix-2013\",\"imdb\":\"tt3829928\",\"tmdb\":285435}}},{\"type\":\"movie\",\"score\":64.281815,\"movie\":{\"title\":\"Sexual
+        Matrix\",\"overview\":\"\\\"Sexual Matrix\\\" is about a matrix that is sexual.
+        A horny professor decides to ask his students all about their sexual fantasies.
+        Of course he does. So while they're describing their wildest dreams, he plugs
+        them into his matrix machine and it lets them live out their fantasies. It
+        seems so real! Mia Zottoli shows up to assist the professor in his quest to
+        know what turns the whole campus on\",\"year\":2000,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":36357,\"slug\":\"sexual-matrix-2000\",\"imdb\":\"tt0224086\",\"tmdb\":51767}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"The
+        Matrix Revolutions\",\"overview\":\"The human city of Zion defends itself
+        against the massive invasion of the machines as Neo fights to end the war
+        at another front while also opposing the rogue Agent Smith.\",\"year\":2003,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":483,\"slug\":\"the-matrix-revolutions-2003\",\"imdb\":\"tt0242653\",\"tmdb\":605}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"The
+        Matrix Reloaded\",\"overview\":\"Six months after the events depicted in The
+        Matrix, Neo has proved to be a good omen for the free humans, as more and
+        more humans are being freed from the matrix and brought to Zion, the one and
+        only stronghold of the Resistance.  Neo himself has discovered his superpowers
+        including super speed, ability to see the codes of the things inside the matrix
+        and a certain degree of pre-cognition. But a nasty piece of news hits the
+        human resistance: 250,000 machine sentinels are digging to Zion and would
+        reach them in 72 hours. As Zion prepares for the ultimate war, Neo, Morpheus
+        and Trinity are advised by the Oracle to find the Keymaker who would help
+        them reach the Source.  Meanwhile Neo's recurrent dreams depicting Trinity's
+        death have got him worried and as if it was not enough, Agent Smith has somehow
+        escaped deletion, has become more powerful than before and has fixed Neo as
+        his next target.\",\"year\":2003,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":482,\"slug\":\"the-matrix-reloaded-2003\",\"imdb\":\"tt0234215\",\"tmdb\":604}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"The
+        Matrix Revisited\",\"overview\":\"The film goes behind the scenes of the 1999
+        sci-fi movie The Matrix.\",\"year\":2001,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":8760,\"slug\":\"the-matrix-revisited-2001\",\"imdb\":\"tt0295432\",\"tmdb\":14543}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"Making
+        The Matrix\",\"overview\":\"A promotional making-of documentary for the film
+        Matrix, The (1999) that devotes its time to explaining the digital and practical
+        effects contained in the film. This is very interesting, seeing as how they're
+        giving away the cinematic secrets that they created solely for the this movie,
+        that have now been spoofed and referenced in countless other films.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\",\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"The
+        Matrix DeZionized\",\"overview\":\"After the fantastic movie \u201CThe Matrix\u201D
+        everyone was awaiting the sequels, but somehow the writer/directors were not
+        able to continue the epic they started in the way they began. In our humble
+        opinion they lost themselves in detail, wanted to much and definetly to show
+        off with effect orgies. We tried to continue the Matrix withing the Matrix
+        wherever possible. Leaving out the Zion scenes was a major improvement of
+        pace and plot development and the most interesting thing about it is that
+        these scenes are not missed when left out. We tried to be smart and reduced
+        the Matrix sequels to the max. Also we cut out several scenes that just did
+        not feel right or felt to be unnecessary, e.G. when Morpheus talks to Link
+        about trust, it just feels wrong and Morpheus seems to become a stereotype
+        of himself.\",\"year\":2005,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":186958,\"slug\":\"the-matrix-dezionized-2005\",\"imdb\":\"\",\"tmdb\":290029}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"The
+        Matrix ASCII\",\"overview\":\"The.Matrix-ASCII  This work is a parody.  As
+        such I do not believe that this DVD has any  possibility of competing with
+        the original in any market.  It is not for  sale.  This does not include a
+        tutorial on burning DVD's but only burn the files  in the VIDEO_TS folder.
+        \ If you want more information on why and how I did this take a look at the
+        \ page I dedicated to this project.  http://onyx.chattanoogastate.edu/~jack/matrix/
+        \ Jack\",\"year\":null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":259826,\"slug\":\"the-matrix-ascii\",\"imdb\":null,\"tmdb\":414884}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"The
+        Matrix Recalibrated\",\"overview\":\"The making of Matrix Revolutions, The
+        (2003) is briefly touched on here in this documentary. Interviews with various
+        cast and crew members inform us how they were affected by the deaths of Gloria
+        Foster and Aaliyah, and also delve into the making of the visual effects that
+        takes up a lot of screen time. Written by Rhyl Donnelly\",\"year\":2004,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":136173,\"slug\":\"the-matrix-recalibrated-2004\",\"imdb\":\"tt0410519\",\"tmdb\":221495}}}]"}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [312a5a64ccf03cef-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:24:38 GMT']
+      ETag: [W/"94804c308f0ad2361b60b945291b9c47"]
+      Expires: ['Sat, 17 Dec 2016 20:24:38 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d9a9fdf7d5de8c9e5577857f2dbe89f161481977477; expires=Sun,
+          17-Dec-17 12:24:37 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['65']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['7']
+      X-Request-Id: [6863ace2-4f10-4b6b-9b7c-0fa0eb06293e]
+      X-Runtime: ['0.033067']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=d9a9fdf7d5de8c9e5577857f2dbe89f161481977477]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/movies/481?extended=full
+  response:
+    body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
+        to the Real World.","overview":"Set in the 22nd century, The Matrix tells
+        the story of a computer hacker who joins a group of underground insurgents
+        fighting the vast and powerful computers who now rule the earth.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/matrix","rating":8.89357,"votes":22878,"updated_at":"2016-12-16T08:41:42.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hu","id","it","ja","ko","mk","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["action","science-fiction"],"certification":"R"}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [312a5a679d5b3cef-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:24:38 GMT']
+      ETag: [W/"71bb837d0fdf4e85d8cd6fc76a31fc09"]
+      Expires: ['Sat, 17 Dec 2016 20:24:38 GMT']
+      Last-Modified: ['Fri, 16 Dec 2016 08:41:42 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [9c974a27-c920-4e4d-971c-06e48254afab]
+      X-Runtime: ['0.012982']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

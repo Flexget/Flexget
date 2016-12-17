@@ -1,0 +1,78 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?year=1990&type=show&query=the+flash
+  response:
+    body: {string: '[{"type":"show","score":67.47618,"show":{"title":"The Flash","overview":"Central
+        City Police forensic scientist Barry Allen''s crime lab is struck by lightning.
+        Allen''s electrified body is flung into and shatters a cabinet of chemicals,
+        which are both electrified and forced to interact with each other and with
+        his physiology when they come into physical contact with his body. He soon
+        discovers that the accident has changed his body''s metabolism and as a result
+        he has gained the ability to move at superhuman speed. Barry Allen has become
+        the Flash.","year":1990,"status":"ended","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781}}}]'}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [312a5a2c38053d0d-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:24:29 GMT']
+      ETag: [W/"caed18dfd87a3c24e466caa2bfd733cc"]
+      Expires: ['Sat, 17 Dec 2016 20:24:29 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d39ffd8f7db2feba8192fe312f56709981481977468; expires=Sun,
+          17-Dec-17 12:24:28 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['1']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['1']
+      X-Request-Id: [6f960cd0-f47e-4702-9c4a-e4e835a97b13]
+      X-Runtime: ['0.020418']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=d39ffd8f7db2feba8192fe312f56709981481977468]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/235?extended=full
+  response:
+    body: {string: '{"title":"The Flash","year":1990,"ids":{"trakt":235,"slug":"the-flash","tvdb":78650,"imdb":"tt0098798","tmdb":236,"tvrage":5781},"overview":"Central
+        City Police forensic scientist Barry Allen''s crime lab is struck by lightning.
+        Allen''s electrified body is flung into and shatters a cabinet of chemicals,
+        which are both electrified and forced to interact with each other and with
+        his physiology when they come into physical contact with his body. He soon
+        discovers that the accident has changed his body''s metabolism and as a result
+        he has gained the ability to move at superhuman speed. Barry Allen has become
+        the Flash.","first_aired":"1990-09-20T07:00:00.000Z","airs":{"day":"Tuesday","time":"20:00","timezone":"America/New_York"},"runtime":60,"certification":"TV-PG","network":"CBS","country":"us","trailer":null,"homepage":null,"status":"ended","rating":7.30108,"votes":279,"updated_at":"2016-11-30T10:53:36.000Z","language":"en","available_translations":["bg","bs","da","de","en","fr","it","pt","ro","ru"],"genres":["drama","action","crime","fantasy","adventure"],"aired_episodes":22}'}
+    headers:
+      CF-Cache-Status: [REVALIDATED]
+      CF-RAY: [312a5a2ee87c3d0d-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:24:29 GMT']
+      ETag: [W/"ca7e6d329be19249e8daf53ba5d6d6b3"]
+      Expires: ['Sat, 17 Dec 2016 20:24:29 GMT']
+      Last-Modified: ['Wed, 30 Nov 2016 10:53:36 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [5342a521-9725-4623-a4d6-3688505d5e5c]
+      X-Runtime: ['0.013624']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

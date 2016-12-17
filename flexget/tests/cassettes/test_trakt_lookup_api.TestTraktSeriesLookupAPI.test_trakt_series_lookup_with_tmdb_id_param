@@ -1,0 +1,84 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?id_type=tmdb&id=60735
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":null,\"show\":{\"title\":\"The Flash\",\"overview\":\"Barry
+        Allen wakes up nine months after he was struck by lightning and discovers
+        that the bolt gave him the power of super speed. With his new team and powers,
+        Barry becomes \\\"The Flash\\\" and fights crime in Central City.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}},{\"type\":\"movie\",\"score\":null,\"movie\":{\"title\":\"Jul
+        i Mummidalen\",\"overview\":\"Mummifamilien har ligget i vinterdvale i flere
+        m\xE5neder og dr\xF8mt om sol og sommer. Men s\xE5 kommer en hemul p\xE5 bes\xF8k
+        \u2013 og vekker dem for \xE5 fortelle at julen er her! Men ingen i Mummifamilien
+        har h\xF8rt om julen f\xF8r. \u201CHvem er julen?\u201D sp\xF8r de. Ingen
+        har tid til \xE5 fortelle dem hvem julen er, men de skj\xF8nner at de m\xE5
+        ha b\xE5de juletre og mat. Mummitrollet, Mummimamma og Mummipappa lager i
+        stand massevis av deilig mat og pynter juletreet vidunderlig vakkert. Og s\xE5
+        kommer det uventet noen p\xE5 bes\xF8k.\",\"year\":null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43506,\"slug\":\"jul-i-mummidalen-1969\",\"imdb\":\"\",\"tmdb\":60735}}},{\"type\":\"episode\",\"score\":null,\"episode\":{\"season\":1,\"number\":25,\"title\":\"Episode
+        25\",\"images\":{\"screenshot\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":72174,\"tvdb\":4596853,\"imdb\":\"\",\"tmdb\":60735,\"tvrage\":556554}},\"show\":{\"title\":\"At
+        the Threshold of an Era\",\"year\":\"1999\",\"ids\":{\"trakt\":1350,\"slug\":\"at-the-threshold-of-an-era\"},\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}}}},{\"type\":\"person\",\"score\":null,\"person\":{\"name\":\"Hannah
+        Farr\",\"images\":{\"headshot\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":46056,\"slug\":\"hannah-farr\",\"imdb\":\"nm2698630\",\"tmdb\":60735,\"tvrage\":null}}}]"}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [312a5a37ee713d4f-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:24:31 GMT']
+      ETag: [W/"e5e24c74fda6b6ef041641c7839a01e6"]
+      Expires: ['Sat, 17 Dec 2016 20:24:31 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d3ec60c24469f54150df30cc2b06573931481977470; expires=Sun,
+          17-Dec-17 12:24:30 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['4']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['1']
+      X-Request-Id: [a758416e-ac3f-43b8-8b8e-b5b87375e8a1]
+      X-Runtime: ['0.206744']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=d3ec60c24469f54150df30cc2b06573931481977470]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/60300?extended=full
+  response:
+    body: {string: '{"title":"The Flash","year":2014,"ids":{"trakt":60300,"slug":"the-flash-2014","tvdb":279121,"imdb":"tt3107288","tmdb":60735,"tvrage":36939},"overview":"Barry
+        Allen wakes up nine months after he was struck by lightning and discovers
+        that the bolt gave him the power of super speed. With his new team and powers,
+        Barry becomes \"The Flash\" and fights crime in Central City.","first_aired":"2014-10-08T00:00:00.000Z","airs":{"day":"Tuesday","time":"20:00","timezone":"America/New_York"},"runtime":44,"certification":"TV-PG","network":"The
+        CW","country":"us","trailer":"http://youtube.com/watch?v=aZxhA_Jihmw","homepage":"http://www.cwtv.com/shows/the-flash/","status":"returning
+        series","rating":8.31138,"votes":12114,"updated_at":"2016-12-15T11:24:21.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fa","fr","he","hr","hu","id","it","ko","lb","lb","lt","ml","ms","nl","pl","pt","ro","ru","sk","sr","sv","te","th","tr","uk","vi","za","zh"],"genres":["drama","fantasy","science-fiction"],"aired_episodes":55}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [312a5a3bcefc3d4f-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:24:31 GMT']
+      ETag: [W/"8e835f41af0610ff3561129f65477ae1"]
+      Expires: ['Sat, 17 Dec 2016 20:24:31 GMT']
+      Last-Modified: ['Thu, 15 Dec 2016 11:24:21 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [3ca13e1f-fa04-45e4-a386-42d74de015f6]
+      X-Runtime: ['0.023394']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

@@ -1,0 +1,73 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?id_type=tvrage&id=36939
+  response:
+    body: {string: '[{"type":"show","score":null,"show":{"title":"The Flash","overview":"Barry
+        Allen wakes up nine months after he was struck by lightning and discovers
+        that the bolt gave him the power of super speed. With his new team and powers,
+        Barry becomes \"The Flash\" and fights crime in Central City.","year":2014,"status":"returning
+        series","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":60300,"slug":"the-flash-2014","tvdb":279121,"imdb":"tt3107288","tmdb":60735,"tvrage":36939}}}]'}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [312a5a47e8743d4f-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:24:34 GMT']
+      ETag: [W/"85140a3806e9bf2f8bb7fb3a06a57e6d"]
+      Expires: ['Sat, 17 Dec 2016 20:24:34 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d8d569812d561f5d2fe11d054d32850141481977473; expires=Sun,
+          17-Dec-17 12:24:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['1']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['1']
+      X-Request-Id: [68e5eaf3-6031-4014-bedc-78910e59aab5]
+      X-Runtime: ['0.139957']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=d8d569812d561f5d2fe11d054d32850141481977473]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/60300?extended=full
+  response:
+    body: {string: '{"title":"The Flash","year":2014,"ids":{"trakt":60300,"slug":"the-flash-2014","tvdb":279121,"imdb":"tt3107288","tmdb":60735,"tvrage":36939},"overview":"Barry
+        Allen wakes up nine months after he was struck by lightning and discovers
+        that the bolt gave him the power of super speed. With his new team and powers,
+        Barry becomes \"The Flash\" and fights crime in Central City.","first_aired":"2014-10-08T00:00:00.000Z","airs":{"day":"Tuesday","time":"20:00","timezone":"America/New_York"},"runtime":44,"certification":"TV-PG","network":"The
+        CW","country":"us","trailer":"http://youtube.com/watch?v=aZxhA_Jihmw","homepage":"http://www.cwtv.com/shows/the-flash/","status":"returning
+        series","rating":8.31138,"votes":12114,"updated_at":"2016-12-15T11:24:21.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fa","fr","he","hr","hu","id","it","ko","lb","lb","lt","ml","ms","nl","pl","pt","ro","ru","sk","sr","sv","te","th","tr","uk","vi","za","zh"],"genres":["drama","fantasy","science-fiction"],"aired_episodes":55}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [312a5a4de95a3d4f-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:24:34 GMT']
+      ETag: [W/"8e835f41af0610ff3561129f65477ae1"]
+      Expires: ['Sat, 17 Dec 2016 20:24:34 GMT']
+      Last-Modified: ['Thu, 15 Dec 2016 11:24:21 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [3ca13e1f-fa04-45e4-a386-42d74de015f6]
+      X-Runtime: ['0.023394']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1
