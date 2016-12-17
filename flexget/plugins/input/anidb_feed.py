@@ -288,7 +288,7 @@ class AnidbFeed(object):
                     new_entry[NAMESPACE_PREFIX_MAIN + 'file_crc32'] = crc_string.lower()
             # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
             anidb_name = self.get_value_via_regex('title', new_entry, r'^(.*?) -')
-            anidb_name.rstrip()
+            anidb_name = anidb_name.rstrip()
             if not anidb_name:
                 log.error('Skipping entry, invalid anidb name parsed from: %s', new_entry['title'])
                 continue
@@ -299,7 +299,7 @@ class AnidbFeed(object):
                 quality_string += resolution_string
             if source_string:
                 quality_string += ' ' + source_string
-            quality_string.strip()
+            quality_string = quality_string.strip()
             if quality_string:
                 new_entry['quality'] = Quality(quality_string)
             # build the new 'title' mimic general scene naming convention
