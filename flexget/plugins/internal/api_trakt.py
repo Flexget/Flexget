@@ -24,7 +24,7 @@ from flexget.utils.database import with_session, json_synonym
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.utils.tools import TimedDict
 
-Base = db_schema.versioned_base('api_trakt', 6)
+Base = db_schema.versioned_base('api_trakt', 7)
 AuthBase = db_schema.versioned_base('trakt_auth', 0)
 log = logging.getLogger('api_trakt')
 # Production Site
@@ -213,7 +213,7 @@ def get_api_url(*endpoint):
 
 @db_schema.upgrade('api_trakt')
 def upgrade(ver, session):
-    if ver is None or ver <= 5:
+    if ver is None or ver <= 6:
         raise db_schema.UpgradeImpossible
     return ver
 
