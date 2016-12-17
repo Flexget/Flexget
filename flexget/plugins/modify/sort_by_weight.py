@@ -6,10 +6,7 @@ from datetime import datetime, timedelta
 import logging
 
 from flexget.utils.tools import parse_timedelta
-from past.types import basestring
-
 from flexget.utils.qualities import Quality
-
 from flexget import plugin
 from flexget.event import event
 
@@ -110,10 +107,10 @@ class PluginSortByWeight(object):
                     key = entry.get('field')
                     settings[key] = entry
                     delta = settings[key].get('delta_distance')
-                    if delta and isinstance(delta, basestring):
+                    if delta and isinstance(delta, str):
                         settings[key]['delta_distance'] = parse_timedelta(delta)
                     limit = settings[key].get('upper_limit')
-                    if limit and isinstance(limit, basestring):
+                    if limit and isinstance(limit, str):
                         settings[key]['upper_limit'] = parse_timedelta(limit)
         return settings
 
@@ -128,10 +125,10 @@ class PluginSortByWeight(object):
         task.all_entries.sort(key=lambda e: e.get(ENTRY_WEIGHT_FIELD_NAME, 0), reverse=True)
         # debug
         #for entry in task.all_entries:
-        #    log.verbose('sum[ %s ] weights: %s, title: %s' % (entry.get(ENTRY_WEIGHT_FIELD_NAME, -1), entry.get('weights', -1), entry['title']))
+        #    log.verbose('sum[ %s ] weights: %s, title: %s', entry.get(ENTRY_WEIGHT_FIELD_NAME, -1), entry.get('weights', -1), entry['title'])
 
     @staticmethod
-    def get_lower_limit(value):
+    def _get_lower_limit(value):
         min_value = 0
         if isinstance(value, Quality):
             min_value = Quality()
@@ -144,58 +141,45 @@ class PluginSortByWeight(object):
         return min_value
 
     @staticmethod
-    def limit_value(key, value, config):
+    def _limit_value(key, value, config):
         if config[key].get('upper_limit'):
             limit = config[key]['upper_limit']
-            try:
-                # auto handle datetime
-                if isinstance(value, datetime) and isinstance(limit, timedelta):
-                    if config[key]['inverse'] is True:
-                        if (datetime.now() - limit) > value:
-                            value = datetime.now() - limit
-                    else:
-                        if (datetime.now() + limit) < value:
-                            value = datetime.now() + limit
-                elif value > limit:
-                    value = limit
-            except Exception as ex:
-                raise plugin.PluginError('Limit failed, key: %s, value: %s, error: %s' % (key, value, ex))
+            # auto handle datetime
+            if isinstance(value, datetime) and isinstance(limit, timedelta):
+                if config[key]['inverse'] is True:
+                    if (datetime.now() - limit) > value:
+                        value = datetime.now() - limit
+                else:
+                    if (datetime.now() + limit) < value:
+                        value = datetime.now() + limit
+            elif value > limit:
+                value = limit
         return value
 
-    def calc_stride_delta(self, key, entries, config):
-        value_range = None
+    def _calc_stride_delta(self, key, entries, config):
         delta = None
-        stride = DEFAULT_STRIDE
+        stride = None
+
+        lower_default = self._get_lower_limit(entries[0][key])
+        max_entry = max(entries, key=lambda e, k=key, d=lower_default: e.get(k, d))
+        min_entry = min(entries, key=lambda e, k=key, d=lower_default: e.get(k, d))
+        max_value = max_entry[key]
+        max_value = self._limit_value(key, max_value, config)
+        min_value = min_entry[key]
         try:
-            lower_default = self.get_lower_limit(entries[0][key])
-            max_entry = max(entries, key=lambda e, k=key, d=lower_default: e.get(k, d))
-            min_entry = min(entries, key=lambda e, k=key, d=lower_default: e.get(k, d))
-            max_value = max_entry[key]
-            max_value = self.limit_value(key, max_value, config)
-            min_value = min_entry[key]
-            try:
-                min_value = min(min_value, lower_default)  # try normalize to natural lower bound
-            except Exception as ex:
-                log.trace('Error min_value: %s' % ex)
-
-            try:
-                value_range = max_value - min_value
-            except Exception as ex:
-                log.trace('Error value_range: %s' % ex)
+            min_value = min(min_value, lower_default)  # try normalize to natural lower bound
         except Exception as ex:
-            log.trace('Error max/min_value: %s' % ex)
+            log.debug('Incompatible min_value op: %s' % ex)
 
+        value_range = max_value - min_value
         if value_range:
-            try:
+            if 'delta_distance' in config[key]:
+                delta = config[key]['delta_distance']
+                stride = value_range / delta
+                if isinstance(stride, timedelta):
+                    stride = stride.days
+            else:
                 delta = value_range / DEFAULT_STRIDE
-                if 'delta_distance' in config[key]:
-                    delta = config[key]['delta_distance']
-                    stride = value_range / delta
-                    if isinstance(stride, timedelta):
-                        stride = stride.days
-            except Exception as ex:
-                log.trace('Error delta/stride: %s' % ex)
-        #log.verbose('key: %s, stride: %s, delta: %s, range: %s' % (key, stride, delta, value_range))  # debug
         return stride, delta
 
     def calc_weights(self, entries, config):
@@ -205,23 +189,29 @@ class PluginSortByWeight(object):
             # stride = max / delta
             # step = max_weight / stride
             # weight = (entry / delta) * step
-            stride, delta = self.calc_stride_delta(key, entries, config)
+            stride = None
+            delta = None
+            try:
+                stride, delta = self._calc_stride_delta(key, entries, config)
+            except Exception as ex:
+                delta = None
+                log.warning('Could not calculate stride for key: %s, type: %s, using fallback sort. Error: %s',
+                            key, type(entries[0][key]), ex)
+                lower_default = self._get_lower_limit(entries[0][key])
+                entries.sort(key=lambda e, k=key,d=lower_default: e.get(k, d), reverse=True)
             if not stride:
-                continue
-            if not delta:
-                lower_default = self.get_lower_limit(entries[0][key])
-                entries.sort(key=lambda e, k=key,d=lower_default: e.get(k, d), reverse=True)  # largest-> smallest by default
+                stride = DEFAULT_STRIDE
             max_weight = config[key]['weight']
             weight_step = max_weight / max(int(stride), 1)
             current_value = None
             weight = None
-            #log.verbose('*** key: `%s`, delta: %s, weight_step: %s' % (key, delta, weight_step))
+            #log.verbose('*** key: `%s`, delta: %s, weight_step: %s', key, delta, weight_step)
             for entry in entries:
                 if ENTRY_WEIGHT_FIELD_NAME not in entry:
                     entry[ENTRY_WEIGHT_FIELD_NAME] = 0
 
                 value = entry[key]
-                value = self.limit_value(key, value, config)
+                value = self._limit_value(key, value, config)
                 if value is None:
                     continue
                 if current_value is None:
@@ -232,13 +222,14 @@ class PluginSortByWeight(object):
                 if delta:
                     try:
                         weight = (value / delta) * weight_step
-                    except Exception as ex:
-                        #log.warning('1) Could not calc weight for key: %s, error: %s' % (key, ex))
+                    except Exception:
                         try:
-                            value_normalized = abs(value - self.get_lower_limit(value))  # convert value to distance from minimum
+                            # convert value to distance from minimum
+                            value_normalized = abs(value - self._get_lower_limit(value))
                             weight = (value_normalized / delta) * weight_step
                         except Exception as ex:
-                            log.warning('Could not calc weight for key: %s, error: %s' % (key, ex))
+                            log.warning('Skipping entry: %s, could not calc weight for key: %s, error: %s',
+                                        entry, key, ex)
                             continue
                     current_value = value
                 elif value < current_value:
@@ -249,9 +240,9 @@ class PluginSortByWeight(object):
 
                 weight = int(max(weight, 0))
                 entry[ENTRY_WEIGHT_FIELD_NAME] += weight
-                #self.add_debug_info(key, entry, weight, entry[key], value) # debug only
+                #self._add_debug_info(key, entry, weight, entry[key], value)  # debug only
 
-    def add_debug_info(self, key, entry, weight, *args):
+    def _add_debug_info(self, key, entry, weight, *args):
         if 'weights' not in entry:
             entry['weights'] = dict()
         short_args = []
@@ -268,6 +259,7 @@ class PluginSortByWeight(object):
             else:
                 short_args.append(arg)
         entry['weights'][key] = '%s = %s' % (weight,  short_args)
+
 
 @event('plugin.register')
 def register_plugin():
