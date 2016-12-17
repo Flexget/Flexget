@@ -32,13 +32,13 @@ class HorribleSubs(object):
         for td_label in soup.findAll('td', attrs={'class': 'dl-label'}):
             title = '[HorribleSubs] {0}'.format(str(td_label.find('i').string))
             urls = []
-            log.debug('Found title `{0}`'.format(title))
+            log.debug('Found title `%s`', title)
             for span in td_label.parent.findAll('span', attrs={'class': 'dl-link'}):
                 # skip non torrent based links
                 if 'hs-ddl-link' in span.parent.attrs['class']:
                     continue
                 url = str(span.find('a').attrs['href'])
-                log.debug('Found url `{0}`'.format(url))
+                log.debug('Found url `%s`', url)
                 urls.append(url)
             # move magnets to last, a bit hacky
             for url in urls[:]:
@@ -48,21 +48,33 @@ class HorribleSubs(object):
             entries.append(Entry(title=title, url=urls[0], urls=urls))
         return entries
 
+    @staticmethod
+    def scraper():
+        try:
+            import cfscrape
+        except ImportError as e:
+            log.debug('Error importing cfscrape: %s', e)
+            raise plugin.DependencyError('cfscraper', 'cfscrape', 'cfscrape module required. ImportError: %s' % e)
+        else:
+            return cfscrape.create_scraper()
+
     @cached('horriblesubs')
     def on_task_input(self, task, config):
         if not config:
             return
-        return HorribleSubs.horrible_entries(
-            task.requests, 'http://horriblesubs.info/lib/latest.php')
+        scraper = HorribleSubs.scraper()
+        return HorribleSubs.horrible_entries(scraper, 'http://horriblesubs.info/lib/latest.php')
 
+    # Search API method
     def search(self, task, entry, config):
         if not config:
             return
         entries = []
+        scraper = HorribleSubs.scraper()
         for search_string in entry.get('search_strings', [entry['title']]):
-            log.debug('Searching `{0}`'.format(search_string))
+            log.debug('Searching `%s`', search_string)
             results = HorribleSubs.horrible_entries(
-                task.requests, 'http://horriblesubs.info/lib/search.php?value={0}'.format(search_string))
+                scraper, 'http://horriblesubs.info/lib/search.php?value={0}'.format(search_string))
             entries.extend(results)
         return entries
 
