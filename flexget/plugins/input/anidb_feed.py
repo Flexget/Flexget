@@ -14,7 +14,6 @@ from datetime import datetime
 from flexget.config_schema import one_or_more
 
 from flexget.utils.qualities import Quality
-from past.builtins import basestring
 from flexget.utils.tools import str_to_boolean
 
 from flexget import plugin
@@ -22,6 +21,7 @@ from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.entry import Entry
 from flexget.utils.requests import TimedLimiter
+from requests import RequestException
 
 
 log = logging.getLogger('anidb_feed')
@@ -39,15 +39,15 @@ NAMESPACE_PREFIX = 'anidb_feed_'
 # NOTE: all lowercase only
 NAMESPACE_ATTRIBUTE_MAP = {
     'added': datetime,
-    'source': basestring,
-    'resolution': basestring,
-    'crc_status': basestring,
-    'language': basestring,
-    'group': basestring,
-    'subtitle_language': basestring,
-    'priority': basestring,
-    'quality': basestring,
-    'size': basestring
+    'source': str,
+    'resolution': str,
+    'crc_status': str,
+    'language': str,
+    'group': str,
+    'subtitle_language': str,
+    'priority': str,
+    'quality': str,
+    'size': str
 }
 
 VALIDATION_LIST = [
@@ -90,9 +90,9 @@ def convert_to_naive_utc(valuestring):
         except ValueError:
             parsed_date = parsed_date.replace(tzinfo=None)
     except ValueError as ex:
-        log.warning('Invalid datetime field format: %s error: %s' % (valuestring, ex))
+        log.warning('Invalid datetime field format: %s error: %s',valuestring, ex)
     except Exception as ex:
-        log.trace('Unexpected datetime field: %s error: %s' % (valuestring, ex))
+        log.debug('Unexpected datetime field: %s error: %s', valuestring, ex)
     return parsed_date
 
 
@@ -104,16 +104,16 @@ def convert_to_number(valuestring):
         try:
             number = float(valuestring)
         except ValueError:
-            log.trace('Invalid number field: %s' % valuestring)
+            log.debug('Invalid number field: %s', valuestring)
     except Exception as ex:
-        log.trace('Invalid number field: %s error: %s' % (valuestring, ex))
+        log.debug('Invalid number field: %s error: %s', valuestring, ex)
     return number
 
 
 def _debug_dump_entry(entry):
     log.verbose('#####################################################################################')
     for key in entry:
-        log.verbose('%-8s [%-30s] = %s' % (type(entry[key]).__name__, key, entry[key]))
+        log.verbose('%-8s [%-30s] = %s', type(entry[key]).__name__, key, entry[key])
 
 
 class AnidbFeed(object):
@@ -144,8 +144,9 @@ class AnidbFeed(object):
         Adds those extra Entry fields if found:
         'content_size'
         'rss_pubdate'
-        'anidb_fileversion'     # fileversion aka v1-5
         'anidb_fid'             # anidb file_id
+        'anidb_file_version'    # fileversion aka v1-5
+        'anidb_file_crc32'      # the anidb validated hash for this file relese
         'anidb_feed_added'
         'anidb_feed_source'
         'anidb_feed_resolution'
@@ -176,7 +177,7 @@ class AnidbFeed(object):
             config['include'] = [config['include']]
         return config
 
-    # notification update interval is 15 minutes
+    # anidb notification update interval is 15 minutes
     @cached('anidb_feed', persist='15 minutes')
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
@@ -208,12 +209,12 @@ class AnidbFeed(object):
         result = None
         if entry.get(key):
             value_string = entry[key]
-            if isinstance(value_string, basestring) and not value_string.isspace():
+            if isinstance(value_string, str) and not value_string.isspace():
                 match = re.search(re_string, value_string)
                 if match and match.group(group_nr) and not match.group(group_nr).isspace():
                     result = match.group(group_nr)
             else:
-                log.error('Expecting string for re lookup got: %s, tyep: %s' % (value_string, type(value_string)))
+                log.error('Expecting string for re lookup got: %s, type: %s', value_string, type(value_string))
         return result
 
     def parse_episode_data(self, key, entry):
@@ -228,13 +229,13 @@ class AnidbFeed(object):
                 ep_nr = int(ep_nr)
             except Exception as ex:
                 ep_nr = None
-                log.warning('Expecting a episode nr as integer in: %s, error: %s' % (entry[key], ex))
+                log.warning('Expecting a episode nr as integer in: %s, error: %s', entry[key], ex)
         if file_version:
             try:
                 file_version = int(file_version)
             except Exception as ex:
                 file_version = None
-                log.warning('Expecting a file version nr as integer in: %s, error: %s' % (entry[key], ex))
+                log.warning('Expecting a file version nr as integer in: %s, error: %s', entry[key], ex)
         out_list = dict()
         out_list['extra'] = True
         if ep_nr is not None:
@@ -274,8 +275,9 @@ class AnidbFeed(object):
                     fid = int(fid_string)
                     if fid is not None:
                         new_entry[NAMESPACE_PREFIX_MAIN + 'fid'] = fid
-                except Exception as ex:
-                    log.error('Could not parse fid string: %s, error: %s' % (fid_string, ex))
+                except (TypeError, ValueError) as ex:
+                    log.error('Skipping Entry: %s, could not parse fid string: %s, error: %s', new_entry, fid_string, ex)
+                    continue
             if xml_entry.updated_parsed:
                 new_entry['rss_pubdate'] = datetime.fromtimestamp(mktime(xml_entry.updated_parsed))
             elif xml_entry.updated:
@@ -284,7 +286,7 @@ class AnidbFeed(object):
                     new_entry['rss_pubdate'] = parsed_date
 
             # add some usefully attributes to the namespace
-            self.fill_namespace_attributes(xml_entry, new_entry)
+            self._fill_namespace_attributes(xml_entry, new_entry)
             if config['valid_only'] is True:
                 if self.is_valid_entry(new_entry, NAMESPACE_PREFIX) is False:
                     continue
@@ -299,8 +301,8 @@ class AnidbFeed(object):
                     if size_mb > 0:
                         new_entry['content_size'] = size_mb  # FIXME: is this valid here or put in NAMESPACE_PREFIX_MAIN?
                         new_entry[NAMESPACE_PREFIX + 'size'] = size_bytes  # update with parsed size
-                except Exception as ex:
-                    log.warning('Could not extract valid size from string: %s, error: %s' % (size_string, ex))
+                except (TypeError, ValueError) as ex:
+                    log.warning('Could not extract valid size from string: %s, error: %s', size_string, ex)
             # "HorribleSubs (HorribleSubs)"
             group_tag = self.get_value_via_regex(NAMESPACE_PREFIX + 'group', new_entry, r'\((.*?)\)')
             # "title - 1 - ... - Complete Movie"
@@ -311,44 +313,53 @@ class AnidbFeed(object):
             source_string = None
             if new_entry.get(NAMESPACE_PREFIX + 'source'):
                 source_string = ANIDB_SOURCES_MAP.get(new_entry[NAMESPACE_PREFIX + 'source'])
+            # 'Matches official CRC (9833055b)'
+            if new_entry.get(NAMESPACE_PREFIX + 'crc_status'):
+                crc_string = self.get_value_via_regex(NAMESPACE_PREFIX + 'crc_status', new_entry,
+                                                      r'Matches official CRC \((([0-9]|[A-Fa-f]){8,8})\)')
+                if crc_string:
+                    new_entry[NAMESPACE_PREFIX_MAIN + 'file_crc32'] = crc_string.lower()
             # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
             anidb_name = self.get_value_via_regex('title', new_entry, r'^(.*?) -')
-            # fix and add to new_entry()
+            anidb_name.rstrip()
+            if not anidb_name:
+                log.error('Skipping entry, invalid anidb name parsed from: %s', new_entry['title'])
+                continue
 
+            # fix and add to new_entry()
             quality_string = ''
             if resolution_string:
                 quality_string += resolution_string
             if source_string:
                 quality_string += ' ' + source_string
             if not quality_string.isspace():
-                try:
-                    quality = Quality(quality_string)
-                    new_entry['quality'] = quality
-                except Exception as ex:
-                    log.error('Could not get Quality from string: %s, error: %s' % (quality_string, ex))
+                new_entry['quality'] = Quality(quality_string)
             # build the new 'title' mimic general scene naming convention
-            title_new = '%s ' % anidb_name
+            title_new = anidb_name
             if is_movie is not None:
                 new_entry['movie_name'] = anidb_name
             else:
                 new_entry['series_name'] = anidb_name
             if 'ep' in episode_data:
-                new_entry['series_episode'] = episode_data['ep']
-                title_new += '- %s' % episode_data['ep']  # FIXME: is there a valid way to encode anime episodes?
-                new_entry['series_id'] = '%02d' % episode_data['ep']  # Is this valid aka a single Integer?
-                if episode_data['ep'] > 99:
-                    new_entry['series_id'] = '%03d' % episode_data['ep']
+                if is_movie and episode_data['ep'] == 1:
+                    log.debug('Hiding episode 1 numbering for Anime/Movie: %s', anidb_name)
+                else:
+                    new_entry['series_episode'] = episode_data['ep']  # FIXME: Does flexget support Movie episodes?
+                    title_new += ' %s' % episode_data['ep']  # FIXME: is there a valid way to encode anime episodes?
+                    new_entry['series_id'] = '%02d' % episode_data['ep']  # Is this valid aka a single Integer?
+                    if episode_data['ep'] > 99:
+                        new_entry['series_id'] = '%03d' % episode_data['ep']
             elif episode_data['extra'] is True:
                 extra_string = episode_data.get('special', '')
                 extra_string += episode_data.get('op-ending', '')
                 extra_string += episode_data.get('trailer-promo', '')
-                title_new += '- %s' % extra_string
+                title_new += ' %s' % extra_string
                 new_entry['series_id'] = extra_string  # FIXME: is this the correct field for extras?
             if episode_data.get('version'):
-                title_new += 'v%s' % episode_data['version']
-                new_entry[NAMESPACE_PREFIX_MAIN + 'fileversion'] = episode_data['version']  # TODO: Is there a official field?
+                title_new += ' v%s' % episode_data['version']  # Anidb uses 'title 9v2' indexer may use 'title 9 v2'
+                new_entry[NAMESPACE_PREFIX_MAIN + 'file_version'] = episode_data['version']  # TODO: Is there a official field?
             if group_tag:
-                title_new += ' - [%s]' % group_tag  # TODO: do we always add group?
+                title_new += ' [%s]' % group_tag  # TODO: do we always add group?
                 new_entry[NAMESPACE_PREFIX + 'grouptag'] = group_tag
             if new_entry.get('quality') and hasattr(new_entry['quality'], 'resolution'):
                 if new_entry['quality'].resolution.name != 'unknown':
@@ -357,79 +368,73 @@ class AnidbFeed(object):
             new_entry['title'] = title_new
             new_entry[NAMESPACE_PREFIX_MAIN + 'name'] = anidb_name
             entries.append(new_entry)
-            #_debug_dump_entry(new_entry)
+            #_debug_dump_entry(new_entry)  # debug
         return entries
 
     def fill_entries_for_url(self, url, task, config):
-        log.verbose('Fetching %s' % url)
-
+        log.verbose('Fetching %s', url)
         try:
             r = task.requests.get(url, headers=HEADER, timeout=20)
-        except Exception as ex:
-            log.error("Failed fetching url: %s error: %s" % (url, ex))
-            return []
+        except RequestException as ex:
+            raise plugin.PluginError('Failed fetching url: %s error: %s' % (url, ex))
 
         if r and r.status_code != 200:
             raise plugin.PluginError('Unable to reach anidb feed url: %s' % url)
 
-        fixed_xml = self.make_feedparser_friendly(r.content)
+        xml_data = r.content
         try:
-            if fixed_xml:
-                parsed_xml = feedparser.parse(fixed_xml)
-            else:
-                parsed_xml = feedparser.parse(r.content)
-            xml_feed = parsed_xml.feed
-            if 'error' in xml_feed:
-                if 'code' in xml_feed['error']:
-                    if 'description' in xml_feed['error']:
-                        log.error(
-                            'Error code: %s detail: %s' % (xml_feed['error']['code'], xml_feed['error']['description']))
-                    else:
-                        log.error('Error code: %s' % xml_feed['error']['code'])
+            xml_data = self._make_feedparser_friendly(xml_data)
         except Exception as ex:
-            log.error('Unable to parse the XML from url: %s error: %s' % (url, ex))
-            return []
+            log.debug('Could not apply feedparser fix, trying without. Error: %s', ex)
 
-        if not len(parsed_xml.entries) > 0:
-            log.info('No entries returned from xml.')
+        try:
+            parsed_xml = feedparser.parse(xml_data)
+        except Exception as ex:
+            raise plugin.PluginError('Unable to parse XML from url: %s error: %s' % (url, ex))
+
+        if 'error' in parsed_xml.feed:
+            feed = parsed_xml.feed
+            if 'code' in feed['error']:
+                if 'description' in feed['error']:
+                    log.error('Error code: %s detail: %s', feed['error']['code'], feed['error']['description'])
+                else:
+                    log.error('Error code: %s', feed['error']['code'])
+            raise plugin.PluginError('Parsed XML is a error return for url: %s' % url)
+
+        if len(parsed_xml.entries) == 0:
+            log.verbose('No entries returned from xml.')
             return []
 
         entries = self.parse_from_xml(parsed_xml.entries, config)
         if len(entries) == 0:
             log.verbose('No entries parsed from xml.')
-        # else:
-        #   dump_entry(entries[0])
 
         return entries
 
-    def make_feedparser_friendly(self, data):
-        try:
-            dom = minidom.parseString(data)
-            entries = dom.getElementsByTagName('entry')
-            for entry in entries:
-                items_ns = entry.getElementsByTagNameNS(NAMESPACE_URL, NAMESPACE_TAGNAME)
-                if items_ns:
-                    for node_ns in items_ns:
-                        dt_nodes = node_ns.getElementsByTagName(NAMESPACE_NAME + ':dt')
-                        dd_nodes = node_ns.getElementsByTagName(NAMESPACE_NAME + ':dd')
-                        if len(dt_nodes) != len(dd_nodes):
-                            logging.warning('unexpected nodecount')
-                            continue
-                        for idx, dt_node in enumerate(dt_nodes):
-                            if len(dt_node.childNodes) >= 1 and len(dd_nodes[idx].childNodes) >= 1:
-                                if dt_node.childNodes[0].nodeValue is not None and dd_nodes[idx].childNodes[0].nodeValue is not None:
-                                    dt_node.tagName = NAMESPACE_NAME + ':%s' % dt_node.childNodes[0].nodeValue.replace(' ', '_')
-                                    dt_node.setAttribute('name', dt_node.childNodes[0].nodeValue)
-                                    dt_node.setAttribute('value', dd_nodes[idx].childNodes[0].nodeValue)
-                                    dt_node.removeChild(dt_node.childNodes[0])
-                                    node_ns.removeChild(dd_nodes[idx])
-                                    entry.appendChild(dt_node)
-        except Exception as ex:
-            logging.debug('Unable to rename nodes in XML: %s' % ex)
-            return None
+    def _make_feedparser_friendly(self, data):
+        dom = minidom.parseString(data)
+        entries = dom.getElementsByTagName('entry')
+        for entry in entries:
+            items_ns = entry.getElementsByTagNameNS(NAMESPACE_URL, NAMESPACE_TAGNAME)
+            if items_ns:
+                for node_ns in items_ns:
+                    dt_nodes = node_ns.getElementsByTagName(NAMESPACE_NAME + ':dt')
+                    dd_nodes = node_ns.getElementsByTagName(NAMESPACE_NAME + ':dd')
+                    if len(dt_nodes) != len(dd_nodes):
+                        log.trace('unexpected nodecount')
+                        continue
+                    for idx, dt_node in enumerate(dt_nodes):
+                        if len(dt_node.childNodes) >= 1 and len(dd_nodes[idx].childNodes) >= 1:
+                            if dt_node.childNodes[0].nodeValue is not None and dd_nodes[idx].childNodes[0].nodeValue is not None:
+                                dt_node.tagName = NAMESPACE_NAME + ':%s' % dt_node.childNodes[0].nodeValue.replace(' ', '_')
+                                dt_node.setAttribute('name', dt_node.childNodes[0].nodeValue)
+                                dt_node.setAttribute('value', dd_nodes[idx].childNodes[0].nodeValue)
+                                dt_node.removeChild(dt_node.childNodes[0])
+                                node_ns.removeChild(dd_nodes[idx])
+                                entry.appendChild(dt_node)
         return dom.toxml()
 
-    def set_ns_attribute(self, name, xml_entry, entry, in_ns_name, out_prefix_name=None, in_type=basestring):
+    def _set_ns_attribute(self, name, xml_entry, entry, in_ns_name, out_prefix_name=None, in_type=str):
         tagname = in_ns_name + '_' + name  # feedparser represents those as nsname_tagname
         value = None
         if tagname in entry and entry.get(tagname) is not None:
@@ -437,43 +442,44 @@ class AnidbFeed(object):
         elif tagname in xml_entry:
             if isinstance(xml_entry[tagname], dict) and 'value' in xml_entry[tagname]:
                 value = xml_entry[tagname]['value']
-            elif isinstance(xml_entry[tagname], basestring):
+            elif isinstance(xml_entry[tagname], str):
                 value = xml_entry[tagname]
+
+        if value is None:
+            log.trace('Could not get value for: %s, type: %s', tagname, in_type)
+            return
 
         if out_prefix_name is not None and not out_prefix_name.isspace():
             tagname = out_prefix_name + name
 
-        if value is not None:
-            if isinstance(value, in_type):
-                entry[tagname] = value
-            elif in_type == int or in_type == float:
+        if isinstance(value, in_type):
+            entry[tagname] = value
+        elif in_type == int or in_type == float:
+            number = convert_to_number(value)
+            if number is not None:
+                entry[tagname] = number
+        elif in_type == datetime:
+            date = convert_to_naive_utc(value)
+            if date is not None:
+                entry[tagname] = date
+        elif in_type == bool:
+            boolvalue = None
+            if isinstance(value, str):
+                if str_to_boolean(value):
+                    boolvalue = True
+            if not boolvalue:
                 number = convert_to_number(value)
-                if number is not None:
-                    entry[tagname] = number
-            elif in_type == datetime:
-                date = convert_to_naive_utc(value)
-                if date is not None:
-                    entry[tagname] = date
-            elif in_type == bool:
-                boolvalue = None
-                if isinstance(value, basestring):
-                    if str_to_boolean(value):
-                        boolvalue = True
-                if not boolvalue:
-                    number = convert_to_number(value)
-                    if number is not None and number > 0:
-                        boolvalue = True
-                    else:
-                        boolvalue = False
-                entry[tagname] = boolvalue
-            else:
-                log.warning('Unsupported attribute type: %s via name: %s' % (in_type, tagname))
+                if number is not None and number > 0:
+                    boolvalue = True
+                else:
+                    boolvalue = False
+            entry[tagname] = boolvalue
 
-    def fill_namespace_attributes(self, xml_entry, entry):
+    def _fill_namespace_attributes(self, xml_entry, entry):
         for key in NAMESPACE_ATTRIBUTE_MAP:
-            self.set_ns_attribute(key, xml_entry, entry, NAMESPACE_NAME, NAMESPACE_PREFIX, NAMESPACE_ATTRIBUTE_MAP[key])
+            self._set_ns_attribute(key, xml_entry, entry, NAMESPACE_NAME, NAMESPACE_PREFIX, NAMESPACE_ATTRIBUTE_MAP[key])
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(AnidbFeed, 'anidb_feed', api_ver=2, groups=['list'])
+    plugin.register(AnidbFeed, 'anidb_feed', api_ver=2)
