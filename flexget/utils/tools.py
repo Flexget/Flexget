@@ -17,6 +17,8 @@ import sys
 from collections import MutableMapping
 from datetime import timedelta, datetime
 from pprint import pformat
+from dateutil.parser import parse as dateutil_parse
+from dateutil.tz import tz
 
 import flexget
 import queue
@@ -505,3 +507,32 @@ def parse_episode_identifier(ep_id):
     if error:
         raise ValueError(error)
     return identified_by
+
+
+def str_to_naive_utc(string):
+    parsed_date = None
+    try:
+        parsed_date = dateutil_parse(string, fuzzy=True)
+        try:
+            parsed_date = parsed_date.astimezone(tz.tzutc()).replace(tzinfo=None)
+        except ValueError:
+            parsed_date = parsed_date.replace(tzinfo=None)
+    except ValueError as ex:
+        log.warning('Invalid datetime field format: %s error: %s', string, ex)
+    except Exception as ex:
+        log.debug('Unexpected datetime field: %s error: %s', string, ex)
+    return parsed_date
+
+
+def str_to_number(string):
+    number = None
+    try:
+        number = int(string)
+    except ValueError:
+        try:
+            number = float(string)
+        except ValueError:
+            log.debug('Invalid number field: %s', string)
+    except Exception as ex:
+        log.debug('Invalid number field: %s error: %s', string, ex)
+    return number

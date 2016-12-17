@@ -3,25 +3,21 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
-from xml.dom import minidom
-
 import feedparser
+from xml.dom import minidom
 from time import mktime
-from dateutil.parser import parse as dateutil_parse
-from dateutil.tz import tz
 from datetime import datetime
 
-from flexget.config_schema import one_or_more
-
-from flexget.utils.qualities import Quality
-from flexget.utils.tools import str_to_boolean
+from requests import RequestException
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
-from flexget.utils.cached_input import cached
 from flexget.entry import Entry
+from flexget.utils.qualities import Quality
+from flexget.utils.tools import str_to_boolean, str_to_naive_utc, str_to_number
+from flexget.utils.cached_input import cached
 from flexget.utils.requests import TimedLimiter
-from requests import RequestException
 
 
 log = logging.getLogger('anidb_feed')
@@ -79,35 +75,6 @@ ANIDB_EXTRA_TYPES = [
     'op-ending',
     'trailer-promo'
 ]
-
-
-def convert_to_naive_utc(valuestring):
-    parsed_date = None
-    try:
-        parsed_date = dateutil_parse(valuestring, fuzzy=True)
-        try:
-            parsed_date = parsed_date.astimezone(tz.tzutc()).replace(tzinfo=None)
-        except ValueError:
-            parsed_date = parsed_date.replace(tzinfo=None)
-    except ValueError as ex:
-        log.warning('Invalid datetime field format: %s error: %s',valuestring, ex)
-    except Exception as ex:
-        log.debug('Unexpected datetime field: %s error: %s', valuestring, ex)
-    return parsed_date
-
-
-def convert_to_number(valuestring):
-    number = None
-    try:
-        number = int(valuestring)
-    except ValueError:
-        try:
-            number = float(valuestring)
-        except ValueError:
-            log.debug('Invalid number field: %s', valuestring)
-    except Exception as ex:
-        log.debug('Invalid number field: %s error: %s', valuestring, ex)
-    return number
 
 
 def _debug_dump_entry(entry):
@@ -227,13 +194,13 @@ class AnidbFeed(object):
             try:
                 # anidb always uses absolute ep numbering, even movies get "- 1 -" !!
                 ep_nr = int(ep_nr)
-            except Exception as ex:
+            except ValueError as ex:
                 ep_nr = None
                 log.warning('Expecting a episode nr as integer in: %s, error: %s', entry[key], ex)
         if file_version:
             try:
                 file_version = int(file_version)
-            except Exception as ex:
+            except ValueError as ex:
                 file_version = None
                 log.warning('Expecting a file version nr as integer in: %s, error: %s', entry[key], ex)
         out_list = dict()
@@ -281,7 +248,7 @@ class AnidbFeed(object):
             if xml_entry.updated_parsed:
                 new_entry['rss_pubdate'] = datetime.fromtimestamp(mktime(xml_entry.updated_parsed))
             elif xml_entry.updated:
-                parsed_date = convert_to_naive_utc(xml_entry.updated)
+                parsed_date = str_to_naive_utc(xml_entry.updated)
                 if parsed_date:
                     new_entry['rss_pubdate'] = parsed_date
 
@@ -301,7 +268,7 @@ class AnidbFeed(object):
                     if size_mb > 0:
                         new_entry['content_size'] = size_mb  # FIXME: is this valid here or put in NAMESPACE_PREFIX_MAIN?
                         new_entry[NAMESPACE_PREFIX + 'size'] = size_bytes  # update with parsed size
-                except (TypeError, ValueError) as ex:
+                except ValueError as ex:
                     log.warning('Could not extract valid size from string: %s, error: %s', size_string, ex)
             # "HorribleSubs (HorribleSubs)"
             group_tag = self.get_value_via_regex(NAMESPACE_PREFIX + 'group', new_entry, r'\((.*?)\)')
@@ -332,7 +299,8 @@ class AnidbFeed(object):
                 quality_string += resolution_string
             if source_string:
                 quality_string += ' ' + source_string
-            if not quality_string.isspace():
+            quality_string.strip()
+            if quality_string:
                 new_entry['quality'] = Quality(quality_string)
             # build the new 'title' mimic general scene naming convention
             title_new = anidb_name
@@ -455,11 +423,11 @@ class AnidbFeed(object):
         if isinstance(value, in_type):
             entry[tagname] = value
         elif in_type == int or in_type == float:
-            number = convert_to_number(value)
+            number = str_to_number(value)
             if number is not None:
                 entry[tagname] = number
         elif in_type == datetime:
-            date = convert_to_naive_utc(value)
+            date = str_to_naive_utc(value)
             if date is not None:
                 entry[tagname] = date
         elif in_type == bool:
@@ -468,7 +436,7 @@ class AnidbFeed(object):
                 if str_to_boolean(value):
                     boolvalue = True
             if not boolvalue:
-                number = convert_to_number(value)
+                number = str_to_number(value)
                 if number is not None and number > 0:
                     boolvalue = True
                 else:
