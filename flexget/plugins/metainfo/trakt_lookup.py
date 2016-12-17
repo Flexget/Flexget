@@ -41,8 +41,6 @@ class PluginTraktLookup(object):
     trakt_series_air_time
     trakt_series_content_rating
     trakt_series_genres
-    trakt_series_banner_url
-    trakt_series_fanart_url
     trakt_series_imdb_url
     trakt_series_trakt_url
     imdb_id
