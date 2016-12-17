@@ -24,17 +24,17 @@ class TorrentFilename(object):
         for entry in task.accepted:
             # skip if entry does not have file assigned
             if 'file' not in entry:
-                log.trace('%s doesn\'t have a file associated' % entry['title'])
+                log.trace('%s doesn\'t have a file associated', entry['title'])
                 continue
             if not os.path.exists(entry['file']):
-                entry.fail('File %s does not exists' % entry['file'])
+                log.debug('File %s does not exist', entry['file'])
                 continue
             if os.path.getsize(entry['file']) == 0:
-                entry.fail('File %s is 0 bytes in size' % entry['file'])
+                log.debug('File %s is 0 bytes in size', entry['file'])
                 continue
             if not is_torrent_file(entry['file']):
                 continue
-            log.debug('%s seems to be a torrent' % entry['title'])
+            log.debug('%s seems to be a torrent', entry['title'])
 
             # create torrent object from torrent
             try:
