@@ -5,23 +5,31 @@ from argparse import ArgumentParser, ArgumentTypeError
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget import options
+from flexget import options, plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
-from flexget.plugin import PluginError
+from flexget.plugin import PluginError, DependencyError
 from flexget.plugins.list.movie_list import get_list_by_exact_name, get_movie_lists, get_movies_by_list_id, \
     get_movie_by_title_and_year, MovieListMovie, get_db_movie_identifiers, MovieListList, MovieListBase
-from flexget.plugins.metainfo.imdb_lookup import ImdbLookup
-from flexget.plugins.metainfo.tmdb_lookup import PluginTmdbLookup
 from flexget.utils.tools import split_title_year
-
-imdb_lookup = ImdbLookup().lookup
-tmdb_lookup = PluginTmdbLookup().lookup
 
 
 def lookup_movie(title, session, identifiers=None):
+    try:
+        imdb_lookup = plugin.get_plugin_by_name('imdb_lookup').instance.lookup
+    except DependencyError:
+        imdb_lookup = None
+
+    try:
+        tmdb_lookup = plugin.get_plugin_by_name('tmdb_lookup').instance.lookup
+    except DependencyError:
+        tmdb_lookup = None
+
+    if not (imdb_lookup or tmdb_lookup):
+        return
+
     entry = Entry(title=title)
     if identifiers:
         for identifier in identifiers:
