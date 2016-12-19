@@ -11,8 +11,9 @@ from flexget.utils.tools import io_encoding
 from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable, PorcelainTable
 from terminaltables.terminal_io import terminal_size
 
-# Enable terminal colors on windows
-if sys.platform == 'win32':
+# Enable terminal colors on windows.
+# pythonw (flexget-headless) does not have a sys.stdout, this command would crash in that case
+if sys.platform == 'win32' and sys.stdout:
     Windows.enable(auto_colors=True)
 
 
