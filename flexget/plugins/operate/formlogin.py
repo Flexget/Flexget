@@ -66,6 +66,7 @@ class FormLogin(object):
             br.open(url)
         except Exception:
             # TODO: improve error handling
+            log.debug('Exception posting login form.', exc_info=True)
             raise plugin.PluginError('Unable to post login form', log)
 
         # br.set_debug_redirects(True)
