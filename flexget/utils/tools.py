@@ -19,6 +19,7 @@ from datetime import timedelta, datetime
 from pprint import pformat
 from dateutil.parser import parse as dateutil_parse
 from dateutil.tz import tz
+from time import mktime
 
 import flexget
 import queue
@@ -35,23 +36,27 @@ def str_to_boolean(value):
 
 def str_to_int(value):
     try:
-        return int(value.replace(',', ''))
+        return int(re.sub(r'[,.]', '', value))
     except ValueError:
         return None
 
 
 def str_to_number(value):
-    number = None
     try:
-        number = int(value)
+        return float(value)
     except ValueError:
-        try:
-            number = float(value)
-        except ValueError:
-            log.debug('Invalid number field: %s', value)
-    except Exception as ex:
-        log.debug('Invalid number field: %s error: %s', value, ex)
-    return number
+        return str_to_int(value)
+
+
+def value_to_number(value):
+    if isinstance(value, str):
+        return str_to_number(value)
+    elif isinstance(value, (int, float)):
+        return value
+    elif isinstance(value, bool):
+        return int(value)
+    else:
+        return None
 
 
 def str_to_naive_utc(value):
@@ -64,9 +69,23 @@ def str_to_naive_utc(value):
             parsed_date = parsed_date.replace(tzinfo=None)
     except ValueError as ex:
         log.warning('Invalid datetime field format: %s error: %s', value, ex)
-    except Exception as ex:
-        log.debug('Unexpected datetime field: %s error: %s', value, ex)
     return parsed_date
+
+
+def value_to_naive_utc(value):
+    result = None
+    if isinstance(value, datetime):
+        return value
+    elif isinstance(value, tuple):
+        try:
+            result = datetime.fromtimestamp(mktime(value))
+        except ValueError:
+            log.warning('Not a valid datetime tuple: %s', value)
+    elif isinstance(value, str):
+        result = str_to_naive_utc(value)
+    else:
+        log.debug('Cant convert type to datetime: %s, type: %s', value, type(value))
+    return result
 
 
 if PY2:

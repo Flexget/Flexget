@@ -254,7 +254,7 @@ class Entry(LazyDict):
                 log.warning('Snapshot `%s` is being overwritten for `%s`' % (name, self['title']))
             self.snapshots[name] = snapshot
 
-    def update_using_map(self, field_map, source_item, ignore_none=False, ignored_values=None):
+    def update_using_map(self, field_map, source_item, ignore_none=False, ignore_values=None):
         """
         Populates entry fields from a source object using a dictionary that maps from entry field names to
         attributes (or keys) in the source object.
@@ -267,11 +267,11 @@ class Entry(LazyDict):
           Source of information to be used by the map
         :param ignore_none:
           Ignore any None values, do not record it to the Entry
-        :param ignored_values:
+        :param ignore_values:
           Ignore the specific values, do not record it to the Entry
         """
-        if ignored_values and not isinstance(ignored_values, list):
-            ignored_values = [ignored_values]
+        if ignore_values and not isinstance(ignore_values, list):
+            ignore_values = [ignore_values]
         func = dict.get if isinstance(source_item, dict) else getattr
         for field, value in field_map.items():
             if isinstance(value, str):
@@ -287,7 +287,7 @@ class Entry(LazyDict):
                 v = value(source_item)
             if ignore_none and v is None:
                 continue
-            if ignored_values and v in ignored_values:
+            if ignore_values and v in ignore_values:
                 continue
             self[field] = v
 

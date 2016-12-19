@@ -4,9 +4,8 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 import re
 import feedparser
+import functools
 from xml.dom import minidom
-from time import mktime
-from datetime import datetime
 
 from requests import RequestException
 
@@ -15,7 +14,7 @@ from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.utils.qualities import Quality
-from flexget.utils.tools import str_to_boolean, str_to_naive_utc, str_to_number
+from flexget.utils.tools import str_to_int, value_to_naive_utc, str_to_naive_utc
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import TimedLimiter
 
@@ -31,24 +30,41 @@ NAMESPACE_URL = 'http://www.w3.org/1999/xhtml'
 NAMESPACE_TAGNAME = 'dl'
 
 
-# NOTE: all lowercase only
 field_map = {
-    'anidb_feed_added': lambda xml: str_to_naive_utc(xml['xhtml_added']['value']),
+    'title': 'title',
+    'url': 'link',
+    'anidb_name':  # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
+        lambda xml: find_value('title', xml, regex=r'^(.*?) -'),
+    'anidb_fid':  # http://anidb.net/f1871677
+        lambda xml: str_to_int(find_value('link', xml, default='', regex=r'/f([0-9]{1,10})$')),
+    'rss_pubdate':
+        lambda xml: value_to_naive_utc(find_value(['updated_parsed', 'updated'], xml)),
+    'anidb_feed_added':
+        lambda xml: str_to_naive_utc(xml['xhtml_added']['value']),
     'anidb_feed_source': 'xhtml_source.value',
     'anidb_feed_resolution': 'xhtml_resolution.value',
     'anidb_feed_crc_status': 'xhtml_crc_status.value',
+    'anidb_file_crc32':  # 'Matches official CRC (9833055b)'
+        lambda xml: find_value('xhtml_crc_status.value', xml, regex=r'Matches official CRC \((([0-9]|[A-Fa-f]){8,8})\)'),
     'anidb_feed_language': 'xhtml_language.value',
     'anidb_feed_group': 'xhtml_group.value',
+    'anidb_feed_group_tag':  # "HorribleSubs (HorribleSubs)"
+        lambda xml: find_value('xhtml_group.value', xml, regex=r'\((.*?)\)$'),
     'anidb_feed_subtitle_language': 'xhtml_subtitle_language.value',
     'anidb_feed_priority': 'xhtml_priority.value',
     'anidb_feed_quality': 'xhtml_quality.value',
-    'anidb_feed_size': 'xhtml_size.value'
+    'anidb_feed_size':  # 344.18 MB (360.895.922)
+        lambda xml: str_to_int(find_value('xhtml_size.value', xml, default='', regex=r'\((([0-9]{1,3}\.|[0-9]{1,3}){1,5})\)'))
 }
 
 field_validation_list = [
+    'title',
+    'url',
+    'anidb_name',
+    'anidb_fid',
     'anidb_feed_source',
     'anidb_feed_resolution',
-    'anidb_feed_group',
+    'anidb_feed_group_tag',
     'anidb_feed_size'
 ]
 
@@ -74,6 +90,49 @@ ANIDB_EXTRA_TYPES = [
     'op-ending',
     'trailer-promo'
 ]
+
+
+def _match_regex(value, regex, regex_group_nr=1):
+    if isinstance(value, str) and not value.isspace():
+        match = re.search(regex, value)
+        if match and match.group(regex_group_nr) and not match.group(regex_group_nr).isspace():
+            return match.group(regex_group_nr)
+    else:
+        log.error('Expecting string for regex lookup got: %s, type: %s', value, type(value))
+        raise ValueError
+    return None
+
+
+def find_value(key_names, source, default=None, regex=None, regex_group_nr=1, ignore_empty=True, strip=True):
+    if not isinstance(key_names, list):
+        key_names = [key_names]
+
+    func = getattr
+    if isinstance(source, dict):
+        func = dict.get
+    elif isinstance(source, Entry):
+        func = Entry.get
+    value = None
+    for key in key_names:
+        try:
+            value = functools.reduce(func, key.split('.'), source)
+        except TypeError as ex:
+            log.debug('Cant find field: %s, in source: %s, error: %s', key, source, ex)
+        if regex:
+            value = _match_regex(value, regex, regex_group_nr)
+        if value is not None:
+            break
+
+    if isinstance(value, str):
+        if strip:
+            value = value.strip()
+        if ignore_empty and not value:
+            value = None
+
+    if value is not None:
+        return value
+    else:
+        return default
 
 
 def _debug_dump_entry(entry):
@@ -144,7 +203,7 @@ class AnidbFeed(object):
         return config
 
     # anidb notification update interval is 15 minutes
-    #@cached('anidb_feed', persist='15 minutes')
+    @cached('anidb_feed', persist='15 minutes')
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
         task.requests.add_domain_limiter(LIMITER)
@@ -161,37 +220,26 @@ class AnidbFeed(object):
             priority_fragment = '&pri=%s' % priority
         return self.fill_entries_for_url(url + priority_fragment, task, config)
 
-    def get_value_via_regex(self, key, entry, re_string, group_nr=1):
-        result = None
-        if entry.get(key):
-            value_string = entry[key]
-            if isinstance(value_string, str) and not value_string.isspace():
-                match = re.search(re_string, value_string)
-                if match and match.group(group_nr) and not match.group(group_nr).isspace():
-                    result = match.group(group_nr)
-            else:
-                log.error('Expecting string for re lookup got: %s, type: %s', value_string, type(value_string))
-        return result
-
-    def parse_episode_data(self, key, entry):
-        ep_nr = self.get_value_via_regex(key, entry, r'^.*? - ([0-9]{1,3})(v([1-5]))? -')
-        file_version = self.get_value_via_regex(key, entry, r'^.*? - T|S|C|ED|OP|[0-9]{1,3}[a-f]?v([1-5]) -')
-        is_special = self.get_value_via_regex(key, entry, r'^.*? - (S[0-9]{1,3})(v([1-5]))? -')
-        is_op_ed = self.get_value_via_regex(key, entry, r'^.*? - ((C|OP|ED)[0-9]{1,2}[a-f]?) -')
-        is_trailer = self.get_value_via_regex(key, entry, r'^.*? - (T[0-9]{1,2}) -')
+    @staticmethod
+    def _parse_episode_data(value):
+        ep_nr = _match_regex(value, r'^.*? - ([0-9]{1,3})(v([1-5]))? -')
+        file_version = _match_regex(value, r'^.*? - T|S|C|ED|OP|[0-9]{1,3}[a-f]?v([1-5]) -')
+        is_special = _match_regex(value, r'^.*? - (S[0-9]{1,3})(v([1-5]))? -')
+        is_op_ed = _match_regex(value, r'^.*? - ((C|OP|ED)[0-9]{1,2}[a-f]?) -')
+        is_trailer = _match_regex(value, r'^.*? - (T[0-9]{1,2}) -')
         if ep_nr:
             try:
                 # anidb always uses absolute ep numbering, even movies get "- 1 -" !!
                 ep_nr = int(ep_nr)
             except ValueError as ex:
                 ep_nr = None
-                log.warning('Expecting a episode nr as integer in: %s, error: %s', entry[key], ex)
+                log.warning('Expecting a episode nr as integer in: %s, error: %s', value, ex)
         if file_version:
             try:
                 file_version = int(file_version)
             except ValueError as ex:
                 file_version = None
-                log.warning('Expecting a file version nr as integer in: %s, error: %s', entry[key], ex)
+                log.warning('Expecting a file version nr as integer in: %s, error: %s', value, ex)
         out_list = dict()
         out_list['extra'] = True
         if ep_nr is not None:
@@ -214,87 +262,31 @@ class AnidbFeed(object):
             # skip if we have no link/title
             if not xml_entry.title or not xml_entry.link:
                 continue
-            # fill base data
-            new_entry['title'] = xml_entry.title  # needs to-be fixed manually later
-            new_entry['url'] = xml_entry.link  # file link
-            episode_data = self.parse_episode_data('title', new_entry)
+            # copy xml data to entry
+            new_entry.update_using_map(field_map, xml_entry, ignore_none=True,
+                                       ignore_values=['Raw/Unknown', 'N/A', 'Unchecked'])
+            # skip entry if we cant validate
+            if config['valid_only'] is True:
+                if not all(key in new_entry for key in field_validation_list):
+                    continue
+            # skip if extra and not wanted
+            episode_data = self._parse_episode_data(new_entry['title'])
             if episode_data['extra'] is True:
                 if 'include' in config:
                     if not any(key in episode_data for key in config['include']):
                         continue  # is extra file
                 else:
                     continue
-            # store some usefully data in the namespace
-            fid_string = self.get_value_via_regex('url', new_entry, r'/f([0-9]{1,10})$')
-            if fid_string:
-                try:
-                    fid = int(fid_string)
-                    if fid is not None:
-                        new_entry['anidb_fid'] = fid
-                except (TypeError, ValueError) as ex:
-                    log.error('Skipping Entry: %s, could not parse fid string: %s, error: %s', new_entry, fid_string, ex)
-                    continue
-            if xml_entry.updated_parsed:
-                new_entry['rss_pubdate'] = datetime.fromtimestamp(mktime(xml_entry.updated_parsed))
-            elif xml_entry.updated:
-                parsed_date = str_to_naive_utc(xml_entry.updated)
-                if parsed_date:
-                    new_entry['rss_pubdate'] = parsed_date
 
-            # copy xml attribute namespace data to entry
-            new_entry.update_using_map(field_map, xml_entry, ignore_none=True, ignored_values=['Raw/Unknown', 'N/A', 'Unchecked'])
-            if config['valid_only'] is True:
-                if not all(key in new_entry for key in field_validation_list):
-                    continue
-            # now manually fix known fields
-            # 344.18 MB (360.895.922)
-            size_string = self.get_value_via_regex('anidb_feed_size', new_entry, r'\((([0-9]{1,3}\.|[0-9]{1,3}){1,5})\)')
-            if size_string:
-                bytes_string = size_string.replace('.', '')
-                try:
-                    size_bytes = int(bytes_string)
-                    size_mb = int(size_bytes / 1024 / 1024)  # MB
-                    if size_mb > 0:
-                        new_entry['content_size'] = size_mb  # FIXME: is this valid here or put in 'anidb'?
-                        new_entry['anidb_feed_size'] = size_bytes  # update with parsed size
-                except ValueError as ex:
-                    log.warning('Could not extract valid size from string: %s, error: %s', size_string, ex)
-            # "HorribleSubs (HorribleSubs)"
-            group_tag = self.get_value_via_regex('anidb_feed_group', new_entry, r'\((.*?)\)')
-            # "title - 1 - ... - Complete Movie"
-            # FIXME: 'Complete Movie' is not guaranteed?
-            is_movie = self.get_value_via_regex('title', new_entry, r'- .*?(Complete Movie)$')
-            # 1920x1080, 848x480, 1280x720
-            resolution_string = self.get_value_via_regex('anidb_feed_resolution', new_entry, r'x([0-9]{3,4})$')
-            source_string = None
-            if new_entry.get('anidb_feed_source'):
-                source_string = ANIDB_SOURCES_MAP.get(new_entry['anidb_feed_source'])
-            # 'Matches official CRC (9833055b)'
-            if new_entry.get('anidb_feed_crc_status'):
-                crc_string = self.get_value_via_regex('anidb_feed_crc_status', new_entry,
-                                                      r'Matches official CRC \((([0-9]|[A-Fa-f]){8,8})\)')
-                if crc_string:
-                    new_entry['anidb_file_crc32'] = crc_string.lower()
-            # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
-            anidb_name = self.get_value_via_regex('title', new_entry, r'^(.*?) -')
-            anidb_name = anidb_name.rstrip()
-            if not anidb_name:
-                log.error('Skipping entry, invalid anidb name parsed from: %s', new_entry['title'])
-                continue
-
-            # fix and add to new_entry()
-            quality_string = ''
-            if resolution_string:
-                quality_string += resolution_string
-            if source_string:
-                quality_string += ' ' + source_string
-            quality_string = quality_string.strip()
-            if quality_string:
-                new_entry['quality'] = Quality(quality_string)
+            # some extra fixups
+            new_entry['content_size'] = int(new_entry['anidb_feed_size'] / 1024 / 1024)  # MB
             # build the new 'title' mimic general scene naming convention
+            anidb_name = new_entry['anidb_name']
             title_new = anidb_name
+            # "title - 1 - ... - Complete Movie"
+            is_movie = _match_regex(new_entry['title'], r'- .*?(Complete Movie)$')
             if is_movie is not None:
-                new_entry['movie_name'] = anidb_name
+                new_entry['movie_name'] = anidb_name  # FIXME: 'Complete Movie' is not guaranteed?
             else:
                 new_entry['series_name'] = anidb_name
             if 'ep' in episode_data:
@@ -315,15 +307,27 @@ class AnidbFeed(object):
             if episode_data.get('version'):
                 title_new += ' v%s' % episode_data['version']  # Anidb uses 'title 9v2' indexer may use 'title 9 v2'
                 new_entry['anidb_file_version'] = episode_data['version']  # TODO: Is there a official field?
-            if group_tag:
-                title_new += ' [%s]' % group_tag  # TODO: do we always add group?
-                new_entry['anidb_feed_grouptag'] = group_tag
-            if new_entry.get('quality') and hasattr(new_entry['quality'], 'resolution'):
-                if new_entry['quality'].resolution.name != 'unknown':
-                    title_new += ' [%s]' % new_entry['quality'].resolution
+            if new_entry.get('anidb_feed_group_tag'):
+                title_new += ' [%s]' % new_entry['anidb_feed_group_tag']  # TODO: do we always add group?
+
+            quality_string = ''
+            # 1920x1080, 848x480, 1280x720
+            if new_entry.get('anidb_feed_resolution'):
+                resolution_string = _match_regex(new_entry['anidb_feed_resolution'], r'x([0-9]{3,4})$')
+                if resolution_string:
+                    quality_string += resolution_string
+            if new_entry.get('anidb_feed_source'):
+                source_string = ANIDB_SOURCES_MAP.get(new_entry['anidb_feed_source'])
+                if source_string:
+                    quality_string += ' ' + source_string
+            quality_string = quality_string.strip()
+            if quality_string:
+                quality = Quality(quality_string)
+                new_entry['quality'] = quality
+                if quality.resolution and quality.resolution.name != 'unknown':
+                    title_new += ' [%s]' % quality.resolution
 
             new_entry['title'] = title_new
-            new_entry['anidb_name'] = anidb_name
             entries.append(new_entry)
             #_debug_dump_entry(new_entry)  # debug
         return entries
