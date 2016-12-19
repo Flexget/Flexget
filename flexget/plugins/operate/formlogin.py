@@ -26,7 +26,7 @@ if mechanize:
             # Run HTML through BeautifulSoup for sanitizing
             if 'html' in response.info().get('content-type', ''):
                 soup = get_soup(response.get_data())
-                response.set_data(soup.prettify())
+                response.set_data(soup.prettify(encoding=soup.original_encoding))
             return response
 
 
