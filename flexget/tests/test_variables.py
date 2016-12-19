@@ -5,46 +5,46 @@ import pytest
 
 from flexget.event import fire_event
 from flexget.manager import Session
-from flexget.plugins.modify.config_secrets import Secrets
+from flexget.plugins.modify.variables import Variables
 
 
 @pytest.mark.usefixtures('tmpdir')
-class TestSecretsFromFile(object):
+class TestVariablesFromFile(object):
     config = """
-        secrets: __tmp__/secret.yml
+        variables: __tmp__/variables.yml
         tasks:
-          test_secret_from_file:
+          test_variable_from_file:
             mock:
               - { title: 'test', location: 'http://mock'}
             if:
-              - '{{ secrets.test_secret }}': accept
+              - '{? test_variable ?}': accept
 
     """
 
-    @pytest.mark.filecopy('secret.yml', '__tmp__/secret.yml')
-    def test_secret_from_file(self, execute_task, manager):
-        task = execute_task('test_secret_from_file')
+    @pytest.mark.filecopy('variables.yml', '__tmp__/variables.yml')
+    def test_variable_from_file(self, execute_task, manager):
+        task = execute_task('test_variable_from_file')
         assert len(task.accepted) == 1
 
 
-class TestSecretsFromDB(object):
+class TestVariablesFromDB(object):
     config = """
-        secrets: yes
+        variables: yes
         tasks:
-          test_secret_from_db:
+          test_variable_from_db:
             mock:
               - { title: 'test', location: 'http://mock'}
             if:
-              - '{{ secrets.test_secret_db }}': accept
+              - '{? test_variable_db ?}': accept
 
     """
 
-    def test_secret_from_db(self, execute_task, manager):
+    def test_variable_from_db(self, execute_task, manager):
         with Session() as session:
-            s = Secrets(secrets={'test_secret_db': True})
+            s = Variables(variables={'test_variable_db': True})
             session.add(s)
 
         fire_event('manager.before_config_validate', manager.config, manager)
 
-        task = execute_task('test_secret_from_db')
+        task = execute_task('test_variable_from_db')
         assert len(task.accepted) == 1
