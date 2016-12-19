@@ -29,28 +29,27 @@ LIMITER = TimedLimiter('anidb.net', '2 seconds')  # default anidb api limit
 NAMESPACE_NAME = 'xhtml'
 NAMESPACE_URL = 'http://www.w3.org/1999/xhtml'
 NAMESPACE_TAGNAME = 'dl'
-NAMESPACE_PREFIX_MAIN = 'anidb_'
-NAMESPACE_PREFIX = 'anidb_feed_'
+
 
 # NOTE: all lowercase only
-NAMESPACE_ATTRIBUTE_MAP = {
-    'added': datetime,
-    'source': str,
-    'resolution': str,
-    'crc_status': str,
-    'language': str,
-    'group': str,
-    'subtitle_language': str,
-    'priority': str,
-    'quality': str,
-    'size': str
+field_map = {
+    'anidb_feed_added': lambda xml: str_to_naive_utc(xml['xhtml_added']['value']),
+    'anidb_feed_source': 'xhtml_source.value',
+    'anidb_feed_resolution': 'xhtml_resolution.value',
+    'anidb_feed_crc_status': 'xhtml_crc_status.value',
+    'anidb_feed_language': 'xhtml_language.value',
+    'anidb_feed_group': 'xhtml_group.value',
+    'anidb_feed_subtitle_language': 'xhtml_subtitle_language.value',
+    'anidb_feed_priority': 'xhtml_priority.value',
+    'anidb_feed_quality': 'xhtml_quality.value',
+    'anidb_feed_size': 'xhtml_size.value'
 }
 
-VALIDATION_LIST = [
-    'source',
-    'resolution',
-    'group',
-    'size'
+field_validation_list = [
+    'anidb_feed_source',
+    'anidb_feed_resolution',
+    'anidb_feed_group',
+    'anidb_feed_size'
 ]
 
 # FIXME: not 100% if this is correct or move directly to qualities.py?
@@ -130,7 +129,7 @@ class AnidbFeed(object):
     schema = {
         'type': 'object',
         'properties': {
-            'url': {'type': 'string', 'format': 'url'},
+            'url': {'type': 'string', 'anyOf': [{'format': 'url'}, {'format': 'file'}]},
             'priority': {'type': 'string', 'enum': ['all', 'medium-high', 'high'], 'default': 'all'},
             'valid_only': {'type': 'boolean', 'default': False},
             'include': one_or_more({'type': 'string', 'enum': ANIDB_EXTRA_TYPES}, unique_items=True)
@@ -145,7 +144,7 @@ class AnidbFeed(object):
         return config
 
     # anidb notification update interval is 15 minutes
-    @cached('anidb_feed', persist='15 minutes')
+    #@cached('anidb_feed', persist='15 minutes')
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
         task.requests.add_domain_limiter(LIMITER)
@@ -161,16 +160,6 @@ class AnidbFeed(object):
                 priority = 2
             priority_fragment = '&pri=%s' % priority
         return self.fill_entries_for_url(url + priority_fragment, task, config)
-
-    @staticmethod
-    def is_valid_entry(entry, ns_prefix_name=''):
-        for key in VALIDATION_LIST:
-            key_name = ns_prefix_name + key
-            if not entry.get(key_name):  # int(0) is invalid
-                return False
-            elif entry[key_name] in ['Raw/Unknown', 'N/A', 'Unchecked']:
-                return False
-        return True
 
     def get_value_via_regex(self, key, entry, re_string, group_nr=1):
         result = None
@@ -241,7 +230,7 @@ class AnidbFeed(object):
                 try:
                     fid = int(fid_string)
                     if fid is not None:
-                        new_entry[NAMESPACE_PREFIX_MAIN + 'fid'] = fid
+                        new_entry['anidb_fid'] = fid
                 except (TypeError, ValueError) as ex:
                     log.error('Skipping Entry: %s, could not parse fid string: %s, error: %s', new_entry, fid_string, ex)
                     continue
@@ -252,40 +241,40 @@ class AnidbFeed(object):
                 if parsed_date:
                     new_entry['rss_pubdate'] = parsed_date
 
-            # add some usefully attributes to the namespace
-            self._fill_namespace_attributes(xml_entry, new_entry)
+            # copy xml attribute namespace data to entry
+            new_entry.update_using_map(field_map, xml_entry, ignore_none=True, ignored_values=['Raw/Unknown', 'N/A', 'Unchecked'])
             if config['valid_only'] is True:
-                if self.is_valid_entry(new_entry, NAMESPACE_PREFIX) is False:
+                if not all(key in new_entry for key in field_validation_list):
                     continue
             # now manually fix known fields
             # 344.18 MB (360.895.922)
-            size_string = self.get_value_via_regex(NAMESPACE_PREFIX + 'size', new_entry, r'\((([0-9]{1,3}\.|[0-9]{1,3}){1,5})\)')
+            size_string = self.get_value_via_regex('anidb_feed_size', new_entry, r'\((([0-9]{1,3}\.|[0-9]{1,3}){1,5})\)')
             if size_string:
                 bytes_string = size_string.replace('.', '')
                 try:
                     size_bytes = int(bytes_string)
                     size_mb = int(size_bytes / 1024 / 1024)  # MB
                     if size_mb > 0:
-                        new_entry['content_size'] = size_mb  # FIXME: is this valid here or put in NAMESPACE_PREFIX_MAIN?
-                        new_entry[NAMESPACE_PREFIX + 'size'] = size_bytes  # update with parsed size
+                        new_entry['content_size'] = size_mb  # FIXME: is this valid here or put in 'anidb'?
+                        new_entry['anidb_feed_size'] = size_bytes  # update with parsed size
                 except ValueError as ex:
                     log.warning('Could not extract valid size from string: %s, error: %s', size_string, ex)
             # "HorribleSubs (HorribleSubs)"
-            group_tag = self.get_value_via_regex(NAMESPACE_PREFIX + 'group', new_entry, r'\((.*?)\)')
+            group_tag = self.get_value_via_regex('anidb_feed_group', new_entry, r'\((.*?)\)')
             # "title - 1 - ... - Complete Movie"
             # FIXME: 'Complete Movie' is not guaranteed?
             is_movie = self.get_value_via_regex('title', new_entry, r'- .*?(Complete Movie)$')
             # 1920x1080, 848x480, 1280x720
-            resolution_string = self.get_value_via_regex(NAMESPACE_PREFIX + 'resolution', new_entry, r'x([0-9]{3,4})$')
+            resolution_string = self.get_value_via_regex('anidb_feed_resolution', new_entry, r'x([0-9]{3,4})$')
             source_string = None
-            if new_entry.get(NAMESPACE_PREFIX + 'source'):
-                source_string = ANIDB_SOURCES_MAP.get(new_entry[NAMESPACE_PREFIX + 'source'])
+            if new_entry.get('anidb_feed_source'):
+                source_string = ANIDB_SOURCES_MAP.get(new_entry['anidb_feed_source'])
             # 'Matches official CRC (9833055b)'
-            if new_entry.get(NAMESPACE_PREFIX + 'crc_status'):
-                crc_string = self.get_value_via_regex(NAMESPACE_PREFIX + 'crc_status', new_entry,
+            if new_entry.get('anidb_feed_crc_status'):
+                crc_string = self.get_value_via_regex('anidb_feed_crc_status', new_entry,
                                                       r'Matches official CRC \((([0-9]|[A-Fa-f]){8,8})\)')
                 if crc_string:
-                    new_entry[NAMESPACE_PREFIX_MAIN + 'file_crc32'] = crc_string.lower()
+                    new_entry['anidb_file_crc32'] = crc_string.lower()
             # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
             anidb_name = self.get_value_via_regex('title', new_entry, r'^(.*?) -')
             anidb_name = anidb_name.rstrip()
@@ -325,16 +314,16 @@ class AnidbFeed(object):
                 new_entry['series_id'] = extra_string  # FIXME: is this the correct field for extras?
             if episode_data.get('version'):
                 title_new += ' v%s' % episode_data['version']  # Anidb uses 'title 9v2' indexer may use 'title 9 v2'
-                new_entry[NAMESPACE_PREFIX_MAIN + 'file_version'] = episode_data['version']  # TODO: Is there a official field?
+                new_entry['anidb_file_version'] = episode_data['version']  # TODO: Is there a official field?
             if group_tag:
                 title_new += ' [%s]' % group_tag  # TODO: do we always add group?
-                new_entry[NAMESPACE_PREFIX + 'grouptag'] = group_tag
+                new_entry['anidb_feed_grouptag'] = group_tag
             if new_entry.get('quality') and hasattr(new_entry['quality'], 'resolution'):
                 if new_entry['quality'].resolution.name != 'unknown':
                     title_new += ' [%s]' % new_entry['quality'].resolution
 
             new_entry['title'] = title_new
-            new_entry[NAMESPACE_PREFIX_MAIN + 'name'] = anidb_name
+            new_entry['anidb_name'] = anidb_name
             entries.append(new_entry)
             #_debug_dump_entry(new_entry)  # debug
         return entries
@@ -369,12 +358,12 @@ class AnidbFeed(object):
                     log.error('Error code: %s', feed['error']['code'])
             raise plugin.PluginError('Parsed XML is a error return for url: %s' % url)
 
-        if len(parsed_xml.entries) == 0:
+        if not parsed_xml.entries:
             log.verbose('No entries returned from xml.')
             return []
 
         entries = self.parse_from_xml(parsed_xml.entries, config)
-        if len(entries) == 0:
+        if not entries:
             log.verbose('No entries parsed from xml.')
 
         return entries
@@ -401,51 +390,6 @@ class AnidbFeed(object):
                                 node_ns.removeChild(dd_nodes[idx])
                                 entry.appendChild(dt_node)
         return dom.toxml()
-
-    def _set_ns_attribute(self, name, xml_entry, entry, in_ns_name, out_prefix_name=None, in_type=str):
-        tagname = in_ns_name + '_' + name  # feedparser represents those as nsname_tagname
-        value = None
-        if tagname in entry and entry.get(tagname) is not None:
-            value = entry.get(tagname)  # use existing, but do type check
-        elif tagname in xml_entry:
-            if isinstance(xml_entry[tagname], dict) and 'value' in xml_entry[tagname]:
-                value = xml_entry[tagname]['value']
-            elif isinstance(xml_entry[tagname], str):
-                value = xml_entry[tagname]
-
-        if value is None:
-            log.trace('Could not get value for: %s, type: %s', tagname, in_type)
-            return
-
-        if out_prefix_name is not None and not out_prefix_name.isspace():
-            tagname = out_prefix_name + name
-
-        if isinstance(value, in_type):
-            entry[tagname] = value
-        elif in_type == int or in_type == float:
-            number = str_to_number(value)
-            if number is not None:
-                entry[tagname] = number
-        elif in_type == datetime:
-            date = str_to_naive_utc(value)
-            if date is not None:
-                entry[tagname] = date
-        elif in_type == bool:
-            boolvalue = None
-            if isinstance(value, str):
-                if str_to_boolean(value):
-                    boolvalue = True
-            if not boolvalue:
-                number = str_to_number(value)
-                if number is not None and number > 0:
-                    boolvalue = True
-                else:
-                    boolvalue = False
-            entry[tagname] = boolvalue
-
-    def _fill_namespace_attributes(self, xml_entry, entry):
-        for key in NAMESPACE_ATTRIBUTE_MAP:
-            self._set_ns_attribute(key, xml_entry, entry, NAMESPACE_NAME, NAMESPACE_PREFIX, NAMESPACE_ATTRIBUTE_MAP[key])
 
 
 @event('plugin.register')

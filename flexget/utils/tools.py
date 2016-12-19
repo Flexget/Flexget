@@ -29,45 +29,74 @@ from html.entities import name2codepoint
 log = logging.getLogger('utils')
 
 
-def str_to_boolean(string):
-    return string.lower() in ['true', '1', 't', 'y', 'yes']
+def str_to_boolean(value):
+    return value.lower() in ['true', '1', 't', 'y', 'yes']
 
 
-def str_to_int(string):
+def str_to_int(value):
     try:
-        return int(string.replace(',', ''))
+        return int(value.replace(',', ''))
     except ValueError:
         return None
 
 
+def str_to_number(value):
+    number = None
+    try:
+        number = int(value)
+    except ValueError:
+        try:
+            number = float(value)
+        except ValueError:
+            log.debug('Invalid number field: %s', value)
+    except Exception as ex:
+        log.debug('Invalid number field: %s error: %s', value, ex)
+    return number
+
+
+def str_to_naive_utc(value):
+    parsed_date = None
+    try:
+        parsed_date = dateutil_parse(value, fuzzy=True)
+        try:
+            parsed_date = parsed_date.astimezone(tz.tzutc()).replace(tzinfo=None)
+        except ValueError:
+            parsed_date = parsed_date.replace(tzinfo=None)
+    except ValueError as ex:
+        log.warning('Invalid datetime field format: %s error: %s', value, ex)
+    except Exception as ex:
+        log.debug('Unexpected datetime field: %s error: %s', value, ex)
+    return parsed_date
+
+
 if PY2:
-    def native_str_to_text(string, **kwargs):
+    def native_str_to_text(value, **kwargs):
         if 'encoding' not in kwargs:
             kwargs['encoding'] = 'ascii'
-        return string.decode(**kwargs)
+        return value.decode(**kwargs)
 else:
-    def native_str_to_text(string, **kwargs):
-        return string
+    def native_str_to_text(value, **kwargs):
+        return value
 
 
-def convert_bytes(bytes):
+def convert_bytes(value):
     """Returns given bytes as prettified string."""
 
-    bytes = float(bytes)
-    if bytes >= 1099511627776:
-        terabytes = bytes / 1099511627776
+    value = float(value)
+    if value >= 1099511627776:
+        terabytes = value / 1099511627776
         size = '%.2fT' % terabytes
-    elif bytes >= 1073741824:
-        gigabytes = bytes / 1073741824
+    elif value >= 1073741824:
+        gigabytes = value / 1073741824
         size = '%.2fG' % gigabytes
-    elif bytes >= 1048576:
-        megabytes = bytes / 1048576
+    elif value >= 1048576:
+        megabytes = value / 1048576
         size = '%.2fM' % megabytes
-    elif bytes >= 1024:
-        kilobytes = bytes / 1024
+    elif value >= 1024:
+        kilobytes = value / 1024
         size = '%.2fK' % kilobytes
     else:
-        size = '%.2fb' % bytes
+        size = '%.2fb' % value
     return size
 
 
@@ -507,32 +536,3 @@ def parse_episode_identifier(ep_id):
     if error:
         raise ValueError(error)
     return identified_by
-
-
-def str_to_naive_utc(string):
-    parsed_date = None
-    try:
-        parsed_date = dateutil_parse(string, fuzzy=True)
-        try:
-            parsed_date = parsed_date.astimezone(tz.tzutc()).replace(tzinfo=None)
-        except ValueError:
-            parsed_date = parsed_date.replace(tzinfo=None)
-    except ValueError as ex:
-        log.warning('Invalid datetime field format: %s error: %s', string, ex)
-    except Exception as ex:
-        log.debug('Unexpected datetime field: %s error: %s', string, ex)
-    return parsed_date
-
-
-def str_to_number(string):
-    number = None
-    try:
-        number = int(string)
-    except ValueError:
-        try:
-            number = float(string)
-        except ValueError:
-            log.debug('Invalid number field: %s', string)
-    except Exception as ex:
-        log.debug('Invalid number field: %s error: %s', string, ex)
-    return number
