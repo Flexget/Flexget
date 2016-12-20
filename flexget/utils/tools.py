@@ -42,14 +42,12 @@ def str_to_int(value):
         return None
 
 
-def value_to_number(value):
-    if isinstance(value, (int, float)):
-        return value
-    elif isinstance(value, bool):
+def value_to_int(value):
+    if isinstance(value, (int, float, bool)):
         return int(value)
     elif isinstance(value, str):
         try:
-            return float(value)
+            return int(float(value))
         except ValueError:
             try:
                 return int(re.sub(r'[,.]', '', value))
@@ -131,9 +129,9 @@ def find_value(key_names, source, default=None, regex=None, regex_group_nr=1, ig
     for key in key_names:
         try:
             value = functools.reduce(func, key.split('.'), source)
-        except TypeError as ex:
+        except (AttributeError, TypeError) as ex:
             log.debug('Cant find field: %s, in source: %s, error: %s', key, source, ex)
-        if regex:
+        if regex and value is not None:
             value = regex_search(value, regex, regex_group_nr)
         if value is not None:
             break

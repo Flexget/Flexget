@@ -13,7 +13,7 @@ from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.utils.qualities import Quality
-from flexget.utils.tools import str_to_int, value_to_naive_utc, find_value, regex_search
+from flexget.utils.tools import value_to_naive_utc, find_value, regex_search, value_to_int
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import TimedLimiter
 
@@ -35,7 +35,7 @@ field_map = {
     'anidb_name':  # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
         lambda xml: find_value('title', xml, regex=r'^(.*?) -'),
     'anidb_fid':  # http://anidb.net/f1871677
-        lambda xml: str_to_int(find_value('link', xml, default='', regex=r'/f([0-9]{1,10})$')),
+        lambda xml: value_to_int(find_value('link', xml, regex=r'/f([0-9]{1,10})$')),
     'rss_pubdate':
         lambda xml: value_to_naive_utc(find_value(['updated_parsed', 'updated'], xml)),
     'anidb_feed_added':
@@ -53,7 +53,7 @@ field_map = {
     'anidb_feed_priority': 'xhtml_priority.value',
     'anidb_feed_quality': 'xhtml_quality.value',
     'anidb_feed_size':  # 344.18 MB (360.895.922)
-        lambda xml: str_to_int(find_value('xhtml_size.value', xml, default='', regex=r'\((([0-9]{1,3}\.|[0-9]{1,3}){1,5})\)'))
+        lambda xml: value_to_int(find_value('xhtml_size.value', xml, regex=r'\((([0-9]{1,3}\.|[0-9]{1,3}){1,5})\)'))
 }
 
 field_validation_list = [
@@ -94,7 +94,7 @@ ANIDB_EXTRA_TYPES = [
 def _debug_dump_entry(entry):
     log.verbose('#####################################################################################')
     for key in entry:
-        log.verbose('%-8s [%-30s] = %s', type(entry[key]).__name__, key, entry[key])
+        log.verbose('%-9s [%-30s] = %s', type(entry[key]).__name__, key, entry[key])
 
 
 class AnidbFeed(object):
