@@ -38,7 +38,6 @@ class TestVariablesFromFile(object):
         task = execute_task('test_variables_alongside_jinja')
         assert len(task.accepted) == 1
         assert task.accepted[0]['a_field'] == 'first bar then foo end'
-        assert False
 
 
 class TestVariablesFromDB(object):
