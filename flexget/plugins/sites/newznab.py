@@ -5,7 +5,6 @@ from future.moves.urllib.parse import quote_plus
 import re
 import logging
 import feedparser
-from time import mktime
 from xml.dom import minidom
 from datetime import datetime, timedelta, date, time
 
@@ -15,7 +14,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.utils.tools import parse_timedelta, str_to_boolean, split_title_year, str_to_naive_utc, str_to_number
+from flexget.utils.tools import parse_timedelta, split_title_year, value_to_int, find_value, value_to_naive_utc
 from flexget.utils.search import normalize_unicode
 from flexget.utils.template import RenderError
 
@@ -95,18 +94,31 @@ CATEGORIES = {
     'not-determined': 7900
 }
 
-# NOTE: all lowercase only
-NAMESPACE_ATTRIBUTE_MAP = {
-    'grabs': int,
-    'size': int,
-    'files': int,
-    'usenetdate': datetime,
-    'password': bool,
-    'guid': str,
-    'hydraindexername': str,
-    'hydraindexerhost': str,
-    'hydraindexerscore': int
+field_map = {
+    'title': 'title',
+    'url': 'link',
+    'newznab_pubdate': lambda xml: value_to_naive_utc(find_value(['updated_parsed', 'updated'], xml)),
+    'newznab_grabs': lambda xml: value_to_int(find_value('newznab_grabs.value', xml)),
+    'newznab_size': lambda xml: value_to_int(find_value('newznab_size.value', xml)),
+    'newznab_files': lambda xml: value_to_int(find_value('newznab_files.value', xml)),
+    'newznab_usenet_date': lambda xml: value_to_naive_utc(find_value('newznab_usenetdate.value', xml)),
+    'newznab_password': lambda xml: value_to_int(find_value('newznab_password.value', xml)),
+    'newznab_guid': lambda xml: re.split(r'[/=]', find_value(['id', 'guid'], xml, default='')).pop(),
+    'newznab_usenet_group': 'newznab_group.value',
+    'newznab_tvairdate': lambda xml: value_to_naive_utc(find_value('newznab_tvairdate.value', xml)),
+    'newznab_season':
+        lambda xml: value_to_int(find_value('newznab_season.value', xml, regex=r'[Ss]([0-9]{1,2})')),
+    'newznab_episode':
+        lambda xml: value_to_int(find_value('newznab_episode.value', xml, regex=r'[Ee]([0-9]{1,3})')),
+    'newznab_hydra_indexer_name': 'newznab_hydraindexername.value',
+    'newznab_hydra_indexer_host': 'newznab_hydraindexerhost.value',
+    'newznab_hydra_indexer_score': lambda xml: value_to_int(find_value('newznab_hydraindexerscore.value', xml))
 }
+
+field_validation_list = [
+    'title',
+    'url'
+]
 
 PLUGIN_LOOKUP_MAP = {
     'tvdb': 'thetvdb_lookup',
@@ -119,11 +131,10 @@ PLUGIN_LOOKUP_MAP = {
 NAMESPACE_NAME = 'newznab'
 NAMESPACE_URL = 'http://www.newznab.com/DTD/2010/feeds/attributes/'
 NAMESPACE_TAGNAME = 'attr'
-NAMESPACE_PREFIX = 'newznab_'
 ENCLOSURE_TYPE = 'application/x-nzb'
 
 
-# utils
+# list utils
 def list_insert_unique(in_list, idx, element, caseinsensitive=False):
     if not isinstance(in_list, list) or element is None:
         return
@@ -148,19 +159,10 @@ def list_combine_unique(list_dst, list_source, caseinsensitive=False):
         list_append_unique(list_dst, item, caseinsensitive=caseinsensitive)
 
 
-def _debug_dump_entry(entry, types=None):
-    if types and not isinstance(types, list):
-        types = [types]
-
+def _debug_dump_entry(entry):
     log.verbose('#####################################################################################')
     for key in entry:
-        if types:
-            for the_type in types:
-                if isinstance(entry[key], the_type):
-                    log.verbose('Entry: [%-30s] = %s', key, entry[key])
-                    break
-        else:
-            log.verbose('Entry: [%-30s] = %s', key, entry[key])
+        log.verbose('%-9s [%-30s] = %s', type(entry[key]).__name__, key, entry[key])
 
 
 class Newznab(object):
@@ -172,17 +174,21 @@ class Newznab(object):
     TIP: Use nzbhydra to perform searches on multiple indexers with one config https://github.com/theotherp/nzbhydra
 
     NOTE: will populate those newznab fields if available:
-    'newznab_age'               - age in days of this release
-    'newznab_pubdate'           - date the indexer added the nzb to its database (aka age)
-    'newznab_guid'              - unique guid of this release
-    'newznab_grabs'             - number of grabs
-    'newznab_size'              - size in bytes of the release
-    'newznab_files'             - number of files this release (archive) has
-    'newznab_usenetdate'        - date the release was posted on usenet
-    'newznab_password'          - if the release uses a password
-    'newznab_hydraindexername'  - the name set in nzbhydra
-    'newznab_hydraindexerhost'  - the host url used by nzbhydra
-    'newznab_hydraindexerscore' - the priority score set by nzbhydra config for this indexer
+    'newznab_age'                   - age in days of this release
+    'newznab_pubdate'               - date the indexer added the nzb to its database (aka age)
+    'newznab_guid'                  - unique guid of this release
+    'newznab_grabs'                 - number of grabs
+    'newznab_size'                  - size in bytes of the release
+    'newznab_files'                 - number of files this release (archive) has
+    'newznab_usenetdate'            - date the release was posted on usenet
+    'newznab_password'              - if the release uses a password ('0' no, '1' rar pass, '2' contains inner archive)
+    'newznab_usenet_group'          - the usenet group patch this was posted
+    'newznab_tvairdate'             - the airdate reported by the indexer
+    'newznab_season'                - the season reported by the indexer
+    'newznab_episode'               - the episode reported by the indexer
+    'newznab_hydra_indexer_name'    - the name set in nzbhydra
+    'newznab_hydra_indexer_host'    - the host url used by nzbhydra
+    'newznab_hydra_indexer_score'   - the priority score set by nzbhydra config for this indexer
 
     Config example:
     # search by name: search in the 'tv' category, using existing names for the type ('title'...)
@@ -416,78 +422,25 @@ class Newznab(object):
             # skip if we have no link/title
             if not xml_entry.title or not xml_entry.link:
                 continue
-            # fill base data
-            new_entry['title'] = xml_entry.title
-            new_entry['url'] = xml_entry.link
+            # copy xml data to entry
+            new_entry.update_using_map(field_map, xml_entry, ignore_none=True)
+            if not all(key in new_entry for key in field_validation_list):
+                log.warning('Skipping, invalid entry: %s', xml_entry.title)
+                continue
+
+            # fill extra, special data
             if xml_entry.enclosures:
                 for link in xml_entry.enclosures:
                     if link.length and link.type == ENCLOSURE_TYPE:
                         new_entry['content_size'] = int(int(link.length) / 1024 / 1024)  # MB
             if 'content_size' not in new_entry or new_entry['content_size'] == 0:
                 log.warning('Could not get valid filesize for entry: %s', xml_entry.title)
+            if new_entry.get('newznab_pubdate'):
+                new_entry['newznab_age'] = datetime.now() - new_entry['newznab_pubdate']
 
-            # store some usefully data in the namespace
-            if xml_entry.id:
-                guid_splits = re.split('[/=]', xml_entry.id)
-                new_entry[NAMESPACE_PREFIX + 'guid'] = guid_splits.pop()
-            if xml_entry.published_parsed:
-                new_entry[NAMESPACE_PREFIX + 'pubdate'] = datetime.fromtimestamp(mktime(xml_entry.published_parsed))
-            elif xml_entry.published:
-                parsed_date = str_to_naive_utc(xml_entry.published)
-                if parsed_date:
-                    new_entry[NAMESPACE_PREFIX + 'pubdate'] = parsed_date
-            if (NAMESPACE_PREFIX + 'pubdate') in new_entry:
-                try:
-                    new_entry[NAMESPACE_PREFIX + 'age'] = datetime.now() - new_entry[NAMESPACE_PREFIX + 'pubdate']
-                except ValueError as ex:
-                    log.debug('Cant calculate Age via pubdate: %s in Entry: %s error : %s',
-                              new_entry[NAMESPACE_PREFIX + 'pubdate'], xml_entry.title, ex)
-
-            # add some usefully attributes to the namespace
-            self._fill_namespace_attributes(xml_entry, new_entry)
             entries.append(new_entry)
+            #_debug_dump_entry(new_entry)  # debug
         return entries
-
-    def _set_ns_attribute(self, name, xml_entry, entry, in_type=str):
-        tagname = NAMESPACE_PREFIX + name
-        value = None
-        if tagname in entry and entry.get(tagname) is not None:
-            value = entry.get(tagname)  # use existing, but do type check
-        elif tagname in xml_entry:
-            if isinstance(xml_entry[tagname], dict) and 'value' in xml_entry[tagname]:
-                value = xml_entry[tagname]['value']
-            elif isinstance(xml_entry[tagname], str):
-                value = xml_entry[tagname]
-
-        if value is not None:
-            if isinstance(value, in_type):
-                entry[tagname] = value
-            elif in_type == int or in_type == float:
-                number = str_to_number(value)
-                if number is not None:
-                    entry[tagname] = number
-            elif in_type == datetime:
-                date = str_to_naive_utc(value)
-                if date is not None:
-                    entry[tagname] = date
-            elif in_type == bool:
-                boolvalue = None
-                if isinstance(value, str):
-                    if str_to_boolean(value):
-                        boolvalue = True
-                if not boolvalue:
-                    number = str_to_number(value)
-                    if number is not None and number > 0:
-                        boolvalue = True
-                    else:
-                        boolvalue = False
-                entry[tagname] = boolvalue
-            else:
-                log.warning('Unsupported attribute type: %s via name: %s', in_type, tagname)
-
-    def _fill_namespace_attributes(self, xml_entry, entry):
-        for key in NAMESPACE_ATTRIBUTE_MAP:
-            self._set_ns_attribute(key, xml_entry, entry, NAMESPACE_ATTRIBUTE_MAP[key])
 
     # feedparser cant handle namespace attributes with same tagname, so rename those nodes.
     def _make_feedparser_friendly(self, data):
@@ -531,12 +484,12 @@ class Newznab(object):
                     log.error('Error code: %s', feed['error']['code'])
             raise plugin.PluginError('Parsed XML is a error return for url: %s' % url)
 
-        if len(parsed_xml.entries) == 0:
+        if not parsed_xml.entries:
             log.info('No entries returned from xml.')
             return []
 
         entries = self.parse_from_xml(parsed_xml.entries)
-        if len(entries) == 0:
+        if not entries:
             log.verbose('No entries parsed from xml.')
 
         return entries
@@ -637,7 +590,7 @@ class Newznab(object):
         # use custom query in all cases (not 100% well defined behaviour in metaid cases)
         list_insert_unique(query_list, 0, custom_query_string, caseinsensitive=True)
         # do search without list
-        if query_list is None or len(query_list) == 0:
+        if not query_list:
             return self.fill_entries_for_url(url, task)
         else:
             results_set = set()
@@ -647,7 +600,7 @@ class Newznab(object):
                 query_url = self._build_query_url_fragment(query_string, config)
                 if query_url:
                     results = self.fill_entries_for_url(url + query_url, task)
-                    if len(results) > 0:
+                    if results:
                         results_set.update(results)
             return list(results_set)
 
