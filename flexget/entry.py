@@ -270,8 +270,6 @@ class Entry(LazyDict):
         :param ignore_values:
           Ignore the specific values, do not record it to the Entry
         """
-        if ignore_values and not isinstance(ignore_values, list):
-            ignore_values = [ignore_values]
         func = dict.get if isinstance(source_item, dict) else getattr
         for field, value in field_map.items():
             if isinstance(value, str):
