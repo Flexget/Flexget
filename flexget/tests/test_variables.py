@@ -19,6 +19,13 @@ class TestVariablesFromFile(object):
             if:
               - '{? test_variable ?}': accept
 
+          test_variables_alongside_jinja:
+            mock:
+            - title: title 1
+              entry_var: foo
+            set:
+              a_field: first {? bar_var ?} then {{ entry_var|default("shouldn't happen") }}
+            accept_all: yes
     """
 
     @pytest.mark.filecopy('variables.yml', '__tmp__/variables.yml')
@@ -26,6 +33,11 @@ class TestVariablesFromFile(object):
         task = execute_task('test_variable_from_file')
         assert len(task.accepted) == 1
 
+    @pytest.mark.filecopy('variables.yml', '__tmp__/variables.yml')
+    def test_variables_alongside_jinja(self, execute_task):
+        task = execute_task('test_variables_alongside_jinja')
+        assert len(task.accepted) == 1
+        assert task.accepted[0]['a_field'] == 'first bar then foo'
 
 class TestVariablesFromDB(object):
     config = """
