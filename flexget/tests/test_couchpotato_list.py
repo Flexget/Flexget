@@ -9,7 +9,7 @@ import mock
 movie_list_file = os.path.join(os.path.dirname(__file__), 'couchpotato_movie_list_test_response.json')
 qualities_profiles_file = os.path.join(os.path.dirname(__file__), 'couchpotato_quality_profile_test_response.json')
 
-with open(movie_list_file, "r") as data:
+with open(movie_list_file, "r", encoding='utf-8') as data:
     movie_list_response = json.load(data)
 
 with open(qualities_profiles_file, "r") as data:
