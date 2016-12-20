@@ -32,7 +32,12 @@ log = logging.getLogger('utils')
 
 
 def str_to_boolean(value):
-    return value.lower() in ['true', '1', 't', 'y', 'yes']
+    if value.lower() in ['true', '1', 't', 'y', 'yes', 'ok']:
+        return True
+    elif value.lower() in ['false', '0', 'f', 'n', 'no', 'nope']:
+        return False
+    else:
+        raise ValueError('Unable to convert to boolean, value: %s' % value)
 
 
 def str_to_int(value):
@@ -52,9 +57,12 @@ def value_to_int(value):
             try:
                 return int(re.sub(r'[,.]', '', value))
             except ValueError:
-                if str_to_boolean(value):
-                    return 1  # don't always fallback to False
-                else:
+                try:
+                    if str_to_boolean(value):
+                        return 1
+                    else:
+                        return 0
+                except ValueError:
                     log.warning('Cant convert string to number, value: %s', value)
     return None
 
