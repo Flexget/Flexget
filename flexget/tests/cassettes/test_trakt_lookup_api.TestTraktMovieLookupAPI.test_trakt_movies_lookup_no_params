@@ -4,29 +4,28 @@ interactions:
     headers:
       Content-Type: [application/json]
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
+      trakt-api-version: ['2']
     method: GET
-    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
+    uri: https://api.trakt.tv/search?type=movie&query=the+matrix
   response:
-    body: {string: "[{\"type\":\"movie\",\"score\":67.13019,\"movie\":{\"title\":\"The
-        Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
-        he is an average computer programmer and by night a malevolent hacker known
-        as Neo, who finds himself targeted by the police when he is contacted by Morpheus,
-        a legendary computer hacker, who reveals the shocking truth about our reality.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg\"}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":62.192234,\"movie\":{\"title\":\"Dot
+    body: {string: "[{\"type\":\"movie\",\"score\":69.366,\"movie\":{\"title\":\"The
+        Matrix\",\"overview\":\"Set in the 22nd century, The Matrix tells the story
+        of a computer hacker who joins a group of underground insurgents fighting
+        the vast and powerful computers who now rule the earth.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":64.29628,\"movie\":{\"title\":\"Dot
         Matrix\",\"overview\":\"In 2012, Richard Tuohy made \\\"Screen Tone\\\" using
         patterns of dots printed straight to 16mm film. By doubling this principle
         in \\\"Dot Matrix\\\", a third, dizzying moire pattern and a deafening noise
         develops in the flicker (alternating black and white frames) because the dots
-        also pass by the sound head.\",\"year\":2013,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/182/633/posters/original/8d9c360cc9.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/182/633/posters/thumb/8d9c360cc9.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":182633,\"slug\":\"dot-matrix-2013\",\"imdb\":\"tt3829928\",\"tmdb\":285435}}},{\"type\":\"movie\",\"score\":62.17835,\"movie\":{\"title\":\"Sexual
+        also pass by the sound head.\",\"year\":2013,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":182633,\"slug\":\"dot-matrix-2013\",\"imdb\":\"tt3829928\",\"tmdb\":285435}}},{\"type\":\"movie\",\"score\":64.281815,\"movie\":{\"title\":\"Sexual
         Matrix\",\"overview\":\"\\\"Sexual Matrix\\\" is about a matrix that is sexual.
         A horny professor decides to ask his students all about their sexual fantasies.
         Of course he does. So while they're describing their wildest dreams, he plugs
         them into his matrix machine and it lets them live out their fantasies. It
         seems so real! Mia Zottoli shows up to assist the professor in his quest to
-        know what turns the whole campus on\",\"year\":2000,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/036/357/posters/original/765eaebdcf.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/036/357/posters/thumb/765eaebdcf.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":36357,\"slug\":\"sexual-matrix-2000\",\"imdb\":\"tt0224086\",\"tmdb\":51767}}},{\"type\":\"movie\",\"score\":53.70415,\"movie\":{\"title\":\"The
+        know what turns the whole campus on\",\"year\":2000,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":36357,\"slug\":\"sexual-matrix-2000\",\"imdb\":\"tt0224086\",\"tmdb\":51767}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"The
         Matrix Revolutions\",\"overview\":\"The human city of Zion defends itself
         against the massive invasion of the machines as Neo fights to end the war
-        at another front while also opposing the rogue Agent Smith.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/posters/original/2483b4ee5c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/original/b3f7b1ce55.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg\"}},\"ids\":{\"trakt\":483,\"slug\":\"the-matrix-revolutions-2003\",\"imdb\":\"tt0242653\",\"tmdb\":605}}},{\"type\":\"movie\",\"score\":53.70415,\"movie\":{\"title\":\"The
+        at another front while also opposing the rogue Agent Smith.\",\"year\":2003,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":483,\"slug\":\"the-matrix-revolutions-2003\",\"imdb\":\"tt0242653\",\"tmdb\":605}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"The
         Matrix Reloaded\",\"overview\":\"Six months after the events depicted in The
         Matrix, Neo has proved to be a good omen for the free humans, as more and
         more humans are being freed from the matrix and brought to Zion, the one and
@@ -39,9 +38,14 @@ interactions:
         them reach the Source.  Meanwhile Neo's recurrent dreams depicting Trinity's
         death have got him worried and as if it was not enough, Agent Smith has somehow
         escaped deletion, has become more powerful than before and has fixed Neo as
-        his next target.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/posters/original/b908a87fb1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/original/4928db3308.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg\"}},\"ids\":{\"trakt\":482,\"slug\":\"the-matrix-reloaded-2003\",\"imdb\":\"tt0234215\",\"tmdb\":604}}},{\"type\":\"movie\",\"score\":53.70415,\"movie\":{\"title\":\"The
+        his next target.\",\"year\":2003,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":482,\"slug\":\"the-matrix-reloaded-2003\",\"imdb\":\"tt0234215\",\"tmdb\":604}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"The
         Matrix Revisited\",\"overview\":\"The film goes behind the scenes of the 1999
-        sci-fi movie The Matrix.\",\"year\":2001,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/posters/original/8a925c5800.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/posters/thumb/8a925c5800.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/original/355e89fdac.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/thumb/355e89fdac.jpg\"}},\"ids\":{\"trakt\":8760,\"slug\":\"the-matrix-revisited-2001\",\"imdb\":\"tt0295432\",\"tmdb\":14543}}},{\"type\":\"movie\",\"score\":53.70415,\"movie\":{\"title\":\"The
+        sci-fi movie The Matrix.\",\"year\":2001,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":8760,\"slug\":\"the-matrix-revisited-2001\",\"imdb\":\"tt0295432\",\"tmdb\":14543}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"Making
+        The Matrix\",\"overview\":\"A promotional making-of documentary for the film
+        Matrix, The (1999) that devotes its time to explaining the digital and practical
+        effects contained in the film. This is very interesting, seeing as how they're
+        giving away the cinematic secrets that they created solely for the this movie,
+        that have now been spoofed and referenced in countless other films.\",\"year\":1999,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\",\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"The
         Matrix DeZionized\",\"overview\":\"After the fantastic movie \u201CThe Matrix\u201D
         everyone was awaiting the sequels, but somehow the writer/directors were not
         able to continue the epic they started in the way they began. In our humble
@@ -53,851 +57,72 @@ interactions:
         the Matrix sequels to the max. Also we cut out several scenes that just did
         not feel right or felt to be unnecessary, e.G. when Morpheus talks to Link
         about trust, it just feels wrong and Morpheus seems to become a stereotype
-        of himself.\",\"year\":2005,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/posters/original/d59fdf29f1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/posters/thumb/d59fdf29f1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/original/a13abcfc1c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/thumb/a13abcfc1c.jpg\"}},\"ids\":{\"trakt\":186958,\"slug\":\"the-matrix-dezionized-2005\",\"imdb\":\"\",\"tmdb\":290029}}},{\"type\":\"movie\",\"score\":53.70415,\"movie\":{\"title\":\"Making
-        The Matrix\",\"overview\":\"A promotional making-of documentary for the film
-        Matrix, The (1999) that devotes its time to explaining the digital and practical
-        effects contained in the film. This is very interesting, seeing as how they're
-        giving away the cinematic secrets that they created solely for the this movie,
-        that have now been spoofed and referenced in countless other films.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/205/793/posters/original/9680ca459a.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\",\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":53.70415,\"movie\":{\"title\":\"The
+        of himself.\",\"year\":2005,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":186958,\"slug\":\"the-matrix-dezionized-2005\",\"imdb\":\"\",\"tmdb\":290029}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"The
+        Matrix ASCII\",\"overview\":\"The.Matrix-ASCII  This work is a parody.  As
+        such I do not believe that this DVD has any  possibility of competing with
+        the original in any market.  It is not for  sale.  This does not include a
+        tutorial on burning DVD's but only burn the files  in the VIDEO_TS folder.
+        \ If you want more information on why and how I did this take a look at the
+        \ page I dedicated to this project.  http://onyx.chattanoogastate.edu/~jack/matrix/
+        \ Jack\",\"year\":null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":259826,\"slug\":\"the-matrix-ascii\",\"imdb\":null,\"tmdb\":414884}}},{\"type\":\"movie\",\"score\":55.492798,\"movie\":{\"title\":\"The
         Matrix Recalibrated\",\"overview\":\"The making of Matrix Revolutions, The
         (2003) is briefly touched on here in this documentary. Interviews with various
         cast and crew members inform us how they were affected by the deaths of Gloria
         Foster and Aaliyah, and also delve into the making of the visual effects that
-        takes up a lot of screen time. Written by Rhyl Donnelly\",\"year\":2004,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":136173,\"slug\":\"the-matrix-recalibrated-2004\",\"imdb\":\"tt0410519\",\"tmdb\":221495}}},{\"type\":\"movie\",\"score\":53.70415,\"movie\":{\"title\":\"The
-        Living Matrix\",\"overview\":\"Becker's documentary presents the arguments
-        of the new-age practice of \\\"bio-energetic medicine.\\\"  Presented as a
-        medical documentary, The Living Matrix, promotes healing through energy reading
-        and manipulation.  Director Greg Becker presents his arguments through anecdotal
-        patient stories, and interviews with parapsychology professionals.\",\"year\":2009,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/083/197/posters/original/14b70abab2.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/083/197/posters/medium/14b70abab2.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/083/197/posters/thumb/14b70abab2.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":83197,\"slug\":\"the-living-matrix-2009\",\"imdb\":\"tt1499960\",\"tmdb\":119742}}}]"}
+        takes up a lot of screen time. Written by Rhyl Donnelly\",\"year\":2004,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":136173,\"slug\":\"the-matrix-recalibrated-2004\",\"imdb\":\"tt0410519\",\"tmdb\":221495}}}]"}
     headers:
-      CF-Cache-Status: [HIT]
-      CF-RAY: [2c4c2a6137bf19c8-SYD]
-      Cache-Control: ['public, max-age=14400']
+      CF-Cache-Status: [MISS]
+      CF-RAY: [312a5a64ccf03cef-CPH]
+      Cache-Control: ['public, max-age=28800']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Tue, 19 Jul 2016 06:37:34 GMT']
-      ETag: [W/"28f15b1aecb7098e7a86afe44d14b0b8"]
-      Expires: ['Tue, 19 Jul 2016 10:37:34 GMT']
+      Date: ['Sat, 17 Dec 2016 12:24:38 GMT']
+      ETag: [W/"94804c308f0ad2361b60b945291b9c47"]
+      Expires: ['Sat, 17 Dec 2016 20:24:38 GMT']
       Server: [cloudflare-nginx]
-      Set-Cookie: ['__cfduid=dd293b1986a185d027b74c261ec50c40a1468910254; expires=Wed,
-          19-Jul-17 06:37:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Set-Cookie: ['__cfduid=d9a9fdf7d5de8c9e5577857f2dbe89f161481977477; expires=Sun,
+          17-Dec-17 12:24:37 GMT; path=/; domain=.trakt.tv; HttpOnly']
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
-      X-Pagination-Item-Count: ['59']
+      X-Pagination-Item-Count: ['65']
       X-Pagination-Limit: ['10']
       X-Pagination-Page: ['1']
-      X-Pagination-Page-Count: ['6']
-      X-Request-Id: [cac8853a-b7cd-4260-9259-cf1090b90fd0]
-      X-Runtime: ['0.031172']
+      X-Pagination-Page-Count: ['7']
+      X-Request-Id: [6863ace2-4f10-4b6b-9b7c-0fa0eb06293e]
+      X-Runtime: ['0.033067']
       X-XSS-Protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
       Content-Type: [application/json]
-      Cookie: [__cfduid=dd293b1986a185d027b74c261ec50c40a1468910254]
+      Cookie: [__cfduid=d9a9fdf7d5de8c9e5577857f2dbe89f161481977477]
       trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
+      trakt-api-version: ['2']
     method: GET
-    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
+    uri: https://api.trakt.tv/movies/481?extended=full
   response:
-    body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
-        to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
-        By day he is an average computer programmer and by night a malevolent hacker
-        known as Neo, who finds himself targeted by the police when he is contacted
-        by Morpheus, a legendary computer hacker, who reveals the shocking truth about
-        our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.91447,"votes":20776,"updated_at":"2016-07-07T08:51:26.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id","fa","bs"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
+    body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
+        to the Real World.","overview":"Set in the 22nd century, The Matrix tells
+        the story of a computer hacker who joins a group of underground insurgents
+        fighting the vast and powerful computers who now rule the earth.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/matrix","rating":8.89357,"votes":22878,"updated_at":"2016-12-16T08:41:42.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hu","id","it","ja","ko","mk","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["action","science-fiction"],"certification":"R"}'}
     headers:
       CF-Cache-Status: [HIT]
-      CF-RAY: [2c4c2a6157c119c8-SYD]
-      Cache-Control: ['public, max-age=14400']
+      CF-RAY: [312a5a679d5b3cef-CPH]
+      Cache-Control: ['public, max-age=28800']
       Connection: [keep-alive]
       Content-Type: [application/json; charset=utf-8]
-      Date: ['Tue, 19 Jul 2016 06:37:34 GMT']
-      ETag: [W/"360b974185eb5e9ce51b5f4241cccdb0"]
-      Expires: ['Tue, 19 Jul 2016 10:37:34 GMT']
-      Last-Modified: ['Thu, 07 Jul 2016 08:51:26 GMT']
+      Date: ['Sat, 17 Dec 2016 12:24:38 GMT']
+      ETag: [W/"71bb837d0fdf4e85d8cd6fc76a31fc09"]
+      Expires: ['Sat, 17 Dec 2016 20:24:38 GMT']
+      Last-Modified: ['Fri, 16 Dec 2016 08:41:42 GMT']
       Server: [cloudflare-nginx]
       Vary: [Accept-Encoding]
       X-Content-Type-Options: [nosniff]
       X-Frame-Options: [SAMEORIGIN]
-      X-Request-Id: [9ff6221d-ea5d-4460-8431-08b168af86e1]
-      X-Runtime: ['0.012824']
+      X-Request-Id: [9c974a27-c920-4e4d-971c-06e48254afab]
+      X-Runtime: ['0.012982']
       X-XSS-Protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
-    method: GET
-    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
-  response:
-    body: {string: "[{\"type\":\"movie\",\"score\":70.7786,\"movie\":{\"title\":\"The
-        Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
-        he is an average computer programmer and by night a malevolent hacker known
-        as Neo, who finds himself targeted by the police when he is contacted by Morpheus,
-        a legendary computer hacker, who reveals the shocking truth about our reality.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg\"}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":65.445595,\"movie\":{\"title\":\"Dot
-        Matrix\",\"overview\":\"In 2012, Richard Tuohy made \\\"Screen Tone\\\" using
-        patterns of dots printed straight to 16mm film. By doubling this principle
-        in \\\"Dot Matrix\\\", a third, dizzying moire pattern and a deafening noise
-        develops in the flicker (alternating black and white frames) because the dots
-        also pass by the sound head.\",\"year\":2013,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/182/633/posters/original/8d9c360cc9.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/182/633/posters/thumb/8d9c360cc9.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":182633,\"slug\":\"dot-matrix-2013\",\"imdb\":\"tt3829928\",\"tmdb\":285435}}},{\"type\":\"movie\",\"score\":65.42926,\"movie\":{\"title\":\"Sexual
-        Matrix\",\"overview\":\"\\\"Sexual Matrix\\\" is about a matrix that is sexual.
-        A horny professor decides to ask his students all about their sexual fantasies.
-        Of course he does. So while they're describing their wildest dreams, he plugs
-        them into his matrix machine and it lets them live out their fantasies. It
-        seems so real! Mia Zottoli shows up to assist the professor in his quest to
-        know what turns the whole campus on\",\"year\":2000,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/036/357/posters/original/765eaebdcf.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/036/357/posters/thumb/765eaebdcf.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":36357,\"slug\":\"sexual-matrix-2000\",\"imdb\":\"tt0224086\",\"tmdb\":51767}}},{\"type\":\"movie\",\"score\":56.622883,\"movie\":{\"title\":\"The
-        Matrix Revolutions\",\"overview\":\"The human city of Zion defends itself
-        against the massive invasion of the machines as Neo fights to end the war
-        at another front while also opposing the rogue Agent Smith.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/posters/original/2483b4ee5c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/original/b3f7b1ce55.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg\"}},\"ids\":{\"trakt\":483,\"slug\":\"the-matrix-revolutions-2003\",\"imdb\":\"tt0242653\",\"tmdb\":605}}},{\"type\":\"movie\",\"score\":56.622883,\"movie\":{\"title\":\"The
-        Matrix Reloaded\",\"overview\":\"Six months after the events depicted in The
-        Matrix, Neo has proved to be a good omen for the free humans, as more and
-        more humans are being freed from the matrix and brought to Zion, the one and
-        only stronghold of the Resistance.  Neo himself has discovered his superpowers
-        including super speed, ability to see the codes of the things inside the matrix
-        and a certain degree of pre-cognition. But a nasty piece of news hits the
-        human resistance: 250,000 machine sentinels are digging to Zion and would
-        reach them in 72 hours. As Zion prepares for the ultimate war, Neo, Morpheus
-        and Trinity are advised by the Oracle to find the Keymaker who would help
-        them reach the Source.  Meanwhile Neo's recurrent dreams depicting Trinity's
-        death have got him worried and as if it was not enough, Agent Smith has somehow
-        escaped deletion, has become more powerful than before and has fixed Neo as
-        his next target.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/posters/original/b908a87fb1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/original/4928db3308.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg\"}},\"ids\":{\"trakt\":482,\"slug\":\"the-matrix-reloaded-2003\",\"imdb\":\"tt0234215\",\"tmdb\":604}}},{\"type\":\"movie\",\"score\":56.622883,\"movie\":{\"title\":\"The
-        Matrix Revisited\",\"overview\":\"The film goes behind the scenes of the 1999
-        sci-fi movie The Matrix.\",\"year\":2001,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/posters/original/8a925c5800.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/posters/thumb/8a925c5800.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/original/355e89fdac.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/thumb/355e89fdac.jpg\"}},\"ids\":{\"trakt\":8760,\"slug\":\"the-matrix-revisited-2001\",\"imdb\":\"tt0295432\",\"tmdb\":14543}}},{\"type\":\"movie\",\"score\":56.622883,\"movie\":{\"title\":\"The
-        Matrix DeZionized\",\"overview\":\"After the fantastic movie \u201CThe Matrix\u201D
-        everyone was awaiting the sequels, but somehow the writer/directors were not
-        able to continue the epic they started in the way they began. In our humble
-        opinion they lost themselves in detail, wanted to much and definetly to show
-        off with effect orgies. We tried to continue the Matrix withing the Matrix
-        wherever possible. Leaving out the Zion scenes was a major improvement of
-        pace and plot development and the most interesting thing about it is that
-        these scenes are not missed when left out. We tried to be smart and reduced
-        the Matrix sequels to the max. Also we cut out several scenes that just did
-        not feel right or felt to be unnecessary, e.G. when Morpheus talks to Link
-        about trust, it just feels wrong and Morpheus seems to become a stereotype
-        of himself.\",\"year\":2005,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/posters/original/d59fdf29f1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/posters/thumb/d59fdf29f1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/original/a13abcfc1c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/thumb/a13abcfc1c.jpg\"}},\"ids\":{\"trakt\":186958,\"slug\":\"the-matrix-dezionized-2005\",\"imdb\":\"\",\"tmdb\":290029}}},{\"type\":\"movie\",\"score\":56.622883,\"movie\":{\"title\":\"Making
-        The Matrix\",\"overview\":\"A promotional making-of documentary for the film
-        Matrix, The (1999) that devotes its time to explaining the digital and practical
-        effects contained in the film. This is very interesting, seeing as how they're
-        giving away the cinematic secrets that they created solely for the this movie,
-        that have now been spoofed and referenced in countless other films.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/205/793/posters/original/9680ca459a.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\",\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":56.622883,\"movie\":{\"title\":\"The
-        Matrix Recalibrated\",\"overview\":\"The making of Matrix Revolutions, The
-        (2003) is briefly touched on here in this documentary. Interviews with various
-        cast and crew members inform us how they were affected by the deaths of Gloria
-        Foster and Aaliyah, and also delve into the making of the visual effects that
-        takes up a lot of screen time. Written by Rhyl Donnelly\",\"year\":2004,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":136173,\"slug\":\"the-matrix-recalibrated-2004\",\"imdb\":\"tt0410519\",\"tmdb\":221495}}},{\"type\":\"movie\",\"score\":56.622883,\"movie\":{\"title\":\"The
-        Matrix ASCII\",\"overview\":\"The.Matrix-ASCII  This work is a parody.  As
-        such I do not believe that this DVD has any  possibility of competing with
-        the original in any market.  It is not for  sale.  This does not include a
-        tutorial on burning DVD's but only burn the files  in the VIDEO_TS folder.
-        \ If you want more information on why and how I did this take a look at the
-        \ page I dedicated to this project.  http://onyx.chattanoogastate.edu/~jack/matrix/
-        \ Jack\",\"year\":null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":259826,\"slug\":\"the-matrix-ascii\",\"imdb\":null,\"tmdb\":414884}}}]"}
-    headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [MISS]
-      cf-ray: [2e657b11afbd26a8-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Thu, 22 Sep 2016 11:40:12 GMT']
-      etag: [W/"b9459049806fb00dd0b6634ff234d992"]
-      expires: ['Thu, 22 Sep 2016 19:40:12 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=dedacc385f1246b7208ed7a724c17d77f1474544412; expires=Fri,
-          22-Sep-17 11:40:12 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-pagination-item-count: ['62']
-      x-pagination-limit: ['10']
-      x-pagination-page: ['1']
-      x-pagination-page-count: ['7']
-      x-request-id: [804628dc-ec8f-4e43-b799-0e3f6e5ecebf]
-      x-runtime: ['0.021095']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=dedacc385f1246b7208ed7a724c17d77f1474544412]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
-    method: GET
-    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
-  response:
-    body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
-        to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
-        By day he is an average computer programmer and by night a malevolent hacker
-        known as Neo, who finds himself targeted by the police when he is contacted
-        by Morpheus, a legendary computer hacker, who reveals the shocking truth about
-        our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.90495,"votes":21642,"updated_at":"2016-09-11T08:51:50.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id","fa","bs"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
-    headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [REVALIDATED]
-      cf-ray: [2e657b15893626a8-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Thu, 22 Sep 2016 11:40:13 GMT']
-      etag: [W/"01d945997878d1800d64d75583644aed"]
-      expires: ['Thu, 22 Sep 2016 19:40:13 GMT']
-      last-modified: ['Sun, 11 Sep 2016 08:51:50 GMT']
-      server: [cloudflare-nginx]
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-request-id: [e7f0bfeb-d0b0-4e60-b554-303f3c8430aa]
-      x-runtime: ['0.011971']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
-    method: GET
-    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
-  response:
-    body: {string: "[{\"type\":\"movie\",\"score\":71.00695,\"movie\":{\"title\":\"The
-        Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
-        he is an average computer programmer and by night a malevolent hacker known
-        as Neo, who finds himself targeted by the police when he is contacted by Morpheus,
-        a legendary computer hacker, who reveals the shocking truth about our reality.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg\"}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":65.686066,\"movie\":{\"title\":\"Dot
-        Matrix\",\"overview\":\"In 2012, Richard Tuohy made \\\"Screen Tone\\\" using
-        patterns of dots printed straight to 16mm film. By doubling this principle
-        in \\\"Dot Matrix\\\", a third, dizzying moire pattern and a deafening noise
-        develops in the flicker (alternating black and white frames) because the dots
-        also pass by the sound head.\",\"year\":2013,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/182/633/posters/thumb/8d9c360cc9.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":182633,\"slug\":\"dot-matrix-2013\",\"imdb\":\"tt3829928\",\"tmdb\":285435}}},{\"type\":\"movie\",\"score\":65.67033,\"movie\":{\"title\":\"Sexual
-        Matrix\",\"overview\":\"\\\"Sexual Matrix\\\" is about a matrix that is sexual.
-        A horny professor decides to ask his students all about their sexual fantasies.
-        Of course he does. So while they're describing their wildest dreams, he plugs
-        them into his matrix machine and it lets them live out their fantasies. It
-        seems so real! Mia Zottoli shows up to assist the professor in his quest to
-        know what turns the whole campus on\",\"year\":2000,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/036/357/posters/thumb/765eaebdcf.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":36357,\"slug\":\"sexual-matrix-2000\",\"imdb\":\"tt0224086\",\"tmdb\":51767}}},{\"type\":\"movie\",\"score\":56.805553,\"movie\":{\"title\":\"The
-        Matrix Revolutions\",\"overview\":\"The human city of Zion defends itself
-        against the massive invasion of the machines as Neo fights to end the war
-        at another front while also opposing the rogue Agent Smith.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg\"}},\"ids\":{\"trakt\":483,\"slug\":\"the-matrix-revolutions-2003\",\"imdb\":\"tt0242653\",\"tmdb\":605}}},{\"type\":\"movie\",\"score\":56.805553,\"movie\":{\"title\":\"The
-        Matrix Reloaded\",\"overview\":\"Six months after the events depicted in The
-        Matrix, Neo has proved to be a good omen for the free humans, as more and
-        more humans are being freed from the matrix and brought to Zion, the one and
-        only stronghold of the Resistance.  Neo himself has discovered his superpowers
-        including super speed, ability to see the codes of the things inside the matrix
-        and a certain degree of pre-cognition. But a nasty piece of news hits the
-        human resistance: 250,000 machine sentinels are digging to Zion and would
-        reach them in 72 hours. As Zion prepares for the ultimate war, Neo, Morpheus
-        and Trinity are advised by the Oracle to find the Keymaker who would help
-        them reach the Source.  Meanwhile Neo's recurrent dreams depicting Trinity's
-        death have got him worried and as if it was not enough, Agent Smith has somehow
-        escaped deletion, has become more powerful than before and has fixed Neo as
-        his next target.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg\"}},\"ids\":{\"trakt\":482,\"slug\":\"the-matrix-reloaded-2003\",\"imdb\":\"tt0234215\",\"tmdb\":604}}},{\"type\":\"movie\",\"score\":56.805553,\"movie\":{\"title\":\"The
-        Matrix Revisited\",\"overview\":\"The film goes behind the scenes of the 1999
-        sci-fi movie The Matrix.\",\"year\":2001,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/posters/thumb/8a925c5800.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/thumb/355e89fdac.jpg\"}},\"ids\":{\"trakt\":8760,\"slug\":\"the-matrix-revisited-2001\",\"imdb\":\"tt0295432\",\"tmdb\":14543}}},{\"type\":\"movie\",\"score\":56.805553,\"movie\":{\"title\":\"The
-        Matrix DeZionized\",\"overview\":\"After the fantastic movie \u201CThe Matrix\u201D
-        everyone was awaiting the sequels, but somehow the writer/directors were not
-        able to continue the epic they started in the way they began. In our humble
-        opinion they lost themselves in detail, wanted to much and definetly to show
-        off with effect orgies. We tried to continue the Matrix withing the Matrix
-        wherever possible. Leaving out the Zion scenes was a major improvement of
-        pace and plot development and the most interesting thing about it is that
-        these scenes are not missed when left out. We tried to be smart and reduced
-        the Matrix sequels to the max. Also we cut out several scenes that just did
-        not feel right or felt to be unnecessary, e.G. when Morpheus talks to Link
-        about trust, it just feels wrong and Morpheus seems to become a stereotype
-        of himself.\",\"year\":2005,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/posters/thumb/d59fdf29f1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/thumb/a13abcfc1c.jpg\"}},\"ids\":{\"trakt\":186958,\"slug\":\"the-matrix-dezionized-2005\",\"imdb\":\"\",\"tmdb\":290029}}},{\"type\":\"movie\",\"score\":56.805553,\"movie\":{\"title\":\"Making
-        The Matrix\",\"overview\":\"A promotional making-of documentary for the film
-        Matrix, The (1999) that devotes its time to explaining the digital and practical
-        effects contained in the film. This is very interesting, seeing as how they're
-        giving away the cinematic secrets that they created solely for the this movie,
-        that have now been spoofed and referenced in countless other films.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\",\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":56.805553,\"movie\":{\"title\":\"The
-        Matrix Recalibrated\",\"overview\":\"The making of Matrix Revolutions, The
-        (2003) is briefly touched on here in this documentary. Interviews with various
-        cast and crew members inform us how they were affected by the deaths of Gloria
-        Foster and Aaliyah, and also delve into the making of the visual effects that
-        takes up a lot of screen time. Written by Rhyl Donnelly\",\"year\":2004,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":136173,\"slug\":\"the-matrix-recalibrated-2004\",\"imdb\":\"tt0410519\",\"tmdb\":221495}}},{\"type\":\"movie\",\"score\":56.805553,\"movie\":{\"title\":\"The
-        Matrix ASCII\",\"overview\":\"The.Matrix-ASCII  This work is a parody.  As
-        such I do not believe that this DVD has any  possibility of competing with
-        the original in any market.  It is not for  sale.  This does not include a
-        tutorial on burning DVD's but only burn the files  in the VIDEO_TS folder.
-        \ If you want more information on why and how I did this take a look at the
-        \ page I dedicated to this project.  http://onyx.chattanoogastate.edu/~jack/matrix/
-        \ Jack\",\"year\":null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":259826,\"slug\":\"the-matrix-ascii\",\"imdb\":null,\"tmdb\":414884}}}]"}
-    headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [EXPIRED]
-      cf-ray: [2e7f1d3b0f1f2786-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Sun, 25 Sep 2016 14:19:58 GMT']
-      etag: [W/"b5fc8d67003656e167a17903eede31f5"]
-      expires: ['Sun, 25 Sep 2016 22:19:58 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=deb763f0ba291e0da961edda6ac0507cf1474813198; expires=Mon,
-          25-Sep-17 14:19:58 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-pagination-item-count: ['63']
-      x-pagination-limit: ['10']
-      x-pagination-page: ['1']
-      x-pagination-page-count: ['7']
-      x-request-id: [a20f7cf9-598c-4c08-bcb6-d0d39e1eec16]
-      x-runtime: ['0.023732']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=deb763f0ba291e0da961edda6ac0507cf1474813198]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
-    method: GET
-    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
-  response:
-    body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
-        to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
-        By day he is an average computer programmer and by night a malevolent hacker
-        known as Neo, who finds himself targeted by the police when he is contacted
-        by Morpheus, a legendary computer hacker, who reveals the shocking truth about
-        our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.90495,"votes":21642,"updated_at":"2016-09-11T08:51:50.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id","fa","bs"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
-    headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [HIT]
-      cf-ray: [2e7f1d3d18152786-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Sun, 25 Sep 2016 14:19:58 GMT']
-      etag: [W/"01d945997878d1800d64d75583644aed"]
-      expires: ['Sun, 25 Sep 2016 22:19:58 GMT']
-      last-modified: ['Sun, 11 Sep 2016 08:51:50 GMT']
-      server: [cloudflare-nginx]
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-request-id: [e7f0bfeb-d0b0-4e60-b554-303f3c8430aa]
-      x-runtime: ['0.011971']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
-    method: GET
-    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
-  response:
-    body: {string: "[{\"type\":\"movie\",\"score\":71.46832,\"movie\":{\"title\":\"The
-        Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
-        he is an average computer programmer and by night a malevolent hacker known
-        as Neo, who finds himself targeted by the police when he is contacted by Morpheus,
-        a legendary computer hacker, who reveals the shocking truth about our reality.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg\"}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":66.21774,\"movie\":{\"title\":\"Dot
-        Matrix\",\"overview\":\"In 2012, Richard Tuohy made \\\"Screen Tone\\\" using
-        patterns of dots printed straight to 16mm film. By doubling this principle
-        in \\\"Dot Matrix\\\", a third, dizzying moire pattern and a deafening noise
-        develops in the flicker (alternating black and white frames) because the dots
-        also pass by the sound head.\",\"year\":2013,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/182/633/posters/thumb/8d9c360cc9.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":182633,\"slug\":\"dot-matrix-2013\",\"imdb\":\"tt3829928\",\"tmdb\":285435}}},{\"type\":\"movie\",\"score\":66.20255,\"movie\":{\"title\":\"Sexual
-        Matrix\",\"overview\":\"\\\"Sexual Matrix\\\" is about a matrix that is sexual.
-        A horny professor decides to ask his students all about their sexual fantasies.
-        Of course he does. So while they're describing their wildest dreams, he plugs
-        them into his matrix machine and it lets them live out their fantasies. It
-        seems so real! Mia Zottoli shows up to assist the professor in his quest to
-        know what turns the whole campus on\",\"year\":2000,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/036/357/posters/thumb/765eaebdcf.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":36357,\"slug\":\"sexual-matrix-2000\",\"imdb\":\"tt0224086\",\"tmdb\":51767}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Revolutions\",\"overview\":\"The human city of Zion defends itself
-        against the massive invasion of the machines as Neo fights to end the war
-        at another front while also opposing the rogue Agent Smith.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg\"}},\"ids\":{\"trakt\":483,\"slug\":\"the-matrix-revolutions-2003\",\"imdb\":\"tt0242653\",\"tmdb\":605}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Reloaded\",\"overview\":\"Six months after the events depicted in The
-        Matrix, Neo has proved to be a good omen for the free humans, as more and
-        more humans are being freed from the matrix and brought to Zion, the one and
-        only stronghold of the Resistance.  Neo himself has discovered his superpowers
-        including super speed, ability to see the codes of the things inside the matrix
-        and a certain degree of pre-cognition. But a nasty piece of news hits the
-        human resistance: 250,000 machine sentinels are digging to Zion and would
-        reach them in 72 hours. As Zion prepares for the ultimate war, Neo, Morpheus
-        and Trinity are advised by the Oracle to find the Keymaker who would help
-        them reach the Source.  Meanwhile Neo's recurrent dreams depicting Trinity's
-        death have got him worried and as if it was not enough, Agent Smith has somehow
-        escaped deletion, has become more powerful than before and has fixed Neo as
-        his next target.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg\"}},\"ids\":{\"trakt\":482,\"slug\":\"the-matrix-reloaded-2003\",\"imdb\":\"tt0234215\",\"tmdb\":604}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Revisited\",\"overview\":\"The film goes behind the scenes of the 1999
-        sci-fi movie The Matrix.\",\"year\":2001,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/posters/thumb/8a925c5800.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/thumb/355e89fdac.jpg\"}},\"ids\":{\"trakt\":8760,\"slug\":\"the-matrix-revisited-2001\",\"imdb\":\"tt0295432\",\"tmdb\":14543}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix DeZionized\",\"overview\":\"After the fantastic movie \u201CThe Matrix\u201D
-        everyone was awaiting the sequels, but somehow the writer/directors were not
-        able to continue the epic they started in the way they began. In our humble
-        opinion they lost themselves in detail, wanted to much and definetly to show
-        off with effect orgies. We tried to continue the Matrix withing the Matrix
-        wherever possible. Leaving out the Zion scenes was a major improvement of
-        pace and plot development and the most interesting thing about it is that
-        these scenes are not missed when left out. We tried to be smart and reduced
-        the Matrix sequels to the max. Also we cut out several scenes that just did
-        not feel right or felt to be unnecessary, e.G. when Morpheus talks to Link
-        about trust, it just feels wrong and Morpheus seems to become a stereotype
-        of himself.\",\"year\":2005,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/posters/thumb/d59fdf29f1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/thumb/a13abcfc1c.jpg\"}},\"ids\":{\"trakt\":186958,\"slug\":\"the-matrix-dezionized-2005\",\"imdb\":\"\",\"tmdb\":290029}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"Making
-        The Matrix\",\"overview\":\"A promotional making-of documentary for the film
-        Matrix, The (1999) that devotes its time to explaining the digital and practical
-        effects contained in the film. This is very interesting, seeing as how they're
-        giving away the cinematic secrets that they created solely for the this movie,
-        that have now been spoofed and referenced in countless other films.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\",\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Recalibrated\",\"overview\":\"The making of Matrix Revolutions, The
-        (2003) is briefly touched on here in this documentary. Interviews with various
-        cast and crew members inform us how they were affected by the deaths of Gloria
-        Foster and Aaliyah, and also delve into the making of the visual effects that
-        takes up a lot of screen time. Written by Rhyl Donnelly\",\"year\":2004,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":136173,\"slug\":\"the-matrix-recalibrated-2004\",\"imdb\":\"tt0410519\",\"tmdb\":221495}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix ASCII\",\"overview\":\"The.Matrix-ASCII  This work is a parody.  As
-        such I do not believe that this DVD has any  possibility of competing with
-        the original in any market.  It is not for  sale.  This does not include a
-        tutorial on burning DVD's but only burn the files  in the VIDEO_TS folder.
-        \ If you want more information on why and how I did this take a look at the
-        \ page I dedicated to this project.  http://onyx.chattanoogastate.edu/~jack/matrix/
-        \ Jack\",\"year\":null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":259826,\"slug\":\"the-matrix-ascii\",\"imdb\":null,\"tmdb\":414884}}}]"}
-    headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [EXPIRED]
-      cf-ray: [2e960749792215cb-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 09:04:32 GMT']
-      etag: [W/"15ec0d01f1c28a1d7f0ee906e230f117"]
-      expires: ['Wed, 28 Sep 2016 17:04:32 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d2e459d29afae36a9f22ea34e6649c6f71475053472; expires=Thu,
-          28-Sep-17 09:04:32 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-pagination-item-count: ['63']
-      x-pagination-limit: ['10']
-      x-pagination-page: ['1']
-      x-pagination-page-count: ['7']
-      x-request-id: [076ef701-8f6f-41ec-bc7a-6d9713cfd416]
-      x-runtime: ['0.055192']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=d2e459d29afae36a9f22ea34e6649c6f71475053472]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
-    method: GET
-    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
-  response:
-    body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
-        to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
-        By day he is an average computer programmer and by night a malevolent hacker
-        known as Neo, who finds himself targeted by the police when he is contacted
-        by Morpheus, a legendary computer hacker, who reveals the shocking truth about
-        our reality.","released":"1999-03-30","runtime":136,"trailer":null,"homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.90322,"votes":21801,"updated_at":"2016-09-25T09:03:50.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hu","id","it","ja","ko","mk","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
-    headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [REVALIDATED]
-      cf-ray: [2e96074d9a7715cb-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 09:04:33 GMT']
-      etag: [W/"3ea8dbf517700e7277c6a569dd915550"]
-      expires: ['Wed, 28 Sep 2016 17:04:33 GMT']
-      last-modified: ['Sun, 25 Sep 2016 09:03:50 GMT']
-      server: [cloudflare-nginx]
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-request-id: [9cef70e7-141d-4455-94a6-8957967657aa]
-      x-runtime: ['0.016893']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
-    method: GET
-    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
-  response:
-    body: {string: "[{\"type\":\"movie\",\"score\":71.46832,\"movie\":{\"title\":\"The
-        Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
-        he is an average computer programmer and by night a malevolent hacker known
-        as Neo, who finds himself targeted by the police when he is contacted by Morpheus,
-        a legendary computer hacker, who reveals the shocking truth about our reality.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg\"}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":66.21774,\"movie\":{\"title\":\"Dot
-        Matrix\",\"overview\":\"In 2012, Richard Tuohy made \\\"Screen Tone\\\" using
-        patterns of dots printed straight to 16mm film. By doubling this principle
-        in \\\"Dot Matrix\\\", a third, dizzying moire pattern and a deafening noise
-        develops in the flicker (alternating black and white frames) because the dots
-        also pass by the sound head.\",\"year\":2013,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/182/633/posters/thumb/8d9c360cc9.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":182633,\"slug\":\"dot-matrix-2013\",\"imdb\":\"tt3829928\",\"tmdb\":285435}}},{\"type\":\"movie\",\"score\":66.20255,\"movie\":{\"title\":\"Sexual
-        Matrix\",\"overview\":\"\\\"Sexual Matrix\\\" is about a matrix that is sexual.
-        A horny professor decides to ask his students all about their sexual fantasies.
-        Of course he does. So while they're describing their wildest dreams, he plugs
-        them into his matrix machine and it lets them live out their fantasies. It
-        seems so real! Mia Zottoli shows up to assist the professor in his quest to
-        know what turns the whole campus on\",\"year\":2000,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/036/357/posters/thumb/765eaebdcf.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":36357,\"slug\":\"sexual-matrix-2000\",\"imdb\":\"tt0224086\",\"tmdb\":51767}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Revolutions\",\"overview\":\"The human city of Zion defends itself
-        against the massive invasion of the machines as Neo fights to end the war
-        at another front while also opposing the rogue Agent Smith.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg\"}},\"ids\":{\"trakt\":483,\"slug\":\"the-matrix-revolutions-2003\",\"imdb\":\"tt0242653\",\"tmdb\":605}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Reloaded\",\"overview\":\"Six months after the events depicted in The
-        Matrix, Neo has proved to be a good omen for the free humans, as more and
-        more humans are being freed from the matrix and brought to Zion, the one and
-        only stronghold of the Resistance.  Neo himself has discovered his superpowers
-        including super speed, ability to see the codes of the things inside the matrix
-        and a certain degree of pre-cognition. But a nasty piece of news hits the
-        human resistance: 250,000 machine sentinels are digging to Zion and would
-        reach them in 72 hours. As Zion prepares for the ultimate war, Neo, Morpheus
-        and Trinity are advised by the Oracle to find the Keymaker who would help
-        them reach the Source.  Meanwhile Neo's recurrent dreams depicting Trinity's
-        death have got him worried and as if it was not enough, Agent Smith has somehow
-        escaped deletion, has become more powerful than before and has fixed Neo as
-        his next target.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg\"}},\"ids\":{\"trakt\":482,\"slug\":\"the-matrix-reloaded-2003\",\"imdb\":\"tt0234215\",\"tmdb\":604}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Revisited\",\"overview\":\"The film goes behind the scenes of the 1999
-        sci-fi movie The Matrix.\",\"year\":2001,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/posters/thumb/8a925c5800.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/thumb/355e89fdac.jpg\"}},\"ids\":{\"trakt\":8760,\"slug\":\"the-matrix-revisited-2001\",\"imdb\":\"tt0295432\",\"tmdb\":14543}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix DeZionized\",\"overview\":\"After the fantastic movie \u201CThe Matrix\u201D
-        everyone was awaiting the sequels, but somehow the writer/directors were not
-        able to continue the epic they started in the way they began. In our humble
-        opinion they lost themselves in detail, wanted to much and definetly to show
-        off with effect orgies. We tried to continue the Matrix withing the Matrix
-        wherever possible. Leaving out the Zion scenes was a major improvement of
-        pace and plot development and the most interesting thing about it is that
-        these scenes are not missed when left out. We tried to be smart and reduced
-        the Matrix sequels to the max. Also we cut out several scenes that just did
-        not feel right or felt to be unnecessary, e.G. when Morpheus talks to Link
-        about trust, it just feels wrong and Morpheus seems to become a stereotype
-        of himself.\",\"year\":2005,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/posters/thumb/d59fdf29f1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/thumb/a13abcfc1c.jpg\"}},\"ids\":{\"trakt\":186958,\"slug\":\"the-matrix-dezionized-2005\",\"imdb\":\"\",\"tmdb\":290029}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"Making
-        The Matrix\",\"overview\":\"A promotional making-of documentary for the film
-        Matrix, The (1999) that devotes its time to explaining the digital and practical
-        effects contained in the film. This is very interesting, seeing as how they're
-        giving away the cinematic secrets that they created solely for the this movie,
-        that have now been spoofed and referenced in countless other films.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\",\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Recalibrated\",\"overview\":\"The making of Matrix Revolutions, The
-        (2003) is briefly touched on here in this documentary. Interviews with various
-        cast and crew members inform us how they were affected by the deaths of Gloria
-        Foster and Aaliyah, and also delve into the making of the visual effects that
-        takes up a lot of screen time. Written by Rhyl Donnelly\",\"year\":2004,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":136173,\"slug\":\"the-matrix-recalibrated-2004\",\"imdb\":\"tt0410519\",\"tmdb\":221495}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix ASCII\",\"overview\":\"The.Matrix-ASCII  This work is a parody.  As
-        such I do not believe that this DVD has any  possibility of competing with
-        the original in any market.  It is not for  sale.  This does not include a
-        tutorial on burning DVD's but only burn the files  in the VIDEO_TS folder.
-        \ If you want more information on why and how I did this take a look at the
-        \ page I dedicated to this project.  http://onyx.chattanoogastate.edu/~jack/matrix/
-        \ Jack\",\"year\":null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":259826,\"slug\":\"the-matrix-ascii\",\"imdb\":null,\"tmdb\":414884}}}]"}
-    headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [HIT]
-      cf-ray: [2e96093aa9b02732-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 09:05:51 GMT']
-      etag: [W/"15ec0d01f1c28a1d7f0ee906e230f117"]
-      expires: ['Wed, 28 Sep 2016 17:05:51 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=da5fd1a4791a20073b98041b98c6e1f9e1475053551; expires=Thu,
-          28-Sep-17 09:05:51 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-pagination-item-count: ['63']
-      x-pagination-limit: ['10']
-      x-pagination-page: ['1']
-      x-pagination-page-count: ['7']
-      x-request-id: [076ef701-8f6f-41ec-bc7a-6d9713cfd416]
-      x-runtime: ['0.055192']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=da5fd1a4791a20073b98041b98c6e1f9e1475053551]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
-    method: GET
-    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
-  response:
-    body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
-        to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
-        By day he is an average computer programmer and by night a malevolent hacker
-        known as Neo, who finds himself targeted by the police when he is contacted
-        by Morpheus, a legendary computer hacker, who reveals the shocking truth about
-        our reality.","released":"1999-03-30","runtime":136,"trailer":null,"homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.90322,"votes":21801,"updated_at":"2016-09-25T09:03:50.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hu","id","it","ja","ko","mk","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
-    headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [HIT]
-      cf-ray: [2e96093bfa2b2732-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 09:05:52 GMT']
-      etag: [W/"3ea8dbf517700e7277c6a569dd915550"]
-      expires: ['Wed, 28 Sep 2016 17:05:52 GMT']
-      last-modified: ['Sun, 25 Sep 2016 09:03:50 GMT']
-      server: [cloudflare-nginx]
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-request-id: [9cef70e7-141d-4455-94a6-8957967657aa]
-      x-runtime: ['0.016893']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
-    method: GET
-    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
-  response:
-    body: {string: "[{\"type\":\"movie\",\"score\":71.46832,\"movie\":{\"title\":\"The
-        Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
-        he is an average computer programmer and by night a malevolent hacker known
-        as Neo, who finds himself targeted by the police when he is contacted by Morpheus,
-        a legendary computer hacker, who reveals the shocking truth about our reality.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg\"}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":66.21774,\"movie\":{\"title\":\"Dot
-        Matrix\",\"overview\":\"In 2012, Richard Tuohy made \\\"Screen Tone\\\" using
-        patterns of dots printed straight to 16mm film. By doubling this principle
-        in \\\"Dot Matrix\\\", a third, dizzying moire pattern and a deafening noise
-        develops in the flicker (alternating black and white frames) because the dots
-        also pass by the sound head.\",\"year\":2013,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/182/633/posters/thumb/8d9c360cc9.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":182633,\"slug\":\"dot-matrix-2013\",\"imdb\":\"tt3829928\",\"tmdb\":285435}}},{\"type\":\"movie\",\"score\":66.20255,\"movie\":{\"title\":\"Sexual
-        Matrix\",\"overview\":\"\\\"Sexual Matrix\\\" is about a matrix that is sexual.
-        A horny professor decides to ask his students all about their sexual fantasies.
-        Of course he does. So while they're describing their wildest dreams, he plugs
-        them into his matrix machine and it lets them live out their fantasies. It
-        seems so real! Mia Zottoli shows up to assist the professor in his quest to
-        know what turns the whole campus on\",\"year\":2000,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/036/357/posters/thumb/765eaebdcf.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":36357,\"slug\":\"sexual-matrix-2000\",\"imdb\":\"tt0224086\",\"tmdb\":51767}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Revolutions\",\"overview\":\"The human city of Zion defends itself
-        against the massive invasion of the machines as Neo fights to end the war
-        at another front while also opposing the rogue Agent Smith.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg\"}},\"ids\":{\"trakt\":483,\"slug\":\"the-matrix-revolutions-2003\",\"imdb\":\"tt0242653\",\"tmdb\":605}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Reloaded\",\"overview\":\"Six months after the events depicted in The
-        Matrix, Neo has proved to be a good omen for the free humans, as more and
-        more humans are being freed from the matrix and brought to Zion, the one and
-        only stronghold of the Resistance.  Neo himself has discovered his superpowers
-        including super speed, ability to see the codes of the things inside the matrix
-        and a certain degree of pre-cognition. But a nasty piece of news hits the
-        human resistance: 250,000 machine sentinels are digging to Zion and would
-        reach them in 72 hours. As Zion prepares for the ultimate war, Neo, Morpheus
-        and Trinity are advised by the Oracle to find the Keymaker who would help
-        them reach the Source.  Meanwhile Neo's recurrent dreams depicting Trinity's
-        death have got him worried and as if it was not enough, Agent Smith has somehow
-        escaped deletion, has become more powerful than before and has fixed Neo as
-        his next target.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg\"}},\"ids\":{\"trakt\":482,\"slug\":\"the-matrix-reloaded-2003\",\"imdb\":\"tt0234215\",\"tmdb\":604}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Revisited\",\"overview\":\"The film goes behind the scenes of the 1999
-        sci-fi movie The Matrix.\",\"year\":2001,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/posters/thumb/8a925c5800.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/thumb/355e89fdac.jpg\"}},\"ids\":{\"trakt\":8760,\"slug\":\"the-matrix-revisited-2001\",\"imdb\":\"tt0295432\",\"tmdb\":14543}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix DeZionized\",\"overview\":\"After the fantastic movie \u201CThe Matrix\u201D
-        everyone was awaiting the sequels, but somehow the writer/directors were not
-        able to continue the epic they started in the way they began. In our humble
-        opinion they lost themselves in detail, wanted to much and definetly to show
-        off with effect orgies. We tried to continue the Matrix withing the Matrix
-        wherever possible. Leaving out the Zion scenes was a major improvement of
-        pace and plot development and the most interesting thing about it is that
-        these scenes are not missed when left out. We tried to be smart and reduced
-        the Matrix sequels to the max. Also we cut out several scenes that just did
-        not feel right or felt to be unnecessary, e.G. when Morpheus talks to Link
-        about trust, it just feels wrong and Morpheus seems to become a stereotype
-        of himself.\",\"year\":2005,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/posters/thumb/d59fdf29f1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/thumb/a13abcfc1c.jpg\"}},\"ids\":{\"trakt\":186958,\"slug\":\"the-matrix-dezionized-2005\",\"imdb\":\"\",\"tmdb\":290029}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"Making
-        The Matrix\",\"overview\":\"A promotional making-of documentary for the film
-        Matrix, The (1999) that devotes its time to explaining the digital and practical
-        effects contained in the film. This is very interesting, seeing as how they're
-        giving away the cinematic secrets that they created solely for the this movie,
-        that have now been spoofed and referenced in countless other films.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\",\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Recalibrated\",\"overview\":\"The making of Matrix Revolutions, The
-        (2003) is briefly touched on here in this documentary. Interviews with various
-        cast and crew members inform us how they were affected by the deaths of Gloria
-        Foster and Aaliyah, and also delve into the making of the visual effects that
-        takes up a lot of screen time. Written by Rhyl Donnelly\",\"year\":2004,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":136173,\"slug\":\"the-matrix-recalibrated-2004\",\"imdb\":\"tt0410519\",\"tmdb\":221495}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix ASCII\",\"overview\":\"The.Matrix-ASCII  This work is a parody.  As
-        such I do not believe that this DVD has any  possibility of competing with
-        the original in any market.  It is not for  sale.  This does not include a
-        tutorial on burning DVD's but only burn the files  in the VIDEO_TS folder.
-        \ If you want more information on why and how I did this take a look at the
-        \ page I dedicated to this project.  http://onyx.chattanoogastate.edu/~jack/matrix/
-        \ Jack\",\"year\":null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":259826,\"slug\":\"the-matrix-ascii\",\"imdb\":null,\"tmdb\":414884}}}]"}
-    headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [HIT]
-      cf-ray: [2e960a3a7f80089f-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 09:06:32 GMT']
-      etag: [W/"15ec0d01f1c28a1d7f0ee906e230f117"]
-      expires: ['Wed, 28 Sep 2016 17:06:32 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=ddf030849d8cb1e08c0ac0426da586bca1475053592; expires=Thu,
-          28-Sep-17 09:06:32 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-pagination-item-count: ['63']
-      x-pagination-limit: ['10']
-      x-pagination-page: ['1']
-      x-pagination-page-count: ['7']
-      x-request-id: [076ef701-8f6f-41ec-bc7a-6d9713cfd416]
-      x-runtime: ['0.055192']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=ddf030849d8cb1e08c0ac0426da586bca1475053592]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
-    method: GET
-    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
-  response:
-    body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
-        to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
-        By day he is an average computer programmer and by night a malevolent hacker
-        known as Neo, who finds himself targeted by the police when he is contacted
-        by Morpheus, a legendary computer hacker, who reveals the shocking truth about
-        our reality.","released":"1999-03-30","runtime":136,"trailer":null,"homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.90322,"votes":21801,"updated_at":"2016-09-25T09:03:50.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hu","id","it","ja","ko","mk","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
-    headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [HIT]
-      cf-ray: [2e960a3bb854089f-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 09:06:32 GMT']
-      etag: [W/"3ea8dbf517700e7277c6a569dd915550"]
-      expires: ['Wed, 28 Sep 2016 17:06:32 GMT']
-      last-modified: ['Sun, 25 Sep 2016 09:03:50 GMT']
-      server: [cloudflare-nginx]
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-request-id: [9cef70e7-141d-4455-94a6-8957967657aa]
-      x-runtime: ['0.016893']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
-    method: GET
-    uri: https://api.trakt.tv/search?query=the+matrix&type=movie
-  response:
-    body: {string: "[{\"type\":\"movie\",\"score\":71.46832,\"movie\":{\"title\":\"The
-        Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
-        he is an average computer programmer and by night a malevolent hacker known
-        as Neo, who finds himself targeted by the police when he is contacted by Morpheus,
-        a legendary computer hacker, who reveals the shocking truth about our reality.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg\"}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":66.21774,\"movie\":{\"title\":\"Dot
-        Matrix\",\"overview\":\"In 2012, Richard Tuohy made \\\"Screen Tone\\\" using
-        patterns of dots printed straight to 16mm film. By doubling this principle
-        in \\\"Dot Matrix\\\", a third, dizzying moire pattern and a deafening noise
-        develops in the flicker (alternating black and white frames) because the dots
-        also pass by the sound head.\",\"year\":2013,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/182/633/posters/thumb/8d9c360cc9.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":182633,\"slug\":\"dot-matrix-2013\",\"imdb\":\"tt3829928\",\"tmdb\":285435}}},{\"type\":\"movie\",\"score\":66.20255,\"movie\":{\"title\":\"Sexual
-        Matrix\",\"overview\":\"\\\"Sexual Matrix\\\" is about a matrix that is sexual.
-        A horny professor decides to ask his students all about their sexual fantasies.
-        Of course he does. So while they're describing their wildest dreams, he plugs
-        them into his matrix machine and it lets them live out their fantasies. It
-        seems so real! Mia Zottoli shows up to assist the professor in his quest to
-        know what turns the whole campus on\",\"year\":2000,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/036/357/posters/thumb/765eaebdcf.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":36357,\"slug\":\"sexual-matrix-2000\",\"imdb\":\"tt0224086\",\"tmdb\":51767}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Revolutions\",\"overview\":\"The human city of Zion defends itself
-        against the massive invasion of the machines as Neo fights to end the war
-        at another front while also opposing the rogue Agent Smith.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg\"}},\"ids\":{\"trakt\":483,\"slug\":\"the-matrix-revolutions-2003\",\"imdb\":\"tt0242653\",\"tmdb\":605}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Reloaded\",\"overview\":\"Six months after the events depicted in The
-        Matrix, Neo has proved to be a good omen for the free humans, as more and
-        more humans are being freed from the matrix and brought to Zion, the one and
-        only stronghold of the Resistance.  Neo himself has discovered his superpowers
-        including super speed, ability to see the codes of the things inside the matrix
-        and a certain degree of pre-cognition. But a nasty piece of news hits the
-        human resistance: 250,000 machine sentinels are digging to Zion and would
-        reach them in 72 hours. As Zion prepares for the ultimate war, Neo, Morpheus
-        and Trinity are advised by the Oracle to find the Keymaker who would help
-        them reach the Source.  Meanwhile Neo's recurrent dreams depicting Trinity's
-        death have got him worried and as if it was not enough, Agent Smith has somehow
-        escaped deletion, has become more powerful than before and has fixed Neo as
-        his next target.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg\"}},\"ids\":{\"trakt\":482,\"slug\":\"the-matrix-reloaded-2003\",\"imdb\":\"tt0234215\",\"tmdb\":604}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Revisited\",\"overview\":\"The film goes behind the scenes of the 1999
-        sci-fi movie The Matrix.\",\"year\":2001,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/posters/thumb/8a925c5800.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/thumb/355e89fdac.jpg\"}},\"ids\":{\"trakt\":8760,\"slug\":\"the-matrix-revisited-2001\",\"imdb\":\"tt0295432\",\"tmdb\":14543}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix DeZionized\",\"overview\":\"After the fantastic movie \u201CThe Matrix\u201D
-        everyone was awaiting the sequels, but somehow the writer/directors were not
-        able to continue the epic they started in the way they began. In our humble
-        opinion they lost themselves in detail, wanted to much and definetly to show
-        off with effect orgies. We tried to continue the Matrix withing the Matrix
-        wherever possible. Leaving out the Zion scenes was a major improvement of
-        pace and plot development and the most interesting thing about it is that
-        these scenes are not missed when left out. We tried to be smart and reduced
-        the Matrix sequels to the max. Also we cut out several scenes that just did
-        not feel right or felt to be unnecessary, e.G. when Morpheus talks to Link
-        about trust, it just feels wrong and Morpheus seems to become a stereotype
-        of himself.\",\"year\":2005,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/posters/thumb/d59fdf29f1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/thumb/a13abcfc1c.jpg\"}},\"ids\":{\"trakt\":186958,\"slug\":\"the-matrix-dezionized-2005\",\"imdb\":\"\",\"tmdb\":290029}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"Making
-        The Matrix\",\"overview\":\"A promotional making-of documentary for the film
-        Matrix, The (1999) that devotes its time to explaining the digital and practical
-        effects contained in the film. This is very interesting, seeing as how they're
-        giving away the cinematic secrets that they created solely for the this movie,
-        that have now been spoofed and referenced in countless other films.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\",\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix Recalibrated\",\"overview\":\"The making of Matrix Revolutions, The
-        (2003) is briefly touched on here in this documentary. Interviews with various
-        cast and crew members inform us how they were affected by the deaths of Gloria
-        Foster and Aaliyah, and also delve into the making of the visual effects that
-        takes up a lot of screen time. Written by Rhyl Donnelly\",\"year\":2004,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":136173,\"slug\":\"the-matrix-recalibrated-2004\",\"imdb\":\"tt0410519\",\"tmdb\":221495}}},{\"type\":\"movie\",\"score\":57.174664,\"movie\":{\"title\":\"The
-        Matrix ASCII\",\"overview\":\"The.Matrix-ASCII  This work is a parody.  As
-        such I do not believe that this DVD has any  possibility of competing with
-        the original in any market.  It is not for  sale.  This does not include a
-        tutorial on burning DVD's but only burn the files  in the VIDEO_TS folder.
-        \ If you want more information on why and how I did this take a look at the
-        \ page I dedicated to this project.  http://onyx.chattanoogastate.edu/~jack/matrix/
-        \ Jack\",\"year\":null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":259826,\"slug\":\"the-matrix-ascii\",\"imdb\":null,\"tmdb\":414884}}}]"}
-    headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [HIT]
-      cf-ray: [2e960b2a5e890f93-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 09:07:11 GMT']
-      etag: [W/"15ec0d01f1c28a1d7f0ee906e230f117"]
-      expires: ['Wed, 28 Sep 2016 17:07:11 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d2405f472b1cd13dd464fbdaeffdee76e1475053631; expires=Thu,
-          28-Sep-17 09:07:11 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-pagination-item-count: ['63']
-      x-pagination-limit: ['10']
-      x-pagination-page: ['1']
-      x-pagination-page-count: ['7']
-      x-request-id: [076ef701-8f6f-41ec-bc7a-6d9713cfd416]
-      x-runtime: ['0.055192']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=d2405f472b1cd13dd464fbdaeffdee76e1475053631]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [!!python/unicode 2]
-    method: GET
-    uri: https://api.trakt.tv/movies/481?extended=full%2Cimages
-  response:
-    body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
-        to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
-        By day he is an average computer programmer and by night a malevolent hacker
-        known as Neo, who finds himself targeted by the police when he is contacted
-        by Morpheus, a legendary computer hacker, who reveals the shocking truth about
-        our reality.","released":"1999-03-30","runtime":136,"trailer":null,"homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.90322,"votes":21801,"updated_at":"2016-09-25T09:03:50.000Z","language":"en","available_translations":["bg","bs","cs","da","de","el","en","es","fa","fi","fr","he","hu","id","it","ja","ko","mk","nl","no","pl","pt","ro","ru","sk","sr","sv","th","tr","uk","zh"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R","images":{"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/c556867276.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/c556867276.jpg"},"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"logo":{"full":"https://walter.trakt.us/images/movies/000/000/481/logos/original/f5e05ed291.png"},"clearart":{"full":"https://walter.trakt.us/images/movies/000/000/481/cleararts/original/2326f6588d.png"},"banner":{"full":"https://walter.trakt.us/images/movies/000/000/481/banners/original/cd678b64e4.jpg"},"thumb":{"full":"https://walter.trakt.us/images/movies/000/000/481/thumbs/original/0a391c9cc8.jpg"}}}'}
-    headers:
-      cache-control: ['public, max-age=28800']
-      cf-cache-status: [HIT]
-      cf-ray: [2e960b2baef40f93-FRA]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Wed, 28 Sep 2016 09:07:11 GMT']
-      etag: [W/"3ea8dbf517700e7277c6a569dd915550"]
-      expires: ['Wed, 28 Sep 2016 17:07:11 GMT']
-      last-modified: ['Sun, 25 Sep 2016 09:03:50 GMT']
-      server: [cloudflare-nginx]
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-request-id: [9cef70e7-141d-4455-94a6-8957967657aa]
-      x-runtime: ['0.016893']
-      x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 version: 1

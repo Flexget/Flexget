@@ -182,6 +182,9 @@ class NotifyTask(NotifyBase):
     )
 
     def on_task_exit(self, task, config):
+        if not (task.accepted or task.failed):
+            log.verbose('Not sending notification as there are no accepted/failed entries.')
+            return
         config['scope'] = 'task'
         plugin.get_plugin_by_name('notify').instance.send_notification(task, config)
 

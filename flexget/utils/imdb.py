@@ -343,7 +343,8 @@ class ImdbParser(object):
         title_details = soup.find('div', attrs={'id': 'titleDetails'})
         if title_details:
             # get languages
-            for link in title_details.find_all('a', href=re.compile('^/search/title\?title_type=feature&languages=')):
+            for link in title_details.find_all('a', href=re.compile('^/search/title\?title_type=feature'
+                                                                    '&primary_language=')):
                 lang = link.text.strip().lower()
                 if lang not in self.languages:
                     self.languages.append(lang.strip())

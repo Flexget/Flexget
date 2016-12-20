@@ -13,30 +13,6 @@ trakt_api = api.namespace('trakt', description='Trakt lookup endpoint')
 
 
 class ObjectsContainer(object):
-    internal_image_object = {
-        'type': 'object',
-        'properties': {
-            'full': {'type': ['string', 'null']},
-            'medium': {'type': ['string', 'null']},
-            'thumb': {'type': ['string', 'null']}
-        },
-        'required': ['full'],
-        'additionalProperties': False
-    }
-
-    images_object = {
-        'type': 'object',
-        'properties': {
-            'banner': internal_image_object,
-            'clearart': internal_image_object,
-            'fanart': internal_image_object,
-            'logo': internal_image_object,
-            'poster': internal_image_object,
-            'thumb': internal_image_object
-        },
-        'additionalProperties': False
-    }
-
     translation_object = {
         'type': 'object',
         'patternProperties': {
@@ -61,14 +37,13 @@ class ObjectsContainer(object):
                     'name': {'type': 'string'},
                     'tmdb_id': {'type': 'integer'},
                     'trakt_id': {'type': 'integer'},
-                    'images': images_object,
                     'trakt_slug': {'type': 'string'},
                     'birthday': {'type': 'string'},
                     'biography': {'type': ['string', 'null']},
                     'homepage': {'type': 'string'},
                     'death': {'type': ['string', 'null']}
                 },
-                'required': ['imdb_id', 'name', 'tmdb_id', 'trakt_id', 'images', 'trakt_slug', 'birthday', 'biography',
+                'required': ['imdb_id', 'name', 'tmdb_id', 'trakt_id', 'trakt_slug', 'birthday', 'biography',
                              'homepage', 'death'],
                 'additionalProperties': False
             }}
@@ -88,8 +63,6 @@ class ObjectsContainer(object):
             'votes': {'type': ['integer', 'null']},
             'language': {'type': ['string', 'null']},
             'updated_at': {'type': 'string', 'format': 'date-time'},
-            'images': images_object,
-            'main_image': {'type': ['string', 'null']},
             'title': {'type': 'string'},
             'year': {'type': ['integer', 'null']},
             'homepage': {'type': ['string', 'null']},
@@ -98,7 +71,7 @@ class ObjectsContainer(object):
             'imdb_id': {'type': ['string', 'null']}
         },
         'required': ['cached_at', 'genres', 'id', 'overview', 'runtime', 'rating', 'votes', 'language', 'updated_at',
-                     'images', 'main_image', 'title', 'year', 'homepage', 'slug', 'tmdb_id', 'imdb_id'],
+                     'title', 'year', 'homepage', 'slug', 'tmdb_id', 'imdb_id'],
         'additionalProperties': False
     }
 

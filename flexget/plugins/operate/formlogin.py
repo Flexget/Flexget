@@ -26,7 +26,7 @@ if mechanize:
             # Run HTML through BeautifulSoup for sanitizing
             if 'html' in response.info().get('content-type', ''):
                 soup = get_soup(response.get_data())
-                response.set_data(soup.prettify())
+                response.set_data(soup.prettify(encoding=soup.original_encoding))
             return response
 
 
@@ -66,6 +66,7 @@ class FormLogin(object):
             br.open(url)
         except Exception:
             # TODO: improve error handling
+            log.debug('Exception posting login form.', exc_info=True)
             raise plugin.PluginError('Unable to post login form', log)
 
         # br.set_debug_redirects(True)

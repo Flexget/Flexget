@@ -115,7 +115,7 @@ class InjectAction(Action):
         if values:
             kwargs['url'] = values.pop(0)
         else:
-            kwargs['url'] = 'http://localhost/inject/%s' % ''.join(random.sample(string.letters + string.digits, 30))
+            kwargs['url'] = 'http://localhost/inject/%s' % ''.join(random.sample(string.ascii_letters + string.digits, 30))
         if 'force' in [v.lower() for v in values]:
             kwargs['immortal'] = True
         entry = Entry(**kwargs)

@@ -182,9 +182,9 @@ div.clear {
         {% if entry.series_name is defined %}
             <div class="series">
 
-                {% if entry.tvdb_banner_url|d(false) %}
+                {% if entry.tvdb_posters |d(false) %}
                     <div class="banner">
-                        <img src="{{ entry.tvdb_banner_url }}" alt="{{ entry.series_name }}" title="{{ entry.series_name }}">
+                        <img src="{{ entry.tvdb_posters[0] }}" alt="{{ entry.series_name }}" title="{{ entry.series_name }}">
                     </div>
                 {% else %}
                     <h1>{{ entry.series_name }}</h1>
