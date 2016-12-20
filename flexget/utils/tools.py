@@ -1,9 +1,9 @@
 """Contains miscellaneous helpers"""
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 from future.moves.urllib import request
 from future.utils import PY2
-from past.builtins import basestring
 
 import logging
 import ast
@@ -14,18 +14,19 @@ import operator
 import os
 import re
 import sys
+import functools
+import queue
+import requests
 from collections import MutableMapping
 from datetime import timedelta, datetime
 from pprint import pformat
 from dateutil.parser import parse as dateutil_parse
 from dateutil.tz import tz
 from time import mktime
+from html.entities import name2codepoint
 
 import flexget
-import queue
-import requests
 
-from html.entities import name2codepoint
 
 log = logging.getLogger('utils')
 
@@ -87,6 +88,68 @@ def value_to_naive_utc(value):
         log.debug('Cant convert type to datetime: %s, type: %s', value, type(value))
     return result
 
+
+def regex_search(value, regex, regex_group_nr=1):
+    """
+    Does a regex search and returns the specified group.
+
+    :param value: The string to-be searched
+    :param regex: The regex to-be used.
+    :param regex_group_nr: The resulting match-group position to return
+    :return: Returns the matching group or None if not found.
+    :raises ValueError: If the value is not a string or is a empty/space string
+    """
+    if isinstance(value, str) and not value.isspace():
+        match = re.search(regex, value)
+        if match and match.group(regex_group_nr) and not match.group(regex_group_nr).isspace():
+            return match.group(regex_group_nr)
+    else:
+        log.error('Expecting string for regex lookup got: %s, type: %s', value, type(value))
+        raise ValueError
+    return None
+
+
+def find_value(key_names, source, default=None, regex=None, regex_group_nr=1, ignore_empty=True, strip=True):
+    """
+    Try's to find a value in a object, using a single or multiple key/attribute-names and a optional regex.
+
+    :param key_names: The name or list of names to look for in the object. Can be in the "root.name" format.
+    :param source: The source object to use for the search.
+    :param default: The default value, returned if no valid value can be found.
+    :param regex: A regex string, that can be used to further confine the search.
+    :param regex_group_nr: The regex group to-be used.
+    :param ignore_empty: Ignores 'empty' values, excluding number types (int, bool, float).
+    :param strip: If value is a string, use the strip() function to get better results in combination with ignore_empty.
+    :return: Returns the value found or None.
+    """
+    if not isinstance(key_names, list):
+        key_names = [key_names]
+
+    func = getattr
+    source_type = type(source)
+    if hasattr(source_type, 'get') and callable(getattr(source_type, 'get')):
+        func = getattr(source_type, 'get')
+
+    value = None
+    for key in key_names:
+        try:
+            value = functools.reduce(func, key.split('.'), source)
+        except TypeError as ex:
+            log.debug('Cant find field: %s, in source: %s, error: %s', key, source, ex)
+        if regex:
+            value = regex_search(value, regex, regex_group_nr)
+        if value is not None:
+            break
+
+    if strip and isinstance(value, str):
+        value = value.strip()
+    if ignore_empty and not isinstance(value, (int, bool, float)) and not value:
+        value = None
+
+    if value is not None:
+        return value
+    else:
+        return default
 
 if PY2:
     def native_str_to_text(value, **kwargs):
@@ -210,12 +273,12 @@ def merge_dict_from_to(d1, d2):
                     merge_dict_from_to(d1[k], d2[k])
                 elif isinstance(v, list):
                     d2[k].extend(copy.deepcopy(v))
-                elif isinstance(v, (basestring, bool, int, float, type(None))):
+                elif isinstance(v, (str, bool, int, float, type(None))):
                     pass
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
-            elif (isinstance(v, (basestring, bool, int, float, type(None))) and
-                  isinstance(d2[k], (basestring, bool, int, float, type(None)))):
+            elif (isinstance(v, (str, bool, int, float, type(None))) and
+                  isinstance(d2[k], (str, bool, int, float, type(None)))):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
@@ -258,7 +321,7 @@ class ReList(list):
 
     def __getitem__(self, k):
         item = list.__getitem__(self, k)
-        if isinstance(item, basestring):
+        if isinstance(item, str):
             item = re.compile(item, re.IGNORECASE | re.UNICODE)
             self[k] = item
         return item

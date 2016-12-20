@@ -4,7 +4,6 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 import re
 import feedparser
-import functools
 from xml.dom import minidom
 
 from requests import RequestException
@@ -14,7 +13,7 @@ from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.utils.qualities import Quality
-from flexget.utils.tools import str_to_int, value_to_naive_utc, str_to_naive_utc
+from flexget.utils.tools import str_to_int, value_to_naive_utc, str_to_naive_utc, find_value, regex_search
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import TimedLimiter
 
@@ -90,49 +89,6 @@ ANIDB_EXTRA_TYPES = [
     'op-ending',
     'trailer-promo'
 ]
-
-
-def _match_regex(value, regex, regex_group_nr=1):
-    if isinstance(value, str) and not value.isspace():
-        match = re.search(regex, value)
-        if match and match.group(regex_group_nr) and not match.group(regex_group_nr).isspace():
-            return match.group(regex_group_nr)
-    else:
-        log.error('Expecting string for regex lookup got: %s, type: %s', value, type(value))
-        raise ValueError
-    return None
-
-
-def find_value(key_names, source, default=None, regex=None, regex_group_nr=1, ignore_empty=True, strip=True):
-    if not isinstance(key_names, list):
-        key_names = [key_names]
-
-    func = getattr
-    if isinstance(source, dict):
-        func = dict.get
-    elif isinstance(source, Entry):
-        func = Entry.get
-    value = None
-    for key in key_names:
-        try:
-            value = functools.reduce(func, key.split('.'), source)
-        except TypeError as ex:
-            log.debug('Cant find field: %s, in source: %s, error: %s', key, source, ex)
-        if regex:
-            value = _match_regex(value, regex, regex_group_nr)
-        if value is not None:
-            break
-
-    if isinstance(value, str):
-        if strip:
-            value = value.strip()
-        if ignore_empty and not value:
-            value = None
-
-    if value is not None:
-        return value
-    else:
-        return default
 
 
 def _debug_dump_entry(entry):
@@ -222,11 +178,11 @@ class AnidbFeed(object):
 
     @staticmethod
     def _parse_episode_data(value):
-        ep_nr = _match_regex(value, r'^.*? - ([0-9]{1,3})(v([1-5]))? -')
-        file_version = _match_regex(value, r'^.*? - T|S|C|ED|OP|[0-9]{1,3}[a-f]?v([1-5]) -')
-        is_special = _match_regex(value, r'^.*? - (S[0-9]{1,3})(v([1-5]))? -')
-        is_op_ed = _match_regex(value, r'^.*? - ((C|OP|ED)[0-9]{1,2}[a-f]?) -')
-        is_trailer = _match_regex(value, r'^.*? - (T[0-9]{1,2}) -')
+        ep_nr = regex_search(value, r'^.*? - ([0-9]{1,3})(v([1-5]))? -')
+        file_version = regex_search(value, r'^.*? - T|S|C|ED|OP|[0-9]{1,3}[a-f]?v([1-5]) -')
+        is_special = regex_search(value, r'^.*? - (S[0-9]{1,3})(v([1-5]))? -')
+        is_op_ed = regex_search(value, r'^.*? - ((C|OP|ED)[0-9]{1,2}[a-f]?) -')
+        is_trailer = regex_search(value, r'^.*? - (T[0-9]{1,2}) -')
         if ep_nr:
             try:
                 # anidb always uses absolute ep numbering, even movies get "- 1 -" !!
@@ -284,7 +240,7 @@ class AnidbFeed(object):
             anidb_name = new_entry['anidb_name']
             title_new = anidb_name
             # "title - 1 - ... - Complete Movie"
-            is_movie = _match_regex(new_entry['title'], r'- .*?(Complete Movie)$')
+            is_movie = regex_search(new_entry['title'], r'- .*?(Complete Movie)$')
             if is_movie is not None:
                 new_entry['movie_name'] = anidb_name  # FIXME: 'Complete Movie' is not guaranteed?
             else:
@@ -313,7 +269,7 @@ class AnidbFeed(object):
             quality_string = ''
             # 1920x1080, 848x480, 1280x720
             if new_entry.get('anidb_feed_resolution'):
-                resolution_string = _match_regex(new_entry['anidb_feed_resolution'], r'x([0-9]{3,4})$')
+                resolution_string = regex_search(new_entry['anidb_feed_resolution'], r'x([0-9]{3,4})$')
                 if resolution_string:
                     quality_string += resolution_string
             if new_entry.get('anidb_feed_source'):

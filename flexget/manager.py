@@ -160,12 +160,15 @@ class Manager(object):
             logger.start(level=self.options.loglevel.upper(), to_file=False)
             raise
         else:
-            log_file = os.path.expanduser(self.options.logfile)
-            # If an absolute path is not specified, use the config directory.
-            if not os.path.isabs(log_file):
-                log_file = os.path.join(self.config_base, log_file)
+            if self.options.logfile.lower() == 'none':  # disable logfile output
+                logger.start(level=self.options.loglevel.upper(), to_file=False)
+            else:
+                log_file = os.path.expanduser(self.options.logfile)
+                # If an absolute path is not specified, use the config directory.
+                if not os.path.isabs(log_file):
+                    log_file = os.path.join(self.config_base, log_file)
 
-            logger.start(log_file, self.options.loglevel.upper(), to_console=not self.options.cron)
+                logger.start(log_file, self.options.loglevel.upper(), to_console=not self.options.cron)
 
         manager = self
 
