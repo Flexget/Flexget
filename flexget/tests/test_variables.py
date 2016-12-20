@@ -24,7 +24,7 @@ class TestVariablesFromFile(object):
             - title: title 1
               entry_var: foo
             set:
-              a_field: first {? bar_var ?} then {{ entry_var|default("shouldn't happen") }}
+              a_field: first {?bar_var?} then {{entry_var|default("shouldn't happen")}} {{fake_field|default("end")}}
             accept_all: yes
     """
 
@@ -37,7 +37,8 @@ class TestVariablesFromFile(object):
     def test_variables_alongside_jinja(self, execute_task):
         task = execute_task('test_variables_alongside_jinja')
         assert len(task.accepted) == 1
-        assert task.accepted[0]['a_field'] == 'first bar then foo'
+        assert task.accepted[0]['a_field'] == 'first bar then foo end'
+
 
 class TestVariablesFromDB(object):
     config = """
