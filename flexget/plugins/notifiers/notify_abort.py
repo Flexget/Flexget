@@ -30,7 +30,7 @@ class NotifyAbort(object):
     }
 
     def on_task_abort(self, task, config):
-        send_notification = plugin.get_plugin_by_name('notify').instance.send_notification
+        send_notification = plugin.get_plugin_by_name('notify_').instance.send_notification
         if task.silent_abort:
             return
         log.debug('sending abort notification')

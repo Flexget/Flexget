@@ -10,27 +10,30 @@ class TestNotifyTask(object):
             - title: an entry
             - title: another entry
             accept_all: yes
-            notify_task:
-              via:
-                - debug_notification:
-                    a: b
+            notify:
+              task:
+                via:
+                  - debug_notification:
+                      a: b
           test_nothing:
             mock:
             - title: an entry
-            notify_task:
-              via:
-                - debug_notification:
-                    a: b
+            notify:
+              task:
+                via:
+                  - debug_notification:
+                      a: b
           test_jinja:
             mock:
             - title: entry 1
             - title: entry 2
             accept_all: yes
-            notify_task:
-              title: "{{task.name}} aoeu"
-              via:
-                - debug_notification:
-                    setting: 1{{task.name}}
+            notify:
+              task:
+                title: "{{task.name}} aoeu"
+                via:
+                  - debug_notification:
+                      setting: 1{{task.name}}
     """
 
     def test_notify_accepted(self, execute_task, debug_notifications):

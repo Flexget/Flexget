@@ -12,12 +12,13 @@ class TestNotifyEntry(object):
              - {title: 'foo', url: 'http://bla.com'}
              - {title: 'bar', url: 'http://bla2.com'}
             accept_all: yes
-            notify_entry:
-              title: "{{title}}"
-              message: "{{url}}"
-              via:
-                - debug_notification:
-                    api_key: apikey
+            notify:
+              entries:
+                title: "{{title}}"
+                message: "{{url}}"
+                via:
+                  - debug_notification:
+                      api_key: apikey
         """
 
     def test_basic_notify(self, debug_notifications, execute_task):
