@@ -18,7 +18,7 @@ import functools
 import queue
 import requests
 from collections import MutableMapping
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 from pprint import pformat
 from dateutil.parser import parse as dateutil_parse
 from dateutil.tz import tz
@@ -42,51 +42,48 @@ def str_to_int(value):
         return None
 
 
-def str_to_number(value):
-    try:
-        return float(value)
-    except ValueError:
-        return str_to_int(value)
-
-
 def value_to_number(value):
-    if isinstance(value, str):
-        return str_to_number(value)
-    elif isinstance(value, (int, float)):
+    if isinstance(value, (int, float)):
         return value
     elif isinstance(value, bool):
         return int(value)
-    else:
-        return None
-
-
-def str_to_naive_utc(value):
-    parsed_date = None
-    try:
-        parsed_date = dateutil_parse(value, fuzzy=True)
+    elif isinstance(value, str):
         try:
-            parsed_date = parsed_date.astimezone(tz.tzutc()).replace(tzinfo=None)
+            return float(value)
         except ValueError:
-            parsed_date = parsed_date.replace(tzinfo=None)
-    except ValueError as ex:
-        log.warning('Invalid datetime field format: %s error: %s', value, ex)
-    return parsed_date
+            try:
+                return int(re.sub(r'[,.]', '', value))
+            except ValueError:
+                if str_to_boolean(value):
+                    return 1  # don't always fallback to False
+                else:
+                    log.warning('Cant convert string to number, value: %s', value)
+    return None
 
 
 def value_to_naive_utc(value):
-    result = None
-    if isinstance(value, datetime):
-        return value
+    datetime_value = None
+    if isinstance(value, date):
+        return datetime(value.year, value.month, value.day)
     elif isinstance(value, tuple):
         try:
-            result = datetime.fromtimestamp(mktime(value))
+            datetime_value = datetime.fromtimestamp(mktime(value))
         except ValueError:
             log.warning('Not a valid datetime tuple: %s', value)
     elif isinstance(value, str):
-        result = str_to_naive_utc(value)
+        try:
+            datetime_value = dateutil_parse(value, fuzzy=True)
+        except ValueError as ex:
+            log.warning('Invalid datetime field format: %s error: %s', value, ex)
+
+    if isinstance(datetime_value, datetime):
+        try:
+            return datetime_value.astimezone(tz.tzutc()).replace(tzinfo=None)
+        except ValueError:
+            return datetime_value.replace(tzinfo=None)
     else:
-        log.debug('Cant convert type to datetime: %s, type: %s', value, type(value))
-    return result
+        log.warning('Cant convert type to datetime: %s, type: %s', value, type(value))
+    return None
 
 
 def regex_search(value, regex, regex_group_nr=1):

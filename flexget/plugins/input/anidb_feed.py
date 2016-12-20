@@ -13,7 +13,7 @@ from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.utils.qualities import Quality
-from flexget.utils.tools import str_to_int, value_to_naive_utc, str_to_naive_utc, find_value, regex_search
+from flexget.utils.tools import str_to_int, value_to_naive_utc, find_value, regex_search
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import TimedLimiter
 
@@ -39,7 +39,7 @@ field_map = {
     'rss_pubdate':
         lambda xml: value_to_naive_utc(find_value(['updated_parsed', 'updated'], xml)),
     'anidb_feed_added':
-        lambda xml: str_to_naive_utc(xml['xhtml_added']['value']),
+        lambda xml: value_to_naive_utc(xml['xhtml_added']['value']),
     'anidb_feed_source': 'xhtml_source.value',
     'anidb_feed_resolution': 'xhtml_resolution.value',
     'anidb_feed_crc_status': 'xhtml_crc_status.value',
@@ -220,7 +220,7 @@ class AnidbFeed(object):
                 continue
             # copy xml data to entry
             new_entry.update_using_map(field_map, xml_entry, ignore_none=True,
-                                       ignore_values=['Raw/Unknown', 'N/A', 'Unchecked'])
+                                       ignore_values=['Raw/Unknown', 'N/A', 'Unchecked', 'unknown'])
             # skip entry if we cant validate
             if config['valid_only'] is True:
                 if not all(key in new_entry for key in field_validation_list):
