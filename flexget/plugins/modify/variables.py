@@ -36,11 +36,11 @@ class Variables(Base):
 
 
 def variables_from_file(config_base, filename):
-    secret_file = os.path.join(config_base, filename)
-    if not os.path.exists(secret_file):
-        raise PluginError('File %s does not exist!' % secret_file)
+    variables_file = os.path.join(config_base, filename)
+    if not os.path.exists(variables_file):
+        raise PluginError('File %s does not exist!' % variables_file)
     try:
-        with codecs.open(secret_file, 'rb', 'utf-8') as f:
+        with codecs.open(variables_file, 'rb', 'utf-8') as f:
             variables_dict = yaml.safe_load(f.read())
     except yaml.YAMLError as e:
         raise PluginError('Invalid variables file: %s' % e)
@@ -83,7 +83,7 @@ def process_variables(config, manager):
     else:
         log.debug('trying to load variables from file')
         variables = variables_from_file(manager.config_base, config['variables'])
-        log.debug('updating DB with secret file contents')
+        log.debug('updating DB with variable file contents')
         variables_to_db(variables)
     env.globals = variables
     _process(config, env)
