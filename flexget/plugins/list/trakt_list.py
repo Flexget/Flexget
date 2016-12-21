@@ -32,7 +32,6 @@ field_maps = {
     'show': {
         'title': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
         'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
-        'series_year': 'show.year',
         'trakt_series_name': 'show.title',
         'trakt_series_year': 'show.year',
         'imdb_id': 'show.ids.imdb',
@@ -46,7 +45,6 @@ field_maps = {
         'title': lambda i: ('%s (%s) S%02dE%02d %s' % (i['show']['title'], i['show']['year'], i['episode']['season'],
                                                        i['episode']['number'], i['episode']['title'] or '')).strip(),
         'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
-        'series_year': 'show.year',
         'trakt_series_name': 'show.title',
         'trakt_series_year': 'show.year',
         'series_season': 'episode.season',

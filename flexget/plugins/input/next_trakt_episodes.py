@@ -75,7 +75,6 @@ class NextTraktEpisodes(object):
                     trakt_id = item['show']['ids']['trakt']
                     listed_series[trakt_id] = {
                         'series_name': '%s (%s)' % (item['show']['title'], item['show']['year']),
-                        'series_year': item['show']['year'],
                         'trakt_id': trakt_id,
                         'trakt_series_name': item['show']['title'],
                         'trakt_series_year': item['show']['year'],
