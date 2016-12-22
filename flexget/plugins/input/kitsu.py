@@ -29,8 +29,7 @@ class KitsuAnime(object):
             'username': {'type': 'string'},
             'lists': one_or_more({'type': 'string', 'enum': ['current', 'planned', 'completed', 'on_hold', 'dropped']}),
             'latest': {'type': 'boolean', 'default': False},
-            'limit_to': {'type': 'string', 'enum': ['airing', 'finished']},
-            'finished_only': {'type': 'boolean', 'default': False}
+            'limit_to': {'type': 'string', 'enum': ['airing', 'finished']}
         },
         'required': ['username'],
         'additionalProperties': False,
@@ -76,7 +75,7 @@ class KitsuAnime(object):
                 if limit_to is not None:
                     if limit_to == 'airing' and anime['attributes']['endDate'] is not None:
                         continue
-                    if limit_to == 'finished' and anime['attributes']['endDate'] == None:
+                    if limit_to == 'finished' and anime['attributes']['endDate'] is None:
                         continue
 
                 entry = Entry()
