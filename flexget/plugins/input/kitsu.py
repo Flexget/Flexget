@@ -42,9 +42,9 @@ class KitsuAnime(object):
         try:
             user_response = task.requests.get('https://kitsu.io/api/edge/users', params=user_payload)
         except RequestException as e:
-            status = getattr(getattr(e, 'response', None), 'status_code', None)
-            error_message = 'Error finding User url: {url} status: {status}'.format(
-                url=e.request.url, status=status)
+            error_message = 'Error finding User url: {url}'.format(url=e.request.url)
+            if hasattr(e, 'response'):
+                error_message += ' status: {status}'.format(status=e.response.status_code)
             log.debug(error_message, exc_info=True)
             raise plugin.PluginError(error_message)
         user = user_response.json()
@@ -56,9 +56,9 @@ class KitsuAnime(object):
         try:
             response = task.requests.get(next_url, params=payload)
         except RequestException as e:
-            status = getattr(getattr(e, 'response', None), 'status_code', None)
-            error_message = 'Error getting list from {url} status: {status}'.format(
-                url=e.request.url, status=status)
+            error_message = 'Error getting list from {url}'.format(url=e.request.url)
+            if hasattr(e, 'response'):
+                error_message += ' status: {status}'.format(status=e.response.status_code)
             log.debug(error_message, exc_info=True)
             log.info(error_message, exc_info=True)
             raise plugin.PluginError(error_message)
@@ -99,9 +99,9 @@ class KitsuAnime(object):
                 try:
                     response = task.requests.get(next_url)
                 except RequestException as e:
-                    status = getattr(getattr(e, 'response', None), 'status_code', None)
-                    error_message = 'Error getting list from next page url: {url} status: {status}'.format(
-                        url=e.request.url, status=status)
+                    error_message = 'Error getting list from next page url: {url}'.format(url=e.request.url)
+                    if hasattr(e, 'response'):
+                        error_message += ' status: {status}'.format(status=e.response.status_code)
                     log.debug(error_message, exc_info=True)
                     raise plugin.PluginError(error_message)
             else:
