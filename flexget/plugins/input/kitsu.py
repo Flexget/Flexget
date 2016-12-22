@@ -41,10 +41,10 @@ class KitsuAnime(object):
         user_payload = {'filter[name]': config['username']}
         try:
             user_response = task.requests.get('https://kitsu.io/api/edge/users', params=user_payload)
-            user_response.raise_for_status()
         except RequestException as e:
+            status = getattr(getattr(e, 'response', None), 'status_code', None)
             error_message = 'Error finding User url: {url} status: {status}'.format(
-                url=e.request.url, status=e.response.status_code)
+                url=e.request.url, status=status)
             log.debug(error_message, exc_info=True)
             raise plugin.PluginError(error_message)
         user = user_response.json()
@@ -55,10 +55,10 @@ class KitsuAnime(object):
                    'page[limit]': 20}
         try:
             response = task.requests.get(next_url, params=payload)
-            response.raise_for_status()
         except RequestException as e:
+            status = getattr(getattr(e, 'response', None), 'status_code', None)
             error_message = 'Error getting list from {url} status: {status}'.format(
-                url=e.request.url, status=e.response.status_code)
+                url=e.request.url, status=status)
             log.debug(error_message, exc_info=True)
             log.info(error_message, exc_info=True)
             raise plugin.PluginError(error_message)
@@ -98,10 +98,10 @@ class KitsuAnime(object):
             if next_url:
                 try:
                     response = task.requests.get(next_url)
-                    response.raise_for_status()
                 except RequestException as e:
+                    status = getattr(getattr(e, 'response', None), 'status_code', None)
                     error_message = 'Error getting list from next page url: {url} status: {status}'.format(
-                        url=e.request.url, status=e.response.status_code)
+                        url=e.request.url, status=status)
                     log.debug(error_message, exc_info=True)
                     raise plugin.PluginError(error_message)
             else:
