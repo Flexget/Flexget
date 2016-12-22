@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
+
+import io
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import collections
@@ -203,7 +205,8 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
 
     # without --cron we log to console
     if to_console:
-        console_handler = logging.StreamHandler(sys.stdout)
+        safe_stdout = io.TextIOWrapper(sys.stdout.buffer, encoding=sys.stdout.encoding, errors='backslashreplace')
+        console_handler = logging.StreamHandler(safe_stdout)
         console_handler.setFormatter(formatter)
         console_handler.setLevel(level)
         logger.addHandler(console_handler)
