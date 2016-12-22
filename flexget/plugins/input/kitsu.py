@@ -80,8 +80,7 @@ class KitsuAnime(object):
                     entry['kitsu_title_en_jp'] = anime['attributes']['titles']['en_jp']
                 if anime['attributes']['titles']['ja_jp']:
                     entry['kitsu_title_ja_jp'] = anime['attributes']['titles']['ja_jp']
-                entry['kitsu_url'] = anime['links']['self']
-                entry['url'] = ''
+                entry['url'] = anime['links']['self']
                 if entry.isvalid():
                     if config.get('latest'):
                         entry['series_episode'] = item['progress']
