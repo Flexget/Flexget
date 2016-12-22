@@ -1,9 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
+import codecs
 import collections
 import contextlib
-import io
 import logging
 import logging.handlers
 import sys
@@ -12,6 +12,7 @@ import uuid
 import warnings
 
 from flexget import __version__
+from flexget.utils.tools import io_encoding
 
 # A level more detailed than DEBUG
 TRACE = 5
@@ -205,7 +206,11 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
     # without --cron we log to console
     if to_console:
         # Make sure we don't send any characters that the current terminal doesn't support printing
-        safe_stdout = io.TextIOWrapper(sys.stdout.buffer, encoding=sys.stdout.encoding, errors='replace')
+        stdout = sys.stdout
+        if hasattr(stdout, 'buffer'):
+            # On python 3, we need to get the buffer directly to support writing bytes
+            stdout = stdout.buffer
+        safe_stdout = codecs.getwriter(io_encoding)(stdout, 'replace')
         console_handler = logging.StreamHandler(safe_stdout)
         console_handler.setFormatter(formatter)
         console_handler.setLevel(level)
