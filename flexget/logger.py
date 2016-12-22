@@ -204,7 +204,8 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
 
     # without --cron we log to console
     if to_console:
-        safe_stdout = io.TextIOWrapper(sys.stdout.buffer, encoding=sys.stdout.encoding, errors='backslashreplace')
+        # Make sure we don't send any characters that the current terminal doesn't support printing
+        safe_stdout = io.TextIOWrapper(sys.stdout.buffer, encoding=sys.stdout.encoding, errors='replace')
         console_handler = logging.StreamHandler(safe_stdout)
         console_handler.setFormatter(formatter)
         console_handler.setLevel(level)

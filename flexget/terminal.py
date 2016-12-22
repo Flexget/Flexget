@@ -263,6 +263,6 @@ def console(text, *args, **kwargs):
     try:
         print(text, *args, **kwargs)
     except UnicodeEncodeError:
-        text = text.encode(io_encoding, 'backslashreplace').decode(io_encoding)
+        text = text.encode(io_encoding, 'replace').decode(io_encoding)
         print(text, *args, **kwargs)
     kwargs['file'].flush()  # flush to make sure the output is printed right away
