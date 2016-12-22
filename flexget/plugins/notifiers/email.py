@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from future.utils import text_to_native_str
 
 import logging
 import smtplib
@@ -146,9 +147,8 @@ class EmailNotifier(object):
 
         try:
             if smtp_username:
-                # Forcing to use `str` type
                 log.debug('logging in to smtp server using username: %s', smtp_username)
-                mailServer.login(str(smtp_username), str(smtp_password))
+                mailServer.login(text_to_native_str(smtp_username), text_to_native_str(smtp_password))
             mailServer.sendmail(email['From'], to, email.as_string())
         except IOError as e:
             raise PluginWarning(str(e))
