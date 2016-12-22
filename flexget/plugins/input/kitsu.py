@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
@@ -18,20 +19,18 @@ class KitsuAnime(object):
       lists:
       	- <current|planned|completed|on_hold|dropped>
       	- <current|planned|completed|on_hold|dropped>
+      list_only: <airing|finished>
       latest: <yes|no>
-      finishedonly: <yes|no>
-      currentonly: <yes|no>
     """
 
     schema = {
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
-            'lists': {'type': 'array',
-                      'items': {'type': 'string', 'enum': ['current', 'planned', 'completed', 'on_hold', 'dropped']}},
+            'lists': one_or_more({'type': 'string', 'enum': ['current', 'planned', 'completed', 'on_hold', 'dropped']}),
             'latest': {'type': 'boolean', 'default': False},
-            'currentonly': {'type': 'boolean', 'default': False},
-            'finishedonly': {'type': 'boolean', 'default': False}
+            'limit_to': {'type': 'string', 'enum': ['airing', 'finished']},
+            'finished_only': {'type': 'boolean', 'default': False}
         },
         'required': ['username'],
         'additionalProperties': False,
@@ -40,37 +39,45 @@ class KitsuAnime(object):
     @cached('kitsu', persist='2 hours')
     def on_task_input(self, task, config):
         entries = []
+        user_payload = {'filter[name]': config['username']}
         try:
-            user_payload = {'filter[name]': config['username']}
             user_response = task.requests.get('https://kitsu.io/api/edge/users', params=user_payload)
             user_response.raise_for_status()
-            user = user_response.json()
-            if len(user['data']) < 1:
-                raise plugin.PluginError('no such username found on kitsu.io')
-            userId = user['data'][0]['id']
-        except RequestException:
-            raise plugin.PluginError('Error getting User ID from kitsu.io')
-
-        next_url = 'https://kitsu.io/api/edge/users/{userId}/library-entries'.format(**locals())
+        except RequestException as e:
+            error_message = 'Error finding User url: {url} status: {status}'.format(
+                url=e.request.url, status=e.response.status_code)
+            log.debug(error_message, exc_info=True)
+            raise plugin.PluginError(error_message)
+        user = user_response.json()
+        if len(user['data']) < 1:
+            raise plugin.PluginError('no such username found "{name}"'.format(name=config['username']))
+        next_url = 'https://kitsu.io/api/edge/users/{id}/library-entries'.format(id=user['data'][0]['id'])
         payload = {'filter[status]': ','.join(config['lists']), 'filter[media_type]': 'Anime', 'include': 'media',
                    'page[limit]': 20}
-
         try:
             response = task.requests.get(next_url, params=payload)
             response.raise_for_status()
-        except RequestException:
-            raise plugin.PluginError('Error getting list from kitsu.io')
+        except RequestException as e:
+            error_message = 'Error getting list from {url} status: {status}'.format(
+                url=e.request.url, status=e.response.status_code)
+            log.debug(error_message, exc_info=True)
+            log.info(error_message, exc_info=True)
+            raise plugin.PluginError(error_message)
 
         while response:
             json_data = response.json()
 
             for item, anime in zip(json_data['data'], json_data['included']):
                 if item['relationships']['media']['data']['id'] != anime['id']:
-                    raise ValueError
-                if config.get('finishedonly') and anime['attributes']['endDate'] == None:
-                    continue
-                if config.get('currentonly') and anime['attributes']['endDate'] is not None:
-                    continue
+                    raise ValueError(
+                        'Anime IDs {id1} and {id2} do not match'.format(
+                            id1=item['relationships']['media']['data']['id'], id2=anime['id']))
+                limit_to = config.get('limit_to')
+                if limit_to is not None:
+                    if limit_to == 'airing' and anime['attributes']['endDate'] is not None:
+                        continue
+                    if limit_to == 'finished' and anime['attributes']['endDate'] == None:
+                        continue
 
                 entry = Entry()
                 entry['title'] = anime['attributes']['canonicalTitle']
@@ -93,8 +100,11 @@ class KitsuAnime(object):
                 try:
                     response = task.requests.get(next_url)
                     response.raise_for_status()
-                except RequestException:
-                    raise plugin.PluginError('Error getting next url from kitsu.io')
+                except RequestException as e:
+                    error_message = 'Error getting list from next page url: {url} status: {status}'.format(
+                        url=e.request.url, status=e.response.status_code)
+                    log.debug(error_message, exc_info=True)
+                    raise plugin.PluginError(error_message)
             else:
                 response = None
 
