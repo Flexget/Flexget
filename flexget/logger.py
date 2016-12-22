@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-
-import io
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import collections
 import contextlib
+import io
 import logging
 import logging.handlers
 import sys
