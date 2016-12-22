@@ -60,7 +60,6 @@ class KitsuAnime(object):
             if hasattr(e, 'response'):
                 error_message += ' status: {status}'.format(status=e.response.status_code)
             log.debug(error_message, exc_info=True)
-            log.info(error_message, exc_info=True)
             raise plugin.PluginError(error_message)
 
         while response:
