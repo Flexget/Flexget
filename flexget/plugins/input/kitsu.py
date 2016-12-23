@@ -1,12 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
+
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from requests import RequestException
+from flexget.utils.requests import RequestException
 
 log = logging.getLogger('kitsu')
 
@@ -19,7 +21,7 @@ class KitsuAnime(object):
       lists:
       	- <current|planned|completed|on_hold|dropped>
       	- <current|planned|completed|on_hold|dropped>
-      list_only: <airing|finished>
+      status: <airing|finished>
       latest: <yes|no>
     """
 
@@ -29,7 +31,7 @@ class KitsuAnime(object):
             'username': {'type': 'string'},
             'lists': one_or_more({'type': 'string', 'enum': ['current', 'planned', 'completed', 'on_hold', 'dropped']}),
             'latest': {'type': 'boolean', 'default': False},
-            'limit_to': {'type': 'string', 'enum': ['airing', 'finished']}
+            'status': {'type': 'string', 'enum': ['airing', 'finished']}
         },
         'required': ['username'],
         'additionalProperties': False,
@@ -48,7 +50,7 @@ class KitsuAnime(object):
             log.debug(error_message, exc_info=True)
             raise plugin.PluginError(error_message)
         user = user_response.json()
-        if len(user['data']) < 1:
+        if not len(user['data']):
             raise plugin.PluginError('no such username found "{name}"'.format(name=config['username']))
         next_url = 'https://kitsu.io/api/edge/users/{id}/library-entries'.format(id=user['data'][0]['id'])
         payload = {'filter[status]': ','.join(config['lists']), 'filter[media_type]': 'Anime', 'include': 'media',
@@ -62,29 +64,33 @@ class KitsuAnime(object):
             log.debug(error_message, exc_info=True)
             raise plugin.PluginError(error_message)
 
-        while response:
-            json_data = response.json()
+        json_data = response.json()
+
+        while json_data:
 
             for item, anime in zip(json_data['data'], json_data['included']):
                 if item['relationships']['media']['data']['id'] != anime['id']:
                     raise ValueError(
                         'Anime IDs {id1} and {id2} do not match'.format(
                             id1=item['relationships']['media']['data']['id'], id2=anime['id']))
-                limit_to = config.get('limit_to')
-                if limit_to is not None:
-                    if limit_to == 'airing' and anime['attributes']['endDate'] is not None:
+                status = config.get('status')
+                if status is not None:
+                    if status == 'airing' and anime['attributes']['endDate'] is not None:
                         continue
-                    if limit_to == 'finished' and anime['attributes']['endDate'] is None:
+                    if status == 'finished' and anime['attributes']['endDate'] is None:
                         continue
 
                 entry = Entry()
                 entry['title'] = anime['attributes']['canonicalTitle']
-                if anime['attributes']['titles']['en']:
-                    entry['kitsu_title_en'] = anime['attributes']['titles']['en']
-                if anime['attributes']['titles']['en_jp']:
-                    entry['kitsu_title_en_jp'] = anime['attributes']['titles']['en_jp']
-                if anime['attributes']['titles']['ja_jp']:
-                    entry['kitsu_title_ja_jp'] = anime['attributes']['titles']['ja_jp']
+                titles_en = anime['attributes']['titles'].get('en')
+                if titles_en:
+                    entry['kitsu_title_en'] = titles_en
+                titles_en_jp = anime['attributes']['titles'].get('en_jp')
+                if titles_en_jp:
+                    entry['kitsu_title_en_jp'] = titles_en_jp
+                titles_ja_jp = anime['attributes']['titles'].get('ja_jp')
+                if titles_ja_jp:
+                    entry['kitsu_title_ja_jp'] = titles_ja_jp
                 entry['url'] = anime['links']['self']
                 if entry.isvalid():
                     if config.get('latest'):
@@ -103,8 +109,9 @@ class KitsuAnime(object):
                         error_message += ' status: {status}'.format(status=e.response.status_code)
                     log.debug(error_message, exc_info=True)
                     raise plugin.PluginError(error_message)
+                json_data = response.json()
             else:
-                response = None
+                break
 
         return entries
 
