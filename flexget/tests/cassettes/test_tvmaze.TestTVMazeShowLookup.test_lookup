@@ -1,99 +1,125 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [!!python/unicode 'FlexGet/2.1.15.dev (www.flexget.com)']
-      method: GET
-      uri: http://api.tvmaze.com/singlesearch/shows?q=House%20MD
-    response:
-      body: {string: !!python/unicode '{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":8.9},"weight":2,"network":{"id":4,"name":"FOX","country":{"name":"United
-          States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255,"imdb":"tt0412142"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/43/109520.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/43/109520.jpg"},"summary":"<p>Sink
-          your teeth into meaty drama and intrigue with <em>House</em>, FOX''s take
-          on mystery, where the villain is a medical malady and the hero is an irreverent,
-          controversial doctor who trusts no one, least of all his patients.</p>","updated":1468337738,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [keep-alive]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Sun, 17 Jul 2016 11:57:36 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [!!python/unicode 'FlexGet/2.1.15.dev (www.flexget.com)']
-      method: GET
-      uri: http://api.tvmaze.com/shows/118/episodebynumber?season=1&number=2
-    response:
-      body: {string: !!python/unicode '{"id":9032,"url":"http://www.tvmaze.com/episodes/9032/house-1x02-paternity","name":"Paternity","season":1,"number":2,"airdate":"2004-11-23","airtime":"21:00","airstamp":"2004-11-23T21:00:00-05:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/57/144511.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/57/144511.jpg"},"summary":"<p>When
-          a teenage lacrosse player is stricken with an unidentifiable brain disease,
-          Dr. House and the team hustle to give his parents answers. Chase breaks
-          the bad news, the kid has MS, but the boy''s night-terror hallucinations
-          disprove the diagnosis and send House and his team back to square one. As
-          the boy''s health deteriorates, House''s side-bet on the paternity of the
-          patient infuriates Dr. Cuddy and the teenager''s parents, but may just pay
-          off in spades.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/9032"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [keep-alive]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Sun, 17 Jul 2016 11:57:36 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [!!python/unicode 'FlexGet/2.1.15.dev (www.flexget.com)']
-      method: GET
-      uri: http://api.tvmaze.com/singlesearch/shows?q=Doctor%20Who
-    response:
-      body: {string: !!python/unicode '{"id":210,"url":"http://www.tvmaze.com/shows/210/doctor-who","name":"Doctor
-          Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Running","runtime":45,"premiered":"2005-03-26","schedule":{"time":"21:00","days":["Saturday"]},"rating":{"average":9.2},"weight":3,"network":{"id":12,"name":"BBC
-          One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":3332,"thetvdb":78804,"imdb":"tt0436992"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3179.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3179.jpg"},"summary":"<p>Adventures
-          across time and space with the time travelling alien and his companions.</p>","updated":1468333142,"_links":{"self":{"href":"http://api.tvmaze.com/shows/210"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228572"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [keep-alive]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Sun, 17 Jul 2016 11:57:36 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [!!python/unicode 'FlexGet/2.1.15.dev (www.flexget.com)']
-      method: GET
-      uri: http://api.tvmaze.com/shows/210/episodebynumber?season=2&number=3
-    response:
-      body: {string: !!python/unicode '{"id":13872,"url":"http://www.tvmaze.com/episodes/13872/doctor-who-2x03-school-reunion","name":"School
-          Reunion","season":2,"number":3,"airdate":"2006-04-29","airtime":"19:35","airstamp":"2006-04-29T19:35:00+01:00","runtime":45,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/14/36848.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/14/36848.jpg"},"summary":"<p>The
-          return of Sarah Jane and K-9! The Doctor plus companions old and new fight
-          the bat-like Krillitanes!</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/13872"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [keep-alive]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Sun, 17 Jul 2016 11:57:36 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=House%20MD
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA41Ty27bMBD8FYKXXhRLcmwnFowARR/oJe3BCNCiCAxG3Ehs+BD4sOoY+fcOZaeH
+        okB7Enc52p3ZWR65kryp6+uCJ695w/sYh6Ysx3Gcxb0RzzRrnSlD78ZQAlb2LgXiBbfCEOCfzmE8
+        DDnctl4NkSQAWtguiS5nP9hOq9Aj2ZH1FHjznb/3wghkbg8hkj/kE0nVCs3vCx6iiAkw/CmnYj7Z
+        qHLDVVXwwZNR5HHR8HlVLS7q+qJeoUJoe5JJA3bkJzif101V4UqKw9T21lkc+f1Lwb2IynYZK/bk
+        J6ZrpEdSXR8xE2ikODr/lCF5Sovfqj9++YqarQMrUMf1eRp3VkE824I+VGaEzPrvtjhnQs/O5vit
+        IQ+p5Wcad99yg5ep78O7XlhLcMEmrQtOPzEZKzSIQ8/+RPFyXcGr2FPcywfeXF3Ol8uCK5MDHmO1
+        qOf1Ys5RUJlJ05EbDDYZXJ+9PfnaSjtZmwbthAzlBA/lCbwbnI9eqFguLsu6Wi/n1ezH0EGG86pT
+        IPWf5V7hO4zKpezPHxVBNCRjRJ4j3ww3W2Wf2MElzyJR7JnCf8yQiAcm88owYWVOgkYiNipANmRu
+        pj3clDgVDO68CSyKJ2LOMnNasIKNPXaGYXJsr7QWyjIVmEDtae2YEVrIw1Q+YwB2EwAw7wkbQjYW
+        rHVo7RAFJTSTro3Oo7Jj0acQA7MOPalgmkSIzD0yoTXr0WjAtqFCmG3K4QZzTIPEkuS3t7iul6vV
+        6go27jTUT3YH0o/Z9t4Tvq/OiUH99VVmu/Eq9iq/xkGFae3+8fMZF8r1vFphA19+Aa1/3HkLBAAA
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 25 Dec 2016 09:56:55 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/118/episodebynumber?season=1&number=2
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA32SwW7bMAyGX0XQ2bZsN9kwo+iphx53GLBjwFhsxNaSBVGqlxZ599IxinUDthMB
+        8uMv/hTfNFk9fGtv+kqXNOlBu5zjYMyyLE1+8fCKzTh7g5F4tshmRY2bC2Pd/Wr7OkLGFCifdaUD
+        eBSF759SjMBz0EMn1eKPmPQgLwElK5Cwfdvu6q6r+xvpl3Smq0TfDW27ZTiDj3+QP65VAep2v2Gp
+        hK3xS1tp8nAS6Tft0VLxvy1tdkYbro5KnGawbK44mw0+TBAsjxDR7L+abrfbd13zFE8yypzoRAE+
+        rei/eh/4QUaby+jQ/qV4qTQX7yGdZcLbePfTYVCgMmKQ+dUEY5qZUcUJzpgUseKcaHwWaqHsFARV
+        AlkU548ExwnVMQEFZWndOVbqPjXqYf0oQa3KDkUbvHKFs8B5Vid6QeVEOEISGRaOF0zcqFsT78Ty
+        YaLwzOsqGafHNbqEEj9uBCL980b05XJ5Bx+rB2ddAgAA
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 25 Dec 2016 09:56:55 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=Doctor%20Who
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA41Ty27bMBD8FWHPsiVLfshCEKBOH4cWKFCj6KEIDEbcSmwokuBDqmP437uUnRyK
+        AslJ4nJ2d3ZmeQLBoS4WeQrBSqih897UWTaO49wPPXvCeaP7zHV6dBnBMq4br+1s7DSkoFiPlPN+
+        iiU/ppg/mhjbN1YYj5xQkqk2sDZGP6hWCtdRsEVl0UH9E97xAZUPFim6bwSqBmcfReOFVnCfgvPM
+        BwLCt6CUUC2hbFBexM7LVQrGYi/QUqcaijxfzfJyVqwJ5ZoOeZAEO8EFDhTl7Dh13VNVSwe4P1NB
+        5mNlArIB7UR1Oy/oYkTRdh7qDc2KftT2MYKiZIviZfzd7i75qiL9RhMze4yYqzTflSARks9Unut+
+        gvAoxKcd/UdWT5oySZhgtcHsi1acxj5PrR/uOqYUkisqSJkC/vFoFZPEnyYaLjzLsiQmvkM/8Aci
+        WlX5MgXRxwN4ny/L9XZbABUU/TTYCXrkIvR0ffX64nPD1WR1MFIz7rIJ7rIL+GC09ZYJn1XbrCiW
+        2yqf/zbRC21FK4jUG8s9ww8klA7RoX8qElEX+p5FFeHG3L5sh0tYY7VzSVQtYYonzrAGk1H4LqH5
+        L3EiOaCUJHfCJO3SBOyES2iLDVO0U25+k5lbYh4MZ3FB68WyKtblalORywdKfZwEdih/RaE7i/R9
+        1ooZ8d93EQWmTRyEDg6NcDq6/EryFUfvqqhWG/LofP4LyKbR948DAAA=
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 25 Dec 2016 09:56:55 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/210/episodebynumber?season=2&number=3
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA32SyU7DMBCGX8X4SlKnTYE2qnriBDfovRriaWPqTV4IUPXdmaRiO8DFI42/+Wc9
+        ciV5M60XN7OC56B5w7uUfCNE3/eT9GLgHSetMwK9ik5iFCMrpGuTC2XfuXL2WtVlbDvndBkwW+Us
+        L7gFgyT2OPrZw5c/IkQCGkpns3nCwJu64KCChDQEzKrquqzm5WxJIuROatSZLpv66uyJCYz/RW7G
+        36aqLqspvYSFbM+B86uCKwN7kj5yg1Jl893iub1W2rHD7LUDGcWIR3GGtxqsjC14FNO5qK8X88Xk
+        2e8phQtqryz8mNi/cp/4lipzue1Q/hY8FTxmYyC8UX0rv950yAKmHCxzO/YIATp2BxYZ1cPuy+UF
+        G4jbcQ3M6xwZbcnDMP3InJYjZ7FnO7XvEksEP0EqtToguw9Ka5VILV6shF9TN1ut7CEOQ4qod4Pt
+        ApL9vAbw6u9r4KfT6QMHmFOwSQIAAA==
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 25 Dec 2016 09:56:56 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
 version: 1
