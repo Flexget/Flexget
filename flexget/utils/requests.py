@@ -238,6 +238,11 @@ class Session(requests.Session):
         try:
             log.debug('Fetching URL %s with args %s and kwargs %s', url, args, kwargs)
             result = super(Session, self).request(method, url, *args, **kwargs)
+            try:
+                log.trace('Contents for URL %s start on next line', url)
+                log.trace('%s', result.text)
+            except UnicodeDecodeError:
+                log.trace('error logging contents!')
         except requests.Timeout:
             # Mark this site in known unresponsive list
             set_unresponsive(url)
