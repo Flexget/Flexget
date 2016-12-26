@@ -238,17 +238,7 @@ class Session(requests.Session):
         try:
             log.debug('Fetching URL %s with args %s and kwargs %s', url, args, kwargs)
             result = super(Session, self).request(method, url, *args, **kwargs)
-            # result.text (from requests/models:Request) tries to encode the
-            # response from the server as unicode, but that doesn't always work
-            # and when it doesn't work the returned string cannot be handled by
-            # the logging library.  We catch the UnicodeDecodeError raised by
-            # the logging library here to avoid 1) failing an otherwise valid
-            # request (enabling debugging would change behaviour, which is bad)
-            # and 2) dumping a stack trace to stderr.
-            try:
-                log.trace('Contents for URL %s: %s', url, result.text)
-            except UnicodeDecodeError:
-                log.trace('error logging contents!')
+            log.trace('Contents for URL %s: %s', url, result.text)
         except requests.Timeout:
             # Mark this site in known unresponsive list
             set_unresponsive(url)
