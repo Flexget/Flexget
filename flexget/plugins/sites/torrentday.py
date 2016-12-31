@@ -130,7 +130,6 @@ class UrlRewriteTorrentday(object):
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
         filter_url = '&cata=yes&c%s=1&clear-new=1' % ','.join(str(c) for c in categories)
-#        filter_url = '&cata=yes&c11=1&clear-new=1'
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string).replace(":", "")
