@@ -138,7 +138,7 @@ class UrlRewriteTorrentday(object):
             url = ('https://www.torrentday.com/browse.php?search=' +
                    quote(query.encode('utf-8')) + filter_url)
             log.debug('Using %s as torrentday search url' % url)
-	
+
             cookies = {}
             cookies["uid"] = config['uid']
             cookies["pass"] = config['passkey']
@@ -150,16 +150,16 @@ class UrlRewriteTorrentday(object):
             for tr in soup.find_all("tr", { "class": "browse" }):
                 entry = Entry()
                 # find the torrent names
-		title = tr.find("a", { "class": "torrentName" })
+                title = tr.find("a", { "class": "torrentName" })
                 entry['title'] = title.contents[0]
-		log.debug('title: %s' % title.contents[0])
+                log.debug('title: %s' % title.contents[0])
 
                 # find download link
                 torrent_url = tr.find("td", { "class": "dlLinksInfo" })
                 torrent_url = torrent_url.find("a").get('href')
 
-		# construct download URL
-		torrent_url = ( "https://www.torrentday.com/" + torrent_url + '?torrent_pass=' + config['rss_key'] )
+                # construct download URL
+                torrent_url = ( "https://www.torrentday.com/" + torrent_url + '?torrent_pass=' + config['rss_key'] )
                 log.debug('RSS-ified download link: %s' % torrent_url)
                 entry['url'] = torrent_url
 
