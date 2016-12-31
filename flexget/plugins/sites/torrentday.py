@@ -103,7 +103,7 @@ class UrlRewriteTorrentday(object):
         if 'url' not in entry:
             log.error("Didn't actually get a URL...")
         else:
-            log.debug("Got the URL: %s" % entry['url'])
+            log.debug("Got the URL: %s", entry['url'])
         if entry['url'].startswith('https://www.torrentday.com/browse'):
             # use search
             results = self.search(task, entry)
@@ -143,7 +143,11 @@ class UrlRewriteTorrentday(object):
             cookies["pass"] = config['passkey']
             cookies["__cfduid"] = config['cfduid']
 
-            page = requests.get(url, cookies=cookies).content
+            try:
+                page = requests.get(url, cookies=cookies).content
+            except RequestException as e:
+                raise PluginError('Could not connect to torrentday: %s', str(e))
+
             soup = get_soup(page)
 
             for tr in soup.find_all("tr", { "class": "browse" }):
