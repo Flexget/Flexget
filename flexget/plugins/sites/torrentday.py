@@ -109,7 +109,6 @@ class UrlRewriteTorrentday(object):
             results = self.search(task, entry)
             if not results:
                 raise UrlRewritingError("No search results found")
-            # TODO: Search doesn't enforce close match to title, be more picky
             entry['url'] = results[0]['url']
 
     @plugin.internet(log)
@@ -120,9 +119,6 @@ class UrlRewriteTorrentday(object):
 
         if not isinstance(config, dict):
             config = {}
-            # sort = SORT.get(config.get('sort_by', 'seeds'))
-            # if config.get('sort_reverse'):
-            # sort += 1
         categories = config.get('category', 'all')
         # Make sure categories is a list
         if not isinstance(categories, list):
@@ -136,7 +132,7 @@ class UrlRewriteTorrentday(object):
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
             url = ('https://www.torrentday.com/browse.php?search=' +
                    quote(query.encode('utf-8')) + filter_url)
-            log.debug('Using %s as torrentday search url' % url)
+            log.debug('Using %s as torrentday search url', url)
 
             cookies = {}
             cookies["uid"] = config['uid']
@@ -146,7 +142,7 @@ class UrlRewriteTorrentday(object):
             try:
                 page = requests.get(url, cookies=cookies).content
             except RequestException as e:
-                raise PluginError('Could not connect to torrentday: %s', str(e))
+                raise PluginError('Could not connect to torrentday')
 
             soup = get_soup(page)
 
@@ -155,7 +151,7 @@ class UrlRewriteTorrentday(object):
                 # find the torrent names
                 title = tr.find("a", { "class": "torrentName" })
                 entry['title'] = title.contents[0]
-                log.debug('title: %s' % title.contents[0])
+                log.debug('title: %s', title.contents[0])
 
                 # find download link
                 torrent_url = tr.find("td", { "class": "dlLinksInfo" })
@@ -163,7 +159,7 @@ class UrlRewriteTorrentday(object):
 
                 # construct download URL
                 torrent_url = ( "https://www.torrentday.com/" + torrent_url + '?torrent_pass=' + config['rss_key'] )
-                log.debug('RSS-ified download link: %s' % torrent_url)
+                log.debug('RSS-ified download link: %s', torrent_url)
                 entry['url'] = torrent_url
 
                 # us tr object for seeders/leechers
