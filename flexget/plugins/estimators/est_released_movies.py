@@ -22,7 +22,7 @@ class EstimatesReleasedMovies(object):
                 return datetime(year=entry['movie_year'], month=1, day=1)
             except ValueError:
                 pass
-        log.debug('Unable to check release for %s, tmdb_release and movie_year fields are not defined' % entry['title'])
+        log.debug('Unable to check release for %s, tmdb_release and movie_year fields are not defined', entry['title'])
 
 
 @event('plugin.register')
