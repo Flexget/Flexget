@@ -142,7 +142,7 @@ class UrlRewriteTorrentday(object):
             try:
                 page = requests.get(url, cookies=cookies).content
             except RequestException as e:
-                raise PluginError('Could not connect to torrentday')
+                raise PluginError('Could not connect to torrentday: %s' % e)
 
             soup = get_soup(page)
 
