@@ -117,30 +117,22 @@ class UrlRewriteTorrentday(object):
         Search for name from torrentday.
         """
 
-        if not isinstance(config, dict):
-            config = {}
         categories = config.get('category', 'all')
         # Make sure categories is a list
         if not isinstance(categories, list):
             categories = [categories]
         # If there are any text categories, turn them into their id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-        filter_url = '&cata=yes&c%s=1&clear-new=1' % ','.join(str(c) for c in categories)
+        params = { 'cata': 'yes', 'c%s' % ','.join(str(c) for c in categories): 1, 'clear-new': 1}
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            query = normalize_unicode(search_string).replace(":", "")
-            # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = ('https://www.torrentday.com/browse.php?search=' +
-                   quote(query.encode('utf-8')) + filter_url)
-            log.debug('Using %s as torrentday search url', url)
 
-            cookies = {}
-            cookies["uid"] = config['uid']
-            cookies["pass"] = config['passkey']
-            cookies["__cfduid"] = config['cfduid']
+            url = 'https://www.torrentday.com/browse.php'
+            params["search"] = normalize_unicode(search_string).replace(":", "")
+            cookies = { 'uid': config['uid'], 'pass': config['passkey'], '__cfduid': config['cfduid'] }
 
             try:
-                page = requests.get(url, cookies=cookies).content
+                page = requests.get(url, params=params, cookies=cookies).content
             except RequestException as e:
                 raise PluginError('Could not connect to torrentday: %s' % e)
 
@@ -164,8 +156,8 @@ class UrlRewriteTorrentday(object):
 
                 # us tr object for seeders/leechers
                 seeders, leechers = tr.find_all('td', { "class": ["seedersInfo", "leechersInfo"]})
-                entry['torrent_seeds'] = int(seeders.contents[0])
-                entry['torrent_leeches'] = int(leechers.contents[0])
+                entry['torrent_seeds'] = int(seeders.contents[0].replace(",", ""))
+                entry['torrent_leeches'] = int(leechers.contents[0].replace(",", ""))
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
 
                 # use tr object for size
