@@ -48,6 +48,10 @@ def str_to_int(value):
 
 
 def value_to_int(value):
+    if value is None:
+        log.debug('None input for value_to_int()')
+        return None
+
     if isinstance(value, (int, float, bool)):
         return int(value)
     elif isinstance(value, str):
@@ -68,6 +72,10 @@ def value_to_int(value):
 
 
 def value_to_naive_utc(value):
+    if value is None:
+        log.debug('None input for value_to_naive_utc()')
+        return None
+
     datetime_value = None
     if isinstance(value, date):
         return datetime(value.year, value.month, value.day)
