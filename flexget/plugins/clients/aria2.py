@@ -110,7 +110,7 @@ class OutputAria2(object):
         if config['secret']:
             secret = 'token:%s' % config['secret']
         # handle torrent files
-        if 'torrent' in entry:
+        if 'file' in entry:
             if secret:
                 return aria2.addTorrent(secret, xmlrpc.client.Binary(open(entry['file'], mode='rb').read()))
             return aria2.addTorrent(xmlrpc.client.Binary(open(entry['file'], mode='rb').read()))
