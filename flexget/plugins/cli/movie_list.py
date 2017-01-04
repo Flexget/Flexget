@@ -37,7 +37,7 @@ def lookup_movie(title, session, identifiers=None):
                 entry[key] = value
     try:
         imdb_lookup(entry, session=session)
-    # TODO IMDB lookup raises PluginError instead of the normal ValueError
+    # IMDB lookup raises PluginError instead of the normal ValueError
     except PluginError:
         tmdb_lookup(entry)
 
@@ -131,17 +131,19 @@ def movie_list_add(options):
             movie_list = MovieListList(name=options.list_name)
             session.add(movie_list)
             session.commit()
+
         title, year = split_title_year(options.movie_title)
         console('Trying to lookup movie title: `{}`'.format(title))
-        movie = lookup_movie(title=title, session=session, identifiers=options.identifiers)
-        if not movie:
+        movie_lookup = lookup_movie(title=title, session=session, identifiers=options.identifiers)
+        if not movie_lookup:
             console('ERROR: movie lookup failed for movie {}, aborting'.format(options.movie_title))
             return
-        title = movie['movie_name']
+
+        title = movie_lookup['movie_name']
         movie = get_movie_by_title_and_year(list_id=movie_list.id, title=title, year=year, session=session)
         if not movie:
             console("Adding movie with title {} to list {}".format(title, movie_list.name))
-            movie = MovieListMovie(title=movie['movie_name'], year=year, list_id=movie_list.id)
+            movie = MovieListMovie(title=title, year=year, list_id=movie_list.id)
         else:
             console("Movie with title {} already exist in list {}".format(title, movie_list.name))
 

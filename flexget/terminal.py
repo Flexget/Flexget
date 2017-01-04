@@ -75,24 +75,29 @@ class TerminalTable(object):
         else:
             self.type = table_type
 
-        self.init_table()
+        self._init_table()
 
-    def init_table(self):
+    def _init_table(self):
         """Assigns self.table with the built table based on data."""
-        self.table = self.build_table(self.type, self.table_data)
+        self.table = self._build_table(self.type, self.table_data)
         if self.type == 'porcelain':
+            self.table.padding_left = 0
+            self.table.padding_right = 0
             return
         adjustable = bool(self.wrap_columns + self.drop_columns)
         if not self.valid_table and adjustable:
             self.table = self._resize_table()
 
-    def build_table(self, table_type, table_data):
+    def _build_table(self, table_type, table_data):
         return self.supported_table_types()[table_type](table_data)
 
     @property
     def output(self):
         self.table.title = self.title
-        return '\n' + self.table.table
+        if self.type == 'porcelain':
+            return '\n'.join(line.rstrip() for line in self.table.table.splitlines())
+        else:
+            return '\n' + self.table.table
 
     @staticmethod
     def supported_table_types():
@@ -127,8 +132,6 @@ class TerminalTable(object):
 
     @property
     def valid_table(self):
-        # print('self.table.table_width: %s' % self.table.table_width)
-        # print('terminal_size()[0]: %s' % terminal_size()[0])
         return self.table.table_width <= terminal_info()['size'][0]
 
     def _calc_wrap(self):
@@ -208,7 +211,7 @@ class TerminalTable(object):
                     output_value = word_wrap(str(value), wrapped_width)
                 output_row.append(output_value)
             output_table.append(output_row)
-        return self.build_table(self.type, output_table)
+        return self._build_table(self.type, output_table)
 
 
 class TerminalTableError(Exception):

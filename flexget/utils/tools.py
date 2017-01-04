@@ -165,7 +165,7 @@ def merge_dict_from_to(d1, d2):
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
             elif (isinstance(v, (basestring, bool, int, float, type(None))) and
-                  isinstance(d2[k], (basestring, bool, int, float, type(None)))):
+                      isinstance(d2[k], (basestring, bool, int, float, type(None)))):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
@@ -407,6 +407,8 @@ def split_title_year(title):
     """Splits title containing a year into a title, year pair."""
     if not title:
         return
+    if not re.search(r'\d{4}', title):
+        return title, None
     match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
     title = match.group(1).strip()
     if match.group(2):

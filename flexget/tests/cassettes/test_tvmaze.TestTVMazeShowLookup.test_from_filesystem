@@ -5,23 +5,32 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=Marvels%20Jessica%20Jones
   response:
-    body: {string: !!python/unicode '{"id":1370,"url":"http://www.tvmaze.com/shows/1370/marvels-jessica-jones","name":"Marvel''s
-        Jessica Jones","type":"Scripted","language":"English","genres":["Action","Crime","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2015-11-20","schedule":{"time":"","days":["Friday"]},"rating":{"average":8.1},"weight":2,"network":null,"webChannel":{"id":1,"name":"Netflix","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":38797,"thetvdb":284190,"imdb":"tt2357547"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/31/77884.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/77884.jpg"},"summary":"<p>Haunted
-        by a traumatic past, Jessica Jones uses her gifts as a private eye to find
-        her tormentor before he can harm anyone else in Hell''s Kitchen.</p>","updated":1457735325,"_links":{"self":{"href":"http://api.tvmaze.com/shows/1370"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/206167"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA41TXWvbQBD8K8e99MW2LH9EjgiBEBpCSvPQkIdSgjlLa2kd6U7cnaw4xv+9c5JT
+        CBRaEEjand2bnZ07Ss5lGs+T6Ui2tpKpLL1v0ijqum7i97V6p0lm6siVpnNRwEW1snuq3HhHznGm
+        xjujycmR1Kom1H/v01+ceBjy4uGc94cm5J8yy42nHBWV0kWrihD9qouKXYlgQdqiX/pL3mSejUbo
+        1jJaj1DKpDMa3/GQeRlJ55VvgZY/Wq1ZF0DZVvuATy8wU2OpZrI4LpWzabwcx/F4NgXKZSXlbQXY
+        UQ5wiWiuDv3Rd5bxKV9OaKd86AuY2pPt2a4Q7oiL0st0gcHJd8a+ylS3VRUym9tSaU1Q8zjI+0ec
+        R/Lbit9wUmZA0x4C5Czcs2bIIp4wUa9nZvKgzPMT0IHhO3TE/01NFrJHj9Stf4ZjT2BDb56sVhXI
+        Y5z9QHO+Si4T1Jbk9/lGprPVIr6EJlyHP+n9bL5MlotEogHX/WRHWVPObY302QeDB7Jc9zZom8qo
+        3EU93EUDeN0Y661iH83jKElWq8Vk14RNGMsFg9V/dvuAr6GMacN+PjcETdfWsB9Uk1fN9b0CEIpt
+        DkIJEGhrrCoTjXJ+9Nl9onXkRElWFLz1Tig8orG8h9SCDiS8EVvWeQ/xxtYEBlZsaGssISgypUWp
+        bC2UPmANAv4nwVrcU1XB6t/Yg66eXEXNNeZumxyNw71aQI14OZ3NR3JdsX7t9+Oo2oY9lZbw/hBa
+        Nfz3CxfWAxvv2WCKhl1vi39Un3Eumk0v4gts+HT6DT0+QjfqAwAA
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:19 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:03 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -29,24 +38,30 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/1370/episodebynumber?season=1&number=2
   response:
-    body: {string: !!python/unicode '{"id":206178,"url":"http://www.tvmaze.com/episodes/206178/marvels-jessica-jones-1x02-aka-crush-syndrome","name":"AKA
-        Crush Syndrome","season":1,"number":2,"airdate":"2015-11-20","airtime":"","airstamp":"2015-11-20T12:00:00+00:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/31/77821.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/77821.jpg"},"summary":"<p>Jessica
-        tracks down Kilgrave to provide Jeri with enough evidence to convince her
-        that a mind-controller exists so that the lawyer will represent Hope. Meanwhile,
-        Jessica and Luke draw closer after a barfight after they both realize the
-        other is more than they seem.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/206178"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA31S227bMAz9FUKvs+PLsKYwigJFX4Z2e9reA8ZibCW6GKIcNy3y76NtFF1fChii
+        dHh4eDHflNGqqcubanubqTFa1ag+paEpimmaNuns8JU2bXAFDYaDJi5WcuEwnslyfiRm02J+DJ44
+        r17KOscT5m0cuc/54nUMjlSmPIpp1MPzAzzOPvjz4WNCDl41ldBGt6coJWUKTdSY5qC6rH7kVZXX
+        pQgJnMyitT44oRs+kf5WdVOW8n1bTqHF0a8xN2WmjMNOVN+UI21G99Hx2m2r/dLwONiAmouFzsVK
+        3ln0mlscqPheFdvtbV1tjkMnKUI0nfH43wC/lHun76SyMLY96c+C10zx6GTIF6nvbrh/WscMKWJ7
+        YtBh8vBsbBfxTJACDDGcjSZ4omhgMqkH8mHsxMywbxdSG/zZzPeeIqQeEyA443UujhSDtQLTi+HE
+        wGElpJ7A4nQRz2SshUhDJCaf4GcYaAO/Cf3UG0uZpF42AWRC8Gs8EeiIE7Q2sATjIc0n7DEeTNdL
+        5gUQ+Qvsg5QbCa15lTIlobyFbBhciDOCfoYvwERuc1cM9zLvnTX+xPNvZLKH2faRxL6vLw7mi/VV
+        1+v1H9k5egr8AgAA
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:19 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:04 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -54,23 +69,29 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/1370/episodebynumber?season=1&number=3
   response:
-    body: {string: !!python/unicode '{"id":206177,"url":"http://www.tvmaze.com/episodes/206177/marvels-jessica-jones-1x03-aka-its-called-whiskey","name":"AKA
-        It''s Called Whiskey","season":1,"number":3,"airdate":"2015-11-20","airtime":"","airstamp":"2015-11-20T12:00:00+00:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/31/78410.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/78410.jpg"},"summary":"<p>While
-        Jessica tries to get the anesthesia she needs to negate Kilgrave''s mind control
-        powers, Trish interviews Hope on her radio show and makes herself Kilgrave''s
-        next target.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/206177"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA32STW/bMAyG/4qgyw6zIzvZmsEoChS7bOu1wI4FZ3E2E31BlON2Rf77GBvd2ksB
+        QYSkRy/JV3rWZHW3ba7a/b7SU3a602MpqTNmnudNOXn4g5s+eoOJOFpks8LGQz6h4/qAzNRDfYgB
+        uW4fm10NR6ipcN2Dc2jreSQ+4pOudACPkuD27lZ9Lx9YfV0A9fMfwAgcg+5aYSf/C7PudpUGyhbK
+        5ea2aT/XbVtvG1GT7UKL4LrgAj69ge7bbdc0Mj4us2B5Cuudq6bS5GEQ1Wft0dLk/7e+tt3bsHQ+
+        JRfBsllwNiv84CBY7iGh2bVm/+VT22wOaZAUMdNAAV45+a7cC/4glcWpH9G+FTxXmicvbj9Jfdfp
+        RsxyqH6srquSCVmVqAYsqoyoQF5BIhMolmVAtMt5wEEsVHfkhgwnFPM9Bav6GEqOTqU4Y+ZK3Wfi
+        UVEomE+EM6tvMaGKQY2YVQZLUWTjLGms8nCU3HLA6H6/Vg74KMVAlpo21ybdiCkPjsKRL15f4Esc
+        M0p8+WyQ6J3Pps/n81/V+g5+qgIAAA==
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:20 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:04 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -78,29 +99,37 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Big%20Bang%20Theory
   response:
-    body: {string: !!python/unicode '{"id":66,"url":"http://www.tvmaze.com/shows/66/the-big-bang-theory","name":"The
-        Big Bang Theory","type":"Scripted","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2007-09-24","schedule":{"time":"20:00","days":["Thursday"]},"rating":{"average":8.4},"weight":27,"network":{"id":2,"name":"CBS","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":8511,"thetvdb":80379,"imdb":"tt0898266"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/58/145637.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/58/145637.jpg"},"summary":"<p><em><strong>\"The
-        Big Bang Theory\"</strong> </em>is a comedy about brilliant physicists, Leonard
-        and Sheldon, who are the kind of \"beautiful minds\" that understand how the
-        universe works. But none of that genius helps them interact with people, especially
-        women. All this begins to change when a free-spirited beauty named Penny moves
-        in next door. Sheldon, Leonard''s roommate, is quite content spending his
-        nights playing Klingon Boggle with their socially dysfunctional friends, fellow
-        Cal Tech scientists Wolowitz and Koothrappali. However, Leonard sees in Penny
-        a whole new universe of possibilities... including love.</p>","updated":1463414832,"_links":{"self":{"href":"http://api.tvmaze.com/shows/66"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/663425"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA5VUbWsjNxD+K0Jf+sXeXTuOY5sQOIdC4UopTY5SekeQd8e702glVS/ebkL++z1a
+        +3pQDtp+sZFmNPO8zOyr5Ebu1uuZTF7LnexidLuyHIahiKdevVBR274MnR1CuV6XsaP5gdv5QZl2
+        joP1o5xJo3rC28eOxJ5bsUdQ4HAOxtHl4EPt2UVqkK4RT6rNt9+bVnPocNmS8RTk7nd5b3tqRvlp
+        JkNUMeFO/pKMYdMizScTOXe7qmbSeeqZPIru5LKqbubVdr5cISvUHTVJI+1VntMR31UVQo0apy6P
+        XfIBB/npDVVVzOWRrU7kJ2ibYoXAQNx2Ue4WW7CkOFj/nLOyZsu/ed/vH1C4toAGORC+6PHBMAiL
+        B7AAs5zRZM4fcnZG9WJNPr/ryXOtyp9oePotN3ibGh/uO2UMwRSTtJ5J+iuSN0oDPUidLiivFwsU
+        6yiemoPcbaqrGyDlPh9kjNVmu1mu1xIFuZ9ovUqIy6lH+GL12ea6MZPTyWmrmlBO6aE8Jz8566NX
+        HMvrTblYXa+rRfGHy3ZYzy0D1H8s9yX9CVLZlE36R0UADanvVdZR3rq72xC9Ne3dN0brtrzEBAeh
+        BMYUUyPUwaYoDp61ZmWicN0YuOYQw0z8SNYo3whlYEpHurFmJobOCuVJQEPxzIjYo/goD6RS5GPS
+        osdd+CgRV1Ek05DHVCINGzG9SYYxMoFEno1QiD3aGxib60xvMNicgkA/F/KLXrCBk6qOYuDYCUfW
+        aZoJCo5qVlqPKNWTKcQ7rfEA7A4EkfHYihoz0aJXRwacj55oHhz7ac4mzKPIw9eIn8mYUfT2RAH9
+        hMH0iMZaX3xlfpHjuyC8tdA8AgSa/ZlQDXICJPQDKNNgN0TGYfIyBOG0GvPVe41fa8Tetq0GqMwG
+        BNmLYC9MmjEck6kjQ3kNvIxqcOJIWkO/e9w9Ut2JUCMQs0viV4sIx5fJpffWxs4r55TmQvxgB4LW
+        X40MdGZ3Jquyl8BhaIBRF1fggrMh8IE1R6ZQFAX0qHWaSGnoU9yW7g6jnFwDCbDYi9VmubxertZX
+        M/kEis/TxgXSx7x5nSf8f1ke5fhb38m8cPg4ndimQI7DtPj/8vaSF8rtdn2zWeUS2bX//XxRVdvq
+        ZomvyNtnDV2K+N0FAAA=
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:20 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:05 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -108,24 +137,30 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/66/episodebynumber?season=9&number=9
   response:
-    body: {string: !!python/unicode '{"id":409180,"url":"http://www.tvmaze.com/episodes/409180/the-big-bang-theory-9x09-the-platonic-permutation","name":"The
-        Platonic Permutation","season":9,"number":9,"airdate":"2015-11-19","airtime":"20:00","airstamp":"2015-11-19T20:00:00-05:00","runtime":30,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/31/77852.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/31/77852.jpg"},"summary":"<p>Sheldon
-        and Amy try hanging out as friends when they spend Thanksgiving together at
-        the aquarium. Also, Wolowitz reluctantly agrees to volunteer at the soup kitchen
-        with Bernadette, Raj and Emily, and Penny discovers that Leonard knows more
-        about her than she thought.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/409180"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA32STW/bMAyG/wrhsx3b6YI2QVGgA3bbIdgC7FgwFmup0df0Ec8t8t9H2yu6XHoS
+        RT189ZLSW6FEsfvSbNu7pixy0MWukCn5XV0Pw7BKZ4OvtOqcqcmr6ATFeoHrJKk6qr46ou0r3rgw
+        Vts/zXaKK68xOau6ylMwOWFSzhZlYdEQX3CQBPt/BOyviEgYGd1tGc7mSGEOUQWBaSpdN+2matuq
+        3bIcp5OaFdfNrmmWTExo/BV5mE8ZqJrNgoVsl8IbbloZ7Fn6rTAkVDYfA1ia74Sd+89eOxSxnvFY
+        L/CTRitih57qm7a+vb3brFcvvmcnLqheWfxvnp/KveNP7MzlTpK4FryURczGYBjZ371/+ClJC2eB
+        r4dHM0IKI0h+CWV7cDkBRngOitgcDJIs8KOMED0n4MDcKfbqPLHJ9cRnATBNDODvjIGnsIJHHV0J
+        v5x2g0qvEEjnLqFNegTsA1HkWjg7zYbpoz667OGkEndggQslfKVgUVBKVMIPfJkdfzNKj+Uc7sna
+        EYSKnTtTYFHJTr6TsxgEnKwbIhgX2NhxamtyyoSFyF6TdLmXaXVf+wee+JNW3Nf0kJH087TKQLy+
+        /2f06pP/XFwul7+TgnNsDQMAAA==
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:20 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:05 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -133,31 +168,38 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Flash
   response:
-    body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
-        Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":38,"network":{"id":5,"name":"The
-        CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/49/124187.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/49/124187.jpg"},"summary":"<p>After
-        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
-        is struck by lightning and falls into a coma. Months later he awakens with
-        the power of super speed, granting him the ability to move through Central
-        City like an unseen guardian angel. Though initially excited by his newfound
-        powers, Barry is shocked to discover he is not the only \"meta-human\" who
-        was created in the wake of the accelerator explosion -- and not everyone is
-        using their new powers for good. Barry partners with S.T.A.R. Labs and dedicates
-        his life to protect the innocent. For now, only a few close friends and associates
-        know that Barry is literally the fastest man alive, but it won''t be long
-        before the world learns what Barry Allen has become...The Flash.</p>","updated":1463464373,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647395"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/647396"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA5VU0Y7bNhD8lS1f8iJLln2Xs40gwPXaAwK0fYgvKIomONDUWmJNkQJJWecc7t87
+        pB2kDQq0fRJFDnd3Zof7LHQjNvWyEKM3YiO6GIdNVU3TVMZjLz9zqVxfhc5NoaqXVex4tjcydKIQ
+        VvaMGw8d0/1lK56GtLVVXg+RG4CMtO0o27T7o22Nzjdbtp6D2PwufvCyl4DdqqidxWKrNFvFs3t9
+        3vlUiBBlHIEW70drtW2B8qONOmV/PS/E4LnX7JFuIxbz+mpWz2fzG6CC6rgZDWDP4gzH+WY+x1Ej
+        Tzn/w8gBa/HpBUFlTNEBlkf2ueZVucTBxLrtIlRCMstxcv6QUEm467/JcPcrQiuH4vwpIS4KfbAa
+        YtAWPMA6IZqkx4ct1qmuz86m/9uevVay+oWnx99Sjpece3fXSWsZzbGjMYXgp8jeSoP6Qet4LnT5
+        er1cI1rH8djsxGZxs64XdSF0n/5EjMt6frNYrQRC6j5zexY9N3rscXxp+rnhqrG55+NgnGxCleGh
+        OoMfB+ejlzpWN6uqXl+vV6vyjyG1xHndapT1H8N9gT9CLDemRn0TEYWGse9lUlK8Gd7e7kGbJA3S
+        R60Mk1SKDfoUnSclx8ABp3vP8kABe31Bd9t39M4eOUTdZtj30vsT3RrDlnQAzI/qQLsTmdTg5C2S
+        tqG9NCaQRmGICPvLkn52NnaBDDroCYaXkzywDTTp2BFUp8FNOHF7CuOARRiYm4JaL2FUhO10n2Fy
+        p42OJ0Lo3h0Ze96NbUd3DM9IQ3fp0OgDMlgabWBUivfjG41/PCU2JT10+YqGqzQqPRE/qWwwEOlA
+        y/K0hwebc02hoDPtRLhz6gAnInujg0IBmUy642Kuz1nE+whnRDnrxl7aj4KmztEkAylom3ysbYYm
+        BRLhxP6vveAnGCfgNdNsluVMsRmpTrB5kn0MSRFc0z7VeimT9uhj61xTXupNjbbsLxpvy4fytnxf
+        0k9yh0aDXQP3qvSiMmmj91DT0eBdZHUmo611CsKWdI/Y1k0FZX6wCdIqVMkwDOZNc44oQ3BK55AH
+        oFGijF/FQ9/gtqR3YryXAakjQSKSRh+5oN0YSUeanH0VacdkHGjuGLxSnxkH3jRkWPpknK+xz37s
+        oPCO4TYuy/IB8DxTv3tTDW/xusahSdpjBl2tFsvV6voas+jRaHvIYyCw2adx0HnG98t7loP+pyGe
+        ZgBm5lE7PJpBhzyN/uXuBReq9XqxrusUwqZB9P+v11cYwC8vL38CGkL6aXkGAAA=
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:21 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:05 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -165,25 +207,31 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=4
   response:
-    body: {string: !!python/unicode '{"id":284974,"url":"http://www.tvmaze.com/episodes/284974/the-flash-2x04-the-fury-of-firestorm","name":"The
-        Fury of Firestorm","season":2,"number":4,"airdate":"2015-10-27","airtime":"20:00","airstamp":"2015-10-27T20:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/26/66222.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/26/66222.jpg"},"summary":"<p>Martin
-        begins to destabilize without Ronnie to merge with him, and the team desperately
-        seek out another metahuman with similar abilities. They find two men: Henry
-        Hewitt and Jefferson \"Jax\" Jackson. Meanwhile, Iris does some digging into
-        Francine''s past, and Barry is hesitate to become involved with Patty after
-        what happened between him and Iris.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/284974"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA31TTW/bMAz9K4Quu9ixa2TpZhQ97BB0AQoMQ48FCiamLS7WByQ5blrkv4+2UbS9
+        9CSIfHx8j5ReFTeqrn6sf16vMzWEXtVKp+TrohjHcZVOBl9odXCmIM/RNRSLBVwkTXnbY9R59Vyu
+        8/k6hHPu2rzlQDG5YFSmLBoSzgdNsJU0uBa2H9KRMDorCgQ5mD0FVYsO5NBgmuqq8up7flXm1bVw
+        STjxTFeVdVkukZjQ+E/IhzkrgLxcL7Aw2KVwU2aKDXZC/aoMNTyYd8OL2UNjZ7+D7x02sZjhsVjA
+        Tz3aJh7QU1Ftis2mqqrVP9+JEhe4Y4sf5vcl3Rv8SZS54aCp+Ux4yVQcjMFwFn03/vYexbqFPUmT
+        CMmBbCLhnnt+IRg5aTck+OusZZqyhkK3xEGzyUBUg2wIEqGZSj0FmW9/hkh0hKkWrRNAkMqEejBo
+        Z1aIbLjHAHOrxBRXIKs8Q8sT4zh1sjXckZXV3pEImZga2FHbUpDNwqPa4fOjgh0ejnJfwT2hHTX3
+        lMHvwBEaRxGiMwQNd+KuA5aRwDagPbClbxE8xrRY+IVB+kiRpshJHExe9yTPk6Tq5PoTNYvuP5jS
+        GbBNYmnUmECj92Qlvac0EtlpLrPUScTqpvC3ssSnnu0xTm8jUt9Opw4k59uXQM9ffAl1uVz+A7gl
+        5LJQAwAA
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:21 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:06 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -191,38 +239,37 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Walking%20Dead
   response:
-    body: {string: "{\"id\":73,\"url\":\"http://www.tvmaze.com/shows/73/the-walking-dead\",\"name\":\"The
-        Walking Dead\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Drama\",\"Action\",\"Horror\",\"Thriller\"],\"status\":\"Running\",\"runtime\":60,\"premiered\":\"2010-10-31\",\"schedule\":{\"time\":\"21:00\",\"days\":[\"Sunday\"]},\"rating\":{\"average\":8.7},\"weight\":6,\"network\":{\"id\":20,\"name\":\"AMC\",\"country\":{\"name\":\"United
-        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":25056,\"thetvdb\":153021,\"imdb\":\"tt1520211\"},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/509.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/509.jpg\"},\"summary\":\"<p><em>The
-        Walking Dead</em> is an American horror drama television series developed
-        by Frank Darabont, based on the comic book series of the same name by Robert
-        Kirkman, Tony Moore, and Charlie Adlard. Andrew Lincoln plays the show's lead
-        character, sheriff's deputy Rick Grimes, who awakens from a months-long coma
-        to confront a post-apocalyptic world overrun by zombies. Grimes reunites with
-        his family and becomes the leader of a group he forms with other survivors.
-        Together they struggle to survive in and adapt to a world filled with zombies
-        and some humans who are even more dangerous than the zombies themselves.</p><p><i>The
-        Walking Dead</i> premiered in the U.S. on October 31, 2010, on the cable television
-        channel AMC and internationally in November 2010 on Fox International Channels.AMC
-        has renewed the series each year because of its consistently increasing Nielsen
-        ratings, which have been unprecedentedly high for a cable series, including
-        averaging the most 18- to 49-year-old adult viewers of any cable or broadcast
-        television series during its fourth and fifth seasons.</p><p>The series has
-        been well received by critics and nominated for several awards, including
-        the Writers Guild of America Award for Television: New Series and the Golden
-        Globe Award for Best Television Series \u2013 Drama.</p>\",\"updated\":1461550359,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/73\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/639999\"},\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/707345\"}}}"}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA5VU/YvjNhD9Vwb9nI3j5PKxYVlI70pbyrWwe0cp5VgUe2KrkSUzkuPLLvu/98n2
+        UjgKbcFgW/M08+bNx4sypdpvVzPViVV7VcfY7rOs7/t5vDT6meeFb7JQ+z5k21UWa77ptT0bV92U
+        rEs1U043jIufaqbfRgt9GC3x2ibLYyGmjZywVruq01U6/d5V1oQahxU74aD2f6gPohuNk0MRjXf4
+        +NGLeFFfZipEHTuA1EPnHKLDKJ2LJsXeLGaqFW4MC6Ls1XKRL27wrHKgQlFz2VnAXtQIV8t8v1jA
+        VOrrEPaxc/hUX17hU8fkHFh9YRmY7uYbGHo2VR3V/t0SGXPsvZwTKom3RPhJhMPH9/BbeDCTa7JP
+        55+dgQD0iCSQaUKUSYPPj/hOpJ69S/+HhsUUOvuF+6ffU4TXIfLxfa2dY5THddbOFH+NLE5bkEdO
+        l5Hmcr1Yb+Ct5ngpj2qfr1eLZT5Tpkl/KsZ8vcRBruDSNENmL6rh0nQNzFPZx5IXpRuq3rXW6zJk
+        AzxkI/ip9RJFm5httlm+2e3y7fzPNtXDi6kMaP1Hd2/wJ4jlu1SlbzyCaOiaRicl1V17fxeieFfd
+        f9tpd9lkoMjWBoIEFKKXK/nT8NN4F+tA2pV0ZS0JoSOdvLW+J32CmKTp2TdHw6RbX2h7bQPP6ac3
+        EO5SJb5rk8fQycVcvIQZWdT0eIUnQeGo9dYUDMgJL6EHU5zpB0F1gexrT1DtwpaMowAWRZ2caQr6
+        hKigFrjohKn2DUIfxjTQZrYkj1ZEs6dQKbc0dxT1mQOZCBzyIO/GtP/mBqQRBEN2LUvwKAwV3p3A
+        EZcwLoFdHPJiNKVQidHEK4LncBNYjEKHaZgyxn3oNsZJKwBO00Ek8boZok99P6dfQZhSX8/G81qL
+        LhAEOiLDAl6qUbmUDgJhuMGFv7Ye4nLigBxjPcoCPZL4PfXG2kQnmT1s11hPv2NJeH6XoUva++90
+        gPtJEqwvU9DR+zMUFgPRpq4I2FuU5jPp+uCPLJF+NnJutJvRJ++u9NF7QQqpOJhAsWiPQ2m1lEMg
+        dHzXltAOKyB/t8s369vtdjtTTyB5HkYzsD2lEa2F8X6bMd2af1qtaS5RlYvxXeDWhGFD/MvdCRey
+        3e16e3ubXLi0HP7v9XyRr3ZpNby+/gU4P+CrEAYAAA==
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:21 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:06 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -230,21 +277,27 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/73/episodebynumber?season=6&number=8
   response:
-    body: {string: !!python/unicode '{"id":185073,"url":"http://www.tvmaze.com/episodes/185073/the-walking-dead-6x08-start-to-finish","name":"Start
-        to Finish","season":6,"number":8,"airdate":"2015-11-29","airtime":"21:00","airstamp":"2015-11-29T21:00:00-05:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/32/82293.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/32/82293.jpg"},"summary":"<p>After
-        having a few moments of peace, trouble finds its way to Alexandria yet again.
-        Only this time, the threat might be too big to defeat.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/185073"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA31Sy27bMBD8FYJnUZRk2HWEIEAuveaQ3o21uJK2ER8gqShu4H/vyoLR5pIDseDO
+        7HBnwE9JRrb1cV/92BVyjpNs5ZhzaLVelqXM7xb+YNl5qzFQ8gaT3sg6j6gWmN7IDcogGHX4qI4q
+        ZYhZZa96cpRGWUgHFln0dQVE9uLnHUgIyTvZHpgz2zNG2R4LCRQN5HWiqeq9qmvVPLAKtzPdhJq6
+        raqtw4/Z8IX564YyQVX7jRZntw0eqkKShYGlP6VFQ7P953Xz2Rl3szqHyYNJ+kZPeiOfJnAmdRBQ
+        7xp9bJqHXfk7DLyJjzSQg/+i+1buTj/xZn7uRjRfBa+FTLO1EC+832N4eu4zRjHCOyctQPS4COst
+        upyE70VA6LAQOfr5PKHg2E0SxNgClzXu5wk/ePFIIC6YBQxArhQvbmJ0pCTWcHh8RD4RIQtLw5jF
+        me/eizMNq4jBnqHyUYcn9nuayL2lNcaEU79WnuR6/zgQ6JuPI6/X61/SAQLudgIAAA==
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:22 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:06 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 version: 1
