@@ -280,13 +280,8 @@ def merge_dict_from_to(d1, d2):
                     pass
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
-<<<<<<< HEAD
             elif (isinstance(v, (str, bool, int, float, type(None))) and
                   isinstance(d2[k], (str, bool, int, float, type(None)))):
-=======
-            elif (isinstance(v, (basestring, bool, int, float, type(None))) and
-                      isinstance(d2[k], (basestring, bool, int, float, type(None)))):
->>>>>>> refs/remotes/Flexget/develop
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
