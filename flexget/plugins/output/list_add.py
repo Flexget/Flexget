@@ -36,6 +36,8 @@ class ListAdd(object):
                 if thelist.immutable:
                     raise plugin.PluginError(thelist.immutable)
 
+    # Run later in the phase, to capture any entry fields that might change during the output phase
+    @plugin.priority(0)
     def on_task_output(self, task, config):
         if not len(task.accepted) > 0:
             log.debug('no accepted entries, nothing to add')
