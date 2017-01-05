@@ -120,8 +120,8 @@ class OutputAria2(object):
                 entry.fail('Cannot find torrent file')
                 return
             if secret:
-                return aria2.addTorrent(secret, xmlrpc.client.Binary(open(torrent_file, mode='rb').read()))
-            return aria2.addTorrent(xmlrpc.client.Binary(open(torrent_file, mode='rb').read()))
+                return aria2.addTorrent(secret, xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), [], options)
+            return aria2.addTorrent(xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), [], options)
         # handle everything else (except metalink -- which is unsupported)
         # so magnets, https, http, ftp .. etc
         if secret:
