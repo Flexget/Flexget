@@ -309,7 +309,6 @@ class InputPlex(object):
                     entry['title'] = title
                     if config['original_filename']:
                         filename, fileext = os.path.splitext(basename(part.getAttribute('file')))
-                        log.debug("filename=%s,fileext=%s" % (filename, fileext))
                         if config['fetch'] != 'file':
                             filename += ".jpg"
                         else:
