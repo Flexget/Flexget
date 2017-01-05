@@ -281,6 +281,14 @@ class Newznab(object):
         'additionalProperties': False
     }
 
+    _movie_identifier_fields = ['movie_name'] + [p.instance.movie_identifier for p in
+                                                 plugin.get_plugins(group='movie_metainfo')]
+    _series_identifier_fields = ['series_name'] + [p.instance.series_identifier for p in
+                                                   plugin.get_plugins(group='series_metainfo')]
+    _metaid_fields = [p.instance.movie_identifier for p in plugin.get_plugins(group='movie_metainfo')] + \
+                     [p.instance.series_identifier for p in plugin.get_plugins(group='series_metainfo')]
+
+
     def prepare_config(self, config):
         if 'use_metadata' in config:
             if 'plugins_list' not in config:
@@ -298,21 +306,20 @@ class Newznab(object):
                 categories = config['category']
                 # Convert named categories to its respective categories id number
                 categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-                if len(categories) > 0:
+                if len(categories):
                     config['category_string'] = ','.join(str(c) for c in categories)
         return config
 
     def _is_tv_entry(self, entry):
-        if any(entry.get(field) for field in ['series_name', 'tvdb_id', 'tvrage_id', 'tvmaze_series_id', 'trakt_id']):
+        if any(entry.get(field) for field in self._series_identifier_fields):
             return True
-        elif any(entry.get(field) for field in ['movie_name', 'tmdb_id', 'imdb_id', 'trakt_movie_id']):
+        elif any(entry.get(field) for field in self._movie_identifier_fields):
             return False
         else:
             return None
 
     def _has_meta_id(self, entry):
-        return any(entry.get(field) for field in ['tvdb_id', 'tvrage_id', 'tvmaze_series_id', 'tmdb_id', 'imdb_id',
-                                                  'trakt_movie_id', 'trakt_id'])
+        return any(entry.get(field) for field in self._metaid_fields)
 
     def _has_supported_meta_id(self, entry):
         if self._is_tv_entry(entry) is True:
