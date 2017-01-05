@@ -90,7 +90,14 @@ class InputPlex(object):
             'fetch': {'type': 'string', 'default': 'file', 'enum': ['file', 'art', 'cover', 'thumb', 'season_cover']}
 
         },
-        'required': ['section']
+        'required': ['section'],
+        'not': {
+            'anyOf': [
+                {'required': ['token', 'username']},
+                {'required': ['token', 'password']},
+            ]},
+        'error_not': 'Cannot specify `username` and `password` with `token`',
+        'additionalProperties': False
     }
 
     def prepare_config(self, config):
