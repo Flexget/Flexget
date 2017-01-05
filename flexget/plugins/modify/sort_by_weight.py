@@ -5,6 +5,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime, timedelta, date
 
 import logging
+import sys
 
 from flexget.utils.tools import parse_timedelta
 from flexget.utils.qualities import Quality
@@ -189,6 +190,9 @@ class PluginSortByWeight(object):
                     delta = value_range / DEFAULT_STRIDE
                 except TypeError:
                     delta = value_range // DEFAULT_STRIDE
+
+        if isinstance(delta, timedelta) and sys.version_info < (3, 0):
+            delta = delta.days
 
         return stride, delta
 
