@@ -1,8 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import sys
-from os import path
-from time import sleep
 
 from flexget import plugin
 from flexget.event import event
