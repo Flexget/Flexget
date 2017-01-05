@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import datetime
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import jsonschema
@@ -27,6 +29,9 @@ import flexget.logger
 from flexget.manager import Manager
 from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
+from flexget.terminal import console
+from flexget.utils.qualities import Quality
+from flexget.utils.tools import parse_timedelta
 from flexget.webserver import User
 from flexget.manager import Session
 from flexget.api import api_app
@@ -319,6 +324,18 @@ class MockManager(Manager):
         """
         Just load our config from the text passed in on init
         """
+
+        def timedelta_constructor(loader, node):
+            values = loader.construct_mapping(node)
+            return parse_timedelta(values['text'])
+
+        def quality_constructor(loader, node):
+            values = loader.construct_mapping(node)
+            console('*** %s' % values)
+            return Quality(text=values['text'])
+
+        yaml.add_constructor('!Interval', timedelta_constructor, Loader=yaml.SafeLoader)
+        yaml.add_constructor('!Quality', quality_constructor, Loader=yaml.SafeLoader)
         config = yaml.safe_load(self.config_text) or {}
         self.update_config(config)
 
