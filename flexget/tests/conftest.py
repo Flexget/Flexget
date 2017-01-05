@@ -327,12 +327,10 @@ class MockManager(Manager):
 
         # provide some extra yaml tag constructors
         def timedelta_constructor(loader, node):
-            values = loader.construct_mapping(node)
-            return parse_timedelta(values['text'])
+            return parse_timedelta(node.value)
 
         def quality_constructor(loader, node):
-            values = loader.construct_mapping(node)
-            return Quality(text=values['text'])
+            return Quality(text=node.value)
 
         yaml.add_constructor('!Interval', timedelta_constructor, Loader=yaml.SafeLoader)
         yaml.add_constructor('!Quality', quality_constructor, Loader=yaml.SafeLoader)

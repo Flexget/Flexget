@@ -26,39 +26,39 @@ class TestSortByWeight(object):
             mock:
               - {title: 'title1a', content_size:  400, score: 10,
                  date: !!timestamp 2016-1-1,
-                 age: !Interval {text: '7 days'}}
+                 age: !Interval '7 days'}
               - {title: 'title1b', content_size:  450, score:  7,
                  date: !!timestamp '2016-2-14 21:59:43.10 -5',
-                 age: !Interval {text: '15 days'},
-                 quality: !Quality {text: 'webrip'}}
+                 age: !Interval '15 days',
+                 quality: !Quality 'webrip'}
               - {title: 'title1c', content_size:  900, score:  7,
                  date: !!timestamp 2016-7-1,
-                 age: !Interval {text: '60 days'},
-                 quality: !Quality {text: 'HDTV'}}
+                 age: !Interval '60 days',
+                 quality: !Quality 'HDTV'}
               - {title: 'title2a', content_size: 1400, score:  1,
                  date: !!timestamp 2016-1-1,
-                 age: !Interval {text: '3 days'},
-                 quality: !Quality {text: '720p webrip'}}
+                 age: !Interval '3 days',
+                 quality: !Quality '720p webrip'}
               - {title: 'title2b', content_size:  900, score:  1,
                  date: !!timestamp 2016-4-1,
-                 age: !Interval {text: '15 days'},
-                 quality: !Quality {text: '720p webdl hi10p'}}
+                 age: !Interval '15 days',
+                 quality: !Quality '720p webdl hi10p'}
               - {title: 'title2c', content_size: 2300, score:  3,
                  date: !!timestamp '2016-2-14 21:59:43.10',
-                 age: !Interval {text: '12 days'},
-                 quality: !Quality {text: '720p webrip'}}
+                 age: !Interval '12 days',
+                 quality: !Quality '720p webrip'}
               - {title: 'title3a', content_size: 4600, score:  1,
                  date: !!timestamp 2016-1-1,
-                 age: !Interval {text: '3 days'},
-                 quality: !Quality {text: '1080p webrip'}}
+                 age: !Interval '3 days',
+                 quality: !Quality '1080p webrip'}
               - {title: 'title3b', content_size: 5600, score:  5,
                  date: !!timestamp 2016-4-1,
-                 age: !Interval {text: '15 days'},
-                 quality: !Quality {text: '1080p webdl'}}
+                 age: !Interval '15 days',
+                 quality: !Quality '1080p webdl'}
               - {title: 'title3c', content_size: 4000, score:  3,
                  date: !!timestamp '2016-2-14 21:59:43.10 -5',
-                 age: !Interval {text: '90 days'},
-                 quality: !Quality {text: '1080p blueray'}}
+                 age: !Interval '90 days',
+                 quality: !Quality '1080p blueray'}
     """
 
     def test_sort_by_weight(self, execute_task):
