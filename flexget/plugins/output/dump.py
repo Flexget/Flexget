@@ -57,7 +57,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             else:
                 try:
                     value = str(entry[field])
-                    console('%-17s: %s (%-10s)' % (field, value.replace('\r', '').replace('\n', ''), type(entry[field])))
+                    console('%-17s: %s' % (field, value.replace('\r', '').replace('\n', '')))
                 except Exception:
                     if debug:
                         console('%-17s: [not printable] (%r)' % (field, value))

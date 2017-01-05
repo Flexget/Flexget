@@ -325,13 +325,13 @@ class MockManager(Manager):
         Just load our config from the text passed in on init
         """
 
+        # provide some extra yaml tag constructors
         def timedelta_constructor(loader, node):
             values = loader.construct_mapping(node)
             return parse_timedelta(values['text'])
 
         def quality_constructor(loader, node):
             values = loader.construct_mapping(node)
-            console('*** %s' % values)
             return Quality(text=values['text'])
 
         yaml.add_constructor('!Interval', timedelta_constructor, Loader=yaml.SafeLoader)

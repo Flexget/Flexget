@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 import logging
 
@@ -134,8 +135,11 @@ class PluginSortByWeight(object):
             min_value = Quality()
         elif isinstance(value, bool):
             min_value = False
-        elif isinstance(value, datetime):
-            min_value = datetime.now()  # assume date comparision vs now()
+        elif isinstance(value, date):
+            if type(value) is datetime:
+                min_value = datetime.now()  # assume date comparision vs now()
+            else:
+                min_value = date.today()
         elif isinstance(value, timedelta):
             min_value = timedelta(0)
         return min_value
@@ -145,7 +149,7 @@ class PluginSortByWeight(object):
         if config[key].get('upper_limit'):
             limit = config[key]['upper_limit']
             # auto handle datetime
-            if isinstance(value, datetime) and isinstance(limit, timedelta):
+            if isinstance(value, date) and isinstance(limit, timedelta):
                 if config[key]['inverse'] is True:
                     if (datetime.now() - limit) > value:
                         value = datetime.now() - limit
@@ -156,11 +160,10 @@ class PluginSortByWeight(object):
                 value = limit
         return value
 
-    def _calc_stride_delta(self, key, entries, config):
+    def _calc_stride_delta(self, key, entries, config, lower_default=0):
         delta = None
         stride = None
 
-        lower_default = self._get_lower_limit(entries[0][key])
         max_entry = max(entries, key=lambda e, k=key, d=lower_default: e.get(k, d))
         min_entry = min(entries, key=lambda e, k=key, d=lower_default: e.get(k, d))
         max_value = max_entry[key]
@@ -184,21 +187,34 @@ class PluginSortByWeight(object):
 
     def calc_weights(self, entries, config):
         for key in config:
-            if key not in entries[0]:
+            first_valid_entry = next((e for e in entries if key in e), None)
+            if not first_valid_entry:
                 continue
+            lower_default = self._get_lower_limit(first_valid_entry[key])
+            try:
+                max_entry = max(entries, key=lambda e, k=key, d=lower_default: e.get(k, d))  # probe for type problems
+            except TypeError:
+                if isinstance(lower_default, date):
+                    for entry in entries:
+                        if key in entry and type(entry[key]) is date:  # convert to datetime
+                            entry[key] = datetime.combine(entry[key], datetime.min.time())  # FIX: find a better way
+                    lower_default = self._get_lower_limit(first_valid_entry[key])  # update default
             # stride = max / delta
             # step = max_weight / stride
             # weight = (entry / delta) * step
             stride = None
             delta = None
             try:
-                stride, delta = self._calc_stride_delta(key, entries, config)
+                stride, delta = self._calc_stride_delta(key, entries, config, lower_default=lower_default)
             except Exception as ex:
                 delta = None
                 log.warning('Could not calculate stride for key: %s, type: %s, using fallback sort. Error: %s',
-                            key, type(entries[0][key]), ex)
-                lower_default = self._get_lower_limit(entries[0][key])
-                entries.sort(key=lambda e, k=key,d=lower_default: e.get(k, d), reverse=True)
+                            key, type(first_valid_entry[key]), ex)
+                try:
+                    entries.sort(key=lambda e, k=key, d=lower_default: e.get(k, d), reverse=True)
+                except TypeError:
+                    log.error('Incompatible fallback sort types detected, skipping key: %s')
+                    continue
             if not stride:
                 stride = DEFAULT_STRIDE
             max_weight = config[key]['weight']
@@ -209,6 +225,8 @@ class PluginSortByWeight(object):
             for entry in entries:
                 if ENTRY_WEIGHT_FIELD_NAME not in entry:
                     entry[ENTRY_WEIGHT_FIELD_NAME] = 0
+                if key not in entry or entry[key] is None:
+                    continue
 
                 value = entry[key]
                 value = self._limit_value(key, value, config)
