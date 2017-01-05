@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 
-import datetime
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import jsonschema
@@ -29,7 +28,6 @@ import flexget.logger
 from flexget.manager import Manager
 from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
-from flexget.terminal import console
 from flexget.utils.qualities import Quality
 from flexget.utils.tools import parse_timedelta
 from flexget.webserver import User
