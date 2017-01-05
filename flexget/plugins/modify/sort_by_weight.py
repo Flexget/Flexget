@@ -182,7 +182,7 @@ class PluginSortByWeight(object):
                 if isinstance(stride, timedelta):
                     stride = stride.days
             else:
-                delta = value_range / DEFAULT_STRIDE
+                delta = value_range * (1 / DEFAULT_STRIDE)
         return stride, delta
 
     def calc_weights(self, entries, config):
