@@ -216,7 +216,8 @@ class PluginInfo(dict):
     # Counts duplicate registrations
     dupe_counter = 0
 
-    def __init__(self, plugin_class, name=None, interfaces=None, builtin=False, debug=False, api_ver=1, category=None):
+    def __init__(self, plugin_class, name=None, interfaces=None, builtin=False, debug=False, api_ver=1, category=None,
+                 groups=None):
         """
         Register a plugin.
 
@@ -228,9 +229,14 @@ class PluginInfo(dict):
         :param int api_ver: Signature of callback hooks (1=task; 2=task,config).
         :param string category: The type of plugin. Can be one of the task phases.
             Defaults to the package name containing the plugin.
+        :param groups: DEPRECATED
         """
         dict.__init__(self)
 
+        if groups is not None:
+            warnings.warn('The `group` argument for plugin registration is deprecated. `interfaces` should be used '
+                          'instead. Plugin %s' % name, DeprecationWarning, stacklevel=2)
+            interfaces = ['task'] + groups
         if interfaces is None:
             interfaces = ['task']
         if name is None:
