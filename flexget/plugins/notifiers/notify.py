@@ -29,7 +29,7 @@ VIA_SCHEMA = {
 }
 
 
-class NotifyEntry(object):
+class Notify(object):
     schema = {
         'type': 'object',
         'properties': {
@@ -68,6 +68,23 @@ class NotifyEntry(object):
                 },
                 'required': ['via'],
                 'additionalProperties': False
+            },
+            'abort': {
+                'type': 'object',
+                'properties': {
+                    'title': {'type': 'string', 'default': 'Task {{ task.name }} has aborted!'},
+                    'message': {'type': 'string', 'default': 'Reason: {{ task.abort_reason }}'},
+                    'via': {
+                        'type': 'array', 'items':
+                            {'allOf': [
+                                {'$ref': '/schema/plugins?group=notifiers'},
+                                {'maxProperties': 1,
+                                 'error_maxProperties': 'Plugin options indented 2 more spaces than the first letter of the'
+                                                        ' plugin name.',
+                                 'minProperties': 1}]}}
+
+                },
+                'required': ['via']
             }
         },
         'additionalProperties': False,
@@ -111,7 +128,16 @@ class NotifyEntry(object):
                 raise plugin.PluginError('Cannot locate template on disk: %s' % config['task']['template'])
             send_notification(config['task']['title'], template, config['task']['via'], template_renderer=task.render)
 
+    def on_task_abort(self, task, config):
+        if 'abort' in config:
+            send_notification = plugin.get_plugin_by_name('notify_').instance.send_notification
+            if task.silent_abort:
+                return
+            log.debug('sending abort notification')
+            send_notification(config['abort']['title'], config['abort']['message'], config['abort']['via'],
+                              template_renderer=task.render)
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(NotifyEntry, 'notify', api_ver=2)
+    plugin.register(Notify, 'notify', api_ver=2)

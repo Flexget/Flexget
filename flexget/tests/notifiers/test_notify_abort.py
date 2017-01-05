@@ -12,16 +12,18 @@ class TestNotifyAbort(object):
             # causes abort
             abort: yes
 
-            notify_abort:
-              via:
-                - debug_notification:
-                    user_key: user_key
+            notify:
+              abort:
+                via:
+                  - debug_notification:
+                      user_key: user_key
           no_crash:
             disable: builtins
-            notify_abort:
-              via:
-                - debug_notification:
-                    user_key: user_key
+            notify:
+              abort:
+                via:
+                  - debug_notification:
+                      user_key: user_key
     """
 
     def test_notify_abort(self, execute_task, debug_notifications):
