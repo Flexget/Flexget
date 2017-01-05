@@ -97,6 +97,10 @@ class InputPlex(object):
                 {'required': ['token', 'password']},
             ]},
         'error_not': 'Cannot specify `username` and `password` with `token`',
+        'dependencies': {
+            'username': ['password'],
+            'password': ['username']
+        },
         'additionalProperties': False
     }
 
