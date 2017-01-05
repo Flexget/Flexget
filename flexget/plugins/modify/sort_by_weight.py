@@ -178,11 +178,18 @@ class PluginSortByWeight(object):
         if value_range:
             if 'delta_distance' in config[key]:
                 delta = config[key]['delta_distance']
-                stride = value_range / delta
+                try:
+                    stride = value_range / delta
+                except TypeError:
+                    stride = value_range // delta
                 if isinstance(stride, timedelta):
                     stride = stride.days
             else:
-                delta = value_range * (1 / DEFAULT_STRIDE)
+                try:
+                    delta = value_range / DEFAULT_STRIDE
+                except TypeError:
+                    delta = value_range // DEFAULT_STRIDE
+
         return stride, delta
 
     def calc_weights(self, entries, config):
@@ -240,15 +247,26 @@ class PluginSortByWeight(object):
                 if delta:
                     try:
                         weight = (value / delta) * weight_step
-                    except Exception:
+                    except TypeError:
                         try:
-                            # convert value to distance from minimum
-                            value_normalized = abs(value - self._get_lower_limit(value))
-                            weight = (value_normalized / delta) * weight_step
-                        except Exception as ex:
-                            log.warning('Skipping entry: %s, could not calc weight for key: %s, error: %s',
-                                        entry, key, ex)
-                            continue
+                            weight = (value // delta) * weight_step
+                        except Exception:
+                            try:
+                                # convert value to distance from minimum
+                                value_normalized = abs(value - self._get_lower_limit(value))
+                                try:
+                                    weight = (value_normalized / delta) * weight_step
+                                except TypeError:
+                                    try:
+                                        weight = (value_normalized // delta) * weight_step
+                                    except Exception as ex:
+                                        log.warning('Skipping entry: %s, could not calc weight for key: %s, error: %s',
+                                                    entry, key, ex)
+                                        continue
+                            except Exception as ex:
+                                log.warning('Skipping entry: %s, could not calc weight for key: %s, error: %s',
+                                            entry, key, ex)
+                                continue
                     current_value = value
                 elif value < current_value:
                     weight = weight - weight_step
