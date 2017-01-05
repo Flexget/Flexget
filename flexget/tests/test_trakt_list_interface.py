@@ -77,6 +77,8 @@ class TestTraktList(object):
                 'series_id': 'S08E15',
                 'series_episode': 15,
                 'trakt_episode_id': 2125119,
+                'trakt_series_name': 'Castle',
+                'trakt_series_year': 2009,
                 'title': 'Castle (2009) S08E15 Fidelis Ad Mortem',
                 'trakt_show_id': 1410,
                 'trakt_ep_name': 'Fidelis Ad Mortem',
@@ -89,9 +91,11 @@ class TestTraktList(object):
                 'title': 'Deadpool (2016)',
                 'url': 'http://trakt.tv/movie/deadpool-2016',
                 'trakt_movie_id': 190430,
+                'trakt_movie_name': 'Deadpool',
                 'imdb_id': 'tt1431045',
                 'movie_year': 2016,
-                'trakt_movie_slug': 'deadpool-2016'
+                'trakt_movie_slug': 'deadpool-2016',
+                'trakt_movie_year': 2016,
             },
             {
                 'trakt_show_slug': 'the-walking-dead',
@@ -103,6 +107,8 @@ class TestTraktList(object):
                 'trakt_show_id': 1393,
                 'tvdb_id': 153021,
                 'imdb_id': 'tt1520211',
+                'trakt_series_name': 'The Walking Dead',
+                'trakt_series_year': 2010,
                 'tvrage_id': 25056
             }
         ], key=lambda x: sorted(x.keys()))
