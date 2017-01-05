@@ -119,7 +119,7 @@ class InputPlex(object):
         if not globalaccesstoken:
             raise plugin.PluginError('Myplex: could not find a server!')
         else:
-            log.debug('Myplex: Got global accesstoken: %s' % globalaccesstoken)
+            log.debug('Myplex: Got global accesstoken: %s', globalaccesstoken)
         return globalaccesstoken
 
     def plex_get_accesstoken(self, config, globalaccesstoken=""):
@@ -138,7 +138,7 @@ class InputPlex(object):
         for node in dom.getElementsByTagName('Server'):
             if config['server'] in (node.getAttribute('address'), node.getAttribute('localAddresses')):
                 accesstoken = node.getAttribute('accessToken')
-                log.debug("Got plextoken: %s" % accesstoken)
+                log.debug("Got plextoken: %s", accesstoken)
         if not accesstoken:
             raise plugin.PluginError('Could not retrieve accesstoken for %s.' % config['server'])
         else:
@@ -161,11 +161,11 @@ class InputPlex(object):
             urlconfig['unwatched'] = '1'
         if config['token']:
             accesstoken = config['token']
-            log.debug("Using accesstoken: %s" % accesstoken)
+            log.debug("Using accesstoken: %s", accesstoken)
             urlconfig['X-Plex-Token'] = accesstoken
         elif config['username'] and config['password']:
             accesstoken = self.plex_get_accesstoken(config)
-            log.debug("Got accesstoken: %s" % accesstoken)
+            log.debug("Got accesstoken: %s", accesstoken)
             urlconfig['X-Plex-Token'] = accesstoken
 
         for key in urlconfig:
@@ -183,8 +183,8 @@ class InputPlex(object):
         if not self.plex_section_is_int(config['section']):
             raise plugin.PluginError('Could not find section \'%s\'' % config['section'])
 
-        log.debug("Fetching http://%s:%d/library/sections/%s/%s%s" %
-                  (config['server'], config['port'], config['section'], config['selection'], urlappend))
+        log.debug("Fetching http://%s:%d/library/sections/%s/%s%s",
+                  config['server'], config['port'], config['section'], config['selection'], urlappend)
         try:
             path = "/library/sections/%s/%s" % (config['section'], config['selection'])
             r = requests.get("http://%s:%d%s%s" % (config['plexserver'], config['port'], path, urlappend))
@@ -194,7 +194,7 @@ class InputPlex(object):
         plexsectionname = dom.getElementsByTagName('MediaContainer')[0].getAttribute('title1')
         viewgroup = dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup')
 
-        log.debug("Plex section \"%s\" is a \"%s\" section" % (plexsectionname, viewgroup))
+        log.debug("Plex section \"%s\" is a \"%s\" section", plexsectionname, viewgroup)
         if viewgroup != "movie" and viewgroup != "show" and viewgroup != "episode":
             raise plugin.PluginError("Section is neither a movie nor tv show section!")
         domroot = "Directory"
@@ -266,8 +266,8 @@ class InputPlex(object):
                     e['series_id_type'] = 'ep'
                     e['series_id'] = 'S%02dE%02d' % (season, episode)
                 else:
-                    log.debug("Could not get episode number for '%s' (Hint, ratingKey: %s)"
-                              % (title, node.getAttribute('ratingKey')))
+                    log.debug("Could not get episode number for '%s' (Hint, ratingKey: %s)",
+                              title, node.getAttribute('ratingKey'))
                     break
             elif viewgroup == "movie":
                 filenamemap = "%s_%s_%s_%s.%s"
