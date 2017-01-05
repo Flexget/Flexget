@@ -4,7 +4,7 @@ from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugins.internal.api_trakt import get_access_token, TraktUserAuth, delete_account, PIN_URL
-from flexget.terminal import TerminalTable, table_parser, console
+from flexget.terminal import TerminalTable, table_parser, console, TerminalTableError
 
 
 def action_auth(options):
@@ -32,9 +32,13 @@ def action_list(options):
 
             for auth in accounts:
                 table_data.append([auth.account, auth.created.strftime('%Y-%m-%d'), auth.expires.strftime('%Y-%m-%d')])
-            table = TerminalTable(options.table_type, table_data)
-            console(table.output)
-            return
+            try:
+                table = TerminalTable(options.table_type, table_data)
+                console(table.output)
+                return
+            except TerminalTableError as e:
+                console('ERROR: %s' % str(e))
+
         # Show a specific account
         acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == options.account).first()
         if acc:

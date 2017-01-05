@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import time
 
@@ -49,11 +49,12 @@ class TestTraktList(object):
     def db_auth(self, manager):
         kwargs = {
             'account': 'flexget_list_test',
-            'access_token': '00b06077e9946af0a268e6e17e62f7a6982c43fad93cc04c407d1d05ca6565be',
-            'refresh_token': '44f8fd49366546cc481cd6d24d0df44b4f8d6c95508b9a62b9ba820b90915fa7',
-            'created': 1468748861.44,
+            'access_token': '336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22',
+            'refresh_token': 'f07c967d834673f5e61cba0942f177fbf839528241db9cb6dfb5a51dd267692f',
+            'created': 1481976079,
             'expires': 7776000
         }
+
         # Creates the trakt token in db
         with Session() as session:
             auth = TraktUserAuth(**kwargs)

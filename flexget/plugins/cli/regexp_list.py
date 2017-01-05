@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from argparse import ArgumentParser, ArgumentTypeError
 import re
@@ -52,11 +52,11 @@ def action_list(options):
         for regexp in regexps:
             regexp_row = [regexp.regexp or '']
             table_data.append(regexp_row)
+    try:
         table = TerminalTable(options.table_type, table_data)
-        try:
-            console(table.output)
-        except TerminalTableError as e:
-            console('ERROR: %s' % str(e))
+        console(table.output)
+    except TerminalTableError as e:
+        console('ERROR: %s' % str(e))
 
 
 def action_add(options):

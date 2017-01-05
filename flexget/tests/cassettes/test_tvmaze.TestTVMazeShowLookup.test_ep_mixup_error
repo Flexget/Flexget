@@ -1,122 +1,141 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [!!python/unicode 'FlexGet/2.1.16.dev (www.flexget.com)']
-      method: GET
-      uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Flash
-    response:
-      body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
-          Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":9,"network":{"id":5,"name":"The
-          CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/63/158168.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/63/158168.jpg"},"summary":"<p>After
-          a particle accelerator causes a freak storm, CSI Investigator Barry Allen
-          is struck by lightning and falls into a coma. Months later he awakens with
-          the power of super speed, granting him the ability to move through Central
-          City like an unseen guardian angel. Though initially excited by his newfound
-          powers, Barry is shocked to discover he is not the only \"meta-human\" who
-          was created in the wake of the accelerator explosion -- and not everyone
-          is using their new powers for good. Barry partners with S.T.A.R. Labs and
-          dedicates his life to protect the innocent. For now, only a few close friends
-          and associates know that Barry is literally the fastest man alive, but it
-          won''t be long before the world learns what Barry Allen has become...<em>The
-          Flash</em>.</p>","updated":1468328738,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647397"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/816120"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [keep-alive]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Mon, 18 Jul 2016 20:02:12 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [!!python/unicode 'FlexGet/2.1.16.dev (www.flexget.com)']
-      method: GET
-      uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=2
-    response:
-      body: {string: !!python/unicode '{"id":211206,"url":"http://www.tvmaze.com/episodes/211206/the-flash-2x02-flash-of-two-worlds","name":"Flash
-          of Two Worlds","season":2,"number":2,"airdate":"2015-10-13","airtime":"20:00","airstamp":"2015-10-13T20:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/23/59298.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/23/59298.jpg"},"summary":"<p>The
-          team''s visitor, Jay Garrick, explains that he comes from a parallel world
-          and was a speedster there, but lost his powers transitioning over. Now he
-          insists that Barry needs his help fighting a new metahuman, Sand Demon,
-          who came from Jay''s world. Meanwhile, Officer Patty Spivot tries to join
-          Joe''s Metahuman Taskforce.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/211206"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [keep-alive]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Mon, 18 Jul 2016 20:02:12 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [!!python/unicode 'FlexGet/2.1.16.dev (www.flexget.com)']
-      method: GET
-      uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Arrow
-    response:
-      body: {string: !!python/unicode '{"id":4,"url":"http://www.tvmaze.com/shows/4/arrow","name":"Arrow","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2012-10-10","schedule":{"time":"20:00","days":["Wednesday"]},"rating":{"average":7.9},"weight":5,"network":{"id":5,"name":"The
-          CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":30715,"thetvdb":257655,"imdb":"tt2193021"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/5/14628.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/5/14628.jpg"},"summary":"<p>After
-          a violent shipwreck, billionaire playboy Oliver Queen was missing and presumed
-          dead for five years before being discovered alive on a remote island in
-          the Pacific. He returned home to Starling City, welcomed by his devoted
-          mother Moira, beloved sister Thea and former flame Laurel Lance. With the
-          aid of his trusted chauffeur/bodyguard John Diggle, the computer-hacking
-          skills of Felicity Smoak and the occasional, reluctant assistance of former
-          police detective, now beat cop, Quentin Lance, Oliver has been waging a
-          one-man war on crime.</p>","updated":1468829442,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647412"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/836110"}}}'}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [keep-alive]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Mon, 18 Jul 2016 20:02:12 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [!!python/unicode 'FlexGet/2.1.16.dev (www.flexget.com)']
-      method: GET
-      uri: http://api.tvmaze.com/shows/4/episodebynumber?season=2&number=2
-    response:
-      body: {string: "{\"id\":137,\"url\":\"http://www.tvmaze.com/episodes/137/arrow-2x02-identity\"\
-          ,\"name\":\"Identity\",\"season\":2,\"number\":2,\"airdate\":\"2013-10-16\"\
-          ,\"airtime\":\"20:00\",\"airstamp\":\"2013-10-16T20:00:00-04:00\",\"runtime\"\
-          :60,\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_landscape/1/4152.jpg\"\
-          ,\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/1/4152.jpg\"\
-          },\"summary\":\"<p>Oliver  finds out the medicine that is being sent to\
-          \ Glades Memorial is being hijacked by thieves.  Without an influx of supplies,\
-          \ the hospital will close.  Roy  attempts to stop the thieves, but he fails\
-          \ and is arrested by Officer Lance.  Oliver gets into a heated battle with\
-          \ China White  and her new partner, Ben Turner, AKA the Bronze Tiger, over\
-          \ the supplies.  Meanwhile, Laurel  makes plans to catch the Arrow, and\
-          \ Thea  gives Roy an ultimatum.\_ </p>\",\"_links\":{\"self\":{\"href\"\
-          :\"http://api.tvmaze.com/episodes/137\"}}}"}
-      headers:
-        access-control-allow-origin: ['*']
-        cache-control: ['public, max-age=3600']
-        connection: [keep-alive]
-        content-type: [application/json; charset=UTF-8]
-        date: ['Mon, 18 Jul 2016 20:02:12 GMT']
-        server: [nginx/1.4.6 (Ubuntu)]
-        x-powered-by: [PHP/5.5.9-1ubuntu4.17]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Flash
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA5VU0Y7bNhD8lS1f8iJLln2Xs40gwPXaAwK0fYgvKIomONDUWmJNkQJJWecc7t87
+        pB2kDQq0fRJFDnd3Zof7LHQjNvWyEKM3YiO6GIdNVU3TVMZjLz9zqVxfhc5NoaqXVex4tjcydKIQ
+        VvaMGw8d0/1lK56GtLVVXg+RG4CMtO0o27T7o22Nzjdbtp6D2PwufvCyl4DdqqidxWKrNFvFs3t9
+        3vlUiBBlHIEW70drtW2B8qONOmV/PS/E4LnX7JFuIxbz+mpWz2fzG6CC6rgZDWDP4gzH+WY+x1Ej
+        Tzn/w8gBa/HpBUFlTNEBlkf2ueZVucTBxLrtIlRCMstxcv6QUEm467/JcPcrQiuH4vwpIS4KfbAa
+        YtAWPMA6IZqkx4ct1qmuz86m/9uevVay+oWnx99Sjpece3fXSWsZzbGjMYXgp8jeSoP6Qet4LnT5
+        er1cI1rH8djsxGZxs64XdSF0n/5EjMt6frNYrQRC6j5zexY9N3rscXxp+rnhqrG55+NgnGxCleGh
+        OoMfB+ejlzpWN6uqXl+vV6vyjyG1xHndapT1H8N9gT9CLDemRn0TEYWGse9lUlK8Gd7e7kGbJA3S
+        R60Mk1SKDfoUnSclx8ABp3vP8kABe31Bd9t39M4eOUTdZtj30vsT3RrDlnQAzI/qQLsTmdTg5C2S
+        tqG9NCaQRmGICPvLkn52NnaBDDroCYaXkzywDTTp2BFUp8FNOHF7CuOARRiYm4JaL2FUhO10n2Fy
+        p42OJ0Lo3h0Ze96NbUd3DM9IQ3fp0OgDMlgabWBUivfjG41/PCU2JT10+YqGqzQqPRE/qWwwEOlA
+        y/K0hwebc02hoDPtRLhz6gAnInujg0IBmUy642Kuz1nE+whnRDnrxl7aj4KmztEkAylom3ysbYYm
+        BRLhxP6vveAnGCfgNdNsluVMsRmpTrB5kn0MSRFc0z7VeimT9uhj61xTXupNjbbsLxpvy4fytnxf
+        0k9yh0aDXQP3qvSiMmmj91DT0eBdZHUmo611CsKWdI/Y1k0FZX6wCdIqVMkwDOZNc44oQ3BK55AH
+        oFGijF/FQ9/gtqR3YryXAakjQSKSRh+5oN0YSUeanH0VacdkHGjuGLxSnxkH3jRkWPpknK+xz37s
+        oPCO4TYuy/IB8DxTv3tTDW/xusahSdpjBl2tFsvV6voas+jRaHvIYyCw2adx0HnG98t7loP+pyGe
+        ZgBm5lE7PJpBhzyN/uXuBReq9XqxrusUwqZB9P+v11cYwC8vL38CGkL6aXkGAAA=
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 25 Dec 2016 09:57:26 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=2
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA31SS2/bMAz+K4Qvu/gVdy3WoOhhGDagQLcBDbBjwNp0pEYSBUmOmxX576PtBl0v
+        PYkQP34PUS+Z7rJ1s1o19VWeDcFk60yl5NdVNY5jmQ4W/1LZsq3I68gdxWoBV0lR0RuMqmie6+a1
+        5L5IIxcjB9PFLM8cWhLG7xMOuIfNyPDn3IyEkZ2oC26wjxTmEnXoME1TTb26LFZ1sboQJrlOeiZr
+        6nVdLzcxofXvkJu5K4Ci/rzAwuCWwas6z7TFnVC/ZJY6Pdi3sEvQtnNz1sEbxi5WMzxWC3hr0HWx
+        RU9Vc1FdXjfXX8onvxMnHPROO/zv7T6kO8O34oyHVlH3nvCUZ3GwFsNR/N34240iSIT2U4SDjjpx
+        yOEOj/ADQ9DtPgd69ga1i5AUJhC07Isi9IEtIHgMaAwZmLcCEgJGjNKInqiLiYLMUaAcHocEhqNQ
+        6AieRwpCGdCJpman3Q74QKGEnzxOKqKoY3pV/SpmjuAmxnlckfHQ651K0xxKZwRLCdVg0eXwMNn4
+        RpalHhVDKx9lMSzJJOjstYR7QjcqbcTcr77XrXj9jSkd4cHrAydxpyVoYnhi7eCOSUbvzyqwwbjv
+        ObRU3lT+Vha1Ndrt47T/SKafThVIzvOXR68/+PLZ6XT6BwEWkk0wAwAA
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 25 Dec 2016 09:57:26 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20Arrow
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA5VUa4sjNxD8K0KfZz2212+Og2UvRwh5O8cSwrG0pbZHsUYa9PBkbtn/ntLYmw8h
+        kAQGZiSVqqu7uudFGi13i0rmYOVONil1u7ru+36SLi194YnybR0b38d6UVMIvpeVdNQywA+3ZRq6
+        styrYLrEGgBL7pTpVHa/cidrYoPNE7vAUe5+kx8CtYSdB5WMd/jYK8NO8d1Hc935XMmYKGWg5c/Z
+        OeNOQIXskimRV9NKdoFbwwHhdnI+nc3vZlM8QEXVsM4WsBd5heN8Ny1HmoYx/hNrxxEr+fkVtJQK
+        P+B04TCqXk+2OOjZnJokd/dzpMyp9+FcUKVgy7+K8EvD4vEJ5MpDXhgK4lafT86gHGKPTJB3QehS
+        kU97fBdlX7wr64eWg1FUf8/9868lxusY+/DYkHMMV1y2tpL8R+LgyCIDJHa5Cr2frmfQkhpOF32Q
+        u/lyvVpiw7RlJVOaz7b30/lMgtK0Y24vsmVtcovjm9tXp5V2o9m5s550rEd4rK/g586HFMiker2s
+        Z5vtdnM/+b0rpvhgTgay/iPdG/wZxfK5WPU3RgiNuW2pVFK+694/HJG2IHEx3rJLIjam6wOrcyUO
+        xlr0D5nAorM0HPwgfrAGJoqfMrMTPUXRmhhhryCnBXoG3LBEM2lx9EEcgRYDU4jiwNhgvApam6g8
+        iIClwii8gwa0nE8sTER/a2GcQN3Fj6TM0aiJ+JoBSDk4XGp8yyL54n2whfDRpKESPVvME84Pg2hM
+        hI4LCLUAbQPV33kTCHmxRWwtookld3QYjfKhD60ijhbjJ76lHNjihbmZiCeTmlENGS38cSRPIeO+
+        FqqhfDxyDvXB6wFzGbT4xjdOfDCnk+VqvAdZXUa0u4bUuQiOZ1Q3Fq6PbI2CfLFvPZ1HJSVvrxTF
+        Un5bIW+bVSLYQ6g2RheiytWb4s6DgZFtYsz3BSGd75EmJaF8VxW3MNnumkz15mED9w5XG9FhcBAm
+        8F1LxddQDMH/puXJu7p7jz7MncaYYTRni81suVptNhiDZ9T+PA5MZHssg9MExvut86kz//CfK8OC
+        VkHH5cidiePY/svVGy7W29V8sV4WClcm9n9fXy+20xV+Aa9/AtIMltSaBQAA
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 25 Dec 2016 09:57:27 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
+    method: GET
+    uri: http://api.tvmaze.com/shows/4/episodebynumber?season=2&number=2
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA31Ty07cQBD8lZbP3rV3IURaISTIIYoShBStxBH12m1Pw7w0D8yC9l/yLfmy9HhB
+        kENy8nimuqq6puel4r7arE4+11UOutpUKiW/aZppmpbp0eAzLTtnGvIcXU+xEWSDIbhpsX5q1wvu
+        ySZO+6quLBqS+m/vO5EwOltt1nKYzY7CvEQOPaYCXberk8WqXazOpFy2E88M63bTtsedmND4v5Db
+        +VQAi/b0CAtZHJTCs7au2OAoy5fKUM/ZvPdz7KXr7dxO9tphH5sZHpsj+E6j7WOHnppVc7r6tF7e
+        +1F8uMAjW/wQzn/J3uB34svlTlH/ke5QVzEbg2Ev3s79xY3mRwoAA4s2uJwgKYJiqGNL8oMJOMKO
+        2I4QJWxIDr5qlLuAazIihvodoPgeuwfqYbeXUqZHikuAW06qMKMFtoPOT+AGiNl7zRTrWVC56DkJ
+        1cRaQ6ddJCn86fYAmBIZn2IRjsn5Gf9KXsNOeMXwgKyjCPTFi8wHxXR0cTMM3EmDP9B2hfK135GE
+        kCUgQCmXcRDLIqRJDCQFX5QEDreKE4kBYVVCYWkCjyFZCjVckYVtDvP68vvlbOoqOPtMsOWxIFzJ
+        tYT51qmoXxPaSbGmWgzlQBrA4INE6eXu5w47TJ2ayy7LlNez+lYsAoxyU3HORILMWoYOUzbL37/g
+        vPEXMih3mu1DLNMXSQ/lqwLJ9+1Noed/vanqcDj8AWztpfaLAwAA
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [keep-alive]
+      content-encoding: [gzip]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 25 Dec 2016 09:57:27 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
+    status: {code: 200, message: OK}
 version: 1

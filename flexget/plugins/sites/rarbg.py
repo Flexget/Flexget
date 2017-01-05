@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -36,14 +36,14 @@ CATEGORIES = {
 
     # Music
     'MusicMP3': 23,
-    'MusicFLAC':25,
+    'MusicFLAC': 25,
 
     # Games
     'Games/PC ISO': 27,
     'Games/PC RIP': 28,
     'Games/PS3': 40,
     'Games/XBOX-360': 32,
-    'Software/PC ISO':33,
+    'Software/PC ISO': 33,
 
     # E-Books
     'e-Books': 35
@@ -141,7 +141,7 @@ class SearchRarBG(object):
                 query_url_fragment = query.encode('utf8')
                 params['search_string'] = query_url_fragment
                 if config['use_tvdb']:
-                    plugin.get_plugin_by_name('thetvdb_lookup').instance.lazy_series_lookup(entry)
+                    plugin.get_plugin_by_name('thetvdb_lookup').instance.lazy_series_lookup(entry, 'en')
                     params['search_tvdb'] = entry.get('tvdb_id')
                     log.debug('Using tvdb id %s', entry.get('tvdb_id'))
             try:

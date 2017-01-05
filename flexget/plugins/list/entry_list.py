@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import pickle
@@ -114,6 +114,7 @@ class DBEntrySet(MutableSet):
     def __iter__(self):
         with Session() as session:
             for e in self._db_list(session).entries.order_by(EntryListEntry.added.desc()).all():
+                log.debug('returning %s', e.entry)
                 yield e.entry
 
     def __contains__(self, entry):
@@ -222,12 +223,10 @@ def delete_list_by_id(list_id, session=None):
 
 
 @with_session
-def get_entries_by_list_id(list_id, count=False, start=None, stop=None, order_by='title', descending=False,
+def get_entries_by_list_id(list_id, start=None, stop=None, order_by='title', descending=False,
                            session=None):
     log.debug('querying entries from entry list with id %d', list_id)
     query = session.query(EntryListEntry).filter(EntryListEntry.list_id == list_id)
-    if count:
-        return query.count()
     if descending:
         query = query.order_by(getattr(EntryListEntry, order_by).desc())
     else:

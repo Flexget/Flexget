@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import PY3
 
 import csv
@@ -249,18 +249,8 @@ class ImdbEntrySet(MutableSet):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
         return set(it)
 
-    def _find_movie(self, entry):
-        log.debug('trying to match %s to existing list items', entry['imdb_id'])
-        for e in self.items:
-            if e['imdb_id'] == entry['imdb_id']:
-                return e
-        log.debug('could not match %s to existing list items', entry['imdb_id'])
-
     def __contains__(self, entry):
-        if not entry.get('imdb_id'):
-            log.debug('entry %s does not have imdb_id, skipping', entry)
-            return False
-        return self._find_movie(entry) is not None
+        return self.get(entry) is not None
 
     def __iter__(self):
         return iter(self.items)
@@ -339,7 +329,15 @@ class ImdbEntrySet(MutableSet):
         return True
 
     def get(self, entry):
-        return self._find_movie(entry)
+        if not entry.get('imdb_id'):
+            log.debug('entry %s does not have imdb_id, cannot compare to imdb list items', entry)
+            return None
+        log.debug('finding %s in imdb list', entry['imdb_id'])
+        for e in self.items:
+            if e['imdb_id'] == entry['imdb_id']:
+                return e
+        log.debug('could not find %s in imdb list items', entry['imdb_id'])
+        return None
 
 
 class ImdbList(object):

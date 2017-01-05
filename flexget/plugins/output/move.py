@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import os
 import shutil
@@ -211,21 +211,23 @@ class TransformingOps(BaseFileOps):
 
         # get the proper path and name in order of: entry, config, above split
         dst_path = entry.get(self.destination_field, config.get('to', src_path))
-        if entry.get('filename') and entry['filename'] != src_name:
+        if config.get('rename'):
+            dst_name = config['rename']
+        elif entry.get('filename') and entry['filename'] != src_name:
             # entry specifies different filename than what was split from the path
             # since some inputs fill in filename it must be different in order to be used
             dst_name = entry['filename']
         else:
-            dst_name = config.get('filename', src_name)
+            dst_name = src_name
 
         try:
             dst_path = entry.render(dst_path)
         except RenderError as err:
-            raise plugin.PluginWarning('Path value replacement `%s` failed: %s' % (dst_path, err.args[0]))
+            raise plugin.PluginError('Path value replacement `%s` failed: %s' % (dst_path, err.args[0]))
         try:
             dst_name = entry.render(dst_name)
         except RenderError as err:
-            raise plugin.PluginWarning('Filename value replacement `%s` failed: %s' % (dst_name, err.args[0]))
+            raise plugin.PluginError('Filename value replacement `%s` failed: %s' % (dst_name, err.args[0]))
 
         # Clean invalid characters with pathscrub plugin
         dst_path = pathscrub(os.path.expanduser(dst_path))
@@ -316,7 +318,7 @@ class CopyFiles(TransformingOps):
                 'type': 'object',
                 'properties': {
                     'to': {'type': 'string', 'format': 'path'},
-                    'filename': {'type': 'string'},
+                    'rename': {'type': 'string'},
                     'allow_dir': {'type': 'boolean'},
                     'unpack_safety': {'type': 'boolean'},
                     'keep_extension': {'type': 'boolean'},
@@ -342,7 +344,7 @@ class MoveFiles(TransformingOps):
                 'type': 'object',
                 'properties': {
                     'to': {'type': 'string', 'format': 'path'},
-                    'filename': {'type': 'string'},
+                    'rename': {'type': 'string'},
                     'allow_dir': {'type': 'boolean'},
                     'unpack_safety': {'type': 'boolean'},
                     'keep_extension': {'type': 'boolean'},

@@ -3,32 +3,32 @@ from __future__ import unicode_literals, division, absolute_import, print_functi
 # This needs to remain before the builtins import!
 native_int = int
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa  pylint: disable=unused-import, redefined-builtin
 
-import atexit
-import codecs
-import copy
-import fnmatch
-import logging
-import os
-import shutil
-import signal
-import sys
-import threading
-import traceback
-import hashlib
-from contextlib import contextmanager
-from datetime import datetime, timedelta
-import io
+import atexit  # noqa
+import codecs  # noqa
+import copy  # noqa
+import fnmatch  # noqa
+import logging  # noqa
+import os  # noqa
+import shutil  # noqa
+import signal  # noqa
+import sys  # noqa
+import threading  # noqa
+import traceback  # noqa
+import hashlib  # noqa
+from contextlib import contextmanager  # noqa
+from datetime import datetime, timedelta  # noqa
+import io  # noqa
 
-import sqlalchemy
-import yaml
-from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import sqlalchemy  # noqa
+import yaml  # noqa
+from sqlalchemy.exc import OperationalError  # noqa
+from sqlalchemy.ext.declarative import declarative_base  # noqa
+from sqlalchemy.orm import sessionmaker  # noqa
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
-from flexget.utils.sqlalchemy_utils import ContextSession
+from flexget.utils.sqlalchemy_utils import ContextSession  # noqa
 
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)
@@ -39,7 +39,7 @@ from flexget.ipc import IPCClient, IPCServer  # noqa
 from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
-from flexget.utils.tools import pid_exists, get_current_flexget_version  # noqa
+from flexget.utils.tools import pid_exists, get_current_flexget_version, io_encoding  # noqa
 from flexget.terminal import console  # noqa
 
 log = logging.getLogger('manager')
@@ -118,7 +118,7 @@ class Manager(object):
             # Decode all arguments to unicode before parsing
             args = unicode_argv()[1:]
         self.args = args
-        self.config_autoreload = False
+        self.autoreload_config = False
         self.config_file_hash = None
         self.config_base = None
         self.config_name = None
@@ -169,8 +169,9 @@ class Manager(object):
 
         manager = self
 
-        log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
-        log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
+        log.debug('sys.defaultencoding: %s', sys.getdefaultencoding())
+        log.debug('sys.getfilesystemencoding: %s', sys.getfilesystemencoding())
+        log.debug('flexget detected io encoding: %s', io_encoding)
         log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
         if codecs.lookup(sys.getfilesystemencoding()).name == 'ascii' and not os.path.supports_unicode_filenames:
             log.warning('Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '
@@ -248,7 +249,7 @@ class Manager(object):
         task_names = self.tasks
         # Only reload config if daemon
         config_hash = self.hash_config()
-        if self.is_daemon and self.config_autoreload and self.config_file_hash != config_hash:
+        if self.is_daemon and self.autoreload_config and self.config_file_hash != config_hash:
             log.info('Config change detected. Reloading.')
             try:
                 self.load_config(output_to_console=False, config_file_hash=config_hash)
@@ -367,7 +368,12 @@ class Manager(object):
         :param options: argparse options
         """
         fire_event('manager.execute.started', self, options)
-        if self.task_queue.is_alive():
+        if self.task_queue.is_alive() or self.is_daemon:
+            if not self.task_queue.is_alive():
+                log.error('Task queue has died unexpectedly. Restarting it. Please open an issue on Github and include'
+                          ' any previous error logs.')
+                self.task_queue = TaskQueue()
+                self.task_queue.start()
             if len(self.task_queue):
                 log.verbose('There is a task already running, execution queued.')
             finished_events = self.execute(options, output=logger.get_capture_stream(),
@@ -406,8 +412,8 @@ class Manager(object):
                 return
             if options.daemonize:
                 self.daemonize()
-            if options.config_autoreload:
-                self.config_autoreload = True
+            if options.autoreload_config:
+                self.autoreload_config = True
             try:
                 signal.signal(signal.SIGTERM, self._handle_sigterm)
             except ValueError as e:
@@ -420,7 +426,7 @@ class Manager(object):
             self.ipc_server.start()
             self.task_queue.wait()
             fire_event('manager.daemon.completed', self)
-        elif options.action in ['stop', 'reload', 'status', 'enable-autoreload', 'disable-autoreload']:
+        elif options.action in ['stop', 'reload-config', 'status']:
             if not self.is_daemon:
                 log.error('There does not appear to be a daemon running.')
                 return
@@ -430,7 +436,7 @@ class Manager(object):
                 tasks = 'all queued tasks (if any) have' if options.wait else 'currently running task (if any) has'
                 log.info('Daemon shutdown requested. Shutdown will commence when %s finished executing.' % tasks)
                 self.shutdown(options.wait)
-            elif options.action == 'reload':
+            elif options.action == 'reload-config':
                 log.info('Reloading config from disk.')
                 try:
                     self.load_config()
@@ -438,12 +444,6 @@ class Manager(object):
                     log.error('Error loading config: %s' % e.args[0])
                 else:
                     log.info('Config successfully reloaded from disk.')
-            elif options.action == 'enable-autoreload':
-                log.info('Enabled automatic config reloading')
-                self.config_autoreload = True
-            elif options.action == 'disable-autoreload':
-                log.info('Disabled automatic config reloading')
-                self.config_autoreload = False
 
     def _handle_sigterm(self, signum, frame):
         log.info('Got SIGTERM. Shutting down.')
@@ -945,3 +945,4 @@ class Manager(object):
                          ' at http://flexget.com/wiki/Plugins/version_checker. You are currently using'
                          ' version %s', filename, get_current_flexget_version())
         log.debug('Traceback:', exc_info=True)
+        return traceback.format_exc()

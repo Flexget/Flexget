@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 from datetime import datetime, timedelta
@@ -70,7 +70,7 @@ class TVDBRequest(object):
         result = result.json()
 
         if result.get('errors'):
-            log.debug(result['errors'])
+            log.debug('Result contains errors: %s', result['errors'])
             # a hack to make sure it doesn't raise exception on a simple invalidLanguage. This is because tvdb
             # has a tendency to contain bad data and randomly return this error for no reason
             if len(result['errors']) > 1 or 'invalidLanguage' not in result['errors']:
@@ -274,7 +274,7 @@ class TVDBEpisode(Base):
 
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=False)
 
-    def __init__(self, series_id, ep_id):
+    def __init__(self, series_id, ep_id, language=None):
         """
         Looks up movie on tvdb and creates a new database model for it.
         These instances should only be added to a session via `session.merge`.
@@ -283,7 +283,7 @@ class TVDBEpisode(Base):
         self.id = ep_id
         self.expired = False
         try:
-            episode = TVDBRequest().get('episodes/%s' % self.id)
+            episode = TVDBRequest().get('episodes/%s' % self.id, language=language)
         except requests.RequestException as e:
             raise LookupError('Error updating data from tvdb: %s' % e)
 
@@ -523,7 +523,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
                 series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
                 if not series:
                     series = session.merge(TVDBSeries(tvdb_id, language))
-        if series:
+        if series and series.name:
             _update_search_strings(series, session, search=name)
 
     if not series:
@@ -612,7 +612,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
                 # Check if this episode id is already in our db
                 episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == results[0]['id']).first()
                 if not episode or (episode and episode.expired is not False):
-                    updated_episode = TVDBEpisode(series.id, results[0]['id'])
+                    updated_episode = TVDBEpisode(series.id, results[0]['id'], language=language)
                     episode = session.merge(updated_episode)
 
         except requests.RequestException as e:

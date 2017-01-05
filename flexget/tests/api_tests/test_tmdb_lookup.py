@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 from flexget.api.app import base_message
@@ -46,10 +46,10 @@ class TestTMDBMovieLookupAPI(object):
         assert not errors
 
         values = {
-            'id': 605,
-            'name': 'The Matrix Revolutions',
+            'id': 604,
+            'name': 'The Matrix Reloaded',
             'year': 2003,
-            'imdb_id': 'tt0242653'
+            'imdb_id': 'tt0234215'
         }
         for field, value in values.items():
             assert data.get(field) == value

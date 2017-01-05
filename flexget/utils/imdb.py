@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import difflib
@@ -118,7 +118,7 @@ class ImdbSearch(object):
                     movies.remove(movie)
                     continue
             if movie['match'] < self.min_match:
-                log.debug('best_match removing %s (min_match)' % movie['name'])
+                log.debug('best_match removing %s (min_match)', movie['name'])
                 movies.remove(movie)
                 continue
 
@@ -343,7 +343,8 @@ class ImdbParser(object):
         title_details = soup.find('div', attrs={'id': 'titleDetails'})
         if title_details:
             # get languages
-            for link in title_details.find_all('a', href=re.compile('^/search/title\?title_type=feature&languages=')):
+            for link in title_details.find_all('a', href=re.compile('^/search/title\?title_type=feature'
+                                                                    '&primary_language=')):
                 lang = link.text.strip().lower()
                 if lang not in self.languages:
                     self.languages.append(lang.strip())

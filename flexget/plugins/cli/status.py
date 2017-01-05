@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *
+from builtins import *  # noqa
 
 import datetime
 from datetime import timedelta
@@ -56,15 +56,15 @@ def do_cli_task(manager, options):
                     ]
                 )
 
-    table = TerminalTable(options.table_type, table_data)
     try:
+        table = TerminalTable(options.table_type, table_data)
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
 
 
 def do_cli_summary(manager, options):
-    header = ['Task', 'Last success', 'Produced', 'Accepted', 'Rejected', 'Failed', 'Duration']
+    header = ['Task', 'Last execution', 'Last success', 'Produced', 'Accepted', 'Rejected', 'Failed', 'Duration']
     table_data = [header]
 
     with Session() as session:
@@ -90,6 +90,7 @@ def do_cli_summary(manager, options):
 
             table_data.append([
                 task.name,
+                task.last_execution_time.strftime('%Y-%m-%d %H:%M'),
                 last_success,
                 ok.produced if ok is not None else '-',
                 ok.accepted if ok is not None else '-',

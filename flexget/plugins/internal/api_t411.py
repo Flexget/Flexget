@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from datetime import datetime
 from functools import partial
 import json
@@ -120,7 +120,7 @@ class FriendlySearchQuery(object):
         self.term_names.append("Episode %02d" % episode)
 
 
-T411API_DOMAIN_URL = "api.t411.ch"
+T411API_DOMAIN_URL = "api.t411.li"
 T411API_CATEGORY_TREE_PATH = "/categories/tree/"
 T411API_AUTH_PATH = "/auth"
 T411API_TERMS_PATH = "/terms/tree/"

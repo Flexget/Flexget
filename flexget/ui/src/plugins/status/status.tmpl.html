@@ -1,0 +1,20 @@
+<div layout="column" flex layout-margin>
+    <mdt-table class="data-table" flex table-card="{ title: 'Latest task executions', actionIcons: true }" animate-sort-icon="true"
+        mdt-row="vm.tableData" >
+        <mdt-header-row>
+            <mdt-column align-rule="left" column-sort="true" sortable-rows-default>Task name</mdt-column>
+            <mdt-column align-rule="left" column-sort="{ comparator: vm.timeSorter }">Start time</mdt-column>
+            <mdt-column align-rule="left" column-sort="true">Produced</mdt-column>
+            <mdt-column align-rule="left" column-sort="true">Accepted</mdt-column>
+            <mdt-column align-rule="left" column-sort="true">Rejected</mdt-column>
+            <mdt-column align-rule="left" column-sort="true">Failed</mdt-column>
+        </mdt-header-row>
+
+        <mdt-custom-cell html-content="true" column-key="name">
+            <md-icon class="fa fa-lg" ng-class="::clientScope.getSuccess(rowId) ? 'fa-check-circle success' : 'fa-times-circle failure'"></md-icon>
+                <span id="taskName">{{ ::value }}</span>
+            </mdt-cell>
+        </mdt-custom-cell>
+    </mdt-table>
+    <fg-pagination load-data="vm.getStatus(page)" link-header="vm.linkHeader" current-page="vm.currentPage"></fg-pagination>
+</div>

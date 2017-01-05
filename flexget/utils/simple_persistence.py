@@ -7,7 +7,7 @@ You can safely use task.simple_persistence and manager.persist, if we implement 
 can replace underlying mechanism in single point (and provide transparent switch).
 """
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.types.newstr import newstr
 
 import logging

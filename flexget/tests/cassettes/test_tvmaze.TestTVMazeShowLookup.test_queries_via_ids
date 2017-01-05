@@ -5,31 +5,38 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/13
   response:
-    body: {string: !!python/unicode '{"id":13,"url":"http://www.tvmaze.com/shows/13/the-flash","name":"The
-        Flash","type":"Scripted","language":"English","genres":["Drama","Action","Adventure","Science-Fiction"],"status":"Running","runtime":60,"premiered":"2014-10-07","schedule":{"time":"20:00","days":["Tuesday"]},"rating":{"average":8.3},"weight":38,"network":{"id":5,"name":"The
-        CW","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":36939,"thetvdb":279121,"imdb":"tt3107288"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/49/124187.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/49/124187.jpg"},"summary":"<p>After
-        a particle accelerator causes a freak storm, CSI Investigator Barry Allen
-        is struck by lightning and falls into a coma. Months later he awakens with
-        the power of super speed, granting him the ability to move through Central
-        City like an unseen guardian angel. Though initially excited by his newfound
-        powers, Barry is shocked to discover he is not the only \"meta-human\" who
-        was created in the wake of the accelerator explosion -- and not everyone is
-        using their new powers for good. Barry partners with S.T.A.R. Labs and dedicates
-        his life to protect the innocent. For now, only a few close friends and associates
-        know that Barry is literally the fastest man alive, but it won''t be long
-        before the world learns what Barry Allen has become...The Flash.</p>","updated":1463464373,"_links":{"self":{"href":"http://api.tvmaze.com/shows/13"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/647395"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/647396"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA5VU0Y7bNhD8lS1f8iJLln2Xs40gwPXaAwK0fYgvKIomONDUWmJNkQJJWecc7t87
+        pB2kDQq0fRJFDnd3Zof7LHQjNvWyEKM3YiO6GIdNVU3TVMZjLz9zqVxfhc5NoaqXVex4tjcydKIQ
+        VvaMGw8d0/1lK56GtLVVXg+RG4CMtO0o27T7o22Nzjdbtp6D2PwufvCyl4DdqqidxWKrNFvFs3t9
+        3vlUiBBlHIEW70drtW2B8qONOmV/PS/E4LnX7JFuIxbz+mpWz2fzG6CC6rgZDWDP4gzH+WY+x1Ej
+        Tzn/w8gBa/HpBUFlTNEBlkf2ueZVucTBxLrtIlRCMstxcv6QUEm467/JcPcrQiuH4vwpIS4KfbAa
+        YtAWPMA6IZqkx4ct1qmuz86m/9uevVay+oWnx99Sjpece3fXSWsZzbGjMYXgp8jeSoP6Qet4LnT5
+        er1cI1rH8djsxGZxs64XdSF0n/5EjMt6frNYrQRC6j5zexY9N3rscXxp+rnhqrG55+NgnGxCleGh
+        OoMfB+ejlzpWN6uqXl+vV6vyjyG1xHndapT1H8N9gT9CLDemRn0TEYWGse9lUlK8Gd7e7kGbJA3S
+        R60Mk1SKDfoUnSclx8ABp3vP8kABe31Bd9t39M4eOUTdZtj30vsT3RrDlnQAzI/qQLsTmdTg5C2S
+        tqG9NCaQRmGICPvLkn52NnaBDDroCYaXkzywDTTp2BFUp8FNOHF7CuOARRiYm4JaL2FUhO10n2Fy
+        p42OJ0Lo3h0Ze96NbUd3DM9IQ3fp0OgDMlgabWBUivfjG41/PCU2JT10+YqGqzQqPRE/qWwwEOlA
+        y/K0hwebc02hoDPtRLhz6gAnInujg0IBmUy642Kuz1nE+whnRDnrxl7aj4KmztEkAylom3ysbYYm
+        BRLhxP6vveAnGCfgNdNsluVMsRmpTrB5kn0MSRFc0z7VeimT9uhj61xTXupNjbbsLxpvy4fytnxf
+        0k9yh0aDXQP3qvSiMmmj91DT0eBdZHUmo611CsKWdI/Y1k0FZX6wCdIqVMkwDOZNc44oQ3BK55AH
+        oFGijF/FQ9/gtqR3YryXAakjQSKSRh+5oN0YSUeanH0VacdkHGjuGLxSnxkH3jRkWPpknK+xz37s
+        oPCO4TYuy/IB8DxTv3tTDW/xusahSdpjBl2tFsvV6voas+jRaHvIYyCw2adx0HnG98t7loP+pyGe
+        ZgBm5lE7PJpBhzyN/uXuBReq9XqxrusUwqZB9P+v11cYwC8vL38CGkL6aXkGAAA=
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:34 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:24 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -37,25 +44,30 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=2
   response:
-    body: {string: !!python/unicode '{"id":211206,"url":"http://www.tvmaze.com/episodes/211206/the-flash-2x02-flash-of-two-worlds","name":"Flash
-        of Two Worlds","season":2,"number":2,"airdate":"2015-10-13","airtime":"20:00","airstamp":"2015-10-13T20:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/23/59298.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/23/59298.jpg"},"summary":"<p>The
-        team''s visitor, Jay Garrick, explains that he comes from a parallel world
-        and was a speedster there, but lost his powers transitioning over. Now he
-        insists that Barry needs his help fighting a new metahuman, Sand Demon, who
-        came from Jay''s world. Meanwhile, Officer Patty Spivot tries to join Joe''s
-        Metahuman Taskforce.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/211206"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA31SS2/bMAz+K4Qvu/gVdy3WoOhhGDagQLcBDbBjwNp0pEYSBUmOmxX576PtBl0v
+        PYkQP34PUS+Z7rJ1s1o19VWeDcFk60yl5NdVNY5jmQ4W/1LZsq3I68gdxWoBV0lR0RuMqmie6+a1
+        5L5IIxcjB9PFLM8cWhLG7xMOuIfNyPDn3IyEkZ2oC26wjxTmEnXoME1TTb26LFZ1sboQJrlOeiZr
+        6nVdLzcxofXvkJu5K4Ci/rzAwuCWwas6z7TFnVC/ZJY6Pdi3sEvQtnNz1sEbxi5WMzxWC3hr0HWx
+        RU9Vc1FdXjfXX8onvxMnHPROO/zv7T6kO8O34oyHVlH3nvCUZ3GwFsNR/N34240iSIT2U4SDjjpx
+        yOEOj/ADQ9DtPgd69ga1i5AUJhC07Isi9IEtIHgMaAwZmLcCEgJGjNKInqiLiYLMUaAcHocEhqNQ
+        6AieRwpCGdCJpman3Q74QKGEnzxOKqKoY3pV/SpmjuAmxnlckfHQ651K0xxKZwRLCdVg0eXwMNn4
+        RpalHhVDKx9lMSzJJOjstYR7QjcqbcTcr77XrXj9jSkd4cHrAydxpyVoYnhi7eCOSUbvzyqwwbjv
+        ObRU3lT+Vha1Ndrt47T/SKafThVIzvOXR68/+PLZ6XT6BwEWkk0wAwAA
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:35 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:24 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -63,25 +75,31 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=3
   response:
-    body: {string: !!python/unicode '{"id":187808,"url":"http://www.tvmaze.com/episodes/187808/the-flash-2x03-family-of-rogues","name":"Family
-        of Rogues","season":2,"number":3,"airdate":"2015-10-20","airtime":"20:00","airstamp":"2015-10-20T20:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/24/61653.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/24/61653.jpg"},"summary":"<p>Lisa
-        Snart, aka Golden Glider, comes to the team for help when her brother Captain
-        Cold is kidnapped. However, the Flash soon discovers that the villain is working
-        for his father Lewis, who has some mysterious hold over him. Meanwhile, Caitlin
-        and Jay work together to build a speed cannon so that Jay can return to Earth-2,
-        and Joe tells Iris the truth about her mother.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/187808"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA32TTW/bMAyG/wqhsx07SZsFQdFLsXYbusu2e8FEdKRFX9BHvKzIfx/lLNh66Umw
+        +PLhS1J+FVqKzXz9Yd2vG1GiERuhcg6brhvHcZaPFn/TbOdtR0EnLyl1F3GXFbWDwaTaxa9+2Q5o
+        tTm1fmij3xdKohEOLTHucYqAH+DbNZIIk3dis2BRsVuKYrNsBOooMdeURT+/bed9u+gZw9dZT6RF
+        v+n/3qSMNrxR/piiLGj7m4ssFndJXPWN0Bb3jH4VlqQu9l+blxZ30k1dlmA8ytRN8tRdxC8GnUw7
+        DNQtbrrVfHW7nP0Me/bmo95rh/9N7V3cVf7CznzZKZJvgedGpGItxhP7uwv3zzohfHcYcwN4QHjy
+        RpKDJ6MlxQZ4LZQge+BdQCa0MPgIikyAUbFOUYRt9ByN8IAho3bwwAjQCQ5aOgyB5Aw++ZGOlVcx
+        j3WlkLx3IHXaeQ5wCYV5ih61MZXCgNHHg3b7S0n+HnCq80yjTg3X96AwMcgS2FPKFLUvCVQtX6Gg
+        tJ3BV0I3Km2oYYM6G0bzqOELniY+97anCctNbovmXIQUiCTs0Dn2mGrzbK5m8BVEyiW6OpOPPDV+
+        mzy4CvR1QMYk+BzZa200x5IV4NaXPA3KTnOa3XXhnhf7wlYOqb6XRGaop4rE5/XnwKDf+TnE+Xz+
+        A61hTH9aAwAA
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:35 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:24 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -89,24 +107,30 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=4
   response:
-    body: {string: !!python/unicode '{"id":284974,"url":"http://www.tvmaze.com/episodes/284974/the-flash-2x04-the-fury-of-firestorm","name":"The
-        Fury of Firestorm","season":2,"number":4,"airdate":"2015-10-27","airtime":"20:00","airstamp":"2015-10-27T20:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/26/66222.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/26/66222.jpg"},"summary":"<p>Martin
-        begins to destabilize without Ronnie to merge with him, and the team desperately
-        seek out another metahuman with similar abilities. They find two men: Henry
-        Hewitt and Jefferson \"Jax\" Jackson. Meanwhile, Iris does some digging into
-        Francine''s past, and Barry is hesitate to become involved with Patty after
-        what happened between him and Iris.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/284974"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA31TTW/bMAz9K4Quu9ixa2TpZhQ97BB0AQoMQ48FCiamLS7WByQ5blrkv4+2UbS9
+        9CSIfHx8j5ReFTeqrn6sf16vMzWEXtVKp+TrohjHcZVOBl9odXCmIM/RNRSLBVwkTXnbY9R59Vyu
+        8/k6hHPu2rzlQDG5YFSmLBoSzgdNsJU0uBa2H9KRMDorCgQ5mD0FVYsO5NBgmuqq8up7flXm1bVw
+        STjxTFeVdVkukZjQ+E/IhzkrgLxcL7Aw2KVwU2aKDXZC/aoMNTyYd8OL2UNjZ7+D7x02sZjhsVjA
+        Tz3aJh7QU1Ftis2mqqrVP9+JEhe4Y4sf5vcl3Rv8SZS54aCp+Ux4yVQcjMFwFn03/vYexbqFPUmT
+        CMmBbCLhnnt+IRg5aTck+OusZZqyhkK3xEGzyUBUg2wIEqGZSj0FmW9/hkh0hKkWrRNAkMqEejBo
+        Z1aIbLjHAHOrxBRXIKs8Q8sT4zh1sjXckZXV3pEImZga2FHbUpDNwqPa4fOjgh0ejnJfwT2hHTX3
+        lMHvwBEaRxGiMwQNd+KuA5aRwDagPbClbxE8xrRY+IVB+kiRpshJHExe9yTPk6Tq5PoTNYvuP5jS
+        GbBNYmnUmECj92Qlvac0EtlpLrPUScTqpvC3ssSnnu0xTm8jUt9Opw4k59uXQM9ffAl1uVz+A7gl
+        5LJQAwAA
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:35 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:25 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 version: 1

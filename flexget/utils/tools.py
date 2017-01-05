@@ -1,6 +1,6 @@
 """Contains miscellaneous helpers"""
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib import request
 from future.utils import PY2
 from past.builtins import basestring
@@ -10,12 +10,10 @@ import ast
 import copy
 import hashlib
 import locale
-import mimetypes
 import operator
 import os
 import re
 import sys
-import io
 from collections import MutableMapping
 from datetime import timedelta, datetime
 from pprint import pformat
@@ -100,7 +98,8 @@ def _htmldecode(text):
     if isinstance(text, str):
         uchr = chr
     else:
-        uchr = lambda value: value > 127 and chr(value) or chr(value)
+        def uchr(value):
+            value > 127 and chr(value) or chr(value)
 
     def entitydecode(match, uchr=uchr):
         entity = match.group(1)
@@ -408,6 +407,8 @@ def split_title_year(title):
     """Splits title containing a year into a title, year pair."""
     if not title:
         return
+    if not re.search(r'\d{4}', title):
+        return title, None
     match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
     title = match.group(1).strip()
     if match.group(2):

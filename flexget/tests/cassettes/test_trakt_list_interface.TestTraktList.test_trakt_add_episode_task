@@ -1,199 +1,137 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        Authorization: [!!python/unicode 'Bearer 00b06077e9946af0a268e6e17e62f7a6982c43fad93cc04c407d1d05ca6565be']
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
-      method: GET
-      uri: https://api-v2launch.trakt.tv/users/me/watchlist/episodes
-    response:
-      body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-08-31T19:23:27.000Z","type":"episode","episode":{"season":1,"number":5,"title":"Chapter
-          Five: The Flea and the Acrobat","ids":{"trakt":2124182,"tvdb":5621929,"imdb":"tt4593128","tmdb":1205904,"tvrage":1065933149}},"show":{"title":"Stranger
-          Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}}]'}
-      headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-ray: [2db2ded572143ca1-CPH]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 31 Aug 2016 19:25:48 GMT']
-        etag: [W/"8635331402729a92c39d6dc66f852ff2"]
-        last-modified: ['Wed, 31 Aug 2016 19:23:27 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d2dccc3da836cedfac14bdc728e02a6071472671547; expires=Thu,
-            31-Aug-17 19:25:47 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-private-user: ['false']
-        x-request-id: [870981f4-438f-4a2f-911e-e78cd17f9684]
-        x-runtime: ['0.030241']
-        x-sort-by: [rank]
-        x-sort-how: [asc]
-        x-xss-protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: '{"shows": [{"seasons": [{"episodes": [{"number": 5}], "number": 1}],
-        "year": 2016, "ids": {"tvdb": 305288, "tvrage": 48493, "imdb": "tt4574334",
-        "trakt": 104439}, "title": "Stranger Things"}]}'
-      headers:
-        Authorization: [!!python/unicode 'Bearer 00b06077e9946af0a268e6e17e62f7a6982c43fad93cc04c407d1d05ca6565be']
-        Content-Length: ['192']
-        Content-Type: [!!python/unicode 'application/json']
-        Cookie: [__cfduid=d2dccc3da836cedfac14bdc728e02a6071472671547]
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
-      method: POST
-      uri: https://api-v2launch.trakt.tv/sync/watchlist/remove
-    response:
-      body: {string: !!python/unicode '{"deleted":{"movies":0,"shows":0,"seasons":0,"episodes":1},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
-      headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-ray: [2db2dedb429d3ca1-CPH]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 31 Aug 2016 19:25:48 GMT']
-        etag: [W/"26981a62b87533b91c5762be18501092"]
-        server: [cloudflare-nginx]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [ee140ebb-bf9a-4f1a-b19d-3c94721a6e34]
-        x-runtime: ['0.027676']
-        x-xss-protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
-      method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=Stranger+Things+S01E05&type=movie
-    response:
-      body: {string: !!python/unicode '[]'}
-      headers:
-        cache-control: ['public, max-age=28800']
-        cf-cache-status: [HIT]
-        cf-ray: [2db2dedd39403cdd-CPH]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 31 Aug 2016 19:25:49 GMT']
-        etag: [W/"da47f0c9ab0e579d0bfd3a201a21f225"]
-        expires: ['Thu, 01 Sep 2016 03:25:49 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=da1d65bc2cd9879725516c3a42bb95f7f1472671548; expires=Thu,
-            31-Aug-17 19:25:48 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['0']
-        x-pagination-limit: ['10']
-        x-pagination-page: ['1']
-        x-pagination-page-count: ['0']
-        x-request-id: [af7d06b5-0756-4381-95c4-548e806dded3]
-        x-runtime: ['0.013910']
-        x-xss-protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
-      method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=Stranger+Things+S01E06&type=movie
-    response:
-      body: {string: !!python/unicode '[]'}
-      headers:
-        cache-control: ['public, max-age=28800']
-        cf-cache-status: [MISS]
-        cf-ray: [2db2deddf2ea3d31-CPH]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 31 Aug 2016 19:25:49 GMT']
-        etag: [W/"77f7cbd525fab3dc0a089c07bd1da586"]
-        expires: ['Thu, 01 Sep 2016 03:25:49 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d24c0cd8383b20a2a2b648aa3092115901472671549; expires=Thu,
-            31-Aug-17 19:25:49 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['0']
-        x-pagination-limit: ['10']
-        x-pagination-page: ['1']
-        x-pagination-page-count: ['0']
-        x-request-id: [6989ebe2-655b-48f3-aecc-28352db279cb]
-        x-runtime: ['0.016935']
-        x-xss-protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: '{"shows": [{"seasons": [{"episodes": [{"number": 5}], "number": 1}],
-        "ids": {}, "title": "Stranger Things"}, {"seasons": [{"episodes": [{"number":
-        6}], "number": 1}], "ids": {}, "title": "Stranger Things"}]}'
-      headers:
-        Authorization: [!!python/unicode 'Bearer 00b06077e9946af0a268e6e17e62f7a6982c43fad93cc04c407d1d05ca6565be']
-        Content-Length: ['207']
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
-      method: POST
-      uri: https://api-v2launch.trakt.tv/sync/watchlist
-    response:
-      body: {string: !!python/unicode '{"added":{"movies":0,"shows":0,"seasons":0,"episodes":2},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
-      headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-ray: [2db2dee873e13ca1-CPH]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 31 Aug 2016 19:25:51 GMT']
-        etag: [W/"cb0e307355b4b78d5dc7fb233fbc112c"]
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d095619281ef0fbc73acf4810b303d6d61472671550; expires=Thu,
-            31-Aug-17 19:25:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [aa81a525-991d-4202-8864-a74ac1ad9f00]
-        x-runtime: ['0.032463']
-        x-xss-protection: [1; mode=block]
-      status: {code: 201, message: Created}
-  - request:
-      body: null
-      headers:
-        Authorization: [!!python/unicode 'Bearer 00b06077e9946af0a268e6e17e62f7a6982c43fad93cc04c407d1d05ca6565be']
-        Content-Type: [!!python/unicode 'application/json']
-        trakt-api-key: [!!python/unicode '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af']
-        trakt-api-version: [!!python/unicode '2']
-      method: GET
-      uri: https://api-v2launch.trakt.tv/users/me/watchlist/episodes
-    response:
-      body: {string: !!python/unicode '[{"rank":1,"listed_at":"2016-08-31T19:25:50.000Z","type":"episode","episode":{"season":1,"number":5,"title":"Chapter
-          Five: The Flea and the Acrobat","ids":{"trakt":2124182,"tvdb":5621929,"imdb":"tt4593128","tmdb":1205904,"tvrage":1065933149}},"show":{"title":"Stranger
-          Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}},{"rank":2,"listed_at":"2016-08-31T19:25:50.000Z","type":"episode","episode":{"season":1,"number":6,"title":"Chapter
-          Six: The Monster","ids":{"trakt":2124184,"tvdb":5621930,"imdb":"tt4593132","tmdb":1205905,"tvrage":1065933150}},"show":{"title":"Stranger
-          Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}}]'}
-      headers:
-        cache-control: ['max-age=0, private, must-revalidate']
-        cf-ray: [2db2def46dd03ca1-CPH]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Wed, 31 Aug 2016 19:25:52 GMT']
-        etag: [W/"f2be4e81d330c9008aedeca698d2ecc2"]
-        last-modified: ['Wed, 31 Aug 2016 19:25:50 GMT']
-        server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=df3bec029898395efc5e9fc7396be87391472671552; expires=Thu,
-            31-Aug-17 19:25:52 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-private-user: ['false']
-        x-request-id: [ab745a7f-cc7d-4f50-8a22-29ad980448a1]
-        x-runtime: ['0.034060']
-        x-sort-by: [rank]
-        x-sort-how: [asc]
-        x-xss-protection: [1; mode=block]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/me/watchlist/episodes
+  response:
+    body: {string: '[{"rank":1,"listed_at":"2016-12-17T12:04:20.000Z","type":"episode","episode":{"season":4,"number":5,"title":"First
+        of His Name","ids":{"trakt":73674,"tvdb":4801605,"imdb":"tt3060856","tmdb":63098,"tvrage":1065501369}},"show":{"title":"Game
+        of Thrones","year":2011,"ids":{"trakt":1390,"slug":"game-of-thrones","tvdb":121361,"imdb":"tt0944947","tmdb":1399,"tvrage":24493}}}]'}
+    headers:
+      CF-RAY: [312a3c778c553d3d-CPH]
+      Cache-Control: ['max-age=0, private, must-revalidate']
+      Cf-Railgun: [16fe92d3e6 1.50 0.024423 0030 e6be]
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:04:12 GMT']
+      Etag: [W/"a89b76b4e66d0aeac5fc3dde1c699cbf"]
+      Last-Modified: ['Sat, 17 Dec 2016 12:04:20 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=dcb23a3affd6be46461c3ba49c0ef4ade1481976252; expires=Sun,
+          17-Dec-17 12:04:12 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Private-User: ['false']
+      X-Request-Id: [3c220acf-e9d6-445f-be49-83c53537c4fe]
+      X-Runtime: ['0.021865']
+      X-Sort-By: [rank]
+      X-Sort-How: [asc]
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"shows": [{"title": "Game of Thrones", "seasons": [{"number": 4, "episodes":
+      [{"number": 5}]}], "ids": {"trakt": 1390, "tvrage": 24493, "tvdb": 121361, "imdb":
+      "tt0944947"}, "year": 2011}]}'
+    headers:
+      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
+      Content-Length: ['190']
+      Content-Type: [application/json]
+      Cookie: [__cfduid=dcb23a3affd6be46461c3ba49c0ef4ade1481976252]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: POST
+    uri: https://api.trakt.tv/sync/watchlist/remove
+  response:
+    body: {string: '{"deleted":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+    headers:
+      CF-RAY: [312a3c83ae613d3d-CPH]
+      Cache-Control: ['max-age=0, private, must-revalidate']
+      Cf-Railgun: [dfd3bf91d5 99.99 0.071227 0030 e6be]
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:04:14 GMT']
+      Etag: [W/"fb0b9bdab4f25c6ca392a2221693462b"]
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [95168ee4-1ee1-483d-b4ed-c7419fb15fce]
+      X-Runtime: ['0.039854']
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: '{"shows": [{"title": "Stranger Things", "seasons": [{"number": 1, "episodes":
+      [{"number": 5}]}], "ids": {}}, {"title": "Stranger Things", "seasons": [{"number":
+      1, "episodes": [{"number": 6}]}], "ids": {}}]}'
+    headers:
+      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
+      Content-Length: ['207']
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: POST
+    uri: https://api.trakt.tv/sync/watchlist
+  response:
+    body: {string: '{"added":{"movies":0,"shows":0,"seasons":0,"episodes":2},"existing":{"movies":0,"shows":0,"seasons":0,"episodes":0},"not_found":{"movies":[],"shows":[],"seasons":[],"episodes":[],"people":[]}}'}
+    headers:
+      CF-RAY: [312a3c907cc73c95-CPH]
+      Cache-Control: ['max-age=0, private, must-revalidate']
+      Cf-Railgun: [2b65f5b5f5 99.99 0.063111 0030 e6be]
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:04:16 GMT']
+      Etag: [W/"6cd047d5d9ae0593d3f071b45aaae41f"]
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=dfe42880ebf234fde76705ab8db38d97d1481976256; expires=Sun,
+          17-Dec-17 12:04:16 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [cd2d7c91-48fe-4170-af96-af2579f2bb1f]
+      X-Runtime: ['0.060022']
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 201, message: Created}
+- request:
+    body: null
+    headers:
+      Authorization: [Bearer 336e1b7bb963b63f3cda4500a31aaa06de5fc22201795c4b89e239211d418f22]
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/users/me/watchlist/episodes
+  response:
+    body: {string: '[{"rank":1,"listed_at":"2016-12-17T12:04:28.000Z","type":"episode","episode":{"season":1,"number":5,"title":"Chapter
+        Five: The Flea and the Acrobat","ids":{"trakt":2124182,"tvdb":5621929,"imdb":"tt4593128","tmdb":1205904,"tvrage":1065933149}},"show":{"title":"Stranger
+        Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}},{"rank":2,"listed_at":"2016-12-17T12:04:28.000Z","type":"episode","episode":{"season":1,"number":6,"title":"Chapter
+        Six: The Monster","ids":{"trakt":2124184,"tvdb":5621930,"imdb":"tt4593132","tmdb":1205905,"tvrage":1065933150}},"show":{"title":"Stranger
+        Things","year":2016,"ids":{"trakt":104439,"slug":"stranger-things","tvdb":305288,"imdb":"tt4574334","tmdb":66732,"tvrage":48493}}}]'}
+    headers:
+      CF-RAY: [312a3c9cfc903d5b-CPH]
+      Cache-Control: ['max-age=0, private, must-revalidate']
+      Cf-Railgun: [7f0554eebd 99.99 0.041313 0030 e6be]
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 12:04:18 GMT']
+      Etag: [W/"cc6cb3633eba7e810795b4d3cd59c124"]
+      Last-Modified: ['Sat, 17 Dec 2016 12:04:28 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d61fec75bc409e6c7e212be03224bccff1481976258; expires=Sun,
+          17-Dec-17 12:04:18 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Private-User: ['false']
+      X-Request-Id: [3205adf8-f241-48ed-bdf3-b70486932a86]
+      X-Runtime: ['0.038552']
+      X-Sort-By: [rank]
+      X-Sort-How: [asc]
+      X-Xss-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
 version: 1

@@ -1,0 +1,341 @@
+{% if task.accepted -%}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <style type="text/css">
+body {
+    background: #000;
+    font-family: Tahoma;
+}
+
+div#main {
+    margin:0px auto 0px auto;
+    width:780px;
+}
+
+/* MOVIE */
+
+div.header {
+  height: 57px;
+}
+
+div.name {
+    float: left;
+}
+
+div.ratings {
+   float: right;
+}
+
+div.photo {
+    border: 1px solid #000;
+    height: 120px;
+    width: 100px;
+    float: right;
+    background: #fff;
+    margin-left: 1em;
+}
+
+h2 {
+    margin: 0;
+    font-size: 0.9em;
+    color: #777;
+}
+
+
+/* SERIES */
+
+div.series, div.movie, div.other {
+    border: 2px solid #FE7C32;
+    margin-bottom: 0.5em;
+    padding: 0.5em;
+    -moz-border-radius: 5px;
+    background: #fff;
+}
+
+div.series h1, div.movie h1, div.other h1 {
+    margin: 0;
+}
+
+div.series div.banner {
+    text-align:center;
+}
+
+div.series div.basic {
+    padding: 0.5em;
+    background: #E0E0E0;
+
+}
+
+div.season_ep {
+    float: right;
+}
+
+div.ep_name {
+    float: left;
+    font-weight: bold;
+}
+
+div.ep_rating {
+   float: left;
+}
+
+div.ep_director {
+    float: right;
+}
+
+div.details-button {
+    text-align: center;
+}
+
+div.actors, div.genres, div.overview {
+    background: #F7F7F7;
+    padding: 0.4em;
+}
+
+div.actors, div.genres, div.overview {
+    font-size: 0.9em;
+}
+
+div.actors h2, div.genres h2, div.overview h2
+{
+    font-size: 1em;
+    margin-top: 0;
+    margin-bottom: 0.5em;
+    color: #366D9C;
+}
+
+div.overview p {
+    padding: 0;
+    margin: 0;
+}
+
+div.actors ul {
+    list-style: none; margin: 0; padding: 0;
+}
+
+div.actors ul li {
+    display: inline;
+}
+
+div.actors li:after {
+    content: ",";
+}
+
+div.actors li:last-child:after {
+    content: "";
+}
+
+div.genres ul {
+    list-style: none; margin: 0; padding: 0;
+}
+
+div.genres ul li {
+    display: inline;
+}
+
+div.genres li:after {
+    content: ",";
+}
+
+div.genres li:last-child:after {
+    content: "";
+}
+
+a {
+    color: #366D9C;
+}
+
+a:hover {
+    color: #f00;
+}
+
+div.clear {
+    clearing: both;
+}
+        </style>
+
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>FlexGet</title>
+    </head>
+
+    <body>
+
+    <script type="text/javascript">
+        function toggle_visibility(c_id, id) {
+           var e = document.getElementById(id);
+           if(e.style.display == 'block')
+              e.style.display = 'none';
+           else
+              e.style.display = 'block';
+           var c = document.getElementById(c_id);
+           c.style.display = 'none';
+        }
+    </script>
+
+
+    <div id="main">
+
+    {% for entry in task.accepted %}
+        {{ entry.title }}
+        <!-- HANDLE SERIES -->
+        {% if entry.series_name is defined %}
+            <div class="series">
+
+                {% if entry.tvdb_posters |d(false) %}
+                    <div class="banner">
+                        <img src="{{ entry.tvdb_posters[0] }}" alt="{{ entry.series_name }}" title="{{ entry.series_name }}">
+                    </div>
+                {% else %}
+                    <h1>{{ entry.series_name }}</h1>
+                {% endif %}
+
+                <div class="basic">
+                    {% if entry.tvdb_ep_name is defined %}
+                        <div class="ep_name">{{ entry.tvdb_ep_name }}</div>
+                    {% endif %}
+
+                    {% if entry.series_episode is defined and entry.series_season is defined %}
+                        <div class="season_ep">
+                            Season: {{ entry.series_season }} Episode: {{ entry.series_episode }}
+                        </div>
+                    {% endif %}
+
+                    <div class="clear">&nbsp;</div>
+
+                    {% if entry.tvdb_ep_rating|d(false) %}
+                        <div class="ep_rating">Rating: {{entry.tvdb_ep_rating}}</div>
+                    {% endif %}
+
+                    {% if entry.tvdb_status is defined %}
+                        <!--
+                        <div class="tvdb_status">Status: {{ entry.tvdb_status }}</div>
+                        -->
+                    {% endif %}
+
+                    {% if entry.tvdb_ep_director is defined %}
+                        <div class="ep_director">Director: {{  entry.tvdb_ep_director }}</div>
+                    {% endif %}
+
+                    <div class="clear">&nbsp;</div>
+                </div>
+
+                {% if entry.tvdb_ep_overview|d(false) %}
+                    <div class="overview">
+                        <h2>Overview</h2>
+                        <p>{{ entry.tvdb_ep_overview }}</p>
+                    </div>
+                {% endif %}
+
+                <div id="info-{{ loop.index }}" style="display: none;">
+                    <!-- a hack to keep browser from reseting position to top when clicking the Details link -->
+                    <a name="a-{{ loop.index }}" style="display:none;">&nbsp;</a>
+
+                    {% if entry.tvdb_genres is defined and entry.tvdb_genres is iterable %}
+                        <div class="genres">
+                            <h2>Genres</h2>
+                            <ul>
+                            {% for genre in entry.tvdb_genres %}
+                                <li>{{ genre }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    {% if entry.series_actors is defined and entry.series_actors is iterable %}
+                        <div class="actors">
+                            <h2>Actors</h2>
+                            <ul>
+                            {% for actor in entry.series_actors %}
+                                <li>{{ actor }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    {% if entry.tvdb_ep_guest_stars is defined and entry.tvdb_ep_guest_stars is iterable %}
+                        <div class="actors">
+                            <h2>Guest stars</h2>
+                            <ul>
+                            {% for actor in entry.tvdb_ep_guest_stars %}
+                                <li>{{ actor }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        <!-- HANDLE MOVIES -->
+
+        {% elif entry.imdb_url is defined %}
+            <div class="movie">
+                <div class="header">
+                    <div class="name">
+                        {% if entry.imdb_name is defined and entry.imdb_year is defined%}
+                            <h1>{{ entry.imdb_name }} ({{ entry.imdb_year }})</h1>
+                            <h2>{{ entry.title }}</h2>
+                        {% else %}
+                            <h1>{{ entry.title }}</h1>
+                        {% endif %}
+                    </div>
+
+                    <div class="ratings">
+                        {% if entry.imdb_score is defined %}
+                            <div class="score">
+                                Score: {{ entry.imdb_score }}
+                            </div>
+                        {% endif %}
+
+                        {% if entry.imdb_votes is defined %}
+                            <div class="votes">
+                                Votes: {{ entry.imdb_votes }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="clear">&nbsp;</div>
+                </div>
+
+                {% if entry.imdb_plot_outline is defined %}
+                    <div class="overview">
+                        <h2>Plot</h2>
+                        {{ entry.imdb_plot_outline }}
+                    </div>
+                {% endif %}
+
+                {% if entry.imdb_genres is defined and entry.imdb_genres is iterable %}
+                    <div class="genres">
+                        <h2>Genres</h2>
+                        <ul>
+                        {% for genre in entry.imdb_genres %}
+                            <li>{{ genre }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                {% if entry.imdb_actors is defined and entry.imdb_actors is iterable %}
+                    <div class="actors">
+                        <h2>Actors</h2>
+                        <ul>
+			{% for imdbid, actor in entry.imdb_actors.items() %}
+                            <li><a href="http://www.imdb.com/name/{{ imdbid }}">{{ actor }}</a></li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+            </div>
+        {% else %}
+            <div class="other">
+            {{ entry.title }}
+            </div>
+        {% endif %}
+
+      {% endfor %}
+      </div>
+
+    </body>
+</html>
+{% endif %}

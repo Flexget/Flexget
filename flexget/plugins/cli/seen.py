@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
 from flexget.event import event
@@ -33,16 +33,28 @@ def seen_forget(manager, options):
 def seen_add(options):
     seen_name = options.add_value
     if is_imdb_url(seen_name):
+        console('IMDB url detected, try to parse ID')
         imdb_id = extract_id(seen_name)
         if imdb_id:
             seen_name = imdb_id
+        else:
+            console("Could not parse IMDB ID")
     seen.add(seen_name, 'cli_add', {'cli_add': seen_name})
     console('Added %s as seen. This will affect all tasks.' % seen_name)
 
 
 @with_session
 def seen_search(options, session=None):
-    search_term = '%' + options.search_term + '%'
+    search_term = options.search_term
+    if is_imdb_url(search_term):
+        console('IMDB url detected, parsing ID')
+        imdb_id = extract_id(search_term)
+        if imdb_id:
+            search_term = imdb_id
+        else:
+            console("Could not parse IMDB ID")
+    else:
+        search_term = '%' + options.search_term + '%'
     seen_entries = seen.search(value=search_term, status=None, session=session)
     table_data = []
     for se in seen_entries.all():
@@ -60,10 +72,10 @@ def seen_search(options, session=None):
         return
     if options.table_type != 'porcelain':
         del table_data[-1]
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
-    table.table.inner_heading_row_border = False
 
     try:
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[1])
+        table.table.inner_heading_row_border = False
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))

@@ -14,9 +14,7 @@ Before submitting an issue, make sure you:
 - Surround your config and log segments with 3 backticks ```` ``` ```` so that they are made into proper code blocks:
 
         ```
-
         <config or log here>
-
         ```
 
 Pull Requests
@@ -33,7 +31,20 @@ When submitting pull requests:
   [UpgradeActions](http://flexget.com/wiki/UpgradeActions) page upon merging anyway.
 - Make separate PRs for separate ideas. The smaller each PR is the easier it is to get it reviewed and merged.
   You don't want a bugfix to get held up by a new feature you also added.
+  
+Commit messages
+===============
+If you want a commit to automatically create an entry in the [changelog](http://flexget.com/ChangeLog) you need to prefix with with square brackets and one of the following tags, followed by plugin name:
+- `add`, `added` or `feature` for the `Added` category
+- `change`, `changed` or `update` for the `Changed` category
+- `fix` or `fixed` for the `Fixed` category
+- `deprecate` or `deprecated` for the `Deprecated` category
+- `remove` or `removed` for the `Removed` category.  
 
+Example:  
+`[add] pending_approval - Pending approval plugin, CLI & API`
+
+Note that the changelog can always be updated manually, but sticking to this structure allows for easier generation.
 
 Wiki
 ====

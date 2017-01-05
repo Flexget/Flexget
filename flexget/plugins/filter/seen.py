@@ -8,7 +8,7 @@ forget (string)
     title will be forgotten. With field value only that particular field is forgotten.
 """
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -123,6 +123,25 @@ class SeenField(Base):
             'added': self.added,
             'seen_entry_id': self.seen_entry_id
         }
+
+
+@with_session
+def add(title, task_name, fields, reason=None, local=None, session=None):
+    """
+    Adds seen entries to DB
+
+    :param title: name of title to be added
+    :param task_name: name of task to be added
+    :param fields: Dict of fields to be added to seen object
+    :return: Seen Entry object as committed to DB
+    """
+    se = SeenEntry(title, task_name, reason, local)
+    for field, value in list(fields.items()):
+        sf = SeenField(field, value)
+        se.fields.append(sf)
+    session.add(se)
+    session.commit()
+    return se.to_dict()
 
 
 @event('forget')

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.utils import PY3
 
 import re
@@ -110,6 +110,7 @@ class TestTVDBLookup(object):
                                             'the paternity of the patient infuriates Dr. Cuddy and the teenager\'s ' \
                                             'parents, but may just pay off in spades.'
         assert entry['tvdb_ep_rating'] == 7.8
+        assert entry['tvdb_language'] == 'en'
 
     def test_no_posters_actors(self, mocked_expired, execute_task):
         persist['auth_tokens'] = {'default': None}
@@ -142,7 +143,7 @@ class TestTVDBLookup(object):
 
             # No requests should be sent as we restore from cache
             with mock.patch('requests.sessions.Session.request',
-                            side_effect=Exception('TVDB should restore from cache')) as _:
+                            side_effect=Exception('TVDB should restore from cache')):
                 lookup_series('house m.d.', session=session)
 
     def test_unknown_series(self, mocked_expired, execute_task):
@@ -168,7 +169,7 @@ class TestTVDBLookup(object):
         assert find_series_id('Once Upon A Time 2011') == 248835
         assert find_series_id('House M.D.') == 73255
         assert find_series_id('House') == 73255
-   
+
     @pytest.mark.skipif(not PY3, reason='VCRPY can\'t handle unicode in py2')
     def test_find_series_with_languages(self, mocked_expired, execute_task):
         assert find_series_id('Tegenlicht', 'nl') == 252712
@@ -208,7 +209,7 @@ class TestTVDBExpire(object):
         # Should not expire as it was checked less then an hour ago
         persist['last_check'] = datetime.utcnow() - timedelta(hours=1)
         with mock.patch('requests.sessions.Session.request',
-                        side_effect=Exception('Tried to expire or lookup, less then an hour since last check')) as _:
+                        side_effect=Exception('Tried to expire or lookup, less then an hour since last check')):
             # Ensure series is not marked as expired
             with Session() as session:
                 mark_expired(session)
@@ -247,7 +248,7 @@ class TestTVDBExpire(object):
         ]
 
         # Ensure series is marked as expired
-        with mock.patch.object(TVDBRequest, 'get', side_effect=[expired_data]) as _:
+        with mock.patch.object(TVDBRequest, 'get', side_effect=[expired_data]):
             with Session() as session:
                 mark_expired(session)
                 ep = session.query(TVDBEpisode) \
@@ -425,10 +426,10 @@ class TestTheTVDBLanguages(object):
                                          'tegelijkertijd gedegen analyses wil Tegenlicht zijn kijk geven op de ' \
                                          'wereld; zowel op nationale als op internationale ontwikkelingen die' \
                                          ' onze wereld in de 21ste eeuw vormgeven.\r\n\r\nTegenlicht is een programma' \
-                                         ' zonder een vast \'format\'. Afhankelijk van het onderwerp wordt steeds een ' \
-                                         'passende vorm gekozen, waardoor langere reportages uit binnen- en buitenland ' \
-                                         'worden afgewisseld met debatten, en met uitzendingen waarbij één persoon ' \
-                                         'alle ruimte krijgt zijn of haar visie op een onderwerp te geven.'
+                                         ' zonder een vast \'format\'. Afhankelijk van het onderwerp wordt steeds ' \
+                                         'een passende vorm gekozen, waardoor langere reportages uit binnen- en ' \
+                                         'buitenland worden afgewisseld met debatten, en met uitzendingen waarbij ' \
+                                         'één persoon alle ruimte krijgt zijn of haar visie op een onderwerp te geven.'
 
         assert entry['tvdb_ep_air_date'] == datetime(2011, 9, 4, 0, 0)
         assert entry['tvdb_ep_id'] == 'S10E01'

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import sys
 from textwrap import wrap
@@ -11,8 +11,9 @@ from flexget.utils.tools import io_encoding
 from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable, PorcelainTable
 from terminaltables.terminal_io import terminal_size
 
-# Enable terminal colors on windows
-if sys.platform == 'win32':
+# Enable terminal colors on windows.
+# pythonw (flexget-headless) does not have a sys.stdout, this command would crash in that case
+if sys.platform == 'win32' and sys.stdout:
     Windows.enable(auto_colors=True)
 
 
@@ -74,24 +75,29 @@ class TerminalTable(object):
         else:
             self.type = table_type
 
-        self.init_table()
+        self._init_table()
 
-    def init_table(self):
+    def _init_table(self):
         """Assigns self.table with the built table based on data."""
-        self.table = self.build_table(self.type, self.table_data)
+        self.table = self._build_table(self.type, self.table_data)
         if self.type == 'porcelain':
+            self.table.padding_left = 0
+            self.table.padding_right = 0
             return
         adjustable = bool(self.wrap_columns + self.drop_columns)
         if not self.valid_table and adjustable:
             self.table = self._resize_table()
 
-    def build_table(self, table_type, table_data):
+    def _build_table(self, table_type, table_data):
         return self.supported_table_types()[table_type](table_data)
 
     @property
     def output(self):
         self.table.title = self.title
-        return '\n' + self.table.table
+        if self.type == 'porcelain':
+            return '\n'.join(line.rstrip() for line in self.table.table.splitlines())
+        else:
+            return '\n' + self.table.table
 
     @staticmethod
     def supported_table_types():
@@ -126,8 +132,6 @@ class TerminalTable(object):
 
     @property
     def valid_table(self):
-        # print('self.table.table_width: %s' % self.table.table_width)
-        # print('terminal_size()[0]: %s' % terminal_size()[0])
         return self.table.table_width <= terminal_info()['size'][0]
 
     def _calc_wrap(self):
@@ -140,16 +144,9 @@ class TerminalTable(object):
         longest = self._longest_rows()
         margin = self._columns * 2 + self._columns + 1
         static_columns = sum(longest.values())
-        for wrap in self.wrap_columns:
-            static_columns -= longest[wrap]
+        for wrap_c in self.wrap_columns:
+            static_columns -= longest[wrap_c]
         space_left = terminal_info()['size'][0] - static_columns - margin
-        """
-        print('margin: %s' % margin)
-        print('static_columns: %s' % static_columns)
-        print('space_left: %s' % space_left)
-        print('self.table.table_width: %s' % self.table.table_width)
-        print(longest)
-        """
         # TODO: This is a bit dumb if wrapped columns have huge disparity
         # for example in flexget plugins the phases and flags
         return int(space_left / len(self.wrap_columns))
@@ -207,11 +204,14 @@ class TerminalTable(object):
             for col_num, value in enumerate(row):
                 output_value = value
                 if col_num in self.wrap_columns:
-                    # print('wrapping val %s col: %s' %  (value, col_num))
-                    output_value = word_wrap(value, wrapped_width)
+                    # This probably shouldn't happen, can be caused by wrong parameters sent to drop_columns and
+                    # wrap_columns
+                    if wrapped_width <= 0:
+                        raise TerminalTableError('Table could not be rendered correctly using it given data')
+                    output_value = word_wrap(str(value), wrapped_width)
                 output_row.append(output_value)
             output_table.append(output_row)
-        return self.build_table(self.type, output_table)
+        return self._build_table(self.type, output_table)
 
 
 class TerminalTableError(Exception):

@@ -1,10 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import base64
 
 from flask import request, session as flask_session
-from flask_login import login_user, LoginManager, current_user, current_app
+from flask_login import LoginManager
+from flask_login.utils import current_app, login_user, current_user
 from flask_restplus import inputs
 from werkzeug.security import check_password_hash
 

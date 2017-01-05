@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 
 class TestListInterface(object):
@@ -116,9 +116,15 @@ class TestListInterface(object):
 
           test_list_queue:
             mock:
-              - {title: 'Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD', url: "http://mock.url/Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent", imdb_id: "tt0303933"}
-              - {title: 'Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD', url: "http://mock.url/Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent", imdb_id: "tt0303933"}
-              - {title: 'Drumline 2002 DVDRip x264-FuzerHD', url: "http://mock.url/Drumline 2002 DVDRip x264-FuzerHD.torrent", imdb_id: "tt0303933"}
+              - {title: 'Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD',
+                 url: "http://mock.url/Drumline 2002 1080p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent",
+                 imdb_id: "tt0303933"}
+              - {title: 'Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD',
+                 url: "http://mock.url/Drumline 2002 720p BluRay DTS-HD MA 5 1 x264-FuzerHD.torrent",
+                 imdb_id: "tt0303933"}
+              - {title: 'Drumline 2002 DVDRip x264-FuzerHD',
+                 url: "http://mock.url/Drumline 2002 DVDRip x264-FuzerHD.torrent",
+                 imdb_id: "tt0303933"}
             list_match:
               from:
                 - movie_list: test_list_queue
@@ -144,6 +150,20 @@ class TestListInterface(object):
               what:
                 - entry_list: test_list
               phase: input
+
+          test_list_add_with_attribute:
+            mock:
+              - {title: 'title 1', url: "http://mock.url/file1.torrent", attribute_name: "some data"}
+            accept_all: yes
+            list_add:
+              - entry_list: test_list
+
+          test_entries_attributes_merge:
+            mock:
+              - {title: 'title 1', url: "http://mock.url/file1.torrent"}
+            list_match:
+              from:
+                - entry_list: test_list
     """
 
     def test_list_add(self, execute_task):
@@ -295,3 +315,15 @@ class TestListInterface(object):
 
         task = execute_task('test_list_clear_input')
         assert len(task.entries) == 0
+
+    def test_entries_attributes_merge(self, execute_task):
+        task = execute_task('test_list_add_with_attribute')
+        assert len(task.entries) == 1
+
+        task = execute_task('test_entries_attributes_merge')
+        assert len(task.all_entries) == 1
+        assert len(task.accepted) == 1
+
+        entry = task.find_entry(title="title 1")
+        assert entry
+        assert entry['attribute_name'] == 'some data'

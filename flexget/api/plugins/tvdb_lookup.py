@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flask import jsonify
 from flask_restplus import inputs
 
@@ -101,6 +101,7 @@ class TVDBSeriesLookupAPI(APIResource):
     @api.response(200, 'Successfully found show', tvdb_series_schema)
     @api.response(NotFoundError)
     def get(self, title, session=None):
+        """TheTVDB series lookup"""
         args = series_parser.parse_args()
         language = args['language']
 
@@ -143,6 +144,7 @@ class TVDBEpisodeSearchAPI(APIResource):
     @api.response(NotFoundError)
     @api.response(BadRequest)
     def get(self, tvdb_id, session=None):
+        """TheTVDB episode lookup"""
         args = episode_parser.parse_args()
         language = args['language']
 
@@ -189,6 +191,7 @@ class TVDBSeriesSearchAPI(APIResource):
     @api.response(BadRequest)
     @api.response(NotFoundError)
     def get(self, session=None):
+        """TheTVDB series search"""
         args = search_parser.parse_args()
         language = args['language']
 

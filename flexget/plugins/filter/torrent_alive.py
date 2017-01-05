@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse, urlsplit, urlunsplit, quote
 from future.moves.urllib.error import URLError
 
@@ -137,21 +137,21 @@ def get_http_seeds(url, info_hash):
     try:
         data = bdecode(requests.get(url).content).get('files')
     except RequestException as e:
-        log.debug('Error scraping: %s' % e)
+        log.debug('Error scraping: %s', e)
         return 0
     except SyntaxError as e:
-        log.warning('Error decoding tracker response: %s' % e)
+        log.warning('Error decoding tracker response: %s', e)
         return 0
     except BadStatusLine as e:
-        log.warning('Error BadStatusLine: %s' % e)
+        log.warning('Error BadStatusLine: %s', e)
         return 0
     except IOError as e:
-        log.warning('Server error: %s' % e)
+        log.warning('Server error: %s', e)
         return 0
     if not data:
         log.debug('No data received from tracker scrape.')
         return 0
-    log.debug('get_http_seeds is returning: %s' % list(data.values())[0]['complete'])
+    log.debug('get_http_seeds is returning: %s', list(data.values())[0]['complete'])
     return list(data.values())[0]['complete']
 
 

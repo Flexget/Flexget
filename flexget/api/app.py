@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import json
 import logging
@@ -22,7 +22,7 @@ from werkzeug.http import generate_etag
 
 from . import __path__
 
-__version__ = '1.0-RC1'
+__version__ = '1.1.2'
 
 log = logging.getLogger('api')
 
@@ -67,7 +67,7 @@ class APIEndpoint(object):
 
 
 def api_version(f):
-    """ Add the 'X-API-Version' header to all responses """
+    """ Add the 'API-Version' header to all responses """
 
     @wraps(f)
     def wrapped(*args, **kwargs):
@@ -208,9 +208,11 @@ class API(RestPlusAPI):
         """
         Return a standardized pagination parser, to be used for any endpoint that has pagination.
 
-        :param parser: Can extend a given parser or create a new one
-        :param sort_choices: A tuple of strings, to be used as server side attribute searches
-        :param default: The default sort string, used `sort_choices[0]` if not given
+        :param RequestParser parser: Can extend a given parser or create a new one
+        :param tuple sort_choices: A tuple of strings, to be used as server side attribute searches
+        :param str default: The default sort string, used `sort_choices[0]` if not given
+        :param bool add_sort: Add sort order choices without adding specific sort choices
+
         :return: An api.parser() instance with pagination and sorting arguments.
         """
         pagination = parser.copy() if parser else self.parser()
@@ -225,7 +227,7 @@ class API(RestPlusAPI):
         return pagination
 
 
-api_app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__path__[0]), 'templates'))
+api_app = Flask(__name__, template_folder=os.path.join(__path__[0], 'templates'))
 api_app.config['REMEMBER_COOKIE_NAME'] = 'flexget.token'
 api_app.config['DEBUG'] = True
 api_app.config['ERROR_404_HELP'] = False
@@ -397,7 +399,11 @@ def etag(f):
         assert request.method in ['HEAD', 'GET'], '@etag is only supported for GET requests'
         rv = f(*args, **kwargs)
         rv = make_response(rv)
-        etag = generate_etag(rv.get_data())
+
+        # Some headers can change without data change for specific page
+        content_headers = rv.headers.get('link', '') + rv.headers.get('count', '') + rv.headers.get('total-count', '')
+        data = (rv.get_data().decode() + content_headers).encode()
+        etag = generate_etag(data)
         rv.headers['Cache-Control'] = 'max-age=86400'
         rv.headers['ETag'] = etag
         if_match = request.headers.get('If-Match')
