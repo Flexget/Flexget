@@ -5,12 +5,12 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning, DependencyError
 
-__name__ = 'notify_osd'
+__name__ = 'on_screen_display'
 
 log = logging.getLogger(__name__)
 
 
-class OutputNotifyOsd(object):
+class NotifyOsd(object):
     schema = {
         'type': 'object',
         'properties': {
@@ -39,4 +39,4 @@ class OutputNotifyOsd(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OutputNotifyOsd, __name__, api_ver=2, groups=['notifiers'])
+    plugin.register(NotifyOsd, __name__, api_ver=2, groups=['notifiers'])
