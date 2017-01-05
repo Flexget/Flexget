@@ -44,7 +44,7 @@ class TestSortByWeight(object):
                  age: !Interval {text: '15 days'},
                  quality: !Quality {text: '720p webdl hi10p'}}
               - {title: 'title2c', content_size: 2300, score:  3,
-                 date: !!timestamp '2016-2-14 21:59:43.10 -5',
+                 date: !!timestamp '2016-2-14 21:59:43.10',
                  age: !Interval {text: '12 days'},
                  quality: !Quality {text: '720p webrip'}}
               - {title: 'title3a', content_size: 4600, score:  1,
