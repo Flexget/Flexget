@@ -49,7 +49,7 @@ class GenSeries(object):
                         entry['title'] = 'series %d name - S%02dE%02d - %s' % \
                                          (num, season + 1, episode + 1, quality)
                         entry['url'] = 'http://localhost/mock/%s' % \
-                                       ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
+                                       ''.join([random.choice(string.ascii_letters + string.digits) for x in range(1, 30)])
                         self.entries.append(entry)
         log.info('Generated %d entries' % len(self.entries))
 

@@ -8,13 +8,13 @@ import sys
 import threading
 
 import rpyc
+from rpyc.utils.server import ThreadedServer
+from terminaltables.terminal_io import terminal_size
 
 from flexget import terminal
 from flexget.logger import capture_output
 from flexget.terminal import console
 from flexget.options import get_parser
-from rpyc.utils.server import ThreadedServer
-from terminaltables.terminal_io import terminal_size
 
 log = logging.getLogger('ipc')
 
@@ -37,17 +37,12 @@ class RemoteStream(object):
         """
         :param writer: A function which writes a line of text to remote client.
         """
-        self.buffer = None
+        self.buffer = ''
         self.writer = writer
 
-    def write(self, data):
-        # This relies on all data up to a newline being either unicode or str, not mixed
-        if not self.buffer:
-            self.buffer = data
-        else:
-            self.buffer += data
-        newline = '\n' if isinstance(self.buffer, str) else b'\n'
-        if newline in self.buffer:
+    def write(self, text):
+        self.buffer += text
+        if '\n' in self.buffer:
             self.flush()
 
     def flush(self):
@@ -59,7 +54,7 @@ class RemoteStream(object):
             self.writer = None
             log.error('Client ended connection while still streaming output.')
         finally:
-            self.buffer = None
+            self.buffer = ''
 
 
 class DaemonService(rpyc.Service):

@@ -5,21 +5,30 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=Unite%209
   response:
-    body: {string: "{\"id\":8652,\"url\":\"http://www.tvmaze.com/shows/8652/unite-9\",\"name\":\"Unit\xE9
-        9\",\"type\":\"Scripted\",\"language\":\"French\",\"genres\":[],\"status\":\"Running\",\"runtime\":45,\"premiered\":\"2012-09-11\",\"schedule\":{\"time\":\"20:00\",\"days\":[\"Wednesday\"]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":451,\"name\":\"ICI
-        Radio-Canada T\xE9l\xE9\",\"country\":{\"name\":\"Canada\",\"code\":\"CA\",\"timezone\":\"Canada/Atlantic\"}},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":261952,\"imdb\":\"tt2388350\"},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/30/77041.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/30/77041.jpg\"},\"summary\":\"\",\"updated\":1452815788,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/8652\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/485612\"}}}"}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA41Sy27bMBD8FWPPsinJli3rFhgokGvaoociMBhxK7GRSIEPq47hD/J3+Me6Kzst
+        ChRoTyJ3h6PZmT2BVlCV6yJPILoOKmhDGCohxnFchEMv33BR21741o5eME5EowPOt5CAkT3Si89U
+        uF5mXAnHgSsfa6eHgIoqnTRNlA1XPzg0dUu1Bo1DD9XX5wR8kCHSGZ6iMdo01HbRBM3MqyKBwWGv
+        0RFXBXma5fN0O88yQvm6RRU7gp3gBqd+labUUvLI7PAFlUFPN3g+E60MzE9weUA3STKx66gzom7a
+        AFVKI2EYrXtlFBuzKrJfYz7uHmdPUmk730kjlZx9ul6664X+V1tS7I786G7JDTG1FI++e6Azq3yz
+        ZrpPDOIhkD1B13CeVLzsWmkMUgosLAH8EdAZ2dEwNOPht2biajEc1AtU+Trbcni65xuEkC/Lclmk
+        QIy6n6Y8QY9Kx57a93BvwdbKTNnGobNSeTHBvbiB94N1wUkdxDIVm026yhbfB07HOt1oEvWfbO/w
+        PVlkI2f2JyHJ9LHvJdsHRB8HJXlzqmxV5GVWbMoygX2nzevkgsfuG7vROqTv+zxy0H9fVnaBNuig
+        bfQ4aG85jX+8vuO8WJXFOsspm/NPvG6uqCYDAAA=
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:32 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:20 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -27,19 +36,24 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.0.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/8652/episodebynumber?season=1&number=16
   response:
-    body: {string: !!python/unicode '{"id":476294,"url":"http://www.tvmaze.com/episodes/476294/unite-9-1x16-episode-16","name":"Episode
-        16","season":1,"number":16,"airdate":"2013-01-22","airtime":"20:00","airstamp":"2013-01-22T20:00:00-04:00","runtime":45,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/476294"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA32PS07EMBBEr4J6bY8/hKDxfm7AHjWkYSxsJ/KHAKPcnZ4YFmxYdavqVUl1AT+B
+        G+5HexwEtBzAwbnWxSm1ruuhvkf8osPzHBUtvswTFdVh1ZKvJI/SfJhR/pjSjCAgYSSuOfXAza4V
+        wjIncIbtFp8o8zsKQJ8nrFfaanMrtZHWcgPL1e8lVjutu1IqxuUP+bC7DEg9dCy31IPDnQAf8ZWr
+        UwtBQGkxYv7kPLc9Bp/eCrgLFAov13vOxPd3Oi7+n+mwbds3HPvb3DgBAAA=
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 17 May 2016 08:58:32 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.16]
+      date: ['Sun, 25 Dec 2016 09:57:20 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 version: 1

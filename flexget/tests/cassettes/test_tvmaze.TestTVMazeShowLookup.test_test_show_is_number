@@ -5,26 +5,34 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=1992
   response:
-    body: {string: !!python/unicode '{"id":4879,"url":"http://www.tvmaze.com/shows/4879/1992","name":"1992","type":"Scripted","language":"Italian","genres":["Drama","Crime","History"],"status":"Ended","runtime":50,"premiered":"2015-03-24","schedule":{"time":"21:00","days":["Tuesday"]},"rating":{"average":9},"weight":0,"network":{"id":370,"name":"Sky
-        Cinema","country":{"name":"Italy","code":"IT","timezone":"Europe/Rome"}},"webChannel":null,"externals":{"tvrage":47669,"thetvdb":292192,"imdb":"tt2983290"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/53426.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/53426.jpg"},"summary":"<p>Set
-        in early nineties Italy when there was a nationwide judicial investigation
-        into corruption. This resulted in the break down of many political parties
-        as well as the arrest and conviction of some high profile political figures.
-        The story will follow six people whose lives are intertwined with the rapidly
-        changing political landscape, exposing the far-reaching impact of the greed
-        and corruption.</p>","updated":1466951790,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4879"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/308495"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA41Uy27bMBD8FYJnJbJlO4mEIpe0QHttciuKgBHX0iYUSfBhxQ3y7x3KSdECBdqT
+        Re7s7Mzu0i+Stey2V5dtJXMwspNjSr6r63mez9NhUj/ovHdTHUc3x7rg6nXbNrKSVk0E+NspHX05
+        3faBfSKNuFF2yGoot1+SMqwsLgeygaLsvsmPQU0KNzeBwVPJzxyTC0f5vZIxqZQBkp+sXqhCtqmg
+        ut2qkj7QxBQQ6GSzWu/OVpuzZguG2I+kswHsRZ7gsll3qxVCWh2XoneZIr7l99dKBpXYDgWsDhQW
+        oS2uZ+JhTLJDJUtpduGpQEqTNpfl7uT69ukobtjSYqF30AfpwL2Fi+Ej6vZOL/7v8F0k/XC2nD/l
+        4DzVXx08vS41H25GZS2h/zYbU0l6ThSsMlANM4eTvO3lxQXGlEZKB/0gu6Zt1m1TSZ7KSabUtFeb
+        pl1JUPK0OHqRE2nOE8Jvcz3NtNd2GWv2xikd6wUe6xP43ruQguJUN+t6t9k2F+ePfoAFF3hgqPpP
+        tnf4PdrjcpnOn4SQGfM0qdI6+cFf31ISbAWpYI7CoruJKYqll2IeyQo4DyRmFYUSFuNzdmZN4jFr
+        7lkZJB8oJh6WEE7Jid6FkH2Bnou7kaPA+mWDDS2VwCceAqknod1shduLSdmj8M5w4h6EXoVFAyrO
+        ZIzAb8lRASxJKKvBbw/cF/6SHjFRMWKBhA9uz4Z+49rzkJFWZJBYdl3MDM69M8bNIvKz8OQ8cubR
+        RRKGYQalqBihkGY0RCMljYuGoDxr9KnH4mAow2+V8PJ07JWnStCzd7FEi+y9Cmdw24/lgiev+lRE
+        l9AQCOQnQ78a9qH215h69lqVJ92tt9i/3fqyxTu4N2yflu2MZPZlS8dA+H1fM6j7+99HWU484QO7
+        HMlzXF7IP7LfcLHerK627Q5v5vUneQNvxrgEAAA=
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 26 Jul 2016 13:06:39 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+      date: ['Sun, 25 Dec 2016 09:57:11 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -32,22 +40,27 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/shows/4879/episodebynumber?season=1&number=2
   response:
-    body: {string: !!python/unicode '{"id":308487,"url":"http://www.tvmaze.com/episodes/308487/1992-1x02-episode-2","name":"Episode
-        2","season":1,"number":2,"airdate":"2015-03-24","airtime":"22:00","airstamp":"2015-03-24T22:00:00+01:00","runtime":50,"image":null,"summary":"<p>Leonardo
-        Notte attempts to hide his murky past as a radical left activist, while Luca
-        Pastore takes care of some personal business. </p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/308487"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA32QQW/CMAyF/4qV61qaBtBGhbjthqYddp9Ma9aIpIniFMYQ/32GbodddrGj5++9
+        yL4o26lmrp8WT4+FGpNTjepzjk1VnU6nWT56/KJZG3xF0XLoiKsJrurVypT1pzblz6Q0qlADepKI
+        5wmGm8SEHAbV1DId/Y6Sakyh0KYO8401ul6Wel6ahcAiZ3uPMKbRelI4o49/yLf7VIAHXU9YGofJ
+        uNSFsh4/JHoYnZP/R+8xncW/jpsthQFTF+Al5EyAUnzMDDlAbzuSwuDHdDhDRM6ADAgJO9uiA0d7
+        Udpsj5ZzAafeOoLt2CK8ChsSQcYDMbQoz7AHDp4gUpLtxb0b2Q7EPIN1FTey2Luzw4FVc5ELuf2t
+        94mk/94fo/3n/up6vX4Dh0COrb0BAAA=
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 26 Jul 2016 13:06:39 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+      date: ['Sun, 25 Dec 2016 09:57:11 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -55,21 +68,33 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
     uri: http://api.tvmaze.com/singlesearch/shows?q=24
   response:
-    body: {string: !!python/unicode '{"id":6353,"url":"http://www.tvmaze.com/shows/6353/24","name":"24","type":"Scripted","language":"Hindi","genres":["Drama"],"status":"Running","runtime":60,"premiered":"2013-10-04","schedule":{"time":"20:00","days":["Saturday","Sunday"]},"rating":{"average":9},"weight":1,"network":{"id":438,"name":"Colors","country":{"name":"India","code":"IN","timezone":"Asia/Kolkata"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":273614,"imdb":"tt2792284"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/24/60878.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/24/60878.jpg"},"summary":"<p>This
-        thriller series focuses on an anti-terrorist unit agent named Jai Singh Rathod
-        who has twenty-four hours to save the country from a major terrorist attack.</p>","updated":1469314293,"_links":{"self":{"href":"http://api.tvmaze.com/shows/6353"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/869841"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/869842"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA41UTW/TQBD9K6u9AJKJHeejbRRVKlU5IAGHthIIVdHWnthL17vWfsSkVf87b5wU
+        OCDBKeudNzNv3rzNk9S1XE2XJ5lM3siVbGPsV3k+DMMk7jr1SJPKdXlo3RBywPJyLjNpVUfAjue4
+        7/l8XXndR6oRNco2STV8e2Ubo0OLy4aspyBX3+RFFbWzuLppvTaGvLzLZIgqJoSRUY9FfLJRc5dl
+        kcneU6fJI4CmRTF9O52+LZYoEaqW6mQAe5IHuCynq6JAqFb7sd1HZ3GUd8+Z9Cpq2zBW7ciPDE8n
+        CwQG0k0boQNGozg4/8AgVmb+a9j3n7+gauXAy+85fBTh1mqMLa4xAOZjRM2T317jzJQeneXvi468
+        rlT+iYbNV27wPPa9v2yVtQTlbTImk/QjkrfKgDom2h1IlvP5AsVairv6Xq5OluUZRNEdf8gYi/J0
+        MZtNJQrqbpzqSXZU69QhfNznYZdVbcd1pt44VYd8hIf8AN70zkevdMyLvJzNisn3vsEMzutGg9F/
+        1nqBb6CTS7yeP8uBYkhdp1hBue7PP6jqQbxTiXwmwNxG4bbi8uZWvL5kocmLG/IeNUMULPQbsVUV
+        BRFbTyoG5ChtEWt1EMfVCGVrfHeBzFZoCyhiavSc6NEOu2I3T8SVqloRSAVnkWsjV+L22JeAYzJB
+        DKBeB2x0zEEYsdYlz7jf3F8FTpiIdYje2ea8nK/z41GgORaHRLN/YcHtmRlGMIItMlLmScBNCeNG
+        FbYKdOrk4dixwp6UD2LQsT2MBMoV9XGyzvtzrCn1NQzIb3l+WhaLs9MFrLsx2j6MVmI12FLQDb8v
+        rlC9/usrZyvhze20S+EowD+Tjzj8S5TF2Rz2fv4JLqP3HFwEAAA=
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 26 Jul 2016 13:06:40 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+      date: ['Sun, 25 Dec 2016 09:57:11 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -77,19 +102,24 @@ interactions:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
       Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.1.25.dev (www.flexget.com)]
+      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
     method: GET
-    uri: http://api.tvmaze.com/shows/6353/episodebynumber?season=1&number=1
+    uri: http://api.tvmaze.com/shows/167/episodebynumber?season=1&number=1
   response:
-    body: {string: !!python/unicode '{"id":377246,"url":"http://www.tvmaze.com/episodes/377246/24-1x01-day-1-1200-am-100-am","name":"Day
-        1: 12:00 AM - 1:00 AM","season":1,"number":1,"airdate":"2013-10-04","airtime":"22:00","airstamp":"2013-10-04T22:00:00+05:30","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/377246"}}}'}
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA3WQTU7EMAyFr4K8bpq4ghFkNwdgx35kaGAi4rTKzxQY9e64qWbBgtWz7Pc+W76C
+        H8EiPj5hBzUFsHAuZbZaL8vSlwvTj+vfJtZu9nkaXdbNq4d7hV8GFQ7GKGKFTaCDSOwEgoM15u7Y
+        P/cKb5VMs6M8RVkoxsqvLrWSfBqpbDGhCROVOYhZ2sU32rAx9k4uxPMf50ubikGZh92WatyDB9OB
+        Z/oQdKwhyP7KTOlb8kI7BR8/M9irnBXeNz0nJ3r7AM3+/w/Auq6/QPMzlz0BAAA=
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [keep-alive]
+      content-encoding: [gzip]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 26 Jul 2016 13:06:40 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.17]
+      date: ['Sun, 25 Dec 2016 09:57:12 GMT']
+      server: [nginx/1.10.0 (Ubuntu)]
+      vary: [Accept-Encoding]
     status: {code: 200, message: OK}
 version: 1

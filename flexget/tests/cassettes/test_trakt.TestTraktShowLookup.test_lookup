@@ -1,528 +1,365 @@
 interactions:
-  - request:
-      body: null
-      headers:
-        Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: [2]
-      method: GET
-      uri: https://api.trakt.tv/search?query=House&type=show
-    response:
-      body: {string: "[{\"type\":\"show\",\"score\":49.270447,\"show\":{\"title\"\
-          :\"House\",\"overview\":\"Go deeper into the medical mysteries of House,\
-          \ TV's most compelling drama. Hugh Laurie stars as the brilliant but sarcastic\
-          \ Dr. Gregory House, a maverick physician who is devoid of bedside manner.\
-          \ While his behavior can border on antisocial, Dr. House thrives on the\
-          \ challenge of solving the medical puzzles that other doctors give up on.\
-          \ Together with his hand-picked team of young medical experts, he'll do\
-          \ whatever it takes in the race against the clock to solve the case.\",\"\
-          year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/399/posters/original/76fae8b69b.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/399/posters/medium/76fae8b69b.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/posters/thumb/76fae8b69b.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/original/c628f24771.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/medium/c628f24771.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg\"\
-          }},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"\
-          tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\"\
-          :39.816532,\"show\":{\"title\":\"House vs. House\",\"overview\":\"House\
-          \ vs. House is a new home makeover competition series where amateur and\
-          \ experienced renovation teams compete for the chance to win $10,000 by\
-          \ proving they can create the better DIY projects in their home. From painting\
-          \ and decorating, to one-of-a-kind, imaginative projects, each episode features\
-          \ two teams will go head-to-head in grueling challenges. Tanya McQueen,\
-          \ a DIY design expert, and David Brian Sanders, an architect and designer,\
-          \ will determine which team completes the most impressive transformation\
-          \ and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"\
-          poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\"\
-          :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\"\
-          :\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"\
-          tvrage\":null}}},{\"type\":\"show\",\"score\":35.193176,\"show\":{\"title\"\
-          :\"Full House\",\"overview\":\"Full House is an American sitcom created\
-          \ by Jeff Franklin for ABC. The show chronicles a widowed father, who enlists\
-          \ his best friend and his brother-in-law to help raise his three daughters.\
-          \ It aired from September 22, 1987, to May 23, 1995, broadcasting eight\
-          \ seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\"\
-          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/posters/original/17202e7ebc.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/004/289/posters/medium/17202e7ebc.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/posters/thumb/17202e7ebc.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/original/98635a003a.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/medium/98635a003a.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/thumb/98635a003a.jpg\"\
-          }},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"\
-          imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\"\
-          ,\"score\":35.193176,\"show\":{\"title\":\"House Hunters\",\"overview\"\
-          :\"House Hunters takes viewers behind the scenes as individuals, couples\
-          \ and families learn what to look for and decide whether or not a home is\
-          \ meant for them. Focusing on the emotional experience of finding and purchasing\
-          \ a new home, each episode follows a prospective buyer and real estate agent\
-          \ through the home-buying process, from start to finish.\",\"year\":1999,\"\
-          status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/441/posters/original/d9d5f542d4.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/006/441/posters/medium/d9d5f542d4.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/posters/thumb/d9d5f542d4.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/original/36bdbe2817.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/medium/36bdbe2817.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/thumb/36bdbe2817.jpg\"\
-          }},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"\
-          imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":35.193176,\"show\":{\"title\":\"Fuller House\",\"overview\":\"\
-          Recently widowed D.J. Tanner-Fuller gets help from her sister Stephanie\
-          \ and best friend Kimmy when the women move in with their families to help\
-          \ D.J. raise her children in this spin-off series.\",\"year\":2016,\"status\"\
-          :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/102/424/posters/original/ff4124c48a.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/102/424/posters/medium/ff4124c48a.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/102/424/posters/thumb/ff4124c48a.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/original/37bbde27f6.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/medium/37bbde27f6.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/thumb/37bbde27f6.jpg\"\
-          }},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"\
-          imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\"\
-          ,\"score\":35.193176,\"show\":{\"title\":\"Alpha House\",\"overview\":\"\
-          Alpha House follows four senators who live together in a rented house in\
-          \ Washington DC.Re-election battles, looming indictments, parties, their\
-          \ Party... these senators need a drink. And a new housemate.\",\"year\"\
-          :2013,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"\
-          https://walter.trakt.us/images/shows/000/060/285/posters/original/5637f1fe65.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/060/285/posters/medium/5637f1fe65.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/posters/thumb/5637f1fe65.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/original/e477e76c44.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/medium/e477e76c44.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/thumb/e477e76c44.jpg\"\
-          }},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"\
-          imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\"\
-          ,\"score\":35.193176,\"show\":{\"title\":\"Playing House\",\"overview\"\
-          :\"A single-camera buddy comedy about what happens when two best friends\
-          \ come back together, just when they need each other most.Inspired by the\
-          \ ultra-close friendship between the series' creators and stars, \\\"Playing\
-          \ House\\\" centers on mother to-be Maggie who asks her single and career-driven\
-          \ best friend Emma to return home from her job overseas to attend her baby\
-          \ shower, having no idea what\u2019s truly in store.\",\"year\":2014,\"\
-          status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/073/385/posters/original/43003e74db.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/073/385/posters/medium/43003e74db.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/posters/thumb/43003e74db.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/original/49c78c5d22.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/medium/49c78c5d22.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/thumb/49c78c5d22.jpg\"\
-          }},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"\
-          imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":35.193176,\"show\":{\"title\":\"House Husbands\",\"overview\"\
-          :\"House Husbands centres around four families with one thing in common,\
-          \ the husbands stay home to raise the children.\",\"year\":2012,\"status\"\
-          :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/posters/original/8d6ef762b1.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/043/830/posters/medium/8d6ef762b1.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/posters/thumb/8d6ef762b1.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/original/632ffeb8be.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/medium/632ffeb8be.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/thumb/632ffeb8be.jpg\"\
-          }},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"\
-          imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":35.193176,\"show\":{\"title\":\"Bleak House\",\"overview\":\"\
-          In this star-studded adaptation of a literary classic, acclaimed writer\
-          \ Andrew Davies turns his talents to one of Charles Dickens' most brilliant\
-          \ novels \u2014 arguably the greatest-ever depiction of Victorian London.\
-          \ Fresh and imaginative, yet faithful to the original, this thrilling fast-paced\
-          \ adaptation is shot with a contemporary edge. At its heart is the story\
-          \ of the icily beautiful Lady Dedlock, who nurses a dark secret, and the\
-          \ merciless lawyer Tulkinghorn, who seeks to uncover it. The generous John\
-          \ Jarndyce, struggling with his own past, and his two young wards Richard\
-          \ and Ada, are all caught up, like Lady Dedlock, in the infamous case of\
-          \ Jarndyce vs. Jarndyce, which will make one of them rich beyond imagination\
-          \ if it can ever be brought to a conclusion. As Tulkinghorn digs deeper\
-          \ into Lady Dedlock's past, he unearths a secret that will change their\
-          \ lives forever, and which is almost as astounding as the final outcome\
-          \ of the Jarndyce case.\",\"year\":2005,\"status\":\"ended\",\"images\"\
-          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/002/474/posters/original/bc8a5abb1d.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/002/474/posters/medium/bc8a5abb1d.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/002/474/posters/thumb/bc8a5abb1d.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/002/474/fanarts/original/4d61afbe9b.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/002/474/fanarts/medium/4d61afbe9b.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/002/474/fanarts/thumb/4d61afbe9b.jpg\"\
-          }},\"ids\":{\"trakt\":2474,\"slug\":\"bleak-house\",\"tvdb\":73558,\"imdb\"\
-          :\"tt0442632\",\"tmdb\":2489,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :35.193176,\"show\":{\"title\":\"Full House\",\"overview\":\"Han Ji Eun\
-          \ is a naive writer who got swindled out of everything she owned including\
-          \ her house by her best friends. Stranded in China, She managed to borrow\
-          \ money from an actor Lee Young Jae to return to Korea. On her return, she\
-          \ found out that her house was bought by Lee Young Jae. In an attempt to\
-          \ get her possessions back, she entered in a contract marriage with Young\
-          \ Jae for one year. In spite of losing all, Ji Eun manages to be cheerful\
-          \ and takes things in strike and the business relationship between the two\
-          \ becomes personal as they start to rely and care for each other. \",\"\
-          year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/003/482/posters/original/3d0d97a090.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/003/482/posters/medium/3d0d97a090.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/003/482/posters/thumb/3d0d97a090.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/003/482/fanarts/original/eedae3b9b4.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/003/482/fanarts/medium/eedae3b9b4.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/003/482/fanarts/thumb/eedae3b9b4.jpg\"\
-          }},\"ids\":{\"trakt\":3482,\"slug\":\"full-house\",\"tvdb\":84928,\"imdb\"\
-          :\"tt0464625\",\"tmdb\":3504,\"tvrage\":null}}}]"}
-      headers:
-        CF-Cache-Status: [HIT]
-        CF-RAY: [29de237a98791fc4-DFW]
-        Cache-Control: ['public, max-age=14400']
-        Connection: [keep-alive]
-        Content-Type: [application/json; charset=utf-8]
-        Date: ['Wed, 04 May 2016 18:50:28 GMT']
-        ETag: [W/"70c5d5d3d52380ad5dd88696946294ec"]
-        Expires: ['Wed, 04 May 2016 22:50:28 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=d5fb0223efe67667c49008492e7ef707c1462387828; expires=Thu,
-            04-May-17 18:50:28 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        Vary: [Accept-Encoding]
-        X-Content-Type-Options: [nosniff]
-        X-Frame-Options: [SAMEORIGIN]
-        X-Pagination-Item-Count: ['1568']
-        X-Pagination-Limit: ['10']
-        X-Pagination-Page: ['1']
-        X-Pagination-Page-Count: ['157']
-        X-Request-Id: [23a21c0b-719a-4d1c-a5fb-1f44ae23638c]
-        X-Runtime: ['0.061275']
-        X-XSS-Protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Content-Type: [application/json]
-        Cookie: [__cfduid=d5fb0223efe67667c49008492e7ef707c1462387828]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: [2]
-      method: GET
-      uri: https://api.trakt.tv/shows/1399?extended=full%2Cimages
-    response:
-      body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
-          deeper into the medical mysteries of House, TV''s most compelling drama.
-          Hugh Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
-          physician who is devoid of bedside manner. While his behavior can border
-          on antisocial, Dr. House thrives on the challenge of solving the medical
-          puzzles that other doctors give up on. Together with his hand-picked team
-          of young medical experts, he''ll do whatever it takes in the race against
-          the clock to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":44,"certification":"TV-14","network":"FOX
-          (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.8017,"votes":16369,"updated_at":"2016-04-27T09:52:29.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es","ro","cs","bs","lt","uk"],"genres":["comedy","drama","mystery"],"aired_episodes":176,"images":{"fanart":{"full":"https://walter.trakt.us/images/shows/000/001/399/fanarts/original/c628f24771.jpg","medium":"https://walter.trakt.us/images/shows/000/001/399/fanarts/medium/c628f24771.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg"},"poster":{"full":"https://walter.trakt.us/images/shows/000/001/399/posters/original/76fae8b69b.jpg","medium":"https://walter.trakt.us/images/shows/000/001/399/posters/medium/76fae8b69b.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/399/posters/thumb/76fae8b69b.jpg"},"logo":{"full":"https://walter.trakt.us/images/shows/000/001/399/logos/original/2a5748f5d7.png"},"clearart":{"full":"https://walter.trakt.us/images/shows/000/001/399/cleararts/original/6a9b6f6448.png"},"banner":{"full":"https://walter.trakt.us/images/shows/000/001/399/banners/original/5395bb01d7.jpg"},"thumb":{"full":"https://walter.trakt.us/images/shows/000/001/399/thumbs/original/ed951f1f59.jpg"}}}'}
-      headers:
-        CF-Cache-Status: [HIT]
-        CF-RAY: [29de237c28a71fc4-DFW]
-        Cache-Control: ['public, max-age=14400']
-        Connection: [keep-alive]
-        Content-Type: [application/json; charset=utf-8]
-        Date: ['Wed, 04 May 2016 18:50:29 GMT']
-        ETag: [W/"1c7e7c5d16e8e9a8275505bae9057491"]
-        Expires: ['Wed, 04 May 2016 22:50:29 GMT']
-        Last-Modified: ['Wed, 27 Apr 2016 09:52:29 GMT']
-        Server: [cloudflare-nginx]
-        Vary: [Accept-Encoding]
-        X-Content-Type-Options: [nosniff]
-        X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [4a74dc27-1b99-41d1-94a5-5fb0d6898ddc]
-        X-Runtime: ['0.019536']
-        X-XSS-Protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: [2]
-      method: GET
-      uri: https://api.trakt.tv/shows/1399/seasons/1/episodes/2/?extended=full,images
-    response:
-      body: {string: '{"season":1,"number":2,"title":"Paternity","ids":{"trakt":74344,"tvdb":110995,"imdb":"tt0606034","tmdb":63739,"tvrage":84700},"number_abs":null,"overview":"When
-          a teenage lacrosse player is stricken with an unidentifiable brain disease,
-          Dr. House and the team hustle to give his parents answers. Chase breaks
-          the bad news, the kid has MS, but the boy''s night-terror hallucinations
-          disprove the diagnosis and send House and his team back to square one. As
-          the boy''s health deteriorates. House''s side-bet on the paternity of the
-          patient infuriates Dr. Cuddy and the teenager''s parents, but may just pay
-          off in spades.","rating":8.0443,"votes":474,"first_aired":"2004-11-23T05:00:00.000Z","updated_at":"2016-05-04T14:35:30.000Z","available_translations":[],"images":{"screenshot":{"full":"https://walter.trakt.us/images/episodes/000/074/344/screenshots/original/4fa866a157.jpg","medium":"https://walter.trakt.us/images/episodes/000/074/344/screenshots/medium/4fa866a157.jpg","thumb":"https://walter.trakt.us/images/episodes/000/074/344/screenshots/thumb/4fa866a157.jpg"}}}'}
-      headers:
-        CF-Cache-Status: [HIT]
-        CF-RAY: [29de237dcf820103-DFW]
-        Cache-Control: ['public, max-age=14400']
-        Connection: [keep-alive]
-        Content-Type: [application/json; charset=utf-8]
-        Date: ['Wed, 04 May 2016 18:50:29 GMT']
-        Expires: ['Wed, 04 May 2016 22:50:29 GMT']
-        Last-Modified: ['Wed, 04 May 2016 14:35:30 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=d7c86f474da6f95b6342e23a4848bfc8d1462387829; expires=Thu,
-            04-May-17 18:50:29 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        Vary: [Accept-Encoding]
-        X-Content-Type-Options: [nosniff]
-        X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [ad72be06-7f91-4d9b-8e50-bf710b6e8a81]
-        X-Runtime: ['0.015027']
-        X-XSS-Protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: [2]
-      method: GET
-      uri: https://api.trakt.tv/search?query=Doctor+Who&type=show&year=2005
-    response:
-      body: {string: "[{\"type\":\"show\",\"score\":64.115395,\"show\":{\"title\"\
-          :\"Doctor Who\",\"overview\":\"The Doctor is an alien Time Lord from the\
-          \ planet Gallifrey who travels through all of time and space in his TARDIS.\
-          \ He has a long list of friends and companions who have shared journeys\
-          \ with him. Instead of dying, the Doctor is able to \u201Cregenerate\u201D\
-          \ into a new body, taking on a new personality with each regeneration. Twelve\
-          \ actors, plus John Hurt, have played The Doctor thus far.\",\"year\":2005,\"\
-          status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/posters/original/8c421e339d.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/posters/medium/8c421e339d.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/posters/thumb/8c421e339d.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/original/e37d501a02.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/medium/e37d501a02.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/thumb/e37d501a02.jpg\"\
-          }},\"ids\":{\"trakt\":56872,\"slug\":\"doctor-who-2005\",\"tvdb\":78804,\"\
-          imdb\":\"tt0436992\",\"tmdb\":57243,\"tvrage\":3332}}},{\"type\":\"show\"\
-          ,\"score\":51.292313,\"show\":{\"title\":\"Doctor Who Confidential\",\"\
-          overview\":\"Specially filmed for BBC Three as a companion piece to Doctor\
-          \ Who, Doctor Who Confidential aims to give a taste of the excitement and\
-          \ the energy that surrounds the show. The programme includes behind-the-scenes\
-          \ filming and interviews with the cast, writers and production team as they\
-          \ bring our favourite Time Lord back to our screens.An abbreviated 15-minute\
-          \ version, concentrating on the production of the new series and without\
-          \ reference to the original show, is also broadcast on BBC Three as Doctor\
-          \ Who Confidential Cutdown.\",\"year\":2005,\"status\":\"ended\",\"images\"\
-          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/051/posters/original/de98e274d3.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/051/posters/medium/de98e274d3.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/051/posters/thumb/de98e274d3.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/original/3b9938962b.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/medium/3b9938962b.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/thumb/3b9938962b.jpg\"\
-          }},\"ids\":{\"trakt\":1051,\"slug\":\"doctor-who-confidential\",\"tvdb\"\
-          :79298,\"imdb\":\"tt0453422\",\"tmdb\":1056,\"tvrage\":null}}},{\"type\"\
-          :\"show\",\"score\":0.44877985,\"show\":{\"title\":\"The Herbalist's Manual\"\
-          ,\"overview\":\"This drama is about Lee Si Jan who studies medicine by secretly\
-          \ following his dad and learning it, since his father doesn't want him to\
-          \ be a doctor as it wasn't popular back then.\",\"year\":2005,\"status\"\
-          :\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\"\
-          :null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\"\
-          :{\"trakt\":103842,\"slug\":\"the-herbalist-s-manual\",\"tvdb\":303990,\"\
-          imdb\":\"tt0855304\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":0.3590239,\"show\":{\"title\":\"Inconceivable\",\"overview\"\
-          :\"Marco Pennette (\\\"All About the Andersons\\\") and Oliver Goldstick\
-          \ (\\\"Desperate Housewives\\\") are set to team on a new comedy pilot at\
-          \ the Peacock, about doctors, shrinks and lawyers who work in a fertility\
-          \ clinic. The project, which has a green light to produce a pilot, is set\
-          \ up at the Touchstone Television-based Tollin/Robbins Productions.\",\"\
-          year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
-          thumb\":null}},\"ids\":{\"trakt\":2748,\"slug\":\"inconceivable\",\"tvdb\"\
-          :75645,\"imdb\":null,\"tmdb\":2766,\"tvrage\":3954}}},{\"type\":\"show\"\
-          ,\"score\":0.31414592,\"show\":{\"title\":\"Dangerous Sister\",\"overview\"\
-          :\"Ito Misaki stars as the number-one cabaret/hostess club girl. Hailing\
-          \ from the Miyazaki countryside, she has been told since her youth that\
-          \ all she has is a beautiful face. Her brilliant younger brother (played\
-          \ by Moriyama Mirai) who aims to become a doctor, is her only pride. For\
-          \ his sake, she is willing to put up with all sorts of hardships in a display\
-          \ of unconditional love.\",\"year\":2005,\"status\":\"ended\",\"images\"\
-          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/009/462/posters/original/cf0bffe7d6.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/009/462/posters/medium/cf0bffe7d6.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/009/462/posters/thumb/cf0bffe7d6.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/009/462/fanarts/original/ddf68caac5.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/009/462/fanarts/medium/ddf68caac5.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/009/462/fanarts/thumb/ddf68caac5.jpg\"\
-          }},\"ids\":{\"trakt\":9462,\"slug\":\"dangerous-sister\",\"tvdb\":99681,\"\
-          imdb\":null,\"tmdb\":9510,\"tvrage\":16128}}},{\"type\":\"show\",\"score\"\
-          :0.2659967,\"show\":{\"title\":\"H2\",\"overview\":\"Kunimi Hiro was an\
-          \ ace pitcher in junior high school,until he was diagnosed by a doctor as\
-          \ having a \\\"glass elbow\\\". He gave up baseball and joined Senkawa Senior\
-          \ High School's soccer team. But then something happens that reignites his\
-          \ passion for baseball and he joins a baseball team managed by Koga Haruka.\
-          \ And he finds himself in a match against his old friend/rival Tachibana\
-          \ Hideo who has advanced to Meiwa No.1 High School. The meeting of the two\
-          \ is observed by Hideo's girlfriend Amamiya Hikari, who is also Hiro's childhood\
-          \ friend. Meanwhile, Haruka finds herself increasingly drawn towards Hiro,\
-          \ despite his being interested only in baseball. It's a story about high\
-          \ school students who dream of appearing at Koushien baseball tournament\
-          \ and young love. --TBS\",\"year\":2005,\"status\":\"ended\",\"images\"\
-          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/726/posters/original/851cb6cfb4.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/061/726/posters/medium/851cb6cfb4.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/061/726/posters/thumb/851cb6cfb4.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/726/fanarts/original/76afe70672.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/061/726/fanarts/medium/76afe70672.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/061/726/fanarts/thumb/76afe70672.jpg\"\
-          }},\"ids\":{\"trakt\":61726,\"slug\":\"h2-2005\",\"tvdb\":84824,\"imdb\"\
-          :null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.2659967,\"\
-          show\":{\"title\":\"Kimi to Itahibi\",\"overview\":\"Kunimi Hiro was an\
-          \ ace pitcher in junior high school,until he was diagnosed by a doctor as\
-          \ having a \\\"glass elbow\\\". He gave up baseball and joined Senkawa Senior\
-          \ High School's soccer team. But then something happens that reignites his\
-          \ passion for baseball and he joins a baseball team managed by Koga Haruka.\
-          \ And he finds himself in a match against his old friend/rival Tachibana\
-          \ Hideo who has advanced to Meiwa No.1 High School. The meeting of the two\
-          \ is observed by Hideo's girlfriend Amamiya Hikari, who is also Hiro's childhood\
-          \ friend. Meanwhile, Haruka finds herself increasingly drawn towards Hiro,\
-          \ despite his being interested only in baseball. It's a story about high\
-          \ school students who dream of appearing at Koushien baseball tournament\
-          \ and young love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\"\
-          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":\"\
-          https://walter.trakt.us/images/shows/000/079/747/fanarts/original/60bfcf99be.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/079/747/fanarts/medium/60bfcf99be.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/079/747/fanarts/thumb/60bfcf99be.jpg\"\
-          }},\"ids\":{\"trakt\":79747,\"slug\":\"kimi-to-itahibi\",\"tvdb\":259209,\"\
-          imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :0.25386822,\"show\":{\"title\":\"Hanoi Bride\",\"overview\":\"Park Eun\
-          \ Woo (Lee Dong Wook) worked as a doctor in a clinic in Hanoi where he fell\
-          \ in love with a Vietnamese girl Ly Thi Vu (Kim Ok Bin). Due to the sudden\
-          \ death of his father, he had to return to Korea in a hurry but the message\
-          \ wasn't related to Ly Thi Vu. His elder brother Park Sok Woo (Lee Won Jong)\
-          \ who worked as a farmer in the field was hard pressed by his mother to\
-          \ go to Vietnam to find a wife and he ended up bringing Ly Thi Vu to Korea\
-          \ with the intention to marry her. Song Il Lan (Yoo Hye Jung) was Park Sok\
-          \ Woo's childhood friend and she realized that she was in love with him\
-          \ and he had similar feeling for her too. When the misunderstanding between\
-          \ Park Sok Woo and Ly Thi Vu got clarified and all truth were out in the\
-          \ open, his mother who thought Ly Thi Vu was going to be her first son's\
-          \ wife and liked her didn't think she was good enough for her second son\
-          \ as he was a doctor. Ly Thi Vu was hurt and returned to Hanoi. Later the\
-          \ mother came to realize her folly and relented. Park Eun Woo didn't want\
-          \ to give up Ly Thi Vu and so he went back to work in Hanoi and search for\
-          \ her.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\"\
-          :null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\"\
-          :null,\"thumb\":null}},\"ids\":{\"trakt\":99658,\"slug\":\"hanoi-bride\"\
-          ,\"tvdb\":256432,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\"\
-          :\"show\",\"score\":0.21279734,\"show\":{\"title\":\"My Rosy Life\",\"overview\"\
-          :\"Maeng Sun-yi sacrificed her childhood and youth to taking care of her\
-          \ father, who started drinking heavily after her mother abandoned them when\
-          \ she was 10, and her two younger siblings. She even gave up her own education\
-          \ because she had to work hard to earn her siblings\u2019 tuitions. She\
-          \ is married to a guy named Ban Sung-moon, her five years junior, and has\
-          \ two daughters with him. Her life continues to present her with endless\
-          \ hardships but she just believes that that is \u201Chappiness\u201D. One\
-          \ day her husband falls in love with an attractive divorced woman and demands\
-          \ a divorce from Sun-yi.Sun-yi\u2019s younger sister, Maeng Young-yi, is\
-          \ a successful career woman. She dates her first love Lee Jung-do, who is\
-          \ now married to another woman and who broke up with her for the sake of\
-          \ his career in the past.Finally, Sun-yi\u2019s younger brother, Chul-soo,\
-          \ earns his doctorate degree in the United States and settles down there,\
-          \ completely ignoring his responsibility of taking care of his father.Just\
-          \ to make things worse, Sun-yi is one day diagnosed with cancer, which to\
-          \ her is tantamount to a death sentence. After learning about her disease,\
-          \ her husband reflects on himself and shows her the genuine meaning of marital\
-          \ love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"\
-          full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
-          medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":104271,\"slug\":\"my-rosy-life\"\
-          ,\"tvdb\":294625,\"imdb\":\"tt1301845\",\"tmdb\":16715,\"tvrage\":14290}}}]"}
-      headers:
-        CF-Cache-Status: [HIT]
-        CF-RAY: [29de237efef5202a-DFW]
-        Cache-Control: ['public, max-age=14400']
-        Connection: [keep-alive]
-        Content-Type: [application/json; charset=utf-8]
-        Date: ['Wed, 04 May 2016 18:50:29 GMT']
-        ETag: [W/"d748b247f3b5275bcc8eb227f1d83250"]
-        Expires: ['Wed, 04 May 2016 22:50:29 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=df7165313741926214ac4c162544814931462387829; expires=Thu,
-            04-May-17 18:50:29 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        Vary: [Accept-Encoding]
-        X-Content-Type-Options: [nosniff]
-        X-Frame-Options: [SAMEORIGIN]
-        X-Pagination-Item-Count: ['9']
-        X-Pagination-Limit: ['10']
-        X-Pagination-Page: ['1']
-        X-Pagination-Page-Count: ['1']
-        X-Request-Id: [0e6bf1b2-e852-42db-a806-0a088d09a7d1]
-        X-Runtime: ['0.056505']
-        X-XSS-Protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Content-Type: [application/json]
-        Cookie: [__cfduid=df7165313741926214ac4c162544814931462387829]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: [2]
-      method: GET
-      uri: https://api.trakt.tv/shows/56872?extended=full%2Cimages
-    response:
-      body: {string: "{\"title\":\"Doctor Who\",\"year\":2005,\"ids\":{\"trakt\":56872,\"\
-          slug\":\"doctor-who-2005\",\"tvdb\":78804,\"imdb\":\"tt0436992\",\"tmdb\"\
-          :57243,\"tvrage\":3332},\"overview\":\"The Doctor is an alien Time Lord\
-          \ from the planet Gallifrey who travels through all of time and space in\
-          \ his TARDIS. He has a long list of friends and companions who have shared\
-          \ journeys with him. Instead of dying, the Doctor is able to \u201Cregenerate\u201D\
-          \ into a new body, taking on a new personality with each regeneration. Twelve\
-          \ actors, plus John Hurt, have played The Doctor thus far.\",\"first_aired\"\
-          :\"2005-03-26T20:30:00.000Z\",\"airs\":{\"day\":\"Saturday\",\"time\":\"\
-          20:30\",\"timezone\":\"Europe/London\"},\"runtime\":45,\"certification\"\
-          :\"TV-PG\",\"network\":\"BBC One\",\"country\":\"gb\",\"trailer\":null,\"\
-          homepage\":\"http://www.bbc.co.uk/programmes/b006q2x0\",\"status\":\"returning\
-          \ series\",\"rating\":9.06967,\"votes\":12617,\"updated_at\":\"2016-05-03T09:44:40.000Z\"\
-          ,\"language\":\"en\",\"available_translations\":[\"da\",\"en\",\"hu\",\"\
-          ru\",\"nl\",\"pt\",\"pl\",\"de\",\"bg\",\"es\",\"fr\",\"zh\",\"tr\",\"cs\"\
-          ,\"it\",\"el\",\"no\",\"he\",\"sv\",\"bs\",\"hr\",\"ko\",\"uk\",\"fa\",\"\
-          vi\",\"ro\",\"fi\"],\"genres\":[\"drama\",\"action\",\"adventure\",\"science-fiction\"\
-          ],\"aired_episodes\":115,\"images\":{\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/original/e37d501a02.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/medium/e37d501a02.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/thumb/e37d501a02.jpg\"\
-          },\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/posters/original/8c421e339d.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/posters/medium/8c421e339d.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/posters/thumb/8c421e339d.jpg\"\
-          },\"logo\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/logos/original/908c4e7ff2.png\"\
-          },\"clearart\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/cleararts/original/9ee95ac313.png\"\
-          },\"banner\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/banners/original/eb6561d0ee.jpg\"\
-          },\"thumb\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/thumbs/original/6066c7e461.jpg\"\
-          }}}"}
-      headers:
-        CF-Cache-Status: [HIT]
-        CF-RAY: [29de237f9f02202a-DFW]
-        Cache-Control: ['public, max-age=14400']
-        Connection: [keep-alive]
-        Content-Type: [application/json; charset=utf-8]
-        Date: ['Wed, 04 May 2016 18:50:29 GMT']
-        ETag: [W/"402f93aaa5f33d079d48d7d246a00d7f"]
-        Expires: ['Wed, 04 May 2016 22:50:29 GMT']
-        Last-Modified: ['Tue, 03 May 2016 09:44:40 GMT']
-        Server: [cloudflare-nginx]
-        Vary: [Accept-Encoding]
-        X-Content-Type-Options: [nosniff]
-        X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [c1e9d939-7a49-43c5-ab1e-a925893af691]
-        X-Runtime: ['0.042883']
-        X-XSS-Protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Content-Type: [application/json]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: [2]
-      method: GET
-      uri: https://api.trakt.tv/shows/56872/seasons/2/episodes/3/?extended=full,images
-    response:
-      body: {string: "{\"season\":2,\"number\":3,\"title\":\"School Reunion\",\"ids\"\
-          :{\"trakt\":951447,\"tvdb\":302431,\"imdb\":null,\"tmdb\":941480,\"tvrage\"\
-          :0},\"number_abs\":null,\"overview\":\"Location: Deffry Vale High School,\
-          \ London, England, Earth \\nDate: 2007 \\nEnemies: The Krillitanes \\n\\\
-          nThere are strange goings-on at a comprehensive school - UFOs, over-intelligent\
-          \ children, and odd-tasting school dinners. This attracts the attention\
-          \ of the Tenth Doctor, Rose and Mickey Smith, as well as a couple of old\
-          \ friends\u2026\",\"rating\":8.06532,\"votes\":643,\"first_aired\":\"2006-04-29T19:30:00.000Z\"\
-          ,\"updated_at\":\"2016-05-02T23:51:34.000Z\",\"available_translations\"\
-          :[],\"images\":{\"screenshot\":{\"full\":\"https://walter.trakt.us/images/episodes/000/951/447/screenshots/original/b1fa29cb68.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/episodes/000/951/447/screenshots/medium/b1fa29cb68.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/episodes/000/951/447/screenshots/thumb/b1fa29cb68.jpg\"\
-          }}}"}
-      headers:
-        CF-Cache-Status: [HIT]
-        CF-RAY: [29de2381077f1fc4-DFW]
-        Cache-Control: ['public, max-age=14400']
-        Connection: [keep-alive]
-        Content-Type: [application/json; charset=utf-8]
-        Date: ['Wed, 04 May 2016 18:50:29 GMT']
-        Expires: ['Wed, 04 May 2016 22:50:29 GMT']
-        Last-Modified: ['Mon, 02 May 2016 23:51:34 GMT']
-        Server: [cloudflare-nginx]
-        Set-Cookie: ['__cfduid=d1b534824e21b1bf3b54c37c4d4d914a61462387829; expires=Thu,
-            04-May-17 18:50:29 GMT; path=/; domain=.trakt.tv; HttpOnly']
-        Vary: [Accept-Encoding]
-        X-Content-Type-Options: [nosniff]
-        X-Frame-Options: [SAMEORIGIN]
-        X-Request-Id: [05bad668-cbfd-4585-b4f9-d3b3ba3d69c1]
-        X-Runtime: ['0.019934']
-        X-XSS-Protection: [1; mode=block]
-      status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?type=show&query=House
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":61.689377,\"show\":{\"title\":\"House\",\"overview\":\"Go
+        deeper into the medical mysteries of House, TV's most compelling drama. Hugh
+        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
+        physician who is devoid of bedside manner. While his behavior can border on
+        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
+        that other doctors give up on. Together with his hand-picked team of young
+        medical experts, he'll do whatever it takes in the race against the clock
+        to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":49.852543,\"show\":{\"title\":\"House
+        vs. House\",\"overview\":\"House vs. House is a new home makeover competition
+        series where amateur and experienced renovation teams compete for the chance
+        to win $10,000 by proving they can create the better DIY projects in their
+        home. From painting and decorating, to one-of-a-kind, imaginative projects,
+        each episode features two teams will go head-to-head in grueling challenges.
+        Tanya McQueen, a DIY design expert, and David Brian Sanders, an architect
+        and designer, will determine which team completes the most impressive transformation
+        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Full
+        House\",\"overview\":\"Full House is an American sitcom created by Jeff Franklin
+        for ABC. The show chronicles a widowed father, who enlists his best friend
+        and his brother-in-law to help raise his three daughters. It aired from September
+        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"House
+        Hunters\",\"overview\":\"House Hunters takes viewers behind the scenes as
+        individuals, couples and families learn what to look for and decide whether
+        or not a home is meant for them. Focusing on the emotional experience of finding
+        and purchasing a new home, each episode follows a prospective buyer and real
+        estate agent through the home-buying process, from start to finish.\",\"year\":1999,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Fuller
+        House\",\"overview\":\"Recently widowed D.J. Tanner-Fuller gets help from
+        her sister Stephanie and best friend Kimmy when the women move in with their
+        families to help D.J. raise her children in this spin-off series.\",\"year\":2016,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Alpha
+        House\",\"overview\":\"Alpha House follows four senators who live together
+        in a rented house in Washington DC.Re-election battles, looming indictments,
+        parties, their Party... these senators need a drink. And a new housemate.\",\"year\":2013,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Playing
+        House\",\"overview\":\"A single-camera buddy comedy about what happens when
+        two best friends come back together, just when they need each other most.Inspired
+        by the ultra-close friendship between the series' creators and stars, \\\"Playing
+        House\\\" centers on mother to-be Maggie who asks her single and career-driven
+        best friend Emma to return home from her job overseas to attend her baby shower,
+        having no idea what\u2019s truly in store.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"House
+        Husbands\",\"overview\":\"House Husbands centres around four families with
+        one thing in common, the husbands stay home to raise the children.\",\"year\":2012,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Bleak
+        House\",\"overview\":\"In this star-studded adaptation of a literary classic,
+        acclaimed writer Andrew Davies turns his talents to one of Charles Dickens'
+        most brilliant novels \u2014 arguably the greatest-ever depiction of Victorian
+        London. Fresh and imaginative, yet faithful to the original, this thrilling
+        fast-paced adaptation is shot with a contemporary edge. At its heart is the
+        story of the icily beautiful Lady Dedlock, who nurses a dark secret, and the
+        merciless lawyer Tulkinghorn, who seeks to uncover it. The generous John Jarndyce,
+        struggling with his own past, and his two young wards Richard and Ada, are
+        all caught up, like Lady Dedlock, in the infamous case of Jarndyce vs. Jarndyce,
+        which will make one of them rich beyond imagination if it can ever be brought
+        to a conclusion. As Tulkinghorn digs deeper into Lady Dedlock's past, he unearths
+        a secret that will change their lives forever, and which is almost as astounding
+        as the final outcome of the Jarndyce case.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":2474,\"slug\":\"bleak-house\",\"tvdb\":73558,\"imdb\":\"tt0442632\",\"tmdb\":2489,\"tvrage\":null}}},{\"type\":\"show\",\"score\":44.06384,\"show\":{\"title\":\"Full
+        House\",\"overview\":\"Han Ji Eun is a naive writer who got swindled out of
+        everything she owned including her house by her best friends. Stranded in
+        China, She managed to borrow money from an actor Lee Young Jae to return to
+        Korea. On her return, she found out that her house was bought by Lee Young
+        Jae. In an attempt to get her possessions back, she entered in a contract
+        marriage with Young Jae for one year. In spite of losing all, Ji Eun manages
+        to be cheerful and takes things in strike and the business relationship between
+        the two becomes personal as they start to rely and care for each other. \",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":3482,\"slug\":\"full-house\",\"tvdb\":84928,\"imdb\":\"tt0464625\",\"tmdb\":3504,\"tvrage\":null}}}]"}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [312a165e88fb3d07-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 11:38:11 GMT']
+      ETag: [W/"bd88943cc0ddc14f3315697ac3a632ef"]
+      Expires: ['Sat, 17 Dec 2016 19:38:11 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d079038fd63a3628c0d0d481440a448951481974691; expires=Sun,
+          17-Dec-17 11:38:11 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['1737']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['174']
+      X-Request-Id: [736fd637-8769-45e7-bd06-fab2e44bbc94]
+      X-Runtime: ['0.018501']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=d079038fd63a3628c0d0d481440a448951481974691]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/1399?extended=full
+  response:
+    body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
+        deeper into the medical mysteries of House, TV''s most compelling drama. Hugh
+        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
+        physician who is devoid of bedside manner. While his behavior can border on
+        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
+        that other doctors give up on. Together with his hand-picked team of young
+        medical experts, he''ll do whatever it takes in the race against the clock
+        to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":44,"certification":"TV-14","network":"FOX
+        (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.78719,"votes":17579,"updated_at":"2016-12-14T09:35:37.000Z","language":"en","available_translations":["ar","bg","bs","cs","da","de","el","en","es","fr","he","hu","it","ko","lt","nl","pl","pt","ro","ru","sk","sr","tr","uk","zh"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [312a165ea9003d07-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 11:38:11 GMT']
+      ETag: [W/"6cabdad3b0db0c728ee72f8827a38aa5"]
+      Expires: ['Sat, 17 Dec 2016 19:38:11 GMT']
+      Last-Modified: ['Wed, 14 Dec 2016 09:35:37 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [33446abf-9aaa-4f6d-a5bc-f192b686fdcf]
+      X-Runtime: ['0.013575']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/1399/seasons/1/episodes/2/?extended=full
+  response:
+    body: {string: '{"season":1,"number":2,"title":"Paternity","ids":{"trakt":74344,"tvdb":110995,"imdb":"tt0606034","tmdb":63739,"tvrage":84700},"number_abs":3,"overview":"When
+        a teenage lacrosse player is stricken with an unidentifiable brain disease,
+        Dr. House and the team hustle to give his parents answers. Chase breaks the
+        bad news, the kid has MS, but the boy''s night-terror hallucinations disprove
+        the diagnosis and send House and his team back to square one. As the boy''s
+        health deteriorates. House''s side-bet on the paternity of the patient infuriates
+        Dr. Cuddy and the teenager''s parents, but may just pay off in spades.","rating":7.97254,"votes":692,"first_aired":"2004-11-23T05:00:00.000Z","updated_at":"2016-12-17T11:02:15.000Z","available_translations":["cs","de","en","es","fr","he","nl","pt","ro"]}'}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [312a165f3a1e3d49-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 11:38:11 GMT']
+      Expires: ['Sat, 17 Dec 2016 19:38:11 GMT']
+      Last-Modified: ['Sat, 17 Dec 2016 11:02:15 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=d915b957c74221afa97713fd826715b421481974691; expires=Sun,
+          17-Dec-17 11:38:11 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [8969a531-8927-4b4a-b9d0-88f989f6a9da]
+      X-Runtime: ['0.019577']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/search?type=show&year=2005&query=Doctor+Who
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":63.71572,\"show\":{\"title\":\"Doctor
+        Who\",\"overview\":\"The Doctor is an alien Time Lord from the planet Gallifrey
+        who travels through all of time and space in his TARDIS. He has a long list
+        of friends and companions who have shared journeys with him. Instead of dying,
+        the Doctor is able to \u201Cregenerate\u201D into a new body, taking on a
+        new personality with each regeneration. Twelve actors, plus John Hurt, have
+        played The Doctor thus far.\",\"year\":2005,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":56872,\"slug\":\"doctor-who-2005\",\"tvdb\":78804,\"imdb\":\"tt0436992\",\"tmdb\":57243,\"tvrage\":3332}}},{\"type\":\"show\",\"score\":50.972576,\"show\":{\"title\":\"Doctor
+        Who Confidential\",\"overview\":\"Specially filmed for BBC Three as a companion
+        piece to Doctor Who, Doctor Who Confidential aims to give a taste of the excitement
+        and the energy that surrounds the show. The programme includes behind-the-scenes
+        filming and interviews with the cast, writers and production team as they
+        bring our favourite Time Lord back to our screens.An abbreviated 15-minute
+        version, concentrating on the production of the new series and without reference
+        to the original show, is also broadcast on BBC Three as Doctor Who Confidential
+        Cutdown.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":1051,\"slug\":\"doctor-who-confidential\",\"tvdb\":79298,\"imdb\":\"tt0453422\",\"tmdb\":1056,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.44222233,\"show\":{\"title\":\"The
+        Herbalist's Manual\",\"overview\":\"This drama is about Lee Si Jan who studies
+        medicine by secretly following his dad and learning it, since his father doesn't
+        want him to be a doctor as it wasn't popular back then.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":103842,\"slug\":\"the-herbalist-s-manual\",\"tvdb\":303990,\"imdb\":\"tt0855304\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.35377786,\"show\":{\"title\":\"Inconceivable\",\"overview\":\"Marco
+        Pennette (\\\"All About the Andersons\\\") and Oliver Goldstick (\\\"Desperate
+        Housewives\\\") are set to team on a new comedy pilot at the Peacock, about
+        doctors, shrinks and lawyers who work in a fertility clinic. The project,
+        which has a green light to produce a pilot, is set up at the Touchstone Television-based
+        Tollin/Robbins Productions.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":2748,\"slug\":\"inconceivable\",\"tvdb\":75645,\"imdb\":null,\"tmdb\":2766,\"tvrage\":3954}}},{\"type\":\"show\",\"score\":0.30955565,\"show\":{\"title\":\"Dangerous
+        Sister\",\"overview\":\"Ito Misaki stars as the number-one cabaret/hostess
+        club girl. Hailing from the Miyazaki countryside, she has been told since
+        her youth that all she has is a beautiful face. Her brilliant younger brother
+        (played by Moriyama Mirai) who aims to become a doctor, is her only pride.
+        For his sake, she is willing to put up with all sorts of hardships in a display
+        of unconditional love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9462,\"slug\":\"dangerous-sister\",\"tvdb\":99681,\"imdb\":null,\"tmdb\":9510,\"tvrage\":16128}}},{\"type\":\"show\",\"score\":0.26197043,\"show\":{\"title\":\"H2\",\"overview\":\"Kunimi
+        Hiro was an ace pitcher in junior high school,until he was diagnosed by a
+        doctor as having a \\\"glass elbow\\\". He gave up baseball and joined Senkawa
+        Senior High School's soccer team. But then something happens that reignites
+        his passion for baseball and he joins a baseball team managed by Koga Haruka.
+        And he finds himself in a match against his old friend/rival Tachibana Hideo
+        who has advanced to Meiwa No.1 High School. The meeting of the two is observed
+        by Hideo's girlfriend Amamiya Hikari, who is also Hiro's childhood friend.
+        Meanwhile, Haruka finds herself increasingly drawn towards Hiro, despite his
+        being interested only in baseball. It's a story about high school students
+        who dream of appearing at Koushien baseball tournament and young love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61726,\"slug\":\"h2-2005\",\"tvdb\":84824,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.26197043,\"show\":{\"title\":\"H2
+        The Day with You\",\"overview\":\"Kunimi Hiro was an ace pitcher in junior
+        high school,until he was diagnosed by a doctor as having a \\\"glass elbow\\\".
+        He gave up baseball and joined Senkawa Senior High School's soccer team. But
+        then something happens that reignites his passion for baseball and he joins
+        a baseball team managed by Koga Haruka. And he finds himself in a match against
+        his old friend/rival Tachibana Hideo who has advanced to Meiwa No.1 High School.
+        The meeting of the two is observed by Hideo's girlfriend Amamiya Hikari, who
+        is also Hiro's childhood friend. Meanwhile, Haruka finds herself increasingly
+        drawn towards Hiro, despite his being interested only in baseball. It's a
+        story about high school students who dream of appearing at Koushien baseball
+        tournament and young love\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":107698,\"slug\":\"h2-the-day-with-you\",\"tvdb\":259196,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.26197043,\"show\":{\"title\":\"Kimi
+        to Itahibi\",\"overview\":\"Kunimi Hiro was an ace pitcher in junior high
+        school,until he was diagnosed by a doctor as having a \\\"glass elbow\\\".
+        He gave up baseball and joined Senkawa Senior High School's soccer team. But
+        then something happens that reignites his passion for baseball and he joins
+        a baseball team managed by Koga Haruka. And he finds himself in a match against
+        his old friend/rival Tachibana Hideo who has advanced to Meiwa No.1 High School.
+        The meeting of the two is observed by Hideo's girlfriend Amamiya Hikari, who
+        is also Hiro's childhood friend. Meanwhile, Haruka finds herself increasingly
+        drawn towards Hiro, despite his being interested only in baseball. It's a
+        story about high school students who dream of appearing at Koushien baseball
+        tournament and young love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":79747,\"slug\":\"kimi-to-itahibi\",\"tvdb\":259209,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.25015873,\"show\":{\"title\":\"Hanoi
+        Bride\",\"overview\":\"Park Eun Woo (Lee Dong Wook) worked as a doctor in
+        a clinic in Hanoi where he fell in love with a Vietnamese girl Ly Thi Vu (Kim
+        Ok Bin). Due to the sudden death of his father, he had to return to Korea
+        in a hurry but the message wasn't related to Ly Thi Vu. His elder brother
+        Park Sok Woo (Lee Won Jong) who worked as a farmer in the field was hard pressed
+        by his mother to go to Vietnam to find a wife and he ended up bringing Ly
+        Thi Vu to Korea with the intention to marry her. Song Il Lan (Yoo Hye Jung)
+        was Park Sok Woo's childhood friend and she realized that she was in love
+        with him and he had similar feeling for her too. When the misunderstanding
+        between Park Sok Woo and Ly Thi Vu got clarified and all truth were out in
+        the open, his mother who thought Ly Thi Vu was going to be her first son's
+        wife and liked her didn't think she was good enough for her second son as
+        he was a doctor. Ly Thi Vu was hurt and returned to Hanoi. Later the mother
+        came to realize her folly and relented. Park Eun Woo didn't want to give up
+        Ly Thi Vu and so he went back to work in Hanoi and search for her.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":99658,\"slug\":\"hanoi-bride\",\"tvdb\":256432,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.20957634,\"show\":{\"title\":\"My
+        Rosy Life\",\"overview\":\"Maeng Sun-yi sacrificed her childhood and youth
+        to taking care of her father, who started drinking heavily after her mother
+        abandoned them when she was 10, and her two younger siblings. She even gave
+        up her own education because she had to work hard to earn her siblings\u2019
+        tuitions. She is married to a guy named Ban Sung-moon, her five years junior,
+        and has two daughters with him. Her life continues to present her with endless
+        hardships but she just believes that that is \u201Chappiness\u201D. One day
+        her husband falls in love with an attractive divorced woman and demands a
+        divorce from Sun-yi.Sun-yi\u2019s younger sister, Maeng Young-yi, is a successful
+        career woman. She dates her first love Lee Jung-do, who is now married to
+        another woman and who broke up with her for the sake of his career in the
+        past.Finally, Sun-yi\u2019s younger brother, Chul-soo, earns his doctorate
+        degree in the United States and settles down there, completely ignoring his
+        responsibility of taking care of his father.Just to make things worse, Sun-yi
+        is one day diagnosed with cancer, which to her is tantamount to a death sentence.
+        After learning about her disease, her husband reflects on himself and shows
+        her the genuine meaning of marital love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":104271,\"slug\":\"my-rosy-life\",\"tvdb\":294625,\"imdb\":\"tt1301845\",\"tmdb\":16715,\"tvrage\":14290}}}]"}
+    headers:
+      CF-Cache-Status: [MISS]
+      CF-RAY: [312a165fcf293d19-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 11:38:12 GMT']
+      ETag: [W/"34199412ec122fc194cd2fd33f09ab18"]
+      Expires: ['Sat, 17 Dec 2016 19:38:12 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=dd51c66d7990b746cbb718f71b9f619901481974691; expires=Sun,
+          17-Dec-17 11:38:11 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Pagination-Item-Count: ['10']
+      X-Pagination-Limit: ['10']
+      X-Pagination-Page: ['1']
+      X-Pagination-Page-Count: ['1']
+      X-Request-Id: [72443570-f4c2-446d-98d8-e3229eb88da7]
+      X-Runtime: ['0.023135']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      Cookie: [__cfduid=dd51c66d7990b746cbb718f71b9f619901481974691]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/56872?extended=full
+  response:
+    body: {string: "{\"title\":\"Doctor Who\",\"year\":2005,\"ids\":{\"trakt\":56872,\"slug\":\"doctor-who-2005\",\"tvdb\":78804,\"imdb\":\"tt0436992\",\"tmdb\":57243,\"tvrage\":3332},\"overview\":\"The
+        Doctor is an alien Time Lord from the planet Gallifrey who travels through
+        all of time and space in his TARDIS. He has a long list of friends and companions
+        who have shared journeys with him. Instead of dying, the Doctor is able to
+        \u201Cregenerate\u201D into a new body, taking on a new personality with each
+        regeneration. Twelve actors, plus John Hurt, have played The Doctor thus far.\",\"first_aired\":\"2005-03-26T08:00:00.000Z\",\"airs\":{\"day\":\"Saturday\",\"time\":\"20:30\",\"timezone\":\"Europe/London\"},\"runtime\":45,\"certification\":\"TV-PG\",\"network\":\"BBC
+        One\",\"country\":\"gb\",\"trailer\":null,\"homepage\":\"http://www.bbc.co.uk/programmes/b006q2x0\",\"status\":\"returning
+        series\",\"rating\":9.05669,\"votes\":13425,\"updated_at\":\"2016-12-16T10:43:27.000Z\",\"language\":\"en\",\"available_translations\":[\"bg\",\"bs\",\"ca\",\"cs\",\"da\",\"de\",\"el\",\"en\",\"es\",\"fa\",\"fi\",\"fr\",\"he\",\"hr\",\"hu\",\"id\",\"it\",\"ko\",\"nl\",\"no\",\"pl\",\"pt\",\"ro\",\"ru\",\"sv\",\"tr\",\"uk\",\"vi\",\"zh\"],\"genres\":[\"drama\",\"action\",\"adventure\",\"science-fiction\",\"fantasy\"],\"aired_episodes\":115}"}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [312a16629f723d19-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 11:38:12 GMT']
+      ETag: [W/"9e1d94938bb9c169c5dc9e06272d889e"]
+      Expires: ['Sat, 17 Dec 2016 19:38:12 GMT']
+      Last-Modified: ['Fri, 16 Dec 2016 10:43:27 GMT']
+      Server: [cloudflare-nginx]
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [7e3f2947-d085-4d0f-b1dc-9ae7e16ec1d3]
+      X-Runtime: ['0.018908']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [application/json]
+      trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: ['2']
+    method: GET
+    uri: https://api.trakt.tv/shows/56872/seasons/2/episodes/3/?extended=full
+  response:
+    body: {string: "{\"season\":2,\"number\":3,\"title\":\"School Reunion\",\"ids\":{\"trakt\":951447,\"tvdb\":302431,\"imdb\":\"tt0562993\",\"tmdb\":941480,\"tvrage\":0},\"number_abs\":16,\"overview\":\"Location:
+        Deffry Vale High School, London, England, Earth \\nDate: 2007 \\nEnemies:
+        The Krillitanes \\n\\nThere are strange goings-on at a comprehensive school
+        - UFOs, over-intelligent children, and odd-tasting school dinners. This attracts
+        the attention of the Tenth Doctor, Rose and Mickey Smith, as well as a couple
+        of old friends\u2026\",\"rating\":8.028,\"votes\":750,\"first_aired\":\"2006-04-29T19:30:00.000Z\",\"updated_at\":\"2016-12-17T09:53:06.000Z\",\"available_translations\":[\"cs\",\"de\",\"en\",\"es\",\"fi\",\"fr\",\"hu\"]}"}
+    headers:
+      CF-Cache-Status: [HIT]
+      CF-RAY: [312a16632dc73cd7-CPH]
+      Cache-Control: ['public, max-age=28800']
+      Connection: [keep-alive]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Sat, 17 Dec 2016 11:38:12 GMT']
+      Expires: ['Sat, 17 Dec 2016 19:38:12 GMT']
+      Last-Modified: ['Sat, 17 Dec 2016 09:53:06 GMT']
+      Server: [cloudflare-nginx]
+      Set-Cookie: ['__cfduid=da53f8fac332109f4deab43b7cc6da9d71481974692; expires=Sun,
+          17-Dec-17 11:38:12 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      Vary: [Accept-Encoding]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [00b908b3-d5dc-40fe-b62b-fdd7d68fbf75]
+      X-Runtime: ['0.015278']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
 version: 1
