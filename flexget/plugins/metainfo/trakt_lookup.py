@@ -431,4 +431,4 @@ class PluginTraktLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=3, interfaces=['task', 'series_metainfo', 'movie_metainfo'])
+    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=2, interfaces=['task', 'series_metainfo', 'movie_metainfo'])
