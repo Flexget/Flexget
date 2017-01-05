@@ -73,16 +73,6 @@ class ProwlNotifier(object):
             log.debug('prowl notification sent. Notifications remaining until next reset: %s. '
                       'Next reset will occur in %s minutes', success['remaining'], success['resetdate'])
 
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
-        # Send default values for backwards compatibility
-        notify_config = {
-            'to': [{__name__: config}],
-            'scope': 'entries',
-            'what': 'accepted'
-        }
-        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
-
 
 @event('plugin.register')
 def register_plugin():

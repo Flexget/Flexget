@@ -74,16 +74,6 @@ class RapidpushNotifier(object):
                 if response.json()['code'] > 400:
                     raise PluginWarning(response.json()['desc'])
 
-    # Run last to make sure other outputs are successful before sending notification
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
-        notify_config = {
-            'to': [{__name__: config}],
-            'scope': 'entries',
-            'what': 'accepted'
-        }
-        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
-
 
 @event('plugin.register')
 def register_plugin():

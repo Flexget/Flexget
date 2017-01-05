@@ -36,17 +36,6 @@ class OutputNotifyOsd(object):
         if not n.show():
             raise PluginWarning('Unable to send notification for %s' % title)
 
-    # Run last to make sure other outputs are successful before sending notification
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
-        # Send default values for backwards compatibility
-        notify_config = {
-            'to': [{__name__: config}],
-            'scope': 'entries',
-            'what': 'accepted'
-        }
-        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
-
 
 @event('plugin.register')
 def register_plugin():
