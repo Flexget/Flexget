@@ -233,12 +233,12 @@ class PluginInfo(dict):
         """
         dict.__init__(self)
 
-        if groups is not None:
-            warnings.warn('The `group` argument for plugin registration is deprecated. `interfaces` should be used '
-                          'instead. Plugin %s' % name, DeprecationWarning, stacklevel=2)
-            interfaces = ['task'] + groups
         if interfaces is None:
             interfaces = ['task']
+        if groups is not None:
+            warnings.warn('The `groups` argument for plugin registration is deprecated. `interfaces` should be used '
+                          'instead. Plugin %s' % name, DeprecationWarning, stacklevel=2)
+            interfaces.extend(groups)
         if name is None:
             # Convention is to take camel-case class name and rewrite it to an underscore form,
             # e.g. 'PluginName' to 'plugin_name'
