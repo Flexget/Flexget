@@ -9,7 +9,7 @@ A plugin who wishes to send messages using this notification framework should im
 
     from flexget import plugin
 
-    send_notification = plugin.get_plugin_by_name('notify').instance.send_notification
+    send_notification = plugin.get_plugin_by_name('notification_framework').instance.send_notification
     send_notification('the title', 'the message', the_notifiers)
 
 This plugin also adds the 'notify' task phase. If a plugin using the framework runs on the notify phase,
@@ -80,7 +80,7 @@ def render_config(config, template_renderer, _path=''):
         return config
 
 
-class Notify(object):
+class NotificationFramework(object):
     def send_notification(self, title, message, notifiers, template_renderer=None):
         """
         Send a notification out to the given `notifiers` with a given `title` and `message`.
@@ -126,5 +126,5 @@ class Notify(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Notify, 'notification_framework', api_ver=2)
+    plugin.register(NotificationFramework, 'notification_framework', api_ver=2)
     plugin.register_task_phase('notify', before='exit', suppress_abort=True)
