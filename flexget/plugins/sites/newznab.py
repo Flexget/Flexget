@@ -284,9 +284,9 @@ class Newznab(object):
     _movie_identifier_fields = ['movie_name'] + [p.instance.movie_identifier for p in
                                                  plugin.get_plugins(group='movie_metainfo')]
     _series_identifier_fields = ['series_name'] + [p.instance.series_identifier for p in
-                                                   plugin.get_plugins(group='series_metainfo')]
+                                                   plugin.get_plugins(group='series_metainfo')] + ['tvrage_id']
     _metaid_fields = [p.instance.movie_identifier for p in plugin.get_plugins(group='movie_metainfo')] + \
-                     [p.instance.series_identifier for p in plugin.get_plugins(group='series_metainfo')]
+                     [p.instance.series_identifier for p in plugin.get_plugins(group='series_metainfo')] + ['tvrage_id']
 
 
     def prepare_config(self, config):
