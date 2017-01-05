@@ -100,7 +100,7 @@ class Notify(object):
         return config
 
     def on_task_notify(self, task, config):
-        send_notification = plugin.get_plugin_by_name('notify_').instance.send_notification
+        send_notification = plugin.get_plugin_by_name('notification_framework').instance.send_notification
         config = self.prepare_config(config)
         if 'entries' in config:
             entries = list(itertools.chain(*(getattr(task, what) for what in config['entries']['what'])))
@@ -130,7 +130,7 @@ class Notify(object):
 
     def on_task_abort(self, task, config):
         if 'abort' in config:
-            send_notification = plugin.get_plugin_by_name('notify_').instance.send_notification
+            send_notification = plugin.get_plugin_by_name('notification_framework').instance.send_notification
             if task.silent_abort:
                 return
             log.debug('sending abort notification')
