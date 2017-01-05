@@ -61,9 +61,9 @@ class NPOWatchlist(object):
 
     csrf_token = None
 
-    def _strip_accents(self, s):
+    def _convert_plain(self, s):
         return ''.join(c for c in unicodedata.normalize('NFD', s)
-                       if unicodedata.category(c) != 'Mn')
+                       if not re.match('Mn|P[^cd]', unicodedata.category(c)))
 
     def _prefix_url(self, prefix, url):
         if ':' not in url:
@@ -152,7 +152,7 @@ class NPOWatchlist(object):
             e['url'] = self._prefix_url('https://mijn.npo.nl', url)
             e['title'] = title
             e['series_name'] = series_name
-            e['series_name_plain'] = self._strip_accents(series_name)
+            e['series_name_plain'] = self._convert_plain(series_name)
             e['series_date'] = entry_date
             e['series_id_type'] = 'date'
             e['description'] = listItem.find('p').text
@@ -217,7 +217,7 @@ class NPOWatchlist(object):
             e['url'] = self._prefix_url('http://www.npo.nl', url)
             e['title'] = title
             e['series_name'] = series_name
-            e['series_name_plain'] = self._strip_accents(series_name)
+            e['series_name_plain'] = self._convert_plain(series_name)
             e['series_date'] = entry_date
             e['series_id_type'] = 'date'
             e['description'] = listItem.find('p').text
@@ -259,7 +259,7 @@ class NPOWatchlist(object):
             e['url'] = self._prefix_url('http://www.npo.nl', url)
             e['title'] = title
             e['series_name'] = series_name
-            e['series_name_plain'] = self._strip_accents(series_name)
+            e['series_name_plain'] = self._convert_plain(series_name)
             e['series_date'] = entry_date
             e['series_id_type'] = 'date'
             e['description'] = listItem.find('p').text
