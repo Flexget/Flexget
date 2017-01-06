@@ -1,0 +1,220 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-agent: [Mozilla/5.0]
+    method: GET
+    uri: http://anidb.net/feeds/files.atom
+  response:
+    body: {string: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<feed xmlns=\"http://www.w3.org/2005/Atom\"
+        xmlns:xhtml=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n\t<title>AniDB
+        - Latest Files</title>\n\t<id>http://anidb.net/feeds/files.atom</id>\n\t<link
+        rel=\"self\" href=\"http://anidb.net/feeds/files.atom\" type=\"application/atom+xml\"/>\n\t<subtitle
+        type=\"text\">Latest File Additions for AniDB</subtitle>\n\t<author>\n\t\t<name>AniDB</name>\n\t\t<uri>http://anidb.net/</uri>\n\t</author>\n\t<icon>http://anidb.net/favicon.ico</icon>\n\t<updated>2017-01-06T16:15:02+00:00</updated>\n\t<entry>\n\t\t<title>Youjo
+        Senki - 1 - The Devil of the Rhine - [HorribleSubs].mkv (322.01 MB)</title>\n\t\t<link
+        href=\"http://anidb.net/f1878344\"/>\n\t\t<id>http://anidb.net/f1878344</id>\n\t\t<updated>2017-01-06T16:08:24+00:00</updated>\n\t\t<content
+        xml:base=\"http://anidb.net\" type=\"xhtml\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>japanese</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>HorribleSubs
+        (HorribleSubs)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>322.01
+        MB (337.656.666)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        16:08</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 83 - Tartaros Chapter: Fire Dragon Iron Fist - [Pn8].mp4 (640.92
+        MB)</title>\n\t\t<link href=\"http://anidb.net/f1878337\"/>\n\t\t<id>http://anidb.net/f1878337</id>\n\t\t<updated>2017-01-06T15:15:04+00:00</updated>\n\t\t<content
+        type=\"xhtml\" xml:base=\"http://anidb.net\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>640.92
+        MB (672.056.942)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 84 - Tartaros Chapter: 00:00 - [Pn8].mp4 (642.31 MB)</title>\n\t\t<link
+        href=\"http://anidb.net/f1878338\"/>\n\t\t<id>http://anidb.net/f1878338</id>\n\t\t<updated>2017-01-06T15:15:04+00:00</updated>\n\t\t<content
+        xml:base=\"http://anidb.net\" type=\"xhtml\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>642.31
+        MB (673.512.037)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 85 - Tartaros Chapter: The Girl in the Crystal - [Pn8].mp4 (641.56
+        MB)</title>\n\t\t<link href=\"http://anidb.net/f1878339\"/>\n\t\t<id>http://anidb.net/f1878339</id>\n\t\t<updated>2017-01-06T15:15:04+00:00</updated>\n\t\t<content
+        xml:lang=\"en\" type=\"xhtml\" xml:base=\"http://anidb.net\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>641.56
+        MB (672.720.133)</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 86 - Tartaros Chapter: Absolute Demon - [Pn8].mp4 (642.83 MB)</title>\n\t\t<link
+        href=\"http://anidb.net/f1878340\"/>\n\t\t<id>http://anidb.net/f1878340</id>\n\t\t<updated>2017-01-06T15:15:04+00:00</updated>\n\t\t<content
+        type=\"xhtml\" xml:base=\"http://anidb.net\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>642.83
+        MB (674.055.577)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 87 - Tartaros Chapter: Memento Mori - [Pn8].mp4 (641.26 MB)</title>\n\t\t<link
+        href=\"http://anidb.net/f1878341\"/>\n\t\t<id>http://anidb.net/f1878341</id>\n\t\t<updated>2017-01-06T15:15:04+00:00</updated>\n\t\t<content
+        xml:lang=\"en\" type=\"xhtml\" xml:base=\"http://anidb.net\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>641.26
+        MB (672.412.815)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 88 - Tartaros Chapter: Soaring Above Ishgar - [Pn8].mp4 (642.80
+        MB)</title>\n\t\t<link href=\"http://anidb.net/f1878342\"/>\n\t\t<id>http://anidb.net/f1878342</id>\n\t\t<updated>2017-01-06T15:15:04+00:00</updated>\n\t\t<content
+        xml:lang=\"en\" type=\"xhtml\" xml:base=\"http://anidb.net\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>642.80
+        MB (674.020.109)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 89 - Tartaros Chapter: Drops of Fire - [Pn8].mp4 (641.78 MB)</title>\n\t\t<link
+        href=\"http://anidb.net/f1878343\"/>\n\t\t<id>http://anidb.net/f1878343</id>\n\t\t<updated>2017-01-06T15:15:04+00:00</updated>\n\t\t<content
+        type=\"xhtml\" xml:base=\"http://anidb.net\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>641.78
+        MB (672.955.355)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 81 - Tartaros Chapter: Final Duels - [Pn8].mp4 (641.39 MB)</title>\n\t\t<link
+        href=\"http://anidb.net/f1878331\"/>\n\t\t<id>http://anidb.net/f1878331</id>\n\t\t<updated>2017-01-06T15:15:03+00:00</updated>\n\t\t<content
+        xml:lang=\"en\" xml:base=\"http://anidb.net\" type=\"xhtml\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>641.39
+        MB (672.550.629)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 90 - Tartaros Chapter, Finale: Where the Power of Life Lies
+        - [Pn8].mp4 (642....</title>\n\t\t<link href=\"http://anidb.net/f1878332\"/>\n\t\t<id>http://anidb.net/f1878332</id>\n\t\t<updated>2017-01-06T15:15:03+00:00</updated>\n\t\t<content
+        type=\"xhtml\" xml:base=\"http://anidb.net\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>642.67
+        MB (673.892.986)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 91 - The Fairy in Your Heart - [Pn8].mp4 (465.46 MB)</title>\n\t\t<link
+        href=\"http://anidb.net/f1878333\"/>\n\t\t<id>http://anidb.net/f1878333</id>\n\t\t<updated>2017-01-06T15:15:03+00:00</updated>\n\t\t<content
+        xml:base=\"http://anidb.net\" type=\"xhtml\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>465.46
+        MB (488.065.562)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 92 - The Adventure Begins - [Pn8].mp4 (465.68 MB)</title>\n\t\t<link
+        href=\"http://anidb.net/f1878334\"/>\n\t\t<id>http://anidb.net/f1878334</id>\n\t\t<updated>2017-01-06T15:15:03+00:00</updated>\n\t\t<content
+        xml:base=\"http://anidb.net\" type=\"xhtml\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>465.68
+        MB (488.301.544)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 93 - Treasure Hunt - [Pn8].mp4 (2.10 MB)</title>\n\t\t<link
+        href=\"http://anidb.net/f1878335\"/>\n\t\t<id>http://anidb.net/f1878335</id>\n\t\t<updated>2017-01-06T15:15:03+00:00</updated>\n\t\t<content
+        xml:base=\"http://anidb.net\" type=\"xhtml\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>2.10
+        MB (2.200.249)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Fairy
+        Tail (2014) - 82 - Tartaros Chapter: Wings of Despair - [Pn8].mp4 (641.59
+        MB)</title>\n\t\t<link href=\"http://anidb.net/f1878336\"/>\n\t\t<id>http://anidb.net/f1878336</id>\n\t\t<updated>2017-01-06T15:15:03+00:00</updated>\n\t\t<content
+        xml:base=\"http://anidb.net\" type=\"xhtml\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:15</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>high</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>641.59
+        MB (672.755.597)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Pikanet128
+        (Pn8)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Shimoneta
+        to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai - 3 - How to Love Someone
+        - [PHF].mp4 (...</title>\n\t\t<link href=\"http://anidb.net/f1878324\"/>\n\t\t<id>http://anidb.net/f1878324</id>\n\t\t<updated>2017-01-06T15:08:53+00:00</updated>\n\t\t<content
+        type=\"xhtml\" xml:base=\"http://anidb.net\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:08</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>unknown</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>620.99
+        MB (651.153.090)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>PokeHerFace
+        (PHF)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Shimoneta
+        to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai - 4 - The Saying Goes... Love
+        Is Justic...</title>\n\t\t<link href=\"http://anidb.net/f1878325\"/>\n\t\t<id>http://anidb.net/f1878325</id>\n\t\t<updated>2017-01-06T15:08:53+00:00</updated>\n\t\t<content
+        xml:base=\"http://anidb.net\" type=\"xhtml\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>620.99
+        MB (651.153.880)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>PokeHerFace
+        (PHF)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:08</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>unknown</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Shimoneta
+        to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai - 5 - Dirty Terrorism Benefits
+        Whom? - ...</title>\n\t\t<link href=\"http://anidb.net/f1878326\"/>\n\t\t<id>http://anidb.net/f1878326</id>\n\t\t<updated>2017-01-06T15:08:53+00:00</updated>\n\t\t<content
+        xml:lang=\"en\" type=\"xhtml\" xml:base=\"http://anidb.net\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>unknown</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:08</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>PokeHerFace
+        (PHF)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>620.98
+        MB (651.148.550)</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Shimoneta
+        to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai - 6 - Handmade Warmth! - [PHF].mp4
+        (620...</title>\n\t\t<link href=\"http://anidb.net/f1878327\"/>\n\t\t<id>http://anidb.net/f1878327</id>\n\t\t<updated>2017-01-06T15:08:53+00:00</updated>\n\t\t<content
+        xml:base=\"http://anidb.net\" type=\"xhtml\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>PokeHerFace
+        (PHF)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>620.97
+        MB (651.134.833)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:08</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>unknown</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Shimoneta
+        to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai - 7 - What SOX Created - [PHF].mp4
+        (620...</title>\n\t\t<link href=\"http://anidb.net/f1878328\"/>\n\t\t<id>http://anidb.net/f1878328</id>\n\t\t<updated>2017-01-06T15:08:53+00:00</updated>\n\t\t<content
+        type=\"xhtml\" xml:base=\"http://anidb.net\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>620.97
+        MB (651.134.097)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>PokeHerFace
+        (PHF)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:08</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>unknown</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Shimoneta
+        to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai - 8 - The Devil Blows His
+        Own Trumpet -...</title>\n\t\t<link href=\"http://anidb.net/f1878329\"/>\n\t\t<id>http://anidb.net/f1878329</id>\n\t\t<updated>2017-01-06T15:08:53+00:00</updated>\n\t\t<content
+        xml:base=\"http://anidb.net\" type=\"xhtml\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:08</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>unknown</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>PokeHerFace
+        (PHF)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>621.11
+        MB (651.279.831)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Shimoneta
+        to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai - 9 - Do Androids Dream of
+        Electric Mas...</title>\n\t\t<link href=\"http://anidb.net/f1878330\"/>\n\t\t<id>http://anidb.net/f1878330</id>\n\t\t<updated>2017-01-06T15:08:53+00:00</updated>\n\t\t<content
+        xml:lang=\"en\" xml:base=\"http://anidb.net\" type=\"xhtml\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>PokeHerFace
+        (PHF)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>622.85
+        MB (653.109.463)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>unknown</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:08</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Shimoneta
+        to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai - 1 - Whom Does Public Order
+        and Morali...</title>\n\t\t<link href=\"http://anidb.net/f1878319\"/>\n\t\t<id>http://anidb.net/f1878319</id>\n\t\t<updated>2017-01-06T15:08:52+00:00</updated>\n\t\t<content
+        type=\"xhtml\" xml:base=\"http://anidb.net\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:08</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>unknown</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>PokeHerFace
+        (PHF)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>621.17
+        MB (651.342.783)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Shimoneta
+        to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai - 10 - Masturbation Quest
+        - [PHF].mp4 (...</title>\n\t\t<link href=\"http://anidb.net/f1878320\"/>\n\t\t<id>http://anidb.net/f1878320</id>\n\t\t<updated>2017-01-06T15:08:52+00:00</updated>\n\t\t<content
+        xml:lang=\"en\" xml:base=\"http://anidb.net\" type=\"xhtml\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>620.98
+        MB (651.142.023)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>PokeHerFace
+        (PHF)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>unknown</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:08</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Shimoneta
+        to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai - 11 - Techno Break - [PHF].mp4
+        (620.93...</title>\n\t\t<link href=\"http://anidb.net/f1878321\"/>\n\t\t<id>http://anidb.net/f1878321</id>\n\t\t<updated>2017-01-06T15:08:52+00:00</updated>\n\t\t<content
+        xml:lang=\"en\" xml:base=\"http://anidb.net\" type=\"xhtml\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>620.93
+        MB (651.094.072)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>PokeHerFace
+        (PHF)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:08</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Subtitle language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>unknown</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n\t<entry>\n\t\t<title>Shimoneta
+        to Iu Gainen ga Sonzai Shinai Taikutsu na Sekai - 12 - Dirty Jokes Forever
+        - [PHF].mp4 ...</title>\n\t\t<link href=\"http://anidb.net/f1878322\"/>\n\t\t<id>http://anidb.net/f1878322</id>\n\t\t<updated>2017-01-06T15:08:52+00:00</updated>\n\t\t<content
+        type=\"xhtml\" xml:base=\"http://anidb.net\" xml:lang=\"en\">\n\t\t\t<xhtml:div>\n\t\t\t\t<xhtml:dl>\n\t\t\t\t\t<xhtml:dt>Subtitle
+        language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd/>\n\t\t\t\t\t<xhtml:dt>Added</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>06.01.2017
+        15:08</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Quality</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>unknown</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>CRC
+        status</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>Unchecked</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Size</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>622.89
+        MB (653.148.677)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Group</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>PokeHerFace
+        (PHF)</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Source</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>www</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Resolution</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>N/A</xhtml:dd>\n\t\t\t\t\t<xhtml:dt>Language</xhtml:dt>\n\t\t\t\t\t<xhtml:dd>english</xhtml:dd>\n\t\t\t\t</xhtml:dl>\n\t\t\t</xhtml:div>\n\t\t</content>\n\t</entry>\n</feed>\n\n"}
+    headers:
+      Accept-Ranges: [bytes]
+      Connection: [Keep-Alive]
+      Content-Length: ['26185']
+      Content-Type: [application/atom+xml]
+      Date: ['Fri, 06 Jan 2017 16:27:13 GMT']
+      Keep-Alive: ['timeout=5, max=150']
+      Last-Modified: ['Fri, 06 Jan 2017 16:15:03 GMT']
+      Server: [Apache]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1
