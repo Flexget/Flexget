@@ -276,7 +276,7 @@ class Entry(LazyDict):
             if obj is None or key is None:
                 raise TypeError('None types detected (%s, %s)' % (obj, key))
             try:
-                return obj.key
+                return getattr(obj, key)
             except AttributeError:
                 return obj.get(key)
 

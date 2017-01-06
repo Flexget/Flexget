@@ -145,7 +145,7 @@ def find_value(key_names, source, default=None, regex=None, regex_group_nr=1, ig
         if obj is None or attr_key_name is None:
             raise TypeError('None types detected (%s, %s)' % (obj, attr_key_name))
         try:
-            return obj.attr_key_name
+            return getattr(obj, attr_key_name)
         except AttributeError:
             return obj.get(attr_key_name)
 
