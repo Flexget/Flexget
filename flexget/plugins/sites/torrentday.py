@@ -101,14 +101,14 @@ class UrlRewriteTorrentday(object):
     # urlrewriter API
     def url_rewrite(self, task, entry):
         if 'url' not in entry:
-            log.error("Didn't actually get a URL...")
+            log.error('Didn\'t actually get a URL...')
         else:
-            log.debug("Got the URL: %s", entry['url'])
+            log.debug('Got the URL: %s', entry['url'])
         if entry['url'].startswith('https://www.torrentday.com/browse'):
             # use search
             results = self.search(task, entry)
             if not results:
-                raise UrlRewritingError("No search results found")
+                raise UrlRewritingError('No search results found')
             entry['url'] = results[0]['url']
 
     @plugin.internet(log)
@@ -128,7 +128,7 @@ class UrlRewriteTorrentday(object):
         for search_string in entry.get('search_strings', [entry['title']]):
 
             url = 'https://www.torrentday.com/browse.php'
-            params["search"] = normalize_unicode(search_string).replace(":", "")
+            params['search'] = normalize_unicode(search_string).replace(':', '')
             cookies = { 'uid': config['uid'], 'pass': config['passkey'], '__cfduid': config['cfduid'] }
 
             try:
@@ -138,30 +138,30 @@ class UrlRewriteTorrentday(object):
 
             soup = get_soup(page)
 
-            for tr in soup.find_all("tr", { "class": "browse" }):
+            for tr in soup.find_all('tr', { 'class': 'browse' }):
                 entry = Entry()
                 # find the torrent names
-                title = tr.find("a", { "class": "torrentName" })
+                title = tr.find('a', { 'class': 'torrentName' })
                 entry['title'] = title.contents[0]
                 log.debug('title: %s', title.contents[0])
 
                 # find download link
-                torrent_url = tr.find("td", { "class": "dlLinksInfo" })
-                torrent_url = torrent_url.find("a").get('href')
+                torrent_url = tr.find('td', { 'class': 'dlLinksInfo' })
+                torrent_url = torrent_url.find('a').get('href')
 
                 # construct download URL
-                torrent_url = ( "https://www.torrentday.com/" + torrent_url + '?torrent_pass=' + config['rss_key'] )
+                torrent_url = ( 'https://www.torrentday.com/' + torrent_url + '?torrent_pass=' + config['rss_key'] )
                 log.debug('RSS-ified download link: %s', torrent_url)
                 entry['url'] = torrent_url
 
                 # us tr object for seeders/leechers
-                seeders, leechers = tr.find_all('td', { "class": ["seedersInfo", "leechersInfo"]})
-                entry['torrent_seeds'] = int(seeders.contents[0].replace(",", ""))
-                entry['torrent_leeches'] = int(leechers.contents[0].replace(",", ""))
+                seeders, leechers = tr.find_all('td', { 'class': ['seedersInfo', 'leechersInfo']})
+                entry['torrent_seeds'] = int(seeders.contents[0].replace(',', ''))
+                entry['torrent_leeches'] = int(leechers.contents[0].replace(',', ''))
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
 
                 # use tr object for size
-                size = tr.find("td", text=re.compile('([\.\d]+) ([TGMKk]?)B')).contents[0]
+                size = tr.find('td', text=re.compile('([\.\d]+) ([TGMKk]?)B')).contents[0]
                 size = re.search('([\.\d]+) ([TGMKk]?)B', str(size))
 
                 entry['content_size'] = parse_filesize(size.group(0))
