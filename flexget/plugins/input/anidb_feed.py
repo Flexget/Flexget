@@ -3,9 +3,12 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
+
 import feedparser
 from xml.dom import minidom
+from xml.sax.saxutils import unescape
 
+from bs4 import BeautifulSoup
 from requests import RequestException
 
 from flexget import plugin
@@ -46,9 +49,10 @@ field_map = {
     'anidb_file_crc32':  # 'Matches official CRC (9833055b)'
         lambda xml: find_value('xhtml_crc_status.value', xml, regex=r'Matches official CRC \((([0-9]|[A-Fa-f]){8,8})\)'),
     'anidb_feed_language': 'xhtml_language.value',
-    'anidb_feed_group': 'xhtml_group.value',
+    'anidb_feed_group':
+        lambda xml: _xml_hex_to_str(find_value('xhtml_group.value', xml)),
     'anidb_feed_group_tag':  # "HorribleSubs (HorribleSubs)"
-        lambda xml: find_value('xhtml_group.value', xml, regex=r'\((.*?)\)$'),
+        lambda xml: _xml_hex_to_str(find_value('xhtml_group.value', xml, regex=r'\((.*?)\)$')),
     'anidb_feed_subtitle_language': 'xhtml_subtitle_language.value',
     'anidb_feed_priority': 'xhtml_priority.value',
     'anidb_feed_quality': 'xhtml_quality.value',
@@ -95,6 +99,15 @@ def _debug_dump_entry(entry):
     log.verbose('#####################################################################################')
     for key in entry:
         log.verbose('%-9s [%-30s] = %s', type(entry[key]).__name__, key, entry[key])
+
+
+# group names can be in xml-hex
+def _xml_hex_to_str(text):
+    if text:
+        soup = BeautifulSoup(unescape(text), "html5lib")
+        if soup and soup.text:
+            return soup.text
+    return None
 
 
 class AnidbFeed(object):
