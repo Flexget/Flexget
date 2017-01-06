@@ -32,7 +32,7 @@ NAMESPACE_URL = 'http://www.w3.org/1999/xhtml'
 NAMESPACE_TAGNAME = 'dl'
 
 
-field_map = {
+FIELD_MAP = {
     'title': 'title',
     'url': 'link',
     'anidb_name':  # "title - 6 - episode name - [group_tag]... or (344.18 MB)"
@@ -60,7 +60,7 @@ field_map = {
         lambda xml: value_to_int(find_value('xhtml_size.value', xml, regex=r'\((([0-9]{1,3}\.|[0-9]{1,3}){1,5})\)'))
 }
 
-field_validation_list = [
+FIELD_VALIDATION_LIST = [
     'title',
     'url',
     'anidb_name',
@@ -232,11 +232,11 @@ class AnidbFeed(object):
             if not xml_entry.title or not xml_entry.link:
                 continue
             # copy xml data to entry
-            new_entry.update_using_map(field_map, xml_entry, ignore_none=True,
+            new_entry.update_using_map(FIELD_MAP, xml_entry, ignore_none=True,
                                        ignore_values=['Raw/Unknown', 'N/A', 'Unchecked', 'unknown'])
             # skip entry if we cant validate
             if config['valid_only'] is True:
-                if not all(key in new_entry for key in field_validation_list):
+                if not all(key in new_entry for key in FIELD_VALIDATION_LIST):
                     continue
             # skip if extra and not wanted
             episode_data = self._parse_episode_data(new_entry['title'])
@@ -247,8 +247,8 @@ class AnidbFeed(object):
                 else:
                     continue
 
-            # some extra fixups
-            new_entry['content_size'] = int(new_entry['anidb_feed_size'] / 1024 / 1024)  # MB
+            if new_entry.get('anidb_feed_size'):
+                new_entry['content_size'] = int(new_entry['anidb_feed_size'] / 1024 / 1024)  # MB
             # build the new 'title' mimic general scene naming convention
             anidb_name = new_entry['anidb_name']
             title_new = anidb_name

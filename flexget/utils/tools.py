@@ -18,11 +18,11 @@ import functools
 import queue
 import requests
 from collections import MutableMapping
+from time import mktime, struct_time
 from datetime import timedelta, datetime, date
 from pprint import pformat
 from dateutil.parser import parse as dateutil_parse
 from dateutil.tz import tz
-from time import mktime
 from html.entities import name2codepoint
 
 import flexget
@@ -77,9 +77,9 @@ def value_to_naive_utc(value):
         return None
 
     datetime_value = None
-    if isinstance(value, date):
+    if type(value) is date:
         return datetime(value.year, value.month, value.day)
-    elif isinstance(value, tuple):
+    elif isinstance(value, (tuple, struct_time)):
         try:
             datetime_value = datetime.fromtimestamp(mktime(value))
         except ValueError:
@@ -133,20 +133,31 @@ def find_value(key_names, source, default=None, regex=None, regex_group_nr=1, ig
     :param strip: If value is a string, use the strip() function to get better results in combination with ignore_empty.
     :return: Returns the value found or None.
     """
+    if source is None:
+        log.error('Source is None')
+        return default
+
     if not isinstance(key_names, list):
         key_names = [key_names]
 
-    func = getattr
-    source_type = type(source)
-    if hasattr(source_type, 'get') and callable(getattr(source_type, 'get')):
-        func = getattr(source_type, 'get')
+    # allow mixed access types while traversing the sequence
+    def get_value(obj, attr_key_name):
+        if obj is None or attr_key_name is None:
+            raise TypeError('None types detected (%s, %s)' % (obj, attr_key_name))
+        try:
+            return obj.attr_key_name
+        except AttributeError:
+            return obj.get(attr_key_name)
 
     value = None
-    for key in key_names:
+    for k in key_names:
+        if not isinstance(k, str):
+            raise TypeError('Expecting strings as keys got: %s, type: %s' % (k, type(k)))
         try:
-            value = functools.reduce(func, key.split('.'), source)
+            value = functools.reduce(get_value, k.split('.'), source)
         except (AttributeError, TypeError) as ex:
-            log.debug('Cant find field: %s, in source: %s, error: %s', key, source, ex)
+            log.debug('Cant find field: %s, in source: %s, error: %s', k, source, ex)
+
         if regex and value is not None:
             value = regex_search(value, regex, regex_group_nr)
         if value is not None:

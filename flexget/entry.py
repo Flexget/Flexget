@@ -270,11 +270,20 @@ class Entry(LazyDict):
         :param ignore_values:
           Ignore the specific values, do not record it to the Entry
         """
-        func = dict.get if isinstance(source_item, dict) else getattr
+
+        # allow mixed access types while traversing the sequence
+        def get_value(obj, key):
+            if obj is None or key is None:
+                raise TypeError('None types detected (%s, %s)' % (obj, key))
+            try:
+                return obj.key
+            except AttributeError:
+                return obj.get(key)
+
         for field, value in field_map.items():
             if isinstance(value, str):
                 try:
-                    v = functools.reduce(func, value.split('.'), source_item)
+                    v = functools.reduce(get_value, value.split('.'), source_item)
                 except TypeError as ex:
                     if ignore_none:
                         log.debug('Skip updating field: %s, from: %s, error: %s', field, value, ex)
