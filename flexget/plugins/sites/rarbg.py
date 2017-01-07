@@ -182,4 +182,4 @@ class SearchRarBG(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchRarBG, 'rarbg', groups=['search'], api_ver=2)
+    plugin.register(SearchRarBG, 'rarbg', interfaces=['search'], api_ver=2)

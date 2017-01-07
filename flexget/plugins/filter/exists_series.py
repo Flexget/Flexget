@@ -123,4 +123,4 @@ class FilterExistsSeries(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(FilterExistsSeries, 'exists_series', groups=['exists'], api_ver=2)
+    plugin.register(FilterExistsSeries, 'exists_series', interfaces=['task'], api_ver=2)

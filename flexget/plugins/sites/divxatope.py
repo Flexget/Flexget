@@ -99,9 +99,4 @@ class UrlRewriteDivxATope(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(
-        UrlRewriteDivxATope,
-        'divxatope',
-        groups=['urlrewriter', 'search'],
-        api_ver=2
-    )
+    plugin.register(UrlRewriteDivxATope, 'divxatope', interfaces=['urlrewriter', 'search'], api_ver=2)

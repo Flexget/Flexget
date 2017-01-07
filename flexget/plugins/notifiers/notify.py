@@ -44,7 +44,7 @@ class NotifyBase(object):
             'to': {
                 'type': 'array', 'items':
                     {'allOf': [
-                        {'$ref': '/schema/plugins?group=notifiers'},
+                        {'$ref': '/schema/plugins?interface=notifiers'},
                         {'maxProperties': 1,
                          'error_maxProperties': 'Plugin options indented 2 more spaces than the first letter of the'
                                                 ' plugin name.',

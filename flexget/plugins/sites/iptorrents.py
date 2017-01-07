@@ -168,4 +168,4 @@ class UrlRewriteIPTorrents(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteIPTorrents, 'iptorrents', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(UrlRewriteIPTorrents, 'iptorrents', interfaces=['urlrewriter', 'search'], api_ver=2)

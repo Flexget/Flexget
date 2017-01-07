@@ -60,4 +60,4 @@ class UrlRewriteEztv(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteEztv, 'eztv', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteEztv, 'eztv', interfaces=['urlrewriter'], api_ver=2)
