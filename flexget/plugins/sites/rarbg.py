@@ -7,8 +7,9 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.utils.requests import Session, get, TimedLimiter, RequestException
+from flexget.utils.requests import Session, TimedLimiter, RequestException
 from flexget.utils.search import normalize_scene
+from flexget.plugin import PluginError
 
 log = logging.getLogger('rarbg')
 
@@ -52,7 +53,7 @@ CATEGORIES = {
 
 class SearchRarBG(object):
     """
-        RarBG search plugin.
+        RarBG search plugin. Implements https://torrentapi.org/apidocs_v2.txt
 
         To perform search against single category:
 
@@ -92,16 +93,45 @@ class SearchRarBG(object):
     }
 
     base_url = 'https://torrentapi.org/pubapi_v2.php'
+    token = None
 
-    def get_token(self):
-        # Don't use a session as tokens are not affected by domain limit
+    def get_token(self, refresh=False):
+        if refresh or not self.token:
+            try:
+                response = requests.get(self.base_url, params={'get_token': 'get_token', 'format': 'json',
+                                                               'app_id': 'flexget'}).json()
+                self.token = response.get('token')
+                log.debug('RarBG token: %s', self.token)
+            except RequestException as e:
+                log.debug('Could not retrieve RarBG token', exc_info=True)
+                raise PluginError('Could not retrieve token: %s' % e)
+        return self.token
+
+    def get(self, params, token_error=False):
+        '''
+        Simple get-wrapper that allows updating invalid tokens
+
+        :param params: the params to be passed to requests
+        :param token_error: whether or not we previously have had token errors, if True we should fetch a new one
+        :return: json response
+        '''
+        params['token'] = self.get_token(refresh=token_error)
         try:
-            r = get(self.base_url, params={'get_token': 'get_token', 'format': 'json'}).json()
-            token = r.get('token')
-            log.debug('RarBG token: %s' % token)
-            return token
+            response = requests.get(self.base_url, params=params)
+            log.debug('requesting: %s', response.url)
+            response = response.json()
         except RequestException as e:
-            log.debug('Could not retrieve RarBG token: %s', e.args[0])
+            log.error('Rarbg request failed: %s', e)
+            return
+
+        # error code 1, 2 and 4 pertain to token errors
+        if response.get('error_code') in [1, 2, 4]:
+            log.debug('Invalid token. Error %s: %s', response['error_code'], response.get('error'))
+            if token_error:
+                raise PluginError('Could not retrieve a valid token: %s' % response.get('error'))
+            return self.get(params=params, token_error=True)
+
+        return response
 
     @plugin.internet(log)
     def search(self, task, entry, config):
@@ -119,12 +149,7 @@ class SearchRarBG(object):
 
         entries = set()
 
-        token = self.get_token()
-        if not token:
-            log.error('Could not retrieve token. Abandoning search.')
-            return entries
-
-        params = {'mode': 'search', 'token': token, 'ranked': int(config['ranked']),
+        params = {'mode': 'search', 'ranked': int(config['ranked']),
                   'min_seeders': config['min_seeders'], 'min_leechers': config['min_leechers'],
                   'sort': config['sorted_by'], 'category': category_url_fragment, 'format': 'json_extended',
                   'app_id': 'flexget'}
@@ -134,7 +159,7 @@ class SearchRarBG(object):
             params.pop('search_imdb', None)
             params.pop('search_tvdb', None)
 
-            if entry.get('movie_name'):
+            if entry.get('movie_name') and entry.get('imdb_id'):
                 params['search_imdb'] = entry.get('imdb_id')
             else:
                 query = normalize_scene(search_string)
@@ -144,24 +169,22 @@ class SearchRarBG(object):
                     plugin.get_plugin_by_name('thetvdb_lookup').instance.lazy_series_lookup(entry, 'en')
                     params['search_tvdb'] = entry.get('tvdb_id')
                     log.debug('Using tvdb id %s', entry.get('tvdb_id'))
-            try:
-                page = requests.get(self.base_url, params=params)
-                log.debug('requesting: %s', page.url)
-            except RequestException as e:
-                log.error('RarBG request failed: %s' % e.args[0])
+
+            response = self.get(params=params)
+            if not response:
                 continue
-            r = page.json()
+
             # error code 10 and 20 just mean no results were found
-            if r.get('error_code') in [10, 20]:
+            if response.get('error_code') in [10, 20]:
                 searched_string = params.get('search_string') or 'imdb={0}'.format(params.get('search_imdb')) or \
                     'tvdb={0}'.format(params.get('tvdb_id'))
-                log.debug('No results found for %s. Message from rarbg: %s', searched_string, r.get('error'))
+                log.debug('No results found for %s. Message from rarbg: %s', searched_string, response.get('error'))
                 continue
-            elif r.get('error'):
-                log.error('Error code %s: %s', r.get('error_code'), r.get('error'))
+            elif response.get('error'):
+                log.error('Error code %s: %s', response.get('error_code'), response.get('error'))
                 continue
             else:
-                for result in r.get('torrent_results'):
+                for result in response.get('torrent_results'):
                     e = Entry()
 
                     e['title'] = result.get('title')
