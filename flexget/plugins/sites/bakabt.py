@@ -17,9 +17,9 @@ class UrlRewriteBakaBT(object):
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        if url.startswith('http://www.bakabt.me/download/'):
+        if url.startswith('https://bakabt.me/download/'):
             return False
-        if url.startswith('http://www.bakabt.me/') or url.startswith('http://bakabt.me/'):
+        if url.startswith('https://www.bakabt.me/') or url.startswith('https://bakabt.me/'):
             return True
         return False
 
@@ -38,7 +38,7 @@ class UrlRewriteBakaBT(object):
         tag_a = soup.find('a', attrs={'class': 'download_link'})
         if not tag_a:
             raise UrlRewritingError('Unable to locate download link from url %s' % url)
-        torrent_url = 'http://www.bakabt.me' + tag_a.get('href')
+        torrent_url = 'https://bakabt.me/' + tag_a.get('href')
         return torrent_url
 
 
