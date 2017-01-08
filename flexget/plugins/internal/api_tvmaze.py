@@ -519,4 +519,4 @@ def tvmaze_lookup(lookup_type, lookup_values):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(APITVMaze, 'api_tvmaze', api_ver=2)
+    plugin.register(APITVMaze, 'api_tvmaze', api_ver=2, interfaces=[])

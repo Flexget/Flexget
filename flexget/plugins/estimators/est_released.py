@@ -33,4 +33,4 @@ class EstimateRelease(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EstimateRelease, 'estimate_release', api_ver=2)
+    plugin.register(EstimateRelease, 'estimate_release', api_ver=2, interfaces=[])
