@@ -6,24 +6,36 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning, DependencyError
 
-__name__ = 'on_screen_display'
+__name__ = 'toast'
 
 log = logging.getLogger(__name__)
 
 
-class NotifyOsd(object):
+class NotifyToast(object):
     schema = {
-        'type': 'object',
-        'properties': {
-            'timeout': {'type': 'integer', 'default': 4},
-        },
-        'additionalProperties': False
+        'anyOf': [
+            {'type': 'boolean', 'enum': [True]},
+            {
+                'type': 'object',
+                'properties': {
+                    'timeout': {'type': 'integer'},
+                },
+                'additionalProperties': False
+            }
+        ]
     }
 
     def __init__(self):
         self.windows_classAtom = None
 
+    def prepare_config(self, config):
+        if not isinstance(config, dict):
+            config = {}
+        config.setdefault('timeout', 4)
+        return config
+
     def linux_notify(self, title, message, config):
+        config = self.prepare_config(config)
         try:
             from gi.repository import Notify
         except ImportError as e:
@@ -41,6 +53,7 @@ class NotifyOsd(object):
             raise PluginWarning('Unable to send notification for %s' % title)
 
     def windows_notify(self, title, message, config):
+        config = self.prepare_config(config)
         try:
             from win32api import GetModuleHandle, PostQuitMessage
             from win32con import (CW_USEDEFAULT, IMAGE_ICON, IDI_APPLICATION, LR_DEFAULTSIZE, LR_LOADFROMFILE,
@@ -86,4 +99,4 @@ class NotifyOsd(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(NotifyOsd, __name__, api_ver=2, groups=['notifiers'])
+    plugin.register(NotifyToast, __name__, api_ver=2, groups=['notifiers'])
