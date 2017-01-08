@@ -181,7 +181,7 @@ class NPOWatchlist(object):
 
     def _get_series_episodes(self, task, config, series_name, series_url, series_info):
         log.info('Retrieving new episodes for %s', series_name)
-        response = task.requests.get(series_url + '/search?category=broadcasts')
+        response = task.requests.get(series_url + '/search?media_type=broadcast')  # only shows full episodes
         page = get_soup(response.content)
 
         if page.find('div', class_='npo3-show-items'):
