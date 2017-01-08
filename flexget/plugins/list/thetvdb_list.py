@@ -130,4 +130,4 @@ class TheTVDBList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TheTVDBList, 'thetvdb_list', api_ver=2, groups=['list'])
+    plugin.register(TheTVDBList, 'thetvdb_list', api_ver=2, interfaces=['task', 'list'])

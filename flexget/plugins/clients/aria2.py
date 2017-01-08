@@ -111,9 +111,17 @@ class OutputAria2(object):
             secret = 'token:%s' % config['secret']
         # handle torrent files
         if 'torrent' in entry:
+            if 'file' in entry:
+                torrent_file = entry['file']
+            elif 'location' in entry:
+                # in case download plugin moved the file elsewhere
+                torrent_file = entry['location']
+            else:
+                entry.fail('Cannot find torrent file')
+                return
             if secret:
-                return aria2.addTorrent(secret, xmlrpc.client.Binary(open(entry['file'], mode='rb').read()))
-            return aria2.addTorrent(xmlrpc.client.Binary(open(entry['file'], mode='rb').read()))
+                return aria2.addTorrent(secret, xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), [], options)
+            return aria2.addTorrent(xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), [], options)
         # handle everything else (except metalink -- which is unsupported)
         # so magnets, https, http, ftp .. etc
         if secret:

@@ -148,4 +148,4 @@ class EmailNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EmailNotifier, __name__, api_ver=2, groups=['notifiers'])
+    plugin.register(EmailNotifier, __name__, api_ver=2, interfaces=['notifiers'])

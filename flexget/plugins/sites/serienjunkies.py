@@ -191,4 +191,4 @@ class UrlRewriteSerienjunkies(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteSerienjunkies, 'serienjunkies', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteSerienjunkies, 'serienjunkies', interfaces=['urlrewriter'], api_ver=2)

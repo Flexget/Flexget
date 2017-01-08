@@ -72,4 +72,4 @@ class PushalotNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PushalotNotifier, __name__, api_ver=2, groups=['notifiers'])
+    plugin.register(PushalotNotifier, __name__, api_ver=2, interfaces=['notifiers'])

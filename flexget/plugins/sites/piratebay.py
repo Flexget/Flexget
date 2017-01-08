@@ -168,4 +168,4 @@ class UrlRewritePirateBay(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewritePirateBay, 'piratebay', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(UrlRewritePirateBay, 'piratebay', interfaces=['urlrewriter', 'search'], api_ver=2)

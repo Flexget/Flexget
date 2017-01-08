@@ -39,7 +39,7 @@ from flexget.ipc import IPCClient, IPCServer  # noqa
 from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
-from flexget.utils.tools import pid_exists, get_current_flexget_version  # noqa
+from flexget.utils.tools import pid_exists, get_current_flexget_version, io_encoding  # noqa
 from flexget.terminal import console  # noqa
 
 log = logging.getLogger('manager')
@@ -169,8 +169,9 @@ class Manager(object):
 
         manager = self
 
-        log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
-        log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
+        log.debug('sys.defaultencoding: %s', sys.getdefaultencoding())
+        log.debug('sys.getfilesystemencoding: %s', sys.getfilesystemencoding())
+        log.debug('flexget detected io encoding: %s', io_encoding)
         log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
         if codecs.lookup(sys.getfilesystemencoding()).name == 'ascii' and not os.path.supports_unicode_filenames:
             log.warning('Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '

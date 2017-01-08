@@ -62,4 +62,4 @@ class EstimatesSeriesTVMaze(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EstimatesSeriesTVMaze, 'est_series_tvmaze', groups=['estimate_release'], api_ver=2)
+    plugin.register(EstimatesSeriesTVMaze, 'est_series_tvmaze', interfaces=['estimate_release'], api_ver=2)

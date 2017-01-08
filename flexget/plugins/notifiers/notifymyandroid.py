@@ -79,4 +79,4 @@ class NotifyMyAndroidNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(NotifyMyAndroidNotifier, __name__, api_ver=2, groups=['notifiers'])
+    plugin.register(NotifyMyAndroidNotifier, __name__, api_ver=2, interfaces=['notifiers'])

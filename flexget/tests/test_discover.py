@@ -25,7 +25,7 @@ class SearchPlugin(object):
         return [Entry(entry)]
 
 
-plugin.register(SearchPlugin, 'test_search', groups=['search'], api_ver=2)
+plugin.register(SearchPlugin, 'test_search', interfaces=['search'], api_ver=2)
 
 
 class EstRelease(object):
@@ -35,7 +35,7 @@ class EstRelease(object):
         return entry.get('est_release')
 
 
-plugin.register(EstRelease, 'test_release', groups=['estimate_release'], api_ver=2)
+plugin.register(EstRelease, 'test_release', interfaces=['estimate_release'], api_ver=2)
 
 
 class TestDiscover(object):

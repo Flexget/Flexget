@@ -20,7 +20,7 @@ class DebugNotification(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(DebugNotification, 'debug_notification', groups=['notifiers'], api_ver=2, debug=True)
+    plugin.register(DebugNotification, 'debug_notification', interfaces=['notifiers'], api_ver=2, debug=True)
 
 
 @pytest.fixture()

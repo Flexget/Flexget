@@ -22,6 +22,8 @@ field_maps = {
         'title': lambda i: '%s (%s)' % (i['movie']['title'], i['movie']['year']),
         'movie_name': 'movie.title',
         'movie_year': 'movie.year',
+        'trakt_movie_name': 'movie.title',
+        'trakt_movie_year': 'movie.year',
         'imdb_id': 'movie.ids.imdb',
         'tmdb_id': 'movie.ids.tmdb',
         'trakt_movie_id': 'movie.ids.trakt',
@@ -30,6 +32,8 @@ field_maps = {
     'show': {
         'title': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
         'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
+        'trakt_series_name': 'show.title',
+        'trakt_series_year': 'show.year',
         'imdb_id': 'show.ids.imdb',
         'tvdb_id': 'show.ids.tvdb',
         'tvrage_id': 'show.ids.tvrage',
@@ -41,6 +45,8 @@ field_maps = {
         'title': lambda i: ('%s (%s) S%02dE%02d %s' % (i['show']['title'], i['show']['year'], i['episode']['season'],
                                                        i['episode']['number'], i['episode']['title'] or '')).strip(),
         'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
+        'trakt_series_name': 'show.title',
+        'trakt_series_year': 'show.year',
         'series_season': 'episode.season',
         'series_episode': 'episode.number',
         'series_id': lambda i: 'S%02dE%02d' % (i['episode']['season'], i['episode']['number']),
@@ -327,4 +333,4 @@ class TraktList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TraktList, 'trakt_list', api_ver=2, groups=['list'])
+    plugin.register(TraktList, 'trakt_list', api_ver=2, interfaces=['task', 'list'])

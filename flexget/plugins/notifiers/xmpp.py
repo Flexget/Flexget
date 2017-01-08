@@ -71,4 +71,4 @@ class XMPPNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(XMPPNotifier, __name__, api_ver=2, groups=['notifiers'])
+    plugin.register(XMPPNotifier, __name__, api_ver=2, interfaces=['notifiers'])

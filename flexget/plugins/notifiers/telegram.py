@@ -434,4 +434,4 @@ class TelegramNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TelegramNotifier, _PLUGIN_NAME, api_ver=2, groups=['notifiers'])
+    plugin.register(TelegramNotifier, _PLUGIN_NAME, api_ver=2, interfaces=['notifiers'])
