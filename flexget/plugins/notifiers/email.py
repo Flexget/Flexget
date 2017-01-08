@@ -91,9 +91,6 @@ class EmailNotifier(object):
             'smtp_password': {'type': 'string'},
             'smtp_tls': {'type': 'boolean', 'default': False},
             'smtp_ssl': {'type': 'boolean', 'default': False},
-            'message': {'type': 'string'},
-            'file_template': {'type': 'string'},
-            'title': {'type': 'string'},
             'html': {'type': 'boolean', 'default': False},
         },
         'required': ['to'],
@@ -105,66 +102,48 @@ class EmailNotifier(object):
         'additionalProperties': False,
     }
 
-    def notify(self, to, message, title, smtp_host, smtp_port, smtp_username=None, smtp_password=None, smtp_tls=None,
-               smtp_ssl=None, html=None, **kwargs):
+    def notify(self, title, message, config):
         """
         Send an email notification
 
-        :param str to: email `to` address
         :param str message: message body
         :param str title: message subject
-        :param str smtp_host: smtp_host to use
-        :param int smtp_port: port to use
-        :param str smtp_username: smtp username if authentication is required
-        :param str smtp_password: smtp password if authentication is required
-        :param bool smtp_tls: enable tls
-        :param bool smtp_ssl: enable ssl
-        :param bool html: set content type to `html`
-        :param kwargs: contains the `from` attribute since that is a reserved keyword
+        :param dict config: email plugin config
         """
 
-        if not isinstance(to, list):
-            to = [to]
+        if not isinstance(config['to'], list):
+            config['to'] = [config['to']]
 
         email = MIMEMultipart('alternative')
-        email['To'] = ','.join(to)
-        email['From'] = kwargs['from']
+        email['To'] = ','.join(config['to'])
+        email['From'] = config['from']
         email['Subject'] = title
         email['Date'] = formatdate(localtime=True)
-        content_type = 'html' if html else 'plain'
+        content_type = 'html' if config['html'] else 'plain'
         email.attach(MIMEText(message.encode('utf-8'), content_type, _charset='utf-8'))
 
         try:
-            log.debug('sending email notification to %s:%s', smtp_host, smtp_port)
-            mailServer = smtplib.SMTP_SSL if smtp_ssl else smtplib.SMTP
-            mailServer = mailServer(smtp_host, smtp_port)
-            if smtp_tls:
-                mailServer.ehlo()
-                mailServer.starttls()
-                mailServer.ehlo()
+            log.debug('sending email notification to %s:%s', config['smtp_host'], config['smtp_port'])
+            mail_server = smtplib.SMTP_SSL if config['smtp_ssl'] else smtplib.SMTP
+            mail_server = mail_server(config['smtp_host'], config['smtp_port'])
+            if config['smtp_tls']:
+                mail_server.ehlo()
+                mail_server.starttls()
+                mail_server.ehlo()
         except (socket.error, OSError) as e:
             raise PluginWarning(str(e))
 
         try:
-            if smtp_username:
-                log.debug('logging in to smtp server using username: %s', smtp_username)
-                mailServer.login(text_to_native_str(smtp_username), text_to_native_str(smtp_password))
-            mailServer.sendmail(email['From'], to, email.as_string())
+            if config.get('smtp_username'):
+                # Forcing to use `str` type
+                log.debug('logging in to smtp server using username: %s', config['smtp_username'])
+                mail_server.login(text_to_native_str(config['smtp_username']),
+                                  text_to_native_str(config['smtp_password']))
+            mail_server.sendmail(email['From'], config['to'], email.as_string())
         except IOError as e:
             raise PluginWarning(str(e))
 
-        mailServer.quit()
-
-    # Run last to make sure other outputs are successful before sending notification
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
-        # Send default values for backwards compatibility
-        notify_config = {
-            'to': [{__name__: config}],
-            'scope': 'entries',
-            'what': 'accepted'
-        }
-        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
+        mail_server.quit()
 
 
 @event('plugin.register')

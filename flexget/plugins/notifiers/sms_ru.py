@@ -30,41 +30,34 @@ class SMSRuNotifier(object):
       sms_ru:
         phone_number: <PHONE_NUMBER> (accepted format example: '79997776655')
         password: <PASSWORD>
-        [message: <MESSAGE_TEXT>]
 
     """
     schema = {
         'type': 'object',
         'properties': {
             'phone_number': {'type': 'string'},
-            'password': {'type': 'string'},
-            'message': {'type': 'string'},
-            'file_template': {'type': 'string'},
+            'password': {'type': 'string'}
         },
         'additionalProperties': False,
         'required': ['phone_number', 'password']
     }
 
-    def notify(self, phone_number, password, message, **kwargs):
+    def notify(self, title, message, config):
         """
         Send an SMS RU notification
-
-        :param str phone_number: Phone number to send to
-        :param str password: Password
-        :param str message: Message to send
         """
         try:
             token_response = requests.get(SMS_TOKEN_URL)
         except RequestException as e:
             raise PluginWarning('Could not get auth token: %s' % repr(e))
 
-        sha512 = hashlib.sha512(password + token_response.text).hexdigest()
+        sha512 = hashlib.sha512(config['password'] + token_response.text).hexdigest()
 
         # Build request params
-        notification = {'login': phone_number,
+        notification = {'login': config['phone_number'],
                        'sha512': sha512,
                        'token': token_response.text,
-                       'to': phone_number,
+                       'to': config['phone_number'],
                        'text': message}
 
         try:
@@ -74,17 +67,6 @@ class SMSRuNotifier(object):
         else:
             if not response.text.find('100') == 0:
                 raise PluginWarning(response.text)
-
-    # Run last to make sure other outputs are successful before sending notification
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
-        # Send default values for backwards compatibility
-        notify_config = {
-            'to': [{__name__: config}],
-            'scope': 'entries',
-            'what': 'accepted'
-        }
-        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
 
 
 @event('plugin.register')

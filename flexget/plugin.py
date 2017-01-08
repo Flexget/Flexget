@@ -156,6 +156,7 @@ DEFAULT_PRIORITY = 128
 # task phases, in order of their execution; note that this can be extended by
 # registering new phases at runtime
 task_phases = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'learn', 'exit']
+suppress_abort_phases = set()
 
 # map phase names to method names
 phase_methods = {
@@ -175,14 +176,20 @@ _plugin_options = []
 _new_phase_queue = {}
 
 
-def register_task_phase(name, before=None, after=None):
-    """Adds a new task phase to the available phases."""
+def register_task_phase(name, before=None, after=None, suppress_abort=False):
+    """
+    Adds a new task phase to the available phases.
+
+    :param suppress_abort: If True, errors during this phase will be suppressed, and not affect task result.
+    """
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
     if not before and not after:
         raise RegisterException('You must specify either a before or after phase.')
     if name in task_phases or name in _new_phase_queue:
         raise RegisterException('Phase %s already exists.' % name)
+    if suppress_abort:
+        suppress_abort_phases.add(name)
 
     def add_phase(phase_name, before, after):
         if before is not None and before not in task_phases:
