@@ -12,3 +12,11 @@ class TestInterfaces(object):
         for p in task_plugins:
             assert isinstance(p.schema, dict), 'Task interface requires a schema to be defined.'
             assert p.phase_handlers, 'Task plugins should have at least on phase handler (on_task_X) method.'
+
+
+    def test_list_interface(self):
+        plugin.load_plugins()
+        task_plugins = plugin.get_plugins(interface='list')
+        for p in task_plugins:
+            assert isinstance(p.schema, dict), 'List interface requires a schema to be defined.'
+            assert hasattr(p.instance, 'get_list'), 'List plugins must implement a get_list method.'
