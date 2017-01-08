@@ -17,7 +17,7 @@ VIA_SCHEMA = {
     'type': 'array',
     'items': {
         'allOf': [
-            {'$ref': '/schema/plugins?group=notifiers'},
+            {'$ref': '/schema/plugins?interface=notifiers'},
             {
                 'maxProperties': 1,
                 'error_maxProperties': 'Plugin options indented 2 more spaces than '
@@ -74,15 +74,7 @@ class Notify(object):
                 'properties': {
                     'title': {'type': 'string', 'default': 'Task {{ task.name }} has aborted!'},
                     'message': {'type': 'string', 'default': 'Reason: {{ task.abort_reason }}'},
-                    'via': {
-                        'type': 'array', 'items':
-                            {'allOf': [
-                                {'$ref': '/schema/plugins?group=notifiers'},
-                                {'maxProperties': 1,
-                                 'error_maxProperties': 'Plugin options indented 2 more spaces than the first letter of the'
-                                                        ' plugin name.',
-                                 'minProperties': 1}]}}
-
+                    'via': VIA_SCHEMA
                 },
                 'required': ['via']
             }

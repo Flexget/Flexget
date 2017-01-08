@@ -41,7 +41,7 @@ NOTIFY_VIA_SCHEMA = {
     'type': 'array',
     'items': {
         'allOf': [
-            {'$ref': '/schema/plugins?group=notifiers'},
+            {'$ref': '/schema/plugins?interface=notifiers'},
             {
                 'minProperties': 1,
                 'maxProperties': 1,
