@@ -44,4 +44,4 @@ class UrlRewriteBakaBT(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteBakaBT, 'bakabt', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteBakaBT, 'bakabt', interfaces=['urlrewriter'], api_ver=2)

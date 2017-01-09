@@ -54,4 +54,4 @@ class UrlRewriteFTDB(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteFTDB, 'frenchtorrentdb', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteFTDB, 'frenchtorrentdb', interfaces=['urlrewriter'], api_ver=2)

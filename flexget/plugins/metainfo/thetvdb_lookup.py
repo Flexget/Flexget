@@ -192,4 +192,4 @@ class PluginThetvdbLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2, groups=['series_metainfo'])
+    plugin.register(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2, interfaces=['task', 'series_metainfo'])

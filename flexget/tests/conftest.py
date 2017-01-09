@@ -214,7 +214,7 @@ def filecopy(request):
                 dest_path = dst
                 if dest_path.isdir():
                     dest_path = dest_path / f.basename()
-
+                log.debug('copying %s to %s', f, dest_path)
                 if not os.path.isdir(os.path.dirname(dest_path)):
                     os.makedirs(os.path.dirname(dest_path))
                 if os.path.isdir(f):

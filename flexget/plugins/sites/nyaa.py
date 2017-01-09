@@ -87,4 +87,4 @@ class UrlRewriteNyaa(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteNyaa, 'nyaa', groups=['search', 'urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteNyaa, 'nyaa', interfaces=['search', 'urlrewriter'], api_ver=2)

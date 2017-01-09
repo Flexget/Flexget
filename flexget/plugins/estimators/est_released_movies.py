@@ -27,4 +27,4 @@ class EstimatesReleasedMovies(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EstimatesReleasedMovies, 'est_released_movies', groups=['estimate_release'], api_ver=2)
+    plugin.register(EstimatesReleasedMovies, 'est_released_movies', interfaces=['estimate_release'], api_ver=2)

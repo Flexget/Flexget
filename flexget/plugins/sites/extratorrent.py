@@ -104,4 +104,4 @@ class UrlRewriteExtraTorrent(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteExtraTorrent, 'extratorrent', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(UrlRewriteExtraTorrent, 'extratorrent', interfaces=['urlrewriter', 'search'], api_ver=2)

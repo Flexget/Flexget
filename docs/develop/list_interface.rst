@@ -199,15 +199,7 @@ After creating the base class, the plugin class itself need to be created.
 
     @event('plugin.register')
     def register_plugin():
-        plugin.register(EntryList, 'entry_list', api_ver=2, groups=['list'])
+        plugin.register(EntryList, 'entry_list', api_ver=2, interfaces=['list', 'task'])
 
-Note the ``get_list(config)`` method which is mandatory, and the ``on_task_input`` method which enable to use the plugin
-as an input plugin.
-
-Also note to register the plugin under the ``list`` group.
-
-
-
-
-
-
+All list plugins must declare the `list` interface, and implement the ``get_list(config)`` method. Declaring the `task`
+interface and the ``on_task_input`` method will allow the plugin to be used as an input plugin.

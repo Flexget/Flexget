@@ -31,7 +31,7 @@ class MovieListBase(object):
     @property
     def supported_ids(self):
         # Return a list of supported series identifier as registered via their plugins
-        return [p.instance.movie_identifier for p in plugin.get_plugins(group='movie_metainfo')]
+        return [p.instance.movie_identifier for p in plugin.get_plugins(interface='movie_metainfo')]
 
 
 class MovieListList(Base):
@@ -253,7 +253,7 @@ class PluginMovieList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginMovieList, 'movie_list', api_ver=2, groups=['list'])
+    plugin.register(PluginMovieList, 'movie_list', api_ver=2, interfaces=['task', 'list'])
 
 
 @with_session

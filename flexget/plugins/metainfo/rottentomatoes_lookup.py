@@ -124,4 +124,4 @@ class PluginRottenTomatoesLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginRottenTomatoesLookup, 'rottentomatoes_lookup', api_ver=2, groups=['movie_metainfo'])
+    plugin.register(PluginRottenTomatoesLookup, 'rottentomatoes_lookup', api_ver=2, interfaces=['task', 'movie_metainfo'])

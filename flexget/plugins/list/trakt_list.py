@@ -333,4 +333,4 @@ class TraktList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TraktList, 'trakt_list', api_ver=2, groups=['list'])
+    plugin.register(TraktList, 'trakt_list', api_ver=2, interfaces=['task', 'list'])

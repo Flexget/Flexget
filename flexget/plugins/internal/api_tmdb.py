@@ -368,4 +368,4 @@ class ApiTmdb(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ApiTmdb, 'api_tmdb', api_ver=2)
+    plugin.register(ApiTmdb, 'api_tmdb', api_ver=2, interfaces=[])

@@ -132,4 +132,4 @@ class Site1337x(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Site1337x, '1337x', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(Site1337x, '1337x', interfaces=['urlrewriter', 'search'], api_ver=2)
