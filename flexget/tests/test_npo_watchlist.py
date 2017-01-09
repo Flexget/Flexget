@@ -25,10 +25,10 @@ class TestNpoWatchlistInfo(object):
 
         task = execute_task('test')
 
-        entry = task.find_entry(url='http://www.npo.nl/als-de-dijken-breken-official-trailer-2016/26-10-2016/POMS_EO_5718640')  # trailer
+        entry = task.find_entry(url='http://www.npo.nl/als-de-dijken-breken/05-11-2016/VPWON_1243425')  # s01e01
         assert entry['npo_url'] == '/als-de-dijken-breken/VPWON_1261083'
         assert entry['npo_name'] == 'Als de dijken breken'
-        assert entry['npo_description'] == 'Serie over een hedendaagse watersnoodramp in Nederland en delen van Vlaanderen.'
+        assert entry['npo_description'] == 'Zesdelige dramaserie over hedendaagse watersnoodramp in Nederland en delen van Vlaanderen. Wat blijft er van Nederland over als nu de dijken breken? Met o.a. Gijs Scholten van Aschat, Susan Visser en Loek Peters.'
         assert entry['npo_language'] == 'nl'
 
 
