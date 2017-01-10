@@ -71,7 +71,7 @@ class FilterIf(object):
                 'fail': Entry.fail}
             for item in config:
                 requirement, action = list(item.items())[0]
-                passed_entries = [e for e in task.entries if self.check_condition(requirement, e)]
+                passed_entries = (e for e in task.entries if self.check_condition(requirement, e))
                 if isinstance(action, str):
                     if not phase == 'filter':
                         continue
