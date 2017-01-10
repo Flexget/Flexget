@@ -5,7 +5,7 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: [!!python/unicode 'FlexGet/2.8.0.dev (www.flexget.com)']
+        User-Agent: [!!python/unicode 'FlexGet/2.8.23.dev (www.flexget.com)']
       method: GET
       uri: https://mijn.npo.nl/profiel/kijklijst
     response:
@@ -14,19 +14,19 @@ interactions:
         cache-control: [no-cache]
         connection: [Keep-Alive]
         content-type: [text/html; charset=utf-8]
-        date: ['Wed, 07 Dec 2016 15:47:53 GMT']
+        date: ['Tue, 10 Jan 2017 13:47:41 GMT']
         keep-alive: ['timeout=1, max=100']
         location: ['https://mijn.npo.nl/inloggen']
         server: [Apache/2.4.23 (Unix) Phusion_Passenger/4.0.58]
-        set-cookie: [_npo_portal_session=SjFLZ0twUEJ2SmE0cUhuQUVCYjVpZjgvZURPb0x4L2RWaEkrb1JLNUdLWGZ5Wjh4MkxmRk1RVUpMMUVZSnJnVW1NTE9MMWlsakNhQ0xwVTVlRDV6WTYyc3RqWUxTUTRQNGVTejJoUk9QWjBaRWc1dnJXMGIyVnpGTGJDamt0bmJIS3hJckVyMEU2ckpOSkNid0x6VUIyRE9wdjVmQnZMdHExMkQwUzZyYXYxZjNtdG5VZ1oyZ2FjY29nNnliK0xYazl4UU8rTUMvWFpsOXMrN2V6dXdqelUwblQxTDJBSGlKc3lpWWtpWnoxQnlWcU53QlNyVGM0ZFZSS1NEdHlORGp1MEhQdzlZMjZ3NG1LdXl5WE5CRXV3ck1ZZXJmcDBMYlpVMmpxYVUyRVA2LytBUG41eHN4MVNGd0k3Q2s4MFYtLVBsZUNMNFpOaGgwUHJ2UzhNQS9ib1E9PQ%3D%3D--482ccd2be10599a0026061c12560961a40a47df8;
-            domain=npo.nl; path=/; HttpOnly, 'balancer://npov2cluster=balancer.npov2g;
+        set-cookie: [_npo_portal_session=Qk1qTldudXUrZFA0dmJzdDgwN2M1R1B0VzNJSnRsaDRPK3ZnSDF0dmUwTEhReGxmNlI3TzQ2US9aSXpOZCs3eE9jY2UvMTFRaDJ1cGxTbUtJcWZVTWpyaW05a2lPblBuVUFnbjJKN3JSQ1pBblRXWnhOY0RuNDZ4MWlZR1B0RURLRW04NGFTREw3M0RVWHAxSVpyei9LNTVoNCt5K1pJeWJXcWhQZzR2MTZuUUZIeTNzQzRoRmc4Y00vMEN0ZEs2WGlxNWl6djQwNmI5L0sxWjJGbmhZTmNvYmV0dEhPSVpxOGkzbkFPU0l2UjhwSDZuQWJ6UWJGWDg2bktzNUFFMDd4SUxRWThLcTU2U1NpeWRZNjlhZVMxbVUxK3ZtckEybENQSkw2L3ZWY2VBWXZ0UzFvd2MwQ2Z1U0lSUGo5RTMtLTJnT25DU1ZMN0NDWDR1eEM0OXVOVWc9PQ%3D%3D--ddcf7a1217ffca5fca9f93cdc3e95b6c8e1b19e4;
+            domain=npo.nl; path=/; HttpOnly, 'balancer://npov2cluster=balancer.npov2b;
             path=/;']
         status: [302 Found]
         x-powered-by: [Phusion Passenger 4.0.58]
-        x-proxyinstancename: [npov1d]
-        x-request-id: [1e71b1cc-849b-4278-a2e1-681ddedcc322]
-        x-runtime: ['0.006422']
-        x-workerinstancename: [npov2g]
+        x-proxyinstancename: [npov1a]
+        x-request-id: [2eaf156e-9e17-47aa-b03f-1d635e6a412e]
+        x-runtime: ['0.032910']
+        x-workerinstancename: [npov2b]
       status: {code: 302, message: Found}
   - request:
       body: null
@@ -34,8 +34,8 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: ['balancer://npov2cluster=balancer.npov2g; _npo_portal_session=SjFLZ0twUEJ2SmE0cUhuQUVCYjVpZjgvZURPb0x4L2RWaEkrb1JLNUdLWGZ5Wjh4MkxmRk1RVUpMMUVZSnJnVW1NTE9MMWlsakNhQ0xwVTVlRDV6WTYyc3RqWUxTUTRQNGVTejJoUk9QWjBaRWc1dnJXMGIyVnpGTGJDamt0bmJIS3hJckVyMEU2ckpOSkNid0x6VUIyRE9wdjVmQnZMdHExMkQwUzZyYXYxZjNtdG5VZ1oyZ2FjY29nNnliK0xYazl4UU8rTUMvWFpsOXMrN2V6dXdqelUwblQxTDJBSGlKc3lpWWtpWnoxQnlWcU53QlNyVGM0ZFZSS1NEdHlORGp1MEhQdzlZMjZ3NG1LdXl5WE5CRXV3ck1ZZXJmcDBMYlpVMmpxYVUyRVA2LytBUG41eHN4MVNGd0k3Q2s4MFYtLVBsZUNMNFpOaGgwUHJ2UzhNQS9ib1E9PQ%3D%3D--482ccd2be10599a0026061c12560961a40a47df8']
-        User-Agent: [!!python/unicode 'FlexGet/2.8.0.dev (www.flexget.com)']
+        Cookie: ['balancer://npov2cluster=balancer.npov2b; _npo_portal_session=Qk1qTldudXUrZFA0dmJzdDgwN2M1R1B0VzNJSnRsaDRPK3ZnSDF0dmUwTEhReGxmNlI3TzQ2US9aSXpOZCs3eE9jY2UvMTFRaDJ1cGxTbUtJcWZVTWpyaW05a2lPblBuVUFnbjJKN3JSQ1pBblRXWnhOY0RuNDZ4MWlZR1B0RURLRW04NGFTREw3M0RVWHAxSVpyei9LNTVoNCt5K1pJeWJXcWhQZzR2MTZuUUZIeTNzQzRoRmc4Y00vMEN0ZEs2WGlxNWl6djQwNmI5L0sxWjJGbmhZTmNvYmV0dEhPSVpxOGkzbkFPU0l2UjhwSDZuQWJ6UWJGWDg2bktzNUFFMDd4SUxRWThLcTU2U1NpeWRZNjlhZVMxbVUxK3ZtckEybENQSkw2L3ZWY2VBWXZ0UzFvd2MwQ2Z1U0lSUGo5RTMtLTJnT25DU1ZMN0NDWDR1eEM0OXVOVWc9PQ%3D%3D--ddcf7a1217ffca5fca9f93cdc3e95b6c8e1b19e4']
+        User-Agent: [!!python/unicode 'FlexGet/2.8.23.dev (www.flexget.com)']
       method: GET
       uri: https://mijn.npo.nl/inloggen
     response:
@@ -46,23 +46,23 @@ interactions:
           <meta content='//www-assets.npo.nl/assets/placeholders/nederland_npo_thumb-35f96b29fb4c884716ba827c3317dc7efc023383517799ef61274c606620f708.png'\
           \ name='image-placeholder'>\n<meta content='IE=EmulateIE9' http-equiv='X-UA-Compatible'>\n\
           <meta content='width=device-width, initial-scale=1, maximum-scale=1' name='viewport'>\n\
-          <meta content='https://mijn.npo.nl/suggesties' name='search-suggestions-url'>\n\
+          <meta content='https://www.npo.nl/suggesties' name='search-suggestions-url'>\n\
           <meta content='app-id=nl.uitzendinggemist' name='google-play-app'>\n<meta\
           \ content='//www-assets.npo.nl/assets/google_play_logo-18cd7223c325ef23806032109b2a3e3c46d1bfc6a368202da20b2bfe214fb48a.png'\
           \ name='google-play-logo'>\n<meta content='3600' name='utc-offset'>\n<meta\
           \ content='30' name='player-tick-length'>\n<meta content='https://mijn.npo.nl'\
           \ name='secure-domain'>\n<meta content='npo_portal_auth_token_status' name='login-status-cookie'>\n\
-          <meta content='https://mijn.npo.nl/sign_in_modal' name='login_modal'>\n\
-          <link rel=\"stylesheet\" media=\"screen\" href=\"//cookiesv2.publiekeomroep.nl/static/css/npo_cc_styles.css\"\
+          <meta content='https://www.npo.nl/sign_in_modal' name='login_modal'>\n<link\
+          \ rel=\"stylesheet\" media=\"screen\" href=\"//cookiesv2.publiekeomroep.nl/static/css/npo_cc_styles.css\"\
           \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/vendors-413847168b67bdd298ce80d94a728ea421b19cd959b1c213fe85361e6d6e2a60.css\"\
-          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/components-c9d207b99d9268b1f6f3f37bf145695f65e13a4efb61b8f16b7767df16086a1d.css\"\
-          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/layout-6d88b59d71294eb593869b479e7eef4a2c39fb0f928c5660759e885581c6789b.css\"\
-          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/application-f71fde3ce7717d694112d17805ba18db9c98e0f4d34f3d1e3de5f94328a5fa69.css\"\
+          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/components-95a008ee390359f6f86e3eb43db85368e1a14597f6c8a8ccacfe84deca695c16.css\"\
+          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/layout-d83570084a72d2d8d0328b4de2fa1a54029f682a5a88a74b8e3dbe5d7330690a.css\"\
+          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/application-3086b183694709d331c4fcb3cb49d29c002d7c8664646d58fb9d04a10ee3f899.css\"\
           \ />\n<!--[if lte IE 8]>\n<link rel=\"stylesheet\" media=\"all\" href=\"\
           //www-assets.npo.nl/assets/ie-2c3aef0b5922d8e9a666c6c5ca3c48dd9250ef07b87ddc7f9f4cae1fbea1d4d3.css\"\
           \ />\n<![endif]-->\n<!--[if lte IE 7]>\n<link rel=\"stylesheet\" media=\"\
           all\" href=\"//www-assets.npo.nl/assets/ie7-1fe92616e92079ba455908152f40f7f7aeab6f7557d47022456a63859cb24ded.css\"\
-          \ />\n<![endif]-->\n<script src=\"//www-assets.npo.nl/assets/application-490d8ddfb7931941141132664f7511d57cff3ca63850e7736d770cc98e2dc88b.js\"\
+          \ />\n<![endif]-->\n<script src=\"//www-assets.npo.nl/assets/application-3191be9ba380a3036d6b7aa8fa379f0fe3a74f6710b4559d155f2e5922ec69da.js\"\
           ></script>\n<script src=\"//cookiesv2.publiekeomroep.nl/data/script/cconsent-no-rw.min.js\"\
           ></script>\n<link rel=\"alternate\" type=\"application/rss+xml\" title=\"\
           Uitgelicht op npo.nl\" href=\"http://www.npo.nl/uitgelicht.rss\" />\n<link\
@@ -94,7 +94,7 @@ interactions:
           ></div></a>\n</div>\n</div>\n</div>\n</div>\n</div>\n</script>\n\n\n\n\n\
           <script>\n//<![CDATA[\nnpo_cookies.init({settings: {set_main_domain_helper_cookie\
           \ : true}});\n//]]>\n</script>\n\n<meta name=\"csrf-param\" content=\"authenticity_token\"\
-          \ />\n<meta name=\"csrf-token\" content=\"MpRj4QAnt3ruMFEWUd2wlM5pHk47Ozs893SJRdZUzcCoRxb66LyeHLRm6A6NawjJnj866BMog14nr7woZ/dmwA==\"\
+          \ />\n<meta name=\"csrf-token\" content=\"0dut72pmFJC16ym/6VkWg9POq1OAuiDxPLctDt8wwhE8xwYMk6u1WdU2tRXaVoihrD107v6UReg86SNAxLv/yg==\"\
           \ />\n\n</head>\n<body>\n<!-- Begin comScore Inline Tag 1.1302.13 -->\n\
           <script type=\"text/plain\" class=\"npo_cc_inline_analytics\">\n// <![CDATA[\n\
           function udm_(e){var t=\"comScore=\",n=document,r=n.cookie,i=\"\",s=\"indexOf\"\
@@ -136,13 +136,12 @@ interactions:
           home\" href=\"http://www.npo.nl/\">Start</a></li>\n<li><a data-show-sub-navigation=\"\
           tv_channels\" href=\"http://www.npo.nl/live\">Tv</a></li>\n<li><a data-show-sub-navigation=\"\
           radio_channels\" href=\"http://www.npo.nl/radio\">Radio</a></li>\n<li><a\
-          \ data-show-sub-navigation=\"programs\" href=\"http://www.npo.nl/uitzending-gemist\"\
-          >Gemist</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"http://www.npo.nl/gids\"\
-          >Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"#npoh__specials-menu\"\
-          \ data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
+          \ data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/programmas\"\
+          >Programma&#39;s</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"\
+          http://www.npo.nl/gids\">Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"\
+          #npoh__specials-menu\" data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
           \ data-show-sub-navigation=\"specials\" href=\"http://www.npo.nl/rubrieken\"\
-          >Rubrieken</a></li>\n<li><a data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/a-z\"\
-          >A-Z</a></li>\n</ul>\n\n<form id=\"npoh__search-form\" class=\"npoh__page-search-box\"\
+          >Rubrieken</a></li>\n</ul>\n\n<form id=\"npoh__search-form\" class=\"npoh__page-search-box\"\
           \ action=\"http://www.npo.nl/zoeken\" accept-charset=\"UTF-8\" method=\"\
           get\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\" />\n<div class='npoh__search-box'>\n\
           <input type=\"text\" name=\"q\" id=\"npoh__search-query\" placeholder=\"\
@@ -194,14 +193,13 @@ interactions:
           home\" href=\"http://www.npo.nl/\">Start</a></li>\n<li><a data-show-sub-navigation=\"\
           tv_channels\" href=\"http://www.npo.nl/live\">Tv</a></li>\n<li><a data-show-sub-navigation=\"\
           radio_channels\" href=\"http://www.npo.nl/radio\">Radio</a></li>\n<li><a\
-          \ data-show-sub-navigation=\"programs\" href=\"http://www.npo.nl/uitzending-gemist\"\
-          >Gemist</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"http://www.npo.nl/gids\"\
-          >Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"#npoh__specials-menu\"\
-          \ data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
+          \ data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/programmas\"\
+          >Programma&#39;s</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"\
+          http://www.npo.nl/gids\">Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"\
+          #npoh__specials-menu\" data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
           \ data-show-sub-navigation=\"specials\" href=\"http://www.npo.nl/rubrieken\"\
-          >Rubrieken</a></li>\n<li><a data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/a-z\"\
-          >A-Z</a></li>\n</ul>\n\n</div>\n</div>\n<form id=\"npoh__search-form\" class=\"\
-          npoh__page-search-box\" action=\"http://www.npo.nl/zoeken\" accept-charset=\"\
+          >Rubrieken</a></li>\n</ul>\n\n</div>\n</div>\n<form id=\"npoh__search-form\"\
+          \ class=\"npoh__page-search-box\" action=\"http://www.npo.nl/zoeken\" accept-charset=\"\
           UTF-8\" method=\"get\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\"\
           \ />\n<div class='npoh__search-box'>\n<input type=\"text\" name=\"q\" id=\"\
           npoh__search-query\" placeholder=\"Zoek\" class=\"npoh__search-query-box\"\
@@ -222,32 +220,30 @@ interactions:
           >Account aanmaken</a>\n</div>\n</div>\n\n</div>\n<div class='npoh__specials-menu\
           \ npoh__hide' id='npoh__specials-menu'>\n<div class='npoh__container'>\n\
           <div class='npoh__collapse-menu'>\n<div class='npoh__menu-item-list'>\n\
-          <ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.alles over baby&#x0027;s\
+          <ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.alles over eten\"}'><a\
+          \ href=\"http://www.npo.nl/specials/alles-over-koken\">Alles over eten</a></li>\n\
+          <li data-scorecard='{\"name\":\"home.rubrieken.natuur en milieu\"}'><a href=\"\
+          http://www.npo.nl/specials/natuur-milieu\">Natuur en milieu</a></li>\n</ul>\n\
+          <ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.humor en cabaret\"\
+          }'><a href=\"http://www.npo.nl/specials/Cabaret\">Humor en cabaret</a></li>\n\
+          <li data-scorecard='{\"name\":\"home.rubrieken.alles over baby&#x0027;s\
           \ \"}'><a href=\"http://www.npo.nl/specials/alles-over-baby-s\">Alles over\
-          \ baby&#39;s </a></li>\n<li data-scorecard='{\"name\":\"home.rubrieken.verenigde\
-          \ staten\"}'><a href=\"http://www.npo.nl/specials/usa\">Verenigde Staten</a></li>\n\
-          </ul>\n<ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.series\"}'><a\
-          \ href=\"http://www.npo.nl/series\">Series</a></li>\n<li data-scorecard='{\"\
-          name\":\"home.rubrieken.liefdesfilms\"}'><a href=\"http://www.npo.nl/specials/liefdesfilms\"\
-          >Liefdesfilms</a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.detectives\"\
-          }'><a href=\"http://www.npo.nl/detectives\">Detectives</a></li>\n<li data-scorecard='{\"\
-          name\":\"home.rubrieken.de beste reisdocumentaires\"}'><a href=\"http://www.npo.nl/specials/de-beste-reisdocumentaires\"\
-          >De beste reisdocumentaires</a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"\
-          name\":\"home.rubrieken.alles over eten\"}'><a href=\"http://www.npo.nl/specials/alles-over-koken\"\
-          >Alles over eten</a></li>\n<li data-scorecard='{\"name\":\"home.rubrieken.het\
-          \ koningshuis\"}'><a href=\"http://www.npo.nl/specials/het-koningshuis--2\"\
-          >Het koningshuis</a></li>\n</ul>\n</div>\n<div class='npoh__mobile-menu-dropdowns'>\n\
+          \ baby&#39;s </a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.series\"\
+          }'><a href=\"http://www.npo.nl/series\">Series</a></li>\n<li data-scorecard='{\"\
+          name\":\"home.rubrieken.nederlandse films\"}'><a href=\"http://www.npo.nl/specials/nederlandse-films\"\
+          >Nederlandse films</a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"name\"\
+          :\"home.rubrieken.detectives\"}'><a href=\"http://www.npo.nl/detectives\"\
+          >Detectives</a></li>\n</ul>\n</div>\n<div class='npoh__mobile-menu-dropdowns'>\n\
           <div class='npoh__custom-select npoh__menu-item-dropdown'>\n<div class='npoh__custom-selected'>Alles</div>\n\
           <select name=\"npoh__menu-item\" id=\"npoh__menu-item\" title=\"Menu item\"\
-          ><option value=\"\">Alles</option><option value=\"http://www.npo.nl/specials/alles-over-baby-s\"\
-          >Alles over baby&#39;s </option>\n<option value=\"http://www.npo.nl/specials/usa\"\
-          >Verenigde Staten</option>\n<option value=\"http://www.npo.nl/series\">Series</option>\n\
-          <option value=\"http://www.npo.nl/specials/liefdesfilms\">Liefdesfilms</option>\n\
-          <option value=\"http://www.npo.nl/detectives\">Detectives</option>\n<option\
-          \ value=\"http://www.npo.nl/specials/de-beste-reisdocumentaires\">De beste\
-          \ reisdocumentaires</option>\n<option value=\"http://www.npo.nl/specials/alles-over-koken\"\
-          >Alles over eten</option>\n<option value=\"http://www.npo.nl/specials/het-koningshuis--2\"\
-          >Het koningshuis</option></select>\n</div>\n</div>\n</div>\n<div class='npoh__more-specials-button'><a\
+          ><option value=\"\">Alles</option><option value=\"http://www.npo.nl/specials/alles-over-koken\"\
+          >Alles over eten</option>\n<option value=\"http://www.npo.nl/specials/natuur-milieu\"\
+          >Natuur en milieu</option>\n<option value=\"http://www.npo.nl/specials/Cabaret\"\
+          >Humor en cabaret</option>\n<option value=\"http://www.npo.nl/specials/alles-over-baby-s\"\
+          >Alles over baby&#39;s </option>\n<option value=\"http://www.npo.nl/series\"\
+          >Series</option>\n<option value=\"http://www.npo.nl/specials/nederlandse-films\"\
+          >Nederlandse films</option>\n<option value=\"http://www.npo.nl/detectives\"\
+          >Detectives</option></select>\n</div>\n</div>\n</div>\n<div class='npoh__more-specials-button'><a\
           \ class=\"global__button--ghost content-type__more\" data-scorecard=\"{&quot;name&quot;:&quot;home.rubrieken.meer-rubrieken&quot;}\"\
           \ href=\"http://www.npo.nl/rubrieken\">Meer rubrieken</a></div>\n</div>\n\
           </div>\n\n</div>\n\n<div class='page-content'>\n<div class='content-container'>\n\
@@ -259,7 +255,7 @@ interactions:
           <form data-cross-domain=\"true\" data-with-credentials=\"true\" action=\"\
           https://mijn.npo.nl/sessions\" accept-charset=\"UTF-8\" data-remote=\"true\"\
           \ method=\"post\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\"\
-          \ /><input type=\"hidden\" name=\"authenticity_token\" value=\"/CA9jpFN5n98EyahmdtI/7M9GqT8Jz50Nq2GPtjZ7Qdm80iVedbPGSZFn7lFbfCi42s+AtQ0hhbmdrNTaXpGBw==\"\
+          \ /><input type=\"hidden\" name=\"authenticity_token\" value=\"u1g7wJALNVGEBwyIc+4l4qoWSIxhLuElzG7EZa9NBQBWRJAjacaUmOTakCJA4bvA1eWXMR8AhDzMMMortMY42w==\"\
           \ />\n\n\n\n\n<div class='input email'>\n<label for=\"email\">E-mailadres</label>\n\
           <div class='npo-glyph email'></div>\n<input type=\"email\" name=\"email\"\
           \ id=\"email\" />\n</div>\n<div class='input password'>\n<label for=\"password\"\
@@ -359,30 +355,30 @@ interactions:
         cache-control: ['max-age=0, private, must-revalidate']
         connection: [Keep-Alive]
         content-type: [text/html; charset=utf-8]
-        date: ['Wed, 07 Dec 2016 15:47:53 GMT']
-        etag: [W/"ab1ad1e55c7cb894feaa0135ecedb879"]
+        date: ['Tue, 10 Jan 2017 13:47:41 GMT']
+        etag: [W/"7be2c40e7a88b246243b4a89f6c0aa42"]
         keep-alive: ['timeout=1, max=99']
         server: [Apache/2.4.23 (Unix) Phusion_Passenger/4.0.58]
-        set-cookie: [_npo_portal_session=c0ZjcnZmV0YveVhVZmNrSlgrS1g3bjJaOWdpTlRoYU1sU0N4cXoveDNqZTd5eVpRUkFXc0hDWXhyUVQ5dTVQK1NoeTFNYURQSHp1ZEdubUxvbmJUd1Y2VWlBaFFUTmI3YXUyUHo1Sjk0MEtRaTVTWkRmbUtnZmhtSXdSaTZ3Tm84SFNjYTlDNk1lOEVDUWhtZVJjcUo3L3J4cU9VeFlIOEdzWER6UDdhU2tqR3VZZ2J0SnBZTk4yVzZGeUNDLzlTQ2RzYjMrR01lV2FNSFFkcnJuRWtZdks2YnVXakorMmNqcGJ5bm5wUmY5alMwKysxS0N1MGVyRUFaTDNsUDlOaXkvWWhDT001c3BZOXRHeDkxWmwxRUpKbFJSajd6ME5ubTduUnJrSjlwOW1ycVhBeGZiUEpjMnhDeFkvcXg1VmxPUm9mMDZibTNtZGZGZ29pUUdLVGdFUDkyMm9UeFMrTFhEbjllZWpDWmptSncyV2d1c3lJcFg4aUpWVmx2T2Z6OGtSNTdSWkc1c0lMVExveVFJZFFhZz09LS1rRDVVMzIzVkFYT0toSUZ4dFJDeGtnPT0%3D--b9599661b51e458abac175e9503330b1a7147bff;
+        set-cookie: [_npo_portal_session=bDFlS2RCcnliNzVQaEYwYmFiT0w5SzVWSGxFUGI0dTdrWWt5aTFXY0lEczZ2dzQ0V1FoRXB5czUxSDVFN2tKTzBHZjU0Mml2RC9iZW05SGNzSVJkY2dXK3I5ditmcCtuWGZrUzhtL0RHaFVuZWhkdXhMem9PU3laN1VwTlZaVGhwRFdMMjczbGt4aE9jU2ttNFFJOVBDNENQM3FnR28xb09RamtZVDhaclk4MS9WcVJ3Q2ZTa1BoWUhPZ1FwWUlOSzluSkJOeG9PL2piM0VMV09rWDhGTHFLdEFiLzBoMHZKZzAwVXZWT0paTTJlcDVpWkpjWVFBSTBZMXo1b2QwK3Zhb0pXbUJETGVjOVFnVUVUTkV0bDdZKzArUnZNdFNTYnVQME5BMDVlbHRRSnlIUHRZOWNJQXJwZ0N3ZE5nWG9XcW9QaDY3dU5BWGFpUkVQNks5OU56VUZSamRQWWsxK29DQ25KZDFEV25BWTM4Z2g3VnBXeEJkb25tclA5aFlhNUptenVDanBDNlJ2c1NZeENBZnFoUT09LS1FLzhhdFJtMEZSYk9XZVd3Rjlnem13PT0%3D--ac7949158c9ae90a3994947d77ae253c8069f718;
             domain=npo.nl; path=/; HttpOnly]
         status: [200 OK]
         x-frame-options: [DENY]
         x-powered-by: [Phusion Passenger 4.0.58]
-        x-proxyinstancename: [npov1d]
-        x-request-id: [612a34ef-c206-4bd4-b4ee-f82e26a3dc9e]
-        x-runtime: ['0.044470']
-        x-workerinstancename: [npov2g]
+        x-proxyinstancename: [npov1a]
+        x-request-id: [2168142b-09da-4b5e-b417-277552c9aea2]
+        x-runtime: ['0.363214']
+        x-workerinstancename: [npov2b]
       status: {code: 200, message: OK}
   - request:
-      body: !!python/unicode 'password=Fl3xg3t&email=chetrutrok%40throwam.com&authenticity_token=%2FCA9jpFN5n98EyahmdtI%2F7M9GqT8Jz50Nq2GPtjZ7Qdm80iVedbPGSZFn7lFbfCi42s%2BAtQ0hhbmdrNTaXpGBw%3D%3D'
+      body: !!python/unicode 'password=Fl3xg3t&email=chetrutrok%40throwam.com&authenticity_token=u1g7wJALNVGEBwyIc%2B4l4qoWSIxhLuElzG7EZa9NBQBWRJAjacaUmOTakCJA4bvA1eWXMR8AhDzMMMortMY42w%3D%3D'
       headers:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Content-Length: ['165']
+        Content-Length: ['161']
         Content-Type: [application/x-www-form-urlencoded]
-        Cookie: ['balancer://npov2cluster=balancer.npov2g; _npo_portal_session=c0ZjcnZmV0YveVhVZmNrSlgrS1g3bjJaOWdpTlRoYU1sU0N4cXoveDNqZTd5eVpRUkFXc0hDWXhyUVQ5dTVQK1NoeTFNYURQSHp1ZEdubUxvbmJUd1Y2VWlBaFFUTmI3YXUyUHo1Sjk0MEtRaTVTWkRmbUtnZmhtSXdSaTZ3Tm84SFNjYTlDNk1lOEVDUWhtZVJjcUo3L3J4cU9VeFlIOEdzWER6UDdhU2tqR3VZZ2J0SnBZTk4yVzZGeUNDLzlTQ2RzYjMrR01lV2FNSFFkcnJuRWtZdks2YnVXakorMmNqcGJ5bm5wUmY5alMwKysxS0N1MGVyRUFaTDNsUDlOaXkvWWhDT001c3BZOXRHeDkxWmwxRUpKbFJSajd6ME5ubTduUnJrSjlwOW1ycVhBeGZiUEpjMnhDeFkvcXg1VmxPUm9mMDZibTNtZGZGZ29pUUdLVGdFUDkyMm9UeFMrTFhEbjllZWpDWmptSncyV2d1c3lJcFg4aUpWVmx2T2Z6OGtSNTdSWkc1c0lMVExveVFJZFFhZz09LS1rRDVVMzIzVkFYT0toSUZ4dFJDeGtnPT0%3D--b9599661b51e458abac175e9503330b1a7147bff']
-        User-Agent: [!!python/unicode 'FlexGet/2.8.0.dev (www.flexget.com)']
+        Cookie: ['balancer://npov2cluster=balancer.npov2b; _npo_portal_session=bDFlS2RCcnliNzVQaEYwYmFiT0w5SzVWSGxFUGI0dTdrWWt5aTFXY0lEczZ2dzQ0V1FoRXB5czUxSDVFN2tKTzBHZjU0Mml2RC9iZW05SGNzSVJkY2dXK3I5ditmcCtuWGZrUzhtL0RHaFVuZWhkdXhMem9PU3laN1VwTlZaVGhwRFdMMjczbGt4aE9jU2ttNFFJOVBDNENQM3FnR28xb09RamtZVDhaclk4MS9WcVJ3Q2ZTa1BoWUhPZ1FwWUlOSzluSkJOeG9PL2piM0VMV09rWDhGTHFLdEFiLzBoMHZKZzAwVXZWT0paTTJlcDVpWkpjWVFBSTBZMXo1b2QwK3Zhb0pXbUJETGVjOVFnVUVUTkV0bDdZKzArUnZNdFNTYnVQME5BMDVlbHRRSnlIUHRZOWNJQXJwZ0N3ZE5nWG9XcW9QaDY3dU5BWGFpUkVQNks5OU56VUZSamRQWWsxK29DQ25KZDFEV25BWTM4Z2g3VnBXeEJkb25tclA5aFlhNUptenVDanBDNlJ2c1NZeENBZnFoUT09LS1FLzhhdFJtMEZSYk9XZVd3Rjlnem13PT0%3D--ac7949158c9ae90a3994947d77ae253c8069f718']
+        User-Agent: [!!python/unicode 'FlexGet/2.8.23.dev (www.flexget.com)']
       method: POST
       uri: https://mijn.npo.nl/sessions
     response:
@@ -396,22 +392,22 @@ interactions:
         cache-control: [no-cache]
         connection: [Keep-Alive]
         content-type: [text/html; charset=utf-8]
-        date: ['Wed, 07 Dec 2016 15:47:53 GMT']
+        date: ['Tue, 10 Jan 2017 13:47:41 GMT']
         keep-alive: ['timeout=1, max=98']
         location: ['https://mijn.npo.nl/profiel/kijklijst']
         server: [Apache/2.4.23 (Unix) Phusion_Passenger/4.0.58]
         set-cookie: [userId=2o947lH0LNYQS7tDft5DnKp_-7yyDERiB7ehT3hMqSs; domain=npo.nl;
             path=/; secure, npo_portal_auth_token_status=created; domain=npo.nl; path=/,
           npo_portal_auth_token=BAhJIjB2YzA5SEZRQU01eVFVM1lIR2RDOGdicW03Q05QX1h4ZWF2VGtUbjE2NzVjBjoGRVQ%3D--e4d3ac3217066cf3331a1c39e385d9024e2b29a4;
-            domain=mijn.npo.nl; path=/; secure; HttpOnly, _npo_portal_session=Y1ZLQUF3Uzhvc3VHcE54dEM4Ky9ub2tJQXhRVVJmZzJITXRLdTEyMUdyV284ZTlNVjliR2hnU0twSW5qM1RjakZGaURoV3c2OWFPRDk3a1hxQlNNY0hjYURMMXl2QjJuS0ZVMXgxYnYwRVN3Sng2bHdpQnBObDE5d2RENXE4VFB1dGM4YTM3QXBjaFQ3T3BkWGR3dVJTSVB3eS9PSVVEZjNma2NESkpITEVpVzd5MG04U0tNUnFoM3NxU2pxQ2NYT1RWc0J3Y2IxUkVOVXkzTXZPQlI5aXBGUm95OTdxNUFBelVNaEZOQkVhV0FZcWVqbjdmcERZSUY4akNKZWM4ak10bzl4VUVINVBQTWFQZEhLUzkycmh1QnYvZllHMnJDOHNzeXB5SUc5RExHU2hFN3RBNmRNNzlwTmx0aWN6aGV5aW5uV2gydzB6YTJkYi9zR2NxTkc0enQrOVRGc2NySkJIRVB2Z2tUaXN5OUlrd0o4QS9aaS9pSlp6a3QzdHpCcnBMdGRxL2o1YzhCcHpJQWJtbndqNTQ1SW45amdRZVJFdmhTdmJ1aksybz0tLXdxRUhidXNVbGF4Qkw5YTN0d2h1SlE9PQ%3D%3D--55d9c45565921aec5d3b0bcd0f8dae12e12fb411;
+            domain=mijn.npo.nl; path=/; secure; HttpOnly, _npo_portal_session=UFVuWkZrMHJSQ1J5Y21xZFNXN3AxSjEvdTBJRmlpNlh6TEZhTnlKYUZpUGUyQ1VEOXVzWnIrVlFTa09IbGhhakhxZFJka0JQMkNEeGFmNVNNaGk5YnBVNWZBWEdUYW9QdzFKWHNMUkcyT3NsZlJPNCtUMnNPV3UzZUtxZEpFdUVjaVd4QVVHV25xRFBNbEhsMDVaM1hMTnZrbzFIbnVkN2V4ZzliSFdTQldxUlZXUjFrMThRczJTdFA3N09NS3dyL01kem1KdDM4QUJLRWx1WmxQaW1VN1cwS0lnMWZ3R3pXa0FwS3gxU1N3KzdCV01SM3Q4b2ZwRkdaTDVGSktzdk5zYjd4Y251Q3NqNS9TQmlLelpwbU8xUGdtM3hpZHB0TVhQd2VmenlVUGpwL25HbHdPcGJlWGh5bFBtN0dnWHJTclN2M0pxQVpMb0h3YVNZMWRhamhEeUlNc1RmOFc3UFl0b0dleG91bGNiZlZleXBxaFpnZGVnbituZDUyUldzQWlwNS8vTUY5YUZBd3JhdUtvSUxhcFpXOXl4Y0pqeG5pZkV4bkxqaEg0VT0tLTNIY1FKdHUxb1A5b1JheEh4RVVGd1E9PQ%3D%3D--9ba90ecec198002399280dbcd0cb3d0262a56c29;
             domain=npo.nl; path=/; HttpOnly]
         status: [302 Found]
         x-frame-options: [DENY]
         x-powered-by: [Phusion Passenger 4.0.58]
-        x-proxyinstancename: [npov1d]
-        x-request-id: [11dc4fcd-1f1e-4be3-93f0-80ed7ea315b5]
-        x-runtime: ['0.567576']
-        x-workerinstancename: [npov2g]
+        x-proxyinstancename: [npov1a]
+        x-request-id: [5e061643-9d74-4041-8b97-785af4ef021e]
+        x-runtime: ['0.631644']
+        x-workerinstancename: [npov2b]
       status: {code: 302, message: Found}
   - request:
       body: null
@@ -419,10 +415,11 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: ['balancer://npov2cluster=balancer.npov2g; npo_portal_auth_token_status=created;
-            userId=2o947lH0LNYQS7tDft5DnKp_-7yyDERiB7ehT3hMqSs; _npo_portal_session=Y1ZLQUF3Uzhvc3VHcE54dEM4Ky9ub2tJQXhRVVJmZzJITXRLdTEyMUdyV284ZTlNVjliR2hnU0twSW5qM1RjakZGaURoV3c2OWFPRDk3a1hxQlNNY0hjYURMMXl2QjJuS0ZVMXgxYnYwRVN3Sng2bHdpQnBObDE5d2RENXE4VFB1dGM4YTM3QXBjaFQ3T3BkWGR3dVJTSVB3eS9PSVVEZjNma2NESkpITEVpVzd5MG04U0tNUnFoM3NxU2pxQ2NYT1RWc0J3Y2IxUkVOVXkzTXZPQlI5aXBGUm95OTdxNUFBelVNaEZOQkVhV0FZcWVqbjdmcERZSUY4akNKZWM4ak10bzl4VUVINVBQTWFQZEhLUzkycmh1QnYvZllHMnJDOHNzeXB5SUc5RExHU2hFN3RBNmRNNzlwTmx0aWN6aGV5aW5uV2gydzB6YTJkYi9zR2NxTkc0enQrOVRGc2NySkJIRVB2Z2tUaXN5OUlrd0o4QS9aaS9pSlp6a3QzdHpCcnBMdGRxL2o1YzhCcHpJQWJtbndqNTQ1SW45amdRZVJFdmhTdmJ1aksybz0tLXdxRUhidXNVbGF4Qkw5YTN0d2h1SlE9PQ%3D%3D--55d9c45565921aec5d3b0bcd0f8dae12e12fb411;
+        Content-Type: [application/x-www-form-urlencoded]
+        Cookie: ['balancer://npov2cluster=balancer.npov2b; npo_portal_auth_token_status=created;
+            userId=2o947lH0LNYQS7tDft5DnKp_-7yyDERiB7ehT3hMqSs; _npo_portal_session=UFVuWkZrMHJSQ1J5Y21xZFNXN3AxSjEvdTBJRmlpNlh6TEZhTnlKYUZpUGUyQ1VEOXVzWnIrVlFTa09IbGhhakhxZFJka0JQMkNEeGFmNVNNaGk5YnBVNWZBWEdUYW9QdzFKWHNMUkcyT3NsZlJPNCtUMnNPV3UzZUtxZEpFdUVjaVd4QVVHV25xRFBNbEhsMDVaM1hMTnZrbzFIbnVkN2V4ZzliSFdTQldxUlZXUjFrMThRczJTdFA3N09NS3dyL01kem1KdDM4QUJLRWx1WmxQaW1VN1cwS0lnMWZ3R3pXa0FwS3gxU1N3KzdCV01SM3Q4b2ZwRkdaTDVGSktzdk5zYjd4Y251Q3NqNS9TQmlLelpwbU8xUGdtM3hpZHB0TVhQd2VmenlVUGpwL25HbHdPcGJlWGh5bFBtN0dnWHJTclN2M0pxQVpMb0h3YVNZMWRhamhEeUlNc1RmOFc3UFl0b0dleG91bGNiZlZleXBxaFpnZGVnbituZDUyUldzQWlwNS8vTUY5YUZBd3JhdUtvSUxhcFpXOXl4Y0pqeG5pZkV4bkxqaEg0VT0tLTNIY1FKdHUxb1A5b1JheEh4RVVGd1E9PQ%3D%3D--9ba90ecec198002399280dbcd0cb3d0262a56c29;
             npo_portal_auth_token=BAhJIjB2YzA5SEZRQU01eVFVM1lIR2RDOGdicW03Q05QX1h4ZWF2VGtUbjE2NzVjBjoGRVQ%3D--e4d3ac3217066cf3331a1c39e385d9024e2b29a4']
-        User-Agent: [!!python/unicode 'FlexGet/2.8.0.dev (www.flexget.com)']
+        User-Agent: [!!python/unicode 'FlexGet/2.8.23.dev (www.flexget.com)']
       method: GET
       uri: https://mijn.npo.nl/profiel/kijklijst
     response:
@@ -433,23 +430,23 @@ interactions:
           <meta content='//www-assets.npo.nl/assets/placeholders/nederland_npo_thumb-35f96b29fb4c884716ba827c3317dc7efc023383517799ef61274c606620f708.png'\
           \ name='image-placeholder'>\n<meta content='IE=EmulateIE9' http-equiv='X-UA-Compatible'>\n\
           <meta content='width=device-width, initial-scale=1, maximum-scale=1' name='viewport'>\n\
-          <meta content='https://mijn.npo.nl/suggesties' name='search-suggestions-url'>\n\
+          <meta content='https://www.npo.nl/suggesties' name='search-suggestions-url'>\n\
           <meta content='app-id=nl.uitzendinggemist' name='google-play-app'>\n<meta\
           \ content='//www-assets.npo.nl/assets/google_play_logo-18cd7223c325ef23806032109b2a3e3c46d1bfc6a368202da20b2bfe214fb48a.png'\
           \ name='google-play-logo'>\n<meta content='3600' name='utc-offset'>\n<meta\
           \ content='30' name='player-tick-length'>\n<meta content='https://mijn.npo.nl'\
           \ name='secure-domain'>\n<meta content='npo_portal_auth_token_status' name='login-status-cookie'>\n\
-          <meta content='https://mijn.npo.nl/sign_in_modal' name='login_modal'>\n\
-          <link rel=\"stylesheet\" media=\"screen\" href=\"//cookiesv2.publiekeomroep.nl/static/css/npo_cc_styles.css\"\
+          <meta content='https://www.npo.nl/sign_in_modal' name='login_modal'>\n<link\
+          \ rel=\"stylesheet\" media=\"screen\" href=\"//cookiesv2.publiekeomroep.nl/static/css/npo_cc_styles.css\"\
           \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/vendors-413847168b67bdd298ce80d94a728ea421b19cd959b1c213fe85361e6d6e2a60.css\"\
-          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/components-c9d207b99d9268b1f6f3f37bf145695f65e13a4efb61b8f16b7767df16086a1d.css\"\
-          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/layout-6d88b59d71294eb593869b479e7eef4a2c39fb0f928c5660759e885581c6789b.css\"\
-          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/application-f71fde3ce7717d694112d17805ba18db9c98e0f4d34f3d1e3de5f94328a5fa69.css\"\
+          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/components-95a008ee390359f6f86e3eb43db85368e1a14597f6c8a8ccacfe84deca695c16.css\"\
+          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/layout-d83570084a72d2d8d0328b4de2fa1a54029f682a5a88a74b8e3dbe5d7330690a.css\"\
+          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/application-3086b183694709d331c4fcb3cb49d29c002d7c8664646d58fb9d04a10ee3f899.css\"\
           \ />\n<!--[if lte IE 8]>\n<link rel=\"stylesheet\" media=\"all\" href=\"\
           //www-assets.npo.nl/assets/ie-2c3aef0b5922d8e9a666c6c5ca3c48dd9250ef07b87ddc7f9f4cae1fbea1d4d3.css\"\
           \ />\n<![endif]-->\n<!--[if lte IE 7]>\n<link rel=\"stylesheet\" media=\"\
           all\" href=\"//www-assets.npo.nl/assets/ie7-1fe92616e92079ba455908152f40f7f7aeab6f7557d47022456a63859cb24ded.css\"\
-          \ />\n<![endif]-->\n<script src=\"//www-assets.npo.nl/assets/application-490d8ddfb7931941141132664f7511d57cff3ca63850e7736d770cc98e2dc88b.js\"\
+          \ />\n<![endif]-->\n<script src=\"//www-assets.npo.nl/assets/application-3191be9ba380a3036d6b7aa8fa379f0fe3a74f6710b4559d155f2e5922ec69da.js\"\
           ></script>\n<script src=\"//cookiesv2.publiekeomroep.nl/data/script/cconsent-no-rw.min.js\"\
           ></script>\n<link rel=\"alternate\" type=\"application/rss+xml\" title=\"\
           Uitgelicht op npo.nl\" href=\"http://www.npo.nl/uitgelicht.rss\" />\n<link\
@@ -483,7 +480,7 @@ interactions:
           ,\"terms_of_service\":true,\"new_favorites_count\":0}' name='current-user-info'>\n\
           \n\n\n<script>\n//<![CDATA[\nnpo_cookies.init({settings: {set_main_domain_helper_cookie\
           \ : true}});\n//]]>\n</script>\n\n<meta name=\"csrf-param\" content=\"authenticity_token\"\
-          \ />\n<meta name=\"csrf-token\" content=\"wLLNwzmh1dT1gZ1ZBOfAUg6lIdfzpSzFVXns4MnLCXpaYbjY0Tr8sq/XJEHYUXgPXvMFcdu2lKeFotmNeGiieg==\"\
+          \ />\n<meta name=\"csrf-token\" content=\"6POiQk2RK6xri1XzMThSS7HeQhEJ5cC/AMzvvt4IHFYF7wmhtFyKZQtWyVkCN8xpzi2drHfLpaYAkuHwxYMhjQ==\"\
           \ />\n\n</head>\n<body>\n<!-- Begin comScore Inline Tag 1.1302.13 -->\n\
           <script type=\"text/plain\" class=\"npo_cc_inline_analytics\">\n// <![CDATA[\n\
           function udm_(e){var t=\"comScore=\",n=document,r=n.cookie,i=\"\",s=\"indexOf\"\
@@ -523,13 +520,12 @@ interactions:
           home\" href=\"http://www.npo.nl/\">Start</a></li>\n<li><a data-show-sub-navigation=\"\
           tv_channels\" href=\"http://www.npo.nl/live\">Tv</a></li>\n<li><a data-show-sub-navigation=\"\
           radio_channels\" href=\"http://www.npo.nl/radio\">Radio</a></li>\n<li><a\
-          \ data-show-sub-navigation=\"programs\" href=\"http://www.npo.nl/uitzending-gemist\"\
-          >Gemist</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"http://www.npo.nl/gids\"\
-          >Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"#npoh__specials-menu\"\
-          \ data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
+          \ data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/programmas\"\
+          >Programma&#39;s</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"\
+          http://www.npo.nl/gids\">Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"\
+          #npoh__specials-menu\" data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
           \ data-show-sub-navigation=\"specials\" href=\"http://www.npo.nl/rubrieken\"\
-          >Rubrieken</a></li>\n<li><a data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/a-z\"\
-          >A-Z</a></li>\n</ul>\n\n<form id=\"npoh__search-form\" class=\"npoh__page-search-box\"\
+          >Rubrieken</a></li>\n</ul>\n\n<form id=\"npoh__search-form\" class=\"npoh__page-search-box\"\
           \ action=\"http://www.npo.nl/zoeken\" accept-charset=\"UTF-8\" method=\"\
           get\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\" />\n<div class='npoh__search-box'>\n\
           <input type=\"text\" name=\"q\" id=\"npoh__search-query\" placeholder=\"\
@@ -581,14 +577,13 @@ interactions:
           home\" href=\"http://www.npo.nl/\">Start</a></li>\n<li><a data-show-sub-navigation=\"\
           tv_channels\" href=\"http://www.npo.nl/live\">Tv</a></li>\n<li><a data-show-sub-navigation=\"\
           radio_channels\" href=\"http://www.npo.nl/radio\">Radio</a></li>\n<li><a\
-          \ data-show-sub-navigation=\"programs\" href=\"http://www.npo.nl/uitzending-gemist\"\
-          >Gemist</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"http://www.npo.nl/gids\"\
-          >Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"#npoh__specials-menu\"\
-          \ data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
+          \ data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/programmas\"\
+          >Programma&#39;s</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"\
+          http://www.npo.nl/gids\">Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"\
+          #npoh__specials-menu\" data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
           \ data-show-sub-navigation=\"specials\" href=\"http://www.npo.nl/rubrieken\"\
-          >Rubrieken</a></li>\n<li><a data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/a-z\"\
-          >A-Z</a></li>\n</ul>\n\n</div>\n</div>\n<form id=\"npoh__search-form\" class=\"\
-          npoh__page-search-box\" action=\"http://www.npo.nl/zoeken\" accept-charset=\"\
+          >Rubrieken</a></li>\n</ul>\n\n</div>\n</div>\n<form id=\"npoh__search-form\"\
+          \ class=\"npoh__page-search-box\" action=\"http://www.npo.nl/zoeken\" accept-charset=\"\
           UTF-8\" method=\"get\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\"\
           \ />\n<div class='npoh__search-box'>\n<input type=\"text\" name=\"q\" id=\"\
           npoh__search-query\" placeholder=\"Zoek\" class=\"npoh__search-query-box\"\
@@ -609,32 +604,30 @@ interactions:
           >Account aanmaken</a>\n</div>\n</div>\n\n</div>\n<div class='npoh__specials-menu\
           \ npoh__hide' id='npoh__specials-menu'>\n<div class='npoh__container'>\n\
           <div class='npoh__collapse-menu'>\n<div class='npoh__menu-item-list'>\n\
-          <ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.alles over baby&#x0027;s\
+          <ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.alles over eten\"}'><a\
+          \ href=\"http://www.npo.nl/specials/alles-over-koken\">Alles over eten</a></li>\n\
+          <li data-scorecard='{\"name\":\"home.rubrieken.natuur en milieu\"}'><a href=\"\
+          http://www.npo.nl/specials/natuur-milieu\">Natuur en milieu</a></li>\n</ul>\n\
+          <ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.humor en cabaret\"\
+          }'><a href=\"http://www.npo.nl/specials/Cabaret\">Humor en cabaret</a></li>\n\
+          <li data-scorecard='{\"name\":\"home.rubrieken.alles over baby&#x0027;s\
           \ \"}'><a href=\"http://www.npo.nl/specials/alles-over-baby-s\">Alles over\
-          \ baby&#39;s </a></li>\n<li data-scorecard='{\"name\":\"home.rubrieken.verenigde\
-          \ staten\"}'><a href=\"http://www.npo.nl/specials/usa\">Verenigde Staten</a></li>\n\
-          </ul>\n<ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.series\"}'><a\
-          \ href=\"http://www.npo.nl/series\">Series</a></li>\n<li data-scorecard='{\"\
-          name\":\"home.rubrieken.liefdesfilms\"}'><a href=\"http://www.npo.nl/specials/liefdesfilms\"\
-          >Liefdesfilms</a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.detectives\"\
-          }'><a href=\"http://www.npo.nl/detectives\">Detectives</a></li>\n<li data-scorecard='{\"\
-          name\":\"home.rubrieken.de beste reisdocumentaires\"}'><a href=\"http://www.npo.nl/specials/de-beste-reisdocumentaires\"\
-          >De beste reisdocumentaires</a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"\
-          name\":\"home.rubrieken.alles over eten\"}'><a href=\"http://www.npo.nl/specials/alles-over-koken\"\
-          >Alles over eten</a></li>\n<li data-scorecard='{\"name\":\"home.rubrieken.het\
-          \ koningshuis\"}'><a href=\"http://www.npo.nl/specials/het-koningshuis--2\"\
-          >Het koningshuis</a></li>\n</ul>\n</div>\n<div class='npoh__mobile-menu-dropdowns'>\n\
+          \ baby&#39;s </a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.series\"\
+          }'><a href=\"http://www.npo.nl/series\">Series</a></li>\n<li data-scorecard='{\"\
+          name\":\"home.rubrieken.nederlandse films\"}'><a href=\"http://www.npo.nl/specials/nederlandse-films\"\
+          >Nederlandse films</a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"name\"\
+          :\"home.rubrieken.detectives\"}'><a href=\"http://www.npo.nl/detectives\"\
+          >Detectives</a></li>\n</ul>\n</div>\n<div class='npoh__mobile-menu-dropdowns'>\n\
           <div class='npoh__custom-select npoh__menu-item-dropdown'>\n<div class='npoh__custom-selected'>Alles</div>\n\
           <select name=\"npoh__menu-item\" id=\"npoh__menu-item\" title=\"Menu item\"\
-          ><option value=\"\">Alles</option><option value=\"http://www.npo.nl/specials/alles-over-baby-s\"\
-          >Alles over baby&#39;s </option>\n<option value=\"http://www.npo.nl/specials/usa\"\
-          >Verenigde Staten</option>\n<option value=\"http://www.npo.nl/series\">Series</option>\n\
-          <option value=\"http://www.npo.nl/specials/liefdesfilms\">Liefdesfilms</option>\n\
-          <option value=\"http://www.npo.nl/detectives\">Detectives</option>\n<option\
-          \ value=\"http://www.npo.nl/specials/de-beste-reisdocumentaires\">De beste\
-          \ reisdocumentaires</option>\n<option value=\"http://www.npo.nl/specials/alles-over-koken\"\
-          >Alles over eten</option>\n<option value=\"http://www.npo.nl/specials/het-koningshuis--2\"\
-          >Het koningshuis</option></select>\n</div>\n</div>\n</div>\n<div class='npoh__more-specials-button'><a\
+          ><option value=\"\">Alles</option><option value=\"http://www.npo.nl/specials/alles-over-koken\"\
+          >Alles over eten</option>\n<option value=\"http://www.npo.nl/specials/natuur-milieu\"\
+          >Natuur en milieu</option>\n<option value=\"http://www.npo.nl/specials/Cabaret\"\
+          >Humor en cabaret</option>\n<option value=\"http://www.npo.nl/specials/alles-over-baby-s\"\
+          >Alles over baby&#39;s </option>\n<option value=\"http://www.npo.nl/series\"\
+          >Series</option>\n<option value=\"http://www.npo.nl/specials/nederlandse-films\"\
+          >Nederlandse films</option>\n<option value=\"http://www.npo.nl/detectives\"\
+          >Detectives</option></select>\n</div>\n</div>\n</div>\n<div class='npoh__more-specials-button'><a\
           \ class=\"global__button--ghost content-type__more\" data-scorecard=\"{&quot;name&quot;:&quot;home.rubrieken.meer-rubrieken&quot;}\"\
           \ href=\"http://www.npo.nl/rubrieken\">Meer rubrieken</a></div>\n</div>\n\
           </div>\n\n</div>\n\n<div class='page-content'>\n<div class='content-container'>\n\
@@ -753,18 +746,18 @@ interactions:
         cache-control: ['max-age=0, private, must-revalidate']
         connection: [Keep-Alive]
         content-type: [text/html; charset=utf-8]
-        date: ['Wed, 07 Dec 2016 15:47:54 GMT']
-        etag: [W/"1c16007cca1f6a02421aa10556cd3ea3"]
+        date: ['Tue, 10 Jan 2017 13:47:42 GMT']
+        etag: [W/"db16cb6ab5812225d9b6e839f92bca9e"]
         keep-alive: ['timeout=1, max=97']
         server: [Apache/2.4.23 (Unix) Phusion_Passenger/4.0.58]
-        set-cookie: [_npo_portal_session=RWMrS0RGVjh2NGh0RUtQemV0V3FLZlBwUy9EaE9Tem1NREh3NzI5S2tjVzVUQlZxT3k3MUVFSjRRMG9JOVlKQ3h2VS9JT3o1QWt6aEFqMzdiODRYMDNQOUNXQncxeDJOOVl5Wm5PMWp4TmtpUHJvWXVJc2ZxMHBySDROeC9VY2orTE9XZ0VuUGdtS2tYU3ZXQ3FEaGFMc0sxL3AveGJZSkxXSzhZYkpqZzJzSSsxUTFwZ3pGWVRJT1ZidjRLcUtDMVBiNGQvdklEekJWVDRGWU42TDNlaXpwSmpmSCtzam1ueGFRVk5DSHdISjBmaVpaNCtlR2M3dFZ6ZU1Cb3dkQ1BBeFNlanJpWWN4YVhKVkdQVzRCZlBuZDA3VTJQb3FMMFJrL1Ixd2hTdVgvMmNya2NJbG1wNGx4eTBhSXZ5aHVQT29hcFJoc1NNNzVDaXdCOTR2WThRPT0tLUVQa1lQY0xlZG1HSEt0SXFqQ2J4TFE9PQ%3D%3D--8d67409b0c354d88855c08371b2be7fa0406614a;
+        set-cookie: [_npo_portal_session=eE9JSzgrZjY2VUluN3pFYUdzc3dKMy9xZ0wvbXlHNVJDTEg5enlsQUdrTGtPQlZOZlpZTGRkSUc1SnNlekJYY2EyeERkLzdOemJ5WU0vR2ZjWE9iWDQ5YjlaYURBSU5mTHpFTUVKbnZSYzVKSFZsaDY5RnRSeU9IVVhUK3hiazFLSTFRRXVRdGxrZ3hjd2wvcllUTHB5dHBrQVY5UWtzeXRLS2dNTXVkWUJRc0VqOFVQNklNeDZkQzVPZEI3SVpPTUV4VkVPa0RQM1hrUFQ4UXZvYVdLdmRRd3YyZ2FpRTBtK1l0TnNwVXpGOHlxb1MxN1E5dGxuNkp5WmhTc3pyMnl5TnI1Mk42aHpqNmVJT1RvQS94SmZ6ZlNJY1k0cDZlUXZueHFxWXFFTDRTdTROUFdLRzgzelFoeTFwK0V2L2pKWmlaZ2I0Q2NtN05IZ1ZIL2gvNFFBPT0tLWpUL0dDY0lLSVYxa1dOUHJHN0loc2c9PQ%3D%3D--b5d255e7ce9c40db3d536ac93691ae84c62229e9;
             domain=npo.nl; path=/; HttpOnly]
         status: [200 OK]
         x-powered-by: [Phusion Passenger 4.0.58]
-        x-proxyinstancename: [npov1d]
-        x-request-id: [e85f528a-2381-4726-b538-cc95d23b5759]
-        x-runtime: ['0.176729']
-        x-workerinstancename: [npov2g]
+        x-proxyinstancename: [npov1a]
+        x-request-id: [a3a05efd-03c8-40a1-84d9-f3393e541770]
+        x-runtime: ['0.164061']
+        x-workerinstancename: [npov2b]
       status: {code: 200, message: OK}
   - request:
       body: null
@@ -772,10 +765,10 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: ['balancer://npov2cluster=balancer.npov2g; npo_portal_auth_token_status=created;
-            userId=2o947lH0LNYQS7tDft5DnKp_-7yyDERiB7ehT3hMqSs; _npo_portal_session=RWMrS0RGVjh2NGh0RUtQemV0V3FLZlBwUy9EaE9Tem1NREh3NzI5S2tjVzVUQlZxT3k3MUVFSjRRMG9JOVlKQ3h2VS9JT3o1QWt6aEFqMzdiODRYMDNQOUNXQncxeDJOOVl5Wm5PMWp4TmtpUHJvWXVJc2ZxMHBySDROeC9VY2orTE9XZ0VuUGdtS2tYU3ZXQ3FEaGFMc0sxL3AveGJZSkxXSzhZYkpqZzJzSSsxUTFwZ3pGWVRJT1ZidjRLcUtDMVBiNGQvdklEekJWVDRGWU42TDNlaXpwSmpmSCtzam1ueGFRVk5DSHdISjBmaVpaNCtlR2M3dFZ6ZU1Cb3dkQ1BBeFNlanJpWWN4YVhKVkdQVzRCZlBuZDA3VTJQb3FMMFJrL1Ixd2hTdVgvMmNya2NJbG1wNGx4eTBhSXZ5aHVQT29hcFJoc1NNNzVDaXdCOTR2WThRPT0tLUVQa1lQY0xlZG1HSEt0SXFqQ2J4TFE9PQ%3D%3D--8d67409b0c354d88855c08371b2be7fa0406614a;
+        Cookie: ['balancer://npov2cluster=balancer.npov2b; npo_portal_auth_token_status=created;
+            userId=2o947lH0LNYQS7tDft5DnKp_-7yyDERiB7ehT3hMqSs; _npo_portal_session=eE9JSzgrZjY2VUluN3pFYUdzc3dKMy9xZ0wvbXlHNVJDTEg5enlsQUdrTGtPQlZOZlpZTGRkSUc1SnNlekJYY2EyeERkLzdOemJ5WU0vR2ZjWE9iWDQ5YjlaYURBSU5mTHpFTUVKbnZSYzVKSFZsaDY5RnRSeU9IVVhUK3hiazFLSTFRRXVRdGxrZ3hjd2wvcllUTHB5dHBrQVY5UWtzeXRLS2dNTXVkWUJRc0VqOFVQNklNeDZkQzVPZEI3SVpPTUV4VkVPa0RQM1hrUFQ4UXZvYVdLdmRRd3YyZ2FpRTBtK1l0TnNwVXpGOHlxb1MxN1E5dGxuNkp5WmhTc3pyMnl5TnI1Mk42aHpqNmVJT1RvQS94SmZ6ZlNJY1k0cDZlUXZueHFxWXFFTDRTdTROUFdLRzgzelFoeTFwK0V2L2pKWmlaZ2I0Q2NtN05IZ1ZIL2gvNFFBPT0tLWpUL0dDY0lLSVYxa1dOUHJHN0loc2c9PQ%3D%3D--b5d255e7ce9c40db3d536ac93691ae84c62229e9;
             npo_portal_auth_token=BAhJIjB2YzA5SEZRQU01eVFVM1lIR2RDOGdicW03Q05QX1h4ZWF2VGtUbjE2NzVjBjoGRVQ%3D--e4d3ac3217066cf3331a1c39e385d9024e2b29a4']
-        User-Agent: [!!python/unicode 'FlexGet/2.8.0.dev (www.flexget.com)']
+        User-Agent: [!!python/unicode 'FlexGet/2.8.23.dev (www.flexget.com)']
       method: GET
       uri: https://mijn.npo.nl/profiel/favorieten
     response:
@@ -786,23 +779,23 @@ interactions:
           <meta content='//www-assets.npo.nl/assets/placeholders/nederland_npo_thumb-35f96b29fb4c884716ba827c3317dc7efc023383517799ef61274c606620f708.png'\
           \ name='image-placeholder'>\n<meta content='IE=EmulateIE9' http-equiv='X-UA-Compatible'>\n\
           <meta content='width=device-width, initial-scale=1, maximum-scale=1' name='viewport'>\n\
-          <meta content='https://mijn.npo.nl/suggesties' name='search-suggestions-url'>\n\
+          <meta content='https://www.npo.nl/suggesties' name='search-suggestions-url'>\n\
           <meta content='app-id=nl.uitzendinggemist' name='google-play-app'>\n<meta\
           \ content='//www-assets.npo.nl/assets/google_play_logo-18cd7223c325ef23806032109b2a3e3c46d1bfc6a368202da20b2bfe214fb48a.png'\
           \ name='google-play-logo'>\n<meta content='3600' name='utc-offset'>\n<meta\
           \ content='30' name='player-tick-length'>\n<meta content='https://mijn.npo.nl'\
           \ name='secure-domain'>\n<meta content='npo_portal_auth_token_status' name='login-status-cookie'>\n\
-          <meta content='https://mijn.npo.nl/sign_in_modal' name='login_modal'>\n\
-          <link rel=\"stylesheet\" media=\"screen\" href=\"//cookiesv2.publiekeomroep.nl/static/css/npo_cc_styles.css\"\
+          <meta content='https://www.npo.nl/sign_in_modal' name='login_modal'>\n<link\
+          \ rel=\"stylesheet\" media=\"screen\" href=\"//cookiesv2.publiekeomroep.nl/static/css/npo_cc_styles.css\"\
           \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/vendors-413847168b67bdd298ce80d94a728ea421b19cd959b1c213fe85361e6d6e2a60.css\"\
-          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/components-c9d207b99d9268b1f6f3f37bf145695f65e13a4efb61b8f16b7767df16086a1d.css\"\
-          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/layout-6d88b59d71294eb593869b479e7eef4a2c39fb0f928c5660759e885581c6789b.css\"\
-          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/application-f71fde3ce7717d694112d17805ba18db9c98e0f4d34f3d1e3de5f94328a5fa69.css\"\
+          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/components-95a008ee390359f6f86e3eb43db85368e1a14597f6c8a8ccacfe84deca695c16.css\"\
+          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/layout-d83570084a72d2d8d0328b4de2fa1a54029f682a5a88a74b8e3dbe5d7330690a.css\"\
+          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/application-3086b183694709d331c4fcb3cb49d29c002d7c8664646d58fb9d04a10ee3f899.css\"\
           \ />\n<!--[if lte IE 8]>\n<link rel=\"stylesheet\" media=\"all\" href=\"\
           //www-assets.npo.nl/assets/ie-2c3aef0b5922d8e9a666c6c5ca3c48dd9250ef07b87ddc7f9f4cae1fbea1d4d3.css\"\
           \ />\n<![endif]-->\n<!--[if lte IE 7]>\n<link rel=\"stylesheet\" media=\"\
           all\" href=\"//www-assets.npo.nl/assets/ie7-1fe92616e92079ba455908152f40f7f7aeab6f7557d47022456a63859cb24ded.css\"\
-          \ />\n<![endif]-->\n<script src=\"//www-assets.npo.nl/assets/application-490d8ddfb7931941141132664f7511d57cff3ca63850e7736d770cc98e2dc88b.js\"\
+          \ />\n<![endif]-->\n<script src=\"//www-assets.npo.nl/assets/application-3191be9ba380a3036d6b7aa8fa379f0fe3a74f6710b4559d155f2e5922ec69da.js\"\
           ></script>\n<script src=\"//cookiesv2.publiekeomroep.nl/data/script/cconsent-no-rw.min.js\"\
           ></script>\n<link rel=\"alternate\" type=\"application/rss+xml\" title=\"\
           Uitgelicht op npo.nl\" href=\"http://www.npo.nl/uitgelicht.rss\" />\n<link\
@@ -836,7 +829,7 @@ interactions:
           ,\"terms_of_service\":true,\"new_favorites_count\":0}' name='current-user-info'>\n\
           \n\n\n<script>\n//<![CDATA[\nnpo_cookies.init({settings: {set_main_domain_helper_cookie\
           \ : true}});\n//]]>\n</script>\n\n<meta name=\"csrf-param\" content=\"authenticity_token\"\
-          \ />\n<meta name=\"csrf-token\" content=\"uC4vU0YOI7akR5S2f2iOeUj9/QLLn5jCMmmu/j15W6si/VpIrpUK0P4RLa6j3jYkGKvZpOOMIKDispuTjNrwqw==\"\
+          \ />\n<meta name=\"csrf-token\" content=\"0v5chZLWXu6iRU9AJ2HVxD2oCUm9PH6h/KqthOLELrM/4vdmaxv/J8KY0+oUbkvmQlvW9MMSG7j89KPK+U8TaA==\"\
           \ />\n\n</head>\n<body>\n<!-- Begin comScore Inline Tag 1.1302.13 -->\n\
           <script type=\"text/plain\" class=\"npo_cc_inline_analytics\">\n// <![CDATA[\n\
           function udm_(e){var t=\"comScore=\",n=document,r=n.cookie,i=\"\",s=\"indexOf\"\
@@ -876,13 +869,12 @@ interactions:
           home\" href=\"http://www.npo.nl/\">Start</a></li>\n<li><a data-show-sub-navigation=\"\
           tv_channels\" href=\"http://www.npo.nl/live\">Tv</a></li>\n<li><a data-show-sub-navigation=\"\
           radio_channels\" href=\"http://www.npo.nl/radio\">Radio</a></li>\n<li><a\
-          \ data-show-sub-navigation=\"programs\" href=\"http://www.npo.nl/uitzending-gemist\"\
-          >Gemist</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"http://www.npo.nl/gids\"\
-          >Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"#npoh__specials-menu\"\
-          \ data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
+          \ data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/programmas\"\
+          >Programma&#39;s</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"\
+          http://www.npo.nl/gids\">Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"\
+          #npoh__specials-menu\" data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
           \ data-show-sub-navigation=\"specials\" href=\"http://www.npo.nl/rubrieken\"\
-          >Rubrieken</a></li>\n<li><a data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/a-z\"\
-          >A-Z</a></li>\n</ul>\n\n<form id=\"npoh__search-form\" class=\"npoh__page-search-box\"\
+          >Rubrieken</a></li>\n</ul>\n\n<form id=\"npoh__search-form\" class=\"npoh__page-search-box\"\
           \ action=\"http://www.npo.nl/zoeken\" accept-charset=\"UTF-8\" method=\"\
           get\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\" />\n<div class='npoh__search-box'>\n\
           <input type=\"text\" name=\"q\" id=\"npoh__search-query\" placeholder=\"\
@@ -934,14 +926,13 @@ interactions:
           home\" href=\"http://www.npo.nl/\">Start</a></li>\n<li><a data-show-sub-navigation=\"\
           tv_channels\" href=\"http://www.npo.nl/live\">Tv</a></li>\n<li><a data-show-sub-navigation=\"\
           radio_channels\" href=\"http://www.npo.nl/radio\">Radio</a></li>\n<li><a\
-          \ data-show-sub-navigation=\"programs\" href=\"http://www.npo.nl/uitzending-gemist\"\
-          >Gemist</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"http://www.npo.nl/gids\"\
-          >Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"#npoh__specials-menu\"\
-          \ data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
+          \ data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/programmas\"\
+          >Programma&#39;s</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"\
+          http://www.npo.nl/gids\">Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"\
+          #npoh__specials-menu\" data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
           \ data-show-sub-navigation=\"specials\" href=\"http://www.npo.nl/rubrieken\"\
-          >Rubrieken</a></li>\n<li><a data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/a-z\"\
-          >A-Z</a></li>\n</ul>\n\n</div>\n</div>\n<form id=\"npoh__search-form\" class=\"\
-          npoh__page-search-box\" action=\"http://www.npo.nl/zoeken\" accept-charset=\"\
+          >Rubrieken</a></li>\n</ul>\n\n</div>\n</div>\n<form id=\"npoh__search-form\"\
+          \ class=\"npoh__page-search-box\" action=\"http://www.npo.nl/zoeken\" accept-charset=\"\
           UTF-8\" method=\"get\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\"\
           \ />\n<div class='npoh__search-box'>\n<input type=\"text\" name=\"q\" id=\"\
           npoh__search-query\" placeholder=\"Zoek\" class=\"npoh__search-query-box\"\
@@ -962,32 +953,30 @@ interactions:
           >Account aanmaken</a>\n</div>\n</div>\n\n</div>\n<div class='npoh__specials-menu\
           \ npoh__hide' id='npoh__specials-menu'>\n<div class='npoh__container'>\n\
           <div class='npoh__collapse-menu'>\n<div class='npoh__menu-item-list'>\n\
-          <ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.alles over baby&#x0027;s\
+          <ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.alles over eten\"}'><a\
+          \ href=\"http://www.npo.nl/specials/alles-over-koken\">Alles over eten</a></li>\n\
+          <li data-scorecard='{\"name\":\"home.rubrieken.natuur en milieu\"}'><a href=\"\
+          http://www.npo.nl/specials/natuur-milieu\">Natuur en milieu</a></li>\n</ul>\n\
+          <ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.humor en cabaret\"\
+          }'><a href=\"http://www.npo.nl/specials/Cabaret\">Humor en cabaret</a></li>\n\
+          <li data-scorecard='{\"name\":\"home.rubrieken.alles over baby&#x0027;s\
           \ \"}'><a href=\"http://www.npo.nl/specials/alles-over-baby-s\">Alles over\
-          \ baby&#39;s </a></li>\n<li data-scorecard='{\"name\":\"home.rubrieken.verenigde\
-          \ staten\"}'><a href=\"http://www.npo.nl/specials/usa\">Verenigde Staten</a></li>\n\
-          </ul>\n<ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.series\"}'><a\
-          \ href=\"http://www.npo.nl/series\">Series</a></li>\n<li data-scorecard='{\"\
-          name\":\"home.rubrieken.liefdesfilms\"}'><a href=\"http://www.npo.nl/specials/liefdesfilms\"\
-          >Liefdesfilms</a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.detectives\"\
-          }'><a href=\"http://www.npo.nl/detectives\">Detectives</a></li>\n<li data-scorecard='{\"\
-          name\":\"home.rubrieken.de beste reisdocumentaires\"}'><a href=\"http://www.npo.nl/specials/de-beste-reisdocumentaires\"\
-          >De beste reisdocumentaires</a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"\
-          name\":\"home.rubrieken.alles over eten\"}'><a href=\"http://www.npo.nl/specials/alles-over-koken\"\
-          >Alles over eten</a></li>\n<li data-scorecard='{\"name\":\"home.rubrieken.het\
-          \ koningshuis\"}'><a href=\"http://www.npo.nl/specials/het-koningshuis--2\"\
-          >Het koningshuis</a></li>\n</ul>\n</div>\n<div class='npoh__mobile-menu-dropdowns'>\n\
+          \ baby&#39;s </a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.series\"\
+          }'><a href=\"http://www.npo.nl/series\">Series</a></li>\n<li data-scorecard='{\"\
+          name\":\"home.rubrieken.nederlandse films\"}'><a href=\"http://www.npo.nl/specials/nederlandse-films\"\
+          >Nederlandse films</a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"name\"\
+          :\"home.rubrieken.detectives\"}'><a href=\"http://www.npo.nl/detectives\"\
+          >Detectives</a></li>\n</ul>\n</div>\n<div class='npoh__mobile-menu-dropdowns'>\n\
           <div class='npoh__custom-select npoh__menu-item-dropdown'>\n<div class='npoh__custom-selected'>Alles</div>\n\
           <select name=\"npoh__menu-item\" id=\"npoh__menu-item\" title=\"Menu item\"\
-          ><option value=\"\">Alles</option><option value=\"http://www.npo.nl/specials/alles-over-baby-s\"\
-          >Alles over baby&#39;s </option>\n<option value=\"http://www.npo.nl/specials/usa\"\
-          >Verenigde Staten</option>\n<option value=\"http://www.npo.nl/series\">Series</option>\n\
-          <option value=\"http://www.npo.nl/specials/liefdesfilms\">Liefdesfilms</option>\n\
-          <option value=\"http://www.npo.nl/detectives\">Detectives</option>\n<option\
-          \ value=\"http://www.npo.nl/specials/de-beste-reisdocumentaires\">De beste\
-          \ reisdocumentaires</option>\n<option value=\"http://www.npo.nl/specials/alles-over-koken\"\
-          >Alles over eten</option>\n<option value=\"http://www.npo.nl/specials/het-koningshuis--2\"\
-          >Het koningshuis</option></select>\n</div>\n</div>\n</div>\n<div class='npoh__more-specials-button'><a\
+          ><option value=\"\">Alles</option><option value=\"http://www.npo.nl/specials/alles-over-koken\"\
+          >Alles over eten</option>\n<option value=\"http://www.npo.nl/specials/natuur-milieu\"\
+          >Natuur en milieu</option>\n<option value=\"http://www.npo.nl/specials/Cabaret\"\
+          >Humor en cabaret</option>\n<option value=\"http://www.npo.nl/specials/alles-over-baby-s\"\
+          >Alles over baby&#39;s </option>\n<option value=\"http://www.npo.nl/series\"\
+          >Series</option>\n<option value=\"http://www.npo.nl/specials/nederlandse-films\"\
+          >Nederlandse films</option>\n<option value=\"http://www.npo.nl/detectives\"\
+          >Detectives</option></select>\n</div>\n</div>\n</div>\n<div class='npoh__more-specials-button'><a\
           \ class=\"global__button--ghost content-type__more\" data-scorecard=\"{&quot;name&quot;:&quot;home.rubrieken.meer-rubrieken&quot;}\"\
           \ href=\"http://www.npo.nl/rubrieken\">Meer rubrieken</a></div>\n</div>\n\
           </div>\n\n</div>\n\n<div class='page-content'>\n<div class='content-container'>\n\
@@ -1029,7 +1018,7 @@ interactions:
           \ /></div>\n<div class='thumb-item__top-tag'></div>\n<div class='thumb-item__content'>\n\
           <div class='thumb-item__title'>Als de dijken breken</div>\n<div class='thumb-item__subtitle'>\n\
           <a class=\"global__button--tag content-type__play\" href=\"http://www.npo.nl/als-de-dijken-breken/VPWON_1261083\"\
-          >Kijk nu</a>\nLaatste aflevering 4 dagen geleden\n</div>\n</div>\n<div class='action-buttons'>\n\
+          >Kijk nu</a>\nLaatste aflevering za 10 dec 2016\n</div>\n</div>\n<div class='action-buttons'>\n\
           <div class='favorites-dropdown'>\n<div class='interactive-favorite-button'>\n\
           <a class=\"npo-glyph plus favorite-toggle\" href=\"#\"></a>\n<div class='favorites-actions'>\n\
           \n<a data-mid=\"VPWON_1261083\" data-scorecard=\"{&quot;name&quot;:&quot;programmas.favoriet.VPWON_1261083&quot;,&quot;soft&quot;:true}\"\
@@ -1121,18 +1110,18 @@ interactions:
         cache-control: ['max-age=0, private, must-revalidate']
         connection: [Keep-Alive]
         content-type: [text/html; charset=utf-8]
-        date: ['Wed, 07 Dec 2016 15:47:54 GMT']
-        etag: [W/"8e5ba07dd36766f4d65bf14cea614bdc"]
+        date: ['Tue, 10 Jan 2017 13:47:42 GMT']
+        etag: [W/"61883eeae32e1df7b22dd5995f0ecd4a"]
         keep-alive: ['timeout=1, max=96']
         server: [Apache/2.4.23 (Unix) Phusion_Passenger/4.0.58]
-        set-cookie: [_npo_portal_session=TGpNeFk5VitEWVBmMklmZGc2K2dscm42TENjUUplSk9DcVFtVWlsQXM2ZWdhZERXTXA1VHREUHVoSmc0RHYremtNL2h1UEllQkk4RFJmT2RnQVE0NnNENlVqL01GcTl1ZWc0MlNKZXM1QUJRb0M2Rm9kSWpjenZyZVFabDNiUUlVcGVjdWV5bnFzV21EOW5mN3VSMVhhSUk1UWpmQlRkbE9EaEJQM3FJNlo1dnR1UEFCcGhpSGJyQWh4dVJqbThDLS1KMXduS2E2bjlWeFF1aktzUkpmL3dRPT0%3D--f290ee554e7a99cb0877bafc8a840af044fb814a;
+        set-cookie: [_npo_portal_session=a0t1UWZmcW5xOW9RenE2YVBKOXo1bzdNNVluVDA4RWI3TStFVkZVNXNTOVVtQldyUEVKQ2VzMTRRaGx3cy9RejZlK2JhUEJjVWc1TFB0ancxaXNFTkNIUXppTkdydzlZRFZxOFlDVkE2Y2l4ai9Ycm0rZ3dzMUpUM01OOVh3dlF0WC9PUVBxRThXbmtEdUVBOGhCUUJ2L242T1NvRmZIVXFqSUNZQmFON08yWDcxRWRBalJZUmo3ZVVwWW9NU2ZKLS1UUENUMm1ISjlzUTYzdUwvS3RkUG9nPT0%3D--44ea2b0a9620dff8c862cf35dda86264da5d6dbb;
             domain=npo.nl; path=/; HttpOnly]
         status: [200 OK]
         x-powered-by: [Phusion Passenger 4.0.58]
-        x-proxyinstancename: [npov1d]
-        x-request-id: [bbe21959-b944-4105-96ab-0b6ed6e58901]
-        x-runtime: ['0.571447']
-        x-workerinstancename: [npov2g]
+        x-proxyinstancename: [npov1a]
+        x-request-id: [d85c4453-8e71-44c1-80ef-4082c4c8035f]
+        x-runtime: ['0.249364']
+        x-workerinstancename: [npov2b]
       status: {code: 200, message: OK}
   - request:
       body: null
@@ -1140,8 +1129,8 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: [npo_portal_auth_token_status=created; _npo_portal_session=TGpNeFk5VitEWVBmMklmZGc2K2dscm42TENjUUplSk9DcVFtVWlsQXM2ZWdhZERXTXA1VHREUHVoSmc0RHYremtNL2h1UEllQkk4RFJmT2RnQVE0NnNENlVqL01GcTl1ZWc0MlNKZXM1QUJRb0M2Rm9kSWpjenZyZVFabDNiUUlVcGVjdWV5bnFzV21EOW5mN3VSMVhhSUk1UWpmQlRkbE9EaEJQM3FJNlo1dnR1UEFCcGhpSGJyQWh4dVJqbThDLS1KMXduS2E2bjlWeFF1aktzUkpmL3dRPT0%3D--f290ee554e7a99cb0877bafc8a840af044fb814a]
-        User-Agent: [!!python/unicode 'FlexGet/2.8.0.dev (www.flexget.com)']
+        Cookie: [npo_portal_auth_token_status=created; _npo_portal_session=a0t1UWZmcW5xOW9RenE2YVBKOXo1bzdNNVluVDA4RWI3TStFVkZVNXNTOVVtQldyUEVKQ2VzMTRRaGx3cy9RejZlK2JhUEJjVWc1TFB0ancxaXNFTkNIUXppTkdydzlZRFZxOFlDVkE2Y2l4ai9Ycm0rZ3dzMUpUM01OOVh3dlF0WC9PUVBxRThXbmtEdUVBOGhCUUJ2L242T1NvRmZIVXFqSUNZQmFON08yWDcxRWRBalJZUmo3ZVVwWW9NU2ZKLS1UUENUMm1ISjlzUTYzdUwvS3RkUG9nPT0%3D--44ea2b0a9620dff8c862cf35dda86264da5d6dbb]
+        User-Agent: [!!python/unicode 'FlexGet/2.8.23.dev (www.flexget.com)']
       method: GET
       uri: http://www.npo.nl/als-de-dijken-breken/VPWON_1261083
     response:
@@ -1161,14 +1150,14 @@ interactions:
           <meta content='http://www.npo.nl/sign_in_modal' name='login_modal'>\n<link\
           \ rel=\"stylesheet\" media=\"screen\" href=\"//cookiesv2.publiekeomroep.nl/static/css/npo_cc_styles.css\"\
           \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/vendors-413847168b67bdd298ce80d94a728ea421b19cd959b1c213fe85361e6d6e2a60.css\"\
-          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/components-c9d207b99d9268b1f6f3f37bf145695f65e13a4efb61b8f16b7767df16086a1d.css\"\
-          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/layout-6d88b59d71294eb593869b479e7eef4a2c39fb0f928c5660759e885581c6789b.css\"\
-          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/application-f71fde3ce7717d694112d17805ba18db9c98e0f4d34f3d1e3de5f94328a5fa69.css\"\
+          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/components-95a008ee390359f6f86e3eb43db85368e1a14597f6c8a8ccacfe84deca695c16.css\"\
+          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/layout-d83570084a72d2d8d0328b4de2fa1a54029f682a5a88a74b8e3dbe5d7330690a.css\"\
+          \ />\n<link rel=\"stylesheet\" media=\"all\" href=\"//www-assets.npo.nl/assets/application-3086b183694709d331c4fcb3cb49d29c002d7c8664646d58fb9d04a10ee3f899.css\"\
           \ />\n<!--[if lte IE 8]>\n<link rel=\"stylesheet\" media=\"all\" href=\"\
           //www-assets.npo.nl/assets/ie-2c3aef0b5922d8e9a666c6c5ca3c48dd9250ef07b87ddc7f9f4cae1fbea1d4d3.css\"\
           \ />\n<![endif]-->\n<!--[if lte IE 7]>\n<link rel=\"stylesheet\" media=\"\
           all\" href=\"//www-assets.npo.nl/assets/ie7-1fe92616e92079ba455908152f40f7f7aeab6f7557d47022456a63859cb24ded.css\"\
-          \ />\n<![endif]-->\n<script src=\"//www-assets.npo.nl/assets/application-490d8ddfb7931941141132664f7511d57cff3ca63850e7736d770cc98e2dc88b.js\"\
+          \ />\n<![endif]-->\n<script src=\"//www-assets.npo.nl/assets/application-3191be9ba380a3036d6b7aa8fa379f0fe3a74f6710b4559d155f2e5922ec69da.js\"\
           ></script>\n<script src=\"//cookiesv2.publiekeomroep.nl/data/script/cconsent-no-rw.min.js\"\
           ></script>\n<link rel=\"alternate\" type=\"application/rss+xml\" title=\"\
           Uitgelicht op npo.nl\" href=\"http://www.npo.nl/uitgelicht.rss\" />\n<link\
@@ -1178,10 +1167,12 @@ interactions:
           ,\"ns_site\":\"po-totaal\",\"potag1\":\"npoportal\",\"potag3\":\"npo\",\"\
           potag4\":\"npo\",\"potag5\":\"zenderportal\",\"potag6\":\"video\",\"potag7\"\
           :\"geen\",\"potag8\":\"site\",\"potag9\":\"site\"}' name='scorecard-default-labels'>\n\
-          <meta content='npo.softclick' name='scorecard-default-prefix'>\n<meta content='Serie\
-          \ over een hedendaagse watersnoodramp in Nederland en delen van Vlaanderen.'\
-          \ name='description'>\n<script id='recommended-tile' type='text/x-handlebars-template'>\n\
-          <div class='wide items-carousel-item' data-mid='{{ID}}' data-recommender='{{RECOMMENDER}}'>\n\
+          <meta content='npo.softclick' name='scorecard-default-prefix'>\n<meta content='Zesdelige\
+          \ dramaserie over hedendaagse watersnoodramp in Nederland en delen van Vlaanderen.\
+          \ Wat blijft er van Nederland over als nu de dijken breken? Met o.a. Gijs\
+          \ Scholten van Aschat, Susan Visser en Loek Peters.' name='description'>\n\
+          <script id='recommended-tile' type='text/x-handlebars-template'>\n<div class='wide\
+          \ items-carousel-item' data-mid='{{ID}}' data-recommender='{{RECOMMENDER}}'>\n\
           <div class='strip-item'>\n<a class=\"full-link \" href=\"{{URL}}\"></a>\n\
           <div class='ratio-16x9'>\n<img alt='Afbeelding van {{TITLE}}' src='//images.poms.omroep.nl/image/s720/c720x405/{{IMAGE_ID}}.jpg'\
           \ title='{{IMAGE_TITLE}}'>\n</div>\n<div class='strip-item__content'>\n\
@@ -1190,16 +1181,18 @@ interactions:
           </div>\n</div>\n</div>\n</script>\n\n\n\n\n<script>\n//<![CDATA[\nnpo_cookies.init({settings:\
           \ {set_main_domain_helper_cookie : true}});\n//]]>\n</script>\n\n<meta name=\"\
           csrf-param\" content=\"authenticity_token\" />\n<meta name=\"csrf-token\"\
-          \ content=\"Xsy+gmrFBG4jCiCPgIZtAqyMQ/s526nqpbD/Sn050KWDUcHRgxMk/1pormIXKjj2/9GkQf8eLSmgCHeDUFBEcw==\"\
+          \ content=\"8jD4vn85O9DbHOkwcdlG/gCJzTtVOdMhgT/tt6+c6+d6gzhdIhEmog60EXHtXBsK8K/062McG4qhPDz3l2AvlA==\"\
           \ />\n<meta property=\"og:title\" content=\"Als de dijken breken\" />\n\
           <meta property=\"og:url\" content=\"http://www.npo.nl/als-de-dijken-breken/VPWON_1261083\"\
           \ />\n<meta property=\"og:image\" content=\"https://images.poms.omroep.nl/image/s265/c265x150/823154.png\"\
-          \ />\n<meta property=\"og:description\" content=\"Serie over een hedendaagse\
-          \ watersnoodramp in Nederland en delen van Vlaanderen.\" />\n<meta property=\"\
-          twitter:card\" content=\"summary_large_image\" />\n<meta property=\"og:type\"\
-          \ content=\"video.tv_show\" />\n<meta property=\"og:image:width\" content=\"\
-          265\" />\n<meta property=\"og:image:height\" content=\"150\" />\n</head>\n\
-          <body>\n<!-- Begin comScore Inline Tag 1.1302.13 -->\n<script type=\"text/plain\"\
+          \ />\n<meta property=\"og:description\" content=\"Zesdelige dramaserie over\
+          \ hedendaagse watersnoodramp in Nederland en delen van Vlaanderen. Wat blijft\
+          \ er van Nederland over als nu de dijken breken? Met o.a. Gijs Scholten\
+          \ van Aschat, Susan Visser en Loek Peters.\" />\n<meta property=\"twitter:card\"\
+          \ content=\"summary_large_image\" />\n<meta property=\"og:type\" content=\"\
+          video.tv_show\" />\n<meta property=\"og:image:width\" content=\"265\" />\n\
+          <meta property=\"og:image:height\" content=\"150\" />\n</head>\n<body>\n\
+          <!-- Begin comScore Inline Tag 1.1302.13 -->\n<script type=\"text/plain\"\
           \ class=\"npo_cc_inline_analytics\">\n// <![CDATA[\nfunction udm_(e){var\
           \ t=\"comScore=\",n=document,r=n.cookie,i=\"\",s=\"indexOf\",o=\"substring\"\
           ,u=\"length\",a=2048,f,l=\"&ns_\",c=\"&\",h,p,d,v,m=window,g=m.encodeURIComponent||escape;if(r[s](t)+1)for(d=0,p=r.split(\"\
@@ -1215,7 +1208,7 @@ interactions:
           itemscope\" itemtype=\"http://data-vocabulary.org/Breadcrumb\"><a itemprop=\"\
           url\" href=\"/\"><span itemprop=\"title\">NPO</span></a></div><div itemscope=\"\
           itemscope\" itemtype=\"http://data-vocabulary.org/Breadcrumb\"><a itemprop=\"\
-          url\" href=\"http://www.npo.nl/a-z\"><span itemprop=\"title\">Series</span></a></div><div\
+          url\" href=\"http://www.npo.nl/programmas\"><span itemprop=\"title\">Series</span></a></div><div\
           \ itemscope=\"itemscope\" itemtype=\"http://data-vocabulary.org/Breadcrumb\"\
           ><a itemprop=\"url\" href=\"/als-de-dijken-breken/VPWON_1261083\"><span\
           \ itemprop=\"title\">Als de dijken breken</span></a></div></div>\n<div class='popup-overlay\
@@ -1241,27 +1234,26 @@ interactions:
           <li><a data-scorecard=\"{&quot;name&quot;:&quot;home.start&quot;}\" data-show-sub-navigation=\"\
           home\" href=\"http://www.npo.nl/\">Start</a></li>\n<li><a data-show-sub-navigation=\"\
           tv_channels\" href=\"http://www.npo.nl/live\">Tv</a></li>\n<li><a data-show-sub-navigation=\"\
-          radio_channels\" href=\"http://www.npo.nl/radio\">Radio</a></li>\n<li><a\
-          \ data-show-sub-navigation=\"programs\" href=\"http://www.npo.nl/uitzending-gemist\"\
-          >Gemist</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"http://www.npo.nl/gids\"\
-          >Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"#npoh__specials-menu\"\
-          \ data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
+          radio_channels\" href=\"http://www.npo.nl/radio\">Radio</a></li>\n<li class=\"\
+          active\"><a data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/programmas\"\
+          >Programma&#39;s</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"\
+          http://www.npo.nl/gids\">Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"\
+          #npoh__specials-menu\" data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
           \ data-show-sub-navigation=\"specials\" href=\"http://www.npo.nl/rubrieken\"\
-          >Rubrieken</a></li>\n<li class=\"active\"><a data-show-sub-navigation=\"\
-          shows\" href=\"http://www.npo.nl/a-z\">A-Z</a></li>\n</ul>\n\n<form id=\"\
-          npoh__search-form\" class=\"npoh__page-search-box\" action=\"http://www.npo.nl/zoeken?q=als\"\
-          \ accept-charset=\"UTF-8\" method=\"get\"><input name=\"utf8\" type=\"hidden\"\
-          \ value=\"&#x2713;\" />\n<div class='npoh__search-box'>\n<input type=\"\
-          text\" name=\"q\" id=\"npoh__search-query\" placeholder=\"Zoek\" class=\"\
-          npoh__search-query-box\" tabindex=\"1\" autocomplete=\"off\" />\n<span></span>\n\
-          </div>\n<div class='npoh__search-suggestions npoh__hide' id='npoh__search-suggestions'>\n\
-          <h2>Snel naar een programma</h2>\n<div class='npoh__suggestion-box'></div>\n\
-          <a id=\"npoh__all-results\" class=\"npoh__all-results\" tabindex=\"-1\"\
-          \ href=\"/zoeken\">Bekijk alle zoekresultaten &raquo;</a>\n</div>\n</form>\n\
-          \n\n</div>\n<div class='npoh__sub-nav-wrapper' data-sub-navigation-category='tv_channels'>\n\
-          <div class='npoh__container'>\n<div class='npoh__sub-navigation-container'>\n\
-          <div class='npoh__slider js-slide-left'>\u25C0</div>\n<div class='npoh__sub-navigation-items'>\n\
-          <ul>\n<li><a data-image=\"//www-assets.npo.nl/uploads/tv_channel/263/logo/regular_logo-npo1.png\"\
+          >Rubrieken</a></li>\n</ul>\n\n<form id=\"npoh__search-form\" class=\"npoh__page-search-box\"\
+          \ action=\"http://www.npo.nl/zoeken\" accept-charset=\"UTF-8\" method=\"\
+          get\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\" />\n<div class='npoh__search-box'>\n\
+          <input type=\"text\" name=\"q\" id=\"npoh__search-query\" placeholder=\"\
+          Zoek\" class=\"npoh__search-query-box\" tabindex=\"1\" autocomplete=\"off\"\
+          \ />\n<span></span>\n</div>\n<div class='npoh__search-suggestions npoh__hide'\
+          \ id='npoh__search-suggestions'>\n<h2>Snel naar een programma</h2>\n<div\
+          \ class='npoh__suggestion-box'></div>\n<a id=\"npoh__all-results\" class=\"\
+          npoh__all-results\" tabindex=\"-1\" href=\"/zoeken\">Bekijk alle zoekresultaten\
+          \ &raquo;</a>\n</div>\n</form>\n\n\n</div>\n<div class='npoh__sub-nav-wrapper'\
+          \ data-sub-navigation-category='tv_channels'>\n<div class='npoh__container'>\n\
+          <div class='npoh__sub-navigation-container'>\n<div class='npoh__slider js-slide-left'>\u25C0\
+          </div>\n<div class='npoh__sub-navigation-items'>\n<ul>\n<li><a data-image=\"\
+          //www-assets.npo.nl/uploads/tv_channel/263/logo/regular_logo-npo1.png\"\
           \ href=\"http://www.npo.nl/live/npo-1\">NPO 1</a></li>\n<li><a data-image=\"\
           //www-assets.npo.nl/uploads/tv_channel/264/logo/regular_logo-npo2.png\"\
           \ href=\"http://www.npo.nl/live/npo-2\">NPO 2</a></li>\n<li><a data-image=\"\
@@ -1299,22 +1291,20 @@ interactions:
           <li><a data-scorecard=\"{&quot;name&quot;:&quot;home.start&quot;}\" data-show-sub-navigation=\"\
           home\" href=\"http://www.npo.nl/\">Start</a></li>\n<li><a data-show-sub-navigation=\"\
           tv_channels\" href=\"http://www.npo.nl/live\">Tv</a></li>\n<li><a data-show-sub-navigation=\"\
-          radio_channels\" href=\"http://www.npo.nl/radio\">Radio</a></li>\n<li><a\
-          \ data-show-sub-navigation=\"programs\" href=\"http://www.npo.nl/uitzending-gemist\"\
-          >Gemist</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"http://www.npo.nl/gids\"\
-          >Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"#npoh__specials-menu\"\
-          \ data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
+          radio_channels\" href=\"http://www.npo.nl/radio\">Radio</a></li>\n<li class=\"\
+          active\"><a data-show-sub-navigation=\"shows\" href=\"http://www.npo.nl/programmas\"\
+          >Programma&#39;s</a></li>\n<li><a data-show-sub-navigation=\"guides\" href=\"\
+          http://www.npo.nl/gids\">Gids</a></li>\n<li><a class=\"npoh__toggler\" data-target=\"\
+          #npoh__specials-menu\" data-scorecard=\"{&quot;soft&quot;:true,&quot;name&quot;:&quot;home.rubrieken&quot;}\"\
           \ data-show-sub-navigation=\"specials\" href=\"http://www.npo.nl/rubrieken\"\
-          >Rubrieken</a></li>\n<li class=\"active\"><a data-show-sub-navigation=\"\
-          shows\" href=\"http://www.npo.nl/a-z\">A-Z</a></li>\n</ul>\n\n</div>\n</div>\n\
-          <form id=\"npoh__search-form\" class=\"npoh__page-search-box\" action=\"\
-          http://www.npo.nl/zoeken?q=als\" accept-charset=\"UTF-8\" method=\"get\"\
-          ><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\" />\n<div class='npoh__search-box'>\n\
-          <input type=\"text\" name=\"q\" id=\"npoh__search-query\" placeholder=\"\
-          Zoek\" class=\"npoh__search-query-box\" tabindex=\"1\" autocomplete=\"off\"\
-          \ />\n<span></span>\n</div>\n<div class='npoh__search-suggestions npoh__hide'\
-          \ id='npoh__search-suggestions'>\n<h2>Snel naar een programma</h2>\n<div\
-          \ class='npoh__suggestion-box'></div>\n<a id=\"npoh__all-results\" class=\"\
+          >Rubrieken</a></li>\n</ul>\n\n</div>\n</div>\n<form id=\"npoh__search-form\"\
+          \ class=\"npoh__page-search-box\" action=\"http://www.npo.nl/zoeken\" accept-charset=\"\
+          UTF-8\" method=\"get\"><input name=\"utf8\" type=\"hidden\" value=\"&#x2713;\"\
+          \ />\n<div class='npoh__search-box'>\n<input type=\"text\" name=\"q\" id=\"\
+          npoh__search-query\" placeholder=\"Zoek\" class=\"npoh__search-query-box\"\
+          \ tabindex=\"1\" autocomplete=\"off\" />\n<span></span>\n</div>\n<div class='npoh__search-suggestions\
+          \ npoh__hide' id='npoh__search-suggestions'>\n<h2>Snel naar een programma</h2>\n\
+          <div class='npoh__suggestion-box'></div>\n<a id=\"npoh__all-results\" class=\"\
           npoh__all-results\" tabindex=\"-1\" href=\"/zoeken\">Bekijk alle zoekresultaten\
           \ &raquo;</a>\n</div>\n</form>\n\n\n<div class='npoh__profile-box'>\n\n\
           <div class='npoh__signed-in npoh__hide'>\n<a class=\"js-sign-out\" rel=\"\
@@ -1329,40 +1319,40 @@ interactions:
           >Account aanmaken</a>\n</div>\n</div>\n\n</div>\n<div class='npoh__specials-menu\
           \ npoh__hide' id='npoh__specials-menu'>\n<div class='npoh__container'>\n\
           <div class='npoh__collapse-menu'>\n<div class='npoh__menu-item-list'>\n\
-          <ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.alles over baby&#x0027;s\
+          <ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.alles over eten\"}'><a\
+          \ href=\"http://www.npo.nl/specials/alles-over-koken\">Alles over eten</a></li>\n\
+          <li data-scorecard='{\"name\":\"home.rubrieken.natuur en milieu\"}'><a href=\"\
+          http://www.npo.nl/specials/natuur-milieu\">Natuur en milieu</a></li>\n</ul>\n\
+          <ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.humor en cabaret\"\
+          }'><a href=\"http://www.npo.nl/specials/Cabaret\">Humor en cabaret</a></li>\n\
+          <li data-scorecard='{\"name\":\"home.rubrieken.alles over baby&#x0027;s\
           \ \"}'><a href=\"http://www.npo.nl/specials/alles-over-baby-s\">Alles over\
-          \ baby&#39;s </a></li>\n<li data-scorecard='{\"name\":\"home.rubrieken.verenigde\
-          \ staten\"}'><a href=\"http://www.npo.nl/specials/usa\">Verenigde Staten</a></li>\n\
-          </ul>\n<ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.series\"}'><a\
-          \ href=\"http://www.npo.nl/series\">Series</a></li>\n<li data-scorecard='{\"\
-          name\":\"home.rubrieken.liefdesfilms\"}'><a href=\"http://www.npo.nl/specials/liefdesfilms\"\
-          >Liefdesfilms</a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.detectives\"\
-          }'><a href=\"http://www.npo.nl/detectives\">Detectives</a></li>\n<li data-scorecard='{\"\
-          name\":\"home.rubrieken.de beste reisdocumentaires\"}'><a href=\"http://www.npo.nl/specials/de-beste-reisdocumentaires\"\
-          >De beste reisdocumentaires</a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"\
-          name\":\"home.rubrieken.alles over eten\"}'><a href=\"http://www.npo.nl/specials/alles-over-koken\"\
-          >Alles over eten</a></li>\n<li data-scorecard='{\"name\":\"home.rubrieken.het\
-          \ koningshuis\"}'><a href=\"http://www.npo.nl/specials/het-koningshuis--2\"\
-          >Het koningshuis</a></li>\n</ul>\n</div>\n<div class='npoh__mobile-menu-dropdowns'>\n\
+          \ baby&#39;s </a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"name\":\"home.rubrieken.series\"\
+          }'><a href=\"http://www.npo.nl/series\">Series</a></li>\n<li data-scorecard='{\"\
+          name\":\"home.rubrieken.nederlandse films\"}'><a href=\"http://www.npo.nl/specials/nederlandse-films\"\
+          >Nederlandse films</a></li>\n</ul>\n<ul>\n<li data-scorecard='{\"name\"\
+          :\"home.rubrieken.detectives\"}'><a href=\"http://www.npo.nl/detectives\"\
+          >Detectives</a></li>\n</ul>\n</div>\n<div class='npoh__mobile-menu-dropdowns'>\n\
           <div class='npoh__custom-select npoh__menu-item-dropdown'>\n<div class='npoh__custom-selected'>Alles</div>\n\
           <select name=\"npoh__menu-item\" id=\"npoh__menu-item\" title=\"Menu item\"\
-          ><option value=\"\">Alles</option><option value=\"http://www.npo.nl/specials/alles-over-baby-s\"\
-          >Alles over baby&#39;s </option>\n<option value=\"http://www.npo.nl/specials/usa\"\
-          >Verenigde Staten</option>\n<option value=\"http://www.npo.nl/series\">Series</option>\n\
-          <option value=\"http://www.npo.nl/specials/liefdesfilms\">Liefdesfilms</option>\n\
-          <option value=\"http://www.npo.nl/detectives\">Detectives</option>\n<option\
-          \ value=\"http://www.npo.nl/specials/de-beste-reisdocumentaires\">De beste\
-          \ reisdocumentaires</option>\n<option value=\"http://www.npo.nl/specials/alles-over-koken\"\
-          >Alles over eten</option>\n<option value=\"http://www.npo.nl/specials/het-koningshuis--2\"\
-          >Het koningshuis</option></select>\n</div>\n</div>\n</div>\n<div class='npoh__more-specials-button'><a\
+          ><option value=\"\">Alles</option><option value=\"http://www.npo.nl/specials/alles-over-koken\"\
+          >Alles over eten</option>\n<option value=\"http://www.npo.nl/specials/natuur-milieu\"\
+          >Natuur en milieu</option>\n<option value=\"http://www.npo.nl/specials/Cabaret\"\
+          >Humor en cabaret</option>\n<option value=\"http://www.npo.nl/specials/alles-over-baby-s\"\
+          >Alles over baby&#39;s </option>\n<option value=\"http://www.npo.nl/series\"\
+          >Series</option>\n<option value=\"http://www.npo.nl/specials/nederlandse-films\"\
+          >Nederlandse films</option>\n<option value=\"http://www.npo.nl/detectives\"\
+          >Detectives</option></select>\n</div>\n</div>\n</div>\n<div class='npoh__more-specials-button'><a\
           \ class=\"global__button--ghost content-type__more\" data-scorecard=\"{&quot;name&quot;:&quot;home.rubrieken.meer-rubrieken&quot;}\"\
           \ href=\"http://www.npo.nl/rubrieken\">Meer rubrieken</a></div>\n</div>\n\
           </div>\n\n</div>\n\n<div class=\"schema-org-props hidden-item-props\"><div\
           \ itemscope=\"itemscope\" itemtype=\"http://schema.org/TVSeries\"><a itemprop=\"\
           url\" href=\"/als-de-dijken-breken/VPWON_1261083\"><span itemprop=\"name\"\
-          >Als de dijken breken</span></a><span itemprop=\"description\">Serie over\
-          \ een hedendaagse watersnoodramp in Nederland en delen van Vlaanderen.</span><span\
-          \ itemprop=\"inLanguage\">nl</span></div></div>\n<div class='showcase showcase-fluid'>\n\
+          >Als de dijken breken</span></a><span itemprop=\"description\">Zesdelige\
+          \ dramaserie over hedendaagse watersnoodramp in Nederland en delen van Vlaanderen.\
+          \ Wat blijft er van Nederland over als nu de dijken breken? Met o.a. Gijs\
+          \ Scholten van Aschat, Susan Visser en Loek Peters.</span><span itemprop=\"\
+          inLanguage\">nl</span></div></div>\n<div class='showcase showcase-fluid'>\n\
           <div class='showcase-background' style='background-image: url(//www-assets.npo.nl/uploads/media_item/media_item/173/94/ADDB_beeld_cover_blurred-1479811715.jpg)'>\n\
           <div class='header-gradient'>\n<div class='info no-overlay-for-small-screen'>\n\
           <div class='container'><div id='header'>\n<div class='row-fluid visible-no-grid-collapse'>\n\
@@ -1370,15 +1360,17 @@ interactions:
           \ title=\"EO\" target=\"_blank\" href=\"http://www.eo.nl\"><img class=\"\
           no-shadow\" src=\"//www-assets.npo.nl/uploads/broadcaster/25/logo/regular_EO.png\"\
           \ alt=\"Regular eo\" /></a></div>\n<h1>Als de dijken breken</h1>\n</div>\n\
-          <div class='row-fluid'>\n<div class='span12'>\n<h2>Zaterdag om 20:25 op\
-          \ NPO 1</h2>\n</div>\n</div>\n<div class='row-fluid'>\n<div class='span4'><img\
-          \ alt=\"Afbeelding van Als de dijken breken\" src=\"//images.poms.omroep.nl/image/s174/c174x98/823154.png\"\
-          \ /></div>\n<div class='span8'>\n<div class='metadata overflow-description'>Serie\
-          \ over een hedendaagse watersnoodramp in Nederland en delen van Vlaanderen.</div>\n\
-          </div>\n</div>\n</div>\n<div class='span-sidebar'>\n<div class='actions'><div\
-          \ class='action-buttons'>\n<div class='favorites-dropdown'>\n<div class='interactive-favorite-button'>\n\
-          <a class=\"npo-glyph plus favorite-toggle\" href=\"#\"></a>\n<div class='favorites-actions'><a\
-          \ data-mid=\"VPWON_1261083\" data-scorecard=\"{&quot;name&quot;:&quot;programmas.favoriet.VPWON_1261083&quot;,&quot;soft&quot;:true}\"\
+          <div class='row-fluid'>\n<div class='span12'>\n</div>\n</div>\n<div class='row-fluid'>\n\
+          <div class='span4'><img alt=\"Afbeelding van Als de dijken breken\" src=\"\
+          //images.poms.omroep.nl/image/s174/c174x98/823154.png\" /></div>\n<div class='span8'>\n\
+          <div class='metadata overflow-description'>Zesdelige dramaserie over hedendaagse\
+          \ watersnoodramp in Nederland en delen van Vlaanderen. Wat blijft er van\
+          \ Nederland over als nu de dijken breken? Met o.a. Gijs Scholten van Aschat,\
+          \ Susan Visser en Loek Peters.</div>\n</div>\n</div>\n</div>\n<div class='span-sidebar'>\n\
+          <div class='actions'><div class='action-buttons'>\n<div class='favorites-dropdown'>\n\
+          <div class='interactive-favorite-button'>\n<a class=\"npo-glyph plus favorite-toggle\"\
+          \ href=\"#\"></a>\n<div class='favorites-actions'><a data-mid=\"VPWON_1261083\"\
+          \ data-scorecard=\"{&quot;name&quot;:&quot;programmas.favoriet.VPWON_1261083&quot;,&quot;soft&quot;:true}\"\
           \ class=\"favorite-button\" href=\"#\"><div class=\"npo-glyph heart\"></div></a></div>\n\
           </div>\n</div>\n<a data-id=\"VPWON_1261083\" class=\"last  share-modal-button\"\
           \ rel=\"nofollow\" href=\"/als-de-dijken-breken/VPWON_1261083/delen\"><span\
@@ -1387,12 +1379,17 @@ interactions:
           ><i class=\"npo-icon-jump-box\"></i>\nNaar de website\n</a></div>\n</div>\n\
           </div>\n</div>\n<div class='row-fluid visible-with-grid-collapse non-responsive'>\n\
           <div class='span8'>\n<h1>\nAls de dijken breken\n<span class='inactive'>(<span\
-          \ id=\"broadcaster\">EO</span>)</span>\n</h1>\n<h2>Zaterdag om 20:25 op\
-          \ NPO 1</h2>\n<div class='metadata visible-no-grid-collapse' title='Serie\
-          \ over een hedendaagse watersnoodramp in Nederland en delen van Vlaanderen.'>\n\
-          <p>Serie over een hedendaagse watersnoodramp in Nederland en delen van Vlaanderen.</p>\n\
-          </div>\n<div class='actions visible-no-grid-collapse'><div class='action-buttons'>\n\
-          <div class='favorites-dropdown'>\n<div class='interactive-favorite-button'>\n\
+          \ id=\"broadcaster\">EO</span>)</span>\n</h1>\n<div class='metadata visible-no-grid-collapse'\
+          \ title='Zesdelige dramaserie over hedendaagse watersnoodramp in Nederland\
+          \ en delen van Vlaanderen. Wat blijft er van Nederland over als nu de dijken\
+          \ breken? Met o.a. Gijs Scholten van Aschat, Susan Visser en Loek Peters.'>\n\
+          <p><span>Zesdelige dramaserie over hedendaagse watersnoodramp in Nederland\
+          \ en delen van Vlaanderen. Wat blijft er van Nederland over als nu de dijken\
+          \ </span><span class=\"omission\">...<a class=\"overflow-toggle\" href=\"\
+          #\">Meer</a></span><span class=\"omission-overflow hide\">breken? Met o.a.\
+          \ Gijs Scholten van Aschat, Susan Visser en Loek Peters.<a class=\"overflow-toggle\
+          \ less\" href=\"#\">Minder</a></span></p>\n</div>\n<div class='actions visible-no-grid-collapse'><div\
+          \ class='action-buttons'>\n<div class='favorites-dropdown'>\n<div class='interactive-favorite-button'>\n\
           <a class=\"npo-glyph plus favorite-toggle\" href=\"#\"></a>\n<div class='favorites-actions'><a\
           \ data-mid=\"VPWON_1261083\" data-scorecard=\"{&quot;name&quot;:&quot;programmas.favoriet.VPWON_1261083&quot;,&quot;soft&quot;:true}\"\
           \ class=\"favorite-button\" href=\"#\"><div class=\"npo-glyph heart\"></div></a></div>\n\
@@ -1439,29 +1436,39 @@ interactions:
           program-end\" />\n</li>\n</ul></div></div>\n</div>\n<div class='row-fluid'>\n\
           <div class='span12'>\n<div class='broadcast-block video-container-block'\
           \ data-media-type='broadcast' id='broadcasts-block'>\n<span class='filter-info'></span>\n\
-          <div class='content'><div class='search-results' data-num-found='5' data-rows='8'\
+          <div class='content'><div class='search-results' data-num-found='6' data-rows='8'\
           \ data-start='0'>\n<div class='js-search-result list-item non-responsive\
-          \ row-fluid' data-crid='crid://npo.nl/VPWON_1243429'>\n<div class='span4'>\n\
-          <div class='image-container'>\n<a href=\"/als-de-dijken-breken/03-12-2016/VPWON_1243429\"\
+          \ row-fluid' data-crid='crid://npo.nl/VPWON_1243430'>\n<div class='span4'>\n\
+          <div class='image-container'>\n<a href=\"/als-de-dijken-breken/10-12-2016/VPWON_1243430\"\
           ><img alt=\"Afbeelding van Als de dijken breken\" class=\"program-image\"\
-          \ data-images=\"[&quot;//images.poms.omroep.nl/image/s174/c174x98/827310.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/837085.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/837086.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/837087.png&quot;]\"\
+          \ data-images=\"[&quot;//images.poms.omroep.nl/image/s174/c174x98/827311.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/839978.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/839979.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/839980.png&quot;]\"\
+          \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/827311.png\"\
+          \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
+          \ 47:04</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken/10-12-2016/VPWON_1243430\"\
+          ><h4>\nAflevering 6\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
+          </h4>\n<h5>Za 10 dec 2016 20:30 \xB7 47 min</h5>\n<p class='without-title\
+          \ visible-for-desktop'>Het water trekt weg en langzaam wordt er weer naar\
+          \ de toekomst gekeken: Ronnie wil met zijn familie naar het buitenland en\
+          \ Stein gaat met nieuws over haar moeder op zoek naar Kimmy.</p>\n</a></div>\n\
+          </div>\n<div class='js-search-result list-item non-responsive row-fluid'\
+          \ data-crid='crid://npo.nl/VPWON_1243429'>\n<div class='span4'>\n<div class='image-container'>\n\
+          <a href=\"/als-de-dijken-breken/03-12-2016/VPWON_1243429\"><img alt=\"Afbeelding\
+          \ van Als de dijken breken\" class=\"program-image\" data-images=\"[&quot;//images.poms.omroep.nl/image/s174/c174x98/827310.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/837085.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/837086.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/837087.png&quot;]\"\
           \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/827310.png\"\
           \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
           \ 48:30</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken/03-12-2016/VPWON_1243429\"\
-          ><h4>\nEen hart onder de riem\n<span class='inactive'>(EO)</span>\n<span\
-          \ class='av-icon'></span>\n</h4>\n<h5>Za 3 dec 2016 20:25 \xB7 48 min</h5>\n\
-          <p class='without-title visible-for-desktop'>Zowel Ronnie als Samir zijn\
-          \ inmiddels op het droge onderweg naar hun families. Nu de vluchtelingenopvang\
-          \ georganiseerd is en familieleden elkaar terugvinden, wordt er een dankdag\
-          \ gehouden.</p>\n</a></div>\n</div>\n<div class='js-search-result list-item\
-          \ non-responsive row-fluid' data-crid='crid://npo.nl/VPWON_1243428'>\n<div\
-          \ class='span4'>\n<div class='image-container'>\n<a href=\"/als-de-dijken-breken/26-11-2016/VPWON_1243428\"\
+          ><h4>\nAflevering 5\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
+          </h4>\n<h5>Za 3 dec 2016 20:25 \xB7 48 min</h5>\n<p class='without-title\
+          \ visible-for-desktop'>Zowel Ronnie als Samir zijn inmiddels op het droge\
+          \ onderweg naar hun families.</p>\n</a></div>\n</div>\n<div class='js-search-result\
+          \ list-item non-responsive row-fluid' data-crid='crid://npo.nl/VPWON_1243428'>\n\
+          <div class='span4'>\n<div class='image-container'>\n<a href=\"/als-de-dijken-breken/26-11-2016/VPWON_1243428\"\
           ><img alt=\"Afbeelding van Als de dijken breken\" class=\"program-image\"\
           \ data-images=\"[&quot;//images.poms.omroep.nl/image/s174/c174x98/827307.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/834250.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/834251.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/834252.png&quot;]\"\
           \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/827307.png\"\
           \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
           \ 46:02</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken/26-11-2016/VPWON_1243428\"\
-          ><h4>\nOp het droge\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
+          ><h4>\nAflevering 4\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
           </h4>\n<h5>Za 26 nov 2016 20:25 \xB7 46 min</h5>\n<p class='without-title\
           \ visible-for-desktop'>Terwijl Ronnie en Samir nog op hun vlot het ondergelopen\
           \ Rotterdam proberen te ontkomen, is minister-president Kreuger al bezig\
@@ -1473,7 +1480,7 @@ interactions:
           \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/821431.png\"\
           \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
           \ 48:32</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken/19-11-2016/VPWON_1243427\"\
-          ><h4>\nStilte na de storm\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
+          ><h4>\nAflevering 3\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
           </h4>\n<h5>Za 19 nov 2016 20:25 \xB7 48 min</h5>\n<p class='without-title\
           \ visible-for-desktop'>De dag na de storm wordt de eerste schade opgenomen:\
           \ het water staat 2,5 meter hoog in de kuststreek en tienduizenden mensen\
@@ -1485,20 +1492,20 @@ interactions:
           \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/827280.png\"\
           \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
           \ 47:30</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken/12-11-2016/VPWON_1243426\"\
-          ><h4>\nCode rood\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
+          ><h4>\nAflevering 2\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
           </h4>\n<h5>Za 12 nov 2016 20:25 \xB7 47 min</h5>\n<p class='without-title\
           \ visible-for-desktop'>De kuststreken van Belgi\xEB en Nederland stromen\
           \ snel onder nu de dijken zijn gebroken. Daarbij raken de snelwegen in de\
-          \ Randstad verstopt door de uitvlucht richting hoger gelegen gebied.</p>\n\
-          </a></div>\n</div>\n<div class='js-search-result list-item non-responsive\
-          \ row-fluid' data-crid='crid://npo.nl/VPWON_1243425'>\n<div class='span4'>\n\
-          <div class='image-container'>\n<a href=\"/als-de-dijken-breken/05-11-2016/VPWON_1243425\"\
+          \ Randstad verstopt door de ongeco\xF6rdineerde uitvlucht richting hoger\
+          \ gelegen gebied.</p>\n</a></div>\n</div>\n<div class='js-search-result\
+          \ list-item non-responsive row-fluid' data-crid='crid://npo.nl/VPWON_1243425'>\n\
+          <div class='span4'>\n<div class='image-container'>\n<a href=\"/als-de-dijken-breken/05-11-2016/VPWON_1243425\"\
           ><img alt=\"Afbeelding van Als de dijken breken\" class=\"program-image\"\
           \ data-images=\"[&quot;//images.poms.omroep.nl/image/s174/c174x98/821430.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/825428.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/825429.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/825430.png&quot;]\"\
           \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/821430.png\"\
           \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
           \ 46:04</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken/05-11-2016/VPWON_1243425\"\
-          ><h4>\nDijkring 14\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
+          ><h4>\nAflevering 1\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
           </h4>\n<h5>Za 5 nov 2016 20:25 \xB7 46 min</h5>\n<p class='without-title\
           \ visible-for-desktop'>Een zware storm trekt langs West-Europa. Wanneer\
           \ de Belgische minister-president besluit de kuststreek bij Oostende te\
@@ -1625,15 +1632,15 @@ interactions:
       headers:
         accept-ranges: [bytes]
         connection: [Keep-Alive]
-        content-length: ['40569']
+        content-length: ['42154']
         content-type: [text/html]
-        date: ['Wed, 07 Dec 2016 15:47:55 GMT']
-        etag: ['"9e79-543137186f4b1"']
+        date: ['Tue, 10 Jan 2017 13:47:43 GMT']
+        etag: ['"a4aa-545bdb270a5a7"']
         keep-alive: ['timeout=1, max=100']
-        last-modified: ['Wed, 07 Dec 2016 15:47:51 GMT']
+        last-modified: ['Tue, 10 Jan 2017 13:45:28 GMT']
         server: [Apache/2.4.23 (Unix) OpenSSL/1.0.2j]
         vary: [Cookie]
-        x-proxyinstancename: [npov1c]
+        x-proxyinstancename: [npov1b]
       status: {code: 200, message: OK}
   - request:
       body: null
@@ -1641,34 +1648,44 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: [npo_portal_auth_token_status=created; _npo_portal_session=TGpNeFk5VitEWVBmMklmZGc2K2dscm42TENjUUplSk9DcVFtVWlsQXM2ZWdhZERXTXA1VHREUHVoSmc0RHYremtNL2h1UEllQkk4RFJmT2RnQVE0NnNENlVqL01GcTl1ZWc0MlNKZXM1QUJRb0M2Rm9kSWpjenZyZVFabDNiUUlVcGVjdWV5bnFzV21EOW5mN3VSMVhhSUk1UWpmQlRkbE9EaEJQM3FJNlo1dnR1UEFCcGhpSGJyQWh4dVJqbThDLS1KMXduS2E2bjlWeFF1aktzUkpmL3dRPT0%3D--f290ee554e7a99cb0877bafc8a840af044fb814a]
-        User-Agent: [!!python/unicode 'FlexGet/2.8.0.dev (www.flexget.com)']
+        Cookie: [npo_portal_auth_token_status=created; _npo_portal_session=a0t1UWZmcW5xOW9RenE2YVBKOXo1bzdNNVluVDA4RWI3TStFVkZVNXNTOVVtQldyUEVKQ2VzMTRRaGx3cy9RejZlK2JhUEJjVWc1TFB0ancxaXNFTkNIUXppTkdydzlZRFZxOFlDVkE2Y2l4ai9Ycm0rZ3dzMUpUM01OOVh3dlF0WC9PUVBxRThXbmtEdUVBOGhCUUJ2L242T1NvRmZIVXFqSUNZQmFON08yWDcxRWRBalJZUmo3ZVVwWW9NU2ZKLS1UUENUMm1ISjlzUTYzdUwvS3RkUG9nPT0%3D--44ea2b0a9620dff8c862cf35dda86264da5d6dbb]
+        User-Agent: [!!python/unicode 'FlexGet/2.8.23.dev (www.flexget.com)']
       method: GET
-      uri: http://www.npo.nl/als-de-dijken-breken/VPWON_1261083/search?category=broadcasts
+      uri: http://www.npo.nl/als-de-dijken-breken/VPWON_1261083/search?media_type=broadcast
     response:
       body: {string: "<div class='search-results' data-num-found='6' data-rows='8'\
           \ data-start='0'>\n<div class='js-search-result list-item non-responsive\
-          \ row-fluid' data-crid='crid://npo.nl/VPWON_1243429'>\n<div class='span4'>\n\
-          <div class='image-container'>\n<a href=\"/als-de-dijken-breken/03-12-2016/VPWON_1243429\"\
+          \ row-fluid' data-crid='crid://npo.nl/VPWON_1243430'>\n<div class='span4'>\n\
+          <div class='image-container'>\n<a href=\"/als-de-dijken-breken/10-12-2016/VPWON_1243430\"\
           ><img alt=\"Afbeelding van Als de dijken breken\" class=\"program-image\"\
-          \ data-images=\"[&quot;//images.poms.omroep.nl/image/s174/c174x98/827310.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/837085.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/837086.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/837087.png&quot;]\"\
+          \ data-images=\"[&quot;//images.poms.omroep.nl/image/s174/c174x98/827311.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/839978.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/839979.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/839980.png&quot;]\"\
+          \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/827311.png\"\
+          \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
+          \ 47:04</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken/10-12-2016/VPWON_1243430\"\
+          ><h4>\nAflevering 6\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
+          </h4>\n<h5>Za 10 dec 2016 20:30 \xB7 47 min</h5>\n<p class='without-title\
+          \ visible-for-desktop'>Het water trekt weg en langzaam wordt er weer naar\
+          \ de toekomst gekeken: Ronnie wil met zijn familie naar het buitenland en\
+          \ Stein gaat met nieuws over haar moeder op zoek naar Kimmy.</p>\n</a></div>\n\
+          </div>\n<div class='js-search-result list-item non-responsive row-fluid'\
+          \ data-crid='crid://npo.nl/VPWON_1243429'>\n<div class='span4'>\n<div class='image-container'>\n\
+          <a href=\"/als-de-dijken-breken/03-12-2016/VPWON_1243429\"><img alt=\"Afbeelding\
+          \ van Als de dijken breken\" class=\"program-image\" data-images=\"[&quot;//images.poms.omroep.nl/image/s174/c174x98/827310.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/837085.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/837086.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/837087.png&quot;]\"\
           \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/827310.png\"\
           \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
           \ 48:30</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken/03-12-2016/VPWON_1243429\"\
-          ><h4>\nEen hart onder de riem\n<span class='inactive'>(EO)</span>\n<span\
-          \ class='av-icon'></span>\n</h4>\n<h5>Za 3 dec 2016 20:25 \xB7 48 min</h5>\n\
-          <p class='without-title visible-for-desktop'>Zowel Ronnie als Samir zijn\
-          \ inmiddels op het droge onderweg naar hun families. Nu de vluchtelingenopvang\
-          \ georganiseerd is en familieleden elkaar terugvinden, wordt er een dankdag\
-          \ gehouden.</p>\n</a></div>\n</div>\n<div class='js-search-result list-item\
-          \ non-responsive row-fluid' data-crid='crid://npo.nl/VPWON_1243428'>\n<div\
-          \ class='span4'>\n<div class='image-container'>\n<a href=\"/als-de-dijken-breken/26-11-2016/VPWON_1243428\"\
+          ><h4>\nAflevering 5\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
+          </h4>\n<h5>Za 3 dec 2016 20:25 \xB7 48 min</h5>\n<p class='without-title\
+          \ visible-for-desktop'>Zowel Ronnie als Samir zijn inmiddels op het droge\
+          \ onderweg naar hun families.</p>\n</a></div>\n</div>\n<div class='js-search-result\
+          \ list-item non-responsive row-fluid' data-crid='crid://npo.nl/VPWON_1243428'>\n\
+          <div class='span4'>\n<div class='image-container'>\n<a href=\"/als-de-dijken-breken/26-11-2016/VPWON_1243428\"\
           ><img alt=\"Afbeelding van Als de dijken breken\" class=\"program-image\"\
           \ data-images=\"[&quot;//images.poms.omroep.nl/image/s174/c174x98/827307.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/834250.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/834251.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/834252.png&quot;]\"\
           \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/827307.png\"\
           \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
           \ 46:02</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken/26-11-2016/VPWON_1243428\"\
-          ><h4>\nOp het droge\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
+          ><h4>\nAflevering 4\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
           </h4>\n<h5>Za 26 nov 2016 20:25 \xB7 46 min</h5>\n<p class='without-title\
           \ visible-for-desktop'>Terwijl Ronnie en Samir nog op hun vlot het ondergelopen\
           \ Rotterdam proberen te ontkomen, is minister-president Kreuger al bezig\
@@ -1680,7 +1697,7 @@ interactions:
           \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/821431.png\"\
           \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
           \ 48:32</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken/19-11-2016/VPWON_1243427\"\
-          ><h4>\nStilte na de storm\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
+          ><h4>\nAflevering 3\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
           </h4>\n<h5>Za 19 nov 2016 20:25 \xB7 48 min</h5>\n<p class='without-title\
           \ visible-for-desktop'>De dag na de storm wordt de eerste schade opgenomen:\
           \ het water staat 2,5 meter hoog in de kuststreek en tienduizenden mensen\
@@ -1692,54 +1709,40 @@ interactions:
           \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/827280.png\"\
           \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
           \ 47:30</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken/12-11-2016/VPWON_1243426\"\
-          ><h4>\nCode rood\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
+          ><h4>\nAflevering 2\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
           </h4>\n<h5>Za 12 nov 2016 20:25 \xB7 47 min</h5>\n<p class='without-title\
           \ visible-for-desktop'>De kuststreken van Belgi\xEB en Nederland stromen\
           \ snel onder nu de dijken zijn gebroken. Daarbij raken de snelwegen in de\
-          \ Randstad verstopt door de uitvlucht richting hoger gelegen gebied.</p>\n\
-          </a></div>\n</div>\n<div class='js-search-result list-item non-responsive\
-          \ row-fluid' data-crid='crid://npo.nl/VPWON_1243425'>\n<div class='span4'>\n\
-          <div class='image-container'>\n<a href=\"/als-de-dijken-breken/05-11-2016/VPWON_1243425\"\
+          \ Randstad verstopt door de ongeco\xF6rdineerde uitvlucht richting hoger\
+          \ gelegen gebied.</p>\n</a></div>\n</div>\n<div class='js-search-result\
+          \ list-item non-responsive row-fluid' data-crid='crid://npo.nl/VPWON_1243425'>\n\
+          <div class='span4'>\n<div class='image-container'>\n<a href=\"/als-de-dijken-breken/05-11-2016/VPWON_1243425\"\
           ><img alt=\"Afbeelding van Als de dijken breken\" class=\"program-image\"\
           \ data-images=\"[&quot;//images.poms.omroep.nl/image/s174/c174x98/821430.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/825428.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/825429.png&quot;,&quot;//images.poms.omroep.nl/image/s174/c174x98/825430.png&quot;]\"\
           \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/821430.png\"\
           \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
           \ 46:04</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken/05-11-2016/VPWON_1243425\"\
-          ><h4>\nDijkring 14\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
+          ><h4>\nAflevering 1\n<span class='inactive'>(EO)</span>\n<span class='av-icon'></span>\n\
           </h4>\n<h5>Za 5 nov 2016 20:25 \xB7 46 min</h5>\n<p class='without-title\
           \ visible-for-desktop'>Een zware storm trekt langs West-Europa. Wanneer\
           \ de Belgische minister-president besluit de kuststreek bij Oostende te\
           \ evacueren komt de Nederlandse minister-president voor een groot dilemma\
-          \ te staan.</p>\n</a></div>\n</div>\n<div class='js-search-result list-item\
-          \ non-responsive row-fluid' data-crid='crid://npo.nl/POMS_EO_5718640'>\n\
-          <div class='span4'>\n<div class='image-container'>\n<a href=\"/als-de-dijken-breken-official-trailer-2016/26-10-2016/POMS_EO_5718640\"\
-          ><img alt=\"Afbeelding van Als de dijken breken | Official Trailer (2016)\"\
-          \ class=\"program-image\" data-images=\"[&quot;//images.poms.omroep.nl/image/s174/c174x98/820961.png&quot;]\"\
-          \ data-toggle=\"image-skimmer\" src=\"//images.poms.omroep.nl/image/s174/c174x98/820961.png\"\
-          \ />\n<div class=\"overlay-icon\"><span class=\"npo-glyph camera\"></span>\
-          \ 1:34</div>\n</a></div>\n</div>\n<div class='span8'>\n<a href=\"/als-de-dijken-breken-official-trailer-2016/26-10-2016/POMS_EO_5718640\"\
-          ><h4>\nAls de dijken breken | Official Trailer (2016)\n<span class='inactive'>(EO)</span>\n\
-          <span class='av-icon'></span>\n</h4>\n<h5>Wo 26 okt 2016 12:27 \xB7 1 min</h5>\n\
-          <p class='without-title visible-for-desktop'>Zesdelige dramaserie over een\
-          \ hedendaagse watersnoodramp in Nederland en delen van Vlaanderen. Vijf\
-          \ miljoen Nederlanders wonen onder zeeniveau. Wat blijft er over van ons\
-          \ Nederland als er zich anno nu een watersn...</p>\n</a></div>\n</div>\n\
-          \n</div>\n"}
+          \ te staan.</p>\n</a></div>\n</div>\n\n</div>\n"}
       headers:
         cache-control: ['max-age=0, private, must-revalidate']
         connection: [Keep-Alive]
         content-type: [text/html; charset=utf-8]
-        date: ['Wed, 07 Dec 2016 15:47:56 GMT']
-        etag: [W/"eb60a756aa4a538164f1beffc2826c95"]
+        date: ['Tue, 10 Jan 2017 13:47:43 GMT']
+        etag: [W/"1c9f98562ae27cb8d3b4aafdcfb9b8c0"]
         keep-alive: ['timeout=1, max=99']
         server: [Apache/2.4.23 (Unix) Phusion_Passenger/4.0.58]
-        set-cookie: ['balancer://npov2cluster=balancer.npov2b; path=/;']
+        set-cookie: ['balancer://npov2cluster=balancer.npov2f; path=/;']
         status: [200 OK]
         x-powered-by: [Phusion Passenger 4.0.58]
-        x-proxyinstancename: [npov1c]
-        x-request-id: [42f34fec-e191-4a65-aaa0-cde831f7c399]
-        x-runtime: ['0.222632']
-        x-workerinstancename: [npov2b]
+        x-proxyinstancename: [npov1b]
+        x-request-id: [3d79da73-92e8-45e1-897e-7f34717d2dbb]
+        x-runtime: ['0.350436']
+        x-workerinstancename: [npov2f]
       status: {code: 200, message: OK}
   - request:
       body: !!python/unicode '{"apikey": "4D297D8CFDE0E105"}'
@@ -1749,29 +1752,29 @@ interactions:
         Connection: [keep-alive]
         Content-Length: ['30']
         Content-Type: [application/json]
-        User-Agent: [!!python/unicode 'FlexGet/2.8.0.dev (www.flexget.com)']
+        User-Agent: [!!python/unicode 'FlexGet/2.8.23.dev (www.flexget.com)']
       method: POST
       uri: https://api.thetvdb.com/login
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAAwTBy5JrQAAA0P18RSp7UwSZ6bujiWmiRUQjG+WtvVPE69b8+5zz/+NwOE59nXXH
-          f4djtullrCXUorrj7ojDFI2ou4sJRGdUDz6BOvjMNr3JfiRqVSprKepmPtCC92REbVOjqqf3dm0y
-          NW1SiEbUgi3y0jzyLiyq+hUrxWo+EIerhM/tz1g/De4p8Kkz60rFMfAZpDKPfySyAuYhLkXCNjh2
-          NbUq7tuActK9gqcDR49tr66WJ2tbh/nYfE1zHp+dBw+lZNdC8aYiTiZ2UkepIYe70nrUaBIZqkFm
-          VaCKAvJlhyhFrrm7Tuoy7fy2d2OVwf1Fn2g6C6YYin0w+FRjwQXpi62ZBeYXLlvaiVN4O9jPY/56
-          A86faSC+6qG8dfpt767YmiwNzJaYk5UZrjGk32QE8uW6qd+ToK05C0N7MUTJQh4IFKc7xR5sMrK2
-          PWSXMo7eWFNN17kBpRkJ36cmOHF14wlkKEyt9KSgZPh8xDQUXOgv3fJ0swhhJ1GNlyzu3KUkQnH8
-          +P0DAAD//wMAulrS+tcBAAA=
+          H4sIAAAAAAAAAwTByZKiMAAA0Ht/heXdLgTEZm4KCAkYiCyJXiwMUVaRJQo9Nf8+7/39WiyWY1vx
+          5/LPYslnmN9sVvgFDONfsEYFGMDztGEG0ED1ookB9W8+w5o7u8IvLck38YRMIKESD6CpK1C2xamZ
+          am5ldWaAATT6nJLsnpKDBMp2QuZDOpqxfDTP0h1/C0J8HxauEw43QnGsb25XdrCes3p0vBmrly4J
+          ACXJ7+EFDoOWxRH8RGN7632aHlXDugQllpJOSoysCyvEK9+3lUpOqlGEIKvmd+vyR2RTTrXmBSFW
+          puCJvD5/4357jbbsCIIiPGuIiTAx7fcdD+5Ub3xTPT0dBcVwsIJ9/KBgsiHrRUICeK8+0QbKdvgR
+          Z8Fu6zcnrlRGAQhQI4+q7BInPRHGerRSy9Gi+9XKixIv11VNpq2Sw+pqx7mZstWQrvu62HO+q81t
+          6WCnvuQ/bPMJhZK5Q+ypIixRS0UW7nZY2sp6Z51029nOYwddJNW6+kNL0V/XXmeouqC4icmgtIH2
+          WH79+w8AAP//AwD6Fr4d1wEAAA==
       headers:
-        cf-ray: [30d91e7bf9240c11-AMS]
+        cf-ray: [31f095201c242b9a-AMS]
         connection: [keep-alive]
         content-encoding: [gzip]
         content-type: [application/json; charset=utf-8]
-        date: ['Wed, 07 Dec 2016 15:47:57 GMT']
+        date: ['Tue, 10 Jan 2017 13:47:44 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=db21d9e6a9cc969abb77e4e93af8551291481125677; expires=Thu,
-            07-Dec-17 15:47:57 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+        set-cookie: ['__cfduid=dd5e5b7158d6fd7f877837c39981b59011484056064; expires=Wed,
+            10-Jan-18 13:47:44 GMT; path=/; domain=.thetvdb.com; HttpOnly']
         vary: [Accept-Language]
         x-powered-by: [Thundar!]
         x-thetvdb-api-version: [2.1.2]
@@ -1782,30 +1785,30 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Accept-Language: [!!python/unicode 'nl']
-        Authorization: [!!python/unicode 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0ODEyMTIwNzcsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDgxMTI1Njc3fQ.bJ2pU2YXiSvJDj1-CZYdB3NHAVx9-T5wgc0lNbUGEjgRypIfVnqYZSCsW0mLUGfcxmk_fsl7tvfb6ST3CAczG_5PEI1BVQckadKB_zDmWiKlcBCEYeOj9jaYV7Q_IdIUMzUSdU-mvuQzKxB9RqiZIt64M5_5oYpXiG09FIJwQGMgN3w1ewmt1D3QYz6sfqu91XviY5qkphPnJPznLNOtOG9vO5fVx-pLbCi8Vs9BFLyE8t4Gxf0C_QwK5AOIW9YDSn2bWCleVxmoC0whbauNGEMUSP9DlsV3odM921klW4VpgMGhWAYh-3fsNi_4UCXwnwZUeaINScEKqB5z1FhV4g']
+        Authorization: [!!python/unicode 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0ODQxNDI0NjQsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDg0MDU2MDY0fQ.uWWOOJiKHSsbWXQU95b_cFEny4MHLyQ4ZqVPIXWVzFpIFs6dUTJwTtobrOXaM4CEZPjQ0Vq0VCdqSkNekOOG3k2VktuSIdkyvoKegTGXeX6mpJJQ3xPnNLrhvQr7_T7cMIPiSY6NcuSVDGvfQsKxl5OD4RnH3NUJsEPBUgXIxGJcruVWPJfkwT5J2GSwuYucb1veWK0jTPIPNm2t42KWHaRWccrN-4jtEXB--LTVLh9462Xo3hJk_GUhDac-sa1rliBeeAlD7jHQHlZh8c5wSu3dKsUL4uSjNoXudSAAQ0729qER9GH7ytqJKN0l948Xjur_1LqC49uXQmUWs3oP6g']
         Connection: [keep-alive]
-        User-Agent: [!!python/unicode 'FlexGet/2.8.0.dev (www.flexget.com)']
+        User-Agent: [!!python/unicode 'FlexGet/2.8.23.dev (www.flexget.com)']
       method: GET
       uri: https://api.thetvdb.com/search/series?name=Als+de+dijken+breken
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA0yRQWsbQQyF7/4Vjz3Hqe2kpfWlhBAolCQ/oOSgzT6P5d3VGM3MGhzy38M4OO5F
-          h/e+JyHpbQY0nWRp1vg3A4C3UwUaGVQSUzVers5iK2b0Zo0muOy3+irDt5vl6tfPxTysrnf70Hyh
-          G/WU79TZVXy1WP6YL5fzxfcLodX5TH9pxnyI3tfIw/MFjRN9Uh6qfjckkIbgMRMpRx8R93hiRx/E
-          OsgGfRwzxsiMvXNUOv6IJfx1lkDHlhkt01A0wzjS1uiLGQ0H4hajDrtIw0hLNHCS10Kn/cajiKM7
-          T+3FYDFANm3RUEmr5omXrMQkhrZ4oKcrHJU9bVv0+EkGTmKBpqkO6UrxjCN7Om7RSaBdX/ZPdGV6
-          kpHnC3REp7uehtZr3//YLLnUvzX30bJaUQvNyXyfAS+z9w8AAAD//wMAV9/7ePUBAAA=
+          H4sIAAAAAAAAA0yQzUoDQRCE73mKYs9GE//QXCQHQRD1AcRDr1OZTHa3J/TMbCDiu8tEYrz0oeqr
+          brq+JkDjJEuzwPsEAL4OE2ikD5KYqvFxdhRbUaU1CzTeZLsOn9JfXM0v7+9mU3++2frmj1wFS3kZ
+          jK7Sl7P57XQ+n85uTkSozm/4T1PmXbSuRh7fTmgcaWPgrurLPoFUeIuZSDnagLjFKx2tF3WQFbo4
+          ZAyRGVvjEGh4Ek14NhZPw5oZLVNfQoZyoC7QFVUqdsQ1htBvIhUDNVHBUT4LjfqAFxGDO17tRKHR
+          Q1ZtCb6SWs0DLzkQoyjaYp6WzrAP7KjrEva/pOco6qkh1SOuFMvYs6PhGk489fz0f6IFplcZeGzA
+          ES5sOipaq3v/sVlySYcG1dE1B/17AnxMvn8AAAD//wMAQnZc5u8BAAA=
       headers:
         cache-control: ['private, max-age=600']
-        cf-ray: [30d91e7f293a2c24-AMS]
+        cf-ray: [31f09524a8562c3c-AMS]
         connection: [keep-alive]
         content-encoding: [gzip]
         content-type: [application/json; charset=utf-8]
-        date: ['Wed, 07 Dec 2016 15:47:58 GMT']
+        date: ['Tue, 10 Jan 2017 13:47:44 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dba5d5200d541c61adf3acde196942f071481125677; expires=Thu,
-            07-Dec-17 15:47:57 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+        set-cookie: ['__cfduid=ddaf09d1a8e16fb3d53625d137b93813e1484056064; expires=Wed,
+            10-Jan-18 13:47:44 GMT; path=/; domain=.thetvdb.com; HttpOnly']
         vary: [Accept-Language]
         x-powered-by: [Thundar!]
         x-thetvdb-api-version: [2.1.2]
@@ -1816,34 +1819,34 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Accept-Language: [!!python/unicode 'nl']
-        Authorization: [!!python/unicode 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0ODEyMTIwNzcsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDgxMTI1Njc3fQ.bJ2pU2YXiSvJDj1-CZYdB3NHAVx9-T5wgc0lNbUGEjgRypIfVnqYZSCsW0mLUGfcxmk_fsl7tvfb6ST3CAczG_5PEI1BVQckadKB_zDmWiKlcBCEYeOj9jaYV7Q_IdIUMzUSdU-mvuQzKxB9RqiZIt64M5_5oYpXiG09FIJwQGMgN3w1ewmt1D3QYz6sfqu91XviY5qkphPnJPznLNOtOG9vO5fVx-pLbCi8Vs9BFLyE8t4Gxf0C_QwK5AOIW9YDSn2bWCleVxmoC0whbauNGEMUSP9DlsV3odM921klW4VpgMGhWAYh-3fsNi_4UCXwnwZUeaINScEKqB5z1FhV4g']
+        Authorization: [!!python/unicode 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0ODQxNDI0NjQsImlkIjoiRmxleEdldCIsIm9yaWdfaWF0IjoxNDg0MDU2MDY0fQ.uWWOOJiKHSsbWXQU95b_cFEny4MHLyQ4ZqVPIXWVzFpIFs6dUTJwTtobrOXaM4CEZPjQ0Vq0VCdqSkNekOOG3k2VktuSIdkyvoKegTGXeX6mpJJQ3xPnNLrhvQr7_T7cMIPiSY6NcuSVDGvfQsKxl5OD4RnH3NUJsEPBUgXIxGJcruVWPJfkwT5J2GSwuYucb1veWK0jTPIPNm2t42KWHaRWccrN-4jtEXB--LTVLh9462Xo3hJk_GUhDac-sa1rliBeeAlD7jHQHlZh8c5wSu3dKsUL4uSjNoXudSAAQ0729qER9GH7ytqJKN0l948Xjur_1LqC49uXQmUWs3oP6g']
         Connection: [keep-alive]
-        User-Agent: [!!python/unicode 'FlexGet/2.8.0.dev (www.flexget.com)']
+        User-Agent: [!!python/unicode 'FlexGet/2.8.23.dev (www.flexget.com)']
       method: GET
       uri: https://api.thetvdb.com/series/312980
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA2RSwW7bMAy95ysInZvOdh0j8WXo2gEbhrXA1mGHYge6YhTFNm1QUoKm6L8PsuMg
-          2Y58fOQD3+PbDEBp9KhKeJsBACirVQk3abZaJlcj4kgsuQdsSZWgbhsHmkDbbU0MlVBNrI5MbCw6
-          cqqE5z9HqEJmkjhoBPuNfcHmw7h9bq63vVEXIl+juDphHn2I29Rdx95ysHzir604f2uFhoksSYt5
-          ms6TxdRn8vtO6tj8/PgPeKkigb0db1ucxg2xROh5KAHUvWCLaqim07odyc7SfnKFiMFI5wmc76SF
-          rocH0iQNsgZcQ921HtqOPPRCrSWBL8gOvgkFQwIb8lCRa4L1wNQSl1AHZmLYE+TQ2mbbEUNL7IiB
-          dvgSSIg/wndEiZGMqjUycGcA11WwJjI5Ngc+ekuwQ4YqiCFxV3CwMb9NsIeRaWiHbIitiyI6BPFw
-          oJoEctBoiK8nhxp0/lev0Q8JpPkyTYqiyNPpFay4e3x9XP8mGlL4iT6Ixld1Rng6+p4lZXayXtDH
-          nM8Ssq2uxsy8z4siW66SqXXAPrP+MlDU+uwrkvgYkCzKJCmT7ILz6VWVkC9Wi+Rm+jjr6cekv/wP
-          vOsC+3jtDOB99v4XAAD//wMAD9WDyz4DAAA=
+          H4sIAAAAAAAAA1yRzU4DMQyE732KUc4UuoUi2AtCAgmEgAdAHNxmuk1341ROtj3w8mj7g1SO/jzj
+          ke2fEeC8FHE1fkYA4IJ3Na6r6f3d5OJAMi0wf0ikq+EeuwxP+LBuqZgbW6o7KqULkpldja/vI5qL
+          Km0wNiabVVhId3WYPm6ml+tN485SXod098eKlH4Y557V05/wMlguj8G4F08n1e24qsaT2amvLLtk
+          7d73+Q+eB1ivJRz2mv3ZG6oN6GtfAu7JJIrbV6e10pa2DdydLkIqGkuFyCVZRNrgg57WiXrIEm2K
+          BTGxYGOMgYYX0Yw3Y9/QsGLBnLnrQ4EyUmu0vSoVO+IGMXTrREWkZiq4lUVPoz7gXcSGdxxSW1Fo
+          aiDLeR+aQanwvwAAAP//ZJJNC8IwDIbv/orgWaR2m2w7qnfBDzxHGmtQ6+hSYQP/u8xZmXhNXgh5
+          n4f6PAoTPNDBMXhLvp5Ayx27c+C2T1p6oLPkuO6OmBC8QEsX8pCCQUtuGhu6Yi37yqC8CczSXCdZ
+          ootZ1IB9vcJmfToQvSlsUYI32IwHgd2nd61K/a3eo7CzQ0J8M8eemUg6n+u8UHHVYqVZfoGiMQMr
+          VCcGqKxUqlT6J7NoxiWkWZGpJMrGQpt4P/8bLu/BSfftCOA5er4AAAD//wMAM8VVhjoDAAA=
       headers:
         cache-control: ['private, max-age=600']
-        cf-ray: [30d91e849e5b1497-AMS]
+        cf-ray: [31f0952668ff2c12-AMS]
         connection: [keep-alive]
         content-encoding: [gzip]
         content-type: [application/json; charset=utf-8]
-        date: ['Wed, 07 Dec 2016 15:47:59 GMT']
-        last-modified: ['Tue, 06 Dec 2016 23:24:01 GMT']
+        date: ['Tue, 10 Jan 2017 13:47:45 GMT']
+        last-modified: ['Wed, 21 Dec 2016 20:48:11 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d091f891c470658aa1273fa5b88a1ee251481125678; expires=Thu,
-            07-Dec-17 15:47:58 GMT; path=/; domain=.thetvdb.com; HttpOnly']
+        set-cookie: ['__cfduid=db48de240eb9e54cd1eab1e611c477aba1484056065; expires=Wed,
+            10-Jan-18 13:47:45 GMT; path=/; domain=.thetvdb.com; HttpOnly']
         vary: [Accept-Language]
         x-powered-by: [Thundar!]
         x-thetvdb-api-version: [2.1.2]
