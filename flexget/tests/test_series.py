@@ -1661,6 +1661,7 @@ class TestIDTypes(object):
           all_types:
             series:
               - episode
+              - seasonless episode
               - date
               - sequence
               - stupid id:
@@ -1673,13 +1674,14 @@ class TestIDTypes(object):
               - title: sequence 003
               - title: sequence 4
               - title: stupid id 3cat
+              - title: seasonless episode e01
     """
 
     def test_id_types(self, execute_task):
         task = execute_task('all_types')
         for entry in task.entries:
             assert entry['series_name'], '%s not parsed by series plugin' % entry['title']
-            assert entry['series_id_type'] in entry['series_name']
+            assert entry['series_id_type'] not in entry['series_name']
 
 
 class TestCaseChange(object):
