@@ -8,7 +8,7 @@ import socket
 import threading
 
 import cherrypy
-import safe
+import zxcvbn
 from flask import Flask, abort, redirect
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, Unicode
@@ -218,8 +218,8 @@ def get_user(username='flexget', session=None):
 
 @with_session
 def change_password(username='flexget', password='', session=None):
-    check = safe.check(password)
-    if check.strength not in ['medium', 'strong']:
+    check = zxcvbn.zxcvbn(password, user_inputs=[username])
+    if check['score'] < 3:
         raise WeakPassword('Password {0} is not strong enough'.format(password))
 
     user = get_user(username=username, session=session)
