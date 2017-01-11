@@ -1681,7 +1681,7 @@ class TestIDTypes(object):
         task = execute_task('all_types')
         for entry in task.entries:
             assert entry['series_name'], '%s not parsed by series plugin' % entry['title']
-            assert entry['series_id_type'] not in entry['series_name']
+            assert entry['series_id_type'] in entry['series_name']
 
 
 class TestCaseChange(object):
