@@ -376,7 +376,7 @@ class TestSeriesParser(object):
                 # There's nothing that can be done with those failing cases with the
                 # current
                 # "grab leftmost occurrence of highest quality-like thing" algorithm.
-                if int(mock_ep1) >= int(mock_ep2):
+                if int(mock_ep1) >= int(mock_ep2) or int(mock_ep2) > 999:
                     continue
 
                 s = parse('FooBar - %s %s-FlexGet' % (mock_ep1, quality2.name), name='FooBar')
