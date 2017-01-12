@@ -71,22 +71,18 @@
             }
 
             function progressNode(progress) {
-                console.log(progress);
-                if(progress)
                 var filtered = $filter('filter')(vm.streamTasks, { status: '!complete' });
                 angular.extend(filtered[0], progress);
                 updateProgress();
             }
 
             function summaryNode(summary) {
-                 console.log(summary);
                 var filtered = $filter('filter')(vm.streamTasks, { status: 'complete' });
                 angular.extend(filtered[filtered.length - 1], summary);
                 updateProgress();
             }
 
             function entryDumpNode(entries) {
-                console.log(entries);
                 var filtered = $filter('filter')(vm.streamTasks, { status: 'complete' });
                 angular.extend(filtered[filtered.length - 1], { entries: entries });
             }
