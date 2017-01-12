@@ -69,7 +69,9 @@ def old_assume_quality(guessed_quality, assumed_quality):
 default_ignore_prefixes = [
     '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
     '(?:HD.720p?:)',
-    '(?:HD.1080p?:)']
+    '(?:HD.1080p?:)',
+    '(?:HD.2160p?:)'
+]
 
 
 def name_to_re(name, ignore_prefixes=None, parser=None):
