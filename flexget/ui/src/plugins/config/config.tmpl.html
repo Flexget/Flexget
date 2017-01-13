@@ -1,7 +1,12 @@
 <div layout="column" layout-fill>
 	<md-toolbar class="md-warn" layout="row">
 		<p class="md-toolbar-tools">
-			<span>This page is still pretty much in beta. Please take a backup before trying to save a new config.</span>
+			<span ng-if="!vm.variables">
+				This page is still pretty much in beta. Please take a backup before trying to save a new config.
+			</span>
+			<span ng-if="vm.variables">
+				Variables get overwritten from file unless you use `variables: yes` in your config file.
+			</span>
 		</p>
 	</md-toolbar>
 	<div layout="column">
