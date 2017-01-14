@@ -71,7 +71,7 @@ class TestQualityParser(object):
         ('Test.File.720P', '720p'),
         ('Test.File.1920x1080', '1080p'),
         ('Test.File.3840x2160', '2160p'),
-        ('Test.File.7680x4320', '2160p'),
+        ('Test.File.7680x4320', '4320p'),
         ('Test.File.1080i', '1080i'),
         ('Test File full hd', '1080p'),
         ('Test File ultra hd', '2160p'),

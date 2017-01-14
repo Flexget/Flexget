@@ -127,7 +127,7 @@ _resolutions = [
     QualityComponent('resolution', 60, '720p', '(1280x)?720(p|hd)?x?(50)?'),
     QualityComponent('resolution', 70, '1080i'),
     QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?x?(50)?|f(ull ?)?hd'),
-    QualityComponent('resolution', 90, '2160p', '((3840x)?2160p?x?(50)?)|4k|u(ltra ?)?hd')
+    QualityComponent('resolution', 90, '2160p', '((3840x)?2160p?x?(50)?)|4k|u(ltra ?)?hd'),
     QualityComponent('resolution', 100, '4320p', '((7680x)?4320p?x?(50)?)|8k')  # technically also named an ultra hd format
 ]
 _sources = [
