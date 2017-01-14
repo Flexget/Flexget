@@ -124,11 +124,11 @@ _resolutions = [
     QualityComponent('resolution', 40, '576p', '576p?'),
     QualityComponent('resolution', 45, 'hr'),
     QualityComponent('resolution', 50, '720i'),
-    QualityComponent('resolution', 60, '720p', '(1280x)?720(p|hd(tv)?)?x?(50)?|hd(tv)?'),
+    QualityComponent('resolution', 60, '720p', '(1280x)?720(p|hd)?x?(50)?'),
     QualityComponent('resolution', 70, '1080i'),
-    QualityComponent('resolution', 80, '1080p', '(1920x)?1080(p|f?hd(tv)?)?x?(50)?|full ?hd(tv)?'),
-    QualityComponent('resolution', 90, '2160p', '((3840x)?2160(p|uhd(tv)?)?x?(50)?)|4k|ultra ?hd(tv)?')
-    QualityComponent('resolution', 100, '4320p', '((7680x)?4320(p|uhd(tv)?)?x?(50)?)|8k')  # technically also named an ultra hd format
+    QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?x?(50)?|f(ull ?)?hd'),
+    QualityComponent('resolution', 90, '2160p', '((3840x)?2160p?x?(50)?)|4k|u(ltra ?)?hd')
+    QualityComponent('resolution', 100, '4320p', '((7680x)?4320p?x?(50)?)|8k')  # technically also named an ultra hd format
 ]
 _sources = [
     QualityComponent('source', 10, 'workprint', modifier=-8),
