@@ -1,15 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
-import urllib2
+
 import logging
+import re
+
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
 from flexget.utils.soup import get_soup
 
-import re
-
 log = logging.getLogger('hliang')
-
 
 class UrlRewriteHliang(object):
     """Hliang urlrewriter."""
@@ -28,8 +27,8 @@ class UrlRewriteHliang(object):
     @plugin.internet(log)
     def parse_download_page(self, url, requests):
         txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
-        page = requests.get(url, headers=txheaders)
         try:
+            page = requests.get(url, headers=txheaders)
             soup = get_soup(page.text)
         except Exception as e:
             raise UrlRewritingError(e)
@@ -40,5 +39,5 @@ class UrlRewriteHliang(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteHliang, 'hliang', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteHliang, 'hliang', interfaces=['urlrewriter'], api_ver=2)
 
