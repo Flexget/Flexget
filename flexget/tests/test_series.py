@@ -1661,6 +1661,7 @@ class TestIDTypes(object):
           all_types:
             series:
               - episode
+              - seasonless episode
               - date
               - sequence
               - stupid id:
@@ -1673,6 +1674,7 @@ class TestIDTypes(object):
               - title: sequence 003
               - title: sequence 4
               - title: stupid id 3cat
+              - title: seasonless episode e01
     """
 
     def test_id_types(self, execute_task):
