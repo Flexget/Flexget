@@ -44,8 +44,8 @@ class MyAnimeList(object):
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
-            'status': one_or_more({'type': 'string', 'enum': STATUS.values()}),
-            'type': one_or_more({'type': 'string', 'enum': ANIME_TYPE.values()})
+            'status': one_or_more({'type': 'string', 'enum': list(STATUS.values())}),
+            'type': one_or_more({'type': 'string', 'enum': list(ANIME_TYPE.values())})
         },
         'required': ['username'],
         'additionalProperties': False
