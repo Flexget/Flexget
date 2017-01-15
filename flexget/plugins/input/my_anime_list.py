@@ -44,8 +44,8 @@ class MyAnimeList(object):
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
-            'status': one_or_more({'type': 'string', 'enum': ['watching', 'completed', 'on_hold', 'dropped', 'plan_to_watch']}),
-            'type': one_or_more({'type': 'string', 'enum': ['series', 'ova', 'movie', 'ona']})
+            'status': one_or_more({'type': 'string', 'enum': STATUS.values()}),
+            'type': one_or_more({'type': 'string', 'enum': ANIME_TYPE.values()})
         },
         'required': ['username'],
         'additionalProperties': False
@@ -56,22 +56,17 @@ class MyAnimeList(object):
         entries = []
         parameters = {'u': config['username'], 'status': 'all', 'type': 'anime'}
 
-        if config.has_key('status'):
-            selected_status = config['status']
-        else:
-            selected_status = STATUS.values()
-
-        if config.has_key('type'):
-            selected_types = config['type']
-        else:
-            selected_types = ANIME_TYPE.values()
+        selected_status = config.get('status', STATUS.values())
+        selected_types = config.get('type', ANIME_TYPE.values())
 
         try:
             list_response = task.requests.get('https://myanimelist.net/malappinfo.php', params=parameters)
-            tree = ET.fromstring(list_response.text.encode('utf-8'))
-            list_items = tree.findall('anime')
         except RequestException as e:
             raise plugin.PluginError('Error finding list on url: {url}'.format(url=e.request.url))
+
+        try:
+            tree = ET.fromstring(list_response.text.encode('utf-8'))
+            list_items = tree.findall('anime')
         except ET.ParseError:
             raise plugin.PluginError('Bad XML')
 
@@ -83,7 +78,7 @@ class MyAnimeList(object):
 
             my_tags = []
             alternate_names = []
-            isExact = False
+            is_exact = False
 
             for name in item.findtext('series_synonyms', '').split('; '):
                 stripped = name.strip()
@@ -95,7 +90,7 @@ class MyAnimeList(object):
                 if stripped:
                     my_tags.append(stripped)
                     if stripped is 'exact':
-                        isExact = True
+                        is_exact = True
 
             if my_status in selected_status and anime_type in selected_types:
                 entry = Entry(title=title,
@@ -105,7 +100,7 @@ class MyAnimeList(object):
                               my_anime_list_status= my_status,
                               my_anime_list_tags=my_tags)
 
-                if isExact:
+                if is_exact:
                     entry['configure_series_exact'] = True
 
                 if entry.isvalid():
