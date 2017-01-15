@@ -56,8 +56,8 @@ class MyAnimeList(object):
         entries = []
         parameters = {'u': config['username'], 'status': 'all', 'type': 'anime'}
 
-        selected_status = config.get('status', STATUS.values())
-        selected_types = config.get('type', ANIME_TYPE.values())
+        selected_status = list(config.get('status', STATUS.values()))
+        selected_types = list(config.get('type', ANIME_TYPE.values()))
 
         try:
             list_response = task.requests.get('https://myanimelist.net/malappinfo.php', params=parameters)
