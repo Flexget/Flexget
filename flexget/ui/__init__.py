@@ -23,7 +23,7 @@ bower_components = os.path.join(ui_base, 'bower_components')
 
 webui_app = Flask(__name__)
 Compress(webui_app)
-webui_app.url_path = '/ui'
+webui_app.url_path = '/'
 
 
 @webui_app.route('/<path:path>')
