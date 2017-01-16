@@ -12,8 +12,8 @@
         };
 
         function request(config) {
-            // Make sure requests end with /
-            if (config.url.startsWith('/api/') && !config.url.endsWith('/')) {
+            // Make sure api requests end with /
+            if (config.url.contains('api') && !config.url.endsWith('/')) {
                 config.url += '/';
             }
 
