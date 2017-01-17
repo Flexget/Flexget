@@ -29,9 +29,15 @@ class UrlRewriteHliang(object):
         txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
         try:
             page = requests.get(url, headers=txheaders)
+        except requests.exceptions.RequestException as e:
+            log.exception('Cannot open "%s"' % url, e)
+            raise UrlRewritingError(e)
+
+        try:
             soup = get_soup(page.text)
         except Exception as e:
             raise UrlRewritingError(e)
+        
         down_link = soup.find('a', attrs={'href': re.compile("down\.php\?.*")})
         if not down_link:
             raise UrlRewritingError('Unable to locate download link from url "%s"' % url)
