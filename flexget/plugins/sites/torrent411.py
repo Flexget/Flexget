@@ -398,7 +398,7 @@ class UrlRewriteTorrent411(object):
     #   urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        if re.match(r'^(https?://)?(www\.)?t411\.ch/torrents/(?!download/)[-A-Za-z0-9+&@#/%|?=~_|!:,.;]+', url):
+        if re.match(r'^(https?://)?(www\.)?t411\.li/torrents/(?!download/)[-A-Za-z0-9+&@#/%|?=~_|!:,.;]+', url):
             return True
         return False
 
