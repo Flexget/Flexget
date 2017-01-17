@@ -36,7 +36,6 @@ class Variables(Base):
 
 
 def variables_from_file(config_base, filename):
-    print "Getting from file"
     variables_file = os.path.join(config_base, filename)
     if not os.path.exists(variables_file):
         raise PluginError('File %s does not exist!' % variables_file)
@@ -60,8 +59,6 @@ def variables_from_db():
 def variables_to_db(variables_dict):
     with Session() as session:
         variables = session.query(Variables).first()
-        print variables.variables
-        print variables_dict
         if not variables:
             variables = Variables()
         variables.variables = variables_dict
