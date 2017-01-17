@@ -55,8 +55,12 @@ def prepare_config(config):
     config.setdefault('ssl_private_key', None)
     config.setdefault('web_ui', True)
     config.setdefault('base_url', '')
-    if config['base_url'] and not config['base_url'].startswith('/'):
-        config['base_url'] = '/' + config['base_url']
+    if config['base_url']:
+        if not config['base_url'].startswith('/'):
+            config['base_url'] = '/' + config['base_url']
+        if config['base_url'].endswith('/'):
+            config['base_url'] = config['base_url'][:-1]
+    
     return config
 
 
