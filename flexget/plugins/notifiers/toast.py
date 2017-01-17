@@ -53,7 +53,8 @@ class NotifyToast(object):
             log.debug('Error trying to get flexget icon from webui folder: %s', e)
 
         try:
-            Notifier.notify(message, title=title, appIcon=icon_path, timeout=config['timeout'], open=config.get('url'))
+            Notifier.notify(message, subtitle=title, title='FlexGet Notification', appIcon=icon_path,
+                            timeout=config['timeout'], open=config.get('url'))
         except Exception as e:
             raise PluginWarning('Cannot send a notification: %s' % e)
 
