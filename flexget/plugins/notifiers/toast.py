@@ -20,6 +20,7 @@ class NotifyToast(object):
                 'type': 'object',
                 'properties': {
                     'timeout': {'type': 'integer'},
+                    'url': {'type': 'string'},
                 },
                 'additionalProperties': False
             }
@@ -33,6 +34,7 @@ class NotifyToast(object):
         if not isinstance(config, dict):
             config = {}
         config.setdefault('timeout', 4)
+        config.setdefault('url', '')
         return config
 
     def mac_notify(self, title, message, config):
@@ -51,7 +53,7 @@ class NotifyToast(object):
             log.debug('Error trying to get flexget icon from webui folder: %s', e)
 
         try:
-            Notifier.notify(message, title=title, appIcon=icon_path, timeout=config['timeout'])
+            Notifier.notify(message, title=title, appIcon=icon_path, timeout=config['timeout'], open=config.get('url'))
         except Exception as e:
             raise PluginWarning('Cannot send a notification: %s' % e)
 
