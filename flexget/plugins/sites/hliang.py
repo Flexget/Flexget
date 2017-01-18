@@ -30,7 +30,7 @@ class UrlRewriteHliang(object):
         try:
             page = requests.get(url, headers=txheaders)
         except requests.exceptions.RequestException as e:
-            log.exception('Cannot open "%s"' % url, e)
+            log.error('Cannot open "%s" : %s', url, e)
             raise UrlRewritingError(e)
 
         try:
