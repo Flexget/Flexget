@@ -30,14 +30,14 @@ class UrlRewriteHliang(object):
         try:
             page = requests.get(url, headers=txheaders)
         except requests.exceptions.RequestException as e:
-            msg = 'Cannot open "%s" : %s'% (url, e.message)
+            msg = 'Cannot open "%s" : %s'% (url, str(e))
             log.error(msg)
             raise UrlRewritingError(msg)
 
         try:
             soup = get_soup(page.text)
         except Exception as e:
-            raise UrlRewritingError(e.message)
+            raise UrlRewritingError(str(e))
         
         down_link = soup.find('a', attrs={'href': re.compile("down\.php\?.*")})
         if not down_link:
