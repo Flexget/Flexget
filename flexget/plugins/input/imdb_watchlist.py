@@ -27,8 +27,7 @@ TITLE_TYPE_MAP = {
     'TV Episode': 'episodes',
     'TV Movie': 'tv movies',
     'TV Special': 'tv specials',
-    'Video': 'videos',
-    'all': 'all'
+    'Video': 'videos'
 }
 
 
@@ -54,8 +53,11 @@ class ImdbWatchlist(object):
             'force_language':
                 {'type': 'string',
                  'default': 'en-us'},
-            'type': one_or_more({'type': 'string', 'enum': list(TITLE_TYPE_MAP.values()), 'default': 'all'},
-                                unique_items=True)
+            'type': {
+                'oneOf': [
+                    one_or_more({'type': 'string', 'enum': list(TITLE_TYPE_MAP.values())}, unique_items=True),
+                    {'type': 'string', 'enum': ['all']}
+                ]}
         },
         'additionalProperties': False,
         'required': ['list'],
@@ -66,10 +68,18 @@ class ImdbWatchlist(object):
         'error_anyOf': 'user_id is required if not using a custom list (lsXXXXXXXXX format)'
     }
 
-    @cached('imdb_watchlist', persist='2 hours')
-    def on_task_input(self, task, config):
+    def prepare_config(self, config):
+        if 'type' not in config:
+            config['type'] = ['all']
+
         if not isinstance(config['type'], list):
             config['type'] = [config['type']]
+
+        return config
+
+    @cached('imdb_watchlist', persist='2 hours')
+    def on_task_input(self, task, config):
+        config = self.prepare_config(config)
 
         # Create movie entries by parsing imdb list page(s) html using beautifulsoup
         log.verbose('Retrieving imdb list: %s', config['list'])
