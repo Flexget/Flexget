@@ -128,7 +128,8 @@ class ImdbWatchlist(object):
 
                 title_type = item.find('td', class_='title_type').text.strip()
                 if 'all' not in config['type'] and TITLE_TYPE_MAP.get(title_type) not in config['type']:
-                    log.verbose('Skipping title %s since it is a %s', a.text, TITLE_TYPE_MAP.get(title_type))
+                    log.verbose('Skipping title %s since it is a %s', a.text,
+                                TITLE_TYPE_MAP.get(title_type).rstrip('s'))
                     continue
                 link = ('http://www.imdb.com' + a.get('href')).rstrip('/')
                 entry = Entry()
