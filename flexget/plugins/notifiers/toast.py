@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import sys
+import os
 
 from flexget import plugin
 from flexget.event import event
@@ -19,6 +20,7 @@ class NotifyToast(object):
                 'type': 'object',
                 'properties': {
                     'timeout': {'type': 'integer'},
+                    'url': {'type': 'string'},
                 },
                 'additionalProperties': False
             }
@@ -32,7 +34,29 @@ class NotifyToast(object):
         if not isinstance(config, dict):
             config = {}
         config.setdefault('timeout', 4)
+        config.setdefault('url', '')
         return config
+
+    def mac_notify(self, title, message, config):
+        config = self.prepare_config(config)
+        try:
+            from pync import Notifier
+        except ImportError as e:
+            log.debug('Error importing pync: %s', e)
+            raise DependencyError(__name__, 'pync', 'pync module required. ImportError: %s' % e)
+
+        icon_path = None
+        try:
+            import flexget.ui
+            icon_path = os.path.join(flexget.ui.__path__[0], 'src', 'favicon.ico')
+        except Exception as e:
+            log.debug('Error trying to get flexget icon from webui folder: %s', e)
+
+        try:
+            Notifier.notify(message, subtitle=title, title='FlexGet Notification', appIcon=icon_path,
+                            timeout=config['timeout'], open=config.get('url'))
+        except Exception as e:
+            raise PluginWarning('Cannot send a notification: %s' % e)
 
     def linux_notify(self, title, message, config):
         config = self.prepare_config(config)
@@ -81,10 +105,10 @@ class NotifyToast(object):
         icon_flags = LR_LOADFROMFILE | LR_DEFAULTSIZE
         try:
             import flexget.ui
-            icon_path = flexget.ui.__path__[0] + '\\src\\favicon.ico'
+            icon_path = os.path.join(flexget.ui.__path__[0], 'src', 'favicon.ico')
             hicon = LoadImage(hinst, icon_path, IMAGE_ICON, 0, 0, icon_flags)
         except Exception as e:
-            logging.debug('Error trying to get flexget icon from webui folder: %s', e)
+            log.debug('Error trying to get flexget icon from webui folder: %s', e)
 
         # Taskbar icon
         flags = NIF_ICON | NIF_MESSAGE | NIF_TIP | NIF_INFO
@@ -93,6 +117,8 @@ class NotifyToast(object):
 
     if sys.platform.startswith('win'):
         notify = windows_notify
+    elif sys.platform == 'darwin':
+        notify = mac_notify
     else:
         notify = linux_notify
 
