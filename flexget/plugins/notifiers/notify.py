@@ -91,8 +91,19 @@ class Notify(object):
                 config['entries']['what'] = [config['entries']['what']]
         return config
 
-    def on_task_notify(self, task, config):
+    def send_notification(self, *args, **kwargs):
         send_notification = plugin.get_plugin_by_name('notification_framework').instance.send_notification
+        try:
+            send_notification(*args, **kwargs)
+        except plugin.PluginError as e:
+            log.error(e)
+        except plugin.PluginWarning as e:
+            log.warning(e)
+        except Exception as e:
+            log.exception(e)
+
+    @plugin.priority(0)
+    def on_task_output(self, task, config):
         config = self.prepare_config(config)
         if 'entries' in config:
             entries = list(itertools.chain(*(getattr(task, what) for what in config['entries']['what'])))
@@ -108,8 +119,8 @@ class Notify(object):
             else:
                 message = config['entries']['message']
             for entry in entries:
-                send_notification(config['entries']['title'], message, config['entries']['via'],
-                                  template_renderer=entry.render)
+                self.send_notification(config['entries']['title'], message, config['entries']['via'],
+                                       template_renderer=entry.render)
         if 'task' in config:
             if not (task.accepted or task.failed):
                 log.verbose('No accepted or failed entries, not sending a notification.')
@@ -118,16 +129,16 @@ class Notify(object):
                 template = get_template(config['task']['template'], scope='task')
             except ValueError:
                 raise plugin.PluginError('Cannot locate template on disk: %s' % config['task']['template'])
-            send_notification(config['task']['title'], template, config['task']['via'], template_renderer=task.render)
+            self.send_notification(config['task']['title'], template, config['task']['via'],
+                                   template_renderer=task.render)
 
     def on_task_abort(self, task, config):
         if 'abort' in config:
-            send_notification = plugin.get_plugin_by_name('notification_framework').instance.send_notification
             if task.silent_abort:
                 return
             log.debug('sending abort notification')
-            send_notification(config['abort']['title'], config['abort']['message'], config['abort']['via'],
-                              template_renderer=task.render)
+            self.send_notification(config['abort']['title'], config['abort']['message'], config['abort']['via'],
+                                   template_renderer=task.render)
 
 
 @event('plugin.register')
