@@ -137,7 +137,7 @@ class UrlRewriteIPTorrents(object):
             log.debug('searching with url: %s' % url)
             req = requests.get(url, cookies={'uid': str(config['uid']), 'pass': config['password']})
 
-            if '/u/' + str(config.get('uid')) not in req.content:
+            if '/u/' + str(config['uid']) not in req.text:
                 raise plugin.PluginError("Invalid cookies (user not logged in)...")
 
             soup = get_soup(req.content, parser="html.parser")
@@ -147,7 +147,7 @@ class UrlRewriteIPTorrents(object):
                 entry = Entry()
                 entry['url'] = "{base}{link}?torrent_pass={key}".format(
                     base=BASE_URL, link=torrent['href'], key=config.get('rss_key'))
-                entry['title'] = torrent.findPrevious("a", attrs={'class': 't_title'}).text
+                entry['title'] = torrent.findPrevious('a', attrs={'class': 'b'}).text
 
                 seeders = torrent.findNext('td', {'class': 'ac t_seeders'}).text
                 leechers = torrent.findNext('td', {'class': 'ac t_leechers'}).text
