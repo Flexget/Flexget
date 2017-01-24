@@ -34,7 +34,7 @@ class ObjectsContainer(object):
             'category': {'type': ['string', 'null']},
             'contexts': {'type': 'array', 'items': {'type': 'string'}},
             'debug': {'type': 'boolean'},
-            'groups': {'type': 'array', 'items': {'type': 'string'}},
+            'interfaces': {'type': 'array', 'items': {'type': 'string'}},
             'phase_handlers': {'type': 'array', 'items': phase_object}
         }
     }
