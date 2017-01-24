@@ -45,7 +45,7 @@ class SlackNotifier(object):
         """
         notification = {'text': message, 'channel': config.get('channel'), 'username': config.get('username')}
         if config.get('icon_emoji'):
-            notification['icon-emoji'] = ':%s:' % config['icon_emoji'].strip(':')
+            notification['icon_emoji'] = ':%s:' % config['icon_emoji'].strip(':')
 
         try:
             requests.post(config['web_hook_url'], json=notification)
