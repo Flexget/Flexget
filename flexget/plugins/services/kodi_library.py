@@ -57,7 +57,7 @@ class KodiLibrary(object):
                         log.debug('Received error response %s', json.dumps(r))
                         log.error('Kodi JSONRPC failed with unrecognized message: %s', json.dumps(r))
             except RequestException as e:
-                raise plugin.PluginError('Failed to send request to Kodi: %s', e.args[0])
+                raise plugin.PluginError('Failed to send request to Kodi: %s' % e.args[0])
         else:
             log.info('No entries were accepted. No request is sent.')
 
