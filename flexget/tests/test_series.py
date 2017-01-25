@@ -1451,6 +1451,8 @@ class TestFromGroup(object):
               - {title: 'Test.13.HDTV-Ignored'}
               - {title: 'Test.13.HDTV-FlexGet'}
               - {title: 'Test.14.HDTV-Name'}
+              - {title: 'Test :: h264 10-bit | Softsubs (FlexGet) | Episode 3'}
+              - {title: 'Test :: h264 10-bit | Softsubs (Ignore) | Episode 3'}
             series:
               - test: {from_group: [Name, FlexGet]}
     """
@@ -1461,6 +1463,7 @@ class TestFromGroup(object):
         assert task.find_entry('accepted', title='[FlexGet] Test 12')
         assert task.find_entry('accepted', title='Test.13.HDTV-FlexGet')
         assert task.find_entry('accepted', title='Test.14.HDTV-Name')
+        assert task.find_entry('accepted', title='Test :: h264 10-bit | Softsubs (FlexGet) | Episode 3')
 
 
 class TestBegin(object):

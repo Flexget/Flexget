@@ -250,7 +250,7 @@ class SeriesParser(TitleParser):
         if self.allow_groups:
             for group in self.allow_groups:
                 group = group.lower()
-                for fmt in ['[%s]', '-%s']:
+                for fmt in ['[%s]', '-%s', '(%s)']:
                     if fmt % group in data_stripped:
                         log.debug('%s is from group %s', self.data, group)
                         self.group = group
