@@ -61,7 +61,6 @@ class UrlRewriteDivxATope(object):
         #url_search = 'http://www.divxatope.com/buscar/descargas/'
         url_search = 'http://divxatope1.com/buscar/descargas'
         results = set()
-        regex = re.compile("(.+) \(\d\d\d\d\)")
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
             query = re.sub(' \(\d\d\d\d\)$', '', query)
