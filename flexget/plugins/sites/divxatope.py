@@ -37,7 +37,7 @@ class UrlRewriteDivxATope(object):
     # urlrewriter API
     def url_rewrite(self, task, entry):
         # Rewrite divxatope.com/descargar/ to divxatope.com/descarga-torrent/
-        entry['url'] = re.sub("/descargar/", "/descarga-torrent/", entry['url'])
+        entry['url'] = re.sub('/descargar/', '/descarga-torrent/', entry['url'])
         entry['url'] = self.parse_download_page(entry['url'])
 
     @plugin.internet(log)
@@ -58,7 +58,6 @@ class UrlRewriteDivxATope(object):
             log.debug('Divxatope disabled')
             return set()
         log.debug('Search DivxATope')
-        #url_search = 'http://www.divxatope.com/buscar/descargas/'
         url_search = 'http://divxatope1.com/buscar/descargas'
         results = set()
         for search_string in entry.get('search_strings', [entry['title']]):
