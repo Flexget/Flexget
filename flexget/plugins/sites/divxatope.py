@@ -31,7 +31,7 @@ class UrlRewriteDivxATope(object):
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        rewritable_regex = '^http:\/\/(www.)?divxatope1?.com.*'
+        rewritable_regex = '^https?:\/\/(www.)?divxatope1?.com.*'
         return re.match(rewritable_regex, url) and not url.endswith('.torrent')
 
     # urlrewriter API
@@ -64,11 +64,9 @@ class UrlRewriteDivxATope(object):
         regex = re.compile("(.+) \(\d\d\d\d\)")
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
-            if regex.findall(query):
-                query = regex.findall(query)[0]
+            query = re.sub(' \(\d\d\d\d\)$', '', query)
             log.debug('Searching DivxATope %s' % query)
             query = query.encode('utf8', 'ignore')
-            #data = {'search': query}
             data = {'q': query}
             try:
                 response = task.requests.post(url_search, data=data)
@@ -98,7 +96,6 @@ class UrlRewriteDivxATope(object):
                 if quality_lan is None:
                     continue
                 quality_lan = quality_lan.contents
-                #log.debug(len(quality_lan))
                 if len(quality_lan) > 2:
                     if (isinstance(quality_lan[0], Tag)):
                         entry_quality_lan = quality_lan[1]
