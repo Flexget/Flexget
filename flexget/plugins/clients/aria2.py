@@ -107,11 +107,12 @@ class OutputAria2(object):
         except RenderError as e:
             entry.fail('failed to render \'path\': %s' % e)
             return
-        try:
-            options['out'] = os.path.expanduser(entry.render(config['filename']))
-        except RenderError as e:
-            entry.fail('failed to render \'filename\': %s' % e)
-            return
+	if 'filename' in config:
+             try:
+                 options['out'] = os.path.expanduser(entry.render(config['filename']))
+             except RenderError as e:
+                 entry.fail('failed to render \'filename\': %s' % e)
+                 return
         secret = None
         if config['secret']:
             secret = 'token:%s' % config['secret']
