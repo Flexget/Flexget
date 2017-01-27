@@ -7,7 +7,6 @@ from textwrap import wrap
 from colorclass import Windows, Color
 from flexget.logger import local_context
 from flexget.options import ArgumentParser
-from flexget.utils.tools import io_encoding
 from terminaltables import AsciiTable, SingleTable, DoubleTable, GithubFlavoredMarkdownTable, PorcelainTable
 from terminaltables.terminal_io import terminal_size
 
@@ -262,10 +261,7 @@ def console(text, *args, **kwargs):
 
     Accepts arguments like the `print` function does.
     """
+
     kwargs['file'] = getattr(local_context, 'output', sys.stdout)
-    try:
-        print(text, *args, **kwargs)
-    except UnicodeEncodeError:
-        text = text.encode(io_encoding, 'replace').decode(io_encoding)
-        print(text, *args, **kwargs)
+    print(text, *args, **kwargs)
     kwargs['file'].flush()  # flush to make sure the output is printed right away

@@ -5,6 +5,7 @@ from future.moves.urllib import request
 from future.utils import PY2
 from past.builtins import basestring
 
+import codecs
 import logging
 import ast
 import copy
@@ -237,6 +238,16 @@ else:
         io_encoding = 'utf8'
     elif io_encoding in ['us-ascii', '646', 'ansi_x3.4-1968']:
         io_encoding = 'ascii'
+
+
+# Writing text that cannot be encoded to the stdout encoding can cause a crash.
+# Using safe_stdout instead will cause the characters to be replaced with `?` rather than crash.
+# TODO: This should not be a magic side effect of importing this module. Move it somewhere better before merging.
+if hasattr(sys.stdout, 'buffer'):
+    # On python 3, we need to get the buffer directly to support writing bytes
+    sys.stdout = codecs.getwriter(io_encoding)(sys.stdout.buffer, 'replace')
+else:
+    sys.stdout = codecs.getwriter(io_encoding)(sys.stdout, 'replace')
 
 
 def parse_timedelta(value):
