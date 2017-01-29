@@ -89,13 +89,14 @@ class PendingListListsAPI(APIResource):
         """ Create a new pending list """
         data = request.json
         name = data.get('name')
-        new_list = False
+
         try:
             get_list_by_exact_name(name=name, session=session)
         except NoResultFound:
-            new_list = True
-        if not new_list:
+            pass
+        else:
             raise Conflict('list with name \'%s\' already exists' % name)
+
         pending_list = PendingListList()
         pending_list.name = name
         session.add(pending_list)
