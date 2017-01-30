@@ -123,7 +123,7 @@ class Notify(object):
                 self.send_notification(config['entries']['title'], message, config['entries']['via'],
                                        template_renderer=entry.render)
         if 'task' in config:
-            if not (task.accepted or task.failed) and not config['always_send']:
+            if not (task.accepted or task.failed) and not config['task']['always_send']:
                 log.verbose('No accepted or failed entries, not sending a notification.')
                 return
             try:
