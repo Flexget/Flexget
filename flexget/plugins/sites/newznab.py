@@ -332,19 +332,19 @@ class Newznab(object):
         if 'plugins_list' not in config:
             return entry
 
-        show_lookup = self._get_entry_type(entry)
-        if show_lookup is None:
+        entry_type = self._get_entry_type(entry)
+        if entry_type is None:
             log.warning('Could not determine entry type (tv/movie) for meta lookup: %s', entry)
             return entry
 
         search_list = []
-        if show_lookup == 'tv':
+        if entry_type == 'tv':
             if entry.get('series_name'):
                 title, year = split_title_year(entry['series_name'])
                 if year:
                     search_list.insert(0, '%s (%s)' % (title, year))
                 list_append_unique(search_list, title, caseinsensitive=True)
-        elif show_lookup == 'movie':
+        elif entry_type == 'movie':
             search_list.insert(0, entry['title'])
             if entry.get('movie_name'):
                 title, year = split_title_year(entry['movie_name'])
@@ -361,7 +361,7 @@ class Newznab(object):
                 continue
             search_entry['title'] = search_string
             # update entry metadata
-            if show_lookup == 'tv':
+            if entry_type == 'tv':
                 search_entry['series_name'] = search_string
                 for plugin_name in config['plugins_list']:
                     log.verbose('Doing `%s` for series: %s', plugin_name, search_string)
@@ -369,7 +369,7 @@ class Newznab(object):
                         plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry, 'en')
                     else:
                         plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry)
-            elif show_lookup == 'movie':
+            elif entry_type == 'movie':
                 for plugin_name in config['plugins_list']:
                     log.verbose('Doing `%s` for movie: %s', plugin_name, search_string)
                     if plugin_name == 'trakt_lookup':
