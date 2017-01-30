@@ -198,12 +198,12 @@ class Newznab(object):
         category: tv
 
     # search by name + age: search in the 'tv' category, using existing names for the type ('title'...)
-    # maxage: auto will try to calculate the maximum possible age for the release and use it to confine the search
+    # max_age: auto will try to calculate the maximum possible age for the release and use it to confine the search
     newznab:
         api_server_url: https://api.nzbindexer.com
         api_key: my_apikey
         category: tv
-        maxage: auto
+        max_age: auto
 
     # meta id based: try using existing metaid's (tvdb/ragetv/imdb) to search only in the tv/hd,uhd categories
     newznab:
@@ -223,7 +223,7 @@ class Newznab(object):
         use_metadata:
             - trakt
             - imdb
-        maxage: 1 week
+        max_age: 1 week
 
     # custom search string: builds the search string and searches in the tv/hd and a custom 5999 category
     newznab:
@@ -264,7 +264,7 @@ class Newznab(object):
                 ]}, unique_items=True),
             'custom_query': {'type': 'string'},
             'force_quotes': {'type': 'boolean', 'default': False},
-            'maxage': {
+            'max_age': {
                 'oneOf': [
                     {'type': 'string', 'format': 'interval'},
                     {'type': 'string', 'enum': ['auto']}
@@ -288,7 +288,6 @@ class Newznab(object):
     _metaid_fields = [p.instance.movie_identifier for p in plugin.get_plugins(group='movie_metainfo')] + \
                      [p.instance.series_identifier for p in plugin.get_plugins(group='series_metainfo')] + ['tvrage_id']
 
-
     def prepare_config(self, config):
         if 'use_metadata' in config:
             if 'plugins_list' not in config:
@@ -310,11 +309,11 @@ class Newznab(object):
                     config['category_string'] = ','.join(str(c) for c in categories)
         return config
 
-    def _is_tv_entry(self, entry):
+    def _get_entry_type(self, entry):
         if any(entry.get(field) for field in self._series_identifier_fields):
-            return True
+            return 'tv'
         elif any(entry.get(field) for field in self._movie_identifier_fields):
-            return False
+            return 'movie'
         else:
             return None
 
@@ -322,9 +321,9 @@ class Newznab(object):
         return any(entry.get(field) for field in self._metaid_fields)
 
     def _has_supported_meta_id(self, entry):
-        if self._is_tv_entry(entry) is True:
+        if self._get_entry_type(entry) == 'tv':
             return any(entry.get(field) for field in ['tvdb_id', 'tvrage_id'])
-        elif self._is_tv_entry(entry) is False:
+        elif self._get_entry_type(entry) == 'movie':
             return any(entry.get(field) for field in ['imdb_id'])
         else:
             return False
@@ -333,19 +332,19 @@ class Newznab(object):
         if 'plugins_list' not in config:
             return entry
 
-        show_lookup = self._is_tv_entry(entry)
+        show_lookup = self._get_entry_type(entry)
         if show_lookup is None:
             log.warning('Could not determine entry type (tv/movie) for meta lookup: %s', entry)
             return entry
 
         search_list = []
-        if show_lookup is True:
+        if show_lookup == 'tv':
             if entry.get('series_name'):
                 title, year = split_title_year(entry['series_name'])
                 if year:
                     search_list.insert(0, '%s (%s)' % (title, year))
                 list_append_unique(search_list, title, caseinsensitive=True)
-        elif show_lookup is False:
+        elif show_lookup == 'movie':
             search_list.insert(0, entry['title'])
             if entry.get('movie_name'):
                 title, year = split_title_year(entry['movie_name'])
@@ -362,37 +361,27 @@ class Newznab(object):
                 continue
             search_entry['title'] = search_string
             # update entry metadata
-            if show_lookup is True:
+            if show_lookup == 'tv':
                 search_entry['series_name'] = search_string
                 for plugin_name in config['plugins_list']:
-                    if plugin_name == 'trakt_lookup':
-                        plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry)
-                        log.verbose('Doing `%s` for series: %s', plugin_name, search_string)
-                    elif plugin_name == 'tvmaze_lookup':
-                        plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry)
-                        log.verbose('Doing `%s` for series: %s', plugin_name, search_string)
-                    elif plugin_name == 'thetvdb_lookup':
-                        # TODO @Andy: do we need language support?
+                    log.verbose('Doing `%s` for series: %s', plugin_name, search_string)
+                    if plugin_name == 'thetvdb_lookup':
                         plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry, 'en')
-                        log.verbose('Doing `%s` for series: %s', plugin_name, search_string)
-            elif show_lookup is False:
+                    else:
+                        plugin.get_plugin_by_name(plugin_name).instance.lazy_series_lookup(search_entry)
+            elif show_lookup == 'movie':
                 for plugin_name in config['plugins_list']:
+                    log.verbose('Doing `%s` for movie: %s', plugin_name, search_string)
                     if plugin_name == 'trakt_lookup':
-                        plugin.get_plugin_by_name('trakt_lookup').instance.lazy_movie_lookup(search_entry)
-                        log.verbose('Doing `%s` for movie: %s', plugin_name, search_string)
-                    elif plugin_name == 'tmdb_lookup':
-                        plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(search_entry)
-                        log.verbose('Doing `%s` for movie: %s', plugin_name, search_string)
-                    elif plugin_name == 'imdb_lookup':
-                        plugin.get_plugin_by_name('imdb_lookup').instance.lookup(search_entry)
-                        log.verbose('Doing `%s` for movie: %s', plugin_name, search_string)
+                        plugin.get_plugin_by_name(plugin_name).instance.lazy_movie_lookup(search_entry)
+                    else:
+                        plugin.get_plugin_by_name(plugin_name).instance.lookup(search_entry)
             if self._has_meta_id(search_entry) is not None:
                 search_entry['title'] = entry['title']  # keep org. title
                 return search_entry
         return entry
 
     def _build_base_url(self, entry, config):
-        # TODO @Andy: do 't=caps' check (many indexers wont correctly handle this, nzbhydra uses 'brute force' since 0.2.169)
         if not config.get('api_server_url'):
             raise plugin.PluginError('Invalid url in config: %s', config)
 
@@ -401,9 +390,9 @@ class Newznab(object):
             api_url += '&apikey=%s' % config['api_key']
         if config.get('category_string'):
             api_url += '&cat=%s' % config['category_string']
-        if 'maxage' in config:
+        if 'max_age' in config:
             maxage = None
-            if config['maxage'] == 'auto':
+            if config['max_age'] == 'auto':
                 estimator = plugin.get_plugin_by_name('estimate_release').instance
                 est_date = estimator.estimate(entry)
                 if est_date:
@@ -413,9 +402,9 @@ class Newznab(object):
                     maxage = datetime.now() - est_date
             else:
                 try:
-                    maxage = parse_timedelta(config['maxage'])
+                    maxage = parse_timedelta(config['max_age'])
                 except ValueError as ex:
-                    log.error('Invalid maxage given in config or estimator: %s', ex)
+                    log.error('Invalid max_age given in config or estimator: %s', ex)
 
             if maxage is not None:
                 maxage = max(maxage, timedelta(days=1))  # cap to one day
@@ -507,7 +496,6 @@ class Newznab(object):
             log.error('Invalid/empty query_string given: %s', query_string)
             return None
         query = normalize_unicode(query_string)
-        # query = normalize_scene(query)
         query = quote_plus(query.encode('utf8'))
         if config['force_quotes'] is True:
             query = "&q=\"%s\"" % query
@@ -518,21 +506,17 @@ class Newznab(object):
     def _build_metaid_url_fragment(self, entry):
         url_param = None
         # use first valid meta id
-        if self._is_tv_entry(entry) is True:
+        if self._get_entry_type(entry) == 'tv':
             if entry.get('tvdb_id'):
                 url_param = '&tvdbid=%s' % entry['tvdb_id']
             elif entry.get('tvrage_id'):
                 url_param = '&rid=%s' % entry['tvrage_id']
-                # lets not use those for now, rarely supported!
-                # elif self.safe_get(entry, 'tvmaze_series_id', [basestring, int]):
-                #    url_param = '&tvmazeid=%s' % entry['tvmaze_series_id']
-                # elif self.safe_get(entry, 'trakt_id', [basestring, int]):
-                #    url_param = '&traktid=%s' % entry['trakt_id']
-        elif self._is_tv_entry(entry) is False:
+            # no tvmazeid/traktid support, indexer rarely support those!
+        elif self._get_entry_type(entry) == 'movie':
             if entry.get('imdb_id'):
                 imdb_str = str(entry['imdb_id'])
                 url_param = '&imdbid=%s' % imdb_str.replace('tt', '')
-                # tmdb_id is not supported for move lookups by indexers!
+            # tmdb_id is not supported for move lookups by indexers!
         return url_param
 
     def _build_series_ep_season_url_fragment(self, entry):
@@ -578,15 +562,15 @@ class Newznab(object):
             if meta_url is None:
                 entry = self.update_metadata(entry, config)
                 meta_url = self._build_metaid_url_fragment(entry)  # try again
-            if self._is_tv_entry(entry) is True:
+            if self._get_entry_type(entry) == 'tv':
                 ep_url = self._build_series_ep_season_url_fragment(entry)
 
         query_list = []
         # build meta and ep fragment
         url = self._build_base_url(entry, config)
-        if meta_url and self._is_tv_entry(entry) is True and ep_url:
+        if meta_url and self._get_entry_type(entry) == 'tv' and ep_url:
             url += '&t=tvsearch' + meta_url + ep_url
-        elif meta_url and self._is_tv_entry(entry) is False:
+        elif meta_url and self._get_entry_type(entry) == 'movie':
             url += '&t=movie' + meta_url
         else:
             url += '&t=search'
