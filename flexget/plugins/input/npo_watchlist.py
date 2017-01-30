@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
@@ -178,7 +179,6 @@ class NPOWatchlist(object):
 
         return series_info
 
-
     def _get_series_episodes(self, task, config, series_name, series_url, series_info):
         log.info('Retrieving new episodes for %s', series_name)
         response = task.requests.get(series_url + '/search?media_type=broadcast')  # only shows full episodes
@@ -201,33 +201,36 @@ class NPOWatchlist(object):
 
         entries = list()
         for listItem in page.findAll('div', class_='item'):
-            url = listItem.find('a')['href']
-            title = listItem.find('h3').text
+            episode_runtime = listItem.find('div', class_='md-value')
+            if episode_runtime:  # if there is no md-value, it is not an episode
+                url = listItem.find('a')['href']
+                title = listItem.find('h3').text
 
-            episode_id = url.split('/')[-1]
-            title = '{} ({})'.format(title, episode_id)
+                episode_id = url.split('/')[-1]
+                title = '{} ({})'.format(title, episode_id)
 
-            entry_date = list(listItem.find('h4').stripped_strings)[1]
-            entry_date = self._parse_date(entry_date)
-            if max_age >= 0 and (date.today() - entry_date) > timedelta(days=max_age):
-                log.debug('Skipping %s, aired on %s', title, entry_date)
-                continue
+                entry_date = list(listItem.find('h4').stripped_strings)[1]
+                entry_date = self._parse_date(entry_date)
+                if max_age >= 0 and (date.today() - entry_date) > timedelta(days=max_age):
+                    log.debug('Skipping %s, aired on %s', title, entry_date)
+                    continue
 
-            e = Entry()
-            e['url'] = self._prefix_url('http://www.npo.nl', url)
-            e['title'] = title
-            e['series_name'] = series_name
-            e['series_name_plain'] = self._convert_plain(series_name)
-            e['series_date'] = entry_date
-            e['series_id_type'] = 'date'
-            e['description'] = listItem.find('p').text
-            e['npo_url'] = series_info['npo_url']
-            e['npo_name'] = series_info['npo_name']
-            e['npo_description'] = series_info['npo_description']
-            e['npo_language'] = series_info['npo_language']
-            e['language'] = series_info['npo_language']  # set language field for (tvdb_)lookup
+                e = Entry()
+                e['url'] = self._prefix_url('http://www.npo.nl', url)
+                e['title'] = title
+                e['series_name'] = series_name
+                e['series_name_plain'] = self._convert_plain(series_name)
+                e['series_date'] = entry_date
+                e['series_id_type'] = 'date'
+                e['description'] = listItem.find('p').text
+                e['npo_url'] = series_info['npo_url']
+                e['npo_name'] = series_info['npo_name']
+                e['npo_description'] = series_info['npo_description']
+                e['npo_language'] = series_info['npo_language']
+                e['npo_runtime'] = episode_runtime.contents[0].split(':')[0].strip()  # only count full minutes
+                e['language'] = series_info['npo_language']  # set language field for (tvdb_)lookup
 
-            entries.append(e)
+                entries.append(e)
 
         return entries
 
@@ -238,7 +241,7 @@ class NPOWatchlist(object):
         for listItem in page.findAll('div', class_='list-item'):
             url = listItem.find('a')['href']
             title = next(listItem.find('h4').stripped_strings)
-            subtitle = listItem.find('h5').text
+            subtitle = listItem.find('h5').text.split('·')
 
             episode_id = url.split('/')[-1]
             title = '{} ({})'.format(title, episode_id)
@@ -250,7 +253,7 @@ class NPOWatchlist(object):
                 log.debug('Skipping fragment: %s', title)
                 continue
 
-            entry_date = self._parse_date(subtitle)
+            entry_date = self._parse_date(subtitle[0])
             if max_age >= 0 and (date.today() - entry_date) > timedelta(days=max_age):
                 log.debug('Skipping %s, aired on %s', title, entry_date)
                 continue
@@ -267,6 +270,8 @@ class NPOWatchlist(object):
             e['npo_name'] = series_info['npo_name']
             e['npo_description'] = series_info['npo_description']
             e['npo_language'] = series_info['npo_language']
+            if subtitle[1]:  # if runtime is available in the subtext
+                e['npo_runtime'] = subtitle[1].strip('min').strip()
             e['language'] = series_info['npo_language']  # set language field for (tvdb_)lookup
 
             entries.append(e)
