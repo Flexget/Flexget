@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+import json
 
 from flexget import plugin
 from flexget.event import event
@@ -63,11 +64,11 @@ class RapidpushNotifier(object):
             if config.get('priority') is not None:
                 notification['priority'] = config['priority']
 
-        wrapper['data'] = notification
+        wrapper['data'] = json.dumps(notification)
         for key in config['api_key']:
             wrapper['apikey'] = key
             try:
-                response = requests.post(RAPIDPUSH_URL, json=wrapper)
+                response = requests.post(RAPIDPUSH_URL, params=wrapper)
             except RequestException as e:
                 raise PluginWarning(e.args[0])
             else:
