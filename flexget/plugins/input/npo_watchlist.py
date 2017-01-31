@@ -270,7 +270,7 @@ class NPOWatchlist(object):
             e['npo_name'] = series_info['npo_name']
             e['npo_description'] = series_info['npo_description']
             e['npo_language'] = series_info['npo_language']
-            if subtitle[1]:  # if runtime is available in the subtext
+            if len(subtitle) > 1:  # if runtime is available in the subtext
                 e['npo_runtime'] = subtitle[1].strip('min').strip()
             e['language'] = series_info['npo_language']  # set language field for (tvdb_)lookup
 
