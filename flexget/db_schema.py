@@ -5,6 +5,8 @@ from future.utils import native_str
 import logging
 from datetime import datetime
 
+from alembic.migration import MigrationContext
+from alembic.operations import Operations
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.exc import OperationalError
 
@@ -104,6 +106,7 @@ def set_version(plugin, version, session=None):
 @with_session
 def upgrade_required(session=None):
     """Returns true if an upgrade of the database is required."""
+    session.query(PluginSchema).filter(~PluginSchema.plugin.in_(plugin_schemas)).delete(synchronize_session='fetch')
     old_schemas = session.query(PluginSchema).all()
     if len(old_schemas) < len(plugin_schemas):
         return True
@@ -142,35 +145,73 @@ def upgrade(plugin):
 
     def upgrade_decorator(upgrade_func):
 
-        @event('manager.upgrade')
-        def upgrade_wrapper(manager):
-            with Session() as session:
-                current_ver = get_version(plugin, session=session)
+        #@event('manager.upgrade')
+        # def upgrade_wrapper(manager):
+        #     with Session() as session:
+        #         current_ver = get_version(plugin, session=session)
+        #         try:
+        #             new_ver = upgrade_func(current_ver, session)
+        #         except UpgradeImpossible:
+        #             log.info('Plugin %s database is not upgradable. Flushing data and regenerating.' % plugin)
+        #             reset_schema(plugin, session=session)
+        #             manager.db_upgraded = True
+        #         except Exception as e:
+        #             log.exception('Failed to upgrade database for plugin %s: %s' % (plugin, e))
+        #             session.rollback()
+        #             manager.shutdown(finish_queue=False)
+        #         else:
+        #             current_ver = -1 if current_ver is None else current_ver
+        #             if new_ver > current_ver:
+        #                 log.info('Plugin `%s` schema upgraded successfully' % plugin)
+        #                 set_version(plugin, new_ver, session=session)
+        #                 manager.db_upgraded = True
+        #             elif new_ver < current_ver:
+        #                 log.critical('A lower schema version was returned (%s) from plugin %s upgrade function '
+        #                              'than passed in (%s)' % (new_ver, plugin, current_ver))
+        #                 session.rollback()
+        #                 manager.shutdown(finish_queue=False)
+
+        return upgrade_func
+
+    return upgrade_decorator
+
+
+@event('manager.upgrade')
+def _run_migrations(manager):
+    with Session() as session:
+        db_versions = {}
+        for db_ver in session.query(PluginSchema).all():
+            db_versions[db_ver.plugin] = db_ver.version
+        conn = session.bind
+        context = MigrationContext.configure(conn)
+        op = Operations(context)
+        for plugin, info in plugin_schemas.items():
+            current_ver = db_versions.get(plugin, -1)
+            latest_ver = info['version']
+            while current_ver < latest_ver:
+                if 'upgrade_func' not in info:
+                    # TODO: temporary for debugging
+                    current_ver = latest_ver
+                    continue
+                    raise Exception('Plugin %s needs db upgraded, but the plugin does not provide an upgrade function' %
+                                    plugin)
                 try:
-                    new_ver = upgrade_func(current_ver, session)
+                    new_ver = info['upgrade_func'](current_ver, op)
                 except UpgradeImpossible:
                     log.info('Plugin %s database is not upgradable. Flushing data and regenerating.' % plugin)
                     reset_schema(plugin, session=session)
-                    manager.db_upgraded = True
                 except Exception as e:
+                    manager.crash_report()
                     log.exception('Failed to upgrade database for plugin %s: %s' % (plugin, e))
-                    session.rollback()
+                    #session.rollback()
                     manager.shutdown(finish_queue=False)
-                else:
-                    current_ver = -1 if current_ver is None else current_ver
-                    if new_ver > current_ver:
-                        log.info('Plugin `%s` schema upgraded successfully' % plugin)
-                        set_version(plugin, new_ver, session=session)
-                        manager.db_upgraded = True
-                    elif new_ver < current_ver:
-                        log.critical('A lower schema version was returned (%s) from plugin %s upgrade function '
-                                     'than passed in (%s)' % (new_ver, plugin, current_ver))
-                        session.rollback()
-                        manager.shutdown(finish_queue=False)
-
-        return upgrade_wrapper
-
-    return upgrade_decorator
+                if new_ver <= current_ver:
+                    raise Exception('Plugin %s db upgrade function did not upgrade the database past version %s.' %
+                                    (plugin, current_ver))
+                elif new_ver > latest_ver:
+                    raise Exception('Plugin %s upgraded the database farther than the latest declared version' % plugin)
+                set_version(plugin, new_ver, session=session)
+                current_ver = new_ver
 
 
 @with_session
@@ -200,7 +241,6 @@ def reset_schema(plugin, session=None):
 
 
 def register_plugin_table(tablename, plugin, version):
-    plugin_schemas.setdefault(plugin, {'version': version, 'tables': []})
     if plugin_schemas[plugin]['version'] != version:
         raise Exception('Two different schema versions received for plugin %s' % plugin)
     plugin_schemas[plugin]['tables'].append(tablename)
@@ -243,6 +283,9 @@ class Meta(type):
         else:
             register_plugin_table(table.name, cls.plugin, cls.version)
 
+    def upgrade(cls, upgrade_func):
+        plugin_schemas[cls.plugin]['upgrade_func'] = upgrade_func
+
     def __getattr__(self, item):
         """Transparently return attributes of Base instead of our own."""
         return getattr(Base, item)
@@ -251,6 +294,9 @@ class Meta(type):
 def versioned_base(plugin, version):
     """Returns a class which can be used like Base, but automatically stores schema version when tables are created."""
 
+    if plugin in plugin_schemas:
+        raise Exception('Plugin %s called versioned_base twice.' % plugin)
+    plugin_schemas[plugin] = {'version': version, 'tables': []}
     return Meta('VersionedBase', (object,), {'__metaclass__': Meta, 'plugin': plugin, 'version': version})
 
 

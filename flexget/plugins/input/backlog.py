@@ -5,7 +5,7 @@ import logging
 import pickle
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, Index, select
+from sqlalchemy import Column, Integer, String, Unicode, DateTime, Index, sql
 
 from flexget import db_schema, plugin
 from flexget.event import event
@@ -19,39 +19,38 @@ log = logging.getLogger('backlog')
 Base = db_schema.versioned_base('backlog', 2)
 
 
-@db_schema.upgrade('backlog')
-def upgrade(ver, session):
-    if ver is None:
+@Base.upgrade
+def upgrade(ver, op):
+    # No idea if these work, don't have good data to test
+    if ver == -1:
         # Make sure there is no data we can't load in the backlog table
-        backlog_table = table_schema('backlog', session)
+        backlog_table = sql.table('backlog', sql.column('entry', String))
         try:
-            for item in session.query('entry').select_from(backlog_table).all():
+            for item in op.get_bind().execute(backlog_table.select()):
                 pickle.loads(item.entry)
         except (ImportError, TypeError):
             # If there were problems, we can drop the data.
             log.info('Backlog table contains unloadable data, clearing old data.')
-            session.execute(backlog_table.delete())
-        ver = 0
+            raise db_schema.UpgradeImpossible()
+        return 0
     if ver == 0:
-        backlog_table = table_schema('backlog', session)
         log.info('Creating index on backlog table.')
-        Index('ix_backlog_feed_expire', backlog_table.c.feed, backlog_table.c.expire).create(bind=session.bind)
-        ver = 1
+        op.create_index('ix_backlog_feed_expire', 'backlog', ['feed', 'expire'])
+        return 1
     if ver == 1:
-        table = table_schema('backlog', session)
-        table_add_column(table, 'json', Unicode, session)
+        op.add_column('backlog', Column('json', Unicode))
         # Make sure we get the new schema with the added column
-        table = table_schema('backlog', session)
-        for row in session.execute(select([table.c.id, table.c.entry])):
+        backlog_table = sql.table('backlog', sql.column('id', Integer), sql.column('entry', String),
+                                  sql.column('json',  Unicode))
+        for row in op.get_bind().execute(backlog_table.select()):
             try:
                 p = pickle.loads(row['entry'])
-                session.execute(table.update().where(table.c.id == row['id']).values(
+                op.execute(backlog_table.update().where(backlog_table.c.id == row['id']).values(
                     json=json.dumps(p, encode_datetime=True)))
             except KeyError as e:
                 log.error('Unable error upgrading backlog pickle object due to %s' % str(e))
 
-        ver = 2
-    return ver
+        return 2
 
 
 class BacklogEntry(Base):
