@@ -13,4 +13,5 @@ The following entries have failed for task {{group.grouper}}:
 - {{entry.title}} ({{entry.url}}) Reason: {{entry.reason|d('unknown')}}
   {% endfor %}
 {% endfor %}
+{% else %} Task did not produce any entries.
 {% endif %}
