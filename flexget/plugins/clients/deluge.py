@@ -839,8 +839,8 @@ class OutputDeluge(DelugePlugin):
         # Leave the timeout long, to give time for possible lookups to occur
         reactor.callLater(600, lambda: tasks.called or on_timeout(tasks))
 
-    def on_task_exit(self, task, config):
-        """Make sure all temp files are cleaned up when task exits"""
+    def on_task_learn(self, task, config):
+        """ Make sure all temp files are cleaned up when entries are learned """
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
@@ -849,7 +849,7 @@ class OutputDeluge(DelugePlugin):
     def on_task_abort(self, task, config):
         """Make sure normal cleanup tasks still happen on abort."""
         DelugePlugin.on_task_abort(self, task, config)
-        self.on_task_exit(task, config)
+        self.on_task_learn(task, config)
 
 
 @event('plugin.register')
