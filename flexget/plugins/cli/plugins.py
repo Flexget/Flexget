@@ -15,11 +15,12 @@ log = logging.getLogger('plugins')
 def plugins_summary(manager, options):
     if options.table_type == 'porcelain':
         disable_all_colors()
-    header = ['Keyword', 'Phases', 'Flags']
+    header = ['Keyword', 'Interfaces', 'Phases', 'Flags']
     table_data = [header]
     for plugin in sorted(get_plugins(phase=options.phase, interface=options.interface)):
         if options.builtins and not plugin.builtin:
             continue
+
         flags = []
         if plugin.instance.__doc__:
             flags.append('doc')
@@ -29,6 +30,7 @@ def plugins_summary(manager, options):
             if not options.debug:
                 continue
             flags.append('developers')
+
         handlers = plugin.phase_handlers
         roles = []
         for phase in handlers:
@@ -36,7 +38,7 @@ def plugins_summary(manager, options):
             roles.append('{0}({1})'.format(phase, priority))
 
         name = colorize('green', plugin.name) if 'builtin' in flags else plugin.name
-        table_data.append([name, ', '.join(roles), ', '.join(flags)])
+        table_data.append([name, ', '.join(plugin.interfaces), ', '.join(roles), ', '.join(flags)])
 
     try:
         table = TerminalTable(options.table_type, table_data, wrap_columns=[1, 2])
