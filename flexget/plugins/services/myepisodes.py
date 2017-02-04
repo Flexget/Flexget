@@ -292,7 +292,7 @@ class MyEpisodes(object):
         try:
             response = session.post(url, data=payload)
 
-            if config['username'] not in response.text:
+            if config['username'].lower() not in response.text.lower():
                 raise plugin.PluginWarning(('Login to myepisodes.com failed, please see if the site is down and verify '
                                             'your credentials.'), log)
         except requests.RequestException as e:
