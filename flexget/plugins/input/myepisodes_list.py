@@ -13,7 +13,7 @@ from flexget.utils.soup import get_soup
 
 from requests import RequestException
 
-log = logging.getLogger('myepisodes')
+log = logging.getLogger('myepisodes_list')
 
 URL = 'http://www.myepisodes.com/'
 
@@ -58,7 +58,7 @@ class MyEpisodesList(object):
                 'action': 'Login'
             }
             try:
-                loginsrc = task.requests.post(URL + 'login.php?action=login', data=params).text
+                loginsrc = task.requests.post(URL + 'login.php', data=params).text
                 if username.lower() not in loginsrc.lower():
                     raise plugin.PluginWarning(('Login to myepisodes.com failed, please check '
                                                 'your account data or see if the site is down.'), log)
