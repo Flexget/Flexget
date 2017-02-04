@@ -58,8 +58,8 @@ class MyEpisodesList(object):
                 'action': 'Login'
             }
             try:
-                loginsrc = task.requests.post(URL + 'login.php', data=params).text
-                if username.lower() not in loginsrc.lower():
+                loginsrc = task.requests.post(URL + 'login.php', data=params)
+                if 'login' in loginsrc.url:
                     raise plugin.PluginWarning(('Login to myepisodes.com failed, please check '
                                                 'your account data or see if the site is down.'), log)
             except RequestException as e:
