@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 
 class ListFramework(object):
-    def __init__(self, plugin_name, plugin_config):
+    def initialize(self, plugin_name, plugin_config):
         try:
             self.plugin_name = plugin_name
             self.plugin_config = plugin_config

@@ -34,7 +34,8 @@ class ListRemove(object):
         for item in config:
             for plugin_name, plugin_config in item.items():
                 try:
-                    the_list = plugin.get_plugin_by_name('list_framework').instance(plugin_name, plugin_config)
+                    the_list = plugin.get_plugin_by_name('list_framework').instance
+                    the_list.initialize(plugin_name, plugin_config)
                 except PluginError as e:
                     log.error(e.value)
                     continue
