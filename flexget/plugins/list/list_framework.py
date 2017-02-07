@@ -7,8 +7,8 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginError
 
-__name__ = 'list_framework'
-log = logging.getLogger(__name__)
+plugin_name = 'list_framework'
+log = logging.getLogger(plugin_name)
 
 
 class ListFramework(object):
@@ -38,4 +38,4 @@ class ListFramework(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ListFramework, __name__, api_ver=2, interfaces=[])
+    plugin.register(ListFramework, plugin_name, api_ver=2, interfaces=[])
