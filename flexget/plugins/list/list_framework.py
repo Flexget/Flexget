@@ -24,7 +24,7 @@ class ListFramework(object):
                 raise PluginError(self.list.immutable)
 
         def add(self, entries):
-            log.verbose('adding entries from %s - %s', self.plugin_name, self.plugin_config)
+            log.verbose('adding entries to %s - %s', self.plugin_name, self.plugin_config)
             self.list |= entries
 
         def remove(self, entries):
