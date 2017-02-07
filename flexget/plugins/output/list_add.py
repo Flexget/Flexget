@@ -26,32 +26,25 @@ class ListAdd(object):
         }
     }
 
-    def on_task_start(self, task, config):
-        for item in config:
-            for plugin_name, plugin_config in item.items():
-                try:
-                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
-                except AttributeError:
-                    raise PluginError('Plugin %s does not support list interface' % plugin_name)
-                if thelist.immutable:
-                    raise plugin.PluginError(thelist.immutable)
-
     # Run later in the phase, to capture any entry fields that might change during the output phase
     @plugin.priority(0)
     def on_task_output(self, task, config):
-        if not len(task.accepted) > 0:
+        if not task.accepted:
             log.debug('no accepted entries, nothing to add')
             return
 
         for item in config:
             for plugin_name, plugin_config in item.items():
-                thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
-                if task.manager.options.test and thelist.online:
+                try:
+                    the_list = plugin.get_plugin_by_name('list_framework').instance(plugin_name, plugin_config)
+                except PluginError as e:
+                    log.error(e.value)
+                    continue
+                if task.manager.options.test and the_list.online:
                     log.info('`%s` is marked as an online plugin, would add accepted items outside of --test mode. '
                              'Skipping', plugin_name)
                     continue
-                log.verbose('adding accepted entries into %s - %s', plugin_name, plugin_config)
-                thelist |= task.accepted
+                the_list.add(task.accepted)
 
 
 @event('plugin.register')

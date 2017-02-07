@@ -36,17 +36,15 @@ class ListClear(object):
         for item in config['what']:
             for plugin_name, plugin_config in item.items():
                 try:
-                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
-                except AttributeError:
-                    raise PluginError('Plugin %s does not support list interface' % plugin_name)
-                if thelist.immutable:
-                    raise plugin.PluginError(thelist.immutable)
+                    the_list = plugin.get_plugin_by_name('list_framework').instance(plugin_name, plugin_config)
+                except PluginError as e:
+                    log.error(e.value)
+                    continue
                 if config['phase'] == task.current_phase:
-                    if task.manager.options.test and thelist.online:
+                    if task.manager.options.test and the_list.online:
                         log.info('would have cleared all items from %s - %s', plugin_name, plugin_config)
                         continue
-                    log.verbose('clearing all items from %s - %s', plugin_name, plugin_config)
-                    thelist.clear()
+                    the_list.clear()
 
 
 @event('plugin.register')
