@@ -33,12 +33,14 @@ class ListMatch(object):
         for item in config['from']:
             for plugin_name, plugin_config in item.items():
                 try:
-                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
-                except AttributeError:
-                    raise PluginError('Plugin %s does not support list interface' % plugin_name)
+                    framework = plugin.get_plugin_by_name('list_framework').instance
+                    list_manager = framework.ListManager(plugin_name, plugin_config)
+                except PluginError as e:
+                    log.error(e.value)
+                    continue
                 already_accepted = []
                 for entry in task.entries:
-                    result = thelist.get(entry)
+                    result = list_manager.list.get(entry)
                     if not result:
                         continue
                     if config['action'] == 'accept':
@@ -61,15 +63,16 @@ class ListMatch(object):
         for item in config['from']:
             for plugin_name, plugin_config in item.items():
                 try:
-                    thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
-                except AttributeError:
-                    raise PluginError('Plugin %s does not support list interface' % plugin_name)
-                if task.manager.options.test and thelist.online:
+                    framework = plugin.get_plugin_by_name('list_framework').instance
+                    list_manager = framework.ListManager(plugin_name, plugin_config)
+                except PluginError as e:
+                    log.error(e.value)
+                    continue
+                if task.manager.options.test and list_manager.list.online:
                     log.info('`%s` is marked as online, would remove accepted items outside of --test mode.',
                              plugin_name)
                     continue
-                log.verbose('removing accepted entries from %s - %s', plugin_name, plugin_config)
-                thelist -= task.accepted
+                list_manager.remove(task.accepted)
 
 
 @event('plugin.register')
