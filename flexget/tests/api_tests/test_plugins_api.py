@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget.api.app import base_message
 from flexget.api.core.plugins import ObjectsContainer as OC
@@ -24,14 +24,14 @@ class TestPluginsAPI(object):
         errors = schema_match(OC.plugin_list_reply, data)
         assert not errors
 
-        rsp = api_client.get('/plugins/?group=search')
+        rsp = api_client.get('/plugins/?interface=search')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 
         errors = schema_match(OC.plugin_list_reply, data)
         assert not errors
 
-        rsp = api_client.get('/plugins/?group=fgfg')
+        rsp = api_client.get('/plugins/?interface=fgfg')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         data = json.loads(rsp.get_data(as_text=True))
 

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -39,7 +39,8 @@ class PluginTmdbLookup(object):
         'tmdb_released': 'released',
         'tmdb_votes': 'votes',
         # Just grab the top 5 posters
-        'tmdb_posters': lambda movie: [poster.url for poster in movie.posters[:5]],
+        'tmdb_posters': lambda movie: [poster.url('original') for poster in movie.posters[:5]],
+        'tmdb_backdrops': lambda movie: [poster.url('original') for poster in movie.backdrops[:5]],
         'tmdb_runtime': 'runtime',
         'tmdb_tagline': 'tagline',
         'tmdb_budget': 'budget',
@@ -88,4 +89,4 @@ class PluginTmdbLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTmdbLookup, 'tmdb_lookup', api_ver=2, groups=['movie_metainfo'])
+    plugin.register(PluginTmdbLookup, 'tmdb_lookup', api_ver=2, interfaces=['task', 'movie_metainfo'])

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import cgi
@@ -35,7 +35,7 @@ def do_cli(manager, options):
     if options.url:
         entry['url'] = options.url
     else:
-        entry['url'] = 'http://localhost/inject/%s' % ''.join(random.sample(string.letters + string.digits, 30))
+        entry['url'] = 'http://localhost/inject/%s' % ''.join(random.sample(string.ascii_letters + string.digits, 30))
     if options.force:
         entry['immortal'] = True
     if options.accept:
@@ -62,7 +62,8 @@ def register_parser_arguments():
                                              help='inject an entry from command line into tasks',
                                              usage='%(prog)s title/url [url] [--accept] [--force] '
                                                    '[--fields NAME=VALUE [NAME=VALUE...]] [<execute arguments>]',
-                                             epilog='If only a URL and no title is given, Flexget will attempt to find a title in the URL\'s response headers.')
+                                             epilog=('If only a URL and no title is given, Flexget will attempt to '
+                                                     'find a title in the URL\'s response headers.'))
     inject_group = inject_parser.add_argument_group('inject arguments')
     inject_group.add_argument('title', metavar='title/url', help='title or url of the entry to inject')
     inject_group.add_argument('url', nargs='?', help='url of the entry to inject')

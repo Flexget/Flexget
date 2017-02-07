@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from io import StringIO
 
@@ -1451,6 +1451,8 @@ class TestFromGroup(object):
               - {title: 'Test.13.HDTV-Ignored'}
               - {title: 'Test.13.HDTV-FlexGet'}
               - {title: 'Test.14.HDTV-Name'}
+              - {title: 'Test :: h264 10-bit | Softsubs (FlexGet) | Episode 3'}
+              - {title: 'Test :: h264 10-bit | Softsubs (Ignore) | Episode 3'}
             series:
               - test: {from_group: [Name, FlexGet]}
     """
@@ -1461,6 +1463,7 @@ class TestFromGroup(object):
         assert task.find_entry('accepted', title='[FlexGet] Test 12')
         assert task.find_entry('accepted', title='Test.13.HDTV-FlexGet')
         assert task.find_entry('accepted', title='Test.14.HDTV-Name')
+        assert task.find_entry('accepted', title='Test :: h264 10-bit | Softsubs (FlexGet) | Episode 3')
 
 
 class TestBegin(object):
@@ -1661,6 +1664,7 @@ class TestIDTypes(object):
           all_types:
             series:
               - episode
+              - seasonless episode
               - date
               - sequence
               - stupid id:
@@ -1673,6 +1677,7 @@ class TestIDTypes(object):
               - title: sequence 003
               - title: sequence 4
               - title: stupid id 3cat
+              - title: seasonless episode e01
     """
 
     def test_id_types(self, execute_task):

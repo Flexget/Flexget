@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -149,7 +149,7 @@ def register_plugin():
 def register_config():
     root_config_schema = {
         'type': 'object',
-        'additionalProperties': plugin.plugin_schemas(context='task')
+        'additionalProperties': plugin.plugin_schemas(interface='task')
     }
     register_config_key('templates', root_config_schema)
 

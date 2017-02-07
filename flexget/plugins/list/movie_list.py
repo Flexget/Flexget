@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from collections import MutableSet
 from datetime import datetime
 
@@ -31,7 +31,7 @@ class MovieListBase(object):
     @property
     def supported_ids(self):
         # Return a list of supported series identifier as registered via their plugins
-        return [p.instance.movie_identifier for p in plugin.get_plugins(group='movie_metainfo')]
+        return [p.instance.movie_identifier for p in plugin.get_plugins(interface='movie_metainfo')]
 
 
 class MovieListList(Base):
@@ -253,15 +253,13 @@ class PluginMovieList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginMovieList, 'movie_list', api_ver=2, groups=['list'])
+    plugin.register(PluginMovieList, 'movie_list', api_ver=2, interfaces=['task', 'list'])
 
 
 @with_session
-def get_movies_by_list_id(list_id, count=False, start=None, stop=None, order_by='added', descending=False,
+def get_movies_by_list_id(list_id, start=None, stop=None, order_by='added', descending=False,
                           session=None):
     query = session.query(MovieListMovie).filter(MovieListMovie.list_id == list_id)
-    if count:
-        return query.count()
     if descending:
         query = query.order_by(getattr(MovieListMovie, order_by).desc())
     else:

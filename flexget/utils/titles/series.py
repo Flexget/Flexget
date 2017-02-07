@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import cmp
 
 import logging
@@ -46,8 +46,9 @@ class SeriesParser(TitleParser):
         '(?:series|season)\s?(\d{1,4})\s(\d{1,3})\s?of\s?(?:\d{1,3})',
         '(\d{1,2})\s?x\s?(\d+)(?:\s(\d{1,2}))?',
         '(\d{1,3})\s?of\s?(?:\d{1,3})',
-        '(?:episode|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
-        'part\s(%s)' % '|'.join(map(str, english_numbers))]])
+        '(?:episode|e|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
+        'part\s(%s)' % '|'.join(map(str, english_numbers)),
+    ]])
     unwanted_regexps = ReList([
         '(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
         'S(\d{1,3})D(\d{1,3})',  # S3D1
@@ -249,7 +250,7 @@ class SeriesParser(TitleParser):
         if self.allow_groups:
             for group in self.allow_groups:
                 group = group.lower()
-                for fmt in ['[%s]', '-%s']:
+                for fmt in ['[%s]', '-%s', '(%s)']:
                     if fmt % group in data_stripped:
                         log.debug('%s is from group %s', self.data, group)
                         self.group = group

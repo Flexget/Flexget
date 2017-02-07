@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.utils import old_div
 from future.moves.urllib.parse import urlencode, quote
 
@@ -124,4 +124,4 @@ class Newznab(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Newznab, 'newznab', api_ver=2, groups=['search'])
+    plugin.register(Newznab, 'newznab', api_ver=2, interfaces=['search'])

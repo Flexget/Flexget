@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
 import logging
@@ -856,8 +856,8 @@ def set_series_begin(series, ep_id):
         ep_id = ep_id.upper()
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
-            raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`', ep_id,
-                             series.identified_by)
+            raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
+                             (ep_id, series.identified_by))
     series.identified_by = identified_by
     episode = (session.query(Episode).filter(Episode.series_id == series.id).
                filter(Episode.identified_by == series.identified_by).
@@ -1416,8 +1416,8 @@ class FilterSeries(FilterSeriesBase):
 
         for entry in entries:
             # skip processed entries
-            if (entry.get('series_parser') and entry['series_parser'].valid and entry[
-                'series_parser'].name.lower() != series_name.lower()):
+            if (entry.get('series_parser') and entry['series_parser'].valid and
+                    entry['series_parser'].name.lower() != series_name.lower()):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
@@ -1602,8 +1602,8 @@ class FilterSeries(FilterSeriesBase):
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
-            if (entry['quality'] in downloaded_qualities and entry['series_parser'].proper_count > downloaded_qualities[
-                entry['quality']]):
+            if (entry['quality'] in downloaded_qualities and
+                    entry['series_parser'].proper_count > downloaded_qualities[entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
@@ -1665,8 +1665,8 @@ class FilterSeries(FilterSeriesBase):
 
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
-            if (not backfill and (episode.season < latest.season or (
-                            episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
+            if (not backfill and (episode.season < latest.season or
+                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
@@ -1722,8 +1722,8 @@ class FilterSeries(FilterSeriesBase):
             hours += diff.days * 24
             minutes, _ = divmod(remainder, 60)
 
-            log.info('Timeframe waiting %s for %sh:%smin, currently best is %s', episode.series.name, hours, minutes,
-                     best['title'])
+            log.info('Timeframe waiting %s for %02dh:%02dmin, currently best is %s',
+                     episode.series.name, hours, minutes, best['title'])
 
             # add best entry to backlog (backlog is able to handle duplicate adds)
             if self.backlog:

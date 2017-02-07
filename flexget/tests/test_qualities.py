@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import pytest
 from jinja2 import Template
@@ -30,6 +30,7 @@ class TestQualityParser(object):
 
     @pytest.mark.parametrize("test_quality", [
         ('Test.File 1080p.web', '1080p webdl'),
+        ('Test.File.2160p.web', '2160p webdl'),
         ('Test.File.1080.web-random', '1080p webdl'),
         ('Test.File.1080.webrandom', '1080p'),
         ('Test.File 1080p.web-dl', '1080p webdl'),
@@ -38,6 +39,7 @@ class TestQualityParser(object):
         ('Test.File.720p.bluray', '720p bluray'),
         ('Test.File.720hd.bluray', '720p bluray'),
         ('Test.File.1080p.bluray', '1080p bluray'),
+        ('Test.File.2160p.bluray', '2160p bluray'),
         ('Test.File.1080p.cam', '1080p cam'),
         ('A Movie 2011 TS 576P XviD-DTRG', '576p ts xvid'),
 
@@ -61,6 +63,7 @@ class TestQualityParser(object):
         ('Test.File.web-dl', 'webdl'),
         ('Test.File.720P', '720p'),
         ('Test.File.1920x1080', '1080p'),
+        ('Test.File.3840x2160', '2160p'),
         ('Test.File.1080i', '1080i'),
         ('Test File blurayrip', 'bluray'),
         ('Test.File.br-rip', 'bluray'),

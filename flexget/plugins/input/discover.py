@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import datetime
 import logging
@@ -68,7 +68,7 @@ class Discover(object):
                 'allOf': [{'$ref': '/schema/plugins?phase=input'}, {'maxProperties': 1, 'minProperties': 1}]
             }},
             'from': {'type': 'array', 'items': {
-                'allOf': [{'$ref': '/schema/plugins?group=search'}, {'maxProperties': 1, 'minProperties': 1}]
+                'allOf': [{'$ref': '/schema/plugins?interface=search'}, {'maxProperties': 1, 'minProperties': 1}]
             }},
             'interval': {'type': 'string', 'format': 'interval', 'default': '5 hours'},
             'release_estimations': {
@@ -108,7 +108,7 @@ class Discover(object):
                 try:
                     result = method(task, input_config)
                 except PluginError as e:
-                    log.warning('Error during input plugin %s: %s', (input_name, e))
+                    log.warning('Error during input plugin %s: %s', input_name, e)
                     continue
                 if not result:
                     log.warning('Input %s did not return anything', input_name)

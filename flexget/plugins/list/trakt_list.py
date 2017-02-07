@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -17,19 +17,44 @@ from flexget.utils.tools import split_title_year
 log = logging.getLogger('trakt_list')
 IMMUTABLE_LISTS = []
 
+
+def generate_show_title(item):
+    show_info = item['show']
+    if show_info['year']:
+        return '%s (%s)' % (show_info['title'], show_info['year'])
+    else:
+        return show_info['title']
+
+
+def generate_episode_title(item):
+    show_info = item['show']
+    episode_info = item['episode']
+    if show_info['year']:
+        return ('%s (%s) S%02dE%02d %s' % (show_info['title'], show_info['year'], episode_info['season'],
+                                           episode_info['number'], episode_info['title'] or '')).strip()
+    else:
+        return ('%s S%02dE%02d %s' % (show_info['title'], episode_info['season'],
+                                      episode_info['number'], episode_info['title'] or '')).strip()
+
+
 field_maps = {
     'movie': {
-        'title': lambda i: '%s (%s)' % (i['movie']['title'], i['movie']['year']),
+        'title': lambda i: '%s (%s)' % (i['movie']['title'], i['movie']['year'])
+        if i['movie']['year'] else '%s' % i['movie']['title'],
         'movie_name': 'movie.title',
         'movie_year': 'movie.year',
+        'trakt_movie_name': 'movie.title',
+        'trakt_movie_year': 'movie.year',
         'imdb_id': 'movie.ids.imdb',
         'tmdb_id': 'movie.ids.tmdb',
         'trakt_movie_id': 'movie.ids.trakt',
         'trakt_movie_slug': 'movie.ids.slug'
     },
     'show': {
-        'title': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
-        'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
+        'title': generate_show_title,
+        'series_name': generate_show_title,
+        'trakt_series_name': 'show.title',
+        'trakt_series_year': 'show.year',
         'imdb_id': 'show.ids.imdb',
         'tvdb_id': 'show.ids.tvdb',
         'tvrage_id': 'show.ids.tvrage',
@@ -38,9 +63,10 @@ field_maps = {
         'trakt_show_slug': 'show.ids.slug'
     },
     'episode': {
-        'title': lambda i: ('%s (%s) S%02dE%02d %s' % (i['show']['title'], i['show']['year'], i['episode']['season'],
-                                                       i['episode']['number'], i['episode']['title'] or '')).strip(),
-        'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
+        'title': generate_episode_title,
+        'series_name': generate_show_title,
+        'trakt_series_name': 'show.title',
+        'trakt_series_year': 'show.year',
         'series_season': 'episode.season',
         'series_episode': 'episode.number',
         'series_id': lambda i: 'S%02dE%02d' % (i['episode']['season'], i['episode']['number']),
@@ -327,4 +353,4 @@ class TraktList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TraktList, 'trakt_list', api_ver=2, groups=['list'])
+    plugin.register(TraktList, 'trakt_list', api_ver=2, interfaces=['task', 'list'])

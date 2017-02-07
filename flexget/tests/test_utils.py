@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from datetime import datetime
 import math
@@ -7,7 +7,7 @@ import math
 import pytest
 
 from flexget.utils import json
-from flexget.utils.tools import parse_filesize
+from flexget.utils.tools import parse_filesize, split_title_year
 
 
 def compare_floats(float1, float2):
@@ -52,17 +52,17 @@ class TestParseFilesize(object):
 
     def test_parse_filesize_space(self):
         size = '200.0 KB'
-        expected = 200 * 1000 / 1024**2
+        expected = 200 * 1000 / 1024 ** 2
         assert compare_floats(parse_filesize(size), expected)
 
     def test_parse_filesize_non_si(self):
         size = '1234 GB'
-        expected = 1234 * 1000**3 / 1024 ** 2
+        expected = 1234 * 1000 ** 3 / 1024 ** 2
         assert compare_floats(parse_filesize(size), expected)
 
     def test_parse_filesize_auto(self):
         size = '1234 GiB'
-        expected = 1234 * 1024**3 / 1024 ** 2
+        expected = 1234 * 1024 ** 3 / 1024 ** 2
         assert compare_floats(parse_filesize(size), expected)
 
     def test_parse_filesize_auto_mib(self):
@@ -83,3 +83,40 @@ class TestParseFilesize(object):
 
         size = '1 234 567 MiB'
         assert parse_filesize(size) == 1234567
+
+
+class TestSplitYearTitle(object):
+    def test_split_year_title_no_year(self):
+        movie = 'The Matrix'
+        expected = 'The Matrix', None
+        assert split_title_year(movie) == expected
+
+    def test_split_year_title_year(self):
+        movie = 'The Matrix 1999'
+        expected = 'The Matrix', 1999
+        assert split_title_year(movie) == expected
+
+    def test_split_year_title_year_parenthesis(self):
+        movie = 'The Matrix (1999)'
+        expected = 'The Matrix', 1999
+        assert split_title_year(movie) == expected
+
+    def test_split_year_title_year_colon(self):
+        movie = 'The Matrix - 1999'
+        expected = 'The Matrix -', 1999
+        assert split_title_year(movie) == expected
+
+    def test_split_year_title_year_scene(self):
+        movie = 'The.Matrix.1999'
+        expected = 'The.Matrix.', 1999
+        assert split_title_year(movie) == expected
+
+    def test_split_year_title_parenthesis_no_year(self):
+        movie = 'The Human Centipede III (Final Sequence)'
+        expected = 'The Human Centipede III (Final Sequence)', None
+        assert split_title_year(movie) == expected
+
+    def test_split_year_title_parenthesis_and_year(self):
+        movie = 'The Human Centipede III (Final Sequence) (2015)'
+        expected = 'The Human Centipede III (Final Sequence)', 2015
+        assert split_title_year(movie) == expected

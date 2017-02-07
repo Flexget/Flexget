@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -74,7 +74,7 @@ class Rejected(APIResource):
         if per_page > 100:
             per_page = 100
 
-        descending = bool(sort_order == 'desc')
+        descending = sort_order == 'desc'
 
         # Handle max size limit
         if per_page > 100:

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import quote
 
 import logging
@@ -45,4 +45,4 @@ class SearchRSS(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchRSS, 'search_rss', groups=['search'], api_ver=2)
+    plugin.register(SearchRSS, 'search_rss', interfaces=['search'], api_ver=2)

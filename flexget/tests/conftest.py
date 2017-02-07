@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import jsonschema
 from future.utils import PY2
@@ -214,7 +214,7 @@ def filecopy(request):
                 dest_path = dst
                 if dest_path.isdir():
                     dest_path = dest_path / f.basename()
-
+                log.debug('copying %s to %s', f, dest_path)
                 if not os.path.isdir(os.path.dirname(dest_path)):
                     os.makedirs(os.path.dirname(dest_path))
                 if os.path.isdir(f):
@@ -243,8 +243,8 @@ def no_requests(monkeypatch):
 
     # Don't monkey patch HTTPSConnection if ssl not installed as it won't exist in backports
     try:
-        import ssl
-        from ssl import SSLContext
+        import ssl  # noqa
+        from ssl import SSLContext  # noqa
         online_funcs.append('future.backports.http.client.HTTPSConnection.request')
     except ImportError:
         pass

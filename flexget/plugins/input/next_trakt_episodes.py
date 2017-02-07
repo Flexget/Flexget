@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -76,8 +76,19 @@ class NextTraktEpisodes(object):
                     listed_series[trakt_id] = {
                         'series_name': '%s (%s)' % (item['show']['title'], item['show']['year']),
                         'trakt_id': trakt_id,
-                        'tvdb_id': item['show']['ids']['tvdb'],
+                        'trakt_series_name': item['show']['title'],
+                        'trakt_series_year': item['show']['year'],
                         'trakt_list': config.get('list')}
+                    if item['show']['ids'].get('tvdb'):
+                        listed_series[trakt_id]['tvdb_id'] = item['show']['ids']['tvdb']
+                    if item['show']['ids'].get('tvrage'):
+                        listed_series[trakt_id]['tvrage_id'] = item['show']['ids']['tvrage']
+                    if item['show']['ids'].get('imdb'):
+                        listed_series[trakt_id]['imdb_id'] = item['show']['ids']['imdb']
+                    if item['show']['ids'].get('tmdb'):
+                        listed_series[trakt_id]['tmdb_id'] = item['show']['ids']['tmdb']
+                    if item['show']['ids'].get('slug'):
+                        listed_series[trakt_id]['trakt_slug'] = item['show']['ids']['slug']
         context = config['context']
         if context == 'collected':
             context = 'collection'

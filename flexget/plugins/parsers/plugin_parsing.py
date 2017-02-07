@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -22,7 +22,7 @@ def init_parsers(manager):
     """Prepare our list of parsing plugins and default parsers."""
     for parser_type in PARSER_TYPES:
         parsers[parser_type] = {}
-        for p in plugin.get_plugins(group=parser_type + '_parser'):
+        for p in plugin.get_plugins(interface=parser_type + '_parser'):
             parsers[parser_type][p.name.replace('parser_', '')] = p.instance
         # Select default parsers based on priority
         func_name = 'parse_' + parser_type
@@ -40,7 +40,7 @@ class PluginParsing(object):
         # Create a schema allowing only our registered parsers to be used under the key of each parser type
         properties = {}
         for parser_type in PARSER_TYPES:
-            parser_names = [p.name.replace('parser_', '') for p in plugin.get_plugins(group=parser_type + '_parser')]
+            parser_names = [p.name.replace('parser_', '') for p in plugin.get_plugins(interface=parser_type + '_parser')]
             properties[parser_type] = {'type': 'string', 'enum': parser_names}
         s = {
             'type': 'object',

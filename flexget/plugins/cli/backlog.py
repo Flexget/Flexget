@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
 from flexget.event import event
@@ -19,8 +19,8 @@ def do_cli(manager, options):
             entries = get_entries(options.task, session=session)
             for entry in entries:
                 table_data.append([entry.title, entry.task, entry.expire.strftime('%Y-%m-%d %H:%M')])
-        table = TerminalTable(options.table_type, table_data, wrap_columns=[0])
         try:
+            table = TerminalTable(options.table_type, table_data, wrap_columns=[0])
             console(table.output)
         except TerminalTableError as e:
             console('ERROR: %s' % str(e))
@@ -30,5 +30,6 @@ def do_cli(manager, options):
 def register_options():
     parser = options.register_command('backlog', do_cli, help='View or clear entries from backlog plugin',
                                       parents=[table_parser])
-    parser.add_argument('action', choices=['list', 'clear'], help='Choose to show items in backlog, or clear all of them')
+    parser.add_argument('action', choices=['list', 'clear'],
+                        help='Choose to show items in backlog, or clear all of them')
     parser.add_argument('task', nargs='?', help='Limit to specific task (if supplied)')

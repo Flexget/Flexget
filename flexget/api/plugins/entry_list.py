@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import copy
 import logging
@@ -145,7 +145,7 @@ class EntryListEntriesAPI(APIResource):
     def get(self, list_id, session=None):
         """ Get entries by list ID """
         try:
-            el.get_list_by_id(list_id=list_id, session=session)
+            list = el.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             raise NotFoundError('list_id %d does not exist' % list_id)
 
@@ -163,7 +163,7 @@ class EntryListEntriesAPI(APIResource):
 
         start = per_page * (page - 1)
         stop = start + per_page
-        descending = bool(sort_order == 'desc')
+        descending = sort_order == 'desc'
 
         kwargs = {
             'start': start,
@@ -174,7 +174,7 @@ class EntryListEntriesAPI(APIResource):
             'session': session
         }
 
-        total_items = el.get_entries_by_list_id(count=True, **kwargs)
+        total_items = list.entries.count()
 
         if not total_items:
             return jsonify([])

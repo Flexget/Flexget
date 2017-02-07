@@ -4,7 +4,7 @@ from __future__ import unicode_literals, division, absolute_import
 from datetime import timedelta, datetime
 
 import pytest
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget.manager import Session
 from flexget.plugins.internal.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries, TVMazeEpisodes
@@ -271,20 +271,13 @@ class TestTVMazeShowLookup(object):
             'tvmaze_episode_id']
         entry = task.find_entry(series_name='24')
         assert entry['tvmaze_series_name'] == '24'.lower(), 'lookup failed'
-        assert entry['tvmaze_series_id'] == 6353, 'series id should be 167, instead its %s' % entry[
+        assert entry['tvmaze_series_id'] == 167, 'series id should be 167, instead its %s' % entry[
             'tvmaze_series_id']
-        assert entry['tvmaze_episode_id'] == 377246, 'episode id should be 12094, instead its %s' % entry[
+        assert entry['tvmaze_episode_id'] == 11891, 'episode id should be 11891, instead its %s' % entry[
             'tvmaze_episode_id']
 
     def test_show_contain_number(self, execute_task):
         task = execute_task('test_show_contain_number')
-        entry = task.find_entry(series_name='Detroit 1-8-7')
-        assert entry['tvmaze_series_name'] == 'Detroit 1-8-7', \
-            'tvmaze_series_name should be Detroit 1-8-7, instead its %s' % entry['tvmaze_series_name']
-        assert entry['tvmaze_series_id'] == 998, 'series id should be 998, instead its %s' % entry[
-            'tvmaze_series_id']
-        assert entry['tvmaze_episode_id'] == 98765, 'episode id should be 98765, instead its %s' % entry[
-            'tvmaze_episode_id']
         entry = task.find_entry(series_name='Tosh.0')
         assert entry['tvmaze_series_name'] == 'Tosh.0', \
             'tvmaze_series_name should be Tosh.0, instead its %s' % entry['tvmaze_series_name']

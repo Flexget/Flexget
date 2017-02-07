@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import logging
@@ -116,7 +116,12 @@ class PluginRottenTomatoesLookup(object):
         for entry in task.entries:
             entry.register_lazy_func(self.lazy_loader, self.field_map)
 
+    @property
+    def movie_identifier(self):
+        """Returns the plugin main identifier type"""
+        return 'rt_id'
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginRottenTomatoesLookup, 'rottentomatoes_lookup', api_ver=2)
+    plugin.register(PluginRottenTomatoesLookup, 'rottentomatoes_lookup', api_ver=2, interfaces=['task', 'movie_metainfo'])

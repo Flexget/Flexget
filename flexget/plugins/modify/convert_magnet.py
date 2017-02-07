@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import os
 import time
 import logging
@@ -22,7 +22,8 @@ class ConvertMagnet(object):
             {
                 "type": "object",
                 "properties": {
-                    "timeout": {"type": "string", "format": "interval", "default": "30 seconds"},
+                    "timeout": {"type": "string", "format": "interval"},
+                    "force": {"type": "boolean"}
                 },
                 "additionalProperties": False
             }
@@ -33,8 +34,10 @@ class ConvertMagnet(object):
         import libtorrent
         params = libtorrent.parse_magnet_uri(magnet_uri)
         session = libtorrent.session()
-        # for some reason the info_hash needs to be bytes but it's a struct called sha1_hash
-        params['info_hash'] = bytes(params['info_hash'])
+        lt_version = [int(v) for v in libtorrent.version.split('.')]
+        if lt_version > [0,16,13,0]:
+            # for some reason the info_hash needs to be bytes but it's a struct called sha1_hash
+            params['info_hash'] = params['info_hash'].to_bytes()
         handle = libtorrent.add_magnet_uri(session, magnet_uri, params)
         log.debug('Acquiring torrent metadata for magnet %s', magnet_uri)
         timeout_value = timeout
@@ -56,6 +59,7 @@ class ConvertMagnet(object):
         if not isinstance(config, dict):
             config = {}
         config.setdefault('timeout', '30 seconds')
+        config.setdefault('force', False)
         return config
 
     @plugin.priority(255)
@@ -63,7 +67,7 @@ class ConvertMagnet(object):
         if config is False:
             return
         try:
-            import libtorrent
+            import libtorrent  # noqa
         except ImportError:
             raise plugin.DependencyError('convert_magnet', 'libtorrent', 'libtorrent package required', log)
 
@@ -88,6 +92,8 @@ class ConvertMagnet(object):
                     torrent_file = self.magnet_to_torrent(entry['url'], converted_path, timeout)
                 except (plugin.PluginError, TypeError) as e:
                     log.error('Unable to convert Magnet URI for entry %s: %s', entry['title'], e)
+                    if config['force']:
+                        entry.fail('Magnet URI conversion failed')
                     continue
                 # Windows paths need an extra / prepended to them for url
                 if not torrent_file.startswith('/'):

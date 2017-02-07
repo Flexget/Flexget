@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
 
 import logging
@@ -41,9 +41,9 @@ class NextSonarrEpisodes(object):
       discover:
         what:
           - next_sonarr_episodes:
-              base_url: '{{ secrets.credentials.sonarr.url }}'
+              base_url: '{? credentials.sonarr.url ?}'
               port: 8989
-              api_key: '{{ secrets.credentials.sonarr.api_key }}'
+              api_key: '{? credentials.sonarr.api_key ?}'
               include_ended: false
         from:
           - kat:

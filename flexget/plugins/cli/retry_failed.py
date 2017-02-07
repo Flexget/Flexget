@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 from flexget import options
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, console
@@ -24,24 +24,22 @@ def list_failed(options):
             table_data.append(
                 [entry.id, entry.title, entry.count, '' if entry.reason == 'None' else entry.reason,
                  entry.tof.strftime('%Y-%m-%d %H:%M')])
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[3])
-    table.table.justify_columns[0] = 'center'
     try:
-        console(table.output)
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[3, 1])
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
+    else:
+        table.table.justify_columns[0] = 'center'
+        console(table.output)
 
 
 def clear_failed(manager):
-    session = Session()
-    try:
+    with Session() as session:
         results = session.query(FailedEntry).delete()
         console('Cleared %i items.' % results)
         session.commit()
         if results:
             manager.config_changed()
-    finally:
-        session.close()
 
 
 @event('options.register')

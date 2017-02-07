@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import pickle
@@ -189,7 +189,7 @@ class EntryList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EntryList, 'entry_list', api_ver=2, groups=['list'])
+    plugin.register(EntryList, 'entry_list', api_ver=2, interfaces=['task', 'list'])
 
 
 @with_session
@@ -223,12 +223,10 @@ def delete_list_by_id(list_id, session=None):
 
 
 @with_session
-def get_entries_by_list_id(list_id, count=False, start=None, stop=None, order_by='title', descending=False,
+def get_entries_by_list_id(list_id, start=None, stop=None, order_by='title', descending=False,
                            session=None):
     log.debug('querying entries from entry list with id %d', list_id)
     query = session.query(EntryListEntry).filter(EntryListEntry.list_id == list_id)
-    if count:
-        return query.count()
     if descending:
         query = query.order_by(getattr(EntryListEntry, order_by).desc())
     else:

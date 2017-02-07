@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 from functools import partial
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -69,6 +69,7 @@ class PluginThetvdbLookup(object):
         'tvdb_network': 'network',
         'tvdb_overview': 'overview',
         'tvdb_banner': 'banner',
+        'tvdb_language': 'language',
         'tvdb_airs_day_of_week': 'airs_dayofweek',
         'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
         'imdb_id': 'imdb_id',
@@ -112,12 +113,12 @@ class PluginThetvdbLookup(object):
             series = lookup_series(
                 entry.get('series_name', eval_lazy=False),
                 tvdb_id=entry.get('tvdb_id', eval_lazy=False),
-                language=language,
+                language=entry.get('language', language),
                 session=session
             )
             entry.update_using_map(field_map, series)
         except LookupError as e:
-            log.debug('Error looking up tvdb series information for %s: %s' % (entry['title'], e.args[0]))
+            log.debug('Error looking up tvdb series information for %s: %s', entry['title'], e.args[0])
         return entry
 
     def lazy_series_lookup(self, entry, language):
@@ -144,7 +145,7 @@ class PluginThetvdbLookup(object):
 
             lookupargs = {'name': entry.get('series_name', eval_lazy=False),
                           'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
-                          'language': language}
+                          'language': entry.get('language', language)}
             if entry['series_id_type'] == 'ep':
                 lookupargs['season_number'] = entry['series_season'] + season_offset
                 lookupargs['episode_number'] = entry['series_episode'] + episode_offset
@@ -157,7 +158,7 @@ class PluginThetvdbLookup(object):
             episode = lookup_episode(**lookupargs)
             entry.update_using_map(self.episode_map, episode)
         except LookupError as e:
-            log.debug('Error looking up tvdb episode information for %s: %s' % (entry['title'], e.args[0]))
+            log.debug('Error looking up tvdb episode information for %s: %s', entry['title'], e.args[0])
 
     # Run after series and metainfo series
     @plugin.priority(110)
@@ -183,7 +184,12 @@ class PluginThetvdbLookup(object):
                     lazy_episode_lookup = partial(self.lazy_episode_lookup, language=language)
                     entry.register_lazy_func(lazy_episode_lookup, self.episode_map)
 
+    @property
+    def series_identifier(self):
+        """Returns the plugin main identifier type"""
+        return 'tvdb_id'
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2)
+    plugin.register(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2, interfaces=['task', 'series_metainfo'])

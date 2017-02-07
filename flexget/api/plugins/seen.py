@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
-from flexget.plugins.filter.seen import forget_by_id, SeenEntry
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+from flexget.plugins.filter.seen import forget_by_id
 from future.moves.urllib.parse import unquote
 
 from math import ceil
@@ -79,7 +79,7 @@ class SeenSearchAPI(APIResource):
         if per_page > 100:
             per_page = 100
 
-        descending = bool(sort_order == 'desc')
+        descending = sort_order == 'desc'
 
         # Unquotes and prepares value for DB lookup
         if value:

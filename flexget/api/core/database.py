@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -28,7 +28,7 @@ class DBCleanup(APIResource):
     def get(self, session=None):
         """ Make all plugins clean un-needed data from the database """
         self.manager.db_cleanup(force=True)
-        return success_response('DB Cleanup triggered')
+        return success_response('DB Cleanup finished')
 
 
 @db_api.route('/vacuum/')
@@ -39,7 +39,7 @@ class DBVacuum(APIResource):
         """ Potentially increase performance and decrease database size"""
         session.execute('VACUUM')
         session.commit()
-        return success_response('DB VACUUM triggered')
+        return success_response('DB VACUUM finished')
 
 
 plugin_parser = api.parser()

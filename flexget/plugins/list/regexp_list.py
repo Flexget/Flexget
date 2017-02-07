@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import re
@@ -233,4 +233,4 @@ def add_to_list_by_name(list_name, regexp, session=None):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginRegexpList, 'regexp_list', api_ver=2, groups=['list'])
+    plugin.register(PluginRegexpList, 'regexp_list', api_ver=2, interfaces=['task', 'list'])

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
 
 import logging
@@ -16,7 +16,6 @@ log = logging.getLogger('couchpotato_list')
 
 
 class CouchPotatoBase(object):
-
     @staticmethod
     def movie_list_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
@@ -111,8 +110,12 @@ class CouchPotatoBase(object):
 
         entries = []
         for movie in active_movies_json['movies']:
+            # Related to #1444, corrupt data from CP
+            if not all([movie.get('status'), movie.get('title'), movie.get('info')]):
+                log.warning('corrupt movie data received, skipping')
+                continue
             quality_req = ''
-            log.debug('movie data: {}'.format(movie))
+            log.debug('movie data: %s', movie)
             if movie['status'] == 'active':
                 if config.get('include_data') and profile_json:
                     for profile in profile_json['list']:
@@ -245,4 +248,4 @@ class CouchPotatoList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(CouchPotatoList, 'couchpotato_list', api_ver=2, groups=['list'])
+    plugin.register(CouchPotatoList, 'couchpotato_list', api_ver=2, interfaces=['task', 'list'])

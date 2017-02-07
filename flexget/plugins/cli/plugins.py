@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
@@ -15,11 +15,12 @@ log = logging.getLogger('plugins')
 def plugins_summary(manager, options):
     if options.table_type == 'porcelain':
         disable_all_colors()
-    header = ['Keyword', 'Phases', 'Flags']
+    header = ['Keyword', 'Interfaces', 'Phases', 'Flags']
     table_data = [header]
-    for plugin in sorted(get_plugins(phase=options.phase, group=options.group)):
+    for plugin in sorted(get_plugins(phase=options.phase, interface=options.interface)):
         if options.builtins and not plugin.builtin:
             continue
+
         flags = []
         if plugin.instance.__doc__:
             flags.append('doc')
@@ -29,6 +30,7 @@ def plugins_summary(manager, options):
             if not options.debug:
                 continue
             flags.append('developers')
+
         handlers = plugin.phase_handlers
         roles = []
         for phase in handlers:
@@ -36,10 +38,10 @@ def plugins_summary(manager, options):
             roles.append('{0}({1})'.format(phase, priority))
 
         name = colorize('green', plugin.name) if 'builtin' in flags else plugin.name
-        table_data.append([name, ', '.join(roles), ', '.join(flags)])
+        table_data.append([name, ', '.join(plugin.interfaces), ', '.join(roles), ', '.join(flags)])
 
-    table = TerminalTable(options.table_type, table_data, wrap_columns=[1, 2])
     try:
+        table = TerminalTable(options.table_type, table_data, wrap_columns=[1, 2])
         console(table.output)
     except TerminalTableError as e:
         console('ERROR: %s' % str(e))
@@ -51,6 +53,6 @@ def plugins_summary(manager, options):
 def register_parser_arguments():
     parser = options.register_command('plugins', plugins_summary, help='Print registered plugin summaries',
                                       parents=[table_parser])
-    parser.add_argument('--group', help='Show plugins belonging to this group')
+    parser.add_argument('--interface', help='Show plugins belonging to this interface')
     parser.add_argument('--phase', help='Show plugins that act on this phase')
     parser.add_argument('--builtins', action='store_true', help='Show just builtin plugins')

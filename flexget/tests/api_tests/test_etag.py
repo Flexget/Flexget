@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from flexget.api.plugins.movie_list import ObjectsContainer as OC
 from flexget.utils import json
 
@@ -62,6 +62,3 @@ class TestETAG(object):
 
         # Verify all 3 lists are received as payload
         assert len(data) == 3
-
-
-

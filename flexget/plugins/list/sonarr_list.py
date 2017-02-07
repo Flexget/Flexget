@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib.parse import urlparse
 
 import json
@@ -278,4 +278,4 @@ class SonarrList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SonarrList, 'sonarr_list', api_ver=2, groups=['list'])
+    plugin.register(SonarrList, 'sonarr_list', api_ver=2, interfaces=['task', 'list'])

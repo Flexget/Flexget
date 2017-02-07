@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 
 import re
@@ -126,7 +126,8 @@ _resolutions = [
     QualityComponent('resolution', 50, '720i'),
     QualityComponent('resolution', 60, '720p', '(1280x)?720(p|hd)?x?(50)?'),
     QualityComponent('resolution', 70, '1080i'),
-    QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?x?(50)?')
+    QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?x?(50)?'),
+    QualityComponent('resolution', 90, '2160p', '((3840x)?2160p?x?(50)?)|4k')
 ]
 _sources = [
     QualityComponent('source', 10, 'workprint', modifier=-8),

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # pylint: disable=unused-import, redefined-builtin
+from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
 from future.moves.urllib.parse import urlparse
 from future.utils import text_to_native_str
@@ -124,8 +124,8 @@ class TransmissionBase(object):
     def on_task_start(self, task, config):
         try:
             import transmissionrpc
-            from transmissionrpc import TransmissionError
-            from transmissionrpc import HTTPHandlerError
+            from transmissionrpc import TransmissionError  # noqa
+            from transmissionrpc import HTTPHandlerError  # noqa
         except:
             raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required.', log)
         if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 11]:
@@ -182,7 +182,9 @@ class PluginTransmissionInput(TransmissionBase):
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             if not config['onlycomplete'] or (downloaded and
                                               ((
-                                                  torrent.status == 'stopped' and seed_ratio_ok is None and idle_limit_ok is None) or
+                                                  torrent.status == 'stopped' and
+                                                  seed_ratio_ok is None and
+                                                  idle_limit_ok is None) or
                                                (seed_ratio_ok is True or idle_limit_ok is True))):
                 entry = Entry(title=torrent.name,
                               url='file://%s' % torrent.torrentFile,
@@ -542,9 +544,7 @@ class PluginTransmission(TransmissionBase):
                             # fl[r.id][index]['name'] = os.path.basename(pathscrub(filename + file_ext).encode('utf-8'))
                             try:
                                 cli.rename_torrent_path(r.id, fl[r.id][index]['name'],
-                                                        os.path.basename(
-                                                            pathscrub(filename + file_ext)).encode('utf-8')
-                                                        )
+                                                        os.path.basename(str(pathscrub(filename + file_ext))))
                             except TransmissionError:
                                 log.error('content_filename only supported with transmission 2.8+')
 
@@ -588,14 +588,14 @@ class PluginTransmission(TransmissionBase):
                 log.error(msg)
                 entry.fail(msg)
 
-    def on_task_exit(self, task, config):
-        """Make sure all temp files are cleaned up when task exits"""
+    def on_task_learn(self, task, config):
+        """ Make sure all temp files are cleaned up when entries are learned """
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
             download.instance.cleanup_temp_files(task)
 
-    on_task_abort = on_task_exit
+    on_task_abort = on_task_learn
 
 
 class PluginTransmissionClean(TransmissionBase):
@@ -638,6 +638,7 @@ class PluginTransmissionClean(TransmissionBase):
         advanced.accept('boolean', key='transmission_seed_limits')
         advanced.accept('boolean', key='delete_files')
         advanced.accept('regexp', key='tracker')
+        advanced.accept('regexp', key='preserve_tracker')
         directories_re = advanced.accept('list', key='directories')
         directories_re.accept('regexp')
         return root
@@ -653,6 +654,7 @@ class PluginTransmissionClean(TransmissionBase):
         delete_files = bool(config['delete_files']) if 'delete_files' in config else False
         trans_checks = bool(config['transmission_seed_limits']) if 'transmission_seed_limits' in config else False
         tracker_re = re.compile(config['tracker'], re.IGNORECASE) if 'tracker' in config else None
+        preserve_tracker_re = re.compile(config['preserve_tracker'], re.IGNORECASE) if 'preserve_tracker' in config else None
         directories_re = config.get('directories')
 
         session = self.client.get_session()
@@ -673,6 +675,9 @@ class PluginTransmissionClean(TransmissionBase):
             is_torrent_idlelimit_since_added_reached = nfor and (torrent.date_added + nfor) <= datetime.now()
             is_torrent_idlelimit_since_finished_reached = nfor and (torrent.date_done + nfor) <= datetime.now()
             is_tracker_matching = not tracker_re or any(tracker_re.search(host) for host in tracker_hosts)
+            is_preserve_tracker_matching = False
+            if preserve_tracker_re is not None:
+                is_preserve_tracker_matching = any(preserve_tracker_re.search(host) for host in tracker_hosts)
             is_directories_matching = not directories_re or any(
                 re.compile(directory, re.IGNORECASE).search(torrent.downloadDir) for directory in directories_re)
             if (downloaded and (is_clean_all or
@@ -681,8 +686,8 @@ class PluginTransmissionClean(TransmissionBase):
                                 is_transmission_idlelimit_reached or
                                 is_minratio_reached or
                                 (is_torrent_seed_only and is_torrent_idlelimit_since_added_reached) or
-                                (not is_torrent_seed_only and is_torrent_idlelimit_since_finished_reached))
-                    and is_tracker_matching and is_directories_matching):
+                                (not is_torrent_seed_only and is_torrent_idlelimit_since_finished_reached)) and
+                    is_directories_matching and (not is_preserve_tracker_matching and is_tracker_matching)):
                 if task.options.test:
                     log.info('Would remove finished torrent `%s` from transmission', torrent.name)
                     continue
