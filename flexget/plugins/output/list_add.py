@@ -36,16 +36,16 @@ class ListAdd(object):
         for item in config:
             for plugin_name, plugin_config in item.items():
                 try:
-                    the_list = plugin.get_plugin_by_name('list_framework').instance
-                    the_list.initialize(plugin_name, plugin_config)
+                    framework = plugin.get_plugin_by_name('list_framework').instance
+                    list_manager = framework.ListManager(plugin_name, plugin_config)
                 except PluginError as e:
                     log.error(e.value)
                     continue
-                if task.manager.options.test and the_list.online:
+                if task.manager.options.test and list_manager.list.online:
                     log.info('`%s` is marked as an online plugin, would add accepted items outside of --test mode. '
                              'Skipping', plugin_name)
                     continue
-                the_list.add(task.accepted)
+                list_manager.add(task.accepted)
 
 
 @event('plugin.register')

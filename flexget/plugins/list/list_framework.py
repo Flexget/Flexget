@@ -12,27 +12,28 @@ log = logging.getLogger(__name__)
 
 
 class ListFramework(object):
-    def initialize(self, plugin_name, plugin_config):
-        try:
-            self.plugin_name = plugin_name
-            self.plugin_config = plugin_config
-            self.list = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
-        except AttributeError:
-            raise PluginError('Plugin %s does not support list interface' % plugin_name)
-        if self.list.immutable:
-            raise PluginError(self.list.immutable)
+    class ListManager(object):
+        def __init__(self, plugin_name, plugin_config):
+            try:
+                self.plugin_name = plugin_name
+                self.plugin_config = plugin_config
+                self.list = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+            except AttributeError:
+                raise PluginError('Plugin %s does not support list interface' % plugin_name)
+            if self.list.immutable:
+                raise PluginError(self.list.immutable)
 
-    def add(self, entries):
-        log.verbose('adding entries from %s - %s', self.plugin_name, self.plugin_config)
-        self.list |= entries
+        def add(self, entries):
+            log.verbose('adding entries from %s - %s', self.plugin_name, self.plugin_config)
+            self.list |= entries
 
-    def remove(self, entries):
-        log.verbose('removing entries from %s - %s', self.plugin_name, self.plugin_config)
-        self.list -= entries
+        def remove(self, entries):
+            log.verbose('removing entries from %s - %s', self.plugin_name, self.plugin_config)
+            self.list -= entries
 
-    def clear(self):
-        log.verbose('clearing all items from %s - %s', self.plugin_name, self.plugin_config)
-        self.list.clear()
+        def clear(self):
+            log.verbose('clearing all items from %s - %s', self.plugin_name, self.plugin_config)
+            self.list.clear()
 
 
 @event('plugin.register')
