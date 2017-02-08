@@ -64,14 +64,17 @@ action_schema = api.schema('lists.action_payload', ObjectsContainer.action_paylo
 lists_schema = api.schema('lists.clear_payload', ObjectsContainer.clear_payload)
 lists_return_schema = api.schema('lists.return_schema', ObjectsContainer.lists_reply)
 
+description = 'To get a list of available List interface plugins and their schema, look into the /plugins/ endpoint'
+
 
 @lists_api.route('/')
+@api.doc(description=description)
 class ListsAPIGet(APIResource):
     @api.validate(lists_schema)
     @api.response(200, model=lists_return_schema)
     @api.response(BadRequest)
     def post(self, session):
-        """Get specific list content"""
+        """Get specific list(s) content"""
         data = request.json
         lists = data['lists']
         for item in lists:
@@ -84,6 +87,7 @@ class ListsAPIGet(APIResource):
 
 
 @lists_api.route('/add/')
+@api.doc(description=description)
 class ListsAPIAdd(APIResource):
     @api.validate(action_schema)
     @api.response(200, 'successfully added entries to list', model=base_message_schema)
@@ -106,6 +110,7 @@ class ListsAPIAdd(APIResource):
 
 
 @lists_api.route('/remove/')
+@api.doc(description=description)
 class ListsAPIRemove(APIResource):
     @api.validate(action_schema)
     @api.response(200, 'successfully removed entries from list', model=base_message_schema)
@@ -129,6 +134,7 @@ class ListsAPIRemove(APIResource):
 
 
 @lists_api.route('/clear/')
+@api.doc(description=description)
 class ListsAPIClear(APIResource):
     @api.validate(lists_schema)
     @api.response(200, 'successfully cleared entries from a list', model=base_message_schema)
