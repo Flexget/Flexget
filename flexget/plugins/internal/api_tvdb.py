@@ -57,6 +57,7 @@ class TVDBRequest(object):
             auth_token.token = new_token
             with Session() as session:
                 session.merge(auth_token)
+                auth_token.refreshed = datetime.now()
 
         return auth_token.token
 
