@@ -1883,7 +1883,7 @@ def register_plugin():
     plugin.register(FilterSeries, 'series', api_ver=2)
     # This is a builtin so that it can update the database for tasks that may have had series plugin removed
     plugin.register(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
-    plugin.register(PluginSeriesList, 'series_list', api_ver=2, groups=['list'])
+    plugin.register(PluginSeriesList, 'series_list', api_ver=2, interfaces=['list'])
 
 
 @event('options.register')
