@@ -251,7 +251,7 @@ def is_path(instance):
 def is_url(instance):
     if not isinstance(instance, str_types):
         return True
-    regexp = ('(' + '|'.join(['ftp', 'http', 'https', 'file', 'udp']) +
+    regexp = ('(' + '|'.join(['ftp', 'http', 'https', 'file', 'udp', 'socks5']) +
               '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
     return re.match(regexp, instance)
 
