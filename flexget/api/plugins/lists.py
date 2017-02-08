@@ -3,7 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import copy
 
-from flask import request
+from flask import request, jsonify
 
 from flexget import plugin
 from flexget.api import api, APIResource
@@ -57,13 +57,34 @@ class ObjectsContainer(object):
     clear_payload['required'] = ['lists']
     del clear_payload['properties']['entries']
 
+    lists_reply = {'type': 'array', 'items': {'type': 'object'}}
+
 
 action_schema = api.schema('lists.action_payload', ObjectsContainer.action_payload)
-clear_schema = api.schema('lists.clear_payload', ObjectsContainer.clear_payload)
+lists_schema = api.schema('lists.clear_payload', ObjectsContainer.clear_payload)
+lists_return_schema = api.schema('lists.return_schema', ObjectsContainer.lists_reply)
+
+
+@lists_api.route('/')
+class ListsAPIGet(APIResource):
+    @api.validate(lists_schema)
+    @api.response(200, model=lists_return_schema)
+    @api.response(BadRequest)
+    def post(self, session):
+        """Get specific list content"""
+        data = request.json
+        lists = data['lists']
+        for item in lists:
+            for plugin_name, plugin_config in item.items():
+                try:
+                    the_list = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+                except AttributeError:
+                    raise BadRequest('Plugin {} does not support list interface'.format(plugin_name))
+                return jsonify([dict(e) for e in list(the_list)])
 
 
 @lists_api.route('/add/')
-class ListsAPI(APIResource):
+class ListsAPIAdd(APIResource):
     @api.validate(action_schema)
     @api.response(200, 'successfully added entries to list', model=base_message_schema)
     @api.response(BadRequest)
@@ -85,7 +106,7 @@ class ListsAPI(APIResource):
 
 
 @lists_api.route('/remove/')
-class ListsAPI(APIResource):
+class ListsAPIRemove(APIResource):
     @api.validate(action_schema)
     @api.response(200, 'successfully removed entries from list', model=base_message_schema)
     @api.response(BadRequest)
@@ -108,8 +129,8 @@ class ListsAPI(APIResource):
 
 
 @lists_api.route('/clear/')
-class ListsAPI(APIResource):
-    @api.validate(clear_schema)
+class ListsAPIClear(APIResource):
+    @api.validate(lists_schema)
     @api.response(200, 'successfully cleared entries from a list', model=base_message_schema)
     @api.response(BadRequest)
     def post(self, session):
