@@ -219,6 +219,10 @@ class SeriesListSet(MutableSet):
 
     def add(self, entry):
         with Session() as session:
+            if 'series_name' not in entry:
+                log.warning('Could not add to list as series_name field is missing (enable metadata_series), skipping')
+                return
+
             if self.__contains__(entry):
                 log.debug('series %s already exist in DB, skipping', entry['series_name'])
                 return
@@ -1883,7 +1887,7 @@ def register_plugin():
     plugin.register(FilterSeries, 'series', api_ver=2)
     # This is a builtin so that it can update the database for tasks that may have had series plugin removed
     plugin.register(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
-    plugin.register(PluginSeriesList, 'series_list', api_ver=2, interfaces=['list'])
+    plugin.register(PluginSeriesList, 'series_list', api_ver=2, interfaces=['list', 'task'])
 
 
 @event('options.register')
