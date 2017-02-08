@@ -566,3 +566,103 @@ class ParsedSerie(ABCMeta(native_str('ParsedSerieABCMeta'), (ParsedVideo,), {}))
 
     def __eq__(self, other):
         return self is other
+
+
+class ParsedAudio(ABCMeta(str('ParsedAudioABCMeta'), (ParsedEntry,), {})):
+    def __init__(self, data, name, **kwargs):
+        ParsedEntry.__init__(self, data, name, **kwargs)
+        self._assumed_quality = None
+
+    @abstractproperty
+    def year(self):
+        raise NotImplementedError
+
+    @property
+    def type(self):
+        return 'audio'
+
+    @abstractproperty
+    def quality(self):
+        raise NotImplementedError
+
+    @property
+    def proper_count(self):
+        return 0
+
+    def assume_quality(self, quality):
+        self._assumed_quality = quality
+
+    def __str__(self):
+        return "<%s(name=%s,year=%s,quality=%s)>" % (self.__class__.__name__, self.name, self.year, self.quality)
+
+    def __cmp__(self, other):
+        """Compares quality of parsed, if quality is equal, compares proper_count."""
+        return cmp((self.quality), (other.quality))
+
+    def __eq__(self, other):
+        return self is other
+
+
+titled_audio_types = ['titled_audio', 'album', 'single', 'track']
+class ParsedTitledAudio(ABCMeta(str('ParsedTitledAudioABCMeta'), (ParsedAudio,), {})):
+    """
+    Terminology : https://musicbrainz.org/doc/MusicBrainz_Terminology
+    Because it's very difficult to distinguish an album of a single, this class
+    assume the role to do that.
+    """
+    def __init__(self):
+        self._type = titled_audio_types[0] # titled_audio
+
+    @property
+    def parsed_name(self):
+        return "%s - %s" % (self.artist, self.title)
+
+    @property
+    def type(self):
+        return self._type
+
+    @abstractproperty
+    def artist(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def title(self):
+        raise NotImplementedError
+
+
+class ParsedAudioQuality(ABCMeta(str('ParsedAudioQualityABCMeta'), (object,), {})):
+    @abstractproperty
+    def source(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_codec(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_profile(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_sampling(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_bit_depth(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_bit_rate(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_bit_rate_distribution(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_channels(self):
+        raise NotImplementedError
+
+    def __str__(self):
+        return "<%s(source=%s,audio_codec=%s,audio_bitrate=%s,audio_channels=%s)>" % (
+            self.__class__.__name__, self.source, self.audio_codec, self.audio_bit_rate, self.audio_channels)

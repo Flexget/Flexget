@@ -14,8 +14,8 @@ directory support or provide interface for external utilities like FlexGet.
 
 .. _FlexGet: http://flexget.com
 
-.. image:: https://api.travis-ci.org/Flexget/Flexget.png?branch=master
-    :target: https://travis-ci.org/Flexget/Flexget
+.. image:: https://api.travis-ci.org/lildadou/Flexget.png?branch=music_snep
+    :target: https://travis-ci.org/lildadou/Flexget
 
 .. image:: https://img.shields.io/pypi/v/Flexget.svg
     :target: https://pypi.python.org/pypi/Flexget
