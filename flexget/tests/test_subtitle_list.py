@@ -29,8 +29,7 @@ class TestSubtitleList(object):
          tasks:
            subtitle_add:
              list_add:
-               - subtitle_list:
-                   list: test
+               - subtitle_list: test
 
            subtitle_emit:
              disable: builtins
@@ -44,13 +43,11 @@ class TestSubtitleList(object):
              #  list: test
              #accept_all: yes
              list_remove:
-               - subtitle_list:
-                   list: test
+               - subtitle_list: test
 
            subtitle_fail:
              template: no_global
-             subtitle_list:
-               list: test
+             subtitle_list: test
              subliminal:
                languages: [en, afr]
                exact_match: no
@@ -65,8 +62,7 @@ class TestSubtitleList(object):
 
            subtitle_simulate_success:
              template: no_global
-             subtitle_list:
-               list: test
+             subtitle_list: test
              subliminal:
                languages: [en, ja]
                exact_match: no
@@ -119,8 +115,7 @@ class TestSubtitleList(object):
                   location: "subtitle_list_test_dir/The.Big.Bang.Theory.S09E09-FlexGet.mkv"}
              accept_all: yes
              list_add:
-               - subtitle_list:
-                   list: test
+               - subtitle_list: test
 
            subtitle_test_expiration_add:
              disable: builtins
@@ -130,9 +125,7 @@ class TestSubtitleList(object):
                   location: "subtitle_list_test_dir/The.Big.Bang.Theory.S09E09-FlexGet.mkv"}
              accept_all: yes
              list_add:
-               - subtitle_list:
-                   list: test
-                   remove_after: 7 days
+               - subtitle_list: test
 
            subtitle_add_local_dir:
              disable: builtins
@@ -207,11 +200,11 @@ class TestSubtitleList(object):
              template: no_global
              mock:
                - {title: "The.Walking.Dead.S06E08-FlexGet",
-                  output: 'subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4'}
+                  location: 'subtitle_list_test_dir/The.Walking.Dead.S06E08-FlexGet.mp4'}
              list_add:
                - subtitle_list:
                    list: test
-                   path: '{{ output }}'
+                   path: '{{ location }}'
              accept_all: yes
 
            subtitle_path_relative:
@@ -243,16 +236,6 @@ class TestSubtitleList(object):
 
             assert s[0].file.title != s[1].file.title, 'There should only be one row per entry as "en" and "eng" are eq'
             assert len(s) == 2, 'Language "en" and "eng" are equivalent and only one should exist per entry'
-
-    def test_subtitle_list_old(self, execute_task):
-        task = execute_task('subtitle_test_expiration_add')
-
-        with Session() as session:
-            s = session.query(SubtitleListFile).first()
-            s.added = datetime.datetime.now() + datetime.timedelta(-8)
-
-        task = execute_task('subtitle_emit')
-        assert len(task.entries) == 0, 'File should have expired.'
 
     # Skip if subliminal is not installed or if python version <2.7
     @pytest.mark.online

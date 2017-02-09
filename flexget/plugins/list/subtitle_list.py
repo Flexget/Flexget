@@ -16,7 +16,6 @@ from flexget.manager import Session
 from flexget.db_schema import versioned_base, with_session
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.tools import parse_timedelta
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('subtitle_list')
@@ -68,7 +67,6 @@ class SubtitleListFile(Base):
     location = Column(Unicode)
     list_id = Column(Integer, ForeignKey(SubtitleListList.id), nullable=False)
     languages = relationship('SubtitleListLanguage', backref='file', lazy='joined', cascade='all, delete-orphan')
-    remove_after = Column(Unicode)
 
     def __repr__(self):
         return '<SubtitleListFile title=%s,path=%s,list_name=%s>' % (self.title, self.location, self.list.name)
@@ -78,7 +76,6 @@ class SubtitleListFile(Base):
         entry['title'] = self.title
         entry['url'] = 'mock://localhost/subtitle_list/%d' % self.id
         entry['location'] = self.location
-        entry['remove_after'] = self.remove_after
         entry['added'] = self.added
         entry['subtitle_languages'] = []
         for subtitle_language in self.languages:
@@ -106,20 +103,34 @@ class SubtitleListLanguage(Base):
 
 class SubtitleList(MutableSet):
     schema = {
-        'type': 'object',
-        'properties': {
-            'list': {'type': 'string'},
-            'languages': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
-            'check_subtitles': {'type': 'boolean', 'default': True},
-            'remove_after': {'type': 'string', 'format': 'interval'},
-            'path': {'type': 'string'},
-            'allow_dir': {'type': 'boolean', 'default': False},
-            'recursion_depth': {'type': 'integer', 'default': 1, 'minimum': 1},
-            'force_file_existence': {'type': 'boolean', 'default': True}
-        },
-        'required': ['list'],
-        'additionalProperties': False
+        'oneOf': [
+            {
+                'type': 'object',
+                'properties': {
+                    'list': {'type': 'string'},
+                    'languages': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
+                    'check_subtitles': {'type': 'boolean', 'default': True},
+                    'path': {'type': 'string'},
+                    'allow_dir': {'type': 'boolean', 'default': False},
+                    'recursion_depth': {'type': 'integer', 'default': 1, 'minimum': 1},
+                    'force_file_existence': {'type': 'boolean', 'default': True}
+                },
+                'required': ['list'],
+                'additionalProperties': False
+            },
+            {'type': 'string'}
+        ]
     }
+
+    def prepare_config(self, config):
+        if not isinstance(config, dict):
+            config = {'list': config}
+
+        config.setdefault('allow_dir', False)
+        config.setdefault('force_file_existence', True)
+        config.setdefault('recursion_depth', 1)
+
+        return config
 
     def _db_list(self, session):
         return session.query(SubtitleListList).filter(SubtitleListList.name == self.config['list']).first()
@@ -130,7 +141,7 @@ class SubtitleList(MutableSet):
 
     @with_session
     def __init__(self, config, session=None):
-        self.config = config
+        self.config = self.prepare_config(config)
         db_list = self._db_list(session)
         if not db_list:
             session.add(SubtitleListList(name=self.config['list']))
@@ -144,12 +155,12 @@ class SubtitleList(MutableSet):
             return self._db_list(session).files.count()
 
     def _extract_path(self, entry):
-        path = ''
         if isinstance(self.config.get('path'), basestring):
             try:
                 path = entry.render(self.config['path'])
             except RenderError as e:
                 log.error(e)
+                return
         else:
             path = entry.get('location')
         return normalize_path(path)
@@ -180,8 +191,6 @@ class SubtitleList(MutableSet):
             db_file.title = entry['title']
             db_file.location = path
             db_file.languages = []
-            db_file.remove_after = self.config.get('remove_after')
-            db_file.languages = []
             normalized_languages = {normalize_language(subtitle_language) for subtitle_language in
                                     self.config.get('languages', [])}
             for subtitle_language in normalized_languages:
@@ -207,7 +216,7 @@ class SubtitleList(MutableSet):
         """Finds `SubtitleListFile` corresponding to this entry, if it exists."""
         path = self._extract_path(entry)
         res = self._db_list(session).files.filter(SubtitleListFile.location == path).first()
-        if not res and match_file_to_dir:
+        if not res and match_file_to_dir and path:
             path = os.path.dirname(path)
             res = self._db_list(session).files.filter(SubtitleListFile.location == path).first()
         return res
@@ -268,11 +277,6 @@ class PluginSubtitleList(object):
                 log.error('File %s does not exist. Removing from list.', item['location'])
                 subtitle_list.discard(item)
                 continue
-            if self._expired(item, config):
-                log.info('File %s has been in the list for %s. Removing from list.', item['location'],
-                         item['remove_after'] or config['remove_after'])
-                subtitle_list.discard(item)
-                continue
 
             languages = set(item['subtitle_languages']) or set(config.get('languages', []))
             num_potential_files = 0
@@ -307,15 +311,6 @@ class PluginSubtitleList(object):
                 subtitle_list.discard(item)
 
         return list(set(subtitle_list) - temp_discarded_items)
-
-    @classmethod
-    def _expired(cls, file, config):
-        added_interval = datetime.combine(date.today(), time()) - file['added']
-        if file['remove_after'] and added_interval > parse_timedelta(file['remove_after']):
-            return True
-        elif config.get('remove_after') and added_interval > parse_timedelta(config['remove_after']):
-            return True
-        return False
 
 
 @event('plugin.register')
