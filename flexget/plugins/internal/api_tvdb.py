@@ -40,7 +40,6 @@ class TVDBRequest(object):
             if not auth_token:
                 auth_token = TVDBTokens()
                 auth_token.name = self.auth_key
-                session.add(auth_token)
 
             if refresh or auth_token.has_expired():
                 data = {'apikey': TVDBRequest.API_KEY}
@@ -53,6 +52,7 @@ class TVDBRequest(object):
 
                 auth_token.token = requests.post(TVDBRequest.BASE_URL + 'login', json=data).json().get('token')
                 auth_token.refreshed = datetime.now()
+                auth_token = session.merge(auth_token)
 
             return auth_token.token
 
