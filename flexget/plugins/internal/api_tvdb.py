@@ -41,25 +41,20 @@ class TVDBRequest(object):
                 auth_token = TVDBTokens()
                 auth_token.name = self.auth_key
                 session.add(auth_token)
-            expired = auth_token.has_expired()
 
-        if refresh or expired:
-            data = {'apikey': TVDBRequest.API_KEY}
-            if self.username:
-                data['username'] = self.username
-            if self.account_id:
-                data['userkey'] = self.account_id
+            if refresh or auth_token.has_expired():
+                data = {'apikey': TVDBRequest.API_KEY}
+                if self.username:
+                    data['username'] = self.username
+                if self.account_id:
+                    data['userkey'] = self.account_id
 
-            log.debug('Authenticating to TheTVDB with %s' % (self.username if self.username else 'api_key'))
+                log.debug('Authenticating to TheTVDB with %s' % (self.username if self.username else 'api_key'))
 
-            new_token = requests.post(TVDBRequest.BASE_URL + 'login', json=data).json().get('token')
-
-            auth_token.token = new_token
-            with Session() as session:
-                session.merge(auth_token)
+                auth_token.token = requests.post(TVDBRequest.BASE_URL + 'login', json=data).json().get('token')
                 auth_token.refreshed = datetime.now()
 
-        return auth_token.token
+            return auth_token.token
 
     def _request(self, method, endpoint, **params):
         url = TVDBRequest.BASE_URL + endpoint
