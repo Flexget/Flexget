@@ -84,7 +84,7 @@ class BaseFileOps(object):
             return
         for entry in task.accepted:
             if 'location' not in entry:
-                self.log.verbose('Cannot handle %s because it does not have the field location.' % entry['title'])
+                self.log.verbose('Cannot handle %s because it does not have the field location.', entry['title'])
                 continue
             src = entry['location']
             src_isdir = os.path.isdir(src)
@@ -131,20 +131,20 @@ class BaseFileOps(object):
         # everything here happens after a successful execution of the main action: the entry has been moved in a
         # different location, or it does not exists anymore. so from here we can just log warnings and move on.
         if not os.path.isdir(base_path):
-            self.log.warning('Cannot delete path `%s` because it does not exists (anymore).' % base_path)
+            self.log.warning('Cannot delete path `%s` because it does not exists (anymore).', base_path)
             return
         dir_size = get_directory_size(base_path) / 1024 / 1024
         if dir_size >= min_size:
-            self.log.info('Path `%s` left because it exceeds safety value set in clean_source option.' % base_path)
+            self.log.info('Path `%s` left because it exceeds safety value set in clean_source option.', base_path)
             return
         if task.options.test:
-            self.log.info('Would delete `%s` and everything under it.' % base_path)
+            self.log.info('Would delete `%s` and everything under it.', base_path)
             return
         try:
             shutil.rmtree(base_path)
-            self.log.info('Path `%s` has been deleted because was less than clean_source safe value.' % base_path)
+            self.log.info('Path `%s` has been deleted because was less than clean_source safe value.', base_path)
         except Exception as err:
-            self.log.warning('Unable to delete path `%s`: %s' % (base_path, err))
+            self.log.warning('Unable to delete path `%s`: %s', base_path, err)
 
     def handle_entry(self, task, config, entry, siblings):
         raise NotImplementedError()
@@ -175,24 +175,24 @@ class DeleteFiles(BaseFileOps):
         src_isdir = os.path.isdir(src)
         if task.options.test:
             if src_isdir:
-                self.log.info('Would delete `%s` and all its content.' % src)
+                self.log.info('Would delete `%s` and all its content.', src)
             else:
-                self.log.info('Would delete `%s`' % src)
+                self.log.info('Would delete `%s`', src)
                 for s, _ in siblings.items():
-                    self.log.info('Would also delete `%s`' % s)
+                    self.log.info('Would also delete `%s`', s)
             return
         # IO errors will have the entry mark failed in the base class
         if src_isdir:
             shutil.rmtree(src)
-            self.log.info('`%s` and all its content has been deleted.' % src)
+            self.log.info('`%s` and all its content has been deleted.', src)
         else:
             os.remove(src)
-            self.log.info('`%s` has been deleted.' % src)
+            self.log.info('`%s` has been deleted.', src)
         # further errors will not have any effect (the entry does not exists anymore)
         for s, _ in siblings.items():
             try:
                 os.remove(s)
-                self.log.info('`%s` has been deleted as well.' % s)
+                self.log.info('`%s` has been deleted as well.', s)
             except Exception as err:
                 self.log.warning(str(err))
         if not src_isdir:
@@ -240,9 +240,9 @@ class TransformingOps(BaseFileOps):
 
         if not os.path.exists(dst_path):
             if task.options.test:
-                self.log.info('Would create `%s`' % dst_path)
+                self.log.info('Would create `%s`', dst_path)
             else:
-                self.log.info('Creating destination directory `%s`' % dst_path)
+                self.log.info('Creating destination directory `%s`', dst_path)
                 os.makedirs(dst_path)
         if not os.path.isdir(dst_path) and not task.options.test:
             raise plugin.PluginWarning('destination `%s` is not a directory.' % dst_path)
@@ -258,7 +258,7 @@ class TransformingOps(BaseFileOps):
                 new_size = os.path.getsize(src)
                 if size != new_size:
                     if not count % 10:
-                        self.log.verbose('File `%s` is possibly being unpacked, waiting ...' % src_name)
+                        self.log.verbose('File `%s` is possibly being unpacked, waiting ...', src_name)
                 else:
                     break
                 count += 1
@@ -269,18 +269,19 @@ class TransformingOps(BaseFileOps):
         # Check dst contains src_ext
         if config.get('keep_extension', entry.get('keep_extension', True)):
             if not src_isdir and dst_ext != src_ext:
-                self.log.verbose('Adding extension `%s` to dst `%s`' % (src_ext, dst))
+                self.log.verbose('Adding extension `%s` to dst `%s`', src_ext, dst)
                 dst += src_ext
+                dst_file += dst_ext  # this is used for sibling files. dst_ext turns out not to be an extension!
 
         funct_name = 'move' if self.move else 'copy'
         funct_done = 'moved' if self.move else 'copied'
 
         if task.options.test:
-            self.log.info('Would %s `%s` to `%s`' % (funct_name, src, dst))
+            self.log.info('Would %s `%s` to `%s`', funct_name, src, dst)
             for s, ext in siblings.items():
                 # we cannot rely on splitext for extensions here (subtitles may have the language code)
                 d = dst_file + ext
-                self.log.info('Would also %s `%s` to `%s`' % (funct_name, s, d))
+                self.log.info('Would also %s `%s` to `%s`', funct_name, s, d)
         else:
             # IO errors will have the entry mark failed in the base class
             if self.move:
@@ -289,7 +290,7 @@ class TransformingOps(BaseFileOps):
                 shutil.copytree(src, dst)
             else:
                 shutil.copy(src, dst)
-            self.log.info('`%s` has been %s to `%s`' % (src, funct_done, dst))
+            self.log.info('`%s` has been %s to `%s`', src, funct_done, dst)
             # further errors will not have any effect (the entry has been successfully moved or copied out)
             for s, ext in siblings.items():
                 # we cannot rely on splitext for extensions here (subtitles may have the language code)
@@ -299,7 +300,7 @@ class TransformingOps(BaseFileOps):
                         shutil.move(s, d)
                     else:
                         shutil.copy(s, d)
-                    self.log.info('`%s` has been %s to `%s` as well.' % (s, funct_done, d))
+                    self.log.info('`%s` has been %s to `%s` as well.', s, funct_done, d)
                 except Exception as err:
                     self.log.warning(str(err))
         entry['old_location'] = entry['location']

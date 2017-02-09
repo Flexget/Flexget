@@ -21,11 +21,13 @@ STATUS = {
 }
 
 ANIME_TYPE = {
+    '0': 'unknown',
     '1': 'series',
     '2': 'ova',
     '3': 'movie',
     '4': 'special',
-    '5': 'ona'
+    '5': 'ona',
+    '6': 'music'
 }
 
 
@@ -35,17 +37,19 @@ class MyAnimeList(object):
     my_anime_list:
       username: <value>
       status:
-      	- <watching|completed|on_hold|dropped|plan_to_watch>
-      	- <watching|completed|on_hold|dropped|plan_to_watch>
+        - <watching|completed|on_hold|dropped|plan_to_watch>
+        - <watching|completed|on_hold|dropped|plan_to_watch>
         ...
+      type:
+        - <series|ova...>
     """
 
     schema = {
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
-            'status': one_or_more({'type': 'string', 'enum': list(STATUS.values())}),
-            'type': one_or_more({'type': 'string', 'enum': list(ANIME_TYPE.values())})
+            'status': one_or_more({'type': 'string', 'enum': list(STATUS.values())}, unique_items=True),
+            'type': one_or_more({'type': 'string', 'enum': list(ANIME_TYPE.values())}, unique_items=True)
         },
         'required': ['username'],
         'additionalProperties': False
@@ -55,8 +59,8 @@ class MyAnimeList(object):
     def on_task_input(self, task, config):
         entries = []
         parameters = {'u': config['username'], 'status': 'all', 'type': 'anime'}
-        selected_status = config.get('status', STATUS.values())
-        selected_types = config.get('type', ANIME_TYPE.values())
+        selected_status = config.get('status', list(STATUS.values()))
+        selected_types = config.get('type', list(ANIME_TYPE.values()))
 
         if not isinstance(selected_status, list):
             selected_status = [selected_status]
@@ -97,12 +101,16 @@ class MyAnimeList(object):
                     if stripped is 'exact':
                         is_exact = True
 
-            if my_status in selected_status and anime_type in selected_types:
+            # if user has chosen a status or a type, match strictly, otherwise let it all through
+            wanted_status = not selected_status or my_status in selected_status
+            wanted_type = not selected_types or anime_type in selected_types
+
+            if wanted_status and wanted_type:
                 entry = Entry(title=title,
                               url='https://myanimelist.net/anime/{}'.format(my_anime_list_id),
                               configure_series_alternate_name=alternate_names,
                               my_anime_list_type=anime_type,
-                              my_anime_list_status= my_status,
+                              my_anime_list_status=my_status,
                               my_anime_list_tags=my_tags)
 
                 if is_exact:

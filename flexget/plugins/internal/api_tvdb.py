@@ -4,7 +4,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime
+from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, Text
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
@@ -12,7 +12,7 @@ from sqlalchemy.schema import ForeignKey
 from flexget import db_schema
 from flexget.utils import requests
 from flexget.utils.tools import split_title_year
-from flexget.utils.database import with_session, text_date_synonym, json_synonym
+from flexget.utils.database import with_session, text_date_synonym, json_synonym, Session
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('api_tvdb')
@@ -32,27 +32,29 @@ class TVDBRequest(object):
     def __init__(self, username=None, account_id=None):
         self.username = username
         self.account_id = account_id
-        self.auth_key = self.username if self.username else 'default'
+        self.auth_key = self.username.lower() if self.username else 'default'
 
     def get_auth_token(self, refresh=False):
-        tokens = persist.get('auth_tokens')
-        if not tokens:
-            tokens = {'default': None}
+        with Session() as session:
+            auth_token = session.query(TVDBTokens).filter(TVDBTokens.name == self.auth_key).first()
+            if not auth_token:
+                auth_token = TVDBTokens()
+                auth_token.name = self.auth_key
 
-        auth_token = tokens.get(self.auth_key)
+            if refresh or auth_token.has_expired():
+                data = {'apikey': TVDBRequest.API_KEY}
+                if self.username:
+                    data['username'] = self.username
+                if self.account_id:
+                    data['userkey'] = self.account_id
 
-        if not auth_token or refresh:
-            data = {'apikey': TVDBRequest.API_KEY}
-            if self.username:
-                data['username'] = self.username
-            if self.account_id:
-                data['userkey'] = self.account_id
+                log.debug('Authenticating to TheTVDB with %s' % (self.username if self.username else 'api_key'))
 
-            log.debug('Authenticating to TheTVDB with %s' % (self.username if self.username else 'api_key'))
+                auth_token.token = requests.post(TVDBRequest.BASE_URL + 'login', json=data).json().get('token')
+                auth_token.refreshed = datetime.now()
+                auth_token = session.merge(auth_token)
 
-            tokens[self.auth_key] = requests.post(TVDBRequest.BASE_URL + 'login', json=data).json().get('token')
-        persist['auth_tokens'] = tokens
-        return tokens[self.auth_key]
+            return auth_token.token
 
     def _request(self, method, endpoint, **params):
         url = TVDBRequest.BASE_URL + endpoint
@@ -106,6 +108,25 @@ genres_table = Table('tvdb_series_genres', Base.metadata,
                      Column('series_id', Integer, ForeignKey('tvdb_series.id')),
                      Column('genre_id', Integer, ForeignKey('tvdb_genres.id')))
 Base.register_table(genres_table)
+
+
+class TVDBTokens(Base):
+    __tablename__ = 'tvdb_tokens'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(Unicode)
+    token = Column(Text)
+    refreshed = Column(DateTime)
+
+    def has_expired(self):
+        if not self.token or not self.refreshed:
+            return True
+
+        seconds = (datetime.now() - self.refreshed).total_seconds()
+        if seconds >= 86400:
+            return True
+
+        return False
 
 
 class TVDBSeries(Base):

@@ -222,7 +222,14 @@ def get_user(username='flexget', session=None):
 def change_password(username='flexget', password='', session=None):
     check = zxcvbn.zxcvbn(password, user_inputs=[username])
     if check['score'] < 3:
-        raise WeakPassword('Password {0} is not strong enough'.format(password))
+        warning = check['feedback']['warning']
+        suggestions = ' '.join(check['feedback']['suggestions'])
+        message = 'Password \'{}\' is not strong enough. '.format(password)
+        if warning:
+            message += warning + ' '
+        if suggestions:
+            message += 'Suggestions: {}'.format(suggestions)
+        raise WeakPassword(message)
 
     user = get_user(username=username, session=session)
     user.password = str(generate_password_hash(password))

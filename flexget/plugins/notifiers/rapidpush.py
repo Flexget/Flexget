@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+import json
 
 from flexget import plugin
 from flexget.event import event
@@ -41,33 +42,39 @@ class RapidpushNotifier(object):
             'priority': {'type': 'integer', 'minimum': 0, 'maximum': 6}
         },
         'additionalProperties': False,
-        'required': ['api_key']
+        'required': ['api_key'],
+        'not':
+            {'anyOf': [
+                {'required': ['channel', 'group']},
+                {'required': ['channel', 'category']},
+                {'required': ['channel', 'priority']}]},
+        'error_not': 'Cannot use \'channel\' with \'group\', \'category\' or \'priority\''
     }
 
     def notify(self, title, message, config):
         """
         Send a Rapidpush notification
         """
-        wrapper = {}
         notification = {'title': title, 'message': message}
         if not isinstance(config['api_key'], list):
             config['api_key'] = [config['api_key']]
 
         if config.get('channel'):
-            wrapper['command'] = 'broadcast'
+            params = {'command': 'broadcast'}
+            notification['channel'] = config['channel']
         else:
-            wrapper['command'] = 'notify'
+            params = {'command': 'notify'}
             notification['category'] = config['category']
             if config.get('group'):
                 notification['group'] = config['group']
             if config.get('priority') is not None:
                 notification['priority'] = config['priority']
 
-        wrapper['data'] = notification
+        params['data'] = json.dumps(notification)
         for key in config['api_key']:
-            wrapper['apikey'] = key
+            params['apikey'] = key
             try:
-                response = requests.post(RAPIDPUSH_URL, json=wrapper)
+                response = requests.post(RAPIDPUSH_URL, params=params)
             except RequestException as e:
                 raise PluginWarning(e.args[0])
             else:

@@ -105,6 +105,9 @@ class Sickbeard(object):
                                                                  config['api_key'], show['tvdbid'])
                 show_json = task.requests.get(show_url).json()
                 log.debug('processing show data: %s', show_json['data'])
+                if 'quality_details' not in show_json['data']:
+                    log.error('Corrupt data returned, skipping: %s', show_json['data'])
+                    continue
                 fg_qualities = self.quality_requirement_builder(show_json['data']['quality_details']['initial'])
             entry = Entry(title=show['show_name'],
                           url='',

@@ -491,13 +491,14 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
     }
 
     def _verify_load(self, client, info_hash):
-        e = IOError()
+        ex = IOError()
         for _ in range(0, 5):
             try:
                 return client.torrent(info_hash, fields=['hash'])
             except (IOError, xmlrpc_client.Error) as e:
+                ex = e
                 sleep(0.5)
-        raise e
+        raise ex
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
@@ -654,14 +655,14 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         except (IOError, xmlrpc_client.Error) as e:
             entry.fail('Failed to verify torrent loaded: %s' % str(e))
 
-    def on_task_exit(self, task, config):
-        """ Make sure all temp files are cleaned up when task exists """
+    def on_task_learn(self, task, config):
+        """ Make sure all temp files are cleaned up when entries are learned """
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
             download.instance.cleanup_temp_files(task)
 
-    on_task_abort = on_task_exit
+    on_task_abort = on_task_learn
 
 
 class RTorrentInputPlugin(RTorrentPluginBase):
