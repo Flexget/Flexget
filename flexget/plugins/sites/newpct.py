@@ -10,15 +10,25 @@ from flexget.plugins.internal.urlrewriting import UrlRewritingError
 from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.soup import get_soup
 
+from flexget.entry import Entry
+from flexget.utils.search import normalize_unicode
+
+from bs4.element import Tag
+
 log = logging.getLogger('newpct')
 
 requests = Session()
 requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'})
-requests.add_domain_limiter(TimedLimiter('imdb.com', '2 seconds'))
+requests.add_domain_limiter(TimedLimiter('www.newpct1.com', '2 seconds'))
 
 
 class UrlRewriteNewPCT(object):
-    """NewPCT urlrewriter."""
+    """NewPCT urlrewriter and search."""
+
+    schema = {
+        'type': 'boolean',
+        'default': False
+    }
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
@@ -64,7 +74,47 @@ class UrlRewriteNewPCT(object):
             torrent_id = torrent_id_prog.search(torrent_ids[0]).group(1)
             return 'http://www.newpct.com/torrents/{:0>6}.torrent'.format(torrent_id)
 
+    def search(self, task, entry, config=None):
+        if not config:
+            log.debug('NewPCT disabled')
+            return set()
+        log.debug('Search NewPCT')
+        url_search = 'http://www.newpct1.com/buscar'
+        results = set()
+        for search_string in entry.get('search_strings', [entry['title']]):
+            query = normalize_unicode(search_string)
+            query = re.sub(' \(\d\d\d\d\)$', '', query)
+            log.debug('Searching NewPCT %s' % query)
+            query = query.encode('utf8', 'ignore')
+            data = {'q': query}
+            try:
+                response = task.requests.post(url_search, data=data)
+            except requests.RequestException as e:
+                log.error('Error searching NewPCT: %s' % e)
+                return
+            content = response.content
+            soup = get_soup(content)
+            soup2 = soup.find('ul', attrs={'class': 'buscar-list'})
+            children = soup2.findAll('a', href=True)
+            for child in children:
+                entry = Entry()
+                entry['url'] = child['href']
+                entry_title = child.find('h2')
+                if entry_title is None:
+                    continue
+                entry_title = entry_title.text
+                if not entry_title:
+                    continue
+                try:
+                    entry_quality_lan = re.search('.+ \[([^\]]+)\](\[[^\]]+\])+$', entry_title).group(1)
+                except AttributeError:
+                    continue
+                entry_title = re.sub(' \[.+]$', '', entry_title)
+                entry['title'] = entry_title + ' ' + entry_quality_lan
+                results.add(entry)
+        log.debug('Finish search NewPCT with %d entries' % len(results))
+        return results
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteNewPCT, 'newpct', interfaces=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteNewPCT, 'newpct', interfaces=['urlrewriter', 'search'], api_ver=2)
