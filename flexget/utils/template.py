@@ -10,12 +10,11 @@ import re
 import locale
 from copy import copy
 from datetime import datetime, date, time
-from email.utils import parsedate
-from time import mktime
 
 import jinja2.filters
 from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, Template,
                     TemplateNotFound, TemplateSyntaxError)
+from dateutil import parser as dateutil_parse
 
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyDict
@@ -81,8 +80,8 @@ def filter_formatdate(val, format):
 
 
 def filter_parsedate(val):
-    """Attempts to parse a date according to the rules in RFC 2822"""
-    return datetime.fromtimestamp(mktime(parsedate(val)))
+    """Attempts to parse a date according to the rules in ISO 8601 and RFC 2822"""
+    return dateutil_parse.parse(val)
 
 
 def filter_date_suffix(date):
