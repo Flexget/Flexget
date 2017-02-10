@@ -203,13 +203,6 @@ class SeriesList(MutableSet):
             log.debug('found series %s', res)
         return res
 
-    @staticmethod
-    def _parse_title(entry):
-        parser = get_plugin_by_name('parsing').instance.parse_series(data=entry['title'])
-        if parser and parser.valid:
-            parser.name = normalize_name(remove_dirt(parser.name))
-            entry.update(parser.fields)
-
     @property
     def immutable(self):
         return False
