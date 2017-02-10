@@ -235,7 +235,7 @@ class RTorrent(object):
         'state', 'complete',
         'bytes_done', 'down.rate', 'left_bytes',
         'ratio',
-        'base_path',
+        'base_path', 'load_date'
     )
 
     required_fields = (
