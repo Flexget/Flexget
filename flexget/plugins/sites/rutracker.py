@@ -65,7 +65,7 @@ class RutrackerAuth(AuthBase):
     def try_authenticate(self, payload):
         for _ in range(5):
             s = RSession()
-            s.post("http://login.rutracker.org/forum/login.php", data=payload)
+            s.post("http://rutracker.org/forum/login.php", data=payload)
             if s.cookies and len(s.cookies) > 0:
                 return s.cookies
             else:
@@ -103,7 +103,7 @@ class RutrackerAuth(AuthBase):
         r.prepare_body(data=data, files=None)
         r.prepare_method('POST')
         r.prepare_url(
-            url='http://dl.rutracker.org/forum/dl.php?t=' + id, params=None)
+            url='http://rutracker.org/forum/dl.php?t=' + id, params=None)
         r.prepare_headers(headers)
         r.prepare_cookies(self.cookies_)
         return r
