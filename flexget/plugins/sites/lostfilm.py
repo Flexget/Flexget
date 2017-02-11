@@ -6,8 +6,6 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 import re
 
-import feedparser
-
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
@@ -18,21 +16,6 @@ __author__ = 'danfocus'
 
 log = logging.getLogger('lostfilm')
 
-EPISODE_REGEXP = re.compile(
-    '.*lostfilm.tv/series/.*/season_(\d+)/episode_(\d+)/.*')
-LOSTFILM_ID_REGEXP = re.compile(
-    '.*static.lostfilm.tv/Images/(\d+)/Posters/poster.jpg.*')
-TEXT_REGEXP = re.compile('^(\d+)\sсезон\s(\d+)\sсерия\.\s(.+)\s\((.+)\)$')
-
-quality_map = {
-    'SD': ('480p', 'avi'),
-    '1080': ('1080p', 'mkv'),
-    'MP4': ('720p', 'mp4'),
-    'HD': ('720p', 'mkv')
-}
-
-LOSTFILM_URL = 'http://lostfilm.tv/rss.xml'
-
 
 class LostFilm(object):
     """
@@ -41,75 +24,69 @@ class LostFilm(object):
     Example::
 
       lostfilm: yes
-
-    Advanced usage:
-
-      lostfilm:
-        url: <url>
     """
 
-    schema = {
-        'type': ['boolean', 'object'],
-        'properties': {
-            'url': {'type': 'string', 'format': 'url'},
-        },
-        'additionalProperties': False
+    schema = {'type': 'boolean'}
+
+    episode_reg = re.compile(
+        '.*lostfilm.tv/series/.*/season_(\d+)/episode_(\d+)/.*')
+    lostfilm_reg = re.compile(
+        '.*static.lostfilm.tv/Images/(\d+)/Posters/poster.jpg.*')
+    text_reg = re.compile('^(\d+)\sсезон\s(\d+)\sсерия\.\s(.+)\s\((.+)\)$')
+
+    quality_map = {
+        'SD': ('480p', 'avi'),
+        '1080': ('1080p', 'mkv'),
+        'MP4': ('720p', 'mp4'),
+        'HD': ('720p', 'mkv')
     }
 
-    def build_config(self, config):
-        """Set default url to config"""
-        if isinstance(config, bool) and config is True:
-            config = {'url': LOSTFILM_URL}
-        return config
-
+    @plugin.priority(-1)
     def on_task_input(self, task, config):
-        config = self.build_config(config)
         if config is False:
             return
-        rss = feedparser.parse(config['url'])
-        if rss.get('status') != 200:
-            log.error('Received not 200 (OK) status')
-            return
         entries = []
-        for item in rss.entries:
-            if item.get('link') is None:
-                log.debug('Item doesn\'t have a link')
+        for entry in task.entries:
+            if entry.get('url') is None:
+                entry.reject('Entry doesn\'t have a url')
                 continue
-            if item.get('description') is None:
-                log.debug('Item doesn\'t have a description')
+            if entry.get('description') is None:
+                entry.reject('Entry doesn\'t have a description')
                 continue
-            match = LOSTFILM_ID_REGEXP.search(item['description'])
+            match = self.lostfilm_reg.search(entry['description'])
             if match:
                 lostfilm_num = match.group(1)
             else:
-                log.debug('Item doesn\'t have lostfilm id in description')
+                entry.reject('Entry doesn\'t have lostfilm id in description')
                 continue
-            match = EPISODE_REGEXP.match(item['link'])
+            match = self.episode_reg.match(entry['url'])
             if match:
-                season_num = int(match.group(1))
-                episode_num = int(match.group(2))
+                season_num = match.group(1)
+                episode_num = match.group(2)
             else:
-                log.debug('Item doesn\'t have episode id in link')
+                entry.reject('Entry doesn\'t have episode id in link')
                 continue
-            redirect_url = 'http://www.lostfilm.tv/v_search.php?' \
-                'c={}&s={}&e={}'.format(lostfilm_num, season_num, episode_num)
+            redirect_url = 'https://www.lostfilm.tv/v_search.php?' \
+                'c=%s&s=%s&e=%s' % (lostfilm_num, season_num, episode_num)
             try:
-                response = task.requests.get(redirect_url)
+                response = task.requests.get(redirect_url,
+                                             headers=task.requests.headers)
             except RequestException as e:
-                log.error('Could not connect to redirect url: {:s}'.format(e))
+                entry.reject('Could not connect to redirect url: %s' % e)
                 continue
 
             page = get_soup(response.content)
             try:
-                redirect_url = page.head.meta['content'].split('url=')[1]
+                redirect_url = page.head.meta['content'].split("url=")[1]
             except:
-                log.error('Missing redirect')
+                entry.reject('Missing redirect')
                 continue
 
             try:
-                response = task.requests.get(redirect_url)
+                response = task.requests.get(redirect_url,
+                                             headers=task.requests.headers)
             except RequestException as e:
-                log.error('Could not connect to redirect url2: {:s}'.format(e))
+                entry.reject('Could not connect to redirect url 2: %s' % e)
                 continue
 
             page = get_soup(response.content)
@@ -122,10 +99,10 @@ class LostFilm(object):
                 title_eng_div = page.find(
                     'div', 'inner-box--subtitle').text.strip() or None
                 series_name_eng = title_eng_div[:-8] \
-                    if title_eng_div.endswith(', сериал') else None
+                    if title_eng_div.endswith(", сериал") else None
                 text_div = page.find('div', 'inner-box--text').text.strip() \
                     or None
-                match = TEXT_REGEXP.match(text_div)
+                match = self.text_reg.match(text_div)
                 if match:
                     season_num = int(match.group(1).strip())
                     episode_num = int(match.group(2).strip())
@@ -133,7 +110,7 @@ class LostFilm(object):
                     episode_name_eng = match.group(4).strip()
                 if series_name_eng and season_num and episode_num:
                     new_title_template = \
-                        '{}.S{:02d}E{:02d}.{{}}.rus.LostFilm.TV.{{}}.torrent'\
+                        "{}.S{:02d}E{:02d}.{{}}.rus.LostFilm.TV.{{}}.torrent"\
                         .format(series_name_eng, season_num, episode_num)
             except:
                 pass
@@ -147,17 +124,12 @@ class LostFilm(object):
                     continue
                 if new_title_template:
                     new_title = new_title_template.format(
-                        quality_map.get(quality, (quality, None))[0],
-                        quality_map.get(quality, (None, 'avi'))[1]
+                        self.quality_map.get(quality)[0] or quality,
+                        self.quality_map.get(quality)[1] or 'avi'
                         ).replace(' ', '.')
                 else:
-                    if item.get('title') is not None:
-                        new_title = '%s %s'.format(
-                            item['title'],
-                            quality_map.get(quality, (quality, None))[0])
-                    else:
-                        log.error('Item doesn\'t have a title')
-                        continue
+                    new_title = entry['title'] + " " \
+                        + self.quality_map.get(quality)[0] or quality
                 new_entry = Entry()
                 new_entry['url'] = torrent_link
                 new_entry['title'] = new_title.strip()
@@ -170,6 +142,7 @@ class LostFilm(object):
                 if episode_name_eng:
                     new_entry['episode_name_eng'] = episode_name_eng
                 entries.append(new_entry)
+            entry.reject("Original entry rejected")
 
         return entries
 
