@@ -44,6 +44,7 @@ class SearchFreshon(object):
                 'default': 'all',
                 'enum': list(LEECHSTATUS.keys())
             },
+            'page_limit': {'type': 'integer', 'default': 10},
         },
         'required': ['username', 'password', 'passkey'],
         'additionalProperties': False
@@ -162,9 +163,7 @@ class SearchFreshon(object):
         else:
             page_number = 1
 
-        # limit to 10 pages
-        if page_number > 10:
-            page_number = 10
+        return min(page_number, self.config['page_limit'])
 
     def parse_entry(self, res):
         entry = Entry()
