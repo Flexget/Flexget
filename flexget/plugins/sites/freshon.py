@@ -102,7 +102,7 @@ class SearchFreshon(object):
             try:
                 page = task.requests.get(url, params=params).content
             except RequestsException:
-                log.error('Could not get page %s, skipping' % url)
+                log.error('Could not get page %s, %s, skipping',  url, params)
                 continue
             soup = get_soup(page)
             if soup.findAll(text=re.compile('Nothing found. Try again with '
@@ -117,7 +117,12 @@ class SearchFreshon(object):
                     if (nextpage > 0):
                         params['page'] = nextpage
                         log.debug('-----> NEXT PAGE : %s %s', url, params)
-                        f1 = task.requests.get(url, params=params).content
+                        try:
+                            f1 = task.requests.get(url, params=params).content
+                        except RequestsException:
+                            log.error('Could not get page %s, %s, skipping',
+                                      url, params)
+                            continue
                         soup = get_soup(f1)
                     results = soup.findAll('tr', {
                         'class': re.compile('torrent_[0-9]*')
@@ -133,7 +138,7 @@ class SearchFreshon(object):
 
     def login(self, task):
         log.debug('Logging in to Freshon.tv...')
-        params = { 'action': 'makelogin' }
+        params = {'action': 'makelogin'}
         data = {
             'username': self.config['username'],
             'password': self.config['password'],
@@ -176,7 +181,7 @@ class SearchFreshon(object):
         entry['title'] = res.find('a', {'class': 'torrent_name_link'})['title']
         # skip if nuked
         if res.find('img', alt='Nuked'):
-            log.info('Skipping entry %s (nuked)' % entry['title'])
+            log.info('Skipping entry %s (nuked)', entry['title'])
             return None
 
         details_url = res.find('a', {'class': 'torrent_name_link'})['href']
