@@ -4,6 +4,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 import re
 import urllib
+from urlparse import urlsplit, parse_qs
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -185,10 +186,10 @@ class SearchFreshon(object):
             return None
 
         details_url = res.find('a', {'class': 'torrent_name_link'})['href']
-        id = int((re.match('.*?([0-9]+)$', details_url).group(1)).strip())
+        torrent_id = parse_qs(urlsplit(details_url).query)['id']
         params = {
             'type': 'rss',
-            'id': id,
+            'id': torrent_id,
             'passkey': self.config['passkey']
         }
         url = '%s/%s?%s' % (BASE_URL, DL_PAGE, urllib.urlencode(params))
