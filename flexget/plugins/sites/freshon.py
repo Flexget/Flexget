@@ -10,14 +10,14 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import parse_filesize
-from flexget.utils.search import normalize_unicode
+from flexget.utils.search import normalize_scene
 
 log = logging.getLogger('search_freshon')
 
 BASE_URL = 'https://freshon.tv'
-SEARCH_FRAGMENT = 'browse.php?search=%s&tab=%s&incldead=%s'
-DL_FRAGMENT = 'download.php?type=rss&id=%s&passkey=%s'
-LOGIN_FRAGMENT = 'login.php?action=makelogin'
+SEARCH_PAGE = 'browse.php'
+DL_PAGE = 'download.php'
+LOGIN_PAGE = 'login.php'
 LEECHSTATUS = {
     'all': 0,
     'free': 3,
@@ -90,13 +90,17 @@ class SearchFreshon(object):
 
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            query = normalize_unicode(search_string.replace(' ', '+'))
-            query = urllib.quote_plus(query.encode('utf-8'))
-            url = (BASE_URL, SEARCH_FRAGMENT)
-            url = '/'.join(url) % (query, config['category'], freeleech)
-            log.debug('Search url: %s', url)
+            query = normalize_scene(search_string)
+            params = {
+                'search': query,
+                'tab': config['category'],
+                'incldead': freeleech,
+                'page': None
+            }
+            url = "%s/%s" % (BASE_URL, SEARCH_PAGE)
+            log.debug('Search : %s %s', url, params)
             try:
-                page = task.requests.get(url).content
+                page = task.requests.get(url, params=params).content
             except RequestsException:
                 log.error('Could not get page %s, skipping' % url)
                 continue
@@ -111,9 +115,9 @@ class SearchFreshon(object):
                 nextpage = 0
                 while (nextpage < page_number):
                     if (nextpage > 0):
-                        newurl = url + '&page=' + str(nextpage)
-                        log.debug('-----> NEXT PAGE : %s', newurl)
-                        f1 = task.requests.get(newurl).content
+                        params['page'] = nextpage
+                        log.debug('-----> NEXT PAGE : %s %s', url, params)
+                        f1 = task.requests.get(url, params=params).content
                         soup = get_soup(f1)
                     results = soup.findAll('tr', {
                         'class': re.compile('torrent_[0-9]*')
@@ -129,13 +133,14 @@ class SearchFreshon(object):
 
     def login(self, task):
         log.debug('Logging in to Freshon.tv...')
-        params = {
+        params = { 'action': 'makelogin' }
+        data = {
             'username': self.config['username'],
             'password': self.config['password'],
             'login': 'Do it!'
         }
-        url = "%s/%s" % (BASE_URL, LOGIN_FRAGMENT)
-        lsrc = task.requests.post(url, data=params)
+        url = "%s/%s" % (BASE_URL, LOGIN_PAGE)
+        lsrc = task.requests.post(url, params=params, data=data)
         if self.config['username'] in lsrc.text:
             log.debug('Login to FreshonTV was successful')
         elif 'Username does not exist in the userbase' in lsrc.text:
@@ -176,8 +181,13 @@ class SearchFreshon(object):
 
         details_url = res.find('a', {'class': 'torrent_name_link'})['href']
         id = int((re.match('.*?([0-9]+)$', details_url).group(1)).strip())
-        url = (BASE_URL, DL_FRAGMENT)
-        entry['url'] = '/'.join(url) % (id, self.config['passkey'])
+        params = {
+            'type': 'rss',
+            'id': id,
+            'passkey': self.config['passkey']
+        }
+        url = '%s/%s?%s' % (BASE_URL, DL_PAGE, urllib.urlencode(params))
+        entry['url'] = url
 
         log.debug('Title: %s | DL LINK: %s', (entry['title'], entry['url']))
 
