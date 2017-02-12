@@ -88,9 +88,9 @@ class LostFilm(object):
                 log.debug('Item doesn\'t have lostfilm id in description')
                 continue
             try:
-                season_num, episode_num = \
-                    [int(x) for x in
-                     EPISODE_REGEXP.search(item['link']).groups()]
+                season_num, episode_num = [
+                    int(x) for x in EPISODE_REGEXP.search(
+                        item['link']).groups()]
             except:
                 log.debug('Item doesn\'t have episode id in link')
                 continue
@@ -121,51 +121,58 @@ class LostFilm(object):
 
             page = get_soup(response.content)
 
-            episode_name_rus = episode_name_eng = series_name_rus = \
-                series_name_eng = None
+            episode_name_rus = episode_name_eng = series_name_rus = None
+            series_name_eng = None
             try:
                 series_name_rus = page.find(
                     'div', 'inner-box--title').text.strip()
                 title_eng_div = page.find(
                     'div', 'inner-box--subtitle').text.strip() or None
-                series_name_eng = (title_eng_div.endswith(', сериал')) \
-                    and title_eng_div[:-8] or None
-                text_div = page.find('div', 'inner-box--text').text.strip() \
-                    or None
-                episode_name_rus, episode_name_eng = \
-                    TEXT_REGEXP.findall(text_div).pop()
+                series_name_eng = (title_eng_div.endswith(
+                    ', сериал')) and title_eng_div[:-8] or None
+                text_div = page.find(
+                    'div', 'inner-box--text').text.strip() or None
+                episode_name_rus, episode_name_eng = TEXT_REGEXP.findall(
+                    text_div).pop()
             except:
                 log.debug('Cannot parse head info')
                 pass
 
+            episode_id = 'S{:02d}E{:02d}'.format(
+                season_num, episode_num)
+
             for item in page.findAll('div', 'inner-box--item'):
                 torrent_link = quality = None
                 try:
-                    torrent_link = \
-                        item.find('div', 'inner-box--link sub').a['href']
-                    quality = \
-                        item.find('div', 'inner-box--label').text.strip()
+                    torrent_link = item.find(
+                        'div', 'inner-box--link sub').a['href']
+                    quality = item.find('div', 'inner-box--label').text.strip()
                 except:
                     log.debug('Item doesn\'t have a link or quality')
                     continue
                 if torrent_link is None or quality is None:
                     log.debug('Item doesn\'t have a link or quality')
                     continue
+                if quality_map.get(quality):
+                    quality, file_ext = quality_map.get(quality)
+                else:
+                    file_ext = 'avi'
                 if series_name_eng:
-                    new_title = \
-                        '.'.join([
+                    new_title = '.'.join(
+                        [
                             series_name_eng,
-                            'S{:02d}E{:02d}'.format(season_num, episode_num),
-                            quality_map.get(quality, (quality, 0))[0],
+                            episode_id,
+                            quality,
                             'rus.LostFilm.TV',
-                            quality_map.get(quality, (0, 'avi'))[1],
+                            file_ext,
                             'torrent'
-                                  ]).replace(' ', '.')
+                        ]
+                    ).replace(' ', '.')
                 else:
                     if item.get('title') is not None:
                         new_title = '{} {}'.format(
                             item['title'],
-                            quality_map.get(quality, (quality, 0))[0])
+                            quality)
                     else:
                         log.debug('Item doesn\'t have a title')
                         continue
