@@ -186,7 +186,7 @@ class SearchFreshon(object):
             return None
 
         details_url = res.find('a', {'class': 'torrent_name_link'})['href']
-        torrent_id = parse_qs(urlsplit(details_url).query)['id']
+        torrent_id = parse_qs(urlsplit(details_url).query)['id'][0]
         params = {
             'type': 'rss',
             'id': torrent_id,
