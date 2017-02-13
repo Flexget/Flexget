@@ -125,10 +125,14 @@ class API(RestPlusAPI):
         response code. If an `ApiError` is used, the response code, and expected response model, is automatically
         documented.
         """
-        if isinstance(code_or_apierror, APIError):
-            description = code_or_apierror.description or description
-            return self.doc(
-                responses={code_or_apierror.status_code: (description, code_or_apierror.response_model)}, **kwargs)
+        try:
+            if issubclass(code_or_apierror, APIError):
+                description = code_or_apierror.description or description
+                return self.doc(
+                    responses={code_or_apierror.status_code: (description, code_or_apierror.response_model)}, **kwargs)
+        except TypeError:
+            # If first argument isn't a class this happens
+            pass
         return self.doc(responses={code_or_apierror: (description, model)}, **kwargs)
 
     def pagination_parser(self, parser=None, sort_choices=None, default=None, add_sort=None):
