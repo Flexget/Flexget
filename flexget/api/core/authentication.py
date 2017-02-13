@@ -68,7 +68,7 @@ def check_valid_login():
 # API Authentication and Authorization
 auth_api = api.namespace('auth', description='Authentication')
 
-login_api_schema = api.schema('auth.login', {
+login_api_schema = api.schema_model('auth.login', {
     'type': 'object',
     'properties': {
         'username': {'type': 'string'},

@@ -52,9 +52,9 @@ class ObjectsContainer(object):
     task_status_list_schema = {'type': 'array', 'items': task_status_schema}
 
 
-task_status = api.schema('tasks.tasks_status', ObjectsContainer.task_status_schema)
-task_status_list = api.schema('tasks.tasks_status_list', ObjectsContainer.task_status_list_schema)
-task_executions = api.schema('tasks.tasks_executions_list', ObjectsContainer.executions_list)
+task_status = api.schema_model('tasks.tasks_status', ObjectsContainer.task_status_schema)
+task_status_list = api.schema_model('tasks.tasks_status_list', ObjectsContainer.task_status_list_schema)
+task_executions = api.schema_model('tasks.tasks_executions_list', ObjectsContainer.executions_list)
 
 sort_choices = ('last_execution_time', 'name', 'id')
 tasks_parser = api.pagination_parser(sort_choices=sort_choices)

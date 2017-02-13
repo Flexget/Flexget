@@ -118,16 +118,16 @@ class ObjectsContainer(object):
     series_input_object['required'] = ['name']
 
 
-series_list_schema = api.schema('list_series', ObjectsContainer.series_list_schema)
-series_edit_schema = api.schema('series_edit_schema', ObjectsContainer.series_edit_object)
-series_input_schema = api.schema('series_input_schema', ObjectsContainer.series_input_object)
-show_details_schema = api.schema('show_details', ObjectsContainer.single_series_object)
+series_list_schema = api.schema_model('list_series', ObjectsContainer.series_list_schema)
+series_edit_schema = api.schema_model('series_edit_schema', ObjectsContainer.series_edit_object)
+series_input_schema = api.schema_model('series_input_schema', ObjectsContainer.series_input_object)
+show_details_schema = api.schema_model('show_details', ObjectsContainer.single_series_object)
 
-episode_list_schema = api.schema('episode_list', ObjectsContainer.episode_list_schema)
-episode_schema = api.schema('episode_item', ObjectsContainer.episode_object)
+episode_list_schema = api.schema_model('episode_list', ObjectsContainer.episode_list_schema)
+episode_schema = api.schema_model('episode_item', ObjectsContainer.episode_object)
 
-release_schema = api.schema('release_schema', ObjectsContainer.release_object)
-release_list_schema = api.schema('release_list_schema', ObjectsContainer.release_list_schema)
+release_schema = api.schema_model('release_schema', ObjectsContainer.release_object)
+release_list_schema = api.schema_model('release_list_schema', ObjectsContainer.release_list_schema)
 
 base_series_parser = api.parser()
 base_series_parser.add_argument('begin', type=inputs.boolean, default=True, help='Show series begin episode')

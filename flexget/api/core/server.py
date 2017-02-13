@@ -88,12 +88,12 @@ class ObjectsContainer(object):
     }
 
 
-yaml_error_schema = api.schema('yaml_error_schema', ObjectsContainer.yaml_error_response)
-config_validation_schema = api.schema('config_validation_schema', ObjectsContainer.config_validation_error)
-pid_schema = api.schema('server.pid', ObjectsContainer.pid_object)
-raw_config_schema = api.schema('raw_config', ObjectsContainer.raw_config_object)
-version_schema = api.schema('server.version', ObjectsContainer.version_object)
-dump_threads_schema = api.schema('server.dump_threads', ObjectsContainer.dump_threads_object)
+yaml_error_schema = api.schema_model('yaml_error_schema', ObjectsContainer.yaml_error_response)
+config_validation_schema = api.schema_model('config_validation_schema', ObjectsContainer.config_validation_error)
+pid_schema = api.schema_model('server.pid', ObjectsContainer.pid_object)
+raw_config_schema = api.schema_model('raw_config', ObjectsContainer.raw_config_object)
+version_schema = api.schema_model('server.version', ObjectsContainer.version_object)
+dump_threads_schema = api.schema_model('server.dump_threads', ObjectsContainer.dump_threads_object)
 
 
 @server_api.route('/reload/')

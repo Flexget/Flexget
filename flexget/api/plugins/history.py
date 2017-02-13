@@ -35,7 +35,7 @@ class ObjectsContainer(object):
     history_list_object = {'type': 'array', 'items': base_history_object}
 
 
-history_list_schema = api.schema('history.list', ObjectsContainer.history_list_object)
+history_list_schema = api.schema_model('history.list', ObjectsContainer.history_list_object)
 
 sort_choices = ('id', 'task', 'filename', 'url', 'title', 'time', 'details')
 

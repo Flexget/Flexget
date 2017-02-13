@@ -11,18 +11,17 @@ from functools import wraps
 from flask import Flask, request, jsonify, make_response
 from flask_compress import Compress
 from flask_cors import CORS
-from flask_restplus import Model, Api as RestPlusAPI
-from flask_restplus import Resource
+from flask_restplus import Api as RestPlusAPI, Resource
+from jsonschema import RefResolutionError
+from werkzeug.http import generate_etag
+
 from flexget import manager
 from flexget.config_schema import process_config
 from flexget.utils.database import with_session
 from flexget.webserver import User
-from jsonschema import RefResolutionError
-from werkzeug.http import generate_etag
-
 from . import __path__
 
-__version__ = '1.1.2'
+__version__ = '1.2.0'
 
 log = logging.getLogger('api')
 
@@ -87,80 +86,12 @@ class APIResource(Resource):
         super(APIResource, self).__init__(api, *args, **kwargs)
 
 
-class APISchemaModel(Model):
-    """A flask restplus :class:`flask_restplus.models.ApiModel` which can take a json schema directly."""
-
-    def __init__(self, name, schema, *args, **kwargs):
-        super(APISchemaModel, self).__init__(name, *args, **kwargs)
-        self._schema = schema
-
-    @property
-    def __schema__(self):
-        if self.__parent__:
-            return {
-                'allOf': [
-                    {'$ref': '#/definitions/{0}'.format(self.__parent__.name)},
-                    self._schema
-                ]
-            }
-        else:
-            return self._schema
-
-    def __nonzero__(self):
-        return bool(self._schema)
-
-    def __bool__(self):
-        return self._schema is not None
-
-    def __repr__(self):
-        return '<ApiSchemaModel(%r)>' % self._schema
-
-
 class API(RestPlusAPI):
     """
     Extends a flask restplus :class:`flask_restplus.Api` with:
       - methods to make using json schemas easier
       - methods to auto document and handle :class:`ApiError` responses
     """
-
-    def _rewrite_refs(self, schema):
-        if isinstance(schema, list):
-            for value in schema:
-                self._rewrite_refs(value)
-
-        if isinstance(schema, dict):
-            for key, value in schema.items():
-                if isinstance(value, (list, dict)):
-                    self._rewrite_refs(value)
-
-                if key == '$ref' and value.startswith('/'):
-                    schema[key] = '#definitions%s' % value
-
-    def schema(self, name, schema, **kwargs):
-        """
-        Register a json schema.
-
-        Usable like :meth:`flask_restplus.Api.model`, except takes a json schema as its argument.
-
-        :returns: An :class:`ApiSchemaModel` instance registered to this api.
-        """
-        model = APISchemaModel(name, schema, **kwargs)
-        model.__apidoc__.update(kwargs)
-        self.models[name] = model
-        return model
-
-    def inherit(self, name, parent, fields):
-        """
-        Extends :meth:`flask_restplus.Api.inherit` to allow `fields` to be a json schema, if `parent` is a
-        :class:`ApiSchemaModel`.
-        """
-        if isinstance(parent, APISchemaModel):
-            model = APISchemaModel(name, fields)
-            model.__apidoc__['name'] = name
-            model.__parent__ = parent
-            self.models[name] = model
-            return model
-        return super(API, self).inherit(name, parent, fields)
 
     def validate(self, model, schema_override=None, description=None):
         """
@@ -194,15 +125,11 @@ class API(RestPlusAPI):
         response code. If an `ApiError` is used, the response code, and expected response model, is automatically
         documented.
         """
-        try:
-            if issubclass(code_or_apierror, APIError):
-                description = code_or_apierror.description or description
-                return self.doc(
-                    responses={code_or_apierror.status_code: (description, code_or_apierror.response_model)}, **kwargs)
-        except TypeError:
-            # If first argument isn't a class this happens
-            pass
-        return super(API, self).response(code_or_apierror, description, model=model, **kwargs)
+        if isinstance(code_or_apierror, APIError):
+            description = code_or_apierror.description or description
+            return self.doc(
+                responses={code_or_apierror.status_code: (description, code_or_apierror.response_model)}, **kwargs)
+        return self.doc(responses={code_or_apierror: (description, model)}, **kwargs)
 
     def pagination_parser(self, parser=None, sort_choices=None, default=None, add_sort=None):
         """
@@ -255,7 +182,7 @@ base_message = {
 
 }
 
-base_message_schema = api.schema('base_message', base_message)
+base_message_schema = api.schema_model('base_message', base_message)
 
 
 class APIError(Exception):
@@ -353,7 +280,7 @@ class ValidationError(APIError):
         return error_dict
 
 
-empty_response = api.schema('empty', {'type': 'object'})
+empty_response = api.schema_model('empty', {'type': 'object'})
 
 
 def success_response(message, status_code=200, status='success'):

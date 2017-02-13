@@ -43,8 +43,8 @@ class ObjectsContainer(object):
     seen_search_object = {'type': 'array', 'items': seen_object}
 
 
-seen_object_schema = api.schema('seen_object_schema', ObjectsContainer.seen_object)
-seen_search_schema = api.schema('seen_search_schema', ObjectsContainer.seen_search_object)
+seen_object_schema = api.schema_model('seen_object_schema', ObjectsContainer.seen_object)
+seen_search_schema = api.schema_model('seen_search_schema', ObjectsContainer.seen_search_object)
 
 seen_base_parser = api.parser()
 seen_base_parser.add_argument('value', help='Filter by any field value or leave empty to get all entries')

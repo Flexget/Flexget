@@ -255,7 +255,7 @@ class TestMovieListAPI(object):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         data = json.loads(rsp.get_data(as_text=True))
-        errors = schema_match(empty_response, data)
+        errors = schema_match({'type': 'object'}, data)
         assert not errors
 
         # Get non existent movie from list

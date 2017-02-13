@@ -83,17 +83,17 @@ class ObjectsContainer(object):
     return_identifiers = {'type': 'array', 'items': {'type': 'string'}}
 
 
-input_movie_entry_schema = api.schema('input_movie_entry', ObjectsContainer.input_movie_entry)
-input_movie_list_id_schema = api.schema('input_movie_list_id_object', ObjectsContainer.input_movie_list_id_object)
+input_movie_entry_schema = api.schema_model('input_movie_entry', ObjectsContainer.input_movie_entry)
+input_movie_list_id_schema = api.schema_model('input_movie_list_id_object', ObjectsContainer.input_movie_list_id_object)
 
-movie_list_id_object_schema = api.schema('movie_list_id_object', ObjectsContainer.return_movie_list_id_object)
-movie_list_object_schema = api.schema('movie_list_object', ObjectsContainer.movie_list_object)
-list_object_schema = api.schema('list_object', ObjectsContainer.list_object)
-return_lists_schema = api.schema('return_lists', ObjectsContainer.return_lists)
-return_movies_schema = api.schema('return_movies', ObjectsContainer.return_movies)
+movie_list_id_object_schema = api.schema_model('movie_list_id_object', ObjectsContainer.return_movie_list_id_object)
+movie_list_object_schema = api.schema_model('movie_list_object', ObjectsContainer.movie_list_object)
+list_object_schema = api.schema_model('list_object', ObjectsContainer.list_object)
+return_lists_schema = api.schema_model('return_lists', ObjectsContainer.return_lists)
+return_movies_schema = api.schema_model('return_movies', ObjectsContainer.return_movies)
 
-new_list_schema = api.schema('new_list', ObjectsContainer.list_input)
-identifiers_schema = api.schema('movie_list.identifiers', ObjectsContainer.return_identifiers)
+new_list_schema = api.schema_model('new_list', ObjectsContainer.list_input)
+identifiers_schema = api.schema_model('movie_list.identifiers', ObjectsContainer.return_identifiers)
 
 movie_list_parser = api.parser()
 movie_list_parser.add_argument('name', help='Filter results by list name')

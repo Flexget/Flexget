@@ -83,9 +83,9 @@ class ObjectsContainer(object):
     search_results_object = {'type': 'array', 'items': search_result_object}
 
 
-tvdb_series_schema = api.schema('tvdb_series_schema', ObjectsContainer.tvdb_series_object)
-tvdb_episode_schema = api.schema('tvdb_episode_schema', ObjectsContainer.episode_object)
-search_results_schema = api.schema('tvdb_search_results_schema', ObjectsContainer.search_results_object)
+tvdb_series_schema = api.schema_model('tvdb_series_schema', ObjectsContainer.tvdb_series_object)
+tvdb_episode_schema = api.schema_model('tvdb_episode_schema', ObjectsContainer.episode_object)
+search_results_schema = api.schema_model('tvdb_search_results_schema', ObjectsContainer.search_results_object)
 
 base_parser = api.parser()
 base_parser.add_argument('language', default='en', help='Language abbreviation string for different language support')

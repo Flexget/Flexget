@@ -26,7 +26,7 @@ class ObjectContainer(object):
     }
 
 
-format_checker_schema = api.schema('format_checker', ObjectContainer.format_checker_input)
+format_checker_schema = api.schema_model('format_checker', ObjectContainer.format_checker_input)
 
 
 @schema_api.route('/', doc=False)

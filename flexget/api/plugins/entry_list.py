@@ -59,9 +59,9 @@ class ObjectsContainer(object):
     entry_lists_entries_return_object = {'type': 'array', 'items': entry_list_entry_base_object}
 
 
-entry_list_object_schema = api.schema('entry_list_object_schema', ObjectsContainer.entry_list_base_object)
-entry_list_input_object_schema = api.schema('entry_list_input_object_schema', ObjectsContainer.entry_list_input_object)
-entry_list_return_lists_schema = api.schema('entry_list_return_lists_schema', ObjectsContainer.entry_list_return_lists)
+entry_list_object_schema = api.schema_model('entry_list_object_schema', ObjectsContainer.entry_list_base_object)
+entry_list_input_object_schema = api.schema_model('entry_list_input_object_schema', ObjectsContainer.entry_list_input_object)
+entry_list_return_lists_schema = api.schema_model('entry_list_return_lists_schema', ObjectsContainer.entry_list_return_lists)
 
 entry_list_parser = api.parser()
 entry_list_parser.add_argument('name', help='Filter results by list name')
@@ -127,9 +127,9 @@ class EntryListListAPI(APIResource):
         return success_response('list successfully deleted')
 
 
-base_entry_schema = api.schema('base_entry_schema', ObjectsContainer.base_entry_object)
-entry_list_entry_base_schema = api.schema('entry_list_entry_base_schema', ObjectsContainer.entry_list_entry_base_object)
-entry_lists_entries_return_schema = api.schema('entry_lists_entries_return_schema',
+base_entry_schema = api.schema_model('base_entry_schema', ObjectsContainer.base_entry_object)
+entry_list_entry_base_schema = api.schema_model('entry_list_entry_base_schema', ObjectsContainer.entry_list_entry_base_object)
+entry_lists_entries_return_schema = api.schema_model('entry_lists_entries_return_schema',
                                                ObjectsContainer.entry_lists_entries_return_object)
 
 sort_choices = ('id', 'added', 'title', 'original_url', 'list_id')

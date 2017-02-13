@@ -42,8 +42,8 @@ class ObjectsContainer(object):
     plugin_list_reply = {'type': 'array', 'items': plugin_object}
 
 
-plugin_schema = api.schema('plugin_object', ObjectsContainer.plugin_object)
-plugin_list_reply_schema = api.schema('plugin_list_reply', ObjectsContainer.plugin_list_reply)
+plugin_schema = api.schema_model('plugin_object', ObjectsContainer.plugin_object)
+plugin_list_reply_schema = api.schema_model('plugin_list_reply', ObjectsContainer.plugin_list_reply)
 
 plugin_parser = api.parser()
 plugin_parser.add_argument('include_schema', type=inputs.boolean, default=False,

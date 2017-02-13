@@ -152,13 +152,13 @@ class ObjectsContainer(object):
     params_return_schema = {'type': 'array', 'items': {'type': 'object'}}
 
 
-tasks_list_schema = api.schema('tasks.list', ObjectsContainer.tasks_list_object)
-task_input_schema = api.schema('tasks.task', ObjectsContainer.task_input_object)
-task_return_schema = api.schema('tasks.task', ObjectsContainer.task_return_object)
-task_api_queue_schema = api.schema('task.queue', ObjectsContainer.task_queue_schema)
-task_api_execute_schema = api.schema('task.execution', ObjectsContainer.task_execution_results_schema)
-task_execution_schema = api.schema('task_execution_input', ObjectsContainer.task_execution_input)
-task_execution_params = api.schema('tasks.execution_params', ObjectsContainer.params_return_schema)
+tasks_list_schema = api.schema_model('tasks.list', ObjectsContainer.tasks_list_object)
+task_input_schema = api.schema_model('tasks.task', ObjectsContainer.task_input_object)
+task_return_schema = api.schema_model('tasks.task', ObjectsContainer.task_return_object)
+task_api_queue_schema = api.schema_model('task.queue', ObjectsContainer.task_queue_schema)
+task_api_execute_schema = api.schema_model('task.execution', ObjectsContainer.task_execution_results_schema)
+task_execution_schema = api.schema_model('task_execution_input', ObjectsContainer.task_execution_input)
+task_execution_params = api.schema_model('tasks.execution_params', ObjectsContainer.params_return_schema)
 
 task_api_desc = 'Task config schema too large to display, you can view the schema using the schema API'
 

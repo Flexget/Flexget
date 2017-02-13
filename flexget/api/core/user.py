@@ -29,8 +29,8 @@ class ObjectsContainer(object):
     }
 
 
-user_password_input_schema = api.schema('user_password_input', ObjectsContainer.user_password_input)
-user_token_response_schema = api.schema('user_token_response', ObjectsContainer.user_token_response)
+user_password_input_schema = api.schema_model('user_password_input', ObjectsContainer.user_password_input)
+user_token_response_schema = api.schema_model('user_token_response', ObjectsContainer.user_token_response)
 
 
 @user_api.route('/')

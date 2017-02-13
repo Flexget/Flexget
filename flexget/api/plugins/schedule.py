@@ -21,9 +21,9 @@ class ObjectsContainer(object):
     schedules_list = {'type': 'array', 'items': schedule_object}
 
 
-base_schedule_schema = api.schema('schedules.base', schedule_schema)
-api_schedule_schema = api.schema('schedules.schedule', ObjectsContainer.schedule_object)
-api_schedules_list_schema = api.schema('schedules.list', ObjectsContainer.schedules_list)
+base_schedule_schema = api.schema_model('schedules.base', schedule_schema)
+api_schedule_schema = api.schema_model('schedules.schedule', ObjectsContainer.schedule_object)
+api_schedules_list_schema = api.schema_model('schedules.list', ObjectsContainer.schedules_list)
 
 
 def _schedule_by_id(schedule_id, schedules):

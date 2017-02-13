@@ -18,7 +18,7 @@ class ObjectsContainer(object):
     plugin_list = {'type': 'array', 'items': {'type': 'string'}}
 
 
-plugins_schema = api.schema('plugins_list', ObjectsContainer.plugin_list)
+plugins_schema = api.schema_model('plugins_list', ObjectsContainer.plugin_list)
 
 
 @db_api.route('/cleanup/')

@@ -41,7 +41,7 @@ class ObjectsContainer(object):
     return_response = {'type': 'array', 'items': connection}
 
 
-return_schema = api.schema('irc.connections', ObjectsContainer.return_response)
+return_schema = api.schema_model('irc.connections', ObjectsContainer.return_response)
 
 
 @irc_api.route('/connections/')

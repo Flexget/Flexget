@@ -47,8 +47,8 @@ class ObjectsContainer(object):
     rejected_entries_list_object = {'type': 'array', 'items': rejected_entry_object}
 
 
-rejected_entry_schema = api.schema('rejected_failed_entry_schema', ObjectsContainer.rejected_entry_object)
-rejected_entries_list_schema = api.schema('rejected_entries_list_schema', ObjectsContainer.rejected_entries_list_object)
+rejected_entry_schema = api.schema_model('rejected_failed_entry_schema', ObjectsContainer.rejected_entry_object)
+rejected_entries_list_schema = api.schema_model('rejected_entries_list_schema', ObjectsContainer.rejected_entries_list_object)
 
 sort_choices = ('added', 'id', 'title', 'url', 'expires', 'rejected_by', 'reason')
 rejected_parser = api.pagination_parser(sort_choices=sort_choices)
