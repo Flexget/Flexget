@@ -11,9 +11,9 @@ from flexget.utils.requests import Session as RequestSession
 
 requests = RequestSession(max_retries=3)
 
-__name__ = 'slack'
+plugin_name = 'slack'
 
-log = logging.getLogger(__name__)
+log = logging.getLogger(plugin_name)
 
 
 class SlackNotifier(object):
@@ -55,4 +55,4 @@ class SlackNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SlackNotifier, __name__, api_ver=2, interfaces=['notifiers'])
+    plugin.register(SlackNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

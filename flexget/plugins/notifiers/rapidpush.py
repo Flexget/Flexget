@@ -11,8 +11,8 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-__name__ = 'rapidpush'
-log = logging.getLogger(__name__)
+plugin_name = 'rapidpush'
+log = logging.getLogger(plugin_name)
 
 RAPIDPUSH_URL = 'https://rapidpush.net/api'
 
@@ -84,4 +84,4 @@ class RapidpushNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(RapidpushNotifier, __name__, api_ver=2, interfaces=['notifiers'])
+    plugin.register(RapidpushNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

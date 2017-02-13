@@ -12,8 +12,8 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-__name__ = 'pushbullet'
-log = logging.getLogger(__name__)
+plugin_name = 'pushbullet'
+log = logging.getLogger(plugin_name)
 
 PUSHBULLET_URL = 'https://api.pushbullet.com/v2/pushes'
 
@@ -121,4 +121,4 @@ class PushbulletNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PushbulletNotifier, __name__, api_ver=2, interfaces=['notifiers'])
+    plugin.register(PushbulletNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

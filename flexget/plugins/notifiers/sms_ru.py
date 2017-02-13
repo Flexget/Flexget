@@ -10,8 +10,8 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-__name__ = 'sms_ru'
-log = logging.getLogger(__name__)
+plugin_name = 'sms_ru'
+log = logging.getLogger(plugin_name)
 
 SMS_SEND_URL = 'http://sms.ru/sms/send'
 SMS_TOKEN_URL = 'http://sms.ru/auth/get_token'
@@ -71,4 +71,4 @@ class SMSRuNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SMSRuNotifier, __name__, api_ver=2, interfaces=['notifiers'])
+    plugin.register(SMSRuNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])
