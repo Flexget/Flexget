@@ -170,7 +170,7 @@ class SubtitleList(MutableSet):
             path = self._extract_path(entry)
 
             if not path:
-                log.error('Entry %s does not represent a local file/dir.')
+                log.error('Entry %s does not represent a local file/dir.', entry['title'])
                 return
 
             path_exists = os.path.exists(path)
