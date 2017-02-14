@@ -16,7 +16,7 @@ from jsonschema import RefResolutionError
 from werkzeug.http import generate_etag
 
 from flexget import manager
-from flexget.config_schema import process_config
+from flexget.config_schema import process_config, format_checker
 from flexget.utils.database import with_session
 from flexget.webserver import User
 from . import __path__
@@ -172,7 +172,8 @@ api = API(
     title='Flexget API v{}'.format(__version__),
     version=__version__,
     description='View and manage flexget core operations and plugins. Open each endpoint view for usage information.'
-                ' Navigate to http://flexget.com/API for more details.'
+                ' Navigate to http://flexget.com/API for more details.',
+    format_checker=format_checker
 )
 
 base_message = {
