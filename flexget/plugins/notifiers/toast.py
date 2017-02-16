@@ -7,9 +7,9 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning, DependencyError
 
-__name__ = 'toast'
+plugin_name = 'toast'
 
-log = logging.getLogger(__name__)
+log = logging.getLogger(plugin_name)
 
 
 class NotifyToast(object):
@@ -43,7 +43,7 @@ class NotifyToast(object):
             from pync import Notifier
         except ImportError as e:
             log.debug('Error importing pync: %s', e)
-            raise DependencyError(__name__, 'pync', 'pync module required. ImportError: %s' % e)
+            raise DependencyError(plugin_name, 'pync', 'pync module required. ImportError: %s' % e)
 
         icon_path = None
         try:
@@ -64,7 +64,7 @@ class NotifyToast(object):
             from gi.repository import Notify
         except ImportError as e:
             log.debug('Error importing Notify: %s', e)
-            raise DependencyError(__name__, 'gi.repository', 'Notify module required. ImportError: %s' % e)
+            raise DependencyError(plugin_name, 'gi.repository', 'Notify module required. ImportError: %s' % e)
 
         if not Notify.init("Flexget"):
             raise PluginWarning('Unable to init libnotify.')
@@ -86,7 +86,7 @@ class NotifyToast(object):
                                   NIF_TIP, NIM_ADD, NIM_DELETE, NIM_MODIFY, RegisterClass, Shell_NotifyIcon,
                                   UpdateWindow, WNDCLASS)
         except ImportError:
-            raise DependencyError(__name__, 'pypiwin32', 'pywin32 module is required for desktop notifications on '
+            raise DependencyError(plugin_name, 'pypiwin32', 'pywin32 module is required for desktop notifications on '
                                                          'windows. You can install it with `pip install pypiwin32`')
 
         # Register the window class.
@@ -125,4 +125,4 @@ class NotifyToast(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(NotifyToast, __name__, api_ver=2, interfaces=['notifiers'])
+    plugin.register(NotifyToast, plugin_name, api_ver=2, interfaces=['notifiers'])

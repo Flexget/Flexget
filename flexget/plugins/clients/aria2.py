@@ -33,6 +33,7 @@ class OutputAria2(object):
             'username': {'type': 'string', 'default': ''}, # NOTE: To be deprecated by aria2
             'password': {'type': 'string', 'default': ''},
             'path': {'type': 'string'},
+            'filename': {'type': 'string'},
             'options': {
                 'type': 'object',
                 'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
@@ -106,6 +107,12 @@ class OutputAria2(object):
         except RenderError as e:
             entry.fail('failed to render \'path\': %s' % e)
             return
+        if 'filename' in config:
+             try:
+                 options['out'] = os.path.expanduser(entry.render(config['filename']))
+             except RenderError as e:
+                 entry.fail('failed to render \'filename\': %s' % e)
+                 return
         secret = None
         if config['secret']:
             secret = 'token:%s' % config['secret']

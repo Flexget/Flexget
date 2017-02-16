@@ -11,8 +11,8 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-__name__ = 'prowl'
-log = logging.getLogger(__name__)
+plugin_name = 'prowl'
+log = logging.getLogger(plugin_name)
 
 PROWL_URL = 'https://api.prowlapp.com/publicapi/add'
 
@@ -76,4 +76,4 @@ class ProwlNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ProwlNotifier, __name__, api_ver=2, interfaces=['notifiers'])
+    plugin.register(ProwlNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

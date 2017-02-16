@@ -10,8 +10,8 @@ from flexget.config_schema import one_or_more
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-__name__ = 'join'
-log = logging.getLogger(__name__)
+plugin_name = 'join'
+log = logging.getLogger(plugin_name)
 
 requests = RequestSession(max_retries=3)
 requests.add_domain_limiter(TimedLimiter('appspot.com', '5 seconds'))
@@ -89,4 +89,4 @@ class JoinNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(JoinNotifier, __name__, api_ver=2, interfaces=['notifiers'])
+    plugin.register(JoinNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

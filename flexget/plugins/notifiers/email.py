@@ -15,8 +15,8 @@ from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.plugin import PluginWarning
 
-__name__ = 'email'
-log = logging.getLogger(__name__)
+plugin_name = 'email'
+log = logging.getLogger(plugin_name)
 
 
 class EmailNotifier(object):
@@ -148,4 +148,4 @@ class EmailNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EmailNotifier, __name__, api_ver=2, interfaces=['notifiers'])
+    plugin.register(EmailNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

@@ -11,8 +11,8 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-__name__ = 'pushover'
-log = logging.getLogger(__name__)
+plugin_name = 'pushover'
+log = logging.getLogger(plugin_name)
 
 PUSHOVER_URL = 'https://api.pushover.net/1/messages.json'
 
@@ -119,4 +119,4 @@ class PushoverNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PushoverNotifier, __name__, api_ver=2, interfaces=['notifiers'])
+    plugin.register(PushoverNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

@@ -10,8 +10,8 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-__name__ = 'pushalot'
-log = logging.getLogger(__name__)
+plugin_name = 'pushalot'
+log = logging.getLogger(plugin_name)
 
 PUSHALOT_URL = 'https://pushalot.com/api/sendmessage'
 
@@ -72,4 +72,4 @@ class PushalotNotifier(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PushalotNotifier, __name__, api_ver=2, interfaces=['notifiers'])
+    plugin.register(PushalotNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

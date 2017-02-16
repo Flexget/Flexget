@@ -235,7 +235,7 @@ class RTorrent(object):
         'state', 'complete',
         'bytes_done', 'down.rate', 'left_bytes',
         'ratio',
-        'base_path',
+        'base_path', 'load_date'
     )
 
     required_fields = (
@@ -517,11 +517,11 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                           session=task.requests)
 
         for entry in task.accepted:
-            if task.options.test:
-                log.info('Would add %s to rTorrent' % entry['url'])
-                continue
 
             if config['action'] == 'add':
+                if task.options.test:
+                    log.info('Would add %s to rTorrent', entry['url'])
+                    continue
                 try:
                     options = self._build_options(config, entry)
                 except RenderError as e:
@@ -537,9 +537,15 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 continue
 
             if config['action'] == 'delete':
+                if task.options.test:
+                    log.info('Would delete %s (%s) from rTorrent', entry['title'], entry['torrent_info_hash'])
+                    continue
                 self.delete_entry(client, entry)
 
             if config['action'] == 'update':
+                if task.options.test:
+                    log.info('Would update %s (%s) in rTorrent', entry['title'], entry['torrent_info_hash'])
+                    continue
                 self.update_entry(client, entry, config)
 
     def delete_entry(self, client, entry):

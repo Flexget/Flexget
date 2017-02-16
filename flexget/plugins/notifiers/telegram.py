@@ -1,15 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
-from flexget.plugin import PluginWarning
 from future.utils import native_str
 
 from distutils.version import LooseVersion
 
+from sqlalchemy import Column, Integer, String
+
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
-
-from sqlalchemy import Column, Integer, String
+from flexget.plugin import PluginWarning, PluginError
 
 try:
     import telegram
@@ -267,7 +267,7 @@ class TelegramNotifier(object):
         self.log.debug('chat_ids=%s', chat_ids)
 
         if not chat_ids:
-            self.log.warning('no chat id found, try manually sending the bot any message to initialize the chat')
+            raise PluginError('no chat id found, try manually sending the bot any message to initialize the chat')
         else:
             if usernames:
                 self.log.warning('no chat id found for usernames: %s', usernames)

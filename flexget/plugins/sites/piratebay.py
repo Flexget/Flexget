@@ -9,7 +9,6 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.internal.urlrewriting import UrlRewritingError
-from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 from flexget.utils.tools import parse_filesize
@@ -88,10 +87,10 @@ class UrlRewritePirateBay(object):
             entry['url'] = results[0]['url']
         else:
             # parse download page
-            entry['url'] = self.parse_download_page(entry['url'])
+            entry['url'] = self.parse_download_page(entry['url'], task.requests)
 
     @plugin.internet(log)
-    def parse_download_page(self, url):
+    def parse_download_page(self, url, requests):
         page = requests.get(url).content
         try:
             soup = get_soup(page)
@@ -133,7 +132,7 @@ class UrlRewritePirateBay(object):
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
             url = 'http://thepiratebay.%s/search/%s%s' % (CUR_TLD, quote(query.encode('utf-8')), filter_url)
             log.debug('Using %s as piratebay search url' % url)
-            page = requests.get(url).content
+            page = task.requests.get(url).content
             soup = get_soup(page)
             for link in soup.find_all('a', attrs={'class': 'detLink'}):
                 entry = Entry()
