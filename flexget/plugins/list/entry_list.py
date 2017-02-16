@@ -8,6 +8,7 @@ from datetime import datetime
 
 from sqlalchemy import Column, Unicode, select, Integer, DateTime, or_, func
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.sql.schema import ForeignKey
 
@@ -187,9 +188,29 @@ class EntryList(object):
         return list(DBEntrySet(config))
 
 
+class EntryListSearch(object):
+    schema = {'type': 'string'}
+
+    def search(self, task, entry, config=None):
+        entries = []
+        with Session() as session:
+            try:
+                entry_list = get_list_by_exact_name(config, session=session)
+            except NoResultFound:
+                log.warning('Entry list with name \'%s\' does not exist', config)
+            else:
+                for search_string in entry.get('search_strings', [entry['title']]):
+                    log.debug('searching for entry that matches %s in entry_list %s', search_string, config)
+                    query = entry_list.entries.filter(EntryListEntry.title.like('%' + search_string + '%'))
+                    entries = [e.entry for e in query.all()]
+            finally:
+                return entries
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(EntryList, 'entry_list', api_ver=2, interfaces=['task', 'list'])
+    plugin.register(EntryListSearch, 'entry_list_search', api_ver=2, interfaces=['search'])
 
 
 @with_session
