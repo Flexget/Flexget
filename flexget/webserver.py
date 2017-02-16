@@ -123,6 +123,7 @@ def setup_server(config):
         port=config['port'],
         ssl_certificate=config['ssl_certificate'],
         ssl_private_key=config['ssl_private_key'],
+        base_url=config['base_url'],
     )
 
     _default_app.secret_key = get_secret()
@@ -142,25 +143,26 @@ class WebServer(threading.Thread):
     # We use a regular list for periodic jobs, so you must hold this lock while using it
     triggers_lock = threading.Lock()
 
-    def __init__(self, bind='0.0.0.0', port=5050, ssl_certificate=None, ssl_private_key=None):
+    def __init__(self, bind='0.0.0.0', port=5050, ssl_certificate=None, ssl_private_key=None, base_url=''):
         threading.Thread.__init__(self, name='web_server')
         self.bind = str(bind)  # String to remove unicode warning from cherrypy startup
         self.port = port
         self.ssl_certificate = ssl_certificate
         self.ssl_private_key = ssl_private_key
+        self.base_url = base_url
 
     def start(self):
         # If we have already started and stopped a thread, we need to reinitialize it to create a new one
         if not self.is_alive():
             self.__init__(bind=self.bind, port=self.port, ssl_certificate=self.ssl_certificate,
-                          ssl_private_key=self.ssl_private_key)
+                ssl_private_key=self.ssl_private_key, base_url=self.base_url)
         threading.Thread.start(self)
 
     def _start_server(self):
         # Mount the WSGI callable object (app) on the root directory
         cherrypy.tree.graft(_default_app, '/')
         for path, registered_app in _app_register.items():
-            cherrypy.tree.graft(registered_app, path)
+            cherrypy.tree.graft(registered_app, self.base_url + path)
 
         cherrypy.log.error_log.propagate = False
         cherrypy.log.access_log.propagate = False
@@ -187,7 +189,7 @@ class WebServer(threading.Thread):
 
         protocol = 'https' if self.ssl_certificate and self.ssl_private_key else 'http'
 
-        log.info('Web interface available at %s://%s:%s', protocol, host, self.port)
+        log.info('Web interface available at %s://%s:%s%s', protocol, host, self.port, self.base_url)
 
         # Start the CherryPy WSGI web server
         cherrypy.engine.start()
