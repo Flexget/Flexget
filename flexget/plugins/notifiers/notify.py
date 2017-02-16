@@ -60,10 +60,15 @@ class Notify(object):
                 'properties': {
                     'title': {
                         'type': 'string',
-                        'default': '[FlexGet] {{task.name}}:'
-                                   '{%if task.failed %} {{task.failed|length}} failed entries.{% endif %}'
-                                   '{% if task.accepted %} {{task.accepted|length}} new entries downloaded.{% endif %}'},
+                        'default': '{% if not task.failed or not task.accepted %} Task {{task.name}} did not'
+                                   ' produce any entries.'
+                                   '{% else %} [FlexGet] {{task.name}}:'
+                                   '{% if task.failed %} {{task.failed|length}} failed entries.{% endif %}'
+                                   '{% if task.accepted %} {{task.accepted|length}} new entries downloaded.{% endif %}'
+                                   '{% endif %}'
+                    },
                     'template': {'type': 'string', 'default': 'default.template'},
+                    'always_send': {'type': 'boolean', 'default': False},
                     'via': VIA_SCHEMA
                 },
                 'required': ['via'],
@@ -122,7 +127,7 @@ class Notify(object):
                 self.send_notification(config['entries']['title'], message, config['entries']['via'],
                                        template_renderer=entry.render)
         if 'task' in config:
-            if not (task.accepted or task.failed):
+            if not (task.accepted or task.failed) and not config['task']['always_send']:
                 log.verbose('No accepted or failed entries, not sending a notification.')
                 return
             try:
