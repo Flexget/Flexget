@@ -17,6 +17,17 @@ class TestEntryListSearch(object):
                     - {title: 'test title'}
                   from:
                   - entry_list_search: 'Test list'
+              entry_list_with_series:
+                max_reruns: 0
+                series:
+                - foo:
+                    begin: s01e01
+                discover:
+                  release_estimations: ignore
+                  what:
+                    - next_series_episodes: yes
+                  from:
+                    - entry_list_search: series list
 
             """
 
@@ -32,8 +43,25 @@ class TestEntryListSearch(object):
             session.commit()
 
             db_entry = EntryListEntry(entry, entry_list.id)
-
             entry_list.entries.append(db_entry)
 
         task = execute_task('entry_list_discover')
         assert len(task.entries) > 0
+        assert task.find_entry(title='test title')
+
+    def test_entry_list_with_next_series_episodes(self, execute_task):
+        entry = Entry()
+        entry['title'] = 'foo.s01e01.720p.hdtv-flexget'
+        entry['url'] = ''
+
+        with Session() as session:
+            entry_list = EntryListList()
+            entry_list.name = 'series list'
+            session.add(entry_list)
+            session.commit()
+
+            db_entry = EntryListEntry(entry, entry_list.id)
+            entry_list.entries.append(db_entry)
+
+        task = execute_task('entry_list_with_series')
+        assert task.find_entry('accepted', title='foo.s01e01.720p.hdtv-flexget')

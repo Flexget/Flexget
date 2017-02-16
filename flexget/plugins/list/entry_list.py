@@ -201,8 +201,9 @@ class EntryListSearch(object):
             else:
                 for search_string in entry.get('search_strings', [entry['title']]):
                     log.debug('searching for entry that matches %s in entry_list %s', search_string, config)
+                    search_string = search_string.replace(' ', '%').replace('.', '%')
                     query = entry_list.entries.filter(EntryListEntry.title.like('%' + search_string + '%'))
-                    entries = [e.entry for e in query.all()]
+                    entries += [e.entry for e in query.all()]
             finally:
                 return entries
 
