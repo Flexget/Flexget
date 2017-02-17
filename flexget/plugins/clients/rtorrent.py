@@ -1,4 +1,4 @@
-from __future__ import division, absolute_import
+from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.xmlrpc import client as xmlrpc_client
 from future.moves.urllib.parse import urlparse, urljoin
@@ -139,7 +139,7 @@ class SCGITransport(xmlrpc_client.Transport):
     def parse_response(self, response):
         p, u = self.getparser()
 
-        response_body = ''
+        response_body = response.read(1024)
 
         while True:
             data = response.read(1024)
