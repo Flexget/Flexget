@@ -91,7 +91,7 @@ class UrlRewriteNewPCT(object):
                 response = task.requests.post(url_search, data=data)
             except requests.RequestException as e:
                 log.error('Error searching NewPCT: %s' % e)
-                return
+                return results
             content = response.content
             soup = get_soup(content)
             soup2 = soup.find('ul', attrs={'class': 'buscar-list'})
@@ -101,6 +101,7 @@ class UrlRewriteNewPCT(object):
                 entry['url'] = child['href']
                 entry_title = child.find('h2')
                 if entry_title is None:
+                    log.debug('Ignore empty entry')
                     continue
                 entry_title = entry_title.text
                 if not entry_title:
@@ -108,6 +109,7 @@ class UrlRewriteNewPCT(object):
                 try:
                     entry_quality_lan = re.search('.+ \[([^\]]+)\](\[[^\]]+\])+$', entry_title).group(1)
                 except AttributeError:
+                    log.debug('Quality not found')
                     continue
                 entry_title = re.sub(' \[.+]$', '', entry_title)
                 entry['title'] = entry_title + ' ' + entry_quality_lan
