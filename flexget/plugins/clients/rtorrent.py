@@ -79,7 +79,7 @@ class HTTPDigestTransport(xmlrpc_client.Transport):
         if self.__digest_auth:
             return HTTPDigestAuth(self.__username, self.__password)
         return HTTPBasicAuth(self.__username, self.__password)
-    
+
     def send_request(self, url, auth, data):
         return self.__session.post(url, auth=auth, data=data, raise_status=False)
 
@@ -139,7 +139,7 @@ class SCGITransport(xmlrpc_client.Transport):
     def parse_response(self, response):
         p, u = self.getparser()
 
-        response_body = ''
+        response_body = ''.encode('utf-8')
 
         while True:
             data = response.read(1024)
