@@ -20,7 +20,7 @@ log = logging.getLogger('filelist')
 Base = db_schema.versioned_base('filelist', 0)
 
 requests = RequestSession()
-requests.add_domain_limiter(TimedLimiter('filelist.tv', '5 seconds'))
+requests.add_domain_limiter(TimedLimiter('filelist.ro', '5 seconds'))
 
 BASE_URL = 'https://filelist.ro/'
 
