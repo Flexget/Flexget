@@ -110,7 +110,7 @@ class SearchFileList(object):
 
         response = requests.get(url, params=params, cookies=cookies)
 
-        if BASE_URL + 'login.php' in response.url:
+        if BASE_URL + 'takelogin.php' in response.url:
             if self.errors:
                 raise plugin.PluginError('FileList.ro login cookie is invalid. Login page received?')
             self.errors = True
