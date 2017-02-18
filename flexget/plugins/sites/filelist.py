@@ -12,12 +12,15 @@ from flexget.event import event
 from flexget.utils.requests import TimedLimiter, RequestException
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
+from flexget.utils.requests import Session as RequestSession
 from flexget.utils.soup import get_soup
-from flexget.config_schema import one_or_more
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('filelist')
 Base = db_schema.versioned_base('filelist', 0)
+
+requests = RequestSession()
+requests.add_domain_limiter(TimedLimiter('filelist.tv', '5 seconds'))
 
 BASE_URL = 'https://filelist.ro/'
 
@@ -92,10 +95,7 @@ class SearchFileList(object):
         'additionalProperties': False
     }
 
-    def on_task_start(self, task, config):
-        task.requests.add_domain_limiter(TimedLimiter('filelist.ro', '5 seconds'))
-
-    def get(self, url, params, username, password, requests, force=False):
+    def get(self, url, params, username, password, force=False):
         """
         Wrapper to allow refreshing the cookie if it is invalid for some reason
 
@@ -106,7 +106,7 @@ class SearchFileList(object):
         :param bool force: flag used to refresh the cookie forcefully ie. forgo DB lookup
         :return:
         """
-        cookies = self.get_login_cookie(username, password, requests, force=force)
+        cookies = self.get_login_cookie(username, password, force=force)
 
         response = requests.get(url, params=params, cookies=cookies)
 
@@ -115,13 +115,13 @@ class SearchFileList(object):
                 raise plugin.PluginError('FileList.ro login cookie is invalid. Login page received?')
             self.errors = True
             # try again
-            response = self.get(url, params, username, password, requests, force=True)
+            response = self.get(url, params, username, password, force=True)
         else:
             self.errors = False
 
         return response
 
-    def get_login_cookie(self, username, password, requests, force=False):
+    def get_login_cookie(self, username, password, force=False):
         """
         Retrieves login cookie
 
@@ -133,7 +133,6 @@ class SearchFileList(object):
         if not force:
             with Session() as session:
                 saved_cookie = session.query(FileListCookie).filter(FileListCookie.username == username.lower()).first()
-                log.error(saved_cookie)
                 if saved_cookie and saved_cookie.expires and saved_cookie.expires >= datetime.datetime.now():
                     log.debug('Found valid login cookie')
                     return saved_cookie.cookie
@@ -180,7 +179,7 @@ class SearchFileList(object):
             params['search'] = search_string
             log.debug('Using search params: %s', params)
             try:
-                page = self.get(BASE_URL + 'browse.php', params, config['username'], config['password'], task.requests)
+                page = self.get(BASE_URL + 'browse.php', params, config['username'], config['password'])
                 log.debug('requesting: %s', page.url)
             except RequestException as e:
                 log.error('FileList.ro request failed: %s', e)
