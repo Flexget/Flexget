@@ -25,6 +25,7 @@ requests.add_domain_limiter(TimedLimiter('filelist.tv', '5 seconds'))
 BASE_URL = 'https://filelist.ro/'
 
 CATEGORIES = {
+    'all': 0,
     'anime': 24,
     'audio': 11,
     'cartoons': 15,
@@ -85,7 +86,7 @@ class SearchFileList(object):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'passkey': {'type': 'string'},
-            'category': {'type': 'string', 'enum': list(CATEGORIES.keys())},
+            'category': {'type': 'string', 'enum': list(CATEGORIES.keys()), 'default': 'all'},
             'order_by': {'type': 'string', 'enum': list(SORTING.keys()), 'default': 'hybrid'},
             'order_ascending': {'type': 'boolean', 'default': False},
             'search_in': {'type': 'boolean', 'enum': list(SEARCH_IN.keys())},
@@ -163,17 +164,17 @@ class SearchFileList(object):
     @plugin.internet(log)
     def search(self, task, entry, config):
         """
-            Search for entries on MoreThanTV
+            Search for entries on FileList.ro
         """
-        params = {}
-
-        if 'category' in config:
-            params['cat'] = CATEGORIES[config['category']]
-
         entries = set()
 
-        params.update({'incldead': int(config['include_dead']), 'order_by': SORTING[config['order_by']],
-                       'searchin': config.get('search_in', 0), 'asc': int(config['order_ascending'])})
+        params = {
+            'cat': CATEGORIES[config['category']],
+            'incldead': int(config['include_dead']),
+            'order_by': SORTING[config['order_by']],
+            'searchin': config.get('search_in', 0),
+            'asc': int(config['order_ascending'])
+        }
 
         for search_string in entry.get('search_strings', [entry['title']]):
             params['search'] = search_string
