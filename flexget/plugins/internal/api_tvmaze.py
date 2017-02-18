@@ -25,15 +25,11 @@ Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 BASE_URL = 'http://api.tvmaze.com'
 
-TVMAZE_ENDPOINTS = {
-    'tvmaze_id': '/shows/{}',
-    'imdb_id': '/lookup/shows?imdb={}',
-    'tvrage_id': '/lookup/shows?tvrage={}',
-    'thetvdb_id': '/lookup/shows?thetvdb={}',
-    'show_name': '/singlesearch/shows?q={}',
-    'date': '/shows/{}/episodesbydate?date={}',
-    'number': '/shows/{}/episodebynumber?season={}&number={}'
-}
+TVMAZE_SHOW_PATH = "/shows/{}"
+TVMAZE_LOOKUP_PATH = "/lookup/shows"
+TVMAZE_SEARCH_PATH = "/singlesearch/shows"
+TVMAZE_EPISODES_BY_DATE_PATH = "/shows/{}/episodesbydate"
+TVMAZE_EPISODES_BY_NUMBER_PATH = "/shows/{}/episodebynumber"
 
 
 @db_schema.upgrade('tvmaze')
@@ -480,27 +476,28 @@ class APITVMaze(object):
 
 def get_show(show_name=None, tvmaze_id=None, imdb_id=None, tvrage_id=None, thetvdb_id=None):
     if tvmaze_id:
-        return tvmaze_lookup('tvmaze_id', [tvmaze_id])
+        return tvmaze_lookup(TVMAZE_SHOW_PATH.format(tvmaze_id))
     if imdb_id:
-        return tvmaze_lookup('imdb_id', [imdb_id])
+        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'imdb_id': imdb_id})
     if tvrage_id:
-        return tvmaze_lookup('tvrage_id', [tvrage_id])
+        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'tvrage_id': tvrage_id})
     if thetvdb_id:
-        return tvmaze_lookup('thetvdb_id', [thetvdb_id])
+        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'thetvdb_id': thetvdb_id})
     if show_name:
-        return tvmaze_lookup('show_name', [show_name])
+        return tvmaze_lookup(TVMAZE_SEARCH_PATH, params={'q': show_name})
     raise LookupError('Not enough parameters sent for series lookup')
 
 
 def get_episode(series_id, date=None, number=None, season=None):
     if date:
-        return tvmaze_lookup('date', [series_id, date])
+        return tvmaze_lookup(TVMAZE_EPISODES_BY_DATE_PATH.format(series_id), params={'date': date})
     elif number and season:
-        return tvmaze_lookup('number', [series_id, season, number])
+        return tvmaze_lookup(TVMAZE_EPISODES_BY_NUMBER_PATH.format(series_id),
+            params={'season': season, 'number': number})
     raise LookupError('Not enough parameters sent for episode lookup')
 
 
-def tvmaze_lookup(lookup_type, lookup_values):
+def tvmaze_lookup(lookup_url, **kwargs):
     """
     Build the URL and return the reply from TVMaze API
 
@@ -508,10 +505,10 @@ def tvmaze_lookup(lookup_type, lookup_values):
     :param lookup_values: A list of values to be used in the URL
     :return: A JSON reply from the API
     """
-    lookup_url = BASE_URL + TVMAZE_ENDPOINTS[lookup_type].format(*lookup_values)
-    log.debug('querying tvmaze API with the following URL: %s', lookup_url)
+    url = BASE_URL + lookup_url
+    log.debug('querying tvmaze API with the following URL: %s', url)
     try:
-        result = requests.get(lookup_url).json()
+        result = requests.get(url, **kwargs).json()
     except RequestException as e:
         raise LookupError(e.args[0])
     return result
