@@ -19,7 +19,10 @@ log = logging.getLogger('newpct')
 
 requests = Session()
 requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'})
-requests.add_domain_limiter(TimedLimiter('www.newpct1.com', '2 seconds'))
+requests.add_domain_limiter(TimedLimiter('newpct1.com', '2 seconds'))
+
+NEWPCT_TORRENT_FORMAT = 'http://www.newpct.com/torrents/{:0>6}.torrent'
+NEWPCT1_TORRENT_FORMAT = 'http://www.newpct1.com/download/%s.torrent'
 
 
 class UrlRewriteNewPCT(object):
@@ -69,10 +72,10 @@ class UrlRewriteNewPCT(object):
 
         if 'newpct1.com' in url:
             torrent_id = torrent_id_prog.search(torrent_ids[0]['href']).group(1)
-            return 'http://www.newpct1.com/download/%s.torrent' % torrent_id
+            return NEWPCT1_TORRENT_FORMAT % torrent_id
         else:
             torrent_id = torrent_id_prog.search(torrent_ids[0]).group(1)
-            return 'http://www.newpct.com/torrents/{:0>6}.torrent'.format(torrent_id)
+            return NEWPCT_TORRENT_FORMAT.format(torrent_id)
 
     def search(self, task, entry, config=None):
         if not config:
@@ -84,13 +87,13 @@ class UrlRewriteNewPCT(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
             query = re.sub(' \(\d\d\d\d\)$', '', query)
-            log.debug('Searching NewPCT %s' % query)
+            log.debug('Searching NewPCT %s', query)
             query = query.encode('utf8', 'ignore')
             data = {'q': query}
             try:
                 response = task.requests.post(url_search, data=data)
             except requests.RequestException as e:
-                log.error('Error searching NewPCT: %s' % e)
+                log.error('Error searching NewPCT: %s', e)
                 return results
             content = response.content
             soup = get_soup(content)
@@ -114,7 +117,7 @@ class UrlRewriteNewPCT(object):
                 entry_title = re.sub(' \[.+]$', '', entry_title)
                 entry['title'] = entry_title + ' ' + entry_quality_lan
                 results.add(entry)
-        log.debug('Finish search NewPCT with %d entries' % len(results))
+        log.debug('Finish search NewPCT with %d entries', len(results))
         return results
 
 @event('plugin.register')
