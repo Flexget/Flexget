@@ -198,9 +198,9 @@ class SearchAlphaRatio(object):
                     group_info.find('a', href=re.compile('torrents.php\?action=download(?!usetoken)'))['href']
 
                 torrent_info = result.findAll('td')
-                size = torrent_info[4].text
-                log.debug('AlphaRatio size: %s', size)
-                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size)
+                size_col = torrent_info[4].text
+                log.debug('AlphaRatio size: %s', size_col)
+                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size_col)
                 torrent_tags = ', '.join([tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})])
 
                 e = Entry()
@@ -208,7 +208,10 @@ class SearchAlphaRatio(object):
                 e['title'] = title
                 e['url'] = url
                 e['torrent_tags'] = torrent_tags
-                e['content_size'] = parse_filesize(size.group(0))
+                if not size:
+                    log.error('No size found! Please create a Github issue. Size received: %s', size_col)
+                else:
+                    e['content_size'] = parse_filesize(size.group(0))
                 e['torrent_snatches'] = int(torrent_info[5].text)
                 e['torrent_seeds'] = int(torrent_info[6].text)
                 e['torrent_leeches'] = int(torrent_info[7].text)
