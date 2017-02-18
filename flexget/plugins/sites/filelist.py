@@ -143,7 +143,7 @@ class SearchFileList(object):
             response = requests.post(url, data={'username': username, 'password': password, 'login': 'Log in',
                                                 'unlock': '1'}, timeout=30)
         except RequestException as e:
-            raise plugin.PluginError('FileList.ro login failed: %s', e)
+            raise plugin.PluginError('FileList.ro login failed: %s' % e)
 
         if 'https://filelist.ro/my.php' != response.url:
             raise plugin.PluginError('FileList.ro login failed: Your username or password was incorrect.')
