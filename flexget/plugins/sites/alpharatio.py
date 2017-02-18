@@ -141,7 +141,7 @@ class SearchAlphaRatio(object):
             response = requests.post(url, data={'username': username, 'password': password, 'login': 'Log in',
                                                 'keeplogged': '1'}, timeout=30)
         except RequestException as e:
-            raise plugin.PluginError('AlphaRatio login failed: %s', e)
+            raise plugin.PluginError('AlphaRatio login failed: %s' % e)
 
         if 'Your username or password was incorrect.' in response.text:
             raise plugin.PluginError('AlphaRatio login failed: Your username or password was incorrect.')
