@@ -56,7 +56,10 @@ class SearchBTN(object):
             except requests.RequestException as e:
                 log.error('Error searching btn: %s' % e)
                 continue
-            content = r.json()
+            try:
+                content = r.json()
+            except ValueError as e:
+                raise plugin.PluginError('Error searching btn: %s' % str(e))
             if not content or not content['result']:
                 log.debug('No results from btn')
                 if content and content.get('error'):
