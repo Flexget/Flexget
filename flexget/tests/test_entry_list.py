@@ -16,7 +16,7 @@ class TestEntryListSearch(object):
                   - mock:
                     - {title: 'test title'}
                   from:
-                  - entry_list_search: 'Test list'
+                  - entry_list: 'Test list'
               entry_list_with_series:
                 max_reruns: 0
                 series:
@@ -27,7 +27,7 @@ class TestEntryListSearch(object):
                   what:
                     - next_series_episodes: yes
                   from:
-                    - entry_list_search: series list
+                    - entry_list: series list
 
             """
 

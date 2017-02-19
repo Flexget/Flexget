@@ -187,10 +187,6 @@ class EntryList(object):
     def on_task_input(self, task, config):
         return list(DBEntrySet(config))
 
-
-class EntryListSearch(object):
-    schema = {'type': 'string'}
-
     def search(self, task, entry, config=None):
         entries = []
         with Session() as session:
@@ -210,8 +206,7 @@ class EntryListSearch(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EntryList, 'entry_list', api_ver=2, interfaces=['task', 'list'])
-    plugin.register(EntryListSearch, 'entry_list_search', api_ver=2, interfaces=['search'])
+    plugin.register(EntryList, 'entry_list', api_ver=2, interfaces=['task', 'list', 'search'])
 
 
 @with_session
