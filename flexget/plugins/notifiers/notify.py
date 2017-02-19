@@ -67,6 +67,7 @@ class Notify(object):
                                    '{% if task.accepted %} {{task.accepted|length}} new entries downloaded.{% endif %}'
                                    '{% endif %}'
                     },
+                    'message': {'type': 'string'},
                     'template': {'type': 'string', 'default': 'default.template'},
                     'always_send': {'type': 'boolean', 'default': False},
                     'via': VIA_SCHEMA
@@ -130,10 +131,13 @@ class Notify(object):
             if not (task.accepted or task.failed) and not config['task']['always_send']:
                 log.verbose('No accepted or failed entries, not sending a notification.')
                 return
-            try:
-                template = get_template(config['task']['template'], scope='task')
-            except ValueError:
-                raise plugin.PluginError('Cannot locate template on disk: %s' % config['task']['template'])
+            if config['task'].get('message'):
+                template = config['task']['message']
+            else:
+                try:
+                    template = get_template(config['task']['template'], scope='task')
+                except ValueError:
+                    raise plugin.PluginError('Cannot locate template on disk: %s' % config['task']['template'])
             self.send_notification(config['task']['title'], template, config['task']['via'],
                                    template_renderer=task.render)
 
