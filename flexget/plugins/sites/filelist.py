@@ -61,6 +61,7 @@ SORTING = {
 }
 
 SEARCH_IN = {
+    'both': 0,
     'title': 1,
     'description': 2
 }
@@ -89,7 +90,7 @@ class SearchFileList(object):
             'category': {'type': 'string', 'enum': list(CATEGORIES.keys()), 'default': 'all'},
             'order_by': {'type': 'string', 'enum': list(SORTING.keys()), 'default': 'hybrid'},
             'order_ascending': {'type': 'boolean', 'default': False},
-            'search_in': {'type': 'boolean', 'enum': list(SEARCH_IN.keys())},
+            'search_in': {'type': 'string', 'enum': list(SEARCH_IN.keys()), 'default': 'both'},
             'include_dead': {'type': 'boolean', 'default': False}
         },
         'required': ['username', 'password', 'passkey'],
@@ -172,7 +173,7 @@ class SearchFileList(object):
             'cat': CATEGORIES[config['category']],
             'incldead': int(config['include_dead']),
             'order_by': SORTING[config['order_by']],
-            'searchin': config.get('search_in', 0),
+            'searchin': config['search_in'],
             'asc': int(config['order_ascending'])
         }
 
