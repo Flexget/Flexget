@@ -217,8 +217,7 @@ class SearchMoreThanTV(object):
                        'order_way': config['order_way'], 'action': 'basic', 'group_results': 0})
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            mtv_friendly_search_string = search_string.replace("'", "")
-            params['searchstr'] = mtv_friendly_search_string
+            params['searchstr'] = search_string.replace("'", "")
             log.debug('Using search params: %s', params)
             try:
                 page = self.get(self.base_url + 'torrents.php', params, config['username'], config['password'])
