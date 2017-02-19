@@ -60,7 +60,7 @@ class Notify(object):
                 'properties': {
                     'title': {
                         'type': 'string',
-                        'default': '{% if not task.failed or not task.accepted %} Task {{task.name}} did not'
+                        'default': '{% if not task.failed and not task.accepted %} Task {{task.name}} did not'
                                    ' produce any entries.'
                                    '{% else %} [FlexGet] {{task.name}}:'
                                    '{% if task.failed %} {{task.failed|length}} failed entries.{% endif %}'
