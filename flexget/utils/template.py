@@ -65,7 +65,7 @@ def filter_re_search(val, pattern):
     """Perform a search for given regexp pattern, return the matching portion of the text."""
     if not isinstance(val, basestring):
         return val
-    result = re.search(pattern, val)
+    result = re.search(pattern, val, re.IGNORECASE)
     if result:
         return result.group(0)
     return ''
