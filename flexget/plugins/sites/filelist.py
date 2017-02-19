@@ -173,7 +173,7 @@ class SearchFileList(object):
             'cat': CATEGORIES[config['category']],
             'incldead': int(config['include_dead']),
             'order_by': SORTING[config['order_by']],
-            'searchin': config['search_in'],
+            'searchin': SEARCH_IN[config['search_in']],
             'asc': int(config['order_ascending'])
         }
 
