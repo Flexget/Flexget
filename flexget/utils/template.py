@@ -162,9 +162,12 @@ def list_templates(extensions=None):
     return environment.list_templates(extensions=extensions)
 
 
-def list_filters():
+def get_filters():
+    """
+    Returns all built-in and custom Jinja filters in a dict, where the key is the name, and the value is the filter func
+    """
     if environment is None or not hasattr(environment, 'loader'):
-        return
+        return {}
     return environment.filters.items()
 
 
