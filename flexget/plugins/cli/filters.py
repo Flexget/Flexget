@@ -28,5 +28,7 @@ def do_cli(manager, options):
 @event('options.register')
 def register_parser_arguments():
     # Register subcommand
-    parser = options.register_command('filters', do_cli, help='View jinja2 filters and their description', parents=[table_parser])
+    parser = options.register_command('jinja-filters', do_cli,
+                                      help='View registered jinja2 filters and their description',
+                                      parents=[table_parser])
     parser.add_argument('--name', help='Filter results by filter name')
