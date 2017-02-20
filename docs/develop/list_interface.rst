@@ -107,7 +107,7 @@ Below are code examples of overridden method taken from ``trakt_list`` and ``ent
         return self
 
 ``__contains__``
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
