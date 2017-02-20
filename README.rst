@@ -32,19 +32,26 @@ To get a sense of the many things that can be done with FlexGet you can take a l
 
 .. _cookbook: https://flexget.com/Cookbook
 
-.. image:: https://api.travis-ci.org/Flexget/Flexget.png?branch=master :target: https://travis-ci.org/Flexget/Flexget
+.. image:: https://api.travis-ci.org/Flexget/Flexget.png?branch=master
+    :target: https://travis-ci.org/Flexget/Flexget
 
-.. image:: https://img.shields.io/pypi/v/Flexget.svg :target: https://pypi.python.org/pypi/Flexget
+.. image:: https://img.shields.io/pypi/v/Flexget.svg
+    :target: https://pypi.python.org/pypi/Flexget
 
-.. image:: https://img.shields.io/pypi/dm/Flexget.svg :target: https://pypi.python.org/pypi/Flexget
+.. image:: https://img.shields.io/pypi/dm/Flexget.svg
+    :target: https://pypi.python.org/pypi/Flexget
 
-.. image:: https://api.codacy.com/project/badge/Grade/81e8ae42c7544dc48853102b1b7f88d5 :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
+.. image:: https://api.codacy.com/project/badge/Grade/81e8ae42c7544dc48853102b1b7f88d5
+    :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Grade
 
-.. image:: https://api.codacy.com/project/badge/Coverage/81e8ae42c7544dc48853102b1b7f88d5 :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Coverage
+.. image:: https://api.codacy.com/project/badge/Coverage/81e8ae42c7544dc48853102b1b7f88d5
+    :target: https://www.codacy.com/app/Flexget/Flexget?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Flexget/Flexget&amp;utm_campaign=Badge_Coverage
 
-.. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg :target: https://gitter.im/Flexget/Flexget
+.. image:: https://img.shields.io/gitter/room/nwjs/nw.js.svg
+    :target: https://gitter.im/Flexget/Flexget
 
-.. image:: http://isitmaintained.com/badge/resolution/Flexget/Flexget.svg :target: http://isitmaintained.com/project/Flexget/Flexget
+.. image:: http://isitmaintained.com/badge/resolution/Flexget/Flexget.svg
+    :target: http://isitmaintained.com/project/Flexget/Flexget
 
 **ChangeLog:** https://flexget.com/ChangeLog
 
