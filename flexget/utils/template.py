@@ -85,6 +85,7 @@ def filter_parsedate(val):
 
 
 def filter_date_suffix(date):
+    """Returns a date suffix for a given date"""
     day = int(date[-2:])
     if 4 <= day <= 20 or 24 <= day <= 30:
         suffix = "th"
@@ -114,13 +115,14 @@ def filter_pad(val, width, fillchar='0'):
 
 
 def filter_to_date(date_time_val):
+    """Returns the date from any date-time object"""
     if not isinstance(date_time_val, (datetime, date, time)):
         return date_time_val
     return date_time_val.date()
 
 
-# Override the built-in Jinja default filter to change the `boolean` param to True by default
 def filter_default(value, default_value='', boolean=True):
+    """Override the built-in Jinja default filter to change the `boolean` param to True by default"""
     return jinja2.filters.do_default(value, default_value, boolean)
 
 
@@ -158,6 +160,15 @@ def list_templates(extensions=None):
     if environment is None or not hasattr(environment, 'loader'):
         return
     return environment.list_templates(extensions=extensions)
+
+
+def get_filters():
+    """
+    Returns all built-in and custom Jinja filters in a dict, where the key is the name, and the value is the filter func
+    """
+    if environment is None or not hasattr(environment, 'loader'):
+        return {}
+    return environment.filters.items()
 
 
 def get_template(template_name, scope='task'):
