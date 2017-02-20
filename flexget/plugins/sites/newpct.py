@@ -20,9 +20,10 @@ log = logging.getLogger('newpct')
 requests = Session()
 requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'})
 requests.add_domain_limiter(TimedLimiter('newpct1.com', '2 seconds'))
+requests.add_domain_limiter(TimedLimiter('newpct.com', '2 seconds'))
 
 NEWPCT_TORRENT_FORMAT = 'http://www.newpct.com/torrents/{:0>6}.torrent'
-NEWPCT1_TORRENT_FORMAT = 'http://www.newpct1.com/download/%s.torrent'
+NEWPCT1_TORRENT_FORMAT = 'http://www.newpct1.com/download/{:0>6}.torrent'
 
 
 class UrlRewriteNewPCT(object):
@@ -72,7 +73,7 @@ class UrlRewriteNewPCT(object):
 
         if 'newpct1.com' in url:
             torrent_id = torrent_id_prog.search(torrent_ids[0]['href']).group(1)
-            return NEWPCT1_TORRENT_FORMAT % torrent_id
+            return NEWPCT1_TORRENT_FORMAT.format(torrent_id)
         else:
             torrent_id = torrent_id_prog.search(torrent_ids[0]).group(1)
             return NEWPCT_TORRENT_FORMAT.format(torrent_id)
