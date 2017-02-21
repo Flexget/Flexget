@@ -18,7 +18,7 @@ log = logging.getLogger('search_btn')
 class SearchBTN(object):
     schema = {'type': 'string'}
     # Advertised limit is 150/hour (24s/request average). This may need some tweaking.
-    request_limiter = TokenBucketLimiter('api.btnapps.net', 100, '25 seconds')
+    request_limiter = TokenBucketLimiter('api.broadcasthe.net/', 100, '25 seconds')
 
     def search(self, task, entry, config):
         task.requests.add_domain_limiter(self.request_limiter)
@@ -51,7 +51,7 @@ class SearchBTN(object):
         for search in searches:
             data = json.dumps({'method': 'getTorrents', 'params': [api_key, search], 'id': 1})
             try:
-                r = task.requests.post('http://api.btnapps.net/',
+                r = task.requests.post('https://api.broadcasthe.net/',
                                        data=data, headers={'Content-type': 'application/json'})
             except requests.RequestException as e:
                 log.error('Error searching btn: %s' % e)
