@@ -25,6 +25,8 @@ __author__ = 'asm0dey'
 log = logging.getLogger('rutracker_auth')
 Base = versioned_base('rutracker_auth', 0)
 
+BASE_URL = 'https://rutracker.org'
+
 
 class JSONEncodedDict(TypeDecorator):
     """Represents an immutable structure as a json-encoded string.
@@ -65,7 +67,7 @@ class RutrackerAuth(AuthBase):
     def try_authenticate(self, payload):
         for _ in range(5):
             s = RSession()
-            s.post("http://rutracker.org/forum/login.php", data=payload)
+            s.post('{}/forum/login.php'.format(BASE_URL), data=payload)
             if s.cookies and len(s.cookies) > 0:
                 return s.cookies
             else:
@@ -94,16 +96,17 @@ class RutrackerAuth(AuthBase):
 
     def __call__(self, r):
         url = r.url
-        id = re.findall(r'\d+', url)[0]
-        data = 't=' + id
+        t_id = re.findall(r'\d+', url)[0]
+        data = 't={}'.format(t_id)
         headers = {
-            'referer': "http://rutracker.org/forum/viewtopic.php?t=" + id,
-            "Content-Type": "application/x-www-form-urlencoded", "t": id, 'Origin': 'http://rutracker.org',
+            'referer': '{}/forum/viewtopic.php?t={}'.format(BASE_URL, t_id),
+            'Content-Type': 'application/x-www-form-urlencoded', 't': t_id,
+            'Origin': BASE_URL,
             'Accept-Encoding': 'gzip,deflate,sdch'}
         r.prepare_body(data=data, files=None)
         r.prepare_method('POST')
-        r.prepare_url(
-            url='http://rutracker.org/forum/dl.php?t=' + id, params=None)
+        r.prepare_url(url='{}/forum/dl.php?t={}'.format(BASE_URL, t_id),
+            params=None)
         r.prepare_headers(headers)
         r.prepare_cookies(self.cookies_)
         return r
@@ -121,7 +124,7 @@ class RutrackerUrlrewrite(object):
                   'username': {'type': 'string'},
                   'password': {'type': 'string'}
               },
-              "additionalProperties": False}
+              'additionalProperties': False}
 
     auth_cache = {}
 
@@ -137,7 +140,7 @@ class RutrackerUrlrewrite(object):
         else:
             auth_handler = self.auth_cache[username]
         for entry in task.accepted:
-            if entry['url'].startswith('http://rutracker.org/forum/viewtopic.php'):
+            if entry['url'].startswith('{}/forum/viewtopic.php'.format(BASE_URL)):
                 entry['download_auth'] = auth_handler
 
     def try_find_cookie(self, db_session, username):
