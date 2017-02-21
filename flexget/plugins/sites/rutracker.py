@@ -25,7 +25,7 @@ __author__ = 'asm0dey'
 log = logging.getLogger('rutracker_auth')
 Base = versioned_base('rutracker_auth', 0)
 
-domain_url = None
+BASE_URL = 'https://rutracker.org'
 
 
 class JSONEncodedDict(TypeDecorator):
@@ -68,7 +68,7 @@ class RutrackerAuth(AuthBase):
     def try_authenticate(self, payload):
         for _ in range(5):
             s = RSession()
-            s.post('{}/forum/login.php'.format(domain_url), data=payload)
+            s.post('{}/forum/login.php'.format(BASE_URL), data=payload)
             if s.cookies and len(s.cookies) > 0:
                 return s.cookies
             else:
@@ -100,14 +100,14 @@ class RutrackerAuth(AuthBase):
         id = re.findall(r'\d+', url)[0]
         data = 't={}'.format(id)
         headers = {
-            'referer': '{}/forum/viewtopic.php?t={}'.format(domain_url, id),
+            'referer': '{}/forum/viewtopic.php?t={}'.format(BASE_URL, id),
             'Content-Type': 'application/x-www-form-urlencoded', 't': id,
-            'Origin': domain_url,
+            'Origin': BASE_URL,
             'Accept-Encoding': 'gzip,deflate,sdch'}
         r.prepare_body(data=data, files=None)
         r.prepare_method('POST')
         r.prepare_url(
-            url='{}/forum/dl.php?t={}'.format(domain_url, id),
+            url='{}/forum/dl.php?t={}'.format(BASE_URL, id),
             params=None)
         r.prepare_headers(headers)
         r.prepare_cookies(self.cookies_)
@@ -120,19 +120,11 @@ class RutrackerUrlrewrite(object):
     rutracker_auth:
       username: 'username_here'
       password: 'password_here'
-
-      For using https add use_ssl
-
-    rutracker_auth:
-      username: 'username_here'
-      password: 'password_here'
-      use_ssl: yes
     """
     schema = {'type': 'object',
               'properties': {
                   'username': {'type': 'string'},
-                  'password': {'type': 'string'},
-                  'use_ssl': {'type': 'boolean', 'default': False}
+                  'password': {'type': 'string'}
               },
               'additionalProperties': False}
 
@@ -140,9 +132,6 @@ class RutrackerUrlrewrite(object):
 
     @plugin.priority(127)
     def on_task_urlrewrite(self, task, config):
-        global domain_url
-        domain_url = 'http{}://rutracker.org'.format(
-            's' if config['use_ssl'] else '')
         username = config['username']
         db_session = Session()
         cookies = self.try_find_cookie(db_session, username)
@@ -154,7 +143,7 @@ class RutrackerUrlrewrite(object):
             auth_handler = self.auth_cache[username]
         for entry in task.accepted:
             if entry['url'].startswith(
-                    '{}/forum/viewtopic.php'.format(domain_url)):
+                    '{}/forum/viewtopic.php'.format(BASE_URL)):
                 entry['download_auth'] = auth_handler
 
     def try_find_cookie(self, db_session, username):
