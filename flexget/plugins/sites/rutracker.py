@@ -61,8 +61,7 @@ class RutrackerAccount(Base):
 
 class RutrackerAuth(AuthBase):
     """Supports downloading of torrents from 'rutracker' tracker
-       if you pass cookies (CookieJar) to constructor then authentication will
-       be bypassed and cookies will be just set
+       if you pass cookies (CookieJar) to constructor then authentication will be bypassed and cookies will be just set
     """
 
     def try_authenticate(self, payload):
@@ -97,17 +96,16 @@ class RutrackerAuth(AuthBase):
 
     def __call__(self, r):
         url = r.url
-        id = re.findall(r'\d+', url)[0]
-        data = 't={}'.format(id)
+        t_id = re.findall(r'\d+', url)[0]
+        data = 't={}'.format(t_id)
         headers = {
-            'referer': '{}/forum/viewtopic.php?t={}'.format(BASE_URL, id),
-            'Content-Type': 'application/x-www-form-urlencoded', 't': id,
+            'referer': '{}/forum/viewtopic.php?t={}'.format(BASE_URL, t_id),
+            'Content-Type': 'application/x-www-form-urlencoded', 't': t_id,
             'Origin': BASE_URL,
             'Accept-Encoding': 'gzip,deflate,sdch'}
         r.prepare_body(data=data, files=None)
         r.prepare_method('POST')
-        r.prepare_url(
-            url='{}/forum/dl.php?t={}'.format(BASE_URL, id),
+        r.prepare_url(url='{}/forum/dl.php?t={}'.format(BASE_URL, t_id),
             params=None)
         r.prepare_headers(headers)
         r.prepare_cookies(self.cookies_)
@@ -142,8 +140,7 @@ class RutrackerUrlrewrite(object):
         else:
             auth_handler = self.auth_cache[username]
         for entry in task.accepted:
-            if entry['url'].startswith(
-                    '{}/forum/viewtopic.php'.format(BASE_URL)):
+            if entry['url'].startswith('{}/forum/viewtopic.php'.format(BASE_URL)):
                 entry['download_auth'] = auth_handler
 
     def try_find_cookie(self, db_session, username):
