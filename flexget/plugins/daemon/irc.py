@@ -423,7 +423,7 @@ class IRCConnection(IRCBot):
             match = rx.search(msg)
             if match:
                 val_names = [irc_prefix(val.lower()) for val in vals]
-                val_values = [strip_whitespace(x) for x in match.groups()]
+                val_values = [strip_whitespace(x) or '' for x in match.groups()]
                 result.update(dict(zip(val_names, val_values)))
                 log.debug('Found: %s', dict(zip(val_names, val_values)))
                 break
