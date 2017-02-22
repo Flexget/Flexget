@@ -929,9 +929,11 @@ def populate_entry_fields(entry, parser, config):
     entry['proper'] = parser.proper
     entry['proper_count'] = parser.proper_count
     entry['release_group'] = parser.group
+    entry['season_pack'] = parser.season_pack
     if parser.id_type == 'ep':
         entry['series_season'] = parser.season
-        entry['series_episode'] = parser.episode
+        if not parser.season_pack:
+            entry['series_episode'] = parser.episode
     elif parser.id_type == 'date':
         entry['series_date'] = parser.id
         entry['series_season'] = parser.id.year
@@ -1002,7 +1004,8 @@ class FilterSeriesBase(object):
                 'special_ids': one_or_more({'type': 'string'}),
                 'prefer_specials': {'type': 'boolean'},
                 'assume_special': {'type': 'boolean'},
-                'tracking': {'type': ['boolean', 'string'], 'enum': [True, False, 'backfill']}
+                'tracking': {'type': ['boolean', 'string'], 'enum': [True, False, 'backfill']},
+                'season_packs': {'type': 'boolean'}
             },
             'additionalProperties': False
         }
@@ -1295,7 +1298,7 @@ class FilterSeries(FilterSeriesBase):
         for entry in entries:
             # skip processed entries
             if (entry.get('series_parser') and entry['series_parser'].valid and
-                    entry['series_parser'].name.lower() != series_name.lower()):
+                        entry['series_parser'].name.lower() != series_name.lower()):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
@@ -1481,7 +1484,7 @@ class FilterSeries(FilterSeriesBase):
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
             if (entry['quality'] in downloaded_qualities and
-                    entry['series_parser'].proper_count > downloaded_qualities[entry['quality']]):
+                        entry['series_parser'].proper_count > downloaded_qualities[entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
@@ -1544,7 +1547,8 @@ class FilterSeries(FilterSeriesBase):
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
             if (not backfill and (episode.season < latest.season or
-                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
+                                      (episode.identified_by == 'sequence' and episode.number < (
+                                          latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)

@@ -49,12 +49,14 @@ class SeriesParser(TitleParser):
         '(?:episode|e|ep|part|pt)\s?(\d{1,3}|%s)' % roman_numeral_re,
         'part\s(%s)' % '|'.join(map(str, english_numbers)),
     ]])
+    season_pack_regexps = ReList([
+        r's(\d{2,})\s',  # S01
+    ])
     unwanted_regexps = ReList([
         '(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
         'S(\d{1,3})D(\d{1,3})',  # S3D1
         '(\d{1,3})\s?x\s?(all)',  # 1xAll
         r'(?:season(?:s)|s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
-        'seasons\s(\d\s){2,}',
         'disc\s\d'])
     # Make sure none of these are found embedded within a word or other numbers
     date_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
@@ -74,7 +76,7 @@ class SeriesParser(TitleParser):
     def __init__(self, name=None, alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
                  date_regexps=None, sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None,
                  allow_seasonless=True, date_dayfirst=None, date_yearfirst=None, special_ids=None,
-                 prefer_specials=False, assume_special=False):
+                 prefer_specials=False, assume_special=False, season_packs=None):
         """
         Init SeriesParser.
 
@@ -124,6 +126,7 @@ class SeriesParser(TitleParser):
         self.allow_seasonless = allow_seasonless
         self.date_dayfirst = date_dayfirst
         self.date_yearfirst = date_yearfirst
+        self.season_packs = season_packs
 
         self.field = None
         self._reset()
@@ -135,6 +138,10 @@ class SeriesParser(TitleParser):
     @property
     def is_movie(self):
         return False
+
+    @property
+    def is_season_pack(self):
+        return self.season_pack is True
 
     def _reset(self):
         # parse produces these
@@ -149,6 +156,7 @@ class SeriesParser(TitleParser):
         self.special = False
         # TODO: group is only produced with allow_groups
         self.group = None
+        self.season_pack = None
 
         # false if item does not match series
         self.valid = False
@@ -311,31 +319,41 @@ class SeriesParser(TitleParser):
                 log.debug('-> no luck with date_regexps')
 
         if self.identified_by in ['ep', 'auto'] and not self.valid:
-            ep_match = self.parse_episode(data_stripped)
-            if ep_match:
-                # strict_name
+            season_pack_match = self.parse_season_packs(data_stripped)
+            if season_pack_match:
                 if self.strict_name:
-                    if ep_match['match'].start() > 1:
+                    if season_pack_match['match'].start() > 1:
                         return
-
-                if ep_match['end_episode'] and ep_match['end_episode'] > ep_match['episode'] + 2:
-                    # This is a pack of too many episodes, ignore it.
-                    log.debug('Series pack contains too many episodes (%d). Rejecting',
-                              ep_match['end_episode'] - ep_match['episode'])
-                    return
-
-                self.season = ep_match['season']
-                self.episode = ep_match['episode']
-                if ep_match['end_episode']:
-                    self.episodes = (ep_match['end_episode'] - ep_match['episode']) + 1
-                else:
-                    self.episodes = 1
+                self.season = season_pack_match['season']
+                self.season_pack = True
                 self.id_type = 'ep'
                 self.valid = True
-                if not (self.special and self.prefer_specials):
-                    return
             else:
-                log.debug('-> no luck with ep_regexps')
+                ep_match = self.parse_episode(data_stripped)
+                if ep_match:
+                    # strict_name
+                    if self.strict_name:
+                        if ep_match['match'].start() > 1:
+                            return
+
+                    if ep_match['end_episode'] and ep_match['end_episode'] > ep_match['episode'] + 2:
+                        # This is a pack of too many episodes, ignore it.
+                        log.debug('Series pack contains too many episodes (%d). Rejecting',
+                                  ep_match['end_episode'] - ep_match['episode'])
+                        return
+
+                    self.season = ep_match['season']
+                    self.episode = ep_match['episode']
+                    if ep_match['end_episode']:
+                        self.episodes = (ep_match['end_episode'] - ep_match['episode']) + 1
+                    else:
+                        self.episodes = 1
+                    self.id_type = 'ep'
+                    self.valid = True
+                    if not (self.special and self.prefer_specials):
+                        return
+                else:
+                    log.debug('-> no luck with ep_regexps')
 
             if self.identified_by == 'ep':
                 # we should be getting season, ep !
@@ -549,6 +567,24 @@ class SeriesParser(TitleParser):
                         'match': match}
         return False
 
+    def parse_season_packs(self, data):
+        """Parses data for season packs. Return True if the data contains a hit"""
+        for season_pack_re in self.season_pack_regexps:
+            match = re.search(season_pack_re, data)
+            if match:
+                log.debug('season pack regexp %s match %s', season_pack_re.pattern, match.groups())
+                matches = match.groups()
+                if len(matches) == 1:
+                    # Single season full pack, no parts etc
+                    season = int(matches[0])
+                elif len(matches) == 2:
+                    # TODO support other formats of season packs: 1xall, s01-PART1, etc.
+                    pass
+                return {
+                    'season': season,
+                    'match': match
+                }
+
     def roman_to_int(self, roman):
         """Converts roman numerals up to 39 to integers"""
 
@@ -575,6 +611,8 @@ class SeriesParser(TitleParser):
         if not self.valid:
             raise Exception('Series flagged invalid')
         if self.id_type == 'ep':
+            if self.season_pack:
+                return ['S%02d' % self.season]
             return ['S%02dE%02d' % (self.season, self.episode + x) for x in range(self.episodes)]
         elif self.id_type == 'date':
             return [self.id.strftime('%Y-%m-%d')]
@@ -594,8 +632,9 @@ class SeriesParser(TitleParser):
     def pack_identifier(self):
         """Return a combined identifier for the whole pack if this has more than one episode."""
         # Currently only supports ep mode
-        if self.id_type == 'ep' and self.episodes > 1:
-            return 'S%02dE%02d-E%02d' % (self.season, self.episode, self.episode + self.episodes - 1)
+        if self.id_type == 'ep':
+            if self.episodes > 1:
+                return 'S%02dE%02d-E%02d' % (self.season, self.episode, self.episode + self.episodes - 1)
         else:
             return self.identifier
 
@@ -609,9 +648,9 @@ class SeriesParser(TitleParser):
         valid = 'INVALID'
         if self.valid:
             valid = 'OK'
-        return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,episode=%s,quality=%s,proper=%s,status=%s)>' % \
-               (self.data, self.name, str(self.id), self.season, self.episode,
-                self.quality, self.proper_count, valid)
+        return '<SeriesParser(data=%s,name=%s,id=%s,season=%s,season_pack=%s,episode=%s,quality=%s,proper=%s,status=%s)>' % \
+               (self.data, self.name, str(self.id), self.season, self.season_pack, self.episode, self.quality,
+                self.proper_count, valid)
 
     def __cmp__(self, other):
         """Compares quality of parsers, if quality is equal, compares proper_count."""

@@ -2047,3 +2047,24 @@ class TestSeriesRemove(object):
         task = execute_task('get_episode')
         assert len(task.accepted) == 1, 'new release not accepted after forgetting ep'
         assert task.accepted[0] != first_rls, 'same release accepted on second run'
+
+
+class TestSeriesSeasonPack(object):
+    config = """
+      templates:
+        global:
+          parsing:
+            series: {{parser}}
+      tasks:
+        season_pack_sanity:
+          series:
+          - foo:
+              season_packs: yes
+          mock:
+          - title: foo.s01.720p-flexget
+
+    """
+
+    def test_season_pack_simple(self, execute_task):
+        task = execute_task('season_pack_sanity')
+        assert len(task.accepted) == 1
