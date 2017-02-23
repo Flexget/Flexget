@@ -142,8 +142,10 @@ class OutputAria2(object):
             except RenderError as e:
                 entry.fail('failed to render \'URI\': %s' % e)
                 return
-        else:
+        elif entry['url']:
             aria2url = entry['url']
+        else:
+            aria2url = ''
         if config['render_options']:
             for opt_key, opt_value in options.items():
                 if opt_key == 'dir' or opt_key == 'out':
@@ -173,6 +175,9 @@ class OutputAria2(object):
             return aria2.addTorrent(xmlrpc.client.Binary(open(torrent_file, mode='rb').read()), [], options)
         # handle everything else (except metalink -- which is unsupported)
         # so magnets, https, http, ftp .. etc
+        if not aria2url:
+            entry.fail('uri option is not set and URL is not present in entry; unable to determine what to download')
+            return
         if secret:
             return aria2.addUri(secret, [aria2url], options)
         return aria2.addUri([aria2url], options)
