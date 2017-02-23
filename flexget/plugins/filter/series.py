@@ -281,6 +281,8 @@ class Series(Base):
     in_tasks = relation('SeriesTask', backref=backref('series', uselist=False), cascade='all, delete, delete-orphan')
     alternate_names = relation('AlternateNames', backref='series', cascade='all, delete, delete-orphan')
 
+    seasons = relation('Season', backref='series', cascade='all, delete, delete-orphan')
+
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
     def name_getter(self):
         return self._name
@@ -300,6 +302,23 @@ class Series(Base):
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
+
+
+class Season(Base):
+    __tablename__ = 'series_seasons'
+
+    id = Column(Integer, primary_key=True)
+    identifier = Column(String)
+    number = Column(Integer)
+    completed = Column(Boolean, default=False)
+
+    series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
+
+    releases = relation('Release', backref='season', cascade='all, delete, delete-orphan')
+
+    @property
+    def is_completed(self):
+        return self.completed is True
 
 
 class Episode(Base):
@@ -424,7 +443,9 @@ class Release(Base):
     __tablename__ = 'episode_releases'
 
     id = Column(Integer, primary_key=True)
-    episode_id = Column(Integer, ForeignKey('series_episodes.id'), nullable=False, index=True)
+    episode_id = Column(Integer, ForeignKey('series_episodes.id'), nullable=True, index=True)
+    season_id = Column(Integer, ForeignKey('series_seasons.id'), nullable=True, index=True)
+
     _quality = Column('quality', String)
     quality = quality_property('_quality')
     downloaded = Column(Boolean, default=False)
@@ -679,24 +700,46 @@ def store_parser(session, parser, series=None, quality=None):
 
     releases = []
     for ix, identifier in enumerate(parser.identifiers):
-        # if episode does not exist in series, add new
-        episode = session.query(Episode).filter(Episode.series_id == series.id). \
-            filter(Episode.identifier == identifier). \
-            filter(Episode.series_id != None).first()
-        if not episode:
-            log.debug('adding episode %s into series %s', identifier, parser.name)
-            episode = Episode()
-            episode.identifier = identifier
-            episode.identified_by = parser.id_type
-            # if episodic format
-            if parser.id_type == 'ep':
-                episode.season = parser.season
-                episode.number = parser.episode + ix
-            elif parser.id_type == 'sequence':
-                episode.season = 0
-                episode.number = parser.id + ix
-            series.episodes.append(episode)  # pylint:disable=E1103
-            log.debug('-> added %s' % episode)
+        if parser.season_pack:
+            season = session.query(Season). \
+                filter(Season.number == parser.season). \
+                filter(Season.series_id == series.id). \
+                filter(Season.identifier == identifier) \
+                .first()
+            if not season:
+                log.debug('adding season %s into series %s', identifier, parser.season)
+                season = Season()
+                season.identifier = identifier
+                season.number = parser.season
+                series.seasons.append(season)
+            session.flush()
+            filter_id = season.id
+            filter_by = Release.season_id
+            entity = season
+            log.debug('-> added %s', season)
+        else:
+            # if episode does not exist in series, add new
+            episode = session.query(Episode).filter(Episode.series_id == series.id). \
+                filter(Episode.identifier == identifier). \
+                filter(Episode.series_id != None).first()
+            if not episode:
+                log.debug('adding episode %s into series %s', identifier, parser.name)
+                episode = Episode()
+                episode.identifier = identifier
+                episode.identified_by = parser.id_type
+                # if episodic format
+                if parser.id_type == 'ep':
+                    episode.season = parser.season
+                    episode.number = parser.episode + ix
+                elif parser.id_type == 'sequence':
+                    episode.season = 0
+                    episode.number = parser.id + ix
+                series.episodes.append(episode)  # pylint:disable=E1103
+                log.debug('-> added %s', episode)
+            session.flush()
+            filter_id = episode.id
+            filter_by = Release.episode_id
+            entity = episode
 
         # if release does not exists in episode, add new
         #
@@ -705,19 +748,19 @@ def store_parser(session, parser, series=None, quality=None):
         # filter(Release.episode_id != None) fixes weird bug where release had/has been added
         # to database but doesn't have episode_id, this causes all kinds of havoc with the plugin.
         # perhaps a bug in sqlalchemy?
-        release = session.query(Release).filter(Release.episode_id == episode.id). \
+        release = session.query(Release).filter(filter_by == filter_id). \
             filter(Release.title == parser.data). \
             filter(Release.quality == quality). \
             filter(Release.proper_count == parser.proper_count). \
-            filter(Release.episode_id != None).first()
+            filter(filter_by != None).first()
         if not release:
-            log.debug('adding release %s into episode', parser)
+            log.debug('adding release %s ', parser)
             release = Release()
             release.quality = quality
             release.proper_count = parser.proper_count
             release.title = parser.data
-            episode.releases.append(release)  # pylint:disable=E1103
-            log.debug('-> added %s' % release)
+            entity.releases.append(release)  # pylint:disable=E1103
+            log.debug('-> added %s', release)
         releases.append(release)
     session.flush()  # Make sure autonumber ids are populated
     return releases
@@ -1232,7 +1275,8 @@ class FilterSeries(FilterSeriesBase):
                     releases = store_parser(session, entry['series_parser'], series=db_series,
                                             quality=entry.get('quality'))
                     entry['series_releases'] = [r.id for r in releases]
-                    series_entries.setdefault(releases[0].episode, []).append(entry)
+                    entity = releases[0].episode or releases[0].season
+                    series_entries.setdefault(entity, []).append(entry)
 
                 # If we didn't find any episodes for this series, continue
                 if not series_entries:
@@ -1319,7 +1363,7 @@ class FilterSeries(FilterSeriesBase):
         :param config: Series configuration
         """
 
-        for ep, entries in series_entries.items():
+        for entity, entries in series_entries.items():
             if not entries:
                 continue
 
@@ -1329,18 +1373,23 @@ class FilterSeries(FilterSeriesBase):
             entries.sort(key=lambda e: (e['quality'], e['series_parser'].episodes, e['series_parser'].proper_count),
                          reverse=True)
 
-            log.debug('start with episodes: %s', [e['title'] for e in entries])
+            log.debug('start with entities: %s', [e['title'] for e in entries])
 
-            # reject episodes that have been marked as watched in config file
-            if ep.series.begin:
-                if ep < ep.series.begin:
+            # reject season packs unless specified
+            if entity.season_pack and not config.get('season_packs'):
+                log.debug('Skipping season packs as support is turned off')
+                continue
+
+            # reject entity that have been marked as watched in config file
+            if entity.series.begin:
+                if entity < entity.series.begin:
                     for entry in entries:
                         entry.reject('Episode `%s` is before begin value of `%s`' %
-                                     (ep.identifier, ep.series.begin.identifier))
+                                     (entity.identifier, entity.series.begin.identifier))
                     continue
 
             # skip special episodes if special handling has been turned off
-            if not config.get('specials', True) and ep.identified_by == 'special':
+            if not config.get('specials', True) and entity.identified_by == 'special':
                 log.debug('Skipping special episode as support is turned off.')
                 continue
 
@@ -1354,12 +1403,12 @@ class FilterSeries(FilterSeriesBase):
                 reason = 'matches quality'
 
             # Many of the following functions need to know this info. Only look it up once.
-            downloaded = ep.downloaded_releases
+            downloaded = entity.downloaded_releases
             downloaded_qualities = [rls.quality for rls in downloaded]
 
             # proper handling
             log.debug('-' * 20 + ' process_propers -->')
-            entries = self.process_propers(config, ep, entries)
+            entries = self.process_propers(config, entity, entries)
             if not entries:
                 continue
 
@@ -1395,9 +1444,9 @@ class FilterSeries(FilterSeriesBase):
                     entries[0].accept('is an upgrade to existing quality')
                     continue
 
-                # Reject eps because we have them
+                # Reject entity because we have them
                 for entry in entries:
-                    entry.reject('episode has already been downloaded')
+                    entry.reject('entity has already been downloaded')
                 continue
 
             best = entries[0]
@@ -1405,14 +1454,14 @@ class FilterSeries(FilterSeriesBase):
             log.debug('best episode is: %s', best['title'])
 
             # episode tracking. used only with season and sequence based series
-            if ep.identified_by in ['ep', 'sequence']:
+            if entity.identified_by in ['ep', 'sequence']:
                 if task.options.disable_tracking or not config.get('tracking', True):
                     log.debug('episode tracking disabled')
                 else:
                     log.debug('-' * 20 + ' episode tracking -->')
                     # Grace is number of distinct eps in the task for this series + 2
                     backfill = config.get('tracking') == 'backfill'
-                    if self.process_episode_tracking(ep, entries, grace=len(series_entries) + 2, backfill=backfill):
+                    if self.process_episode_tracking(entity, entries, grace=len(series_entries) + 2, backfill=backfill):
                         continue
 
             # quality
@@ -1427,7 +1476,7 @@ class FilterSeries(FilterSeriesBase):
                 # We didn't make a quality target match, check timeframe to see
                 # if we should get something anyway
                 if 'timeframe' in config:
-                    if self.process_timeframe(task, config, ep, entries):
+                    if self.process_timeframe(task, config, entity, entries):
                         continue
                     reason = 'Timeframe expired, choosing best available'
                 else:
@@ -1527,36 +1576,36 @@ class FilterSeries(FilterSeriesBase):
             log.debug('no quality meets requirements')
         return result
 
-    def process_episode_tracking(self, episode, entries, grace, backfill=False):
+    def process_episode_tracking(self, entity, entries, grace, backfill=False):
         """
-        Rejects all episodes that are too old or new, return True when this happens.
+        Rejects all entity that are too old or new, return True when this happens.
 
-        :param episode: Episode model
+        :param entity: Entity model
         :param list entries: List of entries for given episode.
         :param int grace: Number of episodes before or after latest download that are allowed.
         :param bool backfill: If this is True, previous episodes will be allowed,
             but forward advancement will still be restricted.
         """
 
-        latest = get_latest_release(episode.series)
-        if episode.series.begin and (not latest or episode.series.begin > latest):
-            latest = episode.series.begin
-        log.debug('latest download: %s' % latest)
-        log.debug('current: %s' % episode)
+        latest = get_latest_release(entity.series)
+        if entity.series.begin and (not latest or entity.series.begin > latest):
+            latest = entity.series.begin
+        log.debug('latest download: %s', latest)
+        log.debug('current: %s', entity)
 
-        if latest and latest.identified_by == episode.identified_by:
+        if latest and latest.identified_by == entity.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
-            if (not backfill and (episode.season < latest.season or
-                                      (episode.identified_by == 'sequence' and episode.number < (
-                                          latest.number - grace)))):
+            if (not backfill and (entity.season < latest.season or
+                                      (entity.identified_by == 'sequence' and entity.number < (
+                                                  latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
                 return True
 
             # Allow future episodes within grace, or first episode of next season
-            if (episode.season > latest.season + 1 or (episode.season > latest.season and episode.number > 1) or
-                    (episode.season == latest.season and episode.number > (latest.number + grace))):
+            if (entity.season > latest.season + 1 or (entity.season > latest.season and entity.number > 1) or
+                    (entity.season == latest.season and entity.number > (latest.number + grace))):
                 log.debug('too new! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the future from latest downloaded episode %s. '

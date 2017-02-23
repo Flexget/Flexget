@@ -326,6 +326,7 @@ class SeriesParser(TitleParser):
                         return
                 self.season = season_pack_match['season']
                 self.season_pack = True
+                self.id = 'S%s' % season_pack_match['season']
                 self.id_type = 'ep'
                 self.valid = True
             else:
@@ -635,6 +636,8 @@ class SeriesParser(TitleParser):
         if self.id_type == 'ep':
             if self.episodes > 1:
                 return 'S%02dE%02d-E%02d' % (self.season, self.episode, self.episode + self.episodes - 1)
+            else:
+                return self.identifier
         else:
             return self.identifier
 
