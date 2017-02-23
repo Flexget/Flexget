@@ -309,6 +309,9 @@ class Season(Base):
 
     id = Column(Integer, primary_key=True)
     identifier = Column(String)
+
+    identified_by = Column(String)
+
     number = Column(Integer)
     completed = Column(Boolean, default=False)
 
@@ -319,6 +322,14 @@ class Season(Base):
     @property
     def is_completed(self):
         return self.completed is True
+
+    @property
+    def is_season_pack(self):
+        return True
+
+    @property
+    def downloaded_releases(self):
+        return [release for release in self.releases if release.downloaded]
 
 
 class Episode(Base):
@@ -333,6 +344,10 @@ class Episode(Base):
     identified_by = Column(String)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
     releases = relation('Release', backref='episode', cascade='all, delete, delete-orphan')
+
+    @property
+    def is_season_pack(self):
+        return False
 
     @hybrid_property
     def first_seen(self):
@@ -710,6 +725,7 @@ def store_parser(session, parser, series=None, quality=None):
                 log.debug('adding season %s into series %s', identifier, parser.season)
                 season = Season()
                 season.identifier = identifier
+                season.identified_by = parser.id_type
                 season.number = parser.season
                 series.seasons.append(season)
             session.flush()
@@ -1376,7 +1392,7 @@ class FilterSeries(FilterSeriesBase):
             log.debug('start with entities: %s', [e['title'] for e in entries])
 
             # reject season packs unless specified
-            if entity.season_pack and not config.get('season_packs'):
+            if entity.is_season_pack and not config.get('season_packs'):
                 log.debug('Skipping season packs as support is turned off')
                 continue
 

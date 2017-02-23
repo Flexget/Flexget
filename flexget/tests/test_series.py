@@ -2049,6 +2049,7 @@ class TestSeriesRemove(object):
         assert task.accepted[0] != first_rls, 'same release accepted on second run'
 
 
+@pytest.mark.xfail(reason='guessit does not support season packs t this time')
 class TestSeriesSeasonPack(object):
     config = """
       templates:
