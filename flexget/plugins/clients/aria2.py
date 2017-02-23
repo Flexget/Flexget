@@ -60,10 +60,10 @@ class OutputAria2(object):
             return xmlrpc.client.ServerProxy(url).aria2
         except xmlrpc.client.ProtocolError as err:
             raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
-                              % (url, err.errcode, err.errmsg), log)
+                                     % (url, err.errcode, err.errmsg), log)
         except xmlrpc.client.Fault as err:
             raise plugin.PluginError('XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
-                              % (url, err.faultString), log)
+                                     % (url, err.faultString), log)
         except socket_error as e:
             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s' % (url, e), log)
         except:
@@ -87,7 +87,7 @@ class OutputAria2(object):
         aria2 = self.aria2_connection(config['server'], config['port'],
                                       config['username'], config['password'])
         for entry in task.accepted:
-            # check for content_files first, then use url or title if not present
+            # check for content_files first, then use url or title if not
             if 'content_files' not in entry:
                 if entry['url']:
                     entry['content_files'] = [entry['url']]
@@ -121,13 +121,14 @@ class OutputAria2(object):
         """
         # reset every loop or it won't work correctly after the first
         options = config['options']
-        # TODO: consider case where config['path'] is a URI of some type using urlparse
         try:
             options['dir'] = os.path.expanduser(entry.render(config['path']).rstrip('/'))
         except RenderError as e:
             entry.fail('failed to render \'path\': %s' % e)
             return
         if config['keep_structure']:
+            # TODO: consider case where current_file is a URL using urlparse,
+            #       to strip out protocol & hostname
             options['dir'] = os.path.join(options['dir'], os.path.dirname(entry['current_file']))
         if 'filename' in config:
             try:
@@ -146,13 +147,13 @@ class OutputAria2(object):
         if config['render_options']:
             for opt_key, opt_value in options.items():
                 if opt_key == 'dir' or opt_key == 'out':
-                    # these were already rendered, don't re-render in case that would cause problems
+                    # these were already rendered, don't re-render
                     continue
                 try:
                     options[opt_key] = entry.render(opt_value)
                 except RenderError as e:
-                     entry.fail('failed to render \'%s\': %s' % opt_key, e)
-                     return
+                    entry.fail('failed to render \'%s\': %s' % opt_key, e)
+                    return
 
         secret = None
         if config['secret']:
