@@ -97,6 +97,8 @@ class SearchFileList(object):
         'additionalProperties': False
     }
 
+    errors = False
+
     def get(self, url, params, username, password, force=False):
         """
         Wrapper to allow refreshing the cookie if it is invalid for some reason
@@ -112,7 +114,7 @@ class SearchFileList(object):
 
         response = requests.get(url, params=params, cookies=cookies)
 
-        if BASE_URL + 'takelogin.php' in response.url:
+        if 'login.php' in response.url:
             if self.errors:
                 raise plugin.PluginError('FileList.ro login cookie is invalid. Login page received?')
             self.errors = True
