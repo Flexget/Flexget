@@ -204,20 +204,15 @@ class MyEpisodes(object):
 
         Return: myepisode id or None
         """
-        search_value = entry['series_name']
-
         # Get the series name from thetvdb to increase match chance on myepisodes
-        if entry.get('tvdb_series_name'):
-            search_value = entry['tvdb_series_name']
-        else:
-            try:
-                series = plugin.get_plugin_by_name('api_tvdb').instance.lookup_series(
-                    name=entry['series_name'], tvdb_id=entry.get('tvdb_id'))
-                search_value = series.name
-            except LookupError:
-                log.warning('Unable to lookup series `%s` from tvdb, using raw name.', entry['series_name'])
+        if not entry.get('tvdb_series_name'):
+            plugin.get_plugin_by_name('thetvdb_lookup').instance.lazy_series_lookup(entry, 'en')
 
-        return search_value
+        if entry.get('tvdb_series_name'):
+            return entry['tvdb_series_name']
+        else:
+            log.warning('Unable to lookup series `%s` from tvdb, using raw name.', entry['series_name'])
+            return entry['series_name']
 
     def _save_id(self, series_name, myepisodes_id):
         """
