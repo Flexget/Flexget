@@ -3,6 +3,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 import datetime
+import re
 
 from sqlalchemy import Column, Unicode, DateTime
 
@@ -20,7 +21,7 @@ log = logging.getLogger('filelist')
 Base = db_schema.versioned_base('filelist', 0)
 
 requests = RequestSession()
-requests.add_domain_limiter(TimedLimiter('filelist.ro', '5 seconds'))
+requests.add_domain_limiter(TimedLimiter('filelist.ro', '2 seconds'))
 
 BASE_URL = 'https://filelist.ro/'
 
@@ -210,9 +211,16 @@ class SearchFileList(object):
                     if tag.get('alt', '').lower() == 'internal':
                         internal = True
 
-                title = torrent_info[1].find('a').get('title', '')
-                if not title:
+                title = torrent_info[1].find('a').get('title')
+                # this is a dirty fix to get the full title since their developer is a moron
+                if re.match("\<img src=\'.*\'\>", title):
                     title = torrent_info[1].find('b').text
+                    # if the title is shortened, then do a request to get the full one :(
+                    if title.endswith('...'):
+                        url = BASE_URL + torrent_info[1].find('a')['href']
+                        request = self.get(url, {}, config['username'], config['password'])
+                        title_soup = get_soup(request.content)
+                        title = title_soup.find('div', attrs={'class': 'cblock-header'}).text
 
                 e['title'] = title
                 e['url'] = BASE_URL + torrent_info[3].find('a')['href'] + '&passkey=' + config['passkey']
