@@ -218,7 +218,11 @@ class SearchFileList(object):
                     # if the title is shortened, then do a request to get the full one :(
                     if title.endswith('...'):
                         url = BASE_URL + torrent_info[1].find('a')['href']
-                        request = self.get(url, {}, config['username'], config['password'])
+                        try:
+                            request = self.get(url, {}, config['username'], config['password'])
+                        except RequestException as e:
+                            log.error('FileList.ro request failed: %s', e)
+                            continue
                         title_soup = get_soup(request.content)
                         title = title_soup.find('div', attrs={'class': 'cblock-header'}).text
 
