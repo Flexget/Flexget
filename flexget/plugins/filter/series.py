@@ -312,16 +312,21 @@ class Season(Base):
 
     identified_by = Column(String)
 
-    number = Column(Integer)
-    completed = Column(Boolean, default=False)
+    season = Column(Integer)
 
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
 
     releases = relation('Release', backref='season', cascade='all, delete, delete-orphan')
 
-    @property
-    def is_completed(self):
-        return self.completed is True
+    @hybrid_property
+    def completed(self):
+        if not self.releases:
+            return None
+        return any(release.downloaded for release in self.releases)
+
+    @completed.expression
+    def completed(cls):
+        return select(Release).where(Release.season_id == cls.id).where(Release.downloaded == True)
 
     @property
     def is_season_pack(self):
@@ -330,6 +335,26 @@ class Season(Base):
     @property
     def downloaded_releases(self):
         return [release for release in self.releases if release.downloaded]
+
+    def __repr__(self):
+        return str(self).encode('ascii', 'replace')
+
+    def __eq__(self, other):
+        if not isinstance(other, Season):
+            return NotImplemented
+        if self.identified_by != 'ep':
+            return NotImplemented
+        return self.season == other.season
+
+    def __lt__(self, other):
+        if not isinstance(other, (Season, Episode)):
+            raise NotImplemented
+        if not self.identified_by != 'ep':
+            return NotImplemented
+        return self.season < other.season
+
+    def __hash__(self):
+        return self.id
 
 
 class Episode(Base):
@@ -423,16 +448,22 @@ class Episode(Base):
         return self.identifier == other.identifier
 
     def __lt__(self, other):
-        if not isinstance(other, Episode):
-            return NotImplemented
-        if self.identified_by != other.identified_by:
-            return NotImplemented
-        if self.identified_by in ['ep', 'sequence']:
-            return self.season < other.season or (self.season == other.season and self.number < other.number)
-        if self.identified_by == 'date':
-            return self.identifier < other.identifier
-        # Can't compare id type identifiers
-        return NotImplemented
+        if isinstance(other, Episode):
+            if self.identified_by != other.identified_by:
+                return NotImplemented
+            if self.identified_by in ['ep', 'sequence']:
+                return self.season < other.season or (self.season == other.season and self.number < other.number)
+            elif self.identified_by == 'date':
+                return self.identifier < other.identifier
+            else:
+                # Can't compare id type identifiers
+                return NotImplemented
+        elif isinstance(other, Season):
+            if self.identified_by != 'ep':
+                return NotImplemented
+            return self.season < other.season
+        else:
+            raise NotImplemented
 
     def __hash__(self):
         return self.id
@@ -629,7 +660,25 @@ def auto_identified_by(series):
     return 'auto'
 
 
-def get_latest_release(series, downloaded=True, season=None):
+def get_latest_season_release(series, downloaded=True, season=None):
+    session = Session.object_session(series)
+    releases = session.query(Season).join(Season.releases, Season.series).filter(Series.id == series.id)
+
+    if downloaded:
+        releases = releases.filter(Release.downloaded == True)
+
+    if season is not None:
+        releases = releases.filter(Season.season == season)
+
+    latest_season = releases.order_by(desc(Season.season)).first()
+    if not latest_season:
+        log.debug('get_latest_season returning None, no downloaded season packs found for: %s', series.name)
+        return
+
+    return latest_season
+
+
+def get_latest_episode_release(series, downloaded=True, season=None):
     """
     :param Series series: SQLAlchemy session
     :param Downloaded: find only downloaded releases
@@ -657,10 +706,17 @@ def get_latest_release(series, downloaded=True, season=None):
         latest_release = releases.order_by(desc(Episode.first_seen.label('ep_first_seen'))).first()
 
     if not latest_release:
-        log.debug('get_latest_release returning None, no downloaded episodes found for: %s', series.name)
+        log.debug('get_latest_episode returning None, no downloaded episodes found for: %s', series.name)
         return
 
     return latest_release
+
+
+def get_latest_release(series, downloaded=True, season=None):
+    latest_ep = get_latest_episode_release(series, downloaded, season)
+    latest_season = get_latest_season_release(series, downloaded, season)
+
+    return latest_season if latest_season else latest_ep
 
 
 def new_eps_after(since_ep):
@@ -717,7 +773,7 @@ def store_parser(session, parser, series=None, quality=None):
     for ix, identifier in enumerate(parser.identifiers):
         if parser.season_pack:
             season = session.query(Season). \
-                filter(Season.number == parser.season). \
+                filter(Season.season == parser.season). \
                 filter(Season.series_id == series.id). \
                 filter(Season.identifier == identifier) \
                 .first()
@@ -726,7 +782,7 @@ def store_parser(session, parser, series=None, quality=None):
                 season = Season()
                 season.identifier = identifier
                 season.identified_by = parser.id_type
-                season.number = parser.season
+                season.season = parser.season
                 series.seasons.append(season)
             session.flush()
             filter_id = season.id
@@ -1609,24 +1665,29 @@ class FilterSeries(FilterSeriesBase):
         log.debug('latest download: %s', latest)
         log.debug('current: %s', entity)
 
-        if latest and latest.identified_by == entity.identified_by:
-            # Allow any previous episodes this season, or previous episodes within grace if sequence mode
-            if (not backfill and (entity.season < latest.season or
-                                      (entity.identified_by == 'sequence' and entity.number < (
-                                                  latest.number - grace)))):
-                log.debug('too old! rejecting all occurrences')
-                for entry in entries:
-                    entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
+        if latest:
+            if latest.is_season_pack and entity.season == latest.season:
+                log.debug('rejecting entity since a season pack for this season was already downloaded')
                 return True
 
-            # Allow future episodes within grace, or first episode of next season
-            if (entity.season > latest.season + 1 or (entity.season > latest.season and entity.number > 1) or
-                    (entity.season == latest.season and entity.number > (latest.number + grace))):
-                log.debug('too new! rejecting all occurrences')
-                for entry in entries:
-                    entry.reject('Too much in the future from latest downloaded episode %s. '
-                                 'See `--disable-tracking` if this should be downloaded.' % latest.identifier)
-                return True
+            elif latest.identified_by == entity.identified_by:
+                # Allow any previous episodes this season, or previous episodes within grace if sequence mode
+                if (not backfill and (entity.season < latest.season or
+                                          (entity.identified_by == 'sequence' and entity.number < (
+                                                      latest.number - grace)))):
+                    log.debug('too old! rejecting all occurrences')
+                    for entry in entries:
+                        entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
+                    return True
+
+                # Allow future episodes within grace, or first episode of next season
+                if (entity.season > latest.season + 1 or (entity.season > latest.season and entity.number > 1) or
+                        (entity.season == latest.season and entity.number > (latest.number + grace))):
+                    log.debug('too new! rejecting all occurrences')
+                    for entry in entries:
+                        entry.reject('Too much in the future from latest downloaded episode %s. '
+                                     'See `--disable-tracking` if this should be downloaded.' % latest.identifier)
+                    return True
 
     def process_timeframe(self, task, config, episode, entries):
         """

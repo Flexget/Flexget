@@ -2049,23 +2049,40 @@ class TestSeriesRemove(object):
         assert task.accepted[0] != first_rls, 'same release accepted on second run'
 
 
-@pytest.mark.xfail(reason='guessit does not support season packs t this time')
 class TestSeriesSeasonPack(object):
     config = """
       templates:
         global:
           parsing:
             series: {{parser}}
-      tasks:
-        season_pack_sanity:
           series:
           - foo:
               season_packs: yes
+      tasks:
+        season_pack_sanity:
           mock:
           - title: foo.s01.720p-flexget
+        foo_s01ep1:
+          mock:
+          - title: foo.s01e1.720p-flexget
+        foo_s02ep1:
+          mock:
+          - title: foo.s02e1.720p-flexget
+
+
 
     """
 
     def test_season_pack_simple(self, execute_task):
         task = execute_task('season_pack_sanity')
+        assert len(task.accepted) == 1
+
+    def test_basic_tracking(self, execute_task):
+        task = execute_task('season_pack_sanity')
+        assert len(task.accepted) == 1
+
+        task = execute_task('foo_s01ep1')
+        assert len(task.accepted) == 0
+
+        task = execute_task('foo_s02ep1')
         assert len(task.accepted) == 1
