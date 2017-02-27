@@ -343,16 +343,16 @@ class Season(Base):
 
     def __eq__(self, other):
         if not isinstance(other, Season):
-            return NotImplemented
+            raise NotImplemented
         if self.identified_by != 'ep':
-            return NotImplemented
+            raise NotImplemented
         return self.season == other.season
 
     def __lt__(self, other):
         if not isinstance(other, (Season, Episode)):
             raise NotImplemented
         if not self.identified_by != 'ep':
-            return NotImplemented
+            raise NotImplemented
         return self.season < other.season
 
     def __hash__(self):
