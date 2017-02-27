@@ -342,17 +342,17 @@ class Season(Base):
         return str(self).encode('ascii', 'replace')
 
     def __eq__(self, other):
-        if not isinstance(other, Season):
-            raise NotImplemented
+        if not isinstance(other, (Season, Episode)):
+            raise NotImplementedError
         if self.identified_by != 'ep':
-            raise NotImplemented
+            raise NotImplementedError
         return self.season == other.season
 
     def __lt__(self, other):
         if not isinstance(other, (Season, Episode)):
-            raise NotImplemented
+            raise NotImplementedError
         if not self.identified_by != 'ep':
-            raise NotImplemented
+            raise NotImplementedError
         return self.season < other.season
 
     def __hash__(self):
@@ -443,29 +443,29 @@ class Episode(Base):
         return str(self).encode('ascii', 'replace')
 
     def __eq__(self, other):
-        if not isinstance(other, Episode):
-            return NotImplemented
+        if not isinstance(other, (Episode, Season)):
+            raise NotImplementedError
         if self.identified_by != other.identified_by:
-            return NotImplemented
+            raise NotImplementedError
         return self.identifier == other.identifier
 
     def __lt__(self, other):
         if isinstance(other, Episode):
             if self.identified_by != other.identified_by:
-                return NotImplemented
+                raise NotImplementedError
             if self.identified_by in ['ep', 'sequence']:
                 return self.season < other.season or (self.season == other.season and self.number < other.number)
             elif self.identified_by == 'date':
                 return self.identifier < other.identifier
             else:
                 # Can't compare id type identifiers
-                return NotImplemented
+                raise NotImplementedError
         elif isinstance(other, Season):
             if self.identified_by != 'ep':
-                return NotImplemented
+                raise NotImplementedError
             return self.season < other.season
         else:
-            raise NotImplemented
+            raise NotImplementedError
 
     def __hash__(self):
         return self.id
@@ -1542,7 +1542,7 @@ class FilterSeries(FilterSeriesBase):
                 if task.options.disable_tracking or not config.get('tracking', True):
                     log.debug('episode tracking disabled')
                 else:
-                    log.debug('-' * 20 + ' episode tracking -->')
+                    log.debug('-' * 20 + ' tracking -->')
                     # Grace is number of distinct eps in the task for this series + 2
                     backfill = config.get('tracking') == 'backfill'
                     if self.process_episode_tracking(entity, entries, grace=len(series_entries) + 2, backfill=backfill):

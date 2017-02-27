@@ -2050,11 +2050,11 @@ class TestSeriesRemove(object):
 
 
 class TestSeriesSeasonPack(object):
-    config = """
+    _config = """
       templates:
         global:
           parsing:
-            series: {{parser}}
+            series: internal
           series:
           - foo:
               season_packs: yes
@@ -2077,6 +2077,11 @@ class TestSeriesSeasonPack(object):
           - title: foo.s01e5.720p-flexget
           - title: foo.s01.720p-flexget
     """
+
+    @pytest.fixture()
+    def config(self):
+        """Overrides outer config fixture since season pack support does not work with guessit parser"""
+        return self._config
 
     def test_season_pack_simple(self, execute_task):
         task = execute_task('season_pack_sanity')
