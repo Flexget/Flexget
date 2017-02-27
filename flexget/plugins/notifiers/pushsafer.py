@@ -29,10 +29,10 @@ class PushsaferNotifier(object):
         body: <string> (default: '{{series_name}} {{series_id}}' )
         url: <string> (default: '{{imdb_url}}')
         url_title: <string> (default: (none))
-		device: <string> ypur device or device group id (default: (none))
+	device: <string> ypur device or device group id (default: (none))
         icon: <integer> (default is 1)
-		sound: <integer> (default is (none))
-		vibration: <integer> (default is 0)
+	sound: <integer> (default is (none))
+	vibration: <integer> (default is 0)
         timetolive: <integer> (default: (none))
 
     """
@@ -41,10 +41,10 @@ class PushsaferNotifier(object):
                   'private_key': one_or_more({'type': 'string'}),
                   'url': {'type': 'string'},
                   'url_title': {'type': 'string'},
-				  'device': {'type': 'string'},
+		  'device': {'type': 'string'},
                   'icon': {'type': 'integer', 'default': 1, 'maximum': 98, 'minimum': 1},
-				  'sound': {'type': 'integer', 'maximum': 28, 'minimum': 0},
-				  'vibration': {'type': 'integer', 'default': 0},
+		  'sound': {'type': 'integer', 'maximum': 28, 'minimum': 0},
+		  'vibration': {'type': 'integer', 'default': 0},
                   'timetolive': {'type': 'integer', 'maximum': 43200, 'minimum': 0},
               },
               'required': ['private_key'],
