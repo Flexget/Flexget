@@ -2076,6 +2076,14 @@ class TestSeriesSeasonPack(object):
           - title: foo.s01e4.720p-flexget
           - title: foo.s01e5.720p-flexget
           - title: foo.s01.720p-flexget
+        respect_begin:
+          series:
+          - bar:
+              begin: s02e01
+              season_packs: yes
+          mock:
+          - title: bar.s01.720p-flexget
+          - title: bar.s02.720p-flexget
     """
 
     @pytest.fixture()
@@ -2101,4 +2109,10 @@ class TestSeriesSeasonPack(object):
         task = execute_task('season_pack_priority')
         assert len(task.accepted) == 1
         entry = task.find_entry(title='foo.s01.720p-flexget')
+        assert entry.accepted
+
+    def test_respect_begin(self, execute_task):
+        task = execute_task('respect_begin')
+        assert len(task.accepted) == 1
+        entry = task.find_entry(title='bar.s02.720p-flexget')
         assert entry.accepted

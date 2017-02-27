@@ -335,8 +335,7 @@ class Season(Base):
         return [release for release in self.releases if release.downloaded]
 
     def __str__(self):
-        return '<Season(id=%s,identifier=%s,season=%s)>' % \
-               (self.id, self.identifier, self.season)
+        return '<Season(id=%s,identifier=%s,season=%s)>' % (self.id, self.identifier, self.season)
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -351,7 +350,7 @@ class Season(Base):
     def __lt__(self, other):
         if not isinstance(other, (Season, Episode)):
             raise NotImplementedError
-        if not self.identified_by != 'ep':
+        if self.identified_by != 'ep':
             raise NotImplementedError
         return self.season < other.season
 
@@ -1440,8 +1439,7 @@ class FilterSeries(FilterSeriesBase):
         accepted_seasons = []
 
         # sort for season packs first
-        for entity, entries in sorted(series_entries.items(), key=lambda e: (e[0].is_season_pack, e[0].season),
-                                      reverse=True):
+        for entity, entries in sorted(series_entries.items(), key=lambda e: e[0].is_season_pack, reverse=True):
             if not entries:
                 continue
 
