@@ -2068,9 +2068,14 @@ class TestSeriesSeasonPack(object):
         foo_s02ep1:
           mock:
           - title: foo.s02e1.720p-flexget
-
-
-
+        season_pack_priority:
+          mock:
+          - title: foo.s01e1.720p-flexget
+          - title: foo.s01e2.720p-flexget
+          - title: foo.s01e3.720p-flexget
+          - title: foo.s01e4.720p-flexget
+          - title: foo.s01e5.720p-flexget
+          - title: foo.s01.720p-flexget
     """
 
     def test_season_pack_simple(self, execute_task):
@@ -2086,3 +2091,9 @@ class TestSeriesSeasonPack(object):
 
         task = execute_task('foo_s02ep1')
         assert len(task.accepted) == 1
+
+    def test_season_pack_takes_priority(self, execute_task):
+        task = execute_task('season_pack_priority')
+        assert len(task.accepted) == 1
+        entry = task.find_entry(title='foo.s01.720p-flexget')
+        assert entry.accepted

@@ -311,9 +311,7 @@ class Season(Base):
     identifier = Column(String)
 
     identified_by = Column(String)
-
     season = Column(Integer)
-
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
 
     releases = relation('Release', backref='season', cascade='all, delete, delete-orphan')
@@ -335,6 +333,10 @@ class Season(Base):
     @property
     def downloaded_releases(self):
         return [release for release in self.releases if release.downloaded]
+
+    def __str__(self):
+        return '<Season(id=%s,identifier=%s,season=%s)>' % \
+               (self.id, self.identifier, self.season)
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
@@ -539,24 +541,6 @@ class SeriesTask(Base):
         self.name = name
 
 
-def get_latest_status(episode):
-    """
-    :param episode: Instance of Episode
-    :return: Status string for given episode
-    """
-    status = ''
-    for release in sorted(episode.releases, key=lambda r: r.quality):
-        if not release.downloaded:
-            continue
-        status += release.quality.name
-        if release.proper_count > 0:
-            status += '-proper'
-            if release.proper_count > 1:
-                status += str(release.proper_count)
-        status += ', '
-    return status.rstrip(', ') if status else None
-
-
 @with_session
 def get_series_summary(configured=None, premieres=None, status=None, days=None, start=None, stop=None, count=False,
                        sort_by='show_name', descending=None, session=None):
@@ -605,22 +589,6 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
     return query.slice(start, stop).from_self()
 
 
-def get_latest_episode(series):
-    """Return latest known identifier in dict (season, episode, name) for series name"""
-    session = Session.object_session(series)
-    episode = session.query(Episode).join(Episode.series). \
-        filter(Series.id == series.id). \
-        filter(Episode.season != None). \
-        order_by(desc(Episode.season)). \
-        order_by(desc(Episode.number)).first()
-    if not episode:
-        # log.trace('get_latest_info: no info available for %s', name)
-        return False
-    # log.trace('get_latest_info, series: %s season: %s episode: %s' % \
-    #    (name, episode.season, episode.number))
-    return episode
-
-
 def auto_identified_by(series):
     """
     Determine if series `name` should be considered identified by episode or id format
@@ -660,7 +628,15 @@ def auto_identified_by(series):
     return 'auto'
 
 
-def get_latest_season_release(series, downloaded=True, season=None):
+def get_latest_season_pack_release(series, downloaded=True, season=None):
+    """
+    Return the latest season pack release for a series
+
+    :param Series series: Series object
+    :param bool downloaded: Flag to return only downloaded season packs
+    :param season: Filter by season number
+    :return: Latest release of a season object
+    """
     session = Session.object_session(series)
     releases = session.query(Season).join(Season.releases, Season.series).filter(Series.id == series.id)
 
@@ -670,12 +646,13 @@ def get_latest_season_release(series, downloaded=True, season=None):
     if season is not None:
         releases = releases.filter(Season.season == season)
 
-    latest_season = releases.order_by(desc(Season.season)).first()
-    if not latest_season:
-        log.debug('get_latest_season returning None, no downloaded season packs found for: %s', series.name)
+    latest_season_pack_release = releases.order_by(desc(Season.season)).first()
+    if not latest_season_pack_release:
+        log.debug('get_latest_season_pack_release returning None, no downloaded season packs found for: %s',
+                  series.name)
         return
 
-    return latest_season
+    return latest_season_pack_release
 
 
 def get_latest_episode_release(series, downloaded=True, season=None):
@@ -698,23 +675,31 @@ def get_latest_episode_release(series, downloaded=True, season=None):
         releases = releases.filter(Episode.identified_by == series.identified_by)
 
     if series.identified_by in ['ep', 'sequence']:
-        latest_release = releases.order_by(desc(Episode.season), desc(Episode.number)).first()
+        latest_episode_release = releases.order_by(desc(Episode.season), desc(Episode.number)).first()
     elif series.identified_by == 'date':
-        latest_release = releases.order_by(desc(Episode.identifier)).first()
+        latest_episode_release = releases.order_by(desc(Episode.identifier)).first()
     else:
         # We have to label the order_by clause to disambiguate from Release.first_seen #3055
-        latest_release = releases.order_by(desc(Episode.first_seen.label('ep_first_seen'))).first()
+        latest_episode_release = releases.order_by(desc(Episode.first_seen.label('ep_first_seen'))).first()
 
-    if not latest_release:
+    if not latest_episode_release:
         log.debug('get_latest_episode returning None, no downloaded episodes found for: %s', series.name)
         return
 
-    return latest_release
+    return latest_episode_release
 
 
 def get_latest_release(series, downloaded=True, season=None):
+    """
+    Return the latest downloaded entity of a series, either season pack or episode
+
+    :param Series series: Series object
+    :param bool downloaded: Downloaded flag
+    :param int season: Filter by season
+    :return:
+    """
     latest_ep = get_latest_episode_release(series, downloaded, season)
-    latest_season = get_latest_season_release(series, downloaded, season)
+    latest_season = get_latest_season_pack_release(series, downloaded, season)
 
     return latest_season if latest_season else latest_ep
 
@@ -772,6 +757,7 @@ def store_parser(session, parser, series=None, quality=None):
     releases = []
     for ix, identifier in enumerate(parser.identifiers):
         if parser.season_pack:
+            # Checks if season object exist
             season = session.query(Season). \
                 filter(Season.season == parser.season). \
                 filter(Season.series_id == series.id). \
@@ -784,11 +770,15 @@ def store_parser(session, parser, series=None, quality=None):
                 season.identified_by = parser.id_type
                 season.season = parser.season
                 series.seasons.append(season)
+                log.debug('-> added season %s', season)
             session.flush()
+
+            # TODO make an association table?
+            # Sets the filter_by, and filter_id for later releases query
             filter_id = season.id
             filter_by = Release.season_id
             entity = season
-            log.debug('-> added %s', season)
+
         else:
             # if episode does not exist in series, add new
             episode = session.query(Episode).filter(Episode.series_id == series.id). \
@@ -809,11 +799,14 @@ def store_parser(session, parser, series=None, quality=None):
                 series.episodes.append(episode)  # pylint:disable=E1103
                 log.debug('-> added %s', episode)
             session.flush()
+
+            # TODO make an association table?
+            # Sets the filter_by, and filter_id for later releases query
             filter_id = episode.id
             filter_by = Release.episode_id
             entity = episode
 
-        # if release does not exists in episode, add new
+        # if release does not exists in episode or season, add new
         #
         # NOTE:
         #
@@ -1011,6 +1004,16 @@ def get_releases(episode, downloaded=None, start=None, stop=None, count=False, d
     else:
         releases = releases.order_by(getattr(Release, sort_by))
     return releases.all()
+
+
+def get_season_status(entity):
+    if isinstance(entity, Season):
+        return entity.completed
+    else:
+        session = Session.object_session(entity)
+        season = session.query(Season).filter(Season.season == entity.season).first()
+        if season:
+            return season.completed
 
 
 def episode_in_show(series_id, episode_id):
@@ -1428,20 +1431,23 @@ class FilterSeries(FilterSeriesBase):
 
     def process_series(self, task, series_entries, config):
         """
-        Accept or Reject episode from available releases, or postpone choosing.
+        Accept or Reject episode or season pack from available releases, or postpone choosing.
 
         :param task: Current Task
-        :param series_entries: dict mapping Episodes to entries for that episode
+        :param series_entries: dict mapping Episodes or Seasons to entries for that episode or season_pack
         :param config: Series configuration
         """
+        accepted_seasons = []
 
-        for entity, entries in series_entries.items():
+        # sort for season packs first
+        for entity, entries in sorted(series_entries.items(), key=lambda e: (e[0].is_season_pack, e[0].season),
+                                      reverse=True):
             if not entries:
                 continue
 
             reason = None
 
-            # sort episodes in order of quality
+            # sort entities in order of quality
             entries.sort(key=lambda e: (e['quality'], e['series_parser'].episodes, e['series_parser'].proper_count),
                          reverse=True)
 
@@ -1465,7 +1471,13 @@ class FilterSeries(FilterSeriesBase):
                 log.debug('Skipping special episode as support is turned off.')
                 continue
 
-            log.debug('current episodes: %s', [e['title'] for e in entries])
+            # check that a season pack for this season has not been downloaded
+            match = get_season_status(entity)
+            if match or entity.season in accepted_seasons:
+                log.debug('a season pack was already downloaded for season %s, skipping', entity.season)
+                continue
+
+            log.debug('current entities: %s', [e['title'] for e in entries])
 
             # quality filtering
             if 'quality' in config:
@@ -1522,8 +1534,8 @@ class FilterSeries(FilterSeriesBase):
                 continue
 
             best = entries[0]
-            log.debug('continuing w. episodes: %s', [e['title'] for e in entries])
-            log.debug('best episode is: %s', best['title'])
+            log.debug('continuing w. entities: %s', [e['title'] for e in entries])
+            log.debug('best entity is: %s', best['title'])
 
             # episode tracking. used only with season and sequence based series
             if entity.identified_by in ['ep', 'sequence']:
@@ -1558,6 +1570,11 @@ class FilterSeries(FilterSeriesBase):
             # Just pick the best ep if we get here
             reason = reason or 'choosing best available quality'
             best.accept(reason)
+
+            # need to reject all other episode/season packs for an accepted season during the task,
+            # can't wait for task learn
+            if entity.is_season_pack:
+                accepted_seasons.append(entity.season)
 
     def process_propers(self, config, episode, entries):
         """
