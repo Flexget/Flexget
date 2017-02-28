@@ -2059,6 +2059,10 @@ class TestSeriesSeasonPack(object):
           - foo:
               season_packs: yes
       tasks:
+        multiple_formats:
+          mock:
+          - title: foo.s01.720p-flexget
+          - title: foo.2xALL.720p-flexget
         foo_s01:
           mock:
           - title: foo.s01.720p-flexget
@@ -2097,6 +2101,7 @@ class TestSeriesSeasonPack(object):
           - title: foo.s03.1080p-flexget
           - title: foo.s06.720p-flexget
           - title: foo.s09.720p-flexget
+
     """
 
     @pytest.fixture()
@@ -2150,3 +2155,7 @@ class TestSeriesSeasonPack(object):
     def test_several_seasons(self, execute_task):
         task = execute_task('several_seasons')
         assert len(task.accepted) == 4
+
+    def test_multiple_formats(self, execute_task):
+        task = execute_task('multiple_formats')
+        assert len(task.accepted) == 2

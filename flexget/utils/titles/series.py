@@ -51,11 +51,11 @@ class SeriesParser(TitleParser):
     ]])
     season_pack_regexps = ReList([
         r's(\d{2,})\s',  # S01
+        '(\d{1,3})\s?x\s?all',  # 1xAll
     ])
     unwanted_regexps = ReList([
         '(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
         'S(\d{1,3})D(\d{1,3})',  # S3D1
-        '(\d{1,3})\s?x\s?(all)',  # 1xAll
         r'(?:season(?:s)|s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
         'disc\s\d'])
     # Make sure none of these are found embedded within a word or other numbers
