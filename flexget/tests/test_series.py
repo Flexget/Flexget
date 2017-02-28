@@ -2152,6 +2152,13 @@ class TestSeriesSeasonPack(object):
         task = execute_task('foo_s01')
         assert not task.accepted
 
+    def test_tracking_rules_new_season(self, execute_task):
+        task = execute_task('foo_s01')
+        assert len(task.accepted) == 1
+
+        task = execute_task('foo_s03')
+        assert not task.accepted
+
     def test_several_seasons(self, execute_task):
         task = execute_task('several_seasons')
         assert len(task.accepted) == 4
