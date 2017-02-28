@@ -327,7 +327,7 @@ class Season(Base):
         return select(Release).where(Release.season_id == cls.id).where(Release.downloaded == True)
 
     @property
-    def is_season_pack(self):
+    def is_season(self):
         return True
 
     @property
@@ -372,7 +372,7 @@ class Episode(Base):
     releases = relation('Release', backref='episode', cascade='all, delete, delete-orphan')
 
     @property
-    def is_season_pack(self):
+    def is_season(self):
         return False
 
     @hybrid_property
@@ -1005,16 +1005,6 @@ def get_releases(episode, downloaded=None, start=None, stop=None, count=False, d
     return releases.all()
 
 
-def get_season_status(entity):
-    if isinstance(entity, Season):
-        return entity.completed
-    else:
-        session = Session.object_session(entity)
-        season = session.query(Season).filter(Season.season == entity.season).first()
-        if season:
-            return season.completed
-
-
 def episode_in_show(series_id, episode_id):
     """ Return True if `episode_id` is part of show with `series_id`, else return False """
     with Session() as session:
@@ -1439,7 +1429,7 @@ class FilterSeries(FilterSeriesBase):
         accepted_seasons = []
 
         # sort for season packs first
-        for entity, entries in sorted(series_entries.items(), key=lambda e: e[0].is_season_pack, reverse=True):
+        for entity, entries in sorted(series_entries.items(), key=lambda e: e[0].is_season, reverse=True):
             if not entries:
                 continue
 
@@ -1452,8 +1442,13 @@ class FilterSeries(FilterSeriesBase):
             log.debug('start with entities: %s', [e['title'] for e in entries])
 
             # reject season packs unless specified
-            if entity.is_season_pack and not config.get('season_packs'):
+            if entity.is_season and not config.get('season_packs'):
                 log.debug('Skipping season packs as support is turned off')
+                continue
+
+            # check that a season ack for this season wasn't already accepted in this task run
+            if entity.season in accepted_seasons:
+                log.debug('already accepted season pack for season %s in this task', entity.season)
                 continue
 
             # reject entity that have been marked as watched in config file
@@ -1467,12 +1462,6 @@ class FilterSeries(FilterSeriesBase):
             # skip special episodes if special handling has been turned off
             if not config.get('specials', True) and entity.identified_by == 'special':
                 log.debug('Skipping special episode as support is turned off.')
-                continue
-
-            # check that a season pack for this season has not been downloaded
-            match = get_season_status(entity)
-            if match or entity.season in accepted_seasons:
-                log.debug('a season pack was already downloaded for season %s, skipping', entity.season)
                 continue
 
             log.debug('current entities: %s', [e['title'] for e in entries])
@@ -1543,7 +1532,7 @@ class FilterSeries(FilterSeriesBase):
                     log.debug('-' * 20 + ' tracking -->')
                     # Grace is number of distinct eps in the task for this series + 2
                     backfill = config.get('tracking') == 'backfill'
-                    if self.process_episode_tracking(entity, entries, grace=len(series_entries) + 2, backfill=backfill):
+                    if self.process_entity_tracking(entity, entries, grace=len(series_entries) + 2, backfill=backfill):
                         continue
 
             # quality
@@ -1571,7 +1560,7 @@ class FilterSeries(FilterSeriesBase):
 
             # need to reject all other episode/season packs for an accepted season during the task,
             # can't wait for task learn
-            if entity.is_season_pack:
+            if entity.is_season:
                 accepted_seasons.append(entity.season)
 
     def process_propers(self, config, episode, entries):
@@ -1663,7 +1652,7 @@ class FilterSeries(FilterSeriesBase):
             log.debug('no quality meets requirements')
         return result
 
-    def process_episode_tracking(self, entity, entries, grace, backfill=False):
+    def process_entity_tracking(self, entity, entries, grace, backfill=False):
         """
         Rejects all entity that are too old or new, return True when this happens.
 
@@ -1681,26 +1670,31 @@ class FilterSeries(FilterSeriesBase):
         log.debug('current: %s', entity)
 
         if latest:
-            if latest.is_season_pack and entity.season == latest.season:
-                log.debug('rejecting entity since a season pack for this season was already downloaded')
+            # reject any entity if a season pack for this season was already downloaded
+            if latest.is_season and entity.season == latest.season and latest.completed:
+                log.debug('season %s already completed for this series', entity.season)
+                for entry in entries:
+                    entry.reject('season %s is already completed' % entity.season)
                 return True
 
-            elif latest.identified_by == entity.identified_by:
-                # Allow any previous episodes this season, or previous episodes within grace if sequence mode
-                if (not backfill and (entity.season < latest.season or
-                                          (entity.identified_by == 'sequence' and entity.number < (
-                                                      latest.number - grace)))):
-                    log.debug('too old! rejecting all occurrences')
-                    for entry in entries:
-                        entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
-                    return True
+            if latest.identified_by == entity.identified_by:
+                # Allow any previous episodes this season, or previous episodes within grace if sequence
+                if not backfill:
+                    if entity.season < latest.season or (
+                                    entity.identified_by == 'sequence' and entity.number < (latest.number - grace)):
+                        log.debug('too old! rejecting all occurrences')
+                        for entry in entries:
+                            entry.reject('Too much in the past from latest downloaded entity %s' % latest.identifier)
+                        return True
 
-                # Allow future episodes within grace, or first episode of next season
-                if (entity.season > latest.season + 1 or (entity.season > latest.season and entity.number > 1) or
-                        (entity.season == latest.season and entity.number > (latest.number + grace))):
+                # Allow future episodes within grace, or first episode of next season, or season pack of next season
+                if (entity.season > latest.season + 1 or
+                            not entity.is_season and (
+                                    (entity.season > latest.season and entity.number > 1) or
+                                    (entity.season == latest.season and entity.number > (latest.number + grace)))):
                     log.debug('too new! rejecting all occurrences')
                     for entry in entries:
-                        entry.reject('Too much in the future from latest downloaded episode %s. '
+                        entry.reject('Too much in the future from latest downloaded entity %s. '
                                      'See `--disable-tracking` if this should be downloaded.' % latest.identifier)
                     return True
 
