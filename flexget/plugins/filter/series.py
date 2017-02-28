@@ -1428,8 +1428,10 @@ class FilterSeries(FilterSeriesBase):
         """
         accepted_seasons = []
 
-        # sort for season packs first
-        for entity, entries in sorted(series_entries.items(), key=lambda e: e[0].is_season, reverse=True):
+        # sort for season packs first, order by season number ascending. Uses -1 in case entity does not return a
+        # season number or sort will crash
+        for entity, entries in sorted(series_entries.items(), key=lambda e: (e[0].is_season, e[0].season or -1),
+                                      reverse=True):
             if not entries:
                 continue
 
@@ -1559,7 +1561,7 @@ class FilterSeries(FilterSeriesBase):
             best.accept(reason)
 
             # need to reject all other episode/season packs for an accepted season during the task,
-            # can't wait for task learn
+            # can't wait for task learn phase
             if entity.is_season:
                 accepted_seasons.append(entity.season)
 

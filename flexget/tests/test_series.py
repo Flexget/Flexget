@@ -2059,9 +2059,15 @@ class TestSeriesSeasonPack(object):
           - foo:
               season_packs: yes
       tasks:
-        season_pack_sanity:
+        foo_s01:
           mock:
           - title: foo.s01.720p-flexget
+        foo_s02:
+          mock:
+          - title: foo.s02.720p-flexget
+        foo_s03:
+          mock:
+          - title: foo.s03.720p-flexget
         foo_s01ep1:
           mock:
           - title: foo.s01e1.720p-flexget
@@ -2084,6 +2090,13 @@ class TestSeriesSeasonPack(object):
           mock:
           - title: bar.s01.720p-flexget
           - title: bar.s02.720p-flexget
+        several_seasons:
+          mock:
+          - title: foo.s03.720p-flexget
+          - title: foo.s07.720p-flexget
+          - title: foo.s03.1080p-flexget
+          - title: foo.s06.720p-flexget
+          - title: foo.s09.720p-flexget
     """
 
     @pytest.fixture()
@@ -2092,11 +2105,11 @@ class TestSeriesSeasonPack(object):
         return self._config
 
     def test_season_pack_simple(self, execute_task):
-        task = execute_task('season_pack_sanity')
+        task = execute_task('foo_s01')
         assert len(task.accepted) == 1
 
     def test_basic_tracking(self, execute_task):
-        task = execute_task('season_pack_sanity')
+        task = execute_task('foo_s01')
         assert len(task.accepted) == 1
 
         task = execute_task('foo_s01ep1')
@@ -2116,3 +2129,24 @@ class TestSeriesSeasonPack(object):
         assert len(task.accepted) == 1
         entry = task.find_entry(title='bar.s02.720p-flexget')
         assert entry.accepted
+
+    def test_tracking_rules_old_eps(self, execute_task):
+        task = execute_task('foo_s01')
+        assert len(task.accepted) == 1
+
+        task = execute_task('foo_s02')
+        assert len(task.accepted) == 1
+
+        task = execute_task('foo_s01ep1')
+        assert not task.accepted
+
+    def test_tracking_rules_old_season(self, execute_task):
+        task = execute_task('foo_s02')
+        assert len(task.accepted) == 1
+
+        task = execute_task('foo_s01')
+        assert not task.accepted
+
+    def test_several_seasons(self, execute_task):
+        task = execute_task('several_seasons')
+        assert len(task.accepted) == 4
