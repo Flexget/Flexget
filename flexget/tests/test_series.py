@@ -2058,6 +2058,9 @@ class TestSeriesSeasonPack(object):
           series:
           - foo:
               season_packs: yes
+          - bar:
+              season_packs: yes
+              tracking: backfill
       tasks:
         multiple_formats:
           mock:
@@ -2101,6 +2104,15 @@ class TestSeriesSeasonPack(object):
           - title: foo.s03.1080p-flexget
           - title: foo.s06.720p-flexget
           - title: foo.s09.720p-flexget
+        test_backfill_1:
+          mock:
+          - title: bar.s03.720p-flexget
+        test_backfill_2:
+          mock:
+          - title: bar.s02.720p-flexget
+        test_backfill_3:
+          mock:
+          - title: bar.s03e01.720p-flexget
 
     """
 
@@ -2166,3 +2178,13 @@ class TestSeriesSeasonPack(object):
     def test_multiple_formats(self, execute_task):
         task = execute_task('multiple_formats')
         assert len(task.accepted) == 2
+
+    def test_backfill(self, execute_task):
+        task = execute_task('test_backfill_1')
+        assert len(task.accepted) == 1
+
+        task = execute_task('test_backfill_2')
+        assert len(task.accepted) == 1
+
+        task = execute_task('test_backfill_3')
+        assert not task.accepted
