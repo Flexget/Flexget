@@ -39,7 +39,7 @@ class NextTraktEpisodes(object):
             'username': {'type': 'string'},
             'account': {'type': 'string'},
             'position': {'type': 'string', 'enum': ['last', 'next'], 'default': 'next'},
-            'context': {'type': 'string', 'enum': ['watched', 'collected'], 'default': 'watched'},
+            'context': {'type': 'string', 'enum': ['watched', 'collected', 'aired'], 'default': 'watched'},
             'list': {'type': 'string'},
             'strip_dates': {'type': 'boolean', 'default': False}
         },
@@ -94,12 +94,22 @@ class NextTraktEpisodes(object):
             context = 'collection'
         entries = []
         for trakt_id, fields in listed_series.items():
-            url = get_api_url('shows', trakt_id, 'progress', context)
+            if context == 'aired':
+                url = get_api_url('shows', trakt_id, '{}_episode'.format(config['position']))
+            else:
+                url = get_api_url('shows', trakt_id, 'progress', context)
             try:
-                data = session.get(url).json()
+                response = session.get(url)
+                if response.status_code == 204:
+                    log.debug('No {} epsisode for {}'.format(config['position'], fields['series_name']))
+                    continue
+                data = response.json()
             except RequestException as e:
                 raise plugin.PluginError('An error has occurred looking up: Trakt_id: %s Error: %s' % (trakt_id, e))
-            if config['position'] == 'next' and data.get('next_episode'):
+            if context == 'aired':
+                eps = data['season']
+                epn = data['number']
+            elif config['position'] == 'next' and data.get('next_episode'):
                 # If the next episode is already in the trakt database, we'll get it here
                 eps = data['next_episode']['season']
                 epn = data['next_episode']['number']
