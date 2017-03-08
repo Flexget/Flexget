@@ -235,7 +235,7 @@ class RTorrent(object):
         'state', 'complete',
         'bytes_done', 'down.rate', 'left_bytes',
         'ratio',
-        'base_path',
+        'base_path', 'load_date'
     )
 
     required_fields = (
@@ -491,13 +491,14 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
     }
 
     def _verify_load(self, client, info_hash):
-        e = IOError()
+        ex = IOError()
         for _ in range(0, 5):
             try:
                 return client.torrent(info_hash, fields=['hash'])
             except (IOError, xmlrpc_client.Error) as e:
+                ex = e
                 sleep(0.5)
-        raise e
+        raise ex
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
@@ -516,11 +517,11 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                           session=task.requests)
 
         for entry in task.accepted:
-            if task.options.test:
-                log.info('Would add %s to rTorrent' % entry['url'])
-                continue
 
             if config['action'] == 'add':
+                if task.options.test:
+                    log.info('Would add %s to rTorrent', entry['url'])
+                    continue
                 try:
                     options = self._build_options(config, entry)
                 except RenderError as e:
@@ -536,9 +537,15 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 continue
 
             if config['action'] == 'delete':
+                if task.options.test:
+                    log.info('Would delete %s (%s) from rTorrent', entry['title'], entry['torrent_info_hash'])
+                    continue
                 self.delete_entry(client, entry)
 
             if config['action'] == 'update':
+                if task.options.test:
+                    log.info('Would update %s (%s) in rTorrent', entry['title'], entry['torrent_info_hash'])
+                    continue
                 self.update_entry(client, entry, config)
 
     def delete_entry(self, client, entry):
@@ -654,14 +661,14 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         except (IOError, xmlrpc_client.Error) as e:
             entry.fail('Failed to verify torrent loaded: %s' % str(e))
 
-    def on_task_exit(self, task, config):
-        """ Make sure all temp files are cleaned up when task exists """
+    def on_task_learn(self, task, config):
+        """ Make sure all temp files are cleaned up when entries are learned """
         # If download plugin is enabled, it will handle cleanup.
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
             download.instance.cleanup_temp_files(task)
 
-    on_task_abort = on_task_exit
+    on_task_abort = on_task_learn
 
 
 class RTorrentInputPlugin(RTorrentPluginBase):

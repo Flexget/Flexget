@@ -12,8 +12,8 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-__name__ = 'pushbullet'
-log = logging.getLogger(__name__)
+plugin_name = 'pushbullet'
+log = logging.getLogger(plugin_name)
 
 PUSHBULLET_URL = 'https://api.pushbullet.com/v2/pushes'
 
@@ -47,55 +47,41 @@ class PushbulletNotifier(object):
             'channel': {'type': 'string'},
             'file_template': {'type': 'string'},
         },
-        'not': {
-            'anyOf': [
-                {'required': ['device', 'email']},
-                {'required': ['channel', 'email']},
-                {'required': ['channel', 'device']}
-            ]},
-        'error_not': 'Can only use one of `email`, `device` or `channel`',
-        'anyOf': [
-            {'required': ['api_key', 'email']},
-            {'required': ['api_key', 'device']},
-            {'required': ['api_key', 'channel']},
-            {'required': ['api_key']}
+        'required': ['api_key'],
+        'oneOf': [
+            {'required': ['device']},
+            {'required': ['channel']},
+            {'required': ['email']},
+            {'not': {'anyOf': [{'required': ['device']}, {'required': ['channel']}, {'required': ['email']}]}}
         ],
-        'error_anyOf': '`api_key` is required',
+        'error_oneOf': 'One (and only one) of `email`, `device` or `channel` are allowed.',
         'additionalProperties': False
     }
 
-    def notify(self, api_key, title, message, device=None, email=None, url=None, channel=None, **kwargs):
+    def notify(self, title, message, config):
         """
         Send a Pushbullet notification
-
-        :param str api_key: one or more api keys
-        :param str title: title of notification
-        :param str message: message of notification
-        :param str device: one or more devices to send to
-        :param str email: one or more emails to send to
-        :param str url: URL to attach to notification
-        :param str channel: Channel to send to
         """
-        if device and not isinstance(device, list):
-            device = [device]
+        if config.get('device') and not isinstance(config['device'], list):
+            config['device'] = [config['device']]
 
-        if email and not isinstance(email, list):
-            email = [email]
+        if config.get('email') and not isinstance(config['email'], list):
+            config['email'] = [config['email']]
 
-        if not isinstance(api_key, list):
-            api_key = [api_key]
+        if not isinstance(config['api_key'], list):
+            config['api_key'] = [config['api_key']]
 
-        for key in api_key:
-            if channel:
-                self.send_push(key, title, message, url, channel, 'channel_tag')
-            elif device:
-                for d in device:
-                    self.send_push(key, title, message, url, d, 'device_iden')
-            elif email:
-                for e in email:
-                    self.send_push(key, title, message, url, e, 'email')
+        for key in config['api_key']:
+            if config.get('channel'):
+                self.send_push(key, title, message, config.get('url'), config.get('channel'), 'channel_tag')
+            elif config.get('device'):
+                for d in config['device']:
+                    self.send_push(key, title, message, config.get('url'), d, 'device_iden')
+            elif config.get('email'):
+                for e in config['email']:
+                    self.send_push(key, title, message, config.get('url'), e, 'email')
             else:
-                self.send_push(key, title, message, url)
+                self.send_push(key, title, message, config.get('url'))
 
     def send_push(self, api_key, title, body, url=None, destination=None, destination_type=None):
         push_type = 'link' if url else 'note'
@@ -132,18 +118,7 @@ class PushbulletNotifier(object):
         log.debug('Pushbullet notification sent. Database operations remaining until next reset: %s. '
                   'Next reset at: %s', remaining, reset_time)
 
-    # Run last to make sure other outputs are successful before sending notification
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
-        # Send default values for backwards compatibility
-        notify_config = {
-            'to': [{__name__: config}],
-            'scope': 'entries',
-            'what': 'accepted'
-        }
-        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
-
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PushbulletNotifier, __name__, api_ver=2, groups=['notifiers'])
+    plugin.register(PushbulletNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

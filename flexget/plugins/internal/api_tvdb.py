@@ -4,7 +4,7 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime
+from sqlalchemy import Table, Column, Integer, Float, Unicode, Boolean, DateTime, Text
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
@@ -12,7 +12,7 @@ from sqlalchemy.schema import ForeignKey
 from flexget import db_schema
 from flexget.utils import requests
 from flexget.utils.tools import split_title_year
-from flexget.utils.database import with_session, text_date_synonym, json_synonym
+from flexget.utils.database import with_session, text_date_synonym, json_synonym, Session
 from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('api_tvdb')
@@ -32,27 +32,29 @@ class TVDBRequest(object):
     def __init__(self, username=None, account_id=None):
         self.username = username
         self.account_id = account_id
-        self.auth_key = self.username if self.username else 'default'
+        self.auth_key = self.username.lower() if self.username else 'default'
 
     def get_auth_token(self, refresh=False):
-        tokens = persist.get('auth_tokens')
-        if not tokens:
-            tokens = {'default': None}
+        with Session() as session:
+            auth_token = session.query(TVDBTokens).filter(TVDBTokens.name == self.auth_key).first()
+            if not auth_token:
+                auth_token = TVDBTokens()
+                auth_token.name = self.auth_key
 
-        auth_token = tokens.get(self.auth_key)
+            if refresh or auth_token.has_expired():
+                data = {'apikey': TVDBRequest.API_KEY}
+                if self.username:
+                    data['username'] = self.username
+                if self.account_id:
+                    data['userkey'] = self.account_id
 
-        if not auth_token or refresh:
-            data = {'apikey': TVDBRequest.API_KEY}
-            if self.username:
-                data['username'] = self.username
-            if self.account_id:
-                data['userkey'] = self.account_id
+                log.debug('Authenticating to TheTVDB with %s', self.username if self.username else 'api_key')
 
-            log.debug('Authenticating to TheTVDB with %s' % (self.username if self.username else 'api_key'))
+                auth_token.token = requests.post(TVDBRequest.BASE_URL + 'login', json=data).json().get('token')
+                auth_token.refreshed = datetime.now()
+                auth_token = session.merge(auth_token)
 
-            tokens[self.auth_key] = requests.post(TVDBRequest.BASE_URL + 'login', json=data).json().get('token')
-        persist['auth_tokens'] = tokens
-        return tokens[self.auth_key]
+            return auth_token.token
 
     def _request(self, method, endpoint, **params):
         url = TVDBRequest.BASE_URL + endpoint
@@ -106,6 +108,25 @@ genres_table = Table('tvdb_series_genres', Base.metadata,
                      Column('series_id', Integer, ForeignKey('tvdb_series.id')),
                      Column('genre_id', Integer, ForeignKey('tvdb_genres.id')))
 Base.register_table(genres_table)
+
+
+class TVDBTokens(Base):
+    __tablename__ = 'tvdb_tokens'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(Unicode)
+    token = Column(Text)
+    refreshed = Column(DateTime)
+
+    def has_expired(self):
+        if not self.token or not self.refreshed:
+            return True
+
+        seconds = (datetime.now() - self.refreshed).total_seconds()
+        if seconds >= 86400:
+            return True
+
+        return False
 
 
 class TVDBSeries(Base):
@@ -195,7 +216,7 @@ class TVDBSeries(Base):
 
     def get_actors(self):
         if not self._actors:
-            log.debug('Looking up actors for series %s' % self.name)
+            log.debug('Looking up actors for series %s', self.name)
             try:
                 actors_query = TVDBRequest().get('series/%s/actors' % self.id)
                 self.actors_list = [a['name'] for a in actors_query] if actors_query else []
@@ -209,7 +230,7 @@ class TVDBSeries(Base):
 
     def get_posters(self):
         if not self._posters:
-            log.debug('Getting top 5 posters for series %s' % self.name)
+            log.debug('Getting top 5 posters for series %s', self.name)
             try:
                 poster_query = TVDBRequest().get('series/%s/images/query' % self.id, keyType='poster')
                 self.posters_list = [p['fileName'] for p in poster_query[:5]] if poster_query else []
@@ -401,7 +422,7 @@ class TVDBSeriesSearchResult(Base):
     def expired(self):
         log.debug('checking series %s for expiration', self.original_name)
         if datetime.now() - self.created_at >= timedelta(days=SEARCH_RESULT_EXPIRATION_DAYS):
-            log.debug('series %s is expires, should refetch', self.original_name)
+            log.debug('series %s is expires, should re-fetch', self.original_name)
             return True
         log.debug('series %s is not expired', self.original_name)
         return False
@@ -509,7 +530,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None, lang
             except LookupError as e:
                 log.warning('Error while updating from tvdb (%s), using cached data.', e.args[0])
         else:
-            log.debug('Series %s information restored from cache.' % id_str())
+            log.debug('Series %s information restored from cache.', id_str())
     else:
         if only_cached:
             raise LookupError('Series %s not found from cache' % id_str())
@@ -598,7 +619,7 @@ def lookup_episode(name=None, season_number=None, episode_number=None, absolute_
                 updated_episode = TVDBEpisode(series.id, episode.id)
                 episode = session.merge(updated_episode)
             except LookupError as e:
-                log.warning('Error while updating from tvdb (%s), using cached data.' % str(e))
+                log.warning('Error while updating from tvdb (%s), using cached data.', str(e))
         else:
             log.debug('Using episode info for %s from cache.', ep_description)
     else:
@@ -682,7 +703,7 @@ def mark_expired(session):
     try:
         # Calculate seconds since epoch minus a minute for buffer
         last_check_epoch = int((last_check - datetime(1970, 1, 1)).total_seconds()) - 60
-        log.debug("Getting updates from thetvdb (%s)" % last_check_epoch)
+        log.debug("Getting updates from thetvdb (%s)", last_check_epoch)
         updates = TVDBRequest().get('updated/query', fromTime=last_check_epoch)
     except requests.RequestException as e:
         log.error('Could not get update information from tvdb: %s', e)

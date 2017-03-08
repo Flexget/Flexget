@@ -207,9 +207,9 @@ class ApiBluray(object):
                 log.debug('Cache has expired for %s, attempting to refresh from blu-ray.com.', movie.name)
                 try:
                     updated_movie = BlurayMovie(title=title, year=year)
-                except LookupError:
-                    log.error('Error refreshing movie details for %s from blu-ray.com, cached info being used.',
-                              title)
+                except LookupError as e:
+                    log.error('Error refreshing movie details for %s from blu-ray.com, cached info being used. %s',
+                              title, e)
                 else:
                     movie = session.merge(updated_movie)
             else:
@@ -237,4 +237,4 @@ class ApiBluray(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ApiBluray, 'api_bluray', api_ver=2)
+    plugin.register(ApiBluray, 'api_bluray', api_ver=2, interfaces=[])

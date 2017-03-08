@@ -141,7 +141,7 @@ class SearchAlphaRatio(object):
             response = requests.post(url, data={'username': username, 'password': password, 'login': 'Log in',
                                                 'keeplogged': '1'}, timeout=30)
         except RequestException as e:
-            raise plugin.PluginError('AlphaRatio login failed: %s', e)
+            raise plugin.PluginError('AlphaRatio login failed: %s' % e)
 
         if 'Your username or password was incorrect.' in response.text:
             raise plugin.PluginError('AlphaRatio login failed: Your username or password was incorrect.')
@@ -198,8 +198,9 @@ class SearchAlphaRatio(object):
                     group_info.find('a', href=re.compile('torrents.php\?action=download(?!usetoken)'))['href']
 
                 torrent_info = result.findAll('td')
-                log.debug('AlphaRatio size: %s', torrent_info[5].text)
-                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', torrent_info[4].text)
+                size_col = torrent_info[4].text
+                log.debug('AlphaRatio size: %s', size_col)
+                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size_col)
                 torrent_tags = ', '.join([tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})])
 
                 e = Entry()
@@ -207,7 +208,10 @@ class SearchAlphaRatio(object):
                 e['title'] = title
                 e['url'] = url
                 e['torrent_tags'] = torrent_tags
-                e['content_size'] = parse_filesize(size.group(0))
+                if not size:
+                    log.error('No size found! Please create a Github issue. Size received: %s', size_col)
+                else:
+                    e['content_size'] = parse_filesize(size.group(0))
                 e['torrent_snatches'] = int(torrent_info[5].text)
                 e['torrent_seeds'] = int(torrent_info[6].text)
                 e['torrent_leeches'] = int(torrent_info[7].text)
@@ -219,4 +223,4 @@ class SearchAlphaRatio(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchAlphaRatio, 'alpharatio', groups=['search'], api_ver=2)
+    plugin.register(SearchAlphaRatio, 'alpharatio', interfaces=['search'], api_ver=2)

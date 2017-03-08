@@ -176,4 +176,4 @@ class PluginTVMazeLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTVMazeLookup, 'tvmaze_lookup', api_ver=3, groups=['series_metainfo'])
+    plugin.register(PluginTVMazeLookup, 'tvmaze_lookup', api_ver=2, interfaces=['task', 'series_metainfo'])

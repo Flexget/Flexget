@@ -153,8 +153,6 @@ def priority(value):
 
 DEFAULT_PRIORITY = 128
 
-plugin_contexts = ['task', 'root']
-
 # task phases, in order of their execution; note that this can be extended by
 # registering new phases at runtime
 task_phases = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'learn', 'exit']
@@ -178,7 +176,11 @@ _new_phase_queue = {}
 
 
 def register_task_phase(name, before=None, after=None):
-    """Adds a new task phase to the available phases."""
+    """
+    Adds a new task phase to the available phases.
+
+    :param suppress_abort: If True, errors during this phase will be suppressed, and not affect task result.
+    """
     if before and after:
         raise RegisterException('You can only give either before or after for a phase.')
     if not before and not after:
@@ -218,33 +220,33 @@ class PluginInfo(dict):
     # Counts duplicate registrations
     dupe_counter = 0
 
-    def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1,
-                 contexts=None, category=None):
+    def __init__(self, plugin_class, name=None, interfaces=None, builtin=False, debug=False, api_ver=1, category=None,
+                 groups=None):
         """
         Register a plugin.
 
         :param plugin_class: The plugin factory.
         :param string name: Name of the plugin (if not given, default to factory class name in underscore form).
-        :param list groups: Groups this plugin belongs to.
+        :param list interfaces: Interfaces this plugin implements.
         :param bool builtin: Auto-activated?
         :param bool debug: True if plugin is for debugging purposes.
         :param int api_ver: Signature of callback hooks (1=task; 2=task,config).
-        :param list contexts: List of where this plugin is configurable. Can be 'task', 'root', or None
         :param string category: The type of plugin. Can be one of the task phases.
             Defaults to the package name containing the plugin.
+        :param groups: DEPRECATED
         """
         dict.__init__(self)
 
-        if groups is None:
-            groups = []
+        if interfaces is None:
+            interfaces = ['task']
+        if groups is not None:
+            warnings.warn('The `groups` argument for plugin registration is deprecated. `interfaces` should be used '
+                          'instead. Plugin %s' % name, DeprecationWarning, stacklevel=2)
+            interfaces.extend(groups)
         if name is None:
             # Convention is to take camel-case class name and rewrite it to an underscore form,
             # e.g. 'PluginName' to 'plugin_name'
             name = re.sub('[A-Z]+', lambda i: '_' + i.group(0).lower(), plugin_class.__name__).lstrip('_')
-        if contexts is None:
-            contexts = ['task']
-        elif isinstance(contexts, str):
-            contexts = [contexts]
         if category is None and plugin_class.__module__.startswith('flexget.plugins'):
             # By default look at the containing package of the plugin.
             category = plugin_class.__module__.split('.')[-2]
@@ -256,10 +258,9 @@ class PluginInfo(dict):
         # Set basic info attributes
         self.api_ver = api_ver
         self.name = name
-        self.groups = groups
+        self.interfaces = interfaces
         self.builtin = builtin
         self.debug = debug
-        self.contexts = contexts
         self.category = category
         self.phase_handlers = {}
 
@@ -468,13 +469,12 @@ def load_plugins(extra_dirs=None):
     log.debug('Plugins took %.2f seconds to load. %s plugins in registry.', took, len(plugins.keys()))
 
 
-def get_plugins(phase=None, group=None, context=None, category=None, name=None, min_api=None):
+def get_plugins(phase=None, interface=None, category=None, name=None, min_api=None):
     """
     Query other plugins characteristics.
 
     :param string phase: Require phase
-    :param string group: Plugin must belong to this group.
-    :param string context: Where plugin is configured, eg. (root, task)
+    :param string interface: Plugin must implement this interface.
     :param string category: Type of plugin, phase names.
     :param string name: Name of the plugin.
     :param int min_api: Minimum api version.
@@ -487,9 +487,7 @@ def get_plugins(phase=None, group=None, context=None, category=None, name=None, 
             raise ValueError('Unknown phase %s' % phase)
         if phase and phase not in plugin.phase_handlers:
             return False
-        if group and group not in plugin.groups:
-            return False
-        if context and context not in plugin.contexts:
+        if interface and interface not in plugin.interfaces:
             return False
         if category and not category == plugin.category:
             return False

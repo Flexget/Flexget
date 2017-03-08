@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+import json
 
 from flexget import plugin
 from flexget.event import event
@@ -10,8 +11,8 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-__name__ = 'rapidpush'
-log = logging.getLogger(__name__)
+plugin_name = 'rapidpush'
+log = logging.getLogger(plugin_name)
 
 RAPIDPUSH_URL = 'https://rapidpush.net/api'
 
@@ -26,9 +27,7 @@ class RapidpushNotifier(object):
       rapidpush:
         apikey: xxxxxxx (can also be a list of api keys)
         [category: category, default FlexGet]
-        [title: title, default New release]
         [group: device group, default no group]
-        [message: the message, default {{title}}]
         [channel: the broadcast notification channel, if provided it will be send to the channel subscribers instead of
             your devices, default no channel]
         [priority: 0 - 6 (6 = highest), default 2 (normal)]
@@ -38,66 +37,51 @@ class RapidpushNotifier(object):
         'properties': {
             'api_key': one_or_more({'type': 'string'}),
             'category': {'type': 'string', 'default': 'Flexget'},
-            'title': {'type': 'string'},
             'group': {'type': 'string'},
             'channel': {'type': 'string'},
-            'priority': {'type': 'integer', 'minimum': 0, 'maximum': 6},
-            'message': {'type': 'string'},
-            'file_template': {'type': 'string'}
+            'priority': {'type': 'integer', 'minimum': 0, 'maximum': 6}
         },
         'additionalProperties': False,
-        'required': ['api_key']
+        'required': ['api_key'],
+        'not':
+            {'anyOf': [
+                {'required': ['channel', 'group']},
+                {'required': ['channel', 'category']},
+                {'required': ['channel', 'priority']}]},
+        'error_not': 'Cannot use \'channel\' with \'group\', \'category\' or \'priority\''
     }
 
-    def notify(self, api_key, title, message, category, group=None, channel=None, priority=None, **kwargs):
+    def notify(self, title, message, config):
         """
         Send a Rapidpush notification
-
-        :param str api_key: one or more api keys
-        :param str title: title of notification
-        :param str message: message of notification
-        :param str category: category of notification
-        :param str group: group of notification
-        :param str channel: channel of notification
-        :param int priority: priority of notification
         """
-        wrapper = {}
         notification = {'title': title, 'message': message}
-        if not isinstance(api_key, list):
-            api_key = [api_key]
+        if not isinstance(config['api_key'], list):
+            config['api_key'] = [config['api_key']]
 
-        if channel:
-            wrapper['command'] = 'broadcast'
+        if config.get('channel'):
+            params = {'command': 'broadcast'}
+            notification['channel'] = config['channel']
         else:
-            wrapper['command'] = 'notify'
-            notification['category'] = category
-            if group:
-                notification['group'] = group
-            if priority:
-                notification['priority'] = priority
+            params = {'command': 'notify'}
+            notification['category'] = config['category']
+            if config.get('group'):
+                notification['group'] = config['group']
+            if config.get('priority') is not None:
+                notification['priority'] = config['priority']
 
-        wrapper['data'] = notification
-        for key in api_key:
-            wrapper['apikey'] = key
+        params['data'] = json.dumps(notification)
+        for key in config['api_key']:
+            params['apikey'] = key
             try:
-                response = requests.post(RAPIDPUSH_URL, json=wrapper)
+                response = requests.post(RAPIDPUSH_URL, params=params)
             except RequestException as e:
                 raise PluginWarning(e.args[0])
             else:
                 if response.json()['code'] > 400:
                     raise PluginWarning(response.json()['desc'])
 
-    # Run last to make sure other outputs are successful before sending notification
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
-        notify_config = {
-            'to': [{__name__: config}],
-            'scope': 'entries',
-            'what': 'accepted'
-        }
-        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
-
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(RapidpushNotifier, __name__, api_ver=2, groups=['notifiers'])
+    plugin.register(RapidpushNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

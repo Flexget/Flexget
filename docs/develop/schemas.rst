@@ -119,7 +119,7 @@ email
     email addresses
 
 quality
-    FlexGet quality, e.g. ``702p hdtv``
+    FlexGet quality, e.g. ``720p hdtv``
 
 quality_requirements
     FlexGet quality requirements specifier, e.g. ``720p-1080p hdtv+``
@@ -202,3 +202,59 @@ The ``default`` keyword is not used during validation either. It will be used
 to fill in default values for properties in the config that the user has not
 provided. This will be done automatically before the parsed config is passed
 to the plugin.
+
+``not``
+^^^^^^^
+
+The ``not`` keyword will allow you to negate a specific schema. This is especially useful when wanting to create
+mutually exclusive properties or groups::
+
+    {
+        "type": "object",
+        "properties": {
+            "this": {"type": "string"},
+            "that": {"type": "string"}
+        },
+        "not": {
+            "required": ["this", "that"]
+        },
+        "error_not": "Can not use both 'this' and 'that'
+    }
+
+Another more complex example::
+
+    {
+        "type": "object",
+        "properties": {
+            "this": {"type": "string"},
+            "that": {"type": "string"},
+            "those": {"type": "string"}
+        },
+        "not": {
+            "anyOf": [
+                "required": ["this", "that"],
+                "required": ["this", "those"],
+                "required": ["that", "those"]
+             ]
+        },
+        "error_not": "Can only use one of 'this', 'that' or 'those'
+    }
+
+``dependencies``
+^^^^^^^^^^^^^^^^
+
+``dependencies`` are used to link a property to one or more other property, raising a validation error if not all
+dependencies have been met::
+
+     {
+        "type": "object",
+        "properties": {
+            "this": {"type": "string"},
+            "that": {"type": "string"},
+            "another" {"type": "string"}
+        },
+        "dependencies": {
+            "this": ["that"]
+        }
+     }
+

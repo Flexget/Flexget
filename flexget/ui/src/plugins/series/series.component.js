@@ -100,7 +100,7 @@
 
             $mdDialog.show(confirm).then(function () {
                 seriesService.deleteShow(show, params).then(function () {
-                    getSeries(vm.currentPage);
+                    vm.searchTerm ? search() : getSeries(vm.currentPage);
                 });
             });
         }

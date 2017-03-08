@@ -152,8 +152,8 @@ def movie_list_add(options):
             id_list = options.identifiers
         else:
             for _id in MovieListBase().supported_ids:
-                if movie.get(_id):
-                    id_list.append({_id: movie.get(_id)})
+                if movie_lookup.get(_id):
+                    id_list.append({_id: movie_lookup.get(_id)})
         if id_list:
             console('Setting movie identifiers:')
             for ident in id_list:
@@ -178,10 +178,10 @@ def movie_list_del(options):
             console('Could not find movie with ID {} in list `{}`'.format(int(options.movie), options.list_name))
             return
         except ValueError:
-            title, year = split_title_year(options.movie_title)
+            title, year = split_title_year(options.movie)
             movie_exist = get_movie_by_title_and_year(list_id=movie_list.id, title=title, year=year, session=session)
         if not movie_exist:
-            console('Could not find movie with title {} in list {}'.format(options.movie_title, options.list_name))
+            console('Could not find movie with title {} in list {}'.format(options.movie, options.list_name))
             return
         else:
             console('Removing movie {} from list {}'.format(movie_exist.title, options.list_name))

@@ -1153,4 +1153,4 @@ class ApiTrakt(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ApiTrakt, 'api_trakt', api_ver=2)
+    plugin.register(ApiTrakt, 'api_trakt', api_ver=2, interfaces=[])

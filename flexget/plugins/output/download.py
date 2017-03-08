@@ -503,7 +503,8 @@ class PluginDownload(object):
             if os.path.exists(entry['file']):
                 log.debug('removing temp file %s from %s', entry['file'], entry['title'])
                 os.remove(entry['file'])
-            shutil.rmtree(os.path.dirname(entry['file']))
+            if os.path.exists(os.path.dirname(entry['file'])):
+                shutil.rmtree(os.path.dirname(entry['file']))
             del (entry['file'])
 
     def cleanup_temp_files(self, task):

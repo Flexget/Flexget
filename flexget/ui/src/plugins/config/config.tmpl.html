@@ -1,14 +1,24 @@
 <div layout="column" layout-fill>
 	<md-toolbar class="md-warn" layout="row">
 		<p class="md-toolbar-tools">
-			<span>This page is still pretty much in beta. Please take a backup before trying to save a new config.</span>
+			<span ng-if="!vm.variables">
+				This page is still pretty much in beta. Please take a backup before trying to save a new config.
+			</span>
+			<span ng-if="vm.variables">
+				Variables get overwritten from file unless you use `variables: yes` in your config file.
+			</span>
 		</p>
 	</md-toolbar>
 	<div layout="column">
 		<div layout="row">
 			<div flex="25" layout-align="center start">
-				<md-button class="md-raised md-primary" ng-click="vm.saveConfig()" ng-disabled="vm.config == vm.origConfig">
+				<md-button class="md-raised md-primary" ng-click="vm.saveConfiguration()" ng-disabled="vm.configuration == vm.originalValues">
 					Save and apply
+				</md-button>
+			</div>
+			<div flex="25" layout-align="center start">
+				<md-button class="md-raised md-primary" ng-click="vm.changeContent()">
+					{{ vm.variables ? 'Load config' : 'Load variables' }}
 				</md-button>
 			</div>
 			<div flex="30" flex-offset="45">
@@ -44,6 +54,6 @@
 		</md-list>
 	</div>
 	<div layout="row" flex>
-		<div flex ui-ace='vm.aceOptions' ng-model="vm.config"></div>
+		<div flex ui-ace='vm.aceOptions' ng-model="vm.configuration"></div>
 	</div>
 </div>

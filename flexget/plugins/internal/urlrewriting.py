@@ -10,7 +10,6 @@ log = logging.getLogger('urlrewriter')
 
 
 class UrlRewritingError(Exception):
-
     def __init__(self, value):
         self.value = value
 
@@ -27,7 +26,7 @@ class PluginUrlRewriting(object):
         self.disabled_rewriters = []
 
     def on_task_urlrewrite(self, task, config):
-        log.debug('Checking %s entries' % len(task.accepted))
+        log.debug('Checking %s entries', len(task.accepted))
         # try to urlrewrite all accepted
         for entry in task.accepted:
             try:
@@ -39,11 +38,11 @@ class PluginUrlRewriting(object):
     # API method
     def url_rewritable(self, task, entry):
         """Return True if entry is urlrewritable by registered rewriter."""
-        for urlrewriter in plugin.get_plugins(group='urlrewriter'):
+        for urlrewriter in plugin.get_plugins(interface='urlrewriter'):
             if urlrewriter.name in self.disabled_rewriters:
-                log.trace('Skipping rewriter %s since it\'s disabled' % urlrewriter.name)
+                log.trace('Skipping rewriter %s since it\'s disabled', urlrewriter.name)
                 continue
-            log.trace('checking urlrewriter %s' % urlrewriter.name)
+            log.trace('checking urlrewriter %s', urlrewriter.name)
             if urlrewriter.instance.url_rewritable(task, entry):
                 return True
         return False
@@ -58,10 +57,10 @@ class PluginUrlRewriting(object):
             if tries > 20:
                 raise UrlRewritingError('URL rewriting was left in infinite loop while rewriting url for %s, '
                                         'some rewriter is returning always True' % entry)
-            for urlrewriter in plugin.get_plugins(group='urlrewriter'):
+            for urlrewriter in plugin.get_plugins(interface='urlrewriter'):
                 name = urlrewriter.name
                 if name in self.disabled_rewriters:
-                    log.trace('Skipping rewriter %s since it\'s disabled' % name)
+                    log.trace('Skipping rewriter %s since it\'s disabled', name)
                     continue
                 try:
                     if urlrewriter.instance.url_rewritable(task, entry):
@@ -71,10 +70,7 @@ class PluginUrlRewriting(object):
                         if entry['url'] != old_url:
                             if entry.get('urls') and old_url in entry.get('urls'):
                                 entry['urls'][entry['urls'].index(old_url)] = entry['url']
-                            log.info('Entry \'%s\' URL rewritten to %s (with %s)' % (
-                                entry['title'],
-                                entry['url'],
-                                name))
+                            log.info('Entry \'%s\' URL rewritten to %s (with %s)', entry['title'], entry['url'], name)
                 except UrlRewritingError as r:
                     # increase failcount
                     # count = self.shared_cache.storedefault(entry['url'], 1)
@@ -98,19 +94,19 @@ class DisableUrlRewriter(object):
             try:
                 plugin.get_plugin_by_name(disable)
             except plugin.DependencyError:
-                log.critical('Unknown url-rewriter %s' % disable)
+                log.critical('Unknown url-rewriter %s', disable)
                 continue
-            log.debug('Disabling url rewriter %s' % disable)
+            log.debug('Disabling url rewriter %s', disable)
             urlrewrite.disabled_rewriters.append(disable)
 
     def on_task_exit(self, task, config):
         urlrewrite = plugin.get_plugin_by_name('urlrewriting')['instance']
         for disable in config:
-            log.debug('Enabling url rewriter %s' % disable)
+            log.debug('Enabling url rewriter %s', disable)
             try:
                 urlrewrite.disabled_rewriters.remove(disable)
             except ValueError:
-                log.debug('%s does not exists' % disable)
+                log.debug('%s does not exists', disable)
 
     on_task_abort = on_task_exit
 

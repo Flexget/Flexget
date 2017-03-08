@@ -68,7 +68,7 @@ class Discover(object):
                 'allOf': [{'$ref': '/schema/plugins?phase=input'}, {'maxProperties': 1, 'minProperties': 1}]
             }},
             'from': {'type': 'array', 'items': {
-                'allOf': [{'$ref': '/schema/plugins?group=search'}, {'maxProperties': 1, 'minProperties': 1}]
+                'allOf': [{'$ref': '/schema/plugins?interface=search'}, {'maxProperties': 1, 'minProperties': 1}]
             }},
             'interval': {'type': 'string', 'format': 'interval', 'default': '5 hours'},
             'release_estimations': {

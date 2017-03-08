@@ -29,5 +29,5 @@ flask-compress>=1.2.1
 flask-login>=0.4.0
 flask-cors>=2.1.2
 pyparsing>=2.0.3
-Safe>=0.4
+zxcvbn-python
 future>=0.15.2

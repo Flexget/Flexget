@@ -39,8 +39,8 @@ class UserManagementAPI(APIResource):
     @api.validate(model=user_password_input_schema, description='Password change schema')
     @api.response(BadRequest)
     @api.response(200, 'Success', model=base_message_schema)
-    @api.doc(description='Change user password. A medium strength password is required.'
-                         ' See https://github.com/lepture/safe for reference')
+    @api.doc(description='Change user password. A score of at least 3 is needed.'
+                         'See https://github.com/dropbox/zxcvbn for details')
     def put(self, session=None):
         """ Change user password """
         user = current_user

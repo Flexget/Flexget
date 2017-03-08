@@ -114,7 +114,7 @@ def create_token(api_key, login, password):
     """
     r = requests.post(API_URL_PREFIX + 'members/auth', params={
         'login': login,
-        'password': md5(password).hexdigest()
+        'password': md5(password.encode('utf-8')).hexdigest()
     }, headers={
         'Accept': 'application/json',
         'X-BetaSeries-Version': '2.1',
@@ -197,4 +197,4 @@ def query_series(api_key, user_token, member_name=None):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(BetaSeriesList, 'betaseries_list', api_ver=2, groups=['list'])
+    plugin.register(BetaSeriesList, 'betaseries_list', api_ver=2, interfaces=['task'])

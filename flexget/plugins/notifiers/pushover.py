@@ -11,8 +11,8 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
-__name__ = 'pushover'
-log = logging.getLogger(__name__)
+plugin_name = 'pushover'
+log = logging.getLogger(plugin_name)
 
 PUSHOVER_URL = 'https://api.pushover.net/1/messages.json'
 
@@ -46,15 +46,12 @@ class PushoverNotifier(object):
             'user_key': one_or_more({'type': 'string'}),
             'api_key': {'type': 'string', 'default': 'aPwSHwkLcNaavShxktBpgJH4bRWc3m'},
             'device': one_or_more({'type': 'string'}),
-            'title': {'type': 'string'},
-            'message': {'type': 'string'},
             'priority': {'oneOf': [
                 {'type': 'number', 'minimum': -2, 'maximum': 2},
                 {'type': 'string'}]},
             'url': {'type': 'string'},
             'url_title': {'type': 'string'},
             'sound': {'type': 'string'},
-            'file_template': {'type': 'string'},
             'retry': {'type': 'integer', 'minimum': 30},
             'expire': {'type': 'integer', 'maximum': 86400},
             'callback': {'type': 'string'},
@@ -64,50 +61,40 @@ class PushoverNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, user_key, api_key, message, title=None, device=None, priority=None, url=None, url_title=None,
-               sound=None, retry=None, expire=None, callback=None, html=None, **kwargs):
+    def notify(self, title, message, config):
         """
         Sends a Pushover notification
 
-        :param str user_key: the user/group key or list of them
-        :param str api_key: your application's API api_key. Default is 'aPwSHwkLcNaavShxktBpgJH4bRWc3m',
-            official Flexget's API key
+        :param str title: the message's title
         :param str message: the message to send
-        :param str title: your message's title, otherwise your app's name is used
-        :param str device: your user's device name to send the message directly to that device,
-            rather than all of the user's devices. Can be a list
-        :param int priority: notification priority, int between -2 and 2
-        :param str url: a supplementary URL to show with your message
-        :param str url_title: a title for your supplementary URL, otherwise just the URL is shown
-        :param str sound: the name of one of the sounds supported by device clients to override the user's default
-            sound choice
-        :param int retry: how often (in seconds) the Pushover servers will send the same notification to the user
-        :param int expire: how many seconds your notification will continue to be retried for (every retry seconds).
-        :param str callback: a publicly-accessible URL that our servers will send a request to when the user has
-            acknowledged your notification
-        :param bool html: enable HTML parsing
+        :param dict config: The pushover config
         """
-        notification = {'token': api_key, 'message': message, 'title': title, 'device': device, 'priority': priority,
-                        'url': url, 'url_title': url_title, 'sound': sound, 'retry': retry, 'expire': expire,
-                        'callback': callback}
+        notification = {'token': config.get('api_key'), 'message': message, 'title': title,
+                        'device': config.get('device'), 'priority': config.get('priority'), 'url': config.get('url'),
+                        'url_title': config.get('url_title'), 'sound': config.get('sound'),
+                        'retry': config.get('retry'), 'expire': config.get('expire'),
+                        'callback': config.get('callback')}
 
         # HTML parsing mode
-        if html:
+        if config.get('html'):
             notification['html'] = 1
 
         # Support multiple devices
-        if isinstance(device, list):
-            notification['device'] = ','.join(device)
+        if isinstance(notification['device'], list):
+            notification['device'] = ','.join(notification['device'])
 
         # Special case, verify certain fields exists if priority is 2
+        priority = config.get('priority')
+        expire = config.get('expire')
+        retry = config.get('retry')
         if priority == 2 and not all([expire, retry]):
             log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.Lowering priority to 1')
             notification['priority'] = 1
 
-        if not isinstance(user_key, list):
-            user_key = [user_key]
+        if not isinstance(config['user_key'], list):
+            config['user_key'] = [config['user_key']]
 
-        for user in user_key:
+        for user in config['user_key']:
             notification['user'] = user
             try:
                 response = requests.post(PUSHOVER_URL, data=notification)
@@ -129,18 +116,7 @@ class PushoverNotifier(object):
             log.debug('Pushover notification sent. Notifications remaining until next reset: %s. '
                       'Next reset at: %s', remaining, reset_time)
 
-    # Run last to make sure other outputs are successful before sending notification
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
-        # Send default values for backwards compatibility
-        notify_config = {
-            'to': [{__name__: config}],
-            'scope': 'entries',
-            'what': 'accepted'
-        }
-        plugin.get_plugin_by_name('notify').instance.send_notification(task, notify_config)
-
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PushoverNotifier, __name__, api_ver=2, groups=['notifiers'])
+    plugin.register(PushoverNotifier, plugin_name, api_ver=2, interfaces=['notifiers'])

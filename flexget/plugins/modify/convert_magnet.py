@@ -22,7 +22,8 @@ class ConvertMagnet(object):
             {
                 "type": "object",
                 "properties": {
-                    "timeout": {"type": "string", "format": "interval", "default": "30 seconds"},
+                    "timeout": {"type": "string", "format": "interval"},
+                    "force": {"type": "boolean"}
                 },
                 "additionalProperties": False
             }
@@ -58,6 +59,7 @@ class ConvertMagnet(object):
         if not isinstance(config, dict):
             config = {}
         config.setdefault('timeout', '30 seconds')
+        config.setdefault('force', False)
         return config
 
     @plugin.priority(255)
@@ -90,6 +92,8 @@ class ConvertMagnet(object):
                     torrent_file = self.magnet_to_torrent(entry['url'], converted_path, timeout)
                 except (plugin.PluginError, TypeError) as e:
                     log.error('Unable to convert Magnet URI for entry %s: %s', entry['title'], e)
+                    if config['force']:
+                        entry.fail('Magnet URI conversion failed')
                     continue
                 # Windows paths need an extra / prepended to them for url
                 if not torrent_file.startswith('/'):

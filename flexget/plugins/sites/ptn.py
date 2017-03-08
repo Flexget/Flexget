@@ -143,4 +143,4 @@ class SearchPTN(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchPTN, 'ptn', groups=['search'], api_ver=2)
+    plugin.register(SearchPTN, 'ptn', interfaces=['search'], api_ver=2)

@@ -177,7 +177,7 @@ class SearchMoreThanTV(object):
             response = requests.post(url, data={'username': username, 'password': password, 'login': 'Log in',
                                                 'keeplogged': '1'}, timeout=30)
         except RequestException as e:
-            raise plugin.PluginError('MoreThanTV login failed: %s', e)
+            raise plugin.PluginError('MoreThanTV login failed: %s' % e)
 
         if 'Your username or password was incorrect.' in response.text:
             raise plugin.PluginError('MoreThanTV login failed: Your username or password was incorrect.')
@@ -217,7 +217,7 @@ class SearchMoreThanTV(object):
                        'order_way': config['order_way'], 'action': 'basic', 'group_results': 0})
 
         for search_string in entry.get('search_strings', [entry['title']]):
-            params['searchstr'] = search_string
+            params['searchstr'] = search_string.replace("'", "")
             log.debug('Using search params: %s', params)
             try:
                 page = self.get(self.base_url + 'torrents.php', params, config['username'], config['password'])
@@ -256,4 +256,4 @@ class SearchMoreThanTV(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchMoreThanTV, 'morethantv', groups=['search'], api_ver=2)
+    plugin.register(SearchMoreThanTV, 'morethantv', interfaces=['search'], api_ver=2)

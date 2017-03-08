@@ -37,7 +37,7 @@
             var deferred = $q.defer();
 
             var stream = oboe({
-                url: '/api/tasks/execute/',
+                url: 'api/tasks/execute/',
                 body: options,
                 method: 'POST'
             }).done(function () {
