@@ -23,7 +23,7 @@ log = logging.getLogger('api_tvmaze')
 DB_VERSION = 6
 Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
-BASE_URL = 'http://api.tvmaze.com'
+BASE_URL = 'https://api.tvmaze.com'
 
 TVMAZE_SHOW_PATH = "/shows/{}"
 TVMAZE_LOOKUP_PATH = "/lookup/shows"
