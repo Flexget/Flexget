@@ -478,11 +478,11 @@ def get_show(show_name=None, tvmaze_id=None, imdb_id=None, tvrage_id=None, thetv
     if tvmaze_id:
         return tvmaze_lookup(TVMAZE_SHOW_PATH.format(tvmaze_id))
     if imdb_id:
-        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'imdb_id': imdb_id})
+        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'imdb': imdb_id})
     if tvrage_id:
-        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'tvrage_id': tvrage_id})
+        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'tvrage': tvrage_id})
     if thetvdb_id:
-        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'thetvdb_id': thetvdb_id})
+        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'thetvdb': thetvdb_id})
     if show_name:
         return tvmaze_lookup(TVMAZE_SEARCH_PATH, params={'q': show_name})
     raise LookupError('Not enough parameters sent for series lookup')
