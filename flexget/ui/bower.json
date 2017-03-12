@@ -26,7 +26,8 @@
     "angular-link-header-parser": "~1.0.2",
     "angular-cache": "~4.6.0",
     "md-data-table": "~2.1.0",
-    "yaml.js": "^0.2.8"
+    "yaml.js": "^0.2.8",
+    "angular-aria": "~1.5.8"
   },
   "devDependencies": {
     "angular-mocks": "^1.5.5",
