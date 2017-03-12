@@ -666,7 +666,7 @@ class PluginTransmissionClean(TransmissionBase):
             downloaded, dummy = self.torrent_info(torrent, config)
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             tracker_hosts = (urlparse(tracker['announce']).hostname for tracker in torrent.trackers)
-            is_clean_all = nrat is None and nfor is None and trans_checks is None
+            is_clean_all = nrat is None and nfor is None and trans_checks is False
             is_minratio_reached = nrat and (nrat <= torrent.ratio)
             is_transmission_seedlimit_unset = trans_checks and seed_ratio_ok is None and idle_limit_ok is None
             is_transmission_seedlimit_reached = trans_checks and seed_ratio_ok is True
