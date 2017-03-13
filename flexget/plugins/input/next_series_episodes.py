@@ -10,7 +10,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release
+from flexget.plugins.filter.series import SeriesTask, Series, Episode, EpisodeRelease, get_latest_release
 
 log = logging.getLogger('next_series_episodes')
 
@@ -137,7 +137,7 @@ class NextSeriesEpisodes(object):
                             episodes_this_season = episodes_this_season.filter(Episode.number >= start_at_ep)
                         latest_ep_this_season = episodes_this_season.order_by(desc(Episode.number)).first()
                         downloaded_this_season = (episodes_this_season.join(Episode.releases).
-                                                  filter(Release.downloaded == True).all())
+                                                  filter(EpisodeRelease.downloaded == True).all())
                         # Calculate the episodes we still need to get from this season
                         if series.begin and series.begin.season == season:
                             start_at_ep = max(start_at_ep, series.begin.number)
@@ -177,7 +177,7 @@ class NextSeriesEpisodes(object):
         with Session() as session:
             series = session.query(Series).filter(Series.name == entry['series_name']).first()
             latest = get_latest_release(series)
-            db_release = (session.query(Release).join(Release.episode).join(Episode.series).
+            db_release = (session.query(EpisodeRelease).join(EpisodeRelease.episode).join(Episode.series).
                           filter(Series.name == entry['series_name']).
                           filter(Episode.season == entry['series_season']).
                           filter(Episode.number == entry['series_episode']).first())

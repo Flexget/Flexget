@@ -12,11 +12,11 @@ from flexget.task import TaskAbort
 
 
 def age_series(**kwargs):
-    from flexget.plugins.filter.series import Release
+    from flexget.plugins.filter.series import EpisodeRelease
     from flexget.manager import Session
     import datetime
     session = Session()
-    session.query(Release).update({'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)})
+    session.query(EpisodeRelease).update({'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)})
     session.commit()
 
 

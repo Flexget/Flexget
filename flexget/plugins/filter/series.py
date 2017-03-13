@@ -160,9 +160,9 @@ def upgrade(ver, session):
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     # Clean up old undownloaded releases
-    result = session.query(Release). \
-        filter(Release.downloaded == False). \
-        filter(Release.first_seen < datetime.now() - timedelta(days=120)).delete(False)
+    result = session.query(EpisodeRelease). \
+        filter(EpisodeRelease.downloaded == False). \
+        filter(EpisodeRelease.first_seen < datetime.now() - timedelta(days=120)).delete(False)
     if result:
         log.verbose('Removed %d undownloaded episode releases.', result)
     # Clean up episodes without releases
@@ -182,7 +182,7 @@ def repair(manager):
         session = Session()
         try:
             # For some reason at least I have some releases in database which don't belong to any episode.
-            for release in session.query(Release).filter(Release.episode == None).all():
+            for release in session.query(EpisodeRelease).filter(EpisodeRelease.episode == None).all():
                 log.info('Purging orphan release %s from database', release.title)
                 session.delete(release)
             session.commit()
@@ -314,7 +314,7 @@ class Season(Base):
     season = Column(Integer)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
 
-    releases = relation('Release', backref='season', cascade='all, delete, delete-orphan')
+    releases = relation('SeasonRelease', backref='season', cascade='all, delete, delete-orphan')
 
     @hybrid_property
     def completed(self):
@@ -324,7 +324,7 @@ class Season(Base):
 
     @completed.expression
     def completed(cls):
-        return select(Release).where(Release.season_id == cls.id).where(Release.downloaded == True)
+        return select(SeasonRelease).where(SeasonRelease.season_id == cls.id).where(SeasonRelease.downloaded == True)
 
     @property
     def is_season(self):
@@ -369,7 +369,7 @@ class Episode(Base):
 
     identified_by = Column(String)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
-    releases = relation('Release', backref='episode', cascade='all, delete, delete-orphan')
+    releases = relation('EpisodeRelease', backref='episode', cascade='all, delete, delete-orphan')
 
     @property
     def is_season(self):
@@ -383,7 +383,7 @@ class Episode(Base):
 
     @first_seen.expression
     def first_seen(cls):
-        return select([func.min(Release.first_seen)]).where(Release.episode_id == cls.id). \
+        return select([func.min(EpisodeRelease.first_seen)]).where(EpisodeRelease.episode_id == cls.id). \
             correlate(Episode.__table__).label('first_seen')
 
     @property
@@ -486,12 +486,11 @@ class Episode(Base):
 Index('episode_series_identifier', Episode.series_id, Episode.identifier)
 
 
-class Release(Base):
+class EpisodeRelease(Base):
     __tablename__ = 'episode_releases'
 
     id = Column(Integer, primary_key=True)
-    episode_id = Column(Integer, ForeignKey('series_episodes.id'), nullable=True, index=True)
-    season_id = Column(Integer, ForeignKey('series_seasons.id'), nullable=True, index=True)
+    episode_id = Column(Integer, ForeignKey('series_episodes.id'), nullable=False, index=True)
 
     _quality = Column('quality', String)
     quality = quality_property('_quality')
@@ -526,6 +525,49 @@ class Release(Base):
             'proper_count': self.proper_count,
             'first_seen': self.first_seen,
             'episode_id': self.episode_id,
+        }
+
+
+class SeasonRelease(Base):
+    __tablename__ = 'season_releases'
+
+    id = Column(Integer, primary_key=True)
+    season_id = Column(Integer, ForeignKey('series_seasons.id'), nullable=False, index=True)
+
+    _quality = Column('quality', String)
+    quality = quality_property('_quality')
+    downloaded = Column(Boolean, default=False)
+    proper_count = Column(Integer, default=0)
+    title = Column(Unicode)
+    first_seen = Column(DateTime)
+    partial_pack = Column(Boolean, default=False)
+
+    def __init__(self):
+        self.first_seen = datetime.now()
+
+    @property
+    def proper(self):
+        # TODO: TEMP
+        import warnings
+        warnings.warn("accessing deprecated release.proper, use release.proper_count instead")
+        return self.proper_count > 0
+
+    def __str__(self):
+        return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % \
+               (self.id, self.quality, self.downloaded, self.proper_count, self.title)
+
+    def __repr__(self):
+        return str(self).encode('ascii', 'replace')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'downloaded': self.downloaded,
+            'quality': self.quality.name,
+            'proper_count': self.proper_count,
+            'first_seen': self.first_seen,
+            'season_id': self.season_id,
         }
 
 
@@ -568,7 +610,7 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         query = query.having(func.count(SeriesTask.id) < 1)
     if premieres:
         query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2)).filter(
-            Release.downloaded == True)
+            EpisodeRelease.downloaded == True)
     if status == 'new':
         if not days:
             days = 7
@@ -582,7 +624,7 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
     if sort_by == 'show_name':
         order_by = Series.name
     else:
-        order_by = func.max(Release.first_seen)
+        order_by = func.max(EpisodeRelease.first_seen)
     query = query.order_by(desc(order_by)) if descending else query.order_by(order_by)
 
     return query.slice(start, stop).from_self()
@@ -640,7 +682,7 @@ def get_latest_season_pack_release(series, downloaded=True, season=None):
     releases = session.query(Season).join(Season.releases, Season.series).filter(Series.id == series.id)
 
     if downloaded:
-        releases = releases.filter(Release.downloaded == True)
+        releases = releases.filter(SeasonRelease.downloaded == True)
 
     if season is not None:
         releases = releases.filter(Season.season == season)
@@ -665,7 +707,7 @@ def get_latest_episode_release(series, downloaded=True, season=None):
     releases = session.query(Episode).join(Episode.releases, Episode.series).filter(Series.id == series.id)
 
     if downloaded:
-        releases = releases.filter(Release.downloaded == True)
+        releases = releases.filter(EpisodeRelease.downloaded == True)
 
     if season is not None:
         releases = releases.filter(Episode.season == season)
@@ -772,10 +814,10 @@ def store_parser(session, parser, series=None, quality=None):
                 log.debug('-> added season %s', season)
             session.flush()
 
-            # TODO make an association table?
             # Sets the filter_by, and filter_id for later releases query
             filter_id = season.id
-            filter_by = Release.season_id
+            table = SeasonRelease
+            filter_by = table.season_id
             entity = season
 
         else:
@@ -799,10 +841,10 @@ def store_parser(session, parser, series=None, quality=None):
                 log.debug('-> added %s', episode)
             session.flush()
 
-            # TODO make an association table?
             # Sets the filter_by, and filter_id for later releases query
+            table = EpisodeRelease
+            filter_by = table.episode_id
             filter_id = episode.id
-            filter_by = Release.episode_id
             entity = episode
 
         # if release does not exists in episode or season, add new
@@ -812,14 +854,14 @@ def store_parser(session, parser, series=None, quality=None):
         # filter(Release.episode_id != None) fixes weird bug where release had/has been added
         # to database but doesn't have episode_id, this causes all kinds of havoc with the plugin.
         # perhaps a bug in sqlalchemy?
-        release = session.query(Release).filter(filter_by == filter_id). \
-            filter(Release.title == parser.data). \
-            filter(Release.quality == quality). \
-            filter(Release.proper_count == parser.proper_count). \
+        release = session.query(table).filter(filter_by == filter_id). \
+            filter(table.title == parser.data). \
+            filter(table.quality == quality). \
+            filter(table.proper_count == parser.proper_count). \
             filter(filter_by != None).first()
         if not release:
             log.debug('adding release %s ', parser)
-            release = Release()
+            release = table()
             release.quality = quality
             release.proper_count = parser.proper_count
             release.title = parser.data
@@ -937,7 +979,7 @@ def remove_series_episode(name, identifier, forget=False):
 
 def delete_release_by_id(release_id):
     with Session() as session:
-        release = session.query(Release).filter(Release.id == release_id).first()
+        release = session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).first()
         if release:
             session.delete(release)
             session.commit()
@@ -970,7 +1012,7 @@ def episode_by_id(episode_id, session=None):
 
 def release_by_id(release_id, session=None):
     """ Return an instance of a release by querying its ID """
-    return session.query(Release).filter(Release.id == release_id).one()
+    return session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).one()
 
 
 def show_episodes(series, start=None, stop=None, count=False, descending=False, session=None):
@@ -992,16 +1034,16 @@ def show_episodes(series, start=None, stop=None, count=False, descending=False, 
 def get_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
                  session=None):
     """ Return all releases for a given episode """
-    releases = session.query(Release).filter(Release.episode_id == episode.id)
+    releases = session.query(EpisodeRelease).filter(EpisodeRelease.episode_id == episode.id)
     if downloaded is not None:
-        releases = releases.filter(Release.downloaded == downloaded)
+        releases = releases.filter(EpisodeRelease.downloaded == downloaded)
     if count:
         return releases.count()
     releases = releases.slice(start, stop).from_self()
     if descending:
-        releases = releases.order_by(getattr(Release, sort_by).desc())
+        releases = releases.order_by(getattr(EpisodeRelease, sort_by).desc())
     else:
-        releases = releases.order_by(getattr(Release, sort_by))
+        releases = releases.order_by(getattr(EpisodeRelease, sort_by))
     return releases.all()
 
 
@@ -1015,7 +1057,7 @@ def episode_in_show(series_id, episode_id):
 def release_in_episode(episode_id, release_id):
     """ Return True if `release_id` is part of episode with `episode_id`, else return False """
     with Session() as session:
-        release = session.query(Release).filter(Release.id == release_id).one()
+        release = session.query(EpisodeRelease).filter(EpisodeRelease.id == release_id).one()
         return release.episode_id == episode_id
 
 
@@ -1339,7 +1381,10 @@ class FilterSeries(FilterSeriesBase):
                     releases = store_parser(session, entry['series_parser'], series=db_series,
                                             quality=entry.get('quality'))
                     entry['series_releases'] = [r.id for r in releases]
-                    entity = releases[0].episode or releases[0].season
+                    if hasattr(releases[0], 'episode'):
+                        entity = releases[0].episode
+                    else:
+                        entity = releases[0].season
                     series_entries.setdefault(entity, []).append(entry)
 
                 # If we didn't find any episodes for this series, continue
@@ -1798,9 +1843,17 @@ class FilterSeries(FilterSeriesBase):
         for entry in task.accepted:
             if 'series_releases' in entry:
                 with Session() as session:
-                    num = (session.query(Release).filter(Release.id.in_(entry['series_releases'])).
-                           update({'downloaded': True}, synchronize_session=False))
-                log.debug('marking %s releases as downloaded for %s', num, entry)
+                    season_num = ep_num = 0
+                    if entry['season_pack']:
+                        season_num = (session.query(SeasonRelease).
+                                      filter(SeasonRelease.id.in_(entry['series_releases'])).
+                                      update({'downloaded': True}, synchronize_session=False))
+                    else:
+                        ep_num = (session.query(EpisodeRelease).filter(EpisodeRelease.id.in_(entry['series_releases'])).
+                                  update({'downloaded': True}, synchronize_session=False))
+
+                log.debug('marking %s episode releases and %s season releses as downloaded for %s', ep_num, season_num,
+                          entry)
             else:
                 log.debug('%s is not a series', entry['title'])
 
