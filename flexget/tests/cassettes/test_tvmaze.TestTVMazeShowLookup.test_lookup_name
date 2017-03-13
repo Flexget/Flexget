@@ -1,35 +1,36 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=House%20MD
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA41Ty27bMBD8FYKXXhRLcmwnFowARR/oJe3BCNCiCAxG3Ehs+BD4sOoY+fcOZaeH
-        okB7Enc52p3ZWR65kryp6+uCJ695w/sYh6Ysx3Gcxb0RzzRrnSlD78ZQAlb2LgXiBbfCEOCfzmE8
-        DDnctl4NkSQAWtguiS5nP9hOq9Aj2ZH1FHjznb/3wghkbg8hkj/kE0nVCs3vCx6iiAkw/CmnYj7Z
-        qHLDVVXwwZNR5HHR8HlVLS7q+qJeoUJoe5JJA3bkJzif101V4UqKw9T21lkc+f1Lwb2IynYZK/bk
-        J6ZrpEdSXR8xE2ikODr/lCF5Sovfqj9++YqarQMrUMf1eRp3VkE824I+VGaEzPrvtjhnQs/O5vit
-        IQ+p5Wcad99yg5ep78O7XlhLcMEmrQtOPzEZKzSIQ8/+RPFyXcGr2FPcywfeXF3Ol8uCK5MDHmO1
-        qOf1Ys5RUJlJ05EbDDYZXJ+9PfnaSjtZmwbthAzlBA/lCbwbnI9eqFguLsu6Wi/n1ezH0EGG86pT
-        IPWf5V7hO4zKpezPHxVBNCRjRJ4j3ww3W2Wf2MElzyJR7JnCf8yQiAcm88owYWVOgkYiNipANmRu
-        pj3clDgVDO68CSyKJ2LOMnNasIKNPXaGYXJsr7QWyjIVmEDtae2YEVrIw1Q+YwB2EwAw7wkbQjYW
-        rHVo7RAFJTSTro3Oo7Jj0acQA7MOPalgmkSIzD0yoTXr0WjAtqFCmG3K4QZzTIPEkuS3t7iul6vV
-        6go27jTUT3YH0o/Z9t4Tvq/OiUH99VVmu/Eq9iq/xkGFae3+8fMZF8r1vFphA19+Aa1/3HkLBAAA
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Dec 2016 09:56:54 GMT']
-      server: [nginx/1.10.0 (Ubuntu)]
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?q=House+MD
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA5VTy27bMBD8FYKXXhTrYceJBSNA0Qd6SXswArQoAoORNhIbPgQ+rCpB/r1D2QmC
+          XoqepCVnd2dnlk9ctrwuy8uMR6d4zfsQhjrPx3FchIMWj7RorM59b0efA5b3NnriGTdCE+BfTmGY
+          hhTuGieHQC0ASpguii6dfjKdkr7HYUfGkef1T/7RCS1wcj35QG5Kf9TKRih+m3EfRIiAIbOdi7lo
+          gkwN10XGB0daksNFzauiWJ2V5Vm5RgXf9NRGBdgTP8J5VdZFgatWTHPba2vwy2+fM+5EkKZLWHEg
+          NzPd4Hgk2fUBmmBGCqN1DwmSVFq9Tv3523fUbCxYgTquT2rcGInh2Q70MWVCtGn+mx3+E6FHa1L8
+          XpPDqPlXGvc/UoPnue/dh14YQ3DBRKUyTr+hjBEKxDHP4UhxuSngVegpHNo7Xl8sq/PzjEudAh5C
+          sSqrclVxFJR6numJawgbNa5P3iZ1ZfPW3jgoK1qfzyk+PybsB+uCEzLkq2VeFpvzqlj8GjqMYp3s
+          JIj9R8mXlD0kszH59FdVEPZRa5H05NvhaifNA5tsdCwQhZ5J5DFNIkysTavDhGnTIahEYqMEZOuD
+          s6a7mndym5+ijMGtd54F8UDMGqaPC5exsccOMSjJDlIpIQ2Tngn0mNeQaaFEO81tEgZgOwMAc46w
+          MWRCxhoLChaRl0Kx1jbBOlS2LLjog2fGoidlTJHwgdl7JpRiPRoN8AAV/GKbD1fQNA4tlia9xdXl
+          5UWxWVfLjO8VVJjt96Tu0xr0jvB9cVIM8q2Nr6802Y9XcpDpdQ7Sz2v4j+QTzuebqlhjI5//AN8R
+          Z/YbBAAA
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Mon, 13 Mar 2017 17:32:53 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
 version: 1
