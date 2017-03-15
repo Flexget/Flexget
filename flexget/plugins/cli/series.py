@@ -71,7 +71,7 @@ def display_summary(options):
         for index, value in enumerate(header):
             if value.lower() == options.sort_by:
                 header[index] = colorize(SORT_COLUMN_COLOR, value)
-        footer = 'Use `flexget series show NAME` to get detailed information'
+
         table_data = [header]
         for series in query:
             name_column = series.name
@@ -109,7 +109,10 @@ def display_summary(options):
         console('ERROR: %s' % str(e))
         return
     if not porcelain:
-        console(footer)
+        if not query.count():
+            console('Use `flexget series list all` to view all known series.')
+        else:
+            console('Use `flexget series show NAME` to get detailed information.')
 
 
 def begin(manager, options):
