@@ -2188,3 +2188,10 @@ class TestSeriesSeasonPack(object):
 
         task = execute_task('test_backfill_3')
         assert not task.accepted
+
+    def test_default_threshold(self, execute_task):
+        task = execute_task('foo_s01ep1')
+        assert len(task.accepted) == 1
+
+        task = execute_task('foo_s01')
+        assert len(task.accepted) == 0

@@ -12,7 +12,7 @@ from past.builtins import basestring
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property, hybrid_method
 from sqlalchemy.orm import relation, backref, object_session
 
 from flexget import db_schema, options, plugin
@@ -302,6 +302,10 @@ class Series(Base):
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
+
+    @hybrid_method
+    def episodes_for_season(self, season_num):
+        return len([episode for episode in self.episodes if episode.season == season_num])
 
 
 class Season(Base):
@@ -1154,7 +1158,11 @@ class FilterSeriesBase(object):
                 'prefer_specials': {'type': 'boolean'},
                 'assume_special': {'type': 'boolean'},
                 'tracking': {'type': ['boolean', 'string'], 'enum': [True, False, 'backfill']},
-                'season_packs': {'type': 'boolean'}
+                'season_packs': {'oneOf': [
+                    {'type': 'boolean'},
+                    {'type': 'integer'},
+                    {'type': 'string', 'enum': ['strict']}
+                ]}
             },
             'additionalProperties': False
         }
@@ -1498,6 +1506,15 @@ class FilterSeries(FilterSeriesBase):
                 log.debug('already accepted season pack for season %s in this task', entity.season)
                 continue
 
+            # Get the episode threshold that will be used for episode tracking
+            season_packs = config.get('season_packs')
+            if isinstance(season_packs, bool):
+                ep_threshold = 0
+            elif isinstance(season_packs, int):
+                ep_threshold = season_packs
+            else:
+                ep_threshold = sys.maxsize
+
             # reject entity that have been marked as watched in config file
             if entity.series.begin:
                 if entity < entity.series.begin:
@@ -1579,7 +1596,8 @@ class FilterSeries(FilterSeriesBase):
                     log.debug('-' * 20 + ' tracking -->')
                     # Grace is number of distinct eps in the task for this series + 2
                     backfill = config.get('tracking') == 'backfill'
-                    if self.process_entity_tracking(entity, entries, grace=len(series_entries) + 2, backfill=backfill):
+                    if self.process_entity_tracking(entity, entries, grace=len(series_entries) + 2, backfill=backfill,
+                                                    threshold=ep_threshold):
                         continue
 
             # quality
@@ -1699,7 +1717,7 @@ class FilterSeries(FilterSeriesBase):
             log.debug('no quality meets requirements')
         return result
 
-    def process_entity_tracking(self, entity, entries, grace, backfill=False):
+    def process_entity_tracking(self, entity, entries, grace, threshold, backfill=False):
         """
         Rejects all entity that are too old or new, return True when this happens.
 
@@ -1722,6 +1740,13 @@ class FilterSeries(FilterSeriesBase):
                 log.debug('season %s already completed for this series', entity.season)
                 for entry in entries:
                     entry.reject('season %s is already completed' % entity.season)
+                return True
+
+            # Test if episode threshold has been met
+            if entity.is_season and entity.series.episodes_for_season(entity.season) > threshold:
+                log.debug('threshold of %s has been met, skipping season pack', threshold)
+                for entry in entries:
+                    entry.reject('The configured number of episode for this season has already been downloaded')
                 return True
 
             if latest.identified_by == entity.identified_by:
