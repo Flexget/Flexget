@@ -26,6 +26,7 @@ log = logging.getLogger('rutracker_auth')
 Base = versioned_base('rutracker_auth', 0)
 
 BASE_URL = 'https://rutracker.org'
+MIRROR_DOMAINS = ['cr', 'net', 'org']
 
 
 class JSONEncodedDict(TypeDecorator):
@@ -64,6 +65,19 @@ class RutrackerAuth(AuthBase):
        if you pass cookies (CookieJar) to constructor then authentication will be bypassed and cookies will be just set
     """
 
+    def update_base_url(self):
+        global BASE_URL
+        for d in MIRROR_DOMAINS:
+            try:
+                url = re.sub('[^.]*$', d, BASE_URL)
+                s = RSession()
+                response = s.get(url, timeout=2)
+                if response.ok:
+                    BASE_URL = url
+                    break
+            except:
+                log.debug('Url unreachable. Trying next mirror.')
+
     def try_authenticate(self, payload):
         for _ in range(5):
             s = RSession()
@@ -75,6 +89,7 @@ class RutrackerAuth(AuthBase):
         raise PluginError('unable to obtain cookies from rutracker')
 
     def __init__(self, login, password, cookies=None, db_session=None):
+        self.update_base_url()
         if cookies is None:
             log.debug('rutracker cookie not found. Requesting new one')
             payload_ = {'login_username': login,
