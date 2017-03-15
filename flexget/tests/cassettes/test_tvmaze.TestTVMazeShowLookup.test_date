@@ -1,65 +1,65 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=the%20daily%20show%20(with%20jon%20stewart)
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA41UTU/bQBD9K6u9cHHiOCSERBFSRXtopbYHQFVVENp4B+/Cetfaj7gB8d/71gbU
-        QyV6SezZt29m3rzxE9eSb+aLdcGTN3zDVYzdpiz7vp/GfSseaVq7tgzK9aEErIyKJlJoc5jk2KTX
-        UU3unZ2ESL3wkRfcipZAdKmIfcxAdgEgy0D2xVl28QaMh24ACvMwYHDXCNsk0eTwJ9sYHRSCDVlP
-        gW9+8XPXkjzwm4KHKGJCDDBJEiCfbNQ58fGs4J2nVpPHwYZX6/XJZLaazOdAhVqRTAawJz7C+fx4
-        M5vhSIrDkOOrs3hE4DJRGJ9+kLSvz5cq+SF884ykImrbZDKxJz/UfTo9xUFPulGRb1CLpdg7/5BB
-        g9THbwqN3bBzstELg4y1QxP+kKEvIl5ZHUlCMxGhQEbIrM3VBZ5z/Y/O5vcPLXldi/Ib9bc/c7Ln
-        oYbduRLWEsZqkzEFp9+RvBUGfaL9/VjwclUtQKYo7uWOb1bVfHlScN3mFx7jrKqW1WLFQajbocMn
-        jiHo1OL4xSyjUWppB6+kzjghQznAQzmCbzvn0aWOZVUuluvT6X3XoAfndaNR0X9yvcJvoZNLeZZ/
-        06HEkNpWZAX5tjv7bokJWyvnCxYoD8iw2nl4qcOMoXoo2CN5x2o4Re+00fEw3ZbdGe6yz3fs4NKR
-        JxY1jpm7Y9CIhegkKqYQXiMgtjABs9SHWoQYkFPmu6wW9iiyHQnPomNBRzB4lxo1MnXatqSxN368
-        EpQ2BrR2OJ4vJsolD5KdoYEcP4OTCiZdJm41itiG6J1tzrbUnl2/t3PXfFsCty1fLhVDJputijVV
-        wtyNOQPcRIElu0seOqH73YG53T3VUe8hUsHuURrGhup1zbSN1HjEmfMsy8FEXScv6lFNjDl1EgbG
-        NlaLk/ViNlufwHK3RtuHwYqBzF22pPKE/1dXiU7/8xOUrYgF32uXAnU6DCvxzuUXHD5hs2q5WmA/
-        nv8AbAYQnfoEAAA=
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Dec 2016 09:56:59 GMT']
-      server: [nginx/1.10.0 (Ubuntu)]
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/249/episodesbydate?date=2012-06-06
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA3WQwWrDMAyGX2XobNdOUlbwA+zW225jDLVRZ2+2Eyxnpit59zkJY9thIBDo//5f
-        Qk83cD2YVu8PjYApeTBgcx6NUqWUXf4I+Em78xAUjY6HnlitrMqWZI/OXyXbocjispVvQ5ScqWDK
-        stVNK/X9UsGdLZKXF2Q+UewpgYCIgequ46bdPfzWmJCHuFzVtJWcwqlazKETgC71mBfjT34Nq+Ps
-        1ry2M1pvE84Yxj/k46pWQOr9hqUpbsZOC3ABX2t0nLwXwFMImK7VX9NevIvvDOYGTP6ydJuo9u9X
-        4ej+fxXM8/z8BY+8oW5oAQAA
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Dec 2016 09:57:00 GMT']
-      server: [nginx/1.10.0 (Ubuntu)]
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?q=the+daily+show+%28with+jon+stewart%29
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA5VUTW/bOBD9KwQvvciW5dhxbBgBFtk97ALtHpKgKNoioKWJOAlFCvyw1gny3/so
+          JUFuxV4kavjm680bPUtu5G652hYyeSN3UsfY78pyGIZ5PHbqiea168qg3RBKwMqoadYoNqdZts0G
+          jnr24OwsRBqUj7KQVnWEQDeaxJ8ZKK4BFBko/nFWXL8D46kfgco8jhj4GmXbpNps/su2hoOGsSXr
+          Kcjdd3nlOmpO8mchQ1QxwQZYQw1APtnIOfHZopC9p47J42Inq+32fLbYzJZLoEKtqUkGsGc5weXy
+          bLdY4KpRpzHHZ2dxhOEmUZhOX6mxb+cbnfxo/vmCpCqybXMwdSQ/1n0xv8DFQNzqKHeoxVIcnH/M
+          oJHqs3eGpm7EFdnolUHG2qEJf8rQVxJvLUdqwJmKYCAjmszN7TXOuf4nZ/P3Hx15rlX5hYa7bznZ
+          y1jD4UorawljtcmYQtJ/kbxVBn2i/eNU8HpTrRBMUzw2B7nbVMv1eSG5yx8yxkVVravVRiIgd2OH
+          zxJD4NTh+lUseRhcf9RL6o1TTShHl1BODne98+iUY1mVq/X2Yv7Qt+jDeW4ZVf2PeG8ud+DLpTzT
+          jyFRakhdpzKTct9f/mtJKFtr5wsRKA/KiNp5aKrHrMF+KMQTeSdqKIYPbDie5vuyv4Sv+PtenFz6
+          5ElExrVw9wJciRBdg6ophDcLAluIQVgaQq1CDMjZZF9RK/spigMpL6ITgSMieJdaPUXq2XbE2B8/
+          uQTNxiCsHa+Xq5l2ySPIwdAYHI9RUYVoXA7cMYrYh+idbS/31F3++N3u/ZD7Erh9+epUjJlslizW
+          VStzP+UMUBUFkewhefCE7g8n4Q4PVEc+gqRCPKA0jA7Vcy3YRmo97MJ5kekQqq6TV/XEJkad+gZC
+          xlZWq/PtarHYnkN6d4bt4yjJQOY+S1N7wvtNXarnj9J6/xVlSWLRj+xSoJ7DuBq/cX7F4Ve2qNab
+          Ffbk5Rf1EPOPAgUAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Mon, 13 Mar 2017 17:26:51 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/shows/249/episodesbydate?date=2012-06-06
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA3WQwWrDMAyGX2XobNdOUlbwA+zW225jDLVRZ2+2Eyxnpit59zkJY9thIBDo//5f
+          Qk83cD2YVu8PjYApeTBgcx6NUqWUXf4I+Em78xAUjY6HnlitrMqWZI/OXyXbocjispVvQ5ScqWDK
+          stVNK/X9UsGdLZKXF2Q+UewpgYCIgequ46bdPfzWmJCHuFzVtJWcwqlazKETgC71mBfjT34Nq+Ps
+          1ry2M1pvE84Yxj/k46pWQOr9hqUpbsZOC3ABX2t0nLwXwFMImK7VX9NevIvvDOYGTP6ydJuo9u9X
+          4ej+fxXM8/z8BY+8oW5oAQAA
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Mon, 13 Mar 2017 17:26:59 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
 version: 1

@@ -1,237 +1,63 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.24.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/3928
-  response:
-    body: {string: !!python/unicode '{"id":3928,"url":"http://www.tvmaze.com/shows/3928/the-daily-show-with-trevor-noah","name":"The
-        Daily Show with Trevor Noah","type":"Talk Show","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2015-09-28","schedule":{"time":"23:00","days":["Monday","Tuesday","Wednesday","Thursday"]},"rating":{"average":7.7},"weight":4,"network":{"id":23,"name":"Comedy
-        Central","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/19/48965.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/19/48965.jpg"},"summary":"<p>An
-        irreverent skewering of the news and pop culture with South African comedian
-        Trevor Noah, who took over for Jon Stewart when he left the anchor desk after
-        17 seasons.</p>","updated":1473678175,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3928"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/911438"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/925421"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 12 Sep 2016 13:27:59 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.24.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/3928/episodesbydate?date=2016-09-12
-  response:
-    body: {string: !!python/unicode '[{"id":925421,"url":"http://www.tvmaze.com/episodes/925421/the-daily-show-with-trevor-noah-2016-09-12-ti-harris","name":"T.I.
-        Harris","season":2016,"number":113,"airdate":"2016-09-12","airtime":"23:00","airstamp":"2016-09-12T23:00:00-04:00","runtime":30,"image":null,"summary":"<p>Rapper
-        T.I. Harris.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/925421"}}}]'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 12 Sep 2016 13:27:59 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.31.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/3928
-  response:
-    body: {string: !!python/unicode '{"id":3928,"url":"http://www.tvmaze.com/shows/3928/the-daily-show-with-trevor-noah","name":"The
-        Daily Show with Trevor Noah","type":"Talk Show","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2015-09-28","schedule":{"time":"23:00","days":["Monday","Tuesday","Wednesday","Thursday"]},"rating":{"average":7.7},"weight":4,"network":{"id":23,"name":"Comedy
-        Central","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/19/48965.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/19/48965.jpg"},"summary":"<p>An
-        irreverent skewering of the news and pop culture with South African comedian
-        Trevor Noah, who took over for Jon Stewart when he left the anchor desk after
-        17 seasons.</p>","updated":1474460516,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3928"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/931843"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/931846"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Thu, 22 Sep 2016 11:40:44 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.31.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/3928/episodesbydate?date=2016-09-12
-  response:
-    body: {string: !!python/unicode '[{"id":925421,"url":"http://www.tvmaze.com/episodes/925421/the-daily-show-with-trevor-noah-2016-09-12-ti-harris","name":"T.I.
-        Harris","season":2016,"number":113,"airdate":"2016-09-12","airtime":"23:00","airstamp":"2016-09-12T23:00:00-04:00","runtime":30,"image":null,"summary":"<p>Rapper
-        T.I. Harris.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/925421"}}}]'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Thu, 22 Sep 2016 11:40:44 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/3928
-  response:
-    body: {string: !!python/unicode '{"id":3928,"url":"http://www.tvmaze.com/shows/3928/the-daily-show-with-trevor-noah","name":"The
-        Daily Show with Trevor Noah","type":"Talk Show","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2015-09-28","schedule":{"time":"23:00","days":["Monday","Tuesday","Wednesday","Thursday"]},"rating":{"average":7.7},"weight":3,"network":{"id":23,"name":"Comedy
-        Central","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/19/48965.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/19/48965.jpg"},"summary":"<p>An
-        irreverent skewering of the news and pop culture with South African comedian
-        Trevor Noah, who took over for Jon Stewart when he left the anchor desk after
-        17 seasons.</p>","updated":1474714066,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3928"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/931846"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/939243"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Sep 2016 14:20:31 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/3928/episodesbydate?date=2016-09-12
-  response:
-    body: {string: !!python/unicode '[{"id":925421,"url":"http://www.tvmaze.com/episodes/925421/the-daily-show-with-trevor-noah-2016-09-12-ti-harris","name":"T.I.
-        Harris","season":2016,"number":113,"airdate":"2016-09-12","airtime":"23:00","airstamp":"2016-09-12T23:00:00-04:00","runtime":30,"image":null,"summary":"<p>Rapper
-        T.I. Harris.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/925421"}}}]'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Sep 2016 14:20:32 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/3928
-  response:
-    body: {string: !!python/unicode '{"id":3928,"url":"http://www.tvmaze.com/shows/3928/the-daily-show-with-trevor-noah","name":"The
-        Daily Show with Trevor Noah","type":"Talk Show","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2015-09-28","schedule":{"time":"23:00","days":["Monday","Tuesday","Wednesday","Thursday"]},"rating":{"average":7.7},"weight":3,"network":{"id":23,"name":"Comedy
-        Central","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/19/48965.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/19/48965.jpg"},"summary":"<p>An
-        irreverent skewering of the news and pop culture with South African comedian
-        Trevor Noah, who took over for Jon Stewart when he left the anchor desk after
-        17 seasons.</p>","updated":1474859915,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3928"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/931846"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/939243"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:20:30 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/3928/episodesbydate?date=2016-09-12
-  response:
-    body: {string: !!python/unicode '[{"id":925421,"url":"http://www.tvmaze.com/episodes/925421/the-daily-show-with-trevor-noah-2016-09-12-ti-harris","name":"T.I.
-        Harris","season":2016,"number":113,"airdate":"2016-09-12","airtime":"23:00","airstamp":"2016-09-12T23:00:00-04:00","runtime":30,"image":null,"summary":"<p>Rapper
-        T.I. Harris.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/925421"}}}]'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:20:31 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/3928
-  response:
-    body: {string: !!python/unicode '{"id":3928,"url":"http://www.tvmaze.com/shows/3928/the-daily-show-with-trevor-noah","name":"The
-        Daily Show with Trevor Noah","type":"Talk Show","language":"English","genres":["Comedy"],"status":"Running","runtime":30,"premiered":"2015-09-28","schedule":{"time":"23:00","days":["Monday","Tuesday","Wednesday","Thursday"]},"rating":{"average":7.7},"weight":3,"network":{"id":23,"name":"Comedy
-        Central","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":null,"imdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/19/48965.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/19/48965.jpg"},"summary":"<p>An
-        irreverent skewering of the news and pop culture with South African comedian
-        Trevor Noah, who took over for Jon Stewart when he left the anchor desk after
-        17 seasons.</p>","updated":1474859915,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3928"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/931846"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/939243"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:22:24 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/3928/episodesbydate?date=2016-09-12
-  response:
-    body: {string: !!python/unicode '[{"id":925421,"url":"http://www.tvmaze.com/episodes/925421/the-daily-show-with-trevor-noah-2016-09-12-ti-harris","name":"T.I.
-        Harris","season":2016,"number":113,"airdate":"2016-09-12","airtime":"23:00","airstamp":"2016-09-12T23:00:00-04:00","runtime":30,"image":null,"summary":"<p>Rapper
-        T.I. Harris.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/925421"}}}]'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:22:25 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/shows/3928
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA5VTy27bMBD8FYJn27LsxLWNIECQ9lKgOdQOiqAIDEZaS6yppcCHVSfIv3coxWh6
+          KnLSajncx8zwRepSruer2XIkozNyLesQ2nWWdV03CcdGPdOksE3ma9v5LOGyUNO4VNqcxik57nSo
+          x8HR0boxW1XLkWTVECptaxKfE1BsABQJKLY9UNwNwHBqe6Ayhx6Du0ZxFVWV0l+4MtqnghWxIy/X
+          P+Wtbag8yceR9EGFiJz8Hpk1V4C5yEGn1vPpSLaOGk2OsJ6cTfPL8XQ1ni2B8kVNZTSAvcgBLmfz
+          9XSKo1Kd+i7fLCNEYhvJD9EPKvkcb+vo+vTjK5qqkLqjmDqS6ydfTC5x0JGu6oBhQAiFzrpDAiW6
+          Zyk1cDTsI26Jg1MGHQuLJdwpQd8g96wDlWKDfcFBQpSJnfsN4jT/s+X0f9OQ04XK7qjbPaRmr/0M
+          T7e1YiYoy9GYkaTfgRwrgz2x/nEYeDiCsOFYPp2RujnHKKSbfrMXCfp1bNDvzSdJBl28t0psjVWl
+          z/orPhsu7FrrsKEOWb7KLparxeXkV5s0s05XGvN8oOL5yg5M2ZjU/LcoxvWxaVRiUV611zcstIPv
+          YAYOwh+oA1NcCbsXWFkwdV4oLkVrW1FEE6KjwawbG2HZm33ilQWeAXZH8M7DI9HVVgRrD8Kivthb
+          J75ahljUKRdwSizQw9A+9M0UFzUwJfmDUHtIIfJPwpPylv3kKmuvQUlsS0gNn+QgKr9YzS/wOHdG
+          86EXzZPZJ/FqR/iedVCtfi/C3/cqQQfewlHb6KnVvnfPf26/4XyWT5eL2SJPNTg55+P3VwuMDy++
+          /gEZnR8JagQAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Mon, 13 Mar 2017 07:57:43 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/shows/3928/episodesbydate?date=2016-09-12
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA32QzWrDMBCEXyXs2bJkOy1EhJzba8gtlLKt1UpEf6zkmDT43SvHhLaXnhZmv5ld
+          5ngF04PctA/rtqlgIAsSdM5Rcj6OY53PDr9U/R4cV9Gk0KvEF5hnrViPxl5Y0mFko8maZVLnQMwH
+          1KwVzSMTG9a0LBumkcgkqMCjU+XGoX6uV093MSlMwYOcPQUZ3JsikE3TVYCGesyz5SewxBQ5m1tS
+          20khFiVldPEPebhtC8DEesFo8IuxExUYh58l2g/WVpAG55Auxb+Nuz3GqGj16816y+Ou3Hm1xp8S
+          yCskZT/mqUmVea8No/mnNpim6eUblU0JqnYBAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Mon, 13 Mar 2017 07:57:43 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
 version: 1

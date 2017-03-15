@@ -1,59 +1,59 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=Unite%209
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA41Sy27bMBD8FWPPsinJli3rFhgokGvaoociMBhxK7GRSIEPq47hD/J3+Me6Kzst
-        ChRoTyJ3h6PZmT2BVlCV6yJPILoOKmhDGCohxnFchEMv33BR21741o5eME5EowPOt5CAkT3Si89U
-        uF5mXAnHgSsfa6eHgIoqnTRNlA1XPzg0dUu1Bo1DD9XX5wR8kCHSGZ6iMdo01HbRBM3MqyKBwWGv
-        0RFXBXma5fN0O88yQvm6RRU7gp3gBqd+labUUvLI7PAFlUFPN3g+E60MzE9weUA3STKx66gzom7a
-        AFVKI2EYrXtlFBuzKrJfYz7uHmdPUmk730kjlZx9ul6664X+V1tS7I786G7JDTG1FI++e6Azq3yz
-        ZrpPDOIhkD1B13CeVLzsWmkMUgosLAH8EdAZ2dEwNOPht2biajEc1AtU+Trbcni65xuEkC/Lclmk
-        QIy6n6Y8QY9Kx57a93BvwdbKTNnGobNSeTHBvbiB94N1wUkdxDIVm026yhbfB07HOt1oEvWfbO/w
-        PVlkI2f2JyHJ9LHvJdsHRB8HJXlzqmxV5GVWbMoygX2nzevkgsfuG7vROqTv+zxy0H9fVnaBNuig
-        bfQ4aG85jX+8vuO8WJXFOsspm/NPvG6uqCYDAAA=
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Dec 2016 09:57:20 GMT']
-      server: [nginx/1.10.0 (Ubuntu)]
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.8.12.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/shows/8652/episodebynumber?season=1&number=16
-  response:
-    body:
-      string: !!binary |
-        H4sIAAAAAAAAA32PS07EMBBEr4J6bY8/hKDxfm7AHjWkYSxsJ/KHAKPcnZ4YFmxYdavqVUl1AT+B
-        G+5HexwEtBzAwbnWxSm1ruuhvkf8osPzHBUtvswTFdVh1ZKvJI/SfJhR/pjSjCAgYSSuOfXAza4V
-        wjIncIbtFp8o8zsKQJ8nrFfaanMrtZHWcgPL1e8lVjutu1IqxuUP+bC7DEg9dCy31IPDnQAf8ZWr
-        UwtBQGkxYv7kPLc9Bp/eCrgLFAov13vOxPd3Oi7+n+mwbds3HPvb3DgBAAA=
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-encoding: [gzip]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Dec 2016 09:57:20 GMT']
-      server: [nginx/1.10.0 (Ubuntu)]
-      vary: [Accept-Encoding]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?q=Unite+9
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA5VSy27bMBD8FWPPsinJli3rFhgokGvaoociMBhxK7GRSIEPq46RD/J3+Me6KztN
+          eip6krg7O5yZ5Qm0gqpcF3kC0XVQQRvCUAkxjuMiHHr5gova9sK3dvSCcSIaHXC+hQSM7JEmvlLh
+          cp5xJRwHrnyunR4CKqp00jRRNlz95NDULdUaNA49VN8fE/BBhkj/8BCN0aahtosmaGZeFQkMDnuN
+          jrgqyNMsn6fbeZYRytctqtgR7ARXOPWrNKWWkkdmh2+oDHo6weMr0crA/ASXB3STJBO7jjoj6qYN
+          UKVkCcNo3TOjOJhVkf2xeb+7nz1Ipe18J41Ucvblcu4uZ7qvtqTYHXnoFskVMbUUW9/d0T+rfLFm
+          Ok8M4i5QPEHX8DqpeNq10hikLbCwBPBXQGdkR2bI4+FdM3G1GA7qCap8nW15ebrnE4SQL8tyWaRA
+          jLqfXJ6gR6VjT+3bcjl0XX/cbxw6K5UX04gX14H9YF1wUgexTMVmk66yxc+BN2SdbjQJ+w/Gt5E9
+          RWUj7+5vUpLrY99LjhHoijgoyS+oylZFXmbFpiwT2HfaPE9peOx+cCqtQ/q++ZKD/mjq/dFyGvSS
+          DtpGj4P2lrfyj+kbzotVWayznHb0+hvxp+vALgMAAA==
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Mon, 13 Mar 2017 17:18:25 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/shows/8652/episodebynumber?season=1&number=16
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA32PS07EMBBEr4J6bY8/hKDxfm7AHjWkYSxsJ/KHAKPcnZ4YFmxYdavqVUl1AT+B
+          G+5HexwEtBzAwbnWxSm1ruuhvkf8osPzHBUtvswTFdVh1ZKvJI/SfJhR/pjSjCAgYSSuOfXAza4V
+          wjIncIbtFp8o8zsKQJ8nrFfaanMrtZHWcgPL1e8lVjutu1IqxuUP+bC7DEg9dCy31IPDnQAf8ZWr
+          UwtBQGkxYv7kPLc9Bp/eCrgLFAov13vOxPd3Oi7+n+mwbds3HPvb3DgBAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Mon, 13 Mar 2017 17:18:33 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
 version: 1
