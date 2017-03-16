@@ -19,14 +19,16 @@ from flexget.manager import Session
 from requests import Session as RSession
 from requests.auth import AuthBase
 from requests.utils import dict_from_cookiejar
+from requests.exceptions import ConnectionError
 
 __author__ = 'asm0dey'
 
 log = logging.getLogger('rutracker_auth')
 Base = versioned_base('rutracker_auth', 0)
 
-BASE_URL = 'https://rutracker.org'
-MIRROR_DOMAINS = ['cr', 'net', 'org']
+MIRRORS = ['https://rutracker.cr',
+           'https://rutracker.net',
+           'https://rutracker.org']
 
 
 class JSONEncodedDict(TypeDecorator):
@@ -65,23 +67,28 @@ class RutrackerAuth(AuthBase):
        if you pass cookies (CookieJar) to constructor then authentication will be bypassed and cookies will be just set
     """
 
-    def update_base_url(self):
-        global BASE_URL
-        for d in MIRROR_DOMAINS:
+    @staticmethod
+    def update_base_url():
+        url = None
+        for mirror in MIRRORS:
             try:
-                url = re.sub('[^.]*$', d, BASE_URL)
                 s = RSession()
-                response = s.get(url, timeout=2)
+                response = s.get(mirror, timeout=2)
                 if response.ok:
-                    BASE_URL = url
+                    url = mirror
                     break
-            except:
-                log.debug('Url unreachable. Trying next mirror.')
+            except ConnectionError as err:
+                log.debug('Connection error. {}'.format(err))
+
+        if url:
+            return url
+        else:
+            raise PluginError('Host unreachable.')
 
     def try_authenticate(self, payload):
         for _ in range(5):
             s = RSession()
-            s.post('{}/forum/login.php'.format(BASE_URL), data=payload)
+            s.post('{}/forum/login.php'.format(self.base_url), data=payload)
             if s.cookies and len(s.cookies) > 0:
                 return s.cookies
             else:
@@ -89,7 +96,7 @@ class RutrackerAuth(AuthBase):
         raise PluginError('unable to obtain cookies from rutracker')
 
     def __init__(self, login, password, cookies=None, db_session=None):
-        self.update_base_url()
+        self.base_url = self.update_base_url()
         if cookies is None:
             log.debug('rutracker cookie not found. Requesting new one')
             payload_ = {'login_username': login,
@@ -114,13 +121,13 @@ class RutrackerAuth(AuthBase):
         t_id = re.findall(r'\d+', url)[0]
         data = 't={}'.format(t_id)
         headers = {
-            'referer': '{}/forum/viewtopic.php?t={}'.format(BASE_URL, t_id),
+            'referer': '{}/forum/viewtopic.php?t={}'.format(self.base_url, t_id),
             'Content-Type': 'application/x-www-form-urlencoded', 't': t_id,
-            'Origin': BASE_URL,
+            'Origin': self.base_url,
             'Accept-Encoding': 'gzip,deflate,sdch'}
         r.prepare_body(data=data, files=None)
         r.prepare_method('POST')
-        r.prepare_url(url='{}/forum/dl.php?t={}'.format(BASE_URL, t_id),
+        r.prepare_url(url='{}/forum/dl.php?t={}'.format(self.base_url, t_id),
             params=None)
         r.prepare_headers(headers)
         r.prepare_cookies(self.cookies_)
@@ -155,7 +162,7 @@ class RutrackerUrlrewrite(object):
         else:
             auth_handler = self.auth_cache[username]
         for entry in task.accepted:
-            if entry['url'].startswith('{}/forum/viewtopic.php'.format(BASE_URL)):
+            if entry['url'].startswith('{}/forum/viewtopic.php'.format(self.auth_cache[username].base_url)):
                 entry['download_auth'] = auth_handler
 
     def try_find_cookie(self, db_session, username):
