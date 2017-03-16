@@ -76,7 +76,7 @@ class SeriesParser(TitleParser):
     def __init__(self, name=None, alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
                  date_regexps=None, sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None,
                  allow_seasonless=True, date_dayfirst=None, date_yearfirst=None, special_ids=None,
-                 prefer_specials=False, assume_special=False, season_packs=None):
+                 prefer_specials=False, assume_special=False):
         """
         Init SeriesParser.
 
@@ -126,7 +126,6 @@ class SeriesParser(TitleParser):
         self.allow_seasonless = allow_seasonless
         self.date_dayfirst = date_dayfirst
         self.date_yearfirst = date_yearfirst
-        self.season_packs = season_packs
 
         self.field = None
         self._reset()
