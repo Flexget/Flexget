@@ -439,7 +439,9 @@ class Episode(Base):
         return str(self).encode('ascii', 'replace')
 
     def __eq__(self, other):
-        if not isinstance(other, (Episode, Season)):
+        if isinstance(other, Season):
+            return False
+        elif not isinstance(other, Episode):
             raise NotImplementedError
         if self.identified_by != other.identified_by:
             raise NotImplementedError
