@@ -2113,6 +2113,9 @@ class TestSeriesSeasonPack(object):
         test_backfill_3:
           mock:
           - title: bar.s03e01.720p-flexget
+        test_backfill_4:
+          mock:
+          - title: bar.s02e01.1080p-flexget
 
     """
 
@@ -2187,6 +2190,9 @@ class TestSeriesSeasonPack(object):
         assert len(task.accepted) == 1
 
         task = execute_task('test_backfill_3')
+        assert not task.accepted
+
+        task = execute_task('test_backfill_4')
         assert not task.accepted
 
     def test_default_threshold(self, execute_task):

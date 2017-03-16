@@ -307,6 +307,10 @@ class Series(Base):
         return len(
             [episode for episode in self.episodes if episode.season == season_num and episode.downloaded_releases])
 
+    @property
+    def completed_seasons(self):
+        return [season.season for season in self.seasons if season.completed]
+
 
 class Season(Base):
     __tablename__ = 'series_seasons'
@@ -322,32 +326,25 @@ class Season(Base):
 
     is_season = True
 
-    @hybrid_property
+    @property
     def completed(self):
+        """
+        Return True if the season has any released marked as downloaded
+        """
         if not self.releases:
-            return None
+            return False
         return any(release.downloaded for release in self.releases)
-
-    @completed.expression
-    def completed(cls):
-        return select(SeasonRelease).where(SeasonRelease.season_id == cls.id).where(SeasonRelease.downloaded == True)
 
     @property
     def downloaded_releases(self):
         return [release for release in self.releases if release.downloaded]
 
     def __str__(self):
-        return '<Season(id=%s,identifier=%s,season=%s)>' % (self.id, self.identifier, self.season)
+        return '<Season(id=%s,identifier=%s,season=%s,completed=%s)>' % (
+            self.id, self.identifier, self.season, self.completed)
 
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
-
-    def __eq__(self, other):
-        if not isinstance(other, (Season, Episode)):
-            raise NotImplementedError
-        if self.identified_by != 'ep':
-            raise NotImplementedError
-        return self.season == other.season
 
     def __lt__(self, other):
         if not isinstance(other, (Season, Episode)):
@@ -1732,7 +1729,7 @@ class FilterSeries(FilterSeriesBase):
 
         if latest:
             # reject any entity if a season pack for this season was already downloaded
-            if latest.is_season and entity.season == latest.season and latest.completed:
+            if entity.season in entity.series.completed_seasons:
                 log.debug('season %s already completed for this series', entity.season)
                 for entry in entries:
                     entry.reject('season %s is already completed' % entity.season)
@@ -1759,7 +1756,8 @@ class FilterSeries(FilterSeriesBase):
                 if (entity.season > latest.season + 1 or
                             not entity.is_season and (
                                     (entity.season > latest.season and entity.number > 1) or
-                                    (entity.season == latest.season and entity.number > (latest.number + grace)))):
+                                        not latest.is_season and (entity.season == latest.season and entity.number > (
+                                                latest.number + grace)))):
                     log.debug('too new! rejecting all occurrences')
                     for entry in entries:
                         entry.reject('Too much in the future from latest downloaded entity %s. '
