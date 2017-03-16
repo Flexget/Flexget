@@ -2061,6 +2061,10 @@ class TestSeriesSeasonPack(object):
           - bar:
               season_packs: yes
               tracking: backfill
+          - baz:
+              season_packs: 3
+          - boo:
+              season_packs: always
       tasks:
         multiple_formats:
           mock:
@@ -2116,6 +2120,29 @@ class TestSeriesSeasonPack(object):
         test_backfill_4:
           mock:
           - title: bar.s02e01.1080p-flexget
+        test_specific_season_pack_threshold_1:
+          mock:
+          - title: baz.s01e01.720p-flexget
+          - title: baz.s01e02.720p-flexget
+          - title: baz.s01e03.720p-flexget
+        test_specific_season_pack_threshold_2:
+          mock:
+          - title: baz.s01.720p-flexget
+        test_specific_season_pack_threshold_3:
+          mock:
+          - title: baz.s01e01.720p-flexget
+          - title: baz.s01e02.720p-flexget
+          - title: baz.s01e03.720p-flexget
+          - title: baz.s01e04.720p-flexget
+        test_always_get_season_pack_1:
+          mock:
+          - title: boo.s01e01.720p-flexget
+          - title: boo.s01e02.720p-flexget
+          - title: boo.s01e03.720p-flexget
+          - title: boo.s01e04.720p-flexget
+        test_always_get_season_pack_2:
+          mock:
+          - title: boo.s01.720p-flexget
 
     """
 
@@ -2201,3 +2228,24 @@ class TestSeriesSeasonPack(object):
 
         task = execute_task('foo_s01')
         assert len(task.accepted) == 0
+
+    def test_specific_season_pack_threshold_positive(self, execute_task):
+        task = execute_task('test_specific_season_pack_threshold_1')
+        assert len(task.accepted) == 3
+
+        task = execute_task('test_specific_season_pack_threshold_2')
+        assert len(task.accepted) == 1
+
+    def test_specific_season_pack_threshold_negative(self, execute_task):
+        task = execute_task('test_specific_season_pack_threshold_3')
+        assert len(task.accepted) == 4
+
+        task = execute_task('test_specific_season_pack_threshold_2')
+        assert not task.accepted
+
+    def test_loose_threshold(self, execute_task):
+        task = execute_task('test_always_get_season_pack_1')
+        assert len(task.accepted) == 4
+
+        task = execute_task('test_always_get_season_pack_2')
+        assert len(task.accepted) == 1

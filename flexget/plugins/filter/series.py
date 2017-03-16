@@ -1151,10 +1151,11 @@ class FilterSeriesBase(object):
                 'prefer_specials': {'type': 'boolean'},
                 'assume_special': {'type': 'boolean'},
                 'tracking': {'type': ['boolean', 'string'], 'enum': [True, False, 'backfill']},
+                # Season pack
                 'season_packs': {'oneOf': [
                     {'type': 'boolean'},
                     {'type': 'integer'},
-                    {'type': 'string', 'enum': ['strict']}
+                    {'type': 'string', 'enum': ['always']}
                 ]}
             },
             'additionalProperties': False
