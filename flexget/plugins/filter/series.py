@@ -12,7 +12,7 @@ from past.builtins import basestring
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.hybrid import Comparator, hybrid_property, hybrid_method
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.orm import relation, backref, object_session
 
 from flexget import db_schema, options, plugin
@@ -303,9 +303,9 @@ class Series(Base):
     def __repr__(self):
         return str(self).encode('ascii', 'replace')
 
-    @hybrid_method
     def episodes_for_season(self, season_num):
-        return len([episode for episode in self.episodes if episode.season == season_num])
+        return len(
+            [episode for episode in self.episodes if episode.season == season_num and episode.downloaded_releases])
 
 
 class Season(Base):
@@ -320,6 +320,8 @@ class Season(Base):
 
     releases = relation('SeasonRelease', backref='season', cascade='all, delete, delete-orphan')
 
+    is_season = True
+
     @hybrid_property
     def completed(self):
         if not self.releases:
@@ -329,10 +331,6 @@ class Season(Base):
     @completed.expression
     def completed(cls):
         return select(SeasonRelease).where(SeasonRelease.season_id == cls.id).where(SeasonRelease.downloaded == True)
-
-    @property
-    def is_season(self):
-        return True
 
     @property
     def downloaded_releases(self):
@@ -375,9 +373,7 @@ class Episode(Base):
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
     releases = relation('EpisodeRelease', backref='episode', cascade='all, delete, delete-orphan')
 
-    @property
-    def is_season(self):
-        return False
+    is_season = False
 
     @hybrid_property
     def first_seen(self):
