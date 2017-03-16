@@ -127,8 +127,7 @@ class RutrackerAuth(AuthBase):
             'Accept-Encoding': 'gzip,deflate,sdch'}
         r.prepare_body(data=data, files=None)
         r.prepare_method('POST')
-        r.prepare_url(url='{}/forum/dl.php?t={}'.format(self.base_url, t_id),
-            params=None)
+        r.prepare_url(url='{}/forum/dl.php?t={}'.format(self.base_url, t_id), params=None)
         r.prepare_headers(headers)
         r.prepare_cookies(self.cookies_)
         return r
@@ -165,7 +164,8 @@ class RutrackerUrlrewrite(object):
             if entry['url'].startswith('{}/forum/viewtopic.php'.format(self.auth_cache[username].base_url)):
                 entry['download_auth'] = auth_handler
 
-    def try_find_cookie(self, db_session, username):
+    @staticmethod
+    def try_find_cookie(db_session, username):
         account = db_session.query(RutrackerAccount).filter(
             RutrackerAccount.login == username).first()
         if account:
