@@ -491,7 +491,7 @@ def parse_entity_identifier(entity_id):
         if entity_id <= 0:
             error = 'sequence type episode must be higher than 0'
         identified_by = 'sequence'
-    elif re.match(r'(?i)^S\d{1,4}E\d{1,3}$', entity_id) or re.match(r'(?i)^S\d{1,4}$', entity_id):
+    elif re.match(r'(?i)^S\d{1,4}(E\d{1,3})?$', entity_id):
         identified_by = 'ep'
     elif re.match(r'\d{4}-\d{2}-\d{2}', entity_id):
         identified_by = 'date'
