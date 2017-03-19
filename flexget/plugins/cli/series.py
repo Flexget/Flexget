@@ -2,13 +2,16 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
+from argparse import ArgumentTypeError
 from datetime import timedelta
 
 from colorclass.toggles import disable_all_colors
+
 from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
+from flexget.utils.tools import parse_entity_identifier
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
@@ -41,6 +44,15 @@ def do_cli(manager, options):
         remove(manager, options, forget=True)
     elif options.series_action == 'begin':
         begin(manager, options)
+
+
+def entity_identifier_type(identifier):
+    try:
+
+        ident = parse_entity_identifier(identifier)
+    except ValueError as e:
+        raise ArgumentTypeError('{}'.format(e.args[0]))
+    return ident
 
 
 def display_summary(options):
@@ -285,7 +297,7 @@ def register_parser_arguments():
                                          help='set the episode to start getting a series from')
     begin_parser.add_argument('episode_id', metavar='<episode ID>',
                               help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
-                                   'depending on how the series is numbered)')
+                                   'depending on how the series is numbered)', type=entity_identifier_type)
     forget_parser = subparsers.add_parser('forget', parents=[series_parser],
                                           help='Removes episodes or whole series from the entire database '
                                                '(including seen plugin)')
