@@ -2,16 +2,13 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import argparse
-from argparse import ArgumentTypeError
 from datetime import timedelta
 
 from colorclass.toggles import disable_all_colors
-
 from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
-from flexget.utils.tools import parse_entity_identifier
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
@@ -44,15 +41,6 @@ def do_cli(manager, options):
         remove(manager, options, forget=True)
     elif options.series_action == 'begin':
         begin(manager, options)
-
-
-def entity_identifier_type(identifier):
-    try:
-
-        ident = parse_entity_identifier(identifier)
-    except ValueError as e:
-        raise ArgumentTypeError('{}'.format(e.args[0]))
-    return ident
 
 
 def display_summary(options):
@@ -91,7 +79,7 @@ def display_summary(options):
             behind = 0
             latest_release = '-'
             age_col = '-'
-            entity_id = '-'
+            episode_id = '-'
             latest = get_latest_release(series)
             identifier_type = series.identified_by
             if identifier_type == 'auto':
@@ -108,12 +96,12 @@ def display_summary(options):
                         age_col = colorize(FRESH_EP_COLOR, latest.age)
                     elif latest.age_timedelta > timedelta(days=400):
                         age_col = colorize(OLD_EP_COLOR, latest.age)
-                entity_id = latest.identifier
+                episode_id = latest.identifier
             if not porcelain:
                 if behind > 0:
                     name_column += colorize(BEHIND_EP_COLOR, ' {} behind'.format(behind))
 
-            table_data.append([name_column, entity_id, age_col, latest_release, identifier_type])
+            table_data.append([name_column, episode_id, age_col, latest_release, identifier_type])
     try:
         table = TerminalTable(options.table_type, table_data, wrap_columns=[3], drop_columns=[4, 3, 2])
         console(table.output)
@@ -127,7 +115,7 @@ def display_summary(options):
 def begin(manager, options):
     series_name = options.series_name
     series_name = series_name.replace(r'\!', '!')
-    entity_id = options.entity_id
+    ep_id = options.episode_id
     normalized_name = normalize_series_name(series_name)
     with Session() as session:
         series = shows_by_exact_name(normalized_name, session)
@@ -139,20 +127,20 @@ def begin(manager, options):
         else:
             series = series[0]
         try:
-            set_series_begin(series, entity_id)
+            set_series_begin(series, ep_id)
         except ValueError as e:
             console(e)
         else:
-            console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, entity_id))
+            console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
             session.commit()
         manager.config_changed()
 
 
 def remove(manager, options, forget=False):
     name = options.series_name
-    if options.entity_id:
+    if options.episode_id:
         # remove by id
-        identifier = options.entity_id
+        identifier = options.episode_id
         try:
             remove_series_episode(name, identifier, forget)
         except ValueError as e:
@@ -295,13 +283,13 @@ def register_parser_arguments():
                           help='Show the releases FlexGet has seen for a given series ')
     begin_parser = subparsers.add_parser('begin', parents=[series_parser],
                                          help='set the episode to start getting a series from')
-    begin_parser.add_argument('entity_id', metavar='<episode ID>',
+    begin_parser.add_argument('episode_id', metavar='<episode ID>',
                               help='Episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
-                                   'depending on how the series is numbered)', type=entity_identifier_type)
+                                   'depending on how the series is numbered)')
     forget_parser = subparsers.add_parser('forget', parents=[series_parser],
                                           help='Removes episodes or whole series from the entire database '
                                                '(including seen plugin)')
-    forget_parser.add_argument('entity_id', nargs='?', default=None, help='episode ID to forget (optional)')
+    forget_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
     delete_parser = subparsers.add_parser('remove', parents=[series_parser],
                                           help='Removes episodes or whole series from the series database only')
-    delete_parser.add_argument('entity_id', nargs='?', default=None, help='Episode ID to forget (optional)')
+    delete_parser.add_argument('episode_id', nargs='?', default=None, help='Episode ID to forget (optional)')
