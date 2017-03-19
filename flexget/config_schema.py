@@ -15,7 +15,7 @@ from jsonschema.compat import str_types, int_types
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
-from flexget.utils.tools import parse_timedelta, parse_episode_identifier
+from flexget.utils.tools import parse_timedelta, parse_entity_identifier
 
 schema_paths = {}
 
@@ -256,11 +256,11 @@ def is_url(instance):
     return re.match(regexp, instance)
 
 
-@format_checker.checks('episode_identifier', raises=ValueError)
-def is_episode_identifier(instance):
+@format_checker.checks('entity_identifier', raises=ValueError)
+def is_entity_identifier(instance):
     if not isinstance(instance, (str_types, int)):
         return True
-    return parse_episode_identifier(instance) is not None
+    return parse_entity_identifier(instance) is not None
 
 
 @format_checker.checks('file_template', raises=ValueError)

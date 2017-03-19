@@ -27,7 +27,7 @@ from flexget.utils.database import quality_property, with_session
 from flexget.utils.log import log_once
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
-from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_episode_identifier
+from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_entity_identifier
 
 SCHEMA_VER = 13
 
@@ -883,7 +883,7 @@ def set_series_begin(series, ep_id):
     # If identified_by is not explicitly specified, auto-detect it based on begin identifier
     # TODO: use some method of series parser to do the identifier parsing
     session = Session.object_session(series)
-    identified_by = parse_episode_identifier(ep_id)
+    identified_by = parse_entity_identifier(ep_id)
     if identified_by == 'ep':
         ep_id = ep_id.upper()
     if series.identified_by not in ['auto', '', None]:
@@ -1147,7 +1147,7 @@ class FilterSeriesBase(object):
                 # Strict naming
                 'exact': {'type': 'boolean'},
                 # Begin takes an ep, sequence or date identifier
-                'begin': {'type': ['string', 'integer'], 'format': 'episode_identifier'},
+                'begin': {'type': ['string', 'integer'], 'format': 'entity_identifier'},
                 'from_group': one_or_more({'type': 'string'}),
                 'parse_only': {'type': 'boolean'},
                 'special_ids': one_or_more({'type': 'string'}),

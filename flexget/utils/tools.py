@@ -477,33 +477,33 @@ def get_config_hash(config):
         return hashlib.md5(str(config).encode('utf-8')).hexdigest()
 
 
-def parse_episode_identifier(ep_id):
+def parse_entity_identifier(entity_id):
     """
-    Parses series episode identifier, raises ValueError if it fails
+    Parses series entity identifier, raises ValueError if it fails
 
-    :param ep_id: Value to parse
+    :param entity_id: Value to parse
     :return: Return identifier type: `sequence`, `ep` or `date`
-    :raises ValueError: If ep_id does not match any valid types
+    :raises ValueError: If entity_id does not match any valid types
     """
     error = None
     identified_by = None
-    if isinstance(ep_id, int):
-        if ep_id <= 0:
+    if isinstance(entity_id, int):
+        if entity_id <= 0:
             error = 'sequence type episode must be higher than 0'
         identified_by = 'sequence'
-    elif re.match(r'(?i)^S\d{1,4}E\d{1,3}$', ep_id):
+    elif re.match(r'(?i)^S\d{1,4}E\d{1,3}$', entity_id) or re.match(r'(?i)^S\d{1,4}$', entity_id):
         identified_by = 'ep'
-    elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
+    elif re.match(r'\d{4}-\d{2}-\d{2}', entity_id):
         identified_by = 'date'
     else:
         # Check if a sequence identifier was passed as a string
         try:
-            ep_id = int(ep_id)
-            if ep_id <= 0:
+            entity_id = int(entity_id)
+            if entity_id <= 0:
                 error = 'sequence type episode must be higher than 0'
             identified_by = 'sequence'
         except ValueError:
-            error = '`%s` is not a valid episode identifier.' % ep_id
+            error = '`%s` is not a valid episode identifier.' % entity_id
     if error:
         raise ValueError(error)
     return identified_by
