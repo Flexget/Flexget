@@ -1226,6 +1226,17 @@ class FilterSeriesBase(object):
                 # Add quality: 720p if timeframe is specified with no target
                 if 'timeframe' in series_settings and 'qualities' not in series_settings:
                     series_settings.setdefault('target', '720p hdtv+')
+                # Get the episode threshold that will be used for episode tracking
+                season_packs = series_settings.get('season_packs')
+                if season_packs is None:
+                    ep_threshold = None
+                elif isinstance(season_packs, bool):
+                    ep_threshold = 0
+                elif isinstance(season_packs, int):
+                    ep_threshold = season_packs
+                else:
+                    ep_threshold = sys.maxsize
+                series_settings['season_packs'] = ep_threshold
 
                 group_series.append({series: series_settings})
             config[group_name] = group_series
@@ -1496,8 +1507,9 @@ class FilterSeries(FilterSeriesBase):
 
             log.debug('start with entities: %s', [e['title'] for e in entries])
 
+            ep_threshold = config['season_packs']
             # reject season packs unless specified
-            if entity.is_season and not config.get('season_packs'):
+            if entity.is_season and ep_threshold is None:
                 log.debug('Skipping season packs as support is turned off')
                 continue
 
@@ -1505,15 +1517,6 @@ class FilterSeries(FilterSeriesBase):
             if entity.season in accepted_seasons:
                 log.debug('already accepted season pack for season %s in this task', entity.season)
                 continue
-
-            # Get the episode threshold that will be used for episode tracking
-            season_packs = config.get('season_packs')
-            if isinstance(season_packs, bool):
-                ep_threshold = 0
-            elif isinstance(season_packs, int):
-                ep_threshold = season_packs
-            else:
-                ep_threshold = sys.maxsize
 
             # reject entity that have been marked as watched in config file
             if entity.series.begin:
@@ -1626,6 +1629,7 @@ class FilterSeries(FilterSeriesBase):
             # need to reject all other episode/season packs for an accepted season during the task,
             # can't wait for task learn phase
             if entity.is_season:
+                log.debug('adding season number %s to accepted seasons or this task', entity.season)
                 accepted_seasons.append(entity.season)
 
     def process_propers(self, config, episode, entries):
