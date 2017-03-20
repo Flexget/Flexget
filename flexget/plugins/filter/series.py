@@ -155,6 +155,9 @@ def upgrade(ver, session):
         series_table = table_schema('series', session)
         session.execute(update(series_table, series_table.c.identified_by == None, {'identified_by': 'auto'}))
         ver = 13
+    if ver == 13:
+        # New season_releases table, added by "create_all"
+        log.info('Adding season_releases table')
     return ver
 
 
@@ -1147,7 +1150,7 @@ class FilterSeriesBase(object):
                 # Strict naming
                 'exact': {'type': 'boolean'},
                 # Begin takes an ep, sequence or date identifier
-                'begin': {'type': ['string', 'integer'], 'format': 'entity_identifier'},
+                'begin': {'type': ['string', 'integer'], 'format': 'episode_identifier'},
                 'from_group': one_or_more({'type': 'string'}),
                 'parse_only': {'type': 'boolean'},
                 'special_ids': one_or_more({'type': 'string'}),
