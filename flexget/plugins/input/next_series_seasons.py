@@ -154,7 +154,7 @@ class NextSeriesSeasons(object):
                 # TODO: this should ideally be in discover so it would be more generic
                 task.max_reruns += 1
                 task.rerun(plugin=plugin_name, reason='Look for next season')
-            elif not latest.completed:
+            elif latest and not latest.completed:
                 # There are known releases of this season, but none were accepted
                 return
 
