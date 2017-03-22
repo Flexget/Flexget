@@ -8,7 +8,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.manager import Session
-from flexget.plugins.filter.series import SeriesTask, Series, Season, SeasonRelease, get_latest_release
+from flexget.plugins.filter.series import SeriesTask, Series, get_latest_release, get_latest_season_pack_release
 
 plugin_name = 'next_series_seasons'
 log = logging.getLogger(plugin_name)
@@ -39,7 +39,7 @@ class NextSeriesSeasons(object):
         self.rerun_entries = []
 
     def season_identifiers(self, season):
-        return ['S%02', season]
+        return ['S%02d' % season]
 
     def search_entry(self, series, season, task, rerun=True):
         # Extract the alternate names for the series
@@ -95,14 +95,14 @@ class NextSeriesSeasons(object):
                     impossible.setdefault(reason, []).append(series.name)
                     continue
 
-                low_season = 1
+                low_season = 0
 
                 check_downloaded = not config.get('backfill')
                 latest_season = get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
                     latest_season = latest_season.season
                 else:
-                    latest_season = low_season
+                    latest_season = low_season + 1
 
                 for season in range(latest_season, low_season, -1):
                     if season in series.completed_seasons:
@@ -143,10 +143,7 @@ class NextSeriesSeasons(object):
         """Decides whether we should look for next season based on whether we found/accepted any seasons."""
         with Session() as session:
             series = session.query(Series).filter(Series.name == entry['series_name']).first()
-            latest = get_latest_release(series)
-            db_release = (session.query(SeasonRelease).join(SeasonRelease.season).join(SeasonRelease.series).
-                          filter(Series.name == entry['series_name']).
-                          filter(Season.season == entry['series_season']).first())
+            latest = get_latest_season_pack_release(series)
 
             if entry.accepted:
                 log.debug('%s %s was accepted, rerunning to look for next season.' % (
@@ -157,7 +154,7 @@ class NextSeriesSeasons(object):
                 # TODO: this should ideally be in discover so it would be more generic
                 task.max_reruns += 1
                 task.rerun(plugin=plugin_name, reason='Look for next season')
-            elif db_release:
+            elif not latest.completed:
                 # There are known releases of this season, but none were accepted
                 return
 
