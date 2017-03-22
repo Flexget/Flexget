@@ -351,6 +351,8 @@ class Season(Base):
         return str(self).encode('ascii', 'replace')
 
     def __lt__(self, other):
+        if other is None:
+            return False
         if not isinstance(other, (Season, Episode)):
             raise NotImplementedError
         if self.identified_by != 'ep':
@@ -691,8 +693,8 @@ def get_latest_season_pack_release(series, downloaded=True, season=None):
 
     latest_season_pack_release = releases.order_by(desc(Season.season)).first()
     if not latest_season_pack_release:
-        log.debug('get_latest_season_pack_release returning None, no downloaded season packs found for: %s',
-                  series.name)
+        log.debug('no downloaded season packs found for series \'%s\', season: %s, downloaded: %s',
+                  series.name, season, downloaded)
         return
 
     return latest_season_pack_release
@@ -726,7 +728,8 @@ def get_latest_episode_release(series, downloaded=True, season=None):
         latest_episode_release = releases.order_by(desc(Episode.first_seen.label('ep_first_seen'))).first()
 
     if not latest_episode_release:
-        log.debug('get_latest_episode returning None, no downloaded episodes found for: %s', series.name)
+        log.debug('no downloaded episodes found for series \'%s\', season: %s, downloaded: %s',
+                  series.name, season, downloaded)
         return
 
     return latest_episode_release
@@ -744,7 +747,7 @@ def get_latest_release(series, downloaded=True, season=None):
     latest_ep = get_latest_episode_release(series, downloaded, season)
     latest_season = get_latest_season_pack_release(series, downloaded, season)
 
-    return latest_season if latest_season else latest_ep
+    return max(latest_season, latest_ep)
 
 
 def new_eps_after(since_ep):
