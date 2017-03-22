@@ -166,6 +166,18 @@ class TestEmitSeriesInDiscover(object):
                 tracking: backfill
                 identified_by: ep
             max_reruns: 0
+          test_next_series_episodes:
+            discover:
+              release_estimations: ignore
+              what:
+              - next_series_episodes: yes
+              from:
+              - test_search: yes
+            series:
+            - My Show 2:
+                begin: s02e01
+                identified_by: ep
+            max_reruns: 0
     """
 
     def test_next_series_episodes_backfill(self, execute_task):
@@ -178,3 +190,8 @@ class TestEmitSeriesInDiscover(object):
         execute_task('inject_series', options={'inject': [Entry(title='My Show 2 S02', url='')]})
         task = execute_task('test_next_series_episodes_backfill')
         assert task.find_entry(title='My Show 2 S01E01')
+
+    def test_next_series_episodes_with_completed_season(self, execute_task):
+        execute_task('inject_series', options={'inject': [Entry(title='My Show 2 S02', url='')]})
+        task = execute_task('test_next_series_episodes')
+        assert task.find_entry(title='My Show 2 S03E01')

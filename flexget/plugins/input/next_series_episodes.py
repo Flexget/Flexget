@@ -124,7 +124,14 @@ class NextSeriesEpisodes(object):
                     log.trace('Adding episodes for series %s season %d', series.name, season)
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
                     if series.begin and (not latest or latest < series.begin):
-                        entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
+                        # In case series.begin season is already completed, look in next available season
+                        lookup_season = series.begin.season
+                        ep_number = series.begin.number
+                        while lookup_season in series.completed_seasons:
+                            lookup_season += 1
+                            # If season number was bumped, start looking for ep 1
+                            ep_number = 1
+                        entries.append(self.search_entry(series, lookup_season, ep_number, task))
                     elif latest and not config.get('backfill'):
                         entries.append(self.search_entry(series, latest.season, latest.number + 1, task))
                     elif latest:
@@ -166,7 +173,7 @@ class NextSeriesEpisodes(object):
                     # Don't look for seasons older than begin ep
                     if series.begin and series.begin.season >= season:
                         break
-        
+
         for reason, series in impossible.items():
             log.verbose('Series `%s` with identified_by value `%s` are not supported. ',
                         ', '.join(sorted(series)), reason)
@@ -199,7 +206,7 @@ class NextSeriesEpisodes(object):
                 # There are know releases of this episode, but none were accepted
                 return
             elif latest and identified_by == 'ep' and (
-                    entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
+                            entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
                 # We searched for next predicted episode of this season unsuccessfully, try the next season
                 self.rerun_entries.append(self.search_entry(series, latest.season + 1, 1, task))
                 log.debug('%s %s not found, rerunning to look for next season' %
