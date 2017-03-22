@@ -151,6 +151,9 @@ class TestEmitSeriesInDiscover(object):
         tasks:
           inject_series:
             series:
+              - My Show 1:
+                  quality: 720p
+                  season_packs: yes
               - My Show 2:
                   season_packs: yes
           test_next_series_episodes_backfill:
@@ -178,6 +181,18 @@ class TestEmitSeriesInDiscover(object):
                 begin: s02e01
                 identified_by: ep
             max_reruns: 0
+          test_next_series_episodes_with_unaccepted_season:
+            discover:
+              release_estimations: ignore
+              what:
+              - next_series_episodes: yes
+              from:
+              - test_search: yes
+            series:
+            - My Show 1:
+                begin: s02e01
+                identified_by: ep
+            max_reruns: 0
     """
 
     def test_next_series_episodes_backfill(self, execute_task):
@@ -195,3 +210,8 @@ class TestEmitSeriesInDiscover(object):
         execute_task('inject_series', options={'inject': [Entry(title='My Show 2 S02', url='')]})
         task = execute_task('test_next_series_episodes')
         assert task.find_entry(title='My Show 2 S03E01')
+
+    def test_next_series_episodes_with_uncompleted_season(self, execute_task):
+        execute_task('inject_series', options={'inject': [Entry(title='My Show 1 S02 480p', url='')]})
+        task = execute_task('test_next_series_episodes_with_unaccepted_season')
+        assert task.find_entry(title='My Show 1 S02E01')
