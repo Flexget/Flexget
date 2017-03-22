@@ -543,7 +543,6 @@ class SeasonRelease(Base):
     proper_count = Column(Integer, default=0)
     title = Column(Unicode)
     first_seen = Column(DateTime)
-    partial_pack = Column(Boolean, default=False)
 
     def __init__(self):
         self.first_seen = datetime.now()

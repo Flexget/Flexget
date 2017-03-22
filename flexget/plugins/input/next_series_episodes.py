@@ -45,9 +45,7 @@ class NextSeriesEpisodes(object):
 
     def sequence_identifiers(self, episode):
         # Use a set to remove doubles, which will happen depending on number of digits in episode
-        return set(['%d' % episode,
-                    '%02d' % episode,
-                    '%03d' % episode])
+        return {'%d' % episode, '%02d' % episode, '%03d' % episode}
 
     def search_entry(self, series, season, episode, task, rerun=True):
         # Extract the alternate names for the series
@@ -120,6 +118,9 @@ class NextSeriesEpisodes(object):
                     latest_season = low_season + 1
 
                 for season in range(latest_season, low_season, -1):
+                    if season in series.completed_seasons:
+                        log.debug('season %s is marked as completed, skipping', season)
+                        continue
                     log.trace('Adding episodes for series %s season %d', series.name, season)
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
                     if series.begin and (not latest or latest < series.begin):

@@ -50,7 +50,7 @@ class SeriesParser(TitleParser):
         'part\s(%s)' % '|'.join(map(str, english_numbers)),
     ]])
     season_pack_regexps = ReList([
-        r's(\d{2,})\s',  # S01
+        r's(\d{2,})(?:\s|$)',  # S01
         '(\d{1,3})\s?x\s?all',  # 1xAll
     ])
     unwanted_regexps = ReList([
