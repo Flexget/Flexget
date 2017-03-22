@@ -1163,7 +1163,7 @@ class FilterSeriesBase(object):
                 'season_packs': {'oneOf': [
                     {'type': 'boolean'},
                     {'type': 'integer'},
-                    {'type': 'string', 'enum': ['always']}
+                    {'type': 'string', 'enum': ['always', 'only']}
                 ]}
             },
             'additionalProperties': False
@@ -1236,8 +1236,10 @@ class FilterSeriesBase(object):
                     ep_threshold = 0
                 elif isinstance(season_packs, int):
                     ep_threshold = season_packs
-                else:
+                elif season_packs == 'always':
                     ep_threshold = sys.maxsize
+                else:
+                    ep_threshold = 'exclusive'
                 series_settings['season_packs'] = ep_threshold
 
                 group_series.append({series: series_settings})
@@ -1513,6 +1515,11 @@ class FilterSeries(FilterSeriesBase):
             # reject season packs unless specified
             if entity.is_season and ep_threshold is None:
                 log.debug('Skipping season packs as support is turned off')
+                continue
+
+            # reject episodes if season pack is set to 'only'
+            if not entity.is_season and ep_threshold is not None and ep_threshold == 'exclusive':
+                log.debug('skipping episode, season pack only mode')
                 continue
 
             # check that a season ack for this season wasn't already accepted in this task run

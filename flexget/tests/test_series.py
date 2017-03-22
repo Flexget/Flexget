@@ -2065,6 +2065,8 @@ class TestSeriesSeasonPack(object):
               season_packs: 3
           - boo:
               season_packs: always
+          - bla:
+              season_packs: only
       tasks:
         multiple_formats:
           mock:
@@ -2143,7 +2145,10 @@ class TestSeriesSeasonPack(object):
         test_always_get_season_pack_2:
           mock:
           - title: boo.s01.720p-flexget
-
+        test_only_get_season_packs:
+          mock:
+          - title: bla.s01.720p-flexget
+          - title: bla.s02e01.720p-flexget
     """
 
     @pytest.fixture()
@@ -2249,3 +2254,9 @@ class TestSeriesSeasonPack(object):
 
         task = execute_task('test_always_get_season_pack_2')
         assert len(task.accepted) == 1
+
+    def test_exclusive(self, execute_task):
+        task = execute_task('test_only_get_season_packs')
+        assert len(task.accepted) == 1
+        entry = task.find_entry(title='bla.s01.720p-flexget')
+        assert entry.accepted
