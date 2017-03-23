@@ -1521,24 +1521,27 @@ class FilterSeries(FilterSeriesBase):
             ep_threshold = config['season_packs']
             # reject season packs unless specified
             if entity.is_season and ep_threshold is None:
-                log.debug('Skipping season pack %s as support is turned off', entity)
+                for entry in entries:
+                    entry.reject('season pack support is turned off')
                 continue
 
             # reject episodes if season pack is set to 'only'
             if not entity.is_season and ep_threshold is not None and ep_threshold == 'exclusive':
-                log.debug('skipping episode, season pack only mode')
+                for entry in entries:
+                    entry.reject('season pack only mode')
                 continue
 
             # check that a season ack for this season wasn't already accepted in this task run
             if entity.season in accepted_seasons:
-                log.debug('already accepted season pack for season %s in this task', entity.season)
+                for entry in entries:
+                    entry.reject('already accepted season pack for season %s in this task' % entity.season)
                 continue
 
             # reject entity that have been marked as watched in config file
             if entity.series.begin:
                 if entity < entity.series.begin:
                     for entry in entries:
-                        entry.reject('Episode `%s` is before begin value of `%s`' %
+                        entry.reject('Entity `%s` is before begin value of `%s`' %
                                      (entity.identifier, entity.series.begin.identifier))
                     continue
 
