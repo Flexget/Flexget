@@ -1768,7 +1768,7 @@ class FilterSeries(FilterSeriesBase):
             if entity.is_season and entity.series.episodes_for_season(entity.season) > threshold:
                 log.debug('threshold of %s has been met, skipping season pack', threshold)
                 for entry in entries:
-                    entry.reject('The configured number of episode for this season has already been downloaded')
+                    entry.reject('The configured number of episodes for this season has already been downloaded')
                 return True
 
             if latest.identified_by == entity.identified_by:
