@@ -8,6 +8,7 @@ import time
 import sys
 from copy import copy
 from datetime import datetime, timedelta
+from functools import total_ordering
 
 from past.builtins import basestring
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
@@ -362,7 +363,7 @@ class Season(Base):
     def __hash__(self):
         return self.id
 
-
+@total_ordering
 class Episode(Base):
     __tablename__ = 'series_episodes'
 
@@ -445,6 +446,8 @@ class Episode(Base):
         return str(self).encode('ascii', 'replace')
 
     def __eq__(self, other):
+        if other is None:
+            return False
         if isinstance(other, Season):
             return False
         elif not isinstance(other, Episode):
@@ -454,7 +457,7 @@ class Episode(Base):
         return self.identifier == other.identifier
 
     def __lt__(self, other):
-        if isinstance(other, None):
+        if other is None:
             return False
         elif isinstance(other, Episode):
             if self.identified_by != other.identified_by:
@@ -749,6 +752,8 @@ def get_latest_release(series, downloaded=True, season=None):
     latest_ep = get_latest_episode_release(series, downloaded, season)
     latest_season = get_latest_season_pack_release(series, downloaded, season)
 
+    if latest_season is None and latest_ep is None:
+        return None
     return max(latest_season, latest_ep)
 
 
