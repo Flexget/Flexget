@@ -454,7 +454,9 @@ class Episode(Base):
         return self.identifier == other.identifier
 
     def __lt__(self, other):
-        if isinstance(other, Episode):
+        if isinstance(other, None):
+            return False
+        elif isinstance(other, Episode):
             if self.identified_by != other.identified_by:
                 raise NotImplementedError
             if self.identified_by in ['ep', 'sequence']:
