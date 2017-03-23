@@ -363,6 +363,7 @@ class Season(Base):
     def __hash__(self):
         return self.id
 
+
 @total_ordering
 class Episode(Base):
     __tablename__ = 'series_episodes'
@@ -1237,17 +1238,15 @@ class FilterSeriesBase(object):
                     series_settings.setdefault('target', '720p hdtv+')
                 # Get the episode threshold that will be used for episode tracking
                 season_packs = series_settings.get('season_packs')
-                if season_packs is None:
-                    ep_threshold = None
-                elif isinstance(season_packs, bool):
-                    ep_threshold = 0
-                elif isinstance(season_packs, int):
-                    ep_threshold = season_packs
-                elif season_packs == 'always':
-                    ep_threshold = sys.maxsize
-                else:
-                    ep_threshold = 'exclusive'
-                series_settings['season_packs'] = ep_threshold
+                if season_packs is not None:
+                    if isinstance(season_packs, bool) and season_packs:
+                        series_settings['season_packs'] = 0
+                    elif isinstance(season_packs, int):
+                        series_settings['season_packs'] = season_packs
+                    elif season_packs == 'always':
+                        series_settings['season_packs'] = sys.maxsize
+                    elif season_packs == 'only':
+                        series_settings['season_packs'] = 'exclusive'
 
                 group_series.append({series: series_settings})
             config[group_name] = group_series
@@ -1518,7 +1517,7 @@ class FilterSeries(FilterSeriesBase):
 
             log.debug('start with entities: %s', [e['title'] for e in entries])
 
-            ep_threshold = config['season_packs']
+            ep_threshold = config.get('season_packs')
             # reject season packs unless specified
             if entity.is_season and ep_threshold is None:
                 for entry in entries:
