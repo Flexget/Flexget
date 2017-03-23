@@ -7,15 +7,20 @@ import logging
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from flexget.utils.soup import get_soup
+from requests.exceptions import HTTPError, RequestException
 
 from datetime import date, timedelta
 
 import unicodedata
-import requests
 import re
 
 log = logging.getLogger('search_npo')
+
+requests = RequestSession(max_retries=3)
+requests.add_domain_limiter(TimedLimiter('npo.nl', '5 seconds'))
+
 fragment_regex = re.compile('[A-Z][^/]+/')
 date_regex = re.compile('([1-3]?[0-9]) ([a-z]{3})(?: ([0-9]{4})|\W)')
 days_ago_regex = re.compile('([0-9]+) dagen geleden')
@@ -102,7 +107,7 @@ class NPOWatchlist(object):
             return date.today()
 
     def _get_page(self, task, config, url):
-        login_response = task.requests.get(url)
+        login_response = requests.get(url)
         if login_response.url == url:
             log.debug('Already logged in')
             return login_response
@@ -116,7 +121,7 @@ class NPOWatchlist(object):
         password = config.get('password')
 
         try:
-            profile_response = task.requests.post('https://mijn.npo.nl/sessions',
+            profile_response = requests.post('https://mijn.npo.nl/sessions',
                                                   {'authenticity_token': token,
                                                    'email': email,
                                                    'password': password})
@@ -168,9 +173,9 @@ class NPOWatchlist(object):
 
     def _get_series_info(self, task, config, series_name, series_url):
         log.info('Retrieving series info for %s', series_name)
-        response = task.requests.get(series_url)
+        response = requests.get(series_url)
         page = get_soup(response.content)
-        tvseries = page.find('div', itemscope='itemscope', itemtype='http://schema.org/TVSeries')
+        tvseries = page.find('div', itemscope='itemscope', itemtype='https://schema.org/TVSeries')
         series_info = Entry()  # create a stub to store the common values for all episodes of this series
         series_info['npo_url'] = tvseries.find('a', itemprop='url')['href']
         series_info['npo_name'] = tvseries.find('span', itemprop='name').contents[0]
@@ -181,7 +186,7 @@ class NPOWatchlist(object):
 
     def _get_series_episodes(self, task, config, series_name, series_url, series_info):
         log.info('Retrieving new episodes for %s', series_name)
-        response = task.requests.get(series_url + '/search?media_type=broadcast')  # only shows full episodes
+        response = requests.get(series_url + '/search?media_type=broadcast')  # only shows full episodes
         page = get_soup(response.content)
 
         if page.find('div', class_='npo3-show-items'):
@@ -340,7 +345,7 @@ class NPOWatchlist(object):
             }
 
             try:
-                delete_response = task.requests.delete(e['remove_url'], headers=headers)
+                delete_response = requests.delete(e['remove_url'], headers=headers)
             except requests.HTTPError as error:
                 log.error('Failed to remove %s, got status %s', e['title'], error.response.status_code)
             else:

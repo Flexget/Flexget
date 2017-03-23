@@ -6,6 +6,7 @@ import datetime
 import re
 
 from sqlalchemy import Column, Unicode, DateTime
+from requests.exceptions import TooManyRedirects
 
 from flexget import plugin, db_schema
 from flexget.entry import Entry
@@ -141,10 +142,18 @@ class SearchMoreThanTV(object):
         :return:
         """
         cookies = self.get_login_cookie(username, password, force=force)
+        invalid_cookie = False
 
-        response = requests.get(url, params=params, cookies=cookies)
+        try:
+            response = requests.get(url, params=params, cookies=cookies)
+            if self.base_url + 'login.php' in response.url:
+                invalid_cookie = True
+        except TooManyRedirects:
+            # Apparently it endlessly redirects if the cookie is invalid?
+            log.debug('MoreThanTV request failed: Too many redirects. Invalid cookie?')
+            invalid_cookie = True
 
-        if self.base_url + 'login.php' in response.url:
+        if invalid_cookie:
             if self.errors:
                 raise plugin.PluginError('MoreThanTV login cookie is invalid. Login page received?')
             self.errors = True

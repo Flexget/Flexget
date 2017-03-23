@@ -23,7 +23,7 @@ log = logging.getLogger('api_tvmaze')
 DB_VERSION = 6
 Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
-BASE_URL = 'http://api.tvmaze.com'
+BASE_URL = 'https://api.tvmaze.com'
 
 TVMAZE_SHOW_PATH = "/shows/{}"
 TVMAZE_LOOKUP_PATH = "/lookup/shows"
@@ -478,11 +478,11 @@ def get_show(show_name=None, tvmaze_id=None, imdb_id=None, tvrage_id=None, thetv
     if tvmaze_id:
         return tvmaze_lookup(TVMAZE_SHOW_PATH.format(tvmaze_id))
     if imdb_id:
-        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'imdb_id': imdb_id})
+        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'imdb': imdb_id})
     if tvrage_id:
-        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'tvrage_id': tvrage_id})
+        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'tvrage': tvrage_id})
     if thetvdb_id:
-        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'thetvdb_id': thetvdb_id})
+        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'thetvdb': thetvdb_id})
     if show_name:
         return tvmaze_lookup(TVMAZE_SEARCH_PATH, params={'q': show_name})
     raise LookupError('Not enough parameters sent for series lookup')

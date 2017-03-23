@@ -78,9 +78,9 @@ class InputPlex(object):
         'properties': {
             'server': {'type': 'string', 'default': '127.0.0.1'},
             'port': {'type': 'integer', 'default': 32400},
-            'username': {'type': 'string', 'default': ''},
-            'password': {'type': 'string', 'default': ''},
-            'token': {'type': 'string', 'default': ''},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'token': {'type': 'string'},
             'section': {'type': ['string', 'integer']},
             'selection': {'type': 'string', 'default': 'all'},
             'lowercase_title': {'type': 'boolean', 'default': False},
@@ -165,11 +165,11 @@ class InputPlex(object):
         entries = []
         if config['unwatched_only'] and config['section'] != 'recentlyViewedShows' and config['section'] != 'all':
             urlconfig['unwatched'] = '1'
-        if config['token']:
+        if config.get('token'):
             accesstoken = config['token']
             log.debug("Using accesstoken: %s", accesstoken)
             urlconfig['X-Plex-Token'] = accesstoken
-        elif config['username'] and config['password']:
+        elif config.get('username'):
             accesstoken = self.plex_get_accesstoken(config)
             log.debug("Got accesstoken: %s", accesstoken)
             urlconfig['X-Plex-Token'] = accesstoken

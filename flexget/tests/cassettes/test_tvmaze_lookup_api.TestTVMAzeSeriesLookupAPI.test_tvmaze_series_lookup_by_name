@@ -1,252 +1,58 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.24.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
-  response:
-    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
-        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
-        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":5,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
-        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
-        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1472402236,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 12 Sep 2016 13:27:56 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.24.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=sdfgv35wvg23vg2
-  response:
-    body: {string: !!python/unicode ''}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 12 Sep 2016 13:27:56 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 404, message: Not Found}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.31.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
-  response:
-    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
-        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
-        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":3,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
-        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
-        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1472402236,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Thu, 22 Sep 2016 11:40:40 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.31.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=sdfgv35wvg23vg2
-  response:
-    body: {string: !!python/unicode ''}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Thu, 22 Sep 2016 11:40:40 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 404, message: Not Found}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
-  response:
-    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
-        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
-        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":3,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
-        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
-        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1474709944,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Sep 2016 14:20:28 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=sdfgv35wvg23vg2
-  response:
-    body: {string: !!python/unicode ''}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 25 Sep 2016 14:20:28 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 404, message: Not Found}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
-  response:
-    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
-        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
-        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":3,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
-        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
-        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1474709944,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:20:26 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
-  response:
-    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
-        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
-        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":3,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
-        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
-        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1474709944,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:22:04 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=sdfgv35wvg23vg2
-  response:
-    body: {string: !!python/unicode ''}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:22:04 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 404, message: Not Found}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=The%20X-Files
-  response:
-    body: {string: !!python/unicode '{"id":430,"url":"http://www.tvmaze.com/shows/430/the-x-files","name":"The
-        X-Files","type":"Scripted","language":"English","genres":["Drama","Crime","Science-Fiction","Thriller","Mystery"],"status":"To
-        Be Determined","runtime":60,"premiered":"1993-09-10","schedule":{"time":"20:00","days":["Monday"]},"rating":{"average":8.9},"weight":3,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":6312,"thetvdb":77398,"imdb":"tt0106179"},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/62/155391.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/62/155391.jpg"},"summary":"<p>Two
-        FBI agents, Fox Mulder the believer and Dana Scully the skeptic, investigate
-        the strange and unexplained while hidden forces work to impede their efforts.</p>","updated":1474709944,"_links":{"self":{"href":"http://api.tvmaze.com/shows/430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/306788"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:22:21 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [!!python/unicode FlexGet/2.3.33.dev (www.flexget.com)]
-    method: GET
-    uri: http://api.tvmaze.com/singlesearch/shows?q=sdfgv35wvg23vg2
-  response:
-    body: {string: !!python/unicode ''}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [keep-alive]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Mon, 26 Sep 2016 12:22:21 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.19]
-    status: {code: 404, message: Not Found}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?q=The+X-Files
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA5VTW2/aMBT+K5afA0mAAomqSms7pD10e6CVOk0VcuNDclbHtmyHQCv++44Draq9
+          THsiOZcv3+XwxlHycjbNEt45xUvehGDLNO37fhx2rXiFcWXa1Dem9ymNpaGB0X60RQWeJ1yLFmjp
+          vgH2OFqdi+FgY3FdObQBJI0poetO1LH6VdcKfUPFGrQjkPIXv3WiFVS5cUhwCW0i6AoIsApoNH9K
+          uA8idDTM7w27BnYLAVyLekB3nQ5xsZyTCuugRXDUKHleFNNRVozyjEB91YDsFI298dM4n2RlFltS
+          HAYed0bTI386JtyJgLqOs2IHbqC+HBfU6AHrJvByQuIh9Ma9xKHBxA87Vj8eCbUyxMsdYvts04NG
+          8oOtScvgXmVktORhTdOR0qvR8f1LCw4rkX6HfvMzfuA4fPf5phFaA4WkO6USDnvyQAtF1EnR7kRy
+          Ps2JGYUUdvKZl4vFtFgmHNv4wkPI8myeLwpOgNgOqt54CxK7ltrn6KPVWH1Ov7PKCOnTYcWnp4WN
+          NS44gSGdT9L84mJa5OPftiYpxmGNROw/IN9XNmSZ6WJSf6ESYd+1rYh+8kt7dd8btrr+xkiDDj5h
+          K7Nnd52S4BiJZ8+gECg4JrRkt0ILtq7ItMPQ9C9gSWHCUO/AB6wpjlOD9OgahqVOw94qEU+M9Q1d
+          NmtQStBsa1wFnsXkWTAMWwtyWEfHYEvd4MeXqb0iIzorCZouMZ8tFxdZNpvMEr5RqF+GzDyobcyu
+          cUC/7/YLi5+9//jnxczouHdoOg8W/XA7/1g+z/l0ms0XyyUd0vEPvxxf7PEDAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Mon, 13 Mar 2017 17:14:34 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+      method: GET
+      uri: https://api.tvmaze.com/singlesearch/shows?q=sdfgv35wvg23vg2
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAAwMAAAAAAAAAAAA=
+      headers:
+        Access-Control-Allow-Origin: ['*']
+        Cache-Control: ['public, max-age=3600']
+        Connection: [keep-alive]
+        Content-Encoding: [gzip]
+        Content-Type: [application/json; charset=UTF-8]
+        Date: ['Mon, 13 Mar 2017 17:14:38 GMT']
+        Server: [nginx/1.10.0 (Ubuntu)]
+        Vary: [Accept-Encoding]
+      status: {code: 404, message: Not Found}
 version: 1
