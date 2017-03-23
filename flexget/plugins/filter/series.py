@@ -1521,7 +1521,7 @@ class FilterSeries(FilterSeriesBase):
             ep_threshold = config['season_packs']
             # reject season packs unless specified
             if entity.is_season and ep_threshold is None:
-                log.debug('Skipping season packs as support is turned off')
+                log.debug('Skipping season pack %s as support is turned off', entity)
                 continue
 
             # reject episodes if season pack is set to 'only'
