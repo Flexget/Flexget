@@ -19,7 +19,6 @@ log = logging.getLogger('est_series_tvmaze')
 
 
 class EstimatesSeriesTVMaze(object):
-
     @plugin.priority(2)
     def estimate(self, entry):
         if not all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
@@ -45,7 +44,7 @@ class EstimatesSeriesTVMaze(object):
         kwargs['series_name'] = series_name
 
         log.debug(
-            'Searching TVMaze for airdate of {0} season {1} episode {2}'.format(series_name, season, episode_number))
+            'Searching TVMaze for air-date of %s season %s episode %s', series_name, season, episode_number)
         for k, v in list(kwargs.items()):
             if v:
                 log.debug('{0}: {1}'.format(k, v))
@@ -55,7 +54,7 @@ class EstimatesSeriesTVMaze(object):
             log.debug(e)
             return
         if episode and episode.airdate:
-            log.debug('received airdate: {0}'.format(episode.airdate))
+            log.debug('received air-date: %s', episode.airdate)
             return episode.airdate
         return
 
