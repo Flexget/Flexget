@@ -741,7 +741,7 @@ class OutputDeluge(DelugePlugin):
                         except Exception as err:
                             log.error('wait_for_metadata Error: %s' % err)
                             break
-                        if len(status['files']) > 0:
+                        if status.get('files'):
                             log.info('"%s" magnetization successful' % (entry['title']))
                             break
                     else:
