@@ -122,7 +122,7 @@ class BaseFileOps(object):
                             siblings.update(get_siblings(ext, filename_no_ext, filename_ext, subdir_path))
                 # execute action in subclasses
                 self.handle_entry(task, config, entry, siblings)
-            except OSError as err:
+            except (OSError, IOError) as err:
                 entry.fail(str(err))
                 continue
 
