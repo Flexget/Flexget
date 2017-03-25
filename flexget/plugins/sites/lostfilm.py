@@ -22,7 +22,7 @@ log = logging.getLogger('lostfilm')
 EPISODE_REGEXP = re.compile(
     '.*lostfilm.tv/series/.*/season_(\d+)/episode_(\d+)/.*')
 LOSTFILM_ID_REGEXP = re.compile(
-    '.*static.lostfilm.tv/Images/(\d+)/Posters/poster.jpg.*')
+    '.*static.lostfilm.tv/Images/(\d+)/Posters/.*')
 TEXT_REGEXP = re.compile('^\d+\sсезон\s\d+\sсерия\.\s(.+)\s\((.+)\)$')
 
 quality_map = {
