@@ -1537,7 +1537,7 @@ class FilterSeries(FilterSeriesBase):
                 continue
 
             # Determine episode threshold for season pack
-            ep_threshold = season_packs['threshold']
+            ep_threshold = season_packs['threshold'] if season_packs else 0
 
             # check that a season ack for this season wasn't already accepted in this task run
             if entity.season in accepted_seasons:

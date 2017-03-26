@@ -107,7 +107,6 @@ class TVMazeSeries(Base):
 
     def __init__(self, series, session):
         self.tvmaze_id = series['id']
-        self.series = series
         self.update(series, session)
 
     def to_dict(self):
@@ -159,7 +158,7 @@ class TVMazeSeries(Base):
         self.last_update = datetime.now()
 
         self.genres = get_db_genres(series['genres'], session)
-        self.seasons = self.populate_seasons()
+        self.seasons = self.populate_seasons(series)
 
     def __repr__(self):
         return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.tvmaze_id, self.last_update)
@@ -176,9 +175,9 @@ class TVMazeSeries(Base):
         expiration = time_dif.days > UPDATE_INTERVAL
         return expiration
 
-    def populate_seasons(self):
-        if '_embedded' in self.series and self.series['_embedded'].get('seasons'):
-            seasons = self.series['_embedded']['seasons']
+    def populate_seasons(self, series=None):
+        if series and '_embedded' in series and series['_embedded'].get('seasons'):
+            seasons = series['_embedded']['seasons']
         else:
             seasons = get_seasons(self.tvmaze_id)
         return [TVMazeSeason(season, self.tvmaze_id) for season in seasons]
