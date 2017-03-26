@@ -100,7 +100,7 @@ class PluginTVMazeLookup(object):
         'tvmaze_season_url': 'url',
         'tvmaze_season_name': 'name',
         'tvmaze_season_episode_order': 'episode_order',
-        'tvmaze_season_premiere_date': 'premiere_date',
+        'tvmaze_season_premiere_date': 'airdate',
         'tvmaze_season_end_date': 'end_date',
         'tvmaze_season_network': 'network',
         'tvmaze_season_web_channel': 'web_channel',

@@ -419,7 +419,7 @@ class TestTVMazeSeasonLookup(object):
           test_season_pack:
             disable: seen
             mock:
-            - {'title': 'The Flash (2014) S01', 'url': 'mock://whatever'}
+            - title: 'The Flash (2014) S01'
             series:
             - The Flash (2014):
                 season_packs: yes
