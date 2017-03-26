@@ -1171,7 +1171,12 @@ class FilterSeriesBase(object):
                 'season_packs': {'oneOf': [
                     {'type': 'boolean'},
                     {'type': 'integer'},
-                    {'type': 'string', 'enum': ['always', 'only']}
+                    {'type': 'string', 'enum': ['always', 'only']},
+                    {'type': 'object',
+                     'properties': {
+                         'threshold': {'type': 'integer'},
+                         'reject_eps': {'type': 'boolean'}
+                     }}
                 ]}
             },
             'additionalProperties': False
@@ -1240,13 +1245,14 @@ class FilterSeriesBase(object):
                 season_packs = series_settings.get('season_packs')
                 if season_packs is not None:
                     if isinstance(season_packs, bool) and season_packs:
-                        series_settings['season_packs'] = 0
+                        season_packs = {'threshold': 0, 'reject_eps': False}
                     elif isinstance(season_packs, int):
-                        series_settings['season_packs'] = season_packs
-                    elif season_packs == 'always':
-                        series_settings['season_packs'] = sys.maxsize
-                    elif season_packs == 'only':
-                        series_settings['season_packs'] = 'exclusive'
+                        season_packs = {'threshold': season_packs, 'reject_eps': False}
+                    elif isinstance(season_packs, str) and season_packs == 'always':
+                        season_packs = {'threshold': sys.maxsize, 'reject_eps': False}
+                    elif isinstance(season_packs, str) and season_packs == 'only':
+                        season_packs = {'threshold': 0, 'reject_eps': True}
+                    series_settings['season_packs'] = season_packs
 
                 group_series.append({series: series_settings})
             config[group_name] = group_series
@@ -1517,18 +1523,21 @@ class FilterSeries(FilterSeriesBase):
 
             log.debug('start with entities: %s', [e['title'] for e in entries])
 
-            ep_threshold = config.get('season_packs')
+            season_packs = config.get('season_packs')
             # reject season packs unless specified
-            if entity.is_season and ep_threshold is None:
+            if entity.is_season and season_packs is None:
                 for entry in entries:
                     entry.reject('season pack support is turned off')
                 continue
 
             # reject episodes if season pack is set to 'only'
-            if not entity.is_season and ep_threshold is not None and ep_threshold == 'exclusive':
+            if not entity.is_season and season_packs is not None and season_packs['reject_eps']:
                 for entry in entries:
                     entry.reject('season pack only mode')
                 continue
+
+            # Determine episode threshold for season pack
+            ep_threshold = season_packs['threshold']
 
             # check that a season ack for this season wasn't already accepted in this task run
             if entity.season in accepted_seasons:
