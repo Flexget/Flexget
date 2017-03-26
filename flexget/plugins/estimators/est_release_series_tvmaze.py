@@ -7,14 +7,6 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils.tools import split_title_year
 
-try:
-    from flexget.plugins.internal.api_tvmaze import APITVMaze
-
-    lookup = APITVMaze.episode_lookup
-except ImportError:
-    raise plugin.DependencyError(issued_by='est_series_tvmaze', missing='api_tvmaze',
-                                 message='est_series_tvmaze requires the `api_tvmaze` plugin')
-
 log = logging.getLogger('est_series_tvmaze')
 
 
@@ -25,8 +17,10 @@ class EstimatesSeriesTVMaze(object):
             return
         series_name = entry['series_name']
         season = entry['series_season']
-        episode_number = entry['series_episode']
+        episode_number = entry.get('series_episode')
         title, year_match = split_title_year(series_name)
+
+        season_pack = entry.get('season_pack')
 
         kwargs = {}
         kwargs['tvmaze_id'] = entry.get('tvmaze_id')
@@ -43,19 +37,26 @@ class EstimatesSeriesTVMaze(object):
         kwargs['series_episode'] = episode_number
         kwargs['series_name'] = series_name
 
-        log.debug(
-            'Searching TVMaze for air-date of %s season %s episode %s', series_name, season, episode_number)
+        api_tvmaze = plugin.get_plugin_by_name('api_tvmaze').instance
+        if season_pack:
+            lookup = api_tvmaze.season_lookup
+            log.debug('Searching api_tvmaze for season')
+        else:
+            log.debug('Searching api_tvmaze for episode')
+            lookup = api_tvmaze.episode_lookup
+
         for k, v in list(kwargs.items()):
             if v:
-                log.debug('{0}: {1}'.format(k, v))
+                log.debug('%s: %s', k, v)
+
         try:
-            episode = lookup(**kwargs)
+            entity = lookup(**kwargs)
         except LookupError as e:
-            log.debug(e)
+            log.debug(str(e))
             return
-        if episode and episode.airdate:
-            log.debug('received air-date: %s', episode.airdate)
-            return episode.airdate
+        if entity and entity.airdate:
+            log.debug('received air-date: %s', entity.airdate)
+            return entity.airdate
         return
 
 
