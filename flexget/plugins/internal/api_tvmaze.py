@@ -107,8 +107,8 @@ class TVMazeSeries(Base):
 
     def __init__(self, series, session):
         self.tvmaze_id = series['id']
-        self.update(series, session)
         self.series = series
+        self.update(series, session)
 
     def to_dict(self):
         return {
@@ -194,15 +194,12 @@ class TVMazeSeason(Base):
     url = Column(String)
     name = Column(Unicode)
     episode_order = Column(Integer)
-    premiere_date = Column(DateTime)
+    airdate = Column(DateTime)
     end_date = Column(DateTime)
     network = Column(Unicode)
     web_channel = Column(Unicode)
     image = Column(String)
     summary = Column(Unicode)
-
-    # Make it compatible with estimator, might get rid of this...
-    airdate = premiere_date
 
     def __init__(self, season, series_id):
         self.tvmaze_id = season['id']
@@ -213,8 +210,8 @@ class TVMazeSeason(Base):
     def update(self, season):
         self.url = season['url']
         self.name = season['name']
-        self.end_date = season['endDate']
-        self.premiere_date = season['premiereDate']
+        self.end_date = parser.parse(season.get('endDate'), ignoretz=True) if season.get('endDate') else None
+        self.airdate = parser.parse(season['premiereDate'], ignoretz=True) if season.get('premiereDate') else None
         self.web_channel = season['web_channel']['name'] if season.get('web_channel') else None
         self.network = season['network']['name'] if season.get('network') else None
         self.image = season['image']['original'] if season.get('image') else None
@@ -445,10 +442,13 @@ class APITVMaze(object):
         series = APITVMaze.series_lookup(session=session, only_cached=only_cached, **lookup_params)
         if not series:
             raise LookupError('Could not find series with the following parameters: {0}'.format(lookup_params))
-
-        # See if episode already exists in cache
+        session.flush()
+        # See if season already exists in cache
         log.debug('searching for season %s of show %s in cache', season_number, series.name)
-        season = session.query(series.seasons).filter(TVMazeSeason.number == season_number).one_or_none()
+        season = session.query(TVMazeSeason) \
+            .filter(TVMazeSeason.series_id == series.tvmaze_id) \
+            .filter(TVMazeSeason.number == season_number) \
+            .one_or_none()
 
         # Logic for cache only mode
         if only_cached:
@@ -464,7 +464,10 @@ class APITVMaze(object):
         series.populate_seasons()
 
         # Query again
-        season = session.query(series.seasons).filter(TVMazeSeason.number == season_number).one_or_none()
+        season = session.query(TVMazeSeason) \
+            .filter(TVMazeSeason.tvmaze_id == series.tvmaze_id) \
+            .filter(TVMazeSeason.number == season_number) \
+            .one_or_none()
         if season:
             return season
 

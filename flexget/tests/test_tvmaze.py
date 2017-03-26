@@ -406,3 +406,26 @@ class TestTVMazeUnicodeLookup(object):
         with Session() as session:
             r = session.query(TVMazeLookup).all()
             assert len(r) == 1, 'Should not have added a new row'
+
+
+@pytest.mark.online
+class TestTVMazeSeasonLookup(object):
+    config = """
+        templates:
+          global:
+            tvmaze_lookup: yes
+            metainfo_series: yes
+        tasks:
+          test_season_pack:
+            disable: seen
+            mock:
+            - {'title': 'The Flash (2014) S01', 'url': 'mock://whatever'}
+            series:
+            - The Flash (2014):
+                season_packs: yes
+    """
+
+    def test_season_pack_lookup(self, execute_task):
+        task = execute_task('test_season_pack')
+        entry = task.entries[0]
+        assert entry['tvmaze_season_id'] == 40
