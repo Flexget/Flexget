@@ -457,7 +457,7 @@ class APITVMaze(object):
                 return season
 
         if season and not series.expired:
-            log.debug('return season % of show %s', season_number, series.name)
+            log.debug('returning season %s of show %s', season_number, series.name)
             return season
 
         # If no season has been found try refreshing the series seasons
