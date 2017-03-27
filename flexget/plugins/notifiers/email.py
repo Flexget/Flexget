@@ -5,14 +5,14 @@ from future.utils import text_to_native_str
 import logging
 import smtplib
 import socket
-
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
+from smtplib import SMTPAuthenticationError
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 from flexget.plugin import PluginWarning
 
 plugin_name = 'email'
@@ -106,7 +106,7 @@ class EmailNotifier(object):
                 # Forcing to use `str` type
                 log.debug('logging in to smtp server using username: %s', self.username)
                 self.mail_server.login(text_to_native_str(self.username), text_to_native_str(self.password))
-        except IOError as e:
+        except (IOError, SMTPAuthenticationError) as e:
             raise PluginWarning(str(e))
 
     schema = {
