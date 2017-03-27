@@ -222,7 +222,7 @@ class t411Auth(AuthBase):
 
     #   RETREIVING LOGIN COOKIES ONLY ONCE A DAY
     def get_login_cookies(self, username, password):
-        url_auth = 'http://www.t411.li/users/login'
+        url_auth = 'http://www.t411.ai/users/login'
         db_session = Session()
         account = db_session.query(torrent411Account).filter(
             torrent411Account.username == username).first()
@@ -336,16 +336,16 @@ class UrlRewriteTorrent411(object):
 
             -- RSS DOWNLOAD WITH LOGIN
             rss:
-              url: http://www.t411.li/rss/?cat=210
+              url: http://www.t411.ai/rss/?cat=210
               username: ****
               password: ****
 
             - OR -
 
-            -- RSS NORMAL URL REWRITE (i.e.: http://www.t411.li/torrents/download/?id=12345678)
+            -- RSS NORMAL URL REWRITE (i.e.: http://www.t411.ai/torrents/download/?id=12345678)
             -- WARNING: NEED CUSTOM COOKIES NOT HANDLE BY THIS PLUGIN
             rss:
-              url: http://www.t411.li/rss/?cat=210
+              url: http://www.t411.ai/rss/?cat=210
 
         ---
             SEARCH WITHIN SITE
@@ -422,7 +422,7 @@ class UrlRewriteTorrent411(object):
             if match:
                 torrent_id = match.group(1)
                 log.debug("Got the Torrent ID: %s" % torrent_id)
-                entry['url'] = 'http://www.t411.li/torrents/download/?id=' + torrent_id
+                entry['url'] = 'http://www.t411.ai/torrents/download/?id=' + torrent_id
                 if 'download_auth' in entry:
                     auth_handler = t411Auth(*entry['download_auth'])
                     entry['download_auth'] = auth_handler
@@ -434,7 +434,7 @@ class UrlRewriteTorrent411(object):
         """
         Search for name from torrent411.
         """
-        url_base = 'http://www.t411.li'
+        url_base = 'http://www.t411.ai'
 
         if not isinstance(config, dict):
             config = {}
@@ -489,12 +489,12 @@ class UrlRewriteTorrent411(object):
                 if nfo_link_res is not None:
                     tid = nfo_link_res.group(1)
                 title_res = re.search(
-                    '<a href=\"//www.t411.li/torrents/([-A-Za-z0-9+&@#/%|?=~_|!:,.;]+)\" title="([^"]*)">',
+                    '<a href=\"//www.t411.ai/torrents/([-A-Za-z0-9+&@#/%|?=~_|!:,.;]+)\" title="([^"]*)">',
                     str(tr))
                 if title_res is not None:
                     entry['title'] = native_str_to_text(title_res.group(2), encoding='utf-8')
                 size = tr('td')[5].contents[0]
-                entry['url'] = 'http://www.t411.li/torrents/download/?id=%s' % tid
+                entry['url'] = 'http://www.t411.ai/torrents/download/?id=%s' % tid
                 entry['torrent_seeds'] = tr('td')[7].contents[0]
                 entry['torrent_leeches'] = tr('td')[8].contents[0]
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
