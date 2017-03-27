@@ -161,7 +161,7 @@ class RutrackerUrlrewrite(object):
         else:
             auth_handler = self.auth_cache[username]
         for entry in task.accepted:
-            if entry['url'].startswith('{}/forum/viewtopic.php'.format(self.auth_cache[username].base_url)):
+            if re.match('https?:\/\/rutracker', entry['url']):
                 entry['download_auth'] = auth_handler
 
     @staticmethod
