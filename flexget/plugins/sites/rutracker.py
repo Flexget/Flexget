@@ -19,7 +19,7 @@ from flexget.manager import Session
 from requests import Session as RSession
 from requests.auth import AuthBase
 from requests.utils import dict_from_cookiejar
-from requests.exceptions import ConnectionError
+from requests.exceptions import RequestException
 
 __author__ = 'asm0dey'
 
@@ -77,8 +77,8 @@ class RutrackerAuth(AuthBase):
                 if response.ok:
                     url = mirror
                     break
-            except ConnectionError as err:
-                log.debug('Connection error. {}'.format(err))
+            except RequestException as err:
+                log.debug('Connection error. %s', str(err))
 
         if url:
             return url
@@ -161,7 +161,7 @@ class RutrackerUrlrewrite(object):
         else:
             auth_handler = self.auth_cache[username]
         for entry in task.accepted:
-            if entry['url'].startswith('{}/forum/viewtopic.php'.format(self.auth_cache[username].base_url)):
+            if re.match('https?:\/\/rutracker', entry['url']):
                 entry['download_auth'] = auth_handler
 
     @staticmethod
