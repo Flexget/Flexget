@@ -8,7 +8,7 @@ import socket
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
-from smtplib import SMTPAuthenticationError
+from smtplib import SMTPAuthenticationError, SMTPServerDisconnected
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -89,7 +89,13 @@ class EmailNotifier(object):
         self.ssl = None
         self.tls = None
 
-    def connect_to_smtp_server(self):
+    def connect_to_smtp_server(self, config):
+        self.host = config['smtp_host']
+        self.port = config['smtp_port']
+        self.ssl = config['smtp_ssl']
+        self.tls = config['smtp_tls']
+        self.username = config.get('smtp_username')
+        self.password = config.get('smtp_password')
         try:
             log.debug('connecting to smtp server %s:%s', self.host, self.port)
             self.mail_server = smtplib.SMTP_SSL if self.ssl else smtplib.SMTP
@@ -153,22 +159,21 @@ class EmailNotifier(object):
 
         # Making sure mail server connection will remain open per host or username
         # (in case several mail servers are used in the same task)
-        if not self.mail_server or not (self.username == config['smtp_username'] and self.host == config['smtp_host']):
-            self.host = config['smtp_host']
-            self.port = config['smtp_port']
-            self.ssl = config['smtp_ssl']
-            self.tls = config['smtp_tls']
-            self.username = config['smtp_username']
-            self.password = config['smtp_password']
-            self.connect_to_smtp_server()
+        if not self.mail_server or not (
+                self.host == config['smtp_host'] and self.username == config.get('smtp_username')):
+            self.connect_to_smtp_server(config)
 
-        self.mail_server.sendmail(email['From'], config['to'], email.as_string())
-
-    def on_task_exit(self, task, config):
-        if self.mail_server:
-            log.debug('disconnecting from mail server')
-            self.mail_server.quit()
-            self.mail_server = None
+        connection_error = None
+        while True:
+            try:
+                self.mail_server.sendmail(email['From'], config['to'], email.as_string())
+                break
+            except SMTPServerDisconnected as e:
+                if not connection_error:
+                    self.connect_to_smtp_server(config)
+                    connection_error = e
+                else:
+                    raise PluginWarning('Could not connect to SMTP server: %s' % str(e))
 
 
 @event('plugin.register')
