@@ -193,10 +193,10 @@ class TraktSet(MutableSet):
                     continue
                 entry = Entry()
                 if list_type == 'episode':
-                    entry['url'] = 'http://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
+                    entry['url'] = 'https://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
                         item['show']['ids']['slug'], item['episode']['season'], item['episode']['number'])
                 else:
-                    entry['url'] = 'http://trakt.tv/%s/%s' % (list_type, item[list_type]['ids'].get('slug'))
+                    entry['url'] = 'https://trakt.tv/%ss/%s' % (list_type, item[list_type]['ids'].get('slug'))
                 entry.update_using_map(field_maps[list_type], item)
                 # Override the title if strip_dates is on. TODO: a better way?
                 if self.config.get('strip_dates'):
