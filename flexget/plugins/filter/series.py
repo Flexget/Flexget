@@ -392,6 +392,8 @@ class Episode(Base):
         if not isinstance(other, Episode):
             return NotImplemented
         if self.identified_by != other.identified_by:
+            if self.identified_by == 'special':
+                return False
             return NotImplemented
         if self.identified_by in ['ep', 'sequence']:
             return self.season < other.season or (self.season == other.season and self.number < other.number)
