@@ -5,18 +5,13 @@ import argparse
 import logging
 import re
 import time
+from collections import MutableSet
 from copy import copy
 from datetime import datetime, timedelta
 
-from past.builtins import basestring
-from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
-                        desc, select, update, delete, ForeignKey, Index, func, and_, not_)
-from sqlalchemy.exc import OperationalError
-from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.orm import relation, backref, object_session
-
 from flexget import db_schema, options, plugin
 from flexget.config_schema import one_or_more
+from flexget.entry import Entry
 from flexget.event import event, fire_event
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
@@ -27,8 +22,15 @@ from flexget.utils.log import log_once
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_episode_identifier
+from past.builtins import basestring
+from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
+                        desc, select, update, delete, ForeignKey, Index, func, and_, not_)
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.orm import relation, backref, object_session
 
-SCHEMA_VER = 13
+SCHEMA_VER = 14
+DEFAULT_SERIES_LIST_NAME = 'series'
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -154,7 +156,125 @@ def upgrade(ver, session):
         series_table = table_schema('series', session)
         session.execute(update(series_table, series_table.c.identified_by == None, {'identified_by': 'auto'}))
         ver = 13
+    if ver == 13:
+        # Create default series list
+        series_list_table = table_schema('series_list_lists', session)
+        result = session.execute(series_list_table.insert().values(name=DEFAULT_SERIES_LIST_NAME, added=datetime.now()))
+        table_add_column('series', 'list_id', Integer, session, result.inserted_primary_key[0])
+        ver = 14
     return ver
+
+
+class SeriesListList(Base):
+    __tablename__ = 'series_list_lists'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode, unique=True)
+    added = Column(DateTime, default=datetime.now)
+    series = relation('Series', backref='series_list', cascade='all, delete, delete-orphan', lazy='dynamic')
+
+    def __init__(self, name):
+        self.name = name
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'list_name': self.list_name,
+            'added_on': self.added
+        }
+
+
+class SeriesListSet(MutableSet):
+    def _db_list(self, session):
+        return session.query(SeriesListList).filter(SeriesListList.name == self.config).first()
+
+    def __init__(self, config):
+        self.config = config
+        with Session() as session:
+            if not self._db_list(session):
+                session.add(SeriesListList(name=self.config))
+
+    def _from_iterable(self, it):
+        return set(it)
+
+    def _find_entry(self, entry):
+        with Session() as session:
+            log.debug('trying to find series %s in DB', entry['series_name'])
+            series = session.query(Series).filter(Series.name == entry['series_name']).one_or_none()
+            if series:
+                log.debug('found series %s', series.name)
+            return series
+
+    def __contains__(self, entry):
+        return self._find_entry(entry) is not None
+
+    def __len__(self):
+        with Session() as session:
+            return len(self._db_list(session).series)
+
+    def __iter__(self):
+        with Session() as session:
+            return iter(
+                [Entry(title=series.name, url='', series_name=series.name) for series in self._db_list(session).series])
+
+    def add(self, entry):
+        with Session() as session:
+            if 'series_name' not in entry:
+                log.warning('Could not add to list as series_name field is missing (enable metadata_series), skipping')
+                return
+
+            if self.__contains__(entry):
+                log.debug('series %s already exist in DB, skipping', entry['series_name'])
+                return
+            db_list = self._db_list(session=session)
+            series = Series()
+            series.name = entry['series_name']
+            log.debug('adding series %s to list %s', series.name, db_list.name)
+            db_list.series.append(series)
+
+    def discard(self, entry):
+        with Session() as session:
+            series = self._find_entry(entry)
+            if series:
+                log.debug('deleting series %s from DB', series.name)
+                session.delete(series)
+
+    @property
+    def immutable(self):
+        return False
+
+    @property
+    def online(self):
+        """
+        Set the online status of the plugin, online plugin should be treated
+        differently in certain situations, like test mode
+        """
+        return False
+
+    def get(self, entry):
+        raise NotImplementedError
+
+
+class PluginSeriesList(object):
+    schema = {'type': 'string'}
+
+    @staticmethod
+    def get_list(config):
+        return SeriesListSet(config)
+
+    def on_task_input(self, task, config):
+        return list(SeriesListSet(config))
+
+
+def default_list_id():
+    with Session() as session:
+        default_list = session.query(SeriesListList).filter(
+            SeriesListList.name == DEFAULT_SERIES_LIST_NAME).one_or_none()
+        if not default_list:
+            default_list = SeriesListList(DEFAULT_SERIES_LIST_NAME)
+            session.add(default_list)
+        session.commit()
+        return default_list.id
 
 
 @event('manager.db_cleanup')
@@ -270,6 +390,7 @@ class Series(Base):
     __tablename__ = 'series'
 
     id = Column(Integer, primary_key=True)
+    list_id = Column(Integer, ForeignKey('series_list_lists.id'), nullable=False)
     _name = Column('name', Unicode)
     _name_normalized = Column('name_lower', Unicode, index=True, unique=True)
     identified_by = Column(String)
@@ -494,7 +615,7 @@ def get_latest_status(episode):
 
 @with_session
 def get_series_summary(configured=None, premieres=None, status=None, days=None, start=None, stop=None, count=False,
-                       sort_by='show_name', descending=None, session=None):
+                       sort_by='show_name', descending=None, list_id=None, session=None):
     """
     Return a query with results for all series.
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
@@ -512,7 +633,7 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         configured = 'configured'
     elif configured not in ['configured', 'unconfigured', 'all']:
         raise LookupError('"configured" parameter must be either "configured", "unconfigured", or "all"')
-    query = session.query(Series)
+    query = session.query(Series).filter(Series.list_id == list_id)
     query = query.outerjoin(Series.episodes).outerjoin(Episode.releases).outerjoin(Series.in_tasks).group_by(Series.id)
     if configured == 'configured':
         query = query.having(func.count(SeriesTask.id) >= 1)
@@ -640,8 +761,7 @@ def new_eps_after(since_ep):
         filter(Series.id == series.id)
     if series.identified_by == 'ep':
         if since_ep.season is None or since_ep.number is None:
-            log.debug('new_eps_after for %s falling back to timestamp because latest dl in non-ep format' %
-                      series.name)
+            log.debug('new_eps_after for %s falling back to timestamp because latest dl in non-ep format', series.name)
             return series_eps.filter(Episode.first_seen > since_ep.first_seen).count()
         return series_eps.filter((Episode.identified_by == 'ep') &
                                  (((Episode.season == since_ep.season) & (Episode.number > since_ep.number)) |
@@ -676,8 +796,9 @@ def store_parser(session, parser, series=None, quality=None):
             log.debug('adding series %s into db', parser.name)
             series = Series()
             series.name = parser.name
+            series.list_id = default_list_id()
             session.add(series)
-            log.debug('-> added %s' % series)
+            log.debug('-> added %s', series)
 
     releases = []
     for ix, identifier in enumerate(parser.identifiers):
@@ -698,7 +819,7 @@ def store_parser(session, parser, series=None, quality=None):
                 episode.season = 0
                 episode.number = parser.id + ix
             series.episodes.append(episode)  # pylint:disable=E1103
-            log.debug('-> added %s' % episode)
+            log.debug('-> added %s', episode)
 
         # if release does not exists in episode, add new
         #
@@ -719,7 +840,7 @@ def store_parser(session, parser, series=None, quality=None):
             release.proper_count = parser.proper_count
             release.title = parser.data
             episode.releases.append(release)  # pylint:disable=E1103
-            log.debug('-> added %s' % release)
+            log.debug('-> added %s', release)
         releases.append(release)
     session.flush()  # Make sure autonumber ids are populated
     return releases
@@ -836,7 +957,7 @@ def delete_release_by_id(release_id):
         if release:
             session.delete(release)
             session.commit()
-            log.debug('Deleted release ID %s' % release_id)
+            log.debug('Deleted release ID %s', release_id)
         else:
             raise ValueError('Unknown identifier %s for release' % release_id)
 
@@ -914,6 +1035,10 @@ def release_in_episode(episode_id, release_id):
         return release.episode_id == episode_id
 
 
+def get_list(list_name, session):
+    return session.query(SeriesListList).filter(SeriesListList.name == list_name).first()
+
+
 def populate_entry_fields(entry, parser, config):
     """
     Populates all series_fields for given entry based on parser.
@@ -925,8 +1050,8 @@ def populate_entry_fields(entry, parser, config):
     # add series, season and episode to entry
     entry['series_name'] = parser.name
     if 'quality' in entry and entry['quality'] != parser.quality:
-        log.verbose('Found different quality for %s. Was %s, overriding with %s.' %
-                    (entry['title'], entry['quality'], parser.quality))
+        log.verbose('Found different quality for %s. Was %s, overriding with %s.', entry['title'], entry['quality'],
+                    parser.quality)
     entry['quality'] = parser.quality
     entry['proper'] = parser.proper
     entry['proper_count'] = parser.proper_count
@@ -1102,7 +1227,7 @@ class FilterSeriesBase(object):
                     unique_series[series].update(series_settings)
         # Turn our all_series dict back into a list
         # sort by reverse alpha, so that in the event of 2 series with common prefix, more specific is parsed first
-        return [{s: unique_series[s]} for s in sorted(unique_series, reverse=True)]
+        return [{series: unique_series[series]} for series in sorted(unique_series, reverse=True)]
 
     def merge_config(self, task, config):
         """Merges another series config dict in with the current one."""
@@ -1214,9 +1339,10 @@ class FilterSeries(FilterSeriesBase):
                     log.debug('adding series %s into db', series_name)
                     db_series = Series()
                     db_series.name = series_name
+                    db_series.list_id = default_list_id()
                     db_series.identified_by = series_config.get('identified_by', 'auto')
                     session.add(db_series)
-                    log.debug('-> added %s' % db_series)
+                    log.debug('-> added %s', db_series)
                     session.flush()  # Flush to get an id on series before adding alternate names.
                     alts = series_config.get('alternate_name', [])
                     if not isinstance(alts, list):
@@ -1478,7 +1604,7 @@ class FilterSeries(FilterSeriesBase):
                 return pass_filter
 
         downloaded_qualities = dict((d.quality, d.proper_count) for d in episode.downloaded_releases)
-        log.debug('propers - downloaded qualities: %s' % downloaded_qualities)
+        log.debug('propers - downloaded qualities: %s', downloaded_qualities)
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
@@ -1540,8 +1666,8 @@ class FilterSeries(FilterSeriesBase):
         latest = get_latest_release(episode.series)
         if episode.series.begin and (not latest or episode.series.begin > latest):
             latest = episode.series.begin
-        log.debug('latest download: %s' % latest)
-        log.debug('current: %s' % episode)
+        log.debug('latest download: %s', latest)
+        log.debug('current: %s', episode)
 
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
@@ -1699,9 +1825,10 @@ class SeriesDBManager(FilterSeriesBase):
                     log.debug('adding series %s into db (on_task_start)', series_name)
                     db_series = Series()
                     db_series.name = series_name
+                    db_series.list_id = default_list_id()
                     session.add(db_series)
                     session.flush()  # flush to get id on series before creating alternate names
-                    log.debug('-> added %s' % db_series)
+                    log.debug('-> added %s', db_series)
                 for alt in alts:
                     _add_alt_name(alt, db_series, series_name, session)
                 log.debug('connecting series %s to task %s', db_series.name, task.name)
@@ -1726,7 +1853,7 @@ def _add_alt_name(alt, db_series, series_name, session):
     elif db_series_alt:
         if not db_series_alt.series:
             # Not sure how this can happen
-            log.debug('Found an alternate name not attached to series. Re-attatching %s to %s' % (alt, series_name))
+            log.debug('Found an alternate name not attached to series. Re-attatching %s to %s', alt, series_name)
             db_series.alternate_names.append(db_series_alt)
         else:
             # Alternate name already exists for another series. Not good.
@@ -1736,7 +1863,7 @@ def _add_alt_name(alt, db_series, series_name, session):
         log.debug('adding alternate name %s for %s into db' % (alt, series_name))
         db_series_alt = AlternateNames(alt)
         db_series.alternate_names.append(db_series_alt)
-        log.debug('-> added %s' % db_series_alt)
+        log.debug('-> added %s', db_series_alt)
 
 
 def set_alt_names(alt_names, db_series, session):
@@ -1762,6 +1889,7 @@ def register_plugin():
     plugin.register(FilterSeries, 'series', api_ver=2)
     # This is a builtin so that it can update the database for tasks that may have had series plugin removed
     plugin.register(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
+    plugin.register(PluginSeriesList, 'series_list', api_ver=2, interfaces=['list', 'task'])
 
 
 @event('options.register')
