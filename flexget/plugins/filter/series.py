@@ -1099,6 +1099,21 @@ def show_episodes(series, start=None, stop=None, count=False, descending=False, 
     return episodes.slice(start, stop).from_self().all()
 
 
+def show_seasons(series, start=None, stop=None, count=False, descending=False, session=None):
+    """ Return all seasons of a given series """
+    seasons = session.query(Season).filter(Season.series_id == series.id)
+    if count:
+        return seasons.count()
+    seasons = seasons.order_by(Season.season.desc()) if descending else seasons.order_by(Season.season)
+    return seasons.slice(start, stop).from_self().all()
+
+
+def get_all_entities(series, session):
+    episodes = show_episodes(series, session=session)
+    seasons = show_seasons(series, session=session)
+    return episodes + seasons
+
+
 def get_releases(episode, downloaded=None, start=None, stop=None, count=False, descending=False, sort_by=None,
                  session=None):
     """ Return all releases for a given episode """
