@@ -12,7 +12,7 @@ from flexget.terminal import TerminalTable, TerminalTableError, table_parser, co
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
-                                               normalize_series_name, new_eps_after, get_latest_release,
+                                               normalize_series_name, new_entities_after, get_latest_release,
                                                get_series_summary, shows_by_name, show_episodes, shows_by_exact_name)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
@@ -76,7 +76,7 @@ def display_summary(options):
         for series in query:
             name_column = series.name
 
-            behind = 0
+            behind = (0,)
             latest_release = '-'
             age_col = '-'
             episode_id = '-'
@@ -85,7 +85,7 @@ def display_summary(options):
             if identifier_type == 'auto':
                 identifier_type = colorize('yellow', 'auto')
             if latest:
-                behind = new_eps_after(latest)
+                behind = new_entities_after(latest)
                 latest_release = get_latest_status(latest)
                 # colorize age
                 age_col = latest.age
@@ -98,8 +98,8 @@ def display_summary(options):
                         age_col = colorize(OLD_EP_COLOR, latest.age)
                 episode_id = latest.identifier
             if not porcelain:
-                if behind > 0:
-                    name_column += colorize(BEHIND_EP_COLOR, ' {} behind'.format(behind))
+                if behind[0] > 0:
+                    name_column += colorize(BEHIND_EP_COLOR, ' {} {} behind'.format(behind[0], behind[1]))
 
             table_data.append([name_column, episode_id, age_col, latest_release, identifier_type])
     try:

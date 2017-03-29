@@ -344,6 +344,46 @@ class Season(Base):
     def downloaded_releases(self):
         return [release for release in self.releases if release.downloaded]
 
+    @hybrid_property
+    def first_seen(self):
+        if not self.releases:
+            return None
+        return min(release.first_seen for release in self.releases)
+
+    @first_seen.expression
+    def first_seen(cls):
+        return select([func.min(SeasonRelease.first_seen)]).where(SeasonRelease.season_id == cls.id). \
+            correlate(Season.__table__).label('first_seen')
+
+    @property
+    def age(self):
+        """
+        :return: Pretty string representing age of episode. eg "23d 12h" or "No releases seen"
+        """
+        if not self.first_seen:
+            return 'No releases seen'
+        diff = datetime.now() - self.first_seen
+        age_days = diff.days
+        age_hours = diff.seconds // 60 // 60
+        age = ''
+        if age_days:
+            age += '%sd ' % age_days
+        age += '%sh' % age_hours
+        return age
+
+    @property
+    def age_timedelta(self):
+        """
+        :return: Timedelta or None if seasons is never seen
+        """
+        if not self.first_seen:
+            return None
+        return datetime.now() - self.first_seen
+
+    @property
+    def is_premiere(self):
+        return False
+
     def __str__(self):
         return '<Season(id=%s,identifier=%s,season=%s,completed=%s)>' % (
             self.id, self.identifier, self.season, self.completed)
@@ -760,30 +800,43 @@ def get_latest_release(series, downloaded=True, season=None):
     return max(latest_season, latest_ep)
 
 
-def new_eps_after(since_ep):
+def new_eps_after(series, since_ep, session):
     """
     :param since_ep: Episode instance
     :return: Number of episodes since then
     """
-    session = Session.object_session(since_ep)
-    series = since_ep.series
-    series_eps = session.query(Episode).join(Episode.series). \
-        filter(Series.id == series.id)
+    series_eps = session.query(Episode).join(Episode.series).filter(Series.id == series.id)
     if series.identified_by == 'ep':
         if since_ep.season is None or since_ep.number is None:
             log.debug('new_eps_after for %s falling back to timestamp because latest dl in non-ep format' %
                       series.name)
-            return series_eps.filter(Episode.first_seen > since_ep.first_seen).count()
-        return series_eps.filter((Episode.identified_by == 'ep') &
-                                 (((Episode.season == since_ep.season) & (Episode.number > since_ep.number)) |
-                                  (Episode.season > since_ep.season))).count()
+            return series_eps.filter(Episode.first_seen > since_ep.first_seen).count(), 'eps'
+        count = series_eps.filter((Episode.identified_by == 'ep') &
+                                  (((Episode.season == since_ep.season) & (Episode.number > since_ep.number)) |
+                                   (Episode.season > since_ep.season))).count()
     elif series.identified_by == 'seq':
-        return series_eps.filter(Episode.number > since_ep.number).count()
+        count = series_eps.filter(Episode.number > since_ep.number).count()
     elif series.identified_by == 'id':
-        return series_eps.filter(Episode.first_seen > since_ep.first_seen).count()
+        count = series_eps.filter(Episode.first_seen > since_ep.first_seen).count()
     else:
         log.debug('unsupported identified_by %s', series.identified_by)
-        return 0
+        count = 0
+    return count, 'eps'
+
+
+def new_seasons_after(series, since_season, session):
+    series_seasons = session.query(Season).join(Season.series).filter(Season.id == series.id)
+    return series_seasons.filter(Season.first_seen > since_season.first_seen).count(), 'seasons'
+
+
+def new_entities_after(since_entity):
+    session = Session.object_session(since_entity)
+    series = since_entity.series
+    if since_entity.is_season:
+        func = new_seasons_after
+    else:
+        func = new_eps_after
+    return func(series, since_entity, session)
 
 
 def store_parser(session, parser, series=None, quality=None):
