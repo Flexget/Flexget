@@ -30,7 +30,7 @@ from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_ta
                                             create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta, parse_episode_identifier
 
-SCHEMA_VER = 13
+SCHEMA_VER = 14
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -159,6 +159,7 @@ def upgrade(ver, session):
     if ver == 13:
         # New season_releases table, added by "create_all"
         log.info('Adding season_releases table')
+        ver = 14
     return ver
 
 
