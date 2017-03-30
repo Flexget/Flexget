@@ -2149,6 +2149,16 @@ class TestSeriesSeasonPack(object):
           mock:
           - title: bla.s01.720p-flexget
           - title: bla.s02e01.720p-flexget
+        test_proper_season_pack:
+          mock:
+          - title: foo.s01.720p-flexget
+          - title: foo.s01.720p.proper-flexget
+        test_proper_season_pack_2:
+          mock:
+          - title: foo.s01.720p-flexget
+        test_proper_season_pack_3:
+          mock:
+          - title: foo.s01.720p.proper-flexget
     """
 
     @pytest.fixture()
@@ -2260,3 +2270,16 @@ class TestSeriesSeasonPack(object):
         assert len(task.accepted) == 1
         entry = task.find_entry(title='bla.s01.720p-flexget')
         assert entry.accepted
+
+    def test_proper_season_pack(self, execute_task):
+        """Series plugin: proper available immediately"""
+        task = execute_task('test_proper_season_pack')
+        assert task.find_entry('accepted', title='foo.s01.720p.proper-flexget')
+
+    def test_proper_season_pack_2(self, execute_task):
+        """Series plugin: proper available immediately"""
+        task = execute_task('test_proper_season_pack_2')
+        assert task.find_entry('accepted', title='foo.s01.720p-flexget')
+
+        task = execute_task('test_proper_season_pack_3')
+        assert task.find_entry('accepted', title='foo.s01.720p.proper-flexget')
