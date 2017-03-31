@@ -7,7 +7,7 @@ interactions:
       Connection: [keep-alive]
       User-Agent: [!!python/unicode 'FlexGet/1.2.415.dev (www.flexget.com)']
     method: GET
-    uri: http://api.t411.ai/torrents/details/666666
+    uri: https://api.t411.ai/torrents/details/666666
   response:
     body: {string: !!python/unicode '{"error":"Invalid token","code":202}'}
     headers:
