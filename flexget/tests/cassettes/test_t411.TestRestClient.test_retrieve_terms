@@ -7,7 +7,7 @@ interactions:
         Connection: [keep-alive]
         User-Agent: [FlexGet/1.2.379.dev (www.flexget.com)]
       method: GET
-      uri: http://api.t411.ai/terms/tree/
+      uri: https://api.t411.ai/terms/tree/
     response:
       body: {string: '{"234":{"11":{"type":"Application - Genre","mode":"single","terms":{"190":"Utilitaire","158":"Edition
           multim\u00e9dia","126":"Administration","137":"Aspiration de site","169":"Lecteur
