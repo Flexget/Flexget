@@ -98,7 +98,6 @@ class TestMetainfoSeries(object):
               - {title: 'FlexGet.aptitude'}
               - {title: 'FlexGet.Step1'}
               - {title: 'Something.1x0.Complete.Season-FlexGet'}
-              - {title: 'Something.1xAll.Season.Complete-FlexGet'}
               - {title: 'Something Seasons 1 & 2 - Complete'}
               - {title: 'Something Seasons 4 Complete'}
               - {title: 'Something.S01D2.DVDR-FlexGet'}
