@@ -2159,6 +2159,11 @@ class TestSeriesSeasonPack(object):
         test_proper_season_pack_3:
           mock:
           - title: foo.s01.720p.proper-flexget
+        test_all_series:
+          mock:
+          - title: show.name.s01.720p.HDTV-Group
+          all_series:
+            season_packs: yes
     """
 
     @pytest.fixture()
@@ -2283,3 +2288,7 @@ class TestSeriesSeasonPack(object):
 
         task = execute_task('test_proper_season_pack_3')
         assert task.find_entry('accepted', title='foo.s01.720p.proper-flexget')
+
+    def test_all_series(self, execute_task):
+        task = execute_task('test_all_series')
+        assert task.find_entry('accepted', title='show.name.s01.720p.HDTV-Group')

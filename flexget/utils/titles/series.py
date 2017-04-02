@@ -175,7 +175,9 @@ class SeriesParser(TitleParser):
         if match:
             self.identified_by = 'date'
         else:
-            match = self.parse_episode(clean_title)
+            match = self.parse_season_packs(clean_title)
+            if not match:
+                match = self.parse_episode(clean_title)
             self.identified_by = 'ep'
         if not match:
             return
