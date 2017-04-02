@@ -57,7 +57,7 @@ class NextSeriesSeasons(object):
                       series_name=series.name,
                       series_alternate_names=alts,  # Not sure if this field is useful down the road.
                       series_season=season,
-                      season_pack=True,
+                      season_pack_lookup=True,
                       series_id=series_id,
                       series_id_type=series.identified_by)
         if rerun:
@@ -147,14 +147,18 @@ class NextSeriesSeasons(object):
             latest = get_latest_season_pack_release(series)
 
             if entry.accepted:
-                log.debug('%s %s was accepted, rerunning to look for next season.' % (
-                    entry['series_name'], entry['series_id']))
-                self.rerun_entries.append(self.search_entry(series, entry['series_season'] + 1, task))
-                # Increase rerun limit by one if we have matches, this way
-                # we keep searching as long as matches are found!
-                # TODO: this should ideally be in discover so it would be more generic
-                task.max_reruns += 1
-                task.rerun(plugin=plugin_name, reason='Look for next season')
+                if not entry.get('season_pack'):
+                    log.debug('season lookup produced an episode result, assuming no season match, no need to rerun')
+                    return
+                else:
+                    log.debug('%s %s was accepted, rerunning to look for next season.', entry['series_name'],
+                              entry['series_id'])
+                    self.rerun_entries.append(self.search_entry(series, entry['series_season'] + 1, task))
+                    # Increase rerun limit by one if we have matches, this way
+                    # we keep searching as long as matches are found!
+                    # TODO: this should ideally be in discover so it would be more generic
+                    task.max_reruns += 1
+                    task.rerun(plugin=plugin_name, reason='Look for next season')
             elif latest and not latest.completed:
                 # There are known releases of this season, but none were accepted
                 return

@@ -20,7 +20,8 @@ class EstimatesSeriesTVMaze(object):
         episode_number = entry.get('series_episode')
         title, year_match = split_title_year(series_name)
 
-        season_pack = entry.get('season_pack')
+        # This value should be added to input plugins to trigger a season lookuo
+        season_pack = entry.get('season_pack_lookup')
 
         kwargs = {}
         kwargs['tvmaze_id'] = entry.get('tvmaze_id')

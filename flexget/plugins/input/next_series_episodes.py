@@ -70,7 +70,7 @@ class NextSeriesEpisodes(object):
                       series_alternate_names=alts,  # Not sure if this field is useful down the road.
                       series_season=season,
                       series_episode=episode,
-                      season_pack=False,
+                      season_pack_lookup=False,
                       series_id=series_id,
                       series_id_type=series.identified_by)
         if rerun:
