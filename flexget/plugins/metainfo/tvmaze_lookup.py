@@ -8,15 +8,6 @@ from flexget import plugin
 from flexget.event import event
 from flexget.manager import Session
 
-try:
-    from flexget.plugins.internal.api_tvmaze import APITVMaze
-
-    series_lookup = APITVMaze.series_lookup
-    episode_lookup = APITVMaze.episode_lookup
-except ImportError:
-    raise plugin.DependencyError(issued_by='tvmaze_lookup', missing='api_tvmaze',
-                                 message='tvmaze_lookup requires the `api_tvmaze` plugin')
-
 log = logging.getLogger('tvmaze_lookup')
 
 
@@ -101,6 +92,22 @@ class PluginTVMazeLookup(object):
         'tvmaze_series_episodes': lambda show: [episodes.title for episodes in show.episodes]
     }
 
+    # Season Info
+    season_map = {
+        'tvmaze_season_id': 'tvmaze_id',
+        'tvmaze_season_series_id': 'series_id',
+        'tvmaze_season_number': 'number',
+        'tvmaze_season_url': 'url',
+        'tvmaze_season_name': 'name',
+        'tvmaze_season_episode_order': 'episode_order',
+        'tvmaze_season_premiere_date': 'airdate',
+        'tvmaze_season_end_date': 'end_date',
+        'tvmaze_season_network': 'network',
+        'tvmaze_season_web_channel': 'web_channel',
+        'tvmaze_season_image': 'image',
+        'tvmaze_season_summary': 'summary'
+    }
+
     # Episode info
     episode_map = {
         'tvmaze_episode_name': 'title',
@@ -120,6 +127,7 @@ class PluginTVMazeLookup(object):
 
     def lazy_series_lookup(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
+        series_lookup = plugin.get_plugin_by_name('api_tvmaze').instance.series_lookup
         with Session() as session:
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
                           'year': entry.get('year', eval_lazy=False),
@@ -135,7 +143,26 @@ class PluginTVMazeLookup(object):
                 entry.update_using_map(self.series_map, series)
         return entry
 
+    def lazy_season_lookup(self, entry):
+        season_lookup = plugin.get_plugin_by_name('api_tvmaze').instance.season_lookup
+        with Session(expire_on_commit=False) as session:
+            lookupargs = {'title': entry.get('series_name', eval_lazy=False),
+                          'year': entry.get('year', eval_lazy=False),
+                          'tvmaze_id': entry.get('tvmaze_id', eval_lazy=False),
+                          'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
+                          'tvrage_id': entry.get('tvrage_id', eval_lazy=False),
+                          'series_season': entry.get('series_season', eval_lazy=False),
+                          'session': session}
+            try:
+                season = season_lookup(**lookupargs)
+            except LookupError as e:
+                log.debug(e)
+            else:
+                entry.update_using_map(self.season_map, season)
+        return entry
+
     def lazy_episode_lookup(self, entry):
+        episode_lookup = plugin.get_plugin_by_name('api_tvmaze').instance.episode_lookup
         with Session(expire_on_commit=False) as session:
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
                           'year': entry.get('year', eval_lazy=False),
@@ -165,6 +192,8 @@ class PluginTVMazeLookup(object):
             if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False) \
                     or entry.get('tvmaze_id', eval_lazy=False) or entry.get('tvrage_id', eval_lazy=False):
                 entry.register_lazy_func(self.lazy_series_lookup, self.series_map)
+                if entry.get('season_pack', eval_lazy=False):
+                    entry.register_lazy_func(self.lazy_season_lookup, self.season_map)
                 if ('series_season' in entry and 'series_episode' in entry) or ('series_date' in entry):
                     entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
 

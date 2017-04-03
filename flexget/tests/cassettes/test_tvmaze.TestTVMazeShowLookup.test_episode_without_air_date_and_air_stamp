@@ -5,30 +5,39 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
       method: GET
-      uri: https://api.tvmaze.com/singlesearch/shows?q=Firefly
+      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=Firefly
     response:
       body:
         string: !!binary |
-          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
+          H4sIAAAAAAAAA8VV227bRhD9lcG+uAVkkZZ8keUggOvWaFO0AaIE6cWGsSJH5MbLXWIvYhjD/96z
+          pByrfQkCBOgTuTOzcz9nH4QqxfJokU9EdFosRR1Cu8yyruumYdvITzwtbJP52nY+g1m2UY43uhcT
+          YWTDuHD9WRD6NglWhVNt4BImWpoqyipJfzKVVr6GsGLj2Ivl3+Ky3LIJ0TGkq0KxKfjwWhVBWQPJ
+          e/aBnRG3E+GDDBFX4KUcHLtogkrhT5F467hR7KBYilmezw7z88NZDg++qLmMGmYPYjSHfpknVSn7
+          IYVrp/Arbh8nwsmgTJVs5ZbdkPX5dA5Fx6qqA7qEmjl01t0no9S34+cuvP4DXguLvFyf1LvuvDMK
+          raAVCkDNyaJM3Xi3wn9K6ZM16XzZsFOFzH7n7u7PFOBxiLu+qqUxjLmYqPVE8MfUEamROirajknO
+          T44XcFZz2JZrsTxbLM6Ql2rSQYSQz/P58emRgEPVDFU9iIZLFRuod9NO/VXF/sBjq60sfTZc8dl4
+          4a61LjipQnaUzU7zfPqhrVCHdapSyOor/D1duUO/bExj2neJVH1sGpk6KV60L6/VlqmOpsSMqWfp
+          PClDqJg2Ma3PhCQ5NlzJkqlw3JFcW+lKiH0jtSbfyoILJzeBglPsKVjy0W2TX4lTzT0UGLsevEZz
+          b2xnqJUueLKbQVhJLT/2JE1JvE2BOukcFoY2cthYnzx1jGj4yhhq1Bhgj3VPTiJCW6oYn5qb6Yus
+          fYnWxbbEYiQEHp+dLeYnRyezibjTytwPI/asN2nUNTD33F3Zqv1RfcZmGjGwsFU2em6VH1btC5d3
+          dsD2PM9Ph7W742bNZcIZInuW3poElXHjF/mXmGK8kMHwiSsORyeHRyjYRDh3I5ZG/oBwl8RrVybV
+          uOpPoP4R/UHp/8I1m3JffDQb4f4/g/Pboes8m83PT8+/Kbz2ff4XX1eyDRKI+k3qwuqGDvBzQG+4
+          N1aXwBr2mTbWgaMooQDrXqTtpy2DjqShrrbJKAGy2LnagQagMj6xBvlatXQjVuBpUGJ/I6Yp3ACn
+          GncTaifExqvK0F+W6VJrxGd6L329js7wRRIfePCAXwOEE2qVtoF+tjjRQTI72Dduoi+iRpLIumAD
+          LqFXMjm8suv1BfVg6gq6AgSLan6VvWama9cjzq5UZKAkniRYleBmDSLYqAI9WKnGGnormwtKqZfK
+          g4QAGQqMQBWThwR2b0Avjr5b21ATLqT24N2ijbPNcFAGVi3eSA4pvcrC3DSgC/TpLYyfErgR318M
+          F9YMXlGbqAkPjcODgsp/QWmS0FYnL4ZuAjgShIo0a27xLekHa++ptND29MGu/YQ0qBL1OFLoMn4n
+          yX2P4SE7BYIbOTF5HYY1cupIkNiFwlk/Thus5u/VjiRxQNSBap/o7WuZ7Jk7wESPt4+P/wCAJ9Qx
+          nwgAAA==
       headers:
         Access-Control-Allow-Origin: ['*']
         Cache-Control: ['public, max-age=3600']
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [application/json; charset=UTF-8]
-        Date: ['Mon, 13 Mar 2017 17:19:48 GMT']
+        Date: ['Sun, 26 Mar 2017 11:10:54 GMT']
         Server: [nginx/1.10.0 (Ubuntu)]
         Vary: [Accept-Encoding]
       status: {code: 200, message: OK}
@@ -38,7 +47,7 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
       method: GET
       uri: https://api.tvmaze.com/shows/180/episodebynumber?season=1&number=13
     response:
@@ -58,7 +67,7 @@ interactions:
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [application/json; charset=UTF-8]
-        Date: ['Mon, 13 Mar 2017 17:19:53 GMT']
+        Date: ['Sun, 26 Mar 2017 11:10:54 GMT']
         Server: [nginx/1.10.0 (Ubuntu)]
         Vary: [Accept-Encoding]
       status: {code: 200, message: OK}

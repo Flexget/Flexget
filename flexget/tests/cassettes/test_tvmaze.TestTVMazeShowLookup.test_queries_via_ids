@@ -5,36 +5,41 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
       method: GET
-      uri: https://api.tvmaze.com/shows/13
+      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=The+Flash
     response:
       body:
         string: !!binary |
-          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
+          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
       headers:
         Access-Control-Allow-Origin: ['*']
         Cache-Control: ['public, max-age=3600']
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [application/json; charset=UTF-8]
-        Date: ['Mon, 13 Mar 2017 17:16:31 GMT']
+        Date: ['Sun, 26 Mar 2017 11:10:57 GMT']
         Server: [nginx/1.10.0 (Ubuntu)]
         Vary: [Accept-Encoding]
       status: {code: 200, message: OK}
@@ -44,7 +49,7 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
       method: GET
       uri: https://api.tvmaze.com/shows/13/episodebynumber?season=2&number=2
     response:
@@ -65,7 +70,7 @@ interactions:
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [application/json; charset=UTF-8]
-        Date: ['Mon, 13 Mar 2017 17:16:36 GMT']
+        Date: ['Sun, 26 Mar 2017 11:10:58 GMT']
         Server: [nginx/1.10.0 (Ubuntu)]
         Vary: [Accept-Encoding]
       status: {code: 200, message: OK}
@@ -75,7 +80,7 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
       method: GET
       uri: https://api.tvmaze.com/shows/13/episodebynumber?season=2&number=3
     response:
@@ -97,7 +102,7 @@ interactions:
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [application/json; charset=UTF-8]
-        Date: ['Mon, 13 Mar 2017 17:16:38 GMT']
+        Date: ['Sun, 26 Mar 2017 11:10:58 GMT']
         Server: [nginx/1.10.0 (Ubuntu)]
         Vary: [Accept-Encoding]
       status: {code: 200, message: OK}
@@ -107,29 +112,29 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
       method: GET
       uri: https://api.tvmaze.com/shows/13/episodebynumber?season=2&number=4
     response:
       body:
         string: !!binary |
           H4sIAAAAAAAAA4VTTW/bMAz9K4Quu8QfNbJ0C4oedgi6AAWGoccCAWPTERfrA5IcNy3y30fbKJru
-          spMgke/xkY96U9yodfVt+f12uVB96NRa6ZT8uiiGYcjTyeAr5bUzBXmOrqFYzMlF0pS1HUadVS/l
+          spMgke/xPZJ6U9yodfVt+f12uVB96NRa6ZT8uiiGYcjTyeAr5bUzBXmOrqFYzMlF0pS1HUadVS/l
           MpuufThnrs1aDhSTC0YtlEVDwvmkCTYSBtfC5iocCaOzokAye7OnoNaiAzk0mEZcVd58zW7KrLoV
-          LnlOPNFV5bos55eY0PhPmU9TVBKycjmnhd7OwFW5UGzwINRvylDDvfloWJgS19c9975z2MRigsRi
-          Buw6tE2s0VNRrYrVqqqq/I8/iBoX+MAWr2b4X8p3yE4Uur7W1HwmvSxU7I3BcBadd/7+EWUEFvYk
-          hSIkB+JIwj13/EowcNKuT/DbWcs0Rg2Fw/wOms0CRDmIU5AIzQj1FGTO3Rki0RFGLFonCUGQCXVv
-          0E6sENlwhwGmUokp5iCWnqHlkXEYK9k1PJAVix9IhIxMDWypbSmIw/CstvjyrGCL9VHuOTwS2kFz
-          Rwv4GThC4yhCdIag4YN0dwCWkcAmoK3Z0pcIHmOaW/iBQeoISFNkcW3qdU+ypiSok+tO1My6f2FK
-          Z8A2SUuDxgQavScr4T2lgciOc5mkjiLyu8Lfi5G7ju0xjjsSqWvHUweS8/1roOfrNfnna6jL5fIX
-          1zGAdVgDAAA=
+          LnlOPNFV5bos55eY0PhPmU9TVBKycjmnhd7OwFW5UGzwINRvylDDvfkwLEyJ62vPve8cNrGYILGY
+          AbsObRNr9FRUq2K1qqoq/+MPosYFPrDFqx7+l/IdshOFrq81NZ9JLwsVe2MwnEXnnb9/RGmBhT1J
+          oQjJgUwk4Z47fiUYOGnXJ/jtrGUao4bCYX4HzWYBohxkUpAIzQj1FKTP3Rki0RFGLFonCUGQCXVv
+          0E6sENlwhwGmUokp5iAjPUPLI+MwVrJreCArI34gETIyNbCltqUgE4ZntcWXZwVbrI9yz+GR0A6a
+          O1rAz8ARGkcRojMEDR/E3QFYWgKbgLZmS18ieIxptvADg9QRkKbICW0ave5J1pQEdXLdiZpZ9y9M
+          6QzYJrE0aEyg0XuyEt5TGojs2JdJ6igivyv8vQxy17E9xnFHInXteOpAcr5/DfR8vSb/fA11uVz+
+          AsI0CMdYAwAA
       headers:
         Access-Control-Allow-Origin: ['*']
         Cache-Control: ['public, max-age=3600']
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [application/json; charset=UTF-8]
-        Date: ['Mon, 13 Mar 2017 17:16:46 GMT']
+        Date: ['Sun, 26 Mar 2017 11:10:58 GMT']
         Server: [nginx/1.10.0 (Ubuntu)]
         Vary: [Accept-Encoding]
       status: {code: 200, message: OK}

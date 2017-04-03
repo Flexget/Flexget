@@ -5,28 +5,31 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
       method: GET
-      uri: https://api.tvmaze.com/singlesearch/shows?q=Unite+9
+      uri: https://api.tvmaze.com/singlesearch/shows?embed=seasons&q=Unite+9
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA5VSy27bMBD8FWPPsinJli3rFhgokGvaoociMBhxK7GRSIEPq46RD/J3+Me6KztN
-          eip6krg7O5yZ5Qm0gqpcF3kC0XVQQRvCUAkxjuMiHHr5gova9sK3dvSCcSIaHXC+hQSM7JEmvlLh
-          cp5xJRwHrnyunR4CKqp00jRRNlz95NDULdUaNA49VN8fE/BBhkj/8BCN0aahtosmaGZeFQkMDnuN
-          jrgqyNMsn6fbeZYRytctqtgR7ARXOPWrNKWWkkdmh2+oDHo6weMr0crA/ASXB3STJBO7jjoj6qYN
-          UKVkCcNo3TOjOJhVkf2xeb+7nz1Ipe18J41Ucvblcu4uZ7qvtqTYHXnoFskVMbUUW9/d0T+rfLFm
-          Ok8M4i5QPEHX8DqpeNq10hikLbCwBPBXQGdkR2bI4+FdM3G1GA7qCap8nW15ebrnE4SQL8tyWaRA
-          jLqfXJ6gR6VjT+3bcjl0XX/cbxw6K5UX04gX14H9YF1wUgexTMVmk66yxc+BN2SdbjQJ+w/Gt5E9
-          RWUj7+5vUpLrY99LjhHoijgoyS+oylZFXmbFpiwT2HfaPE9peOx+cCqtQ/q++ZKD/mjq/dFyGvSS
-          DtpGj4P2lrfyj+kbzotVWayznHb0+hvxp+vALgMAAA==
+          H4sIAAAAAAAAA+WUS27bQAyGrxLMWrLefmgXuCiQVYG0RRdFYIw1rDWNNCPMw25i+EA5Ry5WUrJj
+          O4s03hUtYMAaDkmR/0dqy6Rg5XRcpAHzpmElq53ryijabDYjt275I4wq3Ua21hsbkV/klXQQzljA
+          FG8BI76i4fnpiizuoSPL58rIzoFAS8PVyvMVWT8aUFWNthUoA5aV3+8CZh13Hp/ZrVdKqhVeG6+c
+          pMx5EbDOQCvBYK6SpXGShvEsTBL0slUNwjfotmWDO96XcYxXgj9QdvYNhAKLJ3a3w7TcUX5052sw
+          fUnKNw3ebECuasfKGFsCt9HmnrxImLxIXtq8md9c3XIhdTjnigt+9eX5qXl+wvdVGis2DxS0l2Tw
+          6K8EtT6/xmeq8lGr/txniK4dyuNkxXZ9Fct5zZUCpECFBQx+OTCKN9gM9rg+1oy5anBrsWRlOk5m
+          BE+2dGLOpdl0mhUxw4yy7bvcshaE9C1e7+GS6LI65eu7RnNhoz7ERkPAotPGGS5dlMXRZBLnyehn
+          R4S0kSuJhV2Q8RCyQKm0J3bnSbFc69uWk4wMX+E7wWmCyiSfzmZZkqfjgC0aqe57NSw0P0iV2gD+
+          H/rinTxt6ji0pAZO0lpqb6GTVhOVP0Tv/WyUT4txkvaMFtAuQQiqa8sscKsVTdowLGmRFljkm2s0
+          hES962GTwiFRSFOtPL7AYNcvY4fGfSWfjKCrYTYOe/EBVUIBzlYDlDiaszDOwnRMuf+m2d7P5tDM
+          GflLIZ9KipB2wZHG5P00Jq9ppCc0cL/2i/1uGig7fqjoa3RGIw9j/PWk/3kakzMasyR/Lw10fU0j
+          O6GRXU4DNUcatARnNArajex/oIGSEo273e43WFB4S/IHAAA=
       headers:
         Access-Control-Allow-Origin: ['*']
         Cache-Control: ['public, max-age=3600']
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [application/json; charset=UTF-8]
-        Date: ['Mon, 13 Mar 2017 17:18:25 GMT']
+        Date: ['Sun, 26 Mar 2017 11:10:56 GMT']
         Server: [nginx/1.10.0 (Ubuntu)]
         Vary: [Accept-Encoding]
       status: {code: 200, message: OK}
@@ -36,23 +39,26 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.11 (www.flexget.com)]
+        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
       method: GET
       uri: https://api.tvmaze.com/shows/8652/episodebynumber?season=1&number=16
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA32PS07EMBBEr4J6bY8/hKDxfm7AHjWkYSxsJ/KHAKPcnZ4YFmxYdavqVUl1AT+B
-          G+5HexwEtBzAwbnWxSm1ruuhvkf8osPzHBUtvswTFdVh1ZKvJI/SfJhR/pjSjCAgYSSuOfXAza4V
-          wjIncIbtFp8o8zsKQJ8nrFfaanMrtZHWcgPL1e8lVjutu1IqxuUP+bC7DEg9dCy31IPDnQAf8ZWr
-          UwtBQGkxYv7kPLc9Bp/eCrgLFAov13vOxPd3Oi7+n+mwbds3HPvb3DgBAAA=
+          H4sIAAAAAAAAA32RS47bMAyGr0Jo7fekKcYYzK5AF7Pr7AsmZmIiehiiFDcd5EA9Ry9W2k4X3XQj
+          SuTH/yeoD8OD6Xef993zrjA5WtObMaWpr+t5nqt0dfiTqmNwNU0sYSCpN7jOnhOVz2X7o92Xj2LZ
+          7k1hPDpSmS9bA6w5IZTgTd9qObsDRb3uC4McB0wL3TXtU9m0ZdepgqYTryJd0zfNlpGEbvqHfF+r
+          CpTNbsNi9lvj7lNh2OFZpX22tjCSncN40/6X6fV9JJiDIw/hBG9MKdGVrSXASEDaFe0NcEZO7M+Q
+          lI4k2SZZ+OVJlo6Jg5cKvv3+dUBJrGIJ7UUgBRhZ4BzRDydUOhYwj5pEgQMplv1AESTHK6kp+iOB
+          8HKq8MnS8DAc8cCWEy4+cCSfKFbwVQdHr4Ooy8WH+cEuyxV1ua3WLiyuK7ioKak+WnFQVdVLPb3q
+          Qr9b9hcx/YcRsqcljpE0/v19nPg/v2/u9/sfWvpAKTsCAAA=
       headers:
         Access-Control-Allow-Origin: ['*']
         Cache-Control: ['public, max-age=3600']
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [application/json; charset=UTF-8]
-        Date: ['Mon, 13 Mar 2017 17:18:33 GMT']
+        Date: ['Sun, 26 Mar 2017 11:10:56 GMT']
         Server: [nginx/1.10.0 (Ubuntu)]
         Vary: [Accept-Encoding]
       status: {code: 200, message: OK}
