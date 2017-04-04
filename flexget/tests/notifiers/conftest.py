@@ -14,7 +14,7 @@ class DebugNotification(object):
     def __init__(self):
         self.notifications = []
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         self.notifications.append((title, message, config))
 
 
