@@ -158,6 +158,17 @@ class SearchAlphaRatio(object):
             session.merge(cookie)
             return cookie.cookie
 
+    def find_index(self, soup, text):
+        """Finds the index of the tag containing the text"""
+        for i in range(0, len(soup)):
+            img = soup[i].find('img')
+            if soup[i].text.strip() == '' and img and text.lower() in img.get('title').lower():
+                return i
+            elif text.lower() in soup[i].text.lower():
+                return i
+
+        raise plugin.PluginError('AlphaRatio layout has changed, unable to parse correctly. Please open a Github issue')
+
     @plugin.internet(log)
     def search(self, task, entry, config):
         """
@@ -191,6 +202,15 @@ class SearchAlphaRatio(object):
                 continue
 
             soup = get_soup(page.content)
+
+            # extract the column indices
+            header_soup = soup.find('tr', attrs={'class': 'colhead'}).findAll('td')
+
+            size_idx = self.find_index(header_soup, 'size')
+            snatches_idx = self.find_index(header_soup, 'snatches')
+            seeds_idx = self.find_index(header_soup, 'seeders')
+            leeches_idx = self.find_index(header_soup, 'leechers')
+
             for result in soup.findAll('tr', attrs={'class': 'torrent'}):
                 group_info = result.find('td', attrs={'class': 'big_info'}).find('div', attrs={'class': 'group_info'})
                 title = group_info.find('a', href=re.compile('torrents.php\?id=\d+')).text
@@ -198,7 +218,7 @@ class SearchAlphaRatio(object):
                     group_info.find('a', href=re.compile('torrents.php\?action=download(?!usetoken)'))['href']
 
                 torrent_info = result.findAll('td')
-                size_col = torrent_info[4].text
+                size_col = torrent_info[size_idx].text
                 log.debug('AlphaRatio size: %s', size_col)
                 size = re.search('(\d+(?:[.,]\d+)*)\s?([KMGTP]B)', size_col)
                 torrent_tags = ', '.join([tag.text for tag in group_info.findAll('div', attrs={'class': 'tags'})])
@@ -212,9 +232,9 @@ class SearchAlphaRatio(object):
                     log.error('No size found! Please create a Github issue. Size received: %s', size_col)
                 else:
                     e['content_size'] = parse_filesize(size.group(0))
-                e['torrent_snatches'] = int(torrent_info[5].text)
-                e['torrent_seeds'] = int(torrent_info[6].text)
-                e['torrent_leeches'] = int(torrent_info[7].text)
+                e['torrent_snatches'] = int(torrent_info[snatches_idx].text)
+                e['torrent_seeds'] = int(torrent_info[seeds_idx].text)
+                e['torrent_leeches'] = int(torrent_info[leeches_idx].text)
 
                 entries.add(e)
 
