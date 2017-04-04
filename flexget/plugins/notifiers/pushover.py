@@ -8,10 +8,9 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
+from flexget.utils.tools import merge_dict_from_to
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
-
-from flexget.utils.tools import merge_dict_from_to
 
 plugin_name = 'pushover'
 log = logging.getLogger(plugin_name)
