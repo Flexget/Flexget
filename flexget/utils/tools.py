@@ -151,7 +151,7 @@ def _xmlcharref_encode(unicode_data, encoding):
     return ''.join(chars)
 
 
-def merge_dict_from_to(d1, d2):
+def merge_dict_from_to(d1, d2, override=False):
     """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
     for k, v in list(d1.items()):
         if k in d2:
@@ -161,7 +161,10 @@ def merge_dict_from_to(d1, d2):
                 elif isinstance(v, list):
                     d2[k].extend(copy.deepcopy(v))
                 elif isinstance(v, (basestring, bool, int, float, type(None))):
-                    pass
+                    if not override:
+                        pass
+                    else:
+                        d2[k] = copy.deepcopy(v)
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
             elif (isinstance(v, (basestring, bool, int, float, type(None))) and

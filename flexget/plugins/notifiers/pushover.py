@@ -11,6 +11,8 @@ from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
 from requests.exceptions import RequestException
 
+from flexget.utils.tools import merge_dict_from_to
+
 plugin_name = 'pushover'
 log = logging.getLogger(plugin_name)
 
@@ -61,7 +63,7 @@ class PushoverNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         """
         Sends a Pushover notification
 
@@ -69,6 +71,8 @@ class PushoverNotifier(object):
         :param str message: the message to send
         :param dict config: The pushover config
         """
+        if entry:
+            merge_dict_from_to(dict(entry), config, override=True)
         notification = {'token': config.get('api_key'), 'message': message, 'title': title,
                         'device': config.get('device'), 'priority': config.get('priority'), 'url': config.get('url'),
                         'url_title': config.get('url_title'), 'sound': config.get('sound'),

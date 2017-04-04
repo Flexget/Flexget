@@ -78,7 +78,7 @@ def render_config(config, template_renderer, _path=''):
 
 
 class NotificationFramework(object):
-    def send_notification(self, title, message, notifiers, template_renderer=None):
+    def send_notification(self, title, message, notifiers, template_renderer=None, entry=None):
         """
         Send a notification out to the given `notifiers` with a given `title` and `message`.
         If `template_renderer` is specified, `title`, `message`, as well as any string options in a notifier's config
@@ -114,7 +114,7 @@ class NotificationFramework(object):
 
                 log.debug('Sending a notification to `%s`', notifier_name)
                 try:
-                    notifier.notify(title, message, rendered_config)  # TODO: Update notifiers for new api
+                    notifier.notify(title, message, rendered_config, entry)  # TODO: Update notifiers for new api
                 except PluginWarning as e:
                     log.warning('Error while sending notification to `%s`: %s', notifier_name, e.value)
                 else:
