@@ -405,8 +405,8 @@ class TelegramNotifier(object):
         usernames = dict()
         fullnames = dict()
         groups = dict()
-
-        for chat in (x.message.chat for x in updates):
+        for update in updates:
+            chat = update.message.chat if update.message else update.edited_message.chat
             if chat.type == 'private':
                 usernames[chat.username] = chat
                 fullnames[(chat.first_name, chat.last_name)] = chat
