@@ -237,7 +237,7 @@ class TraktSet(MutableSet):
         return endpoint
 
     def show_match(self, entry1, entry2):
-        if any(entry1.get(id) is not None and entry1[id] == entry2[id] for id in
+        if any(entry1.get(ident) is not None and entry1[ident] == entry2.get(ident) for ident in
                ['series_name', 'trakt_show_id', 'tmdb_id', 'tvdb_id', 'imdb_id', 'tvrage_id']):
             return True
         return False
