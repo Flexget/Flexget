@@ -1,21 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-import logging
 import datetime
+import logging
 import re
 
+from requests.exceptions import TooManyRedirects
 from sqlalchemy import Column, Unicode, DateTime
 
 from flexget import plugin, db_schema
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.requests import TimedLimiter, RequestException
 from flexget.manager import Session
 from flexget.utils.database import json_synonym
-from flexget.utils.requests import Session as RequestSession
+from flexget.utils.requests import Session as RequestSession, TimedLimiter, RequestException
 from flexget.utils.soup import get_soup
-from flexget.config_schema import one_or_more
 from flexget.utils.tools import parse_filesize
 
 log = logging.getLogger('alpharatio')
@@ -105,10 +104,18 @@ class SearchAlphaRatio(object):
         :return:
         """
         cookies = self.get_login_cookie(username, password, force=force)
+        invalid_cookie = False
 
-        response = requests.get(url, params=params, cookies=cookies)
+        try:
+            response = requests.get(url, params=params, cookies=cookies)
+            if self.base_url + 'login.php' in response.url:
+                invalid_cookie = True
+        except TooManyRedirects:
+            # Apparently it endlessly redirects if the cookie is invalid?
+            log.debug('MoreThanTV request failed: Too many redirects. Invalid cookie?')
+            invalid_cookie = True
 
-        if self.base_url + 'login.php' in response.url:
+        if invalid_cookie:
             if self.errors:
                 raise plugin.PluginError('AlphaRatio login cookie is invalid. Login page received?')
             self.errors = True
