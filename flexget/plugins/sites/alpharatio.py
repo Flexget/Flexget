@@ -204,7 +204,11 @@ class SearchAlphaRatio(object):
             soup = get_soup(page.content)
 
             # extract the column indices
-            header_soup = soup.find('tr', attrs={'class': 'colhead'}).findAll('td')
+            header_soup = soup.find('tr', attrs={'class': 'colhead'})
+            if not header_soup:
+                log.debug('no search results found for \'%s\'', search_string)
+                continue
+            header_soup = header_soup.findAll('td')
 
             size_idx = self.find_index(header_soup, 'size')
             snatches_idx = self.find_index(header_soup, 'snatches')
@@ -215,7 +219,7 @@ class SearchAlphaRatio(object):
                 group_info = result.find('td', attrs={'class': 'big_info'}).find('div', attrs={'class': 'group_info'})
                 title = group_info.find('a', href=re.compile('torrents.php\?id=\d+')).text
                 url = self.base_url + \
-                    group_info.find('a', href=re.compile('torrents.php\?action=download(?!usetoken)'))['href']
+                      group_info.find('a', href=re.compile('torrents.php\?action=download(?!usetoken)'))['href']
 
                 torrent_info = result.findAll('td')
                 size_col = torrent_info[size_idx].text
