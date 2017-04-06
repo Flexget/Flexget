@@ -1,15 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-import logging
 import json
+import logging
+
+from requests.exceptions import RequestException
 
 from flexget import plugin
-from flexget.event import event
 from flexget.config_schema import one_or_more
+from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.tools import merge_by_prefix
 
 plugin_name = 'rapidpush'
 log = logging.getLogger(plugin_name)
@@ -51,10 +53,13 @@ class RapidpushNotifier(object):
         'error_not': 'Cannot use \'channel\' with \'group\', \'category\' or \'priority\''
     }
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         """
         Send a Rapidpush notification
         """
+        if entry:
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         notification = {'title': title, 'message': message}
         if not isinstance(config['api_key'], list):
             config['api_key'] = [config['api_key']]

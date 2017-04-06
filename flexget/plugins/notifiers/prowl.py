@@ -4,12 +4,14 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import logging
 import xml.etree.ElementTree as ET
 
+from requests.exceptions import RequestException
+
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.tools import merge_by_prefix
 
 plugin_name = 'prowl'
 log = logging.getLogger(plugin_name)
@@ -41,7 +43,7 @@ class ProwlNotifier(object):
             'application': {'type': 'string', 'default': 'FlexGet'},
             'priority': {'type': 'integer', 'minimum': -2, 'maximum': 2},
             'url': {'type': 'string'},
-            'provider_key':{'type': 'string'}
+            'provider_key': {'type': 'string'}
         },
         'required': ['api_key'],
         'additionalProperties': False
@@ -59,10 +61,8 @@ class ProwlNotifier(object):
         #
 
         if entry:
-            for key in entry:
-                if key.startswith(plugin_name + '_'):
-                    key_name = key[len(plugin_name) + 1:]
-                    config[key_name] = entry[key]
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         notification = {'application': config.get('application'), 'event': title, 'description': message,
                         'url': config.get('url'), 'priority': config.get('priority'),
                         'providerkey': config.get('provider_key')}

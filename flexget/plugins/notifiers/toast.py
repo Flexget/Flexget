@@ -1,11 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
-import sys
 import os
+import sys
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning, DependencyError
+from flexget.utils.tools import merge_by_prefix
 
 plugin_name = 'toast'
 
@@ -37,7 +39,10 @@ class NotifyToast(object):
         config.setdefault('url', '')
         return config
 
-    def mac_notify(self, title, message, config):
+    def mac_notify(self, title, message, config, entry=None):
+        if entry:
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         config = self.prepare_config(config)
         try:
             from pync import Notifier
@@ -58,7 +63,10 @@ class NotifyToast(object):
         except Exception as e:
             raise PluginWarning('Cannot send a notification: %s' % e)
 
-    def linux_notify(self, title, message, config):
+    def linux_notify(self, title, message, config, entry=None):
+        if entry:
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         config = self.prepare_config(config)
         try:
             from gi.repository import Notify
@@ -76,7 +84,10 @@ class NotifyToast(object):
         if not n.show():
             raise PluginWarning('Unable to send notification for %s' % title)
 
-    def windows_notify(self, title, message, config):
+    def windows_notify(self, title, message, config, entry=None):
+        if entry:
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         config = self.prepare_config(config)
         try:
             from win32api import GetModuleHandle, PostQuitMessage
@@ -87,7 +98,7 @@ class NotifyToast(object):
                                   UpdateWindow, WNDCLASS)
         except ImportError:
             raise DependencyError(plugin_name, 'pypiwin32', 'pywin32 module is required for desktop notifications on '
-                                                         'windows. You can install it with `pip install pypiwin32`')
+                                                            'windows. You can install it with `pip install pypiwin32`')
 
         # Register the window class.
         wc = WNDCLASS()

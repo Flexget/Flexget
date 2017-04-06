@@ -178,6 +178,24 @@ def merge_dict_from_to(d1, d2, override=False):
             d2[k] = copy.deepcopy(v)
 
 
+def merge_by_prefix(prefix, dict1, dict2, override=True):
+    """
+    Merges keys from dict1 into dict2 if prefix match.
+
+    :param prefix: Prefix to validate
+    :param dict1: Base dict
+    :param dict2: Target dict
+    :param override: Flag to indicate if to force a copy of field exist in both dict
+    """
+    for key in dict1:
+        if key.startswith(prefix):
+            key_name = key[len(prefix):]
+            if override:
+                dict2[key_name] = dict1[key]
+            else:
+                dict2.setdefault(key_name, dict1[key])
+
+
 class SmartRedirectHandler(request.HTTPRedirectHandler):
     def http_error_301(self, req, fp, code, msg, headers):
         result = request.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)

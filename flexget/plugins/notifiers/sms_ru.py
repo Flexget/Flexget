@@ -1,14 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
-import logging
 import hashlib
+import logging
+
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.tools import merge_by_prefix
 
 plugin_name = 'sms_ru'
 log = logging.getLogger(plugin_name)
@@ -42,10 +44,13 @@ class SMSRuNotifier(object):
         'required': ['phone_number', 'password']
     }
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         """
         Send an SMS RU notification
         """
+        if entry:
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         try:
             token_response = requests.get(SMS_TOKEN_URL)
         except RequestException as e:

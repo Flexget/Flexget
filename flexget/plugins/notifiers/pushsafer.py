@@ -1,14 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
-from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
+
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.tools import merge_by_prefix
 
 plugin_name = 'pushsafer'
 log = logging.getLogger(plugin_name)
@@ -50,10 +51,13 @@ class PushsaferNotifier(object):
               'required': ['private_key'],
               'additionalProperties': False}
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         """
         Send a Pushsafer notification
         """
+        if entry:
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         notification = {'t': title, 'm': message, 'ut': config.get('url_title'),
                         'u': config.get('url'), 's': config.get('sound'),
                         'i': config.get('icon'), 'v': config.get('vibration'),

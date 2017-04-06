@@ -3,12 +3,14 @@ from builtins import *  # pylint: disable=unused-import, redefined-builtin
 
 import logging
 
+from requests.exceptions import RequestException
+
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from flexget.config_schema import one_or_more
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.tools import merge_by_prefix
 
 plugin_name = 'join'
 log = logging.getLogger(plugin_name)
@@ -54,10 +56,13 @@ class JoinNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         """
         Send Join notifications.
         """
+        if entry:
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         notification = {'title': title, 'text': message, 'url': config.get('url'),
                         'icon': config.get('icon'), 'priority': config.get('priority'), 'apikey': config['api_key']}
         if config.get('device'):

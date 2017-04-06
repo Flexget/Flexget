@@ -7,6 +7,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.plugin import DependencyError, PluginWarning
+from flexget.utils.tools import merge_by_prefix
 
 plugin_name = 'xmpp'
 
@@ -27,7 +28,10 @@ class XMPPNotifier(object):
 
     __version__ = '1.0'
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
+        if entry:
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         try:
             import sleekxmpp  # noqa
         except ImportError as e:

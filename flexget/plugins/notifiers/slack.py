@@ -3,11 +3,13 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
+from requests.exceptions import RequestException
+
 from flexget import plugin
 from flexget.event import event
 from flexget.plugin import PluginWarning
-from requests.exceptions import RequestException
 from flexget.utils.requests import Session as RequestSession
+from flexget.utils.tools import merge_by_prefix
 
 requests = RequestSession(max_retries=3)
 
@@ -45,10 +47,13 @@ class SlackNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         """
         Send a Slack notification
         """
+        if entry:
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         notification = {'text': message, 'channel': config.get('channel'), 'username': config.get('username')}
         if config.get('icon_emoji'):
             notification['icon_emoji'] = ':%s:' % config['icon_emoji'].strip(':')

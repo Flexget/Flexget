@@ -3,12 +3,14 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 
 import logging
 
+from requests.exceptions import RequestException
+
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.tools import merge_by_prefix
 
 plugin_name = 'pushalot'
 log = logging.getLogger(plugin_name)
@@ -50,10 +52,13 @@ class PushalotNotifier(object):
               'required': ['api_key'],
               'additionalProperties': False}
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         """
         Send a Pushalot notification
         """
+        if entry:
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         notification = {'Title': title, 'Body': message, 'LinkTitle': config.get('url_title'),
                         'Link': config.get('url'), 'IsImportant': config.get('important'),
                         'IsSilent': config.get('silent'), 'Image': config.get('image'), 'Source': config.get('source'),

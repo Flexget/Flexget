@@ -4,12 +4,14 @@ from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 import datetime
 import logging
 
+from requests.exceptions import RequestException
+
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
 from flexget.utils.requests import Session as RequestSession, TimedLimiter
-from requests.exceptions import RequestException
+from flexget.utils.tools import merge_by_prefix
 
 plugin_name = 'pushover'
 log = logging.getLogger(plugin_name)
@@ -79,10 +81,8 @@ class PushoverNotifier(object):
         #
 
         if entry:
-            for key in entry:
-                if key.startswith(plugin_name + '_'):
-                    key_name = key[len(plugin_name) + 1:]
-                    config[key_name] = entry[key]
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         notification = {'token': config.get('api_key'), 'message': message, 'title': title,
                         'device': config.get('device'), 'priority': config.get('priority'), 'url': config.get('url'),
                         'url_title': config.get('url_title'), 'sound': config.get('sound'),

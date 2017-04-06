@@ -10,6 +10,7 @@ from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import PluginWarning, PluginError
+from flexget.utils.tools import merge_by_prefix
 
 try:
     import telegram
@@ -169,10 +170,13 @@ class TelegramNotifier(object):
         'additionalProperties': False,
     }
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         """
         Send a Telegram notification
         """
+        if entry:
+            prefix = _PLUGIN_NAME + '_'
+            merge_by_prefix(prefix, dict(entry), config)
         chat_ids = self._real_init(Session(), config)
 
         if not chat_ids:

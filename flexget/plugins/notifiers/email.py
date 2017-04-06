@@ -14,6 +14,7 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.plugin import PluginWarning
+from flexget.utils.tools import merge_by_prefix
 
 plugin_name = 'email'
 log = logging.getLogger(plugin_name)
@@ -137,7 +138,7 @@ class EmailNotifier(object):
         'additionalProperties': False,
     }
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         """
         Send an email notification
 
@@ -145,6 +146,9 @@ class EmailNotifier(object):
         :param str title: message subject
         :param dict config: email plugin config
         """
+        if entry:
+            prefix = plugin_name + '_'
+            merge_by_prefix(prefix, dict(entry), config)
 
         if not isinstance(config['to'], list):
             config['to'] = [config['to']]
