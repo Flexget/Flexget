@@ -47,10 +47,22 @@ class ProwlNotifier(object):
         'additionalProperties': False
     }
 
-    def notify(self, title, message, config):
+    def notify(self, title, message, config, entry=None):
         """
         Send a Prowl notification
         """
+        # Enables using 'set' plugin to override plugin config, using plugin name and underscore as prefix
+        # Example:
+        #
+        # set:
+        #   pushover_url: http://newurl.com
+        #
+
+        if entry:
+            for key in entry:
+                if key.startswith(plugin_name + '_'):
+                    key_name = key[len(plugin_name) + 1:]
+                    config[key_name] = entry[key]
         notification = {'application': config.get('application'), 'event': title, 'description': message,
                         'url': config.get('url'), 'priority': config.get('priority'),
                         'providerkey': config.get('provider_key')}
