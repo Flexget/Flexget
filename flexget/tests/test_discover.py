@@ -207,7 +207,8 @@ class TestEmitSeriesInDiscover(object):
         assert task.find_entry(title='My Show 2 S01E01')
 
     def test_next_series_episodes_with_completed_season(self, execute_task):
-        execute_task('inject_series', options={'inject': [Entry(title='My Show 2 S02', url='')]})
+        execute_task('inject_series',
+                     options={'inject': [Entry(title='My Show 2 S02', url=''), Entry(title='My Show 2 S01', url='')]})
         task = execute_task('test_next_series_episodes')
         assert task.find_entry(title='My Show 2 S03E01')
 
