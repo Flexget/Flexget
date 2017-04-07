@@ -1,9 +1,9 @@
 """Contains miscellaneous helpers"""
 from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
+
 from future.moves.urllib import request
 from future.utils import PY2
-from past.builtins import basestring
 
 import logging
 import ast
@@ -14,58 +14,193 @@ import operator
 import os
 import re
 import sys
-from collections import MutableMapping
-from datetime import timedelta, datetime
-from pprint import pformat
-
-import flexget
+import functools
 import queue
 import requests
-
+from collections import MutableMapping
+from time import mktime, struct_time
+from datetime import timedelta, datetime, date
+from pprint import pformat
+from dateutil.parser import parse as dateutil_parse
+from dateutil.tz import tz
 from html.entities import name2codepoint
+
+import flexget
+
 
 log = logging.getLogger('utils')
 
 
-def str_to_boolean(string):
-    return string.lower() in ['true', '1', 't', 'y', 'yes']
+def str_to_boolean(value):
+    if value.lower() in ['true', '1', 't', 'y', 'yes', 'ok']:
+        return True
+    elif value.lower() in ['false', '0', 'f', 'n', 'no', 'nope']:
+        return False
+    else:
+        raise ValueError('Unable to convert to boolean, value: %s' % value)
 
 
-def str_to_int(string):
+def str_to_int(value):
     try:
-        return int(string.replace(',', ''))
+        return int(re.sub(r'[,.]', '', value))
     except ValueError:
         return None
 
 
+def value_to_int(value):
+    if value is None:
+        log.debug('None input for value_to_int()')
+        return None
+
+    if isinstance(value, (int, float, bool)):
+        return int(value)
+    elif isinstance(value, str):
+        try:
+            return int(float(value))
+        except ValueError:
+            try:
+                return int(re.sub(r'[,.]', '', value))
+            except ValueError:
+                try:
+                    if str_to_boolean(value):
+                        return 1
+                    else:
+                        return 0
+                except ValueError:
+                    log.warning('Cant convert string to number, value: %s', value)
+    return None
+
+
+def value_to_naive_utc(value):
+    if value is None:
+        log.debug('None input for value_to_naive_utc()')
+        return None
+
+    datetime_value = None
+    if type(value) is date:
+        return datetime(value.year, value.month, value.day)
+    elif isinstance(value, (tuple, struct_time)):
+        try:
+            datetime_value = datetime.fromtimestamp(mktime(value))
+        except ValueError:
+            log.warning('Not a valid datetime tuple: %s', value)
+    elif isinstance(value, str):
+        try:
+            datetime_value = dateutil_parse(value, fuzzy=True)
+        except ValueError as ex:
+            log.warning('Invalid datetime field format: %s error: %s', value, ex)
+
+    if isinstance(datetime_value, datetime):
+        try:
+            return datetime_value.astimezone(tz.tzutc()).replace(tzinfo=None)
+        except ValueError:
+            return datetime_value.replace(tzinfo=None)
+    else:
+        log.warning('Cant convert type to datetime: %s, type: %s', value, type(value))
+    return None
+
+
+def regex_search(value, regex, regex_group_nr=1):
+    """
+    Does a regex search and returns the specified group.
+
+    :param value: The string to-be searched
+    :param regex: The regex to-be used.
+    :param regex_group_nr: The resulting match-group position to return
+    :return: Returns the matching group or None if not found.
+    :raises ValueError: If the value is not a string or is a empty/space string
+    """
+    if isinstance(value, str) and not value.isspace():
+        match = re.search(regex, value)
+        if match and match.group(regex_group_nr) and not match.group(regex_group_nr).isspace():
+            return match.group(regex_group_nr)
+    else:
+        log.error('Expecting string for regex lookup got: %s, type: %s', value, type(value))
+        raise ValueError
+    return None
+
+
+def find_value(key_names, source, default=None, regex=None, regex_group_nr=1, ignore_empty=True, strip=True):
+    """
+    Try's to find a value in a object, using a single or multiple key/attribute-names and a optional regex.
+
+    :param key_names: The name or list of names to look for in the object. Can be in the "root.name" format.
+    :param source: The source object to use for the search.
+    :param default: The default value, returned if no valid value can be found.
+    :param regex: A regex string, that can be used to further confine the search.
+    :param regex_group_nr: The regex group to-be used.
+    :param ignore_empty: Ignores 'empty' values, excluding number types (int, bool, float).
+    :param strip: If value is a string, use the strip() function to get better results in combination with ignore_empty.
+    :return: Returns the value found or None.
+    """
+    if source is None:
+        log.error('Source is None')
+        return default
+
+    if not isinstance(key_names, list):
+        key_names = [key_names]
+
+    # allow mixed access types while traversing the sequence
+    def get_value(obj, attr_key_name):
+        if obj is None or attr_key_name is None:
+            raise TypeError('None types detected (%s, %s)' % (obj, attr_key_name))
+        try:
+            return getattr(obj, attr_key_name)
+        except AttributeError:
+            return obj.get(attr_key_name)
+
+    value = None
+    for k in key_names:
+        if not isinstance(k, str):
+            raise TypeError('Expecting strings as keys got: %s, type: %s' % (k, type(k)))
+        try:
+            value = functools.reduce(get_value, k.split('.'), source)
+        except (AttributeError, TypeError) as ex:
+            log.debug('Cant find field: %s, in source: %s, error: %s', k, source, ex)
+
+        if regex and value is not None:
+            value = regex_search(value, regex, regex_group_nr)
+        if value is not None:
+            break
+
+    if strip and isinstance(value, str):
+        value = value.strip()
+    if ignore_empty and not isinstance(value, (int, bool, float)) and not value:
+        value = None
+
+    if value is not None:
+        return value
+    else:
+        return default
+
 if PY2:
-    def native_str_to_text(string, **kwargs):
+    def native_str_to_text(value, **kwargs):
         if 'encoding' not in kwargs:
             kwargs['encoding'] = 'ascii'
-        return string.decode(**kwargs)
+        return value.decode(**kwargs)
 else:
-    def native_str_to_text(string, **kwargs):
-        return string
+    def native_str_to_text(value, **kwargs):
+        return value
 
 
-def convert_bytes(bytes):
+def convert_bytes(value):
     """Returns given bytes as prettified string."""
 
-    bytes = float(bytes)
-    if bytes >= 1099511627776:
-        terabytes = bytes / 1099511627776
+    value = float(value)
+    if value >= 1099511627776:
+        terabytes = value / 1099511627776
         size = '%.2fT' % terabytes
-    elif bytes >= 1073741824:
-        gigabytes = bytes / 1073741824
+    elif value >= 1073741824:
+        gigabytes = value / 1073741824
         size = '%.2fG' % gigabytes
-    elif bytes >= 1048576:
-        megabytes = bytes / 1048576
+    elif value >= 1048576:
+        megabytes = value / 1048576
         size = '%.2fM' % megabytes
-    elif bytes >= 1024:
-        kilobytes = bytes / 1024
+    elif value >= 1024:
+        kilobytes = value / 1024
         size = '%.2fK' % kilobytes
     else:
-        size = '%.2fb' % bytes
+        size = '%.2fb' % value
     return size
 
 
@@ -160,12 +295,12 @@ def merge_dict_from_to(d1, d2):
                     merge_dict_from_to(d1[k], d2[k])
                 elif isinstance(v, list):
                     d2[k].extend(copy.deepcopy(v))
-                elif isinstance(v, (basestring, bool, int, float, type(None))):
+                elif isinstance(v, (str, bool, int, float, type(None))):
                     pass
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
-            elif (isinstance(v, (basestring, bool, int, float, type(None))) and
-                      isinstance(d2[k], (basestring, bool, int, float, type(None)))):
+            elif (isinstance(v, (str, bool, int, float, type(None))) and
+                  isinstance(d2[k], (str, bool, int, float, type(None)))):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
@@ -208,7 +343,7 @@ class ReList(list):
 
     def __getitem__(self, k):
         item = list.__getitem__(self, k)
-        if isinstance(item, basestring):
+        if isinstance(item, str):
             item = re.compile(item, re.IGNORECASE | re.UNICODE)
             self[k] = item
         return item

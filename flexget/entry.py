@@ -254,7 +254,7 @@ class Entry(LazyDict):
                 log.warning('Snapshot `%s` is being overwritten for `%s`' % (name, self['title']))
             self.snapshots[name] = snapshot
 
-    def update_using_map(self, field_map, source_item, ignore_none=False):
+    def update_using_map(self, field_map, source_item, ignore_none=False, ignore_values=None):
         """
         Populates entry fields from a source object using a dictionary that maps from entry field names to
         attributes (or keys) in the source object.
@@ -267,14 +267,34 @@ class Entry(LazyDict):
           Source of information to be used by the map
         :param ignore_none:
           Ignore any None values, do not record it to the Entry
+        :param ignore_values:
+          Ignore the specific values, do not record it to the Entry
         """
-        func = dict.get if isinstance(source_item, dict) else getattr
+
+        # allow mixed access types while traversing the sequence
+        def get_value(obj, key):
+            if obj is None or key is None:
+                raise TypeError('None types detected (%s, %s)' % (obj, key))
+            try:
+                return getattr(obj, key)
+            except AttributeError:
+                return obj.get(key)
+
         for field, value in field_map.items():
             if isinstance(value, str):
-                v = functools.reduce(func, value.split('.'), source_item)
+                try:
+                    v = functools.reduce(get_value, value.split('.'), source_item)
+                except TypeError as ex:
+                    if ignore_none:
+                        log.debug('Skip updating field: %s, from: %s, error: %s', field, value, ex)
+                        continue
+                    else:
+                        raise ex
             else:
                 v = value(source_item)
             if ignore_none and v is None:
+                continue
+            if ignore_values and v in ignore_values:
                 continue
             self[field] = v
 
