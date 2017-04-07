@@ -113,7 +113,7 @@ class OutputAria2(object):
                     log.debug('Exception type %s', type(e), exc_info=True)
                     raise
                 else:
-                    log.debug('Added to aria2: `%s`', entry['current_file'])
+                    log.verbose('Added to aria2: `%s`', entry['current_file'])
 
     def add_entry(self, aria2, entry, config):
         """
@@ -179,6 +179,8 @@ class OutputAria2(object):
             entry.fail('uri option is not set and URL is not present in entry; unable to determine what to download')
             return
         if secret:
+            log.debug(aria2url)
+            log.debug(options)
             return aria2.addUri(secret, [aria2url], options)
         return aria2.addUri([aria2url], options)
 
