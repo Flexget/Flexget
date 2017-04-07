@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import, with_statement
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from past.builtins import basestring
+from future.moves.urllib.parse import quote
 
 import os
 import re
@@ -10,7 +11,6 @@ from xml.etree.ElementTree import parse
 import io
 from uuid import uuid4
 import time
-import urllib
 from datetime import datetime, timedelta
 
 from flexget.entry import Entry
@@ -368,7 +368,7 @@ class IRCConnection(IRCBot):
         if tasks:
             if isinstance(tasks, basestring):
                 tasks = [tasks]
-            log.info('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
+            log.debug('Injecting %d entries into tasks %s', len(self.entry_queue), ', '.join(tasks))
             manager.execute(options={'tasks': tasks, 'cron': True, 'inject': self.entry_queue, 'allow_manual': True},
                             priority=5)
 
@@ -389,7 +389,7 @@ class IRCConnection(IRCBot):
                     log.info('Entry "%s" did not match any task regexp.', entry['title'])
 
             for task, entries in tasks_entry_map.items():
-                log.info('Injecting %d entries into task "%s"', len(entries), task)
+                log.debug('Injecting %d entries into task "%s"', len(entries), task)
                 manager.execute(options={'tasks': [task], 'cron': True, 'inject': entries, 'allow_manual': True},
                                 priority=5)
 
@@ -466,7 +466,7 @@ class IRCConnection(IRCBot):
                             log.error('Missing variable %s from config, skipping rule', irc_prefix(varname))
                             break
                         if element.tag == 'varenc':
-                            value = urllib.quote(value.encode('utf-8'))
+                            value = quote(value.encode('utf-8'))
                         result += value
                     else:
                         log.error('Unsupported var operation %s, skipping rule', element.tag)

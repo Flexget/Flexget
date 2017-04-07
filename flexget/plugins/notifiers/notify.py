@@ -115,18 +115,18 @@ class Notify(object):
             entries = list(itertools.chain(*(getattr(task, what) for what in config['entries']['what'])))
             if not entries:
                 log.debug('No entries to notify about.')
-                return
-            # If a file template is defined, it overrides message
-            if config['entries'].get('template'):
-                try:
-                    message = get_template(config['entries']['template'], scope='entry')
-                except ValueError:
-                    raise plugin.PluginError('Cannot locate template on disk: %s' % config['entries']['template'])
             else:
-                message = config['entries']['message']
-            for entry in entries:
-                self.send_notification(config['entries']['title'], message, config['entries']['via'],
-                                       template_renderer=entry.render)
+                # If a file template is defined, it overrides message
+                if config['entries'].get('template'):
+                    try:
+                        message = get_template(config['entries']['template'], scope='entry')
+                    except ValueError:
+                        raise plugin.PluginError('Cannot locate template on disk: %s' % config['entries']['template'])
+                else:
+                    message = config['entries']['message']
+                for entry in entries:
+                    self.send_notification(config['entries']['title'], message, config['entries']['via'],
+                                           template_renderer=entry.render)
         if 'task' in config:
             if not (task.accepted or task.failed) and not config['task']['always_send']:
                 log.verbose('No accepted or failed entries, not sending a notification.')

@@ -39,38 +39,7 @@ interactions:
         Connection: [keep-alive]
         Content-Encoding: [gzip]
         Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 26 Mar 2017 11:10:56 GMT']
-        Server: [nginx/1.10.0 (Ubuntu)]
-        Vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: [FlexGet/2.10.20.dev (www.flexget.com)]
-      method: GET
-      uri: https://api.tvmaze.com/shows/13/episodebynumber?season=2&number=2
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA4VSzW7bMAx+FcKXXezYcddiDYoehmEDCnQb0AA7BqxNx2wkUZDkuFmRdx/tNFi7
-          y04ixO+PEl8ybrNVvVzW1VWeDcFkq6xPya/KchzHRdpb/E2LRmxJnqO0FMsTuEw9FZ3B2Bf1c1W/
-          ltIVaZRilGDamOWZQ0uq+HXCgXSwHgV+nZuRMIpTd8UN9pHCXCKHFtPEqqvlZbGsiuWFKul14lms
-          rlZVdbqJCa1/h1zPXQUU1ccTLAzuRLyq8owtblX6JbPU8mD/DqtKiZu38w7eCLaxnCmxPBE2Bl0b
-          G/RU1hfl5XV9/Wnx5LeaRgJv2eGb9/uv5Jmy0YQyND2170WPeRYHazEcNOeNv133BInQfoiw58hJ
-          Qg53eIBvGAI3uxzo2RtkFyH1mEDR+m8UoQtiAcFjQGPIwPw7oIPAiFEb0RO1MVFQHgXK4XFIYCSq
-          BEfwMlJQyYBOPVkcuy3InsICvss4uagjx/Tq+lnDHMBNijO9J+Oh422fJh5qZwRLCfvBosvhYYrx
-          haxoPfYCjS7MKbBOpoPOWRdwT+jGno2G+9F13GjWn5jSAR487yVpOtZBk8CTsIM7IaXen11gjXHX
-          SWhocVP6W/2sjWG3i9MeRDLddPaB9DyvPnp+uwr/rH52PB7/AKofF4M4AwAA
-      headers:
-        Access-Control-Allow-Origin: ['*']
-        Cache-Control: ['public, max-age=3600']
-        Connection: [keep-alive]
-        Content-Encoding: [gzip]
-        Content-Type: [application/json; charset=UTF-8]
-        Date: ['Sun, 26 Mar 2017 11:10:57 GMT']
+        Date: ['Sun, 26 Mar 2017 11:08:11 GMT']
         Server: [nginx/1.10.0 (Ubuntu)]
         Vary: [Accept-Encoding]
       status: {code: 200, message: OK}

@@ -11,7 +11,7 @@ from flexget.api.plugins.series import ObjectsContainer as OC
 from flexget.api.plugins.tvdb_lookup import ObjectsContainer as tvdb
 from flexget.api.plugins.tvmaze_lookup import ObjectsContainer as tvmaze
 from flexget.manager import Session
-from flexget.plugins.filter.series import Series, SeriesTask, Episode, Release, AlternateNames
+from flexget.plugins.filter.series import Series, SeriesTask, Episode, EpisodeRelease, AlternateNames
 from flexget.utils import json
 
 
@@ -135,7 +135,7 @@ class TestSeriesRootAPI(object):
             episode.series_id = series.id
             series.episodes.append(episode)
 
-            release = Release()
+            release = EpisodeRelease()
             release.title = 'test release'
             release.downloaded = True
 
@@ -177,7 +177,7 @@ class TestSeriesRootAPI(object):
             episode.number = 1
             series.episodes.append(episode)
 
-            release = Release()
+            release = EpisodeRelease()
             release.title = 'test release 2'
             release.downloaded = True
             episode.releases = [release]
@@ -210,7 +210,7 @@ class TestSeriesRootAPI(object):
             episode.series_id = series.id
             series.episodes.append(episode)
 
-            release = Release()
+            release = EpisodeRelease()
             release.title = 'test release'
             release.downloaded = True
 
@@ -233,7 +233,7 @@ class TestSeriesRootAPI(object):
             episode.series_id = series.id
             series.episodes.append(episode)
 
-            release = Release()
+            release = EpisodeRelease()
             release.title = 'test release 2'
             release.downloaded = True
             release.first_seen = datetime.now() - timedelta(days=8)
@@ -297,7 +297,7 @@ class TestSeriesRootAPI(object):
             episode.series_id = series.id
             series.episodes.append(episode)
 
-            release = Release()
+            release = EpisodeRelease()
             release.title = 'test release 3'
             release.downloaded = True
             release.first_seen = datetime.now() - timedelta(days=366)
@@ -582,7 +582,7 @@ class TestSeriesEpisodesAPI(object):
             episode2.number = 1
             episode2.series_id = series.id
 
-            release = Release()
+            release = EpisodeRelease()
             release.title = 'test release'
             release.downloaded = True
 
@@ -654,7 +654,7 @@ class TestSeriesEpisodeAPI(object):
             episode2.number = 1
             episode2.series_id = series.id
 
-            release = Release()
+            release = EpisodeRelease()
             release.title = 'test release'
             release.downloaded = True
 
@@ -760,11 +760,11 @@ class TestSeriesReleasesAPI(object):
             episode1.number = 1
             episode1.series_id = series.id
 
-            release1 = Release()
+            release1 = EpisodeRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = Release()
+            release2 = EpisodeRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
@@ -852,11 +852,11 @@ class TestSeriesReleasesAPI(object):
             episode1.number = 1
             episode1.series_id = series.id
 
-            release1 = Release()
+            release1 = EpisodeRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = Release()
+            release2 = EpisodeRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
@@ -946,11 +946,11 @@ class TestSeriesReleasesAPI(object):
             episode1.number = 1
             episode1.series_id = series.id
 
-            release1 = Release()
+            release1 = EpisodeRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = Release()
+            release2 = EpisodeRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
@@ -1045,15 +1045,15 @@ class TestSeriesReleaseAPI(object):
             episode2.number = 2
             episode2.series_id = series.id
 
-            release1 = Release()
+            release1 = EpisodeRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = Release()
+            release2 = EpisodeRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
-            release3 = Release()
+            release3 = EpisodeRelease()
             release3.title = 'downloaded release'
             release3.downloaded = True
 
@@ -1155,15 +1155,15 @@ class TestSeriesReleaseAPI(object):
             episode2.number = 2
             episode2.series_id = series.id
 
-            release1 = Release()
+            release1 = EpisodeRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = Release()
+            release2 = EpisodeRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
-            release3 = Release()
+            release3 = EpisodeRelease()
             release3.title = 'downloaded release'
             release3.downloaded = True
 
@@ -1260,15 +1260,15 @@ class TestSeriesReleaseAPI(object):
             episode2.number = 2
             episode2.series_id = series.id
 
-            release1 = Release()
+            release1 = EpisodeRelease()
             release1.title = 'downloaded release'
             release1.downloaded = True
 
-            release2 = Release()
+            release2 = EpisodeRelease()
             release2.title = 'un-downloaded release'
             release2.downloaded = False
 
-            release3 = Release()
+            release3 = EpisodeRelease()
             release3.title = 'downloaded release'
             release3.downloaded = True
 
@@ -1288,7 +1288,7 @@ class TestSeriesReleaseAPI(object):
             episode3.number = 2
             episode3.series_id = series2.id
 
-            release4 = Release()
+            release4 = EpisodeRelease()
             release4.title = 'downloaded release'
             release4.downloaded = True
 
@@ -1636,7 +1636,7 @@ class TestSeriesPagination(object):
             series.episodes.append(episode)
 
             for i in range(number_of_releases):
-                release = Release()
+                release = EpisodeRelease()
                 release.title = 'test release {}'.format(i)
                 release.downloaded = True
 

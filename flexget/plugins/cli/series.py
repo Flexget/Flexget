@@ -12,8 +12,9 @@ from flexget.terminal import TerminalTable, TerminalTableError, table_parser, co
 
 try:
     from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
-                                               normalize_series_name, new_eps_after, get_latest_release,
-                                               get_series_summary, shows_by_name, show_episodes, shows_by_exact_name)
+                                               normalize_series_name, new_entities_after, get_latest_release,
+                                               get_series_summary, shows_by_name, show_episodes, shows_by_exact_name,
+                                               get_all_entities)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
@@ -71,12 +72,12 @@ def display_summary(options):
         for index, value in enumerate(header):
             if value.lower() == options.sort_by:
                 header[index] = colorize(SORT_COLUMN_COLOR, value)
-        footer = 'Use `flexget series show NAME` to get detailed information'
+
         table_data = [header]
         for series in query:
             name_column = series.name
 
-            behind = 0
+            behind = (0,)
             latest_release = '-'
             age_col = '-'
             episode_id = '-'
@@ -85,7 +86,7 @@ def display_summary(options):
             if identifier_type == 'auto':
                 identifier_type = colorize('yellow', 'auto')
             if latest:
-                behind = new_eps_after(latest)
+                behind = new_entities_after(latest)
                 latest_release = get_latest_status(latest)
                 # colorize age
                 age_col = latest.age
@@ -98,8 +99,8 @@ def display_summary(options):
                         age_col = colorize(OLD_EP_COLOR, latest.age)
                 episode_id = latest.identifier
             if not porcelain:
-                if behind > 0:
-                    name_column += colorize(BEHIND_EP_COLOR, ' {} behind'.format(behind))
+                if behind[0] > 0:
+                    name_column += colorize(BEHIND_EP_COLOR, ' {} {} behind'.format(behind[0], behind[1]))
 
             table_data.append([name_column, episode_id, age_col, latest_release, identifier_type])
     try:
@@ -109,7 +110,10 @@ def display_summary(options):
         console('ERROR: %s' % str(e))
         return
     if not porcelain:
-        console(footer)
+        if not query.count():
+            console('Use `flexget series list all` to view all known series.')
+        else:
+            console('Use `flexget series show NAME` to get detailed information.')
 
 
 def begin(manager, options):
@@ -197,21 +201,21 @@ def display_details(options):
                        ' {}'.format(name, ', '.join(s.name for s in matches[1:])))
             if not options.table_type == 'porcelain':
                 console(warning)
-        header = ['Episode ID', 'Latest age', 'Release titles', 'Release Quality', 'Proper']
+        header = ['Entity ID', 'Latest age', 'Release titles', 'Release Quality', 'Proper']
         table_data = [header]
-        episodes = show_episodes(series, session=session)
-        for episode in episodes:
-            if episode.identifier is None:
+        entities = get_all_entities(series, session=session)
+        for entity in entities:
+            if entity.identifier is None:
                 identifier = colorize(ERROR_COLOR, 'MISSING')
                 age = ''
             else:
-                identifier = episode.identifier
-                age = episode.age
-            ep_data = [identifier, age]
+                identifier = entity.identifier
+                age = entity.age
+            entity_data = [identifier, age]
             release_titles = []
             release_qualities = []
             release_propers = []
-            for release in episode.releases:
+            for release in entity.releases:
                 title = release.title
                 quality = release.quality.name
                 if not release.downloaded:
@@ -224,10 +228,10 @@ def display_details(options):
                 release_titles.append(title)
                 release_qualities.append(quality)
                 release_propers.append('Yes' if release.proper_count > 0 else '')
-            ep_data.append('\n'.join(release_titles))
-            ep_data.append('\n'.join(release_qualities))
-            ep_data.append('\n'.join(release_propers))
-            table_data.append(ep_data)
+            entity_data.append('\n'.join(release_titles))
+            entity_data.append('\n'.join(release_qualities))
+            entity_data.append('\n'.join(release_propers))
+            table_data.append(entity_data)
         footer = ' %s \n' % (colorize(DOWNLOADED_RELEASE_COLOR, '* Downloaded'))
         if not series.identified_by:
             footer += ('\n Series plugin is still learning which episode numbering mode is \n'

@@ -20,21 +20,22 @@ from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')
 
-DB_VERSION = 6
+DB_VERSION = 7
 Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
-BASE_URL = 'http://api.tvmaze.com'
+BASE_URL = 'https://api.tvmaze.com'
 
 TVMAZE_SHOW_PATH = "/shows/{}"
 TVMAZE_LOOKUP_PATH = "/lookup/shows"
 TVMAZE_SEARCH_PATH = "/singlesearch/shows"
 TVMAZE_EPISODES_BY_DATE_PATH = "/shows/{}/episodesbydate"
 TVMAZE_EPISODES_BY_NUMBER_PATH = "/shows/{}/episodebynumber"
+TVMAZE_SEASONS = '/shows/{}/seasons'
 
 
 @db_schema.upgrade('tvmaze')
 def upgrade(ver, session):
-    if ver is None or ver < 6:
+    if ver is None or ver < 7:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -99,6 +100,9 @@ class TVMazeSeries(Base):
     network = Column(Unicode)
     episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season_number', cascade='all, delete, delete-orphan',
                         backref='series')
+    seasons = relation('TVMazeSeason', order_by='TVMazeSeason.number', cascade='all, delete, delete-orphan',
+                       backref='series')
+
     last_update = Column(DateTime)  # last time we updated the db for the show
 
     def __init__(self, series, session):
@@ -153,7 +157,8 @@ class TVMazeSeries(Base):
         self.network = series.get('network')['name'] if series.get('network') else None
         self.last_update = datetime.now()
 
-        self.genres[:] = get_db_genres(series['genres'], session)
+        self.genres = get_db_genres(series['genres'], session)
+        self.seasons = self.populate_seasons(series)
 
     def __repr__(self):
         return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.tvmaze_id, self.last_update)
@@ -169,6 +174,47 @@ class TVMazeSeries(Base):
         time_dif = datetime.now() - self.last_update
         expiration = time_dif.days > UPDATE_INTERVAL
         return expiration
+
+    def populate_seasons(self, series=None):
+        if series and '_embedded' in series and series['_embedded'].get('seasons'):
+            seasons = series['_embedded']['seasons']
+        else:
+            seasons = get_seasons(self.tvmaze_id)
+        return [TVMazeSeason(season, self.tvmaze_id) for season in seasons]
+
+
+class TVMazeSeason(Base):
+    __tablename__ = 'tvmaze_seasons'
+
+    tvmaze_id = Column(Integer, primary_key=True)
+    series_id = Column(Integer, ForeignKey('tvmaze_series.tvmaze_id'), nullable=False)
+
+    number = Column(Integer)
+    url = Column(String)
+    name = Column(Unicode)
+    episode_order = Column(Integer)
+    airdate = Column(DateTime)
+    end_date = Column(DateTime)
+    network = Column(Unicode)
+    web_channel = Column(Unicode)
+    image = Column(String)
+    summary = Column(Unicode)
+
+    def __init__(self, season, series_id):
+        self.tvmaze_id = season['id']
+        self.series_id = series_id
+        self.number = season['number']
+        self.update(season)
+
+    def update(self, season):
+        self.url = season['url']
+        self.name = season['name']
+        self.end_date = parser.parse(season.get('endDate'), ignoretz=True) if season.get('endDate') else None
+        self.airdate = parser.parse(season['premiereDate'], ignoretz=True) if season.get('premiereDate') else None
+        self.web_channel = season['web_channel']['name'] if season.get('web_channel') else None
+        self.network = season['network']['name'] if season.get('network') else None
+        self.image = season['image']['original'] if season.get('image') else None
+        self.summary = season['summary']
 
 
 class TVMazeEpisodes(Base):
@@ -381,6 +427,51 @@ class APITVMaze(object):
 
     @staticmethod
     @with_session
+    def season_lookup(session=None, only_cached=False, **lookup_params):
+        series_name = lookup_params.get('series_name') or lookup_params.get('title')
+        show_id = lookup_params.get('tvmaze_id') or lookup_params.get('tvdb_id')
+
+        season_number = lookup_params.get('series_season')
+
+        # Verify we have enough parameters for search
+        if not any([series_name, show_id, season_number]):
+            raise LookupError('Not enough parameters to lookup episode')
+
+        # Get series
+        series = APITVMaze.series_lookup(session=session, only_cached=only_cached, **lookup_params)
+        if not series:
+            raise LookupError('Could not find series with the following parameters: {0}'.format(lookup_params))
+        session.flush()
+        # See if season already exists in cache
+        log.debug('searching for season %s of show %s in cache', season_number, series.name)
+        season = session.query(TVMazeSeason) \
+            .filter(TVMazeSeason.series_id == series.tvmaze_id) \
+            .filter(TVMazeSeason.number == season_number) \
+            .one_or_none()
+
+        # Logic for cache only mode
+        if only_cached:
+            if season:
+                log.debug('forcing cache for season % of show %s', season_number, series.name)
+                return season
+
+        if season and not series.expired:
+            log.debug('returning season %s of show %s', season_number, series.name)
+            return season
+
+        # If no season has been found try refreshing the series seasons
+        series.populate_seasons()
+
+        # Query again
+        season = session.query(TVMazeSeason) \
+            .filter(TVMazeSeason.tvmaze_id == series.tvmaze_id) \
+            .filter(TVMazeSeason.number == season_number) \
+            .one_or_none()
+        if season:
+            return season
+
+    @staticmethod
+    @with_session
     def episode_lookup(session=None, only_cached=False, **lookup_params):
         series_name = lookup_params.get('series_name') or lookup_params.get('title')
         show_id = lookup_params.get('tvmaze_id') or lookup_params.get('tvdb_id')
@@ -407,7 +498,7 @@ class APITVMaze(object):
             raise LookupError('Could not find series with the following parameters: {0}'.format(lookup_params))
 
         # See if episode already exists in cache
-        log.debug('searching for episode of show {0} in cache'.format(series.name))
+        log.debug('searching for episode of show %s in cache', series.name)
         episode = session.query(TVMazeEpisodes).filter(
             and_(TVMazeEpisodes.series_id == series.tvmaze_id,
                  TVMazeEpisodes.season_number == season_number,
@@ -475,17 +566,24 @@ class APITVMaze(object):
 
 
 def get_show(show_name=None, tvmaze_id=None, imdb_id=None, tvrage_id=None, thetvdb_id=None):
+    if not any(param for param in [show_name, tvmaze_id, imdb_id, tvrage_id, thetvdb_id]):
+        raise LookupError('Not enough parameters sent for series lookup')
+    params = {'embed': 'seasons'}
     if tvmaze_id:
-        return tvmaze_lookup(TVMAZE_SHOW_PATH.format(tvmaze_id))
+        url = TVMAZE_SHOW_PATH.format(tvmaze_id)
     if imdb_id:
-        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'imdb_id': imdb_id})
+        url = TVMAZE_LOOKUP_PATH
+        params['imdb'] = imdb_id
     if tvrage_id:
-        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'tvrage_id': tvrage_id})
+        url = TVMAZE_LOOKUP_PATH
+        params['tvrage'] = tvrage_id
     if thetvdb_id:
-        return tvmaze_lookup(TVMAZE_LOOKUP_PATH, params={'thetvdb_id': thetvdb_id})
+        url = TVMAZE_LOOKUP_PATH
+        params['thetvdb'] = thetvdb_id
     if show_name:
-        return tvmaze_lookup(TVMAZE_SEARCH_PATH, params={'q': show_name})
-    raise LookupError('Not enough parameters sent for series lookup')
+        params['q'] = show_name
+        url = TVMAZE_SEARCH_PATH
+    return tvmaze_lookup(url, params=params)
 
 
 def get_episode(series_id, date=None, number=None, season=None):
@@ -493,8 +591,12 @@ def get_episode(series_id, date=None, number=None, season=None):
         return tvmaze_lookup(TVMAZE_EPISODES_BY_DATE_PATH.format(series_id), params={'date': date})
     elif number and season:
         return tvmaze_lookup(TVMAZE_EPISODES_BY_NUMBER_PATH.format(series_id),
-            params={'season': season, 'number': number})
+                             params={'season': season, 'number': number})
     raise LookupError('Not enough parameters sent for episode lookup')
+
+
+def get_seasons(series_id):
+    return tvmaze_lookup(TVMAZE_SEASONS.format(series_id))
 
 
 def tvmaze_lookup(lookup_url, **kwargs):

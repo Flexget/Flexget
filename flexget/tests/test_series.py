@@ -12,11 +12,11 @@ from flexget.task import TaskAbort
 
 
 def age_series(**kwargs):
-    from flexget.plugins.filter.series import Release
+    from flexget.plugins.filter.series import EpisodeRelease
     from flexget.manager import Session
     import datetime
     session = Session()
-    session.query(Release).update({'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)})
+    session.query(EpisodeRelease).update({'first_seen': datetime.datetime.now() - datetime.timedelta(**kwargs)})
     session.commit()
 
 
@@ -2047,3 +2047,248 @@ class TestSeriesRemove(object):
         task = execute_task('get_episode')
         assert len(task.accepted) == 1, 'new release not accepted after forgetting ep'
         assert task.accepted[0] != first_rls, 'same release accepted on second run'
+
+
+class TestSeriesSeasonPack(object):
+    _config = """
+      templates:
+        global:
+          parsing:
+            series: internal
+          series:
+          - foo:
+              season_packs: yes
+          - bar:
+              season_packs: yes
+              tracking: backfill
+          - baz:
+              season_packs: 3
+          - boo:
+              season_packs: always
+          - bla:
+              season_packs: only
+      tasks:
+        multiple_formats:
+          mock:
+          - title: foo.s01.720p-flexget
+          - title: foo.2xALL.720p-flexget
+        foo_s01:
+          mock:
+          - title: foo.s01.720p-flexget
+        foo_s02:
+          mock:
+          - title: foo.s02.720p-flexget
+        foo_s03:
+          mock:
+          - title: foo.s03.720p-flexget
+        foo_s01ep1:
+          mock:
+          - title: foo.s01e1.720p-flexget
+        foo_s02ep1:
+          mock:
+          - title: foo.s02e1.720p-flexget
+        season_pack_priority:
+          mock:
+          - title: foo.s01e1.720p-flexget
+          - title: foo.s01e2.720p-flexget
+          - title: foo.s01e3.720p-flexget
+          - title: foo.s01e4.720p-flexget
+          - title: foo.s01e5.720p-flexget
+          - title: foo.s01.720p-flexget
+        respect_begin:
+          series:
+          - bar:
+              begin: s02e01
+              season_packs: yes
+          mock:
+          - title: bar.s01.720p-flexget
+          - title: bar.s02.720p-flexget
+        several_seasons:
+          mock:
+          - title: foo.s03.720p-flexget
+          - title: foo.s07.720p-flexget
+          - title: foo.s03.1080p-flexget
+          - title: foo.s06.720p-flexget
+          - title: foo.s09.720p-flexget
+        test_backfill_1:
+          mock:
+          - title: bar.s03.720p-flexget
+        test_backfill_2:
+          mock:
+          - title: bar.s02.720p-flexget
+        test_backfill_3:
+          mock:
+          - title: bar.s03e01.720p-flexget
+        test_backfill_4:
+          mock:
+          - title: bar.s02e01.1080p-flexget
+        test_specific_season_pack_threshold_1:
+          mock:
+          - title: baz.s01e01.720p-flexget
+          - title: baz.s01e02.720p-flexget
+          - title: baz.s01e03.720p-flexget
+        test_specific_season_pack_threshold_2:
+          mock:
+          - title: baz.s01.720p-flexget
+        test_specific_season_pack_threshold_3:
+          mock:
+          - title: baz.s01e01.720p-flexget
+          - title: baz.s01e02.720p-flexget
+          - title: baz.s01e03.720p-flexget
+          - title: baz.s01e04.720p-flexget
+        test_always_get_season_pack_1:
+          mock:
+          - title: boo.s01e01.720p-flexget
+          - title: boo.s01e02.720p-flexget
+          - title: boo.s01e03.720p-flexget
+          - title: boo.s01e04.720p-flexget
+        test_always_get_season_pack_2:
+          mock:
+          - title: boo.s01.720p-flexget
+        test_only_get_season_packs:
+          mock:
+          - title: bla.s01.720p-flexget
+          - title: bla.s02e01.720p-flexget
+        test_proper_season_pack:
+          mock:
+          - title: foo.s01.720p-flexget
+          - title: foo.s01.720p.proper-flexget
+        test_proper_season_pack_2:
+          mock:
+          - title: foo.s01.720p-flexget
+        test_proper_season_pack_3:
+          mock:
+          - title: foo.s01.720p.proper-flexget
+        test_all_series:
+          mock:
+          - title: show.name.s01.720p.HDTV-Group
+          all_series:
+            season_packs: yes
+    """
+
+    @pytest.fixture()
+    def config(self):
+        """Overrides outer config fixture since season pack support does not work with guessit parser"""
+        return self._config
+
+    def test_season_pack_simple(self, execute_task):
+        task = execute_task('foo_s01')
+        assert len(task.accepted) == 1
+
+    def test_basic_tracking(self, execute_task):
+        task = execute_task('foo_s01')
+        assert len(task.accepted) == 1
+
+        task = execute_task('foo_s01ep1')
+        assert len(task.accepted) == 0
+
+        task = execute_task('foo_s02ep1')
+        assert len(task.accepted) == 1
+
+    def test_season_pack_takes_priority(self, execute_task):
+        task = execute_task('season_pack_priority')
+        assert len(task.accepted) == 1
+        entry = task.find_entry(title='foo.s01.720p-flexget')
+        assert entry.accepted
+
+    def test_respect_begin(self, execute_task):
+        task = execute_task('respect_begin')
+        assert len(task.accepted) == 1
+        entry = task.find_entry(title='bar.s02.720p-flexget')
+        assert entry.accepted
+
+    def test_tracking_rules_old_eps(self, execute_task):
+        task = execute_task('foo_s01')
+        assert len(task.accepted) == 1
+
+        task = execute_task('foo_s02')
+        assert len(task.accepted) == 1
+
+        task = execute_task('foo_s01ep1')
+        assert not task.accepted
+
+    def test_tracking_rules_old_season(self, execute_task):
+        task = execute_task('foo_s02')
+        assert len(task.accepted) == 1
+
+        task = execute_task('foo_s01')
+        assert not task.accepted
+
+    def test_tracking_rules_new_season(self, execute_task):
+        task = execute_task('foo_s01')
+        assert len(task.accepted) == 1
+
+        task = execute_task('foo_s03')
+        assert not task.accepted
+
+    def test_several_seasons(self, execute_task):
+        task = execute_task('several_seasons')
+        assert len(task.accepted) == 4
+
+    def test_multiple_formats(self, execute_task):
+        task = execute_task('multiple_formats')
+        assert len(task.accepted) == 2
+
+    def test_backfill(self, execute_task):
+        task = execute_task('test_backfill_1')
+        assert len(task.accepted) == 1
+
+        task = execute_task('test_backfill_2')
+        assert len(task.accepted) == 1
+
+        task = execute_task('test_backfill_3')
+        assert not task.accepted
+
+        task = execute_task('test_backfill_4')
+        assert not task.accepted
+
+    def test_default_threshold(self, execute_task):
+        task = execute_task('foo_s01ep1')
+        assert len(task.accepted) == 1
+
+        task = execute_task('foo_s01')
+        assert len(task.accepted) == 0
+
+    def test_specific_season_pack_threshold_positive(self, execute_task):
+        task = execute_task('test_specific_season_pack_threshold_1')
+        assert len(task.accepted) == 3
+
+        task = execute_task('test_specific_season_pack_threshold_2')
+        assert len(task.accepted) == 1
+
+    def test_specific_season_pack_threshold_negative(self, execute_task):
+        task = execute_task('test_specific_season_pack_threshold_3')
+        assert len(task.accepted) == 4
+
+        task = execute_task('test_specific_season_pack_threshold_2')
+        assert not task.accepted
+
+    def test_loose_threshold(self, execute_task):
+        task = execute_task('test_always_get_season_pack_1')
+        assert len(task.accepted) == 4
+
+        task = execute_task('test_always_get_season_pack_2')
+        assert len(task.accepted) == 1
+
+    def test_exclusive(self, execute_task):
+        task = execute_task('test_only_get_season_packs')
+        assert len(task.accepted) == 1
+        entry = task.find_entry(title='bla.s01.720p-flexget')
+        assert entry.accepted
+
+    def test_proper_season_pack(self, execute_task):
+        """Series plugin: proper available immediately"""
+        task = execute_task('test_proper_season_pack')
+        assert task.find_entry('accepted', title='foo.s01.720p.proper-flexget')
+
+    def test_proper_season_pack_2(self, execute_task):
+        """Series plugin: proper available immediately"""
+        task = execute_task('test_proper_season_pack_2')
+        assert task.find_entry('accepted', title='foo.s01.720p-flexget')
+
+        task = execute_task('test_proper_season_pack_3')
+        assert task.find_entry('accepted', title='foo.s01.720p.proper-flexget')
+
+    def test_all_series(self, execute_task):
+        task = execute_task('test_all_series')
+        assert task.find_entry('accepted', title='show.name.s01.720p.HDTV-Group')
