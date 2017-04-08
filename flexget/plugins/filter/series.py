@@ -1323,6 +1323,9 @@ class FilterSeriesBase(object):
                         season_packs = {'threshold': sys.maxsize, 'reject_eps': False}
                     elif isinstance(season_packs, str) and season_packs == 'only':
                         season_packs = {'threshold': 0, 'reject_eps': True}
+                    else:
+                        season_packs.setdefault('threshold', 0)
+                        season_packs.setdefault('reject_eps', False)
                     series_settings['season_packs'] = season_packs
 
                 group_series.append({series: series_settings})
