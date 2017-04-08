@@ -10,7 +10,6 @@ from copy import copy
 from datetime import datetime, timedelta
 from functools import total_ordering
 
-from past.builtins import basestring
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
 from sqlalchemy.exc import OperationalError
@@ -1272,7 +1271,7 @@ class FilterSeriesBase(object):
             if group_name == 'settings':
                 continue
             group_series = []
-            if isinstance(group_name, basestring):
+            if isinstance(group_name, str):
                 # if group name is known quality, convenience create settings with that quality
                 try:
                     qualities.Requirements(group_name)
@@ -1293,15 +1292,15 @@ class FilterSeriesBase(object):
                     log.warning('Series config contains a series with no name!')
                     continue
                 # make sure series name is a string to accommodate for "24"
-                if not isinstance(series, basestring):
+                if not isinstance(series, str):
                     series = str(series)
                 # if series have given path instead of dict, convert it into a dict
-                if isinstance(series_settings, basestring):
+                if isinstance(series_settings, str):
                     series_settings = {'path': series_settings}
                 # merge group settings into this series settings
                 merge_dict_from_to(group_settings, series_settings)
                 # Convert to dict if watched is in SXXEXX format
-                if isinstance(series_settings.get('watched'), basestring):
+                if isinstance(series_settings.get('watched'), str):
                     season, episode = series_settings['watched'].upper().split('E')
                     season = season.lstrip('S')
                     series_settings['watched'] = {'season': int(season), 'episode': int(episode)}
@@ -1531,7 +1530,7 @@ class FilterSeries(FilterSeriesBase):
         def get_as_array(config, key):
             """Return configuration key as array, even if given as a single string"""
             v = config.get(key, [])
-            if isinstance(v, basestring):
+            if isinstance(v, str):
                 return [v]
             return v
 
