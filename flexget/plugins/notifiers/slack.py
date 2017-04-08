@@ -52,8 +52,7 @@ class SlackNotifier(object):
         Send a Slack notification
         """
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         notification = {'text': message, 'channel': config.get('channel'), 'username': config.get('username')}
         if config.get('icon_emoji'):
             notification['icon_emoji'] = ':%s:' % config['icon_emoji'].strip(':')

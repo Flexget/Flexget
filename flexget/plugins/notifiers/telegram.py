@@ -175,8 +175,7 @@ class TelegramNotifier(object):
         Send a Telegram notification
         """
         if entry:
-            prefix = _PLUGIN_NAME + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(_PLUGIN_NAME + '_', dict(entry), config)
         chat_ids = self._real_init(Session(), config)
 
         if not chat_ids:

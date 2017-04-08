@@ -61,8 +61,7 @@ class ProwlNotifier(object):
         #
 
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         notification = {'application': config.get('application'), 'event': title, 'description': message,
                         'url': config.get('url'), 'priority': config.get('priority'),
                         'providerkey': config.get('provider_key')}

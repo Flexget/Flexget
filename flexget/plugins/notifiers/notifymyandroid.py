@@ -51,8 +51,7 @@ class NotifyMyAndroidNotifier(object):
         Send a Notifymyandroid notification
         """
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         notification = {'event': title, 'description': message, 'application': config.get('application'),
                         'priority': config.get('priority'), 'developerkey': config.get('developer_key'),
                         'url': config.get('url')}

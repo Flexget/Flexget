@@ -65,8 +65,7 @@ class PushbulletNotifier(object):
         Send a Pushbullet notification
         """
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         if config.get('device') and not isinstance(config['device'], list):
             config['device'] = [config['device']]
 

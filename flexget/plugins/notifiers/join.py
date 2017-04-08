@@ -61,8 +61,7 @@ class JoinNotifier(object):
         Send Join notifications.
         """
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         notification = {'title': title, 'text': message, 'url': config.get('url'),
                         'icon': config.get('icon'), 'priority': config.get('priority'), 'apikey': config['api_key']}
         if config.get('device'):

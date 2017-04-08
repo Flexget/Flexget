@@ -56,8 +56,7 @@ class PushsaferNotifier(object):
         Send a Pushsafer notification
         """
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         notification = {'t': title, 'm': message, 'ut': config.get('url_title'),
                         'u': config.get('url'), 's': config.get('sound'),
                         'i': config.get('icon'), 'v': config.get('vibration'),

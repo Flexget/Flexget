@@ -57,8 +57,7 @@ class PushalotNotifier(object):
         Send a Pushalot notification
         """
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         notification = {'Title': title, 'Body': message, 'LinkTitle': config.get('url_title'),
                         'Link': config.get('url'), 'IsImportant': config.get('important'),
                         'IsSilent': config.get('silent'), 'Image': config.get('image'), 'Source': config.get('source'),

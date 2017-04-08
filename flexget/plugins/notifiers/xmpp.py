@@ -30,8 +30,7 @@ class XMPPNotifier(object):
 
     def notify(self, title, message, config, entry=None):
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         try:
             import sleekxmpp  # noqa
         except ImportError as e:

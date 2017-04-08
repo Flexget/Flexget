@@ -58,8 +58,7 @@ class RapidpushNotifier(object):
         Send a Rapidpush notification
         """
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         notification = {'title': title, 'message': message}
         if not isinstance(config['api_key'], list):
             config['api_key'] = [config['api_key']]

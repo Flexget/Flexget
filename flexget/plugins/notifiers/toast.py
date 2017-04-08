@@ -41,8 +41,7 @@ class NotifyToast(object):
 
     def mac_notify(self, title, message, config, entry=None):
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         config = self.prepare_config(config)
         try:
             from pync import Notifier
@@ -65,8 +64,7 @@ class NotifyToast(object):
 
     def linux_notify(self, title, message, config, entry=None):
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         config = self.prepare_config(config)
         try:
             from gi.repository import Notify
@@ -86,8 +84,7 @@ class NotifyToast(object):
 
     def windows_notify(self, title, message, config, entry=None):
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         config = self.prepare_config(config)
         try:
             from win32api import GetModuleHandle, PostQuitMessage

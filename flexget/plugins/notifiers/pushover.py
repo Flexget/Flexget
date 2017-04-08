@@ -81,8 +81,7 @@ class PushoverNotifier(object):
         #
 
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
         notification = {'token': config.get('api_key'), 'message': message, 'title': title,
                         'device': config.get('device'), 'priority': config.get('priority'), 'url': config.get('url'),
                         'url_title': config.get('url_title'), 'sound': config.get('sound'),

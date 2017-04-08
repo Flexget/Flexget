@@ -147,8 +147,7 @@ class EmailNotifier(object):
         :param dict config: email plugin config
         """
         if entry:
-            prefix = plugin_name + '_'
-            merge_by_prefix(prefix, dict(entry), config)
+            merge_by_prefix(plugin_name + '_', dict(entry), config)
 
         if not isinstance(config['to'], list):
             config['to'] = [config['to']]
