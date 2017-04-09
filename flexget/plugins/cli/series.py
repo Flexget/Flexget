@@ -11,7 +11,7 @@ from flexget.manager import Session
 from flexget.terminal import TerminalTable, TerminalTableError, table_parser, colorize, console
 
 try:
-    from flexget.plugins.filter.series import (Series, remove_series, remove_series_episode, set_series_begin,
+    from flexget.plugins.filter.series import (Series, remove_series, remove_series_entity, set_series_begin,
                                                normalize_series_name, new_entities_after, get_latest_release,
                                                get_series_summary, shows_by_name, show_episodes, shows_by_exact_name,
                                                get_all_entities)
@@ -146,7 +146,7 @@ def remove(manager, options, forget=False):
         # remove by id
         identifier = options.episode_id
         try:
-            remove_series_episode(name, identifier, forget)
+            remove_series_entity(name, identifier, forget)
         except ValueError as e:
             console(e.args[0])
         else:

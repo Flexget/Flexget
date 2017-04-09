@@ -440,7 +440,7 @@ class SeriesEpisodesAPI(APIResource):
         args = delete_parser.parse_args()
         forget = args.get('forget')
         for episode in show.episodes:
-            series.remove_series_episode(show.name, episode.identifier, forget)
+            series.remove_series_entity(show.name, episode.identifier, forget)
         return success_response('successfully removed all series %s episodes from DB' % show_id)
 
 
@@ -489,7 +489,7 @@ class SeriesEpisodeAPI(APIResource):
             raise BadRequest('episode with id %s does not belong to show %s' % (ep_id, show_id))
 
         args = delete_parser.parse_args()
-        series.remove_series_episode(show.name, episode.identifier, args.get('forget'))
+        series.remove_series_entity(show.name, episode.identifier, args.get('forget'))
 
         return success_response('successfully removed episode %s from show %s' % (ep_id, show_id))
 

@@ -1022,13 +1022,12 @@ def remove_series(name, forget=False):
         fire_event('forget', downloaded_release)
 
 
-def remove_series_episode(name, identifier, forget=False):
+def remove_series_entity(name, identifier, forget=False):
     """
-    Remove all episodes by `identifier` from series `name` from database.
+    Remove all entitires by `identifier` from series `name` from database.
 
     :param name: Name of series to be removed
     :param identifier: Series identifier to be deleted,
-        supports case insensitive start with matching
     :param forget: Indication whether or not to fire a 'forget' event
     """
     downloaded_releases = []
@@ -1037,25 +1036,33 @@ def remove_series_episode(name, identifier, forget=False):
         if not series:
             raise ValueError('Unknown series %s' % name)
 
-        def remove_episode(episode):
+        def remove_entity(entity):
             if not series.begin:
                 series.identified_by = ''  # reset identified_by flag so that it will be recalculated
-            session.delete(episode)
-            log.debug('Episode %s from series %s removed from database.', identifier, name)
-            return [release.title for release in episode.downloaded_releases]
+            session.delete(entity)
+            log.debug('Entity %s from series %s removed from database.', identifier, name)
+            return [release.title for release in entity.downloaded_releases]
 
-        episode = session.query(Episode).filter(Episode.identifier == identifier). \
-            filter(Episode.series_id == series.id).first()
-        if episode:
-            downloaded_releases = remove_episode(episode)
+        name_to_parse = '{} {}'.format(series.name, identifier)
+        parsed = get_plugin_by_name('parsing').instance.parse_series(name_to_parse, name=series.name)
+        if not parsed.valid:
+            raise LookupError('Invalid identifier for series {}: {}'.format(series.name, identifier))
+
+        removed = False
+        if parsed.season_pack:
+            season = session.query(Season).filter(Season.season == parsed.season).filter(
+                Season.series_id == series.id).first()
+            if season:
+                removed = True
+                downloaded_releases = remove_entity(season)
         else:
-            removed = False
-            for episode in session.query(Episode).filter(Episode.series_id == series.id).all():
-                if episode.identifier.upper().startswith(identifier.upper()):
-                    removed = True
-                    downloaded_releases.extend(remove_episode(episode))
-            if not removed:
-                raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
+            episode = session.query(Episode).filter(Episode.identifier == identifier). \
+                filter(Episode.series_id == series.id).first()
+            if episode:
+                removed = True
+                downloaded_releases = remove_entity(episode)
+        if not removed:
+            raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
 
     if forget:
         for downloaded_release in downloaded_releases:
