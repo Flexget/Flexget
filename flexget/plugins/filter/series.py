@@ -10,7 +10,6 @@ from copy import copy
 from datetime import datetime, timedelta
 from functools import total_ordering
 
-from past.builtins import basestring
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
 from sqlalchemy.exc import OperationalError
@@ -1242,12 +1241,7 @@ class FilterSeriesBase(object):
                 'season_packs': {'oneOf': [
                     {'type': 'boolean'},
                     {'type': 'integer'},
-                    {'type': 'string', 'enum': ['always', 'only']},
-                    {'type': 'object',
-                     'properties': {
-                         'threshold': {'type': 'integer'},
-                         'reject_eps': {'type': 'boolean'}
-                     }}
+                    {'type': 'string', 'enum': ['always', 'only']}
                 ]}
             },
             'additionalProperties': False
@@ -1263,6 +1257,22 @@ class FilterSeriesBase(object):
             config.setdefault('settings', {})
         return config
 
+    def season_pack_opts(self, season_packs):
+        """
+        Parse the user's `season_packs` option, and turn it in to a more useful form.
+        """
+        if season_packs in [False, None]:
+            return False
+        opts = {'threshold': 0, 'reject_eps': False}
+        if isinstance(season_packs, int):
+            opts['threshold'] = season_packs
+        elif isinstance(season_packs, str):
+            if season_packs == 'always':
+                opts['threshold'] = sys.maxsize
+            else: # 'only'
+                opts['reject_eps'] = True
+        return opts
+
     def apply_group_options(self, config):
         """Applies group settings to each item in series group and removes settings dict."""
 
@@ -1272,7 +1282,7 @@ class FilterSeriesBase(object):
             if group_name == 'settings':
                 continue
             group_series = []
-            if isinstance(group_name, basestring):
+            if isinstance(group_name, str):
                 # if group name is known quality, convenience create settings with that quality
                 try:
                     qualities.Requirements(group_name)
@@ -1280,28 +1290,26 @@ class FilterSeriesBase(object):
                 except ValueError:
                     # If group name is not a valid quality requirement string, do nothing.
                     pass
+            group_settings = config['settings'].get(group_name, {})
             for series in config[group_name]:
                 # convert into dict-form if necessary
                 series_settings = {}
-                group_settings = config['settings'].get(group_name, {})
                 if isinstance(series, dict):
                     series, series_settings = list(series.items())[0]
-                    if series_settings is None:
-                        raise Exception('Series %s has unexpected \':\'' % series)
                 # Make sure this isn't a series with no name
                 if not series:
                     log.warning('Series config contains a series with no name!')
                     continue
                 # make sure series name is a string to accommodate for "24"
-                if not isinstance(series, basestring):
+                if not isinstance(series, str):
                     series = str(series)
                 # if series have given path instead of dict, convert it into a dict
-                if isinstance(series_settings, basestring):
+                if isinstance(series_settings, str):
                     series_settings = {'path': series_settings}
                 # merge group settings into this series settings
                 merge_dict_from_to(group_settings, series_settings)
                 # Convert to dict if watched is in SXXEXX format
-                if isinstance(series_settings.get('watched'), basestring):
+                if isinstance(series_settings.get('watched'), str):
                     season, episode = series_settings['watched'].upper().split('E')
                     season = season.lstrip('S')
                     series_settings['watched'] = {'season': int(season), 'episode': int(episode)}
@@ -1312,18 +1320,6 @@ class FilterSeriesBase(object):
                 # Add quality: 720p if timeframe is specified with no target
                 if 'timeframe' in series_settings and 'qualities' not in series_settings:
                     series_settings.setdefault('target', '720p hdtv+')
-                # Get the episode threshold that will be used for episode tracking
-                season_packs = series_settings.get('season_packs')
-                if season_packs is not None:
-                    if isinstance(season_packs, bool) and season_packs:
-                        season_packs = {'threshold': 0, 'reject_eps': False}
-                    elif isinstance(season_packs, int):
-                        season_packs = {'threshold': season_packs, 'reject_eps': False}
-                    elif isinstance(season_packs, str) and season_packs == 'always':
-                        season_packs = {'threshold': sys.maxsize, 'reject_eps': False}
-                    elif isinstance(season_packs, str) and season_packs == 'only':
-                        season_packs = {'threshold': 0, 'reject_eps': True}
-                    series_settings['season_packs'] = season_packs
 
                 group_series.append({series: series_settings})
             config[group_name] = group_series
@@ -1528,7 +1524,7 @@ class FilterSeries(FilterSeriesBase):
         def get_as_array(config, key):
             """Return configuration key as array, even if given as a single string"""
             v = config.get(key, [])
-            if isinstance(v, basestring):
+            if isinstance(v, str):
                 return [v]
             return v
 
@@ -1594,15 +1590,15 @@ class FilterSeries(FilterSeriesBase):
 
             log.debug('start with entities: %s', [e['title'] for e in entries])
 
-            season_packs = config.get('season_packs')
+            season_packs = self.season_pack_opts(config.get('season_packs', False))
             # reject season packs unless specified
-            if entity.is_season and season_packs is None:
+            if entity.is_season and not season_packs:
                 for entry in entries:
                     entry.reject('season pack support is turned off')
                 continue
 
             # reject episodes if season pack is set to 'only'
-            if not entity.is_season and season_packs is not None and season_packs['reject_eps']:
+            if not entity.is_season and season_packs and season_packs['reject_eps']:
                 for entry in entries:
                     entry.reject('season pack only mode')
                 continue

@@ -3,7 +3,6 @@ from __future__ import unicode_literals, division, absolute_import
 from builtins import *  # noqa pylint: disable=unused-import, redefined-builtin
 from future.moves.urllib import request
 from future.utils import PY2
-from past.builtins import basestring
 
 import logging
 import ast
@@ -153,19 +152,19 @@ def _xmlcharref_encode(unicode_data, encoding):
 
 def merge_dict_from_to(d1, d2):
     """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
-    for k, v in list(d1.items()):
+    for k, v in d1.items():
         if k in d2:
             if isinstance(v, type(d2[k])):
                 if isinstance(v, dict):
                     merge_dict_from_to(d1[k], d2[k])
                 elif isinstance(v, list):
                     d2[k].extend(copy.deepcopy(v))
-                elif isinstance(v, (basestring, bool, int, float, type(None))):
+                elif isinstance(v, (str, bool, int, float, type(None))):
                     pass
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
-            elif (isinstance(v, (basestring, bool, int, float, type(None))) and
-                      isinstance(d2[k], (basestring, bool, int, float, type(None)))):
+            elif (isinstance(v, (str, bool, int, float, type(None))) and
+                      isinstance(d2[k], (str, bool, int, float, type(None)))):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
@@ -208,7 +207,7 @@ class ReList(list):
 
     def __getitem__(self, k):
         item = list.__getitem__(self, k)
-        if isinstance(item, basestring):
+        if isinstance(item, str):
             item = re.compile(item, re.IGNORECASE | re.UNICODE)
             self[k] = item
         return item
