@@ -45,5 +45,5 @@ class TestNotifyEntry(object):
         expected = [('foo', 'http://changed.com', {'api_key': 'apikey'})]
         task = execute_task('test_set_override')
 
-        assert len(task.accepted) == 2
+        assert len(task.accepted) == 1
         assert debug_notifications == expected
