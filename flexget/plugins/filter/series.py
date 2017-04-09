@@ -1264,12 +1264,14 @@ class FilterSeriesBase(object):
         if season_packs in [False, None]:
             return False
         opts = {'threshold': 0, 'reject_eps': False}
-        if isinstance(season_packs, int):
+        if season_packs is True:
+            return opts
+        elif isinstance(season_packs, int):
             opts['threshold'] = season_packs
         elif isinstance(season_packs, str):
             if season_packs == 'always':
                 opts['threshold'] = sys.maxsize
-            else: # 'only'
+            else:  # 'only'
                 opts['reject_eps'] = True
         return opts
 
