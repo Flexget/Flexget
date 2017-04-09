@@ -27,14 +27,19 @@ class SearchBTN(object):
         searches = entry.get('search_strings', [entry['title']])
 
         if 'series_name' in entry:
-            search = {'category': 'Episode'}
+            if entry.get('season_pack_lookup', False):
+                search = {'category': 'Season'}
+            else:
+                search = {'category': 'Episode'}
             if 'tvdb_id' in entry:
                 search['tvdb'] = entry['tvdb_id']
             elif 'tvrage_id' in entry:
                 search['tvrage'] = entry['tvrage_id']
             else:
                 search['series'] = entry['series_name']
-            if 'series_id' in entry:
+            if entry.get('season_pack_lookup', False) and 'series_season' in entry:
+                search['name'] = 'Season %s' % entry['series_season']
+            elif 'series_id' in entry:
                 # BTN wants an ep style identifier even for sequence shows
                 if entry.get('series_id_type') == 'sequence':
                     search['name'] = 'S01E%02d' % entry['series_id']
