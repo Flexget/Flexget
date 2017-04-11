@@ -233,7 +233,7 @@ api_app.config['DEBUG'] = True
 api_app.config['ERROR_404_HELP'] = False
 api_app.url_map.strict_slashes = False
 
-CORS(api_app)
+CORS(api_app, expose_headers='Link, Total-Count, Count, ETag')
 Compress(api_app)
 
 api = API(
