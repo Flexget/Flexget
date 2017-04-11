@@ -398,7 +398,7 @@ class UrlRewriteTorrent411(object):
     #   urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        if re.match(r'^(https?://)?(www\.)?t411\.li/torrents/(?!download/)[-A-Za-z0-9+&@#/%|?=~_|!:,.;]+', url):
+        if re.match(r'^(https?://)?(www\.)?t411\.ai/torrents/(?!download/)[-A-Za-z0-9+&@#/%|?=~_|!:,.;]+', url):
             return True
         return False
 
@@ -422,7 +422,7 @@ class UrlRewriteTorrent411(object):
             if match:
                 torrent_id = match.group(1)
                 log.debug("Got the Torrent ID: %s" % torrent_id)
-                entry['url'] = 'http://www.t411.ai/torrents/download/?id=' + torrent_id
+                entry['url'] = 'https://www.t411.ai/torrents/download/?id=' + torrent_id
                 if 'download_auth' in entry:
                     auth_handler = t411Auth(*entry['download_auth'])
                     entry['download_auth'] = auth_handler
