@@ -16,13 +16,28 @@ log = logging.getLogger('search_btn')
 
 
 class SearchBTN(object):
-    schema = {'type': 'string'}
+    schema = {
+        'oneOf': [
+            {
+                'type': 'object',
+                'properties': {
+                    'api_key': {'type': 'string'},
+                    'exact_only': {'type': 'boolean'}
+                },
+                'required': ['api_key'],
+                'additionalProperties': False
+            },
+            {'type': 'string'}
+        ]
+    }
     # Advertised limit is 150/hour (24s/request average). This may need some tweaking.
     request_limiter = TokenBucketLimiter('api.broadcasthe.net/', 100, '25 seconds')
 
     def search(self, task, entry, config):
         task.requests.add_domain_limiter(self.request_limiter)
-        api_key = config
+        if isinstance(config, basestring):
+            config = {'api_key': config}
+        config.setdefault('exact_only', False)
 
         searches = entry.get('search_strings', [entry['title']])
 
@@ -47,14 +62,15 @@ class SearchBTN(object):
                     search['name'] = entry['series_id'] + '%'  # added wildcard search for better results.
             searches = [search]
             # If searching by series name ending in a parenthetical, try again without it if there are no results.
-            if search.get('series') and search['series'].endswith(')'):
+            if search.get('series') and search['series'].endswith(')') and not config.get('exact_only'):
                 match = re.match('(.+)\([^\(\)]+\)$', search['series'])
                 if match:
                     searches.append(dict(search, series=match.group(1).strip()))
 
+        log.debug(searches)
         results = set()
         for search in searches:
-            data = json.dumps({'method': 'getTorrents', 'params': [api_key, search], 'id': 1})
+            data = json.dumps({'method': 'getTorrents', 'params': [config.get('api_key'), search], 'id': 1})
             try:
                 r = task.requests.post('https://api.broadcasthe.net/',
                                        data=data, headers={'Content-type': 'application/json'})
